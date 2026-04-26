@@ -277,7 +277,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.4` abgeschlossen; naechster Claim `93J.5`; kein Push vor Blockabschluss |
+| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.5` abgeschlossen; `93J.6` durch `readyForTraining=false` blockiert; kein Push vor Blockabschluss |
 | - | BT94A | - | frei | wartet auf `BT93J.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -784,7 +784,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93C | Echter PPO-Learner und konservative Baseline | completed | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
 | BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
-| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 | 93J.3 | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
+| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 | 93J.5 abgeschlossen; 93J.6 blockiert | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93J.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2475,10 +2475,10 @@ Closure-Evidence je Blocker:
 
 - [x] DoD.1 BT93J schreibt `start_truth.json` mit aktueller Gate-Lage, Artefakt-Pinning, Scope-Files, No-Go-Regeln und Workspace-SHA. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_start_truth.py --write-reports` -> `data/training/ppo/bt93j/start_truth.json`)
 - [x] DoD.2 Vor jedem Fix, Repair-Lauf, Pilot oder Long-run liegt ein `diagnostic_split_report.json` mit Hauptursache, Gegenprobe und `readyForRepair`/`readyForTraining` vor. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_action_reward_diagnostics.py --write-reports` -> `data/training/ppo/bt93j/diagnostic_split_report.json`)
-- [ ] DoD.3 F.05/F.19/F.27/F.31 werden nur mit versionierter Diagnose-, Run-, Eval-/Holdout- oder Gate-Evidence geschlossen, downgraded oder als Folgeblocker weitergegeben.
+- [x] DoD.3 F.05/F.19/F.27/F.31 werden nur mit versionierter Diagnose-, Run-, Eval-/Holdout- oder Gate-Evidence geschlossen, downgraded oder als Folgeblocker weitergegeben. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_iterative_pilot_readiness.py --write-reports` -> `data/training/ppo/bt93j/pilot_readiness_report.json`)
 - [x] DoD.4 Observation-, Terminal-/Mapping-, Eval-/Matrix-, Action-/Safety- und Reward-/Curriculum-Ursachen sind getrennt bewertet; Reparaturreihenfolge ist dokumentiert. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_action_reward_diagnostics.py --write-reports` -> `data/training/ppo/bt93j/diagnostic_split_report.json`)
 - [x] DoD.5 Jeder Repair ist minimal, adressiert genau eine primaere Hypothese und endet mit Micro-Test oder Diagnose-Reanalyse. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_r1_micro_test.py --write-reports` -> `data/training/ppo/bt93j/r1_micro_test_report.json`)
-- [ ] DoD.6 Pilot, Holdout und Long-run starten nur nach gruener Readiness und aktivem Holdout-Schutz; kein Candidate-, Freeze-, Promote- oder Rollout-Label wird verwendet.
+- [x] DoD.6 Pilot, Holdout und Long-run starten nur nach gruener Readiness und aktivem Holdout-Schutz; kein Candidate-, Freeze-, Promote- oder Rollout-Label wird verwendet. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_iterative_pilot_readiness.py --write-reports` -> `data/training/ppo/bt93j/pilot_readiness_report.json` (`readyForTraining=false`; kein Pilot/Holdout/Long-run))
 - [ ] DoD.7 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json` werden nur aus BT93J-Artefakten refreshed.
 - [ ] DoD.8 BT94A oeffnet nur, wenn `no_start_gate.json` nach BT93J `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `precomparison != ppo-regression` und `bt94aBlockerCount=0` schreibt.
 - [ ] DoD.9 Produktive Runtime-, Matchstart-, AI-Hub-, Strategy-Flag-, Registry-, Rollback-, Rollout-, Authority- und Bridge-Surfaces bleiben unveraendert.
@@ -2522,10 +2522,10 @@ Closure-Evidence je Blocker:
 
 ### 93J.5 Iterativer Diagnose-Repair-Test-Loop und Pilot-Readiness
 
-- [ ] 93J.5.1 Weitere Runden R2/R3 nur mit neuer oder praezisierter Hypothese, aktualisiertem `diagnostic_split_report.json` und neuer Evidence starten.
-- [ ] 93J.5.2 Jede Iteration endet mit `cause-confirmed`, `cause-refuted`, `new-cause` oder `measurement-invalid`; nach drei roten Runden ohne Metrikverbesserung eskalieren.
-- [ ] 93J.5.3 `pilot_readiness_report.json` schreiben; Pilot nur bei gruener Observation, startfaehiger Terminal-Matrix, `runtimeErrorCount=0`, Action-Schwellen und Micro-Test-Trendverbesserung.
-- [ ] 93J.5.4 `readyForTraining=false` blockiert Pilot, Holdout und Long-run.
+- [x] 93J.5.1 Weitere Runden R2/R3 nur mit neuer oder praezisierter Hypothese, aktualisiertem `diagnostic_split_report.json` und neuer Evidence starten. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_iterative_pilot_readiness.py --write-reports` -> `data/training/ppo/bt93j/pilot_readiness_report.json`)
+- [x] 93J.5.2 Jede Iteration endet mit `cause-confirmed`, `cause-refuted`, `new-cause` oder `measurement-invalid`; nach drei roten Runden ohne Metrikverbesserung eskalieren. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_iterative_pilot_readiness.py --write-reports` -> `data/training/ppo/bt93j/pilot_readiness_report.json` (`R1=green`, decision `cause-confirmed`))
+- [x] 93J.5.3 `pilot_readiness_report.json` schreiben; Pilot nur bei gruener Observation, startfaehiger Terminal-Matrix, `runtimeErrorCount=0`, Action-Schwellen und Micro-Test-Trendverbesserung. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_iterative_pilot_readiness.py --write-reports` -> `data/training/ppo/bt93j/pilot_readiness_report.json` (`blockingChecks=terminal_matrix_start_capable,not_player_dead_only,micro_test_trend_improvement`))
+- [x] 93J.5.4 `readyForTraining=false` blockiert Pilot, Holdout und Long-run. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_iterative_pilot_readiness.py --write-reports` -> `data/training/ppo/bt93j/pilot_readiness_report.json`)
 
 ### 93J.6 Pilot, Holdout-Schutz und Vergleich
 
@@ -2588,7 +2588,7 @@ Claim-Grenze vor BT94A:
 Startstatus 2026-04-25:
 
 - `BT94A` bleibt vor `94A.1` geschlossen. (evidence: `data/training/ppo/bt94a/no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression`, `bt94aBlockerCount=4`, Blocker `F.05/F.19/F.27/F.31`))
-- Naechster erlaubter Trainingsclaim vor BT94A ist `BT93J.4`; keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
+- Naechster erlaubter Trainingsclaim vor BT94A ist `93J.6` nur bei `readyForTraining=true`; aktueller `93J.5`-Befund blockiert Pilot, Holdout und Long-run. Keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
 
 ### Definition of Done (DoD)
 

@@ -1,0 +1,204 @@
+{
+  "blockId": "BT93J",
+  "commands": {
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93j_iterative_pilot_readiness.py --write-reports"
+  },
+  "findingImpact": {
+    "F.05": "still-blocking; avgSteps/eval-holdout trend is not repaired by signal-only R1 evidence",
+    "F.19": "still-blocking; real eval/holdout terminal matrix is not start-capable",
+    "F.27": "still-blocking aggregate until F.05/F.19/F.31 clear and no_start_gate can turn green",
+    "F.31": "still-blocking; current evidence remains player-dead-only in real eval/holdout"
+  },
+  "generatedAt": "2026-04-26T00:02:23Z",
+  "generatedBy": "python/scripts/bt93j_iterative_pilot_readiness.py",
+  "gitSha": "e537a395f88573ec0c821c97a05e8f521ab55b44",
+  "guardrails": {
+    "bt94aGateRefresh": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "noGo": [
+      "no BT94A claim, candidate run, freeze candidate, BT94B handover, promote, or rollout-ready result",
+      "no pilot, holdout, long-run, or gate refresh from BT93J.5 while readyForTraining=false",
+      "R2/R3 require a new or refined hypothesis, updated diagnostic split, and new versioned evidence",
+      "R1 green is reward-signal evidence only, not policy-quality, PPO-Validate, or promotion evidence"
+    ],
+    "pilotStarted": false,
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "iterativeLoop": {
+    "currentIteration": "R1",
+    "escalationRequired": false,
+    "iterations": [
+      {
+        "decision": "cause-confirmed",
+        "decisionScope": "reward-signal micro-test only; eval/holdout policy quality and terminal diversity are not proven",
+        "evidence": "data/training/ppo/bt93j/r1_micro_test_report.json",
+        "hypothesis": "Survival-only positive reward plus player-dead-only eval/holdout and step regression remain after observation, terminal mapping, matrix contract, action safety, and PPO learning-metric collapse checks.",
+        "id": "R1",
+        "metricImprovementProven": false,
+        "newRedSymptoms": false,
+        "primaryCauseId": "reward-curriculum-survival-only-player-dead-policy",
+        "repairId": "reward-terminal-loss-signal-r1",
+        "resultClass": "green"
+      }
+    ],
+    "r2r3Gate": {
+      "allowedOnlyWith": [
+        "new or refined primary hypothesis",
+        "updated diagnostic_split_report.json",
+        "new versioned counterprobe evidence",
+        "no pilot, holdout, long-run, or BT94A refresh while readyForTraining=false"
+      ],
+      "currentlyAllowed": false,
+      "r2Started": false,
+      "r3Started": false,
+      "reason": "No R2/R3 starts from a signal-only green R1 without a new hypothesis and evidence."
+    },
+    "redRoundsWithoutMetricImprovement": 0
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93J.5.1": true,
+    "93J.5.2": true,
+    "93J.5.3": true,
+    "93J.5.4": true
+  },
+  "phaseId": "93J.5",
+  "pilotReadiness": {
+    "blockingChecks": [
+      "terminal_matrix_start_capable",
+      "not_player_dead_only",
+      "micro_test_trend_improvement"
+    ],
+    "checks": [
+      {
+        "id": "observation_integrity_green",
+        "observed": {
+          "description": "Observation schema, order, shape, ranges, staleness, sync, and VecNormalize",
+          "evidence": "data/training/ppo/bt93j/observation_integrity_report.json",
+          "green": true,
+          "id": "observation",
+          "notCausal": true,
+          "phase": "93J.1",
+          "repairOnlyIfRed": false,
+          "status": "green"
+        },
+        "ok": true
+      },
+      {
+        "id": "terminal_matrix_start_capable",
+        "observed": {
+          "matrixContractGreen": true,
+          "matrixInputGatesGreen": false,
+          "realEvalStartCapable": false,
+          "terminalMappingGreen": true
+        },
+        "ok": false
+      },
+      {
+        "id": "not_player_dead_only",
+        "observed": {
+          "playerDeadOnly": true,
+          "terminalMappingGate": {
+            "diagnosis": "Headless and Python field contracts can represent player-dead, non-death natural terminal, max-steps, forced-round, timeout, and runtime-failure. Scripted-safe controls reach non-death natural terminals under the eval matrix, while real PPO eval/holdout remain player-dead-only.",
+            "fieldContractOk": true,
+            "green": true,
+            "notCausal": true,
+            "realEvalPlayerDeadOnly": true,
+            "realEvalStartCapable": false
+          }
+        },
+        "ok": false
+      },
+      {
+        "id": "not_max_steps_only",
+        "observed": {
+          "note": "BT93J current red input is player-dead-only, not max-steps-only.",
+          "rewardLanesMaxStepsOnly": false
+        },
+        "ok": true
+      },
+      {
+        "id": "runtime_error_count_zero",
+        "observed": {
+          "runtimeErrorCount": 0
+        },
+        "ok": true
+      },
+      {
+        "id": "action_thresholds_green",
+        "observed": {
+          "diagnosis": "Action safety is not the active root cause: train/eval/holdout telemetry has zero invalid, sanitizer, post-decode clamp, and veto load, with pre-sampling masking applied by the masked semantic action vocabulary.",
+          "green": true,
+          "notCausal": true,
+          "readyForTraining": false
+        },
+        "ok": true
+      },
+      {
+        "id": "micro_test_trend_improvement",
+        "observed": {
+          "metricTrendImprovementProven": false,
+          "r1Green": true,
+          "reason": "R1 only proves a local reward-signal change; it does not prove eval/holdout terminal diversity or avgSteps improvement."
+        },
+        "ok": false
+      }
+    ],
+    "holdoutAllowed": false,
+    "longRunAllowed": false,
+    "pilotAllowed": false,
+    "readyForPilot": false,
+    "readyForTraining": false
+  },
+  "resultClass": "pilot-readiness-blocked",
+  "sourceArtifacts": {
+    "actionPolicyDiagnostics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/action_policy_diagnostics.json",
+      "role": "BT93J action policy diagnostics",
+      "sha256": "57cea8615c52a934e29662342dd8d31f267d3b6f8acad561aa0372487803c186"
+    },
+    "diagnosticSplit": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/diagnostic_split_report.json",
+      "role": "BT93J diagnostic split after R1",
+      "sha256": "aa56438db146afefa143bbcd077d507e253de34fcbd8ef49f4ec5ae67218259e"
+    },
+    "matrixContract": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/matrix_contract_report.json",
+      "role": "BT93J matrix contract report",
+      "sha256": "5b85919191fd2a85f99e6d8d235c43082c7482b5522340e020b0adec6a10714a"
+    },
+    "observationIntegrity": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/observation_integrity_report.json",
+      "role": "BT93J observation integrity report",
+      "sha256": "f2f2cbb13fd68d495f95ff0d0f8bec3fb6a8b13a42f4ad4f6b34e77fea92c654"
+    },
+    "r1MicroTest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/r1_micro_test_report.json",
+      "role": "BT93J R1 micro-test report",
+      "sha256": "d774789c574b89ed2dd191cfcf3eec754cdd8c602a0da9462efca1a7b7f888dc"
+    },
+    "rewardCurriculumDiagnostics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
+      "role": "BT93J reward/curriculum diagnostics",
+      "sha256": "0d4c5d0c103431d6b11d255da9e7195b80c768cdd3bee43a8bb1dc8865ac970f"
+    },
+    "terminalSemantics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/terminal_semantics_report.json",
+      "role": "BT93J terminal semantics report",
+      "sha256": "533377bd01746d8a6ede25b928cc8fa9a4cf16adef733b972aae1d3d04e52d17"
+    }
+  }
+}
