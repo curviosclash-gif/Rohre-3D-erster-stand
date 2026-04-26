@@ -1,0 +1,10 @@
+{
+  "runId": "20260426T084300Z-bt93j-r2-micro-train-counterprobe",
+  "runKind": "bt93j-r2-micro-train-counterprobe",
+  "ok": true,
+  "report": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/training_report.json",
+  "artifactManifest": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/artifact_manifest.json",
+  "model": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/checkpoints/model.zip",
+  "vecnormalize": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/checkpoints/vecnormalize.pkl",
+  "optimizerState": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/checkpoints/optimizer_state.pt"
+}

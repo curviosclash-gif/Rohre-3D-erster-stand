@@ -1,0 +1,344 @@
+{
+  "actionSafetyTelemetry": {
+    "invalidActionRate": 0.0,
+    "ok": true,
+    "postDecodeClampRate": 0.0,
+    "raw": {
+      "fieldCounts": {},
+      "invalidActionCount": 0,
+      "invalidActionRate": 0.0,
+      "maskCount": 0,
+      "maskRate": 0.0,
+      "noopCount": 19,
+      "noopRate": 0.036822,
+      "postDecodeClampCount": 0,
+      "postDecodeClampRate": 0.0,
+      "preSamplingMaskCount": 516,
+      "preSamplingMaskRate": 1.0,
+      "sanitizerCount": 0,
+      "sanitizerRate": 0.0,
+      "sanitizerReasons": {},
+      "totalActions": 516,
+      "vetoCount": 0,
+      "vetoRate": 0.0
+    },
+    "sanitizerRate": 0.0,
+    "vetoRate": 0.0
+  },
+  "avgStepsTrend": {
+    "currentAvgStepsPerEpisodeObserved": 72.833333,
+    "delta": 3.7,
+    "dqnAnchor": 117.525,
+    "improved": true,
+    "priorAvgStepsPerEpisode": 69.133333,
+    "priorEvalRunId": "20260425T153044Z-terminal-curriculum-repair-eval"
+  },
+  "blockId": "BT93J",
+  "classificationRules": {
+    "measurementInvalid": "preconditions or eval episode target are not satisfied",
+    "newRed": "runtime, collapse, or action-safety regression appears",
+    "sameRed": "player-dead-only, terminal matrix not start-capable, or avgSteps trend does not improve",
+    "trendGreen": "runtimeErrorCount=0, action safety green, terminal matrix start-capable, not player-dead-only, naturalTerminalShare>0, and avgSteps trend improves against prior eval"
+  },
+  "commands": {
+    "eval": "python\\.venv\\Scripts\\python.exe python\\eval.py --profile bt93j --run-kind bt93j-r2-micro-train-counterprobe-eval --phase-id 93J.5a --config python\\configs\\ppo_bt93j_r2_micro_train_counterprobe.json --artifact-root data\\training\\ppo\\bt93j --checkpoint data\\training\\ppo\\bt93j\\latest_bt93j_r2_micro_train_counterprobe.json --min-completed-episodes 6 --max-eval-steps 900",
+    "prepare": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93j_r2_micro_train_counterprobe.py --prepare",
+    "train": "python\\.venv\\Scripts\\python.exe python\\train.py --profile bt93j --run-kind bt93j-r2-micro-train-counterprobe --phase-id 93J.5a --config python\\configs\\ppo_bt93j_r2_micro_train_counterprobe.json --artifact-root data\\training\\ppo\\bt93j --checkpoint data\\training\\ppo\\bt93i\\latest_terminal_curriculum_repair.json",
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93j_r2_micro_train_counterprobe.py --write-reports"
+  },
+  "counterprobe": "Run one bounded micro-train from the BT93I model package with R1 reward signals, then eval only on the reserved eval lane; classify trend-green, same-red, new-red, or measurement-invalid. Holdout stays unused.",
+  "evalCounterprobe": {
+    "episodeTargetGate": {
+      "completedEpisodeCount": 6,
+      "enabled": true,
+      "maxEvalSteps": 900,
+      "minCompletedEpisodes": 6,
+      "satisfied": true,
+      "stopReason": "min-completed-episodes",
+      "vectorStepsExecuted": 258
+    },
+    "holdoutUsed": false,
+    "report": "data/training/ppo/bt93j/runs/20260426T084359Z-bt93j-r2-micro-train-counterprobe-eval/eval_report.json",
+    "runId": "20260426T084359Z-bt93j-r2-micro-train-counterprobe-eval",
+    "runKind": "bt93j-r2-micro-train-counterprobe-eval",
+    "seeds": [
+      944,
+      945,
+      946
+    ]
+  },
+  "findingImpact": {
+    "F.05": "still-blocking",
+    "F.19": "still-blocking",
+    "F.27": "aggregate-still-blocked; no BT94A gate refresh in 93J.5a",
+    "F.31": "still-blocking"
+  },
+  "generatedAt": "2026-04-26T08:44:24Z",
+  "generatedBy": "python/scripts/bt93j_r2_micro_train_counterprobe.py",
+  "gitSha": "8c705deb1d4c446c326071f6ace58bb9a3351ed9",
+  "guardrails": {
+    "bt94aGateRefresh": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "longRunStarted": false,
+    "noGo": [
+      "no BT94A claim, candidate run, freeze candidate, BT94B handover, promote, or rollout-ready result",
+      "no holdout, long-run, baseline, PPO-Validate, or pilot from BT93J.5a",
+      "only trend-green may refresh pilot readiness; all other R2 classes block 93J.6",
+      "runtime, AI-Hub, strategy flag, model registry, rollback, bridge, and authority surfaces stay read-only"
+    ],
+    "phase6Allowed": false,
+    "pilotReadinessRefreshAllowed": false,
+    "pilotStarted": false,
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "hypothesis": "R1 reward-signal fix may reduce player-dead-only terminal behavior only if a bounded micro-train shows eval terminal diversity or avgSteps trend improvement without action safety or runtime regression.",
+  "learningMetrics": {
+    "collapseOrInstabilitySignal": false,
+    "collapseThresholds": {
+      "maxApproxKl": 0.2,
+      "maxClipFraction": 0.6,
+      "maxGradNorm": 0.5,
+      "maxValueLoss": 100.0,
+      "minEntropy": 0.01,
+      "minExplainedVariance": -1.0
+    },
+    "metrics": {
+      "approx_kl": 5.474686622619629e-05,
+      "clip_fraction": 0.0,
+      "entropy": 2.189788818359375,
+      "explained_variance": 0.9362999126315117,
+      "grad_norm": {
+        "configuredMaxGradNorm": 0.5,
+        "globalNorm": 0.5,
+        "maxAbsGradient": 0.107387,
+        "observed": true,
+        "tensorCount": 12,
+        "tolerance": 5e-05,
+        "withinConfiguredMaxGradNorm": true
+      },
+      "policy_loss": -0.0010321727022528648,
+      "value_loss": 0.33015332743525505
+    },
+    "rawLoggerKeys": [
+      "train/approx_kl",
+      "train/clip_fraction",
+      "train/clip_range",
+      "train/entropy_loss",
+      "train/explained_variance",
+      "train/learning_rate",
+      "train/loss",
+      "train/n_updates",
+      "train/policy_gradient_loss",
+      "train/value_loss"
+    ],
+    "sampleClass": "bt93j-r2-micro-train-counterprobe-not-candidate",
+    "source": "stable_baselines3.PPO logger after model.learn()",
+    "thresholdStatus": {
+      "approxKlWithinThreshold": true,
+      "clipFractionWithinThreshold": true,
+      "entropyAboveMinimum": true,
+      "explainedVarianceAboveMinimum": true,
+      "gradNormWithinThreshold": true,
+      "valueLossWithinThreshold": true
+    }
+  },
+  "microTrain": {
+    "modelNumTimesteps": 4992,
+    "optimizerUpdatesAfter": 78,
+    "optimizerUpdatesBefore": 62,
+    "optimizerUpdatesCompleted": true,
+    "runId": "20260426T084300Z-bt93j-r2-micro-train-counterprobe",
+    "runKind": "bt93j-r2-micro-train-counterprobe",
+    "seeds": [
+      934,
+      935,
+      936,
+      937
+    ],
+    "timesteps": 1024,
+    "wallClockSeconds": 39.439262
+  },
+  "modelPackage": {
+    "artifactManifest": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/artifact_manifest.json",
+    "configSha256": "c84615fc46dc810cd7fb6b0d630b9e4d8e376eede6dff7bde63f630ced83e637",
+    "modelSha256": "6ca7b32d896cee1079b511d6021530b36d1b756df8f88641c5555dc8e9dcecd0",
+    "normalizeStateSha256": "e089a5feb10234fa933febf7462c98c62e37a650f2de2f3c7cb6e33155779cf5",
+    "optimizerStateSha256": "a10e78f2f0db8a955cfefd10189bdc7c49f7f7e10b3d63cbdc4698c70bd58d01",
+    "sourceArtifactManifest": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json"
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93J.5a.1": true,
+    "93J.5a.2": true,
+    "93J.5a.3": true,
+    "93J.5a.4": true,
+    "93J.5a.5": true
+  },
+  "phaseId": "93J.5a",
+  "preconditions": {
+    "blockingChecks": [
+      "terminal_matrix_start_capable",
+      "not_player_dead_only",
+      "micro_test_trend_improvement"
+    ],
+    "checks": [
+      {
+        "id": "r1_green",
+        "observed": "green",
+        "ok": true
+      },
+      {
+        "id": "ready_for_training_false",
+        "observed": false,
+        "ok": true
+      },
+      {
+        "expected": [
+          "micro_test_trend_improvement",
+          "not_player_dead_only",
+          "terminal_matrix_start_capable"
+        ],
+        "id": "expected_blockers_exact",
+        "observed": [
+          "micro_test_trend_improvement",
+          "not_player_dead_only",
+          "terminal_matrix_start_capable"
+        ],
+        "ok": true
+      },
+      {
+        "id": "diagnostic_primary_cause_pinned",
+        "observed": "reward-curriculum-survival-only-player-dead-policy",
+        "ok": true
+      }
+    ],
+    "ok": true
+  },
+  "resultClass": "same-red",
+  "rewardBreakdown": {
+    "meanPerStep": {
+      "baseStep": 0.0,
+      "checkpointReached": 0.0,
+      "crash": 0.0,
+      "damageDealt": 0.0,
+      "damageTaken": 0.0,
+      "external": 0.0,
+      "itemPickup": 0.0,
+      "itemUse": 0.0,
+      "kill": 0.0,
+      "loss": -0.017442,
+      "lowHealthThreat": 0.0,
+      "opponentRisk": 0.0,
+      "parcoursCompleted": 0.0,
+      "stuck": 0.0,
+      "survival": 0.118605,
+      "survivalPressureBonus": 0.0,
+      "trailRisk": 0.0,
+      "wallRisk": 0.0,
+      "win": 0.0,
+      "wrongOrder": 0.0
+    },
+    "rewardMean": 0.101163,
+    "rewardTotal": 52.199999,
+    "survivalRewardShare": 1.172414,
+    "totals": {
+      "baseStep": 0.0,
+      "checkpointReached": 0.0,
+      "crash": 0.0,
+      "damageDealt": 0.0,
+      "damageTaken": 0.0,
+      "external": 0.0,
+      "itemPickup": 0.0,
+      "itemUse": 0.0,
+      "kill": 0.0,
+      "loss": -9.0,
+      "lowHealthThreat": 0.0,
+      "opponentRisk": 0.0,
+      "parcoursCompleted": 0.0,
+      "stuck": 0.0,
+      "survival": 61.2,
+      "survivalPressureBonus": 0.0,
+      "trailRisk": 0.0,
+      "wallRisk": 0.0,
+      "win": 0.0,
+      "wrongOrder": 0.0
+    }
+  },
+  "sourceArtifacts": {
+    "artifactManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/artifact_manifest.json",
+      "role": "BT93J R2 model package manifest",
+      "sha256": "7f76631f8e4c52d3a50cf5d707f8ce5df167e6e9abe582625e2046103e81b6a1"
+    },
+    "diagnosticSplit": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/diagnostic_split_report.json",
+      "role": "BT93J diagnostic split",
+      "sha256": "fbc3b635104f8c57a3f9487b78c2dd537ac6622b9ef4ef90c51bf050a606a724"
+    },
+    "evalPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93j/latest_bt93j_r2_micro_train_counterprobe_eval.json",
+      "role": "BT93J mutable eval pointer",
+      "sha256": "3dc0a5dc42ea621fc1dcf6ce006738ac3cfdc9086bb48f4f03f71e0fb7fb4c51"
+    },
+    "evalReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/runs/20260426T084359Z-bt93j-r2-micro-train-counterprobe-eval/eval_report.json",
+      "role": "BT93J R2 eval counterprobe report",
+      "sha256": "620335d7cec65ec5b8f6b2e2ee50608c9faf6ce1d0924918ce7182e94251c7cf"
+    },
+    "matrixContract": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/matrix_contract_report.json",
+      "role": "BT93J matrix contract",
+      "sha256": "5b85919191fd2a85f99e6d8d235c43082c7482b5522340e020b0adec6a10714a"
+    },
+    "pilotReadiness": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/pilot_readiness_report.json",
+      "role": "BT93J pilot-readiness gate",
+      "sha256": "4e7610fab87fc1b9c02e372b76895317b51340982e140ab494dc63d721defa2b"
+    },
+    "r1MicroTest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/r1_micro_test_report.json",
+      "role": "BT93J R1 micro-test",
+      "sha256": "d774789c574b89ed2dd191cfcf3eec754cdd8c602a0da9462efca1a7b7f888dc"
+    },
+    "trainPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93j/latest_bt93j_r2_micro_train_counterprobe.json",
+      "role": "BT93J mutable train pointer",
+      "sha256": "b3049ee2165201d65d378395c1a029c6b547b454017953bd5078ba6207878562"
+    },
+    "trainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/training_report.json",
+      "role": "BT93J R2 micro-train report",
+      "sha256": "d15af1af4c0a9c48cc24558cb40f90eac21d9280c15d634c5da12f8961458d83"
+    }
+  },
+  "terminalMatrix": {
+    "deathCauseCounts": {
+      "player-dead": 6
+    },
+    "maxSteps": 0,
+    "naturalTerminal": 0,
+    "naturalTerminalShare": 0.0,
+    "playerDeadOnly": true,
+    "runtimeErrorCount": 0,
+    "startCapableTerminalMatrix": false,
+    "terminalReasonCounts": {
+      "player-dead": 6
+    },
+    "truncatedReasonCounts": {}
+  }
+}

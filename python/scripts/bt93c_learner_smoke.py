@@ -30,6 +30,8 @@ DEFAULT_ARTIFACT_ROOT = REPO_ROOT / "data" / "training" / "ppo" / "bt93c"
 CHECKPOINT_VERSION = "bt93c-ppo-checkpoint-v1"
 _NUMPY_BIT_GENERATOR_PICKLE_COMPAT_INSTALLED = False
 _NUMPY_CORE_MODULE_ALIASES_INSTALLED = False
+BT93J_R2_TRAIN_RUN_KIND = "bt93j-r2-micro-train-counterprobe"
+BT93J_R2_EVAL_RUN_KIND = "bt93j-r2-micro-train-counterprobe-eval"
 
 
 @dataclass(frozen=True)
@@ -206,6 +208,7 @@ def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
         "BT93G": {"93G.5"},
         "BT93H": {"93H.3"},
         "BT93I": {"93I.2"},
+        "BT93J": {"93J.5a"},
     }
     block_id = str(config.get("blockId") or "")
     if block_id not in allowed_scopes or config.get("phaseId") not in allowed_scopes[block_id]:
@@ -228,6 +231,10 @@ def _run_sample_class(run_kind: str) -> str:
         return "bt93i-terminal-curriculum-repair-not-candidate"
     if run_kind == "terminal-curriculum-repair-eval":
         return "bt93i-terminal-curriculum-repair-eval-not-ppo-validate"
+    if run_kind == BT93J_R2_TRAIN_RUN_KIND:
+        return "bt93j-r2-micro-train-counterprobe-not-candidate"
+    if run_kind == BT93J_R2_EVAL_RUN_KIND:
+        return "bt93j-r2-micro-train-counterprobe-eval-not-ppo-validate"
     if run_kind == "repair-diagnostic":
         return "repair-diagnostic-not-candidate"
     if run_kind.startswith("baseline-"):
@@ -240,7 +247,11 @@ def _run_sample_class(run_kind: str) -> str:
 
 
 def _is_diagnostic_run(run_kind: str) -> bool:
-    return run_kind.startswith("diagnostics-") or run_kind == "repair-diagnostic"
+    return (
+        run_kind.startswith("diagnostics-")
+        or run_kind == "repair-diagnostic"
+        or run_kind == BT93J_R2_TRAIN_RUN_KIND
+    )
 
 
 def _is_pilot_run(run_kind: str) -> bool:
@@ -271,11 +282,16 @@ def _is_bt93i_comparable_eval(block_id: str, run_kind: str) -> bool:
     return block_id == "BT93I" and run_kind in {"terminal-curriculum-repair-eval", "holdout-eval"}
 
 
+def _is_bt93j_r2_eval(block_id: str, run_kind: str) -> bool:
+    return block_id == "BT93J" and run_kind == BT93J_R2_EVAL_RUN_KIND
+
+
 def _is_comparable_repair_eval(block_id: str, run_kind: str) -> bool:
     return (
         _is_bt93g_comparable_eval(block_id, run_kind)
         or _is_bt93h_comparable_eval(block_id, run_kind)
         or _is_bt93i_comparable_eval(block_id, run_kind)
+        or _is_bt93j_r2_eval(block_id, run_kind)
     )
 
 
@@ -575,6 +591,9 @@ def _collect_eval_diagnostics(
             "averageBotSurvival": completed_avg if is_baseline else None,
             "averageBotSurvivalReason": average_survival_reason,
             "averageBotSurvivalSource": (
+                "BT93J R2 micro-train counterprobe completed episode length"
+                if _is_bt93j_r2_eval(block_id, run_kind)
+                else
                 "BT93I terminal curriculum repair completed episode length"
                 if _is_bt93i_comparable_eval(block_id, run_kind)
                 else "BT93H comparable terminal repair completed episode length"
@@ -830,6 +849,91 @@ def _validate_gate_inputs(config: Mapping[str, Any]) -> dict[str, Any]:
             "dqnChampion": ((matrix_manifest.get("baseline") or {}).get("dqnChampion") or {}),
         }
 
+    if block_id == "BT93J":
+        diagnostic_split_path = _repo_path(str(artifacts.get("diagnosticSplit")))
+        pilot_readiness_path = _repo_path(str(artifacts.get("pilotReadinessReport")))
+        r1_report_path = _repo_path(str(artifacts.get("r1MicroTestReport")))
+        terminal_report_path = _repo_path(str(artifacts.get("terminalSemanticsReport")))
+        matrix_report_path = _repo_path(str(artifacts.get("matrixContractReport")))
+        action_report_path = _repo_path(str(artifacts.get("actionPolicyDiagnostics")))
+        reward_report_path = _repo_path(str(artifacts.get("rewardCurriculumDiagnostics")))
+
+        diagnostic_split = _read_json(diagnostic_split_path)
+        pilot_readiness = _read_json(pilot_readiness_path)
+        r1_report = _read_json(r1_report_path)
+        terminal_report = _read_json(terminal_report_path)
+        matrix_report = _read_json(matrix_report_path)
+        action_report = _read_json(action_report_path)
+        reward_report = _read_json(reward_report_path)
+
+        blocking_checks = set((pilot_readiness.get("pilotReadiness") or {}).get("blockingChecks") or [])
+        expected_blockers = {
+            "terminal_matrix_start_capable",
+            "not_player_dead_only",
+            "micro_test_trend_improvement",
+        }
+        if r1_report.get("resultClass") != "green":
+            raise RuntimeError("BT93J.5a start is blocked because R1 is not green")
+        if (pilot_readiness.get("pilotReadiness") or {}).get("readyForTraining") is not False:
+            raise RuntimeError("BT93J.5a start requires readyForTraining=false")
+        if blocking_checks != expected_blockers:
+            raise RuntimeError("BT93J.5a start is blocked by unexpected pilot-readiness blockers")
+        if (terminal_report.get("terminalMappingGate") or {}).get("realEvalPlayerDeadOnly") is not True:
+            raise RuntimeError("BT93J.5a start requires player-dead-only R1 counterprobe input")
+        if (action_report.get("actionPolicyGate") or {}).get("green") is not True:
+            raise RuntimeError("BT93J.5a start is blocked by red action telemetry")
+        if (reward_report.get("rewardCurriculumGate") or {}).get("primaryCause") is not True:
+            raise RuntimeError("BT93J.5a start is blocked by missing reward/curriculum primary cause")
+
+        matrix_contract = matrix_report.get("contract") or {}
+        return {
+            "diagnosticSplit": _rel(diagnostic_split_path),
+            "diagnosticSplitSha256": _sha256_file(diagnostic_split_path),
+            "pilotReadinessReport": _rel(pilot_readiness_path),
+            "pilotReadinessReportSha256": _sha256_file(pilot_readiness_path),
+            "r1MicroTestReport": _rel(r1_report_path),
+            "r1MicroTestReportSha256": _sha256_file(r1_report_path),
+            "terminalSemanticsReport": _rel(terminal_report_path),
+            "terminalSemanticsReportSha256": _sha256_file(terminal_report_path),
+            "matrixContractReport": _rel(matrix_report_path),
+            "matrixContractReportSha256": _sha256_file(matrix_report_path),
+            "actionPolicyDiagnostics": _rel(action_report_path),
+            "actionPolicyDiagnosticsSha256": _sha256_file(action_report_path),
+            "rewardCurriculumDiagnostics": _rel(reward_report_path),
+            "rewardCurriculumDiagnosticsSha256": _sha256_file(reward_report_path),
+            "dependencyLockReport": _rel(dependency_report_path),
+            "dependencyLockReportSha256": _sha256_file(dependency_report_path),
+            "cleanEnvReport": _rel(clean_env_report_path),
+            "cleanEnvReportSha256": _sha256_file(clean_env_report_path),
+            "requirements": _rel(requirements_path),
+            "requirementsSha256": _sha256_file(requirements_path),
+            "freezeOk": False,
+            "reAuditRequired": False,
+            "candidateRunsAllowed": False,
+            "promotionAllowed": False,
+            "actionSurfaceId": _action_surface_id(config),
+            "cleanPython": str(clean_env_report.get("cleanPython") or ""),
+            "semanticWindow": {"modeId": matrix_contract.get("modeId")},
+            "matrix": {
+                "matrixId": matrix_report.get("matrixId"),
+                "maps": matrix_contract.get("maps"),
+                "seeds": matrix_contract.get("seeds"),
+                "maxStepsPerEpisode": matrix_contract.get("maxStepsPerEpisode"),
+                "minimumEpisodes": matrix_contract.get("minimumEpisodes"),
+            },
+            "dqnChampion": matrix_contract.get("dqnChampion") or {},
+            "r2StartGate": {
+                "r1Green": True,
+                "readyForTraining": False,
+                "blockingChecks": sorted(blocking_checks),
+                "allowedRunKind": BT93J_R2_TRAIN_RUN_KIND,
+                "holdoutAllowed": False,
+                "candidateRun": False,
+                "freezeCandidate": False,
+            },
+            "diagnosticSplitResultClass": diagnostic_split.get("resultClass"),
+        }
+
     start_manifest_path = _repo_path(str(artifacts.get("startManifest")))
     action_surface_report_path = _repo_path(str(artifacts.get("actionSurfaceReport")))
     start_manifest = _read_json(start_manifest_path)
@@ -996,6 +1100,7 @@ def _write_model_package(
         (block_id == "BT93G" and run_kind == "comparable-repair")
         or (block_id == "BT93H" and run_kind == "comparable-terminal-repair")
         or (block_id == "BT93I" and run_kind == "terminal-curriculum-repair")
+        or (block_id == "BT93J" and run_kind == BT93J_R2_TRAIN_RUN_KIND)
     )
     checkpoint_dir = run_dir / "checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -1157,6 +1262,7 @@ def run_training_from_cli(
         "comparable-repair",
         "comparable-terminal-repair",
         "terminal-curriculum-repair",
+        BT93J_R2_TRAIN_RUN_KIND,
     }:
         raise RuntimeError(f"unsupported BT93C train run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -1181,11 +1287,13 @@ def run_training_from_cli(
         "comparable-repair",
         "comparable-terminal-repair",
         "terminal-curriculum-repair",
+        BT93J_R2_TRAIN_RUN_KIND,
     }:
         prefer_pointer = {
             "resume-smoke": "latest_learner_smoke.json",
             "comparable-repair": "latest_technical_smoke.json",
             "comparable-terminal-repair": "latest_model_package.json",
+            BT93J_R2_TRAIN_RUN_KIND: "latest_model_package.json",
         }.get(run_kind, "latest_model_package.json")
         source_package = _resolve_package(
             checkpoint,
@@ -1203,6 +1311,7 @@ def run_training_from_cli(
         "comparable-repair": "shortRepairTimesteps",
         "comparable-terminal-repair": "terminalRepairTimesteps",
         "terminal-curriculum-repair": "terminalCurriculumSmokeTimesteps",
+        BT93J_R2_TRAIN_RUN_KIND: "r2MicroTrainTimesteps",
     }[run_kind]
     timesteps = int(
         total_timesteps
@@ -1261,6 +1370,7 @@ def run_training_from_cli(
                 (block_id == "BT93G" and run_kind == "comparable-repair")
                 or (block_id == "BT93H" and run_kind == "comparable-terminal-repair")
                 or (block_id == "BT93I" and run_kind == "terminal-curriculum-repair")
+                or (block_id == "BT93J" and run_kind == BT93J_R2_TRAIN_RUN_KIND)
             ),
             "baselineComparable": block_id == "BT93C" and _is_baseline_run(run_kind),
             "ppoLearningMetrics": ppo_metrics,
@@ -1357,6 +1467,7 @@ def run_eval_from_cli(
         "comparable-repair-eval",
         "comparable-terminal-repair-eval",
         "terminal-curriculum-repair-eval",
+        BT93J_R2_EVAL_RUN_KIND,
     }:
         raise RuntimeError(f"unsupported BT93C eval run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -1532,8 +1643,9 @@ def run_eval_from_cli(
             "holdout-eval": "latest_holdout_eval.json",
             "comparable-repair-eval": "latest_comparable_repair_eval.json",
             "comparable-terminal-repair-eval": "latest_comparable_terminal_repair_eval.json",
-            "terminal-curriculum-repair-eval": "latest_terminal_curriculum_repair_eval.json",
-        }.get(run_kind, "latest_eval_smoke.json")
+                "terminal-curriculum-repair-eval": "latest_terminal_curriculum_repair_eval.json",
+                BT93J_R2_EVAL_RUN_KIND: "latest_bt93j_r2_micro_train_counterprobe_eval.json",
+            }.get(run_kind, "latest_eval_smoke.json")
         _write_json(artifact_root_path / pointer_name, pointer)
         print(json.dumps({
             "ok": True,

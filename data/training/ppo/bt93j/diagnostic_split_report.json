@@ -159,9 +159,9 @@
     "resultClass": "causal-chain-register-pinned"
   },
   "counterprobe": "93J.4 R1 micro-test must change only reward/curriculum pressure and is expected to improve terminal diversity or avgSteps trend while action telemetry remains green; otherwise the primary cause is refuted.",
-  "generatedAt": "2026-04-26T00:02:23Z",
-  "generatedBy": "python/scripts/bt93j_iterative_pilot_readiness.py",
-  "gitSha": "e537a395f88573ec0c821c97a05e8f521ab55b44",
+  "generatedAt": "2026-04-26T08:44:24Z",
+  "generatedBy": "python/scripts/bt93j_r2_micro_train_counterprobe.py",
+  "gitSha": "8c705deb1d4c446c326071f6ace58bb9a3351ed9",
   "guardrails": {
     "bt94aCheckboxClosed": false,
     "candidateRun": false,
@@ -178,7 +178,7 @@
     "runtimeSurfacesTouched": []
   },
   "iterativeLoop": {
-    "currentIteration": "R1",
+    "currentIteration": "R2",
     "iterations": [
       {
         "decision": "cause-confirmed",
@@ -191,20 +191,38 @@
         "primaryCauseId": "reward-curriculum-survival-only-player-dead-policy",
         "repairId": "reward-terminal-loss-signal-r1",
         "resultClass": "green"
+      },
+      {
+        "candidateRun": false,
+        "counterprobe": "Run one bounded micro-train from the BT93I model package with R1 reward signals, then eval only on the reserved eval lane; classify trend-green, same-red, new-red, or measurement-invalid. Holdout stays unused.",
+        "decision": "same-red",
+        "evalRunId": "20260426T084359Z-bt93j-r2-micro-train-counterprobe-eval",
+        "evalRunKind": "bt93j-r2-micro-train-counterprobe-eval",
+        "evidence": "data/training/ppo/bt93j/r2_micro_train_counterprobe_report.json",
+        "freezeCandidate": false,
+        "holdoutUsed": false,
+        "hypothesis": "R1 reward-signal fix may reduce player-dead-only terminal behavior only if a bounded micro-train shows eval terminal diversity or avgSteps trend improvement without action safety or runtime regression.",
+        "id": "R2",
+        "metricImprovementProven": false,
+        "newRedSymptoms": false,
+        "resultClass": "same-red",
+        "runId": "20260426T084300Z-bt93j-r2-micro-train-counterprobe",
+        "runKind": "bt93j-r2-micro-train-counterprobe",
+        "status": "completed"
       }
     ],
     "path": "data/training/ppo/bt93j/pilot_readiness_report.json",
     "r2r3Gate": {
       "allowedOnlyWith": [
-        "new or refined primary hypothesis",
-        "updated diagnostic_split_report.json",
-        "new versioned counterprobe evidence",
-        "no pilot, holdout, long-run, or BT94A refresh while readyForTraining=false"
+        "R1 green",
+        "readyForTraining=false",
+        "exact blockers terminal_matrix_start_capable, not_player_dead_only, micro_test_trend_improvement",
+        "new R2 counterprobe evidence"
       ],
       "currentlyAllowed": false,
-      "r2Started": false,
+      "r2Started": true,
       "r3Started": false,
-      "reason": "No R2/R3 starts from a signal-only green R1 without a new hypothesis and evidence."
+      "reason": "Run one bounded micro-train from the BT93I model package with R1 reward signals, then eval only on the reserved eval lane; classify trend-green, same-red, new-red, or measurement-invalid. Holdout stays unused."
     }
   },
   "matrixContract": {
@@ -260,9 +278,14 @@
     "93J.5.1": true,
     "93J.5.2": true,
     "93J.5.3": true,
-    "93J.5.4": true
+    "93J.5.4": true,
+    "93J.5a.1": true,
+    "93J.5a.2": true,
+    "93J.5a.3": true,
+    "93J.5a.4": true,
+    "93J.5a.5": true
   },
-  "phaseId": "93J.5",
+  "phaseId": "93J.5a",
   "pilotReadiness": {
     "blockingChecks": [
       "terminal_matrix_start_capable",
@@ -294,6 +317,13 @@
     "r1Id": "reward-terminal-loss-signal-r1",
     "resultClass": "green",
     "sameRed": false
+  },
+  "r2MicroTrainCounterprobe": {
+    "holdoutUsed": false,
+    "path": "data/training/ppo/bt93j/r2_micro_train_counterprobe_report.json",
+    "pilotReadinessRefreshAllowed": false,
+    "resultClass": "same-red",
+    "trendGreen": false
   },
   "readyForRepair": false,
   "readyForTraining": false,
