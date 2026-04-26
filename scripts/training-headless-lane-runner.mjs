@@ -42,6 +42,79 @@ const DEFAULT_ACK_TIMEOUT_MS = 2_000;
 const DEFAULT_BRIDGE_READY_TIMEOUT_MS = 8_000;
 const DEFAULT_STATS_TIMEOUT_MS = 2_000;
 const KERNEL_RUNNING_LIFECYCLES = new Set(['running', 'round_end', 'match_end']);
+export const BT93J_REWARD_CURRICULUM_PROOF_PROFILE_ID = 'bt93j-reward-curriculum-proof-v1';
+
+const BT93J_PROOF_REWARD_WEIGHTS = Object.freeze({
+    baseStep: -0.005,
+    survival: 0.04,
+    survivalPressureBonus: 0.02,
+    kill: 1,
+    crash: -7,
+    stuck: -0.5,
+    itemPickup: 0.08,
+    itemUse: 0.03,
+    damageDealt: 0.02,
+    damageTaken: -0.18,
+    wallRisk: -0.1,
+    trailRisk: -0.16,
+    opponentRisk: -0.1,
+    lowHealthThreat: -0.3,
+    win: 2.5,
+    loss: -4,
+    checkpointReached: 0.75,
+    parcoursCompleted: 2,
+    wrongOrder: -0.3,
+});
+
+const BT93J_PROOF_CURRICULUM_STAGES = Object.freeze([
+    Object.freeze({
+        name: 'bt93j-proof-terminal-pressure',
+        minSteps: 0,
+        weightOverrides: Object.freeze({
+            survival: 0.04,
+            survivalPressureBonus: 0.02,
+            baseStep: -0.005,
+            loss: -4,
+            win: 2.5,
+            checkpointReached: 0.75,
+        }),
+    }),
+    Object.freeze({
+        name: 'bt93j-proof-diversity-pressure',
+        minSteps: 250_000,
+        weightOverrides: Object.freeze({
+            survival: 0.03,
+            survivalPressureBonus: 0.015,
+            baseStep: -0.006,
+            loss: -4.5,
+            win: 3,
+            checkpointReached: 0.9,
+        }),
+    }),
+]);
+
+export function resolveHeadlessRewardProfile(profileId = '') {
+    if (String(profileId || '') === BT93J_REWARD_CURRICULUM_PROOF_PROFILE_ID) {
+        return {
+            profileId: BT93J_REWARD_CURRICULUM_PROOF_PROFILE_ID,
+            active: true,
+            runKindBound: ['bt93j-user-owned-1m-proof-longrun'],
+            rewardCalculatorOptions: {
+                weights: BT93J_PROOF_REWARD_WEIGHTS,
+                curriculum: true,
+                curriculumStages: BT93J_PROOF_CURRICULUM_STAGES,
+            },
+            intent: 'BT93J.5b proof lane: player-dead-only must be net-negative; non-death natural terminal remains separately positive.',
+        };
+    }
+    return {
+        profileId: 'default-training-reward-v1',
+        active: false,
+        runKindBound: [],
+        rewardCalculatorOptions: {},
+        intent: 'default training reward semantics',
+    };
+}
 
 if (typeof globalThis.WebSocket !== 'function') {
     globalThis.WebSocket = WebSocket;
@@ -190,12 +263,18 @@ export function buildHeadlessTrainingRewardSignals(episode = {}, context = {}) {
     const terminalReason = normalizeReason(episode?.terminalReason, '');
     const terminalReasonLower = terminalReason.toLowerCase();
     const deathLikeTerminal = done && isDeathLikeTerminalReason(terminalReason);
+    const proofProfileActive = String(context.rewardProfileId || '') === BT93J_REWARD_CURRICULUM_PROOF_PROFILE_ID;
     const signals = {
         survival: done !== true && truncated !== true,
         lost: deathLikeTerminal || terminalReasonLower === 'match-loss',
-        won: terminalReasonLower === 'match-win',
+        won: terminalReasonLower === 'match-win'
+            || (proofProfileActive && done && !deathLikeTerminal && terminalReasonLower === TRAINING_TERMINAL_REASONS.MATCH_ENDED),
         crashed: terminalReasonLower.includes('crash'),
     };
+    if (proofProfileActive && context.progressEvent === true) {
+        signals.parcoursEnabled = true;
+        signals.checkpointReached = 1;
+    }
     if (Number.isFinite(Number(context.totalEnvSteps))) {
         signals.totalEnvSteps = Number(context.totalEnvSteps);
     }
@@ -284,6 +363,7 @@ export class HeadlessLaneStepRunner {
         episodeIdPrefix = 'headless-lane',
         environmentProfile = DEFAULT_ENVIRONMENT_PROFILE,
         laneWorkerCount = DEFAULT_LANE_WORKER_COUNT,
+        rewardProfileId = '',
     } = {}) {
         this.runtime = runtime;
         this.trainingAdapter = trainingAdapter;
@@ -296,7 +376,8 @@ export class HeadlessLaneStepRunner {
         this.episodeController = new EpisodeController({
             defaultMaxSteps: maxSteps,
         });
-        this.rewardCalculator = new RewardCalculator();
+        this.rewardProfile = resolveHeadlessRewardProfile(rewardProfileId);
+        this.rewardCalculator = new RewardCalculator(this.rewardProfile.rewardCalculatorOptions);
         this.observationTracker = new RuntimeNearObservationTracker();
         this._actionScratch = createNeutralBotAction({});
         this._observationScratch = null;
@@ -355,6 +436,11 @@ export class HeadlessLaneStepRunner {
             lane: {
                 workerCount: this.laneWorkerCount,
                 seed: this.seed,
+            },
+            rewardProfile: {
+                profileId: this.rewardProfile.profileId,
+                active: this.rewardProfile.active,
+                runKindBound: this.rewardProfile.runKindBound,
             },
             kernel: {
                 surface: MATCH_KERNEL_SURFACES.HEADLESS,
@@ -474,6 +560,7 @@ export class HeadlessLaneStepRunner {
         });
         const reward = this.rewardCalculator.compute(buildHeadlessTrainingRewardSignals(episode, {
             totalEnvSteps: tickIndex + 1,
+            rewardProfileId: this.rewardProfile.profileId,
         }), episode);
         return buildTrainingStepContract({
             mode: this.mode,
@@ -523,6 +610,7 @@ export class HeadlessBoundaryController {
             episodeIdPrefix: String(options.episodeIdPrefix || 'headless-lane'),
             environmentProfile: String(options.environmentProfile || DEFAULT_ENVIRONMENT_PROFILE),
             laneWorkerCount: Math.max(1, Number(options.laneWorkerCount ?? DEFAULT_LANE_WORKER_COUNT)),
+            rewardProfileId: String(options.rewardProfileId || ''),
         };
         this.readyPayload = null;
         this.settings = null;
@@ -574,6 +662,7 @@ export class HeadlessBoundaryController {
             episodeIdPrefix: this.options.episodeIdPrefix,
             environmentProfile: this.options.environmentProfile,
             laneWorkerCount: this.options.laneWorkerCount,
+            rewardProfileId: this.options.rewardProfileId,
         });
         this.facade = new TrainingTransportFacade({
             bridge: this.bridge,
@@ -628,6 +717,7 @@ export class HeadlessBoundaryController {
                 headlessRuntimeContractVersion: MATCH_KERNEL_HEADLESS_RUNTIME_CONTRACT_VERSION,
                 trainingAdapterContractVersion: MATCH_KERNEL_TRAINING_ADAPTER_CONTRACT_VERSION,
                 surface: this.runtime.getConsumerDescriptors?.()?.training?.profile?.surface || MATCH_KERNEL_SURFACES.HEADLESS,
+                rewardProfile: this.stepRunner?.rewardProfile || null,
             },
         };
     }

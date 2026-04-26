@@ -74,6 +74,7 @@ def main() -> None:
         "comparable-terminal-repair": "93H.3.3",
         "terminal-curriculum-repair": "93I.3.2",
         "bt93j-r2-micro-train-counterprobe": "93J.5a",
+        "bt93j-user-owned-1m-proof-longrun": "93J.5c",
     }
     phase_id = args.phase_id or default_phase_ids.get(run_kind, "93C.3.1")
     from scripts.bt93c_learner_smoke import run_training_from_cli as run_bt93c_training_from_cli

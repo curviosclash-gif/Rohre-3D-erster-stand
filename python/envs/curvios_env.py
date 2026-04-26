@@ -120,23 +120,27 @@ class _ControllerProcess:
         seed: int,
         session_id: str,
         node_executable: str = "node",
+        reward_profile_id: str | None = None,
     ) -> None:
         self._stderr_lines: list[str] = []
         self._responses: queue.Queue[dict[str, Any]] = queue.Queue()
         self._request_lock = threading.Lock()
+        command = [
+            node_executable,
+            str(CONTROLLER_SCRIPT_PATH),
+            "--port",
+            str(port),
+            "--max-steps",
+            str(max_steps),
+            "--seed",
+            str(seed),
+            "--session-id",
+            session_id,
+        ]
+        if reward_profile_id:
+            command.extend(["--reward-profile-id", str(reward_profile_id)])
         self._process = subprocess.Popen(
-            [
-                node_executable,
-                str(CONTROLLER_SCRIPT_PATH),
-                "--port",
-                str(port),
-                "--max-steps",
-                str(max_steps),
-                "--seed",
-                str(seed),
-                "--session-id",
-                session_id,
-            ],
+            command,
             cwd=str(REPO_ROOT),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
@@ -227,6 +231,7 @@ class CurviosEnv(gym.Env[np.ndarray, dict[str, Any]]):
         session_id: str = "bt92-curvios-env",
         node_executable: str = "node",
         controller_timeout_seconds: float = DEFAULT_COMMAND_TIMEOUT_SECONDS,
+        reward_profile_id: str | None = None,
     ) -> None:
         super().__init__()
         self._max_steps = int(max_steps)
@@ -234,6 +239,7 @@ class CurviosEnv(gym.Env[np.ndarray, dict[str, Any]]):
         self._session_id = session_id
         self._node_executable = node_executable
         self._controller_timeout_seconds = float(controller_timeout_seconds)
+        self._reward_profile_id = reward_profile_id
         self._controller: _ControllerProcess | None = None
         self._sidecar: Bt92ControlledBridgeSidecar | None = None
         self._sidecar_runner: _SidecarRunner | None = None
@@ -275,6 +281,7 @@ class CurviosEnv(gym.Env[np.ndarray, dict[str, Any]]):
             seed=normalized_seed,
             session_id=f"{self._session_id}-{normalized_seed}",
             node_executable=self._node_executable,
+            reward_profile_id=self._reward_profile_id,
         )
         self._active_seed = normalized_seed
 

@@ -18,6 +18,7 @@ function parseArgs(argv) {
         maxSteps: 100,
         seed: 91,
         sessionId: 'bt92-single-env',
+        rewardProfileId: '',
     };
     for (let index = 2; index < argv.length; index += 1) {
         const value = argv[index];
@@ -38,6 +39,11 @@ function parseArgs(argv) {
         }
         if (value === '--session-id') {
             options.sessionId = String(argv[index + 1] || options.sessionId);
+            index += 1;
+            continue;
+        }
+        if (value === '--reward-profile-id') {
+            options.rewardProfileId = String(argv[index + 1] || '');
             index += 1;
         }
     }

@@ -32,6 +32,7 @@ _NUMPY_BIT_GENERATOR_PICKLE_COMPAT_INSTALLED = False
 _NUMPY_CORE_MODULE_ALIASES_INSTALLED = False
 BT93J_R2_TRAIN_RUN_KIND = "bt93j-r2-micro-train-counterprobe"
 BT93J_R2_EVAL_RUN_KIND = "bt93j-r2-micro-train-counterprobe-eval"
+BT93J_USER_OWNED_PROOF_LONGRUN_KIND = "bt93j-user-owned-1m-proof-longrun"
 
 
 @dataclass(frozen=True)
@@ -208,7 +209,7 @@ def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
         "BT93G": {"93G.5"},
         "BT93H": {"93H.3"},
         "BT93I": {"93I.2"},
-        "BT93J": {"93J.5a"},
+        "BT93J": {"93J.5a", "93J.5b"},
     }
     block_id = str(config.get("blockId") or "")
     if block_id not in allowed_scopes or config.get("phaseId") not in allowed_scopes[block_id]:
@@ -235,6 +236,8 @@ def _run_sample_class(run_kind: str) -> str:
         return "bt93j-r2-micro-train-counterprobe-not-candidate"
     if run_kind == BT93J_R2_EVAL_RUN_KIND:
         return "bt93j-r2-micro-train-counterprobe-eval-not-ppo-validate"
+    if run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND:
+        return "bt93j-user-owned-1m-proof-longrun-not-candidate"
     if run_kind == "repair-diagnostic":
         return "repair-diagnostic-not-candidate"
     if run_kind.startswith("baseline-"):
@@ -251,6 +254,7 @@ def _is_diagnostic_run(run_kind: str) -> bool:
         run_kind.startswith("diagnostics-")
         or run_kind == "repair-diagnostic"
         or run_kind == BT93J_R2_TRAIN_RUN_KIND
+        or run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND
     )
 
 
@@ -865,6 +869,81 @@ def _validate_gate_inputs(config: Mapping[str, Any]) -> dict[str, Any]:
         matrix_report = _read_json(matrix_report_path)
         action_report = _read_json(action_report_path)
         reward_report = _read_json(reward_report_path)
+        phase_id = str(config.get("phaseId") or "")
+
+        if phase_id == "93J.5b":
+            r2_report_path = _repo_path(str(artifacts.get("r2CounterprobeReport")))
+            proof_lane_path = _repo_path(str(artifacts.get("rewardCurriculumProofLaneReport")))
+            longrun_readiness_path = _repo_path(str(artifacts.get("userOwned1mLongrunReadinessReport")))
+            r2_report = _read_json(r2_report_path)
+            proof_lane = _read_json(proof_lane_path)
+            longrun_readiness = _read_json(longrun_readiness_path)
+
+            if r2_report.get("resultClass") != "same-red":
+                raise RuntimeError("BT93J.5c proof longrun requires R2=same-red as the pinned start finding")
+            if proof_lane.get("resultClass") != "reward-curriculum-proof-lane-ready":
+                raise RuntimeError("BT93J.5c proof longrun is blocked by red proof-lane report")
+            if longrun_readiness.get("readyForUserOwnedLongrun") is not True:
+                raise RuntimeError("BT93J.5c proof longrun readiness is not green")
+            if (action_report.get("actionPolicyGate") or {}).get("green") is not True:
+                raise RuntimeError("BT93J.5c proof longrun is blocked by red action telemetry")
+            if (longrun_readiness.get("guardrails") or {}).get("holdoutUsed") is not False:
+                raise RuntimeError("BT93J.5c proof longrun cannot consume holdout")
+            if (longrun_readiness.get("guardrails") or {}).get("candidateRun") is not False:
+                raise RuntimeError("BT93J.5c proof longrun cannot be a candidate run")
+            if str((config.get("env") or {}).get("rewardProfileId") or "") != "bt93j-reward-curriculum-proof-v1":
+                raise RuntimeError("BT93J.5c proof longrun requires the BT93J reward/curriculum proof profile")
+
+            matrix_contract = matrix_report.get("contract") or {}
+            return {
+                "diagnosticSplit": _rel(diagnostic_split_path),
+                "diagnosticSplitSha256": _sha256_file(diagnostic_split_path),
+                "r2CounterprobeReport": _rel(r2_report_path),
+                "r2CounterprobeReportSha256": _sha256_file(r2_report_path),
+                "rewardCurriculumProofLaneReport": _rel(proof_lane_path),
+                "rewardCurriculumProofLaneReportSha256": _sha256_file(proof_lane_path),
+                "userOwned1mLongrunReadinessReport": _rel(longrun_readiness_path),
+                "userOwned1mLongrunReadinessReportSha256": _sha256_file(longrun_readiness_path),
+                "actionPolicyDiagnostics": _rel(action_report_path),
+                "actionPolicyDiagnosticsSha256": _sha256_file(action_report_path),
+                "rewardCurriculumDiagnostics": _rel(reward_report_path),
+                "rewardCurriculumDiagnosticsSha256": _sha256_file(reward_report_path),
+                "terminalSemanticsReport": _rel(terminal_report_path),
+                "terminalSemanticsReportSha256": _sha256_file(terminal_report_path),
+                "matrixContractReport": _rel(matrix_report_path),
+                "matrixContractReportSha256": _sha256_file(matrix_report_path),
+                "dependencyLockReport": _rel(dependency_report_path),
+                "dependencyLockReportSha256": _sha256_file(dependency_report_path),
+                "cleanEnvReport": _rel(clean_env_report_path),
+                "cleanEnvReportSha256": _sha256_file(clean_env_report_path),
+                "requirements": _rel(requirements_path),
+                "requirementsSha256": _sha256_file(requirements_path),
+                "freezeOk": False,
+                "reAuditRequired": False,
+                "candidateRunsAllowed": False,
+                "promotionAllowed": False,
+                "actionSurfaceId": _action_surface_id(config),
+                "rewardProfileId": str((config.get("env") or {}).get("rewardProfileId") or ""),
+                "cleanPython": str(clean_env_report.get("cleanPython") or ""),
+                "semanticWindow": {"modeId": matrix_contract.get("modeId")},
+                "matrix": {
+                    "matrixId": matrix_report.get("matrixId"),
+                    "maps": matrix_contract.get("maps"),
+                    "seeds": matrix_contract.get("seeds"),
+                    "maxStepsPerEpisode": matrix_contract.get("maxStepsPerEpisode"),
+                    "minimumEpisodes": matrix_contract.get("minimumEpisodes"),
+                },
+                "dqnChampion": matrix_contract.get("dqnChampion") or {},
+                "userOwnedProofLongrunGate": {
+                    "readyForUserOwnedLongrun": True,
+                    "allowedRunKind": BT93J_USER_OWNED_PROOF_LONGRUN_KIND,
+                    "totalTimesteps": (config.get("rollout") or {}).get("userOwnedProofLongrunTimesteps"),
+                    "holdoutAllowed": False,
+                    "candidateRun": False,
+                    "freezeCandidate": False,
+                },
+                "diagnosticSplitResultClass": diagnostic_split.get("resultClass"),
+            }
 
         blocking_checks = set((pilot_readiness.get("pilotReadiness") or {}).get("blockingChecks") or [])
         expected_blockers = {
@@ -974,6 +1053,7 @@ def _make_env_factory(
     max_steps: int,
     timeout_seconds: float,
     action_surface_id: str | None,
+    reward_profile_id: str | None,
 ) -> Any:
     def _factory() -> Any:
         env = make_curvios_action_wrapper(
@@ -982,6 +1062,7 @@ def _make_env_factory(
                 default_seed=seed,
                 session_id=f"{run_id}-env{env_index}",
                 controller_timeout_seconds=timeout_seconds,
+                reward_profile_id=reward_profile_id,
             ),
             surface_id=action_surface_id,
         )
@@ -1004,6 +1085,7 @@ def _build_vec_env(
     max_steps = int(env_cfg["maxStepsPerEpisode"])
     timeout_seconds = float(env_cfg.get("controllerTimeoutSeconds") or DEFAULT_COMMAND_TIMEOUT_SECONDS)
     action_surface_id = _action_surface_id(config)
+    reward_profile_id = str(env_cfg.get("rewardProfileId") or "") or None
     base_env = DummyVecEnv([
         _make_env_factory(
             seed=int(seed),
@@ -1012,6 +1094,7 @@ def _build_vec_env(
             max_steps=max_steps,
             timeout_seconds=timeout_seconds,
             action_surface_id=action_surface_id,
+            reward_profile_id=reward_profile_id,
         )
         for index, seed in enumerate(seeds)
     ])
@@ -1101,6 +1184,7 @@ def _write_model_package(
         or (block_id == "BT93H" and run_kind == "comparable-terminal-repair")
         or (block_id == "BT93I" and run_kind == "terminal-curriculum-repair")
         or (block_id == "BT93J" and run_kind == BT93J_R2_TRAIN_RUN_KIND)
+        or (block_id == "BT93J" and run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND)
     )
     checkpoint_dir = run_dir / "checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -1263,6 +1347,7 @@ def run_training_from_cli(
         "comparable-terminal-repair",
         "terminal-curriculum-repair",
         BT93J_R2_TRAIN_RUN_KIND,
+        BT93J_USER_OWNED_PROOF_LONGRUN_KIND,
     }:
         raise RuntimeError(f"unsupported BT93C train run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -1288,12 +1373,14 @@ def run_training_from_cli(
         "comparable-terminal-repair",
         "terminal-curriculum-repair",
         BT93J_R2_TRAIN_RUN_KIND,
+        BT93J_USER_OWNED_PROOF_LONGRUN_KIND,
     }:
         prefer_pointer = {
             "resume-smoke": "latest_learner_smoke.json",
             "comparable-repair": "latest_technical_smoke.json",
             "comparable-terminal-repair": "latest_model_package.json",
             BT93J_R2_TRAIN_RUN_KIND: "latest_model_package.json",
+            BT93J_USER_OWNED_PROOF_LONGRUN_KIND: "latest_model_package.json",
         }.get(run_kind, "latest_model_package.json")
         source_package = _resolve_package(
             checkpoint,
@@ -1312,6 +1399,7 @@ def run_training_from_cli(
         "comparable-terminal-repair": "terminalRepairTimesteps",
         "terminal-curriculum-repair": "terminalCurriculumSmokeTimesteps",
         BT93J_R2_TRAIN_RUN_KIND: "r2MicroTrainTimesteps",
+        BT93J_USER_OWNED_PROOF_LONGRUN_KIND: "userOwnedProofLongrunTimesteps",
     }[run_kind]
     timesteps = int(
         total_timesteps
@@ -1371,6 +1459,7 @@ def run_training_from_cli(
                 or (block_id == "BT93H" and run_kind == "comparable-terminal-repair")
                 or (block_id == "BT93I" and run_kind == "terminal-curriculum-repair")
                 or (block_id == "BT93J" and run_kind == BT93J_R2_TRAIN_RUN_KIND)
+                or (block_id == "BT93J" and run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND)
             ),
             "baselineComparable": block_id == "BT93C" and _is_baseline_run(run_kind),
             "ppoLearningMetrics": ppo_metrics,
