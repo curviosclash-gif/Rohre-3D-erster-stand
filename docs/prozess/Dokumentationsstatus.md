@@ -5,9 +5,7 @@ Modus: sync
 Gate: PASS
 
 ## Automatisch aktualisiert
-- docs/referenz/ai_project_onboarding.md
-- docs/referenz/ai_architecture_context.md
-- docs/referenz/architektur_ausfuehrlich.md
+- Keine inhaltlichen Datumsupdates noetig.
 
 ## Pflichtdateien
 - Alle Pflichtdateien vorhanden.
