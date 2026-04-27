@@ -103,7 +103,7 @@ test.describe('V59-59.7.3: Network Adapter Robustness', () => {
         expect(state.discoveryProviderKind).toBe('browser-demo');
         expect(state.discoveryReason).toBe('desktop_only');
         expect(state.hostAvailable).toBe(false);
-        expect(state.hostProviderKind).toBe('browser-demo');
+        expect(state.hostProviderKind).toBe('unavailable');
         expect(state.hostReason).toBe('desktop_only');
     });
 });
