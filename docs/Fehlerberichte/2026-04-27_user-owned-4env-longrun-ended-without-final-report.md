@@ -10,7 +10,10 @@ Der User-owned Survival-Longrun wurde nach dem 2-Env-Start bei 200000 Steps auf
 
 ## Fehlerbild
 
-- Der 4-Env-Prozess war spaeter nicht mehr aktiv.
+- Der 4-Env-Prozess war spaeter nicht mehr aktiv; die zusaetzliche Stop-Spur
+  `logs/training/user-owned-survival-stop/20260427T124452.stop.json` zeigt
+  einen externen Force-Stop nach `step_0600000`, aber keinen finalen
+  Runner-Abschlussreport.
 - `stderr` war leer.
 - Artefakte existieren bis `step_0600000`.
 - Es gibt keinen finalen `training_report.json`.
@@ -21,6 +24,7 @@ Der User-owned Survival-Longrun wurde nach dem 2-Env-Start bei 200000 Steps auf
 
 - `data/training/ppo/user-owned-survival-3m-4env/`
 - `logs/training/user-owned-survival-3m-4env/`
+- `logs/training/user-owned-survival-stop/20260427T124452.stop.json`
 - `dev/scripts/switch-user-owned-ppo-survival-to-4env-at-next-checkpoint.ps1`
 
 ## Befund
@@ -28,6 +32,11 @@ Der User-owned Survival-Longrun wurde nach dem 2-Env-Start bei 200000 Steps auf
 Die vorhandenen Snapshots sind als Diagnose brauchbar, aber der Lauf ist nicht
 abschlussfaehig. Ohne finalen Report fehlen Exit-Code, finaler Snapshot-Status,
 komplette Guardrails und maschinenlesbare Abschlussklasse.
+
+Der Stop-Report beweist nur, dass Prozesse nach `step_0600000` beendet wurden
+und `technicalStopOk=true` fuer diesen Snapshot galt. Er ersetzt keinen
+geordneten Runner-Abschluss, keine vollstaendige Longrun-Klassifizierung und
+keine Plan-Closure-Evidence.
 
 Zusatzbefunde:
 
@@ -40,13 +49,13 @@ Zusatzbefunde:
 
 ## Root Cause
 
-Wahrscheinlich operativer Runner-/Supervisor-Mangel, nicht PPO-Crash mit klarer
+Operativer Runner-/Supervisor-Mangel, nicht PPO-Crash mit klarer
 Exception:
 
 - Detached Start loggt keinen verlässlichen Exit-Code in ein finales Artefakt.
 - Kein Watchdog schreibt bei Prozessende zwingend einen Abschlussreport.
 - Kein Supervisor unterscheidet sauber: normaler Stop, User-Stop,
-  Prozessabbruch, Systemsleep, Terminal-Close, Sidecar-Ende.
+  Prozessabbruch, Systemsleep, Terminal-Close, Sidecar-Ende oder Force-Stop.
 
 ## Status
 
