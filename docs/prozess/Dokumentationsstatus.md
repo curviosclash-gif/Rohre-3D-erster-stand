@@ -1,11 +1,13 @@
 # Dokumentationsstatus
 
-Stand: 2026-04-26
+Stand: 2026-04-27
 Modus: sync
 Gate: PASS
 
 ## Automatisch aktualisiert
-- Keine inhaltlichen Datumsupdates noetig.
+- docs/referenz/ai_project_onboarding.md
+- docs/referenz/ai_architecture_context.md
+- docs/referenz/architektur_ausfuehrlich.md
 
 ## Pflichtdateien
 - Alle Pflichtdateien vorhanden.
@@ -22,4 +24,4 @@ Gate: PASS
 - docs/plaene/aktiv/V91.md: Zeilen 87, 132
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-04-26).
+- Dokumentation aktuell (geprueft am 2026-04-27).
