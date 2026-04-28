@@ -1,0 +1,170 @@
+{
+  "blockId": "BT93L",
+  "calibrationGates": {
+    "hazardNegative": true,
+    "maxStepOnlyNonSuccess": true,
+    "noopPlateauNonSuccess": true,
+    "objectiveDominatesProgressStep": true,
+    "playerDeadNegative": true,
+    "profileSourceVerified": true,
+    "progressDominatesNoop": true,
+    "progressReportStillGreen": true,
+    "survivalOnlyNonPositive": true,
+    "truthSignsOk": true,
+    "truthTableComplete": true
+  },
+  "commands": {
+    "write": "python python/scripts/bt93l_reward_balance.py --write-report"
+  },
+  "distributions": {
+    "max-step-only": {
+      "episodeClass": "truncation",
+      "episodeTotalReward": -0.72,
+      "maxSteps": 180,
+      "perStepReward": -0.004,
+      "source": "task_metric_contract.json + reward_signal_truth_table.json",
+      "successEligible": false
+    },
+    "noop-plateau": {
+      "label": "noop-control",
+      "objectiveReward": 0.0,
+      "objectiveSignalReachableCount": 0,
+      "observedSteps": 12,
+      "progressReward": 0.0,
+      "progressSignalReachableCount": 0,
+      "source": "progress_reachability_report.json",
+      "successEligible": false,
+      "totalReward": -0.184403
+    },
+    "objective-complete": {
+      "episodeClass": "task-specific-natural-terminal",
+      "source": "reward_signal_truth_table.json",
+      "successEligible": true,
+      "totalReward": 5.346
+    },
+    "player-dead-only": {
+      "episodeClass": "failure-terminal",
+      "source": "reward_signal_truth_table.json",
+      "successEligible": false,
+      "totalReward": -4.516
+    },
+    "progress": {
+      "label": "positive-control",
+      "objectiveReward": 7.65,
+      "objectiveSignalReachableCount": 9,
+      "observedSteps": 12,
+      "progressReward": 7.65,
+      "progressSignalReachableCount": 9,
+      "source": "progress_reachability_report.json",
+      "successEligible": true,
+      "totalReward": 7.41833
+    }
+  },
+  "earlyStopRules": [
+    {
+      "condition": "mean reward increases while progress/objective counts stay zero or terminal quality worsens",
+      "id": "reward-up-semantics-down",
+      "resultClass": "reward-redesign-required"
+    },
+    {
+      "condition": "noop-control or max-step-only distribution becomes successEligible",
+      "id": "noop-or-max-step-green",
+      "resultClass": "reward-redesign-required"
+    },
+    {
+      "condition": "player-dead-only or hazard-only total reward becomes non-negative",
+      "id": "player-dead-or-hazard-profitable",
+      "resultClass": "reward-redesign-required"
+    },
+    {
+      "condition": "manual progressEvent/context progress is used as reward-balance evidence",
+      "id": "manual-injection-leaks",
+      "resultClass": "measurement-invalid"
+    }
+  ],
+  "generatedAt": "2026-04-28T19:40:51Z",
+  "generatedBy": "python/scripts/bt93l_reward_balance.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "64c242719295e3f76b0f9224bc1486c54739d85c"
+  },
+  "guardrails": {
+    "baselineRun": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93L.3.1": true,
+    "93L.3.2": true,
+    "93L.3.3": true,
+    "93L.3.4": true
+  },
+  "phaseId": "93L.3",
+  "resultClass": "reward-balance-green",
+  "rewardProfileId": "bt93l-objective-reachability-v1",
+  "schemaVersion": "bt93l-reward-balance-report-v1",
+  "sourceArtifacts": {
+    "headlessRunner": {
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93L reward profile source",
+      "sha256": "7d9fa0aeecfce54eaa0952e15e181f2fd63f02507460a91658adc47e7efda5c0"
+    },
+    "progressReachabilityReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/progress_reachability_report.json",
+      "phaseId": "93L.2",
+      "resultClass": "progress-reachability-green",
+      "role": "BT93L.2 real env.step reachability",
+      "sha256": "ea68b9838046e882c79f9574dd3c1d0371dabc65f2d2a60a8c954486971791b3"
+    },
+    "rewardSignalTruthTable": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/reward_signal_truth_table.json",
+      "phaseId": "93L.3",
+      "resultClass": "reward-signal-truth-table-pinned",
+      "role": "BT93L.3.1 reward signal truth table",
+      "sha256": "90a400de3a52aaa3bcb7d6a05d1335bd713ac148312a91ed30730b5979b3e084"
+    },
+    "taskMetricContract": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L.1 task/terminal contract",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0"
+    }
+  },
+  "summary": {
+    "bt94aClaimAllowed": false,
+    "maxStepOnlySuccessEligible": false,
+    "microPpoAllowedAfter93L3": true,
+    "noopPlateauSuccessEligible": false,
+    "progressDominatesNoop": true,
+    "pureDeathAvoidanceSuccessEligible": false,
+    "trainingStartStillBlockedByLaterPhases": [
+      "93L.4",
+      "93L.5"
+    ]
+  }
+}

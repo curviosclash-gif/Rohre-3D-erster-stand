@@ -22,7 +22,7 @@
       "progressSignalReportedCount": 0,
       "realEnvStepPathCount": 12,
       "rewardBreakdownTotals": {
-        "baseStep": -0.048,
+        "baseStep": -0.192,
         "checkpointReached": 0.0,
         "crash": 0.0,
         "damageDealt": 0.0,
@@ -36,10 +36,10 @@
         "opponentRisk": 0.0,
         "parcoursCompleted": 0.0,
         "stuck": 0.0,
-        "survival": 0.24,
-        "survivalPressureBonus": 0.053107,
+        "survival": 0.144,
+        "survivalPressureBonus": 0.023597,
         "trailRisk": 0.0,
-        "wallRisk": -0.22,
+        "wallRisk": -0.16,
         "win": 0.0,
         "wrongOrder": 0.0
       },
@@ -48,21 +48,21 @@
       }
     },
     "positive-control": {
-      "checkpointReachedSignalTotal": 1.0,
+      "checkpointReachedSignalTotal": 9.0,
       "manualProgressEventCount": 0,
-      "objectiveReward": 0.8,
-      "objectiveSignalReachableCount": 1,
+      "objectiveReward": 7.65,
+      "objectiveSignalReachableCount": 9,
       "observedSteps": 12,
       "progressEventCounts": {
-        "local-openness-improved": 1
+        "target-distance-improved": 9
       },
-      "progressReward": 0.8,
-      "progressSignalReachableCount": 1,
-      "progressSignalReportedCount": 1,
+      "progressReward": 7.65,
+      "progressSignalReachableCount": 9,
+      "progressSignalReportedCount": 9,
       "realEnvStepPathCount": 12,
       "rewardBreakdownTotals": {
-        "baseStep": -0.048,
-        "checkpointReached": 0.8,
+        "baseStep": -0.192,
+        "checkpointReached": 7.65,
         "crash": 0.0,
         "damageDealt": 0.0,
         "damageTaken": 0.0,
@@ -75,34 +75,34 @@
         "opponentRisk": 0.0,
         "parcoursCompleted": 0.0,
         "stuck": 0.0,
-        "survival": 0.24,
-        "survivalPressureBonus": 0.045181,
+        "survival": 0.144,
+        "survivalPressureBonus": 0.02633,
         "trailRisk": 0.0,
-        "wallRisk": -0.07,
+        "wallRisk": -0.21,
         "win": 0.0,
         "wrongOrder": 0.0
       },
       "sourceCounts": {
-        "none": 11,
-        "runtime-observation-delta": 1
+        "none": 3,
+        "runtime-observation-delta": 9
       }
     },
     "random-control": {
-      "checkpointReachedSignalTotal": 1.0,
+      "checkpointReachedSignalTotal": 4.0,
       "manualProgressEventCount": 0,
-      "objectiveReward": 0.8,
-      "objectiveSignalReachableCount": 1,
+      "objectiveReward": 3.4,
+      "objectiveSignalReachableCount": 4,
       "observedSteps": 12,
       "progressEventCounts": {
-        "local-openness-improved": 1
+        "target-distance-improved": 4
       },
-      "progressReward": 0.8,
-      "progressSignalReachableCount": 1,
-      "progressSignalReportedCount": 1,
+      "progressReward": 3.4,
+      "progressSignalReachableCount": 4,
+      "progressSignalReportedCount": 4,
       "realEnvStepPathCount": 12,
       "rewardBreakdownTotals": {
-        "baseStep": -0.048,
-        "checkpointReached": 0.8,
+        "baseStep": -0.192,
+        "checkpointReached": 3.4,
         "crash": 0.0,
         "damageDealt": 0.0,
         "damageTaken": 0.0,
@@ -115,16 +115,16 @@
         "opponentRisk": 0.0,
         "parcoursCompleted": 0.0,
         "stuck": 0.0,
-        "survival": 0.24,
-        "survivalPressureBonus": 0.045973,
+        "survival": 0.144,
+        "survivalPressureBonus": 0.02017,
         "trailRisk": 0.0,
-        "wallRisk": -0.22,
+        "wallRisk": 0.0,
         "win": 0.0,
         "wrongOrder": 0.0
       },
       "sourceCounts": {
-        "none": 11,
-        "runtime-observation-delta": 1
+        "none": 8,
+        "runtime-observation-delta": 4
       }
     }
   },
@@ -148,9 +148,9 @@
           "fallbacks": 0,
           "lastFailure": null,
           "lastFallbackReason": null,
-          "lastLatencyMs": 1,
-          "latencyMaxMs": 3,
-          "latencyMeanMs": 0.7692307692307693,
+          "lastLatencyMs": 0,
+          "latencyMaxMs": 2,
+          "latencyMeanMs": 0.6538461538461539,
           "latencyMinMs": 0,
           "latencyP95Ms": 1,
           "latencySampleCount": 26,
@@ -184,7 +184,7 @@
           "training-step": 12
         }
       },
-      "elapsedSeconds": 0.837,
+      "elapsedSeconds": 0.865,
       "error": null,
       "label": "positive-control",
       "observedSteps": 12,
@@ -221,46 +221,50 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
           "index": 0,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": 0,
+              "localOpenness": -0.016429,
               "speed": 0,
-              "targetAlignment": 0.000526,
-              "targetDistance": 0.000325
+              "targetAlignment": -0.016358,
+              "targetDistance": 0.006741
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.67,
-              "pressureLevel": 0.309797,
+              "localOpennessRatio": 0.613571,
+              "pressureLevel": 0.349988,
               "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.742705,
-              "targetDistanceRatio": 0.139452,
+              "targetAlignment": 0.840988,
+              "targetDistanceRatio": 0.173646,
               "targetInFront": true,
-              "wallDistanceFront": 1
+              "wallDistanceFront": 0.875
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": 0.019408,
+          "reward": 0.837925,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -273,10 +277,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003408,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001925,
             "trailRisk": 0,
-            "wallRisk": 0,
+            "wallRisk": -0.01,
             "win": 0,
             "wrongOrder": 0
           },
@@ -302,15 +306,15 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
@@ -319,29 +323,33 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": 0.001577,
-              "targetDistance": 0.000467
+              "targetAlignment": -0.018015,
+              "targetDistance": 0.006432
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.67,
-              "pressureLevel": 0.309965,
-              "pressureSurvivalObserved": false,
+              "localOpennessRatio": 0.613571,
+              "pressureLevel": 0.352303,
+              "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.744282,
-              "targetDistanceRatio": 0.138985,
+              "targetAlignment": 0.822973,
+              "targetDistanceRatio": 0.167214,
               "targetInFront": true,
-              "wallDistanceFront": 1
+              "wallDistanceFront": 0.875
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": 0.01941,
+          "reward": 0.837938,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -354,10 +362,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.00341,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001938,
             "trailRisk": 0,
-            "wallRisk": 0,
+            "wallRisk": -0.01,
             "win": 0,
             "wrongOrder": 0
           },
@@ -383,15 +391,15 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
@@ -400,29 +408,33 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.0373,
-              "targetDistance": 0.000446
+              "targetAlignment": -0.050203,
+              "targetDistance": 0.005945
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.67,
-              "pressureLevel": 0.310126,
-              "pressureSurvivalObserved": false,
+              "localOpennessRatio": 0.613571,
+              "pressureLevel": 0.354443,
+              "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.706982,
-              "targetDistanceRatio": 0.138539,
+              "targetAlignment": 0.772771,
+              "targetDistanceRatio": 0.161268,
               "targetInFront": true,
-              "wallDistanceFront": 1
+              "wallDistanceFront": 0.875
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": 0.019411,
+          "reward": 0.837949,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -435,10 +447,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003411,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001949,
             "trailRisk": 0,
-            "wallRisk": 0,
+            "wallRisk": -0.01,
             "win": 0,
             "wrongOrder": 0
           },
@@ -464,46 +476,50 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
           "index": 3,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": 0,
+              "localOpenness": -0.025,
               "speed": 0,
-              "targetAlignment": 0.002644,
-              "targetDistance": 0.000636
+              "targetAlignment": -0.02303,
+              "targetDistance": 0.005565
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.67,
-              "pressureLevel": 0.310355,
-              "pressureSurvivalObserved": false,
+              "localOpennessRatio": 0.588571,
+              "pressureLevel": 0.408947,
+              "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.709626,
-              "targetDistanceRatio": 0.137903,
+              "targetAlignment": 0.749741,
+              "targetDistanceRatio": 0.155704,
               "targetInFront": true,
-              "wallDistanceFront": 1
+              "wallDistanceFront": 0.75
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": 0.019414,
+          "reward": 0.828249,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -516,10 +532,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003414,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002249,
             "trailRisk": 0,
-            "wallRisk": 0,
+            "wallRisk": -0.02,
             "win": 0,
             "wrongOrder": 0
           },
@@ -545,15 +561,15 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
@@ -562,29 +578,33 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": 0.003484,
-              "targetDistance": 0.000846
+              "targetAlignment": -0.024873,
+              "targetDistance": 0.005156
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.67,
-              "pressureLevel": 0.310659,
-              "pressureSurvivalObserved": false,
+              "localOpennessRatio": 0.588571,
+              "pressureLevel": 0.410803,
+              "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.71311,
-              "targetDistanceRatio": 0.137058,
+              "targetAlignment": 0.724868,
+              "targetDistanceRatio": 0.150547,
               "targetInFront": true,
-              "wallDistanceFront": 1
+              "wallDistanceFront": 0.75
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": 0.019417,
+          "reward": 0.828259,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -597,10 +617,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003417,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002259,
             "trailRisk": 0,
-            "wallRisk": 0,
+            "wallRisk": -0.02,
             "win": 0,
             "wrongOrder": 0
           },
@@ -626,46 +646,50 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
           "index": 5,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": -0.025,
+              "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": 0.002864,
-              "targetDistance": 0.001065
+              "targetAlignment": -0.051649,
+              "targetDistance": 0.004605
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.645,
-              "pressureLevel": 0.363543,
+              "localOpennessRatio": 0.588571,
+              "pressureLevel": 0.412461,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.715973,
-              "targetDistanceRatio": 0.135993,
+              "targetAlignment": 0.673218,
+              "targetDistanceRatio": 0.145943,
               "targetInFront": true,
-              "wallDistanceFront": 0.875
+              "wallDistanceFront": 0.75
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": 0.009999,
+          "reward": 0.828269,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -678,10 +702,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003999,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002269,
             "trailRisk": 0,
-            "wallRisk": -0.01,
+            "wallRisk": -0.02,
             "win": 0,
             "wrongOrder": 0
           },
@@ -707,15 +731,15 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
@@ -724,29 +748,33 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.036451,
-              "targetDistance": 0.001109
+              "targetAlignment": -0.066543,
+              "targetDistance": 0.003963
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.645,
-              "pressureLevel": 0.363942,
+              "localOpennessRatio": 0.588571,
+              "pressureLevel": 0.413887,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.679522,
-              "targetDistanceRatio": 0.134884,
+              "targetAlignment": 0.606675,
+              "targetDistanceRatio": 0.14198,
               "targetInFront": true,
-              "wallDistanceFront": 0.875
+              "wallDistanceFront": 0.75
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": 0.010003,
+          "reward": 0.828276,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -759,10 +787,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004003,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002276,
             "trailRisk": 0,
-            "wallRisk": -0.01,
+            "wallRisk": -0.02,
             "win": 0,
             "wrongOrder": 0
           },
@@ -788,15 +816,15 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
@@ -805,29 +833,33 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": 0.004792,
-              "targetDistance": 0.001363
+              "targetAlignment": -0.033753,
+              "targetDistance": 0.003475
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.645,
-              "pressureLevel": 0.364432,
+              "localOpennessRatio": 0.588571,
+              "pressureLevel": 0.415138,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.684314,
-              "targetDistanceRatio": 0.133521,
+              "targetAlignment": 0.572922,
+              "targetDistanceRatio": 0.138505,
               "targetInFront": true,
-              "wallDistanceFront": 0.875
+              "wallDistanceFront": 0.75
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": 0.010009,
+          "reward": 0.828283,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -840,10 +872,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004009,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002283,
             "trailRisk": 0,
-            "wallRisk": -0.01,
+            "wallRisk": -0.02,
             "win": 0,
             "wrongOrder": 0
           },
@@ -869,46 +901,50 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
           "index": 8,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": -0.025,
+              "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": 0.0053,
-              "targetDistance": 0.001627
+              "targetAlignment": -0.034923,
+              "targetDistance": 0.002983
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.62,
-              "pressureLevel": 0.365018,
+              "localOpennessRatio": 0.588571,
+              "pressureLevel": 0.416212,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.689614,
-              "targetDistanceRatio": 0.131894,
+              "targetAlignment": 0.537998,
+              "targetDistanceRatio": 0.135522,
               "targetInFront": true,
-              "wallDistanceFront": 0.875
+              "wallDistanceFront": 0.75
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": 0.010015,
+          "reward": 0.828289,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -921,10 +957,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004015,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002289,
             "trailRisk": 0,
-            "wallRisk": -0.01,
+            "wallRisk": -0.02,
             "win": 0,
             "wrongOrder": 0
           },
@@ -950,50 +986,46 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 1,
+            "checkpointReachedSignal": 0,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": true,
-            "objectiveSignalSource": "runtime-observation-delta",
+            "objectiveSignalReachable": false,
+            "objectiveSignalSource": "none",
             "progressEventReachable": false,
-            "progressSignalReachable": true,
-            "progressSignalReported": true,
-            "progressSignalSource": "runtime-observation-delta",
+            "progressSignalReachable": false,
+            "progressSignalReported": false,
+            "progressSignalSource": "none",
             "realEnvStepPath": true,
             "truncated": false
           },
           "index": 9,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": 0.017857,
+              "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": 0.005672,
-              "targetDistance": 0.001898
+              "targetAlignment": -0.035694,
+              "targetDistance": 0.002498
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.637857,
-              "pressureLevel": 0.365701,
+              "localOpennessRatio": 0.588571,
+              "pressureLevel": 0.417111,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.695286,
-              "targetDistanceRatio": 0.129996,
-              "targetInFront": true,
-              "wallDistanceFront": 0.875
+              "targetAlignment": 0.502304,
+              "targetDistanceRatio": 0.133024,
+              "targetInFront": false,
+              "wallDistanceFront": 0.75
             },
-            "objectiveEvents": [
-              "local-openness-improved"
-            ],
-            "progressEvents": [
-              "local-openness-improved"
-            ],
-            "source": "runtime-observation-delta"
+            "objectiveEvents": [],
+            "progressEvents": [],
+            "source": "none"
           },
-          "reward": 0.810023,
+          "reward": -0.021706,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0.8,
+            "baseStep": -0.016,
+            "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -1006,10 +1038,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004023,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002294,
             "trailRisk": 0,
-            "wallRisk": -0.01,
+            "wallRisk": -0.02,
             "win": 0,
             "wrongOrder": 0
           },
@@ -1052,28 +1084,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": 0.005901,
-              "targetDistance": 0.002173
+              "targetAlignment": -0.036006,
+              "targetDistance": 0.002027
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.637857,
-              "pressureLevel": 0.366483,
+              "localOpennessRatio": 0.588571,
+              "pressureLevel": 0.417841,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.701187,
-              "targetDistanceRatio": 0.127824,
-              "targetInFront": true,
-              "wallDistanceFront": 0.875
+              "targetAlignment": 0.466298,
+              "targetDistanceRatio": 0.130997,
+              "targetInFront": false,
+              "wallDistanceFront": 0.75
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.010031,
+          "reward": -0.021702,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1087,10 +1119,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004031,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002298,
             "trailRisk": 0,
-            "wallRisk": -0.01,
+            "wallRisk": -0.02,
             "win": 0,
             "wrongOrder": 0
           },
@@ -1131,30 +1163,30 @@
           "index": 11,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": -0.014286,
+              "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": 0.005975,
-              "targetDistance": 0.00245
+              "targetAlignment": -0.035826,
+              "targetDistance": 0.001581
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.623571,
-              "pressureLevel": 0.367365,
+              "localOpennessRatio": 0.588571,
+              "pressureLevel": 0.418411,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": 0.707162,
-              "targetDistanceRatio": 0.125374,
-              "targetInFront": true,
-              "wallDistanceFront": 0.875
+              "targetAlignment": 0.430472,
+              "targetDistanceRatio": 0.129415,
+              "targetInFront": false,
+              "wallDistanceFront": 0.75
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.010041,
+          "reward": -0.021699,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1168,10 +1200,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004041,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002301,
             "trailRisk": 0,
-            "wallRisk": -0.01,
+            "wallRisk": -0.02,
             "win": 0,
             "wrongOrder": 0
           },
@@ -1204,7 +1236,7 @@
           "lastFallbackReason": null,
           "lastLatencyMs": 0,
           "latencyMaxMs": 1,
-          "latencyMeanMs": 0.5769230769230769,
+          "latencyMeanMs": 0.6923076923076923,
           "latencyMinMs": 0,
           "latencyP95Ms": 1,
           "latencySampleCount": 26,
@@ -1238,7 +1270,7 @@
           "training-step": 12
         }
       },
-      "elapsedSeconds": 0.74,
+      "elapsedSeconds": 0.85,
       "error": null,
       "label": "noop-control",
       "observedSteps": 12,
@@ -1290,20 +1322,20 @@
           "index": 0,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": -0.005,
+              "localOpenness": -0.015,
               "speed": 0,
-              "targetAlignment": -0.000254,
-              "targetDistance": 2.2e-05
+              "targetAlignment": -0.000295,
+              "targetDistance": -0.000285
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.545,
-              "pressureLevel": 0.359511,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.585,
+              "pressureLevel": 0.342264,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.994867,
-              "targetDistanceRatio": 0.147193,
+              "targetAlignment": -0.984461,
+              "targetDistanceRatio": 0.195099,
               "targetInFront": false,
               "wallDistanceFront": 0.875
             },
@@ -1311,9 +1343,9 @@
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.009955,
+          "reward": -0.012118,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1327,8 +1359,8 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003955,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001882,
             "trailRisk": 0,
             "wallRisk": -0.01,
             "win": 0,
@@ -1373,18 +1405,18 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.000488,
-              "targetDistance": 1e-05
+              "targetAlignment": -0.000452,
+              "targetDistance": -0.000384
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.545,
-              "pressureLevel": 0.359514,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.585,
+              "pressureLevel": 0.342126,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.995355,
-              "targetDistanceRatio": 0.147183,
+              "targetAlignment": -0.984913,
+              "targetDistanceRatio": 0.195483,
               "targetInFront": false,
               "wallDistanceFront": 0.875
             },
@@ -1392,9 +1424,9 @@
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.009955,
+          "reward": -0.012118,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1408,8 +1440,8 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003955,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001882,
             "trailRisk": 0,
             "wallRisk": -0.01,
             "win": 0,
@@ -1452,30 +1484,30 @@
           "index": 2,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": -0.025,
+              "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.000679,
-              "targetDistance": -4e-05
+              "targetAlignment": -0.00056,
+              "targetDistance": -0.000521
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.52,
-              "pressureLevel": 0.412,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.585,
+              "pressureLevel": 0.341938,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.996034,
-              "targetDistanceRatio": 0.147223,
+              "targetAlignment": -0.985473,
+              "targetDistanceRatio": 0.196004,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 0.875
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.000532,
+          "reward": -0.012119,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1489,10 +1521,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004532,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001881,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": -0.01,
             "win": 0,
             "wrongOrder": 0
           },
@@ -1535,28 +1567,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.000805,
-              "targetDistance": -0.000129
+              "targetAlignment": -0.00061,
+              "targetDistance": -0.000697
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.52,
-              "pressureLevel": 0.411953,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.585,
+              "pressureLevel": 0.341688,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.996839,
-              "targetDistanceRatio": 0.147352,
+              "targetAlignment": -0.986084,
+              "targetDistanceRatio": 0.196701,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 0.875
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.000531,
+          "reward": -0.012121,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1570,10 +1602,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004531,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001879,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": -0.01,
             "win": 0,
             "wrongOrder": 0
           },
@@ -1616,28 +1648,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.000846,
-              "targetDistance": -0.000261
+              "targetAlignment": -0.000597,
+              "targetDistance": -0.000911
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.52,
-              "pressureLevel": 0.411859,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.585,
+              "pressureLevel": 0.34136,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.997685,
-              "targetDistanceRatio": 0.147613,
+              "targetAlignment": -0.986681,
+              "targetDistanceRatio": 0.197612,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 0.875
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.00053,
+          "reward": -0.012123,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1651,10 +1683,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.00453,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001877,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": -0.01,
             "win": 0,
             "wrongOrder": 0
           },
@@ -1697,28 +1729,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.000785,
-              "targetDistance": -0.000436
+              "targetAlignment": -0.000518,
+              "targetDistance": -0.001163
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.52,
-              "pressureLevel": 0.411702,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.585,
+              "pressureLevel": 0.340941,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.99847,
-              "targetDistanceRatio": 0.148049,
+              "targetAlignment": -0.987199,
+              "targetDistanceRatio": 0.198775,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 0.875
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.000529,
+          "reward": -0.012125,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1732,10 +1764,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004529,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001875,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": -0.01,
             "win": 0,
             "wrongOrder": 0
           },
@@ -1778,28 +1810,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.00061,
-              "targetDistance": -0.000655
+              "targetAlignment": -0.000375,
+              "targetDistance": -0.00145
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.52,
-              "pressureLevel": 0.411467,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.585,
+              "pressureLevel": 0.340419,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.99908,
-              "targetDistanceRatio": 0.148704,
+              "targetAlignment": -0.987575,
+              "targetDistanceRatio": 0.200225,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 0.875
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.000526,
+          "reward": -0.012128,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1813,10 +1845,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004526,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001872,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": -0.01,
             "win": 0,
             "wrongOrder": 0
           },
@@ -1859,28 +1891,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.000318,
-              "targetDistance": -0.000918
+              "targetAlignment": -0.000174,
+              "targetDistance": -0.001772
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.52,
-              "pressureLevel": 0.411136,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.585,
+              "pressureLevel": 0.339781,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.999398,
-              "targetDistanceRatio": 0.149622,
+              "targetAlignment": -0.987748,
+              "targetDistanceRatio": 0.201996,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 0.875
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.000522,
+          "reward": -0.012131,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1894,10 +1926,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004522,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001869,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": -0.01,
             "win": 0,
             "wrongOrder": 0
           },
@@ -1938,20 +1970,20 @@
           "index": 8,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": 0,
+              "localOpenness": -0.025,
               "speed": 0,
-              "targetAlignment": 8.7e-05,
-              "targetDistance": -0.001224
+              "targetAlignment": 7.7e-05,
+              "targetDistance": -0.002123
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.52,
-              "pressureLevel": 0.410696,
+              "localOpennessRatio": 0.56,
+              "pressureLevel": 0.391517,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.999311,
-              "targetDistanceRatio": 0.150845,
+              "targetAlignment": -0.987671,
+              "targetDistanceRatio": 0.20412,
               "targetInFront": false,
               "wallDistanceFront": 0.75
             },
@@ -1959,9 +1991,9 @@
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.000518,
+          "reward": -0.021847,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -1975,8 +2007,8 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004518,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002153,
             "trailRisk": 0,
             "wallRisk": -0.02,
             "win": 0,
@@ -2019,20 +2051,20 @@
           "index": 9,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": 0,
+              "localOpenness": -0.01,
               "speed": 0,
-              "targetAlignment": 0.000591,
-              "targetDistance": -0.001569
+              "targetAlignment": 0.000363,
+              "targetDistance": -0.002502
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.52,
-              "pressureLevel": 0.410131,
+              "localOpennessRatio": 0.55,
+              "pressureLevel": 0.390616,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.99872,
-              "targetDistanceRatio": 0.152415,
+              "targetAlignment": -0.987308,
+              "targetDistanceRatio": 0.206621,
               "targetInFront": false,
               "wallDistanceFront": 0.75
             },
@@ -2040,9 +2072,9 @@
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.000511,
+          "reward": -0.021852,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2056,8 +2088,8 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004511,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002148,
             "trailRisk": 0,
             "wallRisk": -0.02,
             "win": 0,
@@ -2102,18 +2134,18 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": 0.00117,
-              "targetDistance": -0.001952
+              "targetAlignment": 0.000669,
+              "targetDistance": -0.002902
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.52,
-              "pressureLevel": 0.409428,
+              "localOpennessRatio": 0.55,
+              "pressureLevel": 0.389572,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.99755,
-              "targetDistanceRatio": 0.154366,
+              "targetAlignment": -0.986639,
+              "targetDistanceRatio": 0.209523,
               "targetInFront": false,
               "wallDistanceFront": 0.75
             },
@@ -2121,9 +2153,9 @@
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.000504,
+          "reward": -0.021857,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2137,8 +2169,8 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004504,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002143,
             "trailRisk": 0,
             "wallRisk": -0.02,
             "win": 0,
@@ -2183,18 +2215,18 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": 0.001795,
-              "targetDistance": -0.002365
+              "targetAlignment": 0.000977,
+              "targetDistance": -0.003319
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.52,
-              "pressureLevel": 0.408577,
+              "localOpennessRatio": 0.55,
+              "pressureLevel": 0.388377,
               "pressureSurvivalObserved": true,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.995756,
-              "targetDistanceRatio": 0.156732,
+              "targetAlignment": -0.985662,
+              "targetDistanceRatio": 0.212842,
               "targetInFront": false,
               "wallDistanceFront": 0.75
             },
@@ -2202,9 +2234,9 @@
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.000494,
+          "reward": -0.021864,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2218,8 +2250,8 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004494,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.002136,
             "trailRisk": 0,
             "wallRisk": -0.02,
             "win": 0,
@@ -2252,11 +2284,11 @@
           "fallbacks": 0,
           "lastFailure": null,
           "lastFallbackReason": null,
-          "lastLatencyMs": 1,
-          "latencyMaxMs": 11,
-          "latencyMeanMs": 1.1153846153846154,
+          "lastLatencyMs": 0,
+          "latencyMaxMs": 2,
+          "latencyMeanMs": 0.6153846153846154,
           "latencyMinMs": 0,
-          "latencyP95Ms": 2,
+          "latencyP95Ms": 1,
           "latencySampleCount": 26,
           "latestEpsilon": 0,
           "latestLoss": 0,
@@ -2288,7 +2320,7 @@
           "training-step": 12
         }
       },
-      "elapsedSeconds": 0.893,
+      "elapsedSeconds": 0.833,
       "error": null,
       "label": "random-control",
       "observedSteps": 12,
@@ -2340,30 +2372,30 @@
           "index": 0,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": -0.025,
+              "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.005113,
-              "targetDistance": 0.001138
+              "targetAlignment": 0.000588,
+              "targetDistance": 0.000341
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.635,
-              "pressureLevel": 0.302888,
+              "localOpennessRatio": 0.61,
+              "pressureLevel": 0.302454,
               "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.688427,
-              "targetDistanceRatio": 0.304479,
+              "targetAlignment": 0.321941,
+              "targetDistanceRatio": 0.159849,
               "targetInFront": false,
-              "wallDistanceFront": 0.875
+              "wallDistanceFront": 1
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.009332,
+          "reward": -0.002337,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2377,10 +2409,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003332,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001663,
             "trailRisk": 0,
-            "wallRisk": -0.01,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -2423,28 +2455,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.004828,
-              "targetDistance": 0.001173
+              "targetAlignment": 0.001003,
+              "targetDistance": 0.000689
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.635,
-              "pressureLevel": 0.30331,
+              "localOpennessRatio": 0.61,
+              "pressureLevel": 0.302703,
               "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.693255,
-              "targetDistanceRatio": 0.303306,
+              "targetAlignment": 0.322944,
+              "targetDistanceRatio": 0.15916,
               "targetInFront": false,
-              "wallDistanceFront": 0.875
+              "wallDistanceFront": 1
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.009336,
+          "reward": -0.002335,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2458,10 +2490,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003336,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001665,
             "trailRisk": 0,
-            "wallRisk": -0.01,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -2504,28 +2536,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.026002,
-              "targetDistance": 0.00108
+              "targetAlignment": -0.050562,
+              "targetDistance": 0.000793
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.635,
-              "pressureLevel": 0.303699,
+              "localOpennessRatio": 0.61,
+              "pressureLevel": 0.302988,
               "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.719257,
-              "targetDistanceRatio": 0.302226,
+              "targetAlignment": 0.272383,
+              "targetDistanceRatio": 0.158367,
               "targetInFront": false,
-              "wallDistanceFront": 0.875
+              "wallDistanceFront": 1
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": 0.009341,
+          "reward": -0.002334,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2539,10 +2571,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003341,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001666,
             "trailRisk": 0,
-            "wallRisk": -0.01,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -2583,30 +2615,30 @@
           "index": 3,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": -0.025,
+              "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.004022,
-              "targetDistance": 0.001068
+              "targetAlignment": 0.000772,
+              "targetDistance": 0.001148
             },
             "metrics": {
               "healthRatio": 1,
               "localOpennessRatio": 0.61,
-              "pressureLevel": 0.356583,
-              "pressureSurvivalObserved": true,
+              "pressureLevel": 0.303401,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.723279,
-              "targetDistanceRatio": 0.301158,
+              "targetAlignment": 0.273154,
+              "targetDistanceRatio": 0.157219,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 1
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": -7.8e-05,
+          "reward": -0.002331,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2620,10 +2652,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003922,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001669,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -2666,28 +2698,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.003778,
-              "targetDistance": 0.00103
+              "targetAlignment": 0.000623,
+              "targetDistance": 0.001502
             },
             "metrics": {
               "healthRatio": 1,
               "localOpennessRatio": 0.61,
-              "pressureLevel": 0.356954,
-              "pressureSurvivalObserved": true,
+              "pressureLevel": 0.303942,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.727057,
-              "targetDistanceRatio": 0.300129,
+              "targetAlignment": 0.273778,
+              "targetDistanceRatio": 0.155716,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 1
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": -7.4e-05,
+          "reward": -0.002328,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2701,10 +2733,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003926,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001672,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -2747,28 +2779,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.034272,
-              "targetDistance": 0.000813
+              "targetAlignment": 0.017897,
+              "targetDistance": 0.001938
             },
             "metrics": {
               "healthRatio": 1,
               "localOpennessRatio": 0.61,
-              "pressureLevel": 0.357246,
-              "pressureSurvivalObserved": true,
+              "pressureLevel": 0.30464,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.761329,
-              "targetDistanceRatio": 0.299316,
+              "targetAlignment": 0.291674,
+              "targetDistanceRatio": 0.153778,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 1
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": -7e-05,
+          "reward": -0.002324,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2782,10 +2814,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.00393,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001676,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -2828,28 +2860,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.022538,
-              "targetDistance": 0.000623
+              "targetAlignment": -0.053136,
+              "targetDistance": 0.002026
             },
             "metrics": {
               "healthRatio": 1,
               "localOpennessRatio": 0.61,
-              "pressureLevel": 0.357471,
-              "pressureSurvivalObserved": true,
+              "pressureLevel": 0.305369,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.783867,
-              "targetDistanceRatio": 0.298693,
+              "targetAlignment": 0.238538,
+              "targetDistanceRatio": 0.151753,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 1
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": -6.8e-05,
+          "reward": -0.00232,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2863,10 +2895,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003932,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.00168,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -2909,28 +2941,28 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.002249,
-              "targetDistance": 0.000502
+              "targetAlignment": -0.002085,
+              "targetDistance": 0.002355
             },
             "metrics": {
               "healthRatio": 1,
               "localOpennessRatio": 0.61,
-              "pressureLevel": 0.357651,
-              "pressureSurvivalObserved": true,
+              "pressureLevel": 0.306217,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.786116,
-              "targetDistanceRatio": 0.298191,
+              "targetAlignment": 0.236454,
+              "targetDistanceRatio": 0.149398,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 1
             },
             "objectiveEvents": [],
             "progressEvents": [],
             "source": "none"
           },
-          "reward": -6.6e-05,
+          "reward": -0.002316,
           "rewardBreakdown": {
-            "baseStep": -0.004,
+            "baseStep": -0.016,
             "checkpointReached": 0,
             "crash": 0,
             "damageDealt": 0,
@@ -2944,10 +2976,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003934,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001684,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -2973,15 +3005,15 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
@@ -2990,29 +3022,33 @@
             "deltas": {
               "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.002085,
-              "targetDistance": 0.000351
+              "targetAlignment": -0.00321,
+              "targetDistance": 0.002672
             },
             "metrics": {
               "healthRatio": 1,
               "localOpennessRatio": 0.61,
-              "pressureLevel": 0.357777,
-              "pressureSurvivalObserved": true,
+              "pressureLevel": 0.307179,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.788201,
-              "targetDistanceRatio": 0.29784,
+              "targetAlignment": 0.233243,
+              "targetDistanceRatio": 0.146726,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 1
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": -6.4e-05,
+          "reward": 0.847689,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -3025,10 +3061,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003936,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001689,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -3054,46 +3090,50 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
           "index": 9,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": -0.025,
+              "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.001937,
-              "targetDistance": 0.000169
+              "targetAlignment": -0.00461,
+              "targetDistance": 0.002973
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.585,
-              "pressureLevel": 0.357838,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.61,
+              "pressureLevel": 0.308249,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.790138,
-              "targetDistanceRatio": 0.297672,
+              "targetAlignment": 0.228633,
+              "targetDistanceRatio": 0.143753,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 1
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": -6.4e-05,
+          "reward": 0.847695,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -3106,10 +3146,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003936,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001695,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -3150,35 +3190,35 @@
           "index": 10,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": 0.017857,
+              "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.001803,
-              "targetDistance": -4.3e-05
+              "targetAlignment": -0.006316,
+              "targetDistance": 0.003254
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.602857,
-              "pressureLevel": 0.357823,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.61,
+              "pressureLevel": 0.30942,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.791941,
-              "targetDistanceRatio": 0.297715,
+              "targetAlignment": 0.222317,
+              "targetDistanceRatio": 0.140499,
               "targetInFront": false,
-              "wallDistanceFront": 0.75
+              "wallDistanceFront": 1
             },
             "objectiveEvents": [
-              "local-openness-improved"
+              "target-distance-improved"
             ],
             "progressEvents": [
-              "local-openness-improved"
+              "target-distance-improved"
             ],
             "source": "runtime-observation-delta"
           },
-          "reward": 0.799936,
+          "reward": 0.847702,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0.8,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -3191,10 +3231,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.003936,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001702,
             "trailRisk": 0,
-            "wallRisk": -0.02,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -3220,46 +3260,50 @@
           },
           "episodeSemantics": {
             "actionActiveForObjectiveSignal": true,
-            "checkpointReachedSignal": 0,
+            "checkpointReachedSignal": 1,
             "done": false,
             "manualProgressEvent": false,
-            "objectiveSignalReachable": false,
-            "objectiveSignalSource": "none",
+            "objectiveSignalReachable": true,
+            "objectiveSignalSource": "runtime-observation-delta",
             "progressEventReachable": false,
-            "progressSignalReachable": false,
-            "progressSignalReported": false,
-            "progressSignalSource": "none",
+            "progressSignalReachable": true,
+            "progressSignalReported": true,
+            "progressSignalSource": "runtime-observation-delta",
             "realEnvStepPath": true,
             "truncated": false
           },
           "index": 11,
           "objectiveReachability": {
             "deltas": {
-              "localOpenness": -0.025,
+              "localOpenness": 0,
               "speed": 0,
-              "targetAlignment": -0.001681,
-              "targetDistance": -0.000286
+              "targetAlignment": -0.008365,
+              "targetDistance": 0.003513
             },
             "metrics": {
               "healthRatio": 1,
-              "localOpennessRatio": 0.577857,
-              "pressureLevel": 0.41022,
-              "pressureSurvivalObserved": true,
+              "localOpennessRatio": 0.61,
+              "pressureLevel": 0.310685,
+              "pressureSurvivalObserved": false,
               "projectileThreat": 0,
               "speedRatio": 1,
-              "targetAlignment": -0.793622,
-              "targetDistanceRatio": 0.298001,
+              "targetAlignment": 0.213952,
+              "targetDistanceRatio": 0.136986,
               "targetInFront": false,
-              "wallDistanceFront": 0.625
+              "wallDistanceFront": 1
             },
-            "objectiveEvents": [],
-            "progressEvents": [],
-            "source": "none"
+            "objectiveEvents": [
+              "target-distance-improved"
+            ],
+            "progressEvents": [
+              "target-distance-improved"
+            ],
+            "source": "runtime-observation-delta"
           },
-          "reward": -0.009488,
+          "reward": 0.847709,
           "rewardBreakdown": {
-            "baseStep": -0.004,
-            "checkpointReached": 0,
+            "baseStep": -0.016,
+            "checkpointReached": 0.85,
             "crash": 0,
             "damageDealt": 0,
             "damageTaken": 0,
@@ -3272,10 +3316,10 @@
             "opponentRisk": 0,
             "parcoursCompleted": 0,
             "stuck": 0,
-            "survival": 0.02,
-            "survivalPressureBonus": 0.004512,
+            "survival": 0.012,
+            "survivalPressureBonus": 0.001709,
             "trailRisk": 0,
-            "wallRisk": -0.03,
+            "wallRisk": 0,
             "win": 0,
             "wrongOrder": 0
           },
@@ -3288,11 +3332,11 @@
       "seed": 9323
     }
   ],
-  "generatedAt": "2026-04-28T19:31:05Z",
+  "generatedAt": "2026-04-28T19:39:35Z",
   "generatedBy": "python/scripts/bt93l_progress_reachability.py",
   "git": {
     "branch": "bot-training",
-    "sha": "eebe17db92f5835921755a99364182911ae571c9"
+    "sha": "64c242719295e3f76b0f9224bc1486c54739d85c"
   },
   "guardrails": {
     "baselineRun": false,
@@ -3339,7 +3383,7 @@
       "isFile": true,
       "path": "scripts/training-headless-lane-runner.mjs",
       "role": "real JS headless runner path",
-      "sha256": "b208be92bf90ad5ac3bfbe479fad20c15b6084de88fbcad2e4d328bf231b6adc"
+      "sha256": "7d9fa0aeecfce54eaa0952e15e181f2fd63f02507460a91658adc47e7efda5c0"
     },
     "taskMetricContract": {
       "exists": true,

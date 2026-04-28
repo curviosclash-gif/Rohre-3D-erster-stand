@@ -123,19 +123,19 @@ export function resolveHeadlessRewardProfile(profileId = '') {
         return {
             profileId: BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
             active: true,
-            runKindBound: ['bt93l-progress-reachability'],
+            runKindBound: ['bt93l-progress-reachability', 'bt93l-reward-balance'],
             rewardCalculatorOptions: {
                 weights: {
-                    baseStep: -0.004,
-                    survival: 0.02,
-                    survivalPressureBonus: 0.02,
-                    checkpointReached: 0.8,
+                    baseStep: -0.016,
+                    survival: 0.012,
+                    survivalPressureBonus: 0.01,
+                    checkpointReached: 0.85,
                     parcoursCompleted: 2,
-                    loss: -4,
+                    loss: -4.5,
                     win: 2.5,
                 },
             },
-            intent: 'BT93L.2 diagnostic reachability lane: progress must come from real observation deltas, not manual progressEvent injection.',
+            intent: 'BT93L.2/93L.3 diagnostic lane: progress must come from real observation deltas; survival-only, noop, and max-step plateaus are non-success.',
         };
     }
     return {

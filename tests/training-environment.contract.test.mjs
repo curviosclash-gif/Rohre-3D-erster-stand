@@ -18,6 +18,7 @@ import {
     BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
     deriveHeadlessLaneEpisodeStep,
     deriveHeadlessObjectiveReachabilitySignals,
+    resolveHeadlessRewardProfile,
 } from '../scripts/training-headless-lane-runner.mjs';
 import { EpisodeController, TRAINING_TERMINAL_REASONS, TRAINING_TRUNCATION_REASONS } from '../src/state/training/EpisodeController.js';
 import { RewardCalculator, sumRewardComponents } from '../src/state/training/RewardCalculator.js';
@@ -178,6 +179,33 @@ test('Headless lane derives BT93L progress from real observation deltas', () => 
     assert.equal(noopSignals.objectiveSignalReachable, false);
     assert.equal(manualSignals.realEnvStepPath, false);
     assert.equal(manualSignals.source, 'manual-injection-counterprobe');
+});
+
+test('BT93L reward profile keeps survival-only and noop plateaus non-success', () => {
+    const profile = resolveHeadlessRewardProfile(BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID);
+    const calculator = new RewardCalculator(profile.rewardCalculatorOptions);
+    const survivalOnly = calculator.compute({ survival: true, healthRatio: 1, pressureLevel: 0 });
+    const noopHazard = calculator.compute({ survival: true, healthRatio: 1, wallRisk: 1 });
+    const progress = calculator.compute({ survival: true, parcoursEnabled: true, checkpointReached: 1 });
+    const objectiveComplete = calculator.compute({
+        survival: true,
+        parcoursEnabled: true,
+        checkpointReached: 1,
+        parcoursCompleted: true,
+        won: true,
+    });
+    const playerDead = calculator.compute({ survival: false, lost: true });
+
+    assert.equal(profile.rewardCalculatorOptions.weights.baseStep, -0.016);
+    assert.equal(profile.rewardCalculatorOptions.weights.survival, 0.012);
+    assert.equal(profile.rewardCalculatorOptions.weights.survivalPressureBonus, 0.01);
+    assert.equal(profile.rewardCalculatorOptions.weights.checkpointReached, 0.85);
+    assert.equal(profile.rewardCalculatorOptions.weights.loss, -4.5);
+    assert.ok(survivalOnly.total <= 0);
+    assert.ok(noopHazard.total < 0);
+    assert.ok(progress.total > 0);
+    assert.ok(objectiveComplete.total > progress.total);
+    assert.ok(playerDead.total < 0);
 });
 
 test('RewardCalculator keeps transparent additive shaping totals', () => {
