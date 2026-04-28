@@ -1,6 +1,6 @@
 # Bot Trainingsplan (Aktiver Master)
 
-Stand: 2026-04-27
+Stand: 2026-04-28
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
@@ -42,10 +42,11 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Training
 ## Aktueller PPO-Ausfuehrungsstand (2026-04-28)
 
 - `BT93K` ist rot als `diagnose-loop-required` abgeschlossen; `BT93J` bleibt rot als `diagnose-loop-required` abgeschlossen.
-- `BT94A` ist geschlossen, bis `BT93K.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` maschinenlesbar `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `bt94aBlockerCount=0` schreiben.
+- Der Diagnosebericht `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` ist der verbindliche Replan fuer den naechsten engen Folgeblock `BT93L`; naechste erlaubte Arbeit ist `93L.1`/`93L.2`, kein Blind-Longrun.
+- `BT94A` ist geschlossen, bis `BT93L.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` maschinenlesbar `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `bt94aBlockerCount=0` schreiben.
 - Der 1000000-Step-Longrun aus `BT93J.5c` ist Diagnose-Evidence mit Steps-Fortschritt, aber rotem Semantikurteil: `naturalTerminalCount=0`, `playerDeadOnly=true`, Progress-/Objective-Rewards `0`.
 - Die User-owned 3M/4-Env-Zusatzspur vom 2026-04-27 ist quarantiniert: Snapshots sind nur Diagnose, kein Closure-, Candidate-, Freeze-, Baseline-, Holdout-, Promote-, PPO-Validate- oder BT94A-Signal.
-- Naechste erlaubte Arbeit: kein freier BT93+/BT94A-Trainingsclaim ohne User-Replan oder engeren Folgeblock; kein weiterer Blind-Longrun.
+- Naechste erlaubte Arbeit: `BT93L Objective-Reachability und Survival-Task-Definition`; kein BT94A, kein Candidate, kein Freeze, kein Holdout und kein weiterer Blind-Longrun.
 
 ## PPO-Zweitpfad (BT90-BT95)
 
@@ -236,7 +237,8 @@ Mikro-Claim-Regel:
 | BT93I | BT93H.99 (`diagnose-blocked`) + `data/training/ppo/bt93h/followup_gate_report.json` (`followupRequired=true`) + User-Intake 2026-04-25 | hard | ja | Terminal-Curriculum, Mindestepisoden und Steps-Non-Regression abgeschlossen; Ergebnis `diagnose-blocked-closed` mit offenen F.05/F.19/F.27/F.31 |
 | BT93J | BT93I.99 (`diagnose-blocked-closed`) + `data/training/ppo/bt93i/followup_gate_report.json` (`followupRequired=true`) + User-Intake 2026-04-25 | hard | ja | Root-Cause-Repair-Trennmesser abgeschlossen; `93J.5c` endet `reward-still-blocking`, `93J.7.1` pinnt `diagnose-loop-required`, kein Pilot/Holdout/BT94A |
 | BT93K | BT93J.99 (`diagnose-loop-required`) + `data/training/ppo/bt93j/post_longrun_decision_report.json` + User-Intake 2026-04-27 | hard | ja | Survival-First Objective Reset: Signalwahrheit, Supervisor, Mode-/Map-Reality und 2/4/6-Env-Smokes vor jedem neuen Longrun |
-| BT94A | BT93K.99 + `bt94a_gate_check.py` (`claimable=true`) | hard | nein | BT94A bleibt vor `94A.1` geschlossen, bis BT93K oder ein spaeteres Gate `claimable=true` schreibt; Kandidatenlaeufe/Freeze bleiben vorher verboten |
+| BT93L | BT93K.99 (`diagnose-loop-required`) + `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` + User-Replan 2026-04-28 | hard | ja | Objective-Reachability, Taskvertrag, Reward-Balance, Action-Effekt-Evidence und Baseline-Matrix vor jedem weiteren PPO-Longrun |
+| BT94A | BT93L.99 + `bt94a_gate_check.py` (`claimable=true`) | hard | nein | BT94A bleibt vor `94A.1` geschlossen, bis BT93L oder ein spaeteres Gate `claimable=true` schreibt; Kandidatenlaeufe/Freeze bleiben vorher verboten |
 | BT94B | BT94A.99 | hard | nein | Externe A/B-Evidence braucht einen eingefrorenen Kandidaten |
 | BT94B PPO-Validate | BT94A.99 + 94B.1/94B.2 feste Kandidatenmatrix | hard | nein | `94B.3` baut eine eigene PPO-Validate-Lane; BT80C `80.9.3` ersetzt diese Lane nicht |
 | BT94B `promote` | gruene PPO-Validate-Lane aus `94B.3` | hard | nein | harter Blocker fuer jedes Rollout-Signal und jeden echten BT95-Handoff |
@@ -255,8 +257,8 @@ Mikro-Claim-Regel:
 | `docs/bot-training/Bot_Trainingsplan.md`, `docs/bot-training/Bot_Survival_Training_Plan_12h.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md` | BT10-BT40, BT73, BT80C, BT90-BT95 | shared | Masterplan + Detailplaene + PPO-Intake-Leiter |
 | `python/**`, `data/training/ppo/**` | BT90-BT95 | offen | neuer Sidecar-/PPO-Pfad ausserhalb der produktiven Runtime |
 | `python/scripts/**`, `python/tests/**`, `scripts/training-headless-bridge-smoke.mjs` | BT90-BT93A | offen | Boundary-Harness, Compliance-Smokes und nichtproduktive Mehr-Env-Orchestrierung |
-| `python/train.py`, `python/eval.py`, `python/configs/**`, `python/callbacks/**`, `python/requirements*.txt`, `python/envs/ppo_action_surface.py`, `python/scripts/bt93h_*.py`, `python/scripts/bt93i_*.py`, `python/scripts/bt93j_*.py`, `python/scripts/bt93k_*.py` | BT93B-BT93K | offen | PPO-Scaffold, echter PPO-Learner, Eval-, Resume-, Diagnose-, Reparatur- und maskierte Comparable-Lane ausserhalb der produktiven Runtime |
-| `scripts/training-headless-lane-runner.mjs`, `scripts/training-single-env-bridge.mjs`, `src/state/training/EpisodeController.js`, `src/state/training/RewardCalculator.js`, `tests/training-*.mjs` | BT93G-BT93K | offen | Enge Trainingssemantik fuer Natural-Terminal-/Death-/Reward-Rueckfuehrung, Mode-/Map-Smokes und Supervisor-Smokes; keine produktive Matchstart-, AI-Hub- oder Runtime-Umschaltung |
+| `python/train.py`, `python/eval.py`, `python/configs/**`, `python/callbacks/**`, `python/requirements*.txt`, `python/envs/ppo_action_surface.py`, `python/scripts/bt93h_*.py`, `python/scripts/bt93i_*.py`, `python/scripts/bt93j_*.py`, `python/scripts/bt93k_*.py`, `python/scripts/bt93l_*.py` | BT93B-BT93L | offen | PPO-Scaffold, echter PPO-Learner, Eval-, Resume-, Diagnose-, Reparatur-, maskierte Comparable- und Objective-Reachability-Lane ausserhalb der produktiven Runtime |
+| `scripts/training-headless-lane-runner.mjs`, `scripts/training-single-env-bridge.mjs`, `src/state/training/EpisodeController.js`, `src/state/training/RewardCalculator.js`, `tests/training-*.mjs` | BT93G-BT93L | offen | Enge Trainingssemantik fuer Natural-Terminal-/Death-/Reward-Rueckfuehrung, Progress-/Objective-Reachability, Action-Effekt-Smokes, Mode-/Map-Smokes und Supervisor-Smokes; keine produktive Matchstart-, AI-Hub- oder Runtime-Umschaltung |
 | `src/state/HeadlessMatchKernelRuntime.js`, `src/core/MatchKernelTrainingAdapter.js`, `src/entities/ai/training/TrainingTransportFacade.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/entities/ai/ObservationBridgePolicy.js`, `src/core/RuntimeConfig.js`, `src/entities/ai/BotPolicyRegistry.js`, `src/entities/ai/BotPolicyTypes.js`, `src/entities/ai/inference/LocalDqnInference.js`, `src/entities/ai/hybrid/HybridDecisionArchitecture.js`, `src/state/MatchSessionFactory.js` | BT90-BT95 | read-only | Layer-sicher konsumieren; keine produktive Runtime-, Matchstart- oder AI-Hub-Umschaltung |
 | `docs/plaene/neu/BT90_GoldStandard/**` | BT90-BT95 | referenz | Draft-, Audit- und Handoff-Material; keine aktiven Locks oder Evidence hier fuehren |
 | `data/training/**`, `output/training/**` | BT10 | shared | Laufartefakte, Logs, Serien |
@@ -287,8 +289,9 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93J | 2026-04-26 | frei | abgeschlossen 2026-04-27 als `diagnose-loop-required`; kein BT94A-Claim |
-| Bot-Codex | BT93K | 2026-04-28 | in-bearbeitung | 93K.7 abgeschlossen; naechster Schritt 93K.99 |
-| - | BT94A | - | frei | wartet auf `BT93K.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
+| Bot-Codex | BT93K | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; kein BT94A-Claim |
+| - | BT93L | - | frei | naechster Claim: `93L.1` Task-/Metrikvertrag und `93L.2` echte Signal-Reachability |
+| - | BT94A | - | frei | wartet auf `BT93L.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
 
@@ -795,8 +798,9 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
 | BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
 | BT93J | Root-Cause-Blocker-Repair | completed | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 + R2-Plananpassung 2026-04-26 | 93J.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
-| BT93K | Survival-First Objective Reset | active | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.99 | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
-| BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93K.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
+| BT93K | Survival-First Objective Reset | completed | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
+| BT93L | Objective-Reachability und Survival-Task-Definition | active | P1 | BT93K.99 (`diagnose-loop-required`) + Diagnosebericht 2026-04-28 | 93L.1 | `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` |
+| BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93L.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
 
@@ -2772,6 +2776,153 @@ Pflicht-Artefakte:
 
 ---
 
+## Block BT93L: Objective-Reachability und Survival-Task-Definition
+
+Quelle:
+
+- `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md`
+- `data/training/ppo/bt93k/handover_package.json`
+- `data/training/ppo/bt93k/longrun_ladder_decision_report.json`
+- `data/training/ppo/bt94a/no_start_gate.json`
+
+<!-- LOCK: frei -->
+
+Scope:
+
+- Enger Folgeblock nach `BT93K.99=diagnose-loop-required`.
+- PPO wird erst weiter trainiert, wenn die Lernaufgabe messbar lebendig ist: echte Progress-/Objective-Signale, task-spezifische Terminal-Semantik, Reward-Balance und Action-Effekt-Evidence.
+- `BT93L` klaert die Trainingsdefinition, nicht die Kandidatenwahl: kein BT94A, kein Candidate, kein Freeze, kein Holdout-Verbrauch, kein Promote, kein Rollout-Signal.
+- Jeder neue PPO-Lauf ist verboten, solange `progress_reachability_report.json` nicht belegt, dass die Zielsignale im realen `env.step(...)`-Pfad erreichbar sind.
+- Laufzeitnahe Surfaces bleiben layer-konform eng begrenzt; produktive Runtime-, Matchstart-, AI-Hub-, Strategy-, Registry-, Rollback- und Rollout-Surfaces bleiben read-only.
+
+Start-Wahrheit 2026-04-28:
+
+| Befund | Wert | Konsequenz |
+| --- | --- | --- |
+| BT93K-Handover | `resultClass=diagnose-loop-required`, `bt94aHandover.ready=false` | Folgeblock statt BT94A |
+| BT93K 20k-Lauf | `resultClass=ladder-blocked-after-20k-signal-smoke`, `runKind=semantic-cycle`, `trainingStarted=false` | Diagnose-Smoke, kein PPO-Qualitaetslauf |
+| Zielsignale | `progressSignalNonZero=false`, `objectiveSignalNonZero=false`, `naturalTerminalShare=0` | Lernsignal ist nicht closure-faehig |
+| Safety-Signale | Invalid-/Sanitizer-/PostDecodeClamp-Raten `0`, Pre-Sampling-Mask aktiv | Action-Safety ist gruen, aber Action-Wirkung ist unbewiesen |
+| BT94A-Gate | `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression` | Candidate-/Freeze-Lane bleibt geschlossen |
+
+Harte Grenzen:
+
+- Kein Langlauf, keine 4-/6-Env-Erweiterung und kein CUDA-/Wallclock-Fokus, solange `93L.2` nicht echte Zielsignal-Reachability in der realen Runner-Lane beweist.
+- `maxSteps`, `avgStepsPerEpisode` und reine Ueberlebensdauer sind ohne Progress-/Objective-/Terminal-Semantik nur Diagnose, kein Qualitaetsbeweis.
+- Natural-Terminal wird task-spezifisch definiert; ein universelles Natural-Terminal-Ziel darf Survival-Lernen nicht blockieren, aber ein reines Player-Dead- oder Max-Step-Plateau darf nie als Erfolg gelten.
+- Manuell injizierte `input.progressEvent`-/`context.progressEvent`-Signale zaehlen nur als Gegenprobe, nicht als Reachability-Beweis fuer den echten PPO-Pfad.
+- Holdout-Seeds bleiben reserviert; BT93L darf Baselines und Micro-Probes bauen, aber keine Candidate- oder Freeze-Optimierung betreiben.
+
+Primaerer Scope:
+
+| Pfad | Zugriff | Zweck |
+| --- | --- | --- |
+| `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` | write | Diagnose- und Neustartbericht als Replan-Quelle |
+| `data/training/ppo/bt93l/**` | write | BT93L-Artefakte, Reports, Handover |
+| `python/scripts/bt93l_*.py`, `python/configs/ppo_bt93l*.json` | write | Diagnosen, Baselines, Micro-Probes |
+| `scripts/training-headless-lane-runner.mjs`, `scripts/training-single-env-bridge.mjs` | eng write | echte Runner-Reachability, nur trainingsnahe Signale |
+| `src/state/training/EpisodeController.js`, `src/state/training/RewardCalculator.js` | eng write | Terminal-/Reward-/Progress-Semantik fuer Trainingspfad |
+| `python/envs/ppo_action_surface.py`, `python/train.py`, `python/eval.py` | eng write | Action-Vocabulary, Micro-PPO, Eval-/Report-Schema |
+| `tests/training-*.mjs`, `python/tests/**` | write | Focused Smokes fuer Signal-, Reward-, Action- und Baseline-Vertraege |
+| produktive Runtime-/AI-Hub-/Registry-/Rollout-Surfaces | read-only | Layer-Grenzen aus Governance und Architektur bleiben bindend |
+
+Pflicht-Artefakte:
+
+| Artefakt | Zweck |
+| --- | --- |
+| `data/training/ppo/bt93l/task_metric_contract.json` | Survival-, Objective-, Candidate- und Terminal-Semantik trennen |
+| `data/training/ppo/bt93l/progress_reachability_report.json` | beweist Zielsignal-Erreichbarkeit im echten `env.step(...)`-Pfad |
+| `data/training/ppo/bt93l/reward_signal_truth_table.json` | zeigt positive/negative/neutral Events und tote Signalpfade |
+| `data/training/ppo/bt93l/reward_balance_report.json` | verhindert Player-Dead-/Max-Step-only-Erfolg |
+| `data/training/ppo/bt93l/action_effect_report.json` | beweist, dass Actions nicht nur sicher, sondern wirksam sind |
+| `data/training/ppo/bt93l/baseline_matrix_report.json` | Random, Noop, Scripted und DQN-Anker auf gleicher Taskmatrix |
+| `data/training/ppo/bt93l/micro_ppo_signal_report.json` | kleinster PPO-Signaltest nach gruenem Reachability-Gate |
+| `data/training/ppo/bt93l/handover_package.json` | ehrliches Ergebnis fuer BT94A oder weiteren Folgeblock |
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 `task_metric_contract.json` unterscheidet Survival-Task, Objective-Task und Candidate-/Freeze-Task; `maxSteps` ist neutral, Natural-Terminal ist task-spezifisch und Player-Dead-only ist rot.
+- [ ] DoD.2 `progress_reachability_report.json` beweist, dass Progress-/Objective-Signale im echten `env.step(...)`-Pfad ohne manuelle Signal-Injektion erreichbar sind.
+- [ ] DoD.3 `reward_balance_report.json` zeigt, dass Player-Dead-only, Noop-Plateau und Max-Step-only nicht als Qualitaetsgewinn durchgehen koennen.
+- [ ] DoD.4 `action_effect_report.json` belegt Action-Wirkung getrennt von Action-Safety: nicht nur `invalidActionRate=0`, sondern messbare Richtungs-, Distanz-, Gefahren- oder Zielzustandsveraenderung.
+- [ ] DoD.5 `baseline_matrix_report.json` vergleicht Random, Noop, Scripted-Heuristik und DQN-Anker auf derselben Matrix und mit identischer Semantik.
+- [ ] DoD.6 Micro-PPO startet erst nach gruenem `93L.2`/`93L.3`; Ergebnis bleibt Signalprobe, kein Candidate, kein Holdout, kein Freeze.
+- [ ] DoD.7 BT94A bleibt geschlossen, solange `handover_package.json` nicht `BT94A-ready` liefert und `no_start_gate.json` nicht `claimable=true` schreibt.
+- [ ] DoD.8 Runtime-, Matchstart-, AI-Hub-, Strategy-, Registry-, Rollback-, Rollout-, Authority- und produktive Bridge-Surfaces bleiben unveraendert.
+- [ ] DoD.9 `npm run docs:check`, `npm run plan:check` und die relevanten Focused Smokes sind PASS oder als Blocker dokumentiert.
+
+### 93L.1 Task- und Metrikvertrag
+
+- [ ] 93L.1.1 `task_metric_contract.json` schreiben: Survival-, Objective- und Candidate-Task explizit trennen; keine Metrik darf spaeter still umgedeutet werden.
+- [ ] 93L.1.2 Matrix fuer Map, Mode, Seeds, Episode-Laenge, maxSteps, Evaluation und Micro-PPO festlegen; Holdout bleibt unbenutzt.
+- [ ] 93L.1.3 Terminal-Semantik definieren: `player-dead`, `max-steps`, `objective-progress`, `objective-complete`, `timeout`, `runtime-error` und `forced-stop` muessen getrennt bleiben.
+- [ ] 93L.1.4 Startlage aus BT93J, BT93K, `no_start_gate.json` und Diagnosebericht maschinenlesbar in `task_metric_contract.json` pinnen.
+
+### 93L.2 Echte Progress-/Objective-Reachability
+
+- [ ] 93L.2.1 Aktuellen toten Signalpfad belegen: `scripts/training-headless-lane-runner.mjs` setzt Progress/Checkpoint nur ueber Kontext-/Input-Signale, die der normale PPO-Step nicht liefert.
+- [ ] 93L.2.2 Reale Quelle fuer Progress-/Objective-Signale im echten Runner-/Episode-Pfad definieren und mit Focused Smoke beweisen.
+- [ ] 93L.2.3 `progress_reachability_report.json` schreibt Positive-Control, Noop-Control und Random-Control; manuelle Signal-Injektion ist separat als Gegenprobe markiert.
+- [ ] 93L.2.4 Trainingsstart bleibt blockiert, wenn `progressSignalReachable`, `objectiveSignalReachable` oder `realEnvStepPath=true` fehlen.
+
+### 93L.3 Reward-Balance und Anti-Plateau
+
+- [ ] 93L.3.1 `reward_signal_truth_table.json` fuer Death, Hazard, Survival-Time, Progress, Objective, Noop und Max-Step schreiben.
+- [ ] 93L.3.2 Reward-Komponenten so kalibrieren, dass reine Todesvermeidung ohne Verhalten nicht als Erfolg reicht.
+- [ ] 93L.3.3 `reward_balance_report.json` zeigt Verteilungen fuer Player-Dead-only, Noop-Plateau, Max-Step-only, Progress und Objective-Complete.
+- [ ] 93L.3.4 Early-Stop-/No-Go-Regeln definieren: steigender Reward bei schlechterer Semantik endet `reward-redesign-required`.
+
+### 93L.4 Action-Effekt und Vocabulary
+
+- [ ] 93L.4.1 `action_effect_report.json` misst pro Action Wirkung auf Heading, Position, Distanz zum Ziel, Gefahrennaehe, Schuss-/Boost-Wirkung und Terminal-Risiko.
+- [ ] 93L.4.2 Aktuelle semantische Actions (`noop`, Yaw/Pitch/Roll, `boost`, `shoot-mg`) gegen Zielerreichbarkeit bewerten und minimal erweitern, falls die Task sonst nicht steuerbar ist.
+- [ ] 93L.4.3 Repetition-, Collapse- und Noop-Detektoren definieren; hohe Sicherheit bei wirkungsloser Action-Verteilung bleibt rot.
+- [ ] 93L.4.4 Invalid-, Sanitizer-, PostDecodeClamp- und Mask-Raten duerfen durch Erweiterungen nicht regressieren.
+
+### 93L.5 Baseline-Matrix
+
+- [ ] 93L.5.1 Random-, Noop- und Semantic-Cycle-Baselines mit identischer Task-/Reward-/Terminal-Semantik auswerten.
+- [ ] 93L.5.2 Kleine Scripted-Heuristik definieren, die Progress/Objective prinzipiell erreichen kann; sie ist Diagnoseanker, kein Produktbot.
+- [ ] 93L.5.3 DQN-Anker auf derselben Matrix referenzieren oder als fehlend blockierend markieren.
+- [ ] 93L.5.4 `baseline_matrix_report.json` friert die Matrix fuer Micro-PPO ein; keine nachtraegliche Optimierung nach Blick auf Ergebnisse.
+
+### 93L.6 Micro-PPO Signalprobe
+
+- [ ] 93L.6.1 10k-Step Micro-PPO nur starten, wenn `93L.2` und `93L.3` gruen sind.
+- [ ] 93L.6.2 50k-Step Erweiterung nur erlauben, wenn 10k Progress-/Objective-Signale und keine Safety-/Reward-Regression zeigt.
+- [ ] 93L.6.3 `micro_ppo_signal_report.json` enthaelt PPO-Metriken, Reward-Breakdown, Action-Verteilung, DeathBefore60, Terminal-Klassen und Zielsignal-Raten.
+- [ ] 93L.6.4 Micro-PPO ist keine Candidate-/Freeze-/Holdout-Evidence; Ergebnis darf nur `signal-green`, `signal-red`, `reward-redesign-required`, `action-space-required` oder `measurement-invalid` heissen.
+
+### 93L.7 Handover
+
+- [ ] 93L.7.1 `handover_package.json` klassifiziert ehrlich: `BT94A-ready`, `diagnose-loop-required`, `reward-redesign-required`, `action-space-required`, `measurement-invalid` oder `blocked`.
+- [ ] 93L.7.2 `bt94a_gate_check.py` wird nur bei `BT94A-ready` erneut als Oeffnungsversuch genutzt; bei roten Ergebnissen bleibt `no_start_gate.json` rot.
+- [ ] 93L.7.3 Offene Restschuld wird einem konkreten Folgeblock zugeordnet statt in BT94A verschoben.
+- [ ] 93L.7.4 Verbotene Ergebnisbegriffe bleiben verboten: kein `candidate`, kein `freeze`, kein `promote`, kein `rollout-ready`, kein `BT95-Handoff-ready`.
+
+### 93L.99 Abschluss-Gate
+
+- [ ] 93L.99.1 Alle Phasen 93L.1 bis 93L.7 sind mit versionierter Evidence dokumentiert.
+- [ ] 93L.99.2 Das Ergebnis ist ehrlich klassifiziert und trennt Messfehler, Reward-Fehler, Action-Space-Fehler und echte PPO-Lernbereitschaft.
+- [ ] 93L.99.3 BT94A oeffnet nur mit `BT94A-ready` plus `claimable=true`; andernfalls bleibt der naechste Schritt ein enger Folgeblock.
+- [ ] 93L.99.4 Runtime-, Matchstart-, AI-Hub-, Strategy-, Registry-, Rollback-, Rollout-, Authority- und produktive Bridge-Surfaces bleiben unveraendert.
+- [ ] 93L.99.5 Governance-Gates und Focused Smokes sind gruen oder als Blocker dokumentiert.
+
+### Risiko-Register BT93L
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Synthetisches Progress-Signal wird als echtes Signal gelesen | kritisch | RL/QA | Real-Env-Step-Pfad und manuelle Injection getrennt reporten | `progressEvent` wird nur per Testkontext gesetzt |
+| Reward-Hacking ersetzt Zielverhalten | kritisch | RL | Reward-Balance mit Noop, Player-Dead-only und Max-Step-only Negativkontrollen | Reward steigt, Progress/Objective bleibt null |
+| Action-Vocabulary bleibt sicher, aber wirkungslos | hoch | RL/QA | Action-Effekt-Probes vor Micro-PPO erzwingen | Invalid-Rate ist 0, aber Zustand aendert sich nicht zielgerichtet |
+| Natural-Terminal wird falsch als universelles Ziel behandelt | hoch | Governance/RL | task-spezifische Terminal-Semantik im Vertrag pinnen | Survival-Task scheitert nur wegen fehlendem Objective-Complete |
+| Max-Step-Plateau wird erneut als Survival-Erfolg gelesen | kritisch | Governance | Max-Step-only bleibt neutral/diagnostisch, nicht quality-green | avgSteps steigt ohne Ziel- oder Risikoverbesserung |
+| DQN-, Scripted- und PPO-Baselines nutzen unterschiedliche Semantik | hoch | QA | Eine Matrix, ein Reward-Vertrag, ein Terminal-Schema fuer alle Baselines | Baseline-Vergleich wird nicht reproduzierbar |
+| Holdout wird in der Diagnose verbraucht | hoch | Governance/RL | BT93L darf keine Candidate-/Freeze-Optimierung betreiben | Holdout-Seeds tauchen in Micro-Probes auf |
+| BT94A wird trotz rotem Handover geoeffnet | kritisch | Governance | `BT94A-ready` plus `claimable=true` als harte Doppelbedingung | Plantext oder Optimismus ersetzt Gate-Artefakt |
+
+---
+
 ## Block BT94A: Candidate Freeze und Ablationen
 
 Quelle: `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md`
@@ -2787,17 +2938,17 @@ Scope:
 
 Claim-Grenze vor BT94A:
 
-- `BT94A` ist nur claimbar, wenn `BT93K.99` `BT94A-ready` liefert und `data/training/ppo/bt94a/no_start_gate.json` nach erneutem Gate-Check `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `summary.bt94a-blocker=0` bzw. `bt93cState.bt94aBlockerCount=0` schreibt.
-- `BT93D.99=diagnose-blocked`, `BT93E.99=diagnose-blocked`, `BT93F.99=diagnose-blocked`, `BT93G.99=diagnose-blocked`, `BT93H.99=diagnose-blocked`, `BT93I.99=diagnose-blocked-closed` und `BT93J.99=diagnose-loop-required` sind keine Startsignale mehr, sondern der Grund fuer den vorgeschalteten Survival-First-Reset-Block `BT93K`.
+- `BT94A` ist nur claimbar, wenn `BT93L.99` `BT94A-ready` liefert und `data/training/ppo/bt94a/no_start_gate.json` nach erneutem Gate-Check `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `summary.bt94a-blocker=0` bzw. `bt93cState.bt94aBlockerCount=0` schreibt.
+- `BT93D.99=diagnose-blocked`, `BT93E.99=diagnose-blocked`, `BT93F.99=diagnose-blocked`, `BT93G.99=diagnose-blocked`, `BT93H.99=diagnose-blocked`, `BT93I.99=diagnose-blocked-closed`, `BT93J.99=diagnose-loop-required` und `BT93K.99=diagnose-loop-required` sind keine Startsignale mehr, sondern der Grund fuer den vorgeschalteten Objective-Reachability-Block `BT93L`.
 - `BT94A` ist nur claimbar, wenn `BT93C` ein echtes Baseline-Paket unter `data/training/ppo/**`, ein echtes PPO-Modell, Normalize-/Optimizer-State, Lernmetriken und eine feste Vergleichs-/Holdout-Matrix geliefert hat.
 - Wenn `BT93C` mit `diagnose`, `throughput insufficient`, Action-Surface-Blocker oder Reward-/Safety-Unklarheit endet, bleibt `BT94A` geschlossen.
-- Wenn der BT93C-/BT93D-/BT93E-/BT93F-/BT93G-/BT93H-/BT93I-/BT93J-/BT93K-Vorvergleich BT73-Intent-/Recovery-Restschuld, fehlende PPO-Validate-Lane, V101-Drift oder JS-Integration-Luecken ausweist, muss BT94A diese Punkte im Freeze-Report sichtbar weiterfuehren.
-- Wenn `BT93K.99` offene Audit-Befunde ohne Folgegate enthaelt, startet BT94A nicht; offene Restschuld muss blockierend oder nicht-blockierend begruendet sein.
+- Wenn der BT93C-/BT93D-/BT93E-/BT93F-/BT93G-/BT93H-/BT93I-/BT93J-/BT93K-/BT93L-Vorvergleich BT73-Intent-/Recovery-Restschuld, fehlende PPO-Validate-Lane, V101-Drift oder JS-Integration-Luecken ausweist, muss BT94A diese Punkte im Freeze-Report sichtbar weiterfuehren.
+- Wenn `BT93L.99` offene Audit-Befunde ohne Folgegate enthaelt, startet BT94A nicht; offene Restschuld muss blockierend oder nicht-blockierend begruendet sein.
 
-Startstatus 2026-04-25:
+Startstatus 2026-04-28:
 
 - `BT94A` bleibt vor `94A.1` geschlossen. (evidence: `data/training/ppo/bt94a/no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression`, `bt94aBlockerCount=4`, Blocker `F.05/F.19/F.27/F.31`))
-- `93J.5c 1000000-Step Proof-Longrun` ist abgeschlossen und klassifiziert `reward-still-blocking`; `93J.6` oeffnet nicht, weil `green-for-93J.6` fehlt. `BT93K` ist der naechste Reparaturblock; keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
+- `93J.5c 1000000-Step Proof-Longrun` ist abgeschlossen und klassifiziert `reward-still-blocking`; `BT93K` ist als `diagnose-loop-required` abgeschlossen. `BT93L` ist der naechste Reparaturblock; keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
 
 ### Definition of Done (DoD)
 
@@ -3045,18 +3196,19 @@ Rollout-Intake-Pflichtpaket:
 | 16 | `93J.5c User-owned 1000000-Step Proof-Longrun` abgeschlossen. | `readyForUserOwnedLongrun=true` aus 93J.5b; technische Stop-Regeln aktiv; Holdout reserviert. | `user_owned_1m_longrun_report.json` meldet `reward-still-blocking`; `avgSteps=166.866667`, aber `naturalTerminalCount=0` und `playerDeadOnly=true`. |
 | 17 | `BT93J` als roten Diagnoseabschluss schliessen. | `93J.5c != green-for-93J.6`; `post_longrun_decision_report.json` meldet `phase93J6Allowed=false`. | `BT93J.99=diagnose-loop-required`; kein Pilot, kein Holdout, kein BT94A-Refresh gruen. |
 | 18 | `BT93K-Survival-First-Objective-Reset` abgeschlossen. | `BT93J.99=diagnose-loop-required`; neuer User-Intake 2026-04-27; BT94A bleibt rot; 3M/4-Env-Zusatzspur ist quarantiniert. | `BT93K.99=diagnose-loop-required`; `data/training/ppo/bt93k/handover_package.json` meldet `bt94aHandover.ready=false`; `data/training/ppo/bt94a/no_start_gate.json` bleibt `claimable=false`. |
-| 19 | Kein freier BT93+/BT94A-Trainingsclaim ohne User-Replan oder engeren Folgeblock. | `BT93K.99 != BT94A-ready`; `no_start_gate.json` meldet weiter `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression`, `bt94aBlockerCount=4`. | Naechster Trainingsclaim braucht Replan/Folge-Diagnose; weiterhin kein Freeze, Candidate, Holdout, Promote oder Rollout-Signal. |
-| 20 | Erst bei `BT93K.99=BT94A-ready`: `94A.1` claimen. | `no_start_gate.json` meldet `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true`, `precomparison != ppo-regression`. | Ablationsmatrix und Entscheidungsregeln fuer BT94A; weiterhin kein Freeze vor `94A.3`. |
+| 19 | `BT93L-Objective-Reachability` claimen: zuerst `93L.1` bis `93L.2`, keine Trainingslaeufe. | `BT93K.99=diagnose-loop-required`; Diagnosebericht 2026-04-28 benennt tote/unerreichbare Progress-/Objective-Signale und unklare Taskdefinition. | Task-/Metrikvertrag und echter Reachability-Beweis im realen `env.step(...)`-Pfad; weiterhin kein Freeze, Candidate, Holdout, Promote oder Rollout-Signal. |
+| 20 | Erst bei `BT93L.99=BT94A-ready`: `94A.1` claimen. | `no_start_gate.json` meldet `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true`, `precomparison != ppo-regression`. | Ablationsmatrix und Entscheidungsregeln fuer BT94A; weiterhin kein Freeze vor `94A.3`. |
 
 No-Go vor Bot-Training:
 
 - Kein `baseline`-, `pilot`- oder Langlauf, solange frisches `freezeOk=true`, Clean-Env, Action-Surface, Startmanifest, Baseline-ID, Audit-Delta und ab BT93K Preflight-/Supervisor-/Signal-Gates nicht belegt sind; die 93J.5c-Diagnose-Ausnahme ist abgeschlossen und wird nicht wiederholt.
+- Kein neuer PPO-Trainingslauf, solange `BT93L.2` nicht echte Progress-/Objective-Reachability im realen `env.step(...)`-Pfad belegt und `BT93L.3` Reward-Balance gegen Player-Dead-/Noop-/Max-Step-only nachweist.
 - Kein `4-Env`-/`6-Env`-Langlauf, solange keine kleine direkte Env-Smoke-Evidence mit finalem Exit-Report vorliegt; BT93K darf diese Smokes bauen, aber nicht als Qualitaetsbeweis lesen.
 - Keine Wiederverwendung der User-owned 3M/4-Env-Start-/Switch-/Stop-Skripte als beweisfuehrende BT93K-Evidence, solange Supervisor, graceful Stop, finaler Runner-Report und BT93K-Run-Kind fehlen.
 - Keine Rollout- oder JS-Runtime-Integration vor BT95 plus separatem Rollout-Block.
 - Kein `promote`, solange die PPO-Validate-Lane aus `94B.3` nicht gruen ist; BT80C `80.9.3` ersetzt diese Evidence nicht.
-- Kein BT94A-Start, solange BT93K.99 nicht `BT94A-ready` ist und `data/training/ppo/bt94a/no_start_gate.json` nicht `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true` und `precomparison != ppo-regression` schreibt.
-- Kein BT94A-Kandidatenlauf, kein Freeze-Kandidat und kein BT94B-Handover innerhalb BT93D, BT93E, BT93F, BT93G, BT93H, BT93I, BT93J oder BT93K.
+- Kein BT94A-Start, solange BT93L.99 nicht `BT94A-ready` ist und `data/training/ppo/bt94a/no_start_gate.json` nicht `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true` und `precomparison != ppo-regression` schreibt.
+- Kein BT94A-Kandidatenlauf, kein Freeze-Kandidat und kein BT94B-Handover innerhalb BT93D, BT93E, BT93F, BT93G, BT93H, BT93I, BT93J, BT93K oder BT93L.
 - Kein alter `data/bot_validation_report.json`, kein `plan:check`, kein Throughput-Report und kein Scaffold-Artefakt darf als PPO-Survival-Beweis verwendet werden.
 
 ## Backlog (priorisiert)
