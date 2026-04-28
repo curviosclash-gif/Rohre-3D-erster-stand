@@ -212,19 +212,30 @@ export async function openSubmenu(page, submenuId, options = {}) {
 
     if (submenuId === 'submenu-game') {
         await selectSessionType(page, options.sessionType || 'single');
-        const modePathButton = page
+        let modePathButton = page
             .locator('#submenu-custom:not(.hidden) [data-mode-path="normal"]:visible:not([disabled])')
             .first();
         if (await modePathButton.count()) {
             await modePathButton.click({ force: true });
         } else {
-            const submenuButton = page
-                .locator('#submenu-custom:not(.hidden) [data-menu-step-target="submenu-game"]:visible:not([disabled])')
-                .first();
-            if (await submenuButton.count()) {
-                await submenuButton.click({ force: true });
+            const openedCustomSetupStep = await openCustomSetupStep(page);
+            if (openedCustomSetupStep) {
+                modePathButton = page
+                    .locator('#submenu-custom:not(.hidden) [data-mode-path="normal"]:visible:not([disabled])')
+                    .first();
+            }
+
+            if (await modePathButton.count()) {
+                await modePathButton.click({ force: true });
             } else {
-                await openViaNavigationRuntime(page, 'submenu-game');
+                const submenuButton = page
+                    .locator('#submenu-custom:not(.hidden) [data-menu-step-target="submenu-game"]:visible:not([disabled])')
+                    .first();
+                if (await submenuButton.count()) {
+                    await submenuButton.click({ force: true });
+                } else {
+                    await openViaNavigationRuntime(page, 'submenu-game');
+                }
             }
         }
         await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
@@ -375,26 +386,87 @@ function isBenignErrorMessage(message) {
 }
 
 async function triggerMatchStart(page) {
-    const started = await page.evaluate(() => {
-        const game = window.GAME_INSTANCE;
-        if (game?.startMatch && typeof game.startMatch === 'function') {
-            setTimeout(() => {
-                try {
-                    game.startMatch();
-                } catch {
-                    // Keep helper resilient; readiness wait will fail if start did not happen.
-                }
-            }, 0);
-            return true;
+    const startResult = await page.evaluate(() => {
+        const startButton = document.querySelector('#submenu-game:not(.hidden) #btn-start');
+        if (startButton instanceof HTMLButtonElement && !startButton.disabled) {
+            startButton.click();
+            return { ok: true, method: 'button' };
         }
 
-        const startButton = document.querySelector('#submenu-game:not(.hidden) #btn-start');
-        if (!(startButton instanceof HTMLButtonElement)) return false;
-        startButton.click();
-        return true;
+        const game = window.GAME_INSTANCE;
+        if (game?.startMatch && typeof game.startMatch === 'function') {
+            try {
+                const result = game.startMatch();
+                if (result === false) {
+                    return { ok: false, reason: 'startMatch-returned-false' };
+                }
+                return { ok: true, method: 'runtime' };
+            } catch (error) {
+                return {
+                    ok: false,
+                    reason: `startMatch-error:${error?.message || String(error || 'unknown')}`,
+                };
+            }
+        }
+
+        return { ok: false, reason: 'start-trigger-unavailable' };
     });
-    if (!started) {
-        throw new Error('Start-Trigger nicht verfuegbar.');
+
+    if (!startResult?.ok) {
+        throw new Error(`Start-Trigger nicht verfuegbar (${startResult?.reason || 'unknown'}).`);
+    }
+}
+
+async function openCustomSetupStep(page) {
+    const setupSelectors = [
+        '#submenu-custom:not(.hidden) [data-menu-step-target="submenu-custom"]:visible:not([disabled])',
+        '#submenu-custom:not(.hidden) button:has-text("Setup frei anpassen"):visible:not([disabled])',
+        '#submenu-custom:not(.hidden) button:has-text("Setup"):visible:not([disabled])',
+    ];
+
+    for (const selector of setupSelectors) {
+        const button = page.locator(selector).first();
+        if (await button.count()) {
+            await button.click({ force: true });
+            await page.waitForTimeout(100);
+            return true;
+        }
+    }
+    return false;
+}
+
+async function selectModePath(page, modePath) {
+    const modePathSelector = `#submenu-custom:not(.hidden) [data-mode-path="${modePath}"]:visible:not([disabled])`;
+    let modeButton = page.locator(modePathSelector).first();
+    if (!(await modeButton.count())) {
+        const openedCustomSetupStep = await openCustomSetupStep(page);
+        if (openedCustomSetupStep) {
+            modeButton = page.locator(modePathSelector).first();
+        }
+    }
+
+    if (await modeButton.count()) {
+        await modeButton.click({ force: true });
+        return;
+    }
+
+    const runtimeSelected = await page.evaluate((path) => {
+        const candidates = [
+            `#submenu-custom:not(.hidden) [data-mode-path="${path}"]`,
+            `#submenu-custom [data-mode-path="${path}"]`,
+        ];
+        for (const selector of candidates) {
+            const button = document.querySelector(selector);
+            if (button instanceof HTMLButtonElement && !button.disabled) {
+                button.click();
+                return true;
+            }
+        }
+        return false;
+    }, modePath);
+
+    if (!runtimeSelected) {
+        throw new Error(`Mode-Pfad nicht verfuegbar: ${modePath}`);
     }
 }
 
@@ -442,7 +514,7 @@ export async function startGameWithBots(page, botCount = 1) {
 export async function startHuntGame(page) {
     await loadGame(page);
     await openCustomSubmenu(page);
-    await page.click('#submenu-custom:not(.hidden) [data-mode-path="fight"]');
+    await selectModePath(page, 'fight');
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
     await triggerMatchStart(page);
     await page.waitForFunction(() => {
@@ -461,7 +533,7 @@ export async function startHuntGame(page) {
 export async function startHuntGameWithBots(page, botCount = 1) {
     await loadGame(page);
     await openCustomSubmenu(page);
-    await page.click('#submenu-custom:not(.hidden) [data-mode-path="fight"]');
+    await selectModePath(page, 'fight');
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
     await page.evaluate((count) => {
         const slider = document.getElementById('bot-count');
