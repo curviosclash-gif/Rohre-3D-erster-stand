@@ -287,7 +287,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93J | 2026-04-26 | frei | abgeschlossen 2026-04-27 als `diagnose-loop-required`; kein BT94A-Claim |
-| Bot-Codex | BT93K | 2026-04-28 | in-bearbeitung | 93K.4 abgeschlossen; naechster Schritt 93K.5 |
+| Bot-Codex | BT93K | 2026-04-28 | in-bearbeitung | 93K.6 abgeschlossen; naechster Schritt 93K.7 |
 | - | BT94A | - | frei | wartet auf `BT93K.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -2736,11 +2736,11 @@ Pflicht-Artefakte:
 
 ### 93K.6 Signal-gated Longrun-Leiter
 
-- [ ] 93K.6.1 20k Signal-Smoke nur nach gruenem Supervisor-, Runner-Signal- und Mode-/Map-Gate.
-- [ ] 93K.6.2 50k 4-/6-Env-Smoke nur bei `progressSignalNonZero=true`, `objectiveSignalNonZero=true`, `naturalTerminalShare>0` oder `deathBefore60Share` mindestens 20 Prozent besser als Startmatrix; `runtimeErrorCount=0`, `invalidActionRate=0`, `sanitizerRate=0` und `postDecodeClampRate=0` bleiben hart.
-- [ ] 93K.6.3 100k Vergleich 2/4/6 Env nur mit stabilen finalen Exit-Reports, gleicher Metriksemantik, gleicher Seed-/Mode-/Map-Matrix und mindestens `completedEpisodeCount>=15` fuer jede qualitative Auswertung.
-- [ ] 93K.6.4 300k Diagnose-Longrun nur, wenn 100k die Survival-Verteilung verbessert, `maxStepShare` nicht alleiniger Gewinntraeger ist und keine Signal-/Safety-Regression zeigt.
-- [ ] 93K.6.5 1M nur nach nonzero Zielsignal, stabiler Survival-Verteilung, finalem Exit-Report, unverbrauchtem Holdout und dokumentierter Entscheidung, warum ein langer Lauf mehr Erkenntnis liefert als ein kleinerer Gegenbeweis.
+- [x] 93K.6.1 20k Signal-Smoke nur nach gruenem Supervisor-, Runner-Signal- und Mode-/Map-Gate. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_longrun_ladder.py --write-report` -> `data/training/ppo/bt93k/longrun_ladder_decision_report.json` (`20k-signal-smoke`, `run_exit_report.ok=true`, `totalStepsObserved=20000`, `completedEpisodeCount=256`))
+- [x] 93K.6.2 50k 4-/6-Env-Smoke nur bei `progressSignalNonZero=true`, `objectiveSignalNonZero=true`, `naturalTerminalShare>0` oder `deathBefore60Share` mindestens 20 Prozent besser als Startmatrix; `runtimeErrorCount=0`, `invalidActionRate=0`, `sanitizerRate=0` und `postDecodeClampRate=0` bleiben hart. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_longrun_ladder.py --write-report` -> `data/training/ppo/bt93k/longrun_ladder_decision_report.json` (`longerRunAllowed=false`, blocked: `avgStepsPerEpisodeObserved=78.015625 < startAvgStepsPerEpisode=166.866667`, 50k nicht gestartet))
+- [x] 93K.6.3 100k Vergleich 2/4/6 Env nur mit stabilen finalen Exit-Reports, gleicher Metriksemantik, gleicher Seed-/Mode-/Map-Matrix und mindestens `completedEpisodeCount>=15` fuer jede qualitative Auswertung. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_longrun_ladder.py --write-report` -> `data/training/ppo/bt93k/longrun_ladder_decision_report.json` (`deferredRungs=blocked-by-20k-signal-gate`, 100k nicht gestartet))
+- [x] 93K.6.4 300k Diagnose-Longrun nur, wenn 100k die Survival-Verteilung verbessert, `maxStepShare` nicht alleiniger Gewinntraeger ist und keine Signal-/Safety-Regression zeigt. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_longrun_ladder.py --write-report` -> `data/training/ppo/bt93k/longrun_ladder_decision_report.json` (`deferredRungs=blocked-by-20k-signal-gate`, 300k nicht gestartet))
+- [x] 93K.6.5 1M nur nach nonzero Zielsignal, stabiler Survival-Verteilung, finalem Exit-Report, unverbrauchtem Holdout und dokumentierter Entscheidung, warum ein langer Lauf mehr Erkenntnis liefert als ein kleinerer Gegenbeweis. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_longrun_ladder.py --write-report` -> `data/training/ppo/bt93k/longrun_ladder_decision_report.json` (`resultClass=ladder-blocked-after-20k-signal-smoke`, `progressSignalNonZero=false`, `objectiveSignalNonZero=false`, `naturalTerminalSharePositive=false`, 1M nicht gestartet))
 
 ### 93K.7 Handover und BT94A-Gate-Disziplin
 
