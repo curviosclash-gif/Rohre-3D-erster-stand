@@ -1,5 +1,5 @@
 // Auto-generated local maps for disk exports from the editor.
-// This file is intentionally tracked as a stub and can be overwritten by the local save API.
+// The tracked empty export keeps imports stable until the local save API writes entries here.
 
 export const GENERATED_LOCAL_MAPS = {};
 

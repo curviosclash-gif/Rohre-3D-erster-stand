@@ -1,8 +1,7 @@
 // ============================================
 // ArcadeModeStrategy.js - Arcade mode (survival gauntlet, HP, scoring)
-// Stub: extends Hunt-like HP/damage defaults so the game starts cleanly.
-// Full Arcade-specific mechanics (combo, sectors, mastery) will be wired
-// once the V45 run-layer is integrated.
+// Extends the shared game-mode contract with arcade-specific health,
+// scoring and sector progression behaviour.
 // ============================================
 
 import { GameModeContract } from './GameModeContract.js';

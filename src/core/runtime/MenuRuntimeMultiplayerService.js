@@ -28,7 +28,7 @@ import {
 import { recordSessionRuntimeEvent } from '../../shared/runtime/SessionRuntimeObservability.js';
 import { tryCloneJsonValue } from '../../shared/utils/JsonClone.js';
 
-const ONLINE_MENU_TRANSPORT_PENDING_MESSAGE = 'Online ist bereits auswaehlbar, die produktive Menu-Lobby-Anbindung folgt noch.';
+const ONLINE_MENU_TRANSPORT_PENDING_MESSAGE = 'Online ist im Menu noch deaktiviert. Bitte aktuell LAN verwenden.';
 
 function deepClone(value) {
     return tryCloneJsonValue(value, null);
@@ -40,10 +40,11 @@ function normalizeString(value, fallback = '') {
 }
 
 // NOTE: 'multiplayer' is a menu-layer coordination type, not a real network transport.
-// The current implementation uses a Storage-Bridge (localStorage + BroadcastChannel) for
+// The legacy browser fallback uses a Storage-Bridge (localStorage + BroadcastChannel) for
 // lobby coordination within the same browser. At match start, each tab runs a
 // LocalSessionAdapter independently — no real-time state sync occurs across tabs.
-// Future transport types ('lan', 'online') are plumbed via localSettings.multiplayerTransport.
+// The selected transport is stored via localSettings.multiplayerTransport; LAN is productive,
+// while the dedicated online menu transport stays blocked until its signaling path is wired.
 function ensureMultiplayerSessionType(game, menuLobbyService = null) {
     if (!game?.settings || typeof game.settings !== 'object') return;
     if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {

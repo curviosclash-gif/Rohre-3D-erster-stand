@@ -679,7 +679,7 @@ export class UIStartSyncController {
                 button.disabled = !allowed || (multiplayerTransportUiState.isOnlinePending && active);
                 if (transport === MULTIPLAYER_TRANSPORTS.ONLINE && allowed) {
                     button.title = multiplayerTransportUiState.isOnlinePending
-                        ? 'Online ist bereits waehlbar, die produktive Menu-Lobby-Anbindung folgt noch.'
+                        ? 'Online ist im Menu noch deaktiviert. Bitte aktuell LAN verwenden.'
                         : 'Online-Lobby als Internet-Pfad vormerken.';
                 } else if (allowed) {
                     button.title = 'LAN als produktiven Host-/Join-Pfad nutzen.';
@@ -690,7 +690,7 @@ export class UIStartSyncController {
         }
         if (this.ui.multiplayerTransportHint) {
             this.ui.multiplayerTransportHint.textContent = multiplayerTransportUiState.isOnlinePending
-                ? 'Auswahl: Online | produktive Online-Lobby wird noch angebunden'
+                ? 'Auswahl: Online | im Menu noch deaktiviert, bitte LAN verwenden'
                 : `Produktiver Transport: ${multiplayerTransportUiState.selectedTransportLabel}`;
         }
         if (this.ui.multiplayerLobbyCodeInput) {
@@ -744,7 +744,7 @@ export class UIStartSyncController {
                     ? `Lobbystatus: ${lobbyCode} | ${sessionContract.transportAudienceLabel}`
                     : 'Lobbystatus: Legacy-Fallback aktiv | lokaler Menu-Bridge-Pfad, kein produktives LAN/Online';
             } else if (multiplayerTransportUiState.isOnlinePending) {
-                this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: Online ausgewaehlt | produktive Online-Lobby wird noch angebunden';
+                this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: Online ausgewaehlt | im Menu noch deaktiviert, bitte LAN verwenden';
             } else if (lobbyCode) {
                 this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${surfaceEntryCopy.joinButtonLabel} noch nicht verbunden`;
             } else {
@@ -758,13 +758,13 @@ export class UIStartSyncController {
             const surfaceDisabled = this.ui.multiplayerHostButton.disabled === true;
             this.ui.multiplayerHostButton.disabled = surfaceDisabled || disableTransportPendingActions;
             if (disableTransportPendingActions) {
-                this.ui.multiplayerHostButton.title = 'Online ist bereits waehlbar, die produktive Menu-Lobby-Anbindung folgt noch.';
+                this.ui.multiplayerHostButton.title = 'Online ist im Menu noch deaktiviert. Bitte aktuell LAN verwenden.';
             }
         }
         if (this.ui.multiplayerJoinButton) {
             this.ui.multiplayerJoinButton.disabled = disableTransportPendingActions;
             if (disableTransportPendingActions) {
-                this.ui.multiplayerJoinButton.title = 'Online ist bereits waehlbar, die produktive Menu-Lobby-Anbindung folgt noch.';
+                this.ui.multiplayerJoinButton.title = 'Online ist im Menu noch deaktiviert. Bitte aktuell LAN verwenden.';
             }
         }
 
