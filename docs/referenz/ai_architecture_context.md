@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-04-26
+Stand: 2026-04-28
 
 ## 1. Architekturparadigma
 
@@ -797,6 +797,8 @@ Architekturprinzip: Alle Surface-Entscheide laufen ueber die obigen Resolver aus
 ## 6. Verifikation
 
 - Testauswahl ueber `.agents/test_mapping.md`
+- Plan-/Governance-Leseweg bleibt: zuerst `docs/Umsetzungsplan.md` (Master-Index), danach blockbezogene Details in `docs/plaene/aktiv/VXX.md`.
+- Fuer Abhaengigkeits-, Scope- und Surface-Fragen dient `docs/generated/knowledge-graph.json` als sekundaere Query-Schicht; bevorzugte Abfragen laufen ueber `node scripts/query-knowledge-graph.mjs open-deps <BLOCK_ID> --json`, `scope-collisions` und `surfaces-for-file <PATH> --json`.
 - Neue Feature-Arbeit waehlt immer den leichtesten passenden Layer: `node-contract` vor `desktop-smoke`, `desktop-e2e` nur fuer produktnahe Integrationen ueber den Smoke-Kern hinaus, `browser-compat` nur fuer Browser-Demo/Web-API-/Fallback-Scope und `heavy-diagnostic` nur fuer bestehende schwere Cluster oder Diagnosebedarf.
 - `desktop-smoke` ist das primaere Produktsignal fuer die Desktop-App; es deckt App-Boot, Menu, Matchstart, Input-Ankunft und Return-to-Menu ueber die echte Electron-Shell ab.
 - `desktop-e2e`-Reruns laufen bevorzugt ueber `node scripts/run-playwright-targeted-clusters.mjs <cluster-id...>`; standardmaessig bleiben nur `core-shell`, `core-platform`, `core-surface` und `core-runtime` im produktnahen Hauptpfad, waehrend `core-regressions` und `physics-*` bewusst `heavy-diagnostic` bleiben.

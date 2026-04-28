@@ -6,6 +6,12 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-04-28
+
+- Neuer geplanter Architekturblock `V104` ist im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V104.md`.
+- `V104` trennt den nachhaltigen God-Object-Sunset bewusst von `V100`: Remount-/Rebuild-/StartSync-Stabilisierung bleibt dort, waehrend `V104` den Ownership-, Port- und Alias-Zuschnitt fuer `UIManager`, `UIStartSyncController`, `UINavigationLifecycleController`, `GameRuntimeBundle`, `GameRuntimePorts`, `ArcadeVehicleManager`, `MatchFlowUiController` und `PlatformCapabilityRegistry` plant.
+- Die empfohlene Intake-Reihenfolge lautet damit `V99 -> V100 -> V104 -> V102`.
+
 ## Stand-Snapshot 2026-04-17
 
 - Nachpflege zum V92-Architekturscope: `src/ui/MatchFlowTransitionHotspots.js` nutzt fuer Arcade-/Recording-/Session-Transitions nur noch Runtime-Port-Fallbacks und keinen direkten `game.runtimeFacade`-Reach-through mehr.
@@ -149,3 +155,132 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Architektur-Hardening-Gates sind gruen: `npm run typecheck:architecture`, `npm run lint:architecture`, `npm run check:architecture:boundaries`, `npm run check:architecture:metrics`.
 - Plan-/Docs-Gates sind gruen: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`.
 - Der offene P-Backlog im Master wurde auf den Restscope nach `V101` reduziert; `P39` und `P40` gelten als geschlossen.
+
+## Stand-Snapshot 2026-04-26 (Plan-Konsistenz und Encoding-Bereinigung)
+
+- `V76` ist dokumentarisch auf den realen Stand nachgezogen: `76.3` bis `76.7` stehen jetzt konsistent auf `status: done`, `76.99.1` ist mit gruener Build-/Plan-/Docs-Evidence abgeschlossen und der alte externe Build-Blockertext wurde entfernt. Offener Rest im Block ist nur noch `76.99.2`.
+- `V103` bleibt validator-konform als geplanter Block im Master gespiegelt; der dokumentierte Fortschritt bis `103.3` ist im Blockfile sichtbar, ohne den Lock-/Master-Status vorzeitig auf aktiv zu ziehen.
+- Der Master-Index bundelt den offenen P-Backlog jetzt zusaetzlich nach Zielbloecken (`V90`, `V99`, `V102`) und macht damit die naechste Uebernahme-Reihenfolge schneller lesbar, ohne die Detailtabelle zu ersetzen.
+- Mojibake in `V72`, `V82` und `V91` wurde auf ASCII-normalisierte Plantexte bereinigt; `docs:sync`/`docs:check` laufen danach ohne Encoding-Warnungen.
+
+## Stand-Snapshot 2026-04-26 (Subphasen `V103 103.2` und `103.3`)
+
+- `src/ui/SettingsStore.js` nutzt jetzt belastbar eine gemeinsame kanonische Persistenzpipeline fuer `loadSettings()` und `saveSettings()`; `tests/settings-manager.contract.test.mjs` spiegelt Load-/Save-Symmetrie und den schmalen Record-Port fuer Runtime-Consumer.
+- `src/core/SettingsManager.js` fuehrt mit `getSettingsRecordStorePort()` einen schmalen JSON-Record-Port ein; `src/core/GameRuntimeFacade.js` reicht fuer die Arcade-Surface keinen direkten `settingsManager.store`-Reach-through mehr weiter.
+- `src/core/runtime/MenuRuntimeDeveloperModeService.js`, `MenuRuntimePresetConfigService.js` und `MenuRuntimeSessionService.js` lesen `changedKeys` jetzt zentral ueber kleine Resolver und nutzen Result-`reason`-Codes fuer gezieltere Runtime-Fehlermeldungen.
+- Naechste offene V103-Subphase ist `103.4.1`.
+
+## Stand-Snapshot 2026-04-26 (Subphase `V103 103.4`)
+
+- Im Core-Settings-Scope (`src/core/settings/*.js`, `src/core/SettingsManager.js`) gibt es keine direkten `document`-/DOM-Zugriffe mehr; UI-seitige Theme-Anwendung bleibt bewusst in `src/ui/menu/MenuDeveloperModeOps.js`.
+- `src/ui/KeybindEditorController.js` konsumiert Keybind-Deskriptoren bereits ueber `src/ui/KeybindActionCatalog.js`, waehrend `src/core/SettingsManager.js` keine Keybind-Action-Listen mehr traegt.
+- Naechste offene V103-Subphase ist `103.5.1`.
+
+## Stand-Snapshot 2026-04-26 (Subphase `V103 103.5`)
+
+- `tests/settings-manager.contract.test.mjs` deckt jetzt neben Persistenzsymmetrie auch den schmalen Record-Port, strukturierte Mutationsresultate und Ownership-/Failure-Reasons fuer Developer-, Preset-, Session- und Text-Override-Pfade ab.
+- `docs/referenz/ai_architecture_context.md` Abschnitt `4.6.6.2` enthaelt den kompakten Erweiterungspfad fuer neue Settings-Funktionen inklusive Domain-Ort, `changedKeys`-Vertrag, Store-Port-Regel, DOM-Freiheit und Testzielpfaden.
+- Naechste offene V103-Subphase ist `103.99.1`.
+
+## Stand-Snapshot 2026-04-26 (Abschluss `V103 103.99`)
+
+- `node --test tests/settings-manager.contract.test.mjs` ist mit 5/5 PASS gruen; `node --test tests/runtime-settings-live-apply.contract.test.mjs` bestaetigt den angrenzenden Live-Apply-/Runtime-Pfad mit 8/8 PASS.
+- `npm run gates:pre-commit` ist nach dem finalen Planabgleich gruen (`plan:check`, `docs:sync`, `docs:check`).
+- Im geaenderten V103-Scope gibt es keine neuen produktiven `settingsManager.store`-Reads und keine neuen Core-zu-DOM-Seiteneffekte; die verbliebenen Arcade-Legacy-Reads liegen ausserhalb des Blocks.
+- `V103` ist damit abgeschlossen; der naechste freie geplante Produktblock im Master ist `V75`, waehrend `V76 76.99.2` weiter gelockt bleibt.
+
+## Stand-Snapshot 2026-04-27 (Subphasen `V75 75.6` und `75.7`)
+
+- `src/core/recording/engines/NativeMediaRecorderEngine.js` haertet Stop-Finalisierung jetzt mit einem expliziten Timeout (`stopTimeoutMs`) ab; bei ausbleibendem `stop`-Event wird eine partielle Blob-Resolution statt haengender Promise geliefert.
+- `electron/recording-video-export-job.cjs` fuehrt fuer native Exportprozesse einen robusteren Timeout-Pfad ein: Child-Prozess-Terminierung (`terminateChildProcess`) plus Force-Resolve verhindern haengende Exportjobs und reduzieren Orphan-Risiken.
+- `src/core/MediaRecorderSystem.js` bindet `match_ended`/`menu_opened` jetzt ueber `settleRecording(event)` an denselben Lifecycle-Settlement-Vertrag statt separatem Stop-Sonderpfad.
+- `tests/recording-video-export-job.contract.test.mjs` deckt jetzt den nativen MP4-Erfolgsfall sowie den degradierten Master-Fallback (`RECORDING_SAVE_OK_MASTER_FALLBACK`) in einem reproduzierbaren Modul-Smoke ab.
+- `tests/media-recorder-engine.contract.test.mjs` und `tests/media-recorder-lifecycle.contract.test.mjs` verankern Stop-Timeout- und Lifecycle-Settlement-Vertraege; `package.json` bindet diese Recorder-Contract-Tests in `test:contract` ein.
+- Naechste offene V75-Subphase ist `75.99.1`.
+
+## Stand-Snapshot 2026-04-27 (Abschluss `V75 75.99`)
+
+- `npm run build:app` ist gruensicher; die Recorder-relevanten Contract-/Regressionstests (`runtime-regressions`, `recording-video-export*`, `media-recorder-*`) laufen mit 34/34 PASS.
+- `npm run gates:pre-commit` ist nach dem V75-Abschlussstand erneut gruen (`plan:check`, `docs:sync`, `docs:check` inkl. Abschluss-Recheck).
+- `tests/recording-video-export-job.contract.test.mjs` validiert den nativen MP4-Erfolgsfall sowie den degradierten Master-Fallback auf derselben Job-API (`RECORDING_SAVE_OK` vs `RECORDING_SAVE_OK_MASTER_FALLBACK`).
+- `V75` ist damit abgeschlossen; im freien Master ist der naechste geplante Produktblock `V81`, waehrend `V76 76.99.2` weiter im aktiven Lock laeuft.
+
+## Stand-Snapshot 2026-04-27 (Subphase `V81 81.1`)
+
+- `src/dev/tuning/TuningParameterRegistry.js` wurde als deklarativer Einstieg fuer Developer-Tuning eingefuehrt: Section-Mapping fuer Player/Trail/Arena/Gameplay/Powerup/Hunt/Projectile/Portal/Homing/Camera/Render/Farben/Bot sowie PPO_V2-Readonly-Ratchet.
+- `src/dev/tuning/TuningRuntimeBridge.js` kapselt jetzt `getValue`, `setValue`, `getAllValues` und `resetToDefaults`; Writes clonieren eingefrorene Branches defensiv und triggern danach den Runtime-Config-Refresh.
+- `src/core/runtime/ActiveRuntimeConfigStore.js` exportiert zusaetzlich `refreshActiveRuntimeConfig()` als expliziten Hook fuer Dev-Tuning-Mutationen.
+- `tests/tuning-runtime-bridge.contract.test.mjs` verankert Registry-Exposure, Runtime-Bridge-Mutation mit Refresh sowie PPO_V2-Readonly-Verhalten; `package.json` bindet den Test in `test:contract` ein.
+- Naechste offene V81-Subphase ist `81.2.1`.
+
+## Stand-Snapshot 2026-04-27 (Subphasen `V81 81.2` bis `81.4`)
+
+- Electron-Tuning-Shell ist Ende-zu-Ende verdrahtet: `electron/tuning-window.cjs`, `electron/tuning-ipc.cjs` und `electron/tuning-preload.cjs` bilden BrowserWindow-Lifecycle, Runtime-Forwarding (`tuning:get-all|set-value|reset-all|get-registry`) und Update-Push (`tuning:update`) ab; `electron/main.cjs` registriert F7-Hotkey, Capability-Check und Cleanup.
+- `electron/preload.cjs` verarbeitet `tuning-runtime:request` jetzt direkt im Game-Renderer: Registry und Runtime-Bridge werden lazy aus `src/dev/tuning/*` geladen, Actions werden ohne neue Runtime-Global-Slots bedient.
+- Console-UI steht in `electron/tuning-console/*`: Tab-/Such-Workflow, typed Controls (number/boolean/color/select/text), Changed-Highlighting, Parameter-Reset und BOT-Profilfilter (EASY/NORMAL/HARD, PPO_V2 readonly).
+- Preset-System ist aktiv: `src/dev/tuning/TuningPresetManager.js` speichert Delta-only Presets in localStorage; `electron/tuning-console/tuning-preset-ui.js` steuert Save/Load/Export/Import/Reset inkl. Changed-Counter; JSON Export/Import laeuft ueber Electron-Dialog-IPC.
+- Neue Contract-Abdeckung: `tests/tuning-ipc.contract.test.mjs`, `tests/tuning-window.contract.test.mjs`, `tests/tuning-preset-manager.contract.test.mjs`; `package.json` (`test:contract`) bindet sie in den Standardlauf ein. Fokussierter Lauf `node --test ... tuning-*` ist 12/12 PASS.
+- Gate-Stand: `npm run guard:main`, `npm run plan:check`, `npm run docs:check` und `npm run gates:pre-commit` sind gruen. `npm run build` bleibt in dieser Session an einem bestehenden touched-strict-Blocker ausserhalb des V81-Scope haengen (`src/core/MediaRecorderSystem.js` Baseline-Delta).
+- Naechste offene V81-Subphase ist `81.99.1`.
+
+## Stand-Snapshot 2026-04-27 (Subphasen `V81 81.99.1` und `81.99.3`)
+
+- Abschluss-Smoke fuer V81 laeuft gruen: `node --test tests/tuning-runtime-bridge.contract.test.mjs tests/tuning-ipc.contract.test.mjs tests/tuning-window.contract.test.mjs tests/tuning-preset-manager.contract.test.mjs` ist mit 14/14 PASS durch, inklusive F7-Hotkey-Vertrag, Frozen-Hunt-Write und Preset-Roundtrip.
+- `docs/referenz/developer_tuning_console.md` steht als kompakte Erweiterungsreferenz (Registry-Eintrag, Control-Typen, Preset-Vertrag) und deckt `81.99.3` ab.
+- `81.99.2` bleibt offen: `npm run build` scheitert weiterhin ausserhalb des V81-Scope an `check:eslint:touched-strict` in `src/core/MediaRecorderSystem.js`; Blockerdoku liegt in `docs/Fehlerberichte/2026-04-27_v81-81.99.2-build-touched-strict-mediarecorder.md`.
+- Naechste offene V81-Subphase ist `81.99.2`.
+
+## Stand-Snapshot 2026-04-27 (Subphasen `V94 94.1` bis `94.3`)
+
+- `94.1` ist abgeschlossen: Frontmatter-/depends_on-/scope-Inventar mit offenen Blocken (`V76`, `V81`, `V94`) und null aktuellen Scope-Ueberlappungen ist in `docs/plaene/aktiv/V94.md` dokumentiert; `docs/generated/knowledge-graph.schema.json` fuehrt `schema_version: 1` plus explizite Versionierungs-/Migrationsregeln.
+- `94.2` ist umgesetzt: `scripts/build-knowledge-graph.mjs` baut deterministisch `docs/generated/knowledge-graph.json` (aktuell `nodes=871`, `edges=1051`) aus Master-Index, aktiven Blockplaenen und Guard-Matrix; Parser-Fixtures liegen in `tests/knowledge-graph-build.contract.test.mjs`; Query-CLI `scripts/query-knowledge-graph.mjs` liefert `open-deps`, `scope-collisions`, `surfaces-for-file`.
+- `94.3` ist als Validator implementiert: `scripts/check-knowledge-graph.mjs` prueft Byte-Diff, Dead-Edges, hard-dep-Zyklen, Scope-Kollisionen, Pflichtdaten, Duplicate-/Orphan-Nodes und Dependency-Merge-Konsistenz.
+- Aktueller Lint-Stand aus `graph:check`: mehrere Dependency-Metadatenzeilen im Master haben keine Basis-Depends-Kante (`V95::V81`, `V97::V64`, `V98::V81`, `V103::V98` etc.); dieser Datenabgleich bleibt fuer `94.4`/`94.99` offen.
+- Naechste offene V94-Subphase ist `94.4.1`.
+
+## Stand-Snapshot 2026-04-27 (Subphase `V94 94.4`)
+
+- `package.json` fuehrt jetzt die Graph-Toolchain-Scripts `graph:build`, `graph:check` und `graph:query`; `scripts/gates-pre-commit.mjs` fuehrt die Meta-Gate-Reihenfolge auf `plan:check -> graph:check -> docs:sync -> docs:check`.
+- `.agents/rules/token_efficiency_and_tools.md` verankert den Graph-First-Leseweg fuer Abhaengigkeits-/Scope-/Surface-Fragen inklusive Query-Shortcuts fuer `open-deps`, `scope-collisions` und `surfaces-for-file`.
+- `.agents/workflows/status.md`, `.agents/workflows/code.md` und `.agents/workflows/plan.md` lesen den Graphen jetzt als bevorzugte Query-Schicht vor Volltext-Lesewegen und spiegeln die neue Gate-Sequenz.
+- `docs/referenz/ai_architecture_context.md` dokumentiert den Graphen explizit als sekundaere Query-Schicht unter dem bestehenden Master-Index-Leseweg.
+- Naechste offene V94-Subphase ist `94.99.1`.
+
+## Stand-Snapshot 2026-04-27 (Subphase `V94 94.99.1`)
+
+- Abschluss-Gates fuer den Graph-Block laufen gruensicher: `npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run gates:pre-commit` (inkl. neuem `graph:check`-Schritt) liefern Exit-Code 0.
+- `graph:check` ist fuer den aktiven Scope blockerfrei; die verbleibenden Abschlussarbeiten liegen in `94.99.2` (Token-Messtrace) und `94.99.3` (sekundaerer Leseweg in V64/V81/V82/V86/V92).
+- Naechste offene V94-Subphase ist `94.99.2`.
+
+## Stand-Snapshot 2026-04-27 (V81 Architektur-Ratchet-Nachzug)
+
+- `src/dev/tuning/TuningRuntimeBridge.js` liest `ActiveRuntimeConfigStore` nicht mehr direkt; Runtime-Refresh laeuft jetzt ueber den expliziten Config-Adapter `refreshConfigRuntimeCache()` aus `src/core/Config.js`.
+- Architektur-Gates sind damit wieder gruensicher: `npm run check:architecture:boundaries` und `npm run check:architecture:ratchet` passieren ohne neue Legacy-Surface- oder Budget-Verletzung.
+
+## Stand-Snapshot 2026-04-27 (Subphasen `V81 81.99.1` bis `81.99.3`)
+
+- `tests/tuning-runtime-bridge.contract.test.mjs` und `tests/tuning-window.contract.test.mjs` wurden fuer das Abschlussfenster erweitert: expliziter Frozen-Branch-Write (`HUNT.MG.DAMAGE`) und F7-Hotkey-Vertragsanker in `electron/main.cjs` sind jetzt mitabgedeckt.
+- Fokussierter Abschluss-Smoke `node --test tests/tuning-runtime-bridge.contract.test.mjs tests/tuning-ipc.contract.test.mjs tests/tuning-window.contract.test.mjs tests/tuning-preset-manager.contract.test.mjs` ist mit 14/14 PASS gruen; damit sind `81.99.1` (Smoke) und `81.99.3` (Entwickler-Referenz) abgeschlossen.
+- `npm run plan:check` und `npm run docs:check` sind gruen; `npm run build` bleibt fuer `81.99.2` am ausserhalb von V81 liegenden touched-strict-Verstoss in `src/core/MediaRecorderSystem.js` blockiert. Blockerdoku: `docs/Fehlerberichte/2026-04-27_v81-81.99.2-build-touched-strict-mediarecorder.md`.
+- Naechste offene V81-Subphase ist `81.99.2`.
+
+## Stand-Snapshot 2026-04-27 (Abschluss `V94 94.99`)
+
+- `V94` ist abgeschlossen: `94.99.2` dokumentiert den Messtrace fuer die drei Referenz-Queries mit deutlichem Zeilengewinn des Graph-Lesewegs (`Q1`: 30 vs 308, `Q2`: 4 vs 580, `Q3`: 5 vs 315).
+- `94.99.3` ist abgeschlossen: `docs/plaene/aktiv/V64.md`, `V81.md`, `V82.md`, `V86.md` und `V92.md` enthalten jetzt den Abschnitt `Sekundaerer Leseweg (V94)`; es waren keine neuen `scope_overlap_allowed_with`-Freigaben noetig.
+- Meta-Gates bleiben gruensicher mit Graph-Pruefung in der Kette (`plan:check -> graph:check -> docs:sync -> docs:check`).
+- Naechste offene Subphase im freien Master bleibt `V81 81.99.2` (Build-Blocker ausserhalb V81-Scope weiterhin dokumentiert), waehrend `V76 76.99.2` parallel im aktiven Lock laeuft.
+
+## Stand-Snapshot 2026-04-27 (Abschluss `V81 81.99.2`)
+
+- Der fruehere Build-Blocker in `src/core/MediaRecorderSystem.js` ist aufgeloest: die Export-Finalisierung liegt jetzt in `src/core/recording/MediaRecorderExportFinalizeOps.js`, wodurch `MediaRecorderSystem.js` wieder unter dem touched-strict-Limit bleibt.
+- `npm run build` ist inklusive `architecture:guard` gruensicher; `check:eslint:touched-strict`, `check:architecture:boundaries` und `check:architecture:ratchet` laufen im selben Build-Pfad ohne neue Verstosse.
+- `V81` ist damit vollstaendig abgeschlossen (`81.99` done). Der Fehlerbericht `docs/Fehlerberichte/2026-04-27_v81-81.99.2-build-touched-strict-mediarecorder.md` ist auf geloest aktualisiert.
+- Naechste offene Subphase im aktiven Master ist `V76 76.99.2` (weiter im Lock), waehrend die naechste freie Intake-Reihenfolge bei `V99 -> V100 -> V102` liegt.
+
+## Stand-Snapshot 2026-04-27 (Abschluss `V76 76.99.2`)
+
+- `V76` ist abgeschlossen (`76.99` done): `docs/plaene/aktiv/V76.md` steht jetzt auf `status: done`, `76.99` ist geschlossen und `76.99.2` dokumentiert den produktnahen Verifikationslauf.
+- Neuer Hangar-Contract-Smoke `tests/hangar-desktop-flow.contract.test.mjs` verifiziert Fight-/Arcade-Entry, mode-spezifischen Selection-Writeback sowie den einheitlichen Lifecycle-Return zu Menue und Match-Start; zusammen mit `tests/arcade-hangar-rules.contract.test.mjs` laeuft der Scope mit 9/9 PASS.
+- Abschluss-Gates sind gruen: `npm run build` sowie `npm run gates:pre-commit` (`plan:check`, `graph:check`, `docs:sync`, `docs:check`) liefern Exit-Code 0.
+- Der Master-Index spiegelt `V76` jetzt unter den abgeschlossenen Bloecken; die naechste freie Intake-Reihenfolge bleibt `V99 -> V100 -> V102`.

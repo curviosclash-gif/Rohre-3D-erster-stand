@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-25. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). V98 abgeschlossen 2026-04-24 (98.99 Abschluss-Gate gruen). V101 abgeschlossen 2026-04-24 (101.99 Abschluss-Gate gruen). `V103` wurde als geplanter P2-Block fuer nachhaltige Settings-Domain-Erweiterung auf Basis von `V92` aufgenommen. Deep-Audit 2026-04-22 verankerte Follow-up-Pakete als P32-P38 im Backlog; Deep-Code-Analyse 2026-04-24 ergaenzt P41-P46. Verbleibende Intake-Drafts liegen in `docs/plaene/neu/` (V99, V100, V102).
+Stand: 2026-04-28. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
+V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). V98 abgeschlossen 2026-04-24 (98.99 Abschluss-Gate gruen). V101 abgeschlossen 2026-04-24 (101.99 Abschluss-Gate gruen). V103 abgeschlossen 2026-04-26 (103.99 Abschluss-Gate gruen). V75 abgeschlossen 2026-04-27 (75.99 Abschluss-Gate gruen). V76 abgeschlossen 2026-04-27 (76.99 Abschluss-Gate gruen). V104 als geplanter Architekturblock aufgenommen 2026-04-28. Deep-Audit 2026-04-22 verankerte Follow-up-Pakete als P32-P38 im Backlog; Deep-Code-Analyse 2026-04-24 ergaenzt P41-P46. Verbleibende Intake-Drafts liegen in `docs/plaene/neu/` (V99, V100, V102).
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -37,33 +37,34 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V91 | Architektur-Ratchet und Legacy-Surface-Sunset | done | P2 | frei | V87.99,V77.99 | 91.99 | `docs/plaene/aktiv/V91.md` |
 | V92 | Runtime-Application-Ownership-Entkopplung und Orchestrator-Zuschnitt | done | P2 | frei | V91.99 | 92.99 | `docs/plaene/aktiv/V92.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | done | P2 | frei | V74.99,V77.99 | 64.99 | `docs/plaene/aktiv/V64.md` |
+| V75 | Cinematic Recorder Desktop Native MP4-Delivery und Master-Artefakt-Stabilisierung | done | P3 | frei | V74.99,V77.99,V64.99 | 75.99 | `docs/plaene/aktiv/V75.md` |
+| V76 | Desktop Hangar Arcade Fight | done | P3 | frei | V71.4,V77.99,V64.99 | 76.99 | `docs/plaene/aktiv/V76.md` |
 | V95 | Settings Studio fuer Menu-Defaults | done | P2 | frei | V77.99,V92.99 | 95.99 | `docs/plaene/aktiv/V95.md` |
+| V81 | Developer Tuning Console (Steuerkonsole) | done | P3 | frei | V74.99,V72.99,V77.99,V91.99 | 81.99 | `docs/plaene/aktiv/V81.md` |
 | V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | done | P2 | frei | V72.99,V74.99 | 82.99 | `docs/plaene/aktiv/V82.md` |
 | V97 | Settings Studio Erklaerbarkeit, Save-Vorschau und Hardening | done | P2 | frei | V95.99,V77.99,V92.99 | 97.99 | `docs/plaene/aktiv/V97.md` |
 | V98 | Settings Studio Browser-Demo Begrenzung | done | P2 | frei | V77.99,V97.99 | 98.99 | `docs/plaene/aktiv/V98.md` |
 | V86 | Editor- und Map-Authoring-Vertraege | done | P2 | frei | V72.99 | 86.99 | `docs/plaene/aktiv/V86.md` |
 | V101 | Architecture Type-Safety und Contract-Hardening | done | P2 | frei | V98.99 | 101.99 | `docs/plaene/aktiv/V101.md` |
+| V103 | Settings-Domain Nachhaltigkeit, Mutationsvertrag und Erweiterungspfad | done | P2 | frei | V92.99 | 103.99 | `docs/plaene/aktiv/V103.md` |
+| V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | done | P3 | frei | V93.99 | 94.99 | `docs/plaene/aktiv/V94.md` |
 
 ### Aktive und geplante Bloecke
 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| V103 | Settings-Domain Nachhaltigkeit, Mutationsvertrag und Erweiterungspfad | planned | P2 | frei | V92.99 | 103.1 | `docs/plaene/aktiv/V103.md` |
-| V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
-| V76 | Desktop Hangar Arcade Fight | active | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.99 | `docs/plaene/aktiv/V76.md` |
-| V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
-| V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | planned | P3 | frei | V93.99 | 94.1 | `docs/plaene/aktiv/V94.md` |
+| V104 | Runtime- und UI-God-Object-Sunset mit Port-Zuschnitt | planned | P2 | frei | V92.99,V103.99 | 104.1 | `docs/plaene/aktiv/V104.md` |
 
 ## Abhaengigkeiten
 
 | Block | Depends-On | Typ | Erfuellt | Hinweis |
 | --- | --- | --- | --- | --- |
 | V72 | Legacy-/Migrationspfad fuer Gate-/Portal-Validierung | hard | ja | In `V72` umgesetzt (sichtbare Warn-, Diagnose- und Migrationspfade); Block ist abgeschlossen |
-| V75 | V64.99 | hard | ja | V64 abgeschlossen 2026-04-18; Recorder-Polish kann beginnen |
+| V75 | V64.99 | hard | ja | V64 abgeschlossen 2026-04-18; native Recorder-Delivery kann beginnen |
 | V75 | V72 Recorder-/Telemetry-Result-Codes | soft | nein | Nur relevant, falls Export-Diagnostik gemeinsam mit Gameplay-Result-Codes vereinheitlicht wird |
 | V76 | V64.99 | hard | ja | V64 abgeschlossen 2026-04-18; Hangar-/Werkstatt-Flows koennen nach V82.99 beginnen |
 | V76 | V82.99 | hard | ja | V82 abgeschlossen 2026-04-20; V76.3 Arcade-Hangar kann jetzt auf V82-Contracts (XP, Upgrades, Leaderboard) aufbauen |
-| V81 | V77 Surface-Policy | soft | nein | Console ist Dev-Only-Feature; sollte V77-Capability-Vertrag respektieren, blockiert aber nicht |
+| V81 | V77 Surface-Policy | soft | ja | Console nutzt expliziten Desktop-Capability-State (F7/IPC), Browser-Demo bleibt ohne produktiven Dev-Zugang |
 | V95 | V77.99 | hard | ja | Surface-Policy aus V77 ist abgeschlossen; Settings Studio bleibt Desktop-only |
 | V95 | V92.99 | hard | ja | Ownership-/Facade-Ratchet aus V92 ist abgeschlossen und bleibt Leitplanke fuer neue Config-Pfade |
 | V95 | V81.99 | soft | nein | UI-/IPC-Synergien mit Developer-Tuning sinnvoll, aber nicht blockierend |
@@ -80,6 +81,8 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V103 | V92.99 | hard | ja | Ownership-/Facade-Ratchet aus V92 ist die bindende Leitplanke fuer nachhaltige Settings-Pfade und Store-/Facade-Zuschnitte |
 | V103 | V98.99 | soft | ja | V98 haertet angrenzende Settings-Studio-/Policy-Pfade; sinnvoll als Synchronisationspunkt, aber kein Startblocker fuer den Core-Settings-Zuschnitt |
 | V101 | V98.99 | hard | ja | V101 schliesst Typecheck-/Lint-/Contract-Hardening auf der V98-Resolverbasis ohne neue Guard-Verletzungen |
+| V104 | V92.99 | hard | ja | V92 liefert Ownership-, Snapshot- und Legacy-Surface-Ratchet als verbindliche Baseline fuer weiteren Alias- und Port-Abbau |
+| V104 | V103.99 | hard | ja | V103 liefert den schmalen Settings-Persistenz- und Mutationspfad, damit UI-Splits keine neuen Store-Bypaesse reaktivieren |
 
 ## Lock-Status
 
@@ -97,8 +100,8 @@ Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in 
 | - | V92 | 2026-04-15 | closed | Abgeschlossen 2026-04-15 |
 | - | V93 | 2026-04-14 | closed | Abgeschlossen 2026-04-14 |
 | - | V64 | 2026-04-18 | closed | Abgeschlossen 2026-04-18 |
-| - | V75 | - | frei | Siehe docs/lock-status/ |
-| build-agent | V76 | 2026-04-20 | in-bearbeitung | Siehe docs/lock-status/ |
+| - | V75 | 2026-04-27 | closed | Abgeschlossen 2026-04-27 |
+| - | V76 | 2026-04-27 | closed | Abgeschlossen 2026-04-27 |
 | - | V82 | - | frei | Siehe docs/lock-status/ |
 | - | V81 | - | frei | Siehe docs/lock-status/ |
 | - | V86 | - | frei | Siehe docs/lock-status/ |
@@ -108,6 +111,7 @@ Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in 
 | - | V98 | - | frei | Siehe docs/lock-status/ |
 | - | V103 | - | frei | Siehe docs/lock-status/ |
 | - | V101 | - | closed | Abgeschlossen 2026-04-24 |
+| - | V104 | - | frei | Siehe docs/lock-status/ |
 
 ## Empfohlene Reihenfolge
 
@@ -117,14 +121,13 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 
 1. `V99` (Signaling/LAN/Connectivity-Hardening) als naechsten Intake-Prioritaetsblock uebernehmen.
 2. Danach `V100` (Runtime-Rebuild/Remount/StartSync) nachziehen.
-3. Danach `V102` (Security-/Runtime-/Contract-Hardening aus Deep-Code-Analyse) uebernehmen.
+3. Danach `V104` (nachhaltiger God-Object-Sunset und UI-Port-Zuschnitt) einschieben.
+4. Danach `V102` (Security-/Runtime-/Contract-Hardening aus Deep-Code-Analyse) uebernehmen.
 
 ### Sofort laufende oder naechste Abschluesse
 
-1. `V76` als aktiven Produktblock auf `76.2` weiterziehen; Hangar-/Werkstatt-Flows bleiben der laufende Hauptpfad.
-2. `V103` als naechsten Settings-Core-Nachhaltigkeitsblock vorbereiten; `V92.99` ist erfuellt und `V98` liefert den abgeschlossenen Settings-Studio-/Policy-Synchronisationspunkt.
-3. `V75` als Recorder-Stabilisierung nachgezogen bearbeiten; `V64.99` ist bereits abgeschlossen.
-4. `V81` und `V94` als nachgelagerte P3-Bloecke vorbereiten (`V81` mit V92-Ratchet, `V94` als Governance-/Query-Layer).
+1. `V76` ist abgeschlossen (`76.99`): Hangar-Entry, mode-spezifischer Save-Writeback und der gemeinsame Rueckgabe-Lifecycle sind per Contract-Smoke plus Build-/Gate-Run gruen verifiziert.
+2. Naechste produktive Uebernahme bleibt `V99`, danach `V100`, `V104` und `V102` entsprechend der Intake-Priorisierung.
 
 ### Hauptpfad Architektur und Produkt
 
@@ -133,23 +136,22 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 3. `V77` vor `V91`, damit Surface-Policy und Produktrollen vor dem haerteren Guard- und Sunset-Ratchet verbindlich sind.
 4. `V91` vor `V92`, damit Guard-Ratchet und Legacy-Surface-Sunset die Ausgangsbasis fuer Ownership-Schnitt und Orchestrator-Zuschnitt sind.
 5. `V92` vor `V64` und `V81`, damit Multiplayer-Produktisierung und Developer-Tuning keine neuen Runtime-, Port- oder Config-Backdoors auf alte Surfaces bauen.
-6. `V64` vor `V75`, weil Recorder-Polish erst nach dem produktiven Desktop-Host-/Join-Hauptpfad kommen soll.
+6. `V64` vor `V75`, weil native Recorder-Delivery und Desktop-Export erst nach dem produktiven Desktop-Host-/Join-Hauptpfad kommen sollen.
 7. `V97` folgt nach `V95.99` als gezielter Produkt-Hardening-Block fuer Settings Studio; Erklaer-UX, Save-Vorschau und Migrationspfade koennen parallel zu Gameplay-Folgearbeit laufen, solange Desktop-only Surface-Policy und V92-Ratchet eingehalten bleiben.
 8. `V98` folgt nach `V97.99` als Desktop-only Folgeblock fuer Browser-Demo-Begrenzung im Settings Studio; Browser bleibt read-only Consumer ueber einen expliziten Auslieferungspfad.
 9. `V103` folgt auf dem durch `V53`, `V92`, `V95`, `V97` und `V98` vorbereiteten Settings-Pfad als nachhaltiger Core-Settings-Block; neue Funktionen sollen danach ueber stabile Domain-/Result-Vertraege statt Manager-Aufblaehung wachsen.
+10. `V104` folgt nach `V100` als nachhaltiger Ownership- und Port-Block fuer die verbleibenden Runtime-/UI-God-Objects; Stabilitaets- oder Security-Fixes sollen danach auf denselben schmalen Erweiterungspfaden statt auf Sammelmodulen aufsetzen.
 
 ### Parallelpfad Gameplay und Authoring
 
-1. `V76` bleibt der laufende Gameplay-Hauptpfad und nutzt die abgeschlossenen Datenvertraege aus `V82`.
-2. `V103` kann nach abgeschlossenem `V98` parallel zu `V76` als Settings-/Ownership-Follow-up laufen; die Ueberschneidung mit Gameplay bleibt gering.
-3. `V81` bleibt fachlich moeglich, ist aber hinter laufender Produktarbeit nachrangig und muss den `V92`-Ownership-Schnitt strikt halten.
-4. `V94` ist als Governance-/Tooling-Block weitgehend entkoppelt und parallelisierbar.
+1. `V76`, `V81` und `V94` sind abgeschlossen; Gameplay-/Authoring-Baselines sind gruensicher in den Produkt-Gates verankert.
+2. Folgearbeit startet auf Intake-Bloecken (`V99`, `V100`, `V102`) und nutzt weiterhin dieselben `V91`/`V92`-Ratchet- und Graph-Gates.
 
 ### Kurzform
 
-`V76 -> V103 -> V99 -> V100 -> V102 -> V75 -> V81 -> V94`
+`V99 -> V100 -> V104 -> V102`
 
-Parallelisierbar im aktuellen Stand: `V76` (laufend) plus `V103` (Settings-Core-Nachhaltigkeit) und `V94` (Governance-/Query-Layer). `V99`, `V100` und anschliessend `V102` folgen nach dem abgeschlossenen V101-Hardening auf einer wieder gruensicheren Typecheck-/Contract-Baseline. `V81` bleibt bewusst nachrangig und startet mit denselben Guard-Leitplanken (`V91`/`V92`), damit keine Runtime-/Config-Bypaesse reaktiviert werden. Die desktop-first-Hauptgates aus `V89` bleiben die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
+Parallelisierbar im aktuellen Stand: `V76`, `V81` und `V94` sind abgeschlossen; `V94` liefert den verpflichtenden Graph-Query-Leseweg plus `graph:check` im Meta-Gate. `V99`, `V100`, `V104` und anschliessend `V102` folgen als priorisierte Intake-Uebernahmen nach dem abgeschlossenen V101-/V103-Hardening auf einer wieder gruensicheren Typecheck-/Contract-Baseline. Die desktop-first-Hauptgates aus `V89` bleiben die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
 
 ## Aufgeschobene Fixes (Code-Review 2026-04-03)
 
@@ -163,12 +165,20 @@ Keine offenen Review-Punkte mehr im V87-Scope; `V87` ist abgeschlossen und dient
 
 ### In Folgeblocks oder eigenstaendig (nicht in V83/V87 scope_files)
 
+Offene Zuordnung fuer die naechsten Folgebloecke:
+
+- `V90`: `P21`
+- `V99`: `P32` bis `P38`
+- `V104`: `P14` plus architektureller Zuschnitt aus `P45` fuer `UIStartSyncController`, `UIManager`-nahe Menuepfade und `ArcadeVehicleManager`
+- `V102`: `P41` bis `P46`
+- Eigenstaendig oder spaeterer Produkt-/Infra-Follow-up: `P6`, `P7`, `P12`, `P14`, `P22` bis `P31`
+
 | ID | Datei(en) | Problem | Schwere |
 | --- | --- | --- | --- |
 | P6 | `PortalLayoutBuilder.js` | Portal-Slot-Modulo erzeugt identische Positionen bei `slots.length < 8` | hoch |
 | P7 | `vulkan_odyssey.js` | Precision-Plattformen (4x2 Einheiten) vermutlich unspielbar | hoch |
 | P12 | `CheckpointRingMeshFactory.js` | Material-Leak: jeder Checkpoint bekommt neues Material ohne Disposal | mittel |
-| P14 | `UIStartSyncController.js` | Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()` | mittel |
+| P14 | `UIStartSyncController.js` | Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()`; nachhaltige Behebung ueber den Ownership-/Port-Zuschnitt in `V104` statt rein lokalem Patch | mittel |
 | P21 | `package.json`, `package-lock.json` | `npm audit` meldet 5 Befunde (2 high, 3 moderate); Dependency-Security ist als neuer Intake-Draft `V90` vorbereitet, aber noch nicht als aktiver Block uebernommen | hoch |
 | P22 | `tmp/`, `.codex_tmp/`, `assets/models/jets/cc0/spaceship_pack/dist/*` | Ignore-Artefakte sind seit `V71 71.99.3` klassifiziert, aber weiterhin repo-schwergewichtig; Hygiene bleibt als Folgearbeit fuer Retention-/Enttracking offen | mittel |
 | P23 | `src/ui/menu/MenuExpertLoginRuntime.js` | Hartcodiertes Expertenpasswort `1307` darf nicht als Sicherheitsbarriere gelten; V77/V81 muessen es als Dev-only-/Surface-Policy klaeren | mittel |

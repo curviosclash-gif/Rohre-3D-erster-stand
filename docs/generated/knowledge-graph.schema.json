@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "docs/generated/knowledge-graph.schema.json",
+  "title": "Curvios Clash Knowledge Graph Schema",
+  "description": "Schema for deterministic graph export generated from master plan, active block plans, and legacy-surface guard matrix.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "contract",
+    "nodes",
+    "edges"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Schema major version. Unknown major versions must fail graph:check."
+    },
+    "contract": {
+      "type": "string",
+      "const": "knowledge-graph.v1"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    }
+  },
+  "x-versioning-policy": {
+    "major": 1,
+    "minor": 0,
+    "rule_additive": "Additive fields and enum extensions remain in major 1 (minor increment).",
+    "rule_breaking": "Breaking changes require major increment and coordinated graph build/check updates."
+  },
+  "x-consumer-migration": {
+    "consumer": "scripts/check-knowledge-graph.mjs",
+    "expected_major": 1,
+    "on_unknown_major": "fail_with_migration_hint",
+    "migration_hint": "Regenerate graph and update graph build/check scripts to the target major before merging."
+  },
+  "$defs": {
+    "nodeType": {
+      "type": "string",
+      "enum": [
+        "block",
+        "phase",
+        "subphase",
+        "file",
+        "surface"
+      ]
+    },
+    "edgeType": {
+      "type": "string",
+      "enum": [
+        "depends_on",
+        "scope",
+        "touches",
+        "contains_phase",
+        "contains_subphase"
+      ]
+    },
+    "dependsSourceType": {
+      "type": "string",
+      "enum": [
+        "frontmatter",
+        "master-table",
+        "merged"
+      ]
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "attributes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/nodeType"
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "planned",
+            "active",
+            "open",
+            "done",
+            "unknown"
+          ]
+        },
+        "attributes": {
+          "type": "object"
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "type",
+        "attributes"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/edgeType"
+        },
+        "source": {
+          "$ref": "#/$defs/dependsSourceType"
+        },
+        "hard": {
+          "type": "boolean"
+        },
+        "fulfilled": {
+          "type": "boolean"
+        },
+        "hint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attributes": {
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "depends_on"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "source",
+              "hard",
+              "fulfilled"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
