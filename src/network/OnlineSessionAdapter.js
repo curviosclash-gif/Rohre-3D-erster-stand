@@ -187,8 +187,9 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
     async _handleSignalingMessage(msg, connectResolve, connectReject) {
         switch (msg.type) {
         case SIGNALING_EVENT_TYPES.LOBBY_CREATED:
-            this._lobbyCode = msg.lobbyCode;
+            this._lobbyCode = msg.lobbyCode || msg?.sessionState?.lobbyCode || this._lobbyCode;
             this.localPlayerId = msg.playerId;
+            this._hostPeerId = msg?.sessionState?.hostPeerId || this.localPlayerId || this._hostPeerId;
             this.isConnected = true;
             this._latencyMonitor.start();
             this._emit('connected', { playerId: this.localPlayerId, lobbyCode: this._lobbyCode });
@@ -196,15 +197,25 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
             break;
 
         case SIGNALING_EVENT_TYPES.LOBBY_JOINED:
+            this._lobbyCode = msg.lobbyCode || msg?.sessionState?.lobbyCode || this._lobbyCode;
             this.localPlayerId = msg.playerId;
+            this._hostPeerId = msg?.sessionState?.hostPeerId || this._hostPeerId;
             this.isConnected = true;
-            this._emit('connected', { playerId: this.localPlayerId });
+            this._latencyMonitor.start();
+            this._emit('connected', { playerId: this.localPlayerId, lobbyCode: this._lobbyCode });
             if (connectResolve) connectResolve();
             break;
 
         case SIGNALING_EVENT_TYPES.CONNECTION_RESUMED:
+            this._lobbyCode = msg.lobbyCode || msg?.sessionState?.lobbyCode || this._lobbyCode;
+            this.localPlayerId = msg.playerId || this.localPlayerId;
+            this._hostPeerId = msg?.sessionState?.hostPeerId || this._hostPeerId;
             this.isConnected = true;
-            this._emit('connectionResumed', { lobbyCode: msg.lobbyCode || this._lobbyCode });
+            this._latencyMonitor.start();
+            this._emit('connectionResumed', {
+                playerId: this.localPlayerId,
+                lobbyCode: this._lobbyCode,
+            });
             if (connectResolve) connectResolve();
             break;
 
@@ -455,7 +466,7 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
                 id: normalizedPeerId,
                 peerId: normalizedPeerId,
                 name: normalizedPeerId,
-                isHost: !this.isHost && normalizedPeerId === 'host',
+                isHost: normalizedPeerId === this._hostPeerId,
                 ready: true,
                 connected: true,
             });

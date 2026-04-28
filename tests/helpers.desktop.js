@@ -256,6 +256,13 @@ function annotateDesktopError(error, { diagnosticsPath, failureKind, failureHint
     return new Error(`${String(error || 'Desktop-Smoke fehlgeschlagen')}\n${suffix}`);
 }
 
+function serializeCompactError(error) {
+    if (!error) return 'unknown-error';
+    const name = String(error?.name || 'Error');
+    const message = String(error?.message || String(error)).split('\n')[0];
+    return `${name}: ${message}`;
+}
+
 async function createDesktopDiagnostics({
     testInfo,
     events,
@@ -472,8 +479,24 @@ export const test = base.extend({
                 url: page.url(),
             });
 
-            await page.screenshot({ path: artifactPaths.readyScreenshotPath });
-            activeScreenshotPath = artifactPaths.readyScreenshotPath;
+            try {
+                await page.screenshot({
+                    path: artifactPaths.readyScreenshotPath,
+                    timeout: 5000,
+                });
+                activeScreenshotPath = artifactPaths.readyScreenshotPath;
+            } catch (screenshotError) {
+                const detail = serializeCompactError(screenshotError);
+                recordStage('ready_screenshot_skipped', { reason: detail });
+                rendererErrorEntries.push({
+                    recordedAt: toIsoNow(),
+                    source: 'harness',
+                    type: 'ready-screenshot-failed',
+                    message: 'Ready screenshot skipped after timeout/error.',
+                    detail,
+                    location: '',
+                });
+            }
             setupComplete = true;
 
             await use({
@@ -498,8 +521,12 @@ export const test = base.extend({
                 processExit,
             });
             if (page && !page.isClosed()) {
-                await page.screenshot({ path: artifactPaths.failureScreenshotPath }).catch(() => {});
-                activeScreenshotPath = artifactPaths.failureScreenshotPath;
+                await page.screenshot({
+                    path: artifactPaths.failureScreenshotPath,
+                    timeout: 5000,
+                }).then(() => {
+                    activeScreenshotPath = artifactPaths.failureScreenshotPath;
+                }).catch(() => {});
             }
             throw annotateDesktopError(error, {
                 diagnosticsPath: artifactPaths.diagnosticsPath,

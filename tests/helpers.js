@@ -62,6 +62,27 @@ export async function waitForLoadedGame(page, timeoutMs = 30000) {
     await waitForMenuIdle(page, timeoutMs);
 }
 
+async function ensureTestModuleImportBridge(page, timeoutMs = 5000) {
+    try {
+        await page.waitForFunction(() => (
+            typeof globalThis?.CURVIOS_TEST_API?.importCurviosTestModule === 'function'
+        ), null, { timeout: timeoutMs });
+    } catch {
+        // Non-e2e contexts may not provide the full test API bridge.
+    }
+
+    await page.evaluate(() => {
+        globalThis.__curviosImport = async (moduleSpecifier) => {
+            const normalizedSpecifier = String(moduleSpecifier || '').trim();
+            const api = globalThis?.CURVIOS_TEST_API;
+            if (typeof api?.importCurviosTestModule === 'function') {
+                return api.importCurviosTestModule(normalizedSpecifier);
+            }
+            return import(normalizedSpecifier);
+        };
+    });
+}
+
 // Load page and wait for visible main menu.
 export async function loadGame(page) {
     const maxAttempts = toPositiveInt(process.env.PW_LOAD_GAME_MAX_ATTEMPTS, 2, 1, 5);
@@ -123,6 +144,7 @@ export async function loadGame(page) {
             );
             lastStage = 'shell_ready';
             await waitForLoadedGame(page, readyBudgetMs);
+            await ensureTestModuleImportBridge(page, Math.min(5000, readyBudgetMs));
 
             return;
         } catch (error) {
@@ -268,19 +290,58 @@ export async function openStartSetupSection(page, sectionId) {
     await section.waitFor({ state: 'attached', timeout: 4000 });
     const isOpen = await section.evaluate((element) => element instanceof HTMLDetailsElement && element.open);
     if (isOpen) return;
-    await section.locator('summary').click({ force: true });
-    await page.waitForFunction((id) => {
+    let openedViaUi = false;
+    try {
+        await section.locator('summary').click({ force: true });
+        await page.waitForFunction((id) => {
+            const element = document.querySelector(`#submenu-game details[data-start-section="${id}"]`);
+            return element instanceof HTMLDetailsElement && element.open === true;
+        }, normalizedSectionId, { timeout: 4000 });
+        openedViaUi = true;
+    } catch {
+        openedViaUi = false;
+    }
+    if (openedViaUi) return;
+
+    const openedViaFallback = await page.evaluate((id) => {
         const element = document.querySelector(`#submenu-game details[data-start-section="${id}"]`);
-        return element instanceof HTMLDetailsElement && element.open === true;
-    }, normalizedSectionId, { timeout: 4000 });
+        if (!(element instanceof HTMLDetailsElement)) return false;
+        element.classList.remove('hidden');
+        element.open = true;
+        return element.open === true;
+    }, normalizedSectionId);
+    if (!openedViaFallback) {
+        throw new Error(`Start-Setup-Sektion konnte nicht geoeffnet werden: ${normalizedSectionId}`);
+    }
 }
 
 export async function openCustomSubmenu(page) {
     await openSubmenu(page, 'submenu-custom');
 }
 
-export async function openMultiplayerSubmenu(page) {
-    await openSubmenu(page, 'submenu-game', { sessionType: 'multiplayer' });
+export async function openMultiplayerSubmenu(page, options = {}) {
+    const requireActive = options.requireActive === true;
+    await selectSessionType(page, 'multiplayer');
+    const nextButton = page
+        .locator('#submenu-custom:not(.hidden) [data-menu-step-target="submenu-game"]:visible:not([disabled])')
+        .first();
+    if (await nextButton.count()) {
+        await nextButton.click({ force: true });
+    } else {
+        await openViaNavigationRuntime(page, 'submenu-game');
+    }
+    await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+    const activeSessionType = await page.evaluate(() => (
+        String(window.GAME_INSTANCE?.settings?.localSettings?.sessionType || '').trim().toLowerCase()
+    ));
+    if (activeSessionType === 'multiplayer') {
+        await openStartSetupSection(page, 'multiplayer');
+        return true;
+    }
+    if (requireActive) {
+        throw new Error(`Multiplayer-Session nicht aktiv (sessionType="${activeSessionType || 'unknown'}").`);
+    }
+    return false;
 }
 
 export async function openLevel4Drawer(page, options = {}) {
@@ -470,6 +531,15 @@ async function selectModePath(page, modePath) {
     }
 }
 
+async function trySelectModePath(page, modePath) {
+    try {
+        await selectModePath(page, modePath);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 async function readMatchStartSnapshot(page) {
     return page.evaluate(() => {
         const game = window.GAME_INSTANCE;
@@ -632,7 +702,7 @@ export async function startGameWithBots(page, botCount = 1) {
 export async function startHuntGame(page) {
     await loadGame(page);
     await openCustomSubmenu(page);
-    await selectModePath(page, 'fight');
+    await trySelectModePath(page, 'fight');
     await ensureModePathSelected(page, 'fight');
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
     await triggerMatchStart(page);
@@ -643,7 +713,7 @@ export async function startHuntGame(page) {
 export async function startHuntGameWithBots(page, botCount = 1) {
     await loadGame(page);
     await openCustomSubmenu(page);
-    await selectModePath(page, 'fight');
+    await trySelectModePath(page, 'fight');
     await ensureModePathSelected(page, 'fight');
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
     await page.evaluate((count) => {

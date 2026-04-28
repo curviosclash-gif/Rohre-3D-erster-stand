@@ -234,13 +234,19 @@ export class OnlineMatchLobby extends MatchLobby {
         }
 
         case SIGNALING_EVENT_TYPES.CONNECTION_RESUMED: {
+            this._playerId = msg.playerId || this._playerId;
+            if (msg?.sessionState && typeof msg.sessionState === 'object') {
+                this._applySessionState(msg.sessionState);
+            }
             const now = Date.now();
-            this._applySessionState({
-                ...this.sessionState,
-                lobbyCode: msg.lobbyCode || this.sessionState.lobbyCode,
-                updatedAt: now,
-                revision: Number(this.sessionState.revision || 0) + 1,
-            });
+            if (!msg?.sessionState || typeof msg.sessionState !== 'object') {
+                this._applySessionState({
+                    ...this.sessionState,
+                    lobbyCode: msg.lobbyCode || this.sessionState.lobbyCode,
+                    updatedAt: now,
+                    revision: Number(this.sessionState.revision || 0) + 1,
+                });
+            }
             this._emit('connectionResumed', { sessionState: this.sessionState });
             if (connectResolve) connectResolve();
             break;
@@ -278,6 +284,10 @@ export class OnlineMatchLobby extends MatchLobby {
         }
 
         case SIGNALING_EVENT_TYPES.PLAYER_LEFT:
+            if (msg?.sessionState && typeof msg.sessionState === 'object') {
+                this._applySessionState(msg.sessionState);
+                break;
+            }
             this._applySessionState({
                 ...this.sessionState,
                 members: this.sessionState.members.filter((member) => member.peerId !== msg.peerId),
@@ -320,6 +330,9 @@ export class OnlineMatchLobby extends MatchLobby {
 
         case SIGNALING_EVENT_TYPES.PLAYER_RECONNECTED: {
             const peerId = String(msg.peerId || '').trim();
+            if (msg?.sessionState && typeof msg.sessionState === 'object') {
+                this._applySessionState(msg.sessionState);
+            }
             if (!peerId) break;
             this._emit('playerReconnected', { peerId, sessionState: this.sessionState });
             break;
