@@ -23,6 +23,17 @@ import {
 import { createNeutralBotAction, sanitizeBotAction } from '../src/entities/ai/actions/BotActionContract.js';
 import { resolveHybridDecision } from '../src/entities/ai/hybrid/HybridDecisionArchitecture.js';
 import { RuntimeNearObservationTracker } from '../src/entities/ai/observation/RuntimeNearObservationAdapter.js';
+import {
+    HEALTH_RATIO,
+    LOCAL_OPENNESS_RATIO,
+    PRESSURE_LEVEL,
+    PROJECTILE_THREAT,
+    SPEED_RATIO,
+    TARGET_ALIGNMENT,
+    TARGET_DISTANCE_RATIO,
+    TARGET_IN_FRONT,
+    WALL_DISTANCE_FRONT,
+} from '../src/entities/ai/observation/ObservationSchemaV1.js';
 import { buildObservation, createObservationContext } from '../src/entities/ai/observation/ObservationSystem.js';
 import {
     EpisodeController,
@@ -43,6 +54,7 @@ const DEFAULT_BRIDGE_READY_TIMEOUT_MS = 8_000;
 const DEFAULT_STATS_TIMEOUT_MS = 2_000;
 const KERNEL_RUNNING_LIFECYCLES = new Set(['running', 'round_end', 'match_end']);
 export const BT93J_REWARD_CURRICULUM_PROOF_PROFILE_ID = 'bt93j-reward-curriculum-proof-v1';
+export const BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID = 'bt93l-objective-reachability-v1';
 
 const BT93J_PROOF_REWARD_WEIGHTS = Object.freeze({
     baseStep: -0.005,
@@ -105,6 +117,25 @@ export function resolveHeadlessRewardProfile(profileId = '') {
                 curriculumStages: BT93J_PROOF_CURRICULUM_STAGES,
             },
             intent: 'BT93J.5b proof lane: player-dead-only must be net-negative; non-death natural terminal remains separately positive.',
+        };
+    }
+    if (String(profileId || '') === BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID) {
+        return {
+            profileId: BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
+            active: true,
+            runKindBound: ['bt93l-progress-reachability'],
+            rewardCalculatorOptions: {
+                weights: {
+                    baseStep: -0.004,
+                    survival: 0.02,
+                    survivalPressureBonus: 0.02,
+                    checkpointReached: 0.8,
+                    parcoursCompleted: 2,
+                    loss: -4,
+                    win: 2.5,
+                },
+            },
+            intent: 'BT93L.2 diagnostic reachability lane: progress must come from real observation deltas, not manual progressEvent injection.',
         };
     }
     return {
@@ -291,6 +322,112 @@ function isDeathLikeTerminalReason(value) {
     return ['dead', 'death', 'killed', 'loss', 'crash'].some((token) => reason.includes(token));
 }
 
+function readObservationValue(observation, index, fallback = 0) {
+    if (!observation || typeof observation.length !== 'number') return fallback;
+    const value = Number(observation[index]);
+    return Number.isFinite(value) ? value : fallback;
+}
+
+function roundDelta(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return 0;
+    return Math.round(numeric * 1_000_000) / 1_000_000;
+}
+
+function actionHasEffect(action = {}) {
+    if (!action || typeof action !== 'object') return false;
+    return Object.values(action).some((value) => {
+        if (value === true) return true;
+        const numeric = Number(value);
+        return Number.isFinite(numeric) && numeric >= 0;
+    });
+}
+
+export function deriveHeadlessObjectiveReachabilitySignals({
+    previousObservation = null,
+    observation = null,
+    episode = {},
+    input = {},
+    action = null,
+    rewardProfileId = '',
+} = {}) {
+    const profileActive = String(rewardProfileId || '') === BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID;
+    const manualInjection = input?.progressEvent === true;
+    const hasPrevious = previousObservation && typeof previousObservation.length === 'number';
+    const hasCurrent = observation && typeof observation.length === 'number';
+    const realEnvStepPath = profileActive && hasPrevious && hasCurrent && !manualInjection;
+    const actionActive = actionHasEffect(action || input?.action || {});
+
+    const previousTargetDistance = readObservationValue(previousObservation, TARGET_DISTANCE_RATIO, 1);
+    const currentTargetDistance = readObservationValue(observation, TARGET_DISTANCE_RATIO, 1);
+    const previousTargetAlignment = readObservationValue(previousObservation, TARGET_ALIGNMENT, 0);
+    const currentTargetAlignment = readObservationValue(observation, TARGET_ALIGNMENT, 0);
+    const previousOpenness = readObservationValue(previousObservation, LOCAL_OPENNESS_RATIO, 0);
+    const currentOpenness = readObservationValue(observation, LOCAL_OPENNESS_RATIO, 0);
+    const previousSpeed = readObservationValue(previousObservation, SPEED_RATIO, 0);
+    const currentSpeed = readObservationValue(observation, SPEED_RATIO, 0);
+    const currentTargetInFront = readObservationValue(observation, TARGET_IN_FRONT, 0) >= 0.5;
+    const currentWallFront = readObservationValue(observation, WALL_DISTANCE_FRONT, 1);
+    const currentPressure = readObservationValue(observation, PRESSURE_LEVEL, 0);
+    const currentHealth = readObservationValue(observation, HEALTH_RATIO, 1);
+    const currentProjectileThreat = readObservationValue(observation, PROJECTILE_THREAT, 0);
+
+    const targetDistanceDelta = previousTargetDistance - currentTargetDistance;
+    const targetAlignmentDelta = currentTargetAlignment - previousTargetAlignment;
+    const opennessDelta = currentOpenness - previousOpenness;
+    const speedDelta = currentSpeed - previousSpeed;
+    const survivedStep = episode?.done !== true && episode?.truncated !== true;
+
+    const targetDistanceImproved = actionActive && targetDistanceDelta >= 0.0025;
+    const targetAlignmentImproved = actionActive && currentTargetInFront && targetAlignmentDelta >= 0.015;
+    const safeMovementProgress = actionActive && speedDelta >= 0.01 && currentSpeed >= 0.02 && currentWallFront >= 0.1 && currentHealth > 0;
+    const opennessImproved = actionActive && opennessDelta >= 0.01;
+    const pressureSurvivalObserved = survivedStep && currentPressure >= 0.35 && currentSpeed >= 0.02;
+
+    const progressEvents = [];
+    if (targetDistanceImproved) progressEvents.push('target-distance-improved');
+    if (targetAlignmentImproved) progressEvents.push('target-alignment-improved');
+    if (safeMovementProgress) progressEvents.push('safe-movement-observed');
+    if (opennessImproved) progressEvents.push('local-openness-improved');
+
+    const objectiveEvents = progressEvents.filter((event) => event !== 'pressure-survival-step');
+    const progressSignalReachable = realEnvStepPath && progressEvents.length > 0;
+    const objectiveSignalReachable = realEnvStepPath && objectiveEvents.length > 0;
+
+    return {
+        active: profileActive,
+        realEnvStepPath,
+        actionActive,
+        manualInjection,
+        manualInjectionCounterprobe: manualInjection,
+        source: progressSignalReachable ? 'runtime-observation-delta' : (manualInjection ? 'manual-injection-counterprobe' : 'none'),
+        progressSignalReachable,
+        objectiveSignalReachable,
+        progressEvents,
+        objectiveEvents,
+        checkpointReached: objectiveSignalReachable ? 1 : 0,
+        parcoursEnabled: progressSignalReachable,
+        deltas: {
+            targetDistance: roundDelta(targetDistanceDelta),
+            targetAlignment: roundDelta(targetAlignmentDelta),
+            localOpenness: roundDelta(opennessDelta),
+            speed: roundDelta(speedDelta),
+        },
+        metrics: {
+            speedRatio: roundDelta(currentSpeed),
+            targetDistanceRatio: roundDelta(currentTargetDistance),
+            targetAlignment: roundDelta(currentTargetAlignment),
+            targetInFront: currentTargetInFront,
+            localOpennessRatio: roundDelta(currentOpenness),
+            wallDistanceFront: roundDelta(currentWallFront),
+            pressureLevel: roundDelta(currentPressure),
+            projectileThreat: roundDelta(currentProjectileThreat),
+            healthRatio: roundDelta(currentHealth),
+            pressureSurvivalObserved,
+        },
+    };
+}
+
 export function buildHeadlessTrainingRewardSignals(episode = {}, context = {}) {
     const done = episode?.done === true;
     const truncated = episode?.truncated === true;
@@ -298,6 +435,9 @@ export function buildHeadlessTrainingRewardSignals(episode = {}, context = {}) {
     const terminalReasonLower = terminalReason.toLowerCase();
     const deathLikeTerminal = done && isDeathLikeTerminalReason(terminalReason);
     const proofProfileActive = String(context.rewardProfileId || '') === BT93J_REWARD_CURRICULUM_PROOF_PROFILE_ID;
+    const objectiveReachability = context.objectiveReachability && typeof context.objectiveReachability === 'object'
+        ? context.objectiveReachability
+        : null;
     const signals = {
         survival: done !== true && truncated !== true,
         lost: deathLikeTerminal || terminalReasonLower === 'match-loss',
@@ -308,6 +448,18 @@ export function buildHeadlessTrainingRewardSignals(episode = {}, context = {}) {
     if (proofProfileActive && context.progressEvent === true) {
         signals.parcoursEnabled = true;
         signals.checkpointReached = 1;
+    }
+    if (objectiveReachability?.progressSignalReachable === true) {
+        signals.parcoursEnabled = true;
+    }
+    if (objectiveReachability?.objectiveSignalReachable === true) {
+        signals.checkpointReached = Math.max(1, Number(objectiveReachability.checkpointReached || 0));
+    }
+    if (objectiveReachability?.metrics && typeof objectiveReachability.metrics === 'object') {
+        signals.healthRatio = objectiveReachability.metrics.healthRatio;
+        signals.pressureLevel = objectiveReachability.metrics.pressureLevel;
+        signals.projectileThreat = objectiveReachability.metrics.projectileThreat;
+        signals.wallRisk = Math.max(0, 1 - Number(objectiveReachability.metrics.wallDistanceFront || 1));
     }
     if (Number.isFinite(Number(context.totalEnvSteps))) {
         signals.totalEnvSteps = Number(context.totalEnvSteps);
@@ -419,6 +571,7 @@ export class HeadlessLaneStepRunner {
         this._actionScratch = createNeutralBotAction({});
         this._observationScratch = null;
         this._observationContext = null;
+        this._previousObjectiveObservation = null;
     }
 
     get session() {
@@ -529,6 +682,7 @@ export class HeadlessLaneStepRunner {
         this.observationTracker.reset();
         const player = createPlayerSnapshot(this._getPlayer());
         const observation = this._buildRawObservation();
+        this._previousObjectiveObservation = Array.from(observation);
         const metadata = this._buildMetadata(input.metadata || {});
         const episode = this.episodeController.reset({
             episodeId: `${this.episodeIdPrefix}-${this.seed}`,
@@ -589,6 +743,9 @@ export class HeadlessLaneStepRunner {
         );
 
         const player = createPlayerSnapshot(this._getPlayer());
+        const previousObjectiveObservation = this._previousObjectiveObservation
+            ? Array.from(this._previousObjectiveObservation)
+            : null;
         const observation = this._buildRawObservation();
         const episodeStepInput = deriveHeadlessLaneEpisodeStep({
             player,
@@ -598,10 +755,20 @@ export class HeadlessLaneStepRunner {
             nowMs: (tickIndex + 1) * 16,
         });
         const episode = this.episodeController.step(episodeStepInput);
+        const objectiveReachability = deriveHeadlessObjectiveReachabilitySignals({
+            previousObservation: previousObjectiveObservation,
+            observation,
+            episode,
+            input,
+            action,
+            rewardProfileId: this.rewardProfile.profileId,
+        });
+        this._previousObjectiveObservation = Array.from(observation);
         const rewardSignals = buildHeadlessTrainingRewardSignals(episode, {
             totalEnvSteps: curriculumTotalEnvSteps,
             rewardProfileId: this.rewardProfile.profileId,
             progressEvent: input.progressEvent === true,
+            objectiveReachability,
         });
         const previousCurriculumStage = this.rewardCalculator.currentStage || null;
         const reward = this.rewardCalculator.compute(rewardSignals, episode);
@@ -659,6 +826,16 @@ export class HeadlessLaneStepRunner {
                     previousCurriculumStage,
                     curriculumStageChanged,
                     progressEventReachable: input.progressEvent === true,
+                    manualProgressEvent: input.progressEvent === true,
+                    realEnvStepPath: objectiveReachability.realEnvStepPath === true,
+                    actionActiveForObjectiveSignal: objectiveReachability.actionActive === true,
+                    progressSignalSource: objectiveReachability.source,
+                    objectiveSignalSource: objectiveReachability.objectiveSignalReachable === true
+                        ? objectiveReachability.source
+                        : 'none',
+                    progressSignalReachable: objectiveReachability.progressSignalReachable === true,
+                    objectiveSignalReachable: objectiveReachability.objectiveSignalReachable === true,
+                    objectiveReachability,
                     progressSignalReported: rewardSignals.parcoursEnabled === true,
                     checkpointReachedSignal: Number(rewardSignals.checkpointReached || 0),
                     done: episode.done,
