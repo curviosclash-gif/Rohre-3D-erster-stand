@@ -3,6 +3,10 @@ import {
     createMatchKernelTickEnvelope,
 } from '../shared/contracts/MatchKernelRuntimeContract.js';
 import {
+    GAMEPLAY_CAMERA_MODE_ID,
+    resolveCameraModeIndexFromModes,
+} from '../shared/contracts/CameraModeContract.js';
+import {
     createHeadlessInputAdapter,
     createHeadlessMatchKernel,
 } from './MatchKernel.js';
@@ -13,6 +17,11 @@ import {
 } from './MatchSessionFactory.js';
 
 export const MATCH_KERNEL_HEADLESS_RUNTIME_CONTRACT_VERSION = 'match-kernel-headless-runtime.v1';
+const HEADLESS_CAMERA_MODE_IDS = Object.freeze(['THIRD_PERSON', GAMEPLAY_CAMERA_MODE_ID, 'TOP_DOWN']);
+const HEADLESS_GAMEPLAY_CAMERA_MODE_INDEX = resolveCameraModeIndexFromModes(
+    HEADLESS_CAMERA_MODE_IDS,
+    GAMEPLAY_CAMERA_MODE_ID
+);
 
 class HeadlessMatchRenderer {
     constructor() {
@@ -46,21 +55,23 @@ class HeadlessMatchRenderer {
         const camera = { index: safeIndex };
         this.cameras[safeIndex] = camera;
         if (!Number.isFinite(Number(this.cameraModes[safeIndex]))) {
-            this.cameraModes[safeIndex] = 0;
+            this.cameraModes[safeIndex] = HEADLESS_GAMEPLAY_CAMERA_MODE_INDEX;
         }
         return camera;
     }
 
     cycleCamera(index = 0) {
         const safeIndex = Math.max(0, Math.floor(Number(index) || 0));
-        const nextMode = ((Number(this.cameraModes[safeIndex]) || 0) + 1) % 2;
-        this.cameraModes[safeIndex] = nextMode;
-        return nextMode;
+        this.cameraModes[safeIndex] = HEADLESS_GAMEPLAY_CAMERA_MODE_INDEX;
+        return HEADLESS_GAMEPLAY_CAMERA_MODE_INDEX;
     }
 
     getCameraMode(index = 0) {
         const safeIndex = Math.max(0, Math.floor(Number(index) || 0));
-        return Number(this.cameraModes[safeIndex]) || 0;
+        if (!Number.isFinite(Number(this.cameraModes[safeIndex]))) {
+            this.cameraModes[safeIndex] = HEADLESS_GAMEPLAY_CAMERA_MODE_INDEX;
+        }
+        return Number(this.cameraModes[safeIndex]) || HEADLESS_GAMEPLAY_CAMERA_MODE_INDEX;
     }
 
     updateCamera() {

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createMatchRenderProjection } from '../contracts/MatchRenderProjectionContract.js';
+import { createGameplayCameraState } from '../contracts/CameraModeContract.js';
 import { resolveGameplayConfig } from '../contracts/GameplayConfigContract.js';
 
 const TMP_RENDER_POSITION = new THREE.Vector3();
@@ -83,7 +84,7 @@ function buildPlayerRenderProjection({ runtimeState, game, player, renderAlpha =
         entityRuntimeConfig: player?.entityRuntimeConfig || null,
     });
     const playerConfig = gameplayConfig?.PLAYER || {};
-    const cameraModeId = gameplayConfig?.CAMERA?.MODES?.[player?.cameraMode] || 'THIRD_PERSON';
+    const gameplayCameraState = createGameplayCameraState(gameplayConfig);
     const boostCapacity = Math.max(0.001, Number(playerConfig.BOOST_DURATION) || 1);
     const renderTransform = copyPlayerRenderTransform(player, renderAlpha);
 
@@ -99,9 +100,9 @@ function buildPlayerRenderProjection({ runtimeState, game, player, renderAlpha =
         isBoosting: player?.isBoosting === true,
         hp: Math.max(0, Number(player?.hp) || 0),
         maxHp: Math.max(1, Number(player?.maxHp) || 1),
-        cockpitCamera: player?.cockpitCamera === true,
+        cockpitCamera: gameplayCameraState.cockpitCamera,
         planarMode: gameplayConfig?.GAMEPLAY?.PLANAR_MODE === true,
-        cameraModeId: String(cameraModeId || 'THIRD_PERSON'),
+        cameraModeId: gameplayCameraState.cameraModeId,
         position: renderTransform.position,
         quaternion: renderTransform.quaternion,
         direction: renderTransform.direction,

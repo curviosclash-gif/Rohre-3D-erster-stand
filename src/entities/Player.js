@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { Trail } from './Trail.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
+import { createGameplayCameraState } from '../shared/contracts/CameraModeContract.js';
 import { isValidVehicleId, VEHICLE_DEFINITIONS } from './vehicle-registry.js';
 import {
     applyDamage,
@@ -41,10 +42,7 @@ export class Player {
         this.isBot = isBot;
         this.entityRuntimeConfig = options?.entityRuntimeConfig || options?.entityManager?.entityRuntimeConfig || null;
         this.gameplayConfig = resolveGameplayConfig(this);
-        const firstPersonCameraModeIndex = Array.isArray(this.gameplayConfig?.CAMERA?.MODES)
-            ? this.gameplayConfig.CAMERA.MODES.indexOf('FIRST_PERSON')
-            : -1;
-        const defaultCameraModeIndex = firstPersonCameraModeIndex >= 0 ? firstPersonCameraModeIndex : 0;
+        const gameplayCameraState = createGameplayCameraState(this.gameplayConfig);
         this.alive = true;
         this.score = 0;
         const playerConfig = this.gameplayConfig.PLAYER;
@@ -93,7 +91,7 @@ export class Player {
         this.itemUseCooldownRemaining = 0;
         this.invertPitchBase = false;
         this.modelScale = playerConfig.MODEL_SCALE || 1;
-        this.cockpitCamera = true;
+        this.cockpitCamera = gameplayCameraState.cockpitCamera;
         this.spawnProtectionTimer = 0;
         this.planarAimOffset = 0;
         this.steeringLockTimer = 0;
@@ -148,7 +146,7 @@ export class Player {
         this.firstPersonAnchor = null;
         this.flames = [];
 
-        this.cameraMode = defaultCameraModeIndex;
+        this.cameraMode = gameplayCameraState.cameraModeIndex;
 
         this.controller = new PlayerController();
         this.controller.setRampRates(this.controlRampRates);
@@ -272,7 +270,9 @@ export class Player {
             this.view?.applyModelScale();
         }
         if (typeof options.cockpitCamera === 'boolean') {
-            this.cockpitCamera = true;
+            const gameplayCameraState = createGameplayCameraState(this.gameplayConfig);
+            this.cockpitCamera = gameplayCameraState.cockpitCamera;
+            this.cameraMode = gameplayCameraState.cameraModeIndex;
         }
         if (typeof options.speed === 'number' && Number.isFinite(options.speed) && options.speed > 0) {
             this.baseSpeed = options.speed;

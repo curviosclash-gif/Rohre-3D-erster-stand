@@ -3,6 +3,7 @@
 // ============================================
 
 import { createLogger } from '../../shared/logging/Logger.js';
+import { createGameplayCameraState } from '../../shared/contracts/CameraModeContract.js';
 import { sanitizeBotAction } from '../ai/actions/BotActionContract.js';
 
 const logger = createLogger('PlayerInputSystem');
@@ -536,9 +537,14 @@ export class PlayerInputSystem {
             }
         }
 
+        const gameplayCameraState = createGameplayCameraState(player?.gameplayConfig || null);
+        player.cockpitCamera = gameplayCameraState.cockpitCamera;
+        player.cameraMode = gameplayCameraState.cameraModeIndex;
+        if (player.index < entityManager.renderer.cameraModes.length) {
+            entityManager.renderer.cameraModes[player.index] = gameplayCameraState.cameraModeIndex;
+        }
         if (input.cameraSwitch) {
-            entityManager.renderer.cycleCamera(player.index);
-            player.cameraMode = entityManager.renderer.cameraModes[player.index] || 0;
+            input.cameraSwitch = false;
         }
         return input;
     }

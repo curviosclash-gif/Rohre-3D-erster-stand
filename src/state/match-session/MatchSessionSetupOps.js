@@ -21,12 +21,12 @@ export function buildHumanConfigs(settings, runtimeConfig = null) {
     return [
         {
             invertPitch: !!settings?.invertPitch?.PLAYER_1,
-            cockpitCamera: !!settings?.cockpitCamera?.PLAYER_1,
+            cockpitCamera: true,
             vehicleId: runtimeVehicles?.PLAYER_1 || settings?.vehicles?.PLAYER_1,
         },
         {
             invertPitch: !!settings?.invertPitch?.PLAYER_2,
-            cockpitCamera: !!settings?.cockpitCamera?.PLAYER_2,
+            cockpitCamera: true,
             vehicleId: runtimeVehicles?.PLAYER_2 || settings?.vehicles?.PLAYER_2,
         },
     ];

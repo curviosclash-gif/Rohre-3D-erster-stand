@@ -331,8 +331,10 @@ export class UIManager {
         ui.autoRollToggle.checked = !!settings.autoRoll;
         ui.invertP1.checked = !!settings.invertPitch.PLAYER_1;
         ui.invertP2.checked = !!settings.invertPitch.PLAYER_2;
-        ui.cockpitCamP1.checked = !!settings.cockpitCamera.PLAYER_1;
-        ui.cockpitCamP2.checked = !!settings.cockpitCamera.PLAYER_2;
+        ui.cockpitCamP1.checked = true;
+        ui.cockpitCamP1.disabled = true;
+        ui.cockpitCamP2.checked = true;
+        ui.cockpitCamP2.disabled = true;
         ui.portalsToggle.checked = !!settings.portalsEnabled;
     }
 

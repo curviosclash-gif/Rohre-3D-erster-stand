@@ -14,6 +14,7 @@ import {
     CAMERA_PERSPECTIVE_MODE,
     createDefaultCameraPerspectiveSettings,
 } from '../../shared/contracts/CameraPerspectiveContract.js';
+import { GAMEPLAY_COCKPIT_CAMERA_ENABLED } from '../../shared/contracts/CameraModeContract.js';
 import { clamp } from '../../utils/MathOps.js';
 import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 import { bindMenuMultiplayerTransportButtons } from './MenuMultiplayerTransportBindings.js';
@@ -40,6 +41,8 @@ export function setupMenuGameplayBindings(ctx) {
     const gameplayLimits = runtimeLimits.gameplay;
     const mgTrailAimLimits = gameplayLimits.mgTrailAimRadius;
     const fightMgDamageLimits = gameplayLimits.fightMgDamage;
+    settings.cockpitCamera = { ...(settings.cockpitCamera && typeof settings.cockpitCamera === 'object' ? settings.cockpitCamera : {}), PLAYER_1: GAMEPLAY_COCKPIT_CAMERA_ENABLED, PLAYER_2: GAMEPLAY_COCKPIT_CAMERA_ENABLED };
+    [ui.cockpitCamP1, ui.cockpitCamP2].forEach((toggle) => { if (toggle) { toggle.checked = GAMEPLAY_COCKPIT_CAMERA_ENABLED; toggle.disabled = true; } });
     const ensureRecordingSettings = () => {
         if (!settings.recording || typeof settings.recording !== 'object') {
             settings.recording = createDefaultRecordingCaptureSettings();
@@ -282,12 +285,14 @@ export function setupMenuGameplayBindings(ctx) {
     });
 
     bind(ui.cockpitCamP1, 'change', () => {
-        settings.cockpitCamera.PLAYER_1 = !!ui.cockpitCamP1.checked;
+        settings.cockpitCamera.PLAYER_1 = GAMEPLAY_COCKPIT_CAMERA_ENABLED;
+        ui.cockpitCamP1.checked = GAMEPLAY_COCKPIT_CAMERA_ENABLED;
         emitSettingsChangedImmediate([keys.RULES_COCKPIT_P1]);
     });
 
     bind(ui.cockpitCamP2, 'change', () => {
-        settings.cockpitCamera.PLAYER_2 = !!ui.cockpitCamP2.checked;
+        settings.cockpitCamera.PLAYER_2 = GAMEPLAY_COCKPIT_CAMERA_ENABLED;
+        ui.cockpitCamP2.checked = GAMEPLAY_COCKPIT_CAMERA_ENABLED;
         emitSettingsChangedImmediate([keys.RULES_COCKPIT_P2]);
     });
 

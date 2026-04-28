@@ -2,6 +2,7 @@
    HUD.js - Fighter Jet Head-Up Display
    ============================================ */
 import * as THREE from 'three';
+import { GAMEPLAY_CAMERA_MODE_ID, resolveGameplayCameraModeId } from '../shared/contracts/CameraModeContract.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 export class HUD {
@@ -167,9 +168,9 @@ export class HUD {
             : fallbackGameplayConfig.GAMEPLAY?.PLANAR_MODE === true;
         const cameraModeId = String(
             player?.cameraModeId
-            || fallbackGameplayConfig.CAMERA?.MODES?.[player?.cameraMode]
-            || 'THIRD_PERSON'
-        ).trim() || 'THIRD_PERSON';
+            || resolveGameplayCameraModeId(fallbackGameplayConfig)
+            || GAMEPLAY_CAMERA_MODE_ID
+        ).trim() || GAMEPLAY_CAMERA_MODE_ID;
 
         if (this.boostFill) {
             const pct = (boostCharge / boostCapacity) * 100;
@@ -190,7 +191,7 @@ export class HUD {
             }
         }
 
-        if (cameraModeId !== 'FIRST_PERSON') {
+        if (cameraModeId !== GAMEPLAY_CAMERA_MODE_ID) {
             this.setVisibility(false);
             return;
         }

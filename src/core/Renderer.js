@@ -9,9 +9,9 @@ import { RenderViewportSystem } from './renderer/RenderViewportSystem.js';
 import { SceneRootManager } from './renderer/SceneRootManager.js';
 import { RenderQualityController } from './renderer/RenderQualityController.js';
 import { RecordingCapturePipeline } from './renderer/RecordingCapturePipeline.js';
+import { createGameplayCameraState } from '../shared/contracts/CameraModeContract.js';
 
-const FIRST_PERSON_CAMERA_MODE_ID = 'FIRST_PERSON';
-const FIRST_PERSON_CAMERA_MODE_INDEX = CONFIG.CAMERA.MODES.indexOf(FIRST_PERSON_CAMERA_MODE_ID);
+const LIVE_GAMEPLAY_CAMERA_STATE = createGameplayCameraState(CONFIG);
 
 export class Renderer {
     constructor(canvas) {
@@ -98,7 +98,7 @@ export class Renderer {
         const camera = this.cameraRigSystem.createCamera(this._getAspect());
         const cameraIndex = this.cameras.length - 1;
         if (cameraIndex >= 0) {
-            this.cameraModes[cameraIndex] = FIRST_PERSON_CAMERA_MODE_INDEX >= 0 ? FIRST_PERSON_CAMERA_MODE_INDEX : 0;
+            this.cameraModes[cameraIndex] = LIVE_GAMEPLAY_CAMERA_STATE.cameraModeIndex;
         }
         return camera;
     }
@@ -112,16 +112,14 @@ export class Renderer {
         if (!Number.isInteger(playerIndex) || playerIndex < 0 || playerIndex >= this.cameraModes.length) {
             return;
         }
-        this.cameraModes[playerIndex] = FIRST_PERSON_CAMERA_MODE_INDEX >= 0 ? FIRST_PERSON_CAMERA_MODE_INDEX : 0;
+        this.cameraModes[playerIndex] = LIVE_GAMEPLAY_CAMERA_STATE.cameraModeIndex;
     }
 
     getCameraMode(playerIndex) {
         if (Number.isInteger(playerIndex) && playerIndex >= 0 && playerIndex < this.cameraModes.length) {
-            this.cameraModes[playerIndex] = FIRST_PERSON_CAMERA_MODE_INDEX >= 0 ? FIRST_PERSON_CAMERA_MODE_INDEX : 0;
+            this.cameraModes[playerIndex] = LIVE_GAMEPLAY_CAMERA_STATE.cameraModeIndex;
         }
-        return FIRST_PERSON_CAMERA_MODE_INDEX >= 0
-            ? FIRST_PERSON_CAMERA_MODE_ID
-            : (this.cameraRigSystem.getCameraMode(playerIndex) || FIRST_PERSON_CAMERA_MODE_ID);
+        return LIVE_GAMEPLAY_CAMERA_STATE.cameraModeId;
     }
 
     triggerCameraShake(playerIndex, intensity = 0.2, duration = 0.2) {

@@ -38,8 +38,8 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             PLAYER_2: true,
         },
         cockpitCamera: {
-            PLAYER_1: false,
-            PLAYER_2: false,
+            PLAYER_1: true,
+            PLAYER_2: true,
         },
         vehicles: {
             PLAYER_1: 'ship8',

@@ -4,6 +4,7 @@
 
 import * as THREE from 'three';
 import { clamp } from '../utils/MathOps.js';
+import { GAMEPLAY_CAMERA_MODE_ID, resolveGameplayCameraModeId } from '../shared/contracts/CameraModeContract.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 export class CrosshairSystem {
@@ -71,13 +72,12 @@ export class CrosshairSystem {
         if (!player) return false;
         if (typeof player?.planarMode === 'boolean') {
             if (player.planarMode) return true;
-            return String(player?.cameraModeId || 'THIRD_PERSON') !== 'FIRST_PERSON';
+            return String(player?.cameraModeId || GAMEPLAY_CAMERA_MODE_ID) !== GAMEPLAY_CAMERA_MODE_ID;
         }
 
         const gameplayConfig = fallbackGameplayConfig || resolveGameplayConfig(this.game);
         if (gameplayConfig.GAMEPLAY?.PLANAR_MODE === true) return true;
-        const camMode = gameplayConfig.CAMERA?.MODES?.[player?.cameraMode] || 'THIRD_PERSON';
-        return camMode !== 'FIRST_PERSON';
+        return resolveGameplayCameraModeId(gameplayConfig) !== GAMEPLAY_CAMERA_MODE_ID;
     }
 
     _updateCrosshairPosition(player, crosshairElement, projection = null) {

@@ -1,4 +1,5 @@
 import { normalizeString } from './ContractNormalizeUtils.js';
+import { GAMEPLAY_CAMERA_MODE_ID } from './CameraModeContract.js';
 
 export const MATCH_RUNTIME_PROJECTION_CONTRACT_VERSION = 'match-runtime-projection.v1';
 
@@ -151,7 +152,7 @@ function createPlayerProjection(value = null) {
         itemUseCooldownRemaining: Math.max(0, normalizeNumber(value.itemUseCooldownRemaining, 0)),
         shootCooldown: Math.max(0, normalizeNumber(value.shootCooldown, 0)),
         planarMode: value.planarMode === true,
-        cameraModeId: normalizeString(value.cameraModeId, 'THIRD_PERSON'),
+        cameraModeId: normalizeString(value.cameraModeId, GAMEPLAY_CAMERA_MODE_ID),
         traversal: createTraversalProjection(value.traversal),
     };
 }

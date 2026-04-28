@@ -1,4 +1,5 @@
 import { normalizeString } from './ContractNormalizeUtils.js';
+import { GAMEPLAY_CAMERA_MODE_ID } from './CameraModeContract.js';
 
 export const MATCH_RENDER_PROJECTION_CONTRACT_VERSION = 'match-render-projection.v1';
 
@@ -48,9 +49,9 @@ function createPlayerProjection(value = null) {
         isBoosting: value.isBoosting === true,
         hp: Math.max(0, normalizeNumber(value.hp, 0)),
         maxHp: Math.max(1, normalizeNumber(value.maxHp, 1)),
-        cockpitCamera: value.cockpitCamera === true,
+        cockpitCamera: value.cockpitCamera !== false,
         planarMode: value.planarMode === true,
-        cameraModeId: normalizeString(value.cameraModeId, 'THIRD_PERSON'),
+        cameraModeId: normalizeString(value.cameraModeId, GAMEPLAY_CAMERA_MODE_ID),
         position: createVector3Projection(value.position),
         quaternion: createQuaternionProjection(value.quaternion),
         direction: createVector3Projection(value.direction),
