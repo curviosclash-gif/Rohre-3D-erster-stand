@@ -290,7 +290,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93J | 2026-04-26 | frei | abgeschlossen 2026-04-27 als `diagnose-loop-required`; kein BT94A-Claim |
 | Bot-Codex | BT93K | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; kein BT94A-Claim |
-| - | BT93L | - | frei | naechster Claim: `93L.1` Task-/Metrikvertrag und `93L.2` echte Signal-Reachability |
+| Bot-Codex | BT93L | 2026-04-28 | active | `93L.1` abgeschlossen; naechster Schritt `93L.2` echte Signal-Reachability |
 | - | BT94A | - | frei | wartet auf `BT93L.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -799,7 +799,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
 | BT93J | Root-Cause-Blocker-Repair | completed | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 + R2-Plananpassung 2026-04-26 | 93J.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
 | BT93K | Survival-First Objective Reset | completed | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
-| BT93L | Objective-Reachability und Survival-Task-Definition | active | P1 | BT93K.99 (`diagnose-loop-required`) + Diagnosebericht 2026-04-28 | 93L.1 | `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` |
+| BT93L | Objective-Reachability und Survival-Task-Definition | active | P1 | BT93K.99 (`diagnose-loop-required`) + Diagnosebericht 2026-04-28 | 93L.2 | `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93L.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2841,7 +2841,7 @@ Pflicht-Artefakte:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 `task_metric_contract.json` unterscheidet Survival-Task, Objective-Task und Candidate-/Freeze-Task; `maxSteps` ist neutral, Natural-Terminal ist task-spezifisch und Player-Dead-only ist rot.
+- [x] DoD.1 `task_metric_contract.json` unterscheidet Survival-Task, Objective-Task und Candidate-/Freeze-Task; `maxSteps` ist neutral, Natural-Terminal ist task-spezifisch und Player-Dead-only ist rot. (abgeschlossen: 2026-04-28; evidence: python python/scripts/bt93l_task_metric_contract.py -> data/training/ppo/bt93l/task_metric_contract.json)
 - [ ] DoD.2 `progress_reachability_report.json` beweist, dass Progress-/Objective-Signale im echten `env.step(...)`-Pfad ohne manuelle Signal-Injektion erreichbar sind.
 - [ ] DoD.3 `reward_balance_report.json` zeigt, dass Player-Dead-only, Noop-Plateau und Max-Step-only nicht als Qualitaetsgewinn durchgehen koennen.
 - [ ] DoD.4 `action_effect_report.json` belegt Action-Wirkung getrennt von Action-Safety: nicht nur `invalidActionRate=0`, sondern messbare Richtungs-, Distanz-, Gefahren- oder Zielzustandsveraenderung.
@@ -2853,10 +2853,10 @@ Pflicht-Artefakte:
 
 ### 93L.1 Task- und Metrikvertrag
 
-- [ ] 93L.1.1 `task_metric_contract.json` schreiben: Survival-, Objective- und Candidate-Task explizit trennen; keine Metrik darf spaeter still umgedeutet werden.
-- [ ] 93L.1.2 Matrix fuer Map, Mode, Seeds, Episode-Laenge, maxSteps, Evaluation und Micro-PPO festlegen; Holdout bleibt unbenutzt.
-- [ ] 93L.1.3 Terminal-Semantik definieren: `player-dead`, `max-steps`, `objective-progress`, `objective-complete`, `timeout`, `runtime-error` und `forced-stop` muessen getrennt bleiben.
-- [ ] 93L.1.4 Startlage aus BT93J, BT93K, `no_start_gate.json` und Diagnosebericht maschinenlesbar in `task_metric_contract.json` pinnen.
+- [x] 93L.1.1 `task_metric_contract.json` schreiben: Survival-, Objective- und Candidate-Task explizit trennen; keine Metrik darf spaeter still umgedeutet werden. (abgeschlossen: 2026-04-28; evidence: python python/scripts/bt93l_task_metric_contract.py -> data/training/ppo/bt93l/task_metric_contract.json)
+- [x] 93L.1.2 Matrix fuer Map, Mode, Seeds, Episode-Laenge, maxSteps, Evaluation und Micro-PPO festlegen; Holdout bleibt unbenutzt. (abgeschlossen: 2026-04-28; evidence: python python/scripts/bt93l_task_metric_contract.py -> data/training/ppo/bt93l/task_metric_contract.json)
+- [x] 93L.1.3 Terminal-Semantik definieren: `player-dead`, `max-steps`, `objective-progress`, `objective-complete`, `timeout`, `runtime-error` und `forced-stop` muessen getrennt bleiben. (abgeschlossen: 2026-04-28; evidence: python python/scripts/bt93l_task_metric_contract.py -> data/training/ppo/bt93l/task_metric_contract.json)
+- [x] 93L.1.4 Startlage aus BT93J, BT93K, `no_start_gate.json` und Diagnosebericht maschinenlesbar in `task_metric_contract.json` pinnen. (abgeschlossen: 2026-04-28; evidence: python python/scripts/bt93l_task_metric_contract.py -> data/training/ppo/bt93l/task_metric_contract.json)
 
 ### 93L.2 Echte Progress-/Objective-Reachability
 
