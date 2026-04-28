@@ -157,10 +157,10 @@ function normalizeDomainMode(modeToken) {
         return { gameMode: 'CLASSIC', planarMode: true, domainId: 'classic-2d', modePath: 'normal' };
     }
     if (normalized === 'hunt' || normalized === 'fight' || normalized === 'hunt-3d' || normalized === 'hunt3d' || normalized === 'fight-3d' || normalized === 'fight3d') {
-        return { gameMode: 'HUNT', planarMode: false, domainId: 'hunt-3d', modePath: 'hunt' };
+        return { gameMode: 'HUNT', planarMode: false, domainId: 'hunt-3d', modePath: 'fight' };
     }
     if (normalized === 'hunt-2d' || normalized === 'hunt2d' || normalized === 'fight-2d' || normalized === 'fight2d') {
-        return { gameMode: 'HUNT', planarMode: true, domainId: 'hunt-2d', modePath: 'hunt' };
+        return { gameMode: 'HUNT', planarMode: true, domainId: 'hunt-2d', modePath: 'fight' };
     }
     return { gameMode: 'CLASSIC', planarMode: false, domainId: 'classic-3d', modePath: 'normal' };
 }

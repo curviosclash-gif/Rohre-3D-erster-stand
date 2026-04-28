@@ -2716,10 +2716,10 @@ Pflicht-Artefakte:
 
 ### 93K.3 Mode-/Map-Smokes und Policy-Schnitt
 
-- [ ] 93K.3.1 Headless-CLI und Python-Env fuer `mapKey`, `domainMode`, `gameMode`, `planarMode` und `modePath` verdrahten.
-- [ ] 93K.3.2 Kurze Probes fuer `classic-3d`, `classic-2d`, `hunt-3d`, `hunt-2d` auf `standard` ausfuehren und effective values versioniert reporten.
-- [ ] 93K.3.3 Entscheiden, ob eine gemeinsame Policy reicht oder getrennte Policies/Normalize-States noetig sind; Entscheidung auf Evidence, nicht Plantext.
-- [ ] 93K.3.4 Keine DQN/PPO- oder Env-Skalierungsvergleiche erlauben, wenn Mode-/Map-Telemetrie fehlt oder von der Konfiguration abweicht.
+- [x] 93K.3.1 Headless-CLI und Python-Env fuer `mapKey`, `domainMode`, `gameMode`, `planarMode` und `modePath` verdrahten. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_mode_map_smokes.py --write-report` -> `data/training/ppo/bt93k/mode_map_smoke_report.json`)
+- [x] 93K.3.2 Kurze Probes fuer `classic-3d`, `classic-2d`, `hunt-3d`, `hunt-2d` auf `standard` ausfuehren und effective values versioniert reporten. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_mode_map_smokes.py --write-report` -> `data/training/ppo/bt93k/mode_map_smoke_report.json`)
+- [x] 93K.3.3 Entscheiden, ob eine gemeinsame Policy reicht oder getrennte Policies/Normalize-States noetig sind; Entscheidung auf Evidence, nicht Plantext. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_mode_map_smokes.py --write-report` -> `data/training/ppo/bt93k/mode_map_smoke_report.json`)
+- [x] 93K.3.4 Keine DQN/PPO- oder Env-Skalierungsvergleiche erlauben, wenn Mode-/Map-Telemetrie fehlt oder von der Konfiguration abweicht. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_mode_map_smokes.py --write-report` -> `data/training/ppo/bt93k/mode_map_smoke_report.json`)
 
 ### 93K.4 2-/4-/6-Env-Smokes und Exit-Report-Pflicht
 
