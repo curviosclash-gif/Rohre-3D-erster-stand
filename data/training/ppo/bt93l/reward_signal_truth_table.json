@@ -265,11 +265,11 @@
       "successEligible": false
     }
   ],
-  "generatedAt": "2026-04-28T19:40:51Z",
+  "generatedAt": "2026-04-28T19:51:08Z",
   "generatedBy": "python/scripts/bt93l_reward_balance.py",
   "git": {
     "branch": "bot-training",
-    "sha": "64c242719295e3f76b0f9224bc1486c54739d85c"
+    "sha": "77925fb9d4d085acecb5582afda933d4f90e8780"
   },
   "guardrails": {
     "candidateRun": false,
@@ -293,7 +293,7 @@
       "phaseId": null,
       "resultClass": null,
       "role": "BT93L reward profile source",
-      "sha256": "7d9fa0aeecfce54eaa0952e15e181f2fd63f02507460a91658adc47e7efda5c0"
+      "sha256": "4737594afcebf3aee050bff96f60e0806b1c47c0984741ba81799a5bb5596d7e"
     },
     "taskMetricContract": {
       "exists": true,

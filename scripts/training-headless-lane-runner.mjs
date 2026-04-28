@@ -338,8 +338,8 @@ function actionHasEffect(action = {}) {
     if (!action || typeof action !== 'object') return false;
     return Object.values(action).some((value) => {
         if (value === true) return true;
-        const numeric = Number(value);
-        return Number.isFinite(numeric) && numeric >= 0;
+        if (typeof value !== 'number') return false;
+        return Number.isFinite(value) && value >= 0;
     });
 }
 

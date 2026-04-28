@@ -34,7 +34,7 @@
       "progressSignalReachableCount": 0,
       "source": "progress_reachability_report.json",
       "successEligible": false,
-      "totalReward": -0.184403
+      "totalReward": -0.030201
     },
     "objective-complete": {
       "episodeClass": "task-specific-natural-terminal",
@@ -50,14 +50,14 @@
     },
     "progress": {
       "label": "positive-control",
-      "objectiveReward": 7.65,
-      "objectiveSignalReachableCount": 9,
+      "objectiveReward": 0.85,
+      "objectiveSignalReachableCount": 1,
       "observedSteps": 12,
-      "progressReward": 7.65,
-      "progressSignalReachableCount": 9,
+      "progressReward": 0.85,
+      "progressSignalReachableCount": 1,
       "source": "progress_reachability_report.json",
       "successEligible": true,
-      "totalReward": 7.41833
+      "totalReward": 0.822705
     }
   },
   "earlyStopRules": [
@@ -82,11 +82,11 @@
       "resultClass": "measurement-invalid"
     }
   ],
-  "generatedAt": "2026-04-28T19:40:51Z",
+  "generatedAt": "2026-04-28T19:51:08Z",
   "generatedBy": "python/scripts/bt93l_reward_balance.py",
   "git": {
     "branch": "bot-training",
-    "sha": "64c242719295e3f76b0f9224bc1486c54739d85c"
+    "sha": "77925fb9d4d085acecb5582afda933d4f90e8780"
   },
   "guardrails": {
     "baselineRun": false,
@@ -122,7 +122,7 @@
       "phaseId": null,
       "resultClass": null,
       "role": "BT93L reward profile source",
-      "sha256": "7d9fa0aeecfce54eaa0952e15e181f2fd63f02507460a91658adc47e7efda5c0"
+      "sha256": "4737594afcebf3aee050bff96f60e0806b1c47c0984741ba81799a5bb5596d7e"
     },
     "progressReachabilityReport": {
       "exists": true,
@@ -132,7 +132,7 @@
       "phaseId": "93L.2",
       "resultClass": "progress-reachability-green",
       "role": "BT93L.2 real env.step reachability",
-      "sha256": "ea68b9838046e882c79f9574dd3c1d0371dabc65f2d2a60a8c954486971791b3"
+      "sha256": "330b0c15b5bce083d6697e5886d0fb2884237ee3cf2097c176e72e465f97b651"
     },
     "rewardSignalTruthTable": {
       "exists": true,
@@ -142,7 +142,7 @@
       "phaseId": "93L.3",
       "resultClass": "reward-signal-truth-table-pinned",
       "role": "BT93L.3.1 reward signal truth table",
-      "sha256": "90a400de3a52aaa3bcb7d6a05d1335bd713ac148312a91ed30730b5979b3e084"
+      "sha256": "6e0f35c3a2152744f117e70a0394a20e3a2f301fefe7196ed0500a527f67193c"
     },
     "taskMetricContract": {
       "exists": true,

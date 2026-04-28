@@ -177,6 +177,24 @@ test('Headless lane derives BT93L progress from real observation deltas', () => 
     assert.ok(signals.progressEvents.includes('target-distance-improved'));
     assert.equal(noopSignals.progressSignalReachable, false);
     assert.equal(noopSignals.objectiveSignalReachable, false);
+    assert.equal(deriveHeadlessObjectiveReachabilitySignals({
+        previousObservation,
+        observation,
+        episode: { done: false, truncated: false },
+        action: {
+            yawLeft: false,
+            yawRight: false,
+            pitchUp: false,
+            pitchDown: false,
+            rollLeft: false,
+            rollRight: false,
+            boost: false,
+            shootMG: false,
+            shootItemIndex: -1,
+            useItem: -1,
+        },
+        rewardProfileId: BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
+    }).progressSignalReachable, false);
     assert.equal(manualSignals.realEnvStepPath, false);
     assert.equal(manualSignals.source, 'manual-injection-counterprobe');
 });

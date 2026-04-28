@@ -40,7 +40,7 @@ HEADLESS_RUNNER_PATH = REPO_ROOT / "scripts" / "training-headless-lane-runner.mj
 CURVIOS_ENV_PATH = PYTHON_ROOT / "envs" / "curvios_env.py"
 ACTION_SURFACE_PATH = PYTHON_ROOT / "envs" / "ppo_action_surface.py"
 PROFILE_ID = "bt93l-objective-reachability-v1"
-POSITIVE_CONTROL_ACTIONS = (8, 5, 4, 8, 6, 1, 4, 0, 0, 5, 6, 0)
+POSITIVE_CONTROL_ACTIONS = (6, 2, 4, 7, 1, 5, 3, 8)
 
 
 def _utc_now() -> str:
