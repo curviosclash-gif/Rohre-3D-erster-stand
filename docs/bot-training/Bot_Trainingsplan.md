@@ -2785,7 +2785,7 @@ Quelle:
 - `data/training/ppo/bt93k/longrun_ladder_decision_report.json`
 - `data/training/ppo/bt94a/no_start_gate.json`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Codex seit 2026-04-28 -->
 
 Scope:
 
