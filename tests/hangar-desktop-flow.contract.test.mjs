@@ -1,0 +1,135 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import {
+    HANGAR_CAPABILITY_IDS,
+    HANGAR_MODES,
+    HANGAR_NAV_EVENTS,
+    assertHangarCapabilityId,
+} from '../src/shared/contracts/HangarModeContract.js';
+import {
+    HANGAR_DESKTOP_ENTRY_IDS,
+    resolveDesktopHangarEntryByMode,
+} from '../src/ui/hangar/HangarDesktopEntryContract.js';
+import { resolveHangarLifecycleContract } from '../src/ui/hangar/HangarLifecycleContract.js';
+import {
+    HANGAR_SELECTION_WRITEBACK_PATHS,
+    readHangarMapSelection,
+    readHangarVehicleSelection,
+    writeHangarMapSelection,
+    writeHangarVehicleSelection,
+} from '../src/ui/hangar/HangarSelectionWritebackContract.js';
+import { createHangarWorkshopPersistenceFacade } from '../src/ui/hangar/HangarWorkshopPersistenceFacade.js';
+
+test('V76.99.2 desktop hangar entry resolves stable fight/arcade open paths', () => {
+    const fightEntry = resolveDesktopHangarEntryByMode(HANGAR_MODES.FIGHT);
+    const arcadeEntry = resolveDesktopHangarEntryByMode(HANGAR_MODES.ARCADE);
+
+    assert.equal(fightEntry.entryId, HANGAR_DESKTOP_ENTRY_IDS.MAIN_MENU_FIGHT_HANGAR);
+    assert.equal(fightEntry.navEvent, HANGAR_NAV_EVENTS.OPEN_FIGHT_HANGAR);
+    assert.equal(fightEntry.capabilityId, HANGAR_CAPABILITY_IDS.OPEN_HANGAR);
+
+    assert.equal(arcadeEntry.entryId, HANGAR_DESKTOP_ENTRY_IDS.MAIN_MENU_ARCADE_HANGAR);
+    assert.equal(arcadeEntry.navEvent, HANGAR_NAV_EVENTS.OPEN_ARCADE_HANGAR);
+    assert.equal(arcadeEntry.capabilityId, HANGAR_CAPABILITY_IDS.OPEN_HANGAR);
+});
+
+test('V76.99.2 map/vehicle writeback persists mode-aware selections through one contract', () => {
+    const settings = {
+        mapKey: 'standard',
+        vehicles: {
+            PLAYER_1: 'ship5',
+            PLAYER_2: 'ship5',
+        },
+        localSettings: {
+            modePath: HANGAR_MODES.FIGHT,
+            startSetup: {
+                modeSelections: {},
+            },
+        },
+    };
+
+    const arcadeMapWrite = writeHangarMapSelection(settings, 'arcade-map', 'standard', { mode: HANGAR_MODES.ARCADE });
+    const arcadeVehicleWrite = writeHangarVehicleSelection(
+        settings,
+        'PLAYER_1',
+        'ship7',
+        'ship5',
+        { mode: HANGAR_MODES.ARCADE }
+    );
+    const fightMapWrite = writeHangarMapSelection(settings, 'fight-map', 'standard', { mode: HANGAR_MODES.FIGHT });
+    const fightVehicleWrite = writeHangarVehicleSelection(
+        settings,
+        'PLAYER_2',
+        'ship9',
+        'ship5',
+        { mode: HANGAR_MODES.FIGHT }
+    );
+
+    assert.equal(arcadeMapWrite.persistencePath, HANGAR_SELECTION_WRITEBACK_PATHS.MODE_ARCADE_MAP_KEY);
+    assert.equal(arcadeVehicleWrite.persistencePath, HANGAR_SELECTION_WRITEBACK_PATHS.MODE_ARCADE_VEHICLE_PLAYER_1);
+    assert.equal(fightMapWrite.persistencePath, HANGAR_SELECTION_WRITEBACK_PATHS.MODE_FIGHT_MAP_KEY);
+    assert.equal(fightVehicleWrite.persistencePath, HANGAR_SELECTION_WRITEBACK_PATHS.MODE_FIGHT_VEHICLE_PLAYER_2);
+
+    const arcadeMap = readHangarMapSelection(settings, 'standard', { mode: HANGAR_MODES.ARCADE });
+    const fightMap = readHangarMapSelection(settings, 'standard', { mode: HANGAR_MODES.FIGHT });
+    const arcadeVehicle = readHangarVehicleSelection(settings, 'PLAYER_1', 'ship5', { mode: HANGAR_MODES.ARCADE });
+    const fightVehicle = readHangarVehicleSelection(settings, 'PLAYER_2', 'ship5', { mode: HANGAR_MODES.FIGHT });
+
+    assert.equal(arcadeMap.value, 'arcade-map');
+    assert.equal(fightMap.value, 'fight-map');
+    assert.equal(arcadeVehicle.value, 'ship7');
+    assert.equal(fightVehicle.value, 'ship9');
+});
+
+test('V76.99.2 lifecycle keeps single contract return path to menu and match start for both modes', () => {
+    for (const mode of [HANGAR_MODES.ARCADE, HANGAR_MODES.FIGHT]) {
+        const lifecycle = resolveHangarLifecycleContract(mode);
+        assert.equal(lifecycle.writeback.source, 'settings.vehicles');
+        assert.equal(lifecycle.writeback.pathMap, HANGAR_SELECTION_WRITEBACK_PATHS);
+
+        const startMatchTransitions = lifecycle.transitions.filter((entry) => entry.transitionId === 'start_match_from_hangar');
+        const returnToMenuTransitions = lifecycle.transitions.filter((entry) => entry.transitionId === 'return_to_menu');
+
+        assert.equal(startMatchTransitions.length, 1);
+        assert.equal(returnToMenuTransitions.length, 1);
+        assert.equal(startMatchTransitions[0].navEvent, HANGAR_NAV_EVENTS.START_MATCH);
+        assert.equal(startMatchTransitions[0].capabilityId, HANGAR_CAPABILITY_IDS.MATCH_START_FROM_HANGAR);
+        assert.equal(returnToMenuTransitions[0].navEvent, HANGAR_NAV_EVENTS.RETURN_TO_MENU);
+        assert.equal(returnToMenuTransitions[0].capabilityId, HANGAR_CAPABILITY_IDS.RETURN_TO_MENU);
+
+        for (const transition of lifecycle.transitions) {
+            assert.notEqual(assertHangarCapabilityId(transition.capabilityId), null);
+        }
+    }
+});
+
+test('V76.99.2 workshop persistence facade saves via named desktop capabilities', async () => {
+    const calls = [];
+    const facade = createHangarWorkshopPersistenceFacade({
+        invokeCapability: async (capabilityId, payload) => {
+            calls.push({ capabilityId, payload });
+            return { persisted: true, payload };
+        },
+    });
+
+    const loadResult = await facade.loadCustomVehicle({ id: 'arcade-fighter' });
+    const saveResult = await facade.saveCustomVehicle({ id: 'arcade-fighter', label: 'Arcade Fighter' });
+    const renameResult = await facade.renameCustomVehicle({ id: 'arcade-fighter', nextLabel: 'Arcade Fighter Mk2' });
+    const deleteResult = await facade.deleteCustomVehicle({ id: 'arcade-fighter' });
+
+    assert.equal(loadResult.ok, true);
+    assert.equal(saveResult.ok, true);
+    assert.equal(renameResult.ok, true);
+    assert.equal(deleteResult.ok, true);
+
+    assert.deepEqual(
+        calls.map((entry) => entry.capabilityId),
+        [
+            HANGAR_CAPABILITY_IDS.LOAD_CUSTOM_BLUEPRINT,
+            HANGAR_CAPABILITY_IDS.SAVE_CUSTOM_BLUEPRINT,
+            HANGAR_CAPABILITY_IDS.RENAME_CUSTOM_BLUEPRINT,
+            HANGAR_CAPABILITY_IDS.DELETE_CUSTOM_BLUEPRINT,
+        ]
+    );
+});
