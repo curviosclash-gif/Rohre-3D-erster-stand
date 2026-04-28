@@ -54,3 +54,10 @@ export function clearActiveRuntimeConfig(options = undefined) {
     ACTIVE_RUNTIME_CONFIG_OWNER = null;
     return true;
 }
+
+export function refreshActiveRuntimeConfig(options = undefined) {
+    if (!ACTIVE_RUNTIME_CONFIG || typeof ACTIVE_RUNTIME_CONFIG !== 'object') {
+        return false;
+    }
+    return clearActiveRuntimeConfig(options);
+}

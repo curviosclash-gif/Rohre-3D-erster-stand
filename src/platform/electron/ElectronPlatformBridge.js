@@ -204,6 +204,12 @@ export function createElectronPreloadSaveAdapter(runtimeGlobal = globalThis) {
         appRuntime,
         appRuntime?.saveRecordingVideoExport
     );
+    const getRecordingVideoExportCapability = createCapabilityIntent(
+        saveContract,
+        saveContract?.getRecordingVideoExportCapability,
+        appRuntime,
+        appRuntime?.getRecordingVideoExportCapability
+    );
     const available = resolveCapabilityAvailability(
         [saveReplay, saveVideo, saveRecordingVideoExport],
         'any'
@@ -236,6 +242,7 @@ export function createElectronPreloadSaveAdapter(runtimeGlobal = globalThis) {
         saveReplay,
         saveVideo,
         saveRecordingVideoExport,
+        getRecordingVideoExportCapability,
     });
 }
 

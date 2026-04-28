@@ -2,13 +2,12 @@
 // electron/main.cjs - Electron main process
 // ============================================
 
-const { app, BrowserWindow, ipcMain, dialog, Tray, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Tray, nativeImage, globalShortcut } = require('electron');
 const path = require('node:path');
 const {
     copyFileSync,
     existsSync,
     mkdirSync,
-    promises: fsPromises,
     readFileSync,
     writeFileSync,
 } = require('node:fs');
@@ -20,6 +19,9 @@ const {
     configureStoragePaths,
     initSessionDataSelfHeal,
 } = require('./session-data-runtime.cjs');
+const { createRecordingVideoExportJob } = require('./recording-video-export-job.cjs');
+const { createTuningWindowController } = require('./tuning-window.cjs');
+const { registerTuningIpc } = require('./tuning-ipc.cjs');
 
 let mainWindow = null;
 let tray = null;
@@ -27,6 +29,7 @@ let signalingRuntime = null;
 let staticAppServer = null;
 let signalingStartPromise = null;
 let signalingStopPromise = null;
+let disposeTuningIpc = null;
 
 const SIGNALING_PORTS = [9090, 9091, 9093, 9094];
 const GRACEFUL_CLOSE_TIMEOUT_MS = 3000;
@@ -57,6 +60,9 @@ const HOST_SHELL_CONTRACT_VERSION = 'electron.lan-host-shell.v1';
 const SETTINGS_DEFAULTS_CONTRACT_VERSION = 'preload.settings-defaults.v1';
 const RECORDING_VIDEO_EXPORT_REQUEST_CONTRACT_VERSION = 'recording-video-export-request.v1';
 const RECORDING_VIDEO_EXPORT_CAPABILITY_ID = 'recording-video-export-save';
+const TUNING_CONSOLE_CAPABILITY_CONTRACT_VERSION = 'tuning-console-capability.v1';
+const TUNING_CONSOLE_CAPABILITY_ID = 'developer-tuning-console';
+const TUNING_CONSOLE_HOTKEY = 'F7';
 const MENU_DEFAULTS_OVERRIDE_FILE_NAME = 'menu-defaults.override.json';
 const SHARED_USER_DATA_DIR_NAME = 'curviosclash-app';
 const MAIN_SESSION_DATA_DIR_NAME = 'session-main';
@@ -525,6 +531,22 @@ function createLanHostShellCapability() {
     });
 }
 
+function resolveTuningConsoleCapabilityState() {
+    const desktopSurfaceAvailable = hasSingleInstanceLock === true;
+    const available = desktopSurfaceAvailable;
+    return Object.freeze({
+        contractVersion: TUNING_CONSOLE_CAPABILITY_CONTRACT_VERSION,
+        capabilityId: TUNING_CONSOLE_CAPABILITY_ID,
+        available,
+        accessMode: available ? 'desktop-capability' : 'blocked',
+        reason: available ? 'desktop_surface_enabled' : 'desktop_surface_unavailable',
+        message: available
+            ? 'Tuning Console ist als Desktop-Capability verfuegbar; Expertenpasswort bleibt nur lokale UX-Grenze.'
+            : 'Tuning Console ist fuer diese Surface nicht verfuegbar.',
+        passwordGate: 'local-ux-only',
+    });
+}
+
 function resolveSharedMenuDefaultsOverrideFilePath() {
     return path.join(
         app.getPath('appData'),
@@ -533,179 +555,8 @@ function resolveSharedMenuDefaultsOverrideFilePath() {
     );
 }
 
-function normalizeString(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
-
-function resolveVideoFileExtension(fileName, mimeType) {
-    const normalizedMimeType = normalizeString(mimeType).toLowerCase();
-    const normalizedExt = path.extname(normalizeString(fileName)).toLowerCase();
-    if (normalizedExt === '.mp4') return 'mp4';
-    if (normalizedExt === '.webm') return 'webm';
-    return normalizedMimeType.includes('mp4') ? 'mp4' : 'webm';
-}
-
-function sanitizeVideoFileName(fileName, mimeType) {
-    const normalizedName = normalizeString(fileName, 'recording').replace(/\\/g, '/');
-    const baseName = normalizedName.split('/').filter(Boolean).pop() || 'recording';
-    const parsedName = path.parse(baseName);
-    const safeName = normalizeString(parsedName.name, 'recording')
-        .replace(/[<>:"/\\|?*\x00-\x1F]+/g, '-')
-        .replace(/\s+/g, ' ')
-        .replace(/-+/g, '-')
-        .replace(/[.\s-]+$/g, '')
-        || 'recording';
-    const extension = resolveVideoFileExtension(parsedName.base || baseName, mimeType);
-    return `${safeName}.${extension}`;
-}
-
-function resolveVideoSaveDialogPath(fileName) {
-    const safeFileName = sanitizeVideoFileName(fileName, '');
-    try {
-        const videoDirectory = app.getPath('videos');
-        if (normalizeString(videoDirectory)) {
-            return path.join(videoDirectory, safeFileName);
-        }
-    } catch {
-        // Ignore missing OS video paths and fall back to documents.
-    }
-    try {
-        return path.join(app.getPath('documents'), safeFileName);
-    } catch {
-        return safeFileName;
-    }
-}
-
-function buildRecordingVideoFilters(extension) {
-    if (extension === 'mp4') {
-        return [{ name: 'MP4 Video', extensions: ['mp4'] }];
-    }
-    return [
-        { name: 'WebM Video', extensions: ['webm'] },
-        { name: 'MP4 Video', extensions: ['mp4'] },
-    ];
-}
-
-function toUint8Array(value) {
-    if (value instanceof Uint8Array) {
-        return value;
-    }
-    if (ArrayBuffer.isView(value)) {
-        return new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
-    }
-    if (value instanceof ArrayBuffer) {
-        return new Uint8Array(value);
-    }
-    if (Array.isArray(value)) {
-        return Uint8Array.from(value);
-    }
-    return new Uint8Array(0);
-}
-
-function buildRecordingVideoTempPath(filePath) {
-    const parsed = path.parse(filePath);
-    const tempName = `.${parsed.name}.recording-${process.pid}-${Date.now()}${parsed.ext}.tmp`;
-    return path.join(parsed.dir, tempName);
-}
-
-function normalizeRecordingVideoExportRequest(payload = null) {
-    const request = payload && typeof payload === 'object' ? payload : {};
-    const fileName = sanitizeVideoFileName(request.fileName, request.mimeType);
-    const container = resolveVideoFileExtension(fileName, request.mimeType);
-    return {
-        contractVersion: normalizeString(
-            request.contractVersion,
-            RECORDING_VIDEO_EXPORT_REQUEST_CONTRACT_VERSION
-        ),
-        capabilityId: normalizeString(request.capabilityId, RECORDING_VIDEO_EXPORT_CAPABILITY_ID),
-        fileName,
-        mimeType: normalizeString(
-            request.mimeType,
-            container === 'mp4' ? 'video/mp4' : 'video/webm'
-        ),
-        container,
-        videoBytes: toUint8Array(request.videoBytes),
-    };
-}
-
-async function persistRecordingVideoBytes(filePath, videoBytes) {
-    const tempPath = buildRecordingVideoTempPath(filePath);
-    await fsPromises.mkdir(path.dirname(filePath), { recursive: true });
-    try {
-        await fsPromises.writeFile(tempPath, Buffer.from(videoBytes));
-    } catch (error) {
-        error.code = 'RECORDING_SAVE_TEMP_WRITE_FAILED';
-        throw error;
-    }
-
-    try {
-        await fsPromises.copyFile(tempPath, filePath);
-    } catch (error) {
-        error.code = 'RECORDING_SAVE_FINALIZE_FAILED';
-        throw error;
-    } finally {
-        await fsPromises.rm(tempPath, { force: true }).catch(() => {});
-    }
-}
-
 async function handleRecordingVideoExport(payload = null) {
-    const request = normalizeRecordingVideoExportRequest(payload);
-    if (request.videoBytes.byteLength <= 0) {
-        return {
-            saved: false,
-            code: 'RECORDING_SAVE_BYTES_INVALID',
-            capabilityId: request.capabilityId,
-            contractVersion: request.contractVersion,
-        };
-    }
-
-    let result = null;
-    try {
-        result = await dialog.showSaveDialog(desktopWindowShellCapability.getWindow(), {
-            title: 'Video speichern',
-            defaultPath: resolveVideoSaveDialogPath(request.fileName),
-            filters: buildRecordingVideoFilters(request.container),
-            showOverwriteConfirmation: true,
-        });
-    } catch {
-        return {
-            saved: false,
-            code: 'RECORDING_SAVE_DIALOG_FAILED',
-            capabilityId: request.capabilityId,
-            contractVersion: request.contractVersion,
-        };
-    }
-
-    if (result?.canceled || !result?.filePath) {
-        return {
-            saved: false,
-            code: 'RECORDING_SAVE_CANCELLED',
-            capabilityId: request.capabilityId,
-            contractVersion: request.contractVersion,
-        };
-    }
-
-    try {
-        await persistRecordingVideoBytes(result.filePath, request.videoBytes);
-        return {
-            saved: true,
-            code: 'RECORDING_SAVE_OK',
-            capabilityId: request.capabilityId,
-            contractVersion: request.contractVersion,
-            filePath: result.filePath,
-            container: request.container,
-            fileName: path.basename(result.filePath),
-            tempFileStrategy: 'dialog-temp-copy-final',
-        };
-    } catch (error) {
-        return {
-            saved: false,
-            code: normalizeString(error?.code, 'RECORDING_SAVE_FINALIZE_FAILED'),
-            capabilityId: request.capabilityId,
-            contractVersion: request.contractVersion,
-        };
-    }
+    return recordingVideoExportJob.handle(payload);
 }
 
 function listLegacyMenuDefaultsOverrideSourcePaths(targetFilePath) {
@@ -777,10 +628,60 @@ function readMenuDefaultsOverrideSnapshotSync() {
 
 const desktopWindowShellCapability = createDesktopWindowShellCapability();
 const lanHostShellCapability = createLanHostShellCapability();
+const tuningWindowShellCapability = createTuningWindowController({
+    BrowserWindow,
+    resolveParentWindow: () => desktopWindowShellCapability.getWindow(),
+    resolveCapabilityState: () => resolveTuningConsoleCapabilityState(),
+});
+const recordingVideoExportJob = createRecordingVideoExportJob({
+    app,
+    dialog,
+    resolveWindow: () => desktopWindowShellCapability.getWindow(),
+    contractVersion: RECORDING_VIDEO_EXPORT_REQUEST_CONTRACT_VERSION,
+    capabilityId: RECORDING_VIDEO_EXPORT_CAPABILITY_ID,
+});
+
+function registerTuningShortcut() {
+    globalShortcut.unregister(TUNING_CONSOLE_HOTKEY);
+    const registered = globalShortcut.register(TUNING_CONSOLE_HOTKEY, () => {
+        void tuningWindowShellCapability.toggleTuningWindow({ focus: true });
+    });
+    if (!registered) {
+        console.warn(`[tuning] Hotkey ${TUNING_CONSOLE_HOTKEY} konnte nicht registriert werden.`);
+    }
+    return registered;
+}
+
+function unregisterTuningShortcut() {
+    globalShortcut.unregister(TUNING_CONSOLE_HOTKEY);
+}
+
+function registerTuningBridgeIpc() {
+    if (disposeTuningIpc) {
+        return;
+    }
+    disposeTuningIpc = registerTuningIpc({
+        ipcMain,
+        dialog,
+        resolveGameWindow: () => desktopWindowShellCapability.getWindow(),
+        resolveTuningWindow: () => tuningWindowShellCapability.getWindow(),
+        resolveCapabilityState: () => resolveTuningConsoleCapabilityState(),
+    });
+}
+
+function disposeTuningBridgeIpc() {
+    if (!disposeTuningIpc) {
+        return;
+    }
+    disposeTuningIpc();
+    disposeTuningIpc = null;
+}
 
 async function startDesktopShell() {
+    registerTuningBridgeIpc();
     await desktopWindowShellCapability.start();
     createTray();
+    registerTuningShortcut();
 }
 
 const DISCOVERY_RATE_LIMIT_MS = 500;
@@ -931,6 +832,10 @@ ipcMain.handle('save-recording-video-export', async (_event, payload) => (
     handleRecordingVideoExport(payload)
 ));
 
+ipcMain.handle('get-recording-video-export-capability', async (_event, options = null) => (
+    recordingVideoExportJob.getCapabilityStatus(options)
+));
+
 ipcMain.handle('save-video', async (_event, videoBytes, defaultName, mimeType) => (
     handleRecordingVideoExport({
         contractVersion: RECORDING_VIDEO_EXPORT_REQUEST_CONTRACT_VERSION,
@@ -947,6 +852,9 @@ ipcMain.on('settings-defaults:read-override-sync', (event) => {
 
 async function shutdownRuntime() {
     stopDiscoveryListener();
+    unregisterTuningShortcut();
+    tuningWindowShellCapability.closeTuningWindow();
+    disposeTuningBridgeIpc();
     await Promise.allSettled([
         lanHostShellCapability.stop(),
         stopAppServer(),
@@ -986,4 +894,7 @@ app.on('before-quit', () => {
     markSessionExitClean();
     stopDiscoveryListener();
     stopBroadcast();
+    unregisterTuningShortcut();
+    tuningWindowShellCapability.closeTuningWindow();
+    disposeTuningBridgeIpc();
 });
