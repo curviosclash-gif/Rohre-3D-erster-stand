@@ -1,0 +1,193 @@
+{
+  "blockId": "BT93L",
+  "blockers": [
+    {
+      "blocks": [
+        "50k extension",
+        "BT94A-ready"
+      ],
+      "evidence": "micro_ppo_signal_report.json has train deathBefore60Count > 0",
+      "id": "BT93L.DEATH_BEFORE_60"
+    },
+    {
+      "blocks": [
+        "longer micro signal confirmation",
+        "BT94A-ready"
+      ],
+      "evidence": "micro_ppo_signal_report.json decision.extension50kAllowed=false",
+      "id": "BT93L.50K_EXTENSION_BLOCKED"
+    },
+    {
+      "blocks": [
+        "BT94A comparison",
+        "candidate/freeze claim"
+      ],
+      "evidence": "baseline_matrix_report.json has sameMatrixDqnAnchorPresent=false",
+      "id": "BT93L.DQN_SAME_MATRIX_ANCHOR_MISSING"
+    },
+    {
+      "blocks": [
+        "94A.1 claim"
+      ],
+      "evidence": "data/training/ppo/bt94a/no_start_gate.json remains claimable=false",
+      "id": "BT94A.NO_START_GATE_STILL_RED"
+    }
+  ],
+  "bt94aHandover": {
+    "bt94aBlockerCount": 4,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "matrixDefinitionAllowed": false,
+    "precomparison": "ppo-regression",
+    "ready": false
+  },
+  "checks": {
+    "actionEffectOk": true,
+    "baselineMatrixOk": true,
+    "bt94aBlockerCountZero": false,
+    "bt94aCandidateRunsAllowed": false,
+    "bt94aMatrixDefinitionAllowed": false,
+    "bt94aNoStartGateClaimable": false,
+    "deathBefore60Clear": false,
+    "extension50kAllowed": false,
+    "microPpoSignalGreen": true,
+    "precomparisonNotRegression": false,
+    "progressReachabilityOk": true,
+    "rewardBalanceOk": true,
+    "runtimeErrorFree": true,
+    "sameMatrixDqnAnchorPresent": false,
+    "taskMetricContractOk": true
+  },
+  "commands": {
+    "write": "python python/scripts/bt93l_handover.py --write-report"
+  },
+  "followup": {
+    "concreteFollowup": "BT93M DeathBefore60-Stability und DQN-Same-Matrix-Anker (manual intake required)",
+    "mustNotShiftIntoBT94A": true,
+    "reason": "BT93L produced real PPO signals, but 50k extension is blocked, same-matrix DQN anchor is missing, and BT94A no-start remains red.",
+    "required": true
+  },
+  "forbiddenResultTerms": {
+    "BT95-Handoff-ready": false,
+    "candidate": false,
+    "freeze": false,
+    "promote": false,
+    "rollout-ready": false
+  },
+  "gateAction": {
+    "bt94aGateCheckExecuted": false,
+    "noStartGatePath": "data/training/ppo/bt94a/no_start_gate.json",
+    "noStartGateRemainsRed": true,
+    "reason": "BT93L result is not BT94A-ready; plan allows bt94a_gate_check.py only for an opening attempt after BT94A-ready."
+  },
+  "generatedAt": "2026-04-28T20:07:41Z",
+  "generatedBy": "python/scripts/bt93l_handover.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "f5a5aecbec9ba6d7cf3be3298eede4a6a69f0512"
+  },
+  "guardrails": {
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93L.7.1": true,
+    "93L.7.2": true,
+    "93L.7.3": true,
+    "93L.7.4": true
+  },
+  "phaseId": "93L.7",
+  "resultClass": "diagnose-loop-required",
+  "schemaVersion": "bt93l-handover-package-v1",
+  "sourceArtifacts": {
+    "actionEffectReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/action_effect_report.json",
+      "phaseId": "93L.4",
+      "resultClass": "action-effect-green",
+      "role": "BT93L.4 action effect",
+      "sha256": "3cb30bf4f9c599aec547ad0106625be9eb63340a5a64bd7a61194169ddf486b8"
+    },
+    "baselineMatrixReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L.5 baseline matrix",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013"
+    },
+    "bt94aNoStartGate": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A red no-start gate",
+      "sha256": "288018064b50e130fb0fea7ded67b7ac2b29a6c393198a9a494417d16fd37062"
+    },
+    "microPpoSignalReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/micro_ppo_signal_report.json",
+      "phaseId": "93L.6",
+      "resultClass": "signal-green",
+      "role": "BT93L.6 micro PPO signal",
+      "sha256": "01912b85c4ad39ef9b4f92d28f19ee29f27ab85670ba451cb7551a679fa74f34"
+    },
+    "progressReachabilityReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/progress_reachability_report.json",
+      "phaseId": "93L.2",
+      "resultClass": "progress-reachability-green",
+      "role": "BT93L.2 progress reachability",
+      "sha256": "330b0c15b5bce083d6697e5886d0fb2884237ee3cf2097c176e72e465f97b651"
+    },
+    "rewardBalanceReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/reward_balance_report.json",
+      "phaseId": "93L.3",
+      "resultClass": "reward-balance-green",
+      "role": "BT93L.3 reward balance",
+      "sha256": "25c8d417fdfa23e2f8cb6e0b9c548648f0780775acc78defab84fd03cd53569e"
+    },
+    "taskMetricContract": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L.1 task metric contract",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0"
+    }
+  },
+  "summary": {
+    "bt94aClaimAllowed": false,
+    "evalObjectiveSignalReachableCount": 25,
+    "extension50kAllowed": false,
+    "microPpoResultClass": "signal-green",
+    "nextStep": "manual intake of BT93M follow-up or 93L.99 closure as diagnose-loop-required",
+    "sameMatrixDqnAnchorPresent": false,
+    "trainDeathBefore60Count": 1
+  }
+}
