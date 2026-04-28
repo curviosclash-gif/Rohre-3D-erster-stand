@@ -11,6 +11,10 @@ const runProfile = applyPlaywrightRunProfileEnv(
     process.env,
     process.env.PW_RUN_PROFILE || PLAYWRIGHT_DEFAULT_RUN_PROFILE
 );
+const hasExplicitAppMode = String(process.env.VITE_APP_MODE || '').trim().length > 0;
+if (!hasExplicitAppMode) {
+    process.env.VITE_APP_MODE = runProfile.name.startsWith('desktop-') ? 'app' : 'web';
+}
 
 function toPositiveInt(rawValue, fallback, min = 1, max = 65_535) {
     const numeric = Number.parseInt(String(rawValue || ''), 10);

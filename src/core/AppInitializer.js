@@ -1,4 +1,5 @@
 // @ts-check
+/* global __CURVIOS_E2E__ */
 
 import { attachGlobalRuntimeErrorHandler, showRuntimeErrorOverlay } from './RuntimeErrorOverlay.js';
 import { createLogger } from '../shared/logging/Logger.js';
@@ -30,6 +31,16 @@ let domReadyHandlerAttached = false;
  */
 function getRuntimeWindow() {
     return /** @type {RuntimeWindow} */ (window);
+}
+
+function isE2ERuntimeEnabled(runtimeWindow) {
+    if (runtimeWindow?.__CURVIOS_E2E__ === true) {
+        return true;
+    }
+    const runtimeGlobal = typeof globalThis !== 'undefined'
+        ? /** @type {RuntimeWindow} */ (globalThis)
+        : null;
+    return runtimeGlobal?.__CURVIOS_E2E__ === true;
 }
 
 /**
@@ -102,7 +113,7 @@ function mountGameInstance(createGame) {
     attachShellLifecycleBridge(game);
 
     try {
-        if (runtimeWindow.__CURVIOS_E2E__ === true) {
+        if (isE2ERuntimeEnabled(runtimeWindow)) {
             import('./TestApiBridge.js')
                 .then((mod) => mod?.attachCurviosTestApi?.(runtimeWindow))
                 .catch(() => {});

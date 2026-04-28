@@ -470,6 +470,124 @@ async function selectModePath(page, modePath) {
     }
 }
 
+async function readMatchStartSnapshot(page) {
+    return page.evaluate(() => {
+        const game = window.GAME_INSTANCE;
+        const hud = document.getElementById('hud');
+        const huntHud = document.getElementById('hunt-hud');
+        const startButton = document.querySelector('#submenu-game #btn-start');
+        return {
+            modePath: String(game?.settings?.localSettings?.modePath || ''),
+            gameMode: String(game?.settings?.gameMode || ''),
+            mapKey: String(game?.settings?.mapKey || ''),
+            players: Number(game?.entityManager?.players?.length || 0),
+            hudVisible: !!(hud && !hud.classList.contains('hidden')),
+            huntHudVisible: !!(huntHud && !huntHud.classList.contains('hidden')),
+            startLabel: startButton?.textContent?.trim?.() || '',
+        };
+    });
+}
+
+async function applyModePathRuntimeFallback(page, modePath) {
+    return page.evaluate((requestedModePath) => {
+        const normalizedModePath = String(requestedModePath || '').trim().toLowerCase();
+        if (!normalizedModePath) {
+            return { ok: false, reason: 'mode-path-missing' };
+        }
+        const game = window.GAME_INSTANCE;
+        if (!game?.settings) {
+            return { ok: false, reason: 'game-unavailable' };
+        }
+
+        if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
+            game.settings.localSettings = {};
+        }
+        if (!game.settings.hunt || typeof game.settings.hunt !== 'object') {
+            game.settings.hunt = {};
+        }
+
+        game.settings.localSettings.modePath = normalizedModePath;
+        if (normalizedModePath === 'fight') {
+            game.settings.gameMode = 'HUNT';
+            game.settings.hunt.respawnEnabled = true;
+        } else if (normalizedModePath === 'normal' || normalizedModePath === 'arcade') {
+            game.settings.gameMode = 'CLASSIC';
+            game.settings.hunt.respawnEnabled = false;
+        }
+
+        const fallbackChangedKeys = [
+            'session.modePath',
+            'session.gameMode',
+            'session.hunt.respawnEnabled',
+            'session.mapKey',
+        ];
+        const compatibility = game.settingsManager?.applyMenuCompatibilityRules?.(game.settings, {
+            changedKeys: fallbackChangedKeys,
+        });
+        const changedKeys = Array.isArray(compatibility?.changedKeys) && compatibility.changedKeys.length > 0
+            ? compatibility.changedKeys
+            : fallbackChangedKeys;
+        game.uiManager?.syncByChangeKeys?.(changedKeys);
+        game.uiManager?.menuNavigationRuntime?.showPanel?.('submenu-game', {
+            trigger: 'test_helper_force_mode_path',
+            modePath: normalizedModePath,
+        });
+
+        return {
+            ok: true,
+            changedKeys,
+            modePath: String(game.settings?.localSettings?.modePath || ''),
+            gameMode: String(game.settings?.gameMode || ''),
+            mapKey: String(game.settings?.mapKey || ''),
+        };
+    }, modePath);
+}
+
+async function ensureModePathSelected(page, modePath) {
+    const expectedModePath = String(modePath || '').trim().toLowerCase();
+    const expectedGameMode = expectedModePath === 'fight' ? 'HUNT' : 'CLASSIC';
+    const before = await readMatchStartSnapshot(page);
+    if (before.modePath === expectedModePath && before.gameMode === expectedGameMode) {
+        return;
+    }
+
+    const fallbackResult = await applyModePathRuntimeFallback(page, expectedModePath);
+    if (!fallbackResult?.ok) {
+        throw new Error(`Mode-Pfad Fallback fehlgeschlagen (${fallbackResult?.reason || 'unknown'})`);
+    }
+
+    const after = await readMatchStartSnapshot(page);
+    if (after.modePath !== expectedModePath || after.gameMode !== expectedGameMode) {
+        throw new Error(
+            `Mode-Pfad nicht stabil gesetzt: erwartet ${expectedModePath}/${expectedGameMode}, ` +
+            `ist ${after.modePath || 'n/a'}/${after.gameMode || 'n/a'}`
+        );
+    }
+}
+
+async function waitForHuntRuntimeReady(page, minimumPlayers = 1, timeoutMs = 60000) {
+    try {
+        await page.waitForFunction((requiredPlayers) => {
+            const hud = document.getElementById('hud');
+            const huntHud = document.getElementById('hunt-hud');
+            const game = window.GAME_INSTANCE;
+            return !!(
+                hud && !hud.classList.contains('hidden')
+                && huntHud && !huntHud.classList.contains('hidden')
+                && game?.entityManager?.players?.length >= requiredPlayers
+            );
+        }, minimumPlayers, { timeout: timeoutMs });
+    } catch {
+        const snapshot = await readMatchStartSnapshot(page);
+        throw new Error(
+            `Hunt-Start Timeout: modePath=${snapshot.modePath || 'n/a'} ` +
+            `gameMode=${snapshot.gameMode || 'n/a'} map=${snapshot.mapKey || 'n/a'} ` +
+            `hudVisible=${snapshot.hudVisible} huntHudVisible=${snapshot.huntHudVisible} ` +
+            `players=${snapshot.players} startLabel=${snapshot.startLabel || 'n/a'}`
+        );
+    }
+}
+
 export async function startGameFromMenu(page) {
     await waitForLoadedGame(page);
     await openGameSubmenu(page);
@@ -515,18 +633,10 @@ export async function startHuntGame(page) {
     await loadGame(page);
     await openCustomSubmenu(page);
     await selectModePath(page, 'fight');
+    await ensureModePathSelected(page, 'fight');
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
     await triggerMatchStart(page);
-    await page.waitForFunction(() => {
-        const hud = document.getElementById('hud');
-        const huntHud = document.getElementById('hunt-hud');
-        const game = window.GAME_INSTANCE;
-        return !!(
-            hud && !hud.classList.contains('hidden')
-            && huntHud && !huntHud.classList.contains('hidden')
-            && game?.entityManager?.players?.length > 0
-        );
-    }, null, { timeout: 60000 });
+    await waitForHuntRuntimeReady(page, 1, 60000);
 }
 
 // Start hunt mode with configurable bot count.
@@ -534,6 +644,7 @@ export async function startHuntGameWithBots(page, botCount = 1) {
     await loadGame(page);
     await openCustomSubmenu(page);
     await selectModePath(page, 'fight');
+    await ensureModePathSelected(page, 'fight');
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
     await page.evaluate((count) => {
         const slider = document.getElementById('bot-count');
@@ -541,16 +652,7 @@ export async function startHuntGameWithBots(page, botCount = 1) {
         slider.dispatchEvent(new Event('input', { bubbles: true }));
     }, botCount);
     await triggerMatchStart(page);
-    await page.waitForFunction(() => {
-        const hud = document.getElementById('hud');
-        const huntHud = document.getElementById('hunt-hud');
-        const game = window.GAME_INSTANCE;
-        return !!(
-            hud && !hud.classList.contains('hidden')
-            && huntHud && !huntHud.classList.contains('hidden')
-            && game?.entityManager?.players?.length > 1
-        );
-    }, null, { timeout: 60000 });
+    await waitForHuntRuntimeReady(page, 2, 60000);
 }
 
 // Press ESC and wait for main menu.

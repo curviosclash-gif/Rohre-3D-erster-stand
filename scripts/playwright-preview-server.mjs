@@ -70,6 +70,11 @@ const host = readArg('--host', String(process.env.TEST_HOST || '127.0.0.1').trim
 const port = readArg('--port', String(process.env.TEST_PORT || '5173').trim() || '5173');
 const runTag = sanitizeRunTag(process.env.PW_RUN_TAG || 'playwright');
 const runProfile = String(process.env.PW_RUN_PROFILE || 'preview-smoke').trim() || 'preview-smoke';
+const hasExplicitAppMode = String(process.env.VITE_APP_MODE || '').trim().length > 0;
+if (!hasExplicitAppMode) {
+    process.env.VITE_APP_MODE = runProfile.startsWith('desktop-') ? 'app' : 'web';
+}
+const appMode = String(process.env.VITE_APP_MODE || 'web').trim() || 'web';
 const outLogPath = path.resolve(
     process.cwd(),
     readArg('--out-log', String(process.env.PW_SERVER_LOG_OUT || `tmp-vite-${runTag}.out.log`).trim())
@@ -82,8 +87,14 @@ const viteCliPath = path.resolve('node_modules', 'vite', 'bin', 'vite.js');
 const outLogStream = createWriteStream(outLogPath, { flags: 'w' });
 const errLogStream = createWriteStream(errLogPath, { flags: 'w' });
 
-outLogStream.write(`[playwright-preview-server] runProfile=${runProfile} runTag=${runTag} host=${host} port=${port}\n`);
-errLogStream.write(`[playwright-preview-server] runProfile=${runProfile} runTag=${runTag} host=${host} port=${port}\n`);
+outLogStream.write(
+    `[playwright-preview-server] runProfile=${runProfile} appMode=${appMode} ` +
+    `runTag=${runTag} host=${host} port=${port}\n`
+);
+errLogStream.write(
+    `[playwright-preview-server] runProfile=${runProfile} appMode=${appMode} ` +
+    `runTag=${runTag} host=${host} port=${port}\n`
+);
 
 let previewProcess = null;
 
