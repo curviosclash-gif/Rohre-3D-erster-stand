@@ -39,32 +39,60 @@ function createDownloadStatus({
     transport,
     status,
     fallbackReason = null,
+    failureReason = null,
     apiStatus = null,
     message = '',
     warnings = [],
     surfaceClassification = '',
     filePath = null,
     container = '',
+    masterContainer = '',
+    deliveryContainer = '',
+    transcodeApplied = false,
+    masterPath = null,
+    deliveryPath = null,
     saveCapabilityId = '',
     saveCode = '',
     exportMatrix = null,
+    nativeTranscodeCapability = null,
+    transcodeFailureCode = null,
 }) {
+    const resolvedMasterContainer = String(masterContainer || container || '').trim();
+    const resolvedDeliveryContainer = String(
+        deliveryContainer || container || masterContainer || ''
+    ).trim();
+    const resolvedDeliveryPath = deliveryPath
+        ? String(deliveryPath)
+        : (filePath ? String(filePath) : null);
+    const resolvedMasterPath = masterPath
+        ? String(masterPath)
+        : (resolvedDeliveryPath && transcodeApplied !== true ? resolvedDeliveryPath : null);
     return {
         requested: requested === true,
         transport: String(transport || ''),
         status: String(status || ''),
         fallbackReason: fallbackReason ? String(fallbackReason) : null,
+        failureReason: failureReason ? String(failureReason) : null,
         apiStatus: Number.isFinite(Number(apiStatus)) ? Number(apiStatus) : null,
         message: String(message || '').trim(),
         warnings: dedupeWarnings(warnings),
         surfaceClassification: String(surfaceClassification || '').trim(),
-        filePath: filePath ? String(filePath) : null,
-        container: String(container || '').trim() || null,
+        filePath: resolvedDeliveryPath,
+        container: resolvedDeliveryContainer || null,
+        masterContainer: resolvedMasterContainer || null,
+        deliveryContainer: resolvedDeliveryContainer || null,
+        transcodeApplied: transcodeApplied === true,
+        masterPath: resolvedMasterPath,
+        deliveryPath: resolvedDeliveryPath,
         saveCapabilityId: String(saveCapabilityId || '').trim() || null,
         saveCode: String(saveCode || '').trim() || null,
         exportMatrix: exportMatrix && typeof exportMatrix === 'object'
             ? { ...exportMatrix }
             : null,
+        nativeTranscodeCapability: nativeTranscodeCapability && typeof nativeTranscodeCapability === 'object'
+            ? { ...nativeTranscodeCapability }
+            : null,
+        transcodeFailureCode: String(transcodeFailureCode || '').trim() || null,
     };
 }
 
@@ -155,6 +183,8 @@ export function buildDownloadFileName(downloadDirectoryName, fileName) {
  *   fileName: string,
  *   mimeType: string,
  *   captureProfile?: string,
+ *   exportPreset?: string,
+ *   masterContainer?: string,
  *   autoDownload: boolean,
  *   downloadHandler: function,
  *   logger: object
@@ -166,6 +196,8 @@ export async function attemptAutoDownload({
     fileName,
     mimeType,
     captureProfile = null,
+    exportPreset = null,
+    masterContainer = null,
     autoDownload,
     downloadHandler,
     logger,
@@ -174,18 +206,62 @@ export async function attemptAutoDownload({
         PLATFORM_SURFACE_FEATURE_IDS.VIDEO_EXPORT,
         { runtimeGlobal: globalThis }
     );
+    const safeFileName = String(fileName || '').trim();
+    const browserFileName = safeFileName.replace(/\\/g, '/').split('/').filter(Boolean).pop() || safeFileName;
+    const desktopSaveAdapter = createElectronPreloadSaveAdapter(globalThis);
+    const saveRequest = createRecordingVideoExportRequest({
+        runtimeKind: desktopSaveAdapter.isAvailable() ? 'desktop' : 'web',
+        fileName: safeFileName,
+        mimeType,
+        captureProfile,
+        exportPreset,
+        masterContainer,
+        surfaceClassification: videoFeatureClassification.classification,
+        videoBytes: null,
+    });
+    const requestMasterContainer = saveRequest.masterContainer || saveRequest.container || null;
+    const requestDeliveryContainer = saveRequest.deliveryContainer || requestMasterContainer;
+    const requestTranscodeRequested = saveRequest.transcodeRequested === true;
+    const resolveResultContainers = (result = null) => {
+        const resolvedMasterContainer = String(
+            result?.masterContainer || requestMasterContainer || ''
+        ).trim() || null;
+        const resolvedDeliveryContainer = String(
+            result?.deliveryContainer
+            || result?.container
+            || requestDeliveryContainer
+            || resolvedMasterContainer
+            || ''
+        ).trim() || null;
+        const transcodeApplied = result?.transcodeApplied === true;
+        const resolvedDeliveryPath = result?.deliveryPath || result?.filePath || null;
+        const resolvedMasterPath = result?.masterPath
+            || (transcodeApplied ? null : resolvedDeliveryPath)
+            || null;
+        return {
+            masterContainer: resolvedMasterContainer,
+            deliveryContainer: resolvedDeliveryContainer,
+            transcodeApplied,
+            masterPath: resolvedMasterPath,
+            deliveryPath: resolvedDeliveryPath,
+        };
+    };
     if (!autoDownload || !blob || blob.size <= 0) {
+        const containers = resolveResultContainers();
         return createDownloadStatus({
             requested: false,
             transport: 'disabled',
             status: 'not_requested',
             message: 'Recording-Export wurde nicht angefordert.',
             surfaceClassification: videoFeatureClassification.classification,
+            masterContainer: containers.masterContainer,
+            deliveryContainer: containers.deliveryContainer,
+            transcodeApplied: containers.transcodeApplied,
+            masterPath: containers.masterPath,
+            deliveryPath: containers.deliveryPath,
+            exportMatrix: saveRequest.exportMatrix,
         });
     }
-    const safeFileName = String(fileName || '').trim();
-    const browserFileName = safeFileName.replace(/\\/g, '/').split('/').filter(Boolean).pop() || safeFileName;
-    const desktopSaveAdapter = createElectronPreloadSaveAdapter(globalThis);
     const isBrowserDemoSurface = videoFeatureClassification.productSurfaceId === PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO;
     const browserVideoFallbackAllowed = !isBrowserDemoSurface
         || videoFeatureClassification.classification === PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DEMO_SAFE;
@@ -193,16 +269,24 @@ export async function attemptAutoDownload({
         const blockedFeatureFeedback = resolveSurfaceBlockedFeatureFeedback('Video-Export', {
             runtimeGlobal: globalThis,
         });
+        const containers = resolveResultContainers();
         return createDownloadStatus({
             requested: true,
             transport: 'blocked',
             status: 'surface_policy_blocked',
             fallbackReason: 'surface-policy',
+            failureReason: 'surface-policy',
             message: blockedFeatureFeedback.message,
             warnings: [
                 'Video-Export bleibt fuer diese Surface ein future opt-in; Browser- und Disk-Fallbacks bleiben bis zu einem echten Demo-Mehrwert deaktiviert.',
             ],
             surfaceClassification: videoFeatureClassification.classification,
+            masterContainer: containers.masterContainer,
+            deliveryContainer: containers.deliveryContainer,
+            transcodeApplied: containers.transcodeApplied,
+            masterPath: containers.masterPath,
+            deliveryPath: containers.deliveryPath,
+            exportMatrix: saveRequest.exportMatrix,
         });
     }
     const saveSurfaceCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.SAVE, {
@@ -236,6 +320,15 @@ export async function attemptAutoDownload({
             : null,
     });
     const statusWarnings = [];
+    const withTranscodeDegradationWarning = (warnings, transcodeApplied = false) => {
+        if (!requestTranscodeRequested || transcodeApplied === true) {
+            return warnings;
+        }
+        return [
+            ...warnings,
+            'Export-Preset youtube-mp4 ist aktiv; Delivery wurde auf den Master-Container degradiert.',
+        ];
+    };
     if (fileIoFeatureClassification.classification === PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY && !desktopSaveAdapter.isAvailable()) {
         statusWarnings.push('Dateioperationen bleiben desktop-only; ohne Desktop-Speicheradapter wird ein degradiertes Fallback genutzt.');
     }
@@ -265,31 +358,42 @@ export async function attemptAutoDownload({
     ) {
         try {
             const bytes = new Uint8Array(await blob.arrayBuffer());
-            const saveRequest = createRecordingVideoExportRequest({
-                runtimeKind: 'desktop',
-                fileName: safeFileName,
-                mimeType,
-                captureProfile,
-                surfaceClassification: videoFeatureClassification.classification,
+            const appResult = await recordingVideoExportInvoker.invoke({
+                ...saveRequest,
                 videoBytes: bytes,
             });
-            const appResult = await recordingVideoExportInvoker.invoke(saveRequest);
             if (appResult?.saved === true) {
                 logger?.info?.('[DownloadService] recording export saved via electron app', browserFileName);
+                const containers = resolveResultContainers(appResult);
+                const appWarnings = withTranscodeDegradationWarning(
+                    [
+                        ...statusWarnings,
+                        ...(Array.isArray(appResult?.warnings) ? appResult.warnings : []),
+                    ],
+                    containers.transcodeApplied
+                );
                 return createDownloadStatus({
                     requested: true,
                     transport: 'app',
                     status: 'saved_via_app',
                     message: 'Recording wurde direkt ueber die Desktop-App gespeichert.',
-                    warnings: statusWarnings,
+                    warnings: appWarnings,
                     surfaceClassification: videoFeatureClassification.classification,
-                    filePath: appResult.filePath || null,
-                    container: appResult.container || saveRequest.container,
+                    filePath: containers.deliveryPath,
+                    container: containers.deliveryContainer,
+                    masterContainer: containers.masterContainer,
+                    deliveryContainer: containers.deliveryContainer,
+                    transcodeApplied: containers.transcodeApplied,
+                    masterPath: containers.masterPath,
+                    deliveryPath: containers.deliveryPath,
                     saveCapabilityId: appResult.capabilityId
                         || saveRequest.capabilityId
                         || RECORDING_DESKTOP_SAVE_CAPABILITY_IDS.VIDEO_EXPORT_SAVE,
                     saveCode: appResult.code || '',
+                    failureReason: appResult.failureReason || '',
                     exportMatrix: saveRequest.exportMatrix,
+                    nativeTranscodeCapability: appResult.nativeTranscodeCapability || null,
+                    transcodeFailureCode: appResult.transcodeFailureCode || null,
                 });
             }
             if (appResult?.code) {
@@ -302,16 +406,31 @@ export async function attemptAutoDownload({
     }
     if (typeof fetch !== 'function') {
         const downloaded = await downloadViaBrowser('fetch-unavailable');
+        const containers = resolveResultContainers({
+            container: requestMasterContainer,
+            masterContainer: requestMasterContainer,
+            deliveryContainer: requestMasterContainer,
+        });
         return createDownloadStatus({
             requested: true,
             transport: downloaded ? 'download' : 'download-failed',
             status: downloaded ? 'saved_via_download' : 'download_failed',
             fallbackReason: 'fetch-unavailable',
+            failureReason: downloaded ? null : 'fetch-unavailable',
             message: downloaded
                 ? 'Recording wurde als Browser-Download gespeichert, weil keine Disk-API verfuegbar ist.'
                 : 'Recording konnte ohne Disk-API auch nicht als Browser-Download gespeichert werden.',
-            warnings: [...statusWarnings, 'Disk-API ist in dieser Umgebung nicht verfuegbar.'],
+            warnings: withTranscodeDegradationWarning(
+                [...statusWarnings, 'Disk-API ist in dieser Umgebung nicht verfuegbar.']
+            ),
             surfaceClassification: videoFeatureClassification.classification,
+            container: containers.deliveryContainer,
+            masterContainer: containers.masterContainer,
+            deliveryContainer: containers.deliveryContainer,
+            transcodeApplied: containers.transcodeApplied,
+            masterPath: containers.masterPath,
+            deliveryPath: containers.deliveryPath,
+            exportMatrix: saveRequest.exportMatrix,
         });
     }
     try {
@@ -322,43 +441,85 @@ export async function attemptAutoDownload({
         });
         if (response?.ok) {
             logger?.info?.('[DownloadService] recording export saved via api', safeFileName);
+            const containers = resolveResultContainers({
+                container: requestMasterContainer,
+                masterContainer: requestMasterContainer,
+                deliveryContainer: requestMasterContainer,
+            });
             return createDownloadStatus({
                 requested: true,
                 transport: 'api',
                 status: 'saved_via_api',
                 apiStatus: Number(response.status) || 200,
                 message: 'Recording wurde ueber die lokale Disk-API gespeichert.',
-                warnings: statusWarnings,
+                warnings: withTranscodeDegradationWarning(statusWarnings),
                 surfaceClassification: videoFeatureClassification.classification,
+                container: containers.deliveryContainer,
+                masterContainer: containers.masterContainer,
+                deliveryContainer: containers.deliveryContainer,
+                transcodeApplied: containers.transcodeApplied,
+                masterPath: containers.masterPath,
+                deliveryPath: containers.deliveryPath,
+                exportMatrix: saveRequest.exportMatrix,
             });
         }
         const apiStatus = Number(response?.status) || 0;
         const apiError = new Error(`http_${apiStatus || 'unknown'}`);
         const downloaded = await downloadViaBrowser('api-failed', apiError);
+        const containers = resolveResultContainers({
+            container: requestMasterContainer,
+            masterContainer: requestMasterContainer,
+            deliveryContainer: requestMasterContainer,
+        });
         return createDownloadStatus({
             requested: true,
             transport: downloaded ? 'api-fallback-download' : 'api-fallback-download-failed',
             status: downloaded ? 'saved_via_download_fallback' : 'download_fallback_failed',
             fallbackReason: 'api-failed',
+            failureReason: downloaded ? null : 'api-failed',
             apiStatus: apiStatus || null,
             message: downloaded
                 ? 'Recording wurde als Browser-Download gespeichert, weil die Disk-API fehlgeschlagen ist.'
                 : 'Recording konnte nach fehlgeschlagener Disk-API auch nicht als Browser-Download gespeichert werden.',
-            warnings: [...statusWarnings, `Disk-API-Fehler: HTTP ${apiStatus || 'unknown'}.`],
+            warnings: withTranscodeDegradationWarning(
+                [...statusWarnings, `Disk-API-Fehler: HTTP ${apiStatus || 'unknown'}.`]
+            ),
             surfaceClassification: videoFeatureClassification.classification,
+            container: containers.deliveryContainer,
+            masterContainer: containers.masterContainer,
+            deliveryContainer: containers.deliveryContainer,
+            transcodeApplied: containers.transcodeApplied,
+            masterPath: containers.masterPath,
+            deliveryPath: containers.deliveryPath,
+            exportMatrix: saveRequest.exportMatrix,
         });
     } catch (error) {
         const downloaded = await downloadViaBrowser('api-throw', error);
+        const containers = resolveResultContainers({
+            container: requestMasterContainer,
+            masterContainer: requestMasterContainer,
+            deliveryContainer: requestMasterContainer,
+        });
         return createDownloadStatus({
             requested: true,
             transport: downloaded ? 'download' : 'download-failed',
             status: downloaded ? 'saved_via_download' : 'download_failed',
             fallbackReason: 'api-throw',
+            failureReason: downloaded ? null : 'api-throw',
             message: downloaded
                 ? 'Recording wurde als Browser-Download gespeichert, weil die Disk-API nicht erreichbar war.'
                 : 'Recording konnte weder ueber die Disk-API noch als Browser-Download gespeichert werden.',
-            warnings: [...statusWarnings, 'Disk-API war nicht erreichbar.'],
+            warnings: withTranscodeDegradationWarning(
+                [...statusWarnings, 'Disk-API war nicht erreichbar.']
+            ),
             surfaceClassification: videoFeatureClassification.classification,
+            container: containers.deliveryContainer,
+            masterContainer: containers.masterContainer,
+            deliveryContainer: containers.deliveryContainer,
+            transcodeApplied: containers.transcodeApplied,
+            masterPath: containers.masterPath,
+            deliveryPath: containers.deliveryPath,
+            exportMatrix: saveRequest.exportMatrix,
         });
     }
 }

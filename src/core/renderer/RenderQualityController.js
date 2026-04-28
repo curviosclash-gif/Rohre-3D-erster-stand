@@ -11,12 +11,52 @@ export class RenderQualityController {
     constructor(renderer, scene) {
         this.renderer = renderer;
         this.scene = scene;
+        this.requestedQuality = 'HIGH';
         this.quality = 'HIGH';
         this.shadowQuality = DEFAULT_SHADOW_QUALITY;
+        this.qualityLockReason = null;
     }
 
     setQuality(quality) {
-        const nextQuality = quality === 'LOW' ? 'LOW' : 'HIGH';
+        this.requestedQuality = this._normalizeQuality(quality);
+        this._applyEffectiveQuality();
+    }
+
+    setQualityLock(active, reason = null) {
+        const shouldLock = active === true;
+        const normalizedReason = shouldLock
+            ? (String(reason || 'quality-lock').trim() || 'quality-lock')
+            : null;
+        if (this.qualityLockReason === normalizedReason) {
+            return this.getQualityState();
+        }
+        this.qualityLockReason = normalizedReason;
+        this._applyEffectiveQuality();
+        return this.getQualityState();
+    }
+
+    getQualityState() {
+        return Object.freeze({
+            requestedQuality: this.requestedQuality,
+            effectiveQuality: this.quality,
+            qualityLockActive: !!this.qualityLockReason,
+            qualityLockReason: this.qualityLockReason,
+        });
+    }
+
+    _normalizeQuality(quality) {
+        return quality === 'LOW' ? 'LOW' : 'HIGH';
+    }
+
+    _resolveEffectiveQuality() {
+        if (this.qualityLockReason) {
+            return 'HIGH';
+        }
+        return this.requestedQuality;
+    }
+
+    _applyEffectiveQuality() {
+        const nextQuality = this._resolveEffectiveQuality();
         if (this.quality === nextQuality) {
             return;
         }

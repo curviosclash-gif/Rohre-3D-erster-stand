@@ -6,8 +6,6 @@ import {
     MATCH_LIFECYCLE_EVENT_TYPES,
 } from '../shared/contracts/MatchLifecycleContract.js';
 import {
-    attemptAutoDownload,
-    buildDownloadFileName,
     defaultDownload,
 } from './recording/DownloadService.js';
 import { toFiniteNumber } from '../utils/MathOps.js';
@@ -23,12 +21,12 @@ import {
     resolvePerfNow,
     resolveSafeMediaRecorderMimeType,
     sanitizeFileToken,
-    toSafeDatePart,
 } from './recording/MediaRecorderSupport.js';
 import {
     createDefaultRecordingCaptureSettings,
+    RECORDING_CINEMATIC_QUALITY_PROFILE,
+    isCinematicCaptureProfile,
     normalizeRecordingCaptureSettings,
-    RECORDING_CAPTURE_PROFILE,
     RECORDING_DOWNLOAD_DIRECTORY,
 } from '../shared/contracts/RecordingCaptureContract.js';
 import {
@@ -43,6 +41,7 @@ import {
     MEDIARECORDER_SYNTHETIC_QUEUE_SOFT_MS,
     toPositiveInt,
 } from './recording/MediaRecorderSystemOps.js';
+import { finalizeMediaRecorderBlobExport } from './recording/MediaRecorderExportFinalizeOps.js';
 const DEFAULT_CONTRACT_VERSION = MATCH_LIFECYCLE_CONTRACT_VERSION;
 export const LIFECYCLE_EVENT_TYPES = MATCH_LIFECYCLE_EVENT_TYPES;
 export class MediaRecorderSystem {
@@ -69,6 +68,7 @@ export class MediaRecorderSystem {
         this.autoDownload = !!autoDownload;
         this.downloadDirectoryName = sanitizeFileToken(downloadDirectoryName, RECORDING_DOWNLOAD_DIRECTORY);
         this.captureFps = Math.max(1, Number(captureFps) || 60);
+        this._activeCaptureFps = this.captureFps;
         this.onRecordingStateChange = typeof onRecordingStateChange === 'function' ? onRecordingStateChange : null;
         this.contractVersion = String(contractVersion || DEFAULT_CONTRACT_VERSION);
         this.filePrefix = sanitizeFileToken(filePrefix, 'aero-arena');
@@ -254,6 +254,9 @@ export class MediaRecorderSystem {
             return this.captureFps;
         }
         this.captureFps = nextFps;
+        if (!this._isRecording) {
+            this._activeCaptureFps = nextFps;
+        }
         if (this._isRecording && this._activeRecorderEngine === RECORDER_ENGINE.NATIVE_WEBCODECS) {
             this._resetWebCodecsCaptureState();
         }
@@ -292,12 +295,13 @@ export class MediaRecorderSystem {
         }
         this._mediaRecorderPumpTimer = null;
     }
-    _startMediaRecorderPump(resolutionScale = 1) {
+    _startMediaRecorderPump(resolutionScale = 1, captureFps = null) {
         this._stopMediaRecorderPump();
         this._mediaRecorderPumpResolutionScale = Math.max(0.2, Math.min(1, toFiniteNumber(resolutionScale, 1)));
         if (typeof setInterval !== 'function') return;
         if (!this._mediaRecorderUsesCaptureCanvas && !this._mediaRecorderSupportsRequestFrame) return;
-        const intervalMs = Math.max(16, Math.round(1000 / Math.max(1, this.captureFps)));
+        const effectiveCaptureFps = Math.max(1, toFiniteNumber(captureFps, this._getActiveCaptureFps()));
+        const intervalMs = Math.max(16, Math.round(1000 / effectiveCaptureFps));
         this._mediaRecorderPumpTimer = setInterval(() => {
             if (!this._isRecording || this._activeRecorderEngine !== RECORDER_ENGINE.NATIVE_MEDIARECORDER) return;
             try {
@@ -312,15 +316,36 @@ export class MediaRecorderSystem {
             }
         }, intervalMs);
     }
+    _getActiveCaptureFps() {
+        return Math.max(1, toFiniteNumber(this._activeCaptureFps, this.captureFps));
+    }
     _getCaptureLevel() {
         return CAPTURE_LOAD_LEVELS[Math.max(0, Math.min(CAPTURE_LOAD_LEVELS.length - 1, this._captureLevelIndex))];
     }
+    _resolveRecordingTargetFps() {
+        if (isCinematicCaptureProfile(this.recordingCaptureSettings?.profile)) {
+            return Math.max(
+                1,
+                toPositiveInt(
+                    RECORDING_CINEMATIC_QUALITY_PROFILE?.targetFps,
+                    this.captureFps,
+                    1,
+                    240
+                )
+            );
+        }
+        return Math.max(1, this.captureFps);
+    }
     _resolveEffectiveCaptureFps() {
+        const activeCaptureFps = this._getActiveCaptureFps();
+        if (isCinematicCaptureProfile(this.recordingCaptureSettings?.profile)) {
+            return activeCaptureFps;
+        }
         const level = this._getCaptureLevel();
-        return Math.max(1, this.captureFps * level.fpsScale);
+        return Math.max(1, activeCaptureFps * level.fpsScale);
     }
     _resolveCaptureResolutionScale(level = null) {
-        if (this.recordingCaptureSettings?.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+        if (isCinematicCaptureProfile(this.recordingCaptureSettings?.profile)) {
             return 1;
         }
         return Math.max(0.2, Math.min(1, toFiniteNumber(level?.resolutionScale, 1)));
@@ -569,7 +594,7 @@ export class MediaRecorderSystem {
         const encodeStart = this._perfNow();
         try {
             const frame = new VideoFrameCtor(frameSource, { timestamp: this._captureTimestampUs });
-            const insertKeyFrame = (this._captureEncodedFrames % Math.max(1, Math.round(this.captureFps * 2))) === 0;
+            const insertKeyFrame = (this._captureEncodedFrames % Math.max(1, Math.round(this._getActiveCaptureFps() * 2))) === 0;
             this._videoEncoder.encode(frame, { keyFrame: insertKeyFrame });
             frame.close();
             this._frameCount += 1;
@@ -672,17 +697,39 @@ export class MediaRecorderSystem {
     getRecordingDiagnostics() {
         const level = this._getCaptureLevel();
         const sourceCanvas = this._getCaptureCanvas();
+        const cinematicQualityProfile = isCinematicCaptureProfile(this.recordingCaptureSettings?.profile)
+            ? { ...RECORDING_CINEMATIC_QUALITY_PROFILE }
+            : null;
+        const lastExport = this._lastExport
+            ? {
+                recorderEngine: this._lastExport.recorderEngine || null,
+                masterContainer: this._lastExport.masterContainer || null,
+                deliveryContainer: this._lastExport.deliveryContainer || null,
+                transcodeApplied: this._lastExport.transcodeApplied === true,
+                transcodeFailureCode: this._lastExport.transcodeFailureCode || null,
+                masterPath: this._lastExport.masterPath || null,
+                deliveryPath: this._lastExport.deliveryPath || null,
+                warnings: Array.isArray(this._lastExport.warnings)
+                    ? this._lastExport.warnings.slice()
+                    : [],
+            }
+            : null;
         return {
             recording: this._isRecording,
             recorderEngine: this._activeRecorderEngine,
             captureProfile: this.recordingCaptureSettings?.profile || null,
             hudMode: this.recordingCaptureSettings?.hudMode || null,
+            captureExportPreset: this.recordingCaptureSettings?.exportPreset || null,
             captureFps: this.captureFps,
+            activeCaptureFps: this._getActiveCaptureFps(),
+            captureTargetFps: this._resolveRecordingTargetFps(),
             effectiveCaptureFps: this._resolveEffectiveCaptureFps(),
             captureResolutionScale: this._resolveCaptureResolutionScale(level),
             captureLevel: this._captureLevelIndex,
             captureSourceWidth: Math.max(0, Math.floor(toFiniteNumber(sourceCanvas?.width, 0))),
             captureSourceHeight: Math.max(0, Math.floor(toFiniteNumber(sourceCanvas?.height, 0))),
+            cinematicQualityProfile,
+            lastExport,
             requestFrameSupported: this._mediaRecorderSupportsRequestFrame,
             encodeQueueSoftLimit: ENCODE_QUEUE_SOFT_LIMIT,
             encodeQueueDropLimit: ENCODE_QUEUE_DROP_LIMIT,
@@ -711,8 +758,23 @@ export class MediaRecorderSystem {
             endedAt: this._lastExport.endedAt,
             durationMs: this._lastExport.durationMs,
             trigger: this._lastExport.trigger,
+            recorderEngine: this._lastExport.recorderEngine || null,
             captureProfile: this._lastExport.captureProfile || null,
             hudMode: this._lastExport.hudMode || null,
+            captureExportPreset: this._lastExport.captureExportPreset || null,
+            masterContainer: this._lastExport.masterContainer || null,
+            deliveryContainer: this._lastExport.deliveryContainer || null,
+            transcodeApplied: this._lastExport.transcodeApplied === true,
+            nativeTranscodeCapability: this._lastExport.nativeTranscodeCapability
+                ? { ...this._lastExport.nativeTranscodeCapability }
+                : null,
+            transcodeFailureCode: this._lastExport.transcodeFailureCode || null,
+            masterPath: this._lastExport.masterPath || null,
+            deliveryPath: this._lastExport.deliveryPath || null,
+            failureReason: this._lastExport.failureReason || null,
+            warnings: Array.isArray(this._lastExport.warnings)
+                ? this._lastExport.warnings.slice()
+                : [],
             saveCapabilityId: this._lastExport.saveCapabilityId || null,
             saveCode: this._lastExport.saveCode || null,
             exportMatrix: this._lastExport.exportMatrix
@@ -750,8 +812,8 @@ export class MediaRecorderSystem {
             return event;
         }
         if (eventType === LIFECYCLE_EVENT_TYPES.MATCH_ENDED || eventType === LIFECYCLE_EVENT_TYPES.MENU_OPENED) {
-            this.stopRecording(event).catch((error) => {
-                this.logger?.warn?.('[MediaRecorderSystem] stop failed after lifecycle event', error);
+            this.settleRecording(event).catch((error) => {
+                this.logger?.warn?.('[MediaRecorderSystem] settle failed after lifecycle event', error);
             });
             return event;
         }
@@ -805,7 +867,18 @@ export class MediaRecorderSystem {
         const resolutionScale = Math.max(0.2, Math.min(1, toFiniteNumber(scale, 1)));
         let width = Math.max(16, Math.floor(rawWidth * resolutionScale));
         let height = Math.max(16, Math.floor(rawHeight * resolutionScale));
-        if (profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+        const cinematicProfileActive = isCinematicCaptureProfile(profile);
+        if (cinematicProfileActive) {
+            const cinematicMaxWidth = Math.max(
+                16,
+                toPositiveInt(RECORDING_CINEMATIC_QUALITY_PROFILE?.maxWidth, 1920, 16, 8192)
+            ) & ~1;
+            const cinematicMaxHeight = Math.max(
+                16,
+                toPositiveInt(RECORDING_CINEMATIC_QUALITY_PROFILE?.maxHeight, 1080, 16, 8192)
+            ) & ~1;
+            width = Math.min(width, cinematicMaxWidth);
+            height = Math.min(height, cinematicMaxHeight);
             width = Math.max(16, width) & ~1;
             height = Math.max(16, height) & ~1;
         } else {
@@ -813,14 +886,14 @@ export class MediaRecorderSystem {
             width = Math.round(width / 16) * 16 || 16;
             height = Math.round(height / 16) * 16 || 16;
         }
-        // Clamp extreme aspect ratios (>3:1) — some encoders reject these.
+        // Clamp extreme aspect ratios (>3:1) â€” some encoders reject these.
         const MAX_ASPECT = 3;
         if (width > height * MAX_ASPECT) {
-            width = profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4
+            width = cinematicProfileActive
                 ? (Math.max(16, Math.floor(height * MAX_ASPECT)) & ~1)
                 : ((Math.round((height * MAX_ASPECT) / 16) * 16) || 16);
         } else if (height > width * MAX_ASPECT) {
-            height = profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4
+            height = cinematicProfileActive
                 ? (Math.max(16, Math.floor(width * MAX_ASPECT)) & ~1)
                 : ((Math.round((width * MAX_ASPECT) / 16) * 16) || 16);
         }
@@ -828,13 +901,32 @@ export class MediaRecorderSystem {
     }
     _resolveRecordingBitrate(width, height) {
         const pixelCount = Math.max(1, toPositiveInt(width, 1) * toPositiveInt(height, 1));
-        if (this.recordingCaptureSettings?.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+        if (isCinematicCaptureProfile(this.recordingCaptureSettings?.profile)) {
+            const bitrate1080p = toPositiveInt(
+                RECORDING_CINEMATIC_QUALITY_PROFILE?.bitrate1080p,
+                18_000_000,
+                1,
+                250_000_000
+            );
+            const bitrate720p = toPositiveInt(
+                RECORDING_CINEMATIC_QUALITY_PROFILE?.bitrate720p,
+                14_000_000,
+                1,
+                250_000_000
+            );
+            const bitrateBase = toPositiveInt(
+                RECORDING_CINEMATIC_QUALITY_PROFILE?.bitrateBase,
+                10_000_000,
+                1,
+                250_000_000
+            );
             if (pixelCount >= (1920 * 1080)) {
-                return 16_000_000;
+                return bitrate1080p;
             }
             if (pixelCount >= (1280 * 720)) {
-                return 12_000_000;
+                return bitrate720p;
             }
+            return bitrateBase;
         }
         return 8_000_000;
     }
@@ -847,7 +939,7 @@ export class MediaRecorderSystem {
             height,
             hardwareAcceleration: 'prefer-hardware',
             bitrate: this._resolveRecordingBitrate(width, height),
-            framerate: this.captureFps,
+            framerate: this._getActiveCaptureFps(),
         };
         // AVC-specific: annex-b format needed for mp4-muxer
         if (family === 'avc') {
@@ -856,6 +948,7 @@ export class MediaRecorderSystem {
         return config;
     }
     async _startWithWebCodecs(trigger, support) {
+        const targetCaptureFps = this._resolveRecordingTargetFps();
         const { width, height } = this._resolveRecordingDimensions();
         const bitrate = this._resolveRecordingBitrate(width, height);
         const strategy = new WebCodecsRecorderEngine({
@@ -863,7 +956,7 @@ export class MediaRecorderSystem {
             globalScope: this._globalScope,
             width,
             height,
-            frameRate: this.captureFps,
+            frameRate: targetCaptureFps,
             bitrate,
         });
         const initializeResult = await strategy.initialize();
@@ -882,6 +975,7 @@ export class MediaRecorderSystem {
         this._isRecording = true;
         this._activeRecorderEngine = RECORDER_ENGINE.NATIVE_WEBCODECS;
         this._activeMimeType = initializeResult?.mimeType || DEFAULT_MIME_TYPE;
+        this._activeCaptureFps = targetCaptureFps;
         this._frameCount = 0;
         this._encoderWidth = width;
         this._encoderHeight = height;
@@ -891,14 +985,17 @@ export class MediaRecorderSystem {
             trigger: trigger || null,
             captureProfile: this.recordingCaptureSettings?.profile || null,
             hudMode: this.recordingCaptureSettings?.hudMode || null,
+            captureExportPreset: this.recordingCaptureSettings?.exportPreset || null,
         };
         this._notifyRecordingStateChange(true);
         return this._buildStartResult(true, 'started', {
             mimeType: this._activeMimeType,
             timestampMs: this._activeRecording.startedAt,
             recorderEngine: this._activeRecorderEngine,
+            captureFps: targetCaptureFps,
             captureProfile: this._activeRecording.captureProfile,
             hudMode: this._activeRecording.hudMode,
+            captureExportPreset: this._activeRecording.captureExportPreset,
         });
     }
     async _startWithMediaRecorder(trigger, support, fallbackFromReason = null) {
@@ -906,6 +1003,7 @@ export class MediaRecorderSystem {
         if (!sourceCanvas || typeof sourceCanvas.captureStream !== 'function') {
             return this._buildStartResult(false, 'missing-capture-stream', { support });
         }
+        const targetCaptureFps = this._resolveRecordingTargetFps();
         const { width, height } = this._resolveRecordingDimensions();
         // WebCodecs can report MP4 support while MediaRecorder still needs a WebM fallback.
         const preferredMediaRecorderMimeType = fallbackFromReason
@@ -928,7 +1026,7 @@ export class MediaRecorderSystem {
             globalScope: this._globalScope,
             canvas: streamSourceCanvas,
             mimeType: selectedMimeType,
-            captureFps: this.captureFps,
+            captureFps: targetCaptureFps,
             videoBitsPerSecond: this._resolveRecordingBitrate(width, height),
         });
         const initializeResult = await strategy.initialize();
@@ -950,10 +1048,11 @@ export class MediaRecorderSystem {
             });
         }
         this._setActiveRecorderStrategy(strategy);
-        this._startMediaRecorderPump(captureResolutionScale);
+        this._startMediaRecorderPump(captureResolutionScale, targetCaptureFps);
         this._isRecording = true;
         this._activeRecorderEngine = RECORDER_ENGINE.NATIVE_MEDIARECORDER;
         this._activeMimeType = initializeResult?.mimeType || selectedMimeType || DEFAULT_FALLBACK_MIME_TYPE;
+        this._activeCaptureFps = targetCaptureFps;
         this._frameCount = 0;
         this._resetWebCodecsCaptureState(Math.min(2, CAPTURE_LOAD_LEVELS.length - 1));
         this._activeRecording = {
@@ -961,6 +1060,7 @@ export class MediaRecorderSystem {
             trigger: trigger || null,
             captureProfile: this.recordingCaptureSettings?.profile || null,
             hudMode: this.recordingCaptureSettings?.hudMode || null,
+            captureExportPreset: this.recordingCaptureSettings?.exportPreset || null,
         };
         this._notifyRecordingStateChange(true);
         return this._buildStartResult(true, 'started', {
@@ -968,8 +1068,10 @@ export class MediaRecorderSystem {
             timestampMs: this._activeRecording.startedAt,
             recorderEngine: this._activeRecorderEngine,
             fallbackFromReason: fallbackFromReason || undefined,
+            captureFps: targetCaptureFps,
             captureProfile: this._activeRecording.captureProfile,
             hudMode: this._activeRecording.hudMode,
+            captureExportPreset: this._activeRecording.captureExportPreset,
         });
     }
     async startRecording(trigger = null) {
@@ -1155,167 +1257,8 @@ export class MediaRecorderSystem {
         }
         return this._buildStopResult(false, 'not_recording');
     }
-    _buildFilename(activeRecording, endedAtMs, mimeType) {
-        const startedAt = activeRecording?.startedAt || endedAtMs;
-        const mode = sanitizeFileToken(activeRecording?.trigger?.context?.activeGameMode, 'classic');
-        const profile = sanitizeFileToken(activeRecording?.captureProfile || this.recordingCaptureSettings?.profile, 'standard');
-        const matchId = sanitizeFileToken(activeRecording?.trigger?.context?.sessionId, 'session');
-        const normalizedMimeType = String(mimeType || '').toLowerCase();
-        const ext = normalizedMimeType.includes('webm')
-            ? 'webm'
-            : (normalizedMimeType.includes('mp4') ? 'mp4' : 'video');
-        return `${this.filePrefix}-${mode}-${profile}-${matchId}-${toSafeDatePart(startedAt)}-${toSafeDatePart(endedAtMs)}.${ext}`;
-    }
-    _buildDownloadFileName(fileName) {
-        return buildDownloadFileName(this.downloadDirectoryName, fileName);
-    }
-    _estimateCapturedDurationMs(frameIntervalStats = null) {
-        const sampleCount = Math.max(0, Math.trunc(toFiniteNumber(frameIntervalStats?.sampleCount, 0)));
-        const meanMs = Math.max(0, toFiniteNumber(frameIntervalStats?.mean, 0));
-        if (sampleCount > 0 && meanMs > 0) {
-            return sampleCount * meanMs;
-        }
-        return Math.max(0, Math.round(this._captureTimestampUs / 1000));
-    }
-    _normalizeExportTiming(activeRecording, endedAtMs, frameIntervalStats = null) {
-        const rawEndedAt = toFiniteNumber(endedAtMs, this.now());
-        const estimatedDurationMs = this._estimateCapturedDurationMs(frameIntervalStats);
-        let startedAt = toFiniteNumber(activeRecording?.startedAt, rawEndedAt);
-        let endedAt = rawEndedAt;
-        let adjusted = false;
-        if (!(startedAt > 0)) {
-            startedAt = Math.max(0, rawEndedAt - estimatedDurationMs);
-            adjusted = true;
-        }
-        if (!(endedAt >= startedAt)) {
-            endedAt = startedAt + Math.max(1, estimatedDurationMs);
-            adjusted = true;
-        }
-        return {
-            startedAt,
-            endedAt,
-            durationMs: Math.max(0, endedAt - startedAt),
-            adjusted,
-            estimatedDurationMs,
-        };
-    }
-    async _attemptAutoDownload(blob, { fileName, downloadFileName = fileName, mimeType, captureProfile = null } = {}) {
-        return attemptAutoDownload({
-            blob,
-            fileName: downloadFileName || fileName,
-            mimeType,
-            captureProfile,
-            autoDownload: this.autoDownload,
-            downloadHandler: this.downloadHandler,
-            logger: this.logger,
-        });
-    }
     async _finalizeBlobExport(blob, mimeType = DEFAULT_MIME_TYPE) {
-        const activeRecording = this._activeRecording || null;
-        // Silent switch-stop (e.g. switching from auto-recording to cinematic) — discard blob, no download.
-        const stopType = activeRecording?.stopTrigger?.type;
-        if (stopType === 'cinematic_switch_stop') {
-            const resolve = activeRecording?.stopResolve;
-            this._cleanupRuntimeRecorder();
-            const result = this._buildStopResult(true, 'discarded_for_switch');
-            if (typeof resolve === 'function') {
-                resolve(result);
-            }
-            this._pendingStop = null;
-            return;
-        }
-        const safeBlob = blob instanceof Blob ? blob : new Blob([], { type: String(mimeType || DEFAULT_MIME_TYPE) });
-        this.logger?.info?.(`[MediaRecorderSystem] _finalizeBlobExport: blob.size=${safeBlob.size}, frameCount=${this._frameCount}, autoDownload=${this.autoDownload}`);
-        const resolvedMimeType = String(mimeType || safeBlob.type || this._activeMimeType || DEFAULT_MIME_TYPE);
-        const frameIntervalStats = this._getFrameIntervalStats(true) || this._lastFrameIntervalStats;
-        const timing = this._normalizeExportTiming(activeRecording, this.now(), frameIntervalStats);
-        const fileName = this._buildFilename(
-            activeRecording
-                ? { ...activeRecording, startedAt: timing.startedAt }
-                : { startedAt: timing.startedAt },
-            timing.endedAt,
-            resolvedMimeType
-        );
-        const downloadFileName = this._buildDownloadFileName(fileName);
-        const recorderDiagnostics = this.getRecordingDiagnostics();
-        const exportStatus = await this._attemptAutoDownload(safeBlob, {
-            fileName,
-            downloadFileName,
-            mimeType: resolvedMimeType,
-            captureProfile: activeRecording?.captureProfile || this.recordingCaptureSettings?.profile || null,
-        });
-        if (this._lastExport?.objectUrl) {
-            URL.revokeObjectURL(this._lastExport.objectUrl);
-        }
-        const objectUrl = safeBlob.size > 0 ? URL.createObjectURL(safeBlob) : null;
-        this._lastExport = {
-            blob: safeBlob,
-            objectUrl,
-            fileName,
-            downloadFileName,
-            filePath: exportStatus?.filePath || null,
-            mimeType: resolvedMimeType,
-            container: exportStatus?.container || null,
-            sizeBytes: safeBlob.size,
-            startedAt: timing.startedAt,
-            endedAt: timing.endedAt,
-            durationMs: timing.durationMs,
-            trigger: activeRecording?.stopTrigger || activeRecording?.trigger || null,
-            captureProfile: activeRecording?.captureProfile || this.recordingCaptureSettings?.profile || null,
-            hudMode: activeRecording?.hudMode || this.recordingCaptureSettings?.hudMode || null,
-            saveCapabilityId: exportStatus?.saveCapabilityId || null,
-            saveCode: exportStatus?.saveCode || null,
-            exportMatrix: exportStatus?.exportMatrix
-                ? { ...exportStatus.exportMatrix }
-                : null,
-            frameIntervalStats: frameIntervalStats
-                ? { ...frameIntervalStats }
-                : null,
-            recorderDiagnostics: recorderDiagnostics
-                ? { ...recorderDiagnostics }
-                : null,
-            timestampValidation: {
-                adjusted: timing.adjusted,
-                estimatedDurationMs: timing.estimatedDurationMs,
-            },
-            exportStatus: { ...exportStatus },
-        };
-        const resolve = activeRecording?.stopResolve;
-        this._cleanupRuntimeRecorder();
-        const result = this._buildStopResult(true, 'stopped', {
-            fileName,
-            downloadFileName,
-            filePath: exportStatus?.filePath || null,
-            mimeType: resolvedMimeType,
-            container: exportStatus?.container || null,
-            sizeBytes: safeBlob.size,
-            exportTransport: exportStatus.transport,
-            exportStatus: { ...exportStatus },
-            startedAt: timing.startedAt,
-            endedAt: timing.endedAt,
-            durationMs: timing.durationMs,
-            captureProfile: this._lastExport.captureProfile,
-            hudMode: this._lastExport.hudMode,
-            saveCapabilityId: this._lastExport.saveCapabilityId || null,
-            saveCode: this._lastExport.saveCode || null,
-            exportMatrix: this._lastExport.exportMatrix
-                ? { ...this._lastExport.exportMatrix }
-                : null,
-            frameIntervalStats: frameIntervalStats
-                ? { ...frameIntervalStats }
-                : null,
-            recorderDiagnostics: recorderDiagnostics
-                ? { ...recorderDiagnostics }
-                : null,
-            timestampValidation: {
-                adjusted: timing.adjusted,
-                estimatedDurationMs: timing.estimatedDurationMs,
-            },
-        });
-        if (typeof resolve === 'function') {
-            resolve(result);
-        }
-        this._pendingStop = null;
+        return finalizeMediaRecorderBlobExport(this, blob, mimeType);
     }
     async _handleRecorderStop() {
         const buffer = this._muxer?.target?.buffer;
@@ -1347,6 +1290,7 @@ export class MediaRecorderSystem {
         this._mediaRecorderSupportsRequestFrame = false;
         this._mediaRecorderUsesCaptureCanvas = false;
         this._mediaRecorderPumpResolutionScale = 1;
+        this._activeCaptureFps = this.captureFps;
         this._activeRecorderStrategy = this._activeRecording = null;
         this._frameCount = 0;
         this._captureCanvas = this._captureCanvasCtx = null;

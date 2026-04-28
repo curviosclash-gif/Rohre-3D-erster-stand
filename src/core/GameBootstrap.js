@@ -12,7 +12,10 @@ import { MediaRecorderSystem } from './MediaRecorderSystem.js';
 import { createRuntimePorts } from '../shared/runtime/GameRuntimePorts.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { CONFIG } from './Config.js';
-import { RECORDING_DOWNLOAD_DIRECTORY } from '../shared/contracts/RecordingCaptureContract.js';
+import {
+    isCinematicCaptureProfile,
+    RECORDING_DOWNLOAD_DIRECTORY,
+} from '../shared/contracts/RecordingCaptureContract.js';
 import {
     createMatchSessionPort,
     MatchLifecycleSessionOrchestrator,
@@ -78,7 +81,8 @@ export function bootstrapGameRuntime(game, options = {}) {
     const renderer = new Renderer(canvas);
     renderer.setShadowQuality(game.settings?.localSettings?.shadowQuality);
     const recorderRuntimeConfig = resolveRecorderRuntimeConfig();
-    const mediaRecorderSystem = new MediaRecorderSystem({
+    let mediaRecorderSystem = null;
+    mediaRecorderSystem = new MediaRecorderSystem({
         canvas,
         autoRecordingEnabled: recorderRuntimeConfig.autoRecordingEnabled,
         autoDownload: true,
@@ -86,7 +90,13 @@ export function bootstrapGameRuntime(game, options = {}) {
         downloadDirectoryName: RECORDING_DOWNLOAD_DIRECTORY,
         captureSourceResolver: () => renderer.getRecordingCaptureCanvas?.() || canvas,
         recordingCaptureSettings: game.settings?.recording,
-        onRecordingStateChange: (isRecording) => renderer.setRecordingActive?.(isRecording),
+        onRecordingStateChange: (isRecording) => {
+            renderer.setRecordingActive?.(isRecording);
+            const captureProfile = mediaRecorderSystem?.getRecordingCaptureSettings?.()?.profile;
+            const cinematicRecordingActive = isRecording === true
+                && isCinematicCaptureProfile(captureProfile);
+            renderer.setRecordingQualityLock?.(cinematicRecordingActive, 'cinematic-recording');
+        },
         runtimePerfProfiler: game.runtimePerfProfiler,
         logger: console,
     });

@@ -697,13 +697,14 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         await loadGame(page);
         const result = await page.evaluate(async () => {
             const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            const { RECORDING_CINEMATIC_QUALITY_PROFILE } = await import('/src/shared/contracts/RecordingCaptureContract.js');
             const captureCanvas = { width: 1920, height: 1080 };
             const recorder = new MediaRecorderSystem({
                 canvas: captureCanvas,
                 autoDownload: false,
                 captureSourceResolver: () => captureCanvas,
                 recordingCaptureSettings: {
-                    profile: 'cinematic_mp4',
+                    profile: 'cinematic',
                     hudMode: 'clean',
                 },
                 globalScope: {},
@@ -715,11 +716,12 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
             return {
                 dimensions,
                 bitrate,
+                expectedBitrate1080p: Number(RECORDING_CINEMATIC_QUALITY_PROFILE?.bitrate1080p || 0),
             };
         });
 
         expect(result.dimensions).toEqual({ width: 1920, height: 1080 });
-        expect(result.bitrate).toBe(16_000_000);
+        expect(result.bitrate).toBe(result.expectedBitrate1080p);
     });
 
     test('T20aj1c: Cinematic-Recording behaelt volle Capture-Aufloesung auch unter Lastregelung', async ({ page }) => {
@@ -732,7 +734,7 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
                 autoDownload: false,
                 captureSourceResolver: () => captureCanvas,
                 recordingCaptureSettings: {
-                    profile: 'cinematic_mp4',
+                    profile: 'cinematic',
                     hudMode: 'clean',
                 },
                 globalScope: {},
@@ -755,6 +757,7 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         await loadGame(page);
         const result = await page.evaluate(async () => {
             const { RecordingCapturePipeline } = await import('/src/core/renderer/RecordingCapturePipeline.js');
+            const { RECORDING_CINEMATIC_QUALITY_PROFILE } = await import('/src/shared/contracts/RecordingCaptureContract.js');
             const sourceCanvas = document.createElement('canvas');
             sourceCanvas.width = 640;
             sourceCanvas.height = 360;
@@ -771,10 +774,15 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
                 scene: null,
             });
             pipeline.setSettings({
-                profile: 'cinematic_mp4',
+                profile: 'cinematic',
                 hudMode: 'clean',
             });
             const captureCanvas = pipeline.getCaptureCanvas();
+            const supersampleScale = Number(RECORDING_CINEMATIC_QUALITY_PROFILE?.supersampleScale || 1);
+            const maxWidth = Math.max(2, Math.floor(Number(RECORDING_CINEMATIC_QUALITY_PROFILE?.maxWidth || 1920)));
+            const maxHeight = Math.max(2, Math.floor(Number(RECORDING_CINEMATIC_QUALITY_PROFILE?.maxHeight || 1080)));
+            const expectedWidth = Math.max(2, Math.floor(Math.min(maxWidth, sourceCanvas.clientWidth * supersampleScale)));
+            const expectedHeight = Math.max(2, Math.floor(Math.min(maxHeight, sourceCanvas.clientHeight * supersampleScale)));
             const snapshot = {
                 sourceWidth: sourceCanvas.width,
                 sourceHeight: sourceCanvas.height,
@@ -782,6 +790,8 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
                 clientHeight: sourceCanvas.clientHeight,
                 captureWidth: captureCanvas?.width || 0,
                 captureHeight: captureCanvas?.height || 0,
+                expectedWidth: expectedWidth - (expectedWidth % 2),
+                expectedHeight: expectedHeight - (expectedHeight % 2),
             };
             pipeline.dispose();
             sourceCanvas.remove();
@@ -792,8 +802,47 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         expect(result.sourceHeight).toBe(360);
         expect(result.clientWidth).toBe(1280);
         expect(result.clientHeight).toBe(720);
-        expect(result.captureWidth).toBe(1280);
-        expect(result.captureHeight).toBe(720);
+        expect(result.captureWidth).toBe(result.expectedWidth);
+        expect(result.captureHeight).toBe(result.expectedHeight);
+    });
+
+    test('T20aj1d1: Render-Quality-Lock haelt Cinematic-Aufnahme auf HIGH trotz LOW-Anforderung', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(() => {
+            const renderer = window.GAME_INSTANCE?.renderer;
+            if (
+                !renderer
+                || typeof renderer.setQuality !== 'function'
+                || typeof renderer.setRecordingQualityLock !== 'function'
+                || typeof renderer.getQualityState !== 'function'
+            ) {
+                return null;
+            }
+
+            renderer.setQuality('LOW');
+            const beforeLock = renderer.getQualityState();
+
+            renderer.setRecordingQualityLock(true, 'cinematic-recording-test');
+            renderer.setQuality('LOW');
+            const duringLock = renderer.getQualityState();
+
+            renderer.setRecordingQualityLock(false, 'cinematic-recording-test');
+            const afterUnlock = renderer.getQualityState();
+
+            renderer.setQuality('HIGH');
+
+            return {
+                beforeLock,
+                duringLock,
+                afterUnlock,
+            };
+        });
+
+        expect(result).not.toBeNull();
+        expect(result.beforeLock.effectiveQuality).toBe('LOW');
+        expect(result.duringLock.effectiveQuality).toBe('HIGH');
+        expect(result.duringLock.qualityLockActive).toBeTruthy();
+        expect(result.afterUnlock.effectiveQuality).toBe('LOW');
     });
 
     test('T20aj1e: Cinematic-Orbit-Shots weichen vor Arena-Kollisionen zurueck', async ({ page }) => {

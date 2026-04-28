@@ -7,6 +7,7 @@ import { drawHudOverlay, drawLetterboxOverlay, storeCaptureMeta } from './Record
 import { RecordingOrbitCameraDirector, SLOT_STYLE } from './camera/RecordingOrbitCameraDirector.js';
 import {
     createDefaultRecordingCaptureSettings,
+    RECORDING_CINEMATIC_QUALITY_PROFILE,
     normalizeRecordingCaptureSettings,
     RECORDING_CAPTURE_PROFILE,
     RECORDING_HUD_MODE,
@@ -103,7 +104,7 @@ export class RecordingCapturePipeline {
             livePerspectiveEnabled: false,
         });
         this._orbitDirector = new RecordingOrbitCameraDirector();
-        // Cinematic-MP4 renderer state
+        // Dedicated cinematic renderer state for high-quality capture.
         this._cinematicCanvas = null;
         this._cinematicRenderer = null;
         this._cinematicRendererUnavailable = false;
@@ -534,7 +535,7 @@ export class RecordingCapturePipeline {
             const sizes = this._resolveShortsCaptureSize();
             return this._ensureCaptureCanvas(sizes.width, sizes.height) || this.sourceCanvas;
         }
-        if (this._settings.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+        if (this._settings.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC) {
             const sizes = this._resolveCinematicCaptureSize();
             return this._ensureCaptureCanvas(sizes.width, sizes.height) || this.sourceCanvas;
         }
@@ -558,7 +559,7 @@ export class RecordingCapturePipeline {
             this._prepareShortsSurface({ renderProjection, renderDelta, splitScreen, arena });
             return;
         }
-        if (this._settings.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+        if (this._settings.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC) {
             this._prepareCinematicSurface({ renderProjection, renderDelta, arena });
             return;
         }
@@ -621,12 +622,22 @@ export class RecordingCapturePipeline {
         const clientHeight = toPositiveFloor(this.sourceCanvas?.clientHeight, 0);
         const rawWidth = toPositiveEven(Math.max(sourceWidth, clientWidth), 2);
         const rawHeight = toPositiveEven(Math.max(sourceHeight, clientHeight), 2);
-        const maxW = 1920;
-        const maxH = 1080;
-        const scale = Math.min(1, maxW / Math.max(1, rawWidth), maxH / Math.max(1, rawHeight));
+        const supersampleScale = toRatio(
+            RECORDING_CINEMATIC_QUALITY_PROFILE?.supersampleScale,
+            1
+        );
+        const maxW = toPositiveEven(RECORDING_CINEMATIC_QUALITY_PROFILE?.maxWidth, 1920);
+        const maxH = toPositiveEven(RECORDING_CINEMATIC_QUALITY_PROFILE?.maxHeight, 1080);
+        const supersampledWidth = toPositiveEven(Math.floor(rawWidth * supersampleScale), 2);
+        const supersampledHeight = toPositiveEven(Math.floor(rawHeight * supersampleScale), 2);
+        const scale = Math.min(
+            1,
+            maxW / Math.max(1, supersampledWidth),
+            maxH / Math.max(1, supersampledHeight)
+        );
         return {
-            width: toPositiveEven(Math.floor(rawWidth * scale), 2),
-            height: toPositiveEven(Math.floor(rawHeight * scale), 2),
+            width: toPositiveEven(Math.floor(supersampledWidth * scale), 2),
+            height: toPositiveEven(Math.floor(supersampledHeight * scale), 2),
         };
     }
 
@@ -717,7 +728,7 @@ export class RecordingCapturePipeline {
         captureCtx.drawImage(this._cinematicCanvas, 0, 0, width, height);
 
         this._storeMeta({
-            profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
+            profile: RECORDING_CAPTURE_PROFILE.CINEMATIC,
             hudMode: RECORDING_HUD_MODE.CLEAN,
             overlay: 'clean',
             layout: 'cinematic_single',

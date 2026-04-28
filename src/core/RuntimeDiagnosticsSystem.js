@@ -1,4 +1,5 @@
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
+import { isCinematicCaptureProfile } from '../shared/contracts/RecordingCaptureContract.js';
 
 const FPS_TRACKER_WINDOW = 60;
 
@@ -35,6 +36,21 @@ function createFpsTracker(windowSize = FPS_TRACKER_WINDOW) {
     };
 }
 
+function isCinematicRecordingActive(game) {
+    const recorder = game?.mediaRecorderSystem;
+    if (!recorder || recorder.isRecording?.() !== true) return false;
+    const profile = recorder.getRecordingCaptureSettings?.()?.profile;
+    return isCinematicCaptureProfile(profile);
+}
+
+function resolveEffectiveQualityLabel(game) {
+    const effectiveQuality = game?.renderer?.getQualityState?.()?.effectiveQuality;
+    if (effectiveQuality === 'LOW' || effectiveQuality === 'HIGH') {
+        return effectiveQuality;
+    }
+    return game?.isLowQuality ? 'LOW' : 'HIGH';
+}
+
 export class RuntimeDiagnosticsSystem {
     constructor(game) {
         this.game = game;
@@ -57,7 +73,11 @@ export class RuntimeDiagnosticsSystem {
             game.isLowQuality = !game.isLowQuality;
             const quality = game.isLowQuality ? 'LOW' : 'HIGH';
             game.renderer.setQuality(quality);
-            game._showStatusToast(`Grafik: ${quality === 'LOW' ? 'Niedrig (Schnell)' : 'Hoch (Schoen)'}`);
+            if (quality === 'LOW' && isCinematicRecordingActive(game)) {
+                game._showStatusToast('Grafik: Niedrig vorgemerkt (waehrend Cinematic-Aufnahme bleibt Hoch)');
+            } else {
+                game._showStatusToast(`Grafik: ${quality === 'LOW' ? 'Niedrig (Schnell)' : 'Hoch (Schoen)'}`);
+            }
             return;
         }
 
@@ -91,7 +111,7 @@ export class RuntimeDiagnosticsSystem {
                 const geos = info.memory.geometries || 0;
                 const texs = info.memory.textures || 0;
                 const players = game.entityManager ? game.entityManager.players.filter((player) => player.alive).length : 0;
-                const quality = game.isLowQuality ? 'LOW' : 'HIGH';
+                const quality = resolveEffectiveQualityLabel(game);
                 const perfSnapshot = game.runtimePerfProfiler?.getSnapshot?.({
                     windowSize: 240,
                     spikeEventsLimit: 0,
@@ -117,7 +137,12 @@ export class RuntimeDiagnosticsSystem {
         game._adaptiveTimer = (game._adaptiveTimer || 0) + dt;
         if (game._adaptiveTimer >= 3.0) {
             game._adaptiveTimer = 0;
-            if (game._fpsTracker.avg < 30 && !game.isLowQuality && game.state === GAME_STATE_IDS.PLAYING) {
+            if (
+                game._fpsTracker.avg < 30
+                && !game.isLowQuality
+                && game.state === GAME_STATE_IDS.PLAYING
+                && !isCinematicRecordingActive(game)
+            ) {
                 game.isLowQuality = true;
                 game.renderer.setQuality('LOW');
                 game._showStatusToast('Grafik automatisch reduziert');

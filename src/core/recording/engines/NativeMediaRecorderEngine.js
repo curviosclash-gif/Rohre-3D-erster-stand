@@ -5,6 +5,8 @@ import {
 } from '../MediaRecorderSupport.js';
 import { toPositiveInt } from '../MediaRecorderSystemOps.js';
 
+const NATIVE_MEDIARECORDER_STOP_TIMEOUT_MS = 4000;
+
 export class NativeMediaRecorderEngine {
     constructor(options = {}) {
         this.logger = options.logger || console;
@@ -13,6 +15,10 @@ export class NativeMediaRecorderEngine {
         this.captureFps = toPositiveInt(options.captureFps, 60);
         this.videoBitsPerSecond = toPositiveInt(options.videoBitsPerSecond, 15_000_000);
         this.mimeType = resolveSafeMediaRecorderMimeType(this.globalScope, options.mimeType) || DEFAULT_FALLBACK_MIME_TYPE;
+        this.stopTimeoutMs = Math.max(
+            250,
+            toPositiveInt(options.stopTimeoutMs, NATIVE_MEDIARECORDER_STOP_TIMEOUT_MS)
+        );
         this._mediaRecorder = null;
         this._mediaRecorderChunks = [];
         this._mediaRecorderStream = null;
@@ -150,7 +156,33 @@ export class NativeMediaRecorderEngine {
         }
 
         return new Promise((resolve) => {
-            const finalize = () => {
+            let settled = false;
+            let detachStopHandler = () => {};
+            const timeoutHandle = this.globalScope?.setTimeout?.(() => {
+                this.logger?.warn?.('[NativeMediaRecorderEngine] stop timed out, resolving with partial blob', {
+                    timeoutMs: this.stopTimeoutMs,
+                    chunkCount: this._mediaRecorderChunks?.length || 0,
+                });
+                try {
+                    if (typeof this._mediaRecorder?.requestData === 'function') {
+                        this._mediaRecorder.requestData();
+                    }
+                } catch {
+                    // Ignore final data flush failures during timeout fallback.
+                }
+                finalize({
+                    partial: true,
+                    partialReason: 'stop_timeout',
+                });
+            }, this.stopTimeoutMs);
+
+            const finalize = (extra = null) => {
+                if (settled) return;
+                settled = true;
+                if (typeof this.globalScope?.clearTimeout === 'function' && timeoutHandle) {
+                    this.globalScope.clearTimeout(timeoutHandle);
+                }
+                detachStopHandler();
                 const mimeType = this.mimeType
                     || this._mediaRecorder?.mimeType
                     || this._mediaRecorderChunks?.[0]?.type
@@ -158,15 +190,18 @@ export class NativeMediaRecorderEngine {
                 const blob = new Blob(this._mediaRecorderChunks || [], { type: mimeType });
                 this._mediaRecorderChunks = [];
                 this._isRecording = false;
-                resolve({
+                const result = {
                     ok: true,
                     blob,
                     mimeType,
-                });
+                };
+                if (extra && typeof extra === 'object') {
+                    Object.assign(result, extra);
+                }
+                resolve(result);
             };
 
-            const detachStopHandler = this._attachStopHandler(() => {
-                detachStopHandler();
+            detachStopHandler = this._attachStopHandler(() => {
                 finalize();
             });
 
@@ -187,9 +222,12 @@ export class NativeMediaRecorderEngine {
             try {
                 this._mediaRecorder.stop();
             } catch (error) {
+                this.logger?.warn?.('[NativeMediaRecorderEngine] stop failed', error);
+                if (typeof this.globalScope?.clearTimeout === 'function' && timeoutHandle) {
+                    this.globalScope.clearTimeout(timeoutHandle);
+                }
                 detachStopHandler();
                 this._isRecording = false;
-                this.logger?.warn?.('[NativeMediaRecorderEngine] stop failed', error);
                 resolve({ ok: false, reason: 'stop_failed', error });
             }
         });

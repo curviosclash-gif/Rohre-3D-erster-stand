@@ -20,6 +20,7 @@ export class CameraRigSystem {
         this.cameraTargets = [];
         this.cameraModes = [];
         this.cameraBoostBlend = [];
+        this.cameraSpeedFovOffsets = [];
         this.cameraDtSmoothing = [];
         this.cameraShakeTimers = [];
         this.cameraShakeDurations = [];
@@ -75,6 +76,9 @@ export class CameraRigSystem {
         for (let i = 0; i < this.cameraBoostBlend.length; i++) {
             this.cameraBoostBlend[i] = 0;
         }
+        for (let i = 0; i < this.cameraSpeedFovOffsets.length; i++) {
+            this.cameraSpeedFovOffsets[i] = 0;
+        }
         this._frameTiming.frameId = Math.max(0, Number(this._frameTiming.frameId) || 0);
         this._frameTiming.rawDt = fallbackDt;
         this._frameTiming.dt = fallbackDt;
@@ -127,6 +131,7 @@ export class CameraRigSystem {
         });
         this.cameraModes.push(0);
         this.cameraBoostBlend.push(0);
+        this.cameraSpeedFovOffsets.push(0);
         this.cameraShakeTimers.push(0);
         this.cameraShakeDurations.push(0);
         this.cameraShakeIntensities.push(0);
@@ -185,6 +190,49 @@ export class CameraRigSystem {
         const baseFov = Number(CONFIG?.CAMERA?.FOV) || 75;
         if (Math.abs(camera.fov - baseFov) <= 0.01) return;
         camera.fov = baseFov;
+        camera.updateProjectionMatrix();
+    }
+
+    _applySpeedFov(playerIndex, camera, mode, dt, playerState = null) {
+        if (!camera) return;
+
+        const baseFov = Number(CONFIG?.CAMERA?.FOV) || 75;
+        const perspectiveSettings = this.cameraPerspectiveSettings || createDefaultCameraPerspectiveSettings();
+        const reduceMotion = perspectiveSettings.reduceMotion === true;
+        const speedFovEnabled = perspectiveSettings.speedFovEnabled !== false;
+        const speedFovIntensity = Math.max(0, Number(perspectiveSettings.speedFovIntensity) || 0);
+        const modeMultiplier = mode === 'THIRD_PERSON'
+            ? 1
+            : (mode === 'FIRST_PERSON' ? 0.38 : 0);
+
+        if (!speedFovEnabled || speedFovIntensity <= 0 || modeMultiplier <= 0) {
+            this.cameraSpeedFovOffsets[playerIndex] = 0;
+            this._restoreBaseFov(camera);
+            return;
+        }
+
+        const referenceSpeed = Math.max(1, Number(CONFIG?.PLAYER?.SPEED) || 35);
+        const boostMultiplier = Math.max(1.05, Number(CONFIG?.PLAYER?.BOOST_MULTIPLIER) || 1.8);
+        const boostSpeed = Math.max(referenceSpeed + 1, referenceSpeed * boostMultiplier);
+        const currentSpeed = Math.max(0, Number(playerState?.speed) || 0);
+        const normalizedSpeed = THREE.MathUtils.clamp(
+            (currentSpeed - referenceSpeed) / Math.max(1, boostSpeed - referenceSpeed),
+            0,
+            1.25
+        );
+        const easedSpeed = Math.pow(normalizedSpeed, 0.8);
+        const boostBias = playerState?.isBoosting === true ? 0.14 : 0;
+        const motionMultiplier = reduceMotion ? 0.38 : 1;
+        const targetOffset = Math.min(1.2, easedSpeed + boostBias) * 8.5 * modeMultiplier * motionMultiplier * speedFovIntensity;
+        const blendAlpha = 1 - Math.exp(-Math.max(0, Number(dt) || 0) * 6.5);
+        const previousOffset = this.cameraSpeedFovOffsets[playerIndex] || 0;
+        const nextOffset = THREE.MathUtils.lerp(previousOffset, targetOffset, blendAlpha);
+        const resolvedOffset = Math.abs(nextOffset) <= 0.01 ? 0 : nextOffset;
+        const desiredFov = baseFov + resolvedOffset;
+
+        this.cameraSpeedFovOffsets[playerIndex] = resolvedOffset;
+        if (Math.abs(camera.fov - desiredFov) <= 0.01) return;
+        camera.fov = desiredFov;
         camera.updateProjectionMatrix();
     }
 
@@ -351,10 +399,11 @@ export class CameraRigSystem {
             const smoothFactor = firstPersonHardLock ? 1 : (1 - Math.pow(1 - smooth, stableDt * 60));
             cam.position.lerp(target.position, smoothFactor);
             if (firstPersonHardLock) {
-                this._restoreBaseFov(cam);
+                this._applySpeedFov(playerIndex, cam, mode, stableDt, playerState);
                 cam.quaternion.copy(playerQuaternion);
             } else {
                 cam.quaternion.slerp(playerQuaternion, smoothFactor);
+                this._applySpeedFov(playerIndex, cam, mode, stableDt, playerState);
             }
             return;
         }
@@ -415,12 +464,13 @@ export class CameraRigSystem {
         if (firstPersonHardLock) {
             cam.position.copy(target.position);
             cam.lookAt(target.lookAt);
-            this._restoreBaseFov(cam);
+            this._applySpeedFov(playerIndex, cam, mode, stableDt, playerState);
             return;
         }
 
         cam.position.copy(target.position);
         cam.lookAt(target.lookAt);
+        this._applySpeedFov(playerIndex, cam, mode, stableDt, playerState);
     }
 
     resetCameras() {
@@ -428,6 +478,7 @@ export class CameraRigSystem {
         this.cameraTargets.length = 0;
         this.cameraModes.length = 0;
         this.cameraBoostBlend.length = 0;
+        this.cameraSpeedFovOffsets.length = 0;
         this.cameraDtSmoothing.length = 0;
         this.cameraShakeTimers.length = 0;
         this.cameraShakeDurations.length = 0;

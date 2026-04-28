@@ -345,6 +345,63 @@ test('Cinematic recording switch does not restart after stop failure', async () 
     assert.equal(toasts.at(-1)?.variant, 'error');
 });
 
+test('Cinematic recording stop toast includes engine and master-delivery diagnostics', async () => {
+    const toasts = [];
+    const recorder = {
+        notifyLifecycleEvent() {},
+        getSupportState() {
+            return { canRecord: true };
+        },
+        startRecording() {
+            return Promise.resolve({ started: true });
+        },
+        stopRecording() {
+            return Promise.resolve({
+                stopped: true,
+                sizeBytes: 1_048_576,
+                mimeType: 'video/webm',
+                captureExportPreset: 'youtube-mp4',
+                masterContainer: 'webm',
+                deliveryContainer: 'mp4',
+                transcodeApplied: true,
+                recorderEngine: 'mediarecorder-native',
+                deliveryPath: 'C:\\captures\\cinematic-export.mp4',
+            });
+        },
+        isRecording() {
+            return true;
+        },
+        getRecordingCaptureSettings() {
+            return { profile: RECORDING_CAPTURE_PROFILE.CINEMATIC };
+        },
+        setRecordingCaptureSettings() {},
+    };
+
+    const result = toggleCinematicRecordingFromHotkey({
+        game: {
+            render() {},
+        },
+        getRuntimeHandle(key) {
+            if (key === 'mediaRecorderSystem') return recorder;
+            if (key === 'renderer') return { setRecordingCaptureSettings() {} };
+            return null;
+        },
+        showStatusToast(message, duration, variant) {
+            toasts.push({ message, duration, variant });
+        },
+    });
+
+    assert.equal(result, true);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const summaryToast = toasts.at(-1) || null;
+    assert.ok(summaryToast);
+    assert.equal(summaryToast.variant, 'success');
+    assert.match(summaryToast.message, /Engine: MediaRecorder/);
+    assert.match(summaryToast.message, /Master: WEBM -> Delivery: MP4/);
+    assert.match(summaryToast.message, /Ziel: cinematic-export\.mp4/);
+});
+
 test('MatchKernel signalRoundEnd stays idempotent during round-end lifecycle', () => {
     const kernel = new MatchKernel();
     kernel.boot({ roundIndex: 2 });

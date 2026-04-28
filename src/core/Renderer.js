@@ -10,6 +10,9 @@ import { SceneRootManager } from './renderer/SceneRootManager.js';
 import { RenderQualityController } from './renderer/RenderQualityController.js';
 import { RecordingCapturePipeline } from './renderer/RecordingCapturePipeline.js';
 
+const FIRST_PERSON_CAMERA_MODE_ID = 'FIRST_PERSON';
+const FIRST_PERSON_CAMERA_MODE_INDEX = CONFIG.CAMERA.MODES.indexOf(FIRST_PERSON_CAMERA_MODE_ID);
+
 export class Renderer {
     constructor(canvas) {
         this.canvas = canvas;
@@ -92,7 +95,12 @@ export class Renderer {
     }
 
     createCamera(_index) {
-        return this.cameraRigSystem.createCamera(this._getAspect());
+        const camera = this.cameraRigSystem.createCamera(this._getAspect());
+        const cameraIndex = this.cameras.length - 1;
+        if (cameraIndex >= 0) {
+            this.cameraModes[cameraIndex] = FIRST_PERSON_CAMERA_MODE_INDEX >= 0 ? FIRST_PERSON_CAMERA_MODE_INDEX : 0;
+        }
+        return camera;
     }
 
     setSplitScreen(enabled) {
@@ -101,11 +109,19 @@ export class Renderer {
     }
 
     cycleCamera(playerIndex) {
-        this.cameraRigSystem.cycleCamera(playerIndex);
+        if (!Number.isInteger(playerIndex) || playerIndex < 0 || playerIndex >= this.cameraModes.length) {
+            return;
+        }
+        this.cameraModes[playerIndex] = FIRST_PERSON_CAMERA_MODE_INDEX >= 0 ? FIRST_PERSON_CAMERA_MODE_INDEX : 0;
     }
 
     getCameraMode(playerIndex) {
-        return this.cameraRigSystem.getCameraMode(playerIndex);
+        if (Number.isInteger(playerIndex) && playerIndex >= 0 && playerIndex < this.cameraModes.length) {
+            this.cameraModes[playerIndex] = FIRST_PERSON_CAMERA_MODE_INDEX >= 0 ? FIRST_PERSON_CAMERA_MODE_INDEX : 0;
+        }
+        return FIRST_PERSON_CAMERA_MODE_INDEX >= 0
+            ? FIRST_PERSON_CAMERA_MODE_ID
+            : (this.cameraRigSystem.getCameraMode(playerIndex) || FIRST_PERSON_CAMERA_MODE_ID);
     }
 
     triggerCameraShake(playerIndex, intensity = 0.2, duration = 0.2) {
@@ -239,6 +255,14 @@ export class Renderer {
 
     setQuality(quality) {
         this.qualityController.setQuality(quality);
+    }
+
+    setRecordingQualityLock(active, reason = 'cinematic-recording') {
+        return this.qualityController.setQualityLock(active === true, reason);
+    }
+
+    getQualityState() {
+        return this.qualityController.getQualityState();
     }
 
     setShadowQuality(level) {
