@@ -39,13 +39,13 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Training
 - PPO bekommt eine eigene Validate-Lane in `BT94B.3`: Kandidat/Modellhash, Normalize-State, Config, Semantikfenster, Seeds, Modi, Maps, Runtime-/Failure-Klassen und `averageBotSurvival` muessen dort PPO-spezifisch geschrieben und versioniert werden.
 - Bis diese Lane existiert, darf kein PPO-Ergebnis `promote`, `rollout-ready` oder `BT95-Handoff-ready` heissen; erlaubte Urteile bleiben `hold`, `diagnose`, `external-candidate` oder `ppo-validate-missing`.
 
-## Aktueller PPO-Ausfuehrungsstand (2026-04-27)
+## Aktueller PPO-Ausfuehrungsstand (2026-04-28)
 
-- Aktiver Einstieg bleibt `BT93K`; `BT93J` ist rot als `diagnose-loop-required` abgeschlossen.
+- `BT93K` ist rot als `diagnose-loop-required` abgeschlossen; `BT93J` bleibt rot als `diagnose-loop-required` abgeschlossen.
 - `BT94A` ist geschlossen, bis `BT93K.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` maschinenlesbar `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `bt94aBlockerCount=0` schreiben.
 - Der 1000000-Step-Longrun aus `BT93J.5c` ist Diagnose-Evidence mit Steps-Fortschritt, aber rotem Semantikurteil: `naturalTerminalCount=0`, `playerDeadOnly=true`, Progress-/Objective-Rewards `0`.
 - Die User-owned 3M/4-Env-Zusatzspur vom 2026-04-27 ist quarantiniert: Snapshots sind nur Diagnose, kein Closure-, Candidate-, Freeze-, Baseline-, Holdout-, Promote-, PPO-Validate- oder BT94A-Signal.
-- Naechste erlaubte Arbeit: `BT93K.0` bis `BT93K.4` fuer Preflight, Signalvertrag, Supervisor/Exit-Report, Mode-/Map-Wirklichkeit und kleine 2-/4-/6-Env-Smokes; kein weiterer Blind-Longrun.
+- Naechste erlaubte Arbeit: kein freier BT93+/BT94A-Trainingsclaim ohne User-Replan oder engeren Folgeblock; kein weiterer Blind-Longrun.
 
 ## PPO-Zweitpfad (BT90-BT95)
 
@@ -2621,7 +2621,7 @@ Quelle:
 - BT93J-Longrun-Evidence: `data/training/ppo/bt93j/user_owned_1m_longrun_report.json`
 - 4-Env-Zusatzdiagnose: `docs/Fehlerberichte/2026-04-27_user-owned-4env-longrun-ended-without-final-report.md`
 
-<!-- LOCK: Bot-Codex seit 2026-04-28 -->
+<!-- LOCK: frei -->
 
 Scope:
 
@@ -2691,7 +2691,7 @@ Pflicht-Artefakte:
 - [x] DoD.6 CUDA wird isoliert benchmarked; CPU bleibt Referenzpfad und CUDA wird nur bei stabiler Wallclock-Verbesserung behalten. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_cuda_benchmark.py --write-report` -> `data/training/ppo/bt93k/cuda_benchmark_report.json` (`resultClass=cuda-not-retained`, `cudaTorchAvailable=true`, `envSmokeWallClockImprovement=-0.011358`, CPU bleibt Referenzpfad))
 - [x] DoD.7 BT94A bleibt geschlossen, solange `bt94a_gate_check.py` nicht `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aBlockerCount=0` und `precomparison != ppo-regression` schreibt. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_handover_package.py --write-report` -> `data/training/ppo/bt93k/handover_package.json` (`bt94aHandover.ready=false`, `claimable=false`, `gateCheckExecutedIn93K7=false`, `precomparisonResultClass=ppo-regression`))
 - [x] DoD.8 Produktive Runtime-, Matchstart-, AI-Hub-, Strategy-Flag-, Registry-, Rollback-, Rollout-, Authority- und Bridge-Surfaces bleiben unveraendert. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_handover_package.py --write-report` -> `data/training/ppo/bt93k/handover_package.json` (`runtimeSurfacesTouched=[]`, `productiveRuntimeChanged=false`))
-- [ ] DoD.9 Abschluss-Gates `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS oder als Blocker dokumentiert; diese Gates zaehlen nicht als PPO-Beweis.
+- [x] DoD.9 Abschluss-Gates `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS oder als Blocker dokumentiert; diese Gates zaehlen nicht als PPO-Beweis. (abgeschlossen: 2026-04-28; evidence: `npm.cmd run gates:pre-commit` + `npm.cmd run build` -> PASS)
 
 ### 93K.0 Preflight und Zusatzspur-Quarantaene
 
@@ -2751,11 +2751,11 @@ Pflicht-Artefakte:
 
 ### 93K.99 Abschluss-Gate
 
-- [ ] 93K.99.1 Alle Phasen 93K.0 bis 93K.7 sind mit versionierter Evidence dokumentiert.
-- [ ] 93K.99.2 Das Ergebnis ist ehrlich klassifiziert: `diagnose-loop-required`, `diagnose-improved`, `BT94A-ready` oder `blocked`.
-- [ ] 93K.99.3 BT94A oeffnet nur mit `claimable=true`; andernfalls bleibt `94A.1` geschlossen und der naechste Schritt ist Replan/Folgeblock.
-- [ ] 93K.99.4 Runtime-, Matchstart-, AI-Hub-, Strategy-, Registry-, Rollback-, Rollout-, Authority- und Bridge-Surfaces bleiben unveraendert.
-- [ ] 93K.99.5 Governance-Gates sind gruen oder als Blocker dokumentiert; Plan-/Docs-Gates werden nicht als PPO-Beweis verwendet.
+- [x] 93K.99.1 Alle Phasen 93K.0 bis 93K.7 sind mit versionierter Evidence dokumentiert. (abgeschlossen: 2026-04-28; evidence: `git ls-files data\training\ppo\bt93k data\training\ppo\bt94a\no_start_gate.json` -> versionierte BT93K-/No-Start-Artefakte vorhanden)
+- [x] 93K.99.2 Das Ergebnis ist ehrlich klassifiziert: `diagnose-loop-required`, `diagnose-improved`, `BT94A-ready` oder `blocked`. (abgeschlossen: 2026-04-28; evidence: `Get-Content data\training\ppo\bt93k\handover_package.json` -> `resultClass=diagnose-loop-required`)
+- [x] 93K.99.3 BT94A oeffnet nur mit `claimable=true`; andernfalls bleibt `94A.1` geschlossen und der naechste Schritt ist Replan/Folgeblock. (abgeschlossen: 2026-04-28; evidence: `Get-Content data\training\ppo\bt94a\no_start_gate.json` + `data\training\ppo\bt93k\handover_package.json` -> `claimable=false`, `bt94aHandover.ready=false`)
+- [x] 93K.99.4 Runtime-, Matchstart-, AI-Hub-, Strategy-, Registry-, Rollback-, Rollout-, Authority- und Bridge-Surfaces bleiben unveraendert. (abgeschlossen: 2026-04-28; evidence: `git diff --name-only -- src scripts python docs\referenz .agents` -> keine Runtime-/Surface-Diffs; `handover_package.json` -> `runtimeSurfacesTouched=[]`, `productiveRuntimeChanged=false`)
+- [x] 93K.99.5 Governance-Gates sind gruen oder als Blocker dokumentiert; Plan-/Docs-Gates werden nicht als PPO-Beweis verwendet. (abgeschlossen: 2026-04-28; evidence: `npm.cmd run gates:pre-commit` + `npm.cmd run build` -> PASS)
 
 ### Risiko-Register BT93K
 
@@ -3044,8 +3044,9 @@ Rollout-Intake-Pflichtpaket:
 | 15 | `BT93J-Reward-Curriculum-Proof-Lane` abgeschlossen: `93J.5b` strukturierte Reward/Curriculum fuer den Beweis-Longrun um. | `93J.5a` war `same-red`; User-Intake 2026-04-26 erlaubte die Diagnose-Ausnahme. | `reward_curriculum_proof_lane_report.json` und `user_owned_1m_longrun_readiness_report.json`; kein BT94A-Claim, kein Holdout, kein Candidate. |
 | 16 | `93J.5c User-owned 1000000-Step Proof-Longrun` abgeschlossen. | `readyForUserOwnedLongrun=true` aus 93J.5b; technische Stop-Regeln aktiv; Holdout reserviert. | `user_owned_1m_longrun_report.json` meldet `reward-still-blocking`; `avgSteps=166.866667`, aber `naturalTerminalCount=0` und `playerDeadOnly=true`. |
 | 17 | `BT93J` als roten Diagnoseabschluss schliessen. | `93J.5c != green-for-93J.6`; `post_longrun_decision_report.json` meldet `phase93J6Allowed=false`. | `BT93J.99=diagnose-loop-required`; kein Pilot, kein Holdout, kein BT94A-Refresh gruen. |
-| 18 | `BT93K-Survival-First-Objective-Reset` claimen: `93K.0` bis `93K.4` zuerst. | `BT93J.99=diagnose-loop-required`; neuer User-Intake 2026-04-27; BT94A bleibt rot; 3M/4-Env-Zusatzspur ist quarantiniert. | Preflight-/Quarantaene-Report, Startwahrheit, Signal-Metrikvertrag, Supervisor-/Exit-Report-Vertrag, Runner-Signalreparatur, Mode-/Map-Smokes und 2/4/6-Env-Smokes. |
-| 19 | Erst bei `BT93K.99=BT94A-ready`: `94A.1` claimen. | `no_start_gate.json` meldet `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true`, `precomparison != ppo-regression`. | Ablationsmatrix und Entscheidungsregeln fuer BT94A; weiterhin kein Freeze vor `94A.3`. |
+| 18 | `BT93K-Survival-First-Objective-Reset` abgeschlossen. | `BT93J.99=diagnose-loop-required`; neuer User-Intake 2026-04-27; BT94A bleibt rot; 3M/4-Env-Zusatzspur ist quarantiniert. | `BT93K.99=diagnose-loop-required`; `data/training/ppo/bt93k/handover_package.json` meldet `bt94aHandover.ready=false`; `data/training/ppo/bt94a/no_start_gate.json` bleibt `claimable=false`. |
+| 19 | Kein freier BT93+/BT94A-Trainingsclaim ohne User-Replan oder engeren Folgeblock. | `BT93K.99 != BT94A-ready`; `no_start_gate.json` meldet weiter `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression`, `bt94aBlockerCount=4`. | Naechster Trainingsclaim braucht Replan/Folge-Diagnose; weiterhin kein Freeze, Candidate, Holdout, Promote oder Rollout-Signal. |
+| 20 | Erst bei `BT93K.99=BT94A-ready`: `94A.1` claimen. | `no_start_gate.json` meldet `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true`, `precomparison != ppo-regression`. | Ablationsmatrix und Entscheidungsregeln fuer BT94A; weiterhin kein Freeze vor `94A.3`. |
 
 No-Go vor Bot-Training:
 
