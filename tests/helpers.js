@@ -212,11 +212,20 @@ export async function openSubmenu(page, submenuId, options = {}) {
 
     if (submenuId === 'submenu-game') {
         await selectSessionType(page, options.sessionType || 'single');
-        const modePathButton = page.locator('#submenu-custom:not(.hidden) [data-mode-path="normal"]').first();
+        const modePathButton = page
+            .locator('#submenu-custom:not(.hidden) [data-mode-path="normal"]:visible:not([disabled])')
+            .first();
         if (await modePathButton.count()) {
             await modePathButton.click({ force: true });
         } else {
-            await page.locator('#submenu-custom:not(.hidden) [data-menu-step-target="submenu-game"]').click({ force: true });
+            const submenuButton = page
+                .locator('#submenu-custom:not(.hidden) [data-menu-step-target="submenu-game"]:visible:not([disabled])')
+                .first();
+            if (await submenuButton.count()) {
+                await submenuButton.click({ force: true });
+            } else {
+                await openViaNavigationRuntime(page, 'submenu-game');
+            }
         }
         await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
         return;

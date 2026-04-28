@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
-import { once } from 'node:events';
 import test from 'node:test';
 
 import WebSocket from 'ws';
@@ -11,6 +10,68 @@ import { TrainerServer } from '../trainer/server/TrainerServer.mjs';
 function parseMessage(raw) {
     const text = typeof raw === 'string' ? raw : Buffer.from(raw).toString('utf8');
     return JSON.parse(text);
+}
+
+async function waitForSocketOpen(socket, timeoutMs = 5000) {
+    const openState = Number.isInteger(WebSocket?.OPEN) ? WebSocket.OPEN : 1;
+    if (socket?.readyState === openState) {
+        return;
+    }
+    await new Promise((resolve, reject) => {
+        let settled = false;
+        const finish = (callback, value) => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            callback(value);
+        };
+        const onOpen = () => finish(resolve);
+        const onError = (error) => {
+            const message = error?.message || String(error || 'unknown');
+            finish(reject, new Error(`socket open error: ${message}`));
+        };
+        const onClose = () => finish(reject, new Error('socket closed before open'));
+        const timer = setTimeout(() => {
+            finish(reject, new Error(`timeout waiting for socket open (${timeoutMs}ms)`));
+        }, timeoutMs);
+        const cleanup = () => {
+            clearTimeout(timer);
+            socket.off('open', onOpen);
+            socket.off('error', onError);
+            socket.off('close', onClose);
+        };
+
+        socket.on('open', onOpen);
+        socket.on('error', onError);
+        socket.on('close', onClose);
+    });
+}
+
+async function closeSocket(socket) {
+    if (!socket) return;
+    await new Promise((resolve) => {
+        let settled = false;
+        const finish = () => {
+            if (settled) return;
+            settled = true;
+            resolve();
+        };
+        socket.once('close', finish);
+        try {
+            socket.close();
+        } catch {
+            finish();
+            return;
+        }
+        setTimeout(() => {
+            try {
+                socket.terminate();
+            } catch {
+                // ignore terminate races
+            }
+            finish();
+        }, 100);
+    });
 }
 
 async function waitForMessage(socket, inbox, predicate, timeoutMs = 2000) {
@@ -74,7 +135,7 @@ test('V36 trainer session loads latest checkpoint via trainer-checkpoint-load-la
     const checkpointPath = `data/training/models/${stamp}/checkpoint.json`;
     const latestIndexPath = `data/training/runs/${stamp}/latest.resume.json`;
     try {
-        await once(socket, 'open');
+        await waitForSocketOpen(socket, 5000);
         await waitForMessage(socket, inbox, (entry) => entry?.type === 'trainer-ready', 2000);
 
         await sendAndWait(socket, inbox, {
@@ -158,11 +219,7 @@ test('V36 trainer session loads latest checkpoint via trainer-checkpoint-load-la
             true
         );
     } finally {
-        try {
-            socket.close();
-        } catch {
-            // ignore close races
-        }
+        await closeSocket(socket);
         await server.stop();
         await rm(`data/training/models/${stamp}`, { recursive: true, force: true });
         await rm(`data/training/runs/${stamp}`, { recursive: true, force: true });
@@ -188,7 +245,7 @@ test('V36 checkpoint-load-latest returns clear error details for missing checkpo
     });
 
     try {
-        await once(socket, 'open');
+        await waitForSocketOpen(socket, 5000);
         await waitForMessage(socket, inbox, (entry) => entry?.type === 'trainer-ready', 2000);
         const response = await sendAndWait(socket, inbox, {
             id: 401,
@@ -203,11 +260,7 @@ test('V36 checkpoint-load-latest returns clear error details for missing checkpo
         assert.equal(Array.isArray(response.details?.errors), true);
         assert.equal(String(response.details.errors[0] || '').length > 0, true);
     } finally {
-        try {
-            socket.close();
-        } catch {
-            // ignore close races
-        }
+        await closeSocket(socket);
         await server.stop();
     }
 });

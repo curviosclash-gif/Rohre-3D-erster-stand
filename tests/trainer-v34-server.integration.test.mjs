@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { once } from 'node:events';
 import test from 'node:test';
 
 import WebSocket from 'ws';
@@ -17,6 +16,68 @@ function parseMessage(raw) {
         ? raw
         : Buffer.from(raw).toString('utf8');
     return JSON.parse(text);
+}
+
+async function waitForSocketOpen(socket, timeoutMs = 5000) {
+    const openState = Number.isInteger(WebSocket?.OPEN) ? WebSocket.OPEN : 1;
+    if (socket?.readyState === openState) {
+        return;
+    }
+    await new Promise((resolve, reject) => {
+        let settled = false;
+        const finish = (callback, value) => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            callback(value);
+        };
+        const onOpen = () => finish(resolve);
+        const onError = (error) => {
+            const message = error?.message || String(error || 'unknown');
+            finish(reject, new Error(`socket open error: ${message}`));
+        };
+        const onClose = () => finish(reject, new Error('socket closed before open'));
+        const timer = setTimeout(() => {
+            finish(reject, new Error(`timeout waiting for socket open (${timeoutMs}ms)`));
+        }, timeoutMs);
+        const cleanup = () => {
+            clearTimeout(timer);
+            socket.off('open', onOpen);
+            socket.off('error', onError);
+            socket.off('close', onClose);
+        };
+
+        socket.on('open', onOpen);
+        socket.on('error', onError);
+        socket.on('close', onClose);
+    });
+}
+
+async function closeSocket(socket) {
+    if (!socket) return;
+    await new Promise((resolve) => {
+        let settled = false;
+        const finish = () => {
+            if (settled) return;
+            settled = true;
+            resolve();
+        };
+        socket.once('close', finish);
+        try {
+            socket.close();
+        } catch {
+            finish();
+            return;
+        }
+        setTimeout(() => {
+            try {
+                socket.terminate();
+            } catch {
+                // ignore terminate races
+            }
+            finish();
+        }, 100);
+    });
 }
 
 async function waitForMessage(socket, inbox, predicate, timeoutMs = 1500) {
@@ -92,7 +153,7 @@ test('V34 trainer server routes request/step/ack and exposes stats', async () =>
     });
 
     try {
-        await once(socket, 'open');
+        await waitForSocketOpen(socket, 5000);
 
         const readyEnvelope = await waitForMessage(
             socket,
@@ -187,11 +248,7 @@ test('V34 trainer server routes request/step/ack and exposes stats', async () =>
         assert.equal(Number(statsResponse.replay?.size), 1);
         assert.equal(typeof statsResponse.model?.epsilon, 'number');
     } finally {
-        try {
-            socket.close();
-        } catch {
-            // ignore close errors
-        }
+        await closeSocket(socket);
         await server.stop();
     }
 });

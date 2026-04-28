@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { once } from 'node:events';
 import test from 'node:test';
 
 import WebSocket from 'ws';
@@ -55,6 +54,41 @@ async function closeSocket(socket) {
             }
             finish();
         }, 50);
+    });
+}
+
+async function waitForSocketOpen(socket, timeoutMs = 5000) {
+    const openState = Number.isInteger(WebSocket?.OPEN) ? WebSocket.OPEN : 1;
+    if (socket?.readyState === openState) {
+        return;
+    }
+    await new Promise((resolve, reject) => {
+        let settled = false;
+        const finish = (callback, value) => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            callback(value);
+        };
+        const onOpen = () => finish(resolve);
+        const onError = (error) => {
+            const message = error?.message || String(error || 'unknown');
+            finish(reject, new Error(`socket open error: ${message}`));
+        };
+        const onClose = () => finish(reject, new Error('socket closed before open'));
+        const timer = setTimeout(() => {
+            finish(reject, new Error(`timeout waiting for socket open (${timeoutMs}ms)`));
+        }, timeoutMs);
+        const cleanup = () => {
+            clearTimeout(timer);
+            socket.off('open', onOpen);
+            socket.off('error', onError);
+            socket.off('close', onClose);
+        };
+
+        socket.on('open', onOpen);
+        socket.on('error', onError);
+        socket.on('close', onClose);
     });
 }
 
@@ -123,7 +157,7 @@ test('V36 match bridge path resumes latest checkpoint before consuming trainer a
     const latestIndexPath = 'data/training/runs/latest.json';
     const latestBefore = await readFileIfExists(latestIndexPath);
     try {
-        await once(setupSocket, 'open');
+        await waitForSocketOpen(setupSocket, 5000);
         await waitForMessage(setupSocket, setupInbox, (entry) => entry?.type === 'trainer-ready', 2000);
 
         await sendAndWait(setupSocket, setupInbox, {
