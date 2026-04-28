@@ -1,0 +1,58 @@
+{
+  "configVersion": "bt93k-cuda-benchmark-v1",
+  "blockId": "BT93K",
+  "phaseId": "93K.5",
+  "runKind": "bt93k-cuda-infra-benchmark",
+  "scope": "BT93K.5 isolated CPU-vs-CUDA infrastructure benchmark only; no longrun, candidate, freeze, baseline, holdout, PPO-Validate, promotion, or runtime integration semantics",
+  "python": {
+    "cpuReference": "python/.venv/Scripts/python.exe",
+    "cudaIsolated": "tmp/bt93k-cuda-venv/Scripts/python.exe",
+    "cudaEnvironmentClass": "local-temp-venv-not-versioned"
+  },
+  "envSmoke": {
+    "sourceConfig": "python/configs/ppo_bt93k_env_scale_smoke.json",
+    "envCounts": [2, 4, 6],
+    "stepsPerEnv": 3,
+    "cpuOutput": "data/training/ppo/bt93k/cuda_benchmark_cpu_env_scale_report.json",
+    "cudaOutput": "data/training/ppo/bt93k/cuda_benchmark_cuda_env_scale_report.json"
+  },
+  "torchProbe": {
+    "obsDim": 96,
+    "hiddenDim": 128,
+    "actionDim": 9,
+    "iterations": 40,
+    "warmupIterations": 5,
+    "seed": 9350
+  },
+  "retentionPolicy": {
+    "minimumStableWallclockImprovement": 0.2,
+    "preferredWallclockImprovement": 0.3,
+    "requiresCpuReferenceOk": true,
+    "requiresCudaTorchAvailable": true,
+    "requiresEnvSmokeArtifactIntegrity": true,
+    "requiresNoDriverProblems": true,
+    "requiresNoDeterminismProblems": true,
+    "qualityClaimAllowed": false
+  },
+  "artifacts": {
+    "root": "data/training/ppo/bt93k",
+    "summaryReport": "data/training/ppo/bt93k/cuda_benchmark_report.json",
+    "envScaleSmokeReport": "data/training/ppo/bt93k/env_scale_smoke_report.json"
+  },
+  "guardrails": {
+    "infrastructureOnly": true,
+    "cpuRemainsReferencePath": true,
+    "comparisonStarted": false,
+    "trainingStarted": false,
+    "baselineRunsStarted": false,
+    "pilotRunsStarted": false,
+    "candidateRunsAllowed": false,
+    "candidateFreezeAllowed": false,
+    "promotionAllowed": false,
+    "ppoValidateAllowed": false,
+    "holdoutAllowed": false,
+    "bt94aGateRefreshAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": []
+  }
+}

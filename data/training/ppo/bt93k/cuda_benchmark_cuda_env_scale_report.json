@@ -1,0 +1,341 @@
+{
+  "blockId": "BT93K",
+  "commands": {
+    "write": "python python/scripts/bt93k_env_scale_smokes.py --write-report"
+  },
+  "comparisonPreparation": {
+    "blockedReasons": [],
+    "comparisonStarted": false,
+    "preparedCommandBlueprint": "future 100k 2/4/6 comparison must use a separate claimed phase, write run_exit_report.json/snapshot_manifest.json/eval_snapshot.json per run, and remain blocked by any missing exit code, stdout/stderr-only result, or forced stop without final report",
+    "qualityClaimAllowed": false,
+    "status": "prepared-not-started"
+  },
+  "generatedAt": "2026-04-28T12:17:23Z",
+  "generatedBy": "python/scripts/bt93k_env_scale_smokes.py",
+  "gitSha": "93297b5ddf29de387e21d538c8ca7d99be445403",
+  "guardrails": {
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "comparisonStarted": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "startupSmokeOnly": true,
+    "trainingStarted": false
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93K.4.1": true,
+    "93K.4.2": true,
+    "93K.4.3": true,
+    "93K.4.4": true
+  },
+  "phaseId": "93K.4",
+  "prerequisites": {
+    "modeMapSmoke": {
+      "exists": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93k/mode_map_smoke_report.json",
+      "sha256": "a4be79c3e34ce294bb9b214d4646b95540228fa043182d59bff76c2336613da4"
+    },
+    "signalMetricContract": {
+      "exists": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93k/signal_metric_contract.json",
+      "sha256": "19f8be481f43822af50e6aa69950df620f844ef7c56d1d398c7db4bd3a126011"
+    },
+    "supervisorContract": {
+      "exists": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93k/supervisor_contract_report.json",
+      "sha256": "3f4a4d3b4f9f32c977d2ed39bf2066c3d81b277fcc205dcb8be739872811d274"
+    }
+  },
+  "quarantine": {
+    "classification": "diagnostic-only-not-closure-evidence",
+    "usedAsBt93kClosureEvidence": false,
+    "userOwned3mExists": true,
+    "userOwned3mPath": "data/training/ppo/user-owned-survival-3m",
+    "userOwned4EnvExists": true,
+    "userOwned4EnvPath": "data/training/ppo/user-owned-survival-3m-4env"
+  },
+  "resultClass": "env-scale-smoke-ready",
+  "runs": [
+    {
+      "artifactManifest": "data/training/ppo/bt93k/runs/20260428T121721Z-bt93k-env-scale-2env-smoke/artifact_manifest.json",
+      "artifactManifestSha256": "b5ceb689f31116e82195ea9b0423d13fddbb58b808e8e57bdae2a1bf8cce0b75",
+      "envCount": 2,
+      "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T121721Z-bt93k-env-scale-2env-smoke/eval_snapshot.json",
+      "evalSnapshotSha256": "a4ac18bc434da7a2a548a36b85bcfa5344964e9a3c25e9361a08b338f073ee1a",
+      "ok": true,
+      "phaseItem": "93K.4.1",
+      "runDirectory": "data/training/ppo/bt93k/runs/20260428T121721Z-bt93k-env-scale-2env-smoke",
+      "runExitReport": "data/training/ppo/bt93k/runs/20260428T121721Z-bt93k-env-scale-2env-smoke/run_exit_report.json",
+      "runExitReportSha256": "a022d2d4f1ac12c11b034d11b1b53140a4e0dcceef9a70c04c27e03bfcacc620",
+      "runId": "20260428T121721Z-bt93k-env-scale-2env-smoke",
+      "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T121721Z-bt93k-env-scale-2env-smoke/snapshot_manifest.json",
+      "snapshotManifestSha256": "8360152111150af8b04345eecf1b3df37c42e4cad181eb500619b02d985d27d5",
+      "summary": {
+        "actionSafety": {
+          "fieldCounts": {},
+          "invalidActionCount": 0,
+          "invalidActionRate": 0.0,
+          "maskCount": 0,
+          "maskRate": 0.0,
+          "noopCount": 6,
+          "noopRate": 1.0,
+          "postDecodeClampCount": 0,
+          "postDecodeClampRate": 0.0,
+          "preSamplingMaskCount": 6,
+          "preSamplingMaskRate": 1.0,
+          "sanitizerCount": 0,
+          "sanitizerRate": 0.0,
+          "sanitizerReasons": {},
+          "totalActions": 6,
+          "vetoCount": 0,
+          "vetoRate": 0.0
+        },
+        "actionSafetyGreen": true,
+        "bridgeFailureCount": 0,
+        "effectiveMapCounts": {
+          "standard": 6
+        },
+        "effectiveModeCounts": {
+          "classic-3d": 6
+        },
+        "envCount": 2,
+        "okWorkerCount": 2,
+        "rewardBreakdownTotals": {
+          "baseStep": -0.036,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.18,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "runtimeErrorCount": 0,
+        "terminalReasonCounts": {},
+        "timeoutCount": 0,
+        "totalDoneCount": 0,
+        "totalStepsObserved": 6,
+        "truncatedReasonCounts": {}
+      }
+    },
+    {
+      "artifactManifest": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-4env-smoke/artifact_manifest.json",
+      "artifactManifestSha256": "b57b4add960c2d6c684e5f7d3b5899baeae41071d7d4c66b71b459336d1ba8f8",
+      "envCount": 4,
+      "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-4env-smoke/eval_snapshot.json",
+      "evalSnapshotSha256": "ca13f17f486460948a3050e041969a908c9f22c0b5c7fa5a3654bb2ffb93cb6e",
+      "ok": true,
+      "phaseItem": "93K.4.2",
+      "runDirectory": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-4env-smoke",
+      "runExitReport": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-4env-smoke/run_exit_report.json",
+      "runExitReportSha256": "56ffcecd11c1079141a0dc9a86ae6910489a7af1b5f16e33d4773423fd0ed770",
+      "runId": "20260428T121722Z-bt93k-env-scale-4env-smoke",
+      "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-4env-smoke/snapshot_manifest.json",
+      "snapshotManifestSha256": "4fc914d861ab6178af603a6d642e3eb9e101fc914bbdf0b3cf57462dbf026088",
+      "summary": {
+        "actionSafety": {
+          "fieldCounts": {},
+          "invalidActionCount": 0,
+          "invalidActionRate": 0.0,
+          "maskCount": 0,
+          "maskRate": 0.0,
+          "noopCount": 12,
+          "noopRate": 1.0,
+          "postDecodeClampCount": 0,
+          "postDecodeClampRate": 0.0,
+          "preSamplingMaskCount": 12,
+          "preSamplingMaskRate": 1.0,
+          "sanitizerCount": 0,
+          "sanitizerRate": 0.0,
+          "sanitizerReasons": {},
+          "totalActions": 12,
+          "vetoCount": 0,
+          "vetoRate": 0.0
+        },
+        "actionSafetyGreen": true,
+        "bridgeFailureCount": 0,
+        "effectiveMapCounts": {
+          "standard": 12
+        },
+        "effectiveModeCounts": {
+          "classic-3d": 12
+        },
+        "envCount": 4,
+        "okWorkerCount": 4,
+        "rewardBreakdownTotals": {
+          "baseStep": -0.072,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.36,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "runtimeErrorCount": 0,
+        "terminalReasonCounts": {},
+        "timeoutCount": 0,
+        "totalDoneCount": 0,
+        "totalStepsObserved": 12,
+        "truncatedReasonCounts": {}
+      }
+    },
+    {
+      "artifactManifest": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-6env-smoke/artifact_manifest.json",
+      "artifactManifestSha256": "c298f5b055e0def077ec463354c43f0e46e516a80967796268e39f41cad19c61",
+      "envCount": 6,
+      "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-6env-smoke/eval_snapshot.json",
+      "evalSnapshotSha256": "674adb127b8b2c2057e583ac619d6657f97c6b0b3dcdccdedfa0e3ece28db5a5",
+      "ok": true,
+      "phaseItem": "93K.4.3",
+      "runDirectory": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-6env-smoke",
+      "runExitReport": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-6env-smoke/run_exit_report.json",
+      "runExitReportSha256": "1fb75d6c33a5b9b63a9e032b9e8a4504c4711660f72a9f38cd30688f9192ac76",
+      "runId": "20260428T121722Z-bt93k-env-scale-6env-smoke",
+      "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-6env-smoke/snapshot_manifest.json",
+      "snapshotManifestSha256": "97487d5f96e87cbd6558fbc6360a987f8ffb3ec331a37b8a9e9b410ff498289c",
+      "summary": {
+        "actionSafety": {
+          "fieldCounts": {},
+          "invalidActionCount": 0,
+          "invalidActionRate": 0.0,
+          "maskCount": 0,
+          "maskRate": 0.0,
+          "noopCount": 18,
+          "noopRate": 1.0,
+          "postDecodeClampCount": 0,
+          "postDecodeClampRate": 0.0,
+          "preSamplingMaskCount": 18,
+          "preSamplingMaskRate": 1.0,
+          "sanitizerCount": 0,
+          "sanitizerRate": 0.0,
+          "sanitizerReasons": {},
+          "totalActions": 18,
+          "vetoCount": 0,
+          "vetoRate": 0.0
+        },
+        "actionSafetyGreen": true,
+        "bridgeFailureCount": 0,
+        "effectiveMapCounts": {
+          "standard": 18
+        },
+        "effectiveModeCounts": {
+          "classic-3d": 18
+        },
+        "envCount": 6,
+        "okWorkerCount": 6,
+        "rewardBreakdownTotals": {
+          "baseStep": -0.108,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.54,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "runtimeErrorCount": 0,
+        "terminalReasonCounts": {},
+        "timeoutCount": 0,
+        "totalDoneCount": 0,
+        "totalStepsObserved": 18,
+        "truncatedReasonCounts": {}
+      }
+    }
+  ],
+  "sourceArtifacts": {
+    "actionSurface": {
+      "exists": true,
+      "path": "python/envs/ppo_action_surface.py",
+      "role": "PPO action telemetry wrapper",
+      "sha256": "4e12c93bd532178f3759234d5217f1cd58a4f4bfaec9c6f7be8ffa708564847b"
+    },
+    "config": {
+      "exists": true,
+      "path": "python/configs/ppo_bt93k_env_scale_smoke.json",
+      "role": "BT93K.4 env-scale smoke config",
+      "sha256": "12c20f4114d82602898489b35bb6f492d1577b0ccf53e3dea9760520d043df53"
+    },
+    "curviosEnv": {
+      "exists": true,
+      "path": "python/envs/curvios_env.py",
+      "role": "Python Curvios env",
+      "sha256": "8d28d42d90e8d5723b31a327fe7a3f975486d1d84fcd41cf114cd332032c1468"
+    },
+    "headlessRunner": {
+      "exists": true,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "role": "JS headless runner",
+      "sha256": "76fb68d990af76505a8b6d4f71e9f868a1f80bbdc1a70a5089fa8a265f004208"
+    },
+    "singleEnvBridge": {
+      "exists": true,
+      "path": "scripts/training-single-env-bridge.mjs",
+      "role": "Node single env bridge CLI",
+      "sha256": "eadee13b0815bf90ff0e3d6b8538de81af4024a7ad12665aeefe3031dec1b36c"
+    }
+  },
+  "sourceChecks": {
+    "actionSurfaceReportsSafetyTelemetry": true,
+    "curviosEnvExposesControllerPidAndDiagnostics": true,
+    "headlessRunnerReportsEffectiveEnvironment": true,
+    "singleEnvBridgeSupportsModeAndCurriculumArgs": true
+  },
+  "summary": {
+    "allRunsOk": true,
+    "bt94aClaimAllowed": false,
+    "envCounts": [
+      2,
+      4,
+      6
+    ],
+    "qualityClaimAllowed": false,
+    "runCount": 3,
+    "totalStepsObserved": 36
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "artifacts": {
+    "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T121719Z-bt93k-env-scale-4env-smoke/eval_snapshot.json",
+    "evalSnapshotSha256": "5bd46867d8445443924e814d261d57217eebd230a5ecf8c2f820c9848643c786",
+    "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T121719Z-bt93k-env-scale-4env-smoke/snapshot_manifest.json"
+  },
+  "blockId": "BT93K",
+  "candidateRun": false,
+  "diagnosticOnly": true,
+  "envCount": 4,
+  "freezeCandidate": false,
+  "generatedAt": "2026-04-28T12:17:20Z",
+  "generatedBy": "python/scripts/bt93k_env_scale_smokes.py",
+  "holdoutUsed": false,
+  "manifestVersion": "bt93k-env-scale-snapshot-v1",
+  "phaseId": "93K.4.2",
+  "promotionAllowed": false,
+  "runId": "20260428T121719Z-bt93k-env-scale-4env-smoke",
+  "runKind": "bt93k-env-scale-smoke",
+  "snapshotClass": "env-startup-final-state",
+  "summary": {
+    "actionSafetyGreen": true,
+    "allSidecarsStarted": true,
+    "allWorkersOk": true,
+    "totalStepsObserved": 12
+  }
+}
