@@ -287,7 +287,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93J | 2026-04-26 | frei | abgeschlossen 2026-04-27 als `diagnose-loop-required`; kein BT94A-Claim |
-| Bot-Codex | BT93K | 2026-04-28 | in-bearbeitung | 93K.1 abgeschlossen; naechster Schritt 93K.2 |
+| Bot-Codex | BT93K | 2026-04-28 | in-bearbeitung | 93K.2 abgeschlossen; naechster Schritt 93K.3 |
 | - | BT94A | - | frei | wartet auf `BT93K.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -795,7 +795,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
 | BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
 | BT93J | Root-Cause-Blocker-Repair | completed | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 + R2-Plananpassung 2026-04-26 | 93J.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
-| BT93K | Survival-First Objective Reset | active | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.2 | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
+| BT93K | Survival-First Objective Reset | active | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.3 | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93K.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2709,10 +2709,10 @@ Pflicht-Artefakte:
 
 ### 93K.2 Runner-Signalreparatur und Curriculum-Uhr
 
-- [ ] 93K.2.1 Curriculum-Uhr von episodischem `tickIndex` auf monotone Env-/Trainingssteps oder einen eindeutig reporteten globalen Step-Zaehler umstellen.
-- [ ] 93K.2.2 `activeCurriculumStage`, `curriculumStepOffset`, `globalEnvSteps` und Stage-Wechsel in Step-/Eval-Telemetrie reporten.
-- [ ] 93K.2.3 `progressEvent`/Objective-Signale nur reporten, wenn sie im echten Runner-Pfad reachable sind; Reachability-Smoke schreiben.
-- [ ] 93K.2.4 `effectiveMap`, `effectiveDomainMode`, `effectiveGameMode`, `planarMode`, `modePath` und Seeds in Train/Eval-Reports ausweisen.
+- [x] 93K.2.1 Curriculum-Uhr von episodischem `tickIndex` auf monotone Env-/Trainingssteps oder einen eindeutig reporteten globalen Step-Zaehler umstellen. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_runner_signal_repair.py --write-report` -> `data/training/ppo/bt93k/runner_signal_repair_report.json`)
+- [x] 93K.2.2 `activeCurriculumStage`, `curriculumStepOffset`, `globalEnvSteps` und Stage-Wechsel in Step-/Eval-Telemetrie reporten. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_runner_signal_repair.py --write-report` -> `data/training/ppo/bt93k/runner_signal_repair_report.json`)
+- [x] 93K.2.3 `progressEvent`/Objective-Signale nur reporten, wenn sie im echten Runner-Pfad reachable sind; Reachability-Smoke schreiben. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_runner_signal_repair.py --write-report` -> `data/training/ppo/bt93k/runner_signal_repair_report.json`)
+- [x] 93K.2.4 `effectiveMap`, `effectiveDomainMode`, `effectiveGameMode`, `planarMode`, `modePath` und Seeds in Train/Eval-Reports ausweisen. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_runner_signal_repair.py --write-report` -> `data/training/ppo/bt93k/runner_signal_repair_report.json`)
 
 ### 93K.3 Mode-/Map-Smokes und Policy-Schnitt
 
