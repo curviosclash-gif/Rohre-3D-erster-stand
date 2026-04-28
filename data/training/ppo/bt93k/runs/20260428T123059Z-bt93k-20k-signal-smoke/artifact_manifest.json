@@ -1,0 +1,38 @@
+{
+  "artifacts": {
+    "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T123059Z-bt93k-20k-signal-smoke/eval_snapshot.json",
+    "evalSnapshotSha256": "4fcf63aae235fe10b9a17c508d0fd1c547a2771626837c079f8cc4772d648652",
+    "heartbeat": "data/training/ppo/bt93k/runs/20260428T123059Z-bt93k-20k-signal-smoke/heartbeat.jsonl",
+    "runExitReport": "data/training/ppo/bt93k/runs/20260428T123059Z-bt93k-20k-signal-smoke/run_exit_report.json",
+    "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T123059Z-bt93k-20k-signal-smoke/snapshot_manifest.json",
+    "snapshotManifestSha256": "5e44ba68be9b69db5149558a9f96893f0cc126b9c6b708841f20c696ee162cd6",
+    "stderr": "data/training/ppo/bt93k/runs/20260428T123059Z-bt93k-20k-signal-smoke/stderr.log",
+    "stdout": "data/training/ppo/bt93k/runs/20260428T123059Z-bt93k-20k-signal-smoke/stdout.log"
+  },
+  "blockId": "BT93K",
+  "generatedAt": "2026-04-28T12:37:29Z",
+  "guardrails": {
+    "baselineRunsStarted": false,
+    "bt94aGateRefreshAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "comparisonStarted": false,
+    "diagnosticOnly": true,
+    "holdoutAllowed": false,
+    "pilotRunsStarted": false,
+    "ppoValidateAllowed": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "manifestVersion": "bt93k-longrun-ladder-artifacts-v1",
+  "phaseId": "93K.6.1",
+  "runId": "20260428T123059Z-bt93k-20k-signal-smoke",
+  "runKind": "bt93k-signal-gated-longrun-ladder",
+  "rungId": "20k-signal-smoke",
+  "sourceConfig": {
+    "path": "python/configs/ppo_bt93k_longrun_ladder.json",
+    "sha256": "7fba5ef81103d66572a72b7ec8ec89053557ba54eef1b2cc931aa0b0f583926f"
+  }
+}

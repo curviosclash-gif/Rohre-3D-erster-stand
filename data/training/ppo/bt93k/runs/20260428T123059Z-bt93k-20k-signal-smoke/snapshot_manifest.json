@@ -1,0 +1,28 @@
+{
+  "artifacts": {
+    "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T123059Z-bt93k-20k-signal-smoke/eval_snapshot.json",
+    "evalSnapshotSha256": "4fcf63aae235fe10b9a17c508d0fd1c547a2771626837c079f8cc4772d648652",
+    "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T123059Z-bt93k-20k-signal-smoke/snapshot_manifest.json"
+  },
+  "blockId": "BT93K",
+  "candidateRun": false,
+  "diagnosticOnly": true,
+  "freezeCandidate": false,
+  "generatedAt": "2026-04-28T12:37:29Z",
+  "generatedBy": "python/scripts/bt93k_longrun_ladder.py",
+  "holdoutUsed": false,
+  "manifestVersion": "bt93k-longrun-ladder-snapshot-v1",
+  "phaseId": "93K.6.1",
+  "promotionAllowed": false,
+  "runId": "20260428T123059Z-bt93k-20k-signal-smoke",
+  "runKind": "bt93k-signal-gated-longrun-ladder",
+  "rungId": "20k-signal-smoke",
+  "snapshotClass": "signal-gated-diagnostic-final-state",
+  "summary": {
+    "actionSafetyGreen": true,
+    "allSidecarsStarted": true,
+    "allWorkersOk": true,
+    "completedEpisodeCount": 256,
+    "totalStepsObserved": 20000
+  }
+}

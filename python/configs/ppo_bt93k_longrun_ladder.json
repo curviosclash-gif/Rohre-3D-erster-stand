@@ -1,0 +1,126 @@
+{
+  "configVersion": "bt93k-longrun-ladder-v1",
+  "blockId": "BT93K",
+  "phaseId": "93K.6",
+  "runKind": "bt93k-signal-gated-longrun-ladder",
+  "scope": "BT93K.6 signal-gated diagnostic ladder only; no candidate, freeze, baseline, holdout, PPO-Validate, promotion, rollout, or runtime integration semantics",
+  "env": {
+    "modeId": "runtime-near-headless-v1",
+    "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+    "rewardProfileId": "bt93j-reward-curriculum-proof-v1",
+    "mapKey": "standard",
+    "domainMode": "classic-3d",
+    "gameMode": "CLASSIC",
+    "planarMode": false,
+    "modePath": "normal",
+    "maxStepsPerEpisode": 180,
+    "controllerTimeoutSeconds": 30,
+    "curriculumStepOffset": 250000,
+    "seedBase": 9360,
+    "actionPolicy": "semantic-cycle"
+  },
+  "ladder": [
+    {
+      "id": "20k-signal-smoke",
+      "phaseItem": "93K.6.1",
+      "envCount": 2,
+      "targetEnvSteps": 20000,
+      "minimumCompletedEpisodes": 15,
+      "sampleClass": "signal-smoke-not-quality-evidence"
+    },
+    {
+      "id": "50k-4env-smoke",
+      "phaseItem": "93K.6.2",
+      "envCount": 4,
+      "targetEnvSteps": 50000,
+      "minimumCompletedEpisodes": 15,
+      "requiresPreviousRung": "20k-signal-smoke"
+    },
+    {
+      "id": "50k-6env-smoke",
+      "phaseItem": "93K.6.2",
+      "envCount": 6,
+      "targetEnvSteps": 50000,
+      "minimumCompletedEpisodes": 15,
+      "requiresPreviousRung": "20k-signal-smoke"
+    },
+    {
+      "id": "100k-2env-comparison",
+      "phaseItem": "93K.6.3",
+      "envCount": 2,
+      "targetEnvSteps": 100000,
+      "minimumCompletedEpisodes": 15,
+      "requiresPreviousPhaseItem": "93K.6.2"
+    },
+    {
+      "id": "100k-4env-comparison",
+      "phaseItem": "93K.6.3",
+      "envCount": 4,
+      "targetEnvSteps": 100000,
+      "minimumCompletedEpisodes": 15,
+      "requiresPreviousPhaseItem": "93K.6.2"
+    },
+    {
+      "id": "100k-6env-comparison",
+      "phaseItem": "93K.6.3",
+      "envCount": 6,
+      "targetEnvSteps": 100000,
+      "minimumCompletedEpisodes": 15,
+      "requiresPreviousPhaseItem": "93K.6.2"
+    },
+    {
+      "id": "300k-diagnostic-longrun",
+      "phaseItem": "93K.6.4",
+      "envCount": 2,
+      "targetEnvSteps": 300000,
+      "minimumCompletedEpisodes": 15,
+      "requiresPreviousPhaseItem": "93K.6.3"
+    },
+    {
+      "id": "1m-diagnostic-longrun",
+      "phaseItem": "93K.6.5",
+      "envCount": 2,
+      "targetEnvSteps": 1000000,
+      "minimumCompletedEpisodes": 15,
+      "requiresPreviousPhaseItem": "93K.6.4"
+    }
+  ],
+  "escalationRules": {
+    "minimumCompletedEpisodesForQualitativeRead": 15,
+    "deathBefore60ImprovementRatio": 0.2,
+    "requireRuntimeErrorCountEq": 0,
+    "requireInvalidActionRateEq": 0.0,
+    "requireSanitizerRateEq": 0.0,
+    "requirePostDecodeClampRateEq": 0.0,
+    "requireStableFinalExitReport": true,
+    "requireSameModeMapSeedSemanticsFor100k": true,
+    "requireAverageSurvivalNonRegressionForLongerRuns": true,
+    "forbidMaxStepOnlyEscalationBeyond100k": true,
+    "holdoutAllowed": false
+  },
+  "artifacts": {
+    "root": "data/training/ppo/bt93k",
+    "summaryReport": "data/training/ppo/bt93k/longrun_ladder_decision_report.json",
+    "supervisorContract": "data/training/ppo/bt93k/supervisor_contract_report.json",
+    "runnerSignalRepair": "data/training/ppo/bt93k/runner_signal_repair_report.json",
+    "modeMapSmoke": "data/training/ppo/bt93k/mode_map_smoke_report.json",
+    "envScaleSmoke": "data/training/ppo/bt93k/env_scale_smoke_report.json",
+    "signalMetricContract": "data/training/ppo/bt93k/signal_metric_contract.json",
+    "cudaBenchmark": "data/training/ppo/bt93k/cuda_benchmark_report.json"
+  },
+  "guardrails": {
+    "diagnosticOnly": true,
+    "comparisonStarted": false,
+    "trainingStarted": false,
+    "baselineRunsStarted": false,
+    "pilotRunsStarted": false,
+    "candidateRunsAllowed": false,
+    "candidateFreezeAllowed": false,
+    "promotionAllowed": false,
+    "ppoValidateAllowed": false,
+    "holdoutAllowed": false,
+    "bt94aGateRefreshAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": []
+  }
+}

@@ -1,0 +1,6 @@
+2026-04-28T12:30:59Z starting BT93K.6 20k-signal-smoke
+config=python/configs/ppo_bt93k_longrun_ladder.json
+envCount=2
+targetEnvSteps=20000
+stepsPerEnv=10000
+2026-04-28T12:37:29Z completed ok=True totalSteps=20000
