@@ -1,3 +1,82 @@
+function resolveCallback(callback, fallback) {
+    return typeof callback === 'function' ? callback : fallback;
+}
+
+export function createStartSetupControllerPort(deps = {}) {
+    const getSettings = resolveCallback(deps.getSettings, () => null);
+    const getSettingsManager = resolveCallback(deps.getSettingsManager, () => null);
+    const getMapDefinitions = resolveCallback(deps.getMapDefinitions, () => ({}));
+    const getMultiplayerSessionState = resolveCallback(deps.getMultiplayerSessionState, () => null);
+    const resolveSurfacePolicy = resolveCallback(deps.resolveSurfacePolicy, () => null);
+
+    return Object.freeze({
+        getSettings: () => getSettings(),
+        getSettingsManager: () => getSettingsManager(),
+        getMapDefinitions: () => getMapDefinitions() || {},
+        getMultiplayerSessionState: () => getMultiplayerSessionState() || null,
+        resolveSurfacePolicy: (settings = undefined) => resolveSurfacePolicy(settings) || null,
+    });
+}
+
+export function createNavigationLifecyclePort(deps = {}) {
+    const getActiveSubmenu = resolveCallback(deps.getActiveSubmenu, () => null);
+    const setActiveSubmenu = resolveCallback(deps.setActiveSubmenu, () => null);
+    const persistMenuState = resolveCallback(deps.persistMenuState, () => null);
+    const getExpertLoginRuntime = resolveCallback(deps.getExpertLoginRuntime, () => null);
+    const getSettingsDirty = resolveCallback(deps.getSettingsDirty, () => false);
+    const getActiveProfileName = resolveCallback(deps.getActiveProfileName, () => '');
+    const normalizeProfileName = resolveCallback(
+        deps.normalizeProfileName,
+        (profileName) => String(profileName || '').trim()
+    );
+
+    return Object.freeze({
+        getActiveSubmenu: () => getActiveSubmenu() || null,
+        setActiveSubmenu: (panelId) => setActiveSubmenu(panelId || null),
+        persistMenuState: (state, transition = null) => persistMenuState(state, transition),
+        getExpertLoginRuntime: () => getExpertLoginRuntime() || null,
+        getSettingsDirty: () => getSettingsDirty() === true,
+        getActiveProfileName: () => String(getActiveProfileName() || '').trim(),
+        normalizeProfileName: (profileName) => normalizeProfileName(profileName),
+    });
+}
+
+export function createStartSetupControllerPortFromManager({
+    manager = null,
+    game = null,
+    settingsManager = null,
+    getMapDefinitions = null,
+} = {}) {
+    return createStartSetupControllerPort({
+        getSettings: () => manager?.settings || null,
+        getSettingsManager: () => settingsManager || manager?.settingsManager || null,
+        getMapDefinitions: () => (typeof getMapDefinitions === 'function' ? getMapDefinitions() : {}),
+        getMultiplayerSessionState: () => game?.menuMultiplayerBridge?.getSessionState?.() || null,
+        resolveSurfacePolicy: (settings = manager?.settings) => manager?.resolveSurfacePolicy?.(settings || manager?.settings) || null,
+    });
+}
+
+export function createNavigationLifecyclePortFromManager({
+    manager = null,
+    game = null,
+    menuExpertLoginRuntime = null,
+    profileManager = null,
+} = {}) {
+    return createNavigationLifecyclePort({
+        getActiveSubmenu: () => game?._activeSubmenu || null,
+        setActiveSubmenu: (panelId) => { if (game) game._activeSubmenu = panelId || null; },
+        persistMenuState: (state, transition = null) => {
+            if (!game) return;
+            game._menuState = state || null;
+            game._menuTransition = transition || null;
+        },
+        getExpertLoginRuntime: () => menuExpertLoginRuntime || manager?.menuExpertLoginRuntime || null,
+        getSettingsDirty: () => game?.settingsDirty === true,
+        getActiveProfileName: () => game?.activeProfileName || profileManager?.getActiveProfileName?.() || '',
+        normalizeProfileName: (profileName) => profileManager?.normalizeProfileName?.(profileName) || String(profileName || '').trim(),
+    });
+}
+
 export function createMatchFlowUiControllerPort(ports = null) {
     const renderPort = ports?.renderPort || null;
     const lifecyclePort = ports?.lifecyclePort || null;

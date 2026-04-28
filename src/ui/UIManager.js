@@ -1,9 +1,4 @@
-// ============================================
-// UIManager.js - Schlanke Fassade (V38 Phase 38.3)
-// Orchestriert UIStartSyncController und UINavigationLifecycleController.
-// Eigene Verantwortung: Sync-Methoden (modes, map, bots, rules, gameplay, vehicles, session)
-//                       sowie dev-text-catalog und disposer-Infrastruktur.
-// ============================================
+// UIManager.js - schlanke Menu-Shell fuer Controller-Verdrahtung und einfache DOM-Syncs.
 
 import { clampSettingValue } from '../shared/contracts/SettingsRuntimeContract.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../hunt/HuntMode.js';
@@ -30,6 +25,10 @@ import { syncFightMenuTuningUi } from './menu/FightMenuTuningSync.js';
 import { syncMenuSurfacePolicyUi } from './menu/MenuSurfacePolicyUiSync.js';
 import { resolveSurfaceEntryCopy } from '../shared/contracts/PlatformSurfacePolicyOps.js';
 import { resolveRuntimeSessionContract } from '../shared/contracts/RuntimeSessionContract.js';
+import {
+    createNavigationLifecyclePortFromManager,
+    createStartSetupControllerPortFromManager,
+} from '../shared/runtime/UiControllerRuntimePorts.js';
 import { UIStartSyncController } from './UIStartSyncController.js';
 import { UINavigationLifecycleController } from './UINavigationLifecycleController.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
@@ -49,10 +48,11 @@ function syncRangeInput(input, value, limits, fallback) {
 export class UIManager {
     constructor(deps = {}) {
         const game = deps.game || null;
-        this.game = game;
         this.ports = deps.ports || null;
         this.ui = game?.ui;
         this.settings = game?.settings;
+        this.settingsManager = game?.settingsManager || null;
+        this.profileManager = game?.profileManager || null;
         ensureMenuContractState(this.settings);
 
         this._navButtons = game?._navButtons || [];
@@ -83,9 +83,11 @@ export class UIManager {
         this._developerPanel = document.getElementById('submenu-developer');
         this._debugHintNodes = Array.isArray(this.ui.debugHints) ? this.ui.debugHints : [];
         this._runtimeSettingLimits = createRuntimeSettingsLimitsForRuntime();
+        this._getGameplayConfig = () => resolveGameplayConfig(game);
+        this._readMenuMultiplayerSessionState = () => game?.menuMultiplayerBridge?.getSessionState?.() || null;
         this.menuTextRuntime = game?.menuTextRuntime instanceof MenuTextRuntime
             ? game.menuTextRuntime
-            : new MenuTextRuntime({ overrideStore: game.settingsManager?.menuTextOverrideStore });
+            : new MenuTextRuntime({ overrideStore: this.settingsManager?.menuTextOverrideStore });
         if (game) {
             game.menuSchema = this.menuSchema;
             game.menuPanelRegistry = this.menuPanelRegistry;
@@ -93,9 +95,9 @@ export class UIManager {
             game.menuTextRuntime = this.menuTextRuntime;
         }
 
-        // Sub-Controller
-        this._startSync = new UIStartSyncController({ ui: this.ui, game, manager: this });
-        this._navLifecycle = new UINavigationLifecycleController({ ui: this.ui, game, manager: this });
+        const controllerPortDeps = { manager: this, game };
+        this._startSync = new UIStartSyncController({ ui: this.ui, manager: this, port: createStartSetupControllerPortFromManager({ ...controllerPortDeps, settingsManager: this.settingsManager, getMapDefinitions: () => this._getGameplayConfig()?.MAPS || {} }) });
+        this._navLifecycle = new UINavigationLifecycleController({ ui: this.ui, manager: this, port: createNavigationLifecyclePortFromManager({ ...controllerPortDeps, menuExpertLoginRuntime: this.menuExpertLoginRuntime, profileManager: this.profileManager }) });
     }
 
     // ------------------------------------------------------------------
@@ -172,19 +174,19 @@ export class UIManager {
         this._listen(select, 'change', () => {
             const selectedTextId = String(select.value || '').trim();
             if (!this.ui.developerTextOverrideInput) return;
-            const overrideValue = this.game.settingsManager?.menuTextOverrideStore?.getOverride?.(selectedTextId) || '';
+            const overrideValue = this.settingsManager?.menuTextOverrideStore?.getOverride?.(selectedTextId) || '';
             this.ui.developerTextOverrideInput.value = overrideValue;
         });
     }
-    _resolveMenuUiContext(settings = this.game.settings) {
+    _resolveMenuUiContext(settings = this.settings) {
         const context = resolveMenuUiSyncContext(settings);
         this._menuUiContext = context;
         this._accessContext = context.accessContext;
         this._runtimeFeatureFlags = context.runtimeFeatureFlags;
         return context;
     }
-    getMenuUiContext(settings = this.game.settings) { return this._resolveMenuUiContext(settings); }
-    resolveSurfacePolicy(settings = this.game.settings) { return this.getMenuUiContext(settings).surfacePolicy || null; }
+    getMenuUiContext(settings = this.settings) { return this._resolveMenuUiContext(settings); }
+    resolveSurfacePolicy(settings = this.settings) { return this.getMenuUiContext(settings).surfacePolicy || null; }
     // ------------------------------------------------------------------
     // Delegations zu Sub-Controllern (public API bleibt erhalten)
     // ------------------------------------------------------------------
@@ -194,7 +196,7 @@ export class UIManager {
     setLevel4Open(isOpen)                  { return this._navLifecycle.setLevel4Open(isOpen); }
     setLevel4Section(sectionId, options)   { return this._navLifecycle.setLevel4Section(sectionId, options); }
     showToast(message, durationOrTone, tone) { return this._navLifecycle.showToast(message, durationOrTone, tone); }
-    updateContext(settings = this.game.settings) { return this._navLifecycle.updateContext(this._resolveMenuUiContext(settings)); }
+    updateContext(settings = this.settings) { return this._navLifecycle.updateContext(this._resolveMenuUiContext(settings)); }
 
     // Interne Methoden die von StartSyncController zurück gerufen werden
     _setStartSectionOpen(sectionId, open)  { return this._navLifecycle._setStartSectionOpen(sectionId, open); }
@@ -208,7 +210,7 @@ export class UIManager {
     // ------------------------------------------------------------------
 
     syncAll() {
-        const settings = this.game.settings;
+        const settings = this.settings;
         const menuUiContext = this._resolveMenuUiContext(settings);
         this.syncSessionState(settings, menuUiContext);
         this.syncModes(settings, menuUiContext);
@@ -252,9 +254,9 @@ export class UIManager {
     // Sync-Methoden (verbleiben im UIManager – einfache DOM-Syncs)
     // ------------------------------------------------------------------
 
-    syncSessionState(settings = this.game.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
+    syncSessionState(settings = this.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
         const ui = this.ui;
-        const huntFeatureEnabled = resolveGameplayConfig(this.game).HUNT?.ENABLED !== false;
+        const huntFeatureEnabled = this._getGameplayConfig()?.HUNT?.ENABLED !== false;
         const sessionType = menuUiContext.surfaceMenuState.sessionType;
         syncMenuSurfacePolicyUi({
             ui,
@@ -272,7 +274,7 @@ export class UIManager {
         this.syncStartSetupState(settings);
     }
 
-    syncModes(settings = this.game.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
+    syncModes(settings = this.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
         const ui = this.ui;
         const sessionType = menuUiContext.surfaceMenuState.sessionType;
         const effectiveMode = sessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
@@ -286,7 +288,7 @@ export class UIManager {
             ui.vehicleP2Container.classList.toggle('hidden', effectiveMode !== '2p');
         }
 
-        const huntFeatureEnabled = resolveGameplayConfig(this.game).HUNT?.ENABLED !== false;
+        const huntFeatureEnabled = this._getGameplayConfig()?.HUNT?.ENABLED !== false;
         const resolvedGameMode = resolveActiveGameMode(settings.gameMode, huntFeatureEnabled);
         const huntRespawnEnabled = resolvedGameMode === GAME_MODE_TYPES.HUNT
             ? !!settings?.hunt?.respawnEnabled
@@ -310,21 +312,21 @@ export class UIManager {
         }
     }
 
-    syncMap(settings = this.game.settings) {
+    syncMap(settings = this.settings) {
         if (this.ui.mapSelect) {
             this.ui.mapSelect.value = settings.mapKey;
         }
         this.syncStartSetupState(settings);
     }
 
-    syncBots(settings = this.game.settings) {
+    syncBots(settings = this.settings) {
         const ui = this.ui;
         syncRangeInput(ui.botSlider, settings.numBots, this._runtimeSettingLimits.session.numBots, settings.numBots);
         ui.botLabel.textContent = settings.numBots;
         if (ui.botDifficultySelect) ui.botDifficultySelect.value = settings.botDifficulty;
     }
 
-    syncRules(settings = this.game.settings) {
+    syncRules(settings = this.settings) {
         const ui = this.ui;
         syncRangeInput(ui.winSlider, settings.winsNeeded, this._runtimeSettingLimits.session.winsNeeded, settings.winsNeeded);
         ui.winLabel.textContent = settings.winsNeeded;
@@ -338,10 +340,10 @@ export class UIManager {
         ui.portalsToggle.checked = !!settings.portalsEnabled;
     }
 
-    syncGameplay(settings = this.game.settings) {
+    syncGameplay(settings = this.settings) {
         const ui = this.ui;
         const gp = settings.gameplay;
-        const runtimeConfig = resolveGameplayConfig(this.game);
+        const runtimeConfig = this._getGameplayConfig();
         const runtimeLimits = this._runtimeSettingLimits;
         syncRangeInput(ui.speedSlider, gp.speed, runtimeLimits.gameplay.speed, gp.speed);
         ui.speedLabel.textContent = `${gp.speed} m/s`;
@@ -405,7 +407,7 @@ export class UIManager {
         }
     }
 
-    syncVehicles(settings = this.game.settings) {
+    syncVehicles(settings = this.settings) {
         const ui = this.ui;
         if (ui.vehicleSelectP1) ui.vehicleSelectP1.value = settings.vehicles.PLAYER_1;
         if (ui.vehicleSelectP2) ui.vehicleSelectP2.value = settings.vehicles.PLAYER_2;
@@ -413,25 +415,25 @@ export class UIManager {
     }
 
     // Delegiert an UIStartSyncController
-    syncStartSetupState(settings = this.game.settings) { return this._startSync.syncStartSetupState(settings); }
+    syncStartSetupState(settings = this.settings) { return this._startSync.syncStartSetupState(settings); }
 
-    syncPresetState(settings = this.game.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
+    syncPresetState(settings = this.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
         syncMenuPresetState({
             ui: this.ui,
             settings,
-            settingsManager: this.game.settingsManager,
+            settingsManager: this.settingsManager,
             surfacePolicy: menuUiContext.surfacePolicy,
         });
     }
 
-    syncMultiplayerState(settings = this.game.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
+    syncMultiplayerState(settings = this.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
         if (!this.ui.multiplayerStatus) return;
         const sessionType = menuUiContext.surfaceMenuState.sessionType;
         const surfaceEntryCopy = resolveSurfaceEntryCopy({
             productSurfaceId: menuUiContext.surfacePolicy?.productSurfaceId,
             sessionType,
         });
-        const sessionState = this.game?.menuMultiplayerBridge?.getSessionState?.() || null;
+        const sessionState = this._readMenuMultiplayerSessionState();
         const activePresetId = String(settings?.matchSettings?.activePresetId || '');
         const presetText = activePresetId ? ` | Preset: ${activePresetId}` : '';
         if (sessionType !== MENU_SESSION_TYPES.MULTIPLAYER) {
@@ -464,19 +466,19 @@ export class UIManager {
                 ? 'Matchstart wurde bereits an die aktive Lobby gesendet.'
                 : (sessionState.canStart
                     ? ''
-                    : (sessionState.isHost
+                : (sessionState.isHost
                     ? 'Alle Teilnehmer muessen Ready sein und mindestens 2 Spieler verbunden sein.'
                     : surfaceEntryCopy.multiplayerClientStartTitle));
         }
     }
 
-    syncDeveloperState(settings = this.game.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
+    syncDeveloperState(settings = this.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
         const releaseState = menuUiContext.releaseState;
         this._navLifecycle.syncDeveloperReleaseCutVisibility(menuUiContext);
         syncMenuDeveloperState({
             ui: this.ui,
             settings,
-            settingsManager: this.game.settingsManager,
+            settingsManager: this.settingsManager,
             accessContext: menuUiContext.accessContext,
             menuTextRuntime: this.menuTextRuntime,
             releaseState,

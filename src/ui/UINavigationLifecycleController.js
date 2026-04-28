@@ -11,24 +11,41 @@ import {
 } from './menu/MenuAccessPolicy.js';
 import { LEVEL4_SECTION_IDS, MENU_SESSION_TYPES } from './menu/MenuStateContracts.js';
 import { MenuNavigationRuntime } from './menu/MenuNavigationRuntime.js';
-import { MenuStateMachine, MENU_STATE_IDS } from './menu/MenuStateMachine.js';
-import { MenuPanelRegistry } from './menu/MenuPanelRegistry.js';
-import { MenuTextRuntime } from './menu/MenuTextRuntime.js';
 import { resolveMapPreview } from './menu/MenuPreviewCatalog.js';
 import { resolveDeveloperReleaseState } from './menu/MenuUiSyncContext.js';
 
 export class UINavigationLifecycleController {
     /**
-     * @param {{ ui: object, game: object, manager: object }} options
+     * @param {{ ui: object, manager: object, port?: object }} options
      */
-    constructor({ ui, game, manager }) {
+    constructor({ ui, manager, port = null }) {
         this.ui = ui;
-        this.game = game;
         this.manager = manager;
+        this.port = port;
         this._level4SectionControlsSetup = false;
         this._level4CloseFallbackSetup = false;
         this._developerTextCatalogSetup = false;
         this._toastTimer = null;
+    }
+
+    _getActiveSubmenu() {
+        return this.port?.getActiveSubmenu?.() || null;
+    }
+
+    _setActiveSubmenu(panelId) {
+        this.port?.setActiveSubmenu?.(panelId || null);
+    }
+
+    _persistMenuState(transition = null) {
+        this.port?.persistMenuState?.(this.manager?.menuStateMachine?.getState?.() || null, transition || null);
+    }
+
+    _getExpertLoginRuntime() {
+        return this.port?.getExpertLoginRuntime?.() || this.manager?.menuExpertLoginRuntime || null;
+    }
+
+    _isSettingsDirty() {
+        return this.port?.getSettingsDirty?.() === true;
     }
 
     // ------------------------------------------------------------------
@@ -106,7 +123,7 @@ export class UINavigationLifecycleController {
         }
     }
 
-    _syncMenuChromeState(panelId = this.game._activeSubmenu) {
+    _syncMenuChromeState(panelId = this._getActiveSubmenu()) {
         const root = this.ui.mainMenu;
         if (!root) return;
         const normalizedPanelId = String(panelId || '').trim();
@@ -161,7 +178,7 @@ export class UINavigationLifecycleController {
         if (open || this._level4SectionControlsSetup) {
             this._syncLevel4SectionState(activeSection, { focus: false });
         }
-        this._syncMenuChromeState(this.game._activeSubmenu || null);
+        this._syncMenuChromeState(this._getActiveSubmenu() || null);
         if (open) {
             const activePanel = Array.isArray(this.ui.level4SectionPanels)
                 ? this.ui.level4SectionPanels.find((panel) => this._resolveLevel4Section(panel?.dataset?.level4Section, '') === activeSection)
@@ -169,7 +186,7 @@ export class UINavigationLifecycleController {
             const firstFocusable = activePanel?.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])')
                 || drawer.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
             firstFocusable?.focus();
-        } else if (this.game._activeSubmenu === 'submenu-game') {
+        } else if (this._getActiveSubmenu() === 'submenu-game') {
             this.ui.openLevel4Button?.focus?.();
         }
         this.manager.updateContext();
@@ -180,7 +197,7 @@ export class UINavigationLifecycleController {
     // ------------------------------------------------------------------
 
     setupExpertLoginBindings() {
-        const runtime = this.game.menuExpertLoginRuntime;
+        const runtime = this._getExpertLoginRuntime();
         if (!runtime) return;
         const listen = (target, type, handler) => this.manager._listen(target, type, handler);
         if (this.ui.expertPasswordInput) {
@@ -198,7 +215,7 @@ export class UINavigationLifecycleController {
     }
 
     _attemptExpertUnlock() {
-        const runtime = this.game.menuExpertLoginRuntime;
+        const runtime = this._getExpertLoginRuntime();
         if (!runtime) return;
         const password = String(this.ui.expertPasswordInput?.value || '');
         const result = runtime.unlock(password);
@@ -223,8 +240,8 @@ export class UINavigationLifecycleController {
             this.manager.updateContext();
             this.manager.syncDeveloperState(this.manager.settings);
         }
-        if (this.game._activeSubmenu === 'submenu-expert') {
-            this.game.menuExpertLoginRuntime?.focusPrimaryControl?.();
+        if (this._getActiveSubmenu() === 'submenu-expert') {
+            this._getExpertLoginRuntime()?.focusPrimaryControl?.();
         }
     }
 
@@ -264,13 +281,13 @@ export class UINavigationLifecycleController {
             accessContext: manager._accessContext,
             onLevel4CloseRequested: () => manager.setLevel4Open(false),
             onPanelChanged: (panelId, _panelConfig, _transition, transitionMetadata) => {
-                const previousPanelId = this.game._activeSubmenu || null;
-                this.game._activeSubmenu = panelId || null;
+                const previousPanelId = this._getActiveSubmenu() || null;
+                this._setActiveSubmenu(panelId || null);
                 if (panelId === 'submenu-developer') {
                     this.ensureDeveloperTextCatalogSetup();
                 }
                 if (panelId === 'submenu-expert') {
-                    this.game.menuExpertLoginRuntime?.focusPrimaryControl?.();
+                    this._getExpertLoginRuntime()?.focusPrimaryControl?.();
                 }
                 if (panelId !== 'submenu-game' && manager.settings?.localSettings?.toolsState?.level4Open) {
                     manager.settings.localSettings.toolsState.level4Open = false;
@@ -281,12 +298,11 @@ export class UINavigationLifecycleController {
                 manager.updateContext();
             },
             onMenuStateChanged: (transition) => {
-                this.game._menuState = manager.menuStateMachine.getState();
-                this.game._menuTransition = transition || null;
+                this._persistMenuState(transition || null);
             },
         });
         manager.menuNavigationRuntime.init();
-        this._syncMenuChromeState(this.game._activeSubmenu || null);
+        this._syncMenuChromeState(this._getActiveSubmenu() || null);
     }
 
     showMainNav() {
@@ -301,7 +317,7 @@ export class UINavigationLifecycleController {
             : Array.from(document.querySelectorAll('.submenu-panel'));
         submenus.forEach(p => p.classList.add('hidden'));
         manager._navButtons.forEach(b => b.classList.remove('active'));
-        this.game._activeSubmenu = null;
+        this._setActiveSubmenu(null);
         manager.setLevel4Open(false);
         manager.updateContext();
     }
@@ -353,11 +369,11 @@ export class UINavigationLifecycleController {
         if (manager._developerPanel) {
             manager._developerPanel.setAttribute('data-release-cut', shouldHideDeveloperUi ? 'true' : 'false');
         }
-        if (!developerAllowed && this.game._activeSubmenu === 'submenu-developer') {
+        if (!developerAllowed && this._getActiveSubmenu() === 'submenu-developer') {
             manager.showMainNav();
             return;
         }
-        if (!debugAllowed && this.game._activeSubmenu === 'submenu-debug') {
+        if (!debugAllowed && this._getActiveSubmenu() === 'submenu-debug') {
             manager.showMainNav();
         }
     }
@@ -398,10 +414,11 @@ export class UINavigationLifecycleController {
         const accessContext = resolvedContext?.accessContext || manager._accessContext || {};
         manager._accessContext = accessContext;
         manager.menuNavigationRuntime?.setAccessContext?.(accessContext);
-        this._syncMenuChromeState(this.game._activeSubmenu || null);
-        const section = this._getMenuSectionLabel(this.game._activeSubmenu);
+        const activeSubmenu = this._getActiveSubmenu();
+        this._syncMenuChromeState(activeSubmenu || null);
+        const section = this._getMenuSectionLabel(activeSubmenu);
         const activeProfile = this._resolveActiveProfileName();
-        const dirtyState = this.game.settingsDirty ? 'ungespeicherte Aenderungen' : 'alles gespeichert';
+        const dirtyState = this._isSettingsDirty() ? 'ungespeicherte Aenderungen' : 'alles gespeichert';
         const sessionType = String(
             resolvedContext?.surfaceMenuState?.sessionType
             || settings?.localSettings?.sessionType
@@ -430,12 +447,12 @@ export class UINavigationLifecycleController {
         let contextText = `${section} | Profil: ${activeProfile} | ${dirtyState}`;
         if (settings?.localSettings?.toolsState?.level4Open) {
             contextText = `Ebene 4 | ${activeSectionLabel} | ${sessionLabel} | ${dirtyState}`;
-        } else if (this.game._activeSubmenu === 'submenu-game') {
+        } else if (activeSubmenu === 'submenu-game') {
             contextText = `${section} | ${sessionLabel} | ${modeLabel} | ${mapLabel}`;
-        } else if (this.game._activeSubmenu === 'submenu-custom') {
+        } else if (activeSubmenu === 'submenu-custom') {
             contextText = `${section} | ${sessionLabel} | Sofortstart oder Setup | ${dirtyState}`;
-        } else if (this.game._activeSubmenu === 'submenu-expert') {
-            const expertState = this.game.menuExpertLoginRuntime?.getState?.() || null;
+        } else if (activeSubmenu === 'submenu-expert') {
+            const expertState = this._getExpertLoginRuntime()?.getState?.() || null;
             const expertStateLabel = expertState?.available === false
                 ? 'lokaler Dev-Pfad'
                 : (expertState?.unlocked ? 'freigeschaltet' : 'gesperrt');
@@ -445,12 +462,9 @@ export class UINavigationLifecycleController {
     }
 
     _resolveActiveProfileName() {
-        const game = this.game;
-        const typedProfile = game.ui?.profileNameInput?.value || '';
-        const normalizedTypedProfile = game.profileManager?.normalizeProfileName
-            ? game.profileManager.normalizeProfileName(typedProfile)
-            : typedProfile.trim();
-        return game.activeProfileName || normalizedTypedProfile || 'kein Profil';
+        const typedProfile = this.ui?.profileNameInput?.value || '';
+        const normalizedTypedProfile = this.port?.normalizeProfileName?.(typedProfile) || typedProfile.trim();
+        return this.port?.getActiveProfileName?.() || normalizedTypedProfile || 'kein Profil';
     }
 
     _getMenuSectionLabel(panelId) {

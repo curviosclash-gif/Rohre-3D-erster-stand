@@ -46,7 +46,6 @@ import {
     writeHangarMapSelection,
     writeHangarVehicleSelection,
 } from './hangar/HangarSelectionWritebackContract.js';
-import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 import { getRuntimeMapCatalog } from '../shared/contracts/RuntimeMapCatalogContract.js';
 import {
     MULTIPLAYER_TRANSPORTS,
@@ -57,16 +56,32 @@ import { hasConfiguredOnlineSignalingUrl } from '../shared/contracts/OnlineSigna
 
 export class UIStartSyncController {
     /**
-     * @param {{ ui: object, game: object, manager: object }} options
+     * @param {{ ui: object, manager: object, port?: object }} options
      */
-    constructor({ ui, game, manager }) {
+    constructor({ ui, manager, port = null }) {
         this.ui = ui;
-        this.game = game;
         this.manager = manager;
+        this.port = port;
         this._mapPreviewEntries = listMapPreviewEntries();
         this._vehiclePreviewEntries = listVehiclePreviewEntries();
         this._startSetupDisposers = [];
         this._startValidationIssue = null;
+    }
+
+    _getSettings() {
+        return this.port?.getSettings?.() || this.manager?.settings || null;
+    }
+
+    _getSettingsManager() {
+        return this.port?.getSettingsManager?.() || null;
+    }
+
+    _getMapDefinitions() {
+        return this.port?.getMapDefinitions?.() || {};
+    }
+
+    _getMultiplayerSessionState() {
+        return this.port?.getMultiplayerSessionState?.() || null;
     }
 
     // ------------------------------------------------------------------
@@ -90,14 +105,15 @@ export class UIStartSyncController {
 
     setupMapSelect() {
         const select = this.ui.mapSelect;
-        if (!select) return;
-        const maps = resolveGameplayConfig(this.game).MAPS || {};
+        const settings = this._getSettings();
+        if (!select || !settings) return;
+        const maps = this._getMapDefinitions();
 
-        const modePath = this._resolveAllowedModePath(this.game?.settings?.localSettings?.modePath || 'normal');
-        if (this.game?.settings?.localSettings) {
-            this.game.settings.localSettings.modePath = modePath;
+        const modePath = this._resolveAllowedModePath(settings?.localSettings?.modePath || 'normal');
+        if (settings?.localSettings) {
+            settings.localSettings.modePath = modePath;
         }
-        const currentValue = String(select.value || this.game.settings?.mapKey || 'standard');
+        const currentValue = String(select.value || settings?.mapKey || 'standard');
         const fallbackMapKey = this._resolveSurfaceFallbackMapKey(maps, modePath, currentValue);
         select.innerHTML = '';
 
@@ -137,8 +153,11 @@ export class UIStartSyncController {
     }
 
     setupStartSetupControls() {
-        const settings = this.game.settings;
+        const settings = this._getSettings();
+        if (!settings) return;
+        this.manager._disposeDisposerList(this._startSetupDisposers);
         const startSetup = ensureStartSetupLocalState(settings);
+        const getSettings = () => this._getSettings();
         const listen = (target, type, handler) => this.manager._listen(target, type, handler, undefined, this._startSetupDisposers);
 
         const mapSearchInput = this.ui.mapSearchInput;
@@ -151,39 +170,49 @@ export class UIStartSyncController {
         if (mapSearchInput) {
             mapSearchInput.value = startSetup.mapSearch;
             listen(mapSearchInput, 'input', () => {
-                startSetup.mapSearch = String(mapSearchInput.value || '');
-                this.syncStartSetupState(settings);
+                const currentSettings = getSettings();
+                if (!currentSettings) return;
+                ensureStartSetupLocalState(currentSettings).mapSearch = String(mapSearchInput.value || '');
+                this.syncStartSetupState(currentSettings);
             });
         }
         if (mapFilterSelect) {
             mapFilterSelect.value = startSetup.mapFilter;
             listen(mapFilterSelect, 'change', () => {
-                startSetup.mapFilter = String(mapFilterSelect.value || 'all');
-                this.syncStartSetupState(settings);
+                const currentSettings = getSettings();
+                if (!currentSettings) return;
+                ensureStartSetupLocalState(currentSettings).mapFilter = String(mapFilterSelect.value || 'all');
+                this.syncStartSetupState(currentSettings);
             });
         }
         if (vehicleSearchInput) {
             vehicleSearchInput.value = startSetup.vehicleSearch;
             listen(vehicleSearchInput, 'input', () => {
-                startSetup.vehicleSearch = String(vehicleSearchInput.value || '');
-                this.syncStartSetupState(settings);
+                const currentSettings = getSettings();
+                if (!currentSettings) return;
+                ensureStartSetupLocalState(currentSettings).vehicleSearch = String(vehicleSearchInput.value || '');
+                this.syncStartSetupState(currentSettings);
             });
         }
         if (vehicleFilterSelect) {
             vehicleFilterSelect.value = startSetup.vehicleFilter;
             listen(vehicleFilterSelect, 'change', () => {
-                startSetup.vehicleFilter = String(vehicleFilterSelect.value || 'all');
-                this.syncStartSetupState(settings);
+                const currentSettings = getSettings();
+                if (!currentSettings) return;
+                ensureStartSetupLocalState(currentSettings).vehicleFilter = String(vehicleFilterSelect.value || 'all');
+                this.syncStartSetupState(currentSettings);
             });
         }
 
         if (this.ui.mapSelect) {
             listen(this.ui.mapSelect, 'change', () => {
-                const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                const currentSettings = getSettings();
+                if (!currentSettings) return;
+                const currentStartSetup = ensureStartSetupLocalState(currentSettings);
                 const selectedMapKey = String(this.ui.mapSelect.value || '').trim();
                 if (selectedMapKey) {
-                    writeHangarMapSelection(this.game.settings, selectedMapKey, selectedMapKey, {
-                        modePath: this._resolveHangarSelectionModePath(this.game.settings),
+                    writeHangarMapSelection(currentSettings, selectedMapKey, selectedMapKey, {
+                        modePath: this._resolveHangarSelectionModePath(currentSettings),
                     });
                 }
                 pushRecentEntry(currentStartSetup.recentMaps, this.ui.mapSelect.value);
@@ -191,26 +220,30 @@ export class UIStartSyncController {
         }
         if (this.ui.vehicleSelectP1) {
             listen(this.ui.vehicleSelectP1, 'change', () => {
-                const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                const currentSettings = getSettings();
+                if (!currentSettings) return;
+                const currentStartSetup = ensureStartSetupLocalState(currentSettings);
                 writeHangarVehicleSelection(
-                    this.game.settings,
+                    currentSettings,
                     HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_1,
                     this.ui.vehicleSelectP1.value,
                     'ship5',
-                    { modePath: this._resolveHangarSelectionModePath(this.game.settings) }
+                    { modePath: this._resolveHangarSelectionModePath(currentSettings) }
                 );
                 pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP1.value);
             });
         }
         if (this.ui.vehicleSelectP2) {
             listen(this.ui.vehicleSelectP2, 'change', () => {
-                const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                const currentSettings = getSettings();
+                if (!currentSettings) return;
+                const currentStartSetup = ensureStartSetupLocalState(currentSettings);
                 writeHangarVehicleSelection(
-                    this.game.settings,
+                    currentSettings,
                     HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_2,
                     this.ui.vehicleSelectP2.value,
                     'ship5',
-                    { modePath: this._resolveHangarSelectionModePath(this.game.settings) }
+                    { modePath: this._resolveHangarSelectionModePath(currentSettings) }
                 );
                 pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP2.value);
             });
@@ -218,16 +251,20 @@ export class UIStartSyncController {
 
         if (mapFavoriteToggleButton) {
             listen(mapFavoriteToggleButton, 'click', () => {
-                const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                const currentSettings = getSettings();
+                if (!currentSettings) return;
+                const currentStartSetup = ensureStartSetupLocalState(currentSettings);
                 toggleFavoriteEntry(currentStartSetup.favoriteMaps, this.ui.mapSelect?.value);
-                this.syncStartSetupState(this.game.settings);
+                this.syncStartSetupState(currentSettings);
             });
         }
         if (vehicleFavoriteToggleButton) {
             listen(vehicleFavoriteToggleButton, 'click', () => {
-                const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                const currentSettings = getSettings();
+                if (!currentSettings) return;
+                const currentStartSetup = ensureStartSetupLocalState(currentSettings);
                 toggleFavoriteEntry(currentStartSetup.favoriteVehicles, this.ui.vehicleSelectP1?.value);
-                this.syncStartSetupState(this.game.settings);
+                this.syncStartSetupState(currentSettings);
             });
         }
 
@@ -281,19 +318,21 @@ export class UIStartSyncController {
         }
     }
 
-    _renderStartFieldHints(settings = this.game.settings, options = {}) {
+    _renderStartFieldHints(settings = this._getSettings(), options = {}) {
+        if (!settings) return;
         renderStartFieldHints({
             ui: this.ui,
             settings,
-            settingsManager: this.game?.settingsManager,
+            settingsManager: this._getSettingsManager(),
             startValidationIssue: this._startValidationIssue,
             focusField: options.focusField === true,
             onOpenSection: (sectionId) => this.manager?._setStartSectionOpen?.(sectionId, true),
         });
     }
 
-    _resolveSurfacePolicy() {
-        return this.manager?.resolveSurfacePolicy?.(this.game?.settings)
+    _resolveSurfacePolicy(settings = this._getSettings()) {
+        return this.port?.resolveSurfacePolicy?.(settings)
+            || this.manager?.resolveSurfacePolicy?.(settings)
             || this.manager?._runtimeFeatureFlags?.surfacePolicy
             || null;
     }
@@ -340,14 +379,14 @@ export class UIStartSyncController {
         return resolveModePathFallbackMapKey(maps, normalizedModePath, currentMapKey);
     }
 
-    _resolveHangarSelectionModePath(settings = this.game.settings) {
+    _resolveHangarSelectionModePath(settings = this._getSettings()) {
         return this._resolveAllowedModePath(settings?.localSettings?.modePath || 'normal');
     }
 
     // 64.3.1 macht die LAN-/Online-Wahl im Menu explizit. Online wird nur dann
     // als produktiver Pfad behandelt, wenn ein Signaling-Endpoint konfiguriert ist.
-    _resolveMultiplayerTransportUiState(settings = this.game.settings) {
-        const surfacePolicy = this._resolveSurfacePolicy();
+    _resolveMultiplayerTransportUiState(settings = this._getSettings()) {
+        const surfacePolicy = this._resolveSurfacePolicy(settings);
         const allowedTransports = Array.isArray(surfacePolicy?.allowedMultiplayerTransports)
             ? surfacePolicy.allowedMultiplayerTransports.filter((transport) => transport !== MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE)
             : [MULTIPLAYER_TRANSPORTS.LAN];
@@ -359,13 +398,13 @@ export class UIStartSyncController {
         )
             ? normalizeMultiplayerTransport(settings?.localSettings?.multiplayerTransport, '')
             : (allowedTransports[0] || MULTIPLAYER_TRANSPORTS.LAN);
-        const isOnlinePending = selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE && !onlineConfigured;
+        const isOnlineUnconfigured = selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE && !onlineConfigured;
         return {
             allowedTransports,
             selectedTransport,
             selectedTransportLabel: selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE ? 'Online' : 'LAN',
             onlineConfigured,
-            isOnlinePending,
+            isOnlineUnconfigured,
         };
     }
 
@@ -380,22 +419,23 @@ export class UIStartSyncController {
             fieldKey: String(normalizedIssue.fieldKey || '').trim(),
             fieldMessage: String(normalizedIssue.fieldMessage || '').trim(),
         };
-        this._renderStartFieldHints(this.game.settings, { focusField: options.focusField !== false });
+        this._renderStartFieldHints(this._getSettings(), { focusField: options.focusField !== false });
     }
 
     clearStartValidationError() {
         if (!this._startValidationIssue) return;
         this._startValidationIssue = null;
-        this._renderStartFieldHints(this.game.settings);
+        this._renderStartFieldHints(this._getSettings());
     }
 
     // ------------------------------------------------------------------
     // Sync-Methoden
     // ------------------------------------------------------------------
 
-    syncStartSetupState(settings = this.game.settings) {
+    syncStartSetupState(settings = this._getSettings()) {
+        if (!settings) return;
         const startSetup = ensureStartSetupLocalState(settings);
-        const multiplayerSessionState = this.game?.menuMultiplayerBridge?.getSessionState?.() || null;
+        const multiplayerSessionState = this._getMultiplayerSessionState();
         const mapSearch = String(startSetup.mapSearch || '').trim().toLowerCase();
         const mapFilter = String(startSetup.mapFilter || 'all').toLowerCase();
         const vehicleSearch = String(startSetup.vehicleSearch || '').trim().toLowerCase();
@@ -686,7 +726,7 @@ export class UIStartSyncController {
                     && !multiplayerTransportUiState.onlineConfigured
                 );
                 if (transport === MULTIPLAYER_TRANSPORTS.ONLINE && allowed) {
-                    button.title = multiplayerTransportUiState.isOnlinePending
+                    button.title = multiplayerTransportUiState.isOnlineUnconfigured
                         ? 'Online ist nicht konfiguriert. Bitte VITE_SIGNALING_URL setzen oder LAN verwenden.'
                         : 'Online-Lobby als Internet-Pfad nutzen.';
                 } else if (allowed) {
@@ -697,7 +737,7 @@ export class UIStartSyncController {
             });
         }
         if (this.ui.multiplayerTransportHint) {
-            this.ui.multiplayerTransportHint.textContent = multiplayerTransportUiState.isOnlinePending
+            this.ui.multiplayerTransportHint.textContent = multiplayerTransportUiState.isOnlineUnconfigured
                 ? 'Auswahl: Online | nicht konfiguriert, bitte LAN verwenden'
                 : `Produktiver Transport: ${multiplayerTransportUiState.selectedTransportLabel}`;
         }
@@ -713,13 +753,13 @@ export class UIStartSyncController {
         if (this.ui.multiplayerHostButton) {
             this.ui.multiplayerHostButton.disabled = !isMultiplayerSession
                 || hasActiveLobbySession
-                || multiplayerTransportUiState.isOnlinePending
+                || multiplayerTransportUiState.isOnlineUnconfigured
                 || surfaceEntryCopy?.hostActionAvailable === false;
         }
         if (this.ui.multiplayerJoinButton) {
             this.ui.multiplayerJoinButton.disabled = !isMultiplayerSession
                 || hasActiveLobbySession
-                || multiplayerTransportUiState.isOnlinePending;
+                || multiplayerTransportUiState.isOnlineUnconfigured;
         }
         if (this.ui.multiplayerLeaveLobbyButton) {
             this.ui.multiplayerLeaveLobbyButton.disabled = !hasActiveLobbySession;
@@ -751,7 +791,7 @@ export class UIStartSyncController {
                 this.ui.multiplayerLobbyState.textContent = lobbyCode
                     ? `Lobbystatus: ${lobbyCode} | ${sessionContract.transportAudienceLabel}`
                     : 'Lobbystatus: Legacy-Fallback aktiv | lokaler Menu-Bridge-Pfad, kein produktives LAN/Online';
-            } else if (multiplayerTransportUiState.isOnlinePending) {
+            } else if (multiplayerTransportUiState.isOnlineUnconfigured) {
                 this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: Online ausgewaehlt | nicht konfiguriert, bitte LAN verwenden';
             } else if (lobbyCode) {
                 this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${surfaceEntryCopy.joinButtonLabel} noch nicht verbunden`;
@@ -760,19 +800,22 @@ export class UIStartSyncController {
             }
         }
 
-        const disableTransportPendingActions = sessionType === MENU_SESSION_TYPES.MULTIPLAYER
-            && multiplayerTransportUiState.isOnlinePending;
+        const disableTransportUnavailableActions = sessionType === MENU_SESSION_TYPES.MULTIPLAYER
+            && multiplayerTransportUiState.isOnlineUnconfigured;
         if (this.ui.multiplayerHostButton) {
             const surfaceDisabled = this.ui.multiplayerHostButton.disabled === true;
-            this.ui.multiplayerHostButton.disabled = surfaceDisabled || disableTransportPendingActions;
-            if (disableTransportPendingActions) {
+            this.ui.multiplayerHostButton.disabled = surfaceDisabled || disableTransportUnavailableActions;
+            if (disableTransportUnavailableActions) {
                 this.ui.multiplayerHostButton.title = 'Online ist nicht konfiguriert. Bitte VITE_SIGNALING_URL setzen oder LAN verwenden.';
             }
         }
         if (this.ui.multiplayerJoinButton) {
-            this.ui.multiplayerJoinButton.disabled = disableTransportPendingActions;
-            if (disableTransportPendingActions) {
+            const surfaceDisabled = this.ui.multiplayerJoinButton.disabled === true;
+            this.ui.multiplayerJoinButton.disabled = surfaceDisabled || disableTransportUnavailableActions;
+            if (disableTransportUnavailableActions) {
                 this.ui.multiplayerJoinButton.title = 'Online ist nicht konfiguriert. Bitte VITE_SIGNALING_URL setzen oder LAN verwenden.';
+            } else {
+                this.ui.multiplayerJoinButton.title = '';
             }
         }
 
