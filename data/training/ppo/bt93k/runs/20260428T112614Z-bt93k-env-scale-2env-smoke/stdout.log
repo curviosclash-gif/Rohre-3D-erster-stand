@@ -1,0 +1,4 @@
+2026-04-28T11:26:14Z starting BT93K.4 2-env smoke
+config=python/configs/ppo_bt93k_env_scale_smoke.json
+stepsPerEnv=3
+2026-04-28T11:26:15Z completed ok=True totalSteps=6

@@ -1,0 +1,38 @@
+{
+  "artifacts": {
+    "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T112614Z-bt93k-env-scale-2env-smoke/eval_snapshot.json",
+    "evalSnapshotSha256": "c5e3b8aba97b242848459624bf2517c1e4aafdbaed116118a542ebca3912763e",
+    "heartbeat": "data/training/ppo/bt93k/runs/20260428T112614Z-bt93k-env-scale-2env-smoke/heartbeat.jsonl",
+    "runExitReport": "data/training/ppo/bt93k/runs/20260428T112614Z-bt93k-env-scale-2env-smoke/run_exit_report.json",
+    "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T112614Z-bt93k-env-scale-2env-smoke/snapshot_manifest.json",
+    "snapshotManifestSha256": "3d90941bb26a3b99cfcf1c022aa8ab62b3e05e276301f55a03ad4bcdb97fa8df",
+    "stderr": "data/training/ppo/bt93k/runs/20260428T112614Z-bt93k-env-scale-2env-smoke/stderr.log",
+    "stdout": "data/training/ppo/bt93k/runs/20260428T112614Z-bt93k-env-scale-2env-smoke/stdout.log"
+  },
+  "blockId": "BT93K",
+  "envCount": 2,
+  "generatedAt": "2026-04-28T11:26:15Z",
+  "guardrails": {
+    "baselineRunsStarted": false,
+    "bt94aGateRefreshAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "comparisonStarted": false,
+    "holdoutAllowed": false,
+    "pilotRunsStarted": false,
+    "ppoValidateAllowed": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "startupSmokeOnly": true,
+    "trainingStarted": false
+  },
+  "manifestVersion": "bt93k-env-scale-artifacts-v1",
+  "phaseId": "93K.4.1",
+  "runId": "20260428T112614Z-bt93k-env-scale-2env-smoke",
+  "runKind": "bt93k-env-scale-smoke",
+  "sourceConfig": {
+    "path": "python/configs/ppo_bt93k_env_scale_smoke.json",
+    "sha256": "12c20f4114d82602898489b35bb6f492d1577b0ccf53e3dea9760520d043df53"
+  }
+}

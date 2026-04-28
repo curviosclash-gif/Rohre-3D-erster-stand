@@ -1,0 +1,176 @@
+{
+  "artifactManifestPath": "data/training/ppo/bt93k/runs/20260428T112616Z-bt93k-env-scale-6env-smoke/artifact_manifest.json",
+  "blockId": "BT93K",
+  "command": "python/scripts/bt93k_env_scale_smokes.py --write-report",
+  "configPath": "python/configs/ppo_bt93k_env_scale_smoke.json",
+  "elapsedSeconds": 0.804041,
+  "evalSnapshotPath": "data/training/ppo/bt93k/runs/20260428T112616Z-bt93k-env-scale-6env-smoke/eval_snapshot.json",
+  "exitCode": 0,
+  "finishedAt": "2026-04-28T11:26:17Z",
+  "forcedStop": false,
+  "gracefulStop": true,
+  "guardrails": {
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "comparisonStarted": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "sampleClass": "startup-smoke-not-quality-evidence",
+    "trainingStarted": false
+  },
+  "heartbeat": {
+    "lastTimestamp": "2026-04-28T11:26:17Z",
+    "path": "data/training/ppo/bt93k/runs/20260428T112616Z-bt93k-env-scale-6env-smoke/heartbeat.jsonl",
+    "stale": false,
+    "writeCount": 2
+  },
+  "metricsSummary": {
+    "actionSafety": {
+      "fieldCounts": {},
+      "invalidActionCount": 0,
+      "invalidActionRate": 0.0,
+      "maskCount": 0,
+      "maskRate": 0.0,
+      "noopCount": 18,
+      "noopRate": 1.0,
+      "postDecodeClampCount": 0,
+      "postDecodeClampRate": 0.0,
+      "preSamplingMaskCount": 18,
+      "preSamplingMaskRate": 1.0,
+      "sanitizerCount": 0,
+      "sanitizerRate": 0.0,
+      "sanitizerReasons": {},
+      "totalActions": 18,
+      "vetoCount": 0,
+      "vetoRate": 0.0
+    },
+    "actionSafetyGreen": true,
+    "bridgeFailureCount": 0,
+    "effectiveMapCounts": {
+      "standard": 18
+    },
+    "effectiveModeCounts": {
+      "classic-3d": 18
+    },
+    "envCount": 6,
+    "okWorkerCount": 6,
+    "rewardBreakdownTotals": {
+      "baseStep": -0.108,
+      "checkpointReached": 0.0,
+      "crash": 0.0,
+      "damageDealt": 0.0,
+      "damageTaken": 0.0,
+      "external": 0.0,
+      "itemPickup": 0.0,
+      "itemUse": 0.0,
+      "kill": 0.0,
+      "loss": 0.0,
+      "lowHealthThreat": 0.0,
+      "opponentRisk": 0.0,
+      "parcoursCompleted": 0.0,
+      "stuck": 0.0,
+      "survival": 0.54,
+      "survivalPressureBonus": 0.0,
+      "trailRisk": 0.0,
+      "wallRisk": 0.0,
+      "win": 0.0,
+      "wrongOrder": 0.0
+    },
+    "runtimeErrorCount": 0,
+    "terminalReasonCounts": {},
+    "timeoutCount": 0,
+    "totalDoneCount": 0,
+    "totalStepsObserved": 18,
+    "truncatedReasonCounts": {}
+  },
+  "ok": true,
+  "phaseId": "93K.4.3",
+  "pidTree": {
+    "controllerPids": [
+      17564,
+      9940,
+      16892,
+      17108,
+      13592,
+      10624
+    ],
+    "mainPid": 3084,
+    "sidecarModel": "one in-process Bt92ControlledBridgeSidecar thread plus one node controller process per env"
+  },
+  "runDirectory": "data/training/ppo/bt93k/runs/20260428T112616Z-bt93k-env-scale-6env-smoke",
+  "runId": "20260428T112616Z-bt93k-env-scale-6env-smoke",
+  "runKind": "bt93k-env-scale-smoke",
+  "schemaVersion": "bt93k-run-exit-report-v1",
+  "sidecars": [
+    {
+      "closed": true,
+      "controllerPid": 17564,
+      "envIndex": 0,
+      "exitCode": 0,
+      "seed": 9940,
+      "sessionId": "20260428T112616Z-bt93k-env-scale-6env-smoke-env0",
+      "started": true,
+      "statusClass": "completed"
+    },
+    {
+      "closed": true,
+      "controllerPid": 9940,
+      "envIndex": 1,
+      "exitCode": 0,
+      "seed": 9941,
+      "sessionId": "20260428T112616Z-bt93k-env-scale-6env-smoke-env1",
+      "started": true,
+      "statusClass": "completed"
+    },
+    {
+      "closed": true,
+      "controllerPid": 16892,
+      "envIndex": 2,
+      "exitCode": 0,
+      "seed": 9942,
+      "sessionId": "20260428T112616Z-bt93k-env-scale-6env-smoke-env2",
+      "started": true,
+      "statusClass": "completed"
+    },
+    {
+      "closed": true,
+      "controllerPid": 17108,
+      "envIndex": 3,
+      "exitCode": 0,
+      "seed": 9943,
+      "sessionId": "20260428T112616Z-bt93k-env-scale-6env-smoke-env3",
+      "started": true,
+      "statusClass": "completed"
+    },
+    {
+      "closed": true,
+      "controllerPid": 13592,
+      "envIndex": 4,
+      "exitCode": 0,
+      "seed": 9944,
+      "sessionId": "20260428T112616Z-bt93k-env-scale-6env-smoke-env4",
+      "started": true,
+      "statusClass": "completed"
+    },
+    {
+      "closed": true,
+      "controllerPid": 10624,
+      "envIndex": 5,
+      "exitCode": 0,
+      "seed": 9945,
+      "sessionId": "20260428T112616Z-bt93k-env-scale-6env-smoke-env5",
+      "started": true,
+      "statusClass": "completed"
+    }
+  ],
+  "signal": null,
+  "snapshotManifestPath": "data/training/ppo/bt93k/runs/20260428T112616Z-bt93k-env-scale-6env-smoke/snapshot_manifest.json",
+  "startedAt": "2026-04-28T11:26:16Z",
+  "statusClass": "completed",
+  "stderrPath": "data/training/ppo/bt93k/runs/20260428T112616Z-bt93k-env-scale-6env-smoke/stderr.log",
+  "stdoutPath": "data/training/ppo/bt93k/runs/20260428T112616Z-bt93k-env-scale-6env-smoke/stdout.log",
+  "stopReason": "normal-completion"
+}
