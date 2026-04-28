@@ -41,6 +41,10 @@ export class Player {
         this.isBot = isBot;
         this.entityRuntimeConfig = options?.entityRuntimeConfig || options?.entityManager?.entityRuntimeConfig || null;
         this.gameplayConfig = resolveGameplayConfig(this);
+        const firstPersonCameraModeIndex = Array.isArray(this.gameplayConfig?.CAMERA?.MODES)
+            ? this.gameplayConfig.CAMERA.MODES.indexOf('FIRST_PERSON')
+            : -1;
+        const defaultCameraModeIndex = firstPersonCameraModeIndex >= 0 ? firstPersonCameraModeIndex : 0;
         this.alive = true;
         this.score = 0;
         const playerConfig = this.gameplayConfig.PLAYER;
@@ -89,7 +93,7 @@ export class Player {
         this.itemUseCooldownRemaining = 0;
         this.invertPitchBase = false;
         this.modelScale = playerConfig.MODEL_SCALE || 1;
-        this.cockpitCamera = false;
+        this.cockpitCamera = true;
         this.spawnProtectionTimer = 0;
         this.planarAimOffset = 0;
         this.steeringLockTimer = 0;
@@ -144,10 +148,11 @@ export class Player {
         this.firstPersonAnchor = null;
         this.flames = [];
 
-        this.cameraMode = 0;
+        this.cameraMode = defaultCameraModeIndex;
 
         this.controller = new PlayerController();
         this.controller.setRampRates(this.controlRampRates);
+        this.particleSystem = options?.particles || options?.entityManager?.particles || null;
         this.view = createPlayerView(this, renderer);
         this.view.createModel();
 
@@ -267,7 +272,7 @@ export class Player {
             this.view?.applyModelScale();
         }
         if (typeof options.cockpitCamera === 'boolean') {
-            this.cockpitCamera = options.cockpitCamera;
+            this.cockpitCamera = true;
         }
         if (typeof options.speed === 'number' && Number.isFinite(options.speed) && options.speed > 0) {
             this.baseSpeed = options.speed;
@@ -468,6 +473,7 @@ export class Player {
         this.group = null;
 
         this.controller = null;
+        this.particleSystem = null;
         this.view = null;
     }
 

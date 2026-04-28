@@ -67,6 +67,7 @@ function createSharePayload(settings) {
         hunt: deepClone(source.hunt || defaults.hunt),
         gameplay: deepClone(source.gameplay || defaults.gameplay),
         recording: deepClone(source.recording || defaults.recording),
+        cameraPerspective: deepClone(source.cameraPerspective || defaults.cameraPerspective),
     };
 }
 
@@ -99,6 +100,10 @@ function applySharePayload(settings, payload) {
     settings.recording = {
         ...(settings.recording && typeof settings.recording === 'object' ? settings.recording : deepClone(defaults.recording || {})),
         ...(payload.recording && typeof payload.recording === 'object' ? payload.recording : {}),
+    };
+    settings.cameraPerspective = {
+        ...(settings.cameraPerspective && typeof settings.cameraPerspective === 'object' ? settings.cameraPerspective : deepClone(defaults.cameraPerspective || {})),
+        ...(payload.cameraPerspective && typeof payload.cameraPerspective === 'object' ? payload.cameraPerspective : {}),
     };
     if (!settings.localSettings || typeof settings.localSettings !== 'object') {
         settings.localSettings = {};

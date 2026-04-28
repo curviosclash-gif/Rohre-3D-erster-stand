@@ -84,6 +84,8 @@ const DEFAULT_FIELD_LIMITS = Object.freeze({
     'baseSettings.gameplay.fightMgDamage': Object.freeze({ ...SETTINGS_LIMITS.gameplay.fightMgDamage, step: 0.25 }),
     'baseSettings.gameplay.portalCount': Object.freeze({ ...SETTINGS_LIMITS.gameplay.portalCount, step: 1 }),
     'baseSettings.gameplay.planarLevelCount': Object.freeze({ ...SETTINGS_LIMITS.gameplay.planarLevelCount, step: 1 }),
+    'baseSettings.cameraPerspective.speedFovIntensity': Object.freeze({ min: 0, max: 1.5, step: 0.05 }),
+    'baseSettings.cameraPerspective.thrusterExhaustIntensity': Object.freeze({ min: 0, max: 1.5, step: 0.05 }),
     'baseSettings.botBridge.timeoutMs': Object.freeze({ ...SETTINGS_LIMITS.botBridge.timeoutMs, step: 1 }),
     'baseSettings.botBridge.maxRetries': Object.freeze({ ...SETTINGS_LIMITS.botBridge.maxRetries, step: 1 }),
     'baseSettings.botBridge.retryDelayMs': Object.freeze({ ...SETTINGS_LIMITS.botBridge.retryDelayMs, step: 1 }),
@@ -103,6 +105,8 @@ const DEFAULT_FIELD_LIMITS = Object.freeze({
     'configShare.gameplay.fightMgDamage': Object.freeze({ ...SETTINGS_LIMITS.gameplay.fightMgDamage, step: 0.25 }),
     'configShare.gameplay.portalCount': Object.freeze({ ...SETTINGS_LIMITS.gameplay.portalCount, step: 1 }),
     'configShare.gameplay.planarLevelCount': Object.freeze({ ...SETTINGS_LIMITS.gameplay.planarLevelCount, step: 1 }),
+    'configShare.cameraPerspective.speedFovIntensity': Object.freeze({ min: 0, max: 1.5, step: 0.05 }),
+    'configShare.cameraPerspective.thrusterExhaustIntensity': Object.freeze({ min: 0, max: 1.5, step: 0.05 }),
 });
 
 function createError(path, code, message) {

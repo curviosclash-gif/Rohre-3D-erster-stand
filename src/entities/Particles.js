@@ -42,6 +42,10 @@ export class ParticleSystem {
 
         this.renderer.addToScene(this.mesh);
         this._tmpColor = new THREE.Color();
+        this._tmpDirection = new THREE.Vector3();
+        this._tmpRight = new THREE.Vector3();
+        this._tmpUp = new THREE.Vector3();
+        this._tmpVelocity = new THREE.Vector3();
     }
 
     _recordDebugEvent(type, count, color) {
@@ -110,6 +114,78 @@ export class ParticleSystem {
 
             // Set initial matrix
             DUMMY.position.set(this.positions[idx * 3], this.positions[idx * 3 + 1], this.positions[idx * 3 + 2]);
+            DUMMY.scale.setScalar(this.scales[idx]);
+            DUMMY.updateMatrix();
+            this.mesh.setMatrixAt(idx, DUMMY.matrix);
+        }
+
+        this.mesh.instanceMatrix.needsUpdate = true;
+        if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
+    }
+
+    spawnDirectional(position, direction, count, color, speed = 1.0, size = 0.5, life = 1.0, options = {}) {
+        if (!this.mesh || !position || !direction) return;
+        const gravity = Number.isFinite(Number(options.gravity)) ? Number(options.gravity) : 0;
+        const spread = THREE.MathUtils.clamp(
+            Number.isFinite(Number(options.spread)) ? Number(options.spread) : 0.25,
+            0,
+            2
+        );
+        const drift = Number.isFinite(Number(options.drift)) ? Number(options.drift) : 0.35;
+        const debugType = options.type || 'directional-burst';
+
+        this._tmpDirection.copy(direction);
+        if (this._tmpDirection.lengthSq() <= 0.000001) {
+            this._tmpDirection.set(0, 0, 1);
+        } else {
+            this._tmpDirection.normalize();
+        }
+
+        this._tmpRight.crossVectors(this._tmpDirection, DUMMY.up);
+        if (this._tmpRight.lengthSq() <= 0.000001) {
+            this._tmpRight.set(1, 0, 0);
+        } else {
+            this._tmpRight.normalize();
+        }
+        this._tmpUp.crossVectors(this._tmpRight, this._tmpDirection).normalize();
+        this._tmpColor.setHex(color);
+        this._recordDebugEvent(debugType, count, color);
+
+        for (let i = 0; i < count; i++) {
+            if (this.count >= MAX_PARTICLES) return;
+
+            const idx = this.count;
+            this.count++;
+            const idx3 = idx * 3;
+            const angle = Math.random() * Math.PI * 2;
+            const radial = Math.random() * spread;
+            const forwardSpeed = speed * (0.65 + Math.random() * 0.6);
+
+            this.positions[idx3] = position.x;
+            this.positions[idx3 + 1] = position.y;
+            this.positions[idx3 + 2] = position.z;
+
+            this._tmpVelocity.copy(this._tmpDirection).multiplyScalar(forwardSpeed);
+            this._tmpVelocity.addScaledVector(this._tmpRight, Math.cos(angle) * radial * speed);
+            this._tmpVelocity.addScaledVector(this._tmpUp, Math.sin(angle) * radial * speed);
+            this._tmpVelocity.addScaledVector(this._tmpDirection, Math.random() * drift * speed);
+
+            this.velocities[idx3] = this._tmpVelocity.x;
+            this.velocities[idx3 + 1] = this._tmpVelocity.y;
+            this.velocities[idx3 + 2] = this._tmpVelocity.z;
+
+            this.lifetimes[idx] = life * (0.85 + Math.random() * 0.35);
+            this.maxLifetimes[idx] = this.lifetimes[idx];
+            this.gravities[idx] = gravity;
+            this.scales[idx] = size * (0.6 + Math.random() * 0.45);
+
+            this.colors[idx3] = this._tmpColor.r;
+            this.colors[idx3 + 1] = this._tmpColor.g;
+            this.colors[idx3 + 2] = this._tmpColor.b;
+
+            this.mesh.setColorAt(idx, this._tmpColor);
+            DUMMY.position.set(this.positions[idx3], this.positions[idx3 + 1], this.positions[idx3 + 2]);
+            DUMMY.rotation.set(0, 0, 0);
             DUMMY.scale.setScalar(this.scales[idx]);
             DUMMY.updateMatrix();
             this.mesh.setMatrixAt(idx, DUMMY.matrix);
@@ -328,6 +404,10 @@ export class ParticleSystem {
         this.scales = null;
         this.colors = null;
         this._tmpColor = null;
+        this._tmpDirection = null;
+        this._tmpRight = null;
+        this._tmpUp = null;
+        this._tmpVelocity = null;
         this._debugEvents = [];
     }
 }

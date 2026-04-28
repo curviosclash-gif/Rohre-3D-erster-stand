@@ -9,6 +9,8 @@ import {
     RECORDING_HUD_MODE,
 } from '../../shared/contracts/RecordingCaptureContract.js';
 import {
+    CAMERA_PERSPECTIVE_EFFECT_INTENSITY_MAX,
+    CAMERA_PERSPECTIVE_EFFECT_INTENSITY_MIN,
     CAMERA_PERSPECTIVE_MODE,
     createDefaultCameraPerspectiveSettings,
 } from '../../shared/contracts/CameraPerspectiveContract.js';
@@ -64,6 +66,20 @@ export function setupMenuGameplayBindings(ctx) {
         if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT) return 'Cinematic Soft';
         if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION) return 'Cinematic Action';
         return 'Klassisch';
+    };
+    const clampCameraPerspectiveIntensity = (value, fallback = 1) => {
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) return fallback;
+        return clamp(
+            numeric,
+            CAMERA_PERSPECTIVE_EFFECT_INTENSITY_MIN,
+            CAMERA_PERSPECTIVE_EFFECT_INTENSITY_MAX
+        );
+    };
+    const readCameraPerspectiveIntensityFromSlider = (input, fallback = 1) => {
+        const sliderValue = Number(input?.value);
+        if (!Number.isFinite(sliderValue)) return fallback;
+        return clampCameraPerspectiveIntensity(sliderValue / 100, fallback);
     };
     const resolveCurrentHangarModePath = () => String(settings?.localSettings?.modePath || 'normal').trim().toLowerCase() || 'normal';
     const isFightModePathActive = () => resolveCurrentHangarModePath() === 'fight';
@@ -466,6 +482,40 @@ export function setupMenuGameplayBindings(ctx) {
                 duration: 1300,
                 tone: 'info',
             });
+        });
+    }
+    if (ui.normalCameraSpeedFovToggle) {
+        bind(ui.normalCameraSpeedFovToggle, 'change', () => {
+            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
+            cameraPerspectiveSettings.speedFovEnabled = !!ui.normalCameraSpeedFovToggle.checked;
+            emitSettingsChangedImmediate([keys.CAMERA_PERSPECTIVE_SPEED_FOV_ENABLED]);
+        });
+    }
+    if (ui.normalCameraSpeedFovIntensitySlider) {
+        bind(ui.normalCameraSpeedFovIntensitySlider, 'input', () => {
+            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
+            cameraPerspectiveSettings.speedFovIntensity = readCameraPerspectiveIntensityFromSlider(
+                ui.normalCameraSpeedFovIntensitySlider,
+                cameraPerspectiveSettings.speedFovIntensity
+            );
+            queueInputSettingsChanged([keys.CAMERA_PERSPECTIVE_SPEED_FOV_INTENSITY]);
+        });
+    }
+    if (ui.normalCameraThrusterExhaustToggle) {
+        bind(ui.normalCameraThrusterExhaustToggle, 'change', () => {
+            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
+            cameraPerspectiveSettings.thrusterExhaustEnabled = !!ui.normalCameraThrusterExhaustToggle.checked;
+            emitSettingsChangedImmediate([keys.CAMERA_PERSPECTIVE_THRUSTER_EXHAUST_ENABLED]);
+        });
+    }
+    if (ui.normalCameraThrusterExhaustIntensitySlider) {
+        bind(ui.normalCameraThrusterExhaustIntensitySlider, 'input', () => {
+            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
+            cameraPerspectiveSettings.thrusterExhaustIntensity = readCameraPerspectiveIntensityFromSlider(
+                ui.normalCameraThrusterExhaustIntensitySlider,
+                cameraPerspectiveSettings.thrusterExhaustIntensity
+            );
+            queueInputSettingsChanged([keys.CAMERA_PERSPECTIVE_THRUSTER_EXHAUST_INTENSITY]);
         });
     }
 

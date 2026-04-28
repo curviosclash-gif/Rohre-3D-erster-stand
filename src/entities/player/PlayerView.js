@@ -72,6 +72,10 @@ export class PlayerView {
         this._vehicleLoadedTarget = null;
         this._renderPosition = new THREE.Vector3();
         this._renderQuaternion = new THREE.Quaternion();
+        this._exhaustAccumulator = 0;
+        this._tmpExhaustOrigin = new THREE.Vector3();
+        this._tmpExhaustSample = new THREE.Vector3();
+        this._tmpExhaustDirection = new THREE.Vector3();
     }
 
     createModel() {
@@ -229,6 +233,91 @@ export class PlayerView {
         this._renderQuaternion.copy(this.player.quaternion);
     }
 
+    _resolveExhaustOrigin(out) {
+        if (!this.group) {
+            return out.copy(this.player.position);
+        }
+
+        if (this.flames.length > 0) {
+            this.group.updateWorldMatrix(true, false);
+            out.set(0, 0, 0);
+            let samples = 0;
+            for (let i = 0; i < this.flames.length; i++) {
+                const flame = this.flames[i];
+                if (!flame?.getWorldPosition) continue;
+                flame.getWorldPosition(this._tmpExhaustSample);
+                out.add(this._tmpExhaustSample);
+                samples += 1;
+            }
+            if (samples > 0) {
+                return out.multiplyScalar(1 / samples);
+            }
+        }
+
+        this.player.getDirection(this._tmpExhaustDirection);
+        return out.copy(this.player.position).addScaledVector(this._tmpExhaustDirection, -0.9 * (this.player.modelScale || 1));
+    }
+
+    _emitThrusterExhaust(dt) {
+        const particleSystem = this.player?.particleSystem;
+        if (!particleSystem?.spawnDirectional || !this.group || this.group.visible !== true) return;
+        const perspectiveSettings = this.renderer?.getCameraPerspectiveSettings?.() || null;
+        const thrusterExhaustEnabled = perspectiveSettings?.thrusterExhaustEnabled !== false;
+        const thrusterExhaustIntensity = Math.max(0, Number(perspectiveSettings?.thrusterExhaustIntensity) || 0);
+        if (!thrusterExhaustEnabled || thrusterExhaustIntensity <= 0) return;
+
+        const gameplayConfig = resolveGameplayConfig(this.player);
+        const playerConfig = gameplayConfig?.PLAYER || {};
+        const baseSpeed = Math.max(1, Number(this.player.baseSpeed) || Number(playerConfig.SPEED) || 35);
+        const boostMultiplier = Math.max(1.05, Number(playerConfig.BOOST_MULTIPLIER) || 1.8);
+        const boostSpeed = Math.max(baseSpeed + 1, baseSpeed * boostMultiplier);
+        const speedBlend = THREE.MathUtils.clamp(
+            (Math.max(0, Number(this.player.speed) || 0) - baseSpeed) / Math.max(1, boostSpeed - baseSpeed),
+            0,
+            1.2
+        );
+        const reduceMotion = perspectiveSettings?.reduceMotion === true;
+        const emissionIntensity = thrusterExhaustIntensity * (reduceMotion ? 0.72 : 1);
+        const emissionRate = THREE.MathUtils.lerp(10, 32, speedBlend) * (this.player.isBoosting ? 1.15 : 1) * emissionIntensity;
+        this._exhaustAccumulator += Math.max(0, Number(dt) || 0) * emissionRate;
+
+        const burstCount = Math.min(4, Math.floor(this._exhaustAccumulator));
+        if (burstCount <= 0) return;
+        this._exhaustAccumulator -= burstCount;
+
+        this.player.getDirection(this._tmpExhaustDirection).multiplyScalar(-1);
+        this._resolveExhaustOrigin(this._tmpExhaustOrigin);
+
+        const color = this.player.isBoosting ? 0xfff0b3 : 0xff9a3c;
+        const speed = THREE.MathUtils.lerp(2.4, 6.8, speedBlend);
+        const size = THREE.MathUtils.lerp(0.16, 0.3, speedBlend) * Math.max(0.6, Math.sqrt(emissionIntensity));
+        const life = THREE.MathUtils.lerp(0.16, 0.28, speedBlend) * THREE.MathUtils.clamp(0.8 + emissionIntensity * 0.2, 0.65, 1.15);
+        const jitter = 0.08 * (this.player.modelScale || 1);
+
+        for (let i = 0; i < burstCount; i++) {
+            this._tmpExhaustSample.copy(this._tmpExhaustOrigin);
+            this._tmpExhaustSample.addScaledVector(this._tmpExhaustDirection, Math.random() * jitter);
+            this._tmpExhaustSample.x += (Math.random() - 0.5) * jitter;
+            this._tmpExhaustSample.y += (Math.random() - 0.5) * jitter;
+            this._tmpExhaustSample.z += (Math.random() - 0.5) * jitter;
+            particleSystem.spawnDirectional(
+                this._tmpExhaustSample,
+                this._tmpExhaustDirection,
+                this.player.isBoosting ? 2 : 1,
+                color,
+                speed,
+                size,
+                life,
+                {
+                    gravity: 0,
+                    spread: this.player.isBoosting ? 0.38 : 0.26,
+                    drift: 0.22,
+                    type: 'thruster-exhaust',
+                }
+            );
+        }
+    }
+
     update(dt) {
         if (!this.group) return;
 
@@ -259,6 +348,8 @@ export class PlayerView {
                 }
             }
         }
+
+        this._emitThrusterExhaust(dt);
 
         if (this.shieldMesh) {
             this.shieldMesh.visible = this.player.hasShield;
