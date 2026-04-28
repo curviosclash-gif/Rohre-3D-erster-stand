@@ -1,0 +1,126 @@
+{
+  "artifactContract": {
+    "artifactManifestRequiredForTrainingRuns": true,
+    "configSha256Required": true,
+    "evalSnapshotRequiredForQualityJudgement": true,
+    "finalSnapshotManifestRequired": true,
+    "gitShaRequired": true
+  },
+  "blockId": "BT93K",
+  "gateUse": {
+    "blocksLongerRunsWhen": [
+      "run_exit_report missing",
+      "statusClass is failed/killed/timeout/measurement-invalid",
+      "heartbeat stale",
+      "exitCode missing",
+      "final snapshot missing",
+      "forced stop has no final report"
+    ],
+    "runCanFeed93KClosureOnlyIf": [
+      "run_exit_report.ok=true",
+      "statusClass in ['completed', 'stopped']",
+      "exitCode is present",
+      "final snapshot manifest exists",
+      "stdout/stderr paths are recorded",
+      "sidecar readiness and exit state are recorded"
+    ]
+  },
+  "generatedAt": "2026-04-28T10:18:42Z",
+  "generatedBy": "python/scripts/bt93k_start_truth_contracts.py",
+  "heartbeatContract": {
+    "heartbeatPathPattern": "data/training/ppo/bt93k/runs/<run-id>/heartbeat.jsonl",
+    "requiredFields": [
+      "timestamp",
+      "runId",
+      "pid",
+      "activeSidecarPids",
+      "progressTimesteps",
+      "lastSnapshotPath",
+      "lastEvalSnapshotPath"
+    ],
+    "staleAfterSeconds": 180,
+    "writeIntervalSecondsMax": 60
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93K.1.3": true,
+    "93K.1.4": true
+  },
+  "phaseId": "93K.1.3",
+  "pidAndSidecarContract": {
+    "recordChildPids": true,
+    "recordMainPid": true,
+    "recordSidecarReadyPayload": true,
+    "sidecarExitCodesRequired": true,
+    "sidecarMissingExitCodeClass": "measurement-invalid"
+  },
+  "requiredRunExitReport": {
+    "missingExitCodeIsInvalid": true,
+    "missingFinalSnapshotIsInvalid": true,
+    "pathPattern": "data/training/ppo/bt93k/runs/<run-id>/run_exit_report.json",
+    "required": true,
+    "requiredFields": [
+      "schemaVersion",
+      "blockId",
+      "phaseId",
+      "runId",
+      "runKind",
+      "command",
+      "configPath",
+      "startedAt",
+      "finishedAt",
+      "elapsedSeconds",
+      "ok",
+      "statusClass",
+      "exitCode",
+      "stopReason",
+      "gracefulStop",
+      "forcedStop",
+      "signal",
+      "pidTree",
+      "sidecars",
+      "heartbeat",
+      "stdoutPath",
+      "stderrPath",
+      "runDirectory",
+      "snapshotManifestPath",
+      "evalSnapshotPath",
+      "artifactManifestPath",
+      "metricsSummary"
+    ],
+    "stdoutStderrOnlyIsInvalid": true
+  },
+  "resultClass": "supervisor-contract-pinned",
+  "sourceStartTruth": {
+    "path": "data/training/ppo/bt93k/start_truth.json",
+    "sha256": "8fda35420b2b4ea8787e3d4d0e9bd24ad6e648bbbe758f2377fc928b4e81bd22",
+    "sideLaneFailureClass": "diagnostic-only-measurement-invalid-for-closure"
+  },
+  "statusClasses": {
+    "allowed": [
+      "completed",
+      "stopped",
+      "failed",
+      "killed",
+      "timeout",
+      "measurement-invalid"
+    ],
+    "completed": "process exited 0 after writing final report, final snapshot, and artifact manifest",
+    "failed": "process exited non-zero or mandatory artifact write failed",
+    "killed": "external termination or missing graceful checkpoint stop",
+    "measurement-invalid": "any mandatory report, exit code, heartbeat, sidecar, or final snapshot evidence is missing",
+    "stopped": "explicit stop request reached a checkpoint and wrote a final report",
+    "timeout": "supervisor timeout fired before valid completion"
+  },
+  "stopContract": {
+    "allowedStopModes": [
+      "normal-completion",
+      "graceful-user-stop-at-checkpoint",
+      "technical-stop",
+      "timeout-stop",
+      "force-stop"
+    ],
+    "forceStopRequiresMeasurementInvalidUnlessFinalReportExists": true,
+    "switchOrRestartRequiresSeparateRunExitReport": true
+  }
+}

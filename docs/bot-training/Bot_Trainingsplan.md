@@ -287,7 +287,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93J | 2026-04-26 | frei | abgeschlossen 2026-04-27 als `diagnose-loop-required`; kein BT94A-Claim |
-| Bot-Codex | BT93K | 2026-04-28 | in-bearbeitung | 93K.0 abgeschlossen; naechster Schritt 93K.1 |
+| Bot-Codex | BT93K | 2026-04-28 | in-bearbeitung | 93K.1 abgeschlossen; naechster Schritt 93K.2 |
 | - | BT94A | - | frei | wartet auf `BT93K.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -795,7 +795,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
 | BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
 | BT93J | Root-Cause-Blocker-Repair | completed | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 + R2-Plananpassung 2026-04-26 | 93J.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
-| BT93K | Survival-First Objective Reset | active | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.1 | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
+| BT93K | Survival-First Objective Reset | active | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.2 | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93K.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2683,9 +2683,9 @@ Pflicht-Artefakte:
 ### Definition of Done (DoD)
 
 - [x] DoD.0 `preflight_quarantine_report.json` pinnt Arbeitsbaum-, Branch-, Prozess- und Zusatzspur-Lage; keine alte User-owned-3M/4-Env-Datei wird als BT93K-Closure-Evidence gelesen. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_preflight_quarantine.py` -> `data/training/ppo/bt93k/preflight_quarantine_report.json`)
-- [ ] DoD.1 `start_truth.json` pinnt BT93J-Post-Decision, BT94A-No-Start und 3M/4-Env-Zusatzdiagnose ohne BT94A-Umdeutung.
-- [ ] DoD.2 Der Metrikvertrag trennt `avgSteps`, `longestEpisode`, `deathBefore60Share`, `maxStepShare`, `naturalTerminalShare`, `progressSignalNonZero`, `objectiveSignalNonZero`, `runtimeErrorCount` und Action-Safety.
-- [ ] DoD.3 Kein Lauf ueber den naechsten Ladder-Schritt startet ohne gruenes Supervisor-/Exit-Report-Gate und mindestens ein echtes nicht-totes Zielsignal oder eine vorab definierte Reduktion frueher Todesfaelle.
+- [x] DoD.1 `start_truth.json` pinnt BT93J-Post-Decision, BT94A-No-Start und 3M/4-Env-Zusatzdiagnose ohne BT94A-Umdeutung. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/start_truth.json`)
+- [x] DoD.2 Der Metrikvertrag trennt `avgSteps`, `longestEpisode`, `deathBefore60Share`, `maxStepShare`, `naturalTerminalShare`, `progressSignalNonZero`, `objectiveSignalNonZero`, `runtimeErrorCount` und Action-Safety. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/signal_metric_contract.json`)
+- [x] DoD.3 Kein Lauf ueber den naechsten Ladder-Schritt startet ohne gruenes Supervisor-/Exit-Report-Gate und mindestens ein echtes nicht-totes Zielsignal oder eine vorab definierte Reduktion frueher Todesfaelle. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/signal_metric_contract.json` + `data/training/ppo/bt93k/supervisor_contract_report.json`)
 - [ ] DoD.4 Curriculum-Step-Uhr, `activeCurriculumStage`, Progress-/Objective-Reachability und effective Map/Mode/Planar werden in Train/Eval-Reports sichtbar.
 - [ ] DoD.5 2-/4-/6-Env-Smokes sind klein, final reportbar und getrennt von Longrun-/Qualitaetsurteilen.
 - [ ] DoD.6 CUDA wird isoliert benchmarked; CPU bleibt Referenzpfad und CUDA wird nur bei stabiler Wallclock-Verbesserung behalten.
@@ -2702,10 +2702,10 @@ Pflicht-Artefakte:
 
 ### 93K.1 Start-Wahrheit, Metrikvertrag und Supervisor-Gate
 
-- [ ] 93K.1.1 `start_truth.json` aus BT93J 1M-Longrun, `post_longrun_decision_report.json`, rotem BT94A-No-Start und 3M/4-Env-Fehlerbericht schreiben.
-- [ ] 93K.1.2 `signal_metric_contract.json` schreiben: Survival wird gegen fruehe Todesfaelle, max-step-only Plateaus, Natural-Terminal-Share, Progress-/Objective-Nonzero und Action-Safety getrennt; Qualitaetsurteile unter `completedEpisodeCount < 15` sind verboten, Env-Startup-Smokes muessen als solche gelabelt sein.
-- [ ] 93K.1.3 Supervisor-Vertrag definieren: Heartbeat, PID-/Sidecar-Liste, Exit-Code, Stopgrund, graceful-vs-force-stop, letzter Snapshot, stderr/stdout-Pfade, finaler `run_exit_report.json` und maschinenlesbare Klassifizierung `completed`, `stopped`, `failed`, `killed`, `timeout` oder `measurement-invalid`.
-- [ ] 93K.1.4 Ladder-Regel pinnen: Ein Run darf nur laenger werden, wenn technische Gates gruen sind, `run_exit_report.ok=true` vorliegt und mindestens eines gilt: `progressSignalNonZero=true`, `objectiveSignalNonZero=true`, `naturalTerminalShare>0`, oder `deathBefore60Share` verbessert sich gegen die gepinnte Startmatrix um mindestens 20 Prozent ohne schlechtere Action-Safety.
+- [x] 93K.1.1 `start_truth.json` aus BT93J 1M-Longrun, `post_longrun_decision_report.json`, rotem BT94A-No-Start und 3M/4-Env-Fehlerbericht schreiben. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/start_truth.json`)
+- [x] 93K.1.2 `signal_metric_contract.json` schreiben: Survival wird gegen fruehe Todesfaelle, max-step-only Plateaus, Natural-Terminal-Share, Progress-/Objective-Nonzero und Action-Safety getrennt; Qualitaetsurteile unter `completedEpisodeCount < 15` sind verboten, Env-Startup-Smokes muessen als solche gelabelt sein. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/signal_metric_contract.json`)
+- [x] 93K.1.3 Supervisor-Vertrag definieren: Heartbeat, PID-/Sidecar-Liste, Exit-Code, Stopgrund, graceful-vs-force-stop, letzter Snapshot, stderr/stdout-Pfade, finaler `run_exit_report.json` und maschinenlesbare Klassifizierung `completed`, `stopped`, `failed`, `killed`, `timeout` oder `measurement-invalid`. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/supervisor_contract_report.json`)
+- [x] 93K.1.4 Ladder-Regel pinnen: Ein Run darf nur laenger werden, wenn technische Gates gruen sind, `run_exit_report.ok=true` vorliegt und mindestens eines gilt: `progressSignalNonZero=true`, `objectiveSignalNonZero=true`, `naturalTerminalShare>0`, oder `deathBefore60Share` verbessert sich gegen die gepinnte Startmatrix um mindestens 20 Prozent ohne schlechtere Action-Safety. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/signal_metric_contract.json` + `data/training/ppo/bt93k/supervisor_contract_report.json`)
 
 ### 93K.2 Runner-Signalreparatur und Curriculum-Uhr
 
