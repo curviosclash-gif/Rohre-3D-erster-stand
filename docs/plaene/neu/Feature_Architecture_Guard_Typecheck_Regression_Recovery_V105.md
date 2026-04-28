@@ -1,0 +1,154 @@
+# Feature: Architecture-Guard- und Typecheck-Regression-Recovery (V105)
+
+Stand: 2026-04-28
+Status: Entwurf
+Owner: Codex
+Risiko: hoch
+plan_file: `docs/plaene/aktiv/V105.md`
+
+## Ziel
+
+Die nach `V101` erneut aufgefallenen Guard- und Typecheck-Regressionen als eigenen Recovery-Block sauber zurueck auf Gruen bringen:
+
+- `npm run check:architecture:boundaries`, `npm run check:architecture:metrics` und `npm run check:architecture:ratchet` duerfen nicht mehr an `core -> ui`-Kanten im Test-/E2E-Importpfad brechen.
+- `npm run typecheck:architecture` soll wieder als belastbarer Guard fuer Recording-, Runtime-, Network- und Menu-Contracts dienen statt aktuell an Literal-, Shape- und Build-Flag-Drift zu scheitern.
+- Recording-/Export-/Capture-Pfade sollen denselben typsicheren Recorder-Engine-, Mime-, Container- und Result-Vertrag konsumieren wie Runtime und Tests.
+- Build-Flags und lockere Objektformen sollen in den noch offenen Fehlerclustern explizit typisiert werden, damit derselbe Drift nicht direkt wieder einzieht.
+- Der Block soll bewusst kein Parallelfeature aufmachen, sondern bestehende Produkt- und Security-Arbeit aus `V99`, `V102` und `V104` gruensicher absichern.
+
+## Desktop-first Scope
+
+- Primaerziel bleibt die Desktop-App und ihre Guard-/Build-Pipeline.
+- Browser-/Demo-Auswirkungen bleiben auf Shared Contracts, Build-Flags und vorhandene Resolver begrenzt.
+- Kein Browser-first-Paritaetsausbau.
+
+## Nicht-Ziel
+
+- Kein neuer Recorder-Featureblock, kein neuer Multiplayer-Featureblock und kein Security-Neubau neben `V99` und `V102`.
+- Kein Big-Bang-Refactor aller betroffenen Dateien nur zur Zeilenreduktion.
+- Kein Aufweichen der `V91`/`V92`-Layer- und Legacy-Surface-Leitplanken.
+- Kein zweiter Test-Harness-Pfad nur fuer E2E-Importe; die Recovery muss mit einem kanonischen Import-/Bridge-Schnitt arbeiten.
+
+## Betroffene Dateien und Bereiche
+
+- `src/core/AppInitializer.js`
+- `src/core/TestApiBridge.js`
+- `src/core/MediaRecorderSystem.js`
+- `src/core/recording/engines/WebCodecsRecorderEngine.js`
+- `src/core/recording/MediaRecorderExportFinalizeOps.js`
+- `src/core/recording/RecordingVideoExportContract.js`
+- `src/core/renderer/CameraRigSystem.js`
+- `src/core/renderer/RecordingCapturePipeline.js`
+- `src/core/runtime/MatchStartValidationService.js`
+- `src/core/runtime/MultiplayerMatchLifecycleKernel.js`
+- `src/core/runtime/RuntimeSessionLifecycleService.js`
+- `src/network/OnlineSessionAdapter.js`
+- `src/network/PeerConnectionManager.js`
+- `src/shared/contracts/HangarModeContract.js`
+- `src/shared/contracts/MultiplayerSessionContract.js`
+- `src/shared/contracts/PlatformSurfacePolicyOps.js`
+- `src/state/TelemetryHistoryStore.js`
+- `src/ui/hangar/HangarSelectionWritebackContract.js`
+- `src/ui/MatchFlowLifecycleTransitions.js`
+- `src/ui/MenuController.js`
+- `src/ui/menu/MenuRuntimeFeatureFlags.js`
+- `src/ui/menu/MenuSurfaceFeatureAccess.js`
+- `src/ui/menu/multiplayer/MenuMultiplayerHostIpResolver.js`
+- `tsconfig.architecture.json`
+- `tests/core-targeted-platform.spec.js`
+- `tests/core-targeted-runtime.spec.js`
+- `tests/core-targeted-surface.spec.js`
+- `tests/runtime-regressions.contract.test.mjs`
+- `tests/recording-video-export.contract.test.mjs`
+- `docs/referenz/ai_architecture_context.md`
+
+## Definition of Done
+
+- [ ] DoD.1 `npm run check:architecture:boundaries`, `npm run check:architecture:metrics` und `npm run check:architecture:ratchet` sind wieder gruen; disallowed `core -> ui`-Kanten aus Test-/E2E-Importpfaden sind entfernt oder ueber einen erlaubten neutralen Schnitt ersetzt.
+- [ ] DoD.2 `npm run typecheck:architecture` ist wieder gruen; die aktuellen Literal-, Shape-, Build-Flag- und Options-Fehler sind entweder behoben oder in den owning Blocks blockerfest begrenzt.
+- [ ] DoD.3 Recording-/Export-/Capture-Pfade nutzen einen konsistenten Recorder-Engine-, Mime-, Container- und Result-Vertrag ohne unabsichtliche Literal-Verengung.
+- [ ] DoD.4 Build-Flags (`__SIGNALING_URL__`, `__TURN_*__`, `__APP_MODE__` und vergleichbare Runtime-Globals) sind im betroffenen Scope explizit deklariert und konsistent konsumierbar.
+- [ ] DoD.5 Die Recovery erzeugt keine neuen Legacy-Surface-Reads, Global-Bypaesse oder Architektur-Ausnahmen ausser klar dokumentierten Restadaptern.
+- [ ] DoD.6 Overlap zu `V99`, `V102` und `V104` ist im aktiven Pfad dokumentiert; Security-, LAN- und God-Object-Arbeit wird nicht still in diesen Recovery-Block hineingezogen.
+
+## Intake-Hinweis fuer den User
+
+- Ziel-Masterplan: `docs/Umsetzungsplan.md`
+- vorgeschlagene Block-ID: `V105`
+- vorgeschlagene kanonische Blockdatei: `docs/plaene/aktiv/V105.md`
+- hard dependencies: `V99.99`, `V102.99`, `V104.99`
+- soft dependencies: `V75.99`, `V101.99`
+- Hinweis: `Manuelle Uebernahme erforderlich`
+
+## Review-Abgleich 2026-04-28
+
+- Finding 4 / neuer Backlogpunkt `P47`: Boundary-/Ratchet-Bruch durch `core -> ui`-Importe in `AppInitializer` und `TestApiBridge` -> `105.2`
+- Finding 7 / neuer Backlogpunkt `P48`: `typecheck:architecture` wieder rot, Schwerpunkt Recording-/Contract-Drift -> `105.3` bis `105.5`
+- Bereits in anderen Bloecken verankert und hier nur abgrenzungsrelevant:
+  - `V99`: LAN-Kapazitaet, Host-Autorisierung, Polling-Overlap, Discovery-Rendering
+  - `V102`: sync IPC, Request-Body-Limits, weiteres UI-/Resolver-Hardening
+  - `V104`: God-Object-/Port-Zuschnitt, kein Ersatz durch Guard-Recovery
+
+## Evidence-Format
+
+Abgeschlossene Checkboxen im spaeteren aktiven Block immer mit:
+
+`(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
+
+## Phasenplan
+
+### 105.1 Guard- und Fehlercluster neu schneiden
+status: open
+goal: Den aktuellen Regressionstand reproduzierbar in Owner-Cluster aufteilen
+output: Baseline fuer Boundary-, Typecheck- und Scope-Abgrenzung
+
+- [ ] 105.1.1 Die aktuellen Fehler aus `check:architecture:boundaries`, `check:architecture:metrics`, `check:architecture:ratchet` und `typecheck:architecture` als Ist-Snapshot sichern und in Cluster schneiden: `boundary edges`, `recording literals`, `result shapes`, `build flags`, `loose option objects`, `residual contract drift`.
+- [ ] 105.1.2 Fuer jeden Cluster festhalten, was in `V105` gehoert und was bewusst bei `V99`, `V102` oder `V104` bleibt; Recovery darf nur owning Restfehler ziehen, nicht fremde Blockziele verdoppeln.
+
+### 105.2 Architektur-Gates fuer Test- und E2E-Importe reparieren
+status: open
+goal: `core -> ui`-Kanten aus dem Guard-pflichtigen Importpfad entfernen
+output: Kanonischer Test-/Import-Schnitt ohne Boundary-Bruch
+
+- [ ] 105.2.1 `AppInitializer` und `TestApiBridge` so zuschneiden, dass UI-nahe Testmodule nicht mehr direkt aus `src/core/**` importiert werden; stattdessen einen erlaubten Import-Manifest-, Adapter- oder Bridge-Pfad ausserhalb der disallowed Layer-Kante nutzen.
+- [ ] 105.2.2 Die geaenderten Test-/E2E-Zugriffspfade gegen bestehende targeted harnesses spiegeln, damit Guard-Recovery nicht still Test-Reichweite oder Debug-Zugang kappt.
+
+### 105.3 Recording-, Capture- und Export-Vertraege typstabil machen
+status: open
+goal: Aktuelle Recorder-Literal- und Result-Shape-Drift beseitigen
+output: Gruensicherer Typecheck fuer Recording-Pfade
+
+- [ ] 105.3.1 `MediaRecorderSystem`, `RecordingCapturePipeline`, `CameraRigSystem` und angrenzende Recorder-Engines auf konsistente Engine-/Profile-/Mode-/Mime-Literale heben; unabsichtliche `'none'`-, `'classic'`- oder `'clean'`-Verengungen verschwinden.
+- [ ] 105.3.2 `MediaRecorderExportFinalizeOps`, `RecordingVideoExportContract` und `WebCodecsRecorderEngine` auf explizite Result-Shapes und Muxer-/Codec-Vertraege heben, sodass Runtime, Export und Tests dieselben Felder und Containerannahmen teilen.
+
+### 105.4 Build-Flags und lose Objektformen haerten
+status: open
+goal: Typecheck-Fehler durch implizite Globals und unpraezise Optionsobjekte abbauen
+output: Explizite Declarations und stabilere Contract-Eingaenge
+
+- [ ] 105.4.1 Build-Flags und Runtime-Globals fuer Network-/Menu-Pfade (`__SIGNALING_URL__`, `__TURN_URL__`, `__TURN_USERNAME__`, `__TURN_CREDENTIAL__`, `__APP_MODE__`) zentral deklarieren und Konsumenten auf denselben Pfad umstellen.
+- [ ] 105.4.2 Verbleibende Shape-Fehler in Runtime-, Menu- und Shared-Contracts (`MatchStartValidationService`, `MultiplayerMatchLifecycleKernel`, `RuntimeSessionLifecycleService`, `MultiplayerSessionContract`, `PlatformSurfacePolicyOps`, `MenuController` und angrenzende Resolver) auf explizite Input-/Snapshot-Typen heben, bis der Guard wieder gruen ist.
+
+### 105.5 Rueckfallnetz fuer Guards und Contracts
+status: open
+goal: Dieselbe Regression beim naechsten Refactor frueher sichtbar machen
+output: Kleine Guardrails fuer Boundary-, Recording- und Build-Flag-Drift
+
+- [ ] 105.5.1 Targeted-/Contract-Tests oder gleichwertige Guard-Pruefungen fuer den neuen Test-Import-Schnitt sowie fuer Recording-/Export-Result-Shapes nachziehen.
+- [ ] 105.5.2 Architekturkontext und relevante Test-Mapping-Hinweise auf denselben Leseweg spiegeln: keine neuen `core -> ui`-Hilfsimporte, keine impliziten Build-Flags, keine still erweiterbaren Recorder-Resultate.
+
+### 105.99 Abschluss-Gate
+status: open
+goal: Guard- und Typecheck-Recovery reproduzierbar abschliessen
+output: Gruene Architektur- und Typ-Nachweise fuer Folgearbeit
+
+- [ ] 105.99.1 `npm run check:architecture:boundaries`, `npm run check:architecture:metrics`, `npm run check:architecture:ratchet`, `npm run typecheck:architecture`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen.
+- [ ] 105.99.2 Relevante targeted-/contract-Tests fuer den geaenderten Scope sind gruen oder blockerfest dokumentiert.
+- [ ] 105.99.3 Die Recovery hat keine neuen disallowed Layer-Kanten, Legacy-Surface-Ausnahmen oder Guard-Budget-Erweiterungen eingefuehrt.
+
+## Risiken
+
+- R1 | hoch | Boundary-Recovery verschiebt Imports nur an einen anderen falschen Ort, wenn kein wirklich neutraler Test-/Bridge-Schnitt definiert wird.
+- R2 | hoch | Type-only Recorder-Korrekturen koennen Export- oder Capture-Verhalten still aendern, wenn Laufzeit- und Result-Vertraege nicht gemeinsam geschnitten werden.
+- R3 | mittel | Der Block kollidiert mit `V99`, `V102` oder `V104`, wenn deren inhaltliche Ziele statt nur der Guard-Restfehler in `V105` hineingezogen werden.
+- R4 | mittel | Build-Flag- und Options-Hardening bleibt unvollstaendig, wenn nur die aktuellen Fehlermeldungen gepatcht werden statt die Eingangsformen zu stabilisieren.

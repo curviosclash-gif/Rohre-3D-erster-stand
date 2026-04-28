@@ -27,6 +27,9 @@ description: Create a compact implementation plan for a new feature or extension
 - Datei-Ownership pruefen: kollidiert der Scope mit einem gelockten Block?
 - Dependencies klassifizieren (`hard`/`soft`).
 - Dependency-/Scope-Abgleich zuerst ueber Graph-Query (`open-deps`, `scope-collisions`), dann bei Bedarf Volltext.
+- Verdacht auf Totcode oder Legacy-Pfade frueh klassifizieren: `duplicate-backed`, `legacy-with-replacement`, `contract-first/plan-drift`, `unverified-altpath`.
+- Fuer jeden geplanten Remove-Pfad Nachfolger, reale Konsumenten, verbleibende Harness-/Test-Nutzung und Delete-Kriterium festhalten.
+- Abschluss-Claims nur planen, wenn Plan, Runtime und Tests denselben produktiven Pfad belegen; Contract-only Evidence reicht nicht.
 
 ## 3. Write plan
 
@@ -36,6 +39,7 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 - A planned `plan_file` target under `docs/plaene/aktiv/VXX.md` when the draft is intended for active-master intake.
 - Phasen mit Pflicht-Unterphasen (jede Phase mindestens 2 Unterphasen).
 - Abschluss-Gate als `X.99`.
+- Bei Legacy-/Dead-Code-Scope pro Kandidat: Klassifikation, geplanter Nachfolger, verbleibende Konsumenten und Delete-Kriterium.
 - Evidence format for completed items:
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
 - Intake-Hinweis fuer den User:

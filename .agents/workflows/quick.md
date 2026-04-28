@@ -15,11 +15,13 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 ## 1. Implement
 
 - Aenderung direkt anwenden. Bestehende Patterns folgen. Desktop-App ist primaeres Ziel.
+- Wenn die Aenderung auf Totcode-Loeschung oder Legacy-Ablosung hinauslaeuft, Quick-Path verlassen und `.agents/workflows/code.md` oder `.agents/workflows/cleanup.md` nutzen.
 
 ## 2. Verify
 
 - Tests sind user-owned (siehe `planning_and_governance.md` -> Test Ownership). Ohne Test-Request nichts ausfuehren.
 - Wenn Plan-/Workflow-/Rule-Dateien geaendert wurden: `npm run gates:pre-commit`.
+- Keine Totcode-Loeschung ohne nachgewiesenen Nachfolgerpfad und dokumentierte Konsumentenlage.
 
 ## 3. Commit
 

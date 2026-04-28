@@ -1,6 +1,6 @@
 # Feature: Toolchain-Security und Dependency-Upgrade (Vorschlag V90)
 
-Stand: 2026-04-10
+Stand: 2026-04-29
 Status: Entwurf
 Owner: frei
 Risiko: hoch
@@ -59,13 +59,13 @@ Zusaetzlich sind mehrere Tooling-Abhaengigkeiten veraltet, darunter `@playwright
 
 ### 90.1 Audit- und Versionenmatrix
 
-- [ ] 90.1.1 `npm audit`, `npm outdated`, Electron-/Server-Unterpakete und CI-Versionen erfassen.
-- [ ] 90.1.2 Befunde in `runtime`, `dev-server`, `build-tooling`, `test-tooling`, `electron-shell` und `server` klassifizieren.
+- [x] 90.1.1 `npm audit`, `npm outdated`, Electron-/Server-Unterpakete und CI-Versionen erfassen. (abgeschlossen: 2026-04-29; evidence: `npm audit --audit-level=low`, `npm outdated`, `npm --prefix electron audit --audit-level=low`, `npm --prefix electron outdated`, `npm --prefix server audit --audit-level=low`, `npm --prefix server outdated`, `Select-String -Path .github/workflows/ci.yml -Pattern 'setup-node|node-version|npm ci|npm --prefix electron ci'` -> Root-, Electron-, Server- und CI-Matrix fuer V90 erfasst)
+- [x] 90.1.2 Befunde in `runtime`, `dev-server`, `build-tooling`, `test-tooling`, `electron-shell` und `server` klassifizieren. (abgeschlossen: 2026-04-29; evidence: `npm ls flatted rollup postcss esbuild brace-expansion`, `npm --prefix electron ls @tootallnate/once tar electron electron-builder`, `npm --prefix server ls ws` -> Befunde auf Root-Guard-/Build-Tooling, Dev-Server, Electron-Shell und Server-Pfade verdichtet)
 
 ### 90.2 Nicht-breaking Security-Fixes
 
-- [ ] 90.2.1 `npm audit fix` ohne `--force` trocken bewerten und nur kompatible Lockfile-Updates uebernehmen.
-- [ ] 90.2.2 Build-, Architektur- und Doku-Gates nachziehen.
+- [x] 90.2.1 `npm audit fix` ohne `--force` trocken bewerten und nur kompatible Lockfile-Updates uebernehmen. (abgeschlossen: 2026-04-29; evidence: `npm audit fix --dry-run`, `npm --prefix electron audit fix --dry-run`, `npm audit fix`, `npm --prefix electron audit fix`, `npm audit --audit-level=low`, `npm --prefix electron audit --audit-level=low` -> Root auf 2 moderate Restbefunde reduziert; Electron-Tree auf 12 verbleibende High/Low-Befunde ohne `vite@8`- oder `electron@41`-/`electron-builder@26`-Sprung verdichtet)
+- [ ] 90.2.2 Build-, Architektur- und Doku-Gates nachziehen. (blockiert: `npm run build` scheitert aktuell in `typecheck:architecture`; Boundary-Guard ist wieder gruen. Siehe `docs/Fehlerberichte/2026-04-29_v90-90.2.2-build-typecheck-architecture-blocked.md`)
 
 ### 90.3 Major-Upgrade-Entscheidungen
 
@@ -77,6 +77,16 @@ Zusaetzlich sind mehrere Tooling-Abhaengigkeiten veraltet, darunter `@playwright
 
 - [ ] 90.99.1 `npm run architecture:guard`, `npm run build`, `npm run docs:check` und der kleinste relevante Dependency-Sanity-Check sind gruen.
 - [ ] 90.99.2 Verbleibende Security-Ausnahmen sind dokumentiert und haben ein Wiedervorlagedatum.
+
+## Audit-Snapshot 2026-04-29
+
+- `runtime`: Kein direkter Root-Runtime- oder Server-Runtime-Befund offen; `npm --prefix server audit --audit-level=low` ist gruen.
+- `dev-server`: `vite@5.4.21` haengt an `esbuild@0.21.5`; nach dem sicheren Fix-Slice bleiben genau 2 moderate Befunde offen, deren Fix `vite@8.0.10` erzwingt.
+- `build-tooling`: Root-`npm audit fix` hat den Guard-/Build-Pfad ueber `eslint -> flat-cache -> flatted@3.4.2`, `eslint -> minimatch -> brace-expansion@5.0.5`, `vite -> postcss@8.5.12` und `vite -> rollup@4.60.2` bereinigt.
+- `test-tooling`: `npm outdated` meldet nur noch Patch-/Minor-Kandidaten fuer `@playwright/test`, `@types/node`, `@commitlint/*`, `eslint` und `ws`; kein eigener Audit-Befund bleibt in diesem Ast offen.
+- `electron-shell`: `npm --prefix electron audit fix` hat `@xmldom/xmldom`, `lodash` und `brace-expansion` aus dem verbleibenden Report entfernt; offen bleiben `electron@33.4.11` sowie `electron-builder@25.1.8`-abgeleitete `tar`-/`@tootallnate/once`-Befunde, deren Fix `electron@41.3.0` bzw. `electron-builder@26.8.1` verlangt.
+- `server`: `npm --prefix server outdated` ist nach dem Audit-Refresh leer; `ws` ist damit kein offener V90-Blocker mehr.
+- `ci`: `.github/workflows/ci.yml` bleibt auf `actions/setup-node@v4` mit `node-version: 'lts/*'` sowie `npm ci` fuer Root und Electron gepinnt; jeder spaetere Major-Sprung muss diese Matrix mitziehen.
 
 ## Risiken
 

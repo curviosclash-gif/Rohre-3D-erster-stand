@@ -30,6 +30,9 @@ Optional (nur bei Bedarf):
 - Bestehende Projekt-Patterns folgen.
 - Keine hartkodierten Config-Werte.
 - Fuer neue Runtime-Objekte Cleanup/Dispose mitdenken.
+- Totcode oder Legacy-Pfade vor einem Remove erst klassifizieren: `duplicate-backed`, `legacy-with-replacement`, `contract-first/plan-drift`, `unverified-altpath`.
+- Nur exakte Dubletten/Shims oder nachweislich ersetzte Altpfade entfernen; sonst im Scope als `legacy`, `compatibility path`, `shim` oder `plan-drift` markieren.
+- Wenn ein neuer Pfad einen alten ersetzt, verbleibende Konsumenten und Delete-Kriterium im aktiven Block oder den Scope-Docs festhalten.
 - Planentwuerfe bleiben in `docs/plaene/neu/`, aktive Bloecke in `docs/plaene/aktiv/VXX.md`.
 - Bot-Training-Scope: Status/Phase nur in `docs/bot-training/Bot_Trainingsplan.md` pflegen.
 
@@ -38,6 +41,7 @@ Optional (nur bei Bedarf):
 // turbo
 - `Grep` nach offenen Markern in geaenderten Pfaden: `(console\.log|TODO:|FIXME:|HACK:)`.
 - Keine offenen TODOs in geaendertem Code.
+- Bei Legacy-/Dead-Code-Aenderungen pruefen, dass keine neuen Konsumenten auf markierte Altpfade zeigen und dass Ersatz-/Behalteentscheidung im Scope dokumentiert ist.
 - Tests sind user-owned (siehe `planning_and_governance.md` -> Test Ownership). Fuer Subphasen unterhalb `*.99` Tests/Smokes vorbereiten, aber Ausfuehrung deferren.
 
 ## 4. Governance + Doc-Gates

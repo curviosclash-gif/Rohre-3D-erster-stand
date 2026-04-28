@@ -13,6 +13,14 @@ description: Code quality, debugging, performance, and lifecycle (consolidated)
 - Validate edge cases and potential null values proactively.
 - Prefer explicit naming over comments. Comments explain *why*, not *what*.
 
+## Dead Code Prevention
+
+- Replace-first: when a newer path is introduced, migrate active consumers and remove the old path in the same scope whenever safely possible.
+- Avoid long-running parallel old/new implementations without named owner, successor, and exit criterion.
+- If an old path must remain, mark the entry path as `legacy`, `compatibility path`, `shim`, or `plan-drift` and name the intended successor.
+- Contract-only or test-only usage is not enough evidence for productive runtime use.
+- Prefer seams that make new consumers of legacy files obvious or impossible.
+
 ## Debugging
 
 - Never guess — systematically narrow down root cause by analyzing logic flow and state.

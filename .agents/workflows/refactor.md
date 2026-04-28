@@ -15,6 +15,8 @@ description: Restructure code without changing behavior.
 
 - Reduce duplication and long functions.
 - Clarify module boundaries and naming.
+- If the refactor reveals suspected dead code, classify it but do not delete it without replacement proof.
+- When a new structure replaces an old path, migrate active consumers and document the remaining delete criterion.
 
 ## 3. Verify
 

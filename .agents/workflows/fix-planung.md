@@ -43,6 +43,7 @@ git push
 - Identify first open phase (`[ ]`) in claimed block.
 - List open sub-phases and affected files.
 - Check `scope_files` in the linked block file for conflicts.
+- If the phase touches suspected dead code or legacy paths, require candidate classification plus successor/delete criteria before execution.
 - If phase has no sub-phases: create/update an external plan in `docs/plaene/neu/` and wait for manual intake by the user.
 
 ## 3. Execute
@@ -50,6 +51,7 @@ git push
 - Run `/code` workflow with `fix:` or `refactor:` prefix as fitting.
 - `/code` remains source of truth for implementation verification.
 - For non-`*.99` phases, adapt tests or smokes as needed but defer their execution to the block Abschluss-Gate unless the user explicitly asks otherwise.
+- Remove old code in phase work only when a newer productive path or exact duplicate-/shim-replacement is evidenced; otherwise keep and mark the path explicitly.
 - If the user explicitly requests Playwright validation, parallel runs require unique `TEST_PORT`, `PW_RUN_TAG`, `PW_OUTPUT_DIR` per bot.
 
 ## 4. Close phase
@@ -59,6 +61,7 @@ git push
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
 - Keep gate invariant intact (`*.99` only when prior phases are `[x]`).
 - For non-`*.99` phases, record the pending block-end verification scope instead of running mapped tests or smokes.
+- If the phase handled dead code or legacy paths, record replacement proof or explicit retention reason in the block evidence before closing.
 - Meta-Gate: `npm run gates:pre-commit` (ruft `plan:check` -> `docs:sync` -> `docs:check`).
 - Commit scoped updates (Git-Policy: `.agents/rules/git_and_commits.md`).
 - Before push on `main`: `npm run snapshot:tag`
@@ -73,4 +76,3 @@ git push
 ## Report
 
 Standardformat verwenden. Set `Next Step` to `/fix-planung`.
-

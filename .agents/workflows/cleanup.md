@@ -1,10 +1,11 @@
 ---
-description: Detect and remove dead code/files with safe dry-run first.
+description: Detect and retire dead code/files with replacement-proof and safe dry-run first.
 ---
 
 ## 0. Detect
 
 // turbo
+- If `knip` is configured (`knip.json` or package script), run it first and treat findings as hints, not delete-proof.
 - Unused exports: `npx -y ts-unused-exports tsconfig.json` (if exists) or manual `rg` checks.
 - Gather TODO/FIXME/HACK markers and large commented blocks.
 
@@ -13,6 +14,8 @@ description: Detect and remove dead code/files with safe dry-run first.
 // turbo
 - `git ls-files "src/**/*.js" "editor/js/**/*.js" "tests/**/*.js"`
 - Cross-check with actual imports/references.
+- Classify each candidate as `duplicate-backed`, `legacy-with-replacement`, `contract-first/plan-drift`, or `unverified-altpath`.
+- Record per candidate: newer path, real consumers, test-/harness-only consumers, and delete criterion.
 
 ## 2. Security and deps
 
@@ -22,11 +25,13 @@ description: Detect and remove dead code/files with safe dry-run first.
 ## 3. Dry-run report (mandatory)
 
 - List candidate deletions/archives with per-item risk rating.
+- Mark which items are safe removes, which need replacement wiring, and which are only plan/runtime drift.
 - No file deletion in dry-run.
 
 ## 4. Execute after confirmation
 
 - Remove/archive approved items only.
+- Delete only `duplicate-backed` items or paths with proven productive replacement; keep or mark everything else as `legacy`, `compatibility path`, `shim`, or `plan-drift`.
 - Re-run relevant tests only after explicit user request; otherwise list the recommended manual test command for the user.
 
 ## 5. Commit (see AGENTS.md §Commit Convention)

@@ -11,7 +11,7 @@ plan_file: `docs/plaene/aktiv/V102.md`
 Die sicherheits- und stabilitaetskritischen Deep-Audit-Befunde als klaren Hardening-Block umsetzen:
 
 - Write-Path-Hardening fuer Editor-/Video-Disk-API (Traversal-Schutz, klare Zielroot).
-- XSS-Hardening fuer untrusted UI-Datenpfade (`innerHTML` zu sicheren DOM-Updates).
+- XSS-Hardening fuer untrusted UI-Datenpfade ausserhalb des bereits in `V99` verankerten LAN-Discovery-Renderings (`innerHTML` zu sicheren DOM-Updates).
 - Blockierende Sync-I/O in Runtime-Vertraegen abbauen (kein sync XHR, kein sync IPC im heissen Pfad).
 - LAN-Signaling-Requestpfade gegen Payload- und Endpoint-Missbrauch haerten.
 - Guardrails fuer monolithische Hotspots, Typ-/Lint-Abdeckung und Repo-Hygiene in umsetzbare Folgearbeit schneiden.
@@ -31,7 +31,6 @@ Die sicherheits- und stabilitaetskritischen Deep-Audit-Befunde als klaren Harden
 ## Betroffene Dateien und Bereiche
 
 - `vite.config.js`
-- `src/ui/menu/testing/MenuMultiplayerPanel.js`
 - `src/ui/start-setup/StartSetupUiOps.js`
 - `src/ui/MatchFlowArcadeOverlayController.js`
 - `src/shared/contracts/PlatformCapabilityRegistry.js`
@@ -48,7 +47,7 @@ Die sicherheits- und stabilitaetskritischen Deep-Audit-Befunde als klaren Harden
 ## Definition of Done
 
 - [ ] DoD.1 Video-Disk-Save-Pfad ist traversal-sicher (`allowed-root` + canonical-path check).
-- [ ] DoD.2 Untrusted UI-Daten werden in den betroffenen Menue-/Overlay-Pfaden nicht mehr per `innerHTML` gerendert.
+- [ ] DoD.2 Untrusted UI-Daten werden in den betroffenen Menue-/Overlay-Pfaden ausserhalb des `V99`-Discovery-Flows nicht mehr per `innerHTML` gerendert.
 - [ ] DoD.3 Browser-Demo-Override-Resolver blockiert den Renderer nicht mehr ueber synchrones XHR.
 - [ ] DoD.4 Settings-Defaults-Read-Pfad benoetigt keinen synchronen IPC-Call im Renderer-Hotpath.
 - [ ] DoD.5 LAN-Signaling liest Request-Bodies mit festen Size-Limits und klaren Fehlerpfaden.
@@ -62,6 +61,12 @@ Die sicherheits- und stabilitaetskritischen Deep-Audit-Befunde als klaren Harden
 - hard dependencies: `V99.99`, `V100.99`
 - soft dependencies: `V75.99`, `V101.99`
 - Hinweis: `Manuelle Uebernahme erforderlich`
+
+## Review-Abgleich 2026-04-28
+
+- Finding 6 / `P37` -> `102.2.2`
+- `P41`, `P42`, `P43`, `P44`, `P45` und `P46` bleiben die kanonischen Audit-Funde dieses Blocks.
+- LAN-Discovery-XSS (`P36`) bleibt bewusst in `V99`, damit Netzwerk-Payload und Renderer-Hardening denselben Lobby-Vertrag teilen.
 
 ## Evidence-Format
 
@@ -77,7 +82,7 @@ goal: direkte Angriffsoberflaechen in API und UI schliessen
 output: traversal-sicherer Disk-Write und XSS-sichere UI-Renderer
 
 - [ ] 102.1.1 `vite.config.js` Video-Save-Endpoint auf erlaubte Root begrenzen (`safeName`, canonical path guard, reject ausserhalb root).
-- [ ] 102.1.2 `MenuMultiplayerPanel`, `StartSetupUiOps` und `MatchFlowArcadeOverlayController` von untrusted `innerHTML` auf sichere DOM-Updates umstellen.
+- [ ] 102.1.2 `StartSetupUiOps` und `MatchFlowArcadeOverlayController` von untrusted `innerHTML` auf sichere DOM-Updates umstellen; der LAN-Discovery-Pfad bleibt bei `V99`.
 
 ### 102.2 Contract-I/O Entblockung
 status: open

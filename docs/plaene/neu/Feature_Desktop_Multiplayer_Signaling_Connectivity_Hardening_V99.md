@@ -1,6 +1,6 @@
 # Feature: Desktop Multiplayer Signaling-, LAN- und Connectivity-Hardening (V99)
 
-Stand: 2026-04-22
+Stand: 2026-04-28
 Status: Entwurf
 Owner: Codex
 Risiko: hoch
@@ -14,6 +14,7 @@ Die nach `V64` verbleibenden Laufzeitluecken im Desktop-Multiplayer-Failure-Hand
 - Disconnect-, Resume- und Host-finalized-Pfade sollen denselben robusten Lifecycle-Vertrag nutzen, inklusive asynchroner Fehlerbehandlung.
 - Connectivity-Profile aus `V64 64.7.2` sollen nicht nur Test-/Doku-Vertrag bleiben, sondern in Validation, UI-Hinweisen und Diagnosepfaden produktiv genutzt werden.
 - LAN-Lobby-Pfade sollen Kapazitaet, Host-Berechtigung, Polling-Stabilitaet und untrusted UI-Daten konsistent haerten.
+- LAN- und Online-Lobby-Status muessen den tatsaechlichen Delivery-/Disconnect-Zustand widerspiegeln; Ready-, Matchstart- und Join-Zustaende duerfen nicht optimistisch gruen bleiben, wenn der Transport bereits weg ist.
 - Neue Haertung soll keine alten `runtimeFacade`-/Global-Bypaesse reaktivieren und den `V92`-Ownership-Schnitt respektieren.
 
 ## Desktop-first Scope
@@ -63,6 +64,22 @@ Die nach `V64` verbleibenden Laufzeitluecken im Desktop-Multiplayer-Failure-Hand
 - [ ] DoD.7 LAN-Join respektiert `maxPlayers`; mutierende LAN-Endpoints sind host-gebunden oder gleichwertig gegen Fremdtrigger gehaertet.
 - [ ] DoD.8 LAN-Polling in Lobby/Session ist timeout- und overlap-sicher (kein ungebremster async-Interval-Backlog).
 - [ ] DoD.9 Discovery-Hostdaten werden im UI ohne untrusted `innerHTML` dargestellt.
+- [ ] DoD.10 Online-Lobby-Mutationen (`ready`, `invalidate-ready`, `match-start`) melden Erfolg nur noch bei verifizierbarer Zustellung/ACK oder liefern explizit einen Fehlerpfad.
+- [ ] DoD.11 LAN-/Online-Lobby-Status faellt bei Signaling-Verlust oder Server-Disconnect sichtbar auf `disconnected`/`closed` zurueck; Start-/Ready-Gates bleiben nicht auf stale Erfolgszustand stehen.
+
+## Review-Abgleich 2026-04-28
+
+- Bereits im Draft enthalten:
+  - `P32` -> `99.4.1`
+  - `P33` -> `99.4.1`
+  - `P34` -> `99.4.3`
+  - `P35` -> `99.4.3`
+  - `P36` -> `99.4.4`
+- Neues Lobby-Truthfulness-/Disconnect-Delta aus dem Review:
+  - Finding 1 / `P49` -> `99.4.2`
+  - Finding 2 / `P50` -> `99.2.2`
+  - Finding 3 / `P51` -> `99.2.3`
+  - Finding 4 / `P52` -> `99.4.2`
 
 ## Intake-Hinweis fuer den User
 
@@ -114,7 +131,8 @@ goal: Strukturierte Fehler nicht nur definieren, sondern im Laufzeitpfad auslief
 output: Robuste Online-Signaling-Fehlerklasse in Lobby und SessionAdapter
 
 - [ ] 99.2.1 `OnlineMatchLobby` und `OnlineSessionAdapter` auf explizite Payload-/Parse-Fehlerbehandlung heben; kaputte Signaling-Nachrichten werden nicht mehr still ignoriert oder roh durchgereicht.
-- [ ] 99.2.2 `signaling_network_unavailable` sichtbar aus realen Verbindungsfehlern ableiten oder bewusst blockerfest begrenzen; generische Socket-Fehler nur als Restfallback behalten.
+- [ ] 99.2.2 `OnlineMatchLobby`-Mutationen (`setReady`, `invalidateReadyForAll`, `startMatch`) nur noch bei offenem Socket plus verifizierbarer Zustellung/ACK als Erfolg aufloesen; geschlossene oder bereits verlorene Sockets muessen explizit fehlschlagen.
+- [ ] 99.2.3 Etablierte Socket-Close-/Error-Pfade nach erfolgreichem Connect in `OnlineMatchLobby`/`NetworkLobbyService` sichtbar als `closed`/Disconnect-/Status-Event propagieren; die Menu-Layer darf keinen joined-Scheinzustand behalten.
 
 ### 99.3 Lifecycle-Kern async robust machen
 status: open
@@ -130,8 +148,9 @@ goal: LAN-Pfade gegen Kapazitaetsdrift, Fremdtrigger und Polling-Backlog absiche
 output: Stabilere LAN-Lobby-/Session-Pfade mit klaren Rollen- und Timeout-Guards
 
 - [ ] 99.4.1 `server/lan-signaling.js`: `LOBBY_JOIN` strikt auf `maxPlayers` begrenzen; mutierende Endpoints (`ready`, `invalidate-ready`, `match-start`, `leave`) host-/player-spezifisch haerten.
-- [ ] 99.4.2 `src/network/LANMatchLobby.js` und `src/network/LANSessionAdapter.js`: Polling auf overlap-sichere Schleifen mit Timeout/Abort und sauberer Stop-Logik umstellen.
-- [ ] 99.4.3 `src/ui/menu/testing/MenuMultiplayerPanel.js`: Discovery-Karten ohne untrusted `innerHTML` rendern (textContent/Node-Aufbau, kein HTML-Injection-Pfad).
+- [ ] 99.4.2 `src/network/LANMatchLobby.js`: Session-State aus dem Serverstatus wahrheitsgetreu ableiten; Ready/Unready/Invalidate duerfen nicht sticky bleiben und Signaling-Verlust muss den Lobby-Status sichtbar auf disconnected/closed kippen.
+- [ ] 99.4.3 `src/network/LANMatchLobby.js` und `src/network/LANSessionAdapter.js`: Polling auf overlap-sichere Schleifen mit Timeout/Abort und sauberer Stop-/Host-Leave-Logik umstellen; kein semantischer Reset ueber `LOBBY_CREATE` als impliziter Leave-Ersatz.
+- [ ] 99.4.4 `src/ui/menu/testing/MenuMultiplayerPanel.js`: Discovery-Karten ohne untrusted `innerHTML` rendern (textContent/Node-Aufbau, kein HTML-Injection-Pfad).
 
 ### 99.5 Connectivity-Profil in Produktpfade ziehen
 status: open

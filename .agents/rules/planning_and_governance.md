@@ -24,6 +24,14 @@ description: Plan governance, bot-training governance, and blocker reporting (co
 - Every `[x]` item needs evidence: `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result>)`
 - Every block has at least 2 sub-phases per top-level phase.
 
+## Dead-Code Governance
+
+- Dead code may be removed only when a newer better path with real consumers or an exact productive duplicate-/shim-replacement is proven.
+- Suspected candidates must be classified before deletion: `duplicate-backed`, `legacy-with-replacement`, `contract-first/plan-drift`, `unverified-altpath`.
+- For every retained legacy or compatibility path, document successor, remaining consumers, and delete criterion in the active block or intake draft.
+- Do not mark a scope as done when only contracts or isolated tests exist; plan, runtime, and tests must point to the same productive path.
+- No new consumers may be added to files already marked `legacy`, `compatibility path`, or `shim`.
+
 ## Blocker Reporting
 
 - If implementation hits a blocker or repeated failure, create/update a report in `docs/Fehlerberichte/` before stopping.
@@ -33,6 +41,7 @@ description: Plan governance, bot-training governance, and blocker reporting (co
 
 - Meta-Gate: `npm run gates:pre-commit` (fuehrt `plan:check` -> `docs:sync` -> `docs:check` in fester Reihenfolge aus).
 - Einzeln falls noetig: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`.
+- If scope includes dead-code or legacy cleanup, closure evidence must also name the replacement proof or the explicit retention reason.
 
 ## Test Ownership
 

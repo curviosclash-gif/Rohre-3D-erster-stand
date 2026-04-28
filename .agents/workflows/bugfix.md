@@ -26,6 +26,8 @@ Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/p
 
 - Kleinste sichere Aenderung fuer Root-Cause.
 - Desktop-first bleibt Prioritaet (siehe `product_focus.md`).
+- Verdaechtige Altpfade nicht still mitloeschen; nur entfernen, wenn ein juengerer produktiver Ersatzpfad oder eine exakte Dublette belegt ist.
+- Wenn der Fix einen alten Pfad umgeht oder ersetzt, verbleibende Konsumenten und Delete-Kriterium im Scope dokumentieren.
 - Tests sind user-owned (siehe `planning_and_governance.md` -> Test Ownership). `npm run build` nur, wenn es das kleinste sinnvolle Signal ist.
 
 ## 4. Governance + Doc-Gates
