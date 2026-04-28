@@ -287,7 +287,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93J | 2026-04-26 | frei | abgeschlossen 2026-04-27 als `diagnose-loop-required`; kein BT94A-Claim |
-| Bot-Codex | BT93K | 2026-04-28 | in-bearbeitung | 93K.2 abgeschlossen; naechster Schritt 93K.3 |
+| Bot-Codex | BT93K | 2026-04-28 | in-bearbeitung | 93K.4 abgeschlossen; naechster Schritt 93K.5 |
 | - | BT94A | - | frei | wartet auf `BT93K.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -795,7 +795,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
 | BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
 | BT93J | Root-Cause-Blocker-Repair | completed | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 + R2-Plananpassung 2026-04-26 | 93J.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
-| BT93K | Survival-First Objective Reset | active | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.3 | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
+| BT93K | Survival-First Objective Reset | active | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.5 | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93K.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2686,8 +2686,8 @@ Pflicht-Artefakte:
 - [x] DoD.1 `start_truth.json` pinnt BT93J-Post-Decision, BT94A-No-Start und 3M/4-Env-Zusatzdiagnose ohne BT94A-Umdeutung. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/start_truth.json`)
 - [x] DoD.2 Der Metrikvertrag trennt `avgSteps`, `longestEpisode`, `deathBefore60Share`, `maxStepShare`, `naturalTerminalShare`, `progressSignalNonZero`, `objectiveSignalNonZero`, `runtimeErrorCount` und Action-Safety. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/signal_metric_contract.json`)
 - [x] DoD.3 Kein Lauf ueber den naechsten Ladder-Schritt startet ohne gruenes Supervisor-/Exit-Report-Gate und mindestens ein echtes nicht-totes Zielsignal oder eine vorab definierte Reduktion frueher Todesfaelle. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/signal_metric_contract.json` + `data/training/ppo/bt93k/supervisor_contract_report.json`)
-- [ ] DoD.4 Curriculum-Step-Uhr, `activeCurriculumStage`, Progress-/Objective-Reachability und effective Map/Mode/Planar werden in Train/Eval-Reports sichtbar.
-- [ ] DoD.5 2-/4-/6-Env-Smokes sind klein, final reportbar und getrennt von Longrun-/Qualitaetsurteilen.
+- [x] DoD.4 Curriculum-Step-Uhr, `activeCurriculumStage`, Progress-/Objective-Reachability und effective Map/Mode/Planar werden in Train/Eval-Reports sichtbar. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_runner_signal_repair.py --write-report` + `python python/scripts/bt93k_mode_map_smokes.py --write-report` -> `data/training/ppo/bt93k/runner_signal_repair_report.json` + `data/training/ppo/bt93k/mode_map_smoke_report.json`)
+- [x] DoD.5 2-/4-/6-Env-Smokes sind klein, final reportbar und getrennt von Longrun-/Qualitaetsurteilen. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_env_scale_smokes.py --write-report` -> `data/training/ppo/bt93k/env_scale_smoke_report.json`)
 - [ ] DoD.6 CUDA wird isoliert benchmarked; CPU bleibt Referenzpfad und CUDA wird nur bei stabiler Wallclock-Verbesserung behalten.
 - [ ] DoD.7 BT94A bleibt geschlossen, solange `bt94a_gate_check.py` nicht `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aBlockerCount=0` und `precomparison != ppo-regression` schreibt.
 - [ ] DoD.8 Produktive Runtime-, Matchstart-, AI-Hub-, Strategy-Flag-, Registry-, Rollback-, Rollout-, Authority- und Bridge-Surfaces bleiben unveraendert.
@@ -2723,10 +2723,10 @@ Pflicht-Artefakte:
 
 ### 93K.4 2-/4-/6-Env-Smokes und Exit-Report-Pflicht
 
-- [ ] 93K.4.1 2-Env-Referenz-Smoke mit finalem `run_exit_report.json`, Snapshot-Manifest, Eval-Snapshot und Action-Safety schreiben.
-- [ ] 93K.4.2 4-Env-Smoke mit demselben Supervisor-Vertrag wiederholen; die fehlerhafte 3M/4-Env-Zusatzspur darf nur Diagnose sein.
-- [ ] 93K.4.3 6-Env-Smoke mit kleinem Budget ausfuehren; Erfolg heisst Sidecars starten, reporten und sauber enden, nicht Survival-Qualitaet.
-- [ ] 93K.4.4 Erst bei gruenem 2-/4-/6-Env-Smoke einen 100k-2/4/6-Vergleich vorbereiten; `stdout`/`stderr`-Only, fehlender Exit-Code oder Force-Stop ohne finalen Runner-Report blockieren die Vorbereitung.
+- [x] 93K.4.1 2-Env-Referenz-Smoke mit finalem `run_exit_report.json`, Snapshot-Manifest, Eval-Snapshot und Action-Safety schreiben. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_env_scale_smokes.py --write-report` -> `data/training/ppo/bt93k/env_scale_smoke_report.json`)
+- [x] 93K.4.2 4-Env-Smoke mit demselben Supervisor-Vertrag wiederholen; die fehlerhafte 3M/4-Env-Zusatzspur darf nur Diagnose sein. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_env_scale_smokes.py --write-report` -> `data/training/ppo/bt93k/env_scale_smoke_report.json`)
+- [x] 93K.4.3 6-Env-Smoke mit kleinem Budget ausfuehren; Erfolg heisst Sidecars starten, reporten und sauber enden, nicht Survival-Qualitaet. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_env_scale_smokes.py --write-report` -> `data/training/ppo/bt93k/env_scale_smoke_report.json`)
+- [x] 93K.4.4 Erst bei gruenem 2-/4-/6-Env-Smoke einen 100k-2/4/6-Vergleich vorbereiten; `stdout`/`stderr`-Only, fehlender Exit-Code oder Force-Stop ohne finalen Runner-Report blockieren die Vorbereitung. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_env_scale_smokes.py --write-report` -> `data/training/ppo/bt93k/env_scale_smoke_report.json`)
 
 ### 93K.5 CUDA-Benchmark als isolierte Infrastruktur-Lane
 
