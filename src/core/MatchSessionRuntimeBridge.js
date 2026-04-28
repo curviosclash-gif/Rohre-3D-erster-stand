@@ -26,15 +26,15 @@ export class MatchSessionRuntimeBridge {
     constructor(deps = {}) {
         this.game = deps.game || null;
         this.ports = deps.ports || null;
-        this.runtimeBundle = deps.runtimeBundle || this.game?.runtimeBundle || null;
+        this.runtimeBundle = deps.runtimeBundle || null;
     }
 
     _getRuntimeHandle(key) {
-        return getSessionRuntimeHandle(this.runtimeBundle || this.game?.runtimeBundle, key);
+        return getSessionRuntimeHandle(this.runtimeBundle, key);
     }
 
     _setRuntimeHandle(key, value) {
-        return setSessionRuntimeHandle(this.runtimeBundle || this.game?.runtimeBundle, key, value);
+        return setSessionRuntimeHandle(this.runtimeBundle, key, value);
     }
 
     _disposeKernelAdapter() {
@@ -58,8 +58,8 @@ export class MatchSessionRuntimeBridge {
 
     applyInitializedMatchSession(initializedMatch) {
         const matchSession = initializedMatch?.session;
-        if (!this.game || !matchSession) return;
-        applyMatchSessionState(this.runtimeBundle || this.game.runtimeBundle, matchSession);
+        if (!this.game || !this.runtimeBundle || !matchSession) return;
+        applyMatchSessionState(this.runtimeBundle, matchSession);
 
         this._disposeKernelAdapter();
         this._disposeKernelConsumers();
@@ -77,10 +77,10 @@ export class MatchSessionRuntimeBridge {
         const kernelConsumers = createMatchKernelConsumerRegistry({
             kernel: matchKernel,
             allowKernelTick: false,
-            sessionProvider: () => getCurrentMatchSessionRefs(this.runtimeBundle || this.game?.runtimeBundle),
+            sessionProvider: () => getCurrentMatchSessionRefs(this.runtimeBundle),
             sessionRuntimeProvider: () => this.runtimeBundle?.sessionRuntime || this.game?.sessionRuntime || null,
             gameStateSnapshotProvider: () => {
-                const session = getCurrentMatchSessionRefs(this.runtimeBundle || this.game?.runtimeBundle);
+                const session = getCurrentMatchSessionRefs(this.runtimeBundle);
                 if (!session?.entityManager) return null;
                 const roundState = this.runtimeBundle?.state?.roundStateController || this.game?.roundStateController || null;
                 return createGameStateSnapshot(session.entityManager, roundState);
@@ -95,7 +95,7 @@ export class MatchSessionRuntimeBridge {
     }
 
     getCurrentMatchSessionRefs() {
-        return getCurrentMatchSessionRefs(this.runtimeBundle || this.game?.runtimeBundle);
+        return getCurrentMatchSessionRefs(this.runtimeBundle);
     }
 
     getCurrentMatchKernel() {
@@ -115,10 +115,10 @@ export class MatchSessionRuntimeBridge {
     }
 
     clearMatchSessionRefs() {
-        if (!this.game) return;
+        if (!this.game || !this.runtimeBundle) return;
         this._disposeKernelAdapter();
         this._disposeKernelConsumers();
         this._disposeMatchKernel();
-        clearMatchSessionState(this.runtimeBundle || this.game.runtimeBundle);
+        clearMatchSessionState(this.runtimeBundle);
     }
 }

@@ -7,6 +7,9 @@ import { deriveRoundEndCountdownUiState } from '../shared/contracts/MatchUiState
 export class RoundStateTickSystem {
     constructor(deps = {}) {
         this.game = deps.game || null;
+        this._readLifecyclePort = typeof deps.getLifecyclePort === 'function'
+            ? deps.getLifecyclePort
+            : () => deps.lifecyclePort || null;
     }
 
     _getKernelAdapter() {
@@ -27,12 +30,13 @@ export class RoundStateTickSystem {
 
     _executeRoundStateTickAction(action) {
         const game = this.game;
+        const lifecyclePort = this._readLifecyclePort();
         if (action === 'RETURN_TO_MENU') {
-            game.runtimeBundle?.ports?.lifecyclePort?.returnToMenu?.({ reason: 'round_state_return_to_menu' });
+            lifecyclePort?.returnToMenu?.({ reason: 'round_state_return_to_menu' });
             return true;
         }
         if (action === 'START_ROUND') {
-            game.runtimeBundle?.ports?.lifecyclePort?.restartRound?.();
+            lifecyclePort?.restartRound?.();
             return true;
         }
         if (action === 'RESTART_MATCH') {

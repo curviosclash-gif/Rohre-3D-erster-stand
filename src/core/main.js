@@ -49,7 +49,10 @@ export class Game {
         this.roundPause = 0;
         this.roundStateController = createRoundStateController({ defaultRoundPause: 3.0 });
         this.playingStateSystem = new PlayingStateSystem(this);
-        this.roundStateTickSystem = new RoundStateTickSystem({ game: this });
+        this.roundStateTickSystem = new RoundStateTickSystem({
+            game: this,
+            getLifecyclePort: () => this.runtimeCoordinator?.getPorts?.()?.lifecyclePort || null,
+        });
         this._hudTimer = 0;
         this._renderAlpha = 1;
         this._renderDelta = 1 / 60;
