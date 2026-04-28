@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "docs/generated/knowledge-graph.schema.json",
   "title": "Curvios Clash Knowledge Graph Schema",
-  "description": "Schema for deterministic graph export generated from master plan, active block plans, and legacy-surface guard matrix.",
+  "description": "Schema for deterministic core graph export generated from project plans, structured bot-training blocks, and the legacy-surface guard matrix. Repo-wide coverage enrichment lives in knowledge-graph.coverage.json.",
   "type": "object",
   "additionalProperties": false,
   "required": [

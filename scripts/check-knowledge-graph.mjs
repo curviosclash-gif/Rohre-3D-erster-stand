@@ -4,7 +4,8 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import {
-    buildKnowledgeGraph,
+    buildKnowledgeGraphArtifacts,
+    parseBotTrainingDependencyTable,
     parseDependencyTable,
     parseDependencyToken,
     parseFrontmatter,
@@ -13,24 +14,38 @@ import {
 
 const ROOT = process.cwd();
 const GRAPH_PATH = 'docs/generated/knowledge-graph.json';
+const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
+const BOT_TRAINING_MASTER_PATH = 'docs/bot-training/Bot_Trainingsplan.md';
 const ACTIVE_PLANS_DIR = 'docs/plaene/aktiv';
 
-function graphToString(graph) {
-    return `${JSON.stringify(graph, null, 2)}\n`;
+function artifactToString(payload) {
+    return `${JSON.stringify(payload, null, 2)}\n`;
 }
 
 function addViolation(violations, code, message) {
     violations.push({ code, message });
 }
 
-async function readExistingGraph() {
-    const absolutePath = path.join(ROOT, GRAPH_PATH);
+async function readExistingArtifact(relativePath) {
+    const absolutePath = path.join(ROOT, relativePath);
     const raw = await fs.readFile(absolutePath, 'utf8');
     return {
         raw,
         parsed: JSON.parse(raw),
     };
+}
+
+function hasSource(node, sourceTag) {
+    return Array.isArray(node?.attributes?.source) && node.attributes.source.includes(sourceTag);
+}
+
+function isScopeCollisionManagedBlock(node) {
+    return hasSource(node, 'master-index') || hasSource(node, 'block-plan');
+}
+
+function isPhaseScopedBlock(node) {
+    return hasSource(node, 'block-plan') || hasSource(node, 'bot-training-plan');
 }
 
 async function readScopeOverlapAllowances() {
@@ -108,8 +123,7 @@ function detectHardDependsCycles(graph, violations) {
             }
             if (nextState === 1) {
                 const cycleStart = stack.lastIndexOf(nextNode);
-                const cycleNodes = stack.slice(cycleStart).concat(nextNode);
-                cyclePath = cycleNodes;
+                cyclePath = stack.slice(cycleStart).concat(nextNode);
                 return;
             }
         }
@@ -154,14 +168,15 @@ function validateScopeCollisions(graph, allowancesByBlock, violations) {
     const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
     const edges = Array.isArray(graph.edges) ? graph.edges : [];
     const openBlocks = nodes
-        .filter((node) => node.type === 'block' && node.status !== 'done')
+        .filter((node) => node.type === 'block' && node.status !== 'done' && isScopeCollisionManagedBlock(node))
         .map((node) => node.id)
         .sort((left, right) => left.localeCompare(right));
+    const openBlockSet = new Set(openBlocks);
 
     const scopeByBlock = new Map();
     for (const edge of edges) {
         if (edge.type !== 'scope') continue;
-        if (!openBlocks.includes(edge.from)) continue;
+        if (!openBlockSet.has(edge.from)) continue;
         if (!scopeByBlock.has(edge.from)) scopeByBlock.set(edge.from, new Set());
         scopeByBlock.get(edge.from).add(edge.to);
     }
@@ -193,29 +208,32 @@ function validateScopeCollisions(graph, allowancesByBlock, violations) {
 function validateRequiredPhaseAndScopeData(graph, violations) {
     const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
     const edges = Array.isArray(graph.edges) ? graph.edges : [];
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
 
     const blockNodes = nodes.filter((node) => node.type === 'block');
     const scopeRelevantBlockIds = new Set(
         blockNodes
-            .filter((node) => Array.isArray(node.attributes?.source)
-                && (node.attributes.source.includes('master-index') || node.attributes.source.includes('block-plan')))
+            .filter((node) => hasSource(node, 'master-index') || isPhaseScopedBlock(node))
             .map((node) => node.id)
     );
-    const blockPlanBlockIds = new Set(
+    const phaseRequiredBlockIds = new Set(
         blockNodes
-            .filter((node) => Array.isArray(node.attributes?.source) && node.attributes.source.includes('block-plan'))
+            .filter((node) => isPhaseScopedBlock(node))
             .map((node) => node.id)
     );
 
     const scopeCountByBlock = new Map();
-    const phaseIdsByBlock = new Map();
+    const phaseNodesByBlock = new Map();
     for (const edge of edges) {
         if (edge.type === 'scope') {
             scopeCountByBlock.set(edge.from, (scopeCountByBlock.get(edge.from) || 0) + 1);
         }
         if (edge.type === 'contains_phase') {
-            if (!phaseIdsByBlock.has(edge.from)) phaseIdsByBlock.set(edge.from, []);
-            phaseIdsByBlock.get(edge.from).push(edge.to);
+            const phaseNode = nodeById.get(edge.to) || null;
+            if (!phaseNodesByBlock.has(edge.from)) phaseNodesByBlock.set(edge.from, []);
+            if (phaseNode) {
+                phaseNodesByBlock.get(edge.from).push(phaseNode);
+            }
         }
     }
 
@@ -226,13 +244,13 @@ function validateRequiredPhaseAndScopeData(graph, violations) {
         }
     }
 
-    for (const blockId of blockPlanBlockIds) {
-        const phaseIds = phaseIdsByBlock.get(blockId) || [];
-        if (phaseIds.length < 1) {
+    for (const blockId of phaseRequiredBlockIds) {
+        const phaseNodes = phaseNodesByBlock.get(blockId) || [];
+        if (phaseNodes.length < 1) {
             addViolation(violations, 'BLOCK_PHASE_MISSING', `Block ohne Phase-Nodes: ${blockId}`);
             continue;
         }
-        const gatePhases = phaseIds.filter((phaseId) => phaseId.startsWith(`${blockId}.`) && phaseId.endsWith('.99'));
+        const gatePhases = phaseNodes.filter((phaseNode) => String(phaseNode.attributes?.phaseCode || '').endsWith('.99'));
         if (gatePhases.length !== 1) {
             addViolation(violations, 'BLOCK_GATE_PHASE_INVALID', `Block ${blockId} braucht genau eine .99-Phase (gefunden: ${gatePhases.length})`);
         }
@@ -268,10 +286,63 @@ function validateNodeIdAndOrphans(graph, violations) {
     }
 }
 
+function validateCoverageArtifact(coverage, graph, violations) {
+    const files = Array.isArray(coverage.files) ? coverage.files : [];
+    const overlayBlocks = Array.isArray(coverage.overlayBlocks) ? coverage.overlayBlocks : [];
+    const summary = coverage.summary || {};
+    const overlayIds = new Set(overlayBlocks.map((entry) => entry.id));
+    const seenPaths = new Set();
+    const rawCoveredCount = files.filter((entry) => entry.covered === true).length;
+    const activeFiles = files.filter((entry) => entry.excludedFromCoverage !== true);
+    const adjustedCoveredCount = activeFiles.filter((entry) => entry.covered === true).length;
+
+    if (coverage.graph_contract !== graph.contract) {
+        addViolation(violations, 'COVERAGE_GRAPH_CONTRACT_MISMATCH', `coverage.graph_contract=${coverage.graph_contract} passt nicht zu graph.contract=${graph.contract}`);
+    }
+    if (summary.trackedFileCount !== files.length) {
+        addViolation(violations, 'COVERAGE_TRACKED_COUNT_MISMATCH', `summary.trackedFileCount=${summary.trackedFileCount} passt nicht zu files.length=${files.length}`);
+    }
+    if (summary.rawCoveredFileCount !== rawCoveredCount) {
+        addViolation(violations, 'COVERAGE_RAW_COUNT_MISMATCH', `summary.rawCoveredFileCount=${summary.rawCoveredFileCount} passt nicht zur Dateiaggregation=${rawCoveredCount}`);
+    }
+    if (summary.adjustedCoveredFileCount !== adjustedCoveredCount) {
+        addViolation(violations, 'COVERAGE_ADJUSTED_COUNT_MISMATCH', `summary.adjustedCoveredFileCount=${summary.adjustedCoveredFileCount} passt nicht zur Dateiaggregation=${adjustedCoveredCount}`);
+    }
+    if (summary.adjustedTrackedFileCount !== activeFiles.length) {
+        addViolation(violations, 'COVERAGE_ADJUSTED_TRACKED_COUNT_MISMATCH', `summary.adjustedTrackedFileCount=${summary.adjustedTrackedFileCount} passt nicht zur Dateiaggregation=${activeFiles.length}`);
+    }
+
+    for (const entry of files) {
+        const normalizedPath = String(entry.path || '').trim();
+        if (!normalizedPath) {
+            addViolation(violations, 'COVERAGE_PATH_EMPTY', 'Coverage-Datei mit leerem Pfad gefunden');
+            continue;
+        }
+        if (seenPaths.has(normalizedPath)) {
+            addViolation(violations, 'COVERAGE_PATH_DUPLICATE', `Doppelte Coverage-Datei gefunden: ${normalizedPath}`);
+        }
+        seenPaths.add(normalizedPath);
+
+        const derivedCovered = entry.coveredInCore === true || entry.coveredByOverlay === true;
+        if (entry.covered !== derivedCovered) {
+            addViolation(violations, 'COVERAGE_FLAG_INCONSISTENT', `covered-Flag inkonsistent fuer ${normalizedPath}`);
+        }
+
+        for (const overlay of entry.overlays || []) {
+            if (!overlayIds.has(overlay.blockId)) {
+                addViolation(violations, 'COVERAGE_OVERLAY_MISSING', `Overlay-Referenz ${overlay.blockId} fuer ${normalizedPath} fehlt in overlayBlocks`);
+            }
+        }
+    }
+}
+
 async function validateDependencyMergeConsistency(graph, violations) {
     const masterContent = await fs.readFile(path.join(ROOT, MASTER_PLAN_PATH), 'utf8');
     const masterRows = parseMasterRows(masterContent);
     const dependencyRows = parseDependencyTable(masterContent);
+    const btDependencyRows = (await fs.access(path.join(ROOT, BOT_TRAINING_MASTER_PATH)).then(() => true).catch(() => false))
+        ? parseBotTrainingDependencyTable(await fs.readFile(path.join(ROOT, BOT_TRAINING_MASTER_PATH), 'utf8'))
+        : [];
     const blockStatusById = new Map(
         (Array.isArray(graph.nodes) ? graph.nodes : [])
             .filter((node) => node.type === 'block')
@@ -298,6 +369,9 @@ async function validateDependencyMergeConsistency(graph, violations) {
             expectedPairs.add(`${blockId}::${dep.blockId}`);
         }
     }
+    for (const row of btDependencyRows) {
+        expectedPairs.add(`${row.blockId}::${row.dependsOn.blockId}`);
+    }
 
     const graphDependsPairs = new Set(
         (Array.isArray(graph.edges) ? graph.edges : [])
@@ -311,14 +385,10 @@ async function validateDependencyMergeConsistency(graph, violations) {
         }
     }
 
-    for (const row of dependencyRows) {
+    for (const row of [...dependencyRows, ...btDependencyRows]) {
         const ownerStatus = blockStatusById.get(row.blockId) || 'unknown';
-        if (ownerStatus === 'done') {
-            continue;
-        }
-        if (row.dependsOn.isCanonical !== true) {
-            continue;
-        }
+        if (ownerStatus === 'done') continue;
+        if (row.dependsOn.isCanonical !== true) continue;
         const pair = `${row.blockId}::${row.dependsOn.blockId}`;
         if (!expectedPairs.has(pair)) {
             addViolation(violations, 'DEPENDS_METADATA_ORPHAN', `Abhaengigkeitsmetadaten ohne Basis-Kante: ${pair}`);
@@ -329,15 +399,20 @@ async function validateDependencyMergeConsistency(graph, violations) {
 async function runChecks() {
     const violations = [];
 
-    const [existingGraph, generatedGraph, allowancesByBlock] = await Promise.all([
-        readExistingGraph(),
-        buildKnowledgeGraph(),
+    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock] = await Promise.all([
+        readExistingArtifact(GRAPH_PATH),
+        readExistingArtifact(COVERAGE_PATH),
+        buildKnowledgeGraphArtifacts(),
         readScopeOverlapAllowances(),
     ]);
 
-    const generatedRaw = graphToString(generatedGraph);
-    if (existingGraph.raw !== generatedRaw) {
+    const generatedGraphRaw = artifactToString(generatedArtifacts.graph);
+    const generatedCoverageRaw = artifactToString(generatedArtifacts.coverage);
+    if (existingGraph.raw !== generatedGraphRaw) {
         addViolation(violations, 'GRAPH_DIFF', 'knowledge-graph.json ist nicht byteidentisch zum Build-Output (run: npm run graph:build)');
+    }
+    if (existingCoverage.raw !== generatedCoverageRaw) {
+        addViolation(violations, 'COVERAGE_DIFF', 'knowledge-graph.coverage.json ist nicht byteidentisch zum Build-Output (run: npm run graph:build)');
     }
 
     validateNodeIdAndOrphans(existingGraph.parsed, violations);
@@ -346,6 +421,7 @@ async function runChecks() {
     validateScopeEdgesAndFiles(existingGraph.parsed, violations);
     validateScopeCollisions(existingGraph.parsed, allowancesByBlock, violations);
     validateRequiredPhaseAndScopeData(existingGraph.parsed, violations);
+    validateCoverageArtifact(existingCoverage.parsed, existingGraph.parsed, violations);
     await validateDependencyMergeConsistency(existingGraph.parsed, violations);
 
     if (violations.length === 0) {

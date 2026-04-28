@@ -457,6 +457,9 @@ async function main() {
     const stopOnFail = parseBoolean(args.get('stop-on-fail'), performanceProfile?.loop?.stopOnFail ?? true);
     const withTrainerServer = parseBoolean(args.get('with-trainer-server'), performanceProfile?.loop?.withTrainerServer ?? true);
     const writeLatest = parseBoolean(args.get('write-latest'), true);
+    const hasExplicitBotValidationReport = typeof args.get('bot-validation-report') === 'string'
+        && Boolean(args.get('bot-validation-report').trim());
+    const skipGateForMissingValidationEvidence = !writeLatest && !hasExplicitBotValidationReport;
     const stageTimeoutMs = parseInteger(
         args.get('stage-timeout-ms'),
         performanceProfile?.loop?.stageTimeoutMs ?? DEFAULT_STAGE_TIMEOUT_MS,
@@ -529,27 +532,37 @@ async function main() {
                     ...evalResult,
                 });
                 if (evalResult.status === 'completed') {
-                    const gateResult = await runNodeScript(
-                        TRAINING_SCRIPT_PATHS.TRAINING_GATE,
-                        buildStageForwardArgs(args, runStamp),
-                        {
-                        timeoutMs: stageTimeoutMs,
-                        env: {
-                            TRAINING_RUN_STAMP: runStamp,
-                            TRAINING_SERIES_STAMP: seriesStamp,
-                            ...(performanceProfileName ? { TRAINING_PERFORMANCE_PROFILE: performanceProfileName } : {}),
-                            ...(algorithmProfileName ? { TRAINING_ALGORITHM_PROFILE: algorithmProfileName } : {}),
-                        },
-                        }
-                    );
-                    stages.push({
-                        stage: 'gate',
-                        ...gateResult,
-                    });
+                    if (skipGateForMissingValidationEvidence) {
+                        stages.push({
+                            stage: 'gate',
+                            status: 'skipped',
+                            exitCode: 0,
+                            reason: 'gate skipped because bot-validation evidence was intentionally not refreshed',
+                            elapsedMs: 0,
+                        });
+                    } else {
+                        const gateResult = await runNodeScript(
+                            TRAINING_SCRIPT_PATHS.TRAINING_GATE,
+                            buildStageForwardArgs(args, runStamp),
+                            {
+                            timeoutMs: stageTimeoutMs,
+                            env: {
+                                TRAINING_RUN_STAMP: runStamp,
+                                TRAINING_SERIES_STAMP: seriesStamp,
+                                ...(performanceProfileName ? { TRAINING_PERFORMANCE_PROFILE: performanceProfileName } : {}),
+                                ...(algorithmProfileName ? { TRAINING_ALGORITHM_PROFILE: algorithmProfileName } : {}),
+                            },
+                            }
+                        );
+                        stages.push({
+                            stage: 'gate',
+                            ...gateResult,
+                        });
+                    }
                 }
             }
 
-            const failedStage = stages.find((entry) => entry.status !== 'completed');
+            const failedStage = stages.find((entry) => entry.status === 'failed');
             const status = failedStage ? 'failed' : 'completed';
             runResults.push({
                 runIndex,

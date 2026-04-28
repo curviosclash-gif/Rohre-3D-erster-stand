@@ -1,10 +1,14 @@
 #!/usr/bin/env node
+import { execFile as execFileCallback } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { promisify } from 'node:util';
 import { pathToFileURL } from 'node:url';
 
 const ROOT = process.cwd();
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
+const BOT_TRAINING_MASTER_PATH = 'docs/bot-training/Bot_Trainingsplan.md';
+const QA_AUDIT_ROOT_PATH = 'docs/qa';
 const CANONICAL_PLAN_DIRS = Object.freeze([
     'docs/plaene/aktiv',
     'docs/plaene/alt',
@@ -12,9 +16,98 @@ const CANONICAL_PLAN_DIRS = Object.freeze([
 const ARCHIVED_COMPLETED_BLOCKS_PATH = 'docs/plaene/archiv/abgeschlossene-bloecke.md';
 const GUARD_MATRIX_PATH = 'scripts/architecture/legacy-surface-guard-matrix.json';
 const OUTPUT_PATH = 'docs/generated/knowledge-graph.json';
+const COVERAGE_OUTPUT_PATH = 'docs/generated/knowledge-graph.coverage.json';
+const GIT_HOTSPOT_OVERLAY_ID = 'GIT-HISTORY-HOTSPOTS';
+const GIT_HOTSPOT_MAX_FILES = 96;
+const GIT_HOTSPOT_MIN_CHANGES = 5;
+const GIT_HOTSPOT_ELIGIBLE_PREFIXES = Object.freeze([
+    '.agents/scripts/',
+    'data/contracts/',
+    'dev/',
+    'docs/referenz/',
+    'editor/',
+    'electron/',
+    'python/',
+    'scripts/',
+    'server/',
+    'src/',
+    'tests/',
+    'trainer/',
+]);
+const GIT_HOTSPOT_ROOT_FILES = new Set([
+    'README.md',
+    'package-lock.json',
+    'package.json',
+    'server.ps1',
+]);
 
 const GRAPH_CONTRACT = 'knowledge-graph.v1';
 const GRAPH_SCHEMA_VERSION = 1;
+const COVERAGE_CONTRACT = 'knowledge-graph.coverage.v1';
+const COVERAGE_SCHEMA_VERSION = 1;
+const execFile = promisify(execFileCallback);
+const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
+    {
+        classification: 'asset',
+        prefixes: ['assets/'],
+        excludedFromCoverage: true,
+        reason: 'Static asset inventory is tracked separately from code-surface coverage.',
+    },
+    {
+        classification: 'prototype',
+        prefixes: ['prototypes/'],
+        excludedFromCoverage: true,
+        reason: 'Prototype spikes stay outside the main repo coverage KPI.',
+    },
+    {
+        classification: 'archive',
+        prefixes: ['archive/'],
+        excludedFromCoverage: true,
+        reason: 'Archived snapshots are intentionally excluded from active coverage.',
+    },
+    {
+        classification: 'temp',
+        prefixes: ['tmp/', '.codex_tmp/'],
+        excludedFromCoverage: true,
+        reason: 'Temporary and local scratch artifacts are not part of active coverage.',
+    },
+    {
+        classification: 'repo-ops',
+        prefixes: ['.github/', '.husky/'],
+        excludedFromCoverage: true,
+        reason: 'Repository automation scaffolding is tracked separately from product/code coverage.',
+    },
+    {
+        classification: 'agent-workflow',
+        prefixes: ['.agents/workflows/'],
+        excludedFromCoverage: true,
+        reason: 'Agent workflow documents are governance references, not product/code coverage targets.',
+    },
+    {
+        classification: 'governance-tooling',
+        prefixes: ['.agents/scripts/'],
+        excludedFromCoverage: false,
+        reason: null,
+    },
+    {
+        classification: 'product-code',
+        prefixes: ['src/', 'scripts/', 'tests/', 'electron/', 'server/', 'python/', 'trainer/', 'editor/', 'data/contracts/'],
+        excludedFromCoverage: false,
+        reason: null,
+    },
+    {
+        classification: 'product-docs',
+        prefixes: ['docs/', 'README.md', 'package.json', 'package-lock.json', 'server.ps1'],
+        excludedFromCoverage: false,
+        reason: null,
+    },
+    {
+        classification: 'dev-tooling',
+        prefixes: ['dev/'],
+        excludedFromCoverage: false,
+        reason: null,
+    },
+]);
 
 const NODE_TYPE_ORDER = Object.freeze({
     block: 0,
@@ -41,6 +134,7 @@ const KNOWN_FRONTMATTER_FIELDS = new Set([
     'current_phase',
     'completed_at',
 ]);
+const REPO_PATH_TOKEN_REGEX = /((?:\.agents|assets|data|dev|docs|editor|electron|public|python|scripts|server|src|tests|tmp|trainer|videos)(?:[\\/][A-Za-z0-9._*-]+)*[\\/]?|(?:README\.md|package(?:-lock)?\.json|server\.ps1|vite\.config\.[A-Za-z0-9._-]+|eslint\.config\.[A-Za-z0-9._-]+|tsconfig\.[A-Za-z0-9._-]+))/g;
 
 function normalizeRepoPath(value) {
     return String(value || '')
@@ -48,6 +142,466 @@ function normalizeRepoPath(value) {
         .replace(/\\/g, '/')
         .replace(/^\.\/+/, '')
         .replace(/\/{2,}/g, '/');
+}
+
+function splitBlockId(blockId) {
+    const normalized = String(blockId || '').trim();
+    const match = normalized.match(/^([A-Za-z]+)(.+)$/);
+    if (!match) {
+        return {
+            blockId: normalized,
+            prefix: '',
+            root: normalized,
+        };
+    }
+    return {
+        blockId: normalized,
+        prefix: match[1],
+        root: match[2],
+    };
+}
+
+function extractPhaseRoot(blockId) {
+    return splitBlockId(blockId).root;
+}
+
+function buildPhaseRootCandidates(blockIdOrRoot) {
+    const rawValue = String(blockIdOrRoot || '').trim();
+    const phaseRoot = /^[A-Za-z]/.test(rawValue) ? extractPhaseRoot(rawValue) : rawValue;
+    const numericRoot = phaseRoot.match(/^\d+/)?.[0] || phaseRoot;
+    return Array.from(new Set([phaseRoot, numericRoot].filter(Boolean)));
+}
+
+function resolvePhaseRootFromLines(lines, blockIdOrRoot) {
+    const candidates = buildPhaseRootCandidates(blockIdOrRoot);
+    for (const candidate of candidates) {
+        const matcher = new RegExp(`\\b${escapeRegExp(candidate)}\\.\\d+(?:\\.\\d+)?\\b`);
+        if ((lines || []).some((line) => matcher.test(String(line || '')))) {
+            return candidate;
+        }
+    }
+    return candidates[0] || '';
+}
+
+function buildPhaseNodeId(blockId, phaseCode) {
+    const { prefix } = splitBlockId(blockId);
+    return `${prefix}${String(phaseCode || '').trim()}`;
+}
+
+function escapeRegExp(value) {
+    return String(value || '').replace(/[|\\{}()[\]^$+?.]/g, '\\$&');
+}
+
+function hasGlobSyntax(value) {
+    return /[*?]/.test(String(value || ''));
+}
+
+function isConcreteScopePath(value) {
+    const normalized = normalizeRepoPath(value);
+    if (!normalized || normalized.endsWith('/')) return false;
+    if (hasGlobSyntax(normalized)) return false;
+    return /(?:^|\/)[^/]+\.[A-Za-z0-9._-]+$/.test(normalized);
+}
+
+function isPathPrefixScope(value) {
+    const normalized = normalizeRepoPath(value);
+    return normalized.endsWith('/') || (!hasGlobSyntax(normalized) && !/\.[A-Za-z0-9._-]+$/.test(normalized));
+}
+
+function createGlobRegExp(pattern) {
+    const normalized = normalizeRepoPath(pattern);
+    let regex = '^';
+
+    for (let index = 0; index < normalized.length; index += 1) {
+        const character = normalized[index];
+        if (character === '*') {
+            const nextCharacter = normalized[index + 1];
+            if (nextCharacter === '*') {
+                regex += '.*';
+                index += 1;
+            } else {
+                regex += '[^/]*';
+            }
+            continue;
+        }
+
+        if (character === '?') {
+            regex += '[^/]';
+            continue;
+        }
+
+        regex += escapeRegExp(character);
+    }
+
+    regex += '$';
+    return new RegExp(regex);
+}
+
+function collectRepoPathReferences(content) {
+    const matches = String(content || '').matchAll(REPO_PATH_TOKEN_REGEX);
+    const results = new Set();
+
+    for (const match of matches) {
+        const normalized = normalizeRepoPath(match[1]);
+        if (normalized && isLikelyRepoPath(normalized)) {
+            results.add(normalized);
+        }
+    }
+
+    return Array.from(results).sort((left, right) => left.localeCompare(right));
+}
+
+function classifyCoveragePath(filePath) {
+    const normalizedPath = normalizeRepoPath(filePath);
+    for (const rule of COVERAGE_CLASSIFICATION_RULES) {
+        if (rule.prefixes.some((prefix) => normalizedPath === prefix || normalizedPath.startsWith(prefix))) {
+            return {
+                classification: rule.classification,
+                excludedFromCoverage: rule.excludedFromCoverage,
+                excludeReason: rule.reason,
+            };
+        }
+    }
+    return {
+        classification: 'other',
+        excludedFromCoverage: false,
+        excludeReason: null,
+    };
+}
+
+function resolveScopeEntries(rawEntries, trackedFiles, trackedFileSet) {
+    const declarations = new Set();
+    const resolved = new Set();
+    const planned = new Set();
+    const trackedList = Array.isArray(trackedFiles) ? trackedFiles : [];
+    const trackedSet = trackedFileSet instanceof Set ? trackedFileSet : new Set(trackedList);
+
+    for (const rawEntry of rawEntries || []) {
+        const normalizedEntry = normalizeRepoPath(rawEntry);
+        if (!normalizedEntry) continue;
+
+        declarations.add(normalizedEntry);
+        const candidates = collectRepoPathReferences(normalizedEntry);
+        const candidateEntries = candidates.length > 0 ? candidates : [normalizedEntry];
+
+        for (const candidateEntry of candidateEntries) {
+            const candidate = normalizeRepoPath(candidateEntry);
+            if (!candidate) continue;
+
+            let matches = [];
+            if (trackedSet.has(candidate)) {
+                matches = [candidate];
+            } else if (hasGlobSyntax(candidate)) {
+                const matcher = createGlobRegExp(candidate);
+                matches = trackedList.filter((filePath) => matcher.test(filePath));
+            } else if (isPathPrefixScope(candidate)) {
+                const prefix = candidate.endsWith('/') ? candidate : `${candidate}/`;
+                matches = trackedList.filter((filePath) => filePath.startsWith(prefix));
+            }
+
+            if (matches.length > 0) {
+                for (const match of matches) {
+                    resolved.add(match);
+                }
+                continue;
+            }
+
+            if (isConcreteScopePath(candidate)) {
+                planned.add(candidate);
+            }
+        }
+    }
+
+    return {
+        scopeFiles: Array.from(new Set([...resolved, ...planned]))
+            .sort((left, right) => left.localeCompare(right)),
+        scopeDeclarations: Array.from(declarations)
+            .sort((left, right) => left.localeCompare(right)),
+        scopeResolution: {
+            concreteCount: resolved.size,
+            plannedCount: planned.size,
+        },
+    };
+}
+
+async function runGitCommand(args) {
+    try {
+        const { stdout } = await execFile('git', args, {
+            cwd: ROOT,
+            maxBuffer: 50 * 1024 * 1024,
+            windowsHide: true,
+        });
+        return stdout;
+    } catch {
+        return '';
+    }
+}
+
+async function readTrackedFiles() {
+    const trackedStdout = await runGitCommand(['ls-files']);
+    const untrackedStdout = await runGitCommand(['ls-files', '--others', '--exclude-standard']);
+    return [...trackedStdout.split(/\r?\n/), ...untrackedStdout.split(/\r?\n/)]
+        .map((line) => normalizeRepoPath(line))
+        .filter(Boolean)
+        .filter((line, index, all) => all.indexOf(line) === index)
+        .sort((left, right) => left.localeCompare(right));
+}
+
+async function readDirtyTrackedFiles() {
+    const stdout = await runGitCommand(['status', '--porcelain']);
+    const dirtyFiles = new Set();
+
+    for (const line of stdout.split(/\r?\n/)) {
+        if (!line || line.startsWith('?? ')) continue;
+        const normalized = normalizeRepoPath(line.slice(3));
+        if (normalized) {
+            dirtyFiles.add(normalized);
+        }
+    }
+
+    return dirtyFiles;
+}
+
+function isHotspotEligible(filePath) {
+    if (!filePath) return false;
+    if (GIT_HOTSPOT_ROOT_FILES.has(filePath)) return true;
+    return GIT_HOTSPOT_ELIGIBLE_PREFIXES.some((prefix) => filePath.startsWith(prefix));
+}
+
+async function readGitChangeCounts() {
+    const gitPaths = [
+        '.agents',
+        'data/contracts',
+        'dev',
+        'docs/bot-training',
+        'docs/referenz',
+        'editor',
+        'electron',
+        'python',
+        'scripts',
+        'server',
+        'src',
+        'tests',
+        'trainer',
+        'README.md',
+        'package-lock.json',
+        'package.json',
+        'server.ps1',
+    ];
+    const stdout = await runGitCommand(['log', '--name-only', '--format=', '--', ...gitPaths]);
+    const counts = new Map();
+
+    for (const line of stdout.split(/\r?\n/)) {
+        const normalized = normalizeRepoPath(line);
+        if (!normalized || !isHotspotEligible(normalized)) continue;
+        counts.set(normalized, (counts.get(normalized) || 0) + 1);
+    }
+
+    return counts;
+}
+
+function materializeScopePlan(plan, trackedFiles, trackedFileSet) {
+    const resolvedScope = resolveScopeEntries(plan.scopeFiles || [], trackedFiles, trackedFileSet);
+    return {
+        ...plan,
+        scopeFiles: resolvedScope.scopeFiles,
+        scopeDeclarations: resolvedScope.scopeDeclarations,
+        scopeResolution: resolvedScope.scopeResolution,
+    };
+}
+
+async function readBotTrainingPlans(trackedFiles, trackedFileSet) {
+    if (!(await pathExists(BOT_TRAINING_MASTER_PATH))) {
+        return [];
+    }
+
+    const content = await fs.readFile(path.join(ROOT, BOT_TRAINING_MASTER_PATH), 'utf8');
+    return parseBotTrainingBlocks(content)
+        .map((plan) => materializeScopePlan(plan, trackedFiles, trackedFileSet))
+        .sort((left, right) => left.id.localeCompare(right.id));
+}
+
+function resolveRelativeRepoPath(baseFilePath, candidatePath) {
+    const normalizedBase = normalizeRepoPath(baseFilePath);
+    const normalizedCandidate = normalizeRepoPath(candidatePath);
+    if (!normalizedCandidate) return '';
+    if (isLikelyRepoPath(normalizedCandidate) && !normalizedCandidate.startsWith('./') && !normalizedCandidate.startsWith('../')) {
+        return normalizedCandidate;
+    }
+    return normalizeRepoPath(path.posix.join(path.posix.dirname(normalizedBase), normalizedCandidate));
+}
+
+function parseAuditMasterRows(masterContent, readmePath) {
+    const normalizedReadmePath = normalizeRepoPath(readmePath);
+    const lines = String(masterContent || '').replace(/\r\n/g, '\n').split('\n');
+    const rows = [];
+    const headingIndex = lines.findIndex((line) => /^##\s+Blockuebersicht\b/i.test(line.trim()));
+    if (headingIndex < 0) return rows;
+
+    let endIndex = lines.length;
+    for (let index = headingIndex + 1; index < lines.length; index += 1) {
+        if (/^##\s+/.test(lines[index])) {
+            endIndex = index;
+            break;
+        }
+    }
+
+    for (let index = headingIndex + 1; index < endIndex; index += 1) {
+        const line = lines[index].trim();
+        if (!line.startsWith('|')) continue;
+        if (/^\|\s*Block\s*\|/i.test(line) || /^\|\s*---/.test(line)) continue;
+
+        const cells = line
+            .split('|')
+            .slice(1, -1)
+            .map((cell) => cell.trim());
+        if (cells.length < 4) continue;
+
+        const [blockCell, areaCell, corePathsCell, findingsCell] = cells;
+        const blockId = String(blockCell || '').match(/\b(B\d+)\b/i)?.[1]?.toUpperCase() || '';
+        if (!blockId) continue;
+
+        const findingsLink = String(findingsCell || '').match(/\]\(([^)]+)\)/)?.[1] || '';
+        const findingsPath = findingsLink
+            ? resolveRelativeRepoPath(normalizedReadmePath, findingsLink)
+            : null;
+
+        rows.push({
+            id: blockId,
+            title: String(areaCell || '').trim() || blockId,
+            status: 'open',
+            readmePath: normalizedReadmePath,
+            findingsPath,
+            scopeEntries: collectRepoPathReferences(corePathsCell),
+        });
+    }
+
+    return rows;
+}
+
+function parseAuditFindingsMetadata(findingsContent) {
+    const lines = String(findingsContent || '').replace(/\r\n/g, '\n').split('\n');
+    const statusMatch = lines.find((line) => /^Status:\s*/i.test(line))?.match(/^Status:\s*(.+)$/i);
+    const status = normalizeBlockStatus(statusMatch?.[1] || 'open');
+
+    const headingIndex = lines.findIndex((line) => /^##\s+Scope\b/i.test(line.trim()));
+    const scopeEntries = new Set();
+    if (headingIndex >= 0) {
+        let endIndex = lines.length;
+        for (let index = headingIndex + 1; index < lines.length; index += 1) {
+            if (/^##\s+/.test(lines[index])) {
+                endIndex = index;
+                break;
+            }
+        }
+        for (const reference of collectPathsFromStructuredLines(lines.slice(headingIndex + 1, endIndex))) {
+            scopeEntries.add(reference);
+        }
+    }
+
+    return {
+        status,
+        scopeEntries: Array.from(scopeEntries).sort((left, right) => left.localeCompare(right)),
+    };
+}
+
+async function readAuditPlans(trackedFiles, trackedFileSet) {
+    const rootPath = path.join(ROOT, QA_AUDIT_ROOT_PATH);
+    let rootEntries = [];
+    try {
+        rootEntries = await fs.readdir(rootPath, { withFileTypes: true });
+    } catch {
+        return [];
+    }
+
+    const auditDirectories = rootEntries
+        .filter((entry) => entry.isDirectory() && /^Spielaudit_/i.test(entry.name))
+        .map((entry) => entry.name)
+        .sort((left, right) => left.localeCompare(right));
+
+    const plans = [];
+    for (const directoryName of auditDirectories) {
+        const readmePath = normalizeRepoPath(path.join(QA_AUDIT_ROOT_PATH, directoryName, 'README.md'));
+        if (!(await pathExists(readmePath))) continue;
+
+        const readmeContent = await fs.readFile(path.join(ROOT, readmePath), 'utf8');
+        const rows = parseAuditMasterRows(readmeContent, readmePath);
+        for (const row of rows) {
+            const mergedScopeEntries = new Set([
+                row.readmePath,
+                ...(row.findingsPath ? [row.findingsPath] : []),
+                ...(row.scopeEntries || []),
+            ]);
+
+            let status = row.status || 'open';
+            if (row.findingsPath && await pathExists(row.findingsPath)) {
+                const findingsContent = await fs.readFile(path.join(ROOT, row.findingsPath), 'utf8');
+                const findingsMeta = parseAuditFindingsMetadata(findingsContent);
+                status = findingsMeta.status || status;
+                for (const entry of findingsMeta.scopeEntries) {
+                    mergedScopeEntries.add(entry);
+                }
+            }
+
+            plans.push(materializeScopePlan({
+                id: row.id,
+                title: row.title,
+                status,
+                priority: null,
+                owner: null,
+                dependsOn: [],
+                currentPhase: null,
+                planFile: row.findingsPath || row.readmePath,
+                referencePlanFile: row.readmePath,
+                source: ['audit-plan'],
+                phases: [],
+                subphases: [],
+                scopeFiles: Array.from(mergedScopeEntries).sort((left, right) => left.localeCompare(right)),
+            }, trackedFiles, trackedFileSet));
+        }
+    }
+
+    return plans.sort((left, right) => left.id.localeCompare(right.id));
+}
+
+async function buildGitHotspotOverlay(coveredFileIds, trackedFiles) {
+    const [changeCounts, dirtyFiles] = await Promise.all([
+        readGitChangeCounts(),
+        readDirtyTrackedFiles(),
+    ]);
+
+    const hotspotFiles = trackedFiles
+        .filter((filePath) => isHotspotEligible(filePath) && !coveredFileIds.has(filePath))
+        .map((filePath) => ({
+            path: filePath,
+            changes: changeCounts.get(filePath) || 0,
+            dirty: dirtyFiles.has(filePath),
+            ...classifyCoveragePath(filePath),
+        }))
+        .filter((entry) => !entry.excludedFromCoverage)
+        .filter((entry) => entry.dirty || entry.changes >= GIT_HOTSPOT_MIN_CHANGES)
+        .sort((left, right) => {
+            if (left.dirty !== right.dirty) {
+                return left.dirty ? -1 : 1;
+            }
+            if (left.changes !== right.changes) {
+                return right.changes - left.changes;
+            }
+            return left.path.localeCompare(right.path);
+        })
+        .slice(0, GIT_HOTSPOT_MAX_FILES);
+
+    if (hotspotFiles.length === 0) {
+        return null;
+    }
+
+    return {
+        id: GIT_HOTSPOT_OVERLAY_ID,
+        title: 'Git-History Hotspots ausserhalb des Core-Graphen',
+        coverageSource: 'git-history',
+        files: hotspotFiles,
+        fileCount: hotspotFiles.length,
+    };
 }
 
 function parseFrontmatter(content) {
@@ -109,23 +663,43 @@ function parseFrontmatter(content) {
     };
 }
 
+function parseChecklistStatus(marker) {
+    const normalized = String(marker || '').trim().toLowerCase();
+    if (normalized === 'x') return 'done';
+    if (normalized === '/') return 'active';
+    return 'open';
+}
+
 function parseChecklistSubphases(lines, phaseRoot) {
     const subphases = [];
     const regex = new RegExp(`^\\s*-\\s*\\[([ xX/])\\]\\s+(${phaseRoot}\\.\\d+\\.\\d+)\\b\\s*(.*)$`);
     for (const line of lines) {
         const match = line.match(regex);
         if (!match) continue;
-        const marker = match[1].toLowerCase();
         const code = match[2];
-        const status = marker === 'x' ? 'done' : 'open';
         subphases.push({
             code,
-            status,
+            status: parseChecklistStatus(match[1]),
             text: match[3].trim(),
             phaseCode: code.split('.').slice(0, 2).join('.'),
         });
     }
     return subphases;
+}
+
+function parseChecklistPhases(lines, phaseRoot) {
+    const phases = [];
+    const regex = new RegExp(`^\\s*-\\s*\\[([ xX/])\\]\\s+(${phaseRoot}\\.\\d+)(?!\\.)\\b\\s*(.*)$`);
+    for (const line of lines) {
+        const match = line.match(regex);
+        if (!match) continue;
+        phases.push({
+            code: match[2],
+            status: parseChecklistStatus(match[1]),
+            title: match[3].trim() || null,
+        });
+    }
+    return phases;
 }
 
 function parsePhaseHeadings(lines, phaseRoot) {
@@ -154,18 +728,108 @@ function parsePhaseHeadings(lines, phaseRoot) {
     return phases;
 }
 
+function mergePhaseStatusesWithSubphases(phases, subphases) {
+    const grouped = new Map();
+    for (const subphase of subphases || []) {
+        if (!grouped.has(subphase.phaseCode)) grouped.set(subphase.phaseCode, []);
+        grouped.get(subphase.phaseCode).push(subphase);
+    }
+
+    return (phases || []).map((phase) => {
+        const members = grouped.get(phase.code) || [];
+        if (members.length === 0) return phase;
+        const allDone = members.every((subphase) => subphase.status === 'done');
+        if (allDone) return { ...phase, status: 'done' };
+        const anyActive = members.some((subphase) => subphase.status === 'active');
+        if (anyActive) return { ...phase, status: 'active' };
+        const anyOpen = members.some((subphase) => subphase.status === 'open');
+        if (anyOpen) return { ...phase, status: phase.status === 'done' ? 'active' : 'open' };
+        return phase;
+    });
+}
+
+function isLikelyRepoPath(value) {
+    const normalized = normalizeRepoPath(value);
+    if (!normalized) return false;
+    if (/^(src|docs|tests|server|electron|scripts|trainer|editor|assets|data|videos|dev|public|tmp|python|\.agents)\//.test(normalized)) {
+        return true;
+    }
+    if (/^(index\.html|style\.css|server\.ps1|package(?:-lock)?\.json|vite\.config\.[a-z0-9._-]+|README\.md|CONTRIBUTING\.md|knip\.json|eslint\.config\.[a-z0-9._-]+|tsconfig\.[^/]+)$/.test(normalized)) {
+        return true;
+    }
+    return normalized.includes('**');
+}
+
+function normalizeLegacyScopeEntry(rawValue) {
+    const normalized = normalizeRepoPath(
+        String(rawValue || '')
+            .trim()
+            .replace(/^-\s+/, '')
+            .replace(/`([^`]+)`/g, '$1')
+    );
+    if (!isLikelyRepoPath(normalized)) {
+        return null;
+    }
+    return normalized;
+}
+
+function parseLegacyScopeFiles(lines) {
+    const scopeFiles = [];
+    let collecting = false;
+    let sawBullet = false;
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+        const headingText = trimmed.replace(/^#{1,6}\s+/, '');
+
+        if (!collecting) {
+            if (/^(Scope|Betroffene Dateien(?:\s+\(.*\))?|Dateien)(:)?$/i.test(trimmed)
+                || /^(Scope|Betroffene Dateien(?:\s+\(.*\))?|Dateien)(:)?$/i.test(headingText)) {
+                collecting = true;
+            }
+            continue;
+        }
+
+        if (/^#{1,6}\s+/.test(trimmed)) {
+            break;
+        }
+        if (!trimmed) {
+            continue;
+        }
+
+        const bulletMatch = trimmed.match(/^-\s+(.+)$/);
+        if (!bulletMatch) {
+            if (sawBullet) break;
+            continue;
+        }
+
+        sawBullet = true;
+        const normalized = normalizeLegacyScopeEntry(bulletMatch[1]);
+        if (normalized) {
+            scopeFiles.push(normalized);
+        }
+    }
+
+    return Array.from(new Set(scopeFiles)).sort((left, right) => left.localeCompare(right));
+}
+
+function extractDependencyTokensFromText(rawValue) {
+    const matches = String(rawValue || '').match(/\b(?:BT\d+[A-Z]?|V\d+)(?:\.\d+(?:\.\d+)?)?\b/g) || [];
+    return Array.from(new Set(matches.map((match) => String(match).trim()))).sort((left, right) => left.localeCompare(right));
+}
+
 function parseDependencyToken(rawToken) {
     const token = String(rawToken || '').trim();
-    const phaseMatch = token.match(/^(V\d+)\.(\d+)$/);
+    const phaseMatch = token.match(/^((?:BT\d+[A-Z]?|V\d+))\.(\d+(?:\.\d+)?)$/);
     if (phaseMatch) {
         return {
             raw: token,
             blockId: phaseMatch[1],
-            dependsPhase: `${phaseMatch[1].replace(/^V/, '')}.${phaseMatch[2]}`,
+            dependsPhase: `${extractPhaseRoot(phaseMatch[1])}.${phaseMatch[2]}`,
             isCanonical: true,
         };
     }
-    const blockMatch = token.match(/^(V\d+)$/);
+    const blockMatch = token.match(/^((?:BT\d+[A-Z]?|V\d+))$/);
     if (blockMatch) {
         return {
             raw: token,
@@ -174,7 +838,7 @@ function parseDependencyToken(rawToken) {
             isCanonical: true,
         };
     }
-    const prefixedBlockMatch = token.match(/^(V\d+)\b/);
+    const prefixedBlockMatch = token.match(/^((?:BT\d+[A-Z]?|V\d+))\b/);
     if (prefixedBlockMatch) {
         return {
             raw: token,
@@ -307,11 +971,11 @@ async function parseBlockPlanFile(relativePath) {
     const content = await fs.readFile(absolutePath, 'utf8');
     const { data, body, unknownKeys } = parseFrontmatter(content);
     const blockId = String(data.id || path.basename(relativePath, '.md')).trim();
-    const phaseRoot = blockId.replace(/^V/, '');
     const lines = body.replace(/\r\n/g, '\n').split('\n');
+    const phaseRoot = resolvePhaseRootFromLines(lines, blockId);
 
-    const phases = parsePhaseHeadings(lines, phaseRoot);
     const subphases = parseChecklistSubphases(lines, phaseRoot);
+    const phases = mergePhaseStatusesWithSubphases(parsePhaseHeadings(lines, phaseRoot), subphases);
     const scopeFiles = Array.isArray(data.scope_files)
         ? data.scope_files.map((entry) => normalizeRepoPath(entry)).filter(Boolean)
         : [];
@@ -407,21 +1071,49 @@ function normalizeLegacyBlockTitle(blockId, rawTitle) {
     return title || null;
 }
 
-function extractCurrentPhase(content, blockId) {
-    const phaseRoot = String(blockId || '').replace(/^V/, '');
+function extractCurrentPhase(content, blockId, phaseRootOverride = null) {
+    const phaseRoot = phaseRootOverride || extractPhaseRoot(blockId);
     if (!phaseRoot) return null;
     const lines = content.replace(/\r\n/g, '\n').split('\n');
     let currentPhase = null;
-    const regex = new RegExp(`^###\\s+(?:Phase\\s+)?(${phaseRoot}\\.\\d+)\\b`);
+    const headingRegex = new RegExp(`^###\\s+(?:Phase\\s+)?(${phaseRoot}\\.\\d+)\\b`);
+    const checklistRegex = new RegExp(`^\\s*-\\s*\\[[ xX/]\\]\\s+(${phaseRoot}\\.\\d+)(?!\\.)\\b`);
 
     for (const line of lines) {
-        const match = line.match(regex);
-        if (match) {
-            currentPhase = match[1];
+        const headingMatch = line.match(headingRegex);
+        if (headingMatch) {
+            currentPhase = headingMatch[1];
+            continue;
+        }
+        const checklistMatch = line.match(checklistRegex);
+        if (checklistMatch) {
+            currentPhase = checklistMatch[1];
         }
     }
 
     return currentPhase;
+}
+
+function mergeStructuredEntries(baseEntries, incomingEntries, keyField) {
+    const merged = new Map();
+
+    for (const entry of [...(baseEntries || []), ...(incomingEntries || [])]) {
+        if (!entry || entry[keyField] == null) continue;
+        const key = String(entry[keyField]);
+        const existing = merged.get(key);
+        if (!existing) {
+            merged.set(key, { ...entry });
+            continue;
+        }
+        if ((existing.title == null || existing.title === '') && entry.title) {
+            existing.title = entry.title;
+        }
+        if ((existing.status === 'unknown' || existing.status === 'open') && entry.status && entry.status !== 'unknown') {
+            existing.status = entry.status;
+        }
+    }
+
+    return Array.from(merged.values()).sort((left, right) => String(left[keyField]).localeCompare(String(right[keyField])));
 }
 
 function mergeBlockMetadata(base, incoming) {
@@ -438,7 +1130,33 @@ function mergeBlockMetadata(base, incoming) {
     if (!next.planFile && incoming.planFile) next.planFile = incoming.planFile;
     const source = new Set([...(base?.source || []), ...(incoming.source || [])]);
     next.source = Array.from(source).sort((left, right) => left.localeCompare(right));
+    next.phases = mergeStructuredEntries(base?.phases, incoming?.phases, 'code');
+    next.subphases = mergeStructuredEntries(base?.subphases, incoming?.subphases, 'code');
+    next.scopeFiles = Array.from(new Set([...(base?.scopeFiles || []), ...(incoming?.scopeFiles || [])]))
+        .sort((left, right) => left.localeCompare(right));
+    next.scopeDeclarations = Array.from(new Set([...(base?.scopeDeclarations || []), ...(incoming?.scopeDeclarations || [])]))
+        .sort((left, right) => left.localeCompare(right));
     return next;
+}
+
+function buildLegacyBlockEntry({ blockId, rawTitle, status, planFile, content, source }) {
+    const lines = content.replace(/\r\n/g, '\n').split('\n');
+    const phaseRoot = resolvePhaseRootFromLines(lines, blockId);
+    const subphases = parseChecklistSubphases(lines, phaseRoot);
+    const headingPhases = mergePhaseStatusesWithSubphases(parsePhaseHeadings(lines, phaseRoot), subphases);
+    const checklistPhases = parseChecklistPhases(lines, phaseRoot);
+
+    return {
+        id: blockId,
+        title: normalizeLegacyBlockTitle(blockId, rawTitle),
+        status,
+        currentPhase: extractCurrentPhase(content, blockId, phaseRoot),
+        planFile,
+        source: Array.isArray(source) ? source : [source],
+        phases: headingPhases.length > 0 ? headingPhases : checklistPhases,
+        subphases,
+        scopeFiles: parseLegacyScopeFiles(lines),
+    };
 }
 
 function parseArchivedSummaryBlocks(content, relativePath) {
@@ -460,20 +1178,20 @@ function parseArchivedSummaryBlocks(content, relativePath) {
 
         const section = lines.slice(index, endIndex).join('\n');
         const planFileMatch = section.match(/Plan-Datei:\s*`([^`]+)`/);
-        entries.push({
-            id: blockId,
-            title: normalizeLegacyBlockTitle(blockId, rawTitle),
+        entries.push(buildLegacyBlockEntry({
+            blockId,
+            rawTitle,
             status: 'done',
-            currentPhase: extractCurrentPhase(section, blockId),
             planFile: normalizeRepoPath(planFileMatch ? planFileMatch[1] : relativePath),
+            content: section,
             source: ['archive-summary'],
-        });
+        }));
     }
 
     return entries;
 }
 
-function parseLegacyPlanFileMetadata(relativePath, content) {
+function parseLegacyPlanFile(relativePath, content) {
     const normalizedPath = normalizeRepoPath(relativePath);
     const basename = path.basename(normalizedPath);
     const fileIdMatch = basename.match(/(?:^|_)(V\d+)\.md$/i);
@@ -486,14 +1204,14 @@ function parseLegacyPlanFileMetadata(relativePath, content) {
 
     const statusMatch = content.replace(/\r\n/g, '\n').match(/^Status:\s*(.+)$/m);
     const fallbackTitle = basename.replace(/\.md$/i, '').replace(/_/g, ' ');
-    return {
-        id: blockId,
-        title: normalizeLegacyBlockTitle(blockId, headingMatch?.[1] || fallbackTitle),
+    return buildLegacyBlockEntry({
+        blockId,
+        rawTitle: headingMatch?.[1] || fallbackTitle,
         status: normalizeBlockStatus(statusMatch?.[1] || ''),
-        currentPhase: extractCurrentPhase(content, blockId),
         planFile: normalizedPath,
+        content,
         source: ['legacy-plan'],
-    };
+    });
 }
 
 async function readCanonicalBlockPlans() {
@@ -574,10 +1292,231 @@ async function readFallbackBlockMetadata() {
     for (const name of singleBlockFiles) {
         const relativePath = normalizeRepoPath(path.join('docs/plaene/alt', name));
         const content = await fs.readFile(path.join(ROOT, relativePath), 'utf8');
-        mergeEntry(parseLegacyPlanFileMetadata(relativePath, content));
+        mergeEntry(parseLegacyPlanFile(relativePath, content));
     }
 
     return metadataById;
+}
+
+function parseBotTrainingDependencyTable(content) {
+    const lines = content.replace(/\r\n/g, '\n').split('\n');
+    const rows = [];
+    const headingIndex = lines.findIndex((line) => /^##\s+Abhaengigkeiten\b/.test(line.trim()));
+    if (headingIndex < 0) {
+        return rows;
+    }
+
+    let endIndex = lines.length;
+    for (let index = headingIndex + 1; index < lines.length; index += 1) {
+        if (/^##\s+/.test(lines[index])) {
+            endIndex = index;
+            break;
+        }
+    }
+
+    for (let index = headingIndex + 1; index < endIndex; index += 1) {
+        const line = lines[index].trim();
+        if (!line.startsWith('|')) continue;
+        if (/^\|\s*Block\s*\|/i.test(line) || /^\|\s*---/.test(line)) continue;
+
+        const cells = line
+            .split('|')
+            .slice(1, -1)
+            .map((cell) => cell.trim());
+        if (cells.length < 5) continue;
+
+        const [blockCell, dependsOnRaw, dependencyType, fulfilledRaw, hint] = cells;
+        const blockIdMatch = String(blockCell || '').match(/\b(BT[0-9A-Z]+)\b/);
+        if (!blockIdMatch) continue;
+
+        const dependencyTokens = extractDependencyTokensFromText(dependsOnRaw);
+        for (const token of dependencyTokens) {
+            rows.push({
+                blockId: blockIdMatch[1],
+                dependsOn: parseDependencyToken(token),
+                hard: String(dependencyType || '').trim().toLowerCase() === 'hard',
+                fulfilled: String(fulfilledRaw || '').trim().toLowerCase() === 'ja',
+                hint: String(hint || '').trim() || null,
+            });
+        }
+    }
+
+    return rows;
+}
+
+function collectPathsFromStructuredLines(lines) {
+    const paths = new Set();
+    for (const line of lines || []) {
+        for (const reference of collectRepoPathReferences(line)) {
+            paths.add(reference);
+        }
+    }
+    return paths;
+}
+
+function collectLabelBlockPathReferences(lines, labelPattern) {
+    const paths = new Set();
+    let collecting = false;
+
+    for (const line of lines || []) {
+        const trimmed = line.trim();
+        if (!collecting && labelPattern.test(trimmed)) {
+            collecting = true;
+            for (const reference of collectRepoPathReferences(trimmed)) {
+                paths.add(reference);
+            }
+            continue;
+        }
+
+        if (!collecting) continue;
+        if (/^###\s+/.test(trimmed)) break;
+        if (/^[A-Za-zÄÖÜäöü0-9 .()/-]+:\s*$/.test(trimmed) && !labelPattern.test(trimmed)) break;
+        if (!trimmed) continue;
+        for (const reference of collectRepoPathReferences(trimmed)) {
+            paths.add(reference);
+        }
+    }
+
+    return paths;
+}
+
+function collectBotTrainingScopeFiles(sectionLines, phaseRoot) {
+    const scopeFiles = new Set([BOT_TRAINING_MASTER_PATH]);
+    const firstHeadingIndex = sectionLines.findIndex((line) => /^###\s+/.test(line));
+    const preambleLines = firstHeadingIndex >= 0 ? sectionLines.slice(0, firstHeadingIndex) : sectionLines.slice();
+    const phaseHeadingRegex = new RegExp(`^###\\s+(${escapeRegExp(phaseRoot)}\\.\\d+)\\b`);
+
+    for (const line of preambleLines) {
+        const planFileMatch = line.match(/Plan-Datei:\s*`([^`]+)`/);
+        if (planFileMatch) {
+            scopeFiles.add(normalizeRepoPath(planFileMatch[1]));
+        }
+    }
+
+    for (const reference of collectLabelBlockPathReferences(preambleLines, /^Quelle:\s*$/i)) {
+        scopeFiles.add(reference);
+    }
+    for (const reference of collectLabelBlockPathReferences(preambleLines, /^Scope:\s*$/i)) {
+        scopeFiles.add(reference);
+    }
+
+    let activeSectionType = null;
+    let activeLines = [];
+    const flushSection = () => {
+        if (activeLines.length === 0 || activeSectionType == null) return;
+        if (activeSectionType === 'dod' || activeSectionType === 'phase') {
+            for (const reference of collectPathsFromStructuredLines(activeLines)) {
+                scopeFiles.add(reference);
+            }
+        }
+        activeLines = [];
+    };
+
+    for (const line of sectionLines.slice(Math.max(firstHeadingIndex, 0))) {
+        const trimmed = line.trim();
+        if (/^###\s+/.test(trimmed)) {
+            flushSection();
+            if (/^###\s+Definition of Done \(DoD\)/i.test(trimmed)) {
+                activeSectionType = 'dod';
+            } else if (phaseHeadingRegex.test(trimmed)) {
+                activeSectionType = 'phase';
+            } else {
+                activeSectionType = null;
+            }
+            continue;
+        }
+        if (activeSectionType != null) {
+            activeLines.push(line);
+        }
+    }
+    flushSection();
+
+    return Array.from(scopeFiles)
+        .map((entry) => normalizeRepoPath(entry))
+        .filter(Boolean)
+        .sort((left, right) => left.localeCompare(right));
+}
+
+function deriveStructuredBlockStatus(blockId, sectionLines, phases, subphases, phaseRoot) {
+    const gatePhaseCode = `${phaseRoot || extractPhaseRoot(blockId)}.99`;
+    const gatePhase = (phases || []).find((phase) => phase.code === gatePhaseCode) || null;
+    const gateSubphases = (subphases || []).filter((subphase) => subphase.phaseCode === gatePhaseCode);
+    const gateDone = gatePhase?.status === 'done'
+        || (gateSubphases.length > 0 && gateSubphases.every((subphase) => subphase.status === 'done'));
+    if (gateDone) return 'done';
+
+    if ((subphases || []).some((subphase) => subphase.status === 'active')) return 'active';
+    if ((phases || []).some((phase) => phase.status === 'active')) return 'active';
+    if (sectionLines.some((line) => /<!--\s*LOCK:.*in-bearbeitung/i.test(line))) return 'active';
+
+    if ((subphases || []).length > 0 || (phases || []).length > 0) return 'open';
+    return 'unknown';
+}
+
+function deriveStructuredCurrentPhase(blockId, sectionContent, phases, phaseRoot) {
+    const firstIncompletePhase = (phases || []).find((phase) => phase.status !== 'done');
+    if (firstIncompletePhase) return firstIncompletePhase.code;
+    return extractCurrentPhase(sectionContent, blockId, phaseRoot) || phases.at(-1)?.code || null;
+}
+
+function parseBotTrainingBlocks(content) {
+    const lines = content.replace(/\r\n/g, '\n').split('\n');
+    const sections = [];
+
+    for (let index = 0; index < lines.length; index += 1) {
+        const headingMatch = lines[index].match(/^##\s+Block\s+(BT[0-9A-Z]+):\s*(.+)$/);
+        if (!headingMatch) continue;
+        const [, blockId, rawTitle] = headingMatch;
+        let endIndex = lines.length;
+        for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
+            if (/^##\s+Block\s+BT[0-9A-Z]+:/.test(lines[cursor])) {
+                endIndex = cursor;
+                break;
+            }
+        }
+
+        const sectionLines = lines.slice(index + 1, endIndex);
+        const sectionContent = sectionLines.join('\n');
+        const phaseRoot = resolvePhaseRootFromLines(sectionLines, blockId);
+        const subphases = parseChecklistSubphases(sectionLines, phaseRoot);
+        const headingPhases = mergePhaseStatusesWithSubphases(parsePhaseHeadings(sectionLines, phaseRoot), subphases);
+        const phases = headingPhases.length > 0 ? headingPhases : parseChecklistPhases(sectionLines, phaseRoot);
+        const planFileMatch = sectionContent.match(/Plan-Datei:\s*`([^`]+)`/);
+        const scopeFiles = collectBotTrainingScopeFiles(sectionLines, phaseRoot);
+
+        sections.push({
+            id: blockId,
+            title: String(rawTitle || '').trim() || null,
+            status: deriveStructuredBlockStatus(blockId, sectionLines, phases, subphases, phaseRoot),
+            priority: null,
+            owner: null,
+            planFile: BOT_TRAINING_MASTER_PATH,
+            currentPhase: deriveStructuredCurrentPhase(blockId, sectionContent, phases, phaseRoot),
+            phases,
+            subphases,
+            scopeFiles,
+            scopeOverlapAllowedWith: [],
+            dependsOn: [],
+            unknownFrontmatterFields: [],
+            source: ['bot-training-plan'],
+            referencePlanFile: planFileMatch ? normalizeRepoPath(planFileMatch[1]) : null,
+        });
+    }
+
+    const dependencyRows = parseBotTrainingDependencyTable(content);
+    const dependenciesByBlock = new Map();
+    for (const row of dependencyRows) {
+        if (!dependenciesByBlock.has(row.blockId)) dependenciesByBlock.set(row.blockId, []);
+        dependenciesByBlock.get(row.blockId).push(row.dependsOn);
+    }
+
+    return sections.map((section) => ({
+        ...section,
+        dependsOn: Array.from(new Map(
+            (dependenciesByBlock.get(section.id) || [])
+                .map((token) => [`${token.blockId}::${token.dependsPhase || ''}`, token])
+        ).values()),
+    }));
 }
 
 function parseGuardMatrix(content) {
@@ -603,6 +1542,145 @@ async function pathExists(relativePath) {
     } catch {
         return false;
     }
+}
+
+function buildGraphFileCoverageIndex(graph) {
+    const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
+    const edges = Array.isArray(graph.edges) ? graph.edges : [];
+    const fileNodeByPath = new Map(
+        nodes
+            .filter((node) => node.type === 'file')
+            .map((node) => [normalizeRepoPath(node.id), node])
+    );
+    const surfacesByFile = new Map();
+    const scopeBlocksByFile = new Map();
+
+    for (const edge of edges) {
+        if (edge.type === 'touches') {
+            const filePath = normalizeRepoPath(edge.from);
+            if (!surfacesByFile.has(filePath)) surfacesByFile.set(filePath, []);
+            surfacesByFile.get(filePath).push({
+                surface: edge.to,
+                roles: Array.isArray(edge.attributes?.roles) ? edge.attributes.roles : [],
+            });
+            continue;
+        }
+        if (edge.type === 'scope') {
+            const filePath = normalizeRepoPath(edge.to);
+            if (!scopeBlocksByFile.has(filePath)) scopeBlocksByFile.set(filePath, []);
+            scopeBlocksByFile.get(filePath).push(edge.from);
+        }
+    }
+
+    for (const values of surfacesByFile.values()) {
+        values.sort((left, right) => left.surface.localeCompare(right.surface));
+    }
+    for (const [filePath, blockIds] of scopeBlocksByFile) {
+        scopeBlocksByFile.set(filePath, Array.from(new Set(blockIds)).sort((left, right) => left.localeCompare(right)));
+    }
+
+    return {
+        fileNodeByPath,
+        surfacesByFile,
+        scopeBlocksByFile,
+    };
+}
+
+function buildCoverageArtifact(coreGraph, trackedFiles, hotspotOverlay) {
+    const index = buildGraphFileCoverageIndex(coreGraph);
+    const hotspotByPath = new Map((hotspotOverlay?.files || []).map((entry) => [entry.path, entry]));
+    const files = trackedFiles.map((filePath) => {
+        const normalizedPath = normalizeRepoPath(filePath);
+        const fileNode = index.fileNodeByPath.get(normalizedPath) || null;
+        const classification = classifyCoveragePath(normalizedPath);
+        const hotspot = hotspotByPath.get(normalizedPath) || null;
+        const coveredInCore = fileNode?.attributes?.exists === true;
+        const coveredByOverlay = hotspot != null;
+        const coverageSources = Array.from(new Set([
+            ...(Array.isArray(fileNode?.attributes?.source) ? fileNode.attributes.source : []),
+            ...(hotspot ? [hotspotOverlay.coverageSource] : []),
+        ])).sort((left, right) => left.localeCompare(right));
+
+        return {
+            path: normalizedPath,
+            tracked: true,
+            coveredInCore,
+            coveredByOverlay,
+            covered: coveredInCore || coveredByOverlay,
+            coverageSources,
+            scopeBlocks: index.scopeBlocksByFile.get(normalizedPath) || [],
+            surfaces: index.surfacesByFile.get(normalizedPath) || [],
+            classification: classification.classification,
+            excludedFromCoverage: classification.excludedFromCoverage,
+            excludeReason: classification.excludeReason,
+            ...(hotspot ? {
+                overlays: [{
+                    blockId: hotspotOverlay.id,
+                    coverageSource: hotspotOverlay.coverageSource,
+                    changeCount: hotspot.changes,
+                    dirty: hotspot.dirty,
+                }],
+            } : {}),
+        };
+    });
+
+    const rawCoveredCount = files.filter((entry) => entry.covered).length;
+    const rawTotalCount = files.length;
+    const activeCoverageFiles = files.filter((entry) => entry.excludedFromCoverage !== true);
+    const adjustedCoveredCount = activeCoverageFiles.filter((entry) => entry.covered).length;
+    const adjustedTotalCount = activeCoverageFiles.length;
+    const classificationSummary = new Map();
+
+    for (const entry of files) {
+        if (!classificationSummary.has(entry.classification)) {
+            classificationSummary.set(entry.classification, {
+                classification: entry.classification,
+                excludedFromCoverage: entry.excludedFromCoverage,
+                count: 0,
+                coveredCount: 0,
+            });
+        }
+        const bucket = classificationSummary.get(entry.classification);
+        bucket.count += 1;
+        if (entry.covered) bucket.coveredCount += 1;
+    }
+
+    return {
+        schema_version: COVERAGE_SCHEMA_VERSION,
+        contract: COVERAGE_CONTRACT,
+        graph_contract: GRAPH_CONTRACT,
+        graph_path: OUTPUT_PATH,
+        overlayBlocks: hotspotOverlay ? [{
+            id: hotspotOverlay.id,
+            title: hotspotOverlay.title,
+            coverageSource: hotspotOverlay.coverageSource,
+            fileCount: hotspotOverlay.fileCount,
+            files: hotspotOverlay.files.map((entry) => ({
+                path: entry.path,
+                changeCount: entry.changes,
+                dirty: entry.dirty,
+            })),
+        }] : [],
+        classificationRules: COVERAGE_CLASSIFICATION_RULES.map((rule) => ({
+            classification: rule.classification,
+            prefixes: rule.prefixes,
+            excludedFromCoverage: rule.excludedFromCoverage,
+            reason: rule.reason,
+        })),
+        summary: {
+            trackedFileCount: rawTotalCount,
+            rawCoveredFileCount: rawCoveredCount,
+            rawCoveragePercent: rawTotalCount > 0 ? Number((rawCoveredCount / rawTotalCount * 100).toFixed(1)) : 0,
+            adjustedTrackedFileCount: adjustedTotalCount,
+            adjustedCoveredFileCount: adjustedCoveredCount,
+            adjustedCoveragePercent: adjustedTotalCount > 0 ? Number((adjustedCoveredCount / adjustedTotalCount * 100).toFixed(1)) : 0,
+            uncoveredFileCount: files.filter((entry) => !entry.covered).length,
+            uncoveredActiveFileCount: activeCoverageFiles.filter((entry) => !entry.covered).length,
+            classifications: Array.from(classificationSummary.values())
+                .sort((left, right) => left.classification.localeCompare(right.classification)),
+        },
+        files,
+    };
 }
 
 function createNodeStore() {
@@ -727,6 +1805,100 @@ function sortEdges(edges) {
     });
 }
 
+function emitBlockPlan(nodes, edges, plan, declaredBy) {
+    const fileSource = (declaredBy === 'frontmatter' || declaredBy === 'archive-summary' || declaredBy === 'legacy-plan')
+        ? 'scope-files'
+        : declaredBy;
+    nodes.upsert({
+        id: plan.id,
+        type: 'block',
+        title: plan.title,
+        status: plan.status,
+        attributes: {
+            source: Array.isArray(plan.source) && plan.source.length > 0 ? plan.source : ['block-plan'],
+            priority: plan.priority ?? null,
+            owner: plan.owner ?? null,
+            planFile: plan.planFile ?? null,
+            ...(plan.referencePlanFile ? { referencePlanFile: plan.referencePlanFile } : {}),
+            ...(plan.currentPhase ? { currentPhase: plan.currentPhase } : {}),
+            ...(Array.isArray(plan.scopeDeclarations) ? { scopeDeclarations: plan.scopeDeclarations } : {}),
+            ...(plan.scopeResolution ? { scopeResolution: plan.scopeResolution } : {}),
+            ...(Array.isArray(plan.scopeOverlapAllowedWith) ? { scopeOverlapAllowedWith: plan.scopeOverlapAllowedWith } : {}),
+            ...(Array.isArray(plan.unknownFrontmatterFields) ? { unknownFrontmatterFields: plan.unknownFrontmatterFields } : {}),
+        },
+    });
+
+    for (const phase of plan.phases || []) {
+        const phaseId = buildPhaseNodeId(plan.id, phase.code);
+        nodes.upsert({
+            id: phaseId,
+            type: 'phase',
+            title: phase.title || null,
+            status: phase.status || 'unknown',
+            attributes: {
+                blockId: plan.id,
+                phaseCode: phase.code,
+            },
+        });
+        edges.upsert({
+            from: plan.id,
+            to: phaseId,
+            type: 'contains_phase',
+            attributes: {
+                blockId: plan.id,
+                phaseCode: phase.code,
+            },
+        });
+    }
+
+    for (const subphase of plan.subphases || []) {
+        const subphaseId = buildPhaseNodeId(plan.id, subphase.code);
+        const phaseId = buildPhaseNodeId(plan.id, subphase.phaseCode);
+        nodes.upsert({
+            id: subphaseId,
+            type: 'subphase',
+            title: subphase.text || null,
+            status: subphase.status,
+            attributes: {
+                blockId: plan.id,
+                phaseCode: subphase.phaseCode,
+                subphaseCode: subphase.code,
+            },
+        });
+        edges.upsert({
+            from: phaseId,
+            to: subphaseId,
+            type: 'contains_subphase',
+            attributes: {
+                blockId: plan.id,
+                phaseCode: subphase.phaseCode,
+                subphaseCode: subphase.code,
+            },
+        });
+    }
+
+    for (const scopeFile of plan.scopeFiles || []) {
+        nodes.upsert({
+            id: scopeFile,
+            type: 'file',
+            title: null,
+            status: 'unknown',
+            attributes: {
+                source: [fileSource],
+                scopeBlocks: [plan.id],
+            },
+        });
+        edges.upsert({
+            from: plan.id,
+            to: scopeFile,
+            type: 'scope',
+            attributes: {
+                declaredBy,
+            },
+        });
+    }
+}
+
 async function buildKnowledgeGraphModel() {
     const [masterContent, guardMatrixContent, canonicalPlans, fallbackBlockMetadata] = await Promise.all([
         fs.readFile(path.join(ROOT, MASTER_PLAN_PATH), 'utf8'),
@@ -734,18 +1906,35 @@ async function buildKnowledgeGraphModel() {
         readCanonicalBlockPlans(),
         readFallbackBlockMetadata(),
     ]);
+    const trackedFiles = await readTrackedFiles();
+    const trackedFileSet = new Set(trackedFiles);
 
     const masterRows = parseMasterRows(masterContent);
     const dependencyRows = parseDependencyTable(masterContent);
     const surfaceRows = parseGuardMatrix(guardMatrixContent);
+    const resolvedCanonicalPlans = canonicalPlans
+        .map((plan) => materializeScopePlan(plan, trackedFiles, trackedFileSet))
+        .map((plan) => ({ ...plan, source: ['block-plan'] }));
+    const resolvedFallbackMetadata = new Map(
+        Array.from(fallbackBlockMetadata.entries())
+            .map(([blockId, plan]) => [blockId, materializeScopePlan(plan, trackedFiles, trackedFileSet)])
+    );
+    const botTrainingPlans = await readBotTrainingPlans(trackedFiles, trackedFileSet);
+    const auditPlans = await readAuditPlans(trackedFiles, trackedFileSet);
+    const botTrainingDependencyRows = (await pathExists(BOT_TRAINING_MASTER_PATH))
+        ? parseBotTrainingDependencyTable(await fs.readFile(path.join(ROOT, BOT_TRAINING_MASTER_PATH), 'utf8'))
+        : [];
 
     const nodes = createNodeStore();
     const edges = createEdgeStore();
 
     const masterById = new Map(masterRows.map((row) => [row.id, row]));
-    const planById = new Map(canonicalPlans.map((plan) => [plan.id, plan]));
+    const planById = new Map(
+        [...resolvedCanonicalPlans, ...botTrainingPlans]
+            .map((plan) => [plan.id, plan])
+    );
     const dependencyMeta = new Map();
-    for (const dependencyRow of dependencyRows) {
+    for (const dependencyRow of [...dependencyRows, ...botTrainingDependencyRows]) {
         const key = `${dependencyRow.blockId}::${dependencyRow.dependsOn.blockId}`;
         if (!dependencyMeta.has(key)) {
             dependencyMeta.set(key, []);
@@ -769,92 +1958,22 @@ async function buildKnowledgeGraphModel() {
         });
     }
 
-    for (const plan of canonicalPlans) {
-        nodes.upsert({
-            id: plan.id,
-            type: 'block',
-            title: plan.title,
-            status: plan.status,
-            attributes: {
-                source: ['block-plan'],
-                priority: plan.priority,
-                owner: plan.owner,
-                planFile: plan.planFile,
-                ...(plan.currentPhase ? { currentPhase: plan.currentPhase } : {}),
-                scopeOverlapAllowedWith: plan.scopeOverlapAllowedWith,
-                unknownFrontmatterFields: plan.unknownFrontmatterFields,
-            },
-        });
+    for (const plan of resolvedCanonicalPlans) {
+        emitBlockPlan(nodes, edges, plan, 'frontmatter');
+    }
 
-        for (const phase of plan.phases) {
-            const phaseId = `V${phase.code}`;
-            nodes.upsert({
-                id: phaseId,
-                type: 'phase',
-                title: phase.title || null,
-                status: phase.status || 'unknown',
-                attributes: {
-                    blockId: plan.id,
-                    phaseCode: phase.code,
-                },
-            });
-            edges.upsert({
-                from: plan.id,
-                to: phaseId,
-                type: 'contains_phase',
-                attributes: {
-                    blockId: plan.id,
-                    phaseCode: phase.code,
-                },
-            });
-        }
+    for (const fallbackPlan of resolvedFallbackMetadata.values()) {
+        if (planById.has(fallbackPlan.id)) continue;
+        if (fallbackPlan.status !== 'done') continue;
+        emitBlockPlan(nodes, edges, fallbackPlan, fallbackPlan.source?.includes('archive-summary') ? 'archive-summary' : 'legacy-plan');
+    }
 
-        for (const subphase of plan.subphases) {
-            const subphaseId = `V${subphase.code}`;
-            const phaseId = `V${subphase.phaseCode}`;
-            nodes.upsert({
-                id: subphaseId,
-                type: 'subphase',
-                title: subphase.text || null,
-                status: subphase.status,
-                attributes: {
-                    blockId: plan.id,
-                    phaseCode: subphase.phaseCode,
-                    subphaseCode: subphase.code,
-                },
-            });
-            edges.upsert({
-                from: phaseId,
-                to: subphaseId,
-                type: 'contains_subphase',
-                attributes: {
-                    blockId: plan.id,
-                    phaseCode: subphase.phaseCode,
-                    subphaseCode: subphase.code,
-                },
-            });
-        }
+    for (const botTrainingPlan of botTrainingPlans) {
+        emitBlockPlan(nodes, edges, botTrainingPlan, 'bot-training-plan');
+    }
 
-        for (const scopeFile of plan.scopeFiles) {
-            nodes.upsert({
-                id: scopeFile,
-                type: 'file',
-                title: null,
-                status: 'unknown',
-                attributes: {
-                    source: ['scope-files'],
-                    scopeBlocks: [plan.id],
-                },
-            });
-            edges.upsert({
-                from: plan.id,
-                to: scopeFile,
-                type: 'scope',
-                attributes: {
-                    declaredBy: 'frontmatter',
-                },
-            });
-        }
+    for (const auditPlan of auditPlans) {
+        emitBlockPlan(nodes, edges, auditPlan, 'audit-scope');
     }
 
     const dependsMap = new Map();
@@ -873,9 +1992,14 @@ async function buildKnowledgeGraphModel() {
         dependsMap.get(key).sources.add(sourceType);
     }
 
-    for (const plan of canonicalPlans) {
+    for (const plan of resolvedCanonicalPlans) {
         for (const dependencyToken of plan.dependsOn) {
             addDepends(plan.id, dependencyToken, 'frontmatter');
+        }
+    }
+    for (const plan of botTrainingPlans) {
+        for (const dependencyToken of plan.dependsOn) {
+            addDepends(plan.id, dependencyToken, 'master-table');
         }
     }
 
@@ -896,7 +2020,7 @@ async function buildKnowledgeGraphModel() {
             ? 'merged'
             : (entry.sources.has('frontmatter') ? 'frontmatter' : 'master-table');
         const resolvedPlan = planById.get(entry.to) || null;
-        const resolvedFallback = fallbackBlockMetadata.get(entry.to) || null;
+        const resolvedFallback = resolvedFallbackMetadata.get(entry.to) || null;
         const resolvedTitle = masterById.get(entry.to)?.title
             || resolvedPlan?.title
             || resolvedFallback?.title
@@ -923,7 +2047,7 @@ async function buildKnowledgeGraphModel() {
             || null;
         const sourceMarkers = Array.from(new Set([
             'dependency-target',
-            ...(resolvedPlan ? ['block-plan'] : []),
+            ...(resolvedPlan?.source || []),
             ...(resolvedFallback?.source || []),
         ])).sort((left, right) => left.localeCompare(right));
 
@@ -1030,31 +2154,76 @@ async function buildKnowledgeGraphModel() {
     const sortedEdges = sortEdges(edges.values());
 
     return {
-        schema_version: GRAPH_SCHEMA_VERSION,
-        contract: GRAPH_CONTRACT,
-        nodes: sortedNodes,
-        edges: sortedEdges,
+        graph: {
+            schema_version: GRAPH_SCHEMA_VERSION,
+            contract: GRAPH_CONTRACT,
+            nodes: sortedNodes,
+            edges: sortedEdges,
+        },
+        trackedFiles,
     };
 }
 
 export async function buildKnowledgeGraph() {
-    return buildKnowledgeGraphModel();
+    const { graph } = await buildKnowledgeGraphModel();
+    return graph;
 }
 
 export async function writeKnowledgeGraph(outputPath = OUTPUT_PATH) {
-    const graph = await buildKnowledgeGraphModel();
+    const graph = await buildKnowledgeGraph();
     const absoluteOutputPath = path.join(ROOT, normalizeRepoPath(outputPath));
     await fs.mkdir(path.dirname(absoluteOutputPath), { recursive: true });
     await fs.writeFile(absoluteOutputPath, `${JSON.stringify(graph, null, 2)}\n`, 'utf8');
     return graph;
 }
 
+export async function buildKnowledgeGraphArtifacts() {
+    const { graph, trackedFiles } = await buildKnowledgeGraphModel();
+    const coveredFileIds = new Set(
+        graph.nodes
+            .filter((node) => node.type === 'file' && node.attributes?.exists === true)
+            .map((node) => node.id)
+    );
+    const hotspotOverlay = await buildGitHotspotOverlay(coveredFileIds, trackedFiles);
+    const coverage = buildCoverageArtifact(graph, trackedFiles, hotspotOverlay);
+    return {
+        graph,
+        coverage,
+    };
+}
+
+async function writeJsonArtifact(outputPath, payload) {
+    const absoluteOutputPath = path.join(ROOT, normalizeRepoPath(outputPath));
+    await fs.mkdir(path.dirname(absoluteOutputPath), { recursive: true });
+    await fs.writeFile(absoluteOutputPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+}
+
+export async function writeKnowledgeGraphArtifacts({
+    graphPath = OUTPUT_PATH,
+    coveragePath = COVERAGE_OUTPUT_PATH,
+} = {}) {
+    const artifacts = await buildKnowledgeGraphArtifacts();
+    await Promise.all([
+        writeJsonArtifact(graphPath, artifacts.graph),
+        writeJsonArtifact(coveragePath, artifacts.coverage),
+    ]);
+    return artifacts;
+}
+
 export {
+    buildCoverageArtifact,
+    buildGitHotspotOverlay,
+    classifyCoveragePath,
     parseFrontmatter,
     parseMasterRows,
     parseDependencyTable,
     parseDependencyToken,
+    parseBotTrainingBlocks,
+    parseBotTrainingDependencyTable,
+    parseAuditMasterRows,
+    parseAuditFindingsMetadata,
     parseGuardMatrix,
+    resolveScopeEntries,
 };
 
 const isDirectRun = process.argv[1]
@@ -1062,8 +2231,11 @@ const isDirectRun = process.argv[1]
 
 if (isDirectRun) {
     try {
-        const graph = await writeKnowledgeGraph();
-        process.stdout.write(`[graph:build] nodes=${graph.nodes.length} edges=${graph.edges.length} -> ${OUTPUT_PATH}\n`);
+        const { graph, coverage } = await writeKnowledgeGraphArtifacts();
+        process.stdout.write(
+            `[graph:build] core nodes=${graph.nodes.length} edges=${graph.edges.length} -> ${OUTPUT_PATH}; `
+            + `coverage tracked=${coverage.summary.trackedFileCount} adjusted=${coverage.summary.adjustedCoveragePercent}% -> ${COVERAGE_OUTPUT_PATH}\n`
+        );
     } catch (error) {
         const message = error instanceof Error ? error.stack || error.message : String(error);
         process.stderr.write(`[graph:build] failed: ${message}\n`);
