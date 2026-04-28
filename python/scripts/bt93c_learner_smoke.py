@@ -327,6 +327,58 @@ def _number(value: Any) -> float | None:
     return result
 
 
+def _optional_bool(value: Any) -> bool | None:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return None
+    normalized = str(value).strip().lower()
+    if normalized in {"1", "true", "yes", "y", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off"}:
+        return False
+    return None
+
+
+def _env_lane_options(env_cfg: Mapping[str, Any]) -> dict[str, Any]:
+    options: dict[str, Any] = {
+        "map_key": str(env_cfg.get("mapKey") or "standard"),
+        "domain_mode": str(env_cfg.get("domainMode") or "classic-3d"),
+        "game_mode": str(env_cfg.get("gameMode") or "") or None,
+        "planar_mode": _optional_bool(env_cfg.get("planarMode")),
+        "mode_path": str(env_cfg.get("modePath") or "") or None,
+        "curriculum_step_offset": int(env_cfg.get("curriculumStepOffset") or 0),
+    }
+    return options
+
+
+def _effective_env_spec(config: Mapping[str, Any], seeds: list[int], *, training: bool) -> dict[str, Any]:
+    env_cfg = config.get("env") or {}
+    lane = _env_lane_options(env_cfg)
+    return {
+        "modeId": env_cfg.get("modeId"),
+        "actionSurfaceId": _action_surface_id(config),
+        "rewardProfileId": str(env_cfg.get("rewardProfileId") or ""),
+        "training": bool(training),
+        "effectiveSeeds": [int(seed) for seed in seeds],
+        "configuredTrainSeeds": [int(seed) for seed in env_cfg.get("trainSeeds", [])],
+        "configuredEvalSeeds": [int(seed) for seed in env_cfg.get("evalSeeds", [])],
+        "envCount": int(env_cfg.get("envCount") or 0),
+        "evalEnvCount": int(env_cfg.get("evalEnvCount") or 0),
+        "maxStepsPerEpisode": int(env_cfg.get("maxStepsPerEpisode") or 0),
+        "effectiveMap": lane["map_key"],
+        "effectiveMapKey": lane["map_key"],
+        "configuredMaps": list(env_cfg.get("maps") or []),
+        "effectiveDomainMode": lane["domain_mode"],
+        "effectiveGameMode": lane["game_mode"],
+        "effectivePlanarMode": lane["planar_mode"],
+        "planarMode": lane["planar_mode"],
+        "modePath": lane["mode_path"],
+        "effectiveModePath": lane["mode_path"],
+        "curriculumStepOffset": lane["curriculum_step_offset"],
+    }
+
+
 def _numeric_summary(values: list[float]) -> dict[str, Any]:
     clean_values = [float(value) for value in values if np.isfinite(value)]
     if not clean_values:
@@ -479,10 +531,65 @@ def _collect_eval_diagnostics(
     intent_requested: Counter[str] = Counter()
     intent_applied: Counter[str] = Counter()
     safety_overrules: Counter[str] = Counter()
+    effective_maps: Counter[str] = Counter()
+    effective_modes: Counter[str] = Counter()
+    effective_curriculum_stages: Counter[str] = Counter()
+    curriculum_offsets: Counter[str] = Counter()
+    global_env_steps: list[float] = []
+    curriculum_total_env_steps: list[float] = []
+    curriculum_stage_change_count = 0
+    progress_event_reachable_count = 0
+    progress_signal_reported_count = 0
     action_latencies: list[float] = []
     ack_latencies: list[float] = []
 
     for info in info_samples:
+        metadata = info.get("metadata") if isinstance(info.get("metadata"), Mapping) else {}
+        effective_env = info.get("effectiveEnvironment")
+        if not isinstance(effective_env, Mapping):
+            effective_env = metadata.get("effectiveEnvironment") if isinstance(metadata, Mapping) else None
+        if isinstance(effective_env, Mapping):
+            map_key = effective_env.get("mapKey")
+            mode = effective_env.get("domainMode") or effective_env.get("mode") or effective_env.get("gameMode")
+            stage = effective_env.get("activeCurriculumStage")
+            offset = _number(effective_env.get("curriculumStepOffset"))
+            global_step = _number(effective_env.get("globalEnvSteps"))
+            total_step = _number(effective_env.get("curriculumTotalEnvSteps"))
+            if map_key:
+                effective_maps[str(map_key)] += 1
+            if mode:
+                effective_modes[str(mode)] += 1
+            if stage:
+                effective_curriculum_stages[str(stage)] += 1
+            if offset is not None:
+                curriculum_offsets[str(int(offset))] += 1
+            if global_step is not None:
+                global_env_steps.append(global_step)
+            if total_step is not None:
+                curriculum_total_env_steps.append(total_step)
+            if effective_env.get("curriculumStageChanged") is True:
+                curriculum_stage_change_count += 1
+        episode_semantics = metadata.get("episodeSemantics") if isinstance(metadata, Mapping) else None
+        if isinstance(episode_semantics, Mapping):
+            stage = episode_semantics.get("activeCurriculumStage")
+            if stage:
+                effective_curriculum_stages[str(stage)] += 1
+            offset = _number(episode_semantics.get("curriculumStepOffset"))
+            global_step = _number(episode_semantics.get("globalEnvSteps"))
+            total_step = _number(episode_semantics.get("curriculumTotalEnvSteps"))
+            if offset is not None:
+                curriculum_offsets[str(int(offset))] += 1
+            if global_step is not None:
+                global_env_steps.append(global_step)
+            if total_step is not None:
+                curriculum_total_env_steps.append(total_step)
+            if episode_semantics.get("curriculumStageChanged") is True:
+                curriculum_stage_change_count += 1
+            if episode_semantics.get("progressEventReachable") is True:
+                progress_event_reachable_count += 1
+            if episode_semantics.get("progressSignalReported") is True:
+                progress_signal_reported_count += 1
+
         reward_breakdown = info.get("rewardBreakdown")
         if isinstance(reward_breakdown, Mapping):
             for key, value in reward_breakdown.items():
@@ -562,6 +669,26 @@ def _collect_eval_diagnostics(
         )
 
     return {
+        "environmentSemantics": {
+            "effectiveMapCounts": _counter_dict(effective_maps),
+            "effectiveModeCounts": _counter_dict(effective_modes),
+            "effectiveCurriculumStageCounts": _counter_dict(effective_curriculum_stages),
+            "curriculumStepOffsetCounts": _counter_dict(curriculum_offsets),
+            "globalEnvStepRange": {
+                "min": min(global_env_steps) if global_env_steps else None,
+                "max": max(global_env_steps) if global_env_steps else None,
+            },
+            "curriculumTotalEnvStepRange": {
+                "min": min(curriculum_total_env_steps) if curriculum_total_env_steps else None,
+                "max": max(curriculum_total_env_steps) if curriculum_total_env_steps else None,
+            },
+            "curriculumStageChangeCount": int(curriculum_stage_change_count),
+            "progressEventReachableCount": int(progress_event_reachable_count),
+            "progressSignalReportedCount": int(progress_signal_reported_count),
+            "modeMapTelemetryPresent": bool(effective_maps or effective_modes),
+            "curriculumStageTelemetryPresent": bool(effective_curriculum_stages),
+            "globalStepTelemetryPresent": bool(global_env_steps and curriculum_total_env_steps),
+        },
         "rewardSafetyDiagnostics": {
             "rewardBreakdownTotals": {key: round(float(value), 6) for key, value in sorted(reward_breakdown_totals.items())},
             "rewardBreakdownMeanPerStep": reward_breakdown_mean,
@@ -1057,6 +1184,7 @@ def _make_env_factory(
     timeout_seconds: float,
     action_surface_id: str | None,
     reward_profile_id: str | None,
+    lane_options: Mapping[str, Any],
 ) -> Any:
     def _factory() -> Any:
         env = make_curvios_action_wrapper(
@@ -1066,6 +1194,12 @@ def _make_env_factory(
                 session_id=f"{run_id}-env{env_index}",
                 controller_timeout_seconds=timeout_seconds,
                 reward_profile_id=reward_profile_id,
+                map_key=lane_options.get("map_key"),
+                domain_mode=lane_options.get("domain_mode"),
+                game_mode=lane_options.get("game_mode"),
+                planar_mode=lane_options.get("planar_mode"),
+                mode_path=lane_options.get("mode_path"),
+                curriculum_step_offset=int(lane_options.get("curriculum_step_offset") or 0),
             ),
             surface_id=action_surface_id,
         )
@@ -1089,6 +1223,7 @@ def _build_vec_env(
     timeout_seconds = float(env_cfg.get("controllerTimeoutSeconds") or DEFAULT_COMMAND_TIMEOUT_SECONDS)
     action_surface_id = _action_surface_id(config)
     reward_profile_id = str(env_cfg.get("rewardProfileId") or "") or None
+    lane_options = _env_lane_options(env_cfg)
     base_env = DummyVecEnv([
         _make_env_factory(
             seed=int(seed),
@@ -1098,6 +1233,7 @@ def _build_vec_env(
             timeout_seconds=timeout_seconds,
             action_surface_id=action_surface_id,
             reward_profile_id=reward_profile_id,
+            lane_options=lane_options,
         )
         for index, seed in enumerate(seeds)
     ])
@@ -1672,6 +1808,7 @@ def _write_bt93j_longrun_eval_snapshot(
             "stepLabelTimesteps": step_label,
             "progressTimesteps": progress_timesteps,
             "holdoutUsed": False,
+            "effectiveEnv": _effective_env_spec(config, seeds, training=False),
             "candidateRun": False,
             "freezeCandidate": False,
             "promotionAllowed": False,
@@ -2268,6 +2405,7 @@ def run_training_from_cli(
             "baselineComparable": block_id == "BT93C" and _is_baseline_run(run_kind),
             "ppoLearningMetrics": ppo_metrics,
             "telemetry": _telemetry(vec_env),
+            "effectiveEnv": _effective_env_spec(config, seeds, training=True),
             "trainingCommand": " ".join(sys.argv),
         }
         if longrun_callback is not None:
@@ -2307,6 +2445,7 @@ def run_training_from_cli(
             "truePpoOptimizerUpdate": learning_report["optimizerUpdatesCompleted"],
             "truePpoModelPackage": True,
             "resumedFrom": _package_pointer(source_package) if source_package else None,
+            "effectiveEnv": _effective_env_spec(config, seeds, training=True),
             "loadCompatibility": _numpy_pickle_compat_report(
                 source_package.vecnormalize_path if source_package else None
             ),
@@ -2514,6 +2653,7 @@ def run_eval_from_cli(
             "runKind": run_kind,
             "loadedRealPpoModel": True,
             "sourcePackage": _package_pointer(source_package),
+            "effectiveEnv": _effective_env_spec(config, seeds, training=False),
             "loadCompatibility": _numpy_pickle_compat_report(source_package.vecnormalize_path),
             "modelReload": {
                 "wallClockMs": round(load_elapsed_ms, 6),

@@ -164,6 +164,13 @@ export function buildTrainerTransitionPayload(transition = {}, options = {}) {
             hybridDecision: metadata.hybridDecision && typeof metadata.hybridDecision === 'object'
                 ? { ...metadata.hybridDecision }
                 : null,
+            metadata: cloneSerializable(metadata) || {},
+            effectiveEnvironment: metadata.effectiveEnvironment && typeof metadata.effectiveEnvironment === 'object'
+                ? cloneSerializable(metadata.effectiveEnvironment)
+                : null,
+            episodeSemantics: metadata.episodeSemantics && typeof metadata.episodeSemantics === 'object'
+                ? cloneSerializable(metadata.episodeSemantics)
+                : null,
         },
         kernelRuntime: options.kernelRuntime && typeof options.kernelRuntime === 'object'
             ? cloneSerializable(options.kernelRuntime)

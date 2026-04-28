@@ -19,6 +19,11 @@ function parseArgs(argv) {
         seed: 91,
         sessionId: 'bt92-single-env',
         rewardProfileId: '',
+        mapKey: 'standard',
+        domainMode: 'classic-3d',
+        gameMode: '',
+        modePath: '',
+        curriculumStepOffset: 0,
     };
     for (let index = 2; index < argv.length; index += 1) {
         const value = argv[index];
@@ -44,6 +49,36 @@ function parseArgs(argv) {
         }
         if (value === '--reward-profile-id') {
             options.rewardProfileId = String(argv[index + 1] || '');
+            index += 1;
+            continue;
+        }
+        if (value === '--map-key') {
+            options.mapKey = String(argv[index + 1] || options.mapKey);
+            index += 1;
+            continue;
+        }
+        if (value === '--domain-mode') {
+            options.domainMode = String(argv[index + 1] || options.domainMode);
+            index += 1;
+            continue;
+        }
+        if (value === '--game-mode') {
+            options.gameMode = String(argv[index + 1] || '');
+            index += 1;
+            continue;
+        }
+        if (value === '--mode-path') {
+            options.modePath = String(argv[index + 1] || '');
+            index += 1;
+            continue;
+        }
+        if (value === '--planar-mode') {
+            options.planarMode = String(argv[index + 1] || '');
+            index += 1;
+            continue;
+        }
+        if (value === '--curriculum-step-offset') {
+            options.curriculumStepOffset = Number(argv[index + 1] || 0);
             index += 1;
         }
     }

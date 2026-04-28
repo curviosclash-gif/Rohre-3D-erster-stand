@@ -139,6 +139,32 @@ function round(value, digits = 3) {
     return Math.round(numeric * factor) / factor;
 }
 
+function normalizeBooleanOption(value, fallback = false) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value !== 'string') return fallback;
+    const normalized = value.trim().toLowerCase();
+    if (['1', 'true', 'yes', 'y', 'on'].includes(normalized)) return true;
+    if (['0', 'false', 'no', 'n', 'off'].includes(normalized)) return false;
+    return fallback;
+}
+
+function normalizeDomainMode(modeToken) {
+    const normalized = String(modeToken || '').trim().toLowerCase();
+    if (normalized === 'classic' || normalized === 'classic-3d' || normalized === 'classic3d') {
+        return { gameMode: 'CLASSIC', planarMode: false, domainId: 'classic-3d', modePath: 'normal' };
+    }
+    if (normalized === 'classic-2d' || normalized === 'classic2d' || normalized === 'planar') {
+        return { gameMode: 'CLASSIC', planarMode: true, domainId: 'classic-2d', modePath: 'normal' };
+    }
+    if (normalized === 'hunt' || normalized === 'fight' || normalized === 'hunt-3d' || normalized === 'hunt3d' || normalized === 'fight-3d' || normalized === 'fight3d') {
+        return { gameMode: 'HUNT', planarMode: false, domainId: 'hunt-3d', modePath: 'hunt' };
+    }
+    if (normalized === 'hunt-2d' || normalized === 'hunt2d' || normalized === 'fight-2d' || normalized === 'fight2d') {
+        return { gameMode: 'HUNT', planarMode: true, domainId: 'hunt-2d', modePath: 'hunt' };
+    }
+    return { gameMode: 'CLASSIC', planarMode: false, domainId: 'classic-3d', modePath: 'normal' };
+}
+
 function createPlayerSnapshot(player) {
     return {
         index: Number.isInteger(player?.index) ? player.index : 0,
@@ -152,20 +178,28 @@ function createPlayerSnapshot(player) {
     };
 }
 
-function createSmokeSettings() {
+function createSmokeSettings(options = {}) {
+    const domain = normalizeDomainMode(options.domainMode);
+    const mapKey = String(options.mapKey || 'standard').trim() || 'standard';
+    const gameMode = String(options.gameMode || domain.gameMode || 'CLASSIC').trim().toUpperCase();
+    const planarMode = Object.prototype.hasOwnProperty.call(options, 'planarMode')
+        ? normalizeBooleanOption(options.planarMode, domain.planarMode)
+        : domain.planarMode;
+    const modePath = String(options.modePath || domain.modePath || 'normal').trim() || 'normal';
     return {
         localSettings: {
-            modePath: 'normal',
+            modePath,
             sessionType: 'single',
         },
         mode: '1p',
-        mapKey: 'standard',
-        gameMode: 'CLASSIC',
+        mapKey,
+        gameMode,
+        trainingDomainMode: domain.domainId,
         numBots: 1,
         winsNeeded: 3,
         botDifficulty: 'NORMAL',
         gameplay: {
-            planarMode: false,
+            planarMode,
         },
         portalsEnabled: false,
     };
@@ -364,6 +398,7 @@ export class HeadlessLaneStepRunner {
         environmentProfile = DEFAULT_ENVIRONMENT_PROFILE,
         laneWorkerCount = DEFAULT_LANE_WORKER_COUNT,
         rewardProfileId = '',
+        curriculumStepOffset = 0,
     } = {}) {
         this.runtime = runtime;
         this.trainingAdapter = trainingAdapter;
@@ -373,6 +408,8 @@ export class HeadlessLaneStepRunner {
         this.episodeIdPrefix = episodeIdPrefix;
         this.environmentProfile = environmentProfile;
         this.laneWorkerCount = laneWorkerCount;
+        this.curriculumStepOffset = Math.max(0, Math.trunc(Number(curriculumStepOffset) || 0));
+        this.globalEnvSteps = 0;
         this.episodeController = new EpisodeController({
             defaultMaxSteps: maxSteps,
         });
@@ -431,6 +468,11 @@ export class HeadlessLaneStepRunner {
     }
 
     _buildMetadata(extra = {}) {
+        const {
+            curriculumStageTelemetry = null,
+            ...metadataExtra
+        } = extra && typeof extra === 'object' ? extra : {};
+        const curriculumTotalEnvSteps = this.curriculumStepOffset + this.globalEnvSteps;
         return {
             environmentProfile: this.environmentProfile,
             lane: {
@@ -442,6 +484,21 @@ export class HeadlessLaneStepRunner {
                 active: this.rewardProfile.active,
                 runKindBound: this.rewardProfile.runKindBound,
             },
+            effectiveEnvironment: {
+                mapKey: this.matchId,
+                mode: this.mode,
+                gameMode: this.settings?.gameMode || null,
+                planarMode: this.planarMode,
+                modePath: this.settings?.localSettings?.modePath || null,
+                domainMode: this.settings?.trainingDomainMode || null,
+                curriculumStepOffset: this.curriculumStepOffset,
+                globalEnvSteps: this.globalEnvSteps,
+                curriculumTotalEnvSteps,
+                activeCurriculumStage: this.rewardCalculator.currentStage || null,
+                ...(curriculumStageTelemetry && typeof curriculumStageTelemetry === 'object'
+                    ? curriculumStageTelemetry
+                    : {}),
+            },
             kernel: {
                 surface: MATCH_KERNEL_SURFACES.HEADLESS,
                 tickIndex: this.trainingAdapter.tickIndex,
@@ -449,7 +506,7 @@ export class HeadlessLaneStepRunner {
                 lifecycle: this.trainingAdapter.lifecycle,
                 contractVersion: MATCH_KERNEL_HEADLESS_RUNTIME_CONTRACT_VERSION,
             },
-            ...extra,
+            ...metadataExtra,
         };
     }
 
@@ -511,6 +568,8 @@ export class HeadlessLaneStepRunner {
             this._actionScratch,
         );
         const tickIndex = this.trainingAdapter.tickIndex;
+        this.globalEnvSteps += 1;
+        const curriculumTotalEnvSteps = this.curriculumStepOffset + this.globalEnvSteps;
         const stepResult = this.trainingAdapter.step({
             players: [{
                 actions: { ...action },
@@ -531,12 +590,6 @@ export class HeadlessLaneStepRunner {
 
         const player = createPlayerSnapshot(this._getPlayer());
         const observation = this._buildRawObservation();
-        const metadata = this._buildMetadata({
-            tickResult: {
-                lifecycle: stepResult.tickResult.lifecycle,
-                tickIndex: stepResult.tickResult.tickIndex,
-            },
-        });
         const episodeStepInput = deriveHeadlessLaneEpisodeStep({
             player,
             lifecycle: stepResult.lifecycle,
@@ -545,6 +598,26 @@ export class HeadlessLaneStepRunner {
             nowMs: (tickIndex + 1) * 16,
         });
         const episode = this.episodeController.step(episodeStepInput);
+        const rewardSignals = buildHeadlessTrainingRewardSignals(episode, {
+            totalEnvSteps: curriculumTotalEnvSteps,
+            rewardProfileId: this.rewardProfile.profileId,
+            progressEvent: input.progressEvent === true,
+        });
+        const previousCurriculumStage = this.rewardCalculator.currentStage || null;
+        const reward = this.rewardCalculator.compute(rewardSignals, episode);
+        const activeCurriculumStage = this.rewardCalculator.currentStage || null;
+        const curriculumStageChanged = previousCurriculumStage !== activeCurriculumStage;
+        const metadata = this._buildMetadata({
+            tickResult: {
+                lifecycle: stepResult.tickResult.lifecycle,
+                tickIndex: stepResult.tickResult.tickIndex,
+            },
+            curriculumStageTelemetry: {
+                activeCurriculumStage,
+                curriculumStageChanged,
+                curriculumTotalEnvSteps,
+            },
+        });
         const liftedObservation = this.observationTracker.lift(observation, {
             environmentProfile: this.environmentProfile,
             metadata,
@@ -558,10 +631,6 @@ export class HeadlessLaneStepRunner {
             player,
             intent: null,
         });
-        const reward = this.rewardCalculator.compute(buildHeadlessTrainingRewardSignals(episode, {
-            totalEnvSteps: tickIndex + 1,
-            rewardProfileId: this.rewardProfile.profileId,
-        }), episode);
         return buildTrainingStepContract({
             mode: this.mode,
             planarMode: this.planarMode,
@@ -583,6 +652,15 @@ export class HeadlessLaneStepRunner {
                     source: 'player-kernel-state',
                     playerAlive: player.alive,
                     kernelLifecycle,
+                    curriculumStepOffset: this.curriculumStepOffset,
+                    globalEnvSteps: this.globalEnvSteps,
+                    curriculumTotalEnvSteps,
+                    activeCurriculumStage,
+                    previousCurriculumStage,
+                    curriculumStageChanged,
+                    progressEventReachable: input.progressEvent === true,
+                    progressSignalReported: rewardSignals.parcoursEnabled === true,
+                    checkpointReachedSignal: Number(rewardSignals.checkpointReached || 0),
                     done: episode.done,
                     truncated: episode.truncated,
                     terminalReason: episode.terminalReason,
@@ -611,6 +689,14 @@ export class HeadlessBoundaryController {
             environmentProfile: String(options.environmentProfile || DEFAULT_ENVIRONMENT_PROFILE),
             laneWorkerCount: Math.max(1, Number(options.laneWorkerCount ?? DEFAULT_LANE_WORKER_COUNT)),
             rewardProfileId: String(options.rewardProfileId || ''),
+            mapKey: String(options.mapKey || 'standard'),
+            domainMode: String(options.domainMode || 'classic-3d'),
+            gameMode: String(options.gameMode || ''),
+            modePath: String(options.modePath || ''),
+            planarMode: Object.prototype.hasOwnProperty.call(options, 'planarMode')
+                ? normalizeBooleanOption(options.planarMode, false)
+                : undefined,
+            curriculumStepOffset: Math.max(0, Math.trunc(Number(options.curriculumStepOffset) || 0)),
         };
         this.readyPayload = null;
         this.settings = null;
@@ -637,7 +723,7 @@ export class HeadlessBoundaryController {
         assert(bridgeReady === true, 'sidecar ready handshake failed');
         this.readyPayload = this.bridge.consumeLatestReadyPayload?.() || this.bridge.consumeLatestResponse?.() || null;
 
-        this.settings = createSmokeSettings();
+        this.settings = createSmokeSettings(this.options);
         this.runtimeConfig = createRuntimeConfigSnapshot(this.settings);
         this.runtime = await Promise.resolve(createHeadlessMatchKernelRuntime({
             settings: this.settings,
@@ -663,6 +749,7 @@ export class HeadlessBoundaryController {
             environmentProfile: this.options.environmentProfile,
             laneWorkerCount: this.options.laneWorkerCount,
             rewardProfileId: this.options.rewardProfileId,
+            curriculumStepOffset: this.options.curriculumStepOffset,
         });
         this.facade = new TrainingTransportFacade({
             bridge: this.bridge,
@@ -718,6 +805,7 @@ export class HeadlessBoundaryController {
                 trainingAdapterContractVersion: MATCH_KERNEL_TRAINING_ADAPTER_CONTRACT_VERSION,
                 surface: this.runtime.getConsumerDescriptors?.()?.training?.profile?.surface || MATCH_KERNEL_SURFACES.HEADLESS,
                 rewardProfile: this.stepRunner?.rewardProfile || null,
+                effectiveEnvironment: this.stepRunner?._buildMetadata?.().effectiveEnvironment || null,
             },
         };
     }
