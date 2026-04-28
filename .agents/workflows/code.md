@@ -9,6 +9,7 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 Pflicht-Reads:
 - `docs/Umsetzungsplan.md` (nur Master-Index, keine Historie).
 - Die verlinkte `docs/plaene/aktiv/VXX.md` mit Lese-Budget: Frontmatter + DoD + aktuelle + naechste Subphase.
+- Fuer Abhaengigkeits-, Scope- und Surface-Fragen zuerst `docs/generated/knowledge-graph.json` oder `node scripts/query-knowledge-graph.mjs ...` nutzen.
 - `git log -n 3 --oneline`.
 - `npm run guard:main`.
 
@@ -42,7 +43,7 @@ Optional (nur bei Bedarf):
 ## 4. Governance + Doc-Gates
 
 // turbo
-- Meta-Gate: `npm run gates:pre-commit` (fuehrt `plan:check` -> `docs:sync` -> `docs:check`).
+- Meta-Gate: `npm run gates:pre-commit` (fuehrt `plan:check` -> `graph:check` -> `docs:sync` -> `docs:check`).
 - Einzeln, falls gezieltes Diagnose-Signal noetig: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`.
 - `npm run build`, wenn Build-Signal relevant.
 

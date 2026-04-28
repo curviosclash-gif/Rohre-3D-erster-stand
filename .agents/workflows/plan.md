@@ -7,6 +7,7 @@ description: Create a compact implementation plan for a new feature or extension
 // turbo
 - Read `docs/Umsetzungsplan.md`.
 - Read a related `docs/plaene/aktiv/VXX.md` when extending or refreshing an active block.
+- If present, use `docs/generated/knowledge-graph.json` or `node scripts/query-knowledge-graph.mjs ...` for dependency/scope/surface reads before full plan text.
 - For bot-training scope also read `docs/bot-training/Bot_Trainingsplan.md` and treat it as active master plan.
 - `git log -n 5 --oneline`.
 - Scan impacted modules in `src/`, `tests/`, `editor/js/`.
@@ -25,6 +26,7 @@ description: Create a compact implementation plan for a new feature or extension
 - Note any intentional online-demo limitations or deferred parity work.
 - Datei-Ownership pruefen: kollidiert der Scope mit einem gelockten Block?
 - Dependencies klassifizieren (`hard`/`soft`).
+- Dependency-/Scope-Abgleich zuerst ueber Graph-Query (`open-deps`, `scope-collisions`), dann bei Bedarf Volltext.
 
 ## 3. Write plan
 
@@ -54,6 +56,7 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 
 // turbo
 - `npm run plan:check`
+- `npm run graph:check` sobald der Draft in `docs/plaene/aktiv/VXX.md` oder den Master aufgenommen wurde.
 - `npm run docs:sync && npm run docs:check`
 
 ## 6. Commit
