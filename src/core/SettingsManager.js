@@ -71,6 +71,10 @@ export class SettingsManager {
             findProfileIndexByName: (profiles, profileName) => this.settingsStore.findProfileIndexByName(profiles, profileName),
             findProfileByName: (profiles, profileName) => this.settingsStore.findProfileByName(profiles, profileName),
         };
+        this.settingsRecordStorePort = Object.freeze({
+            loadJsonRecord: (storageKey, fallbackValue = null) => this.settingsStore.loadJsonRecord(storageKey, fallbackValue),
+            saveJsonRecord: (storageKey, value) => this.settingsStore.saveJsonRecord(storageKey, value),
+        });
     }
 
     createDefaultSettings() {
@@ -181,5 +185,9 @@ export class SettingsManager {
 
     getProfileStorePort() {
         return this.profileStorePort;
+    }
+
+    getSettingsRecordStorePort() {
+        return this.settingsRecordStorePort;
     }
 }

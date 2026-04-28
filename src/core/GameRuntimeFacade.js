@@ -201,7 +201,7 @@ export class GameRuntimeFacade {
             getArcadeMenuSurfaceState: () => this.getArcadeMenuSurfaceState(),
             requestArcadeReplayPlayback: () => this.requestArcadeReplayPlayback(),
             showStatusToast: (message, duration, tone) => game?._showStatusToast?.(message, duration, tone),
-            getSettingsStore: () => game?.settingsManager?.store || null,
+            getSettingsStore: () => game?.settingsManager?.getSettingsRecordStorePort?.() || null,
         });
     }
 

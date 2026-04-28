@@ -76,6 +76,29 @@ const SESSION_SWITCH_CHANGED_KEYS = Object.freeze([
 
 export { SESSION_SWITCH_CHANGED_KEYS, MODE_PATH_TO_PRESET_ID };
 
+function resolveMutationChangedKeys(result, fallbackKeys = []) {
+    return Array.isArray(result?.changedKeys) && result.changedKeys.length > 0
+        ? result.changedKeys.slice()
+        : [...fallbackKeys];
+}
+
+function appendMutationChangedKeys(target, result, fallbackKeys = []) {
+    target.push(...resolveMutationChangedKeys(result, fallbackKeys));
+}
+
+function resolvePresetFailureMessage(result, fallbackMessage) {
+    switch (result?.reason) {
+    case 'invalid_preset_id':
+        return 'Preset-ID ist ungueltig.';
+    case 'preset_not_found':
+        return 'Preset wurde nicht gefunden.';
+    case 'owner_required':
+        return 'Nur der Host darf dieses Preset anwenden.';
+    default:
+        return fallbackMessage;
+    }
+}
+
 function cloneJsonSnapshot(value) {
     try {
         return JSON.parse(JSON.stringify(value));
@@ -171,9 +194,7 @@ export function handleSessionTypeChangeAction(ctx) {
         return;
     }
 
-    const changedKeys = Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-        ? result.changedKeys.slice()
-        : [...SESSION_SWITCH_CHANGED_KEYS];
+    const changedKeys = resolveMutationChangedKeys(result, SESSION_SWITCH_CHANGED_KEYS);
     let selectedMultiplayerTransport = '';
     if (result.targetSessionType === 'multiplayer') {
         const transportResult = applyProductiveMultiplayerTransport(game);
@@ -235,8 +256,11 @@ export function handleModePathChangeAction(ctx) {
             presetId,
             resolveMenuAccessContext()
         );
-        if (presetResult.success && Array.isArray(presetResult.changedKeys)) {
-            changedKeys.push(...presetResult.changedKeys);
+        if (presetResult.success) {
+            appendMutationChangedKeys(changedKeys, presetResult);
+        } else {
+            game._showStatusToast(resolvePresetFailureMessage(presetResult, 'Preset konnte nicht angewendet werden.'), 1700, 'error');
+            return;
         }
     }
     const currentMapKey = String(game.settings?.mapKey || '').trim();
@@ -322,7 +346,7 @@ export async function handleQuickStartEventPlaylistStartAction(ctx) {
         resolveMenuAccessContext()
     );
     if (!presetResult.success) {
-        game._showStatusToast('Event-Playlist konnte nicht vorbereitet werden.', 1600, 'error');
+        game._showStatusToast(resolvePresetFailureMessage(presetResult, 'Event-Playlist konnte nicht vorbereitet werden.'), 1600, 'error');
         return;
     }
 
@@ -334,9 +358,7 @@ export async function handleQuickStartEventPlaylistStartAction(ctx) {
     const changedKeys = [
         SETTINGS_CHANGE_KEYS.MODE_PATH,
     ];
-    if (Array.isArray(presetResult.changedKeys)) {
-        changedKeys.push(...presetResult.changedKeys);
-    }
+    appendMutationChangedKeys(changedKeys, presetResult);
     onSettingsChanged({ changedKeys: Array.from(new Set(changedKeys)) });
 
     const presetName = String(playlistStep?.preset?.name || presetId).trim() || presetId;

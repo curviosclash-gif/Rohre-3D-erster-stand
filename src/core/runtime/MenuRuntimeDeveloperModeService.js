@@ -2,6 +2,31 @@
 // MenuRuntimeDeveloperModeService.js - developer-panel mode/theme/visibility actions
 // ============================================
 
+function resolveMutationChangedKeys(result, fallbackKeys = []) {
+    return Array.isArray(result?.changedKeys) && result.changedKeys.length > 0
+        ? result.changedKeys.slice()
+        : [...fallbackKeys];
+}
+
+function resolveDeveloperFailureMessage(result, fallbackMessage) {
+    switch (result?.reason) {
+    case 'owner_required':
+        return 'Nur der Host darf diese Einstellung aendern.';
+    case 'hidden_for_player':
+        return 'Diese Einstellung ist fuer Mitspieler ausgeblendet.';
+    case 'expert_login_required':
+        return 'Expertenmodus ist gesperrt.';
+    case 'expert_surface_policy':
+        return 'Expertenmodus ist auf dieser Surface nicht verfuegbar.';
+    case 'locked':
+        return 'Developer-Funktion ist derzeit gesperrt.';
+    case 'unknown_text_id':
+        return 'Text-ID ist unbekannt.';
+    default:
+        return fallbackMessage;
+    }
+}
+
 /**
  * @param {{
  *   game: object,
@@ -19,13 +44,11 @@ export function handleDeveloperModeToggleAction(ctx) {
         resolveMenuAccessContext()
     );
     if (!result.success) {
-        game._showStatusToast('Developer-Modus gesperrt.', 1500, 'error');
+        game._showStatusToast(resolveDeveloperFailureMessage(result, 'Developer-Modus gesperrt.'), 1500, 'error');
         return;
     }
     onSettingsChanged({
-        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-            ? result.changedKeys
-            : [SETTINGS_CHANGE_KEYS.DEVELOPER_MODE_ENABLED],
+        changedKeys: resolveMutationChangedKeys(result, [SETTINGS_CHANGE_KEYS.DEVELOPER_MODE_ENABLED]),
     });
 }
 
@@ -38,13 +61,11 @@ export function handleDeveloperThemeChangeAction(ctx) {
         resolveMenuAccessContext()
     );
     if (!result.success) {
-        game._showStatusToast('Theme-Wechsel gesperrt.', 1500, 'error');
+        game._showStatusToast(resolveDeveloperFailureMessage(result, 'Theme-Wechsel gesperrt.'), 1500, 'error');
         return;
     }
     onSettingsChanged({
-        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-            ? result.changedKeys
-            : [SETTINGS_CHANGE_KEYS.DEVELOPER_THEME_ID],
+        changedKeys: resolveMutationChangedKeys(result, [SETTINGS_CHANGE_KEYS.DEVELOPER_THEME_ID]),
     });
 }
 
@@ -56,13 +77,11 @@ export function handleDeveloperVisibilityChangeAction(ctx) {
         resolveMenuAccessContext()
     );
     if (!result.success) {
-        game._showStatusToast('Developer-Visibility gesperrt.', 1500, 'error');
+        game._showStatusToast(resolveDeveloperFailureMessage(result, 'Developer-Visibility gesperrt.'), 1500, 'error');
         return;
     }
     onSettingsChanged({
-        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-            ? result.changedKeys
-            : [SETTINGS_CHANGE_KEYS.DEVELOPER_VISIBILITY_MODE],
+        changedKeys: resolveMutationChangedKeys(result, [SETTINGS_CHANGE_KEYS.DEVELOPER_VISIBILITY_MODE]),
     });
 }
 
@@ -74,13 +93,11 @@ export function handleDeveloperFixedPresetLockToggleAction(ctx) {
         resolveMenuAccessContext()
     );
     if (!result.success) {
-        game._showStatusToast('Fixed-Preset-Lock gesperrt.', 1500, 'error');
+        game._showStatusToast(resolveDeveloperFailureMessage(result, 'Fixed-Preset-Lock gesperrt.'), 1500, 'error');
         return;
     }
     onSettingsChanged({
-        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-            ? result.changedKeys
-            : [SETTINGS_CHANGE_KEYS.DEVELOPER_FIXED_PRESET_LOCK],
+        changedKeys: resolveMutationChangedKeys(result, [SETTINGS_CHANGE_KEYS.DEVELOPER_FIXED_PRESET_LOCK]),
     });
 }
 
@@ -93,13 +110,11 @@ export function handleDeveloperActorChangeAction(ctx) {
         resolveMenuAccessContext()
     );
     if (!result.success) {
-        game._showStatusToast('Actor-Wechsel gesperrt.', 1500, 'error');
+        game._showStatusToast(resolveDeveloperFailureMessage(result, 'Actor-Wechsel gesperrt.'), 1500, 'error');
         return;
     }
     onSettingsChanged({
-        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-            ? result.changedKeys
-            : [SETTINGS_CHANGE_KEYS.DEVELOPER_ACTOR_ID],
+        changedKeys: resolveMutationChangedKeys(result, [SETTINGS_CHANGE_KEYS.DEVELOPER_ACTOR_ID]),
     });
 }
 
@@ -112,13 +127,11 @@ export function handleDeveloperReleasePreviewToggleAction(ctx) {
         resolveMenuAccessContext()
     );
     if (!result.success) {
-        game._showStatusToast('Release-Vorschau gesperrt.', 1500, 'error');
+        game._showStatusToast(resolveDeveloperFailureMessage(result, 'Release-Vorschau gesperrt.'), 1500, 'error');
         return;
     }
     onSettingsChanged({
-        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-            ? result.changedKeys
-            : [SETTINGS_CHANGE_KEYS.DEVELOPER_RELEASE_PREVIEW],
+        changedKeys: resolveMutationChangedKeys(result, [SETTINGS_CHANGE_KEYS.DEVELOPER_RELEASE_PREVIEW]),
     });
     game._showStatusToast(
         enabled
@@ -140,14 +153,12 @@ export function handleDeveloperTextOverrideSetAction(ctx) {
 
     const result = game.settingsManager.setMenuTextOverride(textId, textValue);
     if (!result.success) {
-        game._showStatusToast('Text-Override konnte nicht gesetzt werden.', 1700, 'error');
+        game._showStatusToast(resolveDeveloperFailureMessage(result, 'Text-Override konnte nicht gesetzt werden.'), 1700, 'error');
         return;
     }
 
     onSettingsChanged({
-        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-            ? result.changedKeys
-            : [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES],
+        changedKeys: resolveMutationChangedKeys(result, [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES]),
     });
     game._showStatusToast('Text-Override gespeichert.', 1200, 'success');
 }
@@ -161,13 +172,11 @@ export function handleDeveloperTextOverrideClearAction(ctx) {
     }
     const result = game.settingsManager.clearMenuTextOverride(textId);
     if (!result.success) {
-        game._showStatusToast('Text-Override konnte nicht geloescht werden.', 1700, 'error');
+        game._showStatusToast(resolveDeveloperFailureMessage(result, 'Text-Override konnte nicht geloescht werden.'), 1700, 'error');
         return;
     }
     onSettingsChanged({
-        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-            ? result.changedKeys
-            : [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES],
+        changedKeys: resolveMutationChangedKeys(result, [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES]),
     });
     game._showStatusToast('Text-Override geloescht.', 1200, 'success');
 }

@@ -12,6 +12,25 @@ import {
     resolveSurfaceBlockedFeatureFeedback,
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 
+function resolveMutationChangedKeys(result, fallbackKeys = []) {
+    return Array.isArray(result?.changedKeys) && result.changedKeys.length > 0
+        ? result.changedKeys.slice()
+        : [...fallbackKeys];
+}
+
+function resolvePresetFailureMessage(result, fallbackMessage) {
+    switch (result?.reason) {
+    case 'invalid_preset_id':
+        return 'Preset-ID ist ungueltig.';
+    case 'preset_not_found':
+        return 'Preset wurde nicht gefunden.';
+    case 'owner_required':
+        return 'Nur der Host darf dieses Preset veraendern.';
+    default:
+        return fallbackMessage;
+    }
+}
+
 function setConfigShareStatus(ui, message, tone = 'info') {
     if (!ui?.configShareStatus) return;
     ui.configShareStatus.textContent = String(message || '');
@@ -81,17 +100,15 @@ export function applyMenuPresetAction({
 
     const result = game.settingsManager.applyMenuPreset(game.settings, presetId, resolveMenuAccessContext?.());
     if (!result.success) {
-        game._showStatusToast('Preset konnte nicht angewendet werden.', 1700, 'error');
+        game._showStatusToast(resolvePresetFailureMessage(result, 'Preset konnte nicht angewendet werden.'), 1700, 'error');
         return;
     }
 
-    const changedKeys = Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-        ? result.changedKeys.slice()
-        : [
+    const changedKeys = resolveMutationChangedKeys(result, [
             settingsChangeKeys.PRESET_ACTIVE_ID,
             settingsChangeKeys.PRESET_ACTIVE_KIND,
             settingsChangeKeys.PRESET_STATUS,
-        ];
+        ]);
     onSettingsChanged?.({ changedKeys });
 
     if (result.blockedPaths?.length > 0) {
@@ -121,16 +138,14 @@ export function saveMenuPresetAction({
         resolveMenuAccessContext?.()
     );
     if (!result.success) {
-        game._showStatusToast('Preset konnte nicht gespeichert werden.', 1700, 'error');
+        game._showStatusToast(resolvePresetFailureMessage(result, 'Preset konnte nicht gespeichert werden.'), 1700, 'error');
         return;
     }
     onSettingsChanged?.({
-        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-            ? result.changedKeys
-            : [
+        changedKeys: resolveMutationChangedKeys(result, [
                 settingsChangeKeys.PRESET_LIST,
                 settingsChangeKeys.PRESET_STATUS,
-            ],
+            ]),
     });
     const label = kind === 'fixed' ? 'verbindlich' : 'frei';
     game._showStatusToast(`Preset gespeichert (${label}): ${result.preset?.name || result.preset?.id}`, 1400, 'success');
@@ -150,16 +165,14 @@ export function deleteMenuPresetAction({
     }
     const result = game.settingsManager.deleteMenuPreset(presetId, game.settings, resolveMenuAccessContext?.());
     if (!result.success) {
-        game._showStatusToast('Preset konnte nicht geloescht werden.', 1700, 'error');
+        game._showStatusToast(resolvePresetFailureMessage(result, 'Preset konnte nicht geloescht werden.'), 1700, 'error');
         return;
     }
     onSettingsChanged?.({
-        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
-            ? result.changedKeys
-            : [
+        changedKeys: resolveMutationChangedKeys(result, [
                 settingsChangeKeys.PRESET_LIST,
                 settingsChangeKeys.PRESET_STATUS,
-            ],
+            ]),
     });
     game._showStatusToast(`Preset geloescht: ${presetId}`, 1200, 'success');
 }
