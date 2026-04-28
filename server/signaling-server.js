@@ -20,6 +20,10 @@ function generateLobbyCode() {
     return code;
 }
 
+function generateMatchCommandId() {
+    return `match-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 const lobbies = new Map();
 const peerToLobby = new Map();
 
@@ -54,6 +58,7 @@ function buildLobbyState(lobby) {
         hostPeerId: lobby.hostPeerId,
         maxPlayers: lobby.maxPlayers,
         createdAt: lobby.createdAt,
+        pendingMatchStart: lobby.pendingMatchStart || null,
         players: lobby.players.map((player) => ({
             peerId: player.peerId,
             playerId: player.peerId,
@@ -126,6 +131,7 @@ export function createSignalingServer(port = 9090) {
                     hostPeerId: peerId,
                     players: [{ peerId, ws, isHost: true, ready: true }],
                     createdAt: Date.now(),
+                    pendingMatchStart: null,
                 };
                 lobbies.set(code, lobby);
                 peerToLobby.set(ws, code);
@@ -207,6 +213,48 @@ export function createSignalingServer(port = 9090) {
                 broadcastToLobby(lobby, SIGNALING_EVENT_TYPES.PLAYER_READY, {
                     peerId,
                     ready: msg.ready === true,
+                    sessionState: buildLobbyState(lobby),
+                });
+                break;
+            }
+
+            case SIGNALING_COMMAND_TYPES.INVALIDATE_READY: {
+                const lobbyCode = peerToLobby.get(ws);
+                const lobby = lobbyCode ? lobbies.get(lobbyCode) : null;
+                if (!lobby || lobby.hostPeerId !== peerId) break;
+                for (const player of lobby.players) {
+                    if (player.isHost === true || player.ready !== true) continue;
+                    player.ready = false;
+                    broadcastToLobby(lobby, SIGNALING_EVENT_TYPES.PLAYER_READY, {
+                        peerId: player.peerId,
+                        ready: false,
+                        sessionState: buildLobbyState(lobby),
+                    });
+                }
+                break;
+            }
+
+            case SIGNALING_COMMAND_TYPES.START_MATCH: {
+                const lobbyCode = peerToLobby.get(ws);
+                const lobby = lobbyCode ? lobbies.get(lobbyCode) : null;
+                if (!lobby || lobby.hostPeerId !== peerId) break;
+                if (lobby.players.length < 2) {
+                    sendSignaling(ws, SIGNALING_EVENT_TYPES.ERROR, { message: 'At least two players are required' });
+                    break;
+                }
+                if (lobby.players.some((player) => player.ready !== true)) {
+                    sendSignaling(ws, SIGNALING_EVENT_TYPES.ERROR, { message: 'All players must be ready' });
+                    break;
+                }
+                lobby.pendingMatchStart = {
+                    commandId: String(msg.commandId || '').trim() || generateMatchCommandId(),
+                    lobbyCode: lobby.code,
+                    hostPeerId: lobby.hostPeerId,
+                    issuedAt: Date.now(),
+                    settingsSnapshot: msg.settingsSnapshot ?? null,
+                };
+                broadcastToLobby(lobby, SIGNALING_EVENT_TYPES.MATCH_START, {
+                    pendingMatchStart: lobby.pendingMatchStart,
                     sessionState: buildLobbyState(lobby),
                 });
                 break;

@@ -35,6 +35,7 @@ export class OnlineMatchLobby extends MatchLobby {
         this._signalingUrl = options.signalingUrl || '';
         this._ws = null;
         this._playerId = null;
+        this._lastHandledMatchCommandId = '';
         this.sessionState = createInitialLobbySessionState();
     }
 
@@ -194,51 +195,40 @@ export class OnlineMatchLobby extends MatchLobby {
         case SIGNALING_EVENT_TYPES.LOBBY_CREATED: {
             this.lobbyCode = msg.lobbyCode;
             this._playerId = msg.playerId;
-            const now = Date.now();
-            this._applySessionState({
-                lobbyCode: this.lobbyCode,
-                hostPeerId: this._playerId,
-                maxPlayers: Number(msg.maxPlayers || 10),
-                members: [{
-                    peerId: this._playerId,
-                    actorId: 'Host',
-                    name: 'Host',
-                    role: 'host',
-                    ready: true,
-                    joinedAt: now,
-                    lastSeenAt: now,
-                }],
-                updatedAt: now,
-                revision: Number(this.sessionState.revision || 0) + 1,
-            });
+            const serverState = msg?.sessionState && typeof msg.sessionState === 'object'
+                ? msg.sessionState
+                : {
+                    lobbyCode: this.lobbyCode,
+                    hostPeerId: this._playerId,
+                    maxPlayers: Number(msg.maxPlayers || 10),
+                    members: [{
+                        peerId: this._playerId,
+                        actorId: 'Host',
+                        name: 'Host',
+                        role: 'host',
+                        ready: true,
+                        joinedAt: Date.now(),
+                        lastSeenAt: Date.now(),
+                    }],
+                    updatedAt: Date.now(),
+                    revision: Number(this.sessionState.revision || 0) + 1,
+                };
+            this._applySessionState(serverState);
             if (connectResolve) connectResolve();
             break;
         }
 
         case SIGNALING_EVENT_TYPES.LOBBY_JOINED: {
             this._playerId = msg.playerId;
-            const now = Date.now();
-            const hasMember = this.sessionState.members.some((member) => member.peerId === this._playerId);
-            if (!hasMember) {
-                this._applySessionState({
+            const serverState = msg?.sessionState && typeof msg.sessionState === 'object'
+                ? msg.sessionState
+                : {
                     ...this.sessionState,
                     lobbyCode: msg.lobbyCode || this.sessionState.lobbyCode,
-                    members: [
-                        ...this.sessionState.members,
-                        {
-                            peerId: this._playerId,
-                            actorId: this._playerId,
-                            name: this._playerId,
-                            role: this._playerId === this.sessionState.hostPeerId ? 'host' : 'client',
-                            ready: false,
-                            joinedAt: now,
-                            lastSeenAt: now,
-                        },
-                    ],
-                    updatedAt: now,
+                    updatedAt: Date.now(),
                     revision: Number(this.sessionState.revision || 0) + 1,
-                });
-            }
+                };
+            this._applySessionState(serverState);
             if (connectResolve) connectResolve();
             break;
         }
@@ -257,6 +247,10 @@ export class OnlineMatchLobby extends MatchLobby {
         }
 
         case SIGNALING_EVENT_TYPES.PLAYER_JOINED: {
+            if (msg?.sessionState && typeof msg.sessionState === 'object') {
+                this._applySessionState(msg.sessionState);
+                break;
+            }
             const now = Date.now();
             const peerId = String(msg.peerId || '').trim();
             if (!peerId) break;
@@ -293,8 +287,36 @@ export class OnlineMatchLobby extends MatchLobby {
             break;
 
         case SIGNALING_EVENT_TYPES.PLAYER_READY:
+            if (msg?.sessionState && typeof msg.sessionState === 'object') {
+                this._applySessionState(msg.sessionState);
+                break;
+            }
             this._setReadyStateFor(msg.peerId, msg.ready === true);
             break;
+
+        case SIGNALING_EVENT_TYPES.MATCH_START: {
+            if (msg?.sessionState && typeof msg.sessionState === 'object') {
+                this._applySessionState(msg.sessionState);
+            }
+            const pendingMatchStart = msg?.pendingMatchStart && typeof msg.pendingMatchStart === 'object'
+                ? {
+                    ...msg.pendingMatchStart,
+                    settingsSnapshot: msg.pendingMatchStart.settingsSnapshot ?? null,
+                }
+                : null;
+            const commandId = String(pendingMatchStart?.commandId || '').trim();
+            if (!commandId || commandId === this._lastHandledMatchCommandId) {
+                break;
+            }
+            this._lastHandledMatchCommandId = commandId;
+            this._emit('matchStart', {
+                pendingMatchStart,
+                players: this.players,
+                settings: pendingMatchStart.settingsSnapshot ?? this.settings,
+                sessionState: this.sessionState,
+            });
+            break;
+        }
 
         case SIGNALING_EVENT_TYPES.PLAYER_RECONNECTED: {
             const peerId = String(msg.peerId || '').trim();
@@ -334,6 +356,7 @@ export class OnlineMatchLobby extends MatchLobby {
         }
         this.players = [];
         this.sessionState = createInitialLobbySessionState();
+        this._lastHandledMatchCommandId = '';
         this._emit('closed', {});
     }
 
@@ -341,13 +364,25 @@ export class OnlineMatchLobby extends MatchLobby {
         this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.READY, { ready: ready === true }));
     }
 
+    invalidateReadyForAll() {
+        this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.INVALIDATE_READY));
+    }
+
     updateSettings(settings) {
         Object.assign(this.settings, settings);
         this._emit('settingsChanged', { settings: this.settings, sessionState: this.sessionState });
     }
 
-    startMatch() {
-        this._emit('matchStart', { players: this.players, settings: this.settings, sessionState: this.sessionState });
+    startMatch(options = {}) {
+        const pendingMatchStart = {
+            commandId: `match-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+            lobbyCode: this.sessionState.lobbyCode || this.lobbyCode || '',
+            hostPeerId: this.sessionState.hostPeerId || this._playerId || '',
+            issuedAt: Date.now(),
+            settingsSnapshot: options?.settingsSnapshot ?? this.settings ?? null,
+        };
+        this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.START_MATCH, pendingMatchStart));
+        return { pendingMatchStart };
     }
 
     getLocalPeerId() {

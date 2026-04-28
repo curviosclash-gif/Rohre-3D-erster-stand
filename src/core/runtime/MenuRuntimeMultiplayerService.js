@@ -25,10 +25,11 @@ import {
     RUNTIME_SESSION_TYPES,
     normalizeMultiplayerTransport as normalizeRuntimeMultiplayerTransport,
 } from '../../shared/contracts/RuntimeSessionContract.js';
+import { hasConfiguredOnlineSignalingUrl } from '../../shared/contracts/OnlineSignalingConfig.js';
 import { recordSessionRuntimeEvent } from '../../shared/runtime/SessionRuntimeObservability.js';
 import { tryCloneJsonValue } from '../../shared/utils/JsonClone.js';
 
-const ONLINE_MENU_TRANSPORT_PENDING_MESSAGE = 'Online ist im Menu noch deaktiviert. Bitte aktuell LAN verwenden.';
+const ONLINE_MENU_TRANSPORT_UNAVAILABLE_MESSAGE = 'Online ist nicht konfiguriert. Bitte VITE_SIGNALING_URL setzen oder LAN verwenden.';
 
 function deepClone(value) {
     return tryCloneJsonValue(value, null);
@@ -44,7 +45,7 @@ function normalizeString(value, fallback = '') {
 // lobby coordination within the same browser. At match start, each tab runs a
 // LocalSessionAdapter independently — no real-time state sync occurs across tabs.
 // The selected transport is stored via localSettings.multiplayerTransport; LAN is productive,
-// while the dedicated online menu transport stays blocked until its signaling path is wired.
+// while online remains gated until a signaling endpoint is configured.
 function ensureMultiplayerSessionType(game, menuLobbyService = null) {
     if (!game?.settings || typeof game.settings !== 'object') return;
     if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
@@ -280,9 +281,12 @@ export async function handleMultiplayerHostAction({
         game?.settings?.localSettings?.multiplayerTransport,
         MULTIPLAYER_TRANSPORTS.LAN
     );
-    if (selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE) {
-        game._showStatusToast(ONLINE_MENU_TRANSPORT_PENDING_MESSAGE, 1800, 'warning');
-        return { ok: false, message: ONLINE_MENU_TRANSPORT_PENDING_MESSAGE, reason: 'online_menu_transport_pending' };
+    const onlineConfigured = hasConfiguredOnlineSignalingUrl({
+        runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
+    });
+    if (selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE && !onlineConfigured) {
+        game._showStatusToast(ONLINE_MENU_TRANSPORT_UNAVAILABLE_MESSAGE, 1800, 'warning');
+        return { ok: false, message: ONLINE_MENU_TRANSPORT_UNAVAILABLE_MESSAGE, reason: 'online_signaling_unconfigured' };
     }
     const hostGate = resolveSurfaceMultiplayerGateAccess('host', {
         runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
@@ -332,9 +336,12 @@ export async function handleMultiplayerJoinAction({
         game?.settings?.localSettings?.multiplayerTransport,
         MULTIPLAYER_TRANSPORTS.LAN
     );
-    if (selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE) {
-        game._showStatusToast(ONLINE_MENU_TRANSPORT_PENDING_MESSAGE, 1800, 'warning');
-        return { ok: false, message: ONLINE_MENU_TRANSPORT_PENDING_MESSAGE, reason: 'online_menu_transport_pending' };
+    const onlineConfigured = hasConfiguredOnlineSignalingUrl({
+        runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
+    });
+    if (selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE && !onlineConfigured) {
+        game._showStatusToast(ONLINE_MENU_TRANSPORT_UNAVAILABLE_MESSAGE, 1800, 'warning');
+        return { ok: false, message: ONLINE_MENU_TRANSPORT_UNAVAILABLE_MESSAGE, reason: 'online_signaling_unconfigured' };
     }
     const accessContext = resolveMenuAccessContext?.();
     observeCapabilityFallback(runtimeSource, menuMultiplayerBridge, 'join', event?.lobbyCode);

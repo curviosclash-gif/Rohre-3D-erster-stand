@@ -5,6 +5,7 @@ import {
     normalizeLobbyServiceTransport,
 } from '../../shared/contracts/LobbyServiceContract.js';
 import { LanLobbyService } from './NetworkLobbyService.js';
+import { OnlineLobbyService } from './OnlineLobbyService.js';
 import { StorageLobbyService } from './StorageLobbyService.js';
 
 function resolveRuntimeGlobal(runtime = null) {
@@ -28,10 +29,6 @@ function resolveCustomFactory(serviceFactories = null, transport = '') {
 
 export function resolveMenuLobbyServiceTransport(options = {}) {
     const resolvedTransport = normalizeLobbyServiceTransport(options.transport, '');
-    const customFactory = resolveCustomFactory(options.serviceFactories, resolvedTransport);
-    if (resolvedTransport === LOBBY_SERVICE_TRANSPORTS.ONLINE && !customFactory) {
-        return resolveDefaultTransport(options.runtime);
-    }
     return resolvedTransport || resolveDefaultTransport(options.runtime);
 }
 
@@ -50,6 +47,12 @@ export function createMenuLobbyService(options = {}) {
     }
     if (transport === LOBBY_SERVICE_TRANSPORTS.LAN) {
         return new LanLobbyService({
+            ...options,
+            transport,
+        });
+    }
+    if (transport === LOBBY_SERVICE_TRANSPORTS.ONLINE) {
+        return new OnlineLobbyService({
             ...options,
             transport,
         });

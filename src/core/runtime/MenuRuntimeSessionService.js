@@ -34,6 +34,7 @@ import {
     isLegacyMultiplayerTransport,
     normalizeMultiplayerTransport,
 } from '../../shared/contracts/RuntimeSessionContract.js';
+import { hasConfiguredOnlineSignalingUrl } from '../../shared/contracts/OnlineSignalingConfig.js';
 import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
 
 const MODE_PATH_TO_PRESET_ID = Object.freeze({
@@ -141,12 +142,18 @@ function resolveProductSurfaceId(game) {
     return productSurfaceId;
 }
 
-function resolveProductiveMultiplayerTransport(game, requestedTransport = '') {
+export function resolveProductiveMultiplayerTransport(game, requestedTransport = '') {
     const surfacePolicy = resolveSurfacePolicy({
         productSurfaceId: resolveProductSurfaceId(game),
     });
+    const onlineConfigured = hasConfiguredOnlineSignalingUrl({
+        runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
+    });
     const allowedTransports = Array.isArray(surfacePolicy?.allowedMultiplayerTransports)
-        ? surfacePolicy.allowedMultiplayerTransports.filter((transport) => !isLegacyMultiplayerTransport(transport))
+        ? surfacePolicy.allowedMultiplayerTransports.filter((transport) => (
+            !isLegacyMultiplayerTransport(transport)
+            && (transport !== MULTIPLAYER_TRANSPORTS.ONLINE || onlineConfigured)
+        ))
         : [];
     const candidates = [
         normalizeMultiplayerTransport(requestedTransport, ''),
@@ -155,9 +162,9 @@ function resolveProductiveMultiplayerTransport(game, requestedTransport = '') {
         allowedTransports[0] || '',
         MULTIPLAYER_TRANSPORTS.LAN,
     ];
+    const fallbackTransport = allowedTransports[0] || MULTIPLAYER_TRANSPORTS.LAN;
     return candidates.find((transport) => allowedTransports.includes(transport))
-        || surfacePolicy?.defaultMultiplayerTransport
-        || MULTIPLAYER_TRANSPORTS.LAN;
+        || fallbackTransport;
 }
 
 function applyProductiveMultiplayerTransport(game, requestedTransport = '') {

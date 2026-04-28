@@ -53,6 +53,7 @@ import {
     normalizeMultiplayerTransport,
     resolveRuntimeSessionContract,
 } from '../shared/contracts/RuntimeSessionContract.js';
+import { hasConfiguredOnlineSignalingUrl } from '../shared/contracts/OnlineSignalingConfig.js';
 
 export class UIStartSyncController {
     /**
@@ -343,23 +344,27 @@ export class UIStartSyncController {
         return this._resolveAllowedModePath(settings?.localSettings?.modePath || 'normal');
     }
 
-    // 64.3.1 macht die LAN-/Online-Wahl im Menu explizit; die produktive
-    // Online-Lobby-Anbindung folgt erst in spaeteren V64-Phasen.
+    // 64.3.1 macht die LAN-/Online-Wahl im Menu explizit. Online wird nur dann
+    // als produktiver Pfad behandelt, wenn ein Signaling-Endpoint konfiguriert ist.
     _resolveMultiplayerTransportUiState(settings = this.game.settings) {
         const surfacePolicy = this._resolveSurfacePolicy();
         const allowedTransports = Array.isArray(surfacePolicy?.allowedMultiplayerTransports)
             ? surfacePolicy.allowedMultiplayerTransports.filter((transport) => transport !== MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE)
             : [MULTIPLAYER_TRANSPORTS.LAN];
+        const onlineConfigured = hasConfiguredOnlineSignalingUrl({
+            runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
+        });
         const selectedTransport = allowedTransports.includes(
             normalizeMultiplayerTransport(settings?.localSettings?.multiplayerTransport, '')
         )
             ? normalizeMultiplayerTransport(settings?.localSettings?.multiplayerTransport, '')
             : (allowedTransports[0] || MULTIPLAYER_TRANSPORTS.LAN);
-        const isOnlinePending = selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE;
+        const isOnlinePending = selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE && !onlineConfigured;
         return {
             allowedTransports,
             selectedTransport,
             selectedTransportLabel: selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE ? 'Online' : 'LAN',
+            onlineConfigured,
             isOnlinePending,
         };
     }
@@ -676,11 +681,14 @@ export class UIStartSyncController {
                 button.classList.toggle('active', active);
                 button.setAttribute('aria-hidden', String(!allowed));
                 button.setAttribute('aria-pressed', String(active));
-                button.disabled = !allowed || (multiplayerTransportUiState.isOnlinePending && active);
+                button.disabled = !allowed || (
+                    transport === MULTIPLAYER_TRANSPORTS.ONLINE
+                    && !multiplayerTransportUiState.onlineConfigured
+                );
                 if (transport === MULTIPLAYER_TRANSPORTS.ONLINE && allowed) {
                     button.title = multiplayerTransportUiState.isOnlinePending
-                        ? 'Online ist im Menu noch deaktiviert. Bitte aktuell LAN verwenden.'
-                        : 'Online-Lobby als Internet-Pfad vormerken.';
+                        ? 'Online ist nicht konfiguriert. Bitte VITE_SIGNALING_URL setzen oder LAN verwenden.'
+                        : 'Online-Lobby als Internet-Pfad nutzen.';
                 } else if (allowed) {
                     button.title = 'LAN als produktiven Host-/Join-Pfad nutzen.';
                 } else {
@@ -690,7 +698,7 @@ export class UIStartSyncController {
         }
         if (this.ui.multiplayerTransportHint) {
             this.ui.multiplayerTransportHint.textContent = multiplayerTransportUiState.isOnlinePending
-                ? 'Auswahl: Online | im Menu noch deaktiviert, bitte LAN verwenden'
+                ? 'Auswahl: Online | nicht konfiguriert, bitte LAN verwenden'
                 : `Produktiver Transport: ${multiplayerTransportUiState.selectedTransportLabel}`;
         }
         if (this.ui.multiplayerLobbyCodeInput) {
@@ -744,7 +752,7 @@ export class UIStartSyncController {
                     ? `Lobbystatus: ${lobbyCode} | ${sessionContract.transportAudienceLabel}`
                     : 'Lobbystatus: Legacy-Fallback aktiv | lokaler Menu-Bridge-Pfad, kein produktives LAN/Online';
             } else if (multiplayerTransportUiState.isOnlinePending) {
-                this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: Online ausgewaehlt | im Menu noch deaktiviert, bitte LAN verwenden';
+                this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: Online ausgewaehlt | nicht konfiguriert, bitte LAN verwenden';
             } else if (lobbyCode) {
                 this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${surfaceEntryCopy.joinButtonLabel} noch nicht verbunden`;
             } else {
@@ -758,13 +766,13 @@ export class UIStartSyncController {
             const surfaceDisabled = this.ui.multiplayerHostButton.disabled === true;
             this.ui.multiplayerHostButton.disabled = surfaceDisabled || disableTransportPendingActions;
             if (disableTransportPendingActions) {
-                this.ui.multiplayerHostButton.title = 'Online ist im Menu noch deaktiviert. Bitte aktuell LAN verwenden.';
+                this.ui.multiplayerHostButton.title = 'Online ist nicht konfiguriert. Bitte VITE_SIGNALING_URL setzen oder LAN verwenden.';
             }
         }
         if (this.ui.multiplayerJoinButton) {
             this.ui.multiplayerJoinButton.disabled = disableTransportPendingActions;
             if (disableTransportPendingActions) {
-                this.ui.multiplayerJoinButton.title = 'Online ist im Menu noch deaktiviert. Bitte aktuell LAN verwenden.';
+                this.ui.multiplayerJoinButton.title = 'Online ist nicht konfiguriert. Bitte VITE_SIGNALING_URL setzen oder LAN verwenden.';
             }
         }
 

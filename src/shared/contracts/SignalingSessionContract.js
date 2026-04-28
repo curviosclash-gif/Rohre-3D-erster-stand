@@ -7,6 +7,8 @@ export const SIGNALING_COMMAND_TYPES = Object.freeze({
     JOIN_LOBBY: 'join_lobby',
     RESUME_CONNECTION: 'resume_connection',
     READY: 'ready',
+    INVALIDATE_READY: 'invalidate_ready',
+    START_MATCH: 'start_match',
     LEAVE: 'leave',
     OFFER: 'offer',
     ANSWER: 'answer',
@@ -21,6 +23,7 @@ export const SIGNALING_EVENT_TYPES = Object.freeze({
     PLAYER_LEFT: 'player_left',
     PLAYER_RECONNECTED: 'player_reconnected',
     PLAYER_READY: 'player_ready',
+    MATCH_START: 'match_start',
     ERROR: 'error',
 });
 
@@ -55,6 +58,8 @@ export const SIGNALING_COMMAND_ROLE_MAP = Object.freeze({
     [SIGNALING_COMMAND_TYPES.JOIN_LOBBY]: 'client',
     [SIGNALING_COMMAND_TYPES.RESUME_CONNECTION]: 'both',
     [SIGNALING_COMMAND_TYPES.READY]: 'both',
+    [SIGNALING_COMMAND_TYPES.INVALIDATE_READY]: 'host',
+    [SIGNALING_COMMAND_TYPES.START_MATCH]: 'host',
     [SIGNALING_COMMAND_TYPES.LEAVE]: 'both',
     [SIGNALING_COMMAND_TYPES.OFFER]: 'client',
     [SIGNALING_COMMAND_TYPES.ANSWER]: 'host',

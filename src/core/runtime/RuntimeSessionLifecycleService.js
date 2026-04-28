@@ -36,7 +36,7 @@ export async function createRuntimeSessionAdapter(sessionSource, adapterOptions 
     }
     if (sessionContract.adapterSessionType === RUNTIME_SESSION_TYPES.ONLINE) {
         const { OnlineSessionAdapter } = await import(/* webpackChunkName: "net" */ '../../network/OnlineSessionAdapter.js');
-        return new OnlineSessionAdapter();
+        return new OnlineSessionAdapter(adapterOptions);
     }
     if (sessionContract.usesMenuStorageBridge) {
         // Storage-Bridge coordination is a menu-only transport contract, not a real runtime network adapter.
