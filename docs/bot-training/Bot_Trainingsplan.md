@@ -2688,7 +2688,7 @@ Pflicht-Artefakte:
 - [x] DoD.3 Kein Lauf ueber den naechsten Ladder-Schritt startet ohne gruenes Supervisor-/Exit-Report-Gate und mindestens ein echtes nicht-totes Zielsignal oder eine vorab definierte Reduktion frueher Todesfaelle. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_start_truth_contracts.py` -> `data/training/ppo/bt93k/signal_metric_contract.json` + `data/training/ppo/bt93k/supervisor_contract_report.json`)
 - [x] DoD.4 Curriculum-Step-Uhr, `activeCurriculumStage`, Progress-/Objective-Reachability und effective Map/Mode/Planar werden in Train/Eval-Reports sichtbar. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_runner_signal_repair.py --write-report` + `python python/scripts/bt93k_mode_map_smokes.py --write-report` -> `data/training/ppo/bt93k/runner_signal_repair_report.json` + `data/training/ppo/bt93k/mode_map_smoke_report.json`)
 - [x] DoD.5 2-/4-/6-Env-Smokes sind klein, final reportbar und getrennt von Longrun-/Qualitaetsurteilen. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_env_scale_smokes.py --write-report` -> `data/training/ppo/bt93k/env_scale_smoke_report.json`)
-- [ ] DoD.6 CUDA wird isoliert benchmarked; CPU bleibt Referenzpfad und CUDA wird nur bei stabiler Wallclock-Verbesserung behalten.
+- [x] DoD.6 CUDA wird isoliert benchmarked; CPU bleibt Referenzpfad und CUDA wird nur bei stabiler Wallclock-Verbesserung behalten. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_cuda_benchmark.py --write-report` -> `data/training/ppo/bt93k/cuda_benchmark_report.json` (`resultClass=cuda-not-retained`, `cudaTorchAvailable=true`, `envSmokeWallClockImprovement=-0.011358`, CPU bleibt Referenzpfad))
 - [ ] DoD.7 BT94A bleibt geschlossen, solange `bt94a_gate_check.py` nicht `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aBlockerCount=0` und `precomparison != ppo-regression` schreibt.
 - [ ] DoD.8 Produktive Runtime-, Matchstart-, AI-Hub-, Strategy-Flag-, Registry-, Rollback-, Rollout-, Authority- und Bridge-Surfaces bleiben unveraendert.
 - [ ] DoD.9 Abschluss-Gates `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS oder als Blocker dokumentiert; diese Gates zaehlen nicht als PPO-Beweis.
@@ -2730,9 +2730,9 @@ Pflicht-Artefakte:
 
 ### 93K.5 CUDA-Benchmark als isolierte Infrastruktur-Lane
 
-- [ ] 93K.5.1 Separaten CUDA-PyTorch-Env vorbereiten; CPU-Env bleibt funktionierender Referenzpfad.
-- [ ] 93K.5.2 CPU vs CUDA mit identischem 2-/4-/6-Env-Smoke vergleichen und `cuda_benchmark_report.json` versioniert schreiben: Wallclock, Exit-Report, Snapshot-Integritaet, Determinismus- und Treiberprobleme.
-- [ ] 93K.5.3 CUDA nur behalten, wenn Wallclock stabil mindestens 20-30 Prozent besser ist und keine Artefakt-, Treiber- oder Determinismusprobleme auftreten.
+- [x] 93K.5.1 Separaten CUDA-PyTorch-Env vorbereiten; CPU-Env bleibt funktionierender Referenzpfad. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_cuda_benchmark.py --write-report` -> `data/training/ppo/bt93k/cuda_benchmark_report.json` (`pythonEnvironments.cudaIsolated.torchVersion=2.3.1+cu121`, `cudaAvailable=true`, `cpuReferenceOk=true`))
+- [x] 93K.5.2 CPU vs CUDA mit identischem 2-/4-/6-Env-Smoke vergleichen und `cuda_benchmark_report.json` versioniert schreiben: Wallclock, Exit-Report, Snapshot-Integritaet, Determinismus- und Treiberprobleme. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_cuda_benchmark.py --write-report` -> `data/training/ppo/bt93k/cuda_benchmark_report.json` (`phaseCoverage.93K.5.2=true`, `envSmokeArtifactIntegrityOk=true`, CPU/CUDA Smoke-Reports: `cuda_benchmark_cpu_env_scale_report.json`, `cuda_benchmark_cuda_env_scale_report.json`))
+- [x] 93K.5.3 CUDA nur behalten, wenn Wallclock stabil mindestens 20-30 Prozent besser ist und keine Artefakt-, Treiber- oder Determinismusprobleme auftreten. (abgeschlossen: 2026-04-28; evidence: `python python/scripts/bt93k_cuda_benchmark.py --write-report` -> `data/training/ppo/bt93k/cuda_benchmark_report.json` (`resultClass=cuda-not-retained`, `blockedReasons[0]=env-smoke wallclock improvement below 20 percent`, `torchMinWallClockImprovement=0.386937`))
 
 ### 93K.6 Signal-gated Longrun-Leiter
 
