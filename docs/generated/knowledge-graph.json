@@ -58,36 +58,52 @@
       }
     },
     {
-      "id": "V43-Strukturvertrag",
+      "id": "V43",
       "type": "block",
-      "title": null,
-      "status": "unknown",
+      "title": "Projektstruktur Spiel Dev Ordner",
+      "status": "planned",
       "attributes": {
         "source": [
-          "dependency-target"
-        ]
+          "dependency-target",
+          "legacy-plan"
+        ],
+        "priority": null,
+        "owner": null,
+        "currentPhase": null,
+        "planFile": "docs/plaene/alt/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md"
       }
     },
     {
       "id": "V58",
       "type": "block",
-      "title": null,
-      "status": "unknown",
+      "title": "Architektur-Bereinigung & God-Object Refactoring",
+      "status": "done",
       "attributes": {
         "source": [
+          "archive-summary",
           "dependency-target"
-        ]
+        ],
+        "priority": null,
+        "owner": null,
+        "currentPhase": "58.99",
+        "planFile": "docs/Umsetzungsplan.md"
       }
     },
     {
       "id": "V60",
       "type": "block",
-      "title": null,
-      "status": "unknown",
+      "title": "Architektur- und Totcode-Konsolidierung nach Audit",
+      "status": "done",
       "attributes": {
         "source": [
-          "dependency-target"
-        ]
+          "archive-summary",
+          "dependency-target",
+          "legacy-plan"
+        ],
+        "priority": null,
+        "owner": null,
+        "currentPhase": "60.99",
+        "planFile": "docs/plaene/alt/Feature_Architektur_Totcode_Konsolidierung_V60.md"
       }
     },
     {
@@ -99,6 +115,7 @@
         "source": [
           "block-plan",
           "dependency-target",
+          "legacy-plan",
           "master-index"
         ],
         "priority": "P2",
@@ -112,12 +129,18 @@
     {
       "id": "V69",
       "type": "block",
-      "title": null,
-      "status": "unknown",
+      "title": "Fight/Hunt Combat-Balance - Item, Raketen, Schild, MG",
+      "status": "done",
       "attributes": {
         "source": [
-          "dependency-target"
-        ]
+          "archive-summary",
+          "dependency-target",
+          "legacy-plan"
+        ],
+        "priority": null,
+        "owner": null,
+        "currentPhase": "69.99",
+        "planFile": "docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md"
       }
     },
     {
@@ -129,6 +152,7 @@
         "source": [
           "block-plan",
           "dependency-target",
+          "legacy-plan",
           "master-index"
         ],
         "priority": "P1",
@@ -148,6 +172,7 @@
         "source": [
           "block-plan",
           "dependency-target",
+          "legacy-plan",
           "master-index"
         ],
         "priority": "P1",
@@ -165,13 +190,17 @@
       "status": "done",
       "attributes": {
         "source": [
+          "block-plan",
           "dependency-target",
+          "legacy-plan",
           "master-index"
         ],
         "priority": "P1",
         "owner": "frei",
         "currentPhase": "74.99",
-        "planFile": "docs/plaene/alt/V74.md"
+        "planFile": "docs/plaene/alt/V74.md",
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
       }
     },
     {
@@ -219,6 +248,7 @@
         "source": [
           "block-plan",
           "dependency-target",
+          "legacy-plan",
           "master-index"
         ],
         "priority": "P2",
@@ -268,12 +298,37 @@
     {
       "id": "V83",
       "type": "block",
-      "title": null,
-      "status": "unknown",
+      "title": "Architektur SessionRuntime und Plattform-Capabilities",
+      "status": "done",
       "attributes": {
         "source": [
-          "dependency-target"
-        ]
+          "archive-index",
+          "block-plan",
+          "dependency-target",
+          "legacy-plan"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "planFile": "docs/plaene/alt/V83.md",
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": [],
+        "currentPhase": "83.99"
+      }
+    },
+    {
+      "id": "V84",
+      "type": "block",
+      "title": "Headless MatchKernel und einheitliche GameMode-API",
+      "status": "done",
+      "attributes": {
+        "source": [
+          "block-plan"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "planFile": "docs/plaene/alt/V84.md",
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
       }
     },
     {
@@ -317,14 +372,17 @@
       "status": "done",
       "attributes": {
         "source": [
+          "archive-index",
           "block-plan",
-          "dependency-target"
+          "dependency-target",
+          "legacy-plan"
         ],
         "priority": "P2",
         "owner": "frei",
         "planFile": "docs/plaene/aktiv/V87.md",
         "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
+        "unknownFrontmatterFields": [],
+        "currentPhase": "87.99"
       }
     },
     {
@@ -334,6 +392,7 @@
       "status": "done",
       "attributes": {
         "source": [
+          "archive-index",
           "block-plan",
           "dependency-target"
         ],
@@ -341,7 +400,8 @@
         "owner": "frei",
         "planFile": "docs/plaene/aktiv/V88.md",
         "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
+        "unknownFrontmatterFields": [],
+        "currentPhase": "88.99"
       }
     },
     {
@@ -388,6 +448,7 @@
         "source": [
           "block-plan",
           "dependency-target",
+          "legacy-plan",
           "master-index"
         ],
         "priority": "P2",
@@ -412,7 +473,8 @@
         "owner": "frei",
         "planFile": "docs/plaene/aktiv/V93.md",
         "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
+        "unknownFrontmatterFields": [],
+        "currentPhase": null
       }
     },
     {
@@ -442,6 +504,7 @@
         "source": [
           "block-plan",
           "dependency-target",
+          "legacy-plan",
           "master-index"
         ],
         "priority": "P2",
@@ -461,6 +524,7 @@
         "source": [
           "block-plan",
           "dependency-target",
+          "legacy-plan",
           "master-index"
         ],
         "priority": "P2",
@@ -480,6 +544,7 @@
         "source": [
           "block-plan",
           "dependency-target",
+          "legacy-plan",
           "master-index"
         ],
         "priority": "P2",
@@ -891,6 +956,66 @@
       }
     },
     {
+      "id": "V74.3",
+      "type": "phase",
+      "title": "Match-Session-Lifecycle und Recorder-Finalisierung haerten",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.3"
+      }
+    },
+    {
+      "id": "V74.4",
+      "type": "phase",
+      "title": "Core-, UI- und State-Komposition weiter entkoppeln",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.4"
+      }
+    },
+    {
+      "id": "V74.5",
+      "type": "phase",
+      "title": "Entity- und Config-Vertraege von Core loesen",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.5"
+      }
+    },
+    {
+      "id": "V74.6",
+      "type": "phase",
+      "title": "Desktop-Shell und Capability-Grenzen haerten",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.6"
+      }
+    },
+    {
+      "id": "V74.7",
+      "type": "phase",
+      "title": "Vertragsklarheit und Plan-Sync",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.7"
+      }
+    },
+    {
+      "id": "V74.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.99"
+      }
+    },
+    {
       "id": "V75.1",
       "type": "phase",
       "title": "Capture-/Export-Vertrag und Preset-Schnitt festziehen",
@@ -1278,6 +1403,126 @@
       "attributes": {
         "blockId": "V82",
         "phaseCode": "82.99"
+      }
+    },
+    {
+      "id": "V83.1",
+      "type": "phase",
+      "title": "Zielbild und Vertragsgrenzen fixieren",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.1"
+      }
+    },
+    {
+      "id": "V83.2",
+      "type": "phase",
+      "title": "SessionRuntime als Runtime-Kern einfuehren",
+      "status": "open",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.2"
+      }
+    },
+    {
+      "id": "V83.3",
+      "type": "phase",
+      "title": "Application-Commands und Runtime-Events einziehen",
+      "status": "open",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.3"
+      }
+    },
+    {
+      "id": "V83.4",
+      "type": "phase",
+      "title": "Plattform-Capabilities und Lobby-Service haerten",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.4"
+      }
+    },
+    {
+      "id": "V83.5",
+      "type": "phase",
+      "title": "Legacy-Reste reduzieren und Folgearbeit schneiden",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.5"
+      }
+    },
+    {
+      "id": "V83.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.99"
+      }
+    },
+    {
+      "id": "V84.1",
+      "type": "phase",
+      "title": "Kernel-Zielbild und Simulationsseams definieren",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.1"
+      }
+    },
+    {
+      "id": "V84.2",
+      "type": "phase",
+      "title": "Headless MatchKernel einfuehren",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.2"
+      }
+    },
+    {
+      "id": "V84.3",
+      "type": "phase",
+      "title": "GameMode-API vereinheitlichen",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.3"
+      }
+    },
+    {
+      "id": "V84.4",
+      "type": "phase",
+      "title": "Projektionen und Renderadapter schneiden",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.4"
+      }
+    },
+    {
+      "id": "V84.5",
+      "type": "phase",
+      "title": "Reproduzierbarkeit und Folgeverbrauch absichern",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.5"
+      }
+    },
+    {
+      "id": "V84.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.99"
       }
     },
     {
@@ -3044,6 +3289,193 @@
       }
     },
     {
+      "id": "V74.3.1",
+      "type": "subphase",
+      "title": "`MatchLifecycleSessionOrchestrator` auf ein kleines Dependency-Objekt oder Session-Port umstellen. (abgeschlossen: 2026-04-01; evidence: Select-String -Path src\\state\\MatchLifecycleSessionOrchestrator.js -Pattern 'export function createMatchSessionPort' -> src/state/MatchLifecycleSessionOrchestrator.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.3",
+        "subphaseCode": "74.3.1"
+      }
+    },
+    {
+      "id": "V74.3.2",
+      "type": "subphase",
+      "title": "Verworfene oder ersetzte `initializeMatchSession()`-Ergebnisse aktiv disposen. (abgeschlossen: 2026-04-01; evidence: Select-String -Path src\\state\\MatchSessionFactory.js,src\\core\\runtime\\GameRuntimeBundle.js,tests\\core-targeted.spec.js -Pattern 'disposeFailedSession|arena: state\\\\?\\\\.arena|partial session allocations on async init failure' -> src/state/MatchSessionFactory.js, src/core/runtime/GameRuntimeBundle.js, tests/core-targeted.spec.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.3",
+        "subphaseCode": "74.3.2"
+      }
+    },
+    {
+      "id": "V74.3.3",
+      "type": "subphase",
+      "title": "Einen gemeinsamen Finalize-Vertrag fuer Recording-Stop, Dispose, Return-to-Menu, Session-Abbruch und Shutdown einziehen. (abgeschlossen: 2026-04-01; evidence: Select-String -Path src\\state\\MatchLifecycleSessionOrchestrator.js,src\\core\\GameRuntimeFacade.js,src\\core\\runtime\\MatchFinalizeFlowService.js,src\\shared\\runtime\\GameRuntimePorts.js,src\\ui\\MatchFlowUiController.js,src\\core\\main.js,tests\\core-targeted.spec.js -Pattern 'finalizeMatchSession|finalizeMatchFlow|return game\\\\.runtimeFacade\\\\?\\\\.returnToMenu|suppresses menu cleanup when shutdown reuses pending finalize flow' -> src/state/MatchLifecycleSessionOrchestrator.js, src/core/GameRuntimeFacade.js, src/core/runtime/MatchFinalizeFlowService.js, src/shared/runtime/GameRuntimePorts.js, src/ui/MatchFlowUiController.js, src/core/main.js, tests/core-targeted.spec.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.3",
+        "subphaseCode": "74.3.3"
+      }
+    },
+    {
+      "id": "V74.4.1",
+      "type": "subphase",
+      "title": "`MatchUiStateOps` und aehnliche pure Ableitungen an einen fachlich passenderen Ort verschieben. (abgeschlossen: 2026-04-02; evidence: Select-String -Path src\\shared\\contracts\\MatchUiStateContract.js,src\\ui\\MatchFlowUiController.js,src\\state\\MatchLifecycleStateTransitions.js,src\\state\\RoundEndCoordinator.js,src\\state\\RoundStateTickSystem.js -Pattern 'MatchUiStateContract\\.js|deriveMatchLoadingUiState|deriveRoundEndOverlayUiState|deriveRoundEndCountdownUiState|derivePauseUiState|deriveResumeUiState|deriveReturnToMenuUiState|deriveMatchStartUiState|deriveRoundStartUiState' -> src/shared/contracts/MatchUiStateContract.js, src/ui/MatchFlowUiController.js, src/state/MatchLifecycleStateTransitions.js, src/state/RoundEndCoordinator.js, src/state/RoundStateTickSystem.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.4",
+        "subphaseCode": "74.4.1"
+      }
+    },
+    {
+      "id": "V74.4.2",
+      "type": "subphase",
+      "title": "`main.js` und `GameRuntimePorts` weiter ausduennen und neue Flows in dedizierte Coordinatoren schneiden. (abgeschlossen: 2026-04-02; evidence: Select-String -Path src\\core\\main.js,src\\core\\runtime\\GameRuntimeCoordinator.js,src\\shared\\runtime\\GameRuntimePorts.js -Pattern 'GameRuntimeCoordinator|runtimeCoordinator\\\\.initialize|runtimeCoordinator\\\\.finishStartup|getRuntimeCoordinator|returnToMenu' -> src/core/main.js, src/core/runtime/GameRuntimeCoordinator.js, src/shared/runtime/GameRuntimePorts.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.4",
+        "subphaseCode": "74.4.2"
+      }
+    },
+    {
+      "id": "V74.4.3",
+      "type": "subphase",
+      "title": "`GameRuntimeFacade` in klarere Teilzustaendigkeiten schneiden oder intern ueber kleine Handler organisieren. (abgeschlossen: 2026-04-02; evidence: Select-String -Path src\\core\\GameRuntimeFacade.js,src\\core\\runtime\\GameRuntimeMenuActionHandler.js,src\\core\\runtime\\GameRuntimeSettingsHandler.js,src\\core\\runtime\\GameRuntimeSessionHandler.js -Pattern 'GameRuntimeMenuActionHandler|GameRuntimeSettingsHandler|GameRuntimeSessionHandler|menuActionHandler|settingsHandler|sessionHandler' -> src/core/GameRuntimeFacade.js, src/core/runtime/GameRuntimeMenuActionHandler.js, src/core/runtime/GameRuntimeSettingsHandler.js, src/core/runtime/GameRuntimeSessionHandler.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.4",
+        "subphaseCode": "74.4.3"
+      }
+    },
+    {
+      "id": "V74.5.1",
+      "type": "subphase",
+      "title": "Einen shared Runtime- oder Gameplay-Config-Vertrag definieren. (abgeschlossen: 2026-04-02; evidence: Select-String -Path src\\shared\\contracts\\GameplayConfigContract.js,src\\shared\\contracts\\RuntimeMapCatalogContract.js,src\\core\\Config.js -Pattern 'GAMEPLAY_CONFIG_DEFAULTS|CONFIG_SECTIONS|getGameplayConfigSection|resolveGameplayConfig|getGameplayMapCatalog|registerMapCatalogConfigSource' -> src/shared/contracts/GameplayConfigContract.js, src/shared/contracts/RuntimeMapCatalogContract.js, src/core/Config.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.5",
+        "subphaseCode": "74.5.1"
+      }
+    },
+    {
+      "id": "V74.5.2",
+      "type": "subphase",
+      "title": "Hochfrequente `CONFIG`- und Ambient-State-Leser auf explizite Runtime-Inputs oder Session-Kontexte umstellen. (abgeschlossen: 2026-04-02; evidence: npm exec eslint -- src/shared/contracts/GameplayConfigContract.js src/entities/Bot.js src/entities/Particles.js src/entities/Player.js src/entities/ai/BotDecisionOps.js src/entities/ai/BotProbeOps.js src/entities/ai/BotRecoveryOps.js src/entities/ai/BotSensingOps.js src/entities/ai/BotThreatOps.js src/entities/ai/HuntBridgePolicy.js src/entities/arena/ArenaGeometryCompilePipeline.js src/entities/arena/PortalGateMeshFactory.js src/entities/arena/portal/PortalLayoutBuilder.js src/entities/arena/portal/PortalRuntimeSystem.js src/entities/player/PlayerController.js src/entities/player/PlayerEffectOps.js src/entities/player/PlayerInventoryOps.js src/entities/player/PlayerView.js src/entities/runtime/EntitySetupOps.js src/entities/runtime/EntitySpawnOps.js src/entities/systems/CollisionResponseSystem.js src/entities/systems/lifecycle/PlayerInteractionPhase.js src/entities/systems/projectile/ProjectileHitResolver.js src/hunt/DestructibleTrail.js src/hunt/HuntBotPolicy.js src/hunt/HuntTargetingOps.js src/hunt/OverheatGunSystem.js src/hunt/RocketPickupSystem.js src/hunt/mg/MGHitResolver.js src/hunt/mg/MGOverheatState.js src/modes/HuntModeStrategy.js src/shared/contracts/GameplayConfigContract.js src/state/MatchSessionFactory.js src/ui/CrosshairSystem.js src/ui/HUD.js src/ui/HudRuntimeSystem.js src/ui/MenuController.js src/ui/UIManager.js src/ui/UIStartSyncController.js src/ui/menu/MenuGameplayBindings.js src/core/GameBootstrap.js; npm run plan:check; npm run docs:sync; npm run docs:check; npm run build -> working tree)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.5",
+        "subphaseCode": "74.5.2"
+      }
+    },
+    {
+      "id": "V74.5.3",
+      "type": "subphase",
+      "title": "Architektur-Guards auf eine strengere Zielbaseline nachziehen. (abgeschlossen: 2026-04-02; evidence: npm exec eslint -- scripts/architecture/ArchitectureConfig.mjs; npm run architecture:report; npm run plan:check; npm run docs:sync; npm run docs:check; npm run build -> working tree)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.5",
+        "subphaseCode": "74.5.3"
+      }
+    },
+    {
+      "id": "V74.6.1",
+      "type": "subphase",
+      "title": "`electron/main.cjs` so umstellen, dass Fensterstart und LAN-Host-Start entkoppelt sind. (abgeschlossen: 2026-04-02; evidence: Select-String -Path electron\\main.cjs -Pattern 'startDesktopShell|app.whenReady|start-lan-server' -Context 0,2; npm exec eslint -- electron/main.cjs docs/plaene/aktiv/V74.md; npm run plan:check; npm run docs:sync; npm run docs:check; npm run build -> working tree)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.6",
+        "subphaseCode": "74.6.1"
+      }
+    },
+    {
+      "id": "V74.6.2",
+      "type": "subphase",
+      "title": "Discovery-, Save- und Host-Faehigkeiten ueber kleine benannte Preload-Vertraege absichern. (abgeschlossen: 2026-04-02; evidence: Select-String -Path electron\\preload.cjs -Pattern 'createNamedContract|discovery:|host:|save:' -Context 0,2; npm exec eslint -- --no-warn-ignored electron/preload.cjs docs/plaene/aktiv/V74.md; npm run plan:check; npm run docs:sync; npm run docs:check; npm run build -> working tree)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.6",
+        "subphaseCode": "74.6.2"
+      }
+    },
+    {
+      "id": "V74.6.3",
+      "type": "subphase",
+      "title": "Desktop-spezifische Build- und Shell-Sonderfaelle aus `vite.config.js`, `index.html` und `style.css` modularisieren. (abgeschlossen: 2026-04-02; evidence: npm exec eslint -- --no-warn-ignored vite.config.js dev/vite/rendererShellConfig.js src/core/runtime/GameRuntimeCoordinator.js; npm run plan:check; npm run docs:sync; npm run docs:check; npm run build -> working tree)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.6",
+        "subphaseCode": "74.6.3"
+      }
+    },
+    {
+      "id": "V74.7.1",
+      "type": "subphase",
+      "title": "Den Drift zwischen altem V74-Stand, aktivem Scope und aktuellem Architekturzustand sauber dokumentieren. (abgeschlossen: 2026-04-02; evidence: scoped task delta enthaelt keine geaenderten *.js/*.cjs/*.mjs-Dateien, daher kein `npm exec eslint`-Ziel; npm run plan:check; npm run docs:sync; npm run docs:check; npm run build -> docs/plaene/aktiv/V74.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.7",
+        "subphaseCode": "74.7.1"
+      }
+    },
+    {
+      "id": "V74.7.2",
+      "type": "subphase",
+      "title": "`docs/referenz/ai_architecture_context.md` um Desktop-Shell-, Lifecycle- und Shared-Contract-Grenzen erweitern. (abgeschlossen: 2026-04-02; evidence: scoped task delta enthaelt keine geaenderten *.js/*.cjs/*.mjs-Dateien, daher kein `npm exec eslint`-Ziel; npm run plan:check; npm run docs:sync; npm run docs:check; npm run build -> docs/referenz/ai_architecture_context.md, docs/plaene/aktiv/V74.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.7",
+        "subphaseCode": "74.7.2"
+      }
+    },
+    {
+      "id": "V74.7.3",
+      "type": "subphase",
+      "title": "V64, V75 und V76 auf dieselben Architekturleitplanken spiegeln. (abgeschlossen: 2026-04-03; evidence: scoped task delta enthaelt keine geaenderten *.js/*.cjs/*.mjs-Dateien, daher kein `npm exec eslint`-Ziel; npm run plan:check; npm run docs:sync; npm run docs:check; npm run build -> docs/plaene/aktiv/V64.md, docs/plaene/aktiv/V75.md, docs/plaene/aktiv/V76.md, docs/plaene/aktiv/V74.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.7",
+        "subphaseCode": "74.7.3"
+      }
+    },
+    {
+      "id": "V74.99.1",
+      "type": "subphase",
+      "title": "`npm run architecture:report` und die Build-Architektur-Gates sind gruensicher; direkt betroffene Runtime- oder Desktop-Smokes bleiben bis zum user-owned Browser-/Harness-Rerun offen (siehe `docs/Fehlerberichte/2026-03-31_v74-playwright-browser-prewarm-timeout.md`). (abgeschlossen: 2026-04-03; evidence: npm run architecture:report; npm run check:architecture:boundaries; npm run check:architecture:metrics; npm run build -> docs/plaene/aktiv/V74.md, docs/Fehlerberichte/2026-03-31_v74-playwright-browser-prewarm-timeout.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.99",
+        "subphaseCode": "74.99.1"
+      }
+    },
+    {
+      "id": "V74.99.2",
+      "type": "subphase",
+      "title": "`npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind abgeschlossen; verbleibende Browser- oder Harness-Blocker sind dokumentiert. (abgeschlossen: 2026-04-03; evidence: npm run architecture:report; npm run plan:check; npm run docs:sync; npm run docs:check; npm run build -> docs/plaene/aktiv/V74.md, docs/Fehlerberichte/2026-03-31_v74-playwright-browser-prewarm-timeout.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.99",
+        "subphaseCode": "74.99.2"
+      }
+    },
+    {
       "id": "V75.1.1",
       "type": "subphase",
       "title": "`RecordingCaptureContract` und angrenzende Runtime-Verbraucher von Container-/Delivery-Semantik entkoppeln; Profilnamen wie `CINEMATIC_MP4` in ein capture-neutrales Profil-/Preset-Modell ueberfuehren. (abgeschlossen: 2026-04-27; evidence: `Get-ChildItem src -Recurse -File | Select-String -Pattern \"CINEMATIC_MP4|cinematic_mp4\"` -> aktive Runtime-Consumer nutzen `RECORDING_CAPTURE_PROFILE.CINEMATIC`; nur Legacy-Alias im Contract bleibt fuer Persistenzmigration)",
@@ -4471,6 +4903,325 @@
         "blockId": "V82",
         "phaseCode": "82.99",
         "subphaseCode": "82.99.4"
+      }
+    },
+    {
+      "id": "V83.1.1",
+      "type": "subphase",
+      "title": "Zielgrenzen zwischen `Game`, `SessionRuntime`, Application-Layer, UI und Plattform-Capabilities dokumentieren. (abgeschlossen: 2026-04-03; evidence: Select-String -Path docs\\referenz\\ai_architecture_context.md -Pattern '### 4\\.1 Zielgrenzen fuer V83|### 4\\.2 Aktuelle Mehrfach-Ownerships, die V83 abbauen muss|GameRuntimeCoordinator|GameRuntimeFacade|GameRuntimePorts' -> docs/referenz/ai_architecture_context.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.1",
+        "subphaseCode": "83.1.1"
+      }
+    },
+    {
+      "id": "V83.1.2",
+      "type": "subphase",
+      "title": "Einen kleinen Vertragskatalog fuer Runtime-Commands, Runtime-Events, Session-Snapshots und Plattform-Capabilities definieren. (abgeschlossen: 2026-04-03; evidence: Select-String -Path docs\\referenz\\ai_architecture_context.md -Pattern '### 4\\.4 Kleiner Vertragskatalog fuer V83|SessionRuntimeCommandContract|SessionRuntimeEventContract|SessionRuntimeSnapshotContract|PlatformCapabilityContract' -> docs/referenz/ai_architecture_context.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.1",
+        "subphaseCode": "83.1.2"
+      }
+    },
+    {
+      "id": "V83.1.3",
+      "type": "subphase",
+      "title": "Breite Legacy-Entry-Points, Altports und Uebergangsadapter inventarisieren und fuer jeden Pfad Migrationsziel, Besitzer und Sunset-Kriterium festhalten. (abgeschlossen: 2026-04-03; evidence: Select-String -Path docs\\referenz\\ai_architecture_context.md -Pattern '### 4\\.5 Legacy-Entry-Point-, Altport- und Sunset-Inventar|GameRuntimeBundle-Legacy-Surface|GameRuntimePorts-Altports|curviosApp-/__CURVIOS_APP__-Preload-Aliasse|ActiveRuntimeConfigStore-Adapter' -> docs/referenz/ai_architecture_context.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.1",
+        "subphaseCode": "83.1.3"
+      }
+    },
+    {
+      "id": "V83.2.1",
+      "type": "subphase",
+      "title": "Match-/Session-Referenzen, Finalize-Status, Lifecycle-Status und Runtime-Handles aus `game`/`runtimeBundle` in einen einzigen Runtime-Kern ueberfuehren. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\core\\runtime\\GameRuntimeBundle.js,src\\state\\MatchLifecycleSessionOrchestrator.js,src\\core\\GameBootstrap.js -Pattern 'session-runtime-core\\.v1|getSessionRuntimeState|gameStateId|pendingSessionInit|finalizing' -> src/core/runtime/GameRuntimeBundle.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.2",
+        "subphaseCode": "83.2.1"
+      }
+    },
+    {
+      "id": "V83.2.2",
+      "type": "subphase",
+      "title": "`Game`, `GameBootstrap`, `GameRuntimeCoordinator` und `GameRuntimeFacade` auf Adapter-Rollen ueber dem Runtime-Kern reduzieren. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\core\\runtime\\GameRuntimeBundle.js,src\\core\\GameBootstrap.js,src\\core\\GameRuntimeFacade.js,src\\core\\runtime\\GameRuntimeCoordinator.js,src\\core\\main.js -Pattern 'getSessionRuntimeState|getSessionRuntimeHandle|setSessionRuntimeHandle|getRuntimeHandle|getUiManager|runtimeState\\\\.menuController|runtimeState\\\\.menuMultiplayerBridge' -> src/core/GameRuntimeFacade.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.2",
+        "subphaseCode": "83.2.2"
+      }
+    },
+    {
+      "id": "V83.2.3",
+      "type": "subphase",
+      "title": "Eine explizite Runtime-State-Machine fuer `menu`, `starting`, `playing`, `paused`, `round_end`, `match_end`, `finalizing` und `disposed` definieren und an den Runtime-Kern binden. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\shared\\contracts\\SessionRuntimeStateMachine.js,src\\core\\runtime\\GameRuntimeBundle.js,src\\state\\MatchLifecycleSessionOrchestrator.js -Pattern 'SESSION_RUNTIME_STATE_MACHINE_VERSION|SESSION_RUNTIME_STATES|syncSessionRuntimeLifecycleWithGameState|syncSessionRuntimeLifecycleDisposed|applySessionRuntimeLifecycleTransition' -> src/shared/contracts/SessionRuntimeStateMachine.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.2",
+        "subphaseCode": "83.2.3"
+      }
+    },
+    {
+      "id": "V83.3.1",
+      "type": "subphase",
+      "title": "Kern-Use-Cases wie `startMatch`, `returnToMenu`, `applySettings`, `initializeSession`, `hostLobby`, `joinLobby` und `finalizeMatch` als explizite Commands modellieren. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\shared\\contracts\\SessionRuntimeCommandContract.js,src\\application\\session-runtime\\SessionRuntimeCommandExecutor.js,src\\core\\GameRuntimeFacade.js,src\\core\\runtime\\GameRuntimeSessionHandler.js,src\\core\\runtime\\GameRuntimeMenuActionHandler.js -Pattern 'SESSION_RUNTIME_COMMAND_CONTRACT_VERSION|SessionRuntimeCommandExecutor|executeSessionRuntimeCommand|create(StartMatch|ReturnToMenu|FinalizeMatch|HostLobby|JoinLobby)Command|hostLobby|joinLobby|finalizeMatch' -> src/application/session-runtime/SessionRuntimeCommandExecutor.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.3",
+        "subphaseCode": "83.3.1"
+      }
+    },
+    {
+      "id": "V83.3.2",
+      "type": "subphase",
+      "title": "UI-Controller und Electron-Glue nur noch Intents emittieren und Runtime-Events/State-Projektionen konsumieren. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\shared\\runtime\\GameRuntimePorts.js,src\\ui\\MatchFlowUiController.js,src\\ui\\PauseOverlayController.js,src\\platform\\electron\\ElectronPlatformBridge.js,electron\\preload.cjs -Pattern 'runtimeIntentPort|runtimeProjectionPort|applyStartMatchProjection|applyPauseProjection|createElectronDiscoveryIntentBridge|capabilities' -> src/shared/runtime/GameRuntimePorts.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.3",
+        "subphaseCode": "83.3.2"
+      }
+    },
+    {
+      "id": "V83.3.3",
+      "type": "subphase",
+      "title": "Strukturierte Runtime-Observability fuer Commands, State-Uebergaenge, Finalize-Flows, Capability-Fallbacks und Lobby-/Session-Wechsel einfuehren. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\shared\\contracts\\SessionRuntimeEventContract.js,src\\shared\\runtime\\SessionRuntimeObservability.js,src\\shared\\runtime\\GameRuntimePorts.js,src\\application\\session-runtime\\SessionRuntimeCommandExecutor.js,src\\core\\runtime\\MatchFinalizeFlowService.js,src\\core\\runtime\\MenuRuntimeMultiplayerService.js,src\\core\\runtime\\RuntimeLobbySessionObservability.js,src\\state\\MatchLifecycleSessionOrchestrator.js -Pattern 'runtime_command_observed|runtime_state_transitioned|match_finalizing|match_finalized|capability_fallback_used|lobby_session_changed|getRuntimeObservabilitySnapshot|recordSessionRuntimeEvent|observeLobbySessionStateChange' -> src/shared/contracts/SessionRuntimeEventContract.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.3",
+        "subphaseCode": "83.3.3"
+      }
+    },
+    {
+      "id": "V83.4.1",
+      "type": "subphase",
+      "title": "Desktop-/Browser-Capabilities fuer Host, Discovery, Save und Recording ueber kleine benannte Preload- und Browser-Adapter schneiden. (abgeschlossen: 2026-04-03; evidence: Select-String -Path electron\\preload.cjs,src\\platform\\browser\\BrowserPlatformAdapters.js,src\\platform\\electron\\ElectronPlatformBridge.js,src\\ui\\menu\\multiplayer\\MenuMultiplayerDiscoveryPort.js,src\\ui\\menu\\multiplayer\\MenuMultiplayerHostIpResolver.js,src\\core\\recording\\DownloadService.js,src\\core\\replay\\ReplayRecorder.js,src\\core\\recording\\MediaRecorderSupport.js,src\\core\\runtime\\MenuRuntimeMultiplayerService.js -Pattern 'preload\\.recording\\.v1|createBrowser(Discovery|Host|Save|Recording)Adapter|createElectronPreload(Discovery|Host|Save|Recording)Adapter|createPlatformRecordingCapabilityAdapter|isElectronPreloadRuntime' -> src/platform/electron/ElectronPlatformBridge.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.4",
+        "subphaseCode": "83.4.1"
+      }
+    },
+    {
+      "id": "V83.4.2",
+      "type": "subphase",
+      "title": "Storage-Bridge, LAN-Bridge und kuenftige Online-Vorstufen hinter einem gemeinsamen Lobby-Service-Vertrag kapseln und aus UI-nahen Klassen herausziehen. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\shared\\contracts\\LobbyServiceContract.js,src\\application\\session-runtime\\MenuLobbyServiceFactory.js,src\\application\\session-runtime\\StorageLobbyService.js,src\\application\\session-runtime\\StorageLobbyServiceSupport.js,src\\application\\session-runtime\\NetworkLobbyService.js,src\\application\\session-runtime\\NetworkLobbyServiceSupport.js,src\\core\\runtime\\MenuRuntimeMultiplayerService.js,src\\ui\\menu\\MenuMultiplayerBridge.js,src\\composition\\core-ui\\LanMenuMultiplayerBridge.js -Pattern 'LOBBY_SERVICE_CONTRACT_VERSION|createMenuLobbyService|StorageLobbyService|LanLobbyService|serviceDescriptor|resolveMenuLobbyServiceTransport' -> src/application/session-runtime/MenuLobbyServiceFactory.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.4",
+        "subphaseCode": "83.4.2"
+      }
+    },
+    {
+      "id": "V83.4.3",
+      "type": "subphase",
+      "title": "Eine zentrale Capability-Registry als einzige Produkt- und Plattformquelle fuer Desktop, Browser-Demo, Lobby, Recording, Save und Tooling verankern. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\shared\\contracts\\PlatformCapabilityRegistry.js,src\\platform\\browser\\BrowserPlatformAdapters.js,src\\platform\\electron\\ElectronPlatformBridge.js,src\\shared\\contracts\\LobbyServiceContract.js,src\\application\\session-runtime\\MenuLobbyServiceFactory.js,src\\core\\runtime\\MenuRuntimeMultiplayerService.js,src\\ui\\menu\\MenuRuntimeFeatureFlags.js,src\\core\\recording\\MediaRecorderSupport.js,docs\\referenz\\ai_architecture_context.md -Pattern 'PLATFORM_CAPABILITY_REGISTRY_CONTRACT_VERSION|resolveCapabilityProviderKind|resolveDefaultLobbyTransport|resolveLobbyProviderKind|PlatformCapabilityRegistry\\\\.js' -> src/shared/contracts/PlatformCapabilityRegistry.js; npm run build; npm run plan:check; npm run docs:sync; npm run docs:check)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.4",
+        "subphaseCode": "83.4.3"
+      }
+    },
+    {
+      "id": "V83.5.1",
+      "type": "subphase",
+      "title": "`constructor(game)`, breite Port-Zugriffe, verbleibende Legacy-Kanten und Max-Line-Budgets fuer den migrierten Scope aktiv absenken. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\ui\\MatchFlowUiController.js,src\\ui\\PauseOverlayController.js,src\\core\\GameRuntimeFacade.js,src\\core\\runtime\\GameRuntimeCoordinator.js,src\\shared\\runtime\\UiControllerRuntimePorts.js,scripts\\architecture\\LegacyMaxLinesConfig.mjs -Pattern 'this\\.runtime =|get game\\(\\)|constructor\\(\\{ runtime \\}|createMatchFlowUiControllerPort|createPauseOverlayControllerPort|GameRuntimeFacade\\.js|MatchFlowUiController\\.js|PauseOverlayController\\.js' -> src/shared/runtime/UiControllerRuntimePorts.js; npm run build; npm run plan:check; npm run docs:sync; npm run docs:check)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.5",
+        "subphaseCode": "83.5.1"
+      }
+    },
+    {
+      "id": "V83.5.2",
+      "type": "subphase",
+      "title": "Recorder- und Arcade-Hotspots fuer anschliessende eigenstaendige Folgeblocks vorbereiten, ohne ihren fachlichen Umbau in diesen Block zu druecken. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\shared\\runtime\\GameRuntimePorts.js,src\\shared\\runtime\\GameRuntimeFeaturePorts.js,src\\shared\\runtime\\UiControllerRuntimePorts.js,src\\core\\GameRuntimeFacade.js,src\\core\\runtime\\GameRuntimeCoordinator.js,src\\core\\runtime\\GameRuntimeRecordingSupport.js,src\\core\\main.js,src\\ui\\MatchFlowUiController.js,src\\ui\\MatchFlowTransitionHotspots.js -Pattern 'createArcadePort|createRecordingPort|getArcadeMenuSurfaceState|toggleCinematicRecordingFromHotkey|createRoundEndRecorderAdapter' -> src/shared/runtime/GameRuntimeFeaturePorts.js; npm run build; npm run plan:check; npm run docs:sync; npm run docs:check)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.5",
+        "subphaseCode": "83.5.2"
+      }
+    },
+    {
+      "id": "V83.5.3",
+      "type": "subphase",
+      "title": "Fuer verbleibende Altpfade bewusst markierte Transition-Adapter beibehalten und neue Features explizit daran hindern, wieder auf Legacy-APIs aufzusetzen. (abgeschlossen: 2026-04-03; evidence: Select-String -Path src\\ui\\MatchFlowTransitionHotspots.js,src\\ui\\MatchFlowUiController.js,src\\shared\\runtime\\UiControllerRuntimePorts.js,src\\shared\\runtime\\GameRuntimeFeaturePorts.js -Pattern 'createLegacyArcadeTransitionAdapter|createLegacyRecordingTransitionAdapter|createLegacySessionTransitionAdapter|getMatchSessionAccessSnapshot|syncMatchP2HudVisibility|getSessionRuntimeSnapshot|toggleP2Hud|createRecordingPort' -> src/ui/MatchFlowTransitionHotspots.js; npm run build; npm run plan:check; npm run docs:sync; npm run docs:check)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.5",
+        "subphaseCode": "83.5.3"
+      }
+    },
+    {
+      "id": "V83.99.1",
+      "type": "subphase",
+      "title": "`npm run architecture:report`, `npm run check:architecture:boundaries`, `npm run check:architecture:metrics`, `npm run check:architecture:ratchet` und `npm run typecheck:architecture` sind gruensicher. (abgeschlossen: 2026-04-03; evidence: npm run architecture:report; npm run check:architecture:boundaries; npm run check:architecture:metrics; npm run check:architecture:ratchet; npm run typecheck:architecture -> docs/plaene/aktiv/V83.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.99",
+        "subphaseCode": "83.99.1"
+      }
+    },
+    {
+      "id": "V83.99.2",
+      "type": "subphase",
+      "title": "`npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind abgeschlossen; Referenzdoku und Folgeblock-Leitplanken sind synchronisiert. (abgeschlossen: 2026-04-04; evidence: npm run plan:check -> PASS; npm run docs:sync -> PASS (clean temp worktree; updated=3 missing=0 onboarding=0 legacy=0 mojibake=0); npm run docs:check -> PASS; `docs/referenz/ai_project_onboarding.md`, `docs/referenz/ai_architecture_context.md` und `docs/referenz/architektur_ausfuehrlich.md` auf Stand 2026-04-04; `docs/Umsetzungsplan.md` bestaetigt V84/V85 `depends_on: V83.99`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.99",
+        "subphaseCode": "83.99.2"
+      }
+    },
+    {
+      "id": "V84.1.1",
+      "type": "subphase",
+      "title": "Zielgrenzen zwischen `SessionRuntime`, `MatchKernel`, Renderer, UI und Plattformadaptern dokumentieren. (abgeschlossen: 2026-04-04; evidence: Select-String -Path docs\\referenz\\ai_architecture_context.md -Pattern '### 4\\.6 Zielgrenzen fuer V84|### 4\\.7 Aktuelle Simulationskopplungen, die V84 abbauen muss|MatchSessionFactory\\.js|MatchSessionRuntimeBridge\\.js|PlayingStateSystem\\.js|EntityManager\\.js|Renderer\\.js' -> docs/referenz/ai_architecture_context.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.1",
+        "subphaseCode": "84.1.1"
+      }
+    },
+    {
+      "id": "V84.1.2",
+      "type": "subphase",
+      "title": "Tick-, Clock-, Seed-, Input- und Snapshot-Vertraege fuer headless und interaktive Laeufe definieren. (abgeschlossen: 2026-04-04; evidence: Select-String -Path src\\shared\\contracts\\MatchKernelRuntimeContract.js,docs\\referenz\\ai_architecture_context.md -Pattern 'MATCH_KERNEL_RUN_PROFILE_CONTRACT_VERSION|MATCH_KERNEL_CLOCK_PORT_CONTRACT_VERSION|MATCH_KERNEL_TICK_ENVELOPE_CONTRACT_VERSION|MATCH_KERNEL_SEED_ENVELOPE_CONTRACT_VERSION|MATCH_KERNEL_INPUT_FRAME_CONTRACT_VERSION|MATCH_KERNEL_SNAPSHOT_ENVELOPE_CONTRACT_VERSION|### 4\\.6\\.1 Tick-, Clock-, Seed-, Input- und Snapshot-Vertraege fuer V84' -> src/shared/contracts/MatchKernelRuntimeContract.js, docs/referenz/ai_architecture_context.md)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.1",
+        "subphaseCode": "84.1.2"
+      }
+    },
+    {
+      "id": "V84.2.1",
+      "type": "subphase",
+      "title": "Matchstart, Tick, Round-Ende, Match-Ende und Cleanup in einen headless bootbaren Kern ueberfuehren. (abgeschlossen: 2026-04-04; evidence: Select-String -Path src\\state\\MatchKernel.js,src\\core\\MatchKernelInteractiveAdapter.js,src\\core\\MatchSessionRuntimeBridge.js,src\\state\\MatchSessionFactory.js,src\\state\\MatchLifecycleSessionPort.js,src\\state\\RoundStateTickSystem.js,src\\state\\HeadlessMatchKernelRuntime.js -Pattern 'deriveRoundEndTickStep|deriveMatchEndTickStep|signalRoundEnd|signalMatchEnd|signalRoundRestart|createMatchKernelInteractiveAdapter|createHeadlessMatchKernelRuntime|createHeadlessMatchRenderer' -> src/state/MatchKernel.js, src/core/MatchKernelInteractiveAdapter.js, src/core/MatchSessionRuntimeBridge.js, src/state/MatchSessionFactory.js, src/state/MatchLifecycleSessionPort.js, src/state/RoundStateTickSystem.js, src/state/HeadlessMatchKernelRuntime.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.2",
+        "subphaseCode": "84.2.1"
+      }
+    },
+    {
+      "id": "V84.2.2",
+      "type": "subphase",
+      "title": "Interaktive Runtime, Replay, Training und kuenftige Netzwerklayer ueber Adapter an denselben Kern anbinden. (abgeschlossen: 2026-04-04; evidence: Select-String -Path src\\core\\MatchKernelReplayAdapter.js,src\\core\\MatchKernelTrainingAdapter.js,src\\state\\MatchKernelConsumerAdapters.js,src\\core\\MatchKernelInteractiveAdapter.js,src\\state\\HeadlessMatchKernelRuntime.js,src\\core\\MatchSessionRuntimeBridge.js,src\\state\\MatchLifecycleSessionPort.js,src\\entities\\ai\\training\\TrainerPayloadAdapter.js,src\\entities\\ai\\training\\TrainingTransportFacade.js -Pattern 'MATCH_KERNEL_REPLAY_ADAPTER_CONTRACT_VERSION|MATCH_KERNEL_TRAINING_ADAPTER_CONTRACT_VERSION|MATCH_KERNEL_CONSUMER_ADAPTER_CONTRACT_VERSION|createMatchKernelConsumerRegistry|createMatchKernelTrainingPayload|gameStateSnapshotProvider|matchKernelConsumers|getCurrentMatchKernelConsumers|getCurrentMatchKernelConsumer|kernelRuntime' -> src/core/MatchKernelReplayAdapter.js, src/core/MatchKernelTrainingAdapter.js, src/state/MatchKernelConsumerAdapters.js, src/core/MatchKernelInteractiveAdapter.js, src/state/HeadlessMatchKernelRuntime.js, src/core/MatchSessionRuntimeBridge.js, src/state/MatchLifecycleSessionPort.js, src/entities/ai/training/TrainerPayloadAdapter.js, src/entities/ai/training/TrainingTransportFacade.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.2",
+        "subphaseCode": "84.2.2"
+      }
+    },
+    {
+      "id": "V84.3.1",
+      "type": "subphase",
+      "title": "Fuer `classic`, `hunt`, `arcade` und kuenftige Modi einen gemeinsamen Vertragsrahmen fuer Regeln, Spawn, Score und Cleanup definieren. (abgeschlossen: 2026-04-04; evidence: Select-String -Path src\\modes\\GameModeContract.js -Pattern 'GAME_MODE_CONTRACT_VERSION|bootstrap|cleanup|computeRoundResult|computeMatchResult' -> src/modes/GameModeContract.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.3",
+        "subphaseCode": "84.3.1"
+      }
+    },
+    {
+      "id": "V84.3.2",
+      "type": "subphase",
+      "title": "Bestehende Modus-Sonderpfade schrittweise auf denselben API-Vertrag umstellen. (abgeschlossen: 2026-04-04; evidence: Select-String -Path src\\modes\\ClassicModeStrategy.js,src\\modes\\HuntModeStrategy.js,src\\modes\\ArcadeModeStrategy.js -Pattern 'bootstrap|cleanup|computeRoundResult|computeMatchResult|recordScore' -> src/modes/ClassicModeStrategy.js, src/modes/HuntModeStrategy.js, src/modes/ArcadeModeStrategy.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.3",
+        "subphaseCode": "84.3.2"
+      }
+    },
+    {
+      "id": "V84.4.1",
+      "type": "subphase",
+      "title": "UI- und HUD-Lesewege auf stabile Runtime-Projektionen statt direkte Modus- oder Entity-Zugriffe ziehen. (abgeschlossen: 2026-04-04; evidence: Select-String -Path src\\shared\\contracts\\MatchRuntimeProjectionContract.js,src\\shared\\runtime\\MatchRuntimeProjectionBuilder.js,src\\shared\\runtime\\GameRuntimePorts.js,src\\shared\\runtime\\UiControllerRuntimePorts.js,src\\ui\\HUD.js,src\\ui\\HuntHUD.js,src\\ui\\HudRuntimeSystem.js,src\\ui\\CrosshairSystem.js,src\\ui\\MatchFlowUiController.js,src\\core\\GameRuntimeFacade.js,src\\core\\PlayingStateSystem.js -Pattern 'MATCH_RUNTIME_PROJECTION_CONTRACT_VERSION|buildMatchRuntimeProjection|getMatchRuntimeProjection|tickArcadeSuddenDeath|expiresAtMs|scoreboardSummary' -> src/shared/contracts/MatchRuntimeProjectionContract.js, src/shared/runtime/MatchRuntimeProjectionBuilder.js, src/shared/runtime/GameRuntimePorts.js, src/ui/HUD.js, src/ui/HuntHUD.js, src/ui/HudRuntimeSystem.js, src/ui/CrosshairSystem.js, src/ui/MatchFlowUiController.js, src/core/GameRuntimeFacade.js, src/core/PlayingStateSystem.js)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.4",
+        "subphaseCode": "84.4.1"
+      }
+    },
+    {
+      "id": "V84.4.2",
+      "type": "subphase",
+      "title": "Renderer- und Effektadapter nur noch lesen, was der Kernel oder die Projektionen freigeben. (abgeschlossen: 2026-04-04; evidence: Select-String -Path src\\shared\\contracts\\MatchRenderProjectionContract.js,src\\shared\\runtime\\MatchRenderProjectionBuilder.js,src\\shared\\runtime\\GameRuntimePorts.js,src\\entities\\EntityManager.js,src\\core\\PlayingStateSystem.js,src\\core\\main.js,src\\core\\renderer\\RecordingCapturePipeline.js,src\\core\\renderer\\RecordingCaptureOverlayOps.js -Pattern 'MATCH_RENDER_PROJECTION_CONTRACT_VERSION|buildMatchRenderProjection|getMatchRenderProjection|renderProjection|applyProjectionVector3|playerIndex' -> src/shared/contracts/MatchRenderProjectionContract.js, src/shared/runtime/MatchRenderProjectionBuilder.js, src/shared/runtime/GameRuntimePorts.js, src/entities/EntityManager.js, src/core/PlayingStateSystem.js, src/core/main.js, src/core/renderer/RecordingCapturePipeline.js, src/core/renderer/RecordingCaptureOverlayOps.js; npm run build -> ok; npm run plan:check -> ok; npm run docs:sync -> updated=0; npm run docs:check -> ok)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.4",
+        "subphaseCode": "84.4.2"
+      }
+    },
+    {
+      "id": "V84.5.1",
+      "type": "subphase",
+      "title": "Headless-Smokes fuer Matchstart, Tick und Cleanup ueber denselben Kernel vorbereiten. (abgeschlossen: 2026-04-04; evidence: Select-String -Path package.json,scripts\\headless-match-kernel-smoke.mjs -Pattern 'smoke:headless-kernel|createHeadlessMatchKernelRuntime|runtime\\\\.step|runtime\\\\.dispose' -> package.json, scripts/headless-match-kernel-smoke.mjs; npm run build -> ok; commit c86dcd3; npm run plan:check -> ok; npm run docs:sync -> updated=0; npm run docs:check -> ok)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.5",
+        "subphaseCode": "84.5.1"
+      }
+    },
+    {
+      "id": "V84.5.2",
+      "type": "subphase",
+      "title": "Replay-, Training- und Netzwerknutzung als Folgeverbrauch im Architekturkontext und in Nachfolgeblocks verankern. (abgeschlossen: 2026-04-04; evidence: Select-String -Path docs\\referenz\\ai_architecture_context.md,docs\\plaene\\aktiv\\V64.md,docs\\plaene\\aktiv\\V82.md,docs\\plaene\\aktiv\\V85.md,docs\\bot-training\\Bot_Trainingsplan.md -Pattern '### 4\\\\.6\\\\.2 Folgeverbrauch fuer Replay, Training und Netzwerk|V84-Folgeverbrauch|MatchKernelTrainingAdapter|snapshot_envelope' -> docs/referenz/ai_architecture_context.md, docs/plaene/aktiv/V64.md, docs/plaene/aktiv/V82.md, docs/plaene/aktiv/V85.md, docs/bot-training/Bot_Trainingsplan.md; npm run build -> ok; npm run plan:check -> ok; npm run docs:sync -> updated=0; npm run docs:check -> ok)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.5",
+        "subphaseCode": "84.5.2"
+      }
+    },
+    {
+      "id": "V84.99.1",
+      "type": "subphase",
+      "title": "Architektur-, Doku- und Governance-Gates fuer den migrierten Kernel-Scope sind gruensicher. (abgeschlossen: 2026-04-04; evidence: commit c062c8f; npm run architecture:report; npm run check:architecture:boundaries; npm run check:architecture:metrics; npm run check:architecture:ratchet; npm run typecheck:architecture; npm run build; npm run test:contract; npm run smoke:roundstate; npm run smoke:headless-kernel; npm run plan:check; npm run docs:sync; npm run docs:check -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.99",
+        "subphaseCode": "84.99.1"
+      }
+    },
+    {
+      "id": "V84.99.2",
+      "type": "subphase",
+      "title": "Headless-Boot, GameMode-API und Runtime-Projektionsvertrag sind klar genug fuer Folgearbeit dokumentiert. (abgeschlossen: 2026-04-05; evidence: Select-String -Path docs\\referenz\\ai_architecture_context.md -Pattern '### 4\\\\.6\\\\.3 Headless-Boot, GameMode-API und Runtime-Projektionsvertrag|SessionRuntimeCommandExecutor|createHeadlessMatchKernelRuntime|createHeadlessMatchKernelRunProfile|GameModeContract|buildMatchRuntimeProjection|matchUiPort' -> docs/referenz/ai_architecture_context.md; npm run plan:check; npm run docs:sync; npm run docs:check -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.99",
+        "subphaseCode": "84.99.2"
       }
     },
     {
@@ -6911,6 +7662,21 @@
       }
     },
     {
+      "id": "app-shell.css",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "backups/",
       "type": "file",
       "title": null,
@@ -6936,6 +7702,21 @@
         ],
         "scopeBlocks": [
           "V93"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "dev/vite/rendererShellConfig.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
         ],
         "exists": true
       }
@@ -7133,7 +7914,10 @@
           "V101",
           "V103",
           "V104",
+          "V74",
           "V77",
+          "V83",
+          "V84",
           "V85",
           "V87",
           "V88",
@@ -7378,9 +8162,11 @@
         "scopeBlocks": [
           "V64",
           "V71",
+          "V74",
           "V75",
           "V77",
-          "V81"
+          "V81",
+          "V83"
         ],
         "exists": true
       }
@@ -7413,9 +8199,11 @@
         ],
         "scopeBlocks": [
           "V71",
+          "V74",
           "V75",
           "V77",
-          "V81"
+          "V81",
+          "V83"
         ],
         "exists": true
       }
@@ -7795,6 +8583,21 @@
           "V75"
         ],
         "exists": false
+      }
+    },
+    {
+      "id": "index.html",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
+        ],
+        "exists": true
       }
     },
     {
@@ -8214,6 +9017,22 @@
       }
     },
     {
+      "id": "src/application/**",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V83",
+          "V84"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "src/application/session-runtime/MenuLobbyServiceFactory.js",
       "type": "file",
       "title": null,
@@ -8270,6 +9089,21 @@
         ],
         "scopeBlocks": [
           "V92"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/composition/core-ui/LanMenuMultiplayerBridge.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V83"
         ],
         "exists": true
       }
@@ -8367,7 +9201,25 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V74",
+          "V83",
+          "V84",
           "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/core/GameLoop.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V84"
         ],
         "exists": true
       }
@@ -8384,6 +9236,8 @@
         "scopeBlocks": [
           "V103",
           "V104",
+          "V74",
+          "V83",
           "V87",
           "V91",
           "V92"
@@ -8403,7 +9257,10 @@
         ],
         "scopeBlocks": [
           "V103",
+          "V74",
           "V81",
+          "V83",
+          "V84",
           "V91"
         ],
         "exists": true
@@ -8416,7 +9273,26 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "guard-matrix"
+          "guard-matrix",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V84"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/core/MediaRecorderSystem.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
         ],
         "exists": true
       }
@@ -8428,7 +9304,11 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "guard-matrix"
+          "guard-matrix",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V84"
         ],
         "exists": true
       }
@@ -8520,6 +9400,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V74",
           "V77",
           "V89"
         ],
@@ -8571,6 +9452,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V83",
           "V91",
           "V92"
         ],
@@ -8647,7 +9529,8 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V64"
+          "V64",
+          "V83"
         ],
         "exists": true
       }
@@ -8941,6 +9824,21 @@
       }
     },
     {
+      "id": "src/entities/**",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V84"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "src/entities/ai/BotTuningConfig.js",
       "type": "file",
       "title": null,
@@ -9062,6 +9960,21 @@
       }
     },
     {
+      "id": "src/entities/arena/**",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "src/entities/arena/portal/**",
       "type": "file",
       "title": null,
@@ -9133,6 +10046,21 @@
         "scopeBlocks": [
           "V85",
           "V86"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/entities/EntityManager.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
         ],
         "exists": true
       }
@@ -9223,7 +10151,8 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V72"
+          "V72",
+          "V74"
         ],
         "exists": true
       }
@@ -9289,6 +10218,36 @@
       }
     },
     {
+      "id": "src/entities/systems/ProjectileSystem.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/entities/Trail.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/entities/vehicle-registry.js",
       "type": "file",
       "title": null,
@@ -9314,7 +10273,23 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V72"
+          "V72",
+          "V74"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "src/modes/**",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V84"
         ],
         "exists": false
       }
@@ -9376,6 +10351,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V83",
           "V91",
           "V92"
         ],
@@ -9455,6 +10431,9 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V74",
+          "V83",
+          "V84",
           "V85",
           "V91"
         ],
@@ -9578,6 +10557,21 @@
         ],
         "scopeBlocks": [
           "V76"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/shared/contracts/MatchUiStateContract.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
         ],
         "exists": true
       }
@@ -9796,6 +10790,8 @@
         ],
         "scopeBlocks": [
           "V104",
+          "V74",
+          "V83",
           "V87",
           "V91",
           "V92"
@@ -9874,6 +10870,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V84",
           "V91"
         ],
         "exists": false
@@ -9980,6 +10977,8 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V74",
+          "V83",
           "V87"
         ],
         "exists": true
@@ -9996,6 +10995,21 @@
         ],
         "scopeBlocks": [
           "V87"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/state/MatchSessionFactory.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
         ],
         "exists": true
       }
@@ -10026,6 +11040,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V74",
           "V92"
         ],
         "exists": true
@@ -10228,7 +11243,9 @@
         ],
         "scopeBlocks": [
           "V104",
+          "V74",
           "V75",
+          "V83",
           "V87",
           "V92"
         ],
@@ -10314,6 +11331,21 @@
       }
     },
     {
+      "id": "src/ui/menu/MenuMultiplayerBridge.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V83"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/ui/menu/MenuPresetStore.js",
       "type": "file",
       "title": null,
@@ -10368,7 +11400,9 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V74",
           "V75",
+          "V83",
           "V87",
           "V92"
         ],
@@ -10527,6 +11561,21 @@
         ],
         "scopeBlocks": [
           "V95"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "style.css",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V74"
         ],
         "exists": true
       }
@@ -11067,6 +12116,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V74",
           "V77"
         ],
         "exists": true
@@ -13262,7 +14312,7 @@
     },
     {
       "from": "V71",
-      "to": "V43-Strukturvertrag",
+      "to": "V43",
       "type": "depends_on",
       "source": "merged",
       "hard": false,
@@ -14009,9 +15059,243 @@
     },
     {
       "from": "V74",
+      "to": "app-shell.css",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "dev/vite/rendererShellConfig.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "electron/main.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "electron/preload.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "index.html",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/core/GameBootstrap.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/core/GameRuntimeFacade.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/core/main.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/core/MediaRecorderSystem.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/core/runtime/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/entities/arena/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/entities/EntityManager.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/entities/Powerup.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/entities/systems/ProjectileSystem.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/entities/Trail.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/hunt/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/shared/contracts/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/shared/contracts/MatchUiStateContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/shared/runtime/GameRuntimePorts.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/state/MatchLifecycleSessionOrchestrator.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/state/MatchSessionFactory.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/state/RoundStateTickSystem.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/ui/MatchFlowUiController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "src/ui/PauseOverlayController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "style.css",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
       "to": "V58",
       "type": "depends_on",
-      "source": "master-table",
+      "source": "merged",
       "hard": false,
       "fulfilled": false,
       "hint": null,
@@ -14019,6 +15303,7 @@
         "dependsPhase": "58.99",
         "rawToken": "V58.99",
         "sourceBreakdown": [
+          "frontmatter",
           "master-table"
         ],
         "canonicalToken": true
@@ -14028,7 +15313,7 @@
       "from": "V74",
       "to": "V60",
       "type": "depends_on",
-      "source": "master-table",
+      "source": "merged",
       "hard": false,
       "fulfilled": false,
       "hint": null,
@@ -14036,9 +15321,266 @@
         "dependsPhase": "60.3",
         "rawToken": "V60.3",
         "sourceBreakdown": [
+          "frontmatter",
           "master-table"
         ],
         "canonicalToken": true
+      }
+    },
+    {
+      "from": "V74",
+      "to": "V74.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.3"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "V74.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.4"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "V74.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.5"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "V74.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.6"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "V74.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.7"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "V74.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.99"
+      }
+    },
+    {
+      "from": "V74",
+      "to": "vite.config.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74.3",
+      "to": "V74.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.3",
+        "subphaseCode": "74.3.1"
+      }
+    },
+    {
+      "from": "V74.3",
+      "to": "V74.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.3",
+        "subphaseCode": "74.3.2"
+      }
+    },
+    {
+      "from": "V74.3",
+      "to": "V74.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.3",
+        "subphaseCode": "74.3.3"
+      }
+    },
+    {
+      "from": "V74.4",
+      "to": "V74.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.4",
+        "subphaseCode": "74.4.1"
+      }
+    },
+    {
+      "from": "V74.4",
+      "to": "V74.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.4",
+        "subphaseCode": "74.4.2"
+      }
+    },
+    {
+      "from": "V74.4",
+      "to": "V74.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.4",
+        "subphaseCode": "74.4.3"
+      }
+    },
+    {
+      "from": "V74.5",
+      "to": "V74.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.5",
+        "subphaseCode": "74.5.1"
+      }
+    },
+    {
+      "from": "V74.5",
+      "to": "V74.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.5",
+        "subphaseCode": "74.5.2"
+      }
+    },
+    {
+      "from": "V74.5",
+      "to": "V74.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.5",
+        "subphaseCode": "74.5.3"
+      }
+    },
+    {
+      "from": "V74.6",
+      "to": "V74.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.6",
+        "subphaseCode": "74.6.1"
+      }
+    },
+    {
+      "from": "V74.6",
+      "to": "V74.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.6",
+        "subphaseCode": "74.6.2"
+      }
+    },
+    {
+      "from": "V74.6",
+      "to": "V74.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.6",
+        "subphaseCode": "74.6.3"
+      }
+    },
+    {
+      "from": "V74.7",
+      "to": "V74.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.7",
+        "subphaseCode": "74.7.1"
+      }
+    },
+    {
+      "from": "V74.7",
+      "to": "V74.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.7",
+        "subphaseCode": "74.7.2"
+      }
+    },
+    {
+      "from": "V74.7",
+      "to": "V74.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.7",
+        "subphaseCode": "74.7.3"
+      }
+    },
+    {
+      "from": "V74.99",
+      "to": "V74.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.99",
+        "subphaseCode": "74.99.1"
+      }
+    },
+    {
+      "from": "V74.99",
+      "to": "V74.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V74",
+        "phaseCode": "74.99",
+        "subphaseCode": "74.99.2"
       }
     },
     {
@@ -15727,8 +17269,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": false,
-      "fulfilled": false,
-      "hint": null,
+      "fulfilled": true,
+      "hint": "Console nutzt expliziten Desktop-Capability-State (F7/IPC), Browser-Demo bleibt ohne produktiven Dev-Zugang",
       "attributes": {
         "dependsPhase": "77.99",
         "rawToken": "V77.99",
@@ -16813,6 +18355,731 @@
         "blockId": "V82",
         "phaseCode": "82.99",
         "subphaseCode": "82.99.4"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "electron/main.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "electron/preload.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/application/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/composition/core-ui/LanMenuMultiplayerBridge.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/core/GameBootstrap.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/core/GameRuntimeFacade.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/core/main.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/core/runtime/GameRuntimeCoordinator.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/core/runtime/MenuRuntimeMultiplayerService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/platform/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/shared/contracts/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/shared/runtime/GameRuntimePorts.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/state/MatchLifecycleSessionOrchestrator.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/ui/MatchFlowUiController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/ui/menu/MenuMultiplayerBridge.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/ui/PauseOverlayController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "V74",
+      "type": "depends_on",
+      "source": "frontmatter",
+      "hard": false,
+      "fulfilled": false,
+      "hint": null,
+      "attributes": {
+        "dependsPhase": "74.99",
+        "rawToken": "V74.99",
+        "sourceBreakdown": [
+          "frontmatter"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V83",
+      "to": "V83.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.1"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "V83.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.2"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "V83.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.3"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "V83.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.4"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "V83.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.5"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "V83.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.99"
+      }
+    },
+    {
+      "from": "V83.1",
+      "to": "V83.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.1",
+        "subphaseCode": "83.1.1"
+      }
+    },
+    {
+      "from": "V83.1",
+      "to": "V83.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.1",
+        "subphaseCode": "83.1.2"
+      }
+    },
+    {
+      "from": "V83.1",
+      "to": "V83.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.1",
+        "subphaseCode": "83.1.3"
+      }
+    },
+    {
+      "from": "V83.2",
+      "to": "V83.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.2",
+        "subphaseCode": "83.2.1"
+      }
+    },
+    {
+      "from": "V83.2",
+      "to": "V83.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.2",
+        "subphaseCode": "83.2.2"
+      }
+    },
+    {
+      "from": "V83.2",
+      "to": "V83.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.2",
+        "subphaseCode": "83.2.3"
+      }
+    },
+    {
+      "from": "V83.3",
+      "to": "V83.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.3",
+        "subphaseCode": "83.3.1"
+      }
+    },
+    {
+      "from": "V83.3",
+      "to": "V83.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.3",
+        "subphaseCode": "83.3.2"
+      }
+    },
+    {
+      "from": "V83.3",
+      "to": "V83.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.3",
+        "subphaseCode": "83.3.3"
+      }
+    },
+    {
+      "from": "V83.4",
+      "to": "V83.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.4",
+        "subphaseCode": "83.4.1"
+      }
+    },
+    {
+      "from": "V83.4",
+      "to": "V83.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.4",
+        "subphaseCode": "83.4.2"
+      }
+    },
+    {
+      "from": "V83.4",
+      "to": "V83.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.4",
+        "subphaseCode": "83.4.3"
+      }
+    },
+    {
+      "from": "V83.5",
+      "to": "V83.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.5",
+        "subphaseCode": "83.5.1"
+      }
+    },
+    {
+      "from": "V83.5",
+      "to": "V83.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.5",
+        "subphaseCode": "83.5.2"
+      }
+    },
+    {
+      "from": "V83.5",
+      "to": "V83.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.5",
+        "subphaseCode": "83.5.3"
+      }
+    },
+    {
+      "from": "V83.99",
+      "to": "V83.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.99",
+        "subphaseCode": "83.99.1"
+      }
+    },
+    {
+      "from": "V83.99",
+      "to": "V83.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V83",
+        "phaseCode": "83.99",
+        "subphaseCode": "83.99.2"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/application/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/core/GameBootstrap.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/core/GameLoop.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/core/main.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/core/MatchSessionRuntimeBridge.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/core/PlayingStateSystem.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/entities/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/modes/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/shared/contracts/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/state/**",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "V83",
+      "type": "depends_on",
+      "source": "frontmatter",
+      "hard": false,
+      "fulfilled": false,
+      "hint": null,
+      "attributes": {
+        "dependsPhase": "83.99",
+        "rawToken": "V83.99",
+        "sourceBreakdown": [
+          "frontmatter"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V84",
+      "to": "V84.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.1"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "V84.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.2"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "V84.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.3"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "V84.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.4"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "V84.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.5"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "V84.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.99"
+      }
+    },
+    {
+      "from": "V84.1",
+      "to": "V84.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.1",
+        "subphaseCode": "84.1.1"
+      }
+    },
+    {
+      "from": "V84.1",
+      "to": "V84.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.1",
+        "subphaseCode": "84.1.2"
+      }
+    },
+    {
+      "from": "V84.2",
+      "to": "V84.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.2",
+        "subphaseCode": "84.2.1"
+      }
+    },
+    {
+      "from": "V84.2",
+      "to": "V84.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.2",
+        "subphaseCode": "84.2.2"
+      }
+    },
+    {
+      "from": "V84.3",
+      "to": "V84.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.3",
+        "subphaseCode": "84.3.1"
+      }
+    },
+    {
+      "from": "V84.3",
+      "to": "V84.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.3",
+        "subphaseCode": "84.3.2"
+      }
+    },
+    {
+      "from": "V84.4",
+      "to": "V84.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.4",
+        "subphaseCode": "84.4.1"
+      }
+    },
+    {
+      "from": "V84.4",
+      "to": "V84.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.4",
+        "subphaseCode": "84.4.2"
+      }
+    },
+    {
+      "from": "V84.5",
+      "to": "V84.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.5",
+        "subphaseCode": "84.5.1"
+      }
+    },
+    {
+      "from": "V84.5",
+      "to": "V84.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.5",
+        "subphaseCode": "84.5.2"
+      }
+    },
+    {
+      "from": "V84.99",
+      "to": "V84.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.99",
+        "subphaseCode": "84.99.1"
+      }
+    },
+    {
+      "from": "V84.99",
+      "to": "V84.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V84",
+        "phaseCode": "84.99",
+        "subphaseCode": "84.99.2"
       }
     },
     {

@@ -46,7 +46,12 @@ test('parseDependencyToken supports Vxx and Vxx.yy formats', () => {
         dependsPhase: '74.99',
         isCanonical: true,
     });
-    assert.equal(parseDependencyToken('V43-Strukturvertrag').isCanonical, false);
+    assert.deepEqual(parseDependencyToken('V43-Strukturvertrag'), {
+        raw: 'V43-Strukturvertrag',
+        blockId: 'V43',
+        dependsPhase: null,
+        isCanonical: false,
+    });
 });
 
 test('parseMasterRows reads active block rows with mixed spacing', () => {

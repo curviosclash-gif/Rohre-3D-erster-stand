@@ -5,7 +5,11 @@ import { pathToFileURL } from 'node:url';
 
 const ROOT = process.cwd();
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
-const ACTIVE_PLANS_DIR = 'docs/plaene/aktiv';
+const CANONICAL_PLAN_DIRS = Object.freeze([
+    'docs/plaene/aktiv',
+    'docs/plaene/alt',
+]);
+const ARCHIVED_COMPLETED_BLOCKS_PATH = 'docs/plaene/archiv/abgeschlossene-bloecke.md';
 const GUARD_MATRIX_PATH = 'scripts/architecture/legacy-surface-guard-matrix.json';
 const OUTPUT_PATH = 'docs/generated/knowledge-graph.json';
 
@@ -170,12 +174,39 @@ function parseDependencyToken(rawToken) {
             isCanonical: true,
         };
     }
+    const prefixedBlockMatch = token.match(/^(V\d+)\b/);
+    if (prefixedBlockMatch) {
+        return {
+            raw: token,
+            blockId: prefixedBlockMatch[1],
+            dependsPhase: null,
+            isCanonical: false,
+        };
+    }
     return {
         raw: token,
         blockId: token,
         dependsPhase: null,
         isCanonical: false,
     };
+}
+
+function normalizeBlockStatus(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (!normalized) return 'unknown';
+    if (normalized === 'done' || normalized === 'completed' || normalized === 'abgeschlossen' || normalized === 'closed') {
+        return 'done';
+    }
+    if (normalized === 'planned' || normalized === 'geplant') {
+        return 'planned';
+    }
+    if (normalized === 'active' || normalized === 'in arbeit' || normalized === 'in bearbeitung') {
+        return 'active';
+    }
+    if (normalized === 'open' || normalized === 'offen') {
+        return 'open';
+    }
+    return 'unknown';
 }
 
 function parseMasterRows(masterContent) {
@@ -271,7 +302,7 @@ function parseDependencyTable(masterContent) {
     return rows;
 }
 
-async function parseActiveBlockPlanFile(relativePath) {
+async function parseBlockPlanFile(relativePath) {
     const absolutePath = path.join(ROOT, relativePath);
     const content = await fs.readFile(absolutePath, 'utf8');
     const { data, body, unknownKeys } = parseFrontmatter(content);
@@ -308,19 +339,245 @@ async function parseActiveBlockPlanFile(relativePath) {
     };
 }
 
-async function readActiveBlockPlans() {
-    const absoluteDirectory = path.join(ROOT, ACTIVE_PLANS_DIR);
-    const entries = await fs.readdir(absoluteDirectory, { withFileTypes: true });
-    const planFiles = entries
-        .filter((entry) => entry.isFile() && /^V\d+\.md$/i.test(entry.name))
-        .map((entry) => normalizeRepoPath(path.join(ACTIVE_PLANS_DIR, entry.name)))
+function parseArchivedCompletedRows(content) {
+    const lines = content.replace(/\r\n/g, '\n').split('\n');
+    const rows = [];
+    const headingIndex = lines.findIndex((line) => line.trim() === '## Archivierte abgeschlossene Bloecke');
+    if (headingIndex < 0) {
+        return rows;
+    }
+
+    let endIndex = lines.length;
+    for (let index = headingIndex + 1; index < lines.length; index += 1) {
+        if (/^##\s+/.test(lines[index])) {
+            endIndex = index;
+            break;
+        }
+    }
+
+    for (let index = headingIndex + 1; index < endIndex; index += 1) {
+        const line = lines[index].trim();
+        if (!line.startsWith('|')) continue;
+        if (/^\|\s*id\s*\|/i.test(line) || /^\|\s*---/.test(line)) continue;
+
+        const cells = line
+            .split('|')
+            .slice(1, -1)
+            .map((cell) => cell.trim());
+        if (cells.length < 7) continue;
+
+        const [id, title, status, priority, dependsOnCell, currentPhase, planFileCell] = cells;
+        if (!/^V\d+$/.test(id)) continue;
+
+        const dependsOn = String(dependsOnCell || '')
+            .split(',')
+            .map((token) => token.trim())
+            .filter((token) => token && token !== '-');
+        const planFileMatch = planFileCell.match(/`([^`]+)`/);
+
+        rows.push({
+            id,
+            title: String(title || '').trim() || null,
+            status: normalizeBlockStatus(status),
+            priority: String(priority || '').trim() || null,
+            currentPhase: String(currentPhase || '').trim() || null,
+            planFile: normalizeRepoPath(planFileMatch ? planFileMatch[1] : planFileCell),
+            dependsOn,
+        });
+    }
+
+    return rows;
+}
+
+function normalizeLegacyBlockTitle(blockId, rawTitle) {
+    const blockPattern = String(blockId || '').trim();
+    let title = String(rawTitle || '').trim();
+    if (!title) return null;
+
+    title = title
+        .replace(/^Feature Plan:\s*/i, '')
+        .replace(/^Feature:\s*/i, '')
+        .replace(/^Feature\s+/i, '')
+        .replace(/^Planentwurf:\s*/i, '')
+        .replace(new RegExp(`^Block\\s+${blockPattern}:\\s*`, 'i'), '')
+        .replace(new RegExp(`^${blockPattern}\\s+`, 'i'), '')
+        .replace(new RegExp(`\\s+${blockPattern}\\b.*$`, 'i'), '')
+        .trim();
+
+    return title || null;
+}
+
+function extractCurrentPhase(content, blockId) {
+    const phaseRoot = String(blockId || '').replace(/^V/, '');
+    if (!phaseRoot) return null;
+    const lines = content.replace(/\r\n/g, '\n').split('\n');
+    let currentPhase = null;
+    const regex = new RegExp(`^###\\s+(?:Phase\\s+)?(${phaseRoot}\\.\\d+)\\b`);
+
+    for (const line of lines) {
+        const match = line.match(regex);
+        if (match) {
+            currentPhase = match[1];
+        }
+    }
+
+    return currentPhase;
+}
+
+function mergeBlockMetadata(base, incoming) {
+    const next = { ...(base || {}) };
+    if (!next.id && incoming.id) next.id = incoming.id;
+    if (!next.title && incoming.title) next.title = incoming.title;
+    if (incoming.status === 'done' && next.status !== 'done') {
+        next.status = incoming.status;
+    }
+    if ((!next.status || next.status === 'unknown') && incoming.status) next.status = incoming.status;
+    if (!next.priority && incoming.priority) next.priority = incoming.priority;
+    if (!next.owner && incoming.owner) next.owner = incoming.owner;
+    if (!next.currentPhase && incoming.currentPhase) next.currentPhase = incoming.currentPhase;
+    if (!next.planFile && incoming.planFile) next.planFile = incoming.planFile;
+    const source = new Set([...(base?.source || []), ...(incoming.source || [])]);
+    next.source = Array.from(source).sort((left, right) => left.localeCompare(right));
+    return next;
+}
+
+function parseArchivedSummaryBlocks(content, relativePath) {
+    const lines = content.replace(/\r\n/g, '\n').split('\n');
+    const entries = [];
+
+    for (let index = 0; index < lines.length; index += 1) {
+        const headingMatch = lines[index].match(/^##\s+Block\s+(V\d+):\s*(.+)$/);
+        if (!headingMatch) continue;
+
+        const [, blockId, rawTitle] = headingMatch;
+        let endIndex = lines.length;
+        for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
+            if (/^##\s+Block\s+/.test(lines[cursor])) {
+                endIndex = cursor;
+                break;
+            }
+        }
+
+        const section = lines.slice(index, endIndex).join('\n');
+        const planFileMatch = section.match(/Plan-Datei:\s*`([^`]+)`/);
+        entries.push({
+            id: blockId,
+            title: normalizeLegacyBlockTitle(blockId, rawTitle),
+            status: 'done',
+            currentPhase: extractCurrentPhase(section, blockId),
+            planFile: normalizeRepoPath(planFileMatch ? planFileMatch[1] : relativePath),
+            source: ['archive-summary'],
+        });
+    }
+
+    return entries;
+}
+
+function parseLegacyPlanFileMetadata(relativePath, content) {
+    const normalizedPath = normalizeRepoPath(relativePath);
+    const basename = path.basename(normalizedPath);
+    const fileIdMatch = basename.match(/(?:^|_)(V\d+)\.md$/i);
+    const headingMatch = content.replace(/\r\n/g, '\n').split('\n').find((line) => /^#\s+/.test(line))?.match(/^#\s+(.+)$/);
+    const headingBlockMatch = headingMatch?.[1]?.match(/\b(V\d+)\b/);
+    const blockId = fileIdMatch?.[1] || headingBlockMatch?.[1] || null;
+    if (!blockId) {
+        return null;
+    }
+
+    const statusMatch = content.replace(/\r\n/g, '\n').match(/^Status:\s*(.+)$/m);
+    const fallbackTitle = basename.replace(/\.md$/i, '').replace(/_/g, ' ');
+    return {
+        id: blockId,
+        title: normalizeLegacyBlockTitle(blockId, headingMatch?.[1] || fallbackTitle),
+        status: normalizeBlockStatus(statusMatch?.[1] || ''),
+        currentPhase: extractCurrentPhase(content, blockId),
+        planFile: normalizedPath,
+        source: ['legacy-plan'],
+    };
+}
+
+async function readCanonicalBlockPlans() {
+    const plansById = new Map();
+
+    for (const directory of CANONICAL_PLAN_DIRS) {
+        const absoluteDirectory = path.join(ROOT, directory);
+        let entries = [];
+        try {
+            entries = await fs.readdir(absoluteDirectory, { withFileTypes: true });
+        } catch {
+            continue;
+        }
+
+        const planFiles = entries
+            .filter((entry) => entry.isFile() && /^V\d+\.md$/i.test(entry.name))
+            .map((entry) => normalizeRepoPath(path.join(directory, entry.name)))
+            .sort((left, right) => left.localeCompare(right));
+
+        for (const relativePath of planFiles) {
+            const plan = await parseBlockPlanFile(relativePath);
+            if (!plansById.has(plan.id)) {
+                plansById.set(plan.id, plan);
+            }
+        }
+    }
+
+    return Array.from(plansById.values()).sort((left, right) => left.id.localeCompare(right.id));
+}
+
+async function readFallbackBlockMetadata() {
+    const metadataById = new Map();
+    const mergeEntry = (entry) => {
+        if (!entry?.id) return;
+        const existing = metadataById.get(entry.id);
+        metadataById.set(entry.id, mergeBlockMetadata(existing, entry));
+    };
+
+    if (await pathExists(ARCHIVED_COMPLETED_BLOCKS_PATH)) {
+        const content = await fs.readFile(path.join(ROOT, ARCHIVED_COMPLETED_BLOCKS_PATH), 'utf8');
+        for (const row of parseArchivedCompletedRows(content)) {
+            mergeEntry({
+                id: row.id,
+                title: row.title,
+                status: row.status,
+                priority: row.priority,
+                currentPhase: row.currentPhase,
+                planFile: row.planFile,
+                source: ['archive-index'],
+            });
+        }
+    }
+
+    const legacyDirectory = path.join(ROOT, 'docs/plaene/alt');
+    let entries = [];
+    try {
+        entries = await fs.readdir(legacyDirectory, { withFileTypes: true });
+    } catch {
+        return metadataById;
+    }
+
+    const legacyFiles = entries
+        .filter((entry) => entry.isFile() && /\.md$/i.test(entry.name) && !/^V\d+\.md$/i.test(entry.name))
+        .map((entry) => entry.name)
         .sort((left, right) => left.localeCompare(right));
 
-    const plans = [];
-    for (const relativePath of planFiles) {
-        plans.push(await parseActiveBlockPlanFile(relativePath));
+    const summaryFiles = legacyFiles.filter((name) => /^Umsetzungsplan_Abgeschlossene_Bloecke_/i.test(name));
+    const singleBlockFiles = legacyFiles.filter((name) => !/^Umsetzungsplan_Abgeschlossene_Bloecke_/i.test(name));
+
+    for (const name of summaryFiles) {
+        const relativePath = normalizeRepoPath(path.join('docs/plaene/alt', name));
+        const content = await fs.readFile(path.join(ROOT, relativePath), 'utf8');
+        for (const entry of parseArchivedSummaryBlocks(content, relativePath)) {
+            mergeEntry(entry);
+        }
     }
-    return plans;
+
+    for (const name of singleBlockFiles) {
+        const relativePath = normalizeRepoPath(path.join('docs/plaene/alt', name));
+        const content = await fs.readFile(path.join(ROOT, relativePath), 'utf8');
+        mergeEntry(parseLegacyPlanFileMetadata(relativePath, content));
+    }
+
+    return metadataById;
 }
 
 function parseGuardMatrix(content) {
@@ -471,10 +728,11 @@ function sortEdges(edges) {
 }
 
 async function buildKnowledgeGraphModel() {
-    const [masterContent, guardMatrixContent, activePlans] = await Promise.all([
+    const [masterContent, guardMatrixContent, canonicalPlans, fallbackBlockMetadata] = await Promise.all([
         fs.readFile(path.join(ROOT, MASTER_PLAN_PATH), 'utf8'),
         fs.readFile(path.join(ROOT, GUARD_MATRIX_PATH), 'utf8'),
-        readActiveBlockPlans(),
+        readCanonicalBlockPlans(),
+        readFallbackBlockMetadata(),
     ]);
 
     const masterRows = parseMasterRows(masterContent);
@@ -485,6 +743,7 @@ async function buildKnowledgeGraphModel() {
     const edges = createEdgeStore();
 
     const masterById = new Map(masterRows.map((row) => [row.id, row]));
+    const planById = new Map(canonicalPlans.map((plan) => [plan.id, plan]));
     const dependencyMeta = new Map();
     for (const dependencyRow of dependencyRows) {
         const key = `${dependencyRow.blockId}::${dependencyRow.dependsOn.blockId}`;
@@ -510,7 +769,7 @@ async function buildKnowledgeGraphModel() {
         });
     }
 
-    for (const plan of activePlans) {
+    for (const plan of canonicalPlans) {
         nodes.upsert({
             id: plan.id,
             type: 'block',
@@ -521,6 +780,7 @@ async function buildKnowledgeGraphModel() {
                 priority: plan.priority,
                 owner: plan.owner,
                 planFile: plan.planFile,
+                ...(plan.currentPhase ? { currentPhase: plan.currentPhase } : {}),
                 scopeOverlapAllowedWith: plan.scopeOverlapAllowedWith,
                 unknownFrontmatterFields: plan.unknownFrontmatterFields,
             },
@@ -613,7 +873,7 @@ async function buildKnowledgeGraphModel() {
         dependsMap.get(key).sources.add(sourceType);
     }
 
-    for (const plan of activePlans) {
+    for (const plan of canonicalPlans) {
         for (const dependencyToken of plan.dependsOn) {
             addDepends(plan.id, dependencyToken, 'frontmatter');
         }
@@ -635,14 +895,49 @@ async function buildKnowledgeGraphModel() {
         const source = entry.sources.has('frontmatter') && entry.sources.has('master-table')
             ? 'merged'
             : (entry.sources.has('frontmatter') ? 'frontmatter' : 'master-table');
+        const resolvedPlan = planById.get(entry.to) || null;
+        const resolvedFallback = fallbackBlockMetadata.get(entry.to) || null;
+        const resolvedTitle = masterById.get(entry.to)?.title
+            || resolvedPlan?.title
+            || resolvedFallback?.title
+            || null;
+        const resolvedStatus = masterById.get(entry.to)?.status
+            || resolvedPlan?.status
+            || resolvedFallback?.status
+            || 'unknown';
+        const resolvedPriority = masterById.get(entry.to)?.priority
+            || resolvedPlan?.priority
+            || resolvedFallback?.priority
+            || null;
+        const resolvedOwner = masterById.get(entry.to)?.owner
+            || resolvedPlan?.owner
+            || resolvedFallback?.owner
+            || null;
+        const resolvedCurrentPhase = masterById.get(entry.to)?.currentPhase
+            || resolvedPlan?.currentPhase
+            || resolvedFallback?.currentPhase
+            || null;
+        const resolvedPlanFile = masterById.get(entry.to)?.planFile
+            || resolvedPlan?.planFile
+            || resolvedFallback?.planFile
+            || null;
+        const sourceMarkers = Array.from(new Set([
+            'dependency-target',
+            ...(resolvedPlan ? ['block-plan'] : []),
+            ...(resolvedFallback?.source || []),
+        ])).sort((left, right) => left.localeCompare(right));
 
         nodes.upsert({
             id: entry.to,
             type: 'block',
-            status: masterById.get(entry.to)?.status || 'unknown',
-            title: masterById.get(entry.to)?.title || null,
+            status: resolvedStatus,
+            title: resolvedTitle,
             attributes: {
-                source: ['dependency-target'],
+                source: sourceMarkers,
+                priority: resolvedPriority,
+                owner: resolvedOwner,
+                currentPhase: resolvedCurrentPhase,
+                planFile: resolvedPlanFile,
             },
         });
 
