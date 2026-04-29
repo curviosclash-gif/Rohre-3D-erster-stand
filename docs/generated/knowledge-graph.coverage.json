@@ -140,14 +140,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2402,
+    "trackedFileCount": 2403,
     "rawCoveredFileCount": 1920,
     "rawCoveragePercent": 79.9,
-    "adjustedTrackedFileCount": 1499,
+    "adjustedTrackedFileCount": 1500,
     "adjustedCoveredFileCount": 1261,
     "adjustedCoveragePercent": 84.1,
-    "uncoveredFileCount": 482,
-    "uncoveredActiveFileCount": 238,
+    "uncoveredFileCount": 483,
+    "uncoveredActiveFileCount": 239,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -194,7 +194,7 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 359,
+        "count": 360,
         "coveredCount": 172
       },
       {
@@ -14176,6 +14176,19 @@
     },
     {
       "path": "docs/qa/Playwright_Stability_Runbook.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/qa/Spielaudit_2026-04-28/Audit_Umsetzungsplan_B01-B13.md",
       "tracked": true,
       "coveredInCore": false,
       "coveredByOverlay": false,

@@ -284,3 +284,10 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Neuer Hangar-Contract-Smoke `tests/hangar-desktop-flow.contract.test.mjs` verifiziert Fight-/Arcade-Entry, mode-spezifischen Selection-Writeback sowie den einheitlichen Lifecycle-Return zu Menue und Match-Start; zusammen mit `tests/arcade-hangar-rules.contract.test.mjs` laeuft der Scope mit 9/9 PASS.
 - Abschluss-Gates sind gruen: `npm run build` sowie `npm run gates:pre-commit` (`plan:check`, `graph:check`, `docs:sync`, `docs:check`) liefern Exit-Code 0.
 - Der Master-Index spiegelt `V76` jetzt unter den abgeschlossenen Bloecken; die naechste freie Intake-Reihenfolge bleibt `V99 -> V100 -> V102`.
+
+## Stand-Snapshot 2026-04-29 (Subphase `V104 104.2.2`)
+
+- `src/shared/runtime/GameRuntimePorts.js` nutzt fuer Runtime-Intent-Aufrufe keinen generischen `runtimeFacade`-Fallback mehr; fehlende Intents wurden in `src/core/runtime/GameRuntimeCoordinator.js` explizit nachgezogen (`restartRound`, `handleMenuPanelChanged`), sodass der Port-Adapter nur noch den Coordinator-Pfad als Fach-Entry konsumiert.
+- `src/core/runtime/GameRuntimeBundle.js` hat die Legacy-Alias-Inventarliste sichtbar verkleinert: nicht mehr als Game-Alias benoetigte Menu-State-Felder (`menuController`, `menuMultiplayerBridge`, `_navButtons`, `_menuButtonByPanel`, `_activeSubmenu`, `_lastMenuTrigger`, `_buildInfoClipboardText`) sind aus `GAME_RUNTIME_LEGACY_ALIAS_SPECS` entfernt.
+- Wissensgraph wurde fuer den neuen Sunset-Stand aktualisiert und validiert (`npm run graph:build`, `npm run graph:check`).
+- Naechste offene V104-Subphase ist `104.3.1`.

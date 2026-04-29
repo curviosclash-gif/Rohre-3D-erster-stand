@@ -4333,7 +4333,7 @@
       "id": "V104.2",
       "type": "phase",
       "title": "Runtime-Bundle- und Port-Oeffentlichkeit verengen",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.2"
@@ -11495,8 +11495,8 @@
     {
       "id": "V104.2.1",
       "type": "subphase",
-      "title": "Migrierte Leser und Schreiber von Bundle-Aliassen oder Runtime-Wrappers auf explizite Read-/Write-Ports, Snapshots oder kleine Runtime-Services umstellen; neue Featurearbeit bekommt keinen Grund mehr, `GameRuntimeBundle` direkt als Sammelobjekt zu lesen.",
-      "status": "open",
+      "title": "Migrierte Leser und Schreiber von Bundle-Aliassen oder Runtime-Wrappers auf explizite Read-/Write-Ports, Snapshots oder kleine Runtime-Services umstellen; neue Featurearbeit bekommt keinen Grund mehr, `GameRuntimeBundle` direkt als Sammelobjekt zu lesen. (abgeschlossen: 2026-04-29; evidence: `npm run graph:build && npm run graph:check && npm run plan:check` -> `docs/generated/knowledge-graph.json`, `docs/generated/knowledge-graph.coverage.json`, `Master plan validation passed`)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.2",
@@ -11506,8 +11506,8 @@
     {
       "id": "V104.2.2",
       "type": "subphase",
-      "title": "`GAME_RUNTIME_LEGACY_ALIAS_SPECS`, `GAME_RUNTIME_LEGACY_WRAPPER_SPECS` und dokumentierte `GameRuntimePorts`-Transition-Fallbacks im migrierten Scope sichtbar verkleinern; verbleibende Reste bleiben nur als benannte Diagnostics- oder Migrationsadapter erlaubt.",
-      "status": "open",
+      "title": "`GAME_RUNTIME_LEGACY_ALIAS_SPECS`, `GAME_RUNTIME_LEGACY_WRAPPER_SPECS` und dokumentierte `GameRuntimePorts`-Transition-Fallbacks im migrierten Scope sichtbar verkleinern; verbleibende Reste bleiben nur als benannte Diagnostics- oder Migrationsadapter erlaubt. (abgeschlossen: 2026-04-29; evidence: `Select-String -Path src/core/runtime/GameRuntimeBundle.js -Pattern \"menuController|menuMultiplayerBridge|_navButtons|_menuButtonByPanel|_activeSubmenu|_lastMenuTrigger|_buildInfoClipboardText\"` + `Select-String -Path src/shared/runtime/GameRuntimePorts.js -Pattern \"BUNDLE_FACADE\"` + `npm run graph:build && npm run graph:check` -> Legacy-Alias-Liste um nicht mehr als Game-Alias benoetigte Menu-State-Felder reduziert, generischer Facade-Intent-Fallback entfernt, Knowledge-Graph neu gebaut und validiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.2",
