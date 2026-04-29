@@ -329,7 +329,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93K | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; kein BT94A-Claim |
 | Bot-Codex | BT93L | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; BT94A bleibt geschlossen |
 | Bot-Codex | BT93M | 2026-04-29 | frei | abgeschlossen 2026-04-29 als `gate-fresh-dqn-anchor-blocked`; BT93N nur diagnose-only/Loader/User-Entscheid |
-| - | BT93N | - | frei | wartet auf BT93M.99 |
+| Bot-Codex | BT93N | 2026-04-29 | claimed | 93N.1 Death Trace Instrumentation |
 | - | BT93O | - | frei | wartet auf BT93N.99 |
 | - | BT93P | - | frei | wartet auf BT93O.99 |
 | - | BT94A | - | frei | wartet auf `BT93P.4=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
@@ -3106,7 +3106,7 @@ Pflicht-Evidence:
 
 Quelle: `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-04-29, Phase 93N.1 -->
 
 Scope:
 
