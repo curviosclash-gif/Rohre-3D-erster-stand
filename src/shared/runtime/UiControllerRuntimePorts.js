@@ -19,24 +19,28 @@ export function createStartSetupControllerPort(deps = {}) {
 }
 
 export function createNavigationLifecyclePort(deps = {}) {
+    const getSettings = resolveCallback(deps.getSettings, () => null);
     const getActiveSubmenu = resolveCallback(deps.getActiveSubmenu, () => null);
     const setActiveSubmenu = resolveCallback(deps.setActiveSubmenu, () => null);
     const persistMenuState = resolveCallback(deps.persistMenuState, () => null);
     const getExpertLoginRuntime = resolveCallback(deps.getExpertLoginRuntime, () => null);
     const getSettingsDirty = resolveCallback(deps.getSettingsDirty, () => false);
     const getActiveProfileName = resolveCallback(deps.getActiveProfileName, () => '');
+    const updateToolsState = resolveCallback(deps.updateToolsState, () => null);
     const normalizeProfileName = resolveCallback(
         deps.normalizeProfileName,
         (profileName) => String(profileName || '').trim()
     );
 
     return Object.freeze({
+        getSettings: () => getSettings(),
         getActiveSubmenu: () => getActiveSubmenu() || null,
         setActiveSubmenu: (panelId) => setActiveSubmenu(panelId || null),
         persistMenuState: (state, transition = null) => persistMenuState(state, transition),
         getExpertLoginRuntime: () => getExpertLoginRuntime() || null,
         getSettingsDirty: () => getSettingsDirty() === true,
         getActiveProfileName: () => String(getActiveProfileName() || '').trim(),
+        updateToolsState: (patch = null) => updateToolsState(patch && typeof patch === 'object' ? patch : null),
         normalizeProfileName: (profileName) => normalizeProfileName(profileName),
     });
 }
@@ -63,6 +67,7 @@ export function createNavigationLifecyclePortFromManager({
     profileManager = null,
 } = {}) {
     return createNavigationLifecyclePort({
+        getSettings: () => manager?.settings || null,
         getActiveSubmenu: () => game?._activeSubmenu || null,
         setActiveSubmenu: (panelId) => { if (game) game._activeSubmenu = panelId || null; },
         persistMenuState: (state, transition = null) => {
@@ -73,6 +78,19 @@ export function createNavigationLifecyclePortFromManager({
         getExpertLoginRuntime: () => menuExpertLoginRuntime || manager?.menuExpertLoginRuntime || null,
         getSettingsDirty: () => game?.settingsDirty === true,
         getActiveProfileName: () => game?.activeProfileName || profileManager?.getActiveProfileName?.() || '',
+        updateToolsState: (patch = null) => {
+            const settings = manager?.settings;
+            if (!settings) return;
+            if (!settings.localSettings || typeof settings.localSettings !== 'object') {
+                settings.localSettings = {};
+            }
+            if (!settings.localSettings.toolsState || typeof settings.localSettings.toolsState !== 'object') {
+                settings.localSettings.toolsState = {};
+            }
+            if (patch && typeof patch === 'object') {
+                Object.assign(settings.localSettings.toolsState, patch);
+            }
+        },
         normalizeProfileName: (profileName) => profileManager?.normalizeProfileName?.(profileName) || String(profileName || '').trim(),
     });
 }

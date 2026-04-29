@@ -44,6 +44,30 @@ export class UINavigationLifecycleController {
         return this.port?.getExpertLoginRuntime?.() || this.manager?.menuExpertLoginRuntime || null;
     }
 
+    _getSettings() {
+        return this.port?.getSettings?.() || this.manager?.settings || null;
+    }
+
+    _updateToolsState(patch = null) {
+        const safePatch = patch && typeof patch === 'object' ? patch : null;
+        if (safePatch && this.port?.updateToolsState) {
+            this.port.updateToolsState(safePatch);
+            return this._getSettings();
+        }
+        const settings = this._getSettings();
+        if (!settings) return null;
+        if (!settings.localSettings || typeof settings.localSettings !== 'object') {
+            settings.localSettings = {};
+        }
+        if (!settings.localSettings.toolsState || typeof settings.localSettings.toolsState !== 'object') {
+            settings.localSettings.toolsState = {};
+        }
+        if (safePatch) {
+            Object.assign(settings.localSettings.toolsState, safePatch);
+        }
+        return settings;
+    }
+
     _isSettingsDirty() {
         return this.port?.getSettingsDirty?.() === true;
     }
@@ -127,7 +151,7 @@ export class UINavigationLifecycleController {
         const root = this.ui.mainMenu;
         if (!root) return;
         const normalizedPanelId = String(panelId || '').trim();
-        const level4Open = !!this.manager.settings?.localSettings?.toolsState?.level4Open;
+        const level4Open = !!this._getSettings()?.localSettings?.toolsState?.level4Open;
         let depth = 1;
         if (normalizedPanelId === 'submenu-custom') depth = 2;
         if (normalizedPanelId === 'submenu-game') depth = level4Open ? 4 : 3;
@@ -144,14 +168,12 @@ export class UINavigationLifecycleController {
 
     setLevel4Section(sectionId, options = {}) {
         const resolvedSectionId = this._resolveLevel4Section(sectionId);
-        const settings = this.manager.settings;
-        if (!settings?.localSettings?.toolsState || typeof settings.localSettings.toolsState !== 'object') {
-            settings.localSettings.toolsState = {};
-        }
+        const settings = this._updateToolsState();
+        if (!settings?.localSettings?.toolsState) return;
         if (options.persist !== false) {
-            settings.localSettings.toolsState.activeSection = resolvedSectionId;
+            this._updateToolsState({ activeSection: resolvedSectionId });
         }
-        if (!settings.localSettings.toolsState.level4Open) return;
+        if (!this._getSettings()?.localSettings?.toolsState?.level4Open) return;
         this.ensureLevel4SectionControlsSetup();
         this._syncLevel4SectionState(resolvedSectionId, options);
         this.manager.updateContext();
@@ -164,11 +186,8 @@ export class UINavigationLifecycleController {
         if (open) {
             this.ensureLevel4SectionControlsSetup();
         }
-        const settings = this.manager.settings;
-        if (!settings?.localSettings?.toolsState || typeof settings.localSettings.toolsState !== 'object') {
-            settings.localSettings.toolsState = {};
-        }
-        settings.localSettings.toolsState.level4Open = open;
+        const settings = this._updateToolsState({ level4Open: open });
+        if (!settings?.localSettings?.toolsState) return;
         drawer.classList.toggle('hidden', !open);
         drawer.setAttribute('aria-hidden', String(!open));
         const activeSection = this._resolveLevel4Section(
@@ -232,13 +251,14 @@ export class UINavigationLifecycleController {
     }
 
     handleExpertStateChanged() {
-        const menuUiContext = this.manager._resolveMenuUiContext?.(this.manager.settings) || null;
+        const settings = this._getSettings();
+        const menuUiContext = this.manager._resolveMenuUiContext?.(settings) || null;
         if (menuUiContext) {
-            this.manager.syncDeveloperState(this.manager.settings, menuUiContext);
+            this.manager.syncDeveloperState(settings, menuUiContext);
             this.updateContext(menuUiContext);
         } else {
             this.manager.updateContext();
-            this.manager.syncDeveloperState(this.manager.settings);
+            this.manager.syncDeveloperState(settings);
         }
         if (this._getActiveSubmenu() === 'submenu-expert') {
             this._getExpertLoginRuntime()?.focusPrimaryControl?.();
@@ -289,8 +309,8 @@ export class UINavigationLifecycleController {
                 if (panelId === 'submenu-expert') {
                     this._getExpertLoginRuntime()?.focusPrimaryControl?.();
                 }
-                if (panelId !== 'submenu-game' && manager.settings?.localSettings?.toolsState?.level4Open) {
-                    manager.settings.localSettings.toolsState.level4Open = false;
+                if (panelId !== 'submenu-game' && this._getSettings()?.localSettings?.toolsState?.level4Open) {
+                    this._updateToolsState({ level4Open: false });
                     manager.setLevel4Open(false);
                 }
                 this.manager.ports?.runtimeIntentPort?.handleMenuPanelChanged?.(previousPanelId, panelId || null, transitionMetadata || null);
@@ -340,9 +360,9 @@ export class UINavigationLifecycleController {
         });
     }
 
-    syncDeveloperReleaseCutVisibility(menuUiContext = this.manager.getMenuUiContext?.(this.manager.settings)) {
+    syncDeveloperReleaseCutVisibility(menuUiContext = this.manager.getMenuUiContext?.(this._getSettings())) {
         const manager = this.manager;
-        const settings = menuUiContext?.settings || manager.settings;
+        const settings = menuUiContext?.settings || this._getSettings();
         const accessContext = menuUiContext?.accessContext || manager._accessContext || {};
         const releaseState = menuUiContext?.releaseState || resolveDeveloperReleaseState(settings);
         const shouldHideDeveloperUi = releaseState.developerUiHidden;
@@ -408,9 +428,9 @@ export class UINavigationLifecycleController {
         const manager = this.manager;
         if (!this.ui.menuContext) return;
         const resolvedContext = menuUiContext
-            || manager.getMenuUiContext?.(manager.settings)
+            || manager.getMenuUiContext?.(this._getSettings())
             || null;
-        const settings = resolvedContext?.settings || manager.settings || {};
+        const settings = resolvedContext?.settings || this._getSettings() || {};
         const accessContext = resolvedContext?.accessContext || manager._accessContext || {};
         manager._accessContext = accessContext;
         manager.menuNavigationRuntime?.setAccessContext?.(accessContext);
