@@ -17,7 +17,7 @@ Gate: PASS
 - Keine Legacy-Pfade gefunden.
 
 ## Encoding-Warnungen (Mojibake)
-- Keine Mojibake-Muster gefunden.
+- docs/Fehlerberichte/2026-04-29_v104-v107-graph-check-orphan-dependency.md: Zeilen 5, 24
 
 ## Ergebnis
 - Dokumentation aktuell (geprueft am 2026-04-29).

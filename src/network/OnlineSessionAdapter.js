@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================
 // OnlineSessionAdapter.js - Internet session via WebSocket signaling + STUN/TURN
 // ============================================
@@ -34,8 +33,8 @@ const logger = createLogger('OnlineSessionAdapter');
 
 function resolveSignalingUrl(explicit) {
     if (explicit) return explicit;
-    /* global __SIGNALING_URL__ */
-    return (typeof __SIGNALING_URL__ !== 'undefined' && __SIGNALING_URL__) || '';
+    const signalingUrl = /** @type {any} */ (globalThis).__SIGNALING_URL__;
+    return typeof signalingUrl === 'string' ? signalingUrl : '';
 }
 
 /**

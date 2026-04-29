@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================
 // PeerConnectionManager.js - WebRTC lifecycle, Star topology
 // ============================================
@@ -43,10 +42,10 @@ function resolveIceServers(custom) {
 
     const servers = [...DEFAULT_ICE_SERVERS];
 
-    /* global __TURN_URL__, __TURN_USERNAME__, __TURN_CREDENTIAL__ */
-    const turnUrl = (typeof __TURN_URL__ !== 'undefined' && __TURN_URL__) || '';
-    const turnUser = (typeof __TURN_USERNAME__ !== 'undefined' && __TURN_USERNAME__) || '';
-    const turnCred = (typeof __TURN_CREDENTIAL__ !== 'undefined' && __TURN_CREDENTIAL__) || '';
+    const runtimeGlobals = /** @type {any} */ (globalThis);
+    const turnUrl = typeof runtimeGlobals.__TURN_URL__ === 'string' ? runtimeGlobals.__TURN_URL__ : '';
+    const turnUser = typeof runtimeGlobals.__TURN_USERNAME__ === 'string' ? runtimeGlobals.__TURN_USERNAME__ : '';
+    const turnCred = typeof runtimeGlobals.__TURN_CREDENTIAL__ === 'string' ? runtimeGlobals.__TURN_CREDENTIAL__ : '';
 
     if (turnUrl) {
         const entry = { urls: turnUrl };

@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================
 // TelemetryHistoryStore.js - IndexedDB-based persistent telemetry
 // for cross-session comparison (max 500 entries, auto-pruning)
@@ -19,7 +18,7 @@ function openDb() {
         }
         const request = indexedDB.open(DB_NAME, DB_VERSION);
         request.onupgradeneeded = (event) => {
-            const db = event.target.result;
+            const db = /** @type {IDBOpenDBRequest} */ (event.target).result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
                 store.createIndex('at', 'at', { unique: false });
@@ -208,7 +207,7 @@ export class TelemetryHistoryStore {
                     const cursor = store.openCursor();
                     let deleted = 0;
                     cursor.onsuccess = (event) => {
-                        const c = event.target.result;
+                        const c = /** @type {IDBRequest<IDBCursorWithValue | null>} */ (event.target).result;
                         if (c && deleted < deleteCount) {
                             c.delete();
                             deleted += 1;
