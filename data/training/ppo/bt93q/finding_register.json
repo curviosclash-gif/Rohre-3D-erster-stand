@@ -1,0 +1,902 @@
+{
+  "blockId": "BT93Q",
+  "blocked_actions": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k extension"
+  ],
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93q_finding_register.py --write-report"
+  },
+  "findingIds": [
+    "B.01",
+    "B.02",
+    "B.03",
+    "B.04",
+    "B.05",
+    "B.06",
+    "B.07",
+    "B.08",
+    "B.09"
+  ],
+  "findings": [
+    {
+      "allowedFixClasses": [
+        "Reward"
+      ],
+      "blockEffect": "Reward-only repair improved early-death reward but does not open BT93O or longer PPO runs.",
+      "field": "aggregateDelta",
+      "forbiddenActions": [
+        "second reward fix without 93Q.2/93Q.4 danger-ordering proof",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k extension"
+      ],
+      "id": "B.01",
+      "nextAllowedActions": [
+        "BT93Q.2 trace reanalysis and telemetry-completeness diagnosis",
+        "BT93Q.3 deterministic-policy-collapse diagnosis",
+        "BT93Q.4 wall/trail action-effect stress matrix",
+        "BT93Q.5 exactly one fix class only after cause evidence",
+        "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+      ],
+      "observedValue": {
+        "avgStepsPerEpisode": {
+          "delta": 1.883333,
+          "post": 77.633333,
+          "pre": 75.75
+        },
+        "deathBefore60Count": {
+          "delta": -3.0,
+          "post": 3,
+          "pre": 6
+        },
+        "deathBefore60Share": {
+          "delta": -0.05,
+          "post": 0.05,
+          "pre": 0.1
+        },
+        "maxStepPlateauCount": {
+          "delta": 0.0,
+          "post": 0,
+          "pre": 0
+        },
+        "objectiveSignalReachableTailCount": {
+          "delta": 1.0,
+          "post": 15,
+          "pre": 14
+        },
+        "progressSignalReachableTailCount": {
+          "delta": 1.0,
+          "post": 15,
+          "pre": 14
+        },
+        "resultClass": "reward-fix-delta-green-diagnose-only",
+        "runtimeErrorCount": {
+          "delta": 0.0,
+          "post": 0,
+          "pre": 0
+        }
+      },
+      "sourcePath": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
+      "supportingSourcePaths": [],
+      "title": "Reward-Fix was effective but insufficient"
+    },
+    {
+      "allowedFixClasses": [
+        "Policy",
+        "Action",
+        "Observation/Telemetry",
+        "Reward",
+        "Safety-Mask",
+        "Terminal/Runner"
+      ],
+      "blockEffect": "DeathBefore60 remains blocking; 50k/100k and BT93O stay closed.",
+      "field": "trainSummary/evalSummary/decision",
+      "forbiddenActions": [
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k extension"
+      ],
+      "id": "B.02",
+      "nextAllowedActions": [
+        "BT93Q.2 trace reanalysis and telemetry-completeness diagnosis",
+        "BT93Q.3 deterministic-policy-collapse diagnosis",
+        "BT93Q.4 wall/trail action-effect stress matrix",
+        "BT93Q.5 exactly one fix class only after cause evidence",
+        "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+      ],
+      "observedValue": {
+        "actualModelTimesteps": 10112,
+        "bt93lPrior": {
+          "evalDeathBefore60Count": 0,
+          "resultClass": "signal-green",
+          "trainDeathBefore60Count": 1
+        },
+        "decision": {
+          "blocksNext": [
+            "93N.4",
+            "BT93O",
+            "BT94A"
+          ],
+          "bt94aClaimAllowed": false,
+          "candidateRun": false,
+          "extension50kAllowed": false,
+          "extension50kExecuted": false,
+          "freezeCandidate": false,
+          "holdoutUsed": false,
+          "nextAllowedActions": [
+            "start 93N.4 50k stability ladder only if resultClass is micro-ppo-10k-green-diagnose-only",
+            "otherwise keep BT93N diagnose-only and write a narrow follow-up/root-cause block",
+            "do not claim BT93O, BT93P, BT94A, candidate, freeze, holdout, promote, or rollout from this report"
+          ],
+          "opensNext": [],
+          "resultClass": "death-before60-still-blocking"
+        },
+        "eval": {
+          "completedEpisodes": 79,
+          "deathBefore60Count": 11,
+          "maxStepShare": 0.0,
+          "objectiveSignalReachableCount": 2212,
+          "playerDeadShare": 1.0,
+          "progressSignalReachableCount": 2212,
+          "runtimeErrorCount": 0,
+          "safetyMaxRates": {
+            "invalidActionRate": 0.0,
+            "noopRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "sanitizerRate": 0.0,
+            "vetoRate": 0.0
+          }
+        },
+        "resultClass": "death-before60-still-blocking",
+        "train": {
+          "avgStepsPerEpisode": 75.074627,
+          "completedEpisodes": 134,
+          "deathBefore60Count": 27,
+          "objectiveSignalReachableCount": 1330,
+          "playerDeadShare": 1.0,
+          "progressSignalReachableCount": 1330,
+          "runtimeErrorCount": 0,
+          "safetyMaxRates": {
+            "invalidActionRate": 0.0,
+            "noopRate": 0.333333,
+            "postDecodeClampRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "sanitizerRate": 0.0,
+            "vetoRate": 0.0
+          }
+        }
+      },
+      "sourcePath": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "supportingSourcePaths": [],
+      "title": "10k PPO remains red"
+    },
+    {
+      "allowedFixClasses": [
+        "Policy",
+        "Training-Signal"
+      ],
+      "blockEffect": "Policy-collapsed deterministic eval blocks any 10k recheck until separated from action/observation/reward causes.",
+      "field": "evalSummary.seedSummaries[].actionCounts",
+      "forbiddenActions": [
+        "BT93Q.6 recheck before policy-collapse report",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k extension"
+      ],
+      "id": "B.03",
+      "nextAllowedActions": [
+        "BT93Q.2 trace reanalysis and telemetry-completeness diagnosis",
+        "BT93Q.3 deterministic-policy-collapse diagnosis",
+        "BT93Q.4 wall/trail action-effect stress matrix",
+        "BT93Q.5 exactly one fix class only after cause evidence",
+        "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+      ],
+      "observedValue": {
+        "allEvalSeedsSingleAction": true,
+        "dominantActions": [
+          "yaw-right"
+        ],
+        "evalSeedSummaries": [
+          {
+            "actionCounts": {
+              "2": 2700
+            },
+            "avgStepsPerEpisode": 106.52,
+            "completedEpisodes": 25,
+            "deathBefore60Count": 2,
+            "dominantAction": "yaw-right",
+            "dominantToken": "2",
+            "label": "eval-944"
+          },
+          {
+            "actionCounts": {
+              "2": 2700
+            },
+            "avgStepsPerEpisode": 92.827586,
+            "completedEpisodes": 29,
+            "deathBefore60Count": 7,
+            "dominantAction": "yaw-right",
+            "dominantToken": "2",
+            "label": "eval-945"
+          },
+          {
+            "actionCounts": {
+              "2": 2700
+            },
+            "avgStepsPerEpisode": 107.08,
+            "completedEpisodes": 25,
+            "deathBefore60Count": 2,
+            "dominantAction": "yaw-right",
+            "dominantToken": "2",
+            "label": "eval-946"
+          }
+        ],
+        "semanticActions": [
+          "noop",
+          "yaw-left",
+          "yaw-right",
+          "pitch-up",
+          "pitch-down",
+          "roll-left",
+          "roll-right",
+          "boost",
+          "shoot-mg"
+        ]
+      },
+      "sourcePath": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "supportingSourcePaths": [],
+      "title": "Deterministic eval policy collapses to one action"
+    },
+    {
+      "allowedFixClasses": [
+        "Action",
+        "Observation/Telemetry",
+        "Safety-Mask",
+        "Reward"
+      ],
+      "blockEffect": "Wall/trail root cause is plausible but geometry/action-effect proof is incomplete; BT93Q.2/93Q.4 are mandatory.",
+      "field": "aggregate.deathClassCounts + traceTail wall/trail proximity",
+      "forbiddenActions": [
+        "action or reward fix before trace reanalysis and action-effect stress matrix",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k extension"
+      ],
+      "id": "B.04",
+      "nextAllowedActions": [
+        "BT93Q.2 trace reanalysis and telemetry-completeness diagnosis",
+        "BT93Q.3 deterministic-policy-collapse diagnosis",
+        "BT93Q.4 wall/trail action-effect stress matrix",
+        "BT93Q.5 exactly one fix class only after cause evidence",
+        "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+      ],
+      "observedValue": {
+        "aggregate": {
+          "avgStepsPerEpisode": 75.75,
+          "completedEpisodes": 60,
+          "deathBefore60Count": 6,
+          "deathBefore60Share": 0.1,
+          "deathClassCounts": {
+            "unclassified": 2,
+            "wall/trail": 4
+          },
+          "maxStepPlateauCount": 0,
+          "maxStepShare": 0.0,
+          "maxStepsPerEpisodeObserved": 109,
+          "minStepsPerEpisode": 34,
+          "objectiveSignalReachableTailCount": 14,
+          "policyEpisodeCounts": {
+            "noop-control": 15,
+            "random-control": 15,
+            "scripted-reachability-positive-control": 18,
+            "semantic-cycle-control": 12
+          },
+          "progressSignalReachableTailCount": 14,
+          "rewardMeanPerEpisode": -1.351609,
+          "rewardTotal": -81.096565,
+          "runtimeErrorCount": 0,
+          "terminalReasonCounts": {
+            "player-dead": 60
+          },
+          "truncatedReasonCounts": {}
+        },
+        "measurementInterpretation": {
+          "dominantCause": "wall/trail",
+          "fixAllowedBeforeDominantCause": false,
+          "lowEventCountIsGreen": false,
+          "nextFixGate": "blocked until dominant cause or measurement-invalid is explicitly accepted"
+        },
+        "resultClass": "death-before60-root-cause-classified",
+        "traceSampleSummary": {
+          "deadEndRiskOneFinalRows": 12,
+          "earlyDeathFinalRows": 18,
+          "earlyDeathFinalRowsWallDistanceFrontLte005": 12,
+          "earlyDeathSampleCount": 6,
+          "maxCollisionRiskFinalRows": 1.0,
+          "maxDeadEndRiskFinalRows": 1.0,
+          "maxVetoRateTailRows": 0.0,
+          "rawPoseAvailableAllFalse": true,
+          "rawPoseAvailableValues": [
+            "False"
+          ],
+          "sampleCount": 18,
+          "sampleKindCounts": {
+            "early-death-before60": 6,
+            "non-event-control": 12
+          },
+          "semanticActionTailCounts": {
+            "boost": 27,
+            "noop": 5,
+            "pitch-down": 27,
+            "pitch-up": 24,
+            "roll-left": 28,
+            "roll-right": 25,
+            "shoot-mg": 25,
+            "yaw-left": 31,
+            "yaw-right": 24
+          },
+          "vetoActiveTailRows": 173,
+          "vetoEventTailRows": 0
+        }
+      },
+      "sourcePath": "data/training/ppo/bt93n/death_before60_trace_report.json",
+      "supportingSourcePaths": [
+        "data/training/ppo/bt93n/death_before60_trace_samples.jsonl"
+      ],
+      "title": "Wall/trail danger is visible but not controlled"
+    },
+    {
+      "allowedFixClasses": [
+        "Safety-Mask"
+      ],
+      "blockEffect": "Safety diagnostics may be informative only; a handlungswirksame mask/policy needs proof before any fix.",
+      "field": "traceTail.actionSafety.hybridSafety/vetoEvents/vetoRate",
+      "forbiddenActions": [
+        "productive runtime safety switch",
+        "safety-mask fix before 93Q.2/93Q.4 proof",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k extension"
+      ],
+      "id": "B.05",
+      "nextAllowedActions": [
+        "BT93Q.2 trace reanalysis and telemetry-completeness diagnosis",
+        "BT93Q.3 deterministic-policy-collapse diagnosis",
+        "BT93Q.4 wall/trail action-effect stress matrix",
+        "BT93Q.5 exactly one fix class only after cause evidence",
+        "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+      ],
+      "observedValue": {
+        "evalSafetyMaxRates": {
+          "invalidActionRate": 0.0,
+          "noopRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "preSamplingMaskRate": 1.0,
+          "sanitizerRate": 0.0,
+          "vetoRate": 0.0
+        },
+        "maxCollisionRiskFinalRows": 1.0,
+        "maxDeadEndRiskFinalRows": 1.0,
+        "maxVetoRateTailRows": 0.0,
+        "trainSafetyMaxRates": {
+          "invalidActionRate": 0.0,
+          "noopRate": 0.333333,
+          "postDecodeClampRate": 0.0,
+          "preSamplingMaskRate": 1.0,
+          "sanitizerRate": 0.0,
+          "vetoRate": 0.0
+        },
+        "vetoActiveTailRows": 173,
+        "vetoEventTailRows": 0
+      },
+      "sourcePath": "data/training/ppo/bt93n/death_before60_trace_samples.jsonl",
+      "supportingSourcePaths": [],
+      "title": "Diagnostic safety sees risk but does not act"
+    },
+    {
+      "allowedFixClasses": [
+        "Action"
+      ],
+      "blockEffect": "Compound sidecar actions remain forbidden until existing actions fail the wall/trail stress matrix.",
+      "field": "MASKED_SEMANTIC_ACTIONS",
+      "forbiddenActions": [
+        "speculative action-surface expansion before 93Q.4",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k extension"
+      ],
+      "id": "B.06",
+      "nextAllowedActions": [
+        "BT93Q.2 trace reanalysis and telemetry-completeness diagnosis",
+        "BT93Q.3 deterministic-policy-collapse diagnosis",
+        "BT93Q.4 wall/trail action-effect stress matrix",
+        "BT93Q.5 exactly one fix class only after cause evidence",
+        "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+      ],
+      "observedValue": {
+        "actionCount": 9,
+        "compoundEscapeActionsPresent": false,
+        "semanticActions": [
+          "noop",
+          "yaw-left",
+          "yaw-right",
+          "pitch-up",
+          "pitch-down",
+          "roll-left",
+          "roll-right",
+          "boost",
+          "shoot-mg"
+        ]
+      },
+      "sourcePath": "python/envs/ppo_action_surface.py",
+      "supportingSourcePaths": [],
+      "title": "Current action surface has only atomic single-step actions"
+    },
+    {
+      "allowedFixClasses": [
+        "Reward"
+      ],
+      "blockEffect": "Danger-aware reward ordering must be tested; reward totals alone do not justify a reward fix or quality claim.",
+      "field": "trainSummary/evalSummary.rewardBreakdownTotals",
+      "forbiddenActions": [
+        "reward redesign before pressure-ordering proof",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k extension"
+      ],
+      "id": "B.07",
+      "nextAllowedActions": [
+        "BT93Q.2 trace reanalysis and telemetry-completeness diagnosis",
+        "BT93Q.3 deterministic-policy-collapse diagnosis",
+        "BT93Q.4 wall/trail action-effect stress matrix",
+        "BT93Q.5 exactly one fix class only after cause evidence",
+        "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+      ],
+      "observedValue": {
+        "bt93lSimpleBaselineContext": {
+          "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+          "sameMatrixDqnAnchorPresent": false,
+          "summary": {
+            "bt94aClaimAllowed": false,
+            "candidateRun": false,
+            "dqnAnchorBlockingForBt94a": true,
+            "holdoutUsed": false,
+            "microPpoAllowedBy93L5": true,
+            "microPpoMatrixFrozen": true,
+            "noopClean": true,
+            "sameMatrixDqnAnchorPresent": false,
+            "scriptedHeuristicReachesObjective": true
+          }
+        },
+        "evalRewardBreakdownTotals": {
+          "baseStep": -129.6,
+          "checkpointReached": 1592.64,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "earlyDeath": -248.266666,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": -434.5,
+          "lowHealthThreat": -3.0359,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 80.21,
+          "survivalPressureBonus": 8.99144,
+          "trailRisk": 0.0,
+          "wallRisk": -230.708759,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "trainRewardBreakdownTotals": {
+          "baseStep": -161.792,
+          "checkpointReached": 957.6,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "earlyDeath": -524.800002,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": -737.0,
+          "lowHealthThreat": -21.574525,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 99.78,
+          "survivalPressureBonus": 17.424596,
+          "trailRisk": 0.0,
+          "wallRisk": -512.610557,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        }
+      },
+      "sourcePath": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "supportingSourcePaths": [
+        "data/training/ppo/bt93l/baseline_matrix_report.json"
+      ],
+      "title": "Reward ordering remains suspicious under danger pressure"
+    },
+    {
+      "allowedFixClasses": [
+        "Separate-DQN-Loader",
+        "User-Replacement-Policy-Decision"
+      ],
+      "blockEffect": "BT93Q may repair wall/trail behavior but cannot create BT93P/BT94A positive reentry.",
+      "field": "comparisonPolicyDecision/sameMatrixDqnAnchorPresent/nonBlockingForPositiveReentry",
+      "forbiddenActions": [
+        "phantom DQN anchor",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k extension"
+      ],
+      "id": "B.08",
+      "nextAllowedActions": [
+        "BT93Q.2 trace reanalysis and telemetry-completeness diagnosis",
+        "BT93Q.3 deterministic-policy-collapse diagnosis",
+        "BT93Q.4 wall/trail action-effect stress matrix",
+        "BT93Q.5 exactly one fix class only after cause evidence",
+        "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+      ],
+      "observedValue": {
+        "bt93pPolicy": {
+          "bt94aReadyMayOpen": false,
+          "diagnoseOnlyWhileBlocked": true,
+          "requiredBeforePositiveReentry": [
+            "same-matrix-dqn-ready or explicit user replacement policy",
+            "fresh no_start_gate claimable=true",
+            "BT93N/O/P gates green under the pinned statistics contract"
+          ]
+        },
+        "comparisonPolicyDecision": "dqn-anchor-blocked",
+        "nonBlockingForPositiveReentry": false,
+        "sameMatrixDqnAnchorPresent": false
+      },
+      "sourcePath": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "supportingSourcePaths": [],
+      "title": "DQN anchor remains a separate hard blocker"
+    },
+    {
+      "allowedFixClasses": [
+        "Governance"
+      ],
+      "blockEffect": "No candidate, freeze, holdout, promote, rollout, or BT95 handoff signal is allowed from BT93Q.",
+      "field": "claimable/candidateRunsAllowed/matrixDefinitionAllowed",
+      "forbiddenActions": [
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k extension"
+      ],
+      "id": "B.09",
+      "nextAllowedActions": [
+        "BT93Q.2 trace reanalysis and telemetry-completeness diagnosis",
+        "BT93Q.3 deterministic-policy-collapse diagnosis",
+        "BT93Q.4 wall/trail action-effect stress matrix",
+        "BT93Q.5 exactly one fix class only after cause evidence",
+        "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+      ],
+      "observedValue": {
+        "bt93nClosure": {
+          "gateClass": "death-before60-still-blocking",
+          "resultClass": "diagnose-loop-required",
+          "rootCause": "wall/trail"
+        },
+        "candidateFreezeAllowed": false,
+        "candidateRunsAllowed": false,
+        "claimable": false,
+        "currentHandoverSource": {
+          "blockId": "BT93M",
+          "detectedBt93cInputSource": {
+            "blockId": "BT93I",
+            "fallbackUsed": false,
+            "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+            "phaseId": "93I.5",
+            "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+          },
+          "expected": {
+            "blockId": "BT93M",
+            "reason": "BT93M handover_package.json exists and supersedes older repair handover sources.",
+            "sourceArtifact": "data/training/ppo/bt93m/handover_package.json"
+          },
+          "fallbackUsed": false,
+          "fresh": true,
+          "generatedBy": "python/scripts/bt93m_comparator_no_start_refresh.py",
+          "phaseId": "93M.3",
+          "sourceArtifact": "data/training/ppo/bt93m/handover_package.json",
+          "sourceState": {
+            "blockId": "BT93M",
+            "bt94aClaimAllowed": false,
+            "bt94aGate": "closed-gate-fresh-dqn-anchor-blocked-by-bt93m",
+            "bt94aReady": false,
+            "bt94aReason": "BT93M refreshed the gate source, but Same-Matrix-DQN is blocked and DeathBefore60/extension/no-start blockers remain active.",
+            "candidateFreezeAllowed": false,
+            "candidateRunsAllowed": false,
+            "generatedBy": "python/scripts/bt93m_comparator_no_start_refresh.py",
+            "matrixDefinitionAllowed": false,
+            "path": "data/training/ppo/bt93m/handover_package.json",
+            "phaseId": "93M.3",
+            "resultClass": "gate-fresh-dqn-anchor-blocked",
+            "sha256": "fc7f20a835915ba1c5488f22f77f9c13344dff1f3b7a0e2ed5bc6d27b7e38616"
+          },
+          "supersedesDetectedSource": {
+            "blockId": "BT93I",
+            "fallbackUsed": false,
+            "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+            "phaseId": "93I.5",
+            "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+          }
+        },
+        "matrixDefinitionAllowed": false,
+        "resultClass": "blocked-no-start"
+      },
+      "sourcePath": "data/training/ppo/bt94a/no_start_gate.json",
+      "supportingSourcePaths": [],
+      "title": "BT94A remains hard closed"
+    }
+  ],
+  "generatedAt": "2026-04-29T23:25:45Z",
+  "generatedBy": "python/scripts/bt93q_finding_register.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "c1767b9f416810a426e41fc70ab166b3e8110ea8"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "next_allowed_actions": [
+    "BT93Q.2 trace reanalysis and telemetry-completeness diagnosis",
+    "BT93Q.3 deterministic-policy-collapse diagnosis",
+    "BT93Q.4 wall/trail action-effect stress matrix",
+    "BT93Q.5 exactly one fix class only after cause evidence",
+    "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+  ],
+  "ok": true,
+  "phaseCoverage": {
+    "93Q.1.1": true,
+    "93Q.1.2": true,
+    "93Q.1.3": true,
+    "93Q.1.4": true
+  },
+  "phaseId": "93Q.1",
+  "resultClass": "finding-register-locked",
+  "schemaVersion": "bt93q-finding-register-v1",
+  "sourceArtifacts": {
+    "bt93lBaselineMatrix": {
+      "blockId": "BT93L",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L simple-baseline and reward-ordering context",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013",
+      "tracked": true
+    },
+    "bt93lMicroPpoSignal": {
+      "blockId": "BT93L",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/micro_ppo_signal_report.json",
+      "phaseId": "93L.6",
+      "resultClass": "signal-green",
+      "role": "BT93L prior micro-PPO signal context",
+      "sha256": "01912b85c4ad39ef9b4f92d28f19ee29f27ab85670ba451cb7551a679fa74f34",
+      "tracked": true
+    },
+    "bt93mComparisonPolicyDecision": {
+      "blockId": "BT93M",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "phaseId": "93M.3.6",
+      "resultClass": "comparison-policy-blocks-positive-reentry",
+      "role": "BT93M DQN-anchor/replacement-policy blocker",
+      "sha256": "eadd182f737d7b477a4143df0cc721875caf31cd47bcb5942f2649f2d80609b5",
+      "tracked": true
+    },
+    "bt93nClosureGate": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/closure_gate_report.json",
+      "phaseId": "93N.99",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93N red closure gate",
+      "sha256": "606b45c98569eb4fc2a88c997ec7ccff43c3f8551b013e5e3bfdf22e8b841a1e",
+      "tracked": true
+    },
+    "bt93nDeathTrace": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/death_before60_trace_report.json",
+      "phaseId": "93N.1",
+      "resultClass": "death-before60-root-cause-classified",
+      "role": "BT93N death-before-60 trace source",
+      "sha256": "7766984f4d02ffed3d70dae2318cd76d06da4486ba1162aa3a649c3447cb1bda",
+      "tracked": true
+    },
+    "bt93nDeathTraceSamples": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93n/death_before60_trace_samples.jsonl",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93N raw JSONL trace samples",
+      "sha256": "cda12e585253ece1b52e7d779ccc8b020d19a68008bb65b809369aa9d060fffd",
+      "tracked": true
+    },
+    "bt93nMicroPpoRepeat": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "phaseId": "93N.3",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N 10k micro-PPO repeat source",
+      "sha256": "96f046445da1518eeb9519958b179107326294d6ad83a6bfa074089f52aaa631",
+      "tracked": true
+    },
+    "bt93nRewardTerminalDelta": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
+      "phaseId": "93N.2",
+      "resultClass": "reward-fix-delta-green-diagnose-only",
+      "role": "BT93N reward/terminal delta after single reward fix",
+      "sha256": "270c21992dae1eb6fafa0ed6d5edac85d657de22e77a15ebd3b7c90dd4918a59",
+      "tracked": true
+    },
+    "bt93nStabilityLadder": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/stability_ladder_report.json",
+      "phaseId": "93N.4",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N 50k/100k no-run ladder gate",
+      "sha256": "443758e4aa62918731abaef36b9248ba06fdecb36049d39094b85a2bcf966596",
+      "tracked": true
+    },
+    "bt93qIntake": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93Q user-owned intake source",
+      "sha256": "24f52e88d9d57e532a48c9698293b785123fd0ba7b40759a4a7271193512ab50",
+      "tracked": true
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A closed no-start gate",
+      "sha256": "27dd958fe5463f6f688384957e31cbd4d163c81b07058dd3c0a1a6be9eda7f70",
+      "tracked": true
+    },
+    "ppoActionSurface": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current sidecar PPO action surface",
+      "sha256": "4e12c93bd532178f3759234d5217f1cd58a4f4bfaec9c6f7be8ffa708564847b",
+      "tracked": true
+    }
+  },
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true
+}
