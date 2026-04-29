@@ -1,8 +1,25 @@
 ﻿# Bot Trainings Roadmap (Survival 2026-Q2)
 
-Stand: 2026-03-22
+Stand: 2026-04-29
 Horizon: 2026-03-22 bis 2026-06-30
 Quelle fuer operative Phase-Checks: `docs/bot-training/Bot_Trainingsplan.md`
+
+## Operative Aktualisierung 2026-04-29
+
+Diese Roadmap ist nur noch der Langhorizont. Fuer den PPO-Pfad sind die alten C2-C5-Formulierungen zu grob und duerfen nicht als Freigabe fuer neue Langlaeufe, Kandidaten oder Promotions gelesen werden.
+
+Aktiver PPO-Fokus:
+
+- `BT93M` bis `BT93P` sind Root-Cause-Reparatur: Gate-Wahrheit, Same-Matrix-DQN-Anker, DeathBefore60, Action-/Objective-Qualitaet, Reward-Ordering, MaxStep-Plateau und Mindeststatistik.
+- Bis `BT93P.4=BT94A-ready` plus `data/training/ppo/bt94a/no_start_gate.json` mit `claimable=true` bleibt jeder PPO-Langlauf ueber die gepinnte Reparaturleiter hinaus verboten.
+- Q2-Zielwerte bleiben Produktziele, aber keine Promotionsregel: `promote` braucht BT94A-Freeze, BT94B-A/B-Evidence, gruene PPO-Validate-Lane, Holdout, Statistik und expliziten User-Entscheid.
+- BT93J/BT93K/BT93L haben gezeigt, dass Steps, Durchsatz, CUDA, Smokes und Plan-Gates keine Bot-Qualitaet beweisen. Die Roadmap wertet ab sofort nur noch versionierte Semantik-/Run-/Validate-Evidence aus `docs/bot-training/Bot_Trainingsplan.md`.
+
+Aktuelle No-Go-Regeln:
+
+- Kein Candidate, Freeze, Promote, Rollout oder BT95-Handoff aus Diagnose-, Scaffold-, `tmp/**`-, `latest_*`-, Durchsatz- oder Drei-Run-Zwischenevidence.
+- Kein BT94A-Start ohne geloestes Reward-Ordering gegen Noop/Random/Semantic-Cycle/Scripted, Same-Matrix-DQN- oder Ersatzvergleich, Holdout-Lineage und Statistikvertrag.
+- Kein Runtime-Sunset fuer DQN ohne separaten operativen Rollout-Block mit Export/Load, JS-Inference, Registry, Latenzbudget, Rollback und PPO-Validate.
 
 ## Status-Legende
 
@@ -58,7 +75,7 @@ Aktueller Laufstand:
 - `bot:validate` ist ab jetzt operative Vorbedingung fuer jede BT80C-Kandidatenaussage; drei reproduzierbare Validation-Paesse auf fixer Matrix gehen vor neuen Algorithmus- oder High-Util-Schritten.
 - Kandidatenlaeufe folgen einer festen Leiter: `candidate-smoke -> candidate-benchmark -> operator-high-util`. Ein gruener Smoke-Lauf ersetzt keinen vollstaendigen Benchmark-Lauf.
 - Benchmark-Vergleiche bleiben nur innerhalb desselben Semantikfensters gueltig. Matchstart, Portale, Gates, Items, Shield, Observation-Schema, Action-Invarianten, Reward-Shaping und Validation-Matrix sind Benchmark-relevante Driftfelder.
-- Promotion bleibt manuell und verlangt drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters mit positivem Median-Delta statt Einzelrun-Gewinn.
+- Promotion bleibt manuell; die historische BT80C-Regel verlangte drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters, der PPO-Pfad ab BT94B verlangt fuer `promote` die haertere fuenf-Pass-Regel aus der operativen Aktualisierung.
 - High-Util-Profile werden erst nach dokumentierten Runbooks fuer Start, Resume, Pause, Stop, Recovery und Rollback als normaler Betrieb betrachtet.
 
 ## Zielkorridor bis Q2-Ende
@@ -79,7 +96,7 @@ Aktueller Laufstand:
 | C3 | 2026-03-27 bis 2026-03-31 | Safety-Policy + Risk-Gates | `avgStepsPerEpisode>=155`, no gate regressions |
 | C4 | 2026-04-01 bis 2026-04-10 | Curriculum (einfach->mittel->voll) | `avgStepsPerEpisode>=165` |
 | C5 | 2026-04-11 bis 2026-04-25 | Replay-Priorisierung + Hyperparameter | `avgStepsPerEpisode>=175`, `averageBotSurvival>=40` |
-| C6 | 2026-04-26 bis 2026-06-30 | Haertung + Regression-Schutz | Q2 Zielkorridor erreicht |
+| C6 | 2026-04-26 bis 2026-06-30 | Root-Cause-Reparatur, Statistik, PPO-Validate und spaeterer Rollout-Schutz | Q2 Zielkorridor nur nach BT93M-P, BT94A/B und gruener PPO-Validate belastbar |
 
 ## Roadmap-Phasen
 
@@ -134,8 +151,8 @@ Aktueller Laufstand:
 ## Promotion- und Rollback-Regeln
 
 Promotion (neues Setting wird Standard), wenn alle Punkte wahr sind:
-- 3 vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters mit `gate.ok=true`
-- `bot:validate` ist in allen 3 Laeufen vorhanden und nicht als `validation-disabled` / `artifact-missing` klassifiziert
+- Fuer den PPO-Pfad ab `BT94B`: mindestens 5 vollstaendige gueltige Kandidatenpaesse derselben Lane und desselben Semantikfensters mit `gate.ok=true`; 3 Paesse sind nur Zwischenurteil.
+- PPO-Validate ist in allen gueltigen PPO-Paessen vorhanden und nicht als `validation-disabled`, `artifact-missing`, `ppo-validate-missing` oder `ppo-validate-blocked` klassifiziert
 - Median-Delta in `averageBotSurvival` ist positiv gegen den eingefrorenen Champion
 - `forcedRoundRate=0` und `timeoutRoundRate=0` fuer die Promotionslane
 - `avgStepsPerEpisode` mindestens +5% gegen aktuelle Produktions-Baseline
