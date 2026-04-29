@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2406,
-    "rawCoveredFileCount": 1927,
+    "trackedFileCount": 2409,
+    "rawCoveredFileCount": 1930,
     "rawCoveragePercent": 80.1,
-    "adjustedTrackedFileCount": 1503,
-    "adjustedCoveredFileCount": 1268,
+    "adjustedTrackedFileCount": 1506,
+    "adjustedCoveredFileCount": 1271,
     "adjustedCoveragePercent": 84.4,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 233,
-        "coveredCount": 212
+        "count": 235,
+        "coveredCount": 214
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 876,
-        "coveredCount": 860
+        "count": 877,
+        "coveredCount": 861
       },
       {
         "classification": "product-docs",
@@ -7813,6 +7813,52 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93q/finding_register.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/hypothesis_lock.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt94a/no_start_gate.json",
       "tracked": true,
       "coveredInCore": true,
@@ -10203,6 +10249,7 @@
         "BT93N",
         "BT93O",
         "BT93P",
+        "BT93Q",
         "BT94A",
         "BT94B",
         "BT95"
@@ -13051,6 +13098,7 @@
       ],
       "scopeBlocks": [
         "BT93M",
+        "BT93O",
         "BT94A",
         "BT94B",
         "V77"
@@ -13067,9 +13115,11 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "bot-training-plan",
         "scope-files"
       ],
       "scopeBlocks": [
+        "BT93O",
         "V77"
       ],
       "surfaces": [],
@@ -15171,6 +15221,7 @@
         "BT93K",
         "BT93L",
         "BT93M",
+        "BT93Q",
         "V75",
         "V87",
         "V88",
@@ -18279,6 +18330,29 @@
         "BT93D",
         "BT93E",
         "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93q_finding_register.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
       ],
       "surfaces": [],
       "classification": "product-code",

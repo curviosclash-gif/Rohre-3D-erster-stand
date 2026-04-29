@@ -333,7 +333,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93L | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; BT94A bleibt geschlossen |
 | Bot-Codex | BT93M | 2026-04-29 | frei | abgeschlossen 2026-04-29 als `gate-fresh-dqn-anchor-blocked`; BT93N nur diagnose-only/Loader/User-Entscheid |
 | Bot-Codex | BT93N | 2026-04-29 | frei | abgeschlossen 2026-04-30 als `diagnose-loop-required`; BT93Q folgt, BT93O bleibt blockiert |
-| Bot-Codex | BT93Q | 2026-04-30 | in-bearbeitung | 93Q.1 Befundregister und Hypothesen-Lock |
+| Bot-Codex | BT93Q | 2026-04-30 | in-bearbeitung | naechste Subphase 93Q.2 Trace-Reanalyse |
 | - | BT93O | - | frei | wartet auf BT93Q.99 |
 | - | BT93P | - | frei | wartet auf BT93O.99 |
 | - | BT94A | - | frei | wartet auf `BT93P.4=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
@@ -847,7 +847,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93L | Objective-Reachability und Survival-Task-Definition | completed | P1 | BT93K.99 (`diagnose-loop-required`) + Diagnosebericht 2026-04-28 | 93L.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` |
 | BT93M | Gate-Wahrheit und DQN-Same-Matrix-Anker | completed | P1 | BT93L.99 (`diagnose-loop-required`) + User-Intake 2026-04-29 | 93M.99 abgeschlossen: `gate-fresh-dqn-anchor-blocked` | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93N | DeathBefore60-Stability und Terminal-Root-Cause | completed | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.99 abgeschlossen; `diagnose-loop-required`, BT93Q ist naechster Repair, BT93O/BT94A bleiben blockiert | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
-| BT93Q | DeathBefore60 Wall/Trail Policy Repair | active | P1 | BT93N.99 (`diagnose-loop-required`, `death-before60-still-blocking`) | 93Q.1 | `docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md` |
+| BT93Q | DeathBefore60 Wall/Trail Policy Repair | active | P1 | BT93N.99 (`diagnose-loop-required`, `death-before60-still-blocking`) | 93Q.2 | `docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md` |
 | BT93O | Action-/Objective-Quality und Anti-Plateau | planned | P2 | BT93Q.99 `walltrail-policy-green` oder DeathBefore60 non-blocking | 93O.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93P | PPO Trainingsleiter und BT94A-Reentry-Gate | planned | P2 | BT93O.99 + gruene Action-/Objective-/Anti-Plateau-Gates | 93P.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93P.4 (`BT94A-ready`) + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
@@ -3273,7 +3273,7 @@ Primaerer Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 `finding_register.json` uebernimmt alle Befunde B.01 bis B.09 aus dem Intake mit Quelle, Feldwert, Blockwirkung und erlaubter naechster Aktion.
+- [x] DoD.1 `finding_register.json` uebernimmt alle Befunde B.01 bis B.09 aus dem Intake mit Quelle, Feldwert, Blockwirkung und erlaubter naechster Aktion. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_finding_register.py --write-report` -> `data/training/ppo/bt93q/finding_register.json`)
 - [ ] DoD.2 `trace_reanalysis_report.json` trennt Early-Death, spaete Player-Dead-Controls, Wall-/Trail-Naehesignale, Safety-Diagnostik, Action-Tails und Reward-Tails.
 - [ ] DoD.3 `policy_collapse_report.json` beweist oder widerlegt den deterministischen `yaw-right`-Collapse gegen Stochastic-/Eval-Mode, Logit-/Entropy-Snapshot und Action-Distribution.
 - [ ] DoD.4 `walltrail_scenario_manifest.json` pinnt mehrere kleine Szenarioklassen mit Seeds, Startzustand, erwarteter Escape-Wirkung, Abbruchkriterium, Positiv- und Negativkontrolle.
@@ -3291,10 +3291,10 @@ Primaerer Scope:
 
 ### 93Q.1 Befundregister und Hypothesen-Lock
 
-- [ ] 93Q.1.1 `bt93q_finding_register.py` erstellt `data/training/ppo/bt93q/finding_register.json` aus BT93L/BT93M/BT93N/BT94A-Artefakten.
-- [ ] 93Q.1.2 Jeder Befund B.01 bis B.09 bekommt `sourcePath`, `field`, `observedValue`, `blockEffect`, `allowedFixClasses`, `forbiddenActions`.
-- [ ] 93Q.1.3 `hypothesis_lock.json` pinnt H1-H7 vor jedem Fix; BT93Q darf keine Hypothese nachtraeglich umdeuten.
-- [ ] 93Q.1.4 `next_allowed_actions` nennt nur Diagnose-/Repair-Aktionen und blockiert `BT93O`, `BT93P`, `BT94A`, Candidate, Freeze, Holdout, Promote, Rollout.
+- [x] 93Q.1.1 `bt93q_finding_register.py` erstellt `data/training/ppo/bt93q/finding_register.json` aus BT93L/BT93M/BT93N/BT94A-Artefakten. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_finding_register.py --write-report` -> `data/training/ppo/bt93q/finding_register.json`)
+- [x] 93Q.1.2 Jeder Befund B.01 bis B.09 bekommt `sourcePath`, `field`, `observedValue`, `blockEffect`, `allowedFixClasses`, `forbiddenActions`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_finding_register.py --write-report` -> `data/training/ppo/bt93q/finding_register.json`)
+- [x] 93Q.1.3 `hypothesis_lock.json` pinnt H1-H7 vor jedem Fix; BT93Q darf keine Hypothese nachtraeglich umdeuten. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_finding_register.py --write-report` -> `data/training/ppo/bt93q/hypothesis_lock.json`)
+- [x] 93Q.1.4 `next_allowed_actions` nennt nur Diagnose-/Repair-Aktionen und blockiert `BT93O`, `BT93P`, `BT94A`, Candidate, Freeze, Holdout, Promote, Rollout. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_finding_register.py --write-report` -> `data/training/ppo/bt93q/finding_register.json`)
 
 Pflicht-Evidence:
 
