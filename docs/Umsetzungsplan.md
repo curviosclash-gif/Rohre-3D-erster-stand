@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
 Stand: 2026-04-29. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). V98 abgeschlossen 2026-04-24 (98.99 Abschluss-Gate gruen). V101 abgeschlossen 2026-04-24 (101.99 Abschluss-Gate gruen). V103 abgeschlossen 2026-04-26 (103.99 Abschluss-Gate gruen). V75 abgeschlossen 2026-04-27 (75.99 Abschluss-Gate gruen). V76 abgeschlossen 2026-04-27 (76.99 Abschluss-Gate gruen). V104 als geplanter Architekturblock aufgenommen 2026-04-28. Deep-Audit 2026-04-22 verankerte Follow-up-Pakete als P32-P38 im Backlog; Deep-Code-Analyse 2026-04-24 ergaenzt P41-P46; Code-Review 2026-04-28 ergaenzt P47-P48 als Guard-/Typecheck-Recovery-Paket. Multiplayer-Lobby-Review 2026-04-28 erweitert `V99` um P49-P52 fuer Ready-/Delivery-/Disconnect-Truthfulness. Neuer Intake-Entwurf `V107` (kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer) wurde am 2026-04-29 unter `docs/plaene/neu/` angelegt. Verbleibende Intake-Drafts liegen in `docs/plaene/neu/` (V99, V100, V102, V105, V107).
+V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). V98 abgeschlossen 2026-04-24 (98.99 Abschluss-Gate gruen). V101 abgeschlossen 2026-04-24 (101.99 Abschluss-Gate gruen). V103 abgeschlossen 2026-04-26 (103.99 Abschluss-Gate gruen). V75 abgeschlossen 2026-04-27 (75.99 Abschluss-Gate gruen). V76 abgeschlossen 2026-04-27 (76.99 Abschluss-Gate gruen). V104 als geplanter Architekturblock aufgenommen 2026-04-28. Deep-Audit 2026-04-22 verankerte Follow-up-Pakete als P32-P38 im Backlog; Deep-Code-Analyse 2026-04-24 ergaenzt P41-P46; Code-Review 2026-04-28 ergaenzt P47-P48 als Guard-/Typecheck-Recovery-Paket. Multiplayer-Lobby-Review 2026-04-28 erweitert `V99` um P49-P52 fuer Ready-/Delivery-/Disconnect-Truthfulness. Neuer Intake-Entwurf `V107` (kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer) wurde am 2026-04-29 unter `docs/plaene/neu/` angelegt. V107 wurde am 2026-04-29 inhaltlich auf einen konkreten Toolchain-Zuschnitt geschaerft: bestehender JSON-Build (`graph:build/check/query`) bleibt Basis, zusaetzlich Neo4j-Sync/Abfragen, regelbasierte Dedupe-/Entity-Resolution, optionale LLM-Kanten-Extraktion als zweiter Pass und erweiterte Coverage-/Qualitaetsregeln. V107 ist fuer die naechste Ausbaustufe explizit semantik-first ausgerichtet (entitaetszentrierte `entity -> relation -> entity`-Modellierung fuer spielnahe Diagnosen) und umfasst zusaetzlich einen leichten lokalen read-only Viewer fuer Filter-/Pfadnavigation auf dem Graphen. Verbleibende Intake-Drafts liegen in `docs/plaene/neu/` (V99, V100, V102, V105, V107).
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -9,6 +9,7 @@ Neue oder geaenderte Intake-Entwuerfe entstehen weiter unter `docs/plaene/neu/`.
 Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 Aktuelle Intake-Drafts aus den Audits 2026-04-10 bis 2026-04-29: `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` (Vorschlag V90), `docs/plaene/neu/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md` (Vorschlag V99), `docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md` (Vorschlag V100), `docs/plaene/neu/Feature_Security_Runtime_Contract_Hardening_V102.md` (Vorschlag V102), `docs/plaene/neu/Feature_Architecture_Guard_Typecheck_Regression_Recovery_V105.md` (Vorschlag V105), `docs/plaene/neu/Feature_Kompletter_Spielwissensgraph_V107.md` (Vorschlag V107). `V101` wurde in den aktiven Block `docs/plaene/aktiv/V101.md` uebernommen und abgeschlossen.
+Delta-Auditplan (nur Restarbeit ausserhalb der bereits zugeordneten Bloecke `V99`/`V102`/`V104`/`V105`): `docs/qa/Spielaudit_2026-04-28/Audit_Umsetzungsplan_B01-B13.md`.
 
 ## Externe Planquelle: Bot-Training
 
@@ -43,6 +44,8 @@ Nur Abschluesse, die formal `done` sind, aber vor Archivierung noch einen expliz
 
 ### Aktive und geplante Bloecke
 
+Hinweis: Diese Tabelle zeigt nur bereits in `docs/plaene/aktiv/` uebernommene Bloecke. Intake-Entwuerfe in `docs/plaene/neu/` (z. B. `V99`, `V100`, `V102`, `V105`, `V107`) werden erst nach Uebernahme hier gefuehrt.
+
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V104 | Runtime- und UI-God-Object-Sunset mit Port-Zuschnitt | planned | P2 | frei | V92.99,V103.99 | 104.1 | `docs/plaene/aktiv/V104.md` |
@@ -75,9 +78,6 @@ Nur Abschluesse, die formal `done` sind, aber vor Archivierung noch einen expliz
 | V101 | V98.99 | hard | ja | V101 schliesst Typecheck-/Lint-/Contract-Hardening auf der V98-Resolverbasis ohne neue Guard-Verletzungen |
 | V104 | V92.99 | hard | ja | V92 liefert Ownership-, Snapshot- und Legacy-Surface-Ratchet als verbindliche Baseline fuer weiteren Alias- und Port-Abbau |
 | V104 | V103.99 | hard | ja | V103 liefert den schmalen Settings-Persistenz- und Mutationspfad, damit UI-Splits keine neuen Store-Bypaesse reaktivieren |
-| V107 | V94.99 | hard | ja | V94 liefert den bestehenden Wissensgraph-, Schema- und Check-Pfad als verbindliche Baseline fuer die mehrschichtige Spielgraph-Erweiterung |
-| V107 | V104.99 | soft | nein | Runtime-/UI-Port-Zuschnitt kann die Runtime-System-Modellierung vereinfachen, blockiert den Start des Graph-Ausbaus aber nicht |
-| V107 | V105.99 | soft | nein | Guard-/Typecheck-Recovery reduziert Mapping-Drift in Runtime-/Contract-Pfaden, ist jedoch kein harter Startblocker |
 
 ## Lock-Status
 
@@ -97,14 +97,14 @@ Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in 
 | - | V64 | 2026-04-18 | closed | Abgeschlossen 2026-04-18 |
 | - | V75 | 2026-04-27 | closed | Abgeschlossen 2026-04-27 |
 | - | V76 | 2026-04-27 | closed | Abgeschlossen 2026-04-27 |
-| - | V82 | - | frei | Siehe docs/lock-status/ |
-| - | V81 | - | frei | Siehe docs/lock-status/ |
-| - | V86 | - | frei | Siehe docs/lock-status/ |
-| - | V94 | - | frei | Siehe docs/lock-status/ |
-| - | V95 | - | frei | Siehe docs/lock-status/ |
-| - | V97 | - | frei | Siehe docs/lock-status/ |
-| - | V98 | - | frei | Siehe docs/lock-status/ |
-| - | V103 | - | frei | Siehe docs/lock-status/ |
+| - | V82 | - | closed | Abgeschlossen 2026-04-20 |
+| - | V81 | - | closed | Abgeschlossen (siehe V81.99 / docs/lock-status/) |
+| - | V86 | - | closed | Abgeschlossen 2026-04-20 |
+| - | V94 | - | closed | Abgeschlossen (siehe V94.99 / docs/lock-status/) |
+| - | V95 | - | closed | Abgeschlossen (siehe V95.99 / docs/lock-status/) |
+| - | V97 | - | closed | Abgeschlossen 2026-04-20 |
+| - | V98 | - | closed | Abgeschlossen 2026-04-24 |
+| - | V103 | - | closed | Abgeschlossen 2026-04-26 |
 | - | V101 | - | closed | Abgeschlossen 2026-04-24 |
 | - | V104 | - | frei | Siehe docs/lock-status/ |
 
@@ -117,7 +117,7 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 1. `V99` (Signaling/LAN/Connectivity-Hardening inkl. Lobby-Truthfulness-/Disconnect-Delta) als naechsten Intake-Prioritaetsblock uebernehmen.
 2. Danach `V100` (Runtime-Rebuild/Remount/StartSync) nachziehen.
 3. Danach `V104` (nachhaltiger God-Object-Sunset und UI-Port-Zuschnitt) einschieben.
-4. Danach `V107` (kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer) uebernehmen.
+4. Danach `V107` (kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer; JSON-Core + Neo4j-Sync + Query-/Coverage-Hardening) uebernehmen.
 5. Danach `V102` (Security-/Runtime-/Contract-Hardening aus Deep-Code-Analyse) uebernehmen.
 6. Danach `V105` (Architecture-Guard- und Typecheck-Regression-Recovery aus Code-Review 2026-04-28) als gruensichernden Recovery-Block nachziehen.
 
@@ -171,6 +171,7 @@ Offene Zuordnung fuer die naechsten Folgebloecke:
 - `V102`: `P41` bis `P46`
 - `V105`: `P47` bis `P48`
 - Eigenstaendig oder spaeterer Produkt-/Infra-Follow-up: `P6`, `P7`, `P12`, `P14`, `P22` bis `P31`
+- Delta-Folgearbeit aus Spielaudit B01-B13 (ohne Doppelung zu `V99`/`V102`/`V104`/`V105`): `docs/qa/Spielaudit_2026-04-28/Audit_Umsetzungsplan_B01-B13.md` (D1-D6).
 
 | ID | Datei(en) | Problem | Schwere |
 | --- | --- | --- | --- |
