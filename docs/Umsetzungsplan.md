@@ -75,9 +75,6 @@ Nur Abschluesse, die formal `done` sind, aber vor Archivierung noch einen expliz
 | V101 | V98.99 | hard | ja | V101 schliesst Typecheck-/Lint-/Contract-Hardening auf der V98-Resolverbasis ohne neue Guard-Verletzungen |
 | V104 | V92.99 | hard | ja | V92 liefert Ownership-, Snapshot- und Legacy-Surface-Ratchet als verbindliche Baseline fuer weiteren Alias- und Port-Abbau |
 | V104 | V103.99 | hard | ja | V103 liefert den schmalen Settings-Persistenz- und Mutationspfad, damit UI-Splits keine neuen Store-Bypaesse reaktivieren |
-| V107 | V94.99 | hard | ja | V94 liefert den bestehenden Wissensgraph-, Schema- und Check-Pfad als verbindliche Baseline fuer die mehrschichtige Spielgraph-Erweiterung |
-| V107 | V104.99 | soft | nein | Runtime-/UI-Port-Zuschnitt kann die Runtime-System-Modellierung vereinfachen, blockiert den Start des Graph-Ausbaus aber nicht |
-| V107 | V105.99 | soft | nein | Guard-/Typecheck-Recovery reduziert Mapping-Drift in Runtime-/Contract-Pfaden, ist jedoch kein harter Startblocker |
 
 ## Lock-Status
 
