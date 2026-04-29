@@ -1,0 +1,382 @@
+{
+  "allowedNextActions": [
+    "BT93M.2 same-matrix DQN anchor load/loader-blocker diagnosis",
+    "BT93M.3 comparator/no-start refresh after anchor decision",
+    "record fresh red gate status"
+  ],
+  "blockId": "BT93M",
+  "currentHandoverSource": {
+    "blockId": "BT93M",
+    "fresh": true,
+    "phaseId": "93M.1",
+    "resultClass": "start-truth-pinned-red",
+    "resultField": "resultClass",
+    "sourceArtifact": "data/training/ppo/bt93m/start_truth.json"
+  },
+  "forbiddenActions": [
+    "PPO longrun",
+    "baseline claim",
+    "BT94A candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "PPO-Validate or promote signal",
+    "runtime rollout or JS inference integration"
+  ],
+  "generatedAt": "2026-04-29T16:43:27Z",
+  "generatedBy": "python/scripts/bt93m_start_truth.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "f9020806530ab0a0031461b3653a18300753357b"
+  },
+  "guardrails": {
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "noGoSignals": [
+    {
+      "effect": "50k extension and BT94A-ready remain blocked.",
+      "id": "death-before60-still-open",
+      "observed": 1
+    },
+    {
+      "effect": "No further PPO longrun from BT93L/BT93M.1.",
+      "id": "extension50k-disallowed",
+      "observed": false
+    },
+    {
+      "effect": "BT93M.2 must load a DQN anchor or document a concrete blocker/decision.",
+      "id": "same-matrix-dqn-anchor-missing",
+      "observed": false
+    },
+    {
+      "effect": "No BT94A claim, candidate run, freeze, promote, rollout, or BT95 handoff.",
+      "id": "bt94a-no-start-red",
+      "observed": {
+        "bt94aBlockerCount": 4,
+        "candidateRunsAllowed": false,
+        "claimable": false,
+        "matrixDefinitionAllowed": false,
+        "precomparisonResultClass": "ppo-regression"
+      }
+    }
+  ],
+  "ok": true,
+  "phaseCoverage": {
+    "93M.1.1": true,
+    "93M.1.4": true,
+    "93M.1.5": true
+  },
+  "phaseId": "93M.1",
+  "resultClass": "start-truth-pinned-red",
+  "schemaVersion": "bt93m-start-truth-v1",
+  "sourceArtifacts": {
+    "bt93jPostLongrunDecision": {
+      "blockId": "BT93J",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93j/post_longrun_decision_report.json",
+      "phaseId": "93J.7.1",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93J red post-longrun decision",
+      "sha256": "8ce6a9e37743c7303f08522cd225eaf3392618eb112efb384c17731d2689ee85"
+    },
+    "bt93jUserOwnedLongrun": {
+      "blockId": "BT93J",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93j/user_owned_1m_longrun_report.json",
+      "phaseId": "93J.5c",
+      "resultClass": "reward-still-blocking",
+      "role": "BT93J 1M user-owned diagnostic longrun",
+      "sha256": "239fb23a15b0bba92f86ddccbf1d141d4ce162860092afc6a6de4220b4baa9a0"
+    },
+    "bt93kHandover": {
+      "blockId": "BT93K",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93k/handover_package.json",
+      "phaseId": "93K.7",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93K diagnose-loop-required handover",
+      "sha256": "382b45a5bac869359e736b0cb4eec1537625ea5a057d5d79ccdf55b9bd7a6a94"
+    },
+    "bt93lBaselineMatrix": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L baseline matrix",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013"
+    },
+    "bt93lClosureGate": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/closure_gate_report.json",
+      "phaseId": "93L.99",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93L closure gate",
+      "sha256": "6421c68c52c7505f7f3ae59ff38d9ac1ca99b5dd9321d107ac25e91525e3ea6f"
+    },
+    "bt93lHandover": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/handover_package.json",
+      "phaseId": "93L.7",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93L handover",
+      "sha256": "de967b8dbe18facfc9cef40af5bef3fc9c5d69a9db31c50e1dcb404011ee6e5f"
+    },
+    "bt93lMicroPpoSignal": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/micro_ppo_signal_report.json",
+      "phaseId": "93L.6",
+      "resultClass": "signal-green",
+      "role": "BT93L micro PPO signal",
+      "sha256": "01912b85c4ad39ef9b4f92d28f19ee29f27ab85670ba451cb7551a679fa74f34"
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "candidateRunsAllowed": false,
+      "claimable": false,
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "matrixDefinitionAllowed": false,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A no-start gate",
+      "sha256": "2996d8f344c810515ed1527b50ea9b336676cefd1c0be360a8587a0efd8c3f6a"
+    }
+  },
+  "statusTruth": {
+    "BT93J": {
+      "longrunResultClass": "reward-still-blocking",
+      "phase93J6Allowed": false,
+      "resultClass": "diagnose-loop-required",
+      "survivalOutcome": {
+        "avgStepsPerEpisodeObserved": 166.866667,
+        "deathCauseCounts": {
+          "player-dead": 3
+        },
+        "deltaVsDqnAnchor": 49.341667,
+        "deltaVsStartAvgSteps": 94.033334,
+        "longestEpisode": 180,
+        "maxStepEpisodes": 12,
+        "naturalTerminalCount": 0,
+        "playerDeadOnly": true,
+        "terminalDiversified": false,
+        "terminalReasonCounts": {
+          "player-dead": 3
+        }
+      }
+    },
+    "BT93K": {
+      "bt94aHandover": {
+        "candidateFreezeAllowed": false,
+        "candidateRunsAllowed": false,
+        "claimable": false,
+        "gate": "closed-diagnose-loop-required-by-bt93k",
+        "matrixDefinitionAllowed": false,
+        "ready": false,
+        "reason": "BT93K did not produce BT94A-ready evidence; signal-gated ladder stays diagnostic."
+      },
+      "resultClass": "diagnose-loop-required",
+      "signalGate": {
+        "actionSafetyGreen": true,
+        "avgStepsNonRegression": false,
+        "avgStepsPerEpisodeObserved": 78.015625,
+        "blockedReasons": [
+          "avgStepsPerEpisodeObserved regressed against pinned start matrix"
+        ],
+        "deathBefore60ImprovedBy20Pct": true,
+        "deathBefore60RequiredAtOrBelow": 0.053334,
+        "deathBefore60Share": 0.03125,
+        "longerRunAllowed": false,
+        "longerRunAllowedBySignalContract": true,
+        "maxStepOnlyPlateau": false,
+        "naturalTerminalSharePositive": false,
+        "objectiveSignalNonZero": false,
+        "progressSignalNonZero": false,
+        "startAvgStepsPerEpisode": 166.866667,
+        "technicalOk": true
+      }
+    },
+    "BT93L": {
+      "baselineMatrixResultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "blockers": [
+        {
+          "blocks": [
+            "50k extension",
+            "BT94A-ready"
+          ],
+          "evidence": "micro_ppo_signal_report.json has train deathBefore60Count > 0",
+          "id": "BT93L.DEATH_BEFORE_60"
+        },
+        {
+          "blocks": [
+            "longer micro signal confirmation",
+            "BT94A-ready"
+          ],
+          "evidence": "micro_ppo_signal_report.json decision.extension50kAllowed=false",
+          "id": "BT93L.50K_EXTENSION_BLOCKED"
+        },
+        {
+          "blocks": [
+            "BT94A comparison",
+            "candidate/freeze claim"
+          ],
+          "evidence": "baseline_matrix_report.json has sameMatrixDqnAnchorPresent=false",
+          "id": "BT93L.DQN_SAME_MATRIX_ANCHOR_MISSING"
+        },
+        {
+          "blocks": [
+            "94A.1 claim"
+          ],
+          "evidence": "data/training/ppo/bt94a/no_start_gate.json remains claimable=false",
+          "id": "BT94A.NO_START_GATE_STILL_RED"
+        }
+      ],
+      "closureResultClass": "diagnose-loop-required",
+      "extension50kAllowed": false,
+      "handoverResultClass": "diagnose-loop-required",
+      "microPpoResultClass": "signal-green",
+      "sameMatrixDqnAnchorPresent": false,
+      "trainDeathBefore60Count": 1
+    },
+    "BT94A": {
+      "bt94aBlockerCount": 4,
+      "candidateFreezeAllowed": false,
+      "candidateRunsAllowed": false,
+      "claimable": false,
+      "currentHandoverSource": {
+        "blockId": "BT93M",
+        "detectedBt93cInputSource": {
+          "blockId": "BT93I",
+          "fallbackUsed": false,
+          "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+          "phaseId": "93I.5",
+          "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+        },
+        "expected": {
+          "blockId": "BT93M",
+          "reason": "BT93M start_truth.json exists and supersedes older repair handover sources for gate freshness.",
+          "sourceArtifact": "data/training/ppo/bt93m/start_truth.json"
+        },
+        "fallbackUsed": false,
+        "fresh": true,
+        "generatedBy": "python/scripts/bt93m_start_truth.py",
+        "phaseId": "93M.1",
+        "sourceArtifact": "data/training/ppo/bt93m/start_truth.json",
+        "sourceState": {
+          "blockId": "BT93M",
+          "bt94aClaimAllowed": null,
+          "bt94aReady": null,
+          "candidateRunsAllowed": null,
+          "generatedBy": "python/scripts/bt93m_start_truth.py",
+          "matrixDefinitionAllowed": null,
+          "path": "data/training/ppo/bt93m/start_truth.json",
+          "phaseId": "93M.1",
+          "resultClass": "start-truth-pinned-red",
+          "sha256": "b70575ca79d993d0f7eb5c038ca6149128dff5220f2af61d0da009a90790b92f"
+        },
+        "supersedesDetectedSource": {
+          "blockId": "BT93I",
+          "fallbackUsed": false,
+          "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+          "phaseId": "93I.5",
+          "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+        }
+      },
+      "matrixDefinitionAllowed": false,
+      "noStartReason": "BT93I still has red start evidence; BT94A remains closed.",
+      "noStartStatus": "BT94A remains closed before 94A.1",
+      "precomparisonResultClass": "ppo-regression",
+      "remainingBt94aGates": [
+        "F.05",
+        "F.19",
+        "F.27",
+        "F.31"
+      ],
+      "resultClass": "blocked-no-start"
+    }
+  },
+  "v101AuthoritySchemaFollowup": {
+    "checkedSurfaces": [
+      "src/state/training/TrainingDomain.js",
+      "src/entities/ai/ObservationBridgePolicy.js",
+      "src/entities/ai/observation/RuntimeNearObservationAdapter.js",
+      "src/entities/ai/hybrid/HybridDecisionArchitecture.js",
+      "src/core/RuntimeConfig.js",
+      "src/entities/ai/BotPolicyRegistry.js",
+      "src/entities/ai/BotPolicyTypes.js",
+      "src/entities/ai/inference/LocalDqnInference.js",
+      "src/state/training/RewardCalculator.js",
+      "src/entities/ai/training/TrainingContractV1.js",
+      "src/entities/ai/training/TrainerPayloadAdapter.js"
+    ],
+    "missingContractSurfaces": [],
+    "productiveRuntimeDirtyPaths": [],
+    "resultClass": "no-ppo-contract-drift",
+    "rules": {
+      "productiveRuntimeSurfacesReadOnly": true,
+      "runtimeAiHubRegistryRolloutSurfacesTouched": false,
+      "v101FollowupRequiredWhenDrift": false
+    },
+    "sourceArtifacts": {
+      "aiArchitectureContext": {
+        "closureCapable": true,
+        "exists": true,
+        "isFile": true,
+        "path": "docs/referenz/ai_architecture_context.md",
+        "role": "authoritative BT90-BT95 layer context",
+        "sha256": "98126b0cc5269aaea3dc1054f3a397d224bd61ecc076aa5e8b765f824975bf73"
+      },
+      "authoritySnapshot": {
+        "closureCapable": true,
+        "exists": true,
+        "isFile": true,
+        "path": "python/bridge/authority_snapshot.py",
+        "role": "Python read-only authority snapshot",
+        "sha256": "c213d444cbbc23a2abfa6a54a31bb5956f1ff9c92e3b38cb539b99533906ad83"
+      },
+      "v101Plan": {
+        "closureCapable": true,
+        "exists": true,
+        "isFile": true,
+        "path": "docs/plaene/aktiv/V101.md",
+        "role": "closed V101 contract-hardening plan",
+        "sha256": "21cb72cc485c7b8db8adbf2886ed6eb4eab170a34ccfc9882a0c9f493771ac74"
+      }
+    }
+  }
+}

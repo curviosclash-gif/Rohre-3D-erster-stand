@@ -1,0 +1,119 @@
+{
+  "blockId": "BT93M",
+  "generatedAt": "2026-04-29T16:43:27Z",
+  "generatedBy": "python/scripts/bt93m_start_truth.py",
+  "nextAllowedUse": [
+    "reference as quarantined context",
+    "exclude from closure, baseline, candidate, holdout, freeze, promote, and validate claims"
+  ],
+  "ok": true,
+  "phaseCoverage": {
+    "93M.1.4": true
+  },
+  "phaseId": "93M.1.4",
+  "quarantineClass": "diagnostic-context-only",
+  "quarantinedEvidence": {
+    "historicalDqnReports": {
+      "invalidAs": [
+        "same-matrix DQN anchor",
+        "PPO survival baseline",
+        "candidate/freeze evidence",
+        "BT94A opening evidence"
+      ],
+      "reason": "Historical reports are not same-matrix DQN anchors for the BT93L/BT93M matrix.",
+      "status": "context-only",
+      "validAs": [
+        "historical context"
+      ]
+    },
+    "userOwned3m4EnvSideLane": {
+      "invalidAs": [
+        "closure evidence",
+        "baseline",
+        "candidate",
+        "freeze",
+        "holdout",
+        "promote",
+        "PPO-Validate",
+        "BT94A-ready"
+      ],
+      "reason": "User-owned 3M/4-env traces lack final runner report, controlled BT93M run kind, freeze-holdout lineage, and PPO-Validate/candidate binding.",
+      "status": "quarantined",
+      "validAs": [
+        "diagnostic context"
+      ]
+    }
+  },
+  "resultClass": "evidence-quarantine-pinned",
+  "schemaVersion": "bt93m-evidence-quarantine-v1",
+  "sourceArtifacts": {
+    "historicalBotValidation": {
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "path": "data/bot_validation_report.json",
+      "role": "historical DQN/bot validation context",
+      "sha256": "e7808327e12ec1332f2ab6906cfd3b5a1360871fb0a4c6f64dbb7112b50aea57"
+    },
+    "historicalPerformanceBaseline": {
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "path": "data/performance_ki_baseline_report.json",
+      "role": "historical performance baseline context",
+      "sha256": "2aabae2661ac5303752d175d22e18ff8fa8b3aca336305cddc0948726172935e"
+    },
+    "userOwned3m4EnvConfig": {
+      "blockId": "BT93J",
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "path": "python/configs/ppo_user_owned_survival_3m_4env_longrun.json",
+      "phaseId": "93J.5b",
+      "role": "user-owned 3M/4-env config, diagnostic only",
+      "sha256": "fcc379dc24348320f189053ae31b701c48d6bdbcf36a59a2ef50653fc4eb3b58"
+    },
+    "userOwned3mConfig": {
+      "blockId": "BT93J",
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "path": "python/configs/ppo_user_owned_survival_3m_longrun.json",
+      "phaseId": "93J.5b",
+      "role": "user-owned 3M config, diagnostic only",
+      "sha256": "eaab6f881b5b5149613cad69dc8d8a9071847d6fd4d67c71f87b8348552d62be"
+    },
+    "userOwned4EnvFailureReport": {
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "path": "docs/Fehlerberichte/2026-04-27_user-owned-4env-longrun-ended-without-final-report.md",
+      "role": "quarantined user-owned 4-env failure report",
+      "sha256": "f3a298b6fc2fbacb035c812f0386b997e875aa5be41b45398e3cacb7f677fa50"
+    },
+    "userOwnedStartScript": {
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "path": "dev/scripts/start-user-owned-ppo-survival-3m-longrun.ps1",
+      "role": "manual side-lane start helper",
+      "sha256": "12e33e1fb927e307bcb0e3be723e29c5efa7544243a2ba63798c945eb817f6f7"
+    },
+    "userOwnedStopScript": {
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "path": "dev/scripts/stop-user-owned-ppo-survival-at-next-checkpoint.ps1",
+      "role": "manual side-lane stop helper",
+      "sha256": "c0bce4609d9820d417ab6219db3742a9778c3bac78c937c87518e2887927da64"
+    },
+    "userOwnedSwitchScript": {
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "path": "dev/scripts/switch-user-owned-ppo-survival-to-4env-at-next-checkpoint.ps1",
+      "role": "manual side-lane 4-env switch helper",
+      "sha256": "17fea71f37ebb5f8665a75dc2c674aaa0c4479f6c8d3f5ff3c4789b8630d6d01"
+    }
+  }
+}

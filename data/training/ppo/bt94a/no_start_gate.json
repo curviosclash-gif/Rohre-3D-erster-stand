@@ -28,6 +28,18 @@
     "handoverGate": "closed-diagnose-blocked-by-bt93i",
     "handoverReady": false,
     "handoverResultClass": "diagnose",
+    "latestSourceState": {
+      "blockId": "BT93M",
+      "bt94aClaimAllowed": null,
+      "bt94aReady": null,
+      "candidateRunsAllowed": null,
+      "generatedBy": "python/scripts/bt93m_start_truth.py",
+      "matrixDefinitionAllowed": null,
+      "path": "data/training/ppo/bt93m/start_truth.json",
+      "phaseId": "93M.1",
+      "resultClass": "start-truth-pinned-red",
+      "sha256": "8406aa83297361b4b1ffd64e2ceed863f88d8b5d3cdb3e041c08b8cabe2e2399"
+    },
     "matrixId": "bt93c-dqn-ppo-precomparison-v1",
     "modelPackage": {
       "artifactManifest": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json",
@@ -46,7 +58,14 @@
       "F.27",
       "F.31"
     ],
-    "semanticWindow": "runtime-near-headless-v1"
+    "semanticWindow": "runtime-near-headless-v1",
+    "staleInputSource": {
+      "blockId": "BT93I",
+      "fallbackUsed": false,
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "phaseId": "93I.5",
+      "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+    }
   },
   "candidateFreezeAllowed": false,
   "candidateRunsAllowed": false,
@@ -54,9 +73,21 @@
     {
       "blocksStart": false,
       "id": "current_handover_source_is_latest",
-      "observed": "BT93I",
+      "observed": "BT93M",
       "ok": true,
-      "required": "BT93I"
+      "required": "BT93M"
+    },
+    {
+      "blocksStart": true,
+      "id": "current_handover_source_allows_bt94a",
+      "observed": {
+        "blockId": "BT93M",
+        "bt94aClaimAllowed": null,
+        "bt94aReady": null,
+        "resultClass": "start-truth-pinned-red"
+      },
+      "ok": false,
+      "required": "fresh source resultClass=BT94A-ready with bt94aHandover.ready=true and claimable=true"
     },
     {
       "blocksStart": true,
@@ -89,21 +120,47 @@
   ],
   "claimable": false,
   "currentHandoverSource": {
-    "blockId": "BT93I",
-    "expected": {
+    "blockId": "BT93M",
+    "detectedBt93cInputSource": {
       "blockId": "BT93I",
-      "reason": "BT93I matrix_green_report.json exists and is the latest handover source.",
+      "fallbackUsed": false,
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "phaseId": "93I.5",
       "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+    },
+    "expected": {
+      "blockId": "BT93M",
+      "reason": "BT93M start_truth.json exists and supersedes older repair handover sources for gate freshness.",
+      "sourceArtifact": "data/training/ppo/bt93m/start_truth.json"
     },
     "fallbackUsed": false,
     "fresh": true,
-    "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
-    "phaseId": "93I.5",
-    "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+    "generatedBy": "python/scripts/bt93m_start_truth.py",
+    "phaseId": "93M.1",
+    "sourceArtifact": "data/training/ppo/bt93m/start_truth.json",
+    "sourceState": {
+      "blockId": "BT93M",
+      "bt94aClaimAllowed": null,
+      "bt94aReady": null,
+      "candidateRunsAllowed": null,
+      "generatedBy": "python/scripts/bt93m_start_truth.py",
+      "matrixDefinitionAllowed": null,
+      "path": "data/training/ppo/bt93m/start_truth.json",
+      "phaseId": "93M.1",
+      "resultClass": "start-truth-pinned-red",
+      "sha256": "8406aa83297361b4b1ffd64e2ceed863f88d8b5d3cdb3e041c08b8cabe2e2399"
+    },
+    "supersedesDetectedSource": {
+      "blockId": "BT93I",
+      "fallbackUsed": false,
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "phaseId": "93I.5",
+      "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+    }
   },
-  "generatedAt": "2026-04-25T19:23:50Z",
+  "generatedAt": "2026-04-29T16:47:51Z",
   "generatedBy": "python/scripts/bt94a_gate_check.py",
-  "gitSha": "14c90ba318df3f07936beb0445f5522e6f3f8e9a",
+  "gitSha": "f9020806530ab0a0031461b3653a18300753357b",
   "matrixDefinitionAllowed": false,
   "nextGate": {
     "fallback": "user-owned replan or return to PPO diagnosis before candidate ablations",
@@ -131,6 +188,10 @@
   "phaseId": "94A.1",
   "resultClass": "blocked-no-start",
   "sourceArtifacts": {
+    "currentHandoverSource": {
+      "path": "data/training/ppo/bt93m/start_truth.json",
+      "sha256": "8406aa83297361b4b1ffd64e2ceed863f88d8b5d3cdb3e041c08b8cabe2e2399"
+    },
     "evidenceQualityMatrix": {
       "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
       "sha256": "f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11"

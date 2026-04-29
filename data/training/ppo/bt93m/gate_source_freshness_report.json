@@ -1,0 +1,112 @@
+{
+  "blockId": "BT93M",
+  "blockedActions": [
+    "BT94A candidate run",
+    "freeze candidate",
+    "BT94B handover",
+    "promote",
+    "rollout-ready wording"
+  ],
+  "bt94aGateTruth": {
+    "bt94aBlockerCount": 4,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "matrixDefinitionAllowed": false,
+    "precomparisonResultClass": "ppo-regression",
+    "redButFresh": true
+  },
+  "currentHandoverSource": {
+    "blockId": "BT93M",
+    "detectedBt93cInputSource": {
+      "blockId": "BT93I",
+      "fallbackUsed": false,
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "phaseId": "93I.5",
+      "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+    },
+    "expected": {
+      "blockId": "BT93M",
+      "reason": "BT93M start_truth.json exists and supersedes older repair handover sources for gate freshness.",
+      "sourceArtifact": "data/training/ppo/bt93m/start_truth.json"
+    },
+    "fallbackUsed": false,
+    "fresh": true,
+    "generatedBy": "python/scripts/bt93m_start_truth.py",
+    "phaseId": "93M.1",
+    "sourceArtifact": "data/training/ppo/bt93m/start_truth.json",
+    "sourceState": {
+      "blockId": "BT93M",
+      "bt94aClaimAllowed": null,
+      "bt94aReady": null,
+      "candidateRunsAllowed": null,
+      "generatedBy": "python/scripts/bt93m_start_truth.py",
+      "matrixDefinitionAllowed": null,
+      "path": "data/training/ppo/bt93m/start_truth.json",
+      "phaseId": "93M.1",
+      "resultClass": "start-truth-pinned-red",
+      "sha256": "8406aa83297361b4b1ffd64e2ceed863f88d8b5d3cdb3e041c08b8cabe2e2399"
+    },
+    "supersedesDetectedSource": {
+      "blockId": "BT93I",
+      "fallbackUsed": false,
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "phaseId": "93I.5",
+      "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+    }
+  },
+  "expectedHandoverSource": {
+    "blockId": "BT93M",
+    "phaseId": "93M.1",
+    "resultField": "resultClass",
+    "sourceArtifact": "data/training/ppo/bt93m/start_truth.json"
+  },
+  "fresh": true,
+  "generatedAt": "2026-04-29T16:47:55Z",
+  "generatedBy": "python/scripts/bt93m_start_truth.py",
+  "nextAllowedActions": [
+    "BT93M.2 DQN same-matrix anchor diagnosis",
+    "keep BT94A closed while red raw findings remain"
+  ],
+  "noStartReason": "BT93I still has red start evidence; BT94A remains closed.",
+  "ok": true,
+  "phaseCoverage": {
+    "93M.1.2": true,
+    "93M.1.3": true,
+    "93M.1.6": true
+  },
+  "phaseId": "93M.1.3",
+  "resultClass": "gate-source-fresh-red",
+  "resultField": "start-truth-pinned-red",
+  "schemaVersion": "bt93m-gate-source-freshness-v1",
+  "sourceArtifacts": {
+    "bt93mStartTruth": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/start_truth.json",
+      "phaseId": "93M.1",
+      "resultClass": "start-truth-pinned-red",
+      "role": "BT93M.1 start truth",
+      "sha256": "8406aa83297361b4b1ffd64e2ceed863f88d8b5d3cdb3e041c08b8cabe2e2399"
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "candidateRunsAllowed": false,
+      "claimable": false,
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "matrixDefinitionAllowed": false,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A gate check after BT93M source detection",
+      "sha256": "b309ffcf4e83a6666873ea67c8428f458bbab643389ae59c28cd8f92d385bbce"
+    }
+  },
+  "staleReason": null
+}

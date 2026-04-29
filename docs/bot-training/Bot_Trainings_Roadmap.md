@@ -20,6 +20,9 @@ Aktuelle No-Go-Regeln:
 - Kein Candidate, Freeze, Promote, Rollout oder BT95-Handoff aus Diagnose-, Scaffold-, `tmp/**`-, `latest_*`-, Durchsatz- oder Drei-Run-Zwischenevidence.
 - Kein BT94A-Start ohne geloestes Reward-Ordering gegen Noop/Random/Semantic-Cycle/Scripted, Same-Matrix-DQN- oder Ersatzvergleich, Holdout-Lineage und Statistikvertrag.
 - Kein Runtime-Sunset fuer DQN ohne separaten operativen Rollout-Block mit Export/Load, JS-Inference, Registry, Latenzbudget, Rollback und PPO-Validate.
+- Kein Report-only-Fortschritt: PPO-Artefakte muessen blockierende Konsequenzen, Sampleguete, Matrix-ID, Semantikfenster, Vergleichspolitik und naechste erlaubte Aktionen maschinenlesbar schreiben.
+- Kein Fix ohne Ursache: Reward-, Action-, Terminal-, Curriculum- und Runner-Fixes werden erst nach Trace-/Stress-/Ordering-Evidence gestartet und duerfen nicht in gemischten Reparaturclaims verschwimmen.
+- Kein Q2-Zielwert ersetzt die Gates aus dem aktiven Masterplan; `avgStepsPerEpisode` und `averageBotSurvival` sind nur belastbar, wenn MaxStep-Plateau, Simple-Baseline-Paritaet, DQN-Anker, Holdout, Statistik und PPO-Validate gruen sind.
 
 ## Status-Legende
 

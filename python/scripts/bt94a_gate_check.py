@@ -19,7 +19,24 @@ PYTHON_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = PYTHON_ROOT.parent
 DEFAULT_BT93C_ROOT = REPO_ROOT / "data" / "training" / "ppo" / "bt93c"
 DEFAULT_OUTPUT = REPO_ROOT / "data" / "training" / "ppo" / "bt94a" / "no_start_gate.json"
+PPO_ROOT = REPO_ROOT / "data" / "training" / "ppo"
+BT93M_HANDOVER_SOURCE = PPO_ROOT / "bt93m" / "handover_package.json"
+BT93M_START_TRUTH_SOURCE = PPO_ROOT / "bt93m" / "start_truth.json"
+BT93L_HANDOVER_SOURCE = PPO_ROOT / "bt93l" / "handover_package.json"
 BT93I_CURRENT_SOURCE = REPO_ROOT / "data" / "training" / "ppo" / "bt93i" / "matrix_green_report.json"
+SOURCE_ORDER = {
+    "BT93C": 93.0,
+    "BT93D": 93.1,
+    "BT93E": 93.2,
+    "BT93F": 93.3,
+    "BT93G": 93.4,
+    "BT93H": 93.5,
+    "BT93I": 93.6,
+    "BT93J": 93.7,
+    "BT93K": 93.8,
+    "BT93L": 93.9,
+    "BT93M": 94.0,
+}
 
 
 def _utc_now() -> str:
@@ -36,6 +53,14 @@ def _rel(path: Path) -> str:
 
 def _read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _read_json_or_empty(path: Path) -> dict[str, Any]:
+    try:
+        payload = _read_json(path)
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
 
 
 def _write_json(path: Path, payload: Mapping[str, Any]) -> None:
@@ -67,6 +92,10 @@ def _source(path: Path) -> dict[str, str]:
         "path": _rel(path),
         "sha256": _sha256_file(path),
     }
+
+
+def _optional_source(path: Path) -> dict[str, str] | None:
+    return _source(path) if path.is_file() else None
 
 
 def _summary_value(summary: Mapping[str, Any], key: str) -> int:
@@ -135,6 +164,30 @@ def _detect_handover_source(
 
 
 def _expected_handover_source() -> dict[str, Any]:
+    candidates = [
+        (
+            "BT93M",
+            BT93M_HANDOVER_SOURCE,
+            "BT93M handover_package.json exists and supersedes older repair handover sources.",
+        ),
+        (
+            "BT93M",
+            BT93M_START_TRUTH_SOURCE,
+            "BT93M start_truth.json exists and supersedes older repair handover sources for gate freshness.",
+        ),
+        (
+            "BT93L",
+            BT93L_HANDOVER_SOURCE,
+            "BT93L handover_package.json exists and supersedes BT93I/BT93C gate sources.",
+        ),
+    ]
+    for block_id, path, reason in candidates:
+        if path.exists():
+            return {
+                "blockId": block_id,
+                "reason": reason,
+                "sourceArtifact": _rel(path),
+            }
     if BT93I_CURRENT_SOURCE.exists():
         return {
             "blockId": "BT93I",
@@ -145,6 +198,36 @@ def _expected_handover_source() -> dict[str, Any]:
         "blockId": None,
         "reason": "No newer repair-source artifact detected.",
         "sourceArtifact": None,
+    }
+
+
+def _source_rank(block_id: Any) -> float:
+    return SOURCE_ORDER.get(str(block_id), 0.0)
+
+
+def _repo_path(value: Any) -> Path | None:
+    if not value:
+        return None
+    path = Path(str(value))
+    return path.resolve() if path.is_absolute() else (REPO_ROOT / path).resolve()
+
+
+def _source_payload_summary(source: Mapping[str, Any]) -> dict[str, Any]:
+    source_path = _repo_path(source.get("sourceArtifact"))
+    payload = _read_json_or_empty(source_path) if source_path else {}
+    bt94a = payload.get("bt94aHandover") if isinstance(payload.get("bt94aHandover"), Mapping) else {}
+    decision = payload.get("decision") if isinstance(payload.get("decision"), Mapping) else {}
+    return {
+        "path": _rel(source_path) if source_path else None,
+        "sha256": _sha256_file(source_path) if source_path and source_path.is_file() else None,
+        "generatedBy": payload.get("generatedBy"),
+        "blockId": payload.get("blockId") or source.get("blockId"),
+        "phaseId": payload.get("phaseId") or source.get("phaseId"),
+        "resultClass": payload.get("resultClass"),
+        "bt94aReady": bt94a.get("ready"),
+        "bt94aClaimAllowed": bt94a.get("claimable") or decision.get("bt94aClaimAllowed"),
+        "candidateRunsAllowed": bt94a.get("candidateRunsAllowed") or decision.get("candidateRunsAllowed"),
+        "matrixDefinitionAllowed": bt94a.get("matrixDefinitionAllowed"),
     }
 
 
@@ -161,9 +244,28 @@ def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
     summary = evidence_matrix.get("summary") if isinstance(evidence_matrix.get("summary"), Mapping) else {}
     bt94a_blocker_count = _summary_value(summary, "bt94a-blocker")
     blocked_findings = _blocked_findings(evidence_matrix)
-    current_source = _detect_handover_source(handover, precomparison, evidence_matrix)
+    detected_source = _detect_handover_source(handover, precomparison, evidence_matrix)
     expected_source = _expected_handover_source()
+    expected_is_newer = _source_rank(expected_source.get("blockId")) > _source_rank(detected_source.get("blockId"))
+    current_source = (
+        {
+            "blockId": expected_source.get("blockId"),
+            "phaseId": _source_payload_summary(expected_source).get("phaseId"),
+            "sourceArtifact": expected_source.get("sourceArtifact"),
+            "generatedBy": _source_payload_summary(expected_source).get("generatedBy"),
+            "fallbackUsed": False,
+            "supersedesDetectedSource": detected_source,
+        }
+        if expected_is_newer and expected_source.get("blockId")
+        else detected_source
+    )
+    current_source_summary = _source_payload_summary(current_source)
     latest_source_ok = not expected_source["blockId"] or current_source.get("blockId") == expected_source["blockId"]
+    current_source_allows_start = bool(
+        current_source_summary.get("resultClass") == "BT94A-ready"
+        and current_source_summary.get("bt94aReady") is True
+        and current_source_summary.get("bt94aClaimAllowed") is True
+    )
 
     checks = [
         {
@@ -172,6 +274,18 @@ def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
             "observed": current_source.get("blockId"),
             "required": expected_source["blockId"] or "no newer source",
             "blocksStart": not latest_source_ok,
+        },
+        {
+            "id": "current_handover_source_allows_bt94a",
+            "ok": current_source_allows_start,
+            "observed": {
+                "blockId": current_source_summary.get("blockId"),
+                "resultClass": current_source_summary.get("resultClass"),
+                "bt94aReady": current_source_summary.get("bt94aReady"),
+                "bt94aClaimAllowed": current_source_summary.get("bt94aClaimAllowed"),
+            },
+            "required": "fresh source resultClass=BT94A-ready with bt94aHandover.ready=true and claimable=true",
+            "blocksStart": not current_source_allows_start,
         },
         {
             "id": "bt93c_result_allows_bt94a",
@@ -230,11 +344,14 @@ def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
             **current_source,
             "expected": expected_source,
             "fresh": latest_source_ok,
+            "detectedBt93cInputSource": detected_source,
+            "sourceState": current_source_summary,
         },
         "sourceArtifacts": {
             "handoverReport": _source(handover_path),
             "precomparisonReport": _source(precomparison_path),
             "evidenceQualityMatrix": _source(matrix_path),
+            "currentHandoverSource": _optional_source(_repo_path(current_source.get("sourceArtifact"))) if current_source.get("sourceArtifact") else None,
         },
         "bt93cState": {
             "handoverResultClass": handover.get("resultClass"),
@@ -257,6 +374,8 @@ def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
             "remainingBt94aGates": (handover.get("remainingGates") or {}).get("bt94a"),
             "bt94aBlockerCount": bt94a_blocker_count,
             "bt94aBlockers": blocked_findings,
+            "latestSourceState": current_source_summary,
+            "staleInputSource": detected_source if expected_is_newer else None,
         },
         "claimChecks": checks,
         "noStartDecision": {
