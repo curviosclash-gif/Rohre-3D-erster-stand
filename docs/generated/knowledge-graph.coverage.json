@@ -140,14 +140,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2401,
+    "trackedFileCount": 2402,
     "rawCoveredFileCount": 1920,
-    "rawCoveragePercent": 80,
-    "adjustedTrackedFileCount": 1498,
+    "rawCoveragePercent": 79.9,
+    "adjustedTrackedFileCount": 1499,
     "adjustedCoveredFileCount": 1261,
-    "adjustedCoveragePercent": 84.2,
-    "uncoveredFileCount": 481,
-    "uncoveredActiveFileCount": 237,
+    "adjustedCoveragePercent": 84.1,
+    "uncoveredFileCount": 482,
+    "uncoveredActiveFileCount": 238,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -194,7 +194,7 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 358,
+        "count": 359,
         "coveredCount": 172
       },
       {
@@ -11600,6 +11600,19 @@
     },
     {
       "path": "docs/Fehlerberichte/2026-04-27_v81-81.99.2-build-touched-strict-mediarecorder.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/Fehlerberichte/2026-04-29_v104-v107-graph-check-orphan-dependency.md",
       "tracked": true,
       "coveredInCore": false,
       "coveredByOverlay": false,

@@ -14,8 +14,6 @@ function noop() {}
 const RUNTIME_PORT_ADAPTER_SOURCES = Object.freeze({
     BUNDLE_COORDINATOR: 'runtime-bundle:runtimeCoordinator',
     BUNDLE_FACADE: 'runtime-bundle:runtimeFacade',
-    LEGACY_COORDINATOR: 'legacy-game-slot:runtimeCoordinator',
-    LEGACY_FACADE: 'legacy-game-slot:runtimeFacade',
     UNRESOLVED: 'unresolved',
 });
 
@@ -32,7 +30,7 @@ function getRuntimeState(game) {
 }
 
 function getMenuMultiplayerBridge(game) {
-    return getRuntimeState(game)?.menuMultiplayerBridge || game?.menuMultiplayerBridge || null;
+    return getRuntimeState(game)?.menuMultiplayerBridge || null;
 }
 
 function getRuntimeComponents(game) {
@@ -43,14 +41,29 @@ function getRuntimeComponent(game, key) {
     return getRuntimeComponents(game)?.[key] || null;
 }
 
-function getLegacyRuntimeFacade(game) { return game?.runtimeFacade || null; }
-function getLegacyRuntimeCoordinator(game) { return game?.runtimeCoordinator || null; }
-function getRuntimeFacade(game) { return getRuntimeComponent(game, 'runtimeFacade') || null; }
-function getRuntimeCoordinator(game) { return getRuntimeComponent(game, 'runtimeCoordinator') || null; }
-function getRuntimeFeatureTransitionFacade(game) { return getRuntimeFacade(game) || getLegacyRuntimeFacade(game); }
-function getRuntimeFeatureTransitionCoordinator(game) { return getRuntimeCoordinator(game) || getLegacyRuntimeCoordinator(game); }
+function getRuntimeHandle(game, key) {
+    return getSessionRuntime(game)?.handles?.[key] || null;
+}
 
-function resolveRuntimeIntentAdapter(game, methodName, { allowLegacyFallback = false } = {}) {
+function getRuntimeFacade(game) {
+    return getRuntimeHandle(game, 'runtimeFacade')
+        || getRuntimeComponent(game, 'runtimeFacade')
+        || null;
+}
+
+function getRuntimeCoordinator(game) {
+    return getRuntimeHandle(game, 'runtimeCoordinator')
+        || getRuntimeComponent(game, 'runtimeCoordinator')
+        || null;
+}
+
+function getUiManager(game) {
+    return getRuntimeHandle(game, 'uiManager')
+        || getRuntimeComponent(game, 'uiManager')
+        || null;
+}
+
+function resolveRuntimeIntentAdapter(game, methodName) {
     const coordinator = getRuntimeCoordinator(game);
     if (typeof coordinator?.[methodName] === 'function') {
         return {
@@ -66,23 +79,6 @@ function resolveRuntimeIntentAdapter(game, methodName, { allowLegacyFallback = f
         };
     }
 
-    if (allowLegacyFallback === true) {
-        const legacyCoordinator = getLegacyRuntimeCoordinator(game);
-        if (typeof legacyCoordinator?.[methodName] === 'function') {
-            return {
-                adapter: legacyCoordinator,
-                source: RUNTIME_PORT_ADAPTER_SOURCES.LEGACY_COORDINATOR,
-            };
-        }
-        const legacyFacade = getLegacyRuntimeFacade(game);
-        if (typeof legacyFacade?.[methodName] === 'function') {
-            return {
-                adapter: legacyFacade,
-                source: RUNTIME_PORT_ADAPTER_SOURCES.LEGACY_FACADE,
-            };
-        }
-    }
-
     return {
         adapter: null,
         source: RUNTIME_PORT_ADAPTER_SOURCES.UNRESOLVED,
@@ -95,7 +91,7 @@ function resolveSessionRuntimeAccess(game) {
         multiplayerTransport: getMenuMultiplayerBridge(game)?.transport || game?.settings?.localSettings?.multiplayerTransport,
     });
     const facade = getRuntimeFacade(game);
-    const runtimeSession = facade?.session || game?.session || null;
+    const runtimeSession = facade?.session || null;
     const multiplayerSessionState = getMenuMultiplayerBridge(game)?.getSessionState?.() || null;
     const hasJoinedMultiplayerSession = multiplayerSessionState?.joined === true;
 
@@ -194,7 +190,7 @@ function callRuntimeIntent(game, methodName, options = undefined) {
 export function createSettingsPort(game) {
     return {
         getSettings: () => game?.settings || null,
-        getRuntimeConfig: () => getRuntimeState(game)?.runtimeConfig || game?.runtimeConfig || null,
+        getRuntimeConfig: () => getRuntimeState(game)?.runtimeConfig || null,
         applyAutoRoll(value) {
             const checked = !!value;
             const runtimeState = getRuntimeState(game);
@@ -203,24 +199,21 @@ export function createSettingsPort(game) {
             }
             if (runtimeState?.runtimeConfig?.player) {
                 runtimeState.runtimeConfig.player.autoRoll = checked;
-                return;
-            }
-            if (game?.runtimeConfig?.player) {
-                game.runtimeConfig.player.autoRoll = checked;
             }
         },
         setBindings(bindings) {
             getRuntimeComponents(game)?.input?.setBindings?.(bindings);
         },
         syncUiByChangedKeys(changedKeys) {
+            const uiManager = getUiManager(game);
             if (Array.isArray(changedKeys) && changedKeys.length > 0) {
-                game?.uiManager?.syncByChangeKeys?.(changedKeys);
+                uiManager?.syncByChangeKeys?.(changedKeys);
                 return;
             }
-            game?.uiManager?.syncAll?.();
+            uiManager?.syncAll?.();
         },
         clearStartValidationError() {
-            game?.uiManager?.clearStartValidationError?.();
+            getUiManager(game)?.clearStartValidationError?.();
         },
     };
 }
@@ -252,9 +245,9 @@ export function createSessionPort(game) {
                 game.state = state;
             }
         },
-        getEntityManager: () => getRuntimeState(game)?.entityManager || game?.entityManager || null,
+        getEntityManager: () => getRuntimeState(game)?.entityManager || null,
         clearLastRoundGhost() {
-            const entityManager = getRuntimeState(game)?.entityManager || game?.entityManager || null;
+            const entityManager = getRuntimeState(game)?.entityManager || null;
             entityManager?.clearLastRoundGhost?.();
         },
         finalizeMatchSession(options = undefined) {
@@ -266,7 +259,7 @@ export function createSessionPort(game) {
             return this.finalizeMatchSession(options);
         },
         requestDeltaReset(reason) {
-            const gameLoop = getRuntimeComponent(game, 'gameLoop') || game?.gameLoop || null;
+            const gameLoop = getRuntimeHandle(game, 'gameLoop') || getRuntimeComponent(game, 'gameLoop') || null;
             gameLoop?.requestDeltaReset?.(reason);
         },
     };
@@ -281,7 +274,7 @@ export function createRenderPort(game) {
             getRuntimeComponents(game)?.renderer?.setShadowQuality?.(level);
         },
         syncPortalBeams(isEnabled) {
-            const arena = getRuntimeState(game)?.arena || game?.arena || null;
+            const arena = getRuntimeState(game)?.arena || null;
             arena?.toggleBeams?.(!!isEnabled);
         },
     };
@@ -293,7 +286,9 @@ export function createInputPort(game) {
             getRuntimeComponent(game, 'input')?.clearJustPressed?.();
         },
         startKeyCapture(playerKey, action) {
-            const keybindEditorController = getRuntimeComponent(game, 'keybindEditorController') || game?.keybindEditorController || null;
+            const keybindEditorController = getRuntimeHandle(game, 'keybindEditorController')
+                || getRuntimeComponent(game, 'keybindEditorController')
+                || null;
             keybindEditorController?.startKeyCapture?.(playerKey, action);
         },
         clearPlayerSources() {
@@ -412,12 +407,12 @@ export function createRuntimePorts(game) {
     const inputPort = createInputPort(game);
     const lifecyclePort = createLifecyclePort(game);
     const arcadePort = createArcadePort({
-        getRuntimeCoordinator: () => getRuntimeFeatureTransitionCoordinator(game),
-        getRuntimeFacade: () => getRuntimeFeatureTransitionFacade(game),
+        getRuntimeCoordinator: () => getRuntimeCoordinator(game),
+        getRuntimeFacade: () => getRuntimeFacade(game),
     });
     const recordingPort = createRecordingPort({
-        getRuntimeCoordinator: () => getRuntimeFeatureTransitionCoordinator(game),
-        getRuntimeFacade: () => getRuntimeFeatureTransitionFacade(game),
+        getRuntimeCoordinator: () => getRuntimeCoordinator(game),
+        getRuntimeFacade: () => getRuntimeFacade(game),
     });
     const runtimeIntentPort = createRuntimeIntentPort(game);
     const runtimeProjectionPort = createRuntimeProjectionPort(game);
