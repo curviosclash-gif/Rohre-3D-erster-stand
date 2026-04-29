@@ -13,6 +13,8 @@ import { LEVEL4_SECTION_IDS, MENU_SESSION_TYPES } from './menu/MenuStateContract
 import { MenuNavigationRuntime } from './menu/MenuNavigationRuntime.js';
 import { resolveMapPreview } from './menu/MenuPreviewCatalog.js';
 import { resolveDeveloperReleaseState } from './menu/MenuUiSyncContext.js';
+import { applyMenuChromeState } from './menu/MenuChromeStateOps.js';
+import { showStatusToast } from './menu/StatusToastOps.js';
 
 export class UINavigationLifecycleController {
     /**
@@ -148,18 +150,10 @@ export class UINavigationLifecycleController {
     }
 
     _syncMenuChromeState(panelId = this._getActiveSubmenu()) {
-        const root = this.ui.mainMenu;
-        if (!root) return;
-        const normalizedPanelId = String(panelId || '').trim();
-        const level4Open = !!this._getSettings()?.localSettings?.toolsState?.level4Open;
-        let depth = 1;
-        if (normalizedPanelId === 'submenu-custom') depth = 2;
-        if (normalizedPanelId === 'submenu-game') depth = level4Open ? 4 : 3;
-        if (normalizedPanelId === 'submenu-expert') depth = 2;
-        if (normalizedPanelId === 'submenu-developer' || normalizedPanelId === 'submenu-debug') depth = 5;
-        root.setAttribute('data-menu-depth', String(depth));
-        root.setAttribute('data-menu-panel', normalizedPanelId || 'main');
-        root.setAttribute('data-level4-open', String(level4Open));
+        applyMenuChromeState(this.ui.mainMenu, {
+            panelId,
+            level4Open: this._getSettings()?.localSettings?.toolsState?.level4Open === true,
+        });
     }
 
     // ------------------------------------------------------------------
@@ -403,21 +397,9 @@ export class UINavigationLifecycleController {
     // ------------------------------------------------------------------
 
     showToast(message, durationMsOrTone = 1200, tone = 'info') {
-        const toast = this.ui.statusToast;
-        if (!toast) return;
-        const durationMs = typeof durationMsOrTone === 'number' ? durationMsOrTone : 1200;
-        const requestedTone = typeof durationMsOrTone === 'string' ? durationMsOrTone : tone;
-        const normalizedTone = requestedTone === 'success' || requestedTone === 'error' ? requestedTone : 'info';
-        toast.textContent = message;
-        toast.classList.remove('hidden', 'show', 'toast-info', 'toast-success', 'toast-error');
-        toast.classList.add(`toast-${normalizedTone}`);
-        void toast.offsetWidth;
-        toast.classList.add('show');
         if (this._toastTimer) clearTimeout(this._toastTimer);
-        this._toastTimer = setTimeout(() => {
-            toast.classList.remove('show');
-            toast.classList.add('hidden');
-        }, durationMs);
+        const { timerId } = showStatusToast(this.ui.statusToast, message, durationMsOrTone, tone);
+        this._toastTimer = timerId;
     }
 
     // ------------------------------------------------------------------

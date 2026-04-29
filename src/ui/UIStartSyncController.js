@@ -29,12 +29,11 @@ import {
 import {
     ensureStartSetupLocalState,
     humanizePreviewCategory,
-    pushRecentEntry,
     renderPreviewCard,
     renderQuickList,
     renderSummaryBlocks,
-    toggleFavoriteEntry,
 } from './start-setup/StartSetupUiOps.js';
+import { bindStartSetupControls } from './start-setup/StartSetupControlBindings.js';
 import {
     formatStartSetupMapLabel,
     renderStartFieldHints,
@@ -164,8 +163,6 @@ export class UIStartSyncController {
         const mapFilterSelect = this.ui.mapFilterSelect;
         const vehicleSearchInput = this.ui.vehicleSearchInput;
         const vehicleFilterSelect = this.ui.vehicleFilterSelect;
-        const mapFavoriteToggleButton = this.ui.mapFavoriteToggleButton;
-        const vehicleFavoriteToggleButton = this.ui.vehicleFavoriteToggleButton;
 
         if (mapSearchInput) {
             mapSearchInput.value = startSetup.mapSearch;
@@ -204,102 +201,7 @@ export class UIStartSyncController {
             });
         }
 
-        if (this.ui.mapSelect) {
-            listen(this.ui.mapSelect, 'change', () => {
-                const currentSettings = getSettings();
-                if (!currentSettings) return;
-                const currentStartSetup = ensureStartSetupLocalState(currentSettings);
-                const selectedMapKey = String(this.ui.mapSelect.value || '').trim();
-                if (selectedMapKey) {
-                    writeHangarMapSelection(currentSettings, selectedMapKey, selectedMapKey, {
-                        modePath: this._resolveHangarSelectionModePath(currentSettings),
-                    });
-                }
-                pushRecentEntry(currentStartSetup.recentMaps, this.ui.mapSelect.value);
-            });
-        }
-        if (this.ui.vehicleSelectP1) {
-            listen(this.ui.vehicleSelectP1, 'change', () => {
-                const currentSettings = getSettings();
-                if (!currentSettings) return;
-                const currentStartSetup = ensureStartSetupLocalState(currentSettings);
-                writeHangarVehicleSelection(
-                    currentSettings,
-                    HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_1,
-                    this.ui.vehicleSelectP1.value,
-                    'ship5',
-                    { modePath: this._resolveHangarSelectionModePath(currentSettings) }
-                );
-                pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP1.value);
-            });
-        }
-        if (this.ui.vehicleSelectP2) {
-            listen(this.ui.vehicleSelectP2, 'change', () => {
-                const currentSettings = getSettings();
-                if (!currentSettings) return;
-                const currentStartSetup = ensureStartSetupLocalState(currentSettings);
-                writeHangarVehicleSelection(
-                    currentSettings,
-                    HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_2,
-                    this.ui.vehicleSelectP2.value,
-                    'ship5',
-                    { modePath: this._resolveHangarSelectionModePath(currentSettings) }
-                );
-                pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP2.value);
-            });
-        }
-
-        if (mapFavoriteToggleButton) {
-            listen(mapFavoriteToggleButton, 'click', () => {
-                const currentSettings = getSettings();
-                if (!currentSettings) return;
-                const currentStartSetup = ensureStartSetupLocalState(currentSettings);
-                toggleFavoriteEntry(currentStartSetup.favoriteMaps, this.ui.mapSelect?.value);
-                this.syncStartSetupState(currentSettings);
-            });
-        }
-        if (vehicleFavoriteToggleButton) {
-            listen(vehicleFavoriteToggleButton, 'click', () => {
-                const currentSettings = getSettings();
-                if (!currentSettings) return;
-                const currentStartSetup = ensureStartSetupLocalState(currentSettings);
-                toggleFavoriteEntry(currentStartSetup.favoriteVehicles, this.ui.vehicleSelectP1?.value);
-                this.syncStartSetupState(currentSettings);
-            });
-        }
-
-        if (this.ui.mapFavoritesList) {
-            listen(this.ui.mapFavoritesList, 'click', (event) => {
-                const button = event.target.closest('button[data-map-key]');
-                if (!button || !this.ui.mapSelect) return;
-                this.ui.mapSelect.value = button.dataset.mapKey;
-                this.ui.mapSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            });
-        }
-        if (this.ui.mapRecentList) {
-            listen(this.ui.mapRecentList, 'click', (event) => {
-                const button = event.target.closest('button[data-map-key]');
-                if (!button || !this.ui.mapSelect) return;
-                this.ui.mapSelect.value = button.dataset.mapKey;
-                this.ui.mapSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            });
-        }
-        if (this.ui.vehicleFavoritesList) {
-            listen(this.ui.vehicleFavoritesList, 'click', (event) => {
-                const button = event.target.closest('button[data-vehicle-id]');
-                if (!button || !this.ui.vehicleSelectP1) return;
-                this.ui.vehicleSelectP1.value = button.dataset.vehicleId;
-                this.ui.vehicleSelectP1.dispatchEvent(new Event('change', { bubbles: true }));
-            });
-        }
-        if (this.ui.vehicleRecentList) {
-            listen(this.ui.vehicleRecentList, 'click', (event) => {
-                const button = event.target.closest('button[data-vehicle-id]');
-                if (!button || !this.ui.vehicleSelectP1) return;
-                this.ui.vehicleSelectP1.value = button.dataset.vehicleId;
-                this.ui.vehicleSelectP1.dispatchEvent(new Event('change', { bubbles: true }));
-            });
-        }
+        bindStartSetupControls(this, listen, getSettings);
     }
 
     // ------------------------------------------------------------------

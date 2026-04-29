@@ -172,7 +172,7 @@
           "src/ui/UIStartSyncController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 62,
+          "concreteCount": 65,
           "plannedCount": 0
         }
       }
@@ -1873,7 +1873,7 @@
           "src/ui/UIStartSyncController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 73,
+          "concreteCount": 75,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2253,7 +2253,7 @@
           "src/ui/start-setup/**"
         ],
         "scopeResolution": {
-          "concreteCount": 39,
+          "concreteCount": 40,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2299,7 +2299,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 268,
+          "concreteCount": 271,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2496,7 +2496,7 @@
           "tests/persistence-version-migration.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 164,
+          "concreteCount": 166,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2742,7 +2742,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 242,
+          "concreteCount": 245,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -11517,8 +11517,8 @@
     {
       "id": "V104.3.1",
       "type": "subphase",
-      "title": "`UIManager`, `UIStartSyncController` und `UINavigationLifecycleController` auf einen gemeinsamen Menu-/Start-Snapshot sowie explizite Intent-Ports zuschneiden; direkte `this.game`-Reads, lokale Settings-Reach-Throughs und versteckte Bidirektionalitaet werden fuer den migrierten Scope entfernt.",
-      "status": "open",
+      "title": "`UIManager`, `UIStartSyncController` und `UINavigationLifecycleController` auf einen gemeinsamen Menu-/Start-Snapshot sowie explizite Intent-Ports zuschneiden; direkte `this.game`-Reads, lokale Settings-Reach-Throughs und versteckte Bidirektionalitaet werden fuer den migrierten Scope entfernt. (abgeschlossen: 2026-04-29; evidence: `Select-String -Path src/ui/UINavigationLifecycleController.js -Pattern \"manager\\\\.settings|this\\\\.manager\\\\.settings\"` -> keine Treffer + `npm run graph:build && npm run graph:check && npm run plan:check` -> `docs/generated/knowledge-graph.json` aktualisiert, graph/plan checks gruen)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.3",
@@ -39428,6 +39428,26 @@
       }
     },
     {
+      "id": "src/ui/menu/MenuChromeStateOps.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B05",
+          "V64",
+          "V77",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/ui/menu/MenuCompatibilityRules.js",
       "type": "file",
       "title": null,
@@ -40287,6 +40307,26 @@
       }
     },
     {
+      "id": "src/ui/menu/StatusToastOps.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B05",
+          "V64",
+          "V77",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/ui/menu/testing/MenuLobbyRenderer.js",
       "type": "file",
       "title": null,
@@ -40552,6 +40592,25 @@
           "B07",
           "V103",
           "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/ui/start-setup/StartSetupControlBindings.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B05",
+          "V76",
+          "V77",
           "V91"
         ],
         "exists": true
@@ -57912,6 +57971,15 @@
     },
     {
       "from": "B05",
+      "to": "src/ui/menu/MenuChromeStateOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B05",
       "to": "src/ui/menu/MenuCompatibilityRules.js",
       "type": "scope",
       "hint": null,
@@ -58290,6 +58358,15 @@
     },
     {
       "from": "B05",
+      "to": "src/ui/menu/StatusToastOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B05",
       "to": "src/ui/menu/testing/MenuLobbyRenderer.js",
       "type": "scope",
       "hint": null,
@@ -58300,6 +58377,15 @@
     {
       "from": "B05",
       "to": "src/ui/menu/testing/MenuMultiplayerPanel.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B05",
+      "to": "src/ui/start-setup/StartSetupControlBindings.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -123303,6 +123389,15 @@
     },
     {
       "from": "V64",
+      "to": "src/ui/menu/MenuChromeStateOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V64",
       "to": "src/ui/menu/MenuCompatibilityRules.js",
       "type": "scope",
       "hint": null,
@@ -123673,6 +123768,15 @@
     {
       "from": "V64",
       "to": "src/ui/menu/multiplayer/MenuMultiplayerPresence.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V64",
+      "to": "src/ui/menu/StatusToastOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -134975,6 +135079,15 @@
     },
     {
       "from": "V76",
+      "to": "src/ui/start-setup/StartSetupControlBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V76",
       "to": "src/ui/start-setup/StartSetupUiOps.js",
       "type": "scope",
       "hint": null,
@@ -137349,6 +137462,15 @@
     },
     {
       "from": "V77",
+      "to": "src/ui/menu/MenuChromeStateOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "src/ui/menu/MenuCompatibilityRules.js",
       "type": "scope",
       "hint": null,
@@ -137727,6 +137849,15 @@
     },
     {
       "from": "V77",
+      "to": "src/ui/menu/StatusToastOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "src/ui/menu/testing/MenuLobbyRenderer.js",
       "type": "scope",
       "hint": null,
@@ -137737,6 +137868,15 @@
     {
       "from": "V77",
       "to": "src/ui/menu/testing/MenuMultiplayerPanel.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "src/ui/start-setup/StartSetupControlBindings.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -143873,6 +144013,15 @@
     },
     {
       "from": "V85",
+      "to": "src/ui/menu/MenuChromeStateOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
       "to": "src/ui/menu/MenuCompatibilityRules.js",
       "type": "scope",
       "hint": null,
@@ -144243,6 +144392,15 @@
     {
       "from": "V85",
       "to": "src/ui/menu/multiplayer/MenuMultiplayerPresence.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/ui/menu/StatusToastOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -148627,6 +148785,15 @@
     },
     {
       "from": "V91",
+      "to": "src/ui/menu/MenuChromeStateOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
       "to": "src/ui/menu/MenuCompatibilityRules.js",
       "type": "scope",
       "hint": null,
@@ -149005,6 +149172,15 @@
     },
     {
       "from": "V91",
+      "to": "src/ui/menu/StatusToastOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
       "to": "src/ui/menu/testing/MenuLobbyRenderer.js",
       "type": "scope",
       "hint": null,
@@ -149132,6 +149308,15 @@
     {
       "from": "V91",
       "to": "src/ui/SettingsStore.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/ui/start-setup/StartSetupControlBindings.js",
       "type": "scope",
       "hint": null,
       "attributes": {
