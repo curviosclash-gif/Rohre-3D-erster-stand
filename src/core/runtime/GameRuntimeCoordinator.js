@@ -124,6 +124,14 @@ export class GameRuntimeCoordinator {
         return this.getRuntimeFacade()?.startArcadeRunIfEnabled?.();
     }
 
+    restartRound() {
+        return this.getRuntimeFacade()?.restartRound?.();
+    }
+
+    handleMenuPanelChanged(previousPanelId, nextPanelId, transitionMetadata = undefined) {
+        return this.getRuntimeFacade()?.handleMenuPanelChanged?.(previousPanelId, nextPanelId, transitionMetadata);
+    }
+
     getArcadeMenuSurfaceState() {
         return this.getRuntimeFacade()?.getArcadeMenuSurfaceState?.();
     }

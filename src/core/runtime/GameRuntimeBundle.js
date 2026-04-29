@@ -73,13 +73,6 @@ export const GAME_RUNTIME_LEGACY_ALIAS_SPECS = Object.freeze([
     { key: 'entityManager', target: BUNDLE_TARGET_STATE, migration: LEGACY_ALIAS_MIGRATION.REPLACE_BY_PORT },
     { key: 'powerupManager', target: BUNDLE_TARGET_STATE, migration: LEGACY_ALIAS_MIGRATION.REPLACE_BY_PORT },
     { key: 'particles', target: BUNDLE_TARGET_STATE, migration: LEGACY_ALIAS_MIGRATION.REPLACE_BY_PORT },
-    { key: 'menuController', target: BUNDLE_TARGET_STATE, migration: LEGACY_ALIAS_MIGRATION.REMOVE_AFTER_MIGRATION },
-    { key: 'menuMultiplayerBridge', target: BUNDLE_TARGET_STATE, migration: LEGACY_ALIAS_MIGRATION.REMOVE_AFTER_MIGRATION },
-    { key: '_navButtons', target: BUNDLE_TARGET_STATE, migration: LEGACY_ALIAS_MIGRATION.REMOVE_AFTER_MIGRATION },
-    { key: '_menuButtonByPanel', target: BUNDLE_TARGET_STATE, migration: LEGACY_ALIAS_MIGRATION.REMOVE_AFTER_MIGRATION },
-    { key: '_activeSubmenu', target: BUNDLE_TARGET_STATE, migration: LEGACY_ALIAS_MIGRATION.REMOVE_AFTER_MIGRATION },
-    { key: '_lastMenuTrigger', target: BUNDLE_TARGET_STATE, migration: LEGACY_ALIAS_MIGRATION.REMOVE_AFTER_MIGRATION },
-    { key: '_buildInfoClipboardText', target: BUNDLE_TARGET_STATE, migration: LEGACY_ALIAS_MIGRATION.REMOVE_AFTER_MIGRATION },
 ]);
 
 export const GAME_RUNTIME_LEGACY_WRAPPER_SPECS = Object.freeze([

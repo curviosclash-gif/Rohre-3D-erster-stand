@@ -13,7 +13,6 @@ function noop() {}
 
 const RUNTIME_PORT_ADAPTER_SOURCES = Object.freeze({
     BUNDLE_COORDINATOR: 'runtime-bundle:runtimeCoordinator',
-    BUNDLE_FACADE: 'runtime-bundle:runtimeFacade',
     UNRESOLVED: 'unresolved',
 });
 
@@ -69,13 +68,6 @@ function resolveRuntimeIntentAdapter(game, methodName) {
         return {
             adapter: coordinator,
             source: RUNTIME_PORT_ADAPTER_SOURCES.BUNDLE_COORDINATOR,
-        };
-    }
-    const facade = getRuntimeFacade(game);
-    if (typeof facade?.[methodName] === 'function') {
-        return {
-            adapter: facade,
-            source: RUNTIME_PORT_ADAPTER_SOURCES.BUNDLE_FACADE,
         };
     }
 
