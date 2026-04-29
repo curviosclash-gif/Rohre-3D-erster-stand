@@ -48,7 +48,13 @@ export class MatchFlowUiController {
         this.sessionOrchestrator = deps.sessionOrchestrator
             || new MatchLifecycleSessionOrchestrator(createMatchSessionPort(this.game));
         this.feedbackAdapter = new MatchFeedbackAdapter({
-            showToast: (message, durationMs, tone) => this.game?._showStatusToast?.(message, durationMs, tone),
+            showToast: (message, durationMs, tone) => {
+                if (this.runtimePort?.showStatusToast) {
+                    this.runtimePort.showStatusToast(message, durationMs, tone);
+                    return;
+                }
+                this.game?._showStatusToast?.(message, durationMs, tone);
+            },
             logger: console,
         });
         this._startMatchPromise = null;
@@ -231,7 +237,11 @@ export class MatchFlowUiController {
 
     _handleStartMatchFailure(error) {
         logger.error('startMatch failed:', error);
-        this.game?._showStatusToast?.('Map-Start fehlgeschlagen. Fallback oder Menue wird geladen.', 2600, 'error');
+        if (this.runtimePort?.showStatusToast) {
+            this.runtimePort.showStatusToast('Map-Start fehlgeschlagen. Fallback oder Menue wird geladen.', 2600, 'error');
+        } else {
+            this.game?._showStatusToast?.('Map-Start fehlgeschlagen. Fallback oder Menue wird geladen.', 2600, 'error');
+        }
         this.returnToMenu({ reason: 'match_start_failure', trigger: 'match_start_failure' });
         return false;
     }
@@ -280,11 +290,22 @@ export class MatchFlowUiController {
         const createMatch = () => {
             const initializedMatch = this.sessionOrchestrator.createMatchSession({
                 onPlayerFeedback: (player, message) => {
-                    game._showPlayerFeedback(player, message);
+                    if (this.runtimePort?.showPlayerFeedback) {
+                        this.runtimePort.showPlayerFeedback(player, message);
+                    } else {
+                        game._showPlayerFeedback?.(player, message);
+                    }
                 },
                 onPlayerDied: (player, cause) => {
                     if (!player.isBot) {
-                        game._showStatusToast(game._getDeathMessage(cause), 2500, 'error');
+                        const deathMessage = this.runtimePort?.getDeathMessage
+                            ? this.runtimePort.getDeathMessage(cause)
+                            : game._getDeathMessage?.(cause);
+                        if (this.runtimePort?.showStatusToast) {
+                            this.runtimePort.showStatusToast(deathMessage, 2500, 'error');
+                        } else {
+                            game._showStatusToast?.(deathMessage, 2500, 'error');
+                        }
                     }
                 },
                 onRoundEnd: (winner, outcome) => {

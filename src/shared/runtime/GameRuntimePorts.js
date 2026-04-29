@@ -216,6 +216,12 @@ export function createUiFeedbackPort(game) {
         showStatusToast(message, durationMs, tone) {
             game?._showStatusToast?.(message, durationMs, tone);
         },
+        showPlayerFeedback(player, message) {
+            game?._showPlayerFeedback?.(player, message);
+        },
+        getDeathMessage(cause) {
+            return game?._getDeathMessage?.(cause) || '';
+        },
         syncAll() {
             game?.uiManager?.syncAll?.();
         },

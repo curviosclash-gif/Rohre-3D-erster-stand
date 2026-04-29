@@ -174,6 +174,15 @@ export function createMatchFlowUiControllerPort(ports = null) {
     if (typeof uiFeedbackPort?.syncAll === 'function') {
         controllerPort.syncUi = () => uiFeedbackPort.syncAll();
     }
+    if (typeof uiFeedbackPort?.showStatusToast === 'function') {
+        controllerPort.showStatusToast = (message, durationMs, tone) => uiFeedbackPort.showStatusToast(message, durationMs, tone);
+    }
+    if (typeof uiFeedbackPort?.showPlayerFeedback === 'function') {
+        controllerPort.showPlayerFeedback = (player, message) => uiFeedbackPort.showPlayerFeedback(player, message);
+    }
+    if (typeof uiFeedbackPort?.getDeathMessage === 'function') {
+        controllerPort.getDeathMessage = (cause) => uiFeedbackPort.getDeathMessage(cause);
+    }
 
     return Object.freeze(controllerPort);
 }

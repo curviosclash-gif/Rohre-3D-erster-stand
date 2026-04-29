@@ -73,10 +73,16 @@ function buildUpgradeTooltip(slotLabel, nextTier, upgradeState) {
 export function setupArcadeVehicleManager(ctx = {}) {
     const ui = ctx.ui || {};
     const settings = ctx.settings && typeof ctx.settings === 'object' ? ctx.settings : {};
+    const runtimeAccess = ctx.runtimeAccess && typeof ctx.runtimeAccess === 'object'
+        ? ctx.runtimeAccess
+        : null;
     const emit = typeof ctx.emit === 'function' ? ctx.emit : null;
     const eventTypes = ctx.eventTypes || {};
     const bind = typeof ctx.bind === 'function' ? ctx.bind : null;
-    const store = ctx.settingsManager?.store || null;
+    const store = runtimeAccess?.getSettingsStore?.()
+        || ctx.settingsManager?.getSettingsRecordStorePort?.()
+        || ctx.settingsManager?.store
+        || null;
     if (!bind) return null;
 
     settings.vehicles = settings.vehicles && typeof settings.vehicles === 'object'
