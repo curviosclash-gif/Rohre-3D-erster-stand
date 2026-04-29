@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 328,
+          "concreteCount": 331,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 466,
+          "concreteCount": 469,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 324,
+          "concreteCount": 327,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 323,
+          "concreteCount": 326,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 965,
+          "concreteCount": 968,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 973,
+          "concreteCount": 976,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1647,7 +1647,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93Q.4",
+        "currentPhase": "93Q.5",
         "scopeDeclarations": [
           "data/training/ppo/bt93q/action_effect_stress_report.json",
           "data/training/ppo/bt93q/closure_gate_report.json",
@@ -1667,11 +1667,12 @@
           "package.json",
           "python/scripts/bt93q_finding_register.py",
           "python/scripts/bt93q_policy_collapse.py",
-          "python/scripts/bt93q_trace_reanalysis.py"
+          "python/scripts/bt93q_trace_reanalysis.py",
+          "python/scripts/bt93q_walltrail_stress.py"
         ],
         "scopeResolution": {
-          "concreteCount": 11,
-          "plannedCount": 8
+          "concreteCount": 14,
+          "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -4753,7 +4754,7 @@
       "id": "BT93Q.4",
       "type": "phase",
       "title": "Wall-/Trail Action-Effekt-Stressmatrix",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.4"
@@ -13533,8 +13534,8 @@
     {
       "id": "BT93Q.4.1",
       "type": "subphase",
-      "title": "`walltrail_scenario_manifest.json` definiert mindestens diese Szenarioklassen: frontal-near-wall, side-wall-left, side-wall-right, narrowing-corridor, trail-ahead, trail-side, escape-left-open, escape-right-open, no-danger-control.",
-      "status": "open",
+      "title": "`walltrail_scenario_manifest.json` definiert mindestens diese Szenarioklassen: frontal-near-wall, side-wall-left, side-wall-right, narrowing-corridor, trail-ahead, trail-side, escape-left-open, escape-right-open, no-danger-control. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_walltrail_stress.py --write-report --repeat-steps 4` -> `data/training/ppo/bt93q/walltrail_scenario_manifest.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.4",
@@ -13544,8 +13545,8 @@
     {
       "id": "BT93Q.4.2",
       "type": "subphase",
-      "title": "Jede Klasse hat Seed, Startfenster, maxSteps, expectedSafeAction, forbiddenSuccessProxy und Negativkontrolle.",
-      "status": "open",
+      "title": "Jede Klasse hat Seed, Startfenster, maxSteps, expectedSafeAction, forbiddenSuccessProxy und Negativkontrolle. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_walltrail_stress.py --write-report --repeat-steps 4` -> `data/training/ppo/bt93q/walltrail_scenario_manifest.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.4",
@@ -13555,8 +13556,8 @@
     {
       "id": "BT93Q.4.3",
       "type": "subphase",
-      "title": "`action_effect_stress_report.json` testet alle bestehenden semantischen Actions gegen diese Klassen ohne PPO-Training.",
-      "status": "open",
+      "title": "`action_effect_stress_report.json` testet alle bestehenden semantischen Actions gegen diese Klassen ohne PPO-Training. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_walltrail_stress.py --write-report --repeat-steps 4` -> `data/training/ppo/bt93q/action_effect_stress_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.4",
@@ -13566,8 +13567,8 @@
     {
       "id": "BT93Q.4.4",
       "type": "subphase",
-      "title": "Success braucht reale Zustandswirkung: WallDistance steigt, LocalOpenness steigt oder stabilisiert, CollisionRisk sinkt, TerminalRisk sinkt. Reward allein reicht nicht.",
-      "status": "open",
+      "title": "Success braucht reale Zustandswirkung: WallDistance steigt, LocalOpenness steigt oder stabilisiert, CollisionRisk sinkt, TerminalRisk sinkt. Reward allein reicht nicht. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_walltrail_stress.py --write-report --repeat-steps 4` -> `data/training/ppo/bt93q/action_effect_stress_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.4",
@@ -13577,8 +13578,8 @@
     {
       "id": "BT93Q.4.5",
       "type": "subphase",
-      "title": "Wenn keine bestehende Action eine Klasse rettet, endet die Klasse `action-space-required`.",
-      "status": "open",
+      "title": "Wenn keine bestehende Action eine Klasse rettet, endet die Klasse `action-space-required`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_walltrail_stress.py --write-report --repeat-steps 4` -> `data/training/ppo/bt93q/action_effect_stress_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.4",
@@ -27167,9 +27168,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -27398,9 +27405,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -34351,6 +34364,27 @@
     },
     {
       "id": "python/scripts/bt93q_trace_reanalysis.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93q_walltrail_stress.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -70716,6 +70750,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -70762,6 +70805,15 @@
     {
       "from": "BT90",
       "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -71932,6 +71984,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93q_trace_reanalysis.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93q_walltrail_stress.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -73865,6 +73926,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -73911,6 +73981,15 @@
     {
       "from": "BT91",
       "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -75063,6 +75142,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93q_trace_reanalysis.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93q_walltrail_stress.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78194,6 +78282,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -78240,6 +78337,15 @@
     {
       "from": "BT92",
       "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79401,6 +79507,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93q_trace_reanalysis.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93q_walltrail_stress.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81633,6 +81748,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -81679,6 +81803,15 @@
     {
       "from": "BT93B",
       "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -82840,6 +82973,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93q_trace_reanalysis.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93q_walltrail_stress.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91476,6 +91618,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -91522,6 +91673,15 @@
     {
       "from": "BT93D",
       "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -92683,6 +92843,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93q_trace_reanalysis.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93q_walltrail_stress.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -100494,6 +100663,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -100540,6 +100718,15 @@
     {
       "from": "BT93E",
       "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -101710,6 +101897,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93q_trace_reanalysis.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93q_walltrail_stress.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -126908,6 +127104,15 @@
     {
       "from": "BT93Q",
       "to": "python/scripts/bt93q_trace_reanalysis.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Q",
+      "to": "python/scripts/bt93q_walltrail_stress.py",
       "type": "scope",
       "hint": null,
       "attributes": {

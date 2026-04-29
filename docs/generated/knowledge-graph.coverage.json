@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2415,
-    "rawCoveredFileCount": 1936,
+    "trackedFileCount": 2418,
+    "rawCoveredFileCount": 1939,
     "rawCoveragePercent": 80.2,
-    "adjustedTrackedFileCount": 1512,
-    "adjustedCoveredFileCount": 1277,
+    "adjustedTrackedFileCount": 1515,
+    "adjustedCoveredFileCount": 1280,
     "adjustedCoveragePercent": 84.5,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 239,
-        "coveredCount": 218
+        "count": 241,
+        "coveredCount": 220
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 879,
-        "coveredCount": 863
+        "count": 880,
+        "coveredCount": 864
       },
       {
         "classification": "product-docs",
@@ -7813,6 +7813,29 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93q/finding_register.json",
       "tracked": true,
       "coveredInCore": true,
@@ -7929,6 +7952,29 @@
     },
     {
       "path": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -18476,6 +18522,29 @@
     },
     {
       "path": "python/scripts/bt93q_trace_reanalysis.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93q_walltrail_stress.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

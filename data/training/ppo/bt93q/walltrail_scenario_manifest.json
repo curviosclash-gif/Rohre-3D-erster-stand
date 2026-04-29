@@ -1,0 +1,295 @@
+{
+  "actionSurface": {
+    "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+    "excludedInventoryIndexedActions": [
+      "dropItem",
+      "nextItem",
+      "shootItem",
+      "shootItemIndex",
+      "useItem"
+    ],
+    "gymSpace": "Discrete",
+    "policyLevelMasking": {
+      "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+      "mixedWithPostDecodeClamp": false,
+      "preSamplingAppliedInCurrentSb3Path": true,
+      "preSamplingByConstruction": true,
+      "source": "info.match.inventoryLength from the JS-authoritative transition payload",
+      "specified": true
+    },
+    "rawBoundarySurfaceTraining": false,
+    "sb3Trainable": true,
+    "semanticActions": [
+      "noop",
+      "yaw-left",
+      "yaw-right",
+      "pitch-up",
+      "pitch-down",
+      "roll-left",
+      "roll-right",
+      "boost",
+      "shoot-mg"
+    ],
+    "surfaceId": "bt93g-masked-semantic-action-v1",
+    "telemetry": [
+      "policyLevelMask",
+      "preSamplingMaskRate",
+      "postDecodeClampRate",
+      "invalidActionRate",
+      "vetoRate",
+      "sanitizerRate",
+      "noopRate"
+    ]
+  },
+  "blockId": "BT93Q",
+  "generatedAt": "2026-04-29T23:43:31Z",
+  "generatedBy": "python/scripts/bt93q_walltrail_stress.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "108aa5373b5c1cecef9db89044b44fb532c44998"
+  },
+  "guardrails": {
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "ok": true,
+  "phaseId": "93Q.4",
+  "scenarioClasses": [
+    "frontal-near-wall",
+    "side-wall-left",
+    "side-wall-right",
+    "narrowing-corridor",
+    "trail-ahead",
+    "trail-side",
+    "escape-left-open",
+    "escape-right-open",
+    "no-danger-control"
+  ],
+  "scenarioCount": 9,
+  "scenarios": [
+    {
+      "expectedSafeAction": [
+        "yaw-right",
+        "roll-right"
+      ],
+      "forbiddenSuccessProxy": "reward-only or target-distance-only",
+      "id": "frontal-near-wall",
+      "maxSteps": 20,
+      "negativeControl": "noop",
+      "predicate": "wallDistanceFront <= 0.20",
+      "seed": 934,
+      "startWindow": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "warmupAction": "pitch-up",
+      "warmupSteps": 8
+    },
+    {
+      "expectedSafeAction": [
+        "yaw-right",
+        "roll-right"
+      ],
+      "forbiddenSuccessProxy": "reward-only",
+      "id": "side-wall-left",
+      "maxSteps": 20,
+      "negativeControl": "noop",
+      "predicate": "wallDistanceLeft <= 0.25",
+      "seed": 942,
+      "startWindow": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 942,
+        "warmupAction": "noop",
+        "warmupSteps": 2
+      },
+      "warmupAction": "noop",
+      "warmupSteps": 2
+    },
+    {
+      "expectedSafeAction": [
+        "yaw-left",
+        "roll-left"
+      ],
+      "forbiddenSuccessProxy": "reward-only",
+      "id": "side-wall-right",
+      "maxSteps": 20,
+      "negativeControl": "noop",
+      "predicate": "wallDistanceRight <= 0.25",
+      "seed": 930,
+      "startWindow": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "boost",
+        "warmupSteps": 7
+      },
+      "warmupAction": "boost",
+      "warmupSteps": 7
+    },
+    {
+      "expectedSafeAction": [
+        "yaw-right",
+        "roll-right"
+      ],
+      "forbiddenSuccessProxy": "single target metric",
+      "id": "narrowing-corridor",
+      "maxSteps": 20,
+      "negativeControl": "noop",
+      "predicate": "wallDistanceFront <= 0.35 and one side wall <= 0.35 and localOpennessRatio <= 0.45",
+      "seed": 934,
+      "startWindow": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "warmupAction": "pitch-up",
+      "warmupSteps": 6
+    },
+    {
+      "expectedSafeAction": [
+        "yaw-left",
+        "roll-left"
+      ],
+      "forbiddenSuccessProxy": "reward-only; trailDistance is not exposed",
+      "id": "trail-ahead",
+      "maxSteps": 20,
+      "negativeControl": "noop",
+      "predicate": "pressureLevel >= 0.50 and wallDistanceFront <= 0.40",
+      "seed": 930,
+      "startWindow": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "telemetryLimit": "trailDistance missing; pressure/front-wall proxy used",
+      "warmupAction": "pitch-up",
+      "warmupSteps": 8
+    },
+    {
+      "expectedSafeAction": [
+        "yaw-right",
+        "roll-right"
+      ],
+      "forbiddenSuccessProxy": "reward-only; trailDistance is not exposed",
+      "id": "trail-side",
+      "maxSteps": 20,
+      "negativeControl": "noop",
+      "predicate": "pressureLevel >= 0.40 and side wall <= 0.30",
+      "seed": 934,
+      "startWindow": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "telemetryLimit": "trailDistance missing; pressure/side-wall proxy used",
+      "warmupAction": "pitch-up",
+      "warmupSteps": 6
+    },
+    {
+      "expectedSafeAction": [
+        "yaw-left",
+        "roll-left"
+      ],
+      "forbiddenSuccessProxy": "reward-only",
+      "id": "escape-left-open",
+      "maxSteps": 20,
+      "negativeControl": "noop",
+      "predicate": "wallDistanceLeft >= 0.80 and front/right not both fully open",
+      "seed": 930,
+      "startWindow": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 7
+      },
+      "warmupAction": "pitch-up",
+      "warmupSteps": 7
+    },
+    {
+      "expectedSafeAction": [
+        "yaw-right",
+        "roll-right"
+      ],
+      "forbiddenSuccessProxy": "reward-only",
+      "id": "escape-right-open",
+      "maxSteps": 20,
+      "negativeControl": "noop",
+      "predicate": "wallDistanceRight >= 0.80 and left/front not both fully open",
+      "seed": 930,
+      "startWindow": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      },
+      "warmupAction": "yaw-left",
+      "warmupSteps": 0
+    },
+    {
+      "expectedSafeAction": [
+        "control-stability"
+      ],
+      "forbiddenSuccessProxy": "rescue claim in no-danger state",
+      "id": "no-danger-control",
+      "maxSteps": 20,
+      "negativeControl": "noop",
+      "predicate": "front/left/right open and pressureLevel <= 0.40",
+      "seed": 930,
+      "startWindow": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "noop",
+        "warmupSteps": 0
+      },
+      "warmupAction": "noop",
+      "warmupSteps": 0
+    }
+  ],
+  "schemaVersion": "bt93q-walltrail-scenario-manifest-v1"
+}
