@@ -1,0 +1,360 @@
+{
+  "aggregate": {
+    "avgStepsPerEpisode": 75.75,
+    "completedEpisodes": 60,
+    "deathBefore60Count": 6,
+    "deathBefore60Share": 0.1,
+    "deathClassCounts": {
+      "unclassified": 2,
+      "wall/trail": 4
+    },
+    "maxStepPlateauCount": 0,
+    "maxStepShare": 0.0,
+    "maxStepsPerEpisodeObserved": 109,
+    "minStepsPerEpisode": 34,
+    "objectiveSignalReachableTailCount": 14,
+    "policyEpisodeCounts": {
+      "noop-control": 15,
+      "random-control": 15,
+      "scripted-reachability-positive-control": 18,
+      "semantic-cycle-control": 12
+    },
+    "progressSignalReachableTailCount": 14,
+    "rewardMeanPerEpisode": -1.351609,
+    "rewardTotal": -81.096565,
+    "runtimeErrorCount": 0,
+    "terminalReasonCounts": {
+      "player-dead": 60
+    },
+    "truncatedReasonCounts": {}
+  },
+  "blockId": "BT93N",
+  "blockedActions": [
+    "reward/action/terminal fix without cause",
+    "50k/100k extension",
+    "BT93P BT94A-ready",
+    "BT94A candidate/freeze",
+    "holdout consumption",
+    "promote or rollout-ready wording"
+  ],
+  "comparisonPolicy": {
+    "decision": "dqn-anchor-blocked",
+    "diagnoseOnlyWhileBlocked": true,
+    "nonBlockingForPositiveReentry": false
+  },
+  "controlEvidence": {
+    "controlPolicy": "controls document measurement boundaries; they do not replace PPO, DQN anchor, holdout, candidate, freeze, or validate evidence",
+    "controls": [
+      {
+        "controlClass": "positive",
+        "countsAsPpoBehavior": false,
+        "countsAsQualityEvidence": false,
+        "episodeCount": 18,
+        "policyId": "scripted-reachability-positive-control",
+        "purpose": "real action sequence should expose movement/progress/objective signals when reachable."
+      },
+      {
+        "controlClass": "stochastic-simple",
+        "countsAsPpoBehavior": false,
+        "countsAsQualityEvidence": false,
+        "episodeCount": 15,
+        "policyId": "random-control",
+        "purpose": "simple non-PPO baseline catches measurement and reward-ordering surprises."
+      },
+      {
+        "controlClass": "simple-cycle",
+        "countsAsPpoBehavior": false,
+        "countsAsQualityEvidence": false,
+        "episodeCount": 12,
+        "policyId": "semantic-cycle-control",
+        "purpose": "deterministic simple baseline checks action-cycle collapse and reward-ordering risk."
+      },
+      {
+        "controlClass": "negative",
+        "countsAsPpoBehavior": false,
+        "countsAsQualityEvidence": false,
+        "episodeCount": 15,
+        "policyId": "noop-control",
+        "purpose": "negative control; must not be read as PPO behavior or quality."
+      }
+    ],
+    "negativeControlPresent": true,
+    "positiveControlPresent": true
+  },
+  "deathBefore60Episodes": [
+    {
+      "classification": {
+        "class": "wall/trail",
+        "confidence": "medium",
+        "signals": [
+          "front wall or local openness near zero"
+        ]
+      },
+      "episodeId": "random-control-935-4",
+      "policyId": "random-control",
+      "rewardTotal": 5.000644,
+      "steps": 48
+    },
+    {
+      "classification": {
+        "class": "unclassified",
+        "confidence": "low",
+        "signals": [
+          "no dominant wall/threat/noop/action/runtime signal in trace tail"
+        ]
+      },
+      "episodeId": "random-control-935-6",
+      "policyId": "random-control",
+      "rewardTotal": 11.67423,
+      "steps": 34
+    },
+    {
+      "classification": {
+        "class": "wall/trail",
+        "confidence": "medium",
+        "signals": [
+          "front wall or local openness near zero"
+        ]
+      },
+      "episodeId": "random-control-935-8",
+      "policyId": "random-control",
+      "rewardTotal": 17.197349,
+      "steps": 58
+    },
+    {
+      "classification": {
+        "class": "wall/trail",
+        "confidence": "medium",
+        "signals": [
+          "front wall or local openness near zero"
+        ]
+      },
+      "episodeId": "random-control-935-9",
+      "policyId": "random-control",
+      "rewardTotal": -4.984779,
+      "steps": 43
+    },
+    {
+      "classification": {
+        "class": "unclassified",
+        "confidence": "low",
+        "signals": [
+          "no dominant wall/threat/noop/action/runtime signal in trace tail"
+        ]
+      },
+      "episodeId": "semantic-cycle-control-936-5",
+      "policyId": "semantic-cycle-control",
+      "rewardTotal": 11.985622,
+      "steps": 41
+    },
+    {
+      "classification": {
+        "class": "wall/trail",
+        "confidence": "medium",
+        "signals": [
+          "front wall or local openness near zero"
+        ]
+      },
+      "episodeId": "semantic-cycle-control-936-6",
+      "policyId": "semantic-cycle-control",
+      "rewardTotal": -4.09377,
+      "steps": 58
+    }
+  ],
+  "deathClasses": [
+    "wall/trail",
+    "opponent/projectile",
+    "self-stall/noop",
+    "action-collapse",
+    "reset/spawn-risk",
+    "runtime/bridge",
+    "unclassified"
+  ],
+  "elapsedSeconds": 144.28908,
+  "generatedAt": "2026-04-29T21:36:38Z",
+  "generatedBy": "python/scripts/bt93n_death_trace_probe.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "a226b76839e18d22ed093c4479aa7e8d67b5613e"
+  },
+  "guardrails": {
+    "actionSurfaceChanged": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rewardChanged": false,
+    "runtimeSurfacesTouched": [],
+    "terminalRulesChanged": false,
+    "trainingStarted": false
+  },
+  "measurementInterpretation": {
+    "dominantCause": "wall/trail",
+    "fixAllowedBeforeDominantCause": false,
+    "lowEventCountIsGreen": false,
+    "nextFixGate": "blocked until dominant cause or measurement-invalid is explicitly accepted"
+  },
+  "nextAllowedActions": [
+    "review 93N.1 trace evidence",
+    "only start 93N.2 fix class if a dominant cause is documented",
+    "otherwise keep BT93N diagnose-only and preserve BT93P/BT94A blockers"
+  ],
+  "ok": true,
+  "phaseCoverage": {
+    "93N.1.1": true,
+    "93N.1.2": true,
+    "93N.1.3": true,
+    "93N.1.4": true,
+    "93N.1.5": true,
+    "93N.1.6": true,
+    "93N.1.7": true
+  },
+  "phaseId": "93N.1",
+  "resultClass": "death-before60-root-cause-classified",
+  "samplePath": "data/training/ppo/bt93n/death_before60_trace_samples.jsonl",
+  "schemaVersion": "bt93n-death-before60-trace-v1",
+  "sourceArtifacts": {
+    "bt93lBaselineMatrix": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L simple baseline/control matrix",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013"
+    },
+    "bt93lMicroPpoSignal": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/micro_ppo_signal_report.json",
+      "phaseId": "93L.6",
+      "resultClass": "signal-green",
+      "role": "BT93L micro PPO source blocker",
+      "sha256": "01912b85c4ad39ef9b4f92d28f19ee29f27ab85670ba451cb7551a679fa74f34"
+    },
+    "bt93lTaskMetricContract": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L pinned matrix/task contract",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0"
+    },
+    "bt93mComparisonPolicyDecision": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "phaseId": "93M.3.6",
+      "resultClass": "comparison-policy-blocks-positive-reentry",
+      "role": "BT93M comparison policy blocker",
+      "sha256": "eadd182f737d7b477a4143df0cc721875caf31cd47bcb5942f2649f2d80609b5"
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A closed no-start gate",
+      "sha256": "27dd958fe5463f6f688384957e31cbd4d163c81b07058dd3c0a1a6be9eda7f70"
+    },
+    "curviosEnv": {
+      "blockId": null,
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/curvios_env.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "Python CurviosEnv bridge path",
+      "sha256": "2a12d75b327b10daef853cc242e6d81fb87c4ee838756d6cef1905d19de94d59"
+    },
+    "headlessLaneRunner": {
+      "blockId": null,
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "JS headless training lane",
+      "sha256": "df696c807c7663f58f1e661a8693fcec14ed3bba8cc23ec4d84d332ebdb9400f"
+    },
+    "ppoActionSurface": {
+      "blockId": null,
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "masked semantic action surface",
+      "sha256": "4e12c93bd532178f3759234d5217f1cd58a4f4bfaec9c6f7be8ffa708564847b"
+    }
+  },
+  "tracePolicy": {
+    "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+    "episodesRequested": 60,
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "maxStepsPerEpisode": 180,
+    "policyBudget": [
+      {
+        "controlClass": "positive",
+        "episodeCount": 18,
+        "policyId": "scripted-reachability-positive-control",
+        "purpose": "real action sequence should expose movement/progress/objective signals when reachable."
+      },
+      {
+        "controlClass": "stochastic-simple",
+        "episodeCount": 15,
+        "policyId": "random-control",
+        "purpose": "simple non-PPO baseline catches measurement and reward-ordering surprises."
+      },
+      {
+        "controlClass": "simple-cycle",
+        "episodeCount": 12,
+        "policyId": "semantic-cycle-control",
+        "purpose": "deterministic simple baseline checks action-cycle collapse and reward-ordering risk."
+      },
+      {
+        "controlClass": "negative",
+        "episodeCount": 15,
+        "policyId": "noop-control",
+        "purpose": "negative control; must not be read as PPO behavior or quality."
+      }
+    ],
+    "rewardProfileId": "bt93l-objective-reachability-v1",
+    "sampleLimitPerClass": 12,
+    "sampleThreshold": {
+      "lowEventCountInterpretation": "measurement finding, never a green quality signal",
+      "minimumCompletedEpisodes": 60
+    },
+    "seedStart": 934,
+    "semanticWindow": "runtime-near-headless-v1",
+    "traceTailLength": 12
+  }
+}

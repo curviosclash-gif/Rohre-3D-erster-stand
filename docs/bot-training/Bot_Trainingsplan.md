@@ -3144,13 +3144,13 @@ Primaerer Scope:
 
 ### 93N.1 Death Trace Instrumentation
 
-- [ ] 93N.1.1 Fuer jeden Tod vor Step 60 die letzten N Beobachtungen, Actions, Rewards, Action-Safety, Wall-/Trail-/Threat-Metriken, Position-/Heading-Delta, Progress-/Objective-Signale und TerminalReason schreiben.
-- [ ] 93N.1.2 Todesklassen trennen: wall/trail, opponent/projectile, self-stall/noop, action-collapse, reset/spawn-risk, runtime/bridge.
-- [ ] 93N.1.3 Positive/negative Controls dokumentieren, damit Messfehler nicht als PPO-Verhalten gelesen werden.
-- [ ] 93N.1.4 Kein Reward-, Action- oder Terminal-Fix vor dominanter Ursache oder `measurement-invalid`.
-- [ ] 93N.1.5 Fuer MaxStep-only Episoden dieselben letzten N Beobachtungen, Actions, Rewards, Objective-/Progress-Signale, Threat- und Stagnationsmerkmale schreiben; MaxStep-Plateau ist ein eigener Root-Cause-Kanal.
-- [ ] 93N.1.6 Probe laeuft bis mindestens 60 abgeschlossene Episoden oder bis eine vorab definierte Sample-Schwelle erreicht ist; geringe Ereigniszahl ist ein Messbefund, kein Gruensignal.
-- [ ] 93N.1.7 Trace-Evidence darf nicht nur aggregiert sein; mindestens repraesentative raw Samples fuer fruehe Tode, MaxStep-Plateaus und Nicht-Ereignisse werden versioniert.
+- [x] 93N.1.1 Fuer jeden Tod vor Step 60 die letzten N Beobachtungen, Actions, Rewards, Action-Safety, Wall-/Trail-/Threat-Metriken, Position-/Heading-Delta, Progress-/Objective-Signale und TerminalReason schreiben. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_death_trace_probe.py --write-report --episodes 60` -> `data/training/ppo/bt93n/death_before60_trace_report.json`, `deathBefore60Count=6`, `phaseCoverage.93N.1.1=true`)
+- [x] 93N.1.2 Todesklassen trennen: wall/trail, opponent/projectile, self-stall/noop, action-collapse, reset/spawn-risk, runtime/bridge. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_death_trace_probe.py --write-report --episodes 60` -> `data/training/ppo/bt93n/death_before60_trace_report.json`, `deathClassCounts.wall/trail=4`, `deathClassCounts.unclassified=2`)
+- [x] 93N.1.3 Positive/negative Controls dokumentieren, damit Messfehler nicht als PPO-Verhalten gelesen werden. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_death_trace_probe.py --write-report --episodes 60` -> `data/training/ppo/bt93n/death_before60_trace_report.json`, `controlEvidence.positiveControlPresent=true`, `controlEvidence.negativeControlPresent=true`)
+- [x] 93N.1.4 Kein Reward-, Action- oder Terminal-Fix vor dominanter Ursache oder `measurement-invalid`. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_death_trace_probe.py --write-report --episodes 60` -> `data/training/ppo/bt93n/death_before60_trace_report.json`, `guardrails.fixApplied=false`, `measurementInterpretation.dominantCause=wall/trail`)
+- [x] 93N.1.5 Fuer MaxStep-only Episoden dieselben letzten N Beobachtungen, Actions, Rewards, Objective-/Progress-Signale, Threat- und Stagnationsmerkmale schreiben; MaxStep-Plateau ist ein eigener Root-Cause-Kanal. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_death_trace_probe.py --write-report --episodes 60` -> `data/training/ppo/bt93n/maxstep_plateau_trace_report.json`, `maxStepPlateauCount=0`, `resultClass=maxstep-plateau-not-observed`)
+- [x] 93N.1.6 Probe laeuft bis mindestens 60 abgeschlossene Episoden oder bis eine vorab definierte Sample-Schwelle erreicht ist; geringe Ereigniszahl ist ein Messbefund, kein Gruensignal. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_death_trace_probe.py --write-report --episodes 60` -> `data/training/ppo/bt93n/death_before60_trace_report.json`, `completedEpisodes=60`, `lowEventCountIsGreen=false`)
+- [x] 93N.1.7 Trace-Evidence darf nicht nur aggregiert sein; mindestens repraesentative raw Samples fuer fruehe Tode, MaxStep-Plateaus und Nicht-Ereignisse werden versioniert. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_death_trace_probe.py --write-report --episodes 60` -> `data/training/ppo/bt93n/death_before60_trace_samples.jsonl`, `phaseCoverage.93N.1.7=true`)
 
 Empfohlener Command:
 
