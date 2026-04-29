@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2405,
-    "rawCoveredFileCount": 1926,
+    "trackedFileCount": 2406,
+    "rawCoveredFileCount": 1927,
     "rawCoveragePercent": 80.1,
-    "adjustedTrackedFileCount": 1502,
-    "adjustedCoveredFileCount": 1267,
+    "adjustedTrackedFileCount": 1503,
+    "adjustedCoveredFileCount": 1268,
     "adjustedCoveragePercent": 84.4,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
@@ -189,8 +189,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 366,
-        "coveredCount": 181
+        "count": 367,
+        "coveredCount": 182
       },
       {
         "classification": "prototype",
@@ -13053,6 +13053,23 @@
         "BT93M",
         "BT94A",
         "BT94B",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
         "V77"
       ],
       "surfaces": [],

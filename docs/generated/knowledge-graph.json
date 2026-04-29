@@ -2574,7 +2574,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 273,
+          "concreteCount": 274,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -29258,6 +29258,21 @@
           "BT93M",
           "BT94A",
           "BT94B",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
           "V77"
         ],
         "exists": true
@@ -156486,6 +156501,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md",
       "type": "scope",
       "hint": null,
       "attributes": {
