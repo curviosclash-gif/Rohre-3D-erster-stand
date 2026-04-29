@@ -1,0 +1,590 @@
+{
+  "blockId": "BT93J",
+  "bt93gRewardGate": {
+    "evidenceLimits": {
+      "candidateRun": false,
+      "countsAsPpoValidateEvidence": false,
+      "countsAsPromotionEvidence": false,
+      "countsAsSurvivalQualityEvidence": false,
+      "freezeCandidate": false
+    },
+    "path": "data/training/ppo/bt93g/reward_gate_report.json",
+    "resultClass": "reward-gates-pinned-r01-blocking",
+    "rewardGate": {
+      "R.01": {
+        "positiveRewardMayOpenBt94a": false,
+        "priorAverageBotSurvivalPct": -57.19291,
+        "priorAvgStepsPerEpisodePct": -86.385875,
+        "priorBt93fResultClass": "ppo-regression",
+        "reason": "Positive reward claims remain blocked until comparable 93G.5 eval/holdout proves survival/steps are not regressive.",
+        "status": "still-blocking"
+      },
+      "actionSafety": {
+        "invalidActionRate": 0.0,
+        "postDecodeClampRate": 0.0,
+        "probeThresholdsPass": true,
+        "safetyVetoRate": 0.0,
+        "sanitizerRate": 0.0,
+        "status": "probe-pass-still-requires-93G.5",
+        "thresholds": {
+          "invalidActionRateEq": 0.0,
+          "postDecodeClampRateLt": 0.5,
+          "safetyVetoRateLt": 0.25,
+          "sanitizerRateEq": 0.0
+        }
+      },
+      "episodeShortening": {
+        "maxStepsOnlyMayOpenBt94a": false,
+        "maxStepsPerEpisode": 180,
+        "prior16StepComparisonReclassified": true,
+        "status": "blocked-until-93G.5"
+      },
+      "terminalDeathMatrix": {
+        "emptyDeathMatrixMayOpenBt94a": false,
+        "evalHoldoutMatrixRequired": true,
+        "probeCoverage": {
+          "93G.2.1": true,
+          "93G.2.2": true,
+          "93G.2.3": true,
+          "93G.2.4": true
+        },
+        "status": "probe-wired-not-quality-evidence"
+      }
+    }
+  },
+  "causalSeparation": {
+    "actionPolicyGateGreen": true,
+    "matrixContractGateGreen": true,
+    "observationGateGreen": true,
+    "ppoLearningMetricCollapse": false,
+    "realEvalPlayerDeadOnly": true,
+    "stepsBelowDqnAnchor": true,
+    "survivalOnlyPositiveReward": true,
+    "terminalMappingGateGreen": true
+  },
+  "commands": {
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93j_action_reward_diagnostics.py --write-reports"
+  },
+  "curriculumConfig": {
+    "config": "python/configs/ppo_bt93i_terminal_curriculum_repair.json",
+    "diagnostics": {
+      "classification": "BT93I.2 readiness and later BT93I.3 repair only; no BT94A candidate, freeze, promotion, PPO-Validate, or runtime rollout signal",
+      "collapseThresholds": {
+        "maxApproxKl": 0.2,
+        "maxClipFraction": 0.6,
+        "maxGradNorm": 0.5,
+        "maxValueLoss": 100.0,
+        "minEntropy": 0.01,
+        "minExplainedVariance": -1.0
+      },
+      "earlyStopRules": [
+        "stop if runtimeErrorCount > 0",
+        "stop if eval or holdout terminal/death matrix is empty or max-steps-only",
+        "stop if avgStepsPerEpisode regresses below the DQN anchor",
+        "stop if averageBotSurvival regresses below the DQN anchor",
+        "stop if reward gain is paired with episode shortening or survival regression",
+        "stop if approx_kl, clip_fraction, entropy, value_loss, grad_norm, or explained_variance crosses collapse thresholds",
+        "stop if pre-sampling mask is missing or post-decode clamp/veto/invalid-action load exceeds safety thresholds",
+        "stop before holdout if eval does not satisfy the minimum completed-episode target",
+        "no optimization after holdout"
+      ],
+      "safetyThresholds": {
+        "invalidActionRateEq": 0.0,
+        "postDecodeClampRateLt": 0.5,
+        "safetyVetoRateLt": 0.25,
+        "sanitizerRateEq": 0.0
+      }
+    },
+    "normalization": {
+      "clipObservation": 10.0,
+      "implementation": "stable_baselines3.common.vec_env.VecNormalize",
+      "normalizeObservation": true,
+      "normalizeReward": false,
+      "persistStatsWithCheckpoint": true
+    },
+    "profileId": "bt93i-terminal-curriculum-steps-nonregression-v1",
+    "rollout": {
+      "batchSize": 32,
+      "budgetRule": "BT93I repair may run up to 32768 timesteps or 14400 seconds, whichever comes first; 4-env remains disabled",
+      "checkpointFrequencyTimesteps": 2048,
+      "evalIntervalTimesteps": 2048,
+      "evalMinCompletedEpisodes": 15,
+      "evalSteps": 2700,
+      "extensionRule": "after a green 2048 smoke, extend only in 4096-timestep increments while early-stop checks stay green",
+      "holdoutEvalSteps": 1440,
+      "holdoutMinCompletedEpisodes": 8,
+      "nEpochs": 2,
+      "nStepsPerEnv": 64,
+      "terminalCurriculumIncrementTimesteps": 4096,
+      "terminalCurriculumMaxTimesteps": 32768,
+      "terminalCurriculumSmokeTimesteps": 2048,
+      "timeoutBudgetSeconds": 14400,
+      "wallClockLimitSeconds": 14400
+    }
+  },
+  "findingImpact": {
+    "F.05": "still-blocking-primary-cause-candidate-reward-curriculum",
+    "F.19": "still-blocking-policy-terminal-behavior-not-mapping",
+    "F.27": "aggregate-still-blocked-until-R1-counterprobe",
+    "F.31": "still-blocking-player-dead-only-policy-terminal-behavior"
+  },
+  "generatedAt": "2026-04-25T23:39:46Z",
+  "generatedBy": "python/scripts/bt93j_action_reward_diagnostics.py",
+  "gitSha": "f6f1212afd73603de647a48142975524cbf6b26e",
+  "guardrails": {
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "noGo": [
+      "no BT94A claim, candidate run, freeze candidate, BT94B handover, promote, or rollout-ready result",
+      "no pilot, holdout, long-run, or fix from BT93J.3",
+      "no productive RuntimeConfig, Strategy Flag, JS inference, model registry, rollback, Matchstart, AI-Hub, bridge, or authority change",
+      "positive reward, clean action telemetry, or governance gates do not count as PPO-Validate, promotion, or rollout evidence"
+    ],
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "lanes": [
+    {
+      "actionTelemetry": {
+        "fieldCounts": {},
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "maskCount": 0,
+        "maskRate": 0.0,
+        "noopCount": 171,
+        "noopRate": 0.163793,
+        "postDecodeClampCount": 0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskCount": 1044,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "sanitizerReasons": {},
+        "totalActions": 1044,
+        "vetoCount": 0,
+        "vetoRate": 0.0
+      },
+      "deathAndTerminalClass": {
+        "deathCauseCounts": {
+          "player-dead": 15
+        },
+        "naturalTerminal": 0,
+        "playerDeadOnly": true,
+        "startCapableTerminalMatrix": false,
+        "terminalReasonCounts": {
+          "player-dead": 15
+        },
+        "truncatedReasonCounts": {}
+      },
+      "episodeLength": {
+        "avgStepsPerCompletedEpisode": 69.133333,
+        "belowDqnAnchor": true,
+        "completedEpisodeLengths": [
+          41,
+          44,
+          67,
+          113,
+          103,
+          72,
+          40,
+          70,
+          72,
+          37,
+          48,
+          36,
+          103,
+          89,
+          102
+        ],
+        "dqnAnchor": 117.525,
+        "maxStepsPerEpisode": 180
+      },
+      "laneId": "bt93i-eval",
+      "phaseId": "93I.4.1",
+      "report": "data/training/ppo/bt93i/runs/20260425T153044Z-terminal-curriculum-repair-eval/eval_report.json",
+      "reward": {
+        "progressRewardTotal": 0.0,
+        "rewardBreakdownMeanPerStep": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.118276,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownTotals": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 123.48,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardMean": 0.118276,
+        "rewardTotal": 123.479997,
+        "riskPenaltyTotal": 0.0,
+        "survivalOnlyPositiveReward": true,
+        "survivalRewardShare": 1.0
+      },
+      "riskActions": {
+        "safetyOverruleCounts": {
+          "combatVeto": 12,
+          "intent-request-applied-mismatch": 15,
+          "vetoActive": 171
+        },
+        "sampleSource": "persisted rawActionExamples/infoTail only",
+        "sampledCounts": {},
+        "vetoActiveRateFromSafetyTrace": 0.163793
+      },
+      "runId": "20260425T153044Z-terminal-curriculum-repair-eval",
+      "runKind": "terminal-curriculum-repair-eval",
+      "survivalKpis": {
+        "averageBotSurvival": 69.133333,
+        "averageBotSurvivalReason": null,
+        "averageBotSurvivalSource": "BT93I terminal curriculum repair completed episode length",
+        "avgStepsPerEpisode": 69.133333,
+        "avgStepsPerEpisodeObserved": 69.133333,
+        "baselineComparable": true,
+        "comparisonComparable": true,
+        "completedEpisodeCount": 15,
+        "doneCount": 15,
+        "envCount": 2,
+        "observedVectorSteps": 1044,
+        "openEpisodeLengthsAtStop": [
+          7,
+          0
+        ]
+      }
+    },
+    {
+      "actionTelemetry": {
+        "fieldCounts": {},
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "maskCount": 0,
+        "maskRate": 0.0,
+        "noopCount": 93,
+        "noopRate": 0.14006,
+        "postDecodeClampCount": 0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskCount": 664,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "sanitizerReasons": {},
+        "totalActions": 664,
+        "vetoCount": 0,
+        "vetoRate": 0.0
+      },
+      "deathAndTerminalClass": {
+        "deathCauseCounts": {
+          "player-dead": 8
+        },
+        "naturalTerminal": 0,
+        "playerDeadOnly": true,
+        "startCapableTerminalMatrix": false,
+        "terminalReasonCounts": {
+          "player-dead": 8
+        },
+        "truncatedReasonCounts": {}
+      },
+      "episodeLength": {
+        "avgStepsPerCompletedEpisode": 71.75,
+        "belowDqnAnchor": true,
+        "completedEpisodeLengths": [
+          60,
+          67,
+          47,
+          67,
+          87,
+          108,
+          91,
+          47
+        ],
+        "dqnAnchor": 117.525,
+        "maxStepsPerEpisode": 180
+      },
+      "laneId": "bt93i-holdout",
+      "phaseId": "93I.4.1",
+      "report": "data/training/ppo/bt93i/runs/20260425T153136Z-holdout-eval/eval_report.json",
+      "reward": {
+        "progressRewardTotal": 0.0,
+        "rewardBreakdownMeanPerStep": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.118554,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownTotals": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 78.72,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardMean": 0.118554,
+        "rewardTotal": 78.719998,
+        "riskPenaltyTotal": 0.0,
+        "survivalOnlyPositiveReward": true,
+        "survivalRewardShare": 1.0
+      },
+      "riskActions": {
+        "safetyOverruleCounts": {
+          "combatVeto": 20,
+          "intent-request-applied-mismatch": 20,
+          "vetoActive": 118
+        },
+        "sampleSource": "persisted rawActionExamples/infoTail only",
+        "sampledCounts": {
+          "boost": 8
+        },
+        "vetoActiveRateFromSafetyTrace": 0.177711
+      },
+      "runId": "20260425T153136Z-holdout-eval",
+      "runKind": "holdout-eval",
+      "survivalKpis": {
+        "averageBotSurvival": 71.75,
+        "averageBotSurvivalReason": null,
+        "averageBotSurvivalSource": "BT93I terminal curriculum repair completed episode length",
+        "avgStepsPerEpisode": 71.75,
+        "avgStepsPerEpisodeObserved": 71.75,
+        "baselineComparable": true,
+        "comparisonComparable": true,
+        "completedEpisodeCount": 8,
+        "doneCount": 8,
+        "envCount": 2,
+        "observedVectorSteps": 664,
+        "openEpisodeLengthsAtStop": [
+          0,
+          90
+        ]
+      }
+    }
+  ],
+  "learningMetrics": {
+    "allThresholdsGreen": true,
+    "collapseOrInstabilitySignal": false,
+    "collapseThresholds": {
+      "maxApproxKl": 0.2,
+      "maxClipFraction": 0.6,
+      "maxGradNorm": 0.5,
+      "maxValueLoss": 100.0,
+      "minEntropy": 0.01,
+      "minExplainedVariance": -1.0
+    },
+    "metrics": {
+      "approx_kl": 7.514562457799911e-05,
+      "clip_fraction": 0.0,
+      "entropy": 2.195156991481781,
+      "explained_variance": 0.7293955683708191,
+      "grad_norm": {
+        "configuredMaxGradNorm": 0.5,
+        "globalNorm": 0.5,
+        "maxAbsGradient": 0.129769,
+        "observed": true,
+        "tensorCount": 12,
+        "tolerance": 5e-05,
+        "withinConfiguredMaxGradNorm": true
+      },
+      "policy_loss": -0.002175874193198979,
+      "value_loss": 1.3619821220636368
+    },
+    "runId": "20260425T151155Z-terminal-curriculum-repair",
+    "runKind": "terminal-curriculum-repair",
+    "sampleClass": "bt93i-terminal-curriculum-repair-not-candidate",
+    "source": "stable_baselines3.PPO logger after model.learn()",
+    "thresholdStatus": {
+      "approxKlWithinThreshold": true,
+      "clipFractionWithinThreshold": true,
+      "entropyAboveMinimum": true,
+      "explainedVarianceAboveMinimum": true,
+      "gradNormWithinThreshold": true,
+      "valueLossWithinThreshold": true
+    }
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93J.3.3": true,
+    "93J.3.4": true
+  },
+  "phaseId": "93J.3",
+  "repairLeversDefinedNotApplied": [
+    {
+      "appliedIn93J3": false,
+      "counterprobe": "if terminal diversity or avgSteps trend does not improve while action telemetry stays green, reward/curriculum cause is refuted",
+      "expectedEffect": "reduce survival-only reward dominance and expose non-death terminal/progress pressure before any pilot",
+      "id": "reward-terminal-pressure-r1",
+      "scope": "93J.4 candidate micro-test only"
+    },
+    {
+      "appliedIn93J3": false,
+      "counterprobe": "if natural-terminal/death mix remains player-dead-only, escalate back to diagnosis instead of widening training",
+      "expectedEffect": "force a small terminal/diversity diagnostic window without candidate, freeze, holdout optimization, or long-run semantics",
+      "id": "curriculum-terminal-diversity-r1",
+      "scope": "93J.4 candidate micro-test only"
+    }
+  ],
+  "resultClass": "reward-curriculum-primary-cause-ready-for-r1",
+  "rewardCurriculumGate": {
+    "diagnosis": "Reward/curriculum is the single active root-cause candidate after observation, terminal mapping, matrix contract, action safety, and PPO learning-metric collapse checks are cleared: reward is survival-only, eval/holdout remain player-dead-only, and steps remain below the DQN anchor.",
+    "green": false,
+    "longRunBlocked": true,
+    "notCausal": false,
+    "pilotBlocked": true,
+    "primaryCause": true,
+    "readyForRepair": true,
+    "readyForTraining": false
+  },
+  "sourceArtifacts": {
+    "bt93gRewardGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/reward_gate_report.json",
+      "role": "BT93G reward gate report",
+      "sha256": "f221e4bfb849bca314bc8873433b68b05d4debd84bbef8eee6aeb9b4c9db8f92"
+    },
+    "bt93iConfig": {
+      "closureCapable": true,
+      "path": "python/configs/ppo_bt93i_terminal_curriculum_repair.json",
+      "role": "BT93I terminal curriculum config",
+      "sha256": "779b1c9d573480b4ea04a26606a2d263f8fb614a23b3d2e66e7571e9eb19623a"
+    },
+    "evalPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_terminal_curriculum_repair_eval.json",
+      "role": "BT93I eval pointer",
+      "sha256": "dfff5fd998e61e7c57530b3abc67a492f1eef5eb21afc110f9ddd1a7bb1e9ec6"
+    },
+    "evalReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T153044Z-terminal-curriculum-repair-eval/eval_report.json",
+      "role": "BT93I eval report",
+      "sha256": "b3609beb8c20a922f297bd47a4684ca7361c7cac03aff52bc60a403512158653"
+    },
+    "holdoutPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_holdout_eval.json",
+      "role": "BT93I holdout pointer",
+      "sha256": "5abf59cd3a0aa2ec379db2079a07b068d726ce070f1080cb976bec361e55ebf6"
+    },
+    "holdoutReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T153136Z-holdout-eval/eval_report.json",
+      "role": "BT93I holdout report",
+      "sha256": "f69fed6de58f77e440f1e1240ae898bb076e0d5fe08040d8e00a2d2a718d1af4"
+    },
+    "matrixGreen": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_green_report.json",
+      "role": "BT93I matrix green report",
+      "sha256": "c664bdc5f716ed7575dd02c9adf7dd7d5bd2aed92c8e6932c0f546639a43d4fc"
+    },
+    "trainPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_terminal_curriculum_repair.json",
+      "role": "BT93I train pointer",
+      "sha256": "10899e5a181fa0d5bd2c7bcaef21fca6c4437829815c83dc11199fe3010630be"
+    },
+    "trainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+      "role": "BT93I train report",
+      "sha256": "f819b7d808b1694396112a41659bd2ae15a88b8fd7d082e45b8074a51b5928da"
+    }
+  },
+  "sourceChecks": {
+    "checks": {
+      "learnerSmoke": {
+        "episodeShorteningCheck": true,
+        "grad_norm": true,
+        "ppoLearningMetrics": true,
+        "rewardBreakdownTotals": true,
+        "survivalRewardShare": true
+      },
+      "rewardCalculator": {
+        "CURRICULUM_STAGES": true,
+        "DEFAULT_TRAINING_REWARD_WEIGHTS": true,
+        "crash": true,
+        "loss": true,
+        "survival": true,
+        "survivalPressureBonus": true
+      }
+    },
+    "ok": true,
+    "sourceArtifacts": {
+      "learnerSmoke": {
+        "closureCapable": true,
+        "path": "python/scripts/bt93c_learner_smoke.py",
+        "role": "PPO reward/learning diagnostics aggregation",
+        "sha256": "446358c4eb0c601619b83d9ec26f16c3cd1ea28a4985e1329e5869261e016c57"
+      },
+      "rewardCalculator": {
+        "closureCapable": true,
+        "path": "src/state/training/RewardCalculator.js",
+        "role": "JS training reward calculator",
+        "sha256": "455bfd1c3aa94ea23a4275d410c2f48454315937ce41b8b57efcdcfca86a0c74"
+      }
+    }
+  }
+}

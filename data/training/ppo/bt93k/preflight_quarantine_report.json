@@ -1,0 +1,330 @@
+{
+  "activeProcesses": {
+    "activeTrainingProcessCount": 0,
+    "collector": {
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command $items = Get-CimInstance Win32_Process | Where-Object { ($_.Name -match '^(python|python3|node|node.exe|python.exe)') -and ($_.CommandLine -match '(training|ppo|bt93|train\\.py|eval\\.py|user-owned|headless-lane)') } | ForEach-Object { [PSCustomObject]@{ pid=$_.ProcessId; name=$_.Name; commandLine=$_.CommandLine } }; $items | ConvertTo-Json -Depth 4",
+      "returnCode": 0,
+      "stderrTail": "",
+      "stdoutTail": "{\n    \"pid\":  10624,\n    \"name\":  \"python.exe\",\n    \"commandLine\":  \"\\\"C:\\\\Users\\\\Justin Wolff\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\\\" python/scripts/bt93k_preflight_quarantine.py\"\n}\n",
+      "timedOut": false
+    },
+    "processes": []
+  },
+  "blockId": "BT93K",
+  "bt93jStartState": {
+    "avgStepsPerEpisodeObserved": 166.866667,
+    "bt94aClaimableFromPostDecision": null,
+    "dqnStepsDelta": 49.341667,
+    "longrunResultClass": "reward-still-blocking",
+    "naturalTerminalCount": 0,
+    "objectiveReward": 0,
+    "phase93J6Allowed": null,
+    "playerDeadOnly": true,
+    "postDecisionResultClass": "diagnose-loop-required",
+    "progressReward": 0
+  },
+  "commands": {
+    "guardMain": {
+      "command": "npm run guard:main",
+      "returnCode": 0,
+      "stderrTail": "",
+      "stdoutTail": "\n> cuviosclash@0.9.0 guard:main\n> npm run git:acl:heal && node scripts/ensure-main-branch.mjs\n\n\n> cuviosclash@0.9.0 git:acl:heal\n> node scripts/heal-git-acl-windows.mjs\n\n[git-acl-heal] ok:no_explicit_deny\n",
+      "timedOut": false
+    },
+    "planCheck": {
+      "command": "npm run plan:check",
+      "returnCode": 0,
+      "stderrTail": "",
+      "stdoutTail": "\n> cuviosclash@0.9.0 plan:check\n> node scripts/validate-umsetzungsplan.mjs\n\nMaster plan validation passed.\n",
+      "timedOut": false
+    }
+  },
+  "generatedAt": "2026-04-27T22:56:46Z",
+  "generatedBy": "python/scripts/bt93k_preflight_quarantine.py",
+  "git": {
+    "branch": "bot-training",
+    "branchExceptionApprovedByUser": true,
+    "dirtyEntries": [
+      {
+        "path": "docs/Fehlerberichte/2026-04-27_user-owned-4env-longrun-ended-without-final-report.md",
+        "status": "M"
+      },
+      {
+        "path": "docs/bot-training/Bot_Trainingsplan.md",
+        "status": " M"
+      },
+      {
+        "path": "docs/lock-status/_locks-registry.json",
+        "status": " M"
+      },
+      {
+        "path": "docs/prozess/Dokumentationsstatus.md",
+        "status": " M"
+      },
+      {
+        "path": "docs/referenz/ai_architecture_context.md",
+        "status": " M"
+      },
+      {
+        "path": "docs/referenz/ai_project_onboarding.md",
+        "status": " M"
+      },
+      {
+        "path": "docs/referenz/architektur_ausfuehrlich.md",
+        "status": " M"
+      },
+      {
+        "path": "python/envs/curvios_env.py",
+        "status": " M"
+      },
+      {
+        "path": "python/scripts/bt93c_learner_smoke.py",
+        "status": " M"
+      },
+      {
+        "path": "scripts/training-headless-lane-runner.mjs",
+        "status": " M"
+      },
+      {
+        "path": "scripts/training-single-env-bridge.mjs",
+        "status": " M"
+      },
+      {
+        "path": "data/training/ppo/bt93k/",
+        "status": "??"
+      },
+      {
+        "path": "data/training/ppo/user-owned-survival-3m-4env/",
+        "status": "??"
+      },
+      {
+        "path": "data/training/ppo/user-owned-survival-3m/",
+        "status": "??"
+      },
+      {
+        "path": "dev/scripts/check-ppo-cuda-readiness.ps1",
+        "status": "??"
+      },
+      {
+        "path": "dev/scripts/start-user-owned-ppo-survival-3m-longrun.ps1",
+        "status": "??"
+      },
+      {
+        "path": "dev/scripts/stop-user-owned-ppo-survival-at-next-checkpoint.ps1",
+        "status": "??"
+      },
+      {
+        "path": "dev/scripts/switch-user-owned-ppo-survival-to-4env-at-next-checkpoint.ps1",
+        "status": "??"
+      },
+      {
+        "path": "docs/plaene/neu/Bot_Trainingsplan_PPO_Only_Entwurf_2026-04-27.md",
+        "status": "??"
+      },
+      {
+        "path": "logs/",
+        "status": "??"
+      },
+      {
+        "path": "python/configs/ppo_user_owned_survival_3m_4env_longrun.json",
+        "status": "??"
+      },
+      {
+        "path": "python/configs/ppo_user_owned_survival_3m_longrun.json",
+        "status": "??"
+      },
+      {
+        "path": "python/scripts/bt93k_preflight_quarantine.py",
+        "status": "??"
+      }
+    ],
+    "dirtyWorkspace": true,
+    "expectedBranch": "bot-training",
+    "sha": "4f9f6b41b1e26c9bd85bc6974ce202bf17ff6afc"
+  },
+  "inputArtifacts": {
+    "bt93jLongrun": {
+      "exists": true,
+      "isFile": true,
+      "path": "data/training/ppo/bt93j/user_owned_1m_longrun_report.json",
+      "resultClass": "reward-still-blocking",
+      "sha256": "239fb23a15b0bba92f86ddccbf1d141d4ce162860092afc6a6de4220b4baa9a0"
+    },
+    "bt93jPostDecision": {
+      "exists": true,
+      "isFile": true,
+      "path": "data/training/ppo/bt93j/post_longrun_decision_report.json",
+      "resultClass": "diagnose-loop-required",
+      "sha256": "8ce6a9e37743c7303f08522cd225eaf3392618eb112efb384c17731d2689ee85"
+    },
+    "bt94aNoStartGate": {
+      "bt94aBlockerCount": 4,
+      "candidateRunsAllowed": false,
+      "claimable": false,
+      "exists": true,
+      "isFile": true,
+      "matrixDefinitionAllowed": false,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "precomparisonResultClass": "ppo-regression",
+      "resultClass": "blocked-no-start",
+      "sha256": "288018064b50e130fb0fea7ded67b7ac2b29a6c393198a9a494417d16fd37062"
+    },
+    "userOwned4EnvFailureReport": {
+      "exists": true,
+      "isFile": true,
+      "path": "docs/Fehlerberichte/2026-04-27_user-owned-4env-longrun-ended-without-final-report.md",
+      "sha256": "d131e3c4bf512d722ce242381ef1ce4c22516437db070d4487e8fb3bb917edcc"
+    },
+    "userOwnedStopLog": {
+      "exists": true,
+      "isFile": true,
+      "path": "logs/training/user-owned-survival-stop/20260427T124452.stop.json",
+      "sha256": "66362b33a9d5238449c4ce97b5185d9f3d41ebf41a2ef8a5e20f6417a689b106"
+    }
+  },
+  "noGoStatus": {
+    "bt93kRunsAllowedNow": false,
+    "noFurtherRunBefore": [
+      "93K.1 supervisor_contract_report.json",
+      "signal_metric_contract.json",
+      "explicit run_exit_report contract",
+      "cleared active process list"
+    ],
+    "preflightBlockingReasons": [],
+    "runBlockingReasons": [
+      "supervisor_contract_missing_until_93K_1"
+    ]
+  },
+  "ok": true,
+  "phaseId": "93K.0",
+  "staleLabels": [
+    {
+      "label": "BT93J",
+      "requiredReplacement": "BT93K/93K.* run kind under data/training/ppo/bt93k/**",
+      "status": "historic-diagnostic-only"
+    },
+    {
+      "label": "93J.5b",
+      "requiredReplacement": "BT93K/93K.* run kind under data/training/ppo/bt93k/**",
+      "status": "historic-diagnostic-only"
+    },
+    {
+      "label": "bt93j-user-owned-1m-proof-longrun",
+      "requiredReplacement": "BT93K/93K.* run kind under data/training/ppo/bt93k/**",
+      "status": "historic-diagnostic-only"
+    },
+    {
+      "label": "user-owned-survival-3m",
+      "requiredReplacement": "BT93K/93K.* run kind under data/training/ppo/bt93k/**",
+      "status": "historic-diagnostic-only"
+    },
+    {
+      "label": "user-owned-survival-3m-4env",
+      "requiredReplacement": "BT93K/93K.* run kind under data/training/ppo/bt93k/**",
+      "status": "historic-diagnostic-only"
+    }
+  ],
+  "userOwnedSideLaneQuarantine": {
+    "classification": "diagnostic-only",
+    "closureCapable": false,
+    "dirtyStatusEntries": [
+      {
+        "path": "data/training/ppo/user-owned-survival-3m-4env/",
+        "status": "??"
+      },
+      {
+        "path": "data/training/ppo/user-owned-survival-3m/",
+        "status": "??"
+      },
+      {
+        "path": "python/configs/ppo_user_owned_survival_3m_4env_longrun.json",
+        "status": "??"
+      },
+      {
+        "path": "python/configs/ppo_user_owned_survival_3m_longrun.json",
+        "status": "??"
+      }
+    ],
+    "matchedPaths": [
+      {
+        "exists": true,
+        "isDir": true,
+        "path": "data/training/ppo/user-owned-survival-3m",
+        "pattern": "data/training/ppo/user-owned-survival-3m*",
+        "sha256": null
+      },
+      {
+        "exists": true,
+        "isDir": true,
+        "path": "data/training/ppo/user-owned-survival-3m-4env",
+        "pattern": "data/training/ppo/user-owned-survival-3m*",
+        "sha256": null
+      },
+      {
+        "exists": true,
+        "isDir": true,
+        "path": "data/training/ppo/user-owned-survival-3m-4env",
+        "pattern": "data/training/ppo/user-owned-survival-3m-4env*",
+        "sha256": null
+      },
+      {
+        "exists": true,
+        "isDir": true,
+        "path": "logs/training/user-owned-survival-stop",
+        "pattern": "logs/training/user-owned-survival-stop*",
+        "sha256": null
+      },
+      {
+        "exists": true,
+        "isDir": false,
+        "path": "dev/scripts/start-user-owned-ppo-survival-3m-longrun.ps1",
+        "pattern": "dev/scripts/*user-owned*survival*.ps1",
+        "sha256": "95a0ce9e6f2bd068fb49e23e5c65422c5f5b927035a940797f79e247833ba3c8"
+      },
+      {
+        "exists": true,
+        "isDir": false,
+        "path": "dev/scripts/stop-user-owned-ppo-survival-at-next-checkpoint.ps1",
+        "pattern": "dev/scripts/*user-owned*survival*.ps1",
+        "sha256": "11e440c262f45f80b577f1bd29643b926b535715e4d4d18668770b85ea9e0d88"
+      },
+      {
+        "exists": true,
+        "isDir": false,
+        "path": "dev/scripts/switch-user-owned-ppo-survival-to-4env-at-next-checkpoint.ps1",
+        "pattern": "dev/scripts/*user-owned*survival*.ps1",
+        "sha256": "31557d43054c3fd8fde004212facad593c346ec0384b36b79ba5744abb5ff182"
+      },
+      {
+        "exists": true,
+        "isDir": false,
+        "path": "python/configs/ppo_user_owned_survival_3m_4env_longrun.json",
+        "pattern": "python/configs/ppo_user_owned_survival*.json",
+        "sha256": "243d3c8d89b268b92ca6773261d79d356642db482283fbd91c05d2cd2633a79b"
+      },
+      {
+        "exists": true,
+        "isDir": false,
+        "path": "python/configs/ppo_user_owned_survival_3m_longrun.json",
+        "pattern": "python/configs/ppo_user_owned_survival*.json",
+        "sha256": "3ca26f7ee8d616737b7cd04be21a299ab3a0c8aee4e1d7aa6dbfd9c1734998ea"
+      }
+    ],
+    "prohibitedAsEvidenceFor": [
+      "BT94A-claim",
+      "candidate",
+      "freeze",
+      "baseline",
+      "holdout",
+      "promote",
+      "PPO-Validate",
+      "rollout"
+    ],
+    "reason": "The 3M/4-Env side lane has no BT93K run kind, no versioned supervisor contract, no PID/sidecar report, no graceful-stop proof, and no final run_exit_report.json."
+  },
+  "writeTargets": {
+    "bt93kRoot": "data/training/ppo/bt93k",
+    "exists": true,
+    "reportPath": "data/training/ppo/bt93k/preflight_quarantine_report.json"
+  }
+}

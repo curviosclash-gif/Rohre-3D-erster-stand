@@ -1,0 +1,114 @@
+{
+  "configVersion": "user-owned-survival-3m-longrun-v1",
+  "blockId": "BT93J",
+  "phaseId": "93J.5b",
+  "profileId": "user-owned-survival-3m-longrun-v1",
+  "claim": "User-owned PPO survival 3M longrun",
+  "scope": "User-owned diagnostic PPO longrun outside the bot-training plan; starts from the latest completed BT93J 1M longrun checkpoint, trains 3000000 additional PPO timesteps, raises the per-episode cap to a 10-minute survival horizon, and does not create candidate, freeze, promote, holdout, PPO-Validate, baseline, BT94A, or runtime integration semantics.",
+  "env": {
+    "modeId": "runtime-near-headless-v1",
+    "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+    "rewardProfileId": "bt93j-reward-curriculum-proof-v1",
+    "envCount": 2,
+    "evalEnvCount": 2,
+    "maxStepsPerEpisode": 36000,
+    "controllerTimeoutSeconds": 30,
+    "trainSeeds": [934, 935, 936, 937],
+    "evalSeeds": [944, 945, 946],
+    "holdoutSeeds": [960, 961],
+    "maps": ["standard", "maze"],
+    "holdoutStatus": "reserved and unused in this user-owned diagnostic longrun"
+  },
+  "rollout": {
+    "userOwnedProofLongrunTimesteps": 3000000,
+    "evalSteps": 72000,
+    "evalMinCompletedEpisodes": 4,
+    "nStepsPerEnv": 64,
+    "batchSize": 32,
+    "nEpochs": 2,
+    "wallClockLimitSeconds": 259200,
+    "timeoutBudgetSeconds": 259200,
+    "checkpointFrequencyTimesteps": 100000,
+    "evalIntervalTimesteps": 100000,
+    "budgetRule": "User-owned survival longrun only; 3000000 additional PPO timesteps are trained from the latest completed 1M model package, with a 10-minute episode cap expressed as 36000 steps at 60 steps/second."
+  },
+  "algorithm": {
+    "library": "stable-baselines3",
+    "name": "PPO",
+    "policy": "MlpPolicy",
+    "device": "cpu",
+    "gamma": 0.99,
+    "gaeLambda": 0.95,
+    "learningRate": 0.00025,
+    "clipRange": 0.2,
+    "entCoef": 0.01,
+    "vfCoef": 0.5,
+    "maxGradNorm": 0.5
+  },
+  "policy": {
+    "netArch": [64, 64],
+    "activation": "tanh",
+    "actorCriticHeadsRequired": true,
+    "actionSurfaceId": "bt93g-masked-semantic-action-v1"
+  },
+  "normalization": {
+    "implementation": "stable_baselines3.common.vec_env.VecNormalize",
+    "normalizeObservation": true,
+    "normalizeReward": false,
+    "clipObservation": 10.0,
+    "persistStatsWithCheckpoint": true
+  },
+  "diagnostics": {
+    "collapseThresholds": {
+      "maxApproxKl": 0.2,
+      "maxClipFraction": 0.6,
+      "minEntropy": 0.01,
+      "maxValueLoss": 100.0,
+      "maxGradNorm": 0.5,
+      "minExplainedVariance": -1.0
+    },
+    "safetyThresholds": {
+      "postDecodeClampRateLt": 0.5,
+      "safetyVetoRateLt": 0.25,
+      "invalidActionRateEq": 0.0,
+      "sanitizerRateEq": 0.0
+    },
+    "technicalStopRules": [
+      "stop on NaN or Inf in reward, observation, loss, KL, entropy, value loss, or gradient norm",
+      "stop on runtimeErrorCount > 0, timeout-class drift, or artifact corruption",
+      "stop on observation schema/range/staleness drift",
+      "stop on invalidActionRate > 0, sanitizerRate > 0, postDecodeClampRate > 0, or vetoRate >= 0.25",
+      "stop if a mandatory 100000-step checkpoint or eval snapshot is missing"
+    ],
+    "classification": "User-owned diagnostic survival longrun; all results remain diagnostic and cannot become candidate, freeze, promote, rollout, BT94A, holdout, or PPO-Validate evidence."
+  },
+  "artifacts": {
+    "root": "data/training/ppo/user-owned-survival-3m",
+    "requirements": "python/requirements-ppo.txt",
+    "dependencyLockReport": "data/training/ppo/bt93c/dependency_lock_report.json",
+    "cleanEnvReport": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+    "diagnosticSplit": "data/training/ppo/bt93j/diagnostic_split_report.json",
+    "pilotReadinessReport": "data/training/ppo/bt93j/pilot_readiness_report.json",
+    "r1MicroTestReport": "data/training/ppo/bt93j/r1_micro_test_report.json",
+    "terminalSemanticsReport": "data/training/ppo/bt93j/terminal_semantics_report.json",
+    "matrixContractReport": "data/training/ppo/bt93j/matrix_contract_report.json",
+    "actionPolicyDiagnostics": "data/training/ppo/bt93j/action_policy_diagnostics.json",
+    "rewardCurriculumDiagnostics": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
+    "r2CounterprobeReport": "data/training/ppo/bt93j/r2_micro_train_counterprobe_report.json",
+    "rewardCurriculumProofLaneReport": "data/training/ppo/bt93j/reward_curriculum_proof_lane_report.json",
+    "userOwned1mLongrunReadinessReport": "data/training/ppo/bt93j/user_owned_1m_longrun_readiness_report.json"
+  },
+  "guardrails": {
+    "repairOnly": true,
+    "baselineRunsStarted": false,
+    "pilotRunsStarted": false,
+    "candidateRunsAllowed": false,
+    "candidateFreezeAllowed": false,
+    "promotionAllowed": false,
+    "ppoValidateAllowed": false,
+    "holdoutAllowed": false,
+    "bt94aGateRefreshAllowed": false,
+    "fourEnvAllowed": false,
+    "runtimeSurfacesTouched": []
+  }
+}

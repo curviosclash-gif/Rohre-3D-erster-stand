@@ -1,0 +1,162 @@
+{
+  "blockId": "BT93L",
+  "bt94aClosed": true,
+  "changedFiles": [
+    "data/training/ppo/bt93l/action_effect_report.json",
+    "data/training/ppo/bt93l/baseline_matrix_report.json",
+    "data/training/ppo/bt93l/handover_package.json",
+    "data/training/ppo/bt93l/micro_ppo_signal_report.json",
+    "data/training/ppo/bt93l/progress_reachability_report.json",
+    "data/training/ppo/bt93l/reward_balance_report.json",
+    "data/training/ppo/bt93l/reward_signal_truth_table.json",
+    "data/training/ppo/bt93l/task_metric_contract.json",
+    "docs/bot-training/Bot_Trainingsplan.md",
+    "docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md",
+    "python/scripts/bt93l_action_effect.py",
+    "python/scripts/bt93l_baseline_matrix.py",
+    "python/scripts/bt93l_handover.py",
+    "python/scripts/bt93l_micro_ppo_signal.py",
+    "python/scripts/bt93l_progress_reachability.py",
+    "python/scripts/bt93l_reward_balance.py",
+    "python/scripts/bt93l_task_metric_contract.py",
+    "scripts/training-headless-lane-runner.mjs",
+    "tests/training-environment.contract.test.mjs"
+  ],
+  "commands": {
+    "metaGate": "npm run gates:pre-commit",
+    "write": "python python/scripts/bt93l_closure_gate.py --write-report"
+  },
+  "forbiddenProductiveSurfaceTouched": [],
+  "generatedAt": "2026-04-28T20:10:00Z",
+  "generatedBy": "python/scripts/bt93l_closure_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "2eea4a1cafe4f352179c279fb283a8cd5bfa3947",
+    "sha": "40a8eee7a1678d719291c51e5268b82535122b83"
+  },
+  "guardrails": {
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": []
+  },
+  "honestResult": true,
+  "ok": true,
+  "phaseCoverage": {
+    "93L.99.1": true,
+    "93L.99.2": true,
+    "93L.99.3": true,
+    "93L.99.4": true,
+    "93L.99.5": true
+  },
+  "phaseId": "93L.99",
+  "resultClass": "diagnose-loop-required",
+  "schemaVersion": "bt93l-closure-gate-report-v1",
+  "sourceArtifacts": {
+    "actionEffectReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/action_effect_report.json",
+      "phaseId": "93L.4",
+      "resultClass": "action-effect-green",
+      "role": "BT93L.4 action effect",
+      "sha256": "3cb30bf4f9c599aec547ad0106625be9eb63340a5a64bd7a61194169ddf486b8"
+    },
+    "baselineMatrixReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L.5 baseline matrix",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013"
+    },
+    "bt94aNoStartGate": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A red no-start gate",
+      "sha256": "288018064b50e130fb0fea7ded67b7ac2b29a6c393198a9a494417d16fd37062"
+    },
+    "handoverPackage": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/handover_package.json",
+      "phaseId": "93L.7",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93L.7 handover",
+      "sha256": "de967b8dbe18facfc9cef40af5bef3fc9c5d69a9db31c50e1dcb404011ee6e5f"
+    },
+    "microPpoSignalReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/micro_ppo_signal_report.json",
+      "phaseId": "93L.6",
+      "resultClass": "signal-green",
+      "role": "BT93L.6 micro PPO signal",
+      "sha256": "01912b85c4ad39ef9b4f92d28f19ee29f27ab85670ba451cb7551a679fa74f34"
+    },
+    "progressReachabilityReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/progress_reachability_report.json",
+      "phaseId": "93L.2",
+      "resultClass": "progress-reachability-green",
+      "role": "BT93L.2 progress reachability",
+      "sha256": "330b0c15b5bce083d6697e5886d0fb2884237ee3cf2097c176e72e465f97b651"
+    },
+    "rewardBalanceReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/reward_balance_report.json",
+      "phaseId": "93L.3",
+      "resultClass": "reward-balance-green",
+      "role": "BT93L.3 reward balance",
+      "sha256": "25c8d417fdfa23e2f8cb6e0b9c548648f0780775acc78defab84fd03cd53569e"
+    },
+    "taskMetricContract": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L.1 task metric contract",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0"
+    }
+  },
+  "sourceOk": {
+    "actionEffectReport": true,
+    "baselineMatrixReport": true,
+    "handoverPackage": true,
+    "microPpoSignalReport": true,
+    "progressReachabilityReport": true,
+    "rewardBalanceReport": true,
+    "taskMetricContract": true
+  },
+  "summary": {
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "finalResult": "diagnose-loop-required",
+    "followup": "BT93M DeathBefore60-Stability und DQN-Same-Matrix-Anker (manual intake required)",
+    "followupRequired": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "nextAllowedWork": "manual intake/replan for BT93M; no BT94A claim"
+  }
+}

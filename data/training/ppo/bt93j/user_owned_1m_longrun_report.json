@@ -1,0 +1,3748 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-26T21:49:20Z",
+  "generatedBy": "python/train.py::BT93J.5c",
+  "blockId": "BT93J",
+  "phaseId": "93J.5c",
+  "runId": "20260426T175502Z-bt93j-user-owned-1m-proof-longrun",
+  "runKind": "bt93j-user-owned-1m-proof-longrun",
+  "resultClass": "reward-still-blocking",
+  "requestedTimesteps": 1000000,
+  "actualProgressTimesteps": 1000000,
+  "modelNumTimesteps": 1004992,
+  "classificationRules": {
+    "greenFor93J6": "final eval avgStepsPerEpisodeObserved >= DQN anchor, terminal matrix is not player-dead-only, natural terminal evidence exists, and no technical stop fired",
+    "undertrainingSupported": "steps improved from the R2 same-red start and terminal distribution diversified, but 93J.6 gate is still not green",
+    "rewardStillBlocking": "1M diagnostic proof lane did not separate reward/curriculum from the same-red start finding",
+    "newInstability": "runtime, action-safety, non-finite metric, or technical stop rule fired",
+    "measurementInvalid": "mandatory checkpoint/eval snapshot missing, final eval unavailable, or snapshot writer failed"
+  },
+  "startFinding": {
+    "r2ResultClass": "same-red",
+    "avgStepsPerEpisodeObserved": 72.833333,
+    "dqnAnchor": 117.525,
+    "playerDeadOnly": true
+  },
+  "finalEval": {
+    "avgStepsPerEpisodeObserved": 166.866667,
+    "averageBotSurvivalObserved": 166.866667,
+    "completedEpisodeCount": 15,
+    "longestEpisode": 180,
+    "completedEpisodeLengths": [
+      180,
+      180,
+      180,
+      180,
+      180,
+      180,
+      59,
+      180,
+      180,
+      108,
+      176,
+      180,
+      180,
+      180,
+      180
+    ],
+    "rewardBreakdownTotals": {
+      "baseStep": -13.15,
+      "checkpointReached": 0.0,
+      "crash": 0.0,
+      "damageDealt": 0.0,
+      "damageTaken": 0.0,
+      "external": 0.0,
+      "itemPickup": 0.0,
+      "itemUse": 0.0,
+      "kill": 0.0,
+      "loss": -12.0,
+      "lowHealthThreat": 0.0,
+      "opponentRisk": 0.0,
+      "parcoursCompleted": 0.0,
+      "stuck": 0.0,
+      "survival": 104.6,
+      "survivalPressureBonus": 0.0,
+      "trailRisk": 0.0,
+      "wallRisk": 0.0,
+      "win": 0.0,
+      "wrongOrder": 0.0
+    },
+    "actionTelemetry": {
+      "totalActions": 2630,
+      "invalidActionCount": 0,
+      "preSamplingMaskCount": 2630,
+      "maskCount": 0,
+      "postDecodeClampCount": 0,
+      "vetoCount": 0,
+      "sanitizerCount": 0,
+      "noopCount": 0,
+      "invalidActionRate": 0.0,
+      "preSamplingMaskRate": 1.0,
+      "maskRate": 0.0,
+      "postDecodeClampRate": 0.0,
+      "vetoRate": 0.0,
+      "sanitizerRate": 0.0,
+      "noopRate": 0.0,
+      "fieldCounts": {},
+      "sanitizerReasons": {}
+    },
+    "terminalMatrix": {
+      "terminalReasonCounts": {
+        "player-dead": 3
+      },
+      "deathCauseCounts": {
+        "player-dead": 3
+      },
+      "naturalTerminalCount": 0,
+      "maxSteps": 12,
+      "runtimeErrorCount": 0,
+      "playerDeadOnly": true
+    }
+  },
+  "trend": {
+    "stepsImproved": true,
+    "terminalDiversified": false,
+    "deltaVsStartAvgSteps": 94.033334,
+    "deltaVsDqnAnchor": 49.341667
+  },
+  "snapshotCadence": {
+    "checkpointFrequencyTimesteps": 50000,
+    "evalIntervalTimesteps": 50000,
+    "expectedSteps": [
+      50000,
+      100000,
+      150000,
+      200000,
+      250000,
+      300000,
+      350000,
+      400000,
+      450000,
+      500000,
+      550000,
+      600000,
+      650000,
+      700000,
+      750000,
+      800000,
+      850000,
+      900000,
+      950000,
+      1000000
+    ],
+    "presentSteps": [
+      50000,
+      100000,
+      150000,
+      200000,
+      250000,
+      300000,
+      350000,
+      400000,
+      450000,
+      500000,
+      550000,
+      600000,
+      650000,
+      700000,
+      750000,
+      800000,
+      850000,
+      900000,
+      950000,
+      1000000
+    ],
+    "missingSteps": [],
+    "ok": true
+  },
+  "technicalStop": {
+    "stopReason": null,
+    "stopError": null,
+    "allSnapshotGatesOk": true,
+    "measurementInvalid": false,
+    "newInstability": false
+  },
+  "snapshots": [
+    {
+      "stepLabelTimesteps": 50000,
+      "progressTimesteps": 50000,
+      "modelNumTimesteps": 54992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0050000/snapshot_manifest.json",
+        "sha256": "af8187e53bda8b942ca4315c010d1b090c23a9ca524c6eb30fcf39dff7b994d9"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0050000/eval_snapshot.json",
+        "sha256": "03bd14885a11daa1f717991a104c4c9b954b70c10c38fa7dc8672fbf4031821e",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 150.2,
+          "averageBotSurvivalObserved": 150.2,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            113,
+            65,
+            180,
+            180,
+            180,
+            180,
+            180,
+            76,
+            180,
+            140,
+            180,
+            180,
+            180,
+            180,
+            59
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -11.39,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -20.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 90.52,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2278,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2278,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 5
+            },
+            "deathCauseCounts": {
+              "player-dead": 5
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 10,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1139
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 100000,
+      "progressTimesteps": 100000,
+      "modelNumTimesteps": 104992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0100000/snapshot_manifest.json",
+        "sha256": "5a64dd44303d77c5dc9b96787680d1ae1dc65c513ea37c081f527c8086cf11d1"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0100000/eval_snapshot.json",
+        "sha256": "c0fbd166e74dbf7cd3ab4df8215aa5cdc60866a8ac188ac090d50242f2f1d35a",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 125.266667,
+          "averageBotSurvivalObserved": 125.266667,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            54,
+            51,
+            180,
+            180,
+            180,
+            180,
+            39,
+            180,
+            18,
+            180,
+            54,
+            180,
+            43,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -9.61,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -24.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 76.28,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 1922,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 1922,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 129,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.067118,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 6
+            },
+            "deathCauseCounts": {
+              "player-dead": 6
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 9,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 961
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 150000,
+      "progressTimesteps": 150000,
+      "modelNumTimesteps": 154992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0150000/snapshot_manifest.json",
+        "sha256": "258bc247d5758861c6d1889177a0418897079e74b83536523c4924b282657698"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0150000/eval_snapshot.json",
+        "sha256": "e4eba92e96c3ba343d54b9077ebe360cc035e7095e54d8a2067bfa1a0f092a9f",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 148.4,
+          "averageBotSurvivalObserved": 148.4,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            35,
+            115,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            52,
+            44
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -11.76,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 93.48,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2352,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2352,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 36,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.015306,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 4
+            },
+            "deathCauseCounts": {
+              "player-dead": 4
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 11,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1176
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 200000,
+      "progressTimesteps": 200000,
+      "modelNumTimesteps": 204992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0200000/snapshot_manifest.json",
+        "sha256": "f731aa5ac87f8aba5e2171568d7aba2084e559676b814c066cfa31ee2752c0f2"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0200000/eval_snapshot.json",
+        "sha256": "12dc3078c5516ac2e483e11862b15652d1f8726ea21249239052b6cb5763ae6f",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 172.4,
+          "averageBotSurvivalObserved": 172.4,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            66,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -13.26,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -4.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 105.48,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2652,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2652,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 10,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.003771,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 1
+            },
+            "deathCauseCounts": {
+              "player-dead": 1
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 14,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1326
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 250000,
+      "progressTimesteps": 250000,
+      "modelNumTimesteps": 254992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0250000/snapshot_manifest.json",
+        "sha256": "61a121d6189e4a4e36507ee3c064e72acd78162288e260a3f2f3f873d7bb2bcf"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0250000/eval_snapshot.json",
+        "sha256": "87120eadd7a018e3e44b089b65c868230171f8fe7cd68615fb81ef4859b190df",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 159.866667,
+          "averageBotSurvivalObserved": 159.866667,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            180,
+            180,
+            76,
+            180,
+            180,
+            108,
+            54,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -12.42,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -12.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 98.76,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2484,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2484,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 3
+            },
+            "deathCauseCounts": {
+              "player-dead": 3
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 12,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1242
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 300000,
+      "progressTimesteps": 300000,
+      "modelNumTimesteps": 304992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0300000/snapshot_manifest.json",
+        "sha256": "930229097cb6a1badd33a4f808e407510d758781e137f4ab1d6aeb1ae45663e0"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0300000/eval_snapshot.json",
+        "sha256": "4214a6797c671746a7036971bf77d3bf15c8747c7cd3bba7301905cbd59b8840",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 155.0,
+          "averageBotSurvivalObserved": 155.0,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            180,
+            180,
+            180,
+            180,
+            26,
+            47,
+            180,
+            180,
+            92,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -11.72,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -12.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 93.16,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2344,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2344,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 2,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.000853,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 3
+            },
+            "deathCauseCounts": {
+              "player-dead": 3
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 12,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1172
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 350000,
+      "progressTimesteps": 350000,
+      "modelNumTimesteps": 354992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0350000/snapshot_manifest.json",
+        "sha256": "09c413ed86bc9a17e689f9801a9a2af2d38861248ab90f5e6a913ab79701a6cf"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0350000/eval_snapshot.json",
+        "sha256": "fc11ae0662c9cd78640dfa3ba3defea057fc6b44b5d7fb344456725009edf43f",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 171.4,
+          "averageBotSurvivalObserved": 171.4,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            180,
+            180,
+            180,
+            180,
+            157,
+            180,
+            180,
+            180,
+            74,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -13.34,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -8.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 106.12,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2668,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2668,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 24,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.008996,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 2
+            },
+            "deathCauseCounts": {
+              "player-dead": 2
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 13,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1334
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 400000,
+      "progressTimesteps": 400000,
+      "modelNumTimesteps": 404992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0400000/snapshot_manifest.json",
+        "sha256": "7600af2430c3014cd8cb5a0f9a786c4da134f14258ff031cf7c9b9e62098ed8b"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0400000/eval_snapshot.json",
+        "sha256": "d1a74c6357e7d46be650de1ed61525cff77a060e1ece012572bb47d72a439003",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 154.2,
+          "averageBotSurvivalObserved": 154.2,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            180,
+            180,
+            180,
+            180,
+            68,
+            180,
+            26,
+            180,
+            180,
+            180,
+            59,
+            180,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -11.65,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -12.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 92.6,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2330,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2330,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 41,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.017597,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 3
+            },
+            "deathCauseCounts": {
+              "player-dead": 3
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 12,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1165
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 450000,
+      "progressTimesteps": 450000,
+      "modelNumTimesteps": 454992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0450000/snapshot_manifest.json",
+        "sha256": "900234f2d63b92088fa05f865e6ba99460c1c2ffa33965197b370123d992eeac"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0450000/eval_snapshot.json",
+        "sha256": "8456b09419836a2b02b9661338275ce9650af37086a64f1f0c10e6eb28c906c2",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 138.866667,
+          "averageBotSurvivalObserved": 138.866667,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            180,
+            180,
+            35,
+            162,
+            35,
+            180,
+            89,
+            72,
+            70,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -10.77,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -24.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 85.56,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2154,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2154,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 6
+            },
+            "deathCauseCounts": {
+              "player-dead": 6
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 9,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1077
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 500000,
+      "progressTimesteps": 500000,
+      "modelNumTimesteps": 504992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0500000/snapshot_manifest.json",
+        "sha256": "d8553f67403a1430b9dcec98d7336dd7b83e45a6284ce8be5fb7e8f981731e7a"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0500000/eval_snapshot.json",
+        "sha256": "266ff1716211d3b4ed035f93a500146231c02a9b2266b06a2307aea4fe8ec813",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 173.2,
+          "averageBotSurvivalObserved": 173.2,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            78,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -13.38,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -4.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 106.44,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2676,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2676,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 1
+            },
+            "deathCauseCounts": {
+              "player-dead": 1
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 14,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1338
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 550000,
+      "progressTimesteps": 550000,
+      "modelNumTimesteps": 554992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0550000/snapshot_manifest.json",
+        "sha256": "754a0513deb9353b777b3b66979af758f9cad805e85398deed1fd5a9d2b47112"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T110816Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0550000/eval_snapshot.json",
+        "sha256": "d1140dab4355195965342294c1131d03eb6c68b5b7e607817feb8733c0f347a6",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 136.333333,
+          "averageBotSurvivalObserved": 136.333333,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            53,
+            180,
+            141,
+            180,
+            180,
+            112,
+            47,
+            180,
+            170,
+            180,
+            26,
+            56,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -10.63,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -28.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 84.44,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2126,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2126,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 7
+            },
+            "deathCauseCounts": {
+              "player-dead": 7
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 8,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1063
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 600000,
+      "progressTimesteps": 600000,
+      "modelNumTimesteps": 604992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0600000/snapshot_manifest.json",
+        "sha256": "97a5dbeabcdd482e76c2d2f55e423eb1020dedd89e22223d53edc400500145f6"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0600000/eval_snapshot.json",
+        "sha256": "c1e75daf7cdae82e974114de0d429bb0a6d47f5613afea14594a9785341115a0",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 119.466667,
+          "averageBotSurvivalObserved": 119.466667,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            37,
+            53,
+            24,
+            180,
+            180,
+            41,
+            180,
+            180,
+            90,
+            61,
+            180,
+            180,
+            46,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -9.54,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -28.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 75.72,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 1908,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 1908,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 23,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.012055,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 7
+            },
+            "deathCauseCounts": {
+              "player-dead": 7
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 8,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 954
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 650000,
+      "progressTimesteps": 650000,
+      "modelNumTimesteps": 654992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0650000/snapshot_manifest.json",
+        "sha256": "177e464c69a4efc7b36f4de14e7c1f5754c74fa7963b6500cef7fffb84bdea6b"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0650000/eval_snapshot.json",
+        "sha256": "0f21187458d72fd1e4ee63fd6316cc73460b8e59f092fd32aa06d89d50ee9e00",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 174.6,
+          "averageBotSurvivalObserved": 174.6,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            177,
+            180,
+            180,
+            180,
+            167,
+            180,
+            143,
+            180,
+            152,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -13.72,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 109.16,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2744,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2744,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 4
+            },
+            "deathCauseCounts": {
+              "player-dead": 4
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 11,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1372
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 700000,
+      "progressTimesteps": 700000,
+      "modelNumTimesteps": 704992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0700000/snapshot_manifest.json",
+        "sha256": "662ed1d8f70c899dc89e7906305cf7647c58bf754d8ae78a04c26d9c497d83a3"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0700000/eval_snapshot.json",
+        "sha256": "a0fa5aa18f81a8a5d1d92f5a7580580d29ccc641f24b89fc11d64cf2aeadfb18",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 148.133333,
+          "averageBotSurvivalObserved": 148.133333,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            18,
+            180,
+            180,
+            34,
+            149,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            41,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -11.55,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 91.8,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2310,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2310,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 4
+            },
+            "deathCauseCounts": {
+              "player-dead": 4
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 11,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1155
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 750000,
+      "progressTimesteps": 750000,
+      "modelNumTimesteps": 754992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0750000/snapshot_manifest.json",
+        "sha256": "bdcf5f842c03016e132fb6857e6c8ff145592d8a80ce83c3e1cbc2472e3c0130"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0750000/eval_snapshot.json",
+        "sha256": "196bcbad8c5107d82365d69957d91ca6261032acbfa64fbe6b850bbdd54edb04",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 167.066667,
+          "averageBotSurvivalObserved": 167.066667,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            180,
+            180,
+            180,
+            180,
+            176,
+            180,
+            165,
+            180,
+            74,
+            111,
+            180,
+            180,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -13.3,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 105.8,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2660,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2660,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 4
+            },
+            "deathCauseCounts": {
+              "player-dead": 4
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 11,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1330
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 800000,
+      "progressTimesteps": 800000,
+      "modelNumTimesteps": 804992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0800000/snapshot_manifest.json",
+        "sha256": "3fe6d1ef3b91ac8d77c5c472362bf6a2a60e4372ad754045d62dd333ec75e4c7"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0800000/eval_snapshot.json",
+        "sha256": "f738b14de4c8ebdfd7be7eeeeb6c58a25e18176198af9dead558e211a4f2e2bf",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 170.933333,
+          "averageBotSurvivalObserved": 170.933333,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            165,
+            180,
+            59,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -13.04,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -8.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 103.72,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2608,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2608,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 2
+            },
+            "deathCauseCounts": {
+              "player-dead": 2
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 13,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1304
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 850000,
+      "progressTimesteps": 850000,
+      "modelNumTimesteps": 854992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0850000/snapshot_manifest.json",
+        "sha256": "8203609f86d1e3c7adb36bb422186cb859e2a493acd91cedd0335369ea93f4bb"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0850000/eval_snapshot.json",
+        "sha256": "77d9f0aab4356078d8a6ea0218f128e2cb3664ce411279bfdc43e692c2dde802",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 169.0,
+          "averageBotSurvivalObserved": 169.0,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            112,
+            158,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            125,
+            180,
+            160,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -13.43,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -20.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 106.84,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2686,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2686,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 5
+            },
+            "deathCauseCounts": {
+              "player-dead": 5
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 10,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1343
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 900000,
+      "progressTimesteps": 900000,
+      "modelNumTimesteps": 904992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0900000/snapshot_manifest.json",
+        "sha256": "5e60dc435e3c27a68eb3a264564e9da3783fe64bc65ae9a9874beab7480fa66b"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0900000/eval_snapshot.json",
+        "sha256": "b96ad8eac79ecf25fd5ba469974a7eade0fdee9b735d617e8dd6fc020fc263de",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 166.333333,
+          "averageBotSurvivalObserved": 166.333333,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            143,
+            180,
+            180,
+            180,
+            180,
+            180,
+            76,
+            180,
+            124,
+            180,
+            180,
+            172,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -12.8,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 101.8,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2560,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2560,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 4
+            },
+            "deathCauseCounts": {
+              "player-dead": 4
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 11,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1280
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 950000,
+      "progressTimesteps": 950000,
+      "modelNumTimesteps": 954992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0950000/snapshot_manifest.json",
+        "sha256": "bf1fe258b172e80b7569235100754c05ab755db3294fb07c8e3c9ec3e14ce2cc"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0950000/eval_snapshot.json",
+        "sha256": "9da64e8a92d65fa09d4c0367e102d3e16a5117e4887d75c8bcb71c5e45478cfa",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 138.333333,
+          "averageBotSurvivalObserved": 138.333333,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            27,
+            180,
+            180,
+            41,
+            180,
+            180,
+            180,
+            162,
+            180,
+            180,
+            122,
+            180,
+            56,
+            180,
+            47
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -11.27,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -24.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 89.56,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2254,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2254,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 6
+            },
+            "deathCauseCounts": {
+              "player-dead": 6
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 9,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1127
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepLabelTimesteps": 1000000,
+      "progressTimesteps": 1000000,
+      "modelNumTimesteps": 1004992,
+      "checkpoint": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_1000000/snapshot_manifest.json",
+        "sha256": "d5be9e027034fabfb8e814a5f96cd59a02ed3c143f2cc5c8d4af65cbbcf468d6"
+      },
+      "evalSnapshot": {
+        "ok": true,
+        "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_1000000/eval_snapshot.json",
+        "sha256": "a998b500c535778db1476d3264016dce463cd35abe64d3c33ec131f6b4b241b3",
+        "summary": {
+          "avgStepsPerEpisodeObserved": 166.866667,
+          "averageBotSurvivalObserved": 166.866667,
+          "completedEpisodeCount": 15,
+          "longestEpisode": 180,
+          "completedEpisodeLengths": [
+            180,
+            180,
+            180,
+            180,
+            180,
+            180,
+            59,
+            180,
+            180,
+            108,
+            176,
+            180,
+            180,
+            180,
+            180
+          ],
+          "rewardBreakdownTotals": {
+            "baseStep": -13.15,
+            "checkpointReached": 0.0,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -12.0,
+            "lowHealthThreat": 0.0,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 104.6,
+            "survivalPressureBonus": 0.0,
+            "trailRisk": 0.0,
+            "wallRisk": 0.0,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "actionTelemetry": {
+            "totalActions": 2630,
+            "invalidActionCount": 0,
+            "preSamplingMaskCount": 2630,
+            "maskCount": 0,
+            "postDecodeClampCount": 0,
+            "vetoCount": 0,
+            "sanitizerCount": 0,
+            "noopCount": 0,
+            "invalidActionRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "maskRate": 0.0,
+            "postDecodeClampRate": 0.0,
+            "vetoRate": 0.0,
+            "sanitizerRate": 0.0,
+            "noopRate": 0.0,
+            "fieldCounts": {},
+            "sanitizerReasons": {}
+          },
+          "terminalMatrix": {
+            "terminalReasonCounts": {
+              "player-dead": 3
+            },
+            "deathCauseCounts": {
+              "player-dead": 3
+            },
+            "naturalTerminalCount": 0,
+            "maxSteps": 12,
+            "runtimeErrorCount": 0,
+            "playerDeadOnly": true
+          }
+        },
+        "episodeTargetGate": {
+          "enabled": true,
+          "minCompletedEpisodes": 15,
+          "completedEpisodeCount": 15,
+          "satisfied": true,
+          "stopReason": "min-completed-episodes",
+          "maxEvalSteps": 2700,
+          "vectorStepsExecuted": 1315
+        },
+        "technicalStopGate": {
+          "ok": true,
+          "checks": [
+            {
+              "id": "finite_eval_report",
+              "ok": true
+            },
+            {
+              "id": "finite_ppo_metrics",
+              "ok": true
+            },
+            {
+              "id": "runtime_error_count_zero",
+              "ok": true,
+              "observed": 0
+            },
+            {
+              "id": "invalid_action_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "sanitizer_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "post_decode_clamp_rate_zero",
+              "ok": true,
+              "observed": 0.0
+            },
+            {
+              "id": "veto_rate_below_0_25",
+              "ok": true,
+              "observed": 0.0
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "learning": {
+    "requestedTimesteps": 400000,
+    "modelNumTimesteps": 1004992,
+    "progressTimesteps": 1000000,
+    "optimizerUpdatesBefore": 9450,
+    "optimizerUpdatesAfter": 15700,
+    "optimizerUpdatesCompleted": true,
+    "wallClockSeconds": 14056.146519,
+    "stepsPerSecond": 71.498401,
+    "diagnosticOnly": true,
+    "learningQualityClaimAllowed": false,
+    "repairEvidenceClaimAllowed": true,
+    "baselineComparable": false,
+    "ppoLearningMetrics": {
+      "source": "stable_baselines3.PPO logger after model.learn()",
+      "sampleClass": "bt93j-user-owned-1m-proof-longrun-not-candidate",
+      "metrics": {
+        "policy_loss": -0.0008942432468757033,
+        "value_loss": 0.8309706966392696,
+        "entropy": 0.9406925290822983,
+        "approx_kl": 5.51324337720871e-05,
+        "clip_fraction": 0.0,
+        "explained_variance": 0.29051172733306885,
+        "grad_norm": {
+          "observed": true,
+          "tensorCount": 12,
+          "globalNorm": 0.5,
+          "maxAbsGradient": 0.076575,
+          "configuredMaxGradNorm": 0.5,
+          "tolerance": 5e-05,
+          "withinConfiguredMaxGradNorm": true
+        }
+      },
+      "rawLoggerKeys": [
+        "train/approx_kl",
+        "train/clip_fraction",
+        "train/clip_range",
+        "train/entropy_loss",
+        "train/explained_variance",
+        "train/learning_rate",
+        "train/loss",
+        "train/n_updates",
+        "train/policy_gradient_loss",
+        "train/value_loss"
+      ],
+      "collapseThresholds": {
+        "maxApproxKl": 0.2,
+        "maxClipFraction": 0.6,
+        "minEntropy": 0.01,
+        "maxValueLoss": 100.0,
+        "maxGradNorm": 0.5,
+        "minExplainedVariance": -1.0
+      },
+      "thresholdStatus": {
+        "approxKlWithinThreshold": true,
+        "clipFractionWithinThreshold": true,
+        "entropyAboveMinimum": true,
+        "valueLossWithinThreshold": true,
+        "explainedVarianceAboveMinimum": true,
+        "gradNormWithinThreshold": true
+      },
+      "collapseOrInstabilitySignal": false
+    },
+    "telemetry": [
+      {
+        "totalActions": 200000,
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "preSamplingMaskCount": 200000,
+        "preSamplingMaskRate": 1.0,
+        "maskCount": 0,
+        "maskRate": 0.0,
+        "postDecodeClampCount": 0,
+        "postDecodeClampRate": 0.0,
+        "vetoCount": 0,
+        "vetoRate": 0.0,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "noopCount": 5574,
+        "noopRate": 0.02787,
+        "fieldCounts": {},
+        "sanitizerReasons": {},
+        "rawActionExamples": [
+          {
+            "raw": 5,
+            "semanticAction": "roll-left",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": true,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": true,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 7,
+            "semanticAction": "boost",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": true,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": true,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 3,
+            "semanticAction": "pitch-up",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": true,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": true,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 7,
+            "semanticAction": "boost",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": true,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": true,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 5,
+            "semanticAction": "roll-left",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": true,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": true,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 6,
+            "semanticAction": "roll-right",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": true,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": true,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 1,
+            "semanticAction": "yaw-left",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": true,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": true,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 7,
+            "semanticAction": "boost",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": true,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": true,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          }
+        ]
+      },
+      {
+        "totalActions": 200000,
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "preSamplingMaskCount": 200000,
+        "preSamplingMaskRate": 1.0,
+        "maskCount": 0,
+        "maskRate": 0.0,
+        "postDecodeClampCount": 0,
+        "postDecodeClampRate": 0.0,
+        "vetoCount": 0,
+        "vetoRate": 0.0,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "noopCount": 5572,
+        "noopRate": 0.02786,
+        "fieldCounts": {},
+        "sanitizerReasons": {},
+        "rawActionExamples": [
+          {
+            "raw": 1,
+            "semanticAction": "yaw-left",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": true,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": true,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 1,
+            "semanticAction": "yaw-left",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": true,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": true,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 3,
+            "semanticAction": "pitch-up",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": true,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": true,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 3,
+            "semanticAction": "pitch-up",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": true,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": true,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 3,
+            "semanticAction": "pitch-up",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": true,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": true,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 1,
+            "semanticAction": "yaw-left",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": true,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": true,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 2,
+            "semanticAction": "yaw-right",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": true,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": true,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          },
+          {
+            "raw": 0,
+            "semanticAction": "noop",
+            "inventoryLength": 0,
+            "decoded": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "sanitized": {
+              "pitchUp": false,
+              "pitchDown": false,
+              "yawLeft": false,
+              "yawRight": false,
+              "rollLeft": false,
+              "rollRight": false,
+              "boost": false,
+              "cameraSwitch": false,
+              "dropItem": false,
+              "shootItem": false,
+              "shootMG": false,
+              "nextItem": false,
+              "shootItemIndex": -1,
+              "useItem": -1
+            },
+            "invalidReasons": [],
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": []
+          }
+        ]
+      }
+    ],
+    "trainingCommand": "python\\train.py --profile bt93j --run-kind bt93j-user-owned-1m-proof-longrun --phase-id 93J.5c --config python\\configs\\ppo_bt93j_reward_curriculum_proof_lane.json --artifact-root data\\training\\ppo\\bt93j --checkpoint data\\training\\ppo\\bt93j\\runs\\20260426T171638Z-bt93j-user-owned-1m-proof-longrun\\artifact_manifest.json --total-timesteps 400000 --longrun-start-progress 600000 --longrun-capture-start-snapshot --longrun-prior-run-dir data\\training\\ppo\\bt93j\\runs\\20260426T110816Z-bt93j-user-owned-1m-proof-longrun",
+    "longrunSnapshots": {
+      "plannedTotalTimesteps": 1000000,
+      "startProgressTimesteps": 600000,
+      "checkpointFrequencyTimesteps": 50000,
+      "capturedCount": 9,
+      "capturedSteps": [
+        600000,
+        650000,
+        700000,
+        750000,
+        800000,
+        850000,
+        900000,
+        950000,
+        1000000
+      ],
+      "stopReason": null,
+      "stopError": null
+    }
+  },
+  "sourceConfig": {
+    "path": "python/configs/ppo_bt93j_reward_curriculum_proof_lane.json",
+    "sha256": "90f35f353babae5665c80806bea8d5678d9414e1e161637824127345c66d975f"
+  },
+  "artifacts": {
+    "runDirectory": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun",
+    "trainingReport": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/training_report.json",
+    "artifactManifest": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/artifact_manifest.json",
+    "artifactManifestSha256": "5ddab03e26d397af3d76bdd35481921bd03d2273312cf68e59e85869a9ac8d4b",
+    "model": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/checkpoints/model.zip",
+    "modelSha256": "748739d5697a60c44cf2af17a1efdff7af6859eb9882c493acb32506be4f8af4",
+    "vecnormalize": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/checkpoints/vecnormalize.pkl",
+    "vecnormalizeSha256": "7a52b229a1e65d6bd4a54ca448ad603cc296d3125556c465c6e2579e6e68eec7",
+    "optimizerState": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/checkpoints/optimizer_state.pt",
+    "optimizerStateSha256": "8bc0e3fbdb39aa822b2f2f0171aa492cfd3ee744f8c0c1e62d02aaae4cd4bc8c"
+  },
+  "phaseCoverage": {
+    "93J.5c.1": true,
+    "93J.5c.2": true,
+    "93J.5c.3": true,
+    "93J.5c.4": true,
+    "93J.5c.5": true,
+    "93J.5c.6": true
+  },
+  "guardrails": {
+    "diagnosticOnly": true,
+    "holdoutUsed": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "promotionAllowed": false,
+    "bt94aGateRefresh": false,
+    "ppoValidateEvidence": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": [],
+    "productiveRuntimeChanged": false
+  },
+  "nextAllowedStep": "93J.6 only if resultClass=green-for-93J.6; otherwise diagnose/replan without BT94A claim"
+}

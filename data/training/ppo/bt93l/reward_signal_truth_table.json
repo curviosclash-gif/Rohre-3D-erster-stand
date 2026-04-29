@@ -1,0 +1,330 @@
+{
+  "blockId": "BT93L",
+  "events": [
+    {
+      "eventId": "death",
+      "expectedSign": "negative",
+      "label": "player-dead terminal",
+      "qualityMeaning": "failure terminal; never objective or candidate success",
+      "reward": {
+        "components": {
+          "baseStep": -0.016,
+          "checkpointReached": 0.0,
+          "crash": -0.0,
+          "damageDealt": 0.0,
+          "damageTaken": -0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": -4.5,
+          "lowHealthThreat": -0.0,
+          "opponentRisk": -0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": -0.0,
+          "survival": 0.0,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": -0.0,
+          "wallRisk": -0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "total": -4.516
+      },
+      "signals": {
+        "lost": true,
+        "survival": false
+      },
+      "successEligible": false
+    },
+    {
+      "eventId": "hazard",
+      "expectedSign": "negative",
+      "label": "hazard pressure without progress",
+      "qualityMeaning": "risk exposure must not become reward hacking",
+      "reward": {
+        "components": {
+          "baseStep": -0.016,
+          "checkpointReached": 0.0,
+          "crash": -0.0,
+          "damageDealt": 0.0,
+          "damageTaken": -0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": -0.048,
+          "opponentRisk": -0.032,
+          "parcoursCompleted": 0.0,
+          "stuck": -0.0,
+          "survival": 0.012,
+          "survivalPressureBonus": 0.00674,
+          "trailRisk": -0.06,
+          "wallRisk": -0.056,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "total": -0.19326
+      },
+      "signals": {
+        "healthRatio": 0.35,
+        "pressureLevel": 0.8,
+        "riskProximity": {
+          "opponent": 0.4,
+          "trail": 0.5,
+          "wall": 0.7
+        },
+        "survival": true
+      },
+      "successEligible": false
+    },
+    {
+      "eventId": "survival-time",
+      "expectedSign": "non-positive",
+      "label": "survival-only step",
+      "qualityMeaning": "time alive is diagnostic until progress/objective signals are present",
+      "reward": {
+        "components": {
+          "baseStep": -0.016,
+          "checkpointReached": 0.0,
+          "crash": -0.0,
+          "damageDealt": 0.0,
+          "damageTaken": -0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": -0.0,
+          "opponentRisk": -0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": -0.0,
+          "survival": 0.012,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": -0.0,
+          "wallRisk": -0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "total": -0.004
+      },
+      "signals": {
+        "healthRatio": 1.0,
+        "pressureLevel": 0.0,
+        "survival": true
+      },
+      "successEligible": false
+    },
+    {
+      "eventId": "progress",
+      "expectedSign": "positive",
+      "label": "real checkpoint progress",
+      "qualityMeaning": "intermediate objective evidence only when emitted by real env.step path",
+      "reward": {
+        "components": {
+          "baseStep": -0.016,
+          "checkpointReached": 0.85,
+          "crash": -0.0,
+          "damageDealt": 0.0,
+          "damageTaken": -0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": -0.0,
+          "opponentRisk": -0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": -0.0,
+          "survival": 0.012,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": -0.0,
+          "wallRisk": -0.0,
+          "win": 0.0,
+          "wrongOrder": -0.0
+        },
+        "total": 0.846
+      },
+      "signals": {
+        "checkpointReached": 1,
+        "parcoursEnabled": true,
+        "survival": true
+      },
+      "successEligible": true
+    },
+    {
+      "eventId": "objective",
+      "expectedSign": "positive",
+      "label": "objective-complete terminal",
+      "qualityMeaning": "task-specific success; still diagnostic in BT93L, not candidate/freeze evidence",
+      "reward": {
+        "components": {
+          "baseStep": -0.016,
+          "checkpointReached": 0.85,
+          "crash": -0.0,
+          "damageDealt": 0.0,
+          "damageTaken": -0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": -0.0,
+          "opponentRisk": -0.0,
+          "parcoursCompleted": 2.0,
+          "stuck": -0.0,
+          "survival": 0.012,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": -0.0,
+          "wallRisk": -0.0,
+          "win": 2.5,
+          "wrongOrder": -0.0
+        },
+        "total": 5.346
+      },
+      "signals": {
+        "checkpointReached": 1,
+        "parcoursCompleted": true,
+        "parcoursEnabled": true,
+        "survival": true,
+        "won": true
+      },
+      "successEligible": true
+    },
+    {
+      "eventId": "noop",
+      "expectedSign": "non-positive",
+      "label": "noop plateau step",
+      "qualityMeaning": "no action/effect cannot be scored as success",
+      "reward": {
+        "components": {
+          "baseStep": -0.016,
+          "checkpointReached": 0.0,
+          "crash": -0.0,
+          "damageDealt": 0.0,
+          "damageTaken": -0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": -0.0,
+          "opponentRisk": -0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": -0.0,
+          "survival": 0.012,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": -0.0,
+          "wallRisk": -0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "total": -0.004
+      },
+      "signals": {
+        "healthRatio": 1.0,
+        "survival": true
+      },
+      "successEligible": false
+    },
+    {
+      "eventId": "max-step",
+      "expectedSign": "non-positive",
+      "label": "max-step-only episode",
+      "qualityMeaning": "truncation cap is neutral/red without progress or objective completion",
+      "reward": {
+        "components": {
+          "baseStep": -0.016,
+          "checkpointReached": 0.0,
+          "crash": -0.0,
+          "damageDealt": 0.0,
+          "damageTaken": -0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": -0.0,
+          "opponentRisk": -0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": -0.0,
+          "survival": 0.012,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": -0.0,
+          "wallRisk": -0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "total": -0.004
+      },
+      "signals": {
+        "healthRatio": 1.0,
+        "survival": true
+      },
+      "successEligible": false
+    }
+  ],
+  "generatedAt": "2026-04-28T19:51:08Z",
+  "generatedBy": "python/scripts/bt93l_reward_balance.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "77925fb9d4d085acecb5582afda933d4f90e8780"
+  },
+  "guardrails": {
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "manualInjectionEvidenceAllowed": false,
+    "rolloutSignal": false
+  },
+  "ok": true,
+  "phaseId": "93L.3",
+  "resultClass": "reward-signal-truth-table-pinned",
+  "rewardProfileId": "bt93l-objective-reachability-v1",
+  "schemaVersion": "bt93l-reward-signal-truth-table-v1",
+  "sourceArtifacts": {
+    "headlessRunner": {
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93L reward profile source",
+      "sha256": "4737594afcebf3aee050bff96f60e0806b1c47c0984741ba81799a5bb5596d7e"
+    },
+    "taskMetricContract": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L.1 task/terminal contract",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0"
+    }
+  },
+  "weights": {
+    "baseStep": -0.016,
+    "checkpointReached": 0.85,
+    "crash": -6.0,
+    "damageDealt": 0.015,
+    "damageTaken": -0.12,
+    "itemPickup": 0.08,
+    "itemUse": 0.03,
+    "kill": 1.0,
+    "loss": -4.5,
+    "lowHealthThreat": -0.2,
+    "opponentRisk": -0.08,
+    "parcoursCompleted": 2.0,
+    "stuck": -0.35,
+    "survival": 0.012,
+    "survivalPressureBonus": 0.01,
+    "trailRisk": -0.12,
+    "wallRisk": -0.08,
+    "win": 2.5,
+    "wrongOrder": -0.3
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "configVersion": "bt93k-env-scale-smoke-v1",
+  "blockId": "BT93K",
+  "phaseId": "93K.4",
+  "runKind": "bt93k-env-scale-smoke",
+  "scope": "BT93K.4 startup, supervisor, snapshot, eval-snapshot, and action-safety smoke only; no longrun, candidate, freeze, baseline, holdout, PPO-Validate, promotion, or runtime integration semantics",
+  "env": {
+    "modeId": "runtime-near-headless-v1",
+    "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+    "rewardProfileId": "bt93j-reward-curriculum-proof-v1",
+    "mapKey": "standard",
+    "domainMode": "classic-3d",
+    "gameMode": "CLASSIC",
+    "planarMode": false,
+    "modePath": "normal",
+    "maxStepsPerEpisode": 12,
+    "controllerTimeoutSeconds": 12,
+    "curriculumStepOffset": 250000,
+    "envCounts": [2, 4, 6],
+    "stepsPerEnv": 3,
+    "seedBase": 9340
+  },
+  "artifacts": {
+    "root": "data/training/ppo/bt93k",
+    "summaryReport": "data/training/ppo/bt93k/env_scale_smoke_report.json",
+    "supervisorContract": "data/training/ppo/bt93k/supervisor_contract_report.json",
+    "modeMapSmoke": "data/training/ppo/bt93k/mode_map_smoke_report.json",
+    "signalMetricContract": "data/training/ppo/bt93k/signal_metric_contract.json"
+  },
+  "guardrails": {
+    "startupSmokeOnly": true,
+    "comparisonStarted": false,
+    "trainingStarted": false,
+    "baselineRunsStarted": false,
+    "pilotRunsStarted": false,
+    "candidateRunsAllowed": false,
+    "candidateFreezeAllowed": false,
+    "promotionAllowed": false,
+    "ppoValidateAllowed": false,
+    "holdoutAllowed": false,
+    "bt94aGateRefreshAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": []
+  }
+}

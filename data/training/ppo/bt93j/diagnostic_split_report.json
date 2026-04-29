@@ -1,4 +1,10 @@
 {
+  "actionPolicyDiagnostics": {
+    "green": true,
+    "notCausal": true,
+    "path": "data/training/ppo/bt93j/action_policy_diagnostics.json",
+    "resultClass": "action-policy-diagnostics-green"
+  },
   "blockId": "BT93J",
   "blockedFindings": {
     "F.05": {
@@ -116,27 +122,35 @@
     },
     {
       "description": "Pre-sampling mask, clamp, veto, sanitizer, invalid action, and executed action",
-      "green": false,
+      "evidence": "data/training/ppo/bt93j/action_policy_diagnostics.json",
+      "green": true,
       "id": "action-safety",
-      "notCausal": false,
+      "notCausal": true,
       "phase": "93J.3",
-      "status": "not-run"
+      "status": "green"
     },
     {
       "description": "Reward breakdown versus episode length, terminal class, risk actions, and learning metrics",
+      "evidence": "data/training/ppo/bt93j/r1_micro_test_report.json",
       "green": false,
       "id": "reward-curriculum",
+      "longRunBlocked": true,
       "notCausal": false,
-      "phase": "93J.3",
-      "status": "not-run"
+      "phase": "93J.4",
+      "pilotBlocked": true,
+      "primaryCause": true,
+      "status": "r1-micro-test-green"
     },
     {
       "description": "Minimal repair, micro-test, pilot readiness, holdout guard, and long-run readiness",
+      "evidence": "data/training/ppo/bt93j/pilot_readiness_report.json",
       "green": false,
       "id": "training-pilot",
+      "longRunBlocked": true,
       "notCausal": false,
-      "phase": "93J.4+",
-      "status": "not-run"
+      "phase": "93J.5",
+      "pilotBlocked": true,
+      "status": "pilot-readiness-blocked"
     }
   ],
   "causalChainRegister": {
@@ -144,10 +158,10 @@
     "path": "data/training/ppo/bt93j/causal_chain_register.json",
     "resultClass": "causal-chain-register-pinned"
   },
-  "counterprobe": "scripted-safe eval-config controls reach non-death natural terminal while real PPO eval/holdout remain player-dead-only",
-  "generatedAt": "2026-04-25T23:11:53Z",
-  "generatedBy": "python/scripts/bt93j_terminal_matrix.py",
-  "gitSha": "9043776509a61e6dbadf2f2ef27a2f108fc4bc46",
+  "counterprobe": "93J.4 R1 micro-test must change only reward/curriculum pressure and is expected to improve terminal diversity or avgSteps trend while action telemetry remains green; otherwise the primary cause is refuted.",
+  "generatedAt": "2026-04-26T08:44:24Z",
+  "generatedBy": "python/scripts/bt93j_r2_micro_train_counterprobe.py",
+  "gitSha": "8c705deb1d4c446c326071f6ace58bb9a3351ed9",
   "guardrails": {
     "bt94aCheckboxClosed": false,
     "candidateRun": false,
@@ -163,6 +177,54 @@
     "rolloutSignal": false,
     "runtimeSurfacesTouched": []
   },
+  "iterativeLoop": {
+    "currentIteration": "R2",
+    "iterations": [
+      {
+        "decision": "cause-confirmed",
+        "decisionScope": "reward-signal micro-test only; eval/holdout policy quality and terminal diversity are not proven",
+        "evidence": "data/training/ppo/bt93j/r1_micro_test_report.json",
+        "hypothesis": "Survival-only positive reward plus player-dead-only eval/holdout and step regression remain after observation, terminal mapping, matrix contract, action safety, and PPO learning-metric collapse checks.",
+        "id": "R1",
+        "metricImprovementProven": false,
+        "newRedSymptoms": false,
+        "primaryCauseId": "reward-curriculum-survival-only-player-dead-policy",
+        "repairId": "reward-terminal-loss-signal-r1",
+        "resultClass": "green"
+      },
+      {
+        "candidateRun": false,
+        "counterprobe": "Run one bounded micro-train from the BT93I model package with R1 reward signals, then eval only on the reserved eval lane; classify trend-green, same-red, new-red, or measurement-invalid. Holdout stays unused.",
+        "decision": "same-red",
+        "evalRunId": "20260426T084359Z-bt93j-r2-micro-train-counterprobe-eval",
+        "evalRunKind": "bt93j-r2-micro-train-counterprobe-eval",
+        "evidence": "data/training/ppo/bt93j/r2_micro_train_counterprobe_report.json",
+        "freezeCandidate": false,
+        "holdoutUsed": false,
+        "hypothesis": "R1 reward-signal fix may reduce player-dead-only terminal behavior only if a bounded micro-train shows eval terminal diversity or avgSteps trend improvement without action safety or runtime regression.",
+        "id": "R2",
+        "metricImprovementProven": false,
+        "newRedSymptoms": false,
+        "resultClass": "same-red",
+        "runId": "20260426T084300Z-bt93j-r2-micro-train-counterprobe",
+        "runKind": "bt93j-r2-micro-train-counterprobe",
+        "status": "completed"
+      }
+    ],
+    "path": "data/training/ppo/bt93j/pilot_readiness_report.json",
+    "r2r3Gate": {
+      "allowedOnlyWith": [
+        "R1 green",
+        "readyForTraining=false",
+        "exact blockers terminal_matrix_start_capable, not_player_dead_only, micro_test_trend_improvement",
+        "new R2 counterprobe evidence"
+      ],
+      "currentlyAllowed": false,
+      "r2Started": true,
+      "r3Started": false,
+      "reason": "Run one bounded micro-train from the BT93I model package with R1 reward signals, then eval only on the reserved eval lane; classify trend-green, same-red, new-red, or measurement-invalid. Holdout stays unused."
+    }
+  },
   "matrixContract": {
     "green": true,
     "inputGatesGreen": false,
@@ -170,7 +232,7 @@
     "path": "data/training/ppo/bt93j/matrix_contract_report.json",
     "resultClass": "matrix-contract-pinned-inputs-red"
   },
-  "nextDiagnosticPhase": "93J.3",
+  "nextDiagnosticPhase": "93J.6-blocked",
   "noStartDecision": {
     "allowedWork": [
       "record gate status",
@@ -204,12 +266,75 @@
     "93J.2.1": true,
     "93J.2.2": true,
     "93J.2.3": true,
-    "93J.2.4": true
+    "93J.2.4": true,
+    "93J.3.1": true,
+    "93J.3.2": true,
+    "93J.3.3": true,
+    "93J.3.4": true,
+    "93J.4.1": true,
+    "93J.4.2": true,
+    "93J.4.3": true,
+    "93J.4.4": true,
+    "93J.5.1": true,
+    "93J.5.2": true,
+    "93J.5.3": true,
+    "93J.5.4": true,
+    "93J.5a.1": true,
+    "93J.5a.2": true,
+    "93J.5a.3": true,
+    "93J.5a.4": true,
+    "93J.5a.5": true
   },
-  "phaseId": "93J.2",
-  "primaryCause": null,
+  "phaseId": "93J.5a",
+  "pilotReadiness": {
+    "blockingChecks": [
+      "terminal_matrix_start_capable",
+      "not_player_dead_only",
+      "micro_test_trend_improvement"
+    ],
+    "path": "data/training/ppo/bt93j/pilot_readiness_report.json",
+    "readyForPilot": false,
+    "readyForTraining": false,
+    "resultClass": "pilot-readiness-blocked"
+  },
+  "primaryCause": {
+    "evidence": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
+    "findingIds": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31"
+    ],
+    "id": "reward-curriculum-survival-only-player-dead-policy",
+    "phase": "93J.3",
+    "summary": "Survival-only positive reward plus player-dead-only eval/holdout and step regression remain after observation, terminal mapping, matrix contract, action safety, and PPO learning-metric collapse checks."
+  },
+  "r1MicroTest": {
+    "green": true,
+    "inconclusive": false,
+    "newRed": false,
+    "path": "data/training/ppo/bt93j/r1_micro_test_report.json",
+    "r1Id": "reward-terminal-loss-signal-r1",
+    "resultClass": "green",
+    "sameRed": false
+  },
+  "r2MicroTrainCounterprobe": {
+    "holdoutUsed": false,
+    "path": "data/training/ppo/bt93j/r2_micro_train_counterprobe_report.json",
+    "pilotReadinessRefreshAllowed": false,
+    "resultClass": "same-red",
+    "trendGreen": false
+  },
   "readyForRepair": false,
   "readyForTraining": false,
+  "repairConstraints": {
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "holdoutAllowed": false,
+    "longRunAllowed": false,
+    "maxPrimaryCausesAllowed": 1,
+    "pilotAllowed": false
+  },
   "repairGateRule": "readyForRepair remains false until exactly one primary cause and one counterprobe are named.",
   "repairOrder": [
     {
@@ -249,7 +374,14 @@
       "phase": "93J.4+"
     }
   ],
-  "resultClass": "diagnostic-split-terminal-matrix-cleared-action-reward-pending",
+  "resultClass": "diagnostic-split-pilot-readiness-blocked",
+  "rewardCurriculumDiagnostics": {
+    "green": false,
+    "notCausal": false,
+    "path": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
+    "primaryCause": true,
+    "resultClass": "reward-curriculum-primary-cause-ready-for-r1"
+  },
   "sourceArtifacts": {
     "bt93cEvidenceQualityMatrix": {
       "artifactGitSha": "1e1670ab30446b9643806cd68abee6be4819ea07",

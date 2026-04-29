@@ -30,6 +30,13 @@ data/training/
 data/training/*
 !data/training/ppo/
 !data/training/ppo/**
+data/training/ppo/**/runs/
+data/training/ppo/**/*.zip
+data/training/ppo/**/*.pt
+data/training/ppo/**/*.pkl
+data/training/ppo/**/*.log
+data/training/ppo/**/*.jsonl
+logs/training/
 data/maps/editor_qa-disk-map-*.editor.json
 data/maps/editor_qa-disk-map-*.runtime.json
 

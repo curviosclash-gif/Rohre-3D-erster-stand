@@ -1,0 +1,8 @@
+{
+  "runId": "20260426T084359Z-bt93j-r2-micro-train-counterprobe-eval",
+  "runKind": "bt93j-r2-micro-train-counterprobe-eval",
+  "ok": true,
+  "report": "data/training/ppo/bt93j/runs/20260426T084359Z-bt93j-r2-micro-train-counterprobe-eval/eval_report.json",
+  "sourceArtifactManifest": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/artifact_manifest.json",
+  "sourceModel": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/checkpoints/model.zip"
+}

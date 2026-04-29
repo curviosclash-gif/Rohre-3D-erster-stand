@@ -1,0 +1,87 @@
+{
+  "blockId": "BT93J",
+  "blockingChecksIfFalse": [],
+  "commands": {
+    "userOwnedLongrun": "python\\.venv\\Scripts\\python.exe python\\train.py --profile bt93j --run-kind bt93j-user-owned-1m-proof-longrun --phase-id 93J.5c  --config python\\configs\\ppo_bt93j_reward_curriculum_proof_lane.json --artifact-root data\\training\\ppo\\bt93j --checkpoint data\\training\\ppo\\bt93j\\runs\\20260426T084300Z-bt93j-r2-micro-train-counterprobe\\artifact_manifest.json --total-timesteps 1000000",
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93j_reward_curriculum_proof_lane.py --write-reports"
+  },
+  "config": {
+    "checkpointFrequencyTimesteps": 50000,
+    "evalIntervalTimesteps": 50000,
+    "path": "python/configs/ppo_bt93j_reward_curriculum_proof_lane.json",
+    "rewardProfileId": "bt93j-reward-curriculum-proof-v1",
+    "sha256": "90f35f353babae5665c80806bea8d5678d9414e1e161637824127345c66d975f",
+    "totalTimesteps": 1000000
+  },
+  "generatedAt": "2026-04-26T10:49:25Z",
+  "generatedBy": "python/scripts/bt93j_reward_curriculum_proof_lane.py",
+  "gitSha": "68eddbba0d4e517746acb11bbd10da4c566db85f",
+  "guardrails": {
+    "bt94aGateRefresh": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "noGo": [
+      "no BT94A claim, candidate run, freeze candidate, BT94B handover, promote, or rollout-ready result",
+      "no holdout, pilot, baseline, PPO-Validate, or gate refresh from BT93J.5b",
+      "no productive RuntimeConfig, Strategy Flag, JS inference, model registry, rollback, Matchstart, AI-Hub, bridge, or authority change",
+      "BT93J.5b only prepares the explicit user-owned 93J.5c diagnostic longrun"
+    ],
+    "pilotStarted": false,
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "ok": true,
+  "phaseId": "93J.5b",
+  "qualityInterpretation": {
+    "greenFor93J6OnlyAllowedAfter": "93J.5c user_owned_1m_longrun_report.resultClass=green-for-93J.6",
+    "holdoutReserved": true,
+    "noBt94aGateRefresh": true,
+    "noPpoValidateEvidence": true,
+    "noPromotionEvidence": true
+  },
+  "readyForUserOwnedLongrun": true,
+  "requiredRunKind": "bt93j-user-owned-1m-proof-longrun",
+  "resultClass": "ready",
+  "sourceArtifacts": {
+    "proofConfig": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "python/configs/ppo_bt93j_reward_curriculum_proof_lane.json",
+      "role": "BT93J.5b PPO proof-lane config",
+      "sha256": "90f35f353babae5665c80806bea8d5678d9414e1e161637824127345c66d975f"
+    },
+    "proofLaneReport": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "data/training/ppo/bt93j/reward_curriculum_proof_lane_report.json",
+      "role": "BT93J.5b proof lane report",
+      "sha256": "53d2b0fd7dbefa4ce61020028e8204cb843d91d8f8e73962f11dacc49ccffedf"
+    },
+    "r2Counterprobe": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "data/training/ppo/bt93j/r2_micro_train_counterprobe_report.json",
+      "role": "BT93J R2 same-red start finding",
+      "sha256": "551bb1c85ec1291ab37960ae6d09cf143bf4ac606eed95a578f7ee82c1c4b63a"
+    }
+  },
+  "sourceModelPackage": {
+    "artifactManifest": "data/training/ppo/bt93j/runs/20260426T084300Z-bt93j-r2-micro-train-counterprobe/artifact_manifest.json",
+    "configSha256": "c84615fc46dc810cd7fb6b0d630b9e4d8e376eede6dff7bde63f630ced83e637",
+    "modelSha256": "6ca7b32d896cee1079b511d6021530b36d1b756df8f88641c5555dc8e9dcecd0",
+    "normalizeStateSha256": "e089a5feb10234fa933febf7462c98c62e37a650f2de2f3c7cb6e33155779cf5",
+    "optimizerStateSha256": "a10e78f2f0db8a955cfefd10189bdc7c49f7f7e10b3d63cbdc4698c70bd58d01",
+    "runId": "20260426T084300Z-bt93j-r2-micro-train-counterprobe"
+  },
+  "technicalStopRules": [
+    "stop on NaN or Inf in reward, observation, loss, KL, entropy, value loss, or gradient norm",
+    "stop on runtimeErrorCount > 0, timeout-class drift, or artifact corruption",
+    "stop on observation schema/range/staleness drift",
+    "stop on invalidActionRate > 0, sanitizerRate > 0, postDecodeClampRate > 0, or vetoRate >= 0.25",
+    "stop if mandatory 50000-step checkpoint or eval snapshot is missing"
+  ]
+}

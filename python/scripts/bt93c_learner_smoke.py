@@ -7,7 +7,7 @@ import subprocess
 import sys
 import time
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
@@ -16,6 +16,7 @@ from typing import Any, Mapping
 import numpy as np
 import torch
 from stable_baselines3 import PPO
+from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
 from bridge.authority_snapshot import READ_ONLY_RUNTIME_SURFACES
@@ -30,6 +31,9 @@ DEFAULT_ARTIFACT_ROOT = REPO_ROOT / "data" / "training" / "ppo" / "bt93c"
 CHECKPOINT_VERSION = "bt93c-ppo-checkpoint-v1"
 _NUMPY_BIT_GENERATOR_PICKLE_COMPAT_INSTALLED = False
 _NUMPY_CORE_MODULE_ALIASES_INSTALLED = False
+BT93J_R2_TRAIN_RUN_KIND = "bt93j-r2-micro-train-counterprobe"
+BT93J_R2_EVAL_RUN_KIND = "bt93j-r2-micro-train-counterprobe-eval"
+BT93J_USER_OWNED_PROOF_LONGRUN_KIND = "bt93j-user-owned-1m-proof-longrun"
 
 
 @dataclass(frozen=True)
@@ -44,6 +48,8 @@ class ModelPackage:
     vecnormalize_sha256: str
     optimizer_sha256: str
     config_sha256: str
+    step_label_timesteps: int | None = None
+    source_run_dir: Path | None = None
 
 
 def _utc_now() -> str:
@@ -206,6 +212,7 @@ def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
         "BT93G": {"93G.5"},
         "BT93H": {"93H.3"},
         "BT93I": {"93I.2"},
+        "BT93J": {"93J.5a", "93J.5b"},
     }
     block_id = str(config.get("blockId") or "")
     if block_id not in allowed_scopes or config.get("phaseId") not in allowed_scopes[block_id]:
@@ -228,6 +235,12 @@ def _run_sample_class(run_kind: str) -> str:
         return "bt93i-terminal-curriculum-repair-not-candidate"
     if run_kind == "terminal-curriculum-repair-eval":
         return "bt93i-terminal-curriculum-repair-eval-not-ppo-validate"
+    if run_kind == BT93J_R2_TRAIN_RUN_KIND:
+        return "bt93j-r2-micro-train-counterprobe-not-candidate"
+    if run_kind == BT93J_R2_EVAL_RUN_KIND:
+        return "bt93j-r2-micro-train-counterprobe-eval-not-ppo-validate"
+    if run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND:
+        return "bt93j-user-owned-1m-proof-longrun-not-candidate"
     if run_kind == "repair-diagnostic":
         return "repair-diagnostic-not-candidate"
     if run_kind.startswith("baseline-"):
@@ -240,7 +253,12 @@ def _run_sample_class(run_kind: str) -> str:
 
 
 def _is_diagnostic_run(run_kind: str) -> bool:
-    return run_kind.startswith("diagnostics-") or run_kind == "repair-diagnostic"
+    return (
+        run_kind.startswith("diagnostics-")
+        or run_kind == "repair-diagnostic"
+        or run_kind == BT93J_R2_TRAIN_RUN_KIND
+        or run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND
+    )
 
 
 def _is_pilot_run(run_kind: str) -> bool:
@@ -271,11 +289,16 @@ def _is_bt93i_comparable_eval(block_id: str, run_kind: str) -> bool:
     return block_id == "BT93I" and run_kind in {"terminal-curriculum-repair-eval", "holdout-eval"}
 
 
+def _is_bt93j_r2_eval(block_id: str, run_kind: str) -> bool:
+    return block_id == "BT93J" and run_kind == BT93J_R2_EVAL_RUN_KIND
+
+
 def _is_comparable_repair_eval(block_id: str, run_kind: str) -> bool:
     return (
         _is_bt93g_comparable_eval(block_id, run_kind)
         or _is_bt93h_comparable_eval(block_id, run_kind)
         or _is_bt93i_comparable_eval(block_id, run_kind)
+        or _is_bt93j_r2_eval(block_id, run_kind)
     )
 
 
@@ -302,6 +325,58 @@ def _number(value: Any) -> float | None:
     if not np.isfinite(result):
         return None
     return result
+
+
+def _optional_bool(value: Any) -> bool | None:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return None
+    normalized = str(value).strip().lower()
+    if normalized in {"1", "true", "yes", "y", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off"}:
+        return False
+    return None
+
+
+def _env_lane_options(env_cfg: Mapping[str, Any]) -> dict[str, Any]:
+    options: dict[str, Any] = {
+        "map_key": str(env_cfg.get("mapKey") or "standard"),
+        "domain_mode": str(env_cfg.get("domainMode") or "classic-3d"),
+        "game_mode": str(env_cfg.get("gameMode") or "") or None,
+        "planar_mode": _optional_bool(env_cfg.get("planarMode")),
+        "mode_path": str(env_cfg.get("modePath") or "") or None,
+        "curriculum_step_offset": int(env_cfg.get("curriculumStepOffset") or 0),
+    }
+    return options
+
+
+def _effective_env_spec(config: Mapping[str, Any], seeds: list[int], *, training: bool) -> dict[str, Any]:
+    env_cfg = config.get("env") or {}
+    lane = _env_lane_options(env_cfg)
+    return {
+        "modeId": env_cfg.get("modeId"),
+        "actionSurfaceId": _action_surface_id(config),
+        "rewardProfileId": str(env_cfg.get("rewardProfileId") or ""),
+        "training": bool(training),
+        "effectiveSeeds": [int(seed) for seed in seeds],
+        "configuredTrainSeeds": [int(seed) for seed in env_cfg.get("trainSeeds", [])],
+        "configuredEvalSeeds": [int(seed) for seed in env_cfg.get("evalSeeds", [])],
+        "envCount": int(env_cfg.get("envCount") or 0),
+        "evalEnvCount": int(env_cfg.get("evalEnvCount") or 0),
+        "maxStepsPerEpisode": int(env_cfg.get("maxStepsPerEpisode") or 0),
+        "effectiveMap": lane["map_key"],
+        "effectiveMapKey": lane["map_key"],
+        "configuredMaps": list(env_cfg.get("maps") or []),
+        "effectiveDomainMode": lane["domain_mode"],
+        "effectiveGameMode": lane["game_mode"],
+        "effectivePlanarMode": lane["planar_mode"],
+        "planarMode": lane["planar_mode"],
+        "modePath": lane["mode_path"],
+        "effectiveModePath": lane["mode_path"],
+        "curriculumStepOffset": lane["curriculum_step_offset"],
+    }
 
 
 def _numeric_summary(values: list[float]) -> dict[str, Any]:
@@ -456,10 +531,65 @@ def _collect_eval_diagnostics(
     intent_requested: Counter[str] = Counter()
     intent_applied: Counter[str] = Counter()
     safety_overrules: Counter[str] = Counter()
+    effective_maps: Counter[str] = Counter()
+    effective_modes: Counter[str] = Counter()
+    effective_curriculum_stages: Counter[str] = Counter()
+    curriculum_offsets: Counter[str] = Counter()
+    global_env_steps: list[float] = []
+    curriculum_total_env_steps: list[float] = []
+    curriculum_stage_change_count = 0
+    progress_event_reachable_count = 0
+    progress_signal_reported_count = 0
     action_latencies: list[float] = []
     ack_latencies: list[float] = []
 
     for info in info_samples:
+        metadata = info.get("metadata") if isinstance(info.get("metadata"), Mapping) else {}
+        effective_env = info.get("effectiveEnvironment")
+        if not isinstance(effective_env, Mapping):
+            effective_env = metadata.get("effectiveEnvironment") if isinstance(metadata, Mapping) else None
+        if isinstance(effective_env, Mapping):
+            map_key = effective_env.get("mapKey")
+            mode = effective_env.get("domainMode") or effective_env.get("mode") or effective_env.get("gameMode")
+            stage = effective_env.get("activeCurriculumStage")
+            offset = _number(effective_env.get("curriculumStepOffset"))
+            global_step = _number(effective_env.get("globalEnvSteps"))
+            total_step = _number(effective_env.get("curriculumTotalEnvSteps"))
+            if map_key:
+                effective_maps[str(map_key)] += 1
+            if mode:
+                effective_modes[str(mode)] += 1
+            if stage:
+                effective_curriculum_stages[str(stage)] += 1
+            if offset is not None:
+                curriculum_offsets[str(int(offset))] += 1
+            if global_step is not None:
+                global_env_steps.append(global_step)
+            if total_step is not None:
+                curriculum_total_env_steps.append(total_step)
+            if effective_env.get("curriculumStageChanged") is True:
+                curriculum_stage_change_count += 1
+        episode_semantics = metadata.get("episodeSemantics") if isinstance(metadata, Mapping) else None
+        if isinstance(episode_semantics, Mapping):
+            stage = episode_semantics.get("activeCurriculumStage")
+            if stage:
+                effective_curriculum_stages[str(stage)] += 1
+            offset = _number(episode_semantics.get("curriculumStepOffset"))
+            global_step = _number(episode_semantics.get("globalEnvSteps"))
+            total_step = _number(episode_semantics.get("curriculumTotalEnvSteps"))
+            if offset is not None:
+                curriculum_offsets[str(int(offset))] += 1
+            if global_step is not None:
+                global_env_steps.append(global_step)
+            if total_step is not None:
+                curriculum_total_env_steps.append(total_step)
+            if episode_semantics.get("curriculumStageChanged") is True:
+                curriculum_stage_change_count += 1
+            if episode_semantics.get("progressEventReachable") is True:
+                progress_event_reachable_count += 1
+            if episode_semantics.get("progressSignalReported") is True:
+                progress_signal_reported_count += 1
+
         reward_breakdown = info.get("rewardBreakdown")
         if isinstance(reward_breakdown, Mapping):
             for key, value in reward_breakdown.items():
@@ -539,6 +669,26 @@ def _collect_eval_diagnostics(
         )
 
     return {
+        "environmentSemantics": {
+            "effectiveMapCounts": _counter_dict(effective_maps),
+            "effectiveModeCounts": _counter_dict(effective_modes),
+            "effectiveCurriculumStageCounts": _counter_dict(effective_curriculum_stages),
+            "curriculumStepOffsetCounts": _counter_dict(curriculum_offsets),
+            "globalEnvStepRange": {
+                "min": min(global_env_steps) if global_env_steps else None,
+                "max": max(global_env_steps) if global_env_steps else None,
+            },
+            "curriculumTotalEnvStepRange": {
+                "min": min(curriculum_total_env_steps) if curriculum_total_env_steps else None,
+                "max": max(curriculum_total_env_steps) if curriculum_total_env_steps else None,
+            },
+            "curriculumStageChangeCount": int(curriculum_stage_change_count),
+            "progressEventReachableCount": int(progress_event_reachable_count),
+            "progressSignalReportedCount": int(progress_signal_reported_count),
+            "modeMapTelemetryPresent": bool(effective_maps or effective_modes),
+            "curriculumStageTelemetryPresent": bool(effective_curriculum_stages),
+            "globalStepTelemetryPresent": bool(global_env_steps and curriculum_total_env_steps),
+        },
         "rewardSafetyDiagnostics": {
             "rewardBreakdownTotals": {key: round(float(value), 6) for key, value in sorted(reward_breakdown_totals.items())},
             "rewardBreakdownMeanPerStep": reward_breakdown_mean,
@@ -575,6 +725,9 @@ def _collect_eval_diagnostics(
             "averageBotSurvival": completed_avg if is_baseline else None,
             "averageBotSurvivalReason": average_survival_reason,
             "averageBotSurvivalSource": (
+                "BT93J R2 micro-train counterprobe completed episode length"
+                if _is_bt93j_r2_eval(block_id, run_kind)
+                else
                 "BT93I terminal curriculum repair completed episode length"
                 if _is_bt93i_comparable_eval(block_id, run_kind)
                 else "BT93H comparable terminal repair completed episode length"
@@ -830,6 +983,166 @@ def _validate_gate_inputs(config: Mapping[str, Any]) -> dict[str, Any]:
             "dqnChampion": ((matrix_manifest.get("baseline") or {}).get("dqnChampion") or {}),
         }
 
+    if block_id == "BT93J":
+        diagnostic_split_path = _repo_path(str(artifacts.get("diagnosticSplit")))
+        pilot_readiness_path = _repo_path(str(artifacts.get("pilotReadinessReport")))
+        r1_report_path = _repo_path(str(artifacts.get("r1MicroTestReport")))
+        terminal_report_path = _repo_path(str(artifacts.get("terminalSemanticsReport")))
+        matrix_report_path = _repo_path(str(artifacts.get("matrixContractReport")))
+        action_report_path = _repo_path(str(artifacts.get("actionPolicyDiagnostics")))
+        reward_report_path = _repo_path(str(artifacts.get("rewardCurriculumDiagnostics")))
+
+        diagnostic_split = _read_json(diagnostic_split_path)
+        pilot_readiness = _read_json(pilot_readiness_path)
+        r1_report = _read_json(r1_report_path)
+        terminal_report = _read_json(terminal_report_path)
+        matrix_report = _read_json(matrix_report_path)
+        action_report = _read_json(action_report_path)
+        reward_report = _read_json(reward_report_path)
+        phase_id = str(config.get("phaseId") or "")
+
+        if phase_id == "93J.5b":
+            r2_report_path = _repo_path(str(artifacts.get("r2CounterprobeReport")))
+            proof_lane_path = _repo_path(str(artifacts.get("rewardCurriculumProofLaneReport")))
+            longrun_readiness_path = _repo_path(str(artifacts.get("userOwned1mLongrunReadinessReport")))
+            r2_report = _read_json(r2_report_path)
+            proof_lane = _read_json(proof_lane_path)
+            longrun_readiness = _read_json(longrun_readiness_path)
+
+            if r2_report.get("resultClass") != "same-red":
+                raise RuntimeError("BT93J.5c proof longrun requires R2=same-red as the pinned start finding")
+            if proof_lane.get("resultClass") != "reward-curriculum-proof-lane-ready":
+                raise RuntimeError("BT93J.5c proof longrun is blocked by red proof-lane report")
+            if longrun_readiness.get("readyForUserOwnedLongrun") is not True:
+                raise RuntimeError("BT93J.5c proof longrun readiness is not green")
+            if (action_report.get("actionPolicyGate") or {}).get("green") is not True:
+                raise RuntimeError("BT93J.5c proof longrun is blocked by red action telemetry")
+            if (longrun_readiness.get("guardrails") or {}).get("holdoutUsed") is not False:
+                raise RuntimeError("BT93J.5c proof longrun cannot consume holdout")
+            if (longrun_readiness.get("guardrails") or {}).get("candidateRun") is not False:
+                raise RuntimeError("BT93J.5c proof longrun cannot be a candidate run")
+            if str((config.get("env") or {}).get("rewardProfileId") or "") != "bt93j-reward-curriculum-proof-v1":
+                raise RuntimeError("BT93J.5c proof longrun requires the BT93J reward/curriculum proof profile")
+
+            matrix_contract = matrix_report.get("contract") or {}
+            return {
+                "diagnosticSplit": _rel(diagnostic_split_path),
+                "diagnosticSplitSha256": _sha256_file(diagnostic_split_path),
+                "r2CounterprobeReport": _rel(r2_report_path),
+                "r2CounterprobeReportSha256": _sha256_file(r2_report_path),
+                "rewardCurriculumProofLaneReport": _rel(proof_lane_path),
+                "rewardCurriculumProofLaneReportSha256": _sha256_file(proof_lane_path),
+                "userOwned1mLongrunReadinessReport": _rel(longrun_readiness_path),
+                "userOwned1mLongrunReadinessReportSha256": _sha256_file(longrun_readiness_path),
+                "actionPolicyDiagnostics": _rel(action_report_path),
+                "actionPolicyDiagnosticsSha256": _sha256_file(action_report_path),
+                "rewardCurriculumDiagnostics": _rel(reward_report_path),
+                "rewardCurriculumDiagnosticsSha256": _sha256_file(reward_report_path),
+                "terminalSemanticsReport": _rel(terminal_report_path),
+                "terminalSemanticsReportSha256": _sha256_file(terminal_report_path),
+                "matrixContractReport": _rel(matrix_report_path),
+                "matrixContractReportSha256": _sha256_file(matrix_report_path),
+                "dependencyLockReport": _rel(dependency_report_path),
+                "dependencyLockReportSha256": _sha256_file(dependency_report_path),
+                "cleanEnvReport": _rel(clean_env_report_path),
+                "cleanEnvReportSha256": _sha256_file(clean_env_report_path),
+                "requirements": _rel(requirements_path),
+                "requirementsSha256": _sha256_file(requirements_path),
+                "freezeOk": False,
+                "reAuditRequired": False,
+                "candidateRunsAllowed": False,
+                "promotionAllowed": False,
+                "actionSurfaceId": _action_surface_id(config),
+                "rewardProfileId": str((config.get("env") or {}).get("rewardProfileId") or ""),
+                "cleanPython": str(clean_env_report.get("cleanPython") or ""),
+                "semanticWindow": {"modeId": matrix_contract.get("modeId")},
+                "matrix": {
+                    "matrixId": matrix_report.get("matrixId"),
+                    "maps": matrix_contract.get("maps"),
+                    "seeds": matrix_contract.get("seeds"),
+                    "maxStepsPerEpisode": matrix_contract.get("maxStepsPerEpisode"),
+                    "minimumEpisodes": matrix_contract.get("minimumEpisodes"),
+                },
+                "dqnChampion": matrix_contract.get("dqnChampion") or {},
+                "userOwnedProofLongrunGate": {
+                    "readyForUserOwnedLongrun": True,
+                    "allowedRunKind": BT93J_USER_OWNED_PROOF_LONGRUN_KIND,
+                    "totalTimesteps": (config.get("rollout") or {}).get("userOwnedProofLongrunTimesteps"),
+                    "holdoutAllowed": False,
+                    "candidateRun": False,
+                    "freezeCandidate": False,
+                },
+                "diagnosticSplitResultClass": diagnostic_split.get("resultClass"),
+            }
+
+        blocking_checks = set((pilot_readiness.get("pilotReadiness") or {}).get("blockingChecks") or [])
+        expected_blockers = {
+            "terminal_matrix_start_capable",
+            "not_player_dead_only",
+            "micro_test_trend_improvement",
+        }
+        if r1_report.get("resultClass") != "green":
+            raise RuntimeError("BT93J.5a start is blocked because R1 is not green")
+        if (pilot_readiness.get("pilotReadiness") or {}).get("readyForTraining") is not False:
+            raise RuntimeError("BT93J.5a start requires readyForTraining=false")
+        if blocking_checks != expected_blockers:
+            raise RuntimeError("BT93J.5a start is blocked by unexpected pilot-readiness blockers")
+        if (terminal_report.get("terminalMappingGate") or {}).get("realEvalPlayerDeadOnly") is not True:
+            raise RuntimeError("BT93J.5a start requires player-dead-only R1 counterprobe input")
+        if (action_report.get("actionPolicyGate") or {}).get("green") is not True:
+            raise RuntimeError("BT93J.5a start is blocked by red action telemetry")
+        if (reward_report.get("rewardCurriculumGate") or {}).get("primaryCause") is not True:
+            raise RuntimeError("BT93J.5a start is blocked by missing reward/curriculum primary cause")
+
+        matrix_contract = matrix_report.get("contract") or {}
+        return {
+            "diagnosticSplit": _rel(diagnostic_split_path),
+            "diagnosticSplitSha256": _sha256_file(diagnostic_split_path),
+            "pilotReadinessReport": _rel(pilot_readiness_path),
+            "pilotReadinessReportSha256": _sha256_file(pilot_readiness_path),
+            "r1MicroTestReport": _rel(r1_report_path),
+            "r1MicroTestReportSha256": _sha256_file(r1_report_path),
+            "terminalSemanticsReport": _rel(terminal_report_path),
+            "terminalSemanticsReportSha256": _sha256_file(terminal_report_path),
+            "matrixContractReport": _rel(matrix_report_path),
+            "matrixContractReportSha256": _sha256_file(matrix_report_path),
+            "actionPolicyDiagnostics": _rel(action_report_path),
+            "actionPolicyDiagnosticsSha256": _sha256_file(action_report_path),
+            "rewardCurriculumDiagnostics": _rel(reward_report_path),
+            "rewardCurriculumDiagnosticsSha256": _sha256_file(reward_report_path),
+            "dependencyLockReport": _rel(dependency_report_path),
+            "dependencyLockReportSha256": _sha256_file(dependency_report_path),
+            "cleanEnvReport": _rel(clean_env_report_path),
+            "cleanEnvReportSha256": _sha256_file(clean_env_report_path),
+            "requirements": _rel(requirements_path),
+            "requirementsSha256": _sha256_file(requirements_path),
+            "freezeOk": False,
+            "reAuditRequired": False,
+            "candidateRunsAllowed": False,
+            "promotionAllowed": False,
+            "actionSurfaceId": _action_surface_id(config),
+            "cleanPython": str(clean_env_report.get("cleanPython") or ""),
+            "semanticWindow": {"modeId": matrix_contract.get("modeId")},
+            "matrix": {
+                "matrixId": matrix_report.get("matrixId"),
+                "maps": matrix_contract.get("maps"),
+                "seeds": matrix_contract.get("seeds"),
+                "maxStepsPerEpisode": matrix_contract.get("maxStepsPerEpisode"),
+                "minimumEpisodes": matrix_contract.get("minimumEpisodes"),
+            },
+            "dqnChampion": matrix_contract.get("dqnChampion") or {},
+            "r2StartGate": {
+                "r1Green": True,
+                "readyForTraining": False,
+                "blockingChecks": sorted(blocking_checks),
+                "allowedRunKind": BT93J_R2_TRAIN_RUN_KIND,
+                "holdoutAllowed": False,
+                "candidateRun": False,
+                "freezeCandidate": False,
+            },
+            "diagnosticSplitResultClass": diagnostic_split.get("resultClass"),
+        }
+
     start_manifest_path = _repo_path(str(artifacts.get("startManifest")))
     action_surface_report_path = _repo_path(str(artifacts.get("actionSurfaceReport")))
     start_manifest = _read_json(start_manifest_path)
@@ -870,6 +1183,8 @@ def _make_env_factory(
     max_steps: int,
     timeout_seconds: float,
     action_surface_id: str | None,
+    reward_profile_id: str | None,
+    lane_options: Mapping[str, Any],
 ) -> Any:
     def _factory() -> Any:
         env = make_curvios_action_wrapper(
@@ -878,6 +1193,13 @@ def _make_env_factory(
                 default_seed=seed,
                 session_id=f"{run_id}-env{env_index}",
                 controller_timeout_seconds=timeout_seconds,
+                reward_profile_id=reward_profile_id,
+                map_key=lane_options.get("map_key"),
+                domain_mode=lane_options.get("domain_mode"),
+                game_mode=lane_options.get("game_mode"),
+                planar_mode=lane_options.get("planar_mode"),
+                mode_path=lane_options.get("mode_path"),
+                curriculum_step_offset=int(lane_options.get("curriculum_step_offset") or 0),
             ),
             surface_id=action_surface_id,
         )
@@ -900,6 +1222,8 @@ def _build_vec_env(
     max_steps = int(env_cfg["maxStepsPerEpisode"])
     timeout_seconds = float(env_cfg.get("controllerTimeoutSeconds") or DEFAULT_COMMAND_TIMEOUT_SECONDS)
     action_surface_id = _action_surface_id(config)
+    reward_profile_id = str(env_cfg.get("rewardProfileId") or "") or None
+    lane_options = _env_lane_options(env_cfg)
     base_env = DummyVecEnv([
         _make_env_factory(
             seed=int(seed),
@@ -908,6 +1232,8 @@ def _build_vec_env(
             max_steps=max_steps,
             timeout_seconds=timeout_seconds,
             action_surface_id=action_surface_id,
+            reward_profile_id=reward_profile_id,
+            lane_options=lane_options,
         )
         for index, seed in enumerate(seeds)
     ])
@@ -996,6 +1322,8 @@ def _write_model_package(
         (block_id == "BT93G" and run_kind == "comparable-repair")
         or (block_id == "BT93H" and run_kind == "comparable-terminal-repair")
         or (block_id == "BT93I" and run_kind == "terminal-curriculum-repair")
+        or (block_id == "BT93J" and run_kind == BT93J_R2_TRAIN_RUN_KIND)
+        or (block_id == "BT93J" and run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND)
     )
     checkpoint_dir = run_dir / "checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -1022,6 +1350,11 @@ def _write_model_package(
         optimizer_path,
     )
 
+    longrun_step_label = (
+        int(learning_report.get("progressTimesteps") or 0)
+        if run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND
+        else None
+    )
     package = ModelPackage(
         manifest_path=manifest_path,
         run_id=run_id,
@@ -1033,6 +1366,8 @@ def _write_model_package(
         vecnormalize_sha256=_sha256_file(vecnormalize_path),
         optimizer_sha256=_sha256_file(optimizer_path),
         config_sha256=_sha256_file(config_snapshot_path),
+        step_label_timesteps=longrun_step_label,
+        source_run_dir=run_dir if run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND else None,
     )
     manifest = {
         "manifestVersion": CHECKPOINT_VERSION,
@@ -1098,7 +1433,7 @@ def _write_model_package(
 def _package_pointer(package: ModelPackage | None) -> dict[str, Any] | None:
     if package is None:
         return None
-    return {
+    pointer = {
         "runId": package.run_id,
         "artifactManifest": _rel(package.manifest_path),
         "model": _rel(package.model_path),
@@ -1110,6 +1445,11 @@ def _package_pointer(package: ModelPackage | None) -> dict[str, Any] | None:
         "config": _rel(package.config_path),
         "configSha256": package.config_sha256,
     }
+    if package.step_label_timesteps is not None:
+        pointer["stepLabelTimesteps"] = package.step_label_timesteps
+    if package.source_run_dir is not None:
+        pointer["sourceRunDirectory"] = _rel(package.source_run_dir)
+    return pointer
 
 
 def _resolve_package(checkpoint: str | None, artifact_root: Path, *, prefer: str = "latest_model_package.json") -> ModelPackage:
@@ -1123,6 +1463,18 @@ def _resolve_package(checkpoint: str | None, artifact_root: Path, *, prefer: str
     artifacts = payload.get("artifacts")
     if not isinstance(artifacts, Mapping):
         raise RuntimeError(f"model package manifest is malformed: {_rel(source)}")
+    source_run_dir = None
+    if source.parent.name.startswith("step_") and source.parent.parent.name == "longrun_snapshots":
+        source_run_dir = source.parent.parent.parent
+    elif source.parent.name == "checkpoints":
+        source_run_dir = source.parent.parent
+    elif source.name == "artifact_manifest.json":
+        source_run_dir = source.parent
+    step_label_raw = payload.get("stepLabelTimesteps")
+    if step_label_raw is None and str(payload.get("runKind") or "") == BT93J_USER_OWNED_PROOF_LONGRUN_KIND:
+        learning = payload.get("learning")
+        if isinstance(learning, Mapping):
+            step_label_raw = learning.get("progressTimesteps")
     return ModelPackage(
         manifest_path=source.resolve(),
         run_id=str(payload.get("runId") or ""),
@@ -1134,7 +1486,739 @@ def _resolve_package(checkpoint: str | None, artifact_root: Path, *, prefer: str
         vecnormalize_sha256=str(artifacts["vecnormalizeSha256"]),
         optimizer_sha256=str(artifacts["optimizerStateSha256"]),
         config_sha256=str(artifacts["configSha256"]),
+        step_label_timesteps=int(step_label_raw) if step_label_raw is not None else None,
+        source_run_dir=source_run_dir.resolve() if source_run_dir is not None else None,
     )
+
+
+def _has_non_finite(value: Any) -> bool:
+    if value is None or isinstance(value, (str, bool)):
+        return False
+    if isinstance(value, np.ndarray):
+        try:
+            return not bool(np.isfinite(value.astype(float)).all())
+        except (TypeError, ValueError):
+            return False
+    if isinstance(value, np.generic):
+        value = value.item()
+    if isinstance(value, torch.Tensor):
+        return not bool(torch.isfinite(value).all().item())
+    if isinstance(value, (int, float)):
+        return not bool(np.isfinite(float(value)))
+    if isinstance(value, Mapping):
+        return any(_has_non_finite(entry) for entry in value.values())
+    if isinstance(value, (list, tuple)):
+        return any(_has_non_finite(entry) for entry in value)
+    return False
+
+
+def _bt93j_player_dead_only(terminal_counts: Mapping[str, int], death_counts: Mapping[str, int]) -> bool:
+    total_terminals = sum(int(value) for value in terminal_counts.values())
+    if total_terminals <= 0:
+        return False
+    player_dead = int(terminal_counts.get("player-dead", 0))
+    death_total = sum(int(value) for value in death_counts.values())
+    return player_dead == total_terminals and death_total == total_terminals
+
+
+def _bt93j_eval_summary(eval_report: Mapping[str, Any]) -> dict[str, Any]:
+    diagnostics = eval_report.get("diagnostics") or {}
+    survival = diagnostics.get("survivalKpis") or {}
+    reward_safety = diagnostics.get("rewardSafetyDiagnostics") or {}
+    failure = diagnostics.get("failureSemantics") or {}
+    terminal_counts = {
+        str(key): int(value)
+        for key, value in dict(failure.get("terminalReasonCounts") or {}).items()
+    }
+    death_counts = {
+        str(key): int(value)
+        for key, value in dict(failure.get("deathCauseCounts") or {}).items()
+    }
+    completed_lengths = [
+        int(value)
+        for value in (survival.get("completedEpisodeLengths") or [])
+        if isinstance(value, (int, float, np.integer, np.floating))
+    ]
+    natural_terminal_count = int(failure.get("naturalTerminal") or 0)
+    return {
+        "avgStepsPerEpisodeObserved": survival.get("avgStepsPerEpisodeObserved"),
+        "averageBotSurvivalObserved": survival.get("avgStepsPerEpisodeObserved"),
+        "completedEpisodeCount": survival.get("completedEpisodeCount"),
+        "longestEpisode": max(completed_lengths) if completed_lengths else None,
+        "completedEpisodeLengths": completed_lengths,
+        "rewardBreakdownTotals": reward_safety.get("rewardBreakdownTotals") or {},
+        "actionTelemetry": reward_safety.get("actionTelemetry") or {},
+        "terminalMatrix": {
+            "terminalReasonCounts": terminal_counts,
+            "deathCauseCounts": death_counts,
+            "naturalTerminalCount": natural_terminal_count,
+            "maxSteps": int(failure.get("maxSteps") or 0),
+            "runtimeErrorCount": int(failure.get("runtimeErrorCount") or 0),
+            "playerDeadOnly": _bt93j_player_dead_only(terminal_counts, death_counts),
+        },
+    }
+
+
+def _bt93j_snapshot_technical_gate(eval_report: Mapping[str, Any], learning_metrics: Mapping[str, Any]) -> dict[str, Any]:
+    summary = _bt93j_eval_summary(eval_report)
+    action = summary["actionTelemetry"]
+    terminal = summary["terminalMatrix"]
+    ppo_metrics = (learning_metrics.get("ppoLearningMetrics") or {}).get("metrics") or {}
+    checks = [
+        {
+            "id": "finite_eval_report",
+            "ok": not _has_non_finite(eval_report.get("eval")),
+        },
+        {
+            "id": "finite_ppo_metrics",
+            "ok": not _has_non_finite(ppo_metrics),
+        },
+        {
+            "id": "runtime_error_count_zero",
+            "ok": int(terminal.get("runtimeErrorCount") or 0) == 0,
+            "observed": terminal.get("runtimeErrorCount"),
+        },
+        {
+            "id": "invalid_action_rate_zero",
+            "ok": float(action.get("invalidActionRate") or 0.0) == 0.0,
+            "observed": action.get("invalidActionRate"),
+        },
+        {
+            "id": "sanitizer_rate_zero",
+            "ok": float(action.get("sanitizerRate") or 0.0) == 0.0,
+            "observed": action.get("sanitizerRate"),
+        },
+        {
+            "id": "post_decode_clamp_rate_zero",
+            "ok": float(action.get("postDecodeClampRate") or 0.0) == 0.0,
+            "observed": action.get("postDecodeClampRate"),
+        },
+        {
+            "id": "veto_rate_below_0_25",
+            "ok": float(action.get("vetoRate") or 0.0) < 0.25,
+            "observed": action.get("vetoRate"),
+        },
+    ]
+    return {
+        "ok": all(bool(check["ok"]) for check in checks),
+        "checks": checks,
+    }
+
+
+def _write_bt93j_longrun_checkpoint(
+    *,
+    model: PPO,
+    vec_env: VecNormalize,
+    config: Mapping[str, Any],
+    config_path: Path,
+    run_dir: Path,
+    run_id: str,
+    run_kind: str,
+    phase_id: str,
+    step_label: int,
+    progress_timesteps: int,
+) -> dict[str, Any]:
+    snapshot_dir = run_dir / "longrun_snapshots" / f"step_{step_label:07d}"
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    model_path = snapshot_dir / "model.zip"
+    vecnormalize_path = snapshot_dir / "vecnormalize.pkl"
+    optimizer_path = snapshot_dir / "optimizer_state.pt"
+    config_snapshot_path = snapshot_dir / "config.json"
+    manifest_path = snapshot_dir / "snapshot_manifest.json"
+
+    _write_json(config_snapshot_path, config)
+    normalize_pickle_compat = _clear_space_rng_for_vecnormalize_pickle(vec_env)
+    model.save(str(model_path))
+    vec_env.save(str(vecnormalize_path))
+    torch.save(
+        {
+            "checkpointVersion": CHECKPOINT_VERSION,
+            "runId": run_id,
+            "runKind": run_kind,
+            "phaseId": phase_id,
+            "stepLabelTimesteps": step_label,
+            "progressTimesteps": progress_timesteps,
+            "modelNumTimesteps": int(model.num_timesteps),
+            "optimizerStateDict": model.policy.optimizer.state_dict(),
+            "optimizerSummary": _optimizer_summary(model),
+        },
+        optimizer_path,
+    )
+    manifest = {
+        "manifestVersion": f"{CHECKPOINT_VERSION}-bt93j-longrun-snapshot",
+        "generatedAt": _utc_now(),
+        "generatedBy": "python/train.py::BT93JLongrunSnapshotCallback",
+        "blockId": "BT93J",
+        "phaseId": phase_id,
+        "runId": run_id,
+        "runKind": run_kind,
+        "stepLabelTimesteps": step_label,
+        "progressTimesteps": progress_timesteps,
+        "modelNumTimesteps": int(model.num_timesteps),
+        "diagnosticOnly": True,
+        "candidateRun": False,
+        "freezeCandidate": False,
+        "promotionAllowed": False,
+        "holdoutUsed": False,
+        "bt94aGateRefresh": False,
+        "artifacts": {
+            "model": _rel(model_path),
+            "modelSha256": _sha256_file(model_path),
+            "vecnormalize": _rel(vecnormalize_path),
+            "vecnormalizeSha256": _sha256_file(vecnormalize_path),
+            "optimizerState": _rel(optimizer_path),
+            "optimizerStateSha256": _sha256_file(optimizer_path),
+            "config": _rel(config_snapshot_path),
+            "configSha256": _sha256_file(config_snapshot_path),
+            "snapshotManifest": _rel(manifest_path),
+        },
+        "sourceConfig": {
+            "path": _rel(config_path),
+            "sha256": _sha256_file(config_path),
+        },
+        "policy": _policy_summary(model, config),
+        "optimizer": _optimizer_summary(model),
+        "pickleCompatibility": normalize_pickle_compat,
+        "guardrails": {
+            "readOnlyRuntimeSurfaces": list(READ_ONLY_RUNTIME_SURFACES),
+            "runtimeSurfacesTouched": [],
+            "productiveRuntimeChanged": False,
+            "diagnosticOnly": True,
+            "learningQualityClaimAllowed": False,
+            "baselineRunsStarted": False,
+            "pilotRunsStarted": False,
+            "candidateRun": False,
+            "freezeCandidate": False,
+            "promotionAllowed": False,
+            "holdoutUsed": False,
+            "bt94aGateRefresh": False,
+        },
+    }
+    _write_json(manifest_path, manifest)
+    return manifest
+
+
+def _write_bt93j_longrun_eval_snapshot(
+    *,
+    snapshot_manifest: Mapping[str, Any],
+    config: Mapping[str, Any],
+    run_id: str,
+    run_kind: str,
+    phase_id: str,
+    step_label: int,
+    progress_timesteps: int,
+    learning_metrics: Mapping[str, Any],
+) -> dict[str, Any]:
+    artifacts = snapshot_manifest.get("artifacts") or {}
+    snapshot_dir = _repo_path(str(artifacts["snapshotManifest"])).parent
+    source_run_dir = snapshot_dir.parent.parent if snapshot_dir.parent.name == "longrun_snapshots" else None
+    source_package = ModelPackage(
+        manifest_path=_repo_path(str(artifacts["snapshotManifest"])),
+        run_id=str(snapshot_manifest.get("runId") or run_id),
+        model_path=_repo_path(str(artifacts["model"])),
+        vecnormalize_path=_repo_path(str(artifacts["vecnormalize"])),
+        optimizer_path=_repo_path(str(artifacts["optimizerState"])),
+        config_path=_repo_path(str(artifacts["config"])),
+        model_sha256=str(artifacts["modelSha256"]),
+        vecnormalize_sha256=str(artifacts["vecnormalizeSha256"]),
+        optimizer_sha256=str(artifacts["optimizerStateSha256"]),
+        config_sha256=str(artifacts["configSha256"]),
+        step_label_timesteps=int(snapshot_manifest.get("stepLabelTimesteps") or step_label),
+        source_run_dir=source_run_dir.resolve() if source_run_dir is not None else None,
+    )
+    env_cfg = config["env"]
+    seeds = [int(seed) for seed in env_cfg["evalSeeds"][: int(env_cfg["evalEnvCount"])]]
+    steps = int((config.get("rollout") or {}).get("evalSteps") or 0)
+    target_completed_episodes = int((config.get("rollout") or {}).get("evalMinCompletedEpisodes") or 0)
+    eval_env: VecNormalize | None = None
+    try:
+        eval_env = _build_vec_env(
+            config=config,
+            seeds=seeds,
+            run_id=f"{run_id}-eval-{step_label}",
+            training=False,
+            vecnormalize_source=source_package.vecnormalize_path,
+        )
+        load_started = time.perf_counter()
+        eval_model = PPO.load(
+            str(source_package.model_path),
+            device=str(config["algorithm"]["device"]),
+            force_reset=False,
+        )
+        eval_model.set_env(eval_env, force_reset=False)
+        load_elapsed_ms = (time.perf_counter() - load_started) * 1000.0
+        obs = eval_env.reset()
+        forward_started = time.perf_counter()
+        eval_model.predict(obs[:1], deterministic=True)
+        forward_elapsed_ms = (time.perf_counter() - forward_started) * 1000.0
+
+        rewards: list[float] = []
+        done_count = 0
+        info_tail: list[dict[str, Any]] = []
+        info_samples: list[dict[str, Any]] = []
+        completed_episode_lengths: list[int] = []
+        open_episode_lengths = [0 for _ in seeds]
+        vector_steps_executed = 0
+        stop_reason = "step-limit"
+        for _ in range(steps):
+            action, _ = eval_model.predict(obs, deterministic=True)
+            obs, reward, done, infos = eval_env.step(action)
+            vector_steps_executed += 1
+            reward_entries = [float(entry) for entry in np.asarray(reward).reshape(-1)]
+            done_entries = [bool(entry) for entry in np.asarray(done).reshape(-1)]
+            rewards.extend(reward_entries)
+            done_count += int(np.count_nonzero(done))
+            for index, info in enumerate(infos):
+                if index < len(open_episode_lengths):
+                    open_episode_lengths[index] += 1
+                    if index < len(done_entries) and done_entries[index]:
+                        completed_episode_lengths.append(open_episode_lengths[index])
+                        open_episode_lengths[index] = 0
+                info_samples.append(dict(info))
+                if len(info_tail) < 4:
+                    info_tail.append(dict(info))
+            if target_completed_episodes > 0 and len(completed_episode_lengths) >= target_completed_episodes:
+                stop_reason = "min-completed-episodes"
+                break
+        telemetry_reports = _telemetry(eval_env)
+        diagnostics = _collect_eval_diagnostics(
+            block_id="BT93J",
+            run_kind=run_kind,
+            info_samples=info_samples,
+            telemetry_reports=telemetry_reports,
+            reward_values=rewards,
+            done_count=done_count,
+            completed_episode_lengths=completed_episode_lengths,
+            open_episode_lengths=open_episode_lengths,
+            env_count=len(seeds),
+            max_steps_per_episode=int(env_cfg["maxStepsPerEpisode"]),
+            training_report={"learning": dict(learning_metrics)},
+            model_reload_ms=load_elapsed_ms,
+            forward_pass_ms=forward_elapsed_ms,
+        )
+        diagnostics["survivalKpis"]["completedEpisodeLengths"] = list(completed_episode_lengths)
+        report = {
+            "ok": True,
+            "generatedAt": _utc_now(),
+            "generatedBy": "python/train.py::BT93JLongrunSnapshotCallback",
+            "blockId": "BT93J",
+            "phaseId": phase_id,
+            "runId": run_id,
+            "runKind": run_kind,
+            "stepLabelTimesteps": step_label,
+            "progressTimesteps": progress_timesteps,
+            "holdoutUsed": False,
+            "effectiveEnv": _effective_env_spec(config, seeds, training=False),
+            "candidateRun": False,
+            "freezeCandidate": False,
+            "promotionAllowed": False,
+            "bt94aGateRefresh": False,
+            "sourcePackage": _package_pointer(source_package),
+            "modelReload": {
+                "wallClockMs": round(load_elapsed_ms, 6),
+                "countsAsJsTickLatency": False,
+            },
+            "forwardPass": {
+                "wallClockMs": round(forward_elapsed_ms, 6),
+                "countsAsJsTickLatency": False,
+            },
+            "eval": {
+                "steps": vector_steps_executed,
+                "stepLimit": steps,
+                "rewardTotal": round(sum(rewards), 6),
+                "rewardMean": round(sum(rewards) / len(rewards), 6) if rewards else 0.0,
+                "doneCount": done_count,
+                "completedEpisodeLengths": list(completed_episode_lengths),
+                "openEpisodeLengthsAtStop": list(open_episode_lengths),
+                "telemetry": telemetry_reports,
+                "infoTail": info_tail,
+            },
+            "episodeTargetGate": {
+                "enabled": target_completed_episodes > 0,
+                "minCompletedEpisodes": target_completed_episodes or None,
+                "completedEpisodeCount": len(completed_episode_lengths),
+                "satisfied": (
+                    len(completed_episode_lengths) >= target_completed_episodes
+                    if target_completed_episodes > 0
+                    else None
+                ),
+                "stopReason": stop_reason,
+                "maxEvalSteps": steps,
+                "vectorStepsExecuted": vector_steps_executed,
+            },
+            "diagnostics": diagnostics,
+            "guardrails": {
+                "diagnosticOnly": True,
+                "learningQualityClaimAllowed": False,
+                "baselineRunsStarted": False,
+                "pilotRunsStarted": False,
+                "candidateRun": False,
+                "freezeCandidate": False,
+                "promotionAllowed": False,
+                "holdoutUsed": False,
+                "bt94aGateRefresh": False,
+                "runtimeSurfacesTouched": [],
+                "productiveRuntimeChanged": False,
+            },
+        }
+        technical_gate = _bt93j_snapshot_technical_gate(report, learning_metrics)
+        report["technicalStopGate"] = technical_gate
+        report_path = snapshot_dir / "eval_snapshot.json"
+        _write_json(report_path, report)
+        return {
+            "ok": technical_gate["ok"],
+            "path": _rel(report_path),
+            "sha256": _sha256_file(report_path),
+            "summary": _bt93j_eval_summary(report),
+            "episodeTargetGate": report["episodeTargetGate"],
+            "technicalStopGate": technical_gate,
+        }
+    finally:
+        if eval_env is not None:
+            eval_env.close()
+
+
+class _BT93JLongrunSnapshotCallback(BaseCallback):
+    def __init__(
+        self,
+        *,
+        config: Mapping[str, Any],
+        config_path: Path,
+        run_dir: Path,
+        run_id: str,
+        run_kind: str,
+        phase_id: str,
+        total_timesteps: int,
+        start_progress_timesteps: int,
+        capture_start_snapshot: bool,
+    ) -> None:
+        super().__init__(verbose=0)
+        rollout = config.get("rollout") or {}
+        self.config = config
+        self.config_path = config_path
+        self.run_dir = run_dir
+        self.run_id = run_id
+        self.run_kind = run_kind
+        self.phase_id = phase_id
+        self.total_timesteps = int(total_timesteps)
+        self.start_progress_timesteps = int(start_progress_timesteps)
+        self.capture_start_snapshot = bool(capture_start_snapshot)
+        self.interval = int(rollout.get("checkpointFrequencyTimesteps") or 50000)
+        self.next_step = ((self.start_progress_timesteps // self.interval) + 1) * self.interval
+        self.start_timesteps = 0
+        self.snapshots: list[dict[str, Any]] = []
+        self.stop_reason: str | None = None
+        self.stop_error: dict[str, Any] | None = None
+
+    def _on_training_start(self) -> None:
+        self.start_timesteps = int(self.model.num_timesteps)
+        if not self.capture_start_snapshot or self.start_progress_timesteps <= 0:
+            return
+        if self.start_progress_timesteps % self.interval != 0:
+            raise RuntimeError(
+                "BT93J.5c start snapshot requires longrun-start-progress "
+                f"to align with checkpoint interval {self.interval}: {self.start_progress_timesteps}"
+            )
+        try:
+            self._capture(self.start_progress_timesteps, self.start_progress_timesteps)
+        except Exception as exc:
+            self.stop_reason = f"snapshot-error-at-{self.start_progress_timesteps}"
+            self.stop_error = {
+                "type": exc.__class__.__name__,
+                "message": str(exc),
+                "stepLabelTimesteps": self.start_progress_timesteps,
+            }
+
+    def _capture(self, step_label: int, progress_timesteps: int) -> None:
+        vec_env = self.training_env
+        if not isinstance(vec_env, VecNormalize):
+            raise RuntimeError("BT93J.5c snapshots require VecNormalize training env")
+        learning_metrics = {
+            "requestedTimesteps": self.total_timesteps,
+            "modelNumTimesteps": int(self.model.num_timesteps),
+            "progressTimesteps": progress_timesteps,
+            "ppoLearningMetrics": _ppo_learning_metrics(self.model, self.config, self.run_kind),
+        }
+        checkpoint = _write_bt93j_longrun_checkpoint(
+            model=self.model,
+            vec_env=vec_env,
+            config=self.config,
+            config_path=self.config_path,
+            run_dir=self.run_dir,
+            run_id=self.run_id,
+            run_kind=self.run_kind,
+            phase_id=self.phase_id,
+            step_label=step_label,
+            progress_timesteps=progress_timesteps,
+        )
+        eval_snapshot = _write_bt93j_longrun_eval_snapshot(
+            snapshot_manifest=checkpoint,
+            config=self.config,
+            run_id=self.run_id,
+            run_kind=self.run_kind,
+            phase_id=self.phase_id,
+            step_label=step_label,
+            progress_timesteps=progress_timesteps,
+            learning_metrics=learning_metrics,
+        )
+        entry = {
+            "stepLabelTimesteps": step_label,
+            "progressTimesteps": progress_timesteps,
+            "modelNumTimesteps": int(self.model.num_timesteps),
+            "checkpoint": {
+                "ok": True,
+                "path": checkpoint["artifacts"]["snapshotManifest"],
+                "sha256": _sha256_file(_repo_path(str(checkpoint["artifacts"]["snapshotManifest"]))),
+            },
+            "evalSnapshot": eval_snapshot,
+        }
+        self.snapshots.append(entry)
+        if eval_snapshot["ok"] is not True:
+            self.stop_reason = f"technical-stop-at-{step_label}"
+
+    def _on_step(self) -> bool:
+        if self.stop_reason:
+            return False
+        progress = self.start_progress_timesteps + int(self.model.num_timesteps) - self.start_timesteps
+        try:
+            while self.next_step <= self.total_timesteps and progress >= self.next_step:
+                self._capture(self.next_step, progress)
+                self.next_step += self.interval
+                if self.stop_reason:
+                    return False
+        except Exception as exc:
+            self.stop_reason = f"snapshot-error-at-{self.next_step}"
+            self.stop_error = {
+                "type": exc.__class__.__name__,
+                "message": str(exc),
+                "stepLabelTimesteps": self.next_step,
+            }
+            return False
+        return True
+
+    def capture_target_if_missing(self) -> None:
+        if self.stop_reason:
+            return
+        captured = {int(entry["stepLabelTimesteps"]) for entry in self.snapshots}
+        progress = self.start_progress_timesteps + int(self.model.num_timesteps) - self.start_timesteps
+        if self.total_timesteps not in captured and progress >= self.total_timesteps:
+            self._capture(self.total_timesteps, progress)
+
+
+def _read_bt93j_snapshot_entry(snapshot_dir: Path) -> dict[str, Any] | None:
+    manifest_path = snapshot_dir / "snapshot_manifest.json"
+    eval_path = snapshot_dir / "eval_snapshot.json"
+    if not manifest_path.exists() or not eval_path.exists():
+        return None
+    manifest = _read_json(manifest_path)
+    eval_report = _read_json(eval_path)
+    return {
+        "stepLabelTimesteps": int(manifest.get("stepLabelTimesteps") or eval_report.get("stepLabelTimesteps") or 0),
+        "progressTimesteps": int(manifest.get("progressTimesteps") or eval_report.get("progressTimesteps") or 0),
+        "modelNumTimesteps": int(manifest.get("modelNumTimesteps") or 0),
+        "checkpoint": {
+            "ok": True,
+            "path": _rel(manifest_path),
+            "sha256": _sha256_file(manifest_path),
+        },
+        "evalSnapshot": {
+            "ok": bool((eval_report.get("technicalStopGate") or {}).get("ok")),
+            "path": _rel(eval_path),
+            "sha256": _sha256_file(eval_path),
+            "summary": _bt93j_eval_summary(eval_report),
+            "episodeTargetGate": eval_report.get("episodeTargetGate") or {},
+            "technicalStopGate": eval_report.get("technicalStopGate") or {},
+        },
+    }
+
+
+def _collect_bt93j_longrun_snapshot_entries(run_dir: Path | None) -> list[dict[str, Any]]:
+    if run_dir is None or not run_dir.exists():
+        return []
+    snapshot_root = run_dir / "longrun_snapshots"
+    if not snapshot_root.exists():
+        return []
+    entries: list[dict[str, Any]] = []
+    for snapshot_dir in sorted(path for path in snapshot_root.iterdir() if path.is_dir()):
+        entry = _read_bt93j_snapshot_entry(snapshot_dir)
+        if entry is not None:
+            entries.append(entry)
+    return entries
+
+
+def _build_bt93j_user_owned_longrun_report(
+    *,
+    config: Mapping[str, Any],
+    config_path: Path,
+    run_dir: Path,
+    run_id: str,
+    phase_id: str,
+    gate_inputs: Mapping[str, Any],
+    requested_timesteps: int,
+    learning_report: Mapping[str, Any],
+    final_package: ModelPackage,
+    callback: _BT93JLongrunSnapshotCallback,
+    prior_snapshots: list[Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
+    interval = int((config.get("rollout") or {}).get("checkpointFrequencyTimesteps") or 50000)
+    expected_steps = list(range(interval, requested_timesteps + 1, interval))
+    by_step: dict[int, dict[str, Any]] = {}
+    for entry in list(prior_snapshots or []) + list(callback.snapshots):
+        step = int(entry.get("stepLabelTimesteps") or 0)
+        if step > 0:
+            by_step[step] = dict(entry)
+    snapshots = [by_step[step] for step in sorted(by_step)]
+    present_steps = {
+        int(entry.get("stepLabelTimesteps") or 0)
+        for entry in snapshots
+        if (entry.get("checkpoint") or {}).get("ok") is True and (entry.get("evalSnapshot") or {}).get("path")
+    }
+    missing_steps = [step for step in expected_steps if step not in present_steps]
+    final_snapshot = snapshots[-1] if snapshots else None
+    final_summary = ((final_snapshot or {}).get("evalSnapshot") or {}).get("summary") or {}
+    final_avg = _number(final_summary.get("avgStepsPerEpisodeObserved"))
+    terminal = final_summary.get("terminalMatrix") or {}
+    start_artifacts = config.get("artifacts") or {}
+    r2_report = _read_json(_repo_path(str(start_artifacts.get("r2CounterprobeReport"))))
+    start_avg = _number((r2_report.get("avgStepsTrend") or {}).get("currentAvgStepsPerEpisodeObserved"))
+    dqn_anchor = _number(((gate_inputs.get("dqnChampion") or {}).get("avgStepsPerEpisode")))
+    player_dead_only = bool(terminal.get("playerDeadOnly"))
+    natural_terminal_count = int(terminal.get("naturalTerminalCount") or 0)
+    technical_gates_ok = all(
+        bool(((entry.get("evalSnapshot") or {}).get("technicalStopGate") or {}).get("ok"))
+        for entry in snapshots
+    )
+    technical_stop = bool(str(callback.stop_reason or "").startswith("technical-stop"))
+    measurement_invalid = bool(
+        callback.stop_error
+        or not snapshots
+        or final_avg is None
+        or (missing_steps and not technical_stop)
+    )
+    new_instability = bool(not measurement_invalid and (technical_stop or not technical_gates_ok))
+    green_for_phase6 = bool(
+        not measurement_invalid
+        and not new_instability
+        and dqn_anchor is not None
+        and final_avg is not None
+        and final_avg >= dqn_anchor
+        and not player_dead_only
+        and natural_terminal_count > 0
+    )
+    steps_improved = bool(start_avg is not None and final_avg is not None and final_avg > start_avg)
+    terminal_diversified = bool(not player_dead_only or natural_terminal_count > 0)
+    if measurement_invalid:
+        result_class = "measurement-invalid"
+    elif new_instability:
+        result_class = "new-instability"
+    elif green_for_phase6:
+        result_class = "green-for-93J.6"
+    elif steps_improved and terminal_diversified:
+        result_class = "undertraining-supported"
+    else:
+        result_class = "reward-still-blocking"
+
+    return {
+        "ok": result_class in {
+            "green-for-93J.6",
+            "undertraining-supported",
+            "reward-still-blocking",
+            "new-instability",
+            "measurement-invalid",
+        },
+        "generatedAt": _utc_now(),
+        "generatedBy": "python/train.py::BT93J.5c",
+        "blockId": "BT93J",
+        "phaseId": phase_id,
+        "runId": run_id,
+        "runKind": BT93J_USER_OWNED_PROOF_LONGRUN_KIND,
+        "resultClass": result_class,
+        "requestedTimesteps": requested_timesteps,
+        "actualProgressTimesteps": int(learning_report.get("progressTimesteps") or 0),
+        "modelNumTimesteps": int(learning_report.get("modelNumTimesteps") or 0),
+        "classificationRules": {
+            "greenFor93J6": "final eval avgStepsPerEpisodeObserved >= DQN anchor, terminal matrix is not player-dead-only, natural terminal evidence exists, and no technical stop fired",
+            "undertrainingSupported": "steps improved from the R2 same-red start and terminal distribution diversified, but 93J.6 gate is still not green",
+            "rewardStillBlocking": "1M diagnostic proof lane did not separate reward/curriculum from the same-red start finding",
+            "newInstability": "runtime, action-safety, non-finite metric, or technical stop rule fired",
+            "measurementInvalid": "mandatory checkpoint/eval snapshot missing, final eval unavailable, or snapshot writer failed",
+        },
+        "startFinding": {
+            "r2ResultClass": r2_report.get("resultClass"),
+            "avgStepsPerEpisodeObserved": start_avg,
+            "dqnAnchor": dqn_anchor,
+            "playerDeadOnly": (r2_report.get("terminalMatrix") or {}).get("playerDeadOnly"),
+        },
+        "finalEval": final_summary,
+        "trend": {
+            "stepsImproved": steps_improved,
+            "terminalDiversified": terminal_diversified,
+            "deltaVsStartAvgSteps": (
+                round(final_avg - start_avg, 6)
+                if final_avg is not None and start_avg is not None
+                else None
+            ),
+            "deltaVsDqnAnchor": (
+                round(final_avg - dqn_anchor, 6)
+                if final_avg is not None and dqn_anchor is not None
+                else None
+            ),
+        },
+        "snapshotCadence": {
+            "checkpointFrequencyTimesteps": interval,
+            "evalIntervalTimesteps": int((config.get("rollout") or {}).get("evalIntervalTimesteps") or interval),
+            "expectedSteps": expected_steps,
+            "presentSteps": sorted(present_steps),
+            "missingSteps": missing_steps,
+            "ok": not missing_steps,
+        },
+        "technicalStop": {
+            "stopReason": callback.stop_reason,
+            "stopError": callback.stop_error,
+            "allSnapshotGatesOk": technical_gates_ok,
+            "measurementInvalid": measurement_invalid,
+            "newInstability": new_instability,
+        },
+        "snapshots": snapshots,
+        "learning": dict(learning_report),
+        "sourceConfig": {
+            "path": _rel(config_path),
+            "sha256": _sha256_file(config_path),
+        },
+        "artifacts": {
+            "runDirectory": _rel(run_dir),
+            "trainingReport": _rel(run_dir / "training_report.json"),
+            "artifactManifest": _rel(final_package.manifest_path),
+            "artifactManifestSha256": _sha256_file(final_package.manifest_path),
+            "model": _rel(final_package.model_path),
+            "modelSha256": final_package.model_sha256,
+            "vecnormalize": _rel(final_package.vecnormalize_path),
+            "vecnormalizeSha256": final_package.vecnormalize_sha256,
+            "optimizerState": _rel(final_package.optimizer_path),
+            "optimizerStateSha256": final_package.optimizer_sha256,
+        },
+        "phaseCoverage": {
+            "93J.5c.1": True,
+            "93J.5c.2": requested_timesteps == 1000000 and result_class != "measurement-invalid",
+            "93J.5c.3": not missing_steps,
+            "93J.5c.4": final_snapshot is not None,
+            "93J.5c.5": True,
+            "93J.5c.6": True,
+        },
+        "guardrails": {
+            "diagnosticOnly": True,
+            "holdoutUsed": False,
+            "candidateRun": False,
+            "freezeCandidate": False,
+            "promotionAllowed": False,
+            "bt94aGateRefresh": False,
+            "ppoValidateEvidence": False,
+            "rolloutSignal": False,
+            "runtimeSurfacesTouched": [],
+            "productiveRuntimeChanged": False,
+        },
+        "nextAllowedStep": "93J.6 only if resultClass=green-for-93J.6; otherwise diagnose/replan without BT94A claim",
+    }
 
 
 def run_training_from_cli(
@@ -1145,6 +2229,9 @@ def run_training_from_cli(
     artifact_root: str | None,
     total_timesteps: int | None,
     checkpoint: str | None,
+    longrun_start_progress: int | None = None,
+    longrun_capture_start_snapshot: bool = False,
+    longrun_prior_run_dirs: list[str] | None = None,
 ) -> dict[str, Any]:
     if run_kind not in {
         "learner-smoke",
@@ -1157,6 +2244,8 @@ def run_training_from_cli(
         "comparable-repair",
         "comparable-terminal-repair",
         "terminal-curriculum-repair",
+        BT93J_R2_TRAIN_RUN_KIND,
+        BT93J_USER_OWNED_PROOF_LONGRUN_KIND,
     }:
         raise RuntimeError(f"unsupported BT93C train run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -1181,17 +2270,37 @@ def run_training_from_cli(
         "comparable-repair",
         "comparable-terminal-repair",
         "terminal-curriculum-repair",
+        BT93J_R2_TRAIN_RUN_KIND,
+        BT93J_USER_OWNED_PROOF_LONGRUN_KIND,
     }:
         prefer_pointer = {
             "resume-smoke": "latest_learner_smoke.json",
             "comparable-repair": "latest_technical_smoke.json",
             "comparable-terminal-repair": "latest_model_package.json",
+            BT93J_R2_TRAIN_RUN_KIND: "latest_model_package.json",
+            BT93J_USER_OWNED_PROOF_LONGRUN_KIND: "latest_model_package.json",
         }.get(run_kind, "latest_model_package.json")
         source_package = _resolve_package(
             checkpoint,
             artifact_root_path,
             prefer=prefer_pointer,
         )
+    longrun_resume_offset = 0
+    if run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND:
+        longrun_resume_offset = (
+            int(longrun_start_progress)
+            if longrun_start_progress is not None
+            else int(source_package.step_label_timesteps or 0)
+            if source_package is not None
+            else 0
+        )
+        if source_package is not None and longrun_start_progress is not None:
+            source_package = replace(source_package, step_label_timesteps=longrun_resume_offset)
+    longrun_planned_total = int(
+        (rollout_cfg.get("userOwnedProofLongrunTimesteps") or total_timesteps or 0)
+        if run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND
+        else 0
+    )
     timestep_key = {
         "learner-smoke": "learnerTimesteps",
         "resume-smoke": "resumeTimesteps",
@@ -1203,6 +2312,8 @@ def run_training_from_cli(
         "comparable-repair": "shortRepairTimesteps",
         "comparable-terminal-repair": "terminalRepairTimesteps",
         "terminal-curriculum-repair": "terminalCurriculumSmokeTimesteps",
+        BT93J_R2_TRAIN_RUN_KIND: "r2MicroTrainTimesteps",
+        BT93J_USER_OWNED_PROOF_LONGRUN_KIND: "userOwnedProofLongrunTimesteps",
     }[run_kind]
     timesteps = int(
         total_timesteps
@@ -1242,14 +2353,41 @@ def run_training_from_cli(
                 verbose=0,
             )
         updates_before = int(getattr(model, "_n_updates", 0))
+        longrun_callback = (
+            _BT93JLongrunSnapshotCallback(
+                config=config,
+                config_path=resolved_config_path,
+                run_dir=run_dir,
+                run_id=run_id,
+                run_kind=run_kind,
+                phase_id=phase_id,
+                total_timesteps=longrun_planned_total,
+                start_progress_timesteps=longrun_resume_offset,
+                capture_start_snapshot=longrun_capture_start_snapshot,
+            )
+            if run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND
+            else None
+        )
         started = time.perf_counter()
-        model.learn(total_timesteps=timesteps, reset_num_timesteps=(run_kind == "learner-smoke"))
+        model.learn(
+            total_timesteps=timesteps,
+            reset_num_timesteps=(run_kind == "learner-smoke"),
+            callback=longrun_callback,
+        )
+        if longrun_callback is not None:
+            longrun_callback.capture_target_if_missing()
         elapsed = time.perf_counter() - started
         updates_after = int(getattr(model, "_n_updates", 0))
         ppo_metrics = _ppo_learning_metrics(model, config, run_kind)
+        progress_timesteps = (
+            longrun_callback.start_progress_timesteps + int(model.num_timesteps) - longrun_callback.start_timesteps
+            if longrun_callback is not None
+            else int(model.num_timesteps)
+        )
         learning_report = {
             "requestedTimesteps": timesteps,
             "modelNumTimesteps": int(model.num_timesteps),
+            "progressTimesteps": progress_timesteps,
             "optimizerUpdatesBefore": updates_before,
             "optimizerUpdatesAfter": updates_after,
             "optimizerUpdatesCompleted": updates_after > updates_before,
@@ -1261,12 +2399,28 @@ def run_training_from_cli(
                 (block_id == "BT93G" and run_kind == "comparable-repair")
                 or (block_id == "BT93H" and run_kind == "comparable-terminal-repair")
                 or (block_id == "BT93I" and run_kind == "terminal-curriculum-repair")
+                or (block_id == "BT93J" and run_kind == BT93J_R2_TRAIN_RUN_KIND)
+                or (block_id == "BT93J" and run_kind == BT93J_USER_OWNED_PROOF_LONGRUN_KIND)
             ),
             "baselineComparable": block_id == "BT93C" and _is_baseline_run(run_kind),
             "ppoLearningMetrics": ppo_metrics,
             "telemetry": _telemetry(vec_env),
+            "effectiveEnv": _effective_env_spec(config, seeds, training=True),
             "trainingCommand": " ".join(sys.argv),
         }
+        if longrun_callback is not None:
+            learning_report["longrunSnapshots"] = {
+                "plannedTotalTimesteps": longrun_planned_total,
+                "startProgressTimesteps": longrun_callback.start_progress_timesteps,
+                "checkpointFrequencyTimesteps": longrun_callback.interval,
+                "capturedCount": len(longrun_callback.snapshots),
+                "capturedSteps": [
+                    int(entry["stepLabelTimesteps"])
+                    for entry in longrun_callback.snapshots
+                ],
+                "stopReason": longrun_callback.stop_reason,
+                "stopError": longrun_callback.stop_error,
+            }
         package, manifest = _write_model_package(
             model=model,
             vec_env=vec_env,
@@ -1291,6 +2445,7 @@ def run_training_from_cli(
             "truePpoOptimizerUpdate": learning_report["optimizerUpdatesCompleted"],
             "truePpoModelPackage": True,
             "resumedFrom": _package_pointer(source_package) if source_package else None,
+            "effectiveEnv": _effective_env_spec(config, seeds, training=True),
             "loadCompatibility": _numpy_pickle_compat_report(
                 source_package.vecnormalize_path if source_package else None
             ),
@@ -1306,6 +2461,49 @@ def run_training_from_cli(
             "freezeCandidate": False,
             "promotionAllowed": False,
         }
+        if longrun_callback is not None:
+            prior_snapshot_entries: list[Mapping[str, Any]] = []
+            prior_dirs: list[Path] = []
+            if source_package is not None and source_package.source_run_dir is not None:
+                prior_dirs.append(source_package.source_run_dir)
+            for prior_dir in longrun_prior_run_dirs or []:
+                prior_dirs.append(_repo_path(prior_dir))
+            seen_prior_dirs: set[str] = set()
+            for prior_dir in prior_dirs:
+                prior_key = str(prior_dir.resolve())
+                if prior_key in seen_prior_dirs:
+                    continue
+                seen_prior_dirs.add(prior_key)
+                prior_snapshot_entries.extend(_collect_bt93j_longrun_snapshot_entries(prior_dir))
+            longrun_report = _build_bt93j_user_owned_longrun_report(
+                config=config,
+                config_path=resolved_config_path,
+                run_dir=run_dir,
+                run_id=run_id,
+                phase_id=phase_id,
+                gate_inputs=gate_inputs,
+                requested_timesteps=longrun_planned_total,
+                learning_report=learning_report,
+                final_package=package,
+                callback=longrun_callback,
+                prior_snapshots=prior_snapshot_entries,
+            )
+            longrun_report_path = artifact_root_path / "user_owned_1m_longrun_report.json"
+            _write_json(longrun_report_path, longrun_report)
+            _write_json(
+                artifact_root_path / "latest_bt93j_user_owned_1m_longrun_report.json",
+                {
+                    "ok": True,
+                    "resultClass": longrun_report["resultClass"],
+                    "runId": run_id,
+                    "runKind": run_kind,
+                    "report": _rel(longrun_report_path),
+                    "sha256": _sha256_file(longrun_report_path),
+                },
+            )
+            report["artifacts"]["userOwned1mLongrunReport"] = _rel(longrun_report_path)
+            report["artifacts"]["userOwned1mLongrunReportSha256"] = _sha256_file(longrun_report_path)
+            report["longrunResultClass"] = longrun_report["resultClass"]
         report_path = run_dir / "training_report.json"
         _write_json(report_path, report)
         pointer = {
@@ -1357,6 +2555,7 @@ def run_eval_from_cli(
         "comparable-repair-eval",
         "comparable-terminal-repair-eval",
         "terminal-curriculum-repair-eval",
+        BT93J_R2_EVAL_RUN_KIND,
     }:
         raise RuntimeError(f"unsupported BT93C eval run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -1454,6 +2653,7 @@ def run_eval_from_cli(
             "runKind": run_kind,
             "loadedRealPpoModel": True,
             "sourcePackage": _package_pointer(source_package),
+            "effectiveEnv": _effective_env_spec(config, seeds, training=False),
             "loadCompatibility": _numpy_pickle_compat_report(source_package.vecnormalize_path),
             "modelReload": {
                 "wallClockMs": round(load_elapsed_ms, 6),
@@ -1532,8 +2732,9 @@ def run_eval_from_cli(
             "holdout-eval": "latest_holdout_eval.json",
             "comparable-repair-eval": "latest_comparable_repair_eval.json",
             "comparable-terminal-repair-eval": "latest_comparable_terminal_repair_eval.json",
-            "terminal-curriculum-repair-eval": "latest_terminal_curriculum_repair_eval.json",
-        }.get(run_kind, "latest_eval_smoke.json")
+                "terminal-curriculum-repair-eval": "latest_terminal_curriculum_repair_eval.json",
+                BT93J_R2_EVAL_RUN_KIND: "latest_bt93j_r2_micro_train_counterprobe_eval.json",
+            }.get(run_kind, "latest_eval_smoke.json")
         _write_json(artifact_root_path / pointer_name, pointer)
         print(json.dumps({
             "ok": True,

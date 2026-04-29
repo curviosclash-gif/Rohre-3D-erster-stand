@@ -1,0 +1,185 @@
+{
+  "blockId": "BT93K",
+  "classificationRules": {
+    "BT94A-ready": [
+      "reserved for 93K.99 only after all BT93K evidence and no-start gate become green"
+    ],
+    "diagnose-improved": [
+      "at least one required signal improves without action-safety or runtime-stability regression"
+    ],
+    "diagnose-loop-required": [
+      "all progress/objective/natural-terminal signals are zero and early-death or player-dead-only state remains red"
+    ],
+    "measurement-invalid": [
+      "missing final run_exit_report",
+      "completedEpisodeCount below minimum for quality judgement",
+      "stdout/stderr-only completion",
+      "missing exit code",
+      "missing final snapshot or eval report"
+    ],
+    "technical-smoke-only": [
+      "env startup, sidecar launch, snapshot, and exit are proven but episode evidence is below quality minimum"
+    ]
+  },
+  "generatedAt": "2026-04-28T10:18:42Z",
+  "generatedBy": "python/scripts/bt93k_start_truth_contracts.py",
+  "longrunLadderRule": {
+    "blindLongrunForbidden": true,
+    "longerRunAllowedOnlyWhen": [
+      "technical gates are green",
+      "run_exit_report.ok=true",
+      "supervisor status is completed or stopped with graceful stop and final report",
+      "action safety is not worse than the pinned start matrix",
+      "at least one survival-first signal is green"
+    ],
+    "plannedLadder": [
+      "20k",
+      "50k",
+      "100k",
+      "300k",
+      "1M"
+    ],
+    "survivalFirstSignals": [
+      "progressSignalNonZero=true",
+      "objectiveSignalNonZero=true",
+      "naturalTerminalShare>0",
+      "deathBefore60Share <= 0.053334 without worse action safety"
+    ]
+  },
+  "metricFamilies": {
+    "actionSafety": [
+      "invalidActionRate",
+      "sanitizerRate",
+      "postDecodeClampRate",
+      "vetoRate",
+      "policyMaskRate",
+      "noopRate"
+    ],
+    "earlyDeaths": [
+      "deathBefore60Count",
+      "deathBefore60Share",
+      "terminalReasonCounts",
+      "deathCauseCounts"
+    ],
+    "maxStepPlateau": [
+      "maxStepEpisodes",
+      "maxStepEpisodeShare",
+      "max-step-only plateau flag"
+    ],
+    "naturalTerminal": [
+      "naturalTerminalCount",
+      "naturalTerminalShare",
+      "playerDeadOnly"
+    ],
+    "progressAndObjective": [
+      "progressSignalNonZero",
+      "objectiveSignalNonZero",
+      "checkpointReachedReward",
+      "parcoursCompletedReward",
+      "killReward",
+      "winReward"
+    ],
+    "runtimeStability": [
+      "runtimeErrorCount",
+      "nonFiniteMetricCount",
+      "timeoutCount",
+      "forcedStop"
+    ],
+    "survival": [
+      "avgStepsPerEpisode",
+      "averageBotSurvival",
+      "completedEpisodeCount",
+      "longestEpisode",
+      "completedEpisodeLengths"
+    ]
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93K.1.2": true,
+    "93K.1.4": true
+  },
+  "phaseId": "93K.1.2",
+  "qualityJudgementRules": {
+    "envStartupSmokesMustBeLabelledAs": [
+      "startup-smoke",
+      "supervisor-smoke",
+      "measurement-smoke"
+    ],
+    "forbiddenResultClassWhenBelowMinimum": "quality-judgement-invalid",
+    "minimumCompletedEpisodes": 15,
+    "qualityJudgementForbiddenWhenCompletedEpisodesBelow": 15,
+    "startupSmokesCannotProve": [
+      "baseline",
+      "candidate",
+      "freeze",
+      "holdout",
+      "promote",
+      "BT94A-ready",
+      "PPO-Validate"
+    ]
+  },
+  "resultClass": "signal-metric-contract-pinned",
+  "signalBooleans": {
+    "deathBefore60ImprovedBy20Pct": {
+      "comparison": "lower is better; must not worsen action safety",
+      "requiredAtOrBelow": 0.053334,
+      "startDeathBefore60Share": 0.066667
+    },
+    "naturalTerminalSharePositive": "true when naturalTerminalShare > 0",
+    "objectiveSignalNonZero": "true when real runner objective reward is non-zero",
+    "progressSignalNonZero": "true when real runner progress/checkpoint/parcours reward is non-zero"
+  },
+  "sourceStartTruth": {
+    "matrixId": "bt93k-start-matrix-from-bt93j-1m-v1",
+    "path": "data/training/ppo/bt93k/start_truth.json",
+    "sha256": "8fda35420b2b4ea8787e3d4d0e9bd24ad6e648bbbe758f2377fc928b4e81bd22"
+  },
+  "startMatrix": {
+    "actionSafety": {
+      "invalidActionCount": 0,
+      "invalidActionRate": 0.0,
+      "noopRate": 0.0,
+      "policyMaskRate": 1.0,
+      "postDecodeClampRate": 0.0,
+      "preSamplingMaskCount": 2630,
+      "preSamplingMaskRate": 1.0,
+      "sanitizerRate": 0.0,
+      "totalActions": 2630,
+      "vetoRate": 0.0
+    },
+    "averageBotSurvival": 166.866667,
+    "avgStepsPerEpisode": 166.866667,
+    "blockingConclusion": "Steps improved, but progress/objective rewards stayed zero and terminal evidence remained player-dead-only with naturalTerminalCount=0.",
+    "completedEpisodeCount": 15,
+    "longestEpisode": 180,
+    "matrixId": "bt93k-start-matrix-from-bt93j-1m-v1",
+    "qualityJudgementAllowed": true,
+    "rewardSignal": {
+      "checkpointReachedReward": 0.0,
+      "objectiveReward": 0.0,
+      "objectiveSignalNonZero": false,
+      "parcoursCompletedReward": 0.0,
+      "progressReward": 0.0,
+      "progressSignalNonZero": false
+    },
+    "sourceResultClass": "reward-still-blocking",
+    "sourceRunId": "20260426T175502Z-bt93j-user-owned-1m-proof-longrun",
+    "sourceRunKind": "bt93j-user-owned-1m-proof-longrun",
+    "terminalSignal": {
+      "deathBefore60Count": 1,
+      "deathBefore60Share": 0.066667,
+      "deathCauseCounts": {
+        "player-dead": 3
+      },
+      "maxStepEpisodeShare": 0.8,
+      "maxStepEpisodes": 12,
+      "naturalTerminalCount": 0,
+      "naturalTerminalShare": 0.0,
+      "playerDeadOnly": true,
+      "runtimeErrorCount": 0,
+      "terminalReasonCounts": {
+        "player-dead": 3
+      }
+    }
+  }
+}

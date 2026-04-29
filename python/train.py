@@ -19,7 +19,11 @@ from scaffold.bt93b_runner import run_from_cli as run_bt93b_from_cli
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--profile", default="bt93b", choices=["bt93b", "bt93c", "bt93f", "bt93g", "bt93h", "bt93i"])
+    parser.add_argument(
+        "--profile",
+        default="bt93b",
+        choices=["bt93b", "bt93c", "bt93f", "bt93g", "bt93h", "bt93i", "bt93j"],
+    )
     parser.add_argument("--run-kind", default=None)
     parser.add_argument("--phase-id", default=None)
     parser.add_argument("--manifest-template", default=None)
@@ -28,6 +32,9 @@ def main() -> None:
     parser.add_argument("--target-steps-per-env", type=int, default=None)
     parser.add_argument("--total-timesteps", type=int, default=None)
     parser.add_argument("--checkpoint", default=None)
+    parser.add_argument("--longrun-start-progress", type=int, default=None)
+    parser.add_argument("--longrun-capture-start-snapshot", action="store_true")
+    parser.add_argument("--longrun-prior-run-dir", action="append", default=None)
     args = parser.parse_args()
 
     if args.profile == "bt93b":
@@ -50,6 +57,8 @@ def main() -> None:
         if args.profile == "bt93h"
         else "terminal-curriculum-repair"
         if args.profile == "bt93i"
+        else "bt93j-r2-micro-train-counterprobe"
+        if args.profile == "bt93j"
         else "comparable-repair"
         if args.profile == "bt93g"
         else "repair-diagnostic"
@@ -67,6 +76,8 @@ def main() -> None:
         "comparable-repair": "93G.5.3",
         "comparable-terminal-repair": "93H.3.3",
         "terminal-curriculum-repair": "93I.3.2",
+        "bt93j-r2-micro-train-counterprobe": "93J.5a",
+        "bt93j-user-owned-1m-proof-longrun": "93J.5c",
     }
     phase_id = args.phase_id or default_phase_ids.get(run_kind, "93C.3.1")
     from scripts.bt93c_learner_smoke import run_training_from_cli as run_bt93c_training_from_cli
@@ -78,6 +89,9 @@ def main() -> None:
         artifact_root=args.artifact_root,
         total_timesteps=args.total_timesteps,
         checkpoint=args.checkpoint,
+        longrun_start_progress=args.longrun_start_progress,
+        longrun_capture_start_snapshot=args.longrun_capture_start_snapshot,
+        longrun_prior_run_dirs=args.longrun_prior_run_dir,
     )
 
 

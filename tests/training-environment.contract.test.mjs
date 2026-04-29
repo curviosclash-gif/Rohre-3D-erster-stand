@@ -1,12 +1,25 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { OBSERVATION_LENGTH_V1 } from '../src/entities/ai/observation/ObservationSchemaV1.js';
+import {
+    LOCAL_OPENNESS_RATIO,
+    OBSERVATION_LENGTH_V1,
+    SPEED_RATIO,
+    TARGET_ALIGNMENT,
+    TARGET_DISTANCE_RATIO,
+    TARGET_IN_FRONT,
+    WALL_DISTANCE_FRONT,
+} from '../src/entities/ai/observation/ObservationSchemaV1.js';
 import { OBSERVATION_LENGTH_V2, OBSERVATION_SCHEMA_VERSION_V2 } from '../src/entities/ai/observation/ObservationSchemaV2.js';
 import { DeterministicTrainingStepRunner } from '../src/entities/ai/training/DeterministicTrainingStepRunner.js';
 import { WebSocketTrainerBridge } from '../src/entities/ai/training/WebSocketTrainerBridge.js';
 import { buildTrainerRuntimeObservationPayload, buildTrainerTransitionPayload } from '../src/entities/ai/training/TrainerPayloadAdapter.js';
-import { deriveHeadlessLaneEpisodeStep } from '../scripts/training-headless-lane-runner.mjs';
+import {
+    BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
+    deriveHeadlessLaneEpisodeStep,
+    deriveHeadlessObjectiveReachabilitySignals,
+    resolveHeadlessRewardProfile,
+} from '../scripts/training-headless-lane-runner.mjs';
 import { EpisodeController, TRAINING_TERMINAL_REASONS, TRAINING_TRUNCATION_REASONS } from '../src/state/training/EpisodeController.js';
 import { RewardCalculator, sumRewardComponents } from '../src/state/training/RewardCalculator.js';
 
@@ -121,6 +134,96 @@ test('Headless lane derives episode terminal semantics from player and kernel st
     assert.equal(timeout.truncatedReason, TRAINING_TRUNCATION_REASONS.TIME_LIMIT);
     assert.equal(running.done, false);
     assert.equal(running.truncated, false);
+});
+
+test('Headless lane derives BT93L progress from real observation deltas', () => {
+    const previousObservation = new Array(OBSERVATION_LENGTH_V1).fill(0);
+    previousObservation[TARGET_DISTANCE_RATIO] = 0.82;
+    previousObservation[TARGET_ALIGNMENT] = 0.1;
+    previousObservation[LOCAL_OPENNESS_RATIO] = 0.3;
+
+    const observation = new Array(OBSERVATION_LENGTH_V1).fill(0);
+    observation[SPEED_RATIO] = 0.2;
+    observation[TARGET_DISTANCE_RATIO] = 0.76;
+    observation[TARGET_ALIGNMENT] = 0.4;
+    observation[TARGET_IN_FRONT] = 1;
+    observation[LOCAL_OPENNESS_RATIO] = 0.34;
+    observation[WALL_DISTANCE_FRONT] = 0.7;
+
+    const signals = deriveHeadlessObjectiveReachabilitySignals({
+        previousObservation,
+        observation,
+        episode: { done: false, truncated: false },
+        action: { boost: true },
+        rewardProfileId: BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
+    });
+    const noopSignals = deriveHeadlessObjectiveReachabilitySignals({
+        previousObservation,
+        observation: previousObservation,
+        episode: { done: false, truncated: false },
+        rewardProfileId: BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
+    });
+    const manualSignals = deriveHeadlessObjectiveReachabilitySignals({
+        previousObservation,
+        observation,
+        input: { progressEvent: true },
+        rewardProfileId: BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
+    });
+
+    assert.equal(signals.realEnvStepPath, true);
+    assert.equal(signals.progressSignalReachable, true);
+    assert.equal(signals.objectiveSignalReachable, true);
+    assert.equal(signals.source, 'runtime-observation-delta');
+    assert.ok(signals.progressEvents.includes('target-distance-improved'));
+    assert.equal(noopSignals.progressSignalReachable, false);
+    assert.equal(noopSignals.objectiveSignalReachable, false);
+    assert.equal(deriveHeadlessObjectiveReachabilitySignals({
+        previousObservation,
+        observation,
+        episode: { done: false, truncated: false },
+        action: {
+            yawLeft: false,
+            yawRight: false,
+            pitchUp: false,
+            pitchDown: false,
+            rollLeft: false,
+            rollRight: false,
+            boost: false,
+            shootMG: false,
+            shootItemIndex: -1,
+            useItem: -1,
+        },
+        rewardProfileId: BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
+    }).progressSignalReachable, false);
+    assert.equal(manualSignals.realEnvStepPath, false);
+    assert.equal(manualSignals.source, 'manual-injection-counterprobe');
+});
+
+test('BT93L reward profile keeps survival-only and noop plateaus non-success', () => {
+    const profile = resolveHeadlessRewardProfile(BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID);
+    const calculator = new RewardCalculator(profile.rewardCalculatorOptions);
+    const survivalOnly = calculator.compute({ survival: true, healthRatio: 1, pressureLevel: 0 });
+    const noopHazard = calculator.compute({ survival: true, healthRatio: 1, wallRisk: 1 });
+    const progress = calculator.compute({ survival: true, parcoursEnabled: true, checkpointReached: 1 });
+    const objectiveComplete = calculator.compute({
+        survival: true,
+        parcoursEnabled: true,
+        checkpointReached: 1,
+        parcoursCompleted: true,
+        won: true,
+    });
+    const playerDead = calculator.compute({ survival: false, lost: true });
+
+    assert.equal(profile.rewardCalculatorOptions.weights.baseStep, -0.016);
+    assert.equal(profile.rewardCalculatorOptions.weights.survival, 0.012);
+    assert.equal(profile.rewardCalculatorOptions.weights.survivalPressureBonus, 0.01);
+    assert.equal(profile.rewardCalculatorOptions.weights.checkpointReached, 0.85);
+    assert.equal(profile.rewardCalculatorOptions.weights.loss, -4.5);
+    assert.ok(survivalOnly.total <= 0);
+    assert.ok(noopHazard.total < 0);
+    assert.ok(progress.total > 0);
+    assert.ok(objectiveComplete.total > progress.total);
+    assert.ok(playerDead.total < 0);
 });
 
 test('RewardCalculator keeps transparent additive shaping totals', () => {
