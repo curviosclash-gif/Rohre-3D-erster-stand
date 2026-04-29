@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2413,
-    "rawCoveredFileCount": 1934,
-    "rawCoveragePercent": 80.1,
-    "adjustedTrackedFileCount": 1510,
-    "adjustedCoveredFileCount": 1275,
-    "adjustedCoveragePercent": 84.4,
+    "trackedFileCount": 2415,
+    "rawCoveredFileCount": 1936,
+    "rawCoveragePercent": 80.2,
+    "adjustedTrackedFileCount": 1512,
+    "adjustedCoveredFileCount": 1277,
+    "adjustedCoveragePercent": 84.5,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
     "classifications": [
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 238,
-        "coveredCount": 217
+        "count": 239,
+        "coveredCount": 218
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 878,
-        "coveredCount": 862
+        "count": 879,
+        "coveredCount": 863
       },
       {
         "classification": "product-docs",
@@ -7883,6 +7883,29 @@
     },
     {
       "path": "data/training/ppo/bt93q/player_dead_control_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/policy_collapse_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -18407,6 +18430,29 @@
     },
     {
       "path": "python/scripts/bt93q_finding_register.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93q_policy_collapse.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

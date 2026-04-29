@@ -3275,7 +3275,7 @@ Primaerer Scope:
 
 - [x] DoD.1 `finding_register.json` uebernimmt alle Befunde B.01 bis B.09 aus dem Intake mit Quelle, Feldwert, Blockwirkung und erlaubter naechster Aktion. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_finding_register.py --write-report` -> `data/training/ppo/bt93q/finding_register.json`)
 - [x] DoD.2 `trace_reanalysis_report.json` trennt Early-Death, spaete Player-Dead-Controls, Wall-/Trail-Naehesignale, Safety-Diagnostik, Action-Tails und Reward-Tails. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/trace_reanalysis_report.json`)
-- [ ] DoD.3 `policy_collapse_report.json` beweist oder widerlegt den deterministischen `yaw-right`-Collapse gegen Stochastic-/Eval-Mode, Logit-/Entropy-Snapshot und Action-Distribution.
+- [x] DoD.3 `policy_collapse_report.json` beweist oder widerlegt den deterministischen `yaw-right`-Collapse gegen Stochastic-/Eval-Mode, Logit-/Entropy-Snapshot und Action-Distribution. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_policy_collapse.py --write-report` -> `data/training/ppo/bt93q/policy_collapse_report.json`)
 - [ ] DoD.4 `walltrail_scenario_manifest.json` pinnt mehrere kleine Szenarioklassen mit Seeds, Startzustand, erwarteter Escape-Wirkung, Abbruchkriterium, Positiv- und Negativkontrolle.
 - [ ] DoD.5 `action_effect_stress_report.json` beweist fuer vorhandene Actions, ob sie Wand-/Trail-Gefahr real reduzieren koennen: WallDistance, LocalOpenness, ThreatHorizon, CollisionRisk, Heading-/Target-Delta und TerminalRisk.
 - [ ] DoD.6 Neue Sidecar-Actions sind nur erlaubt, wenn DoD.5 eine konkrete Action-Wirkungsluecke belegt; jede neue Action braucht Safety-Raten 0/0/0 und realen Zustandsgewinn.
@@ -3316,10 +3316,10 @@ Pflicht-Evidence:
 
 ### 93Q.3 Deterministic-Policy-Collapse Diagnose
 
-- [ ] 93Q.3.1 `policy_collapse_report.json` prueft Stochastic-Train, Deterministic-Eval und mindestens eine Temperature-/Top-2-Diagnose ohne Qualitaetsclaim.
-- [ ] 93Q.3.2 Report schreibt Action-Distribution, repeated-action streaks, Entropy/Logit-Snapshot, `argmaxAction`, `secondBestAction`, Margin und Szenariokontext.
-- [ ] 93Q.3.3 Wenn deterministische Eval weiter `yaw-right` dominiert, endet die Subphase `policy-collapse-active` und blockiert jeden 10k-Recheck.
-- [ ] 93Q.3.4 Wenn Collapse nur Eval-Mode-Artefakt ist, muss der Report belegen, dass Stochastic-/Deterministic-Urteile getrennt bleiben und welches Urteil fuer Gate-Evidence gilt.
+- [x] 93Q.3.1 `policy_collapse_report.json` prueft Stochastic-Train, Deterministic-Eval und mindestens eine Temperature-/Top-2-Diagnose ohne Qualitaetsclaim. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_policy_collapse.py --write-report` -> `data/training/ppo/bt93q/policy_collapse_report.json`)
+- [x] 93Q.3.2 Report schreibt Action-Distribution, repeated-action streaks, Entropy/Logit-Snapshot, `argmaxAction`, `secondBestAction`, Margin und Szenariokontext. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_policy_collapse.py --write-report` -> `data/training/ppo/bt93q/policy_collapse_report.json`)
+- [x] 93Q.3.3 Wenn deterministische Eval weiter `yaw-right` dominiert, endet die Subphase `policy-collapse-active` und blockiert jeden 10k-Recheck. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_policy_collapse.py --write-report` -> `data/training/ppo/bt93q/policy_collapse_report.json`)
+- [x] 93Q.3.4 Wenn Collapse nur Eval-Mode-Artefakt ist, muss der Report belegen, dass Stochastic-/Deterministic-Urteile getrennt bleiben und welches Urteil fuer Gate-Evidence gilt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_policy_collapse.py --write-report` -> `data/training/ppo/bt93q/policy_collapse_report.json`)
 
 Pflicht-Evidence:
 

@@ -1,0 +1,655 @@
+{
+  "actionDistribution": {
+    "deterministicEval": {
+      "argmaxAction": "yaw-right",
+      "argmaxCount": 8100,
+      "argmaxShare": 1.0,
+      "argmaxToken": "2",
+      "counts": {
+        "2": 8100
+      },
+      "entropy": -0.0,
+      "marginShare": 1.0,
+      "normalizedEntropy": -0.0,
+      "probabilities": {
+        "2": 1.0
+      },
+      "rankedActions": [
+        {
+          "count": 8100,
+          "semanticAction": "yaw-right",
+          "share": 1.0,
+          "token": "2"
+        }
+      ],
+      "secondBestAction": null,
+      "secondBestCount": 0,
+      "secondBestShare": 0.0,
+      "secondBestToken": null,
+      "total": 8100
+    },
+    "stochasticTrain": {
+      "argmaxAction": "yaw-right",
+      "argmaxCount": 1514,
+      "argmaxShare": 0.149723,
+      "argmaxToken": "2",
+      "counts": {
+        "0": 769,
+        "1": 1148,
+        "2": 1514,
+        "3": 1025,
+        "4": 1343,
+        "5": 941,
+        "6": 889,
+        "7": 1320,
+        "8": 1163
+      },
+      "entropy": 2.176654,
+      "marginShare": 0.016911,
+      "normalizedEntropy": 0.990638,
+      "probabilities": {
+        "0": 0.076048,
+        "1": 0.113528,
+        "2": 0.149723,
+        "3": 0.101365,
+        "4": 0.132812,
+        "5": 0.093058,
+        "6": 0.087915,
+        "7": 0.130538,
+        "8": 0.115012
+      },
+      "rankedActions": [
+        {
+          "count": 1514,
+          "semanticAction": "yaw-right",
+          "share": 0.149723,
+          "token": "2"
+        },
+        {
+          "count": 1343,
+          "semanticAction": "pitch-down",
+          "share": 0.132812,
+          "token": "4"
+        },
+        {
+          "count": 1320,
+          "semanticAction": "boost",
+          "share": 0.130538,
+          "token": "7"
+        },
+        {
+          "count": 1163,
+          "semanticAction": "shoot-mg",
+          "share": 0.115012,
+          "token": "8"
+        },
+        {
+          "count": 1148,
+          "semanticAction": "yaw-left",
+          "share": 0.113528,
+          "token": "1"
+        },
+        {
+          "count": 1025,
+          "semanticAction": "pitch-up",
+          "share": 0.101365,
+          "token": "3"
+        },
+        {
+          "count": 941,
+          "semanticAction": "roll-left",
+          "share": 0.093058,
+          "token": "5"
+        },
+        {
+          "count": 889,
+          "semanticAction": "roll-right",
+          "share": 0.087915,
+          "token": "6"
+        },
+        {
+          "count": 769,
+          "semanticAction": "noop",
+          "share": 0.076048,
+          "token": "0"
+        }
+      ],
+      "secondBestAction": "pitch-down",
+      "secondBestCount": 1343,
+      "secondBestShare": 0.132812,
+      "secondBestToken": "4",
+      "total": 10112
+    }
+  },
+  "actionSurface": {
+    "actionCount": 9,
+    "path": "python/envs/ppo_action_surface.py",
+    "semanticActions": [
+      "noop",
+      "yaw-left",
+      "yaw-right",
+      "pitch-up",
+      "pitch-down",
+      "roll-left",
+      "roll-right",
+      "boost",
+      "shoot-mg"
+    ]
+  },
+  "blockId": "BT93Q",
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93q_policy_collapse.py --write-report"
+  },
+  "decision": {
+    "blocksNext": [
+      "93Q.6 10k micro-PPO recheck",
+      "BT93O claim",
+      "BT93P claim",
+      "BT94A claim",
+      "candidate run",
+      "freeze candidate",
+      "holdout consumption",
+      "promote",
+      "rollout",
+      "PPO-Validate or BT95 handoff signal",
+      "50k/100k/200k extension"
+    ],
+    "nextAllowedActions": [
+      "continue with 93Q.4 stress matrix without quality claim",
+      "do not start 93Q.6 until policy collapse is fixed or explicitly explained by later evidence"
+    ],
+    "opensNext": [
+      "93Q.4 wall/trail action-effect stress matrix"
+    ],
+    "resultClass": "policy-collapse-active"
+  },
+  "deterministicEval": {
+    "combinedDistribution": {
+      "argmaxAction": "yaw-right",
+      "argmaxCount": 8100,
+      "argmaxShare": 1.0,
+      "argmaxToken": "2",
+      "counts": {
+        "2": 8100
+      },
+      "entropy": -0.0,
+      "marginShare": 1.0,
+      "normalizedEntropy": -0.0,
+      "probabilities": {
+        "2": 1.0
+      },
+      "rankedActions": [
+        {
+          "count": 8100,
+          "semanticAction": "yaw-right",
+          "share": 1.0,
+          "token": "2"
+        }
+      ],
+      "secondBestAction": null,
+      "secondBestCount": 0,
+      "secondBestShare": 0.0,
+      "secondBestToken": null,
+      "total": 8100
+    },
+    "deterministicYawRightDominates": true,
+    "dominantAction": "yaw-right",
+    "seedDistributions": [
+      {
+        "avgStepsPerEpisode": 106.52,
+        "completedEpisodes": 25,
+        "deathBefore60Count": 2,
+        "distribution": {
+          "argmaxAction": "yaw-right",
+          "argmaxCount": 2700,
+          "argmaxShare": 1.0,
+          "argmaxToken": "2",
+          "counts": {
+            "2": 2700
+          },
+          "entropy": -0.0,
+          "marginShare": 1.0,
+          "normalizedEntropy": -0.0,
+          "probabilities": {
+            "2": 1.0
+          },
+          "rankedActions": [
+            {
+              "count": 2700,
+              "semanticAction": "yaw-right",
+              "share": 1.0,
+              "token": "2"
+            }
+          ],
+          "secondBestAction": null,
+          "secondBestCount": 0,
+          "secondBestShare": 0.0,
+          "secondBestToken": null,
+          "total": 2700
+        },
+        "label": "eval-944",
+        "repeatedActionStreakLowerBound": 2700
+      },
+      {
+        "avgStepsPerEpisode": 92.827586,
+        "completedEpisodes": 29,
+        "deathBefore60Count": 7,
+        "distribution": {
+          "argmaxAction": "yaw-right",
+          "argmaxCount": 2700,
+          "argmaxShare": 1.0,
+          "argmaxToken": "2",
+          "counts": {
+            "2": 2700
+          },
+          "entropy": -0.0,
+          "marginShare": 1.0,
+          "normalizedEntropy": -0.0,
+          "probabilities": {
+            "2": 1.0
+          },
+          "rankedActions": [
+            {
+              "count": 2700,
+              "semanticAction": "yaw-right",
+              "share": 1.0,
+              "token": "2"
+            }
+          ],
+          "secondBestAction": null,
+          "secondBestCount": 0,
+          "secondBestShare": 0.0,
+          "secondBestToken": null,
+          "total": 2700
+        },
+        "label": "eval-945",
+        "repeatedActionStreakLowerBound": 2700
+      },
+      {
+        "avgStepsPerEpisode": 107.08,
+        "completedEpisodes": 25,
+        "deathBefore60Count": 2,
+        "distribution": {
+          "argmaxAction": "yaw-right",
+          "argmaxCount": 2700,
+          "argmaxShare": 1.0,
+          "argmaxToken": "2",
+          "counts": {
+            "2": 2700
+          },
+          "entropy": -0.0,
+          "marginShare": 1.0,
+          "normalizedEntropy": -0.0,
+          "probabilities": {
+            "2": 1.0
+          },
+          "rankedActions": [
+            {
+              "count": 2700,
+              "semanticAction": "yaw-right",
+              "share": 1.0,
+              "token": "2"
+            }
+          ],
+          "secondBestAction": null,
+          "secondBestCount": 0,
+          "secondBestShare": 0.0,
+          "secondBestToken": null,
+          "total": 2700
+        },
+        "label": "eval-946",
+        "repeatedActionStreakLowerBound": 2700
+      }
+    ],
+    "singleActionEvalShare": 1.0,
+    "source": "BT93N micro_ppo_repeat_report.evalSummary.seedSummaries[].actionCounts"
+  },
+  "entropyLogitSnapshot": {
+    "empiricalLogitProxy": {
+      "alpha": 1.0,
+      "argmaxAction": "yaw-right",
+      "argmaxToken": "2",
+      "limitation": "BT93N did not persist a model package; this proxy uses eval action counts with Laplace smoothing.",
+      "logits": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 8.999743,
+        "3": 0.0,
+        "4": 0.0,
+        "5": 0.0,
+        "6": 0.0,
+        "7": 0.0,
+        "8": 0.0
+      },
+      "margin": 8.999743,
+      "realModelLogitsAvailable": false,
+      "secondBestAction": "noop",
+      "secondBestToken": "0",
+      "snapshotKind": "empirical-count-logit-proxy"
+    },
+    "modelLoggerEntropy": {
+      "available": true,
+      "entropy": 1.999628,
+      "nUpdates": 156,
+      "normalizedEntropy": 0.91007,
+      "rawEntropyLoss": -1.9996279776096344,
+      "source": "stable_baselines3 logger train/entropy_loss from last rollout snapshot"
+    },
+    "modelPackagePersistedInBT93N": false,
+    "realModelLogitsAvailable": false
+  },
+  "generatedAt": "2026-04-29T23:34:01Z",
+  "generatedBy": "python/scripts/bt93q_policy_collapse.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "821259a57e52688c337d07c0c8341651585b9882"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "microPpoRecheckAllowed": false,
+  "modeSeparation": {
+    "evalModeArtifactOnly": false,
+    "gateEvidenceMode": "deterministic-eval-remains-blocking",
+    "judgement": "Stochastic train distribution is broad, but deterministic eval is single-action yaw-right on every eval seed.",
+    "stochasticTrainAndDeterministicEvalSeparated": true
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93Q.3.1": true,
+    "93Q.3.2": true,
+    "93Q.3.3": true,
+    "93Q.3.4": true
+  },
+  "phaseId": "93Q.3",
+  "policyIds": {
+    "eval": "ppo-bt93n-micro-10k-deterministic",
+    "train": "ppo-bt93n-micro-10k-stochastic"
+  },
+  "qualityClaimAllowed": false,
+  "repeatedActionStreaks": {
+    "combinedEvalLowerBound": 8100,
+    "deterministicEvalSeedLowerBounds": [
+      {
+        "label": "eval-944",
+        "lowerBound": 2700,
+        "semanticAction": "yaw-right"
+      },
+      {
+        "label": "eval-945",
+        "lowerBound": 2700,
+        "semanticAction": "yaw-right"
+      },
+      {
+        "label": "eval-946",
+        "lowerBound": 2700,
+        "semanticAction": "yaw-right"
+      }
+    ]
+  },
+  "resultClass": "policy-collapse-active",
+  "scenarioContext": {
+    "latePlayerDeadControlCount": 12,
+    "observationTelemetryResultClass": "observation-telemetry-required",
+    "playerDeadControlResultClass": "player-dead-controls-separated",
+    "requiredTelemetryFieldGroups": [
+      "rawPose",
+      "heading",
+      "velocity",
+      "trailDistance",
+      "escapeLane"
+    ],
+    "traceReanalysisResultClass": "trace-reanalysis-complete-with-telemetry-gap",
+    "traceSampleCounts": {
+      "earlyDeathBefore60": 6,
+      "latePlayerDeadControl": 12,
+      "nonEventControl": 12,
+      "rawSampleCount": 18,
+      "traceTailRows": 216
+    }
+  },
+  "schemaVersion": "bt93q-policy-collapse-report-v1",
+  "sourceArtifacts": {
+    "bt93nMicroPpoRepeat": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "phaseId": "93N.3",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N stochastic-train and deterministic-eval source",
+      "sha256": "96f046445da1518eeb9519958b179107326294d6ad83a6bfa074089f52aaa631",
+      "tracked": true
+    },
+    "bt93qObservationTelemetryGap": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "phaseId": "93Q.2",
+      "resultClass": "observation-telemetry-required",
+      "role": "BT93Q.2 telemetry-gap decision",
+      "sha256": "1442849162125578f468ed0937ca08611267dad1b1d0d0da059ac0007d749241",
+      "tracked": true
+    },
+    "bt93qPlayerDeadControl": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/player_dead_control_report.json",
+      "phaseId": "93Q.2",
+      "resultClass": "player-dead-controls-separated",
+      "role": "BT93Q.2 player-dead control separation",
+      "sha256": "d76a6f536dba54211268599f53aa6e1cbb5b2cfe756d8f36ed085a520a52e87a",
+      "tracked": true
+    },
+    "bt93qTraceReanalysis": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "phaseId": "93Q.2",
+      "resultClass": "trace-reanalysis-complete-with-telemetry-gap",
+      "role": "BT93Q.2 trace reanalysis context",
+      "sha256": "086a62eb602ef28caffbd1525199d1522691c39d360c4f60b58d1b79e9dad849",
+      "tracked": true
+    },
+    "ppoActionSurface": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current masked semantic action surface",
+      "sha256": "4e12c93bd532178f3759234d5217f1cd58a4f4bfaec9c6f7be8ffa708564847b",
+      "tracked": true
+    }
+  },
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "stochasticTrain": {
+    "distribution": {
+      "argmaxAction": "yaw-right",
+      "argmaxCount": 1514,
+      "argmaxShare": 0.149723,
+      "argmaxToken": "2",
+      "counts": {
+        "0": 769,
+        "1": 1148,
+        "2": 1514,
+        "3": 1025,
+        "4": 1343,
+        "5": 941,
+        "6": 889,
+        "7": 1320,
+        "8": 1163
+      },
+      "entropy": 2.176654,
+      "marginShare": 0.016911,
+      "normalizedEntropy": 0.990638,
+      "probabilities": {
+        "0": 0.076048,
+        "1": 0.113528,
+        "2": 0.149723,
+        "3": 0.101365,
+        "4": 0.132812,
+        "5": 0.093058,
+        "6": 0.087915,
+        "7": 0.130538,
+        "8": 0.115012
+      },
+      "rankedActions": [
+        {
+          "count": 1514,
+          "semanticAction": "yaw-right",
+          "share": 0.149723,
+          "token": "2"
+        },
+        {
+          "count": 1343,
+          "semanticAction": "pitch-down",
+          "share": 0.132812,
+          "token": "4"
+        },
+        {
+          "count": 1320,
+          "semanticAction": "boost",
+          "share": 0.130538,
+          "token": "7"
+        },
+        {
+          "count": 1163,
+          "semanticAction": "shoot-mg",
+          "share": 0.115012,
+          "token": "8"
+        },
+        {
+          "count": 1148,
+          "semanticAction": "yaw-left",
+          "share": 0.113528,
+          "token": "1"
+        },
+        {
+          "count": 1025,
+          "semanticAction": "pitch-up",
+          "share": 0.101365,
+          "token": "3"
+        },
+        {
+          "count": 941,
+          "semanticAction": "roll-left",
+          "share": 0.093058,
+          "token": "5"
+        },
+        {
+          "count": 889,
+          "semanticAction": "roll-right",
+          "share": 0.087915,
+          "token": "6"
+        },
+        {
+          "count": 769,
+          "semanticAction": "noop",
+          "share": 0.076048,
+          "token": "0"
+        }
+      ],
+      "secondBestAction": "pitch-down",
+      "secondBestCount": 1343,
+      "secondBestShare": 0.132812,
+      "secondBestToken": "4",
+      "total": 10112
+    },
+    "entropyInterpretation": "Stochastic train remains multi-action and is not used as quality evidence.",
+    "source": "BT93N micro_ppo_repeat_report.trainSummary.actionCounts"
+  },
+  "temperatureTop2Diagnosis": {
+    "diagnostics": [
+      {
+        "argmaxAction": "yaw-right",
+        "argmaxShare": 0.999013,
+        "argmaxToken": "2",
+        "marginShare": 0.99889,
+        "probabilities": {
+          "0": 0.000123,
+          "1": 0.000123,
+          "2": 0.999013,
+          "3": 0.000123,
+          "4": 0.000123,
+          "5": 0.000123,
+          "6": 0.000123,
+          "7": 0.000123,
+          "8": 0.000123
+        },
+        "secondBestAction": "noop",
+        "secondBestShare": 0.000123,
+        "secondBestToken": "0",
+        "temperature": 1.0
+      },
+      {
+        "argmaxAction": "yaw-right",
+        "argmaxShare": 0.918372,
+        "argmaxToken": "2",
+        "marginShare": 0.908168,
+        "probabilities": {
+          "0": 0.010204,
+          "1": 0.010204,
+          "2": 0.918372,
+          "3": 0.010204,
+          "4": 0.010204,
+          "5": 0.010204,
+          "6": 0.010204,
+          "7": 0.010204,
+          "8": 0.010204
+        },
+        "secondBestAction": "noop",
+        "secondBestShare": 0.010204,
+        "secondBestToken": "0",
+        "temperature": 2.0
+      },
+      {
+        "argmaxAction": "yaw-right",
+        "argmaxShare": 0.430578,
+        "argmaxToken": "2",
+        "marginShare": 0.3594,
+        "probabilities": {
+          "0": 0.071178,
+          "1": 0.071178,
+          "2": 0.430578,
+          "3": 0.071178,
+          "4": 0.071178,
+          "5": 0.071178,
+          "6": 0.071178,
+          "7": 0.071178,
+          "8": 0.071178
+        },
+        "secondBestAction": "noop",
+        "secondBestShare": 0.071178,
+        "secondBestToken": "0",
+        "temperature": 5.0
+      }
+    ],
+    "source": "empirical-count-logit-proxy from deterministic eval counts",
+    "top2Conclusion": "Temperature softening exposes alternate actions only as a diagnostic proxy; deterministic gate evidence remains yaw-right collapsed."
+  }
+}
