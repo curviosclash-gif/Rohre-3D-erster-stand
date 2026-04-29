@@ -50,7 +50,7 @@ CURVIOS_ENV_PATH = PYTHON_ROOT / "envs" / "curvios_env.py"
 ACTION_SURFACE_PATH = PYTHON_ROOT / "envs" / "ppo_action_surface.py"
 HEADLESS_RUNNER_PATH = REPO_ROOT / "scripts" / "training-headless-lane-runner.mjs"
 
-PROFILE_ID = "bt93l-objective-reachability-v1"
+DEFAULT_REWARD_PROFILE_ID = "bt93l-objective-reachability-v1"
 DEFAULT_EPISODES = 60
 DEFAULT_TRACE_TAIL = 12
 DEFAULT_MAX_STEPS = 180
@@ -436,6 +436,7 @@ def _run_policy(
     max_steps: int,
     trace_tail_length: int,
     global_step_start: int,
+    reward_profile_id: str,
 ) -> tuple[list[dict[str, Any]], int]:
     rng = np.random.default_rng(seed)
     env = make_curvios_action_wrapper(
@@ -444,7 +445,7 @@ def _run_policy(
             default_seed=seed,
             session_id=f"bt93n-death-trace-{policy_id}",
             controller_timeout_seconds=30.0,
-            reward_profile_id=PROFILE_ID,
+            reward_profile_id=reward_profile_id,
             map_key="standard",
             domain_mode="classic-3d",
             game_mode="CLASSIC",
@@ -716,7 +717,15 @@ def _source_artifacts() -> dict[str, Any]:
     }
 
 
-def build_reports(*, episodes: int, trace_tail: int, max_steps: int, seed_start: int, sample_limit: int) -> dict[str, Any]:
+def build_reports(
+    *,
+    episodes: int,
+    trace_tail: int,
+    max_steps: int,
+    seed_start: int,
+    sample_limit: int,
+    reward_profile_id: str = DEFAULT_REWARD_PROFILE_ID,
+) -> dict[str, Any]:
     started = time.perf_counter()
     budget = _episode_budget(episodes)
     all_episodes: list[dict[str, Any]] = []
@@ -729,6 +738,7 @@ def build_reports(*, episodes: int, trace_tail: int, max_steps: int, seed_start:
             max_steps=max_steps,
             trace_tail_length=trace_tail,
             global_step_start=global_step,
+            reward_profile_id=reward_profile_id,
         )
         all_episodes.extend(policy_episodes)
     aggregate = _aggregate(all_episodes)
@@ -746,7 +756,7 @@ def build_reports(*, episodes: int, trace_tail: int, max_steps: int, seed_start:
     trace_policy = {
         "matrixId": _get(_read_json(BT93L_TASK_CONTRACT_PATH), "matrix", "matrixId"),
         "semanticWindow": _get(_read_json(BT93L_TASK_CONTRACT_PATH), "matrix", "semanticWindow"),
-        "rewardProfileId": PROFILE_ID,
+        "rewardProfileId": reward_profile_id,
         "actionSurfaceId": PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID,
         "episodesRequested": int(episodes),
         "traceTailLength": int(trace_tail),
@@ -890,6 +900,7 @@ def main() -> int:
     parser.add_argument("--max-steps", type=int, default=DEFAULT_MAX_STEPS)
     parser.add_argument("--seed-start", type=int, default=934)
     parser.add_argument("--sample-limit", type=int, default=DEFAULT_SAMPLE_LIMIT)
+    parser.add_argument("--reward-profile-id", default=DEFAULT_REWARD_PROFILE_ID)
     parser.add_argument("--output-root", type=Path, default=BT93N_ROOT)
     args = parser.parse_args()
 
@@ -904,6 +915,7 @@ def main() -> int:
         max_steps=max(1, int(args.max_steps)),
         seed_start=int(args.seed_start),
         sample_limit=max(1, int(args.sample_limit)),
+        reward_profile_id=str(args.reward_profile_id),
     )
     if args.write_report:
         _write_json(DEATH_REPORT_PATH, reports["deathReport"])

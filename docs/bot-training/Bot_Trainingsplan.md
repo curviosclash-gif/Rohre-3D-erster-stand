@@ -3106,7 +3106,7 @@ Pflicht-Evidence:
 
 Quelle: `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md`
 
-<!-- LOCK: Bot-Codex seit 2026-04-29, Phase 93N.1 -->
+<!-- LOCK: Bot-Codex seit 2026-04-29, Phase 93N.2 -->
 
 Scope:
 
@@ -3164,13 +3164,13 @@ Pflicht-Evidence:
 
 ### 93N.2 Stabilitaetsfix nach Ursache
 
-- [ ] 93N.2.1 Reward-Fix nur bei belegter Reward-Ursache: frueher Tod zeitabhaengig staerker negativ, ohne Noop- oder MaxStep-Fehlbelohnung.
-- [ ] 93N.2.2 Curriculum-Fix nur bei belegtem Start-/Gefahrenfenster: sichere Startfenster, graduelle Gefahr, danach volle Matrix.
-- [ ] 93N.2.3 Action-Fix nur bei belegter Action-Ursache: vorhandene Actions koennen Ausweichen, Bremsen, Drehen oder Entkommen nicht leisten.
-- [ ] 93N.2.4 Terminal-/Runner-Fix nur bei falscher `player-dead`/`max-steps`/`match-ended`/`truncated`-Klassifikation oder Bridge-/Reset-Artefakt.
-- [ ] 93N.2.5 Focused JS-/Python-Smokes vorbereiten; Ausfuehrung bleibt bei Tests user-owned, ausser Abschluss-/Gate-Kontext verlangt sie explizit.
-- [ ] 93N.2.6 Jeder Fix schreibt `pre_fix`/`post_fix`-Deltas fuer DeathBefore60, MaxStep-Plateau, Progress-/Objective-Raten und Reward-Ordering; ein isolierter Reward-Gewinn ohne Semantikgewinn ist `reward-redesign-required`.
-- [ ] 93N.2.7 `fix_manifest.json` benennt Ursache, Fix-Klasse, geaenderte Dateien, erwartete Metrikrichtung und Falsifikationsregel vor Ausfuehrung.
+- [x] 93N.2.1 Reward-Fix nur bei belegter Reward-Ursache: frueher Tod zeitabhaengig staerker negativ, ohne Noop- oder MaxStep-Fehlbelohnung. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_stability_fix.py --write-report` -> `data/training/ppo/bt93n/fix_manifest.json`, `selectedFixClass=Reward`, `dominantCause=wall/trail`, `positiveRewardCount=4`)
+- [x] 93N.2.2 Curriculum-Fix nur bei belegtem Start-/Gefahrenfenster: sichere Startfenster, graduelle Gefahr, danach volle Matrix. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_stability_fix.py --write-report` -> `data/training/ppo/bt93n/stability_fix_report.json`, `curriculumFixApplied=false`, `notAppliedReasons.curriculum` dokumentiert)
+- [x] 93N.2.3 Action-Fix nur bei belegter Action-Ursache: vorhandene Actions koennen Ausweichen, Bremsen, Drehen oder Entkommen nicht leisten. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_stability_fix.py --write-report` -> `data/training/ppo/bt93n/stability_fix_report.json`, `actionFixApplied=false`, `notAppliedReasons.action` dokumentiert)
+- [x] 93N.2.4 Terminal-/Runner-Fix nur bei falscher `player-dead`/`max-steps`/`match-ended`/`truncated`-Klassifikation oder Bridge-/Reset-Artefakt. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_stability_fix.py --write-report` -> `data/training/ppo/bt93n/stability_fix_report.json`, `terminalOrRunnerFixApplied=false`, `notAppliedReasons.terminalRunner` dokumentiert)
+- [x] 93N.2.5 Focused JS-/Python-Smokes vorbereiten; Ausfuehrung bleibt bei Tests user-owned, ausser Abschluss-/Gate-Kontext verlangt sie explizit. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_stability_fix.py --write-report` -> `data/training/ppo/bt93n/stability_fix_report.json`, `testsPreparedButNotRun.prepared` alle true)
+- [x] 93N.2.6 Jeder Fix schreibt `pre_fix`/`post_fix`-Deltas fuer DeathBefore60, MaxStep-Plateau, Progress-/Objective-Raten und Reward-Ordering; ein isolierter Reward-Gewinn ohne Semantikgewinn ist `reward-redesign-required`. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_stability_fix.py --write-report` -> `data/training/ppo/bt93n/reward_terminal_delta_report.json`, `deathBefore60Count 6->3`, `positiveRewardCount 4->0`, `progress/objective 14->15`, `maxStepPlateauCount 0->0`)
+- [x] 93N.2.7 `fix_manifest.json` benennt Ursache, Fix-Klasse, geaenderte Dateien, erwartete Metrikrichtung und Falsifikationsregel vor Ausfuehrung. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_stability_fix.py --write-report` -> `data/training/ppo/bt93n/fix_manifest.json`, `resultClass=reward-fix-manifest-pinned`, `data/training/ppo/bt93n/stability_fix_report.json` `phaseCoverage.93N.2.7=true`)
 
 Empfohlene Smokes:
 

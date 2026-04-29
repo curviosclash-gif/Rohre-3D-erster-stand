@@ -1,0 +1,187 @@
+{
+  "blockId": "BT93N",
+  "blockedActions": [
+    "50k/100k extension from 93N.2 alone",
+    "candidate, freeze, holdout, promote, rollout, or BT94A-ready wording",
+    "action-surface or terminal follow-up without separate trace evidence"
+  ],
+  "commands": {
+    "write": "python python/scripts/bt93n_stability_fix.py --write-report"
+  },
+  "deltaReport": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
+  "fixDecision": {
+    "actionFixApplied": false,
+    "curriculumFixApplied": false,
+    "dominantCause": "wall/trail",
+    "notAppliedReasons": {
+      "action": "BT93N.1 did not prove missing evade/turn action capacity or action-collapse dominance",
+      "curriculum": "BT93N.1 classified wall/trail reward profitability, not start-window or danger-window curriculum evidence",
+      "terminalRunner": "BT93N.1 terminalReason was consistently player-dead; no reset, bridge, max-step, or truncation misclassification was proven"
+    },
+    "rewardFixApplied": true,
+    "selectedFixClass": "Reward",
+    "terminalOrRunnerFixApplied": false
+  },
+  "fixManifest": "data/training/ppo/bt93n/fix_manifest.json",
+  "generatedAt": "2026-04-29T21:51:37Z",
+  "generatedBy": "python/scripts/bt93n_stability_fix.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "41000a339565bb4e19685467ab8e86a295c4a86e"
+  },
+  "guardrails": {
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "nextAllowedActions": [
+    "BT93N.3 10k micro-PPO may run only as diagnose-only with the BT93N reward profile",
+    "50k/100k remain blocked until the 10k report is green by its pre-pinned tolerance",
+    "BT93P/BT94A positive reentry stays blocked while DQN anchor policy is dqn-anchor-blocked"
+  ],
+  "ok": true,
+  "phaseCoverage": {
+    "93N.2.1": true,
+    "93N.2.2": true,
+    "93N.2.3": true,
+    "93N.2.4": true,
+    "93N.2.5": true,
+    "93N.2.6": true,
+    "93N.2.7": true
+  },
+  "phaseId": "93N.2",
+  "resultClass": "stability-fix-reward-profile-ready-diagnose-only",
+  "schemaVersion": "bt93n-stability-fix-report-v1",
+  "sourceArtifacts": {
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A closed no-start gate",
+      "sha256": "27dd958fe5463f6f688384957e31cbd4d163c81b07058dd3c0a1a6be9eda7f70"
+    },
+    "comparisonPolicyDecision": {
+      "blockId": "BT93M",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "phaseId": "93M.3.6",
+      "resultClass": "comparison-policy-blocks-positive-reentry",
+      "role": "BT93M comparison policy blocker",
+      "sha256": "eadd182f737d7b477a4143df0cc721875caf31cd47bcb5942f2649f2d80609b5"
+    },
+    "preDeathTraceReport": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/death_before60_trace_report.json",
+      "phaseId": "93N.1",
+      "resultClass": "death-before60-root-cause-classified",
+      "role": "BT93N.1 death trace pre-fix source",
+      "sha256": "7766984f4d02ffed3d70dae2318cd76d06da4486ba1162aa3a649c3447cb1bda"
+    },
+    "preMaxstepTraceReport": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/maxstep_plateau_trace_report.json",
+      "phaseId": "93N.1",
+      "resultClass": "maxstep-plateau-not-observed",
+      "role": "BT93N.1 maxstep trace pre-fix source",
+      "sha256": "ce48bc4c593d40bbc5ed02825cf8a52c9a5484cd37f855e8f94aeaf58d6ba53b"
+    },
+    "python_scripts_bt93n_death_trace_probe_py": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93n_death_trace_probe.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93N.2 changed/prepared file",
+      "sha256": "7dd4ff8f2443122c2c479374c705eb8411a9fa6b2f282660714917c19a8aaf68"
+    },
+    "python_scripts_bt93n_stability_fix_py": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93n_stability_fix.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93N.2 changed/prepared file",
+      "sha256": "655fc3950a1ee65807f6b0ca5e10ed3df0c40f5d4eb0baf590375d3395484184"
+    },
+    "scripts_training-headless-lane-runner_mjs": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93N.2 changed/prepared file",
+      "sha256": "d6a2917a001a310010a98ee150726af110f1444b0716e6ac3a35815253144360"
+    },
+    "src_state_training_RewardCalculator_js": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "src/state/training/RewardCalculator.js",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93N.2 changed/prepared file",
+      "sha256": "2c2969af572479e6583c72b79f32e7192a08260755933e86702654593ecc6c74"
+    },
+    "tests_training-environment_contract_test_mjs": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "tests/training-environment.contract.test.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93N.2 changed/prepared file",
+      "sha256": "eb9888ef5b7cde8a6249c41896a2d58c9530870ff74af4d58fdeb8b9b84fdfe3"
+    },
+    "tests_training-reward-survival_test_mjs": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "tests/training-reward-survival.test.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93N.2 changed/prepared file",
+      "sha256": "31ee57bdc9a6bc00bf8bef89b6fbbcdeee32f5d8a308ff8edfdf57dcfe4d4ab2"
+    }
+  },
+  "testsPreparedButNotRun": {
+    "policy": "tests are user-owned for non-*.99 subphases",
+    "prepared": {
+      "python/tests/test_curvios_env.py": true,
+      "python/tests/test_ppo_action_surface.py": true,
+      "tests/training-environment.contract.test.mjs": true,
+      "tests/training-reward-survival.test.mjs": true
+    },
+    "recommendedSmokes": [
+      "node --test tests/training-reward-survival.test.mjs tests/training-environment.contract.test.mjs",
+      "python -m pytest python/tests/test_ppo_action_surface.py python/tests/test_curvios_env.py"
+    ]
+  }
+}

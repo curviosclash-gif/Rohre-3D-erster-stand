@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2392,
-    "rawCoveredFileCount": 1913,
+    "trackedFileCount": 2397,
+    "rawCoveredFileCount": 1918,
     "rawCoveragePercent": 80,
-    "adjustedTrackedFileCount": 1489,
-    "adjustedCoveredFileCount": 1254,
-    "adjustedCoveragePercent": 84.2,
+    "adjustedTrackedFileCount": 1494,
+    "adjustedCoveredFileCount": 1259,
+    "adjustedCoveragePercent": 84.3,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
     "classifications": [
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 224,
-        "coveredCount": 203
+        "count": 228,
+        "coveredCount": 207
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 872,
-        "coveredCount": 856
+        "count": 873,
+        "coveredCount": 857
       },
       {
         "classification": "product-docs",
@@ -7583,7 +7583,99 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93n/death_before60_trace_samples.jsonl",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93n/fix_manifest.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93n/maxstep_plateau_trace_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93n/stability_fix_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -17948,6 +18040,29 @@
     },
     {
       "path": "python/scripts/bt93n_death_trace_probe.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93n_stability_fix.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

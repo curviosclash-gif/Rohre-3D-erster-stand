@@ -51,3 +51,35 @@ test('V36 curriculum navigate stage amplifies survival-first weighting', () => {
     assert.equal(reward.components.lowHealthThreat, -0.093632);
     assert.equal(reward.total, -0.009608);
 });
+
+test('BT93N early-death shaping is terminal-only and step-scaled', () => {
+    const earlyDeath = calculateReward({
+        survival: false,
+        lost: true,
+        episodeStep: 30,
+        earlyDeathBeforeStep: 60,
+    }, {
+        weights: {
+            loss: -2,
+            earlyDeath: -4,
+        },
+    });
+    const lateDeath = calculateReward({
+        survival: false,
+        lost: true,
+        episodeStep: 80,
+        earlyDeathBeforeStep: 60,
+    }, {
+        weights: {
+            loss: -2,
+            earlyDeath: -4,
+        },
+    });
+
+    assert.equal(earlyDeath.components.loss, -2);
+    assert.equal(earlyDeath.components.earlyDeath, -6);
+    assert.equal(earlyDeath.total, -8);
+    assert.equal(lateDeath.components.loss, -2);
+    assert.equal(lateDeath.components.earlyDeath, 0);
+    assert.equal(lateDeath.total, -2);
+});

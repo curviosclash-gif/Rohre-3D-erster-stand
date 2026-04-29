@@ -16,6 +16,7 @@ import { WebSocketTrainerBridge } from '../src/entities/ai/training/WebSocketTra
 import { buildTrainerRuntimeObservationPayload, buildTrainerTransitionPayload } from '../src/entities/ai/training/TrainerPayloadAdapter.js';
 import {
     BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
+    BT93N_WALL_TRAIL_STABILITY_PROFILE_ID,
     deriveHeadlessLaneEpisodeStep,
     deriveHeadlessObjectiveReachabilitySignals,
     resolveHeadlessRewardProfile,
@@ -224,6 +225,40 @@ test('BT93L reward profile keeps survival-only and noop plateaus non-success', (
     assert.ok(progress.total > 0);
     assert.ok(objectiveComplete.total > progress.total);
     assert.ok(playerDead.total < 0);
+});
+
+test('BT93N wall-trail stability profile penalizes net-profitable early deaths', () => {
+    const profile = resolveHeadlessRewardProfile(BT93N_WALL_TRAIL_STABILITY_PROFILE_ID);
+    const calculator = new RewardCalculator(profile.rewardCalculatorOptions);
+    const earlyWallDeath = calculator.compute({
+        survival: false,
+        lost: true,
+        wallRisk: 0.95,
+        parcoursEnabled: true,
+        checkpointReached: 1,
+        episodeStep: 48,
+        earlyDeathBeforeStep: 60,
+    });
+    const progress = calculator.compute({
+        survival: true,
+        parcoursEnabled: true,
+        checkpointReached: 1,
+        wallRisk: 0.2,
+    });
+    const signals = deriveHeadlessObjectiveReachabilitySignals({
+        previousObservation: [0, 0, 0, 0.2, 0, 0, 0, 0, 0.8, 0.1, 1, 0.1, 0, 0.3],
+        observation: [0.2, 0, 0, 0.7, 0, 0, 0, 0, 0.7, 0.4, 1, 0.1, 0, 0.35],
+        episode: { done: false, truncated: false },
+        action: { yawRight: true },
+        rewardProfileId: BT93N_WALL_TRAIL_STABILITY_PROFILE_ID,
+    });
+
+    assert.equal(profile.active, true);
+    assert.equal(profile.rewardCalculatorOptions.weights.earlyDeath, -16);
+    assert.ok(earlyWallDeath.total < 0);
+    assert.ok(progress.total > 0);
+    assert.equal(signals.realEnvStepPath, true);
+    assert.equal(signals.progressSignalReachable, true);
 });
 
 test('RewardCalculator keeps transparent additive shaping totals', () => {

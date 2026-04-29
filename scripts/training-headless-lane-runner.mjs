@@ -55,6 +55,11 @@ const DEFAULT_STATS_TIMEOUT_MS = 2_000;
 const KERNEL_RUNNING_LIFECYCLES = new Set(['running', 'round_end', 'match_end']);
 export const BT93J_REWARD_CURRICULUM_PROOF_PROFILE_ID = 'bt93j-reward-curriculum-proof-v1';
 export const BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID = 'bt93l-objective-reachability-v1';
+export const BT93N_WALL_TRAIL_STABILITY_PROFILE_ID = 'bt93n-wall-trail-stability-v1';
+const OBJECTIVE_REACHABILITY_PROFILE_IDS = new Set([
+    BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID,
+    BT93N_WALL_TRAIL_STABILITY_PROFILE_ID,
+]);
 
 const BT93J_PROOF_REWARD_WEIGHTS = Object.freeze({
     baseStep: -0.005,
@@ -136,6 +141,28 @@ export function resolveHeadlessRewardProfile(profileId = '') {
                 },
             },
             intent: 'BT93L.2/93L.3 diagnostic lane: progress must come from real observation deltas; survival-only, noop, and max-step plateaus are non-success.',
+        };
+    }
+    if (String(profileId || '') === BT93N_WALL_TRAIL_STABILITY_PROFILE_ID) {
+        return {
+            profileId: BT93N_WALL_TRAIL_STABILITY_PROFILE_ID,
+            active: true,
+            runKindBound: ['bt93n-stability-fix', 'bt93n-micro-ppo-stability'],
+            rewardCalculatorOptions: {
+                weights: {
+                    baseStep: -0.016,
+                    survival: 0.01,
+                    survivalPressureBonus: 0.006,
+                    wallRisk: -0.11,
+                    trailRisk: -0.14,
+                    checkpointReached: 0.72,
+                    parcoursCompleted: 2,
+                    loss: -5.5,
+                    earlyDeath: -16,
+                    win: 2.5,
+                },
+            },
+            intent: 'BT93N.2 diagnostic reward fix: wall/trail early deaths before step 60 must not remain net-profitable while real progress/objective deltas stay positive.',
         };
     }
     return {
@@ -351,7 +378,7 @@ export function deriveHeadlessObjectiveReachabilitySignals({
     action = null,
     rewardProfileId = '',
 } = {}) {
-    const profileActive = String(rewardProfileId || '') === BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID;
+    const profileActive = OBJECTIVE_REACHABILITY_PROFILE_IDS.has(String(rewardProfileId || ''));
     const manualInjection = input?.progressEvent === true;
     const hasPrevious = previousObservation && typeof previousObservation.length === 'number';
     const hasCurrent = observation && typeof observation.length === 'number';
@@ -435,6 +462,7 @@ export function buildHeadlessTrainingRewardSignals(episode = {}, context = {}) {
     const terminalReasonLower = terminalReason.toLowerCase();
     const deathLikeTerminal = done && isDeathLikeTerminalReason(terminalReason);
     const proofProfileActive = String(context.rewardProfileId || '') === BT93J_REWARD_CURRICULUM_PROOF_PROFILE_ID;
+    const stabilityProfileActive = String(context.rewardProfileId || '') === BT93N_WALL_TRAIL_STABILITY_PROFILE_ID;
     const objectiveReachability = context.objectiveReachability && typeof context.objectiveReachability === 'object'
         ? context.objectiveReachability
         : null;
@@ -460,6 +488,10 @@ export function buildHeadlessTrainingRewardSignals(episode = {}, context = {}) {
         signals.pressureLevel = objectiveReachability.metrics.pressureLevel;
         signals.projectileThreat = objectiveReachability.metrics.projectileThreat;
         signals.wallRisk = Math.max(0, 1 - Number(objectiveReachability.metrics.wallDistanceFront || 1));
+    }
+    if (stabilityProfileActive && deathLikeTerminal) {
+        signals.episodeStep = Number(episode?.stepIndex || 0);
+        signals.earlyDeathBeforeStep = 60;
     }
     if (Number.isFinite(Number(context.totalEnvSteps))) {
         signals.totalEnvSteps = Number(context.totalEnvSteps);

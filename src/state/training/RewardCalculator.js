@@ -19,6 +19,7 @@
 //   lowHealthThreat: -0.2..0 (extra penalty when fragile under pressure)
 //   win:          0..1.5   (terminal only)
 //   loss:        -1.5..0   (terminal only)
+//   earlyDeath:   0..-N     (optional terminal-only early-death penalty)
 //   checkpointReached: 0..0.5 (rare - parcours checkpoint; only when parcoursEnabled=true)
 //   parcoursCompleted: 0..2.0 (terminal only - parcours finish; only when parcoursEnabled=true)
 //   wrongOrder:  -0.3..0   (rare - wrong checkpoint order; only when parcoursEnabled=true)
@@ -49,6 +50,7 @@ export const DEFAULT_TRAINING_REWARD_WEIGHTS = Object.freeze({
     lowHealthThreat: -0.2,
     win: 1.5,
     loss: -1.5,
+    earlyDeath: 0,
     checkpointReached: 0.5,
     parcoursCompleted: 2.0,
     wrongOrder: -0.3,
@@ -140,6 +142,11 @@ export function calculateReward(signals = {}, options = {}) {
         ? riskPressure * ((0.5 - healthRatio) / 0.5)
         : 0;
     const { won, lost } = resolveTerminalWinLoss(signals, episodeSnapshot);
+    const episodeStep = toFiniteNumber(signals.episodeStep ?? episodeSnapshot?.stepIndex, 0);
+    const earlyDeathBeforeStep = toFiniteNumber(signals.earlyDeathBeforeStep, 0);
+    const earlyDeathScale = lost && earlyDeathBeforeStep > 0 && episodeStep > 0 && episodeStep < earlyDeathBeforeStep
+        ? 1 + ((earlyDeathBeforeStep - episodeStep) / earlyDeathBeforeStep)
+        : 0;
     const parcoursEnabled = signals.parcoursEnabled === true;
     const checkpointCount = parcoursEnabled
         ? toCount(signals.checkpointReached ?? signals.parcoursCheckpoints)
@@ -166,6 +173,7 @@ export function calculateReward(signals = {}, options = {}) {
         lowHealthThreat: roundReward(lowHealthThreatScale * weights.lowHealthThreat),
         win: roundReward(won ? weights.win : 0),
         loss: roundReward(lost ? weights.loss : 0),
+        earlyDeath: roundReward(earlyDeathScale * weights.earlyDeath),
         checkpointReached: roundReward(checkpointCount * weights.checkpointReached),
         parcoursCompleted: roundReward(parcoursFinished ? weights.parcoursCompleted : 0),
         wrongOrder: roundReward(wrongOrderCount * weights.wrongOrder),
