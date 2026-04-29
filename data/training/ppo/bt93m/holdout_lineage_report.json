@@ -1,0 +1,268 @@
+{
+  "blockId": "BT93M",
+  "blocksNext": [
+    "BT94A freeze/candidate work before a fresh holdout manifest",
+    "any post-holdout optimization on reserved freeze seeds"
+  ],
+  "diagnosisLineage": {
+    "consumedDiagnosticSeeds": [
+      934,
+      935,
+      936,
+      937,
+      944,
+      945,
+      946
+    ],
+    "controlSeeds": [
+      944,
+      945,
+      946
+    ],
+    "diagnosticEvalSeeds": [
+      944,
+      945,
+      946
+    ],
+    "diagnosticTrainSeeds": [
+      934,
+      935,
+      936,
+      937
+    ],
+    "interpretation": "Consumed diagnosis/control seeds cannot become a later freeze-holdout line.",
+    "pre20260429DiagnosisArtifacts": [
+      {
+        "blockId": "BT93C",
+        "closureCapable": false,
+        "exists": true,
+        "isFile": true,
+        "ok": true,
+        "path": "data/training/ppo/bt93c/precomparison_report.json",
+        "phaseId": "93I.5.1",
+        "resultClass": "ppo-regression",
+        "role": "pre-2026-04-29 diagnosis/precomparison context",
+        "sha256": "7ff00d1c24d345642e521b76a89f7746a9d5dc0748adaeaa39f51caa12bcb1fb"
+      },
+      {
+        "blockId": "BT93C",
+        "closureCapable": false,
+        "exists": true,
+        "isFile": true,
+        "ok": true,
+        "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+        "phaseId": "93I.5.1",
+        "resultClass": null,
+        "role": "pre-2026-04-29 diagnosis evidence matrix",
+        "sha256": "f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11"
+      },
+      {
+        "blockId": "BT93C",
+        "closureCapable": false,
+        "exists": true,
+        "isFile": true,
+        "ok": true,
+        "path": "data/training/ppo/bt93c/handover_report.json",
+        "phaseId": "93I.5.1",
+        "resultClass": "diagnose",
+        "role": "pre-2026-04-29 diagnosis handover",
+        "sha256": "f7554bef13fd37a5bc4a24061a5422ebe23c460c2f0e070b4521425665bebd68"
+      }
+    ]
+  },
+  "freezeHoldoutReservation": {
+    "mayBeUsedOnlyAfter": [
+      "BT93P.4=BT94A-ready",
+      "fresh BT94A gate claimable=true",
+      "no-post-holdout-optimization manifest is written before use"
+    ],
+    "reservedFreezeSeeds": [
+      960,
+      961
+    ],
+    "sourceStatus": "reserved-unused-in-BT93L.1-through-BT93L.6",
+    "usedInBt93l1ThroughBt93l6": false,
+    "usedInBt93m": false
+  },
+  "generatedAt": "2026-04-29T20:50:11Z",
+  "generatedBy": "python/scripts/bt93m_comparator_no_start_refresh.py",
+  "invalidAsFreezeHoldout": [
+    "diagnosticTrainSeeds",
+    "diagnosticEvalSeeds",
+    "controlSeeds",
+    "pre-2026-04-29 diagnosis/holdout artifacts",
+    "quarantined user-owned side-lane artifacts"
+  ],
+  "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+  "noPostHoldoutOptimization": {
+    "manifestRequiredBeforeFreeze": true,
+    "required": true,
+    "rule": "Any optimization after reading a freeze holdout invalidates that candidate and forces a new unseen holdout seed line."
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93M.3.5": true
+  },
+  "phaseId": "93M.3.5",
+  "resultClass": "holdout-lineage-pinned-freeze-reserved",
+  "schemaVersion": "bt93m-holdout-lineage-v1",
+  "semanticWindow": "runtime-near-headless-v1",
+  "sourceArtifacts": {
+    "bt93cEvidenceQualityMatrix": {
+      "blockId": "BT93C",
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "phaseId": "93I.5.1",
+      "resultClass": null,
+      "role": "historical BT93C/BT93I evidence matrix context",
+      "sha256": "f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11"
+    },
+    "bt93cHandover": {
+      "blockId": "BT93C",
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93c/handover_report.json",
+      "phaseId": "93I.5.1",
+      "resultClass": "diagnose",
+      "role": "historical BT93C/BT93I handover context",
+      "sha256": "f7554bef13fd37a5bc4a24061a5422ebe23c460c2f0e070b4521425665bebd68"
+    },
+    "bt93cPrecomparison": {
+      "blockId": "BT93C",
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "phaseId": "93I.5.1",
+      "resultClass": "ppo-regression",
+      "role": "historical BT93C/BT93I precomparison context",
+      "sha256": "7ff00d1c24d345642e521b76a89f7746a9d5dc0748adaeaa39f51caa12bcb1fb"
+    },
+    "bt93lBaselineMatrix": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L baseline/control matrix",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013"
+    },
+    "bt93lHandover": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/handover_package.json",
+      "phaseId": "93L.7",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93L handover",
+      "sha256": "de967b8dbe18facfc9cef40af5bef3fc9c5d69a9db31c50e1dcb404011ee6e5f"
+    },
+    "bt93lMicroPpoSignal": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/micro_ppo_signal_report.json",
+      "phaseId": "93L.6",
+      "resultClass": "signal-green",
+      "role": "BT93L 10k micro PPO signal",
+      "sha256": "01912b85c4ad39ef9b4f92d28f19ee29f27ab85670ba451cb7551a679fa74f34"
+    },
+    "bt93lTaskMetricContract": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L task metric contract",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0"
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A no-start gate",
+      "sha256": "85a29bb4c20663a2d619e0f3c72ae220dfe8a9e07ccfa8ec09426f16d178dd84"
+    },
+    "dqnAnchorManifest": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
+      "phaseId": "93M.2",
+      "resultClass": null,
+      "role": "BT93M.2 same-matrix manifest",
+      "sha256": "10afc4fa1f257252332645bb5caeab755081f00019b824b7ca3ba358092c6bc3"
+    },
+    "dqnAnchorReport": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
+      "phaseId": "93M.2",
+      "resultClass": "dqn-anchor-blocked",
+      "role": "BT93M.2 DQN same-matrix anchor diagnosis",
+      "sha256": "416598a0a005391b87a1ac6d3b2644bc97dadd28a0aa8392134821186d162373"
+    },
+    "evidenceQuarantine": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/evidence_quarantine_report.json",
+      "phaseId": "93M.1.4",
+      "resultClass": "evidence-quarantine-pinned",
+      "role": "BT93M.1 quarantine policy",
+      "sha256": "397557cd65b91885b6760795cad32045b4f57afed3e12227cd96d9332845c7f2"
+    },
+    "gateSourceFreshness": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/gate_source_freshness_report.json",
+      "phaseId": "93M.1.3",
+      "resultClass": "gate-source-fresh-red",
+      "role": "BT93M.1 gate-source freshness",
+      "sha256": "4746b559303ae1d4796b0a3cd7a99c33e07eef7d07fcfc3645d56d4269a88a73"
+    },
+    "startTruth": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/start_truth.json",
+      "phaseId": "93M.1",
+      "resultClass": "start-truth-pinned-red",
+      "role": "BT93M.1 start truth",
+      "sha256": "8406aa83297361b4b1ffd64e2ceed863f88d8b5d3cdb3e041c08b8cabe2e2399"
+    }
+  }
+}

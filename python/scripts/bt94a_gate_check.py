@@ -217,6 +217,18 @@ def _source_payload_summary(source: Mapping[str, Any]) -> dict[str, Any]:
     payload = _read_json_or_empty(source_path) if source_path else {}
     bt94a = payload.get("bt94aHandover") if isinstance(payload.get("bt94aHandover"), Mapping) else {}
     decision = payload.get("decision") if isinstance(payload.get("decision"), Mapping) else {}
+    claimable = bt94a["claimable"] if "claimable" in bt94a else decision.get("bt94aClaimAllowed")
+    candidate_runs = bt94a["candidateRunsAllowed"] if "candidateRunsAllowed" in bt94a else decision.get("candidateRunsAllowed")
+    matrix_definition = (
+        bt94a["matrixDefinitionAllowed"]
+        if "matrixDefinitionAllowed" in bt94a
+        else decision.get("matrixDefinitionAllowed")
+    )
+    candidate_freeze = (
+        bt94a["candidateFreezeAllowed"]
+        if "candidateFreezeAllowed" in bt94a
+        else decision.get("candidateFreezeAllowed")
+    )
     return {
         "path": _rel(source_path) if source_path else None,
         "sha256": _sha256_file(source_path) if source_path and source_path.is_file() else None,
@@ -225,9 +237,12 @@ def _source_payload_summary(source: Mapping[str, Any]) -> dict[str, Any]:
         "phaseId": payload.get("phaseId") or source.get("phaseId"),
         "resultClass": payload.get("resultClass"),
         "bt94aReady": bt94a.get("ready"),
-        "bt94aClaimAllowed": bt94a.get("claimable") or decision.get("bt94aClaimAllowed"),
-        "candidateRunsAllowed": bt94a.get("candidateRunsAllowed") or decision.get("candidateRunsAllowed"),
-        "matrixDefinitionAllowed": bt94a.get("matrixDefinitionAllowed"),
+        "bt94aClaimAllowed": claimable,
+        "candidateRunsAllowed": candidate_runs,
+        "matrixDefinitionAllowed": matrix_definition,
+        "candidateFreezeAllowed": candidate_freeze,
+        "bt94aGate": bt94a.get("gate"),
+        "bt94aReason": bt94a.get("reason") or decision.get("blockingReason") or decision.get("reason"),
     }
 
 
@@ -266,6 +281,7 @@ def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
         and current_source_summary.get("bt94aReady") is True
         and current_source_summary.get("bt94aClaimAllowed") is True
     )
+    no_start_reason = current_source_summary.get("bt94aReason") or handover_gate.get("reason")
 
     checks = [
         {
@@ -283,6 +299,8 @@ def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
                 "resultClass": current_source_summary.get("resultClass"),
                 "bt94aReady": current_source_summary.get("bt94aReady"),
                 "bt94aClaimAllowed": current_source_summary.get("bt94aClaimAllowed"),
+                "candidateRunsAllowed": current_source_summary.get("candidateRunsAllowed"),
+                "matrixDefinitionAllowed": current_source_summary.get("matrixDefinitionAllowed"),
             },
             "required": "fresh source resultClass=BT94A-ready with bt94aHandover.ready=true and claimable=true",
             "blocksStart": not current_source_allows_start,
@@ -380,7 +398,7 @@ def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
         "claimChecks": checks,
         "noStartDecision": {
             "status": "BT94A remains closed before 94A.1" if blocks_start else "BT94A may be claimed",
-            "reason": handover_gate.get("reason"),
+            "reason": no_start_reason,
             "allowedWork": [
                 "record gate status",
                 "carry blockers into plan/evidence",
