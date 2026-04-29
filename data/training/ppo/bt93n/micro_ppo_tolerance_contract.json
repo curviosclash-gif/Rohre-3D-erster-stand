@@ -1,0 +1,202 @@
+{
+  "blockId": "BT93N",
+  "generatedAt": "2026-04-29T22:06:43Z",
+  "generatedBy": "python/scripts/bt93n_micro_ppo_repeat.py",
+  "guardrails": {
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStartedAtContractWrite": false
+  },
+  "lockedBeforeTraining": true,
+  "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+  "phaseId": "93N.3",
+  "policyIds": {
+    "eval": "ppo-bt93n-micro-10k-deterministic",
+    "train": "ppo-bt93n-micro-10k-stochastic"
+  },
+  "resultClasses": [
+    "micro-ppo-10k-green-diagnose-only",
+    "death-before60-still-blocking",
+    "maxstep-plateau-still-blocking",
+    "signal-unstable-diagnose-only",
+    "measurement-invalid"
+  ],
+  "runContract": {
+    "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+    "evalSeeds": [
+      944,
+      945,
+      946
+    ],
+    "evalStepsPerSeed": 2700,
+    "extension50kAllowedInThisCommand": false,
+    "extension50kExecuted": false,
+    "holdoutStatus": "reserved-unused-in-BT93L.1-through-BT93L.6",
+    "maxStepsPerEpisode": 180,
+    "minimumTimesteps": 10000,
+    "requestedTimesteps": 10000,
+    "rewardProfileId": "bt93n-wall-trail-stability-v1",
+    "trainSeed": 934
+  },
+  "schemaVersion": "bt93n-micro-ppo-tolerance-contract-v1",
+  "semanticWindow": "runtime-near-headless-v1",
+  "sourceArtifacts": {
+    "bt93lBaselineMatrix": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L baseline/control matrix",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013"
+    },
+    "bt93lMicroPpoSignal": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/micro_ppo_signal_report.json",
+      "phaseId": "93L.6",
+      "resultClass": "signal-green",
+      "role": "BT93L original 10k micro-PPO signal",
+      "sha256": "01912b85c4ad39ef9b4f92d28f19ee29f27ab85670ba451cb7551a679fa74f34"
+    },
+    "bt93lTaskMetricContract": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L pinned task/matrix contract",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0"
+    },
+    "bt93mComparisonPolicyDecision": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "phaseId": "93M.3.6",
+      "resultClass": "comparison-policy-blocks-positive-reentry",
+      "role": "BT93M comparison policy blocker",
+      "sha256": "eadd182f737d7b477a4143df0cc721875caf31cd47bcb5942f2649f2d80609b5"
+    },
+    "bt93nFixManifest": {
+      "blockId": "BT93N",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/fix_manifest.json",
+      "phaseId": "93N.2",
+      "resultClass": "reward-fix-manifest-pinned",
+      "role": "BT93N.2 selected reward fix manifest",
+      "sha256": "a4d2bf16df00d54769e296f7eea366ece4544d501503c4ea406627dc3932e2eb"
+    },
+    "bt93nRewardTerminalDelta": {
+      "blockId": "BT93N",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
+      "phaseId": "93N.2",
+      "resultClass": "reward-fix-delta-green-diagnose-only",
+      "role": "BT93N.2 pre/post reward-terminal delta",
+      "sha256": "270c21992dae1eb6fafa0ed6d5edac85d657de22e77a15ebd3b7c90dd4918a59"
+    },
+    "bt93nStabilityFixReport": {
+      "blockId": "BT93N",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/stability_fix_report.json",
+      "phaseId": "93N.2",
+      "resultClass": "stability-fix-reward-profile-ready-diagnose-only",
+      "role": "BT93N.2 stability fix report",
+      "sha256": "51fb202179857ee9bb26cfd251686e8fd5314962d7020d5dad6470b6874b9f75"
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A closed no-start gate",
+      "sha256": "27dd958fe5463f6f688384957e31cbd4d163c81b07058dd3c0a1a6be9eda7f70"
+    },
+    "curviosEnv": {
+      "blockId": null,
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/curvios_env.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "Python CurviosEnv bridge path",
+      "sha256": "2a12d75b327b10daef853cc242e6d81fb87c4ee838756d6cef1905d19de94d59"
+    },
+    "headlessLaneRunner": {
+      "blockId": null,
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "JS headless training lane",
+      "sha256": "d6a2917a001a310010a98ee150726af110f1444b0716e6ac3a35815253144360"
+    },
+    "ppoActionSurface": {
+      "blockId": null,
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "masked semantic action surface",
+      "sha256": "4e12c93bd532178f3759234d5217f1cd58a4f4bfaec9c6f7be8ffa708564847b"
+    }
+  },
+  "statisticalCorridor": {
+    "afterTheFactToleranceChangesAllowed": false,
+    "deathBefore60EvalMax": 0,
+    "deathBefore60TrainMax": 0,
+    "invalidActionRateMax": 0.0,
+    "lockedBefore10kRun": true,
+    "minimumEvalCompletedEpisodes": 3,
+    "minimumTrainCompletedEpisodes": 15,
+    "objectiveSignalReachableMinEval": 1,
+    "objectiveSignalReachableMinTrain": 1,
+    "postDecodeClampRateMax": 0.0,
+    "progressSignalReachableMinEval": 1,
+    "progressSignalReachableMinTrain": 1,
+    "pureMaxStepPlateauBlocksGreen": true,
+    "purePlateauDefinition": "deathBefore60Count == 0 and maxStepShare >= 0.80 and progress/objective event shares are 0",
+    "runtimeErrorCountMax": 0,
+    "sanitizerRateMax": 0.0
+  }
+}

@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 311,
+          "concreteCount": 314,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 449,
+          "concreteCount": 452,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 307,
+          "concreteCount": 310,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 306,
+          "concreteCount": 309,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 948,
+          "concreteCount": 951,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 956,
+          "concreteCount": 959,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1534,20 +1534,21 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93N.3",
+        "currentPhase": "93N.4",
         "scopeDeclarations": [
           "data/training/ppo/bt93n/death_before60_trace_report.json",
           "data/training/ppo/bt93n/death_before60_trace_samples.jsonl",
           "data/training/ppo/bt93n/fix_manifest.json",
           "data/training/ppo/bt93n/maxstep_plateau_trace_report.json",
-          "data/training/ppo/bt93n/micro_ppo_stability_report.json",
+          "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+          "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
           "data/training/ppo/bt93n/reward_terminal_delta_report.json",
           "data/training/ppo/bt93n/runs/**",
           "data/training/ppo/bt93n/stability_fix_report.json",
           "data/training/ppo/bt93n/stability_ladder_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "python/scripts/bt93n_death_trace_probe.py",
-          "python/scripts/bt93n_micro_ppo_stability.py",
+          "python/scripts/bt93n_micro_ppo_repeat.py",
           "python/scripts/bt93n_stability_fix.py",
           "python/tests/test_curvios_env.py",
           "python/tests/test_ppo_action_surface.py",
@@ -1555,8 +1556,8 @@
           "tests/training-reward-survival.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 13,
-          "plannedCount": 3
+          "concreteCount": 16,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -4554,7 +4555,7 @@
       "id": "BT93N.3",
       "type": "phase",
       "title": "Micro-PPO Wiederholung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.3"
@@ -12435,8 +12436,8 @@
     {
       "id": "BT93N.3.1",
       "type": "subphase",
-      "title": "10k Micro-PPO auf derselben BT93L-Matrix ausfuehren, keine 50k-Erweiterung im selben Schritt.",
-      "status": "open",
+      "title": "10k Micro-PPO auf derselben BT93L-Matrix ausfuehren, keine 50k-Erweiterung im selben Schritt. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `actualModelTimesteps=10112`, `extension50kExecuted=false`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.3",
@@ -12446,8 +12447,8 @@
     {
       "id": "BT93N.3.2",
       "type": "subphase",
-      "title": "`deathBefore60Count` fuer Train und Eval ausweisen; Erweiterung nur bei null oder vorab definiertem statistischem Korridor.",
-      "status": "open",
+      "title": "`deathBefore60Count` fuer Train und Eval ausweisen; Erweiterung nur bei null oder vorab definiertem statistischem Korridor. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `train.deathBefore60Count=27`, `eval.deathBefore60Count=11`, `resultClass=death-before60-still-blocking`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.3",
@@ -12457,8 +12458,8 @@
     {
       "id": "BT93N.3.3",
       "type": "subphase",
-      "title": "Runtime-, Invalid-, PostDecodeClamp- und Sanitizer-Raten bleiben null.",
-      "status": "open",
+      "title": "Runtime-, Invalid-, PostDecodeClamp- und Sanitizer-Raten bleiben null. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `phaseCoverage.93N.3.3=true`, `runtimeErrorCount=0`, `invalid/postDecodeClamp/sanitizer=0`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.3",
@@ -12468,8 +12469,8 @@
     {
       "id": "BT93N.3.4",
       "type": "subphase",
-      "title": "Progress-/Objective-Nonzero und Reward-Breakdown muessen stabil bleiben.",
-      "status": "open",
+      "title": "Progress-/Objective-Nonzero und Reward-Breakdown muessen stabil bleiben. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `train progress/objective=1330/1330`, `eval progress/objective=2212/2212`, `phaseCoverage.93N.3.4=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.3",
@@ -12479,8 +12480,8 @@
     {
       "id": "BT93N.3.5",
       "type": "subphase",
-      "title": "`maxStepShare`, `playerDeadShare`, `objectiveEventShare`, `progressEventShare` und `stagnationShare` muessen gemeinsam bewertet werden; ein gruenes DeathBefore60 bei reinem MaxStep-Plateau bleibt rot.",
-      "status": "open",
+      "title": "`maxStepShare`, `playerDeadShare`, `objectiveEventShare`, `progressEventShare` und `stagnationShare` muessen gemeinsam bewertet werden; ein gruenes DeathBefore60 bei reinem MaxStep-Plateau bleibt rot. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `plateauAssessment.train.maxStepShare=0`, `plateauAssessment.eval.maxStepShare=0`, `phaseCoverage.93N.3.5=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.3",
@@ -12490,8 +12491,8 @@
     {
       "id": "BT93N.3.6",
       "type": "subphase",
-      "title": "10k wird nur gruen, wenn Train und Eval keine fruehen Tode zeigen oder die vorab gepinnte statistische Toleranz samt Samplegroesse erfuellt ist; nachtraegliches Umdeuten ist ungueltig.",
-      "status": "open",
+      "title": "10k wird nur gruen, wenn Train und Eval keine fruehen Tode zeigen oder die vorab gepinnte statistische Toleranz samt Samplegroesse erfuellt ist; nachtraegliches Umdeuten ist ungueltig. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `resultClass=death-before60-still-blocking`, `blocksNext=93N.4,BT93O,BT94A`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.3",
@@ -12501,8 +12502,8 @@
     {
       "id": "BT93N.3.7",
       "type": "subphase",
-      "title": "Der Toleranzkorridor muss vor dem 10k-Lauf im Report stehen; nachtraeglich eingefuehrte \"ein Tod ist okay\"-Regeln invalidieren den Lauf.",
-      "status": "open",
+      "title": "Der Toleranzkorridor muss vor dem 10k-Lauf im Report stehen; nachtraeglich eingefuehrte \"ein Tod ist okay\"-Regeln invalidieren den Lauf. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_tolerance_contract.json`, `lockedBeforeTraining=true`, `deathBefore60TrainMax=0`, `deathBefore60EvalMax=0`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.3",
@@ -26319,7 +26320,7 @@
       }
     },
     {
-      "id": "data/training/ppo/bt93n/micro_ppo_stability_report.json",
+      "id": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -26328,9 +26329,36 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93N"
         ],
-        "exists": false
+        "exists": true
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93N"
+        ],
+        "exists": true
       }
     },
     {
@@ -33401,7 +33429,7 @@
       }
     },
     {
-      "id": "python/scripts/bt93n_micro_ppo_stability.py",
+      "id": "python/scripts/bt93n_micro_ppo_repeat.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -33410,9 +33438,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93N"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -69719,6 +69753,24 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
       "type": "scope",
       "hint": null,
@@ -70836,6 +70888,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93n_death_trace_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93n_micro_ppo_repeat.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -72715,6 +72776,24 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
       "type": "scope",
       "hint": null,
@@ -73814,6 +73893,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93n_death_trace_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93n_micro_ppo_repeat.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -76891,6 +76979,24 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
       "type": "scope",
       "hint": null,
@@ -77999,6 +78105,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93n_death_trace_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93n_micro_ppo_repeat.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -80177,6 +80292,24 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
       "type": "scope",
       "hint": null,
@@ -81285,6 +81418,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93n_death_trace_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93n_micro_ppo_repeat.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -89867,6 +90009,24 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
       "type": "scope",
       "hint": null,
@@ -90975,6 +91135,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93n_death_trace_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93n_micro_ppo_repeat.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98732,6 +98901,24 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
       "type": "scope",
       "hint": null,
@@ -99849,6 +100036,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93n_death_trace_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93n_micro_ppo_repeat.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -117588,7 +117784,16 @@
     },
     {
       "from": "BT93N",
-      "to": "data/training/ppo/bt93n/micro_ppo_stability_report.json",
+      "to": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93N",
+      "to": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -117642,7 +117847,7 @@
     },
     {
       "from": "BT93N",
-      "to": "python/scripts/bt93n_micro_ppo_stability.py",
+      "to": "python/scripts/bt93n_micro_ppo_repeat.py",
       "type": "scope",
       "hint": null,
       "attributes": {

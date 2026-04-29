@@ -46,7 +46,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Training
 - `BT94A` bleibt geschlossen: der letzte Gate-Stand schreibt weiter `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression` und offene Blocker; Reentry laeuft jetzt nur ueber `BT93P.4=BT94A-ready`.
 - Der 1000000-Step-Longrun aus `BT93J.5c` ist Diagnose-Evidence mit Steps-Fortschritt, aber rotem Semantikurteil: `naturalTerminalCount=0`, `playerDeadOnly=true`, Progress-/Objective-Rewards `0`.
 - Die User-owned 3M/4-Env-Zusatzspur vom 2026-04-27 ist quarantiniert: Snapshots sind nur Diagnose, kein Closure-, Candidate-, Freeze-, Baseline-, Holdout-, Promote-, PPO-Validate- oder BT94A-Signal.
-- Der Intake `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` ist als Reparaturkette `BT93M` bis `BT93P` vor `BT94A` aufgenommen; `BT93M.99` ist `gate-fresh-dqn-anchor-blocked`, naechste claimbare Arbeit ist `93N.1` nur diagnose-only, Loader-Fix-Block, expliziter User-Ersatzentscheid oder Stop.
+- Der Intake `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` ist als Reparaturkette `BT93M` bis `BT93P` vor `BT94A` aufgenommen; `BT93M.99` ist `gate-fresh-dqn-anchor-blocked`, `BT93N.3` ist `death-before60-still-blocking`, `93N.4`/`BT93O`/`BT94A` bleiben blockiert.
 - Die BT93L-Baseline-Matrix zeigt ein hartes Reward-Ordnungsrisiko: `random` und `semantic-cycle` erreichen in Kurzfenstern teilweise gleichwertige oder bessere Progress-/Objective-Signale als `scripted-reachability`; bis `BT93O` das mit laengeren Szenariofenstern widerlegt oder repariert, bleibt das ein aktiver Blocker fuer `BT93P` und `BT94A`.
 - Kein BT94A, kein Candidate, kein Freeze, kein Holdout, kein Promote, kein Rollout und kein weiterer Blind-Longrun vor frischem `BT93P.4=BT94A-ready` plus gruenem `bt94a_gate_check.py`.
 
@@ -329,7 +329,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93K | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; kein BT94A-Claim |
 | Bot-Codex | BT93L | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; BT94A bleibt geschlossen |
 | Bot-Codex | BT93M | 2026-04-29 | frei | abgeschlossen 2026-04-29 als `gate-fresh-dqn-anchor-blocked`; BT93N nur diagnose-only/Loader/User-Entscheid |
-| Bot-Codex | BT93N | 2026-04-29 | claimed | 93N.1 Death Trace Instrumentation |
+| Bot-Codex | BT93N | 2026-04-29 | claimed | 93N.3 abgeschlossen: `death-before60-still-blocking`; 93N.4 blockiert |
 | - | BT93O | - | frei | wartet auf BT93N.99 |
 | - | BT93P | - | frei | wartet auf BT93O.99 |
 | - | BT94A | - | frei | wartet auf `BT93P.4=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
@@ -3185,21 +3185,22 @@ Pflicht-Evidence:
 
 ### 93N.3 Micro-PPO Wiederholung
 
-- [ ] 93N.3.1 10k Micro-PPO auf derselben BT93L-Matrix ausfuehren, keine 50k-Erweiterung im selben Schritt.
-- [ ] 93N.3.2 `deathBefore60Count` fuer Train und Eval ausweisen; Erweiterung nur bei null oder vorab definiertem statistischem Korridor.
-- [ ] 93N.3.3 Runtime-, Invalid-, PostDecodeClamp- und Sanitizer-Raten bleiben null.
-- [ ] 93N.3.4 Progress-/Objective-Nonzero und Reward-Breakdown muessen stabil bleiben.
-- [ ] 93N.3.5 `maxStepShare`, `playerDeadShare`, `objectiveEventShare`, `progressEventShare` und `stagnationShare` muessen gemeinsam bewertet werden; ein gruenes DeathBefore60 bei reinem MaxStep-Plateau bleibt rot.
-- [ ] 93N.3.6 10k wird nur gruen, wenn Train und Eval keine fruehen Tode zeigen oder die vorab gepinnte statistische Toleranz samt Samplegroesse erfuellt ist; nachtraegliches Umdeuten ist ungueltig.
-- [ ] 93N.3.7 Der Toleranzkorridor muss vor dem 10k-Lauf im Report stehen; nachtraeglich eingefuehrte "ein Tod ist okay"-Regeln invalidieren den Lauf.
+- [x] 93N.3.1 10k Micro-PPO auf derselben BT93L-Matrix ausfuehren, keine 50k-Erweiterung im selben Schritt. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `actualModelTimesteps=10112`, `extension50kExecuted=false`)
+- [x] 93N.3.2 `deathBefore60Count` fuer Train und Eval ausweisen; Erweiterung nur bei null oder vorab definiertem statistischem Korridor. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `train.deathBefore60Count=27`, `eval.deathBefore60Count=11`, `resultClass=death-before60-still-blocking`)
+- [x] 93N.3.3 Runtime-, Invalid-, PostDecodeClamp- und Sanitizer-Raten bleiben null. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `phaseCoverage.93N.3.3=true`, `runtimeErrorCount=0`, `invalid/postDecodeClamp/sanitizer=0`)
+- [x] 93N.3.4 Progress-/Objective-Nonzero und Reward-Breakdown muessen stabil bleiben. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `train progress/objective=1330/1330`, `eval progress/objective=2212/2212`, `phaseCoverage.93N.3.4=true`)
+- [x] 93N.3.5 `maxStepShare`, `playerDeadShare`, `objectiveEventShare`, `progressEventShare` und `stagnationShare` muessen gemeinsam bewertet werden; ein gruenes DeathBefore60 bei reinem MaxStep-Plateau bleibt rot. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `plateauAssessment.train.maxStepShare=0`, `plateauAssessment.eval.maxStepShare=0`, `phaseCoverage.93N.3.5=true`)
+- [x] 93N.3.6 10k wird nur gruen, wenn Train und Eval keine fruehen Tode zeigen oder die vorab gepinnte statistische Toleranz samt Samplegroesse erfuellt ist; nachtraegliches Umdeuten ist ungueltig. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_repeat_report.json`, `resultClass=death-before60-still-blocking`, `blocksNext=93N.4,BT93O,BT94A`)
+- [x] 93N.3.7 Der Toleranzkorridor muss vor dem 10k-Lauf im Report stehen; nachtraeglich eingefuehrte "ein Tod ist okay"-Regeln invalidieren den Lauf. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93n/micro_ppo_tolerance_contract.json`, `lockedBeforeTraining=true`, `deathBefore60TrainMax=0`, `deathBefore60EvalMax=0`)
 
 Empfohlener Command:
 
-- `python python/scripts/bt93n_micro_ppo_stability.py --write-report --total-timesteps 10000`
+- `python python/scripts/bt93n_micro_ppo_repeat.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700`
 
 Pflicht-Evidence:
 
-- `data/training/ppo/bt93n/micro_ppo_stability_report.json`
+- `data/training/ppo/bt93n/micro_ppo_tolerance_contract.json`
+- `data/training/ppo/bt93n/micro_ppo_repeat_report.json`
 
 ### 93N.4 50k/100k Stability Ladder
 

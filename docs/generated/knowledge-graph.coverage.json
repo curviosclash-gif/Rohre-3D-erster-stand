@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2397,
-    "rawCoveredFileCount": 1918,
+    "trackedFileCount": 2400,
+    "rawCoveredFileCount": 1921,
     "rawCoveragePercent": 80,
-    "adjustedTrackedFileCount": 1494,
-    "adjustedCoveredFileCount": 1259,
+    "adjustedTrackedFileCount": 1497,
+    "adjustedCoveredFileCount": 1262,
     "adjustedCoveragePercent": 84.3,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 228,
-        "coveredCount": 207
+        "count": 230,
+        "coveredCount": 209
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 873,
-        "coveredCount": 857
+        "count": 874,
+        "coveredCount": 858
       },
       {
         "classification": "product-docs",
@@ -7630,6 +7630,52 @@
     },
     {
       "path": "data/training/ppo/bt93n/maxstep_plateau_trace_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -18040,6 +18086,29 @@
     },
     {
       "path": "python/scripts/bt93n_death_trace_probe.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93n_micro_ppo_repeat.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
