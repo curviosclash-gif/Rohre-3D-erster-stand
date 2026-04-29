@@ -2,12 +2,12 @@
 
 Datum: 2026-04-30
 
-Status: Intake-Vorschlag fuer user-owned Aufnahme in `docs/bot-training/Bot_Trainingsplan.md`.
+Status: gepruefter Intake; am 2026-04-30 in `docs/bot-training/Bot_Trainingsplan.md` uebernommen.
 
 Dieser Intake ist eine gezielte Reparatur nach `BT93N.99`. Er ersetzt keinen
-aktiven Master-Eintrag automatisch. Er soll vor `BT93O` eingeschoben werden,
-weil `BT93O` laut aktivem Plan nur nach gruenem `BT93N.99` starten darf und
-`BT93N.99` ausdruecklich `death-before60-still-blocking` meldet.
+anderen aktiven Block. Er ist vor `BT93O` eingeschoben, weil `BT93O` nicht aus
+einem roten `BT93N.99` starten darf und `BT93N.99` ausdruecklich
+`death-before60-still-blocking` meldet.
 
 ## Kurzurteil
 
@@ -290,7 +290,8 @@ Primary scope:
 
 | Pfad | Zugriff | Zweck |
 | --- | --- | --- |
-| `docs/plaene/neu/BT93Q_*.md` | write | Intake/Handoff |
+| `docs/bot-training/Bot_Trainingsplan.md` | write | aktiver BT93Q-Block und Abhaengigkeiten |
+| `docs/plaene/neu/BT93Q_*.md` | read | Intake-/Handoff-Quelle |
 | `data/training/ppo/bt93q/**` | write | neue Diagnose- und Repair-Artefakte |
 | `python/scripts/bt93q_*.py` | write | Reanalyse, Stress-Matrix, Closure-Gate |
 | `python/configs/ppo_bt93q*.json` | write | kleine Recheck-Konfigurationen |
@@ -521,10 +522,10 @@ Evidence:
 - Keine produktive Runtime-, Matchstart-, AI-Hub-, Strategy-, Registry-,
   Rollback- oder JS-Inference-Aenderung.
 
-## Empfohlene Master-Aufnahme
+## Empfohlene Bot-Trainingsplan-Aufnahme
 
-In `docs/bot-training/Bot_Trainingsplan.md` waere dieser Block als neuer
-Reparaturblock vor `BT93O` aufzunehmen:
+In `docs/bot-training/Bot_Trainingsplan.md` wurde dieser Block als neuer
+Reparaturblock vor `BT93O` aufgenommen:
 
 | id | titel | status | prio | depends_on | current_phase | quelle |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -541,13 +542,13 @@ Abhaengigkeitsschaerfung:
 
 ## Erste konkrete Aktion nach Aufnahme
 
-Nach manueller Aufnahme in den aktiven Master:
+Nach Aufnahme in den aktiven Bot-Trainingsplan:
 
-1. `/fix-planung` claimt `BT93Q`.
+1. `/bot-training-plan` claimt `BT93Q` oder `/fix-planung` mit Bot-Training-Scope.
 2. Erste Subphase ist `93Q.1 Befundregister und Hypothesen-Lock`.
 3. Erste Artefakte:
    - `python/scripts/bt93q_finding_register.py`
    - `data/training/ppo/bt93q/finding_register.json`
    - `data/training/ppo/bt93q/hypothesis_lock.json`
 4. Noch kein PPO-Lauf in 93Q.1.
-5. Abschluss nur mit `npm.cmd run gates:pre-commit` und versionierter Evidence.
+5. Abschluss-Governance mindestens mit `npm.cmd run gates:pre-commit` und versionierter Evidence; Code-/Gate-Abschluss folgt den Bot-Training-Closure-Checks.
