@@ -328,7 +328,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93J | 2026-04-26 | frei | abgeschlossen 2026-04-27 als `diagnose-loop-required`; kein BT94A-Claim |
 | Bot-Codex | BT93K | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; kein BT94A-Claim |
 | Bot-Codex | BT93L | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; BT94A bleibt geschlossen |
-| - | BT93M | - | frei | naechster claimbarer Block; Start mit `93M.1` |
+| Bot-Codex | BT93M | 2026-04-29 | active | 93M.99 offen |
 | - | BT93N | - | frei | wartet auf BT93M.99 |
 | - | BT93O | - | frei | wartet auf BT93N.99 |
 | - | BT93P | - | frei | wartet auf BT93O.99 |
@@ -841,7 +841,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93J | Root-Cause-Blocker-Repair | completed | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 + R2-Plananpassung 2026-04-26 | 93J.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
 | BT93K | Survival-First Objective Reset | completed | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
 | BT93L | Objective-Reachability und Survival-Task-Definition | completed | P1 | BT93K.99 (`diagnose-loop-required`) + Diagnosebericht 2026-04-28 | 93L.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` |
-| BT93M | Gate-Wahrheit und DQN-Same-Matrix-Anker | planned | P1 | BT93L.99 (`diagnose-loop-required`) + User-Intake 2026-04-29 | 93M.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
+| BT93M | Gate-Wahrheit und DQN-Same-Matrix-Anker | active | P1 | BT93L.99 (`diagnose-loop-required`) + User-Intake 2026-04-29 | 93M.99 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93N | DeathBefore60-Stability und Terminal-Root-Cause | planned | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93O | Action-/Objective-Quality und Anti-Plateau | planned | P2 | BT93N.99 ohne `death-before60-still-blocking` | 93O.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93P | PPO Trainingsleiter und BT94A-Reentry-Gate | planned | P2 | BT93O.99 + gruene Action-/Objective-/Anti-Plateau-Gates | 93P.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
@@ -3063,12 +3063,12 @@ Pflicht-Evidence:
 
 ### 93M.3 Comparator- und No-Start-Refresh
 
-- [ ] 93M.3.1 `precomparison_refresh_report.json` aus BT93L/BT93M-Artefakten neu schreiben.
-- [ ] 93M.3.2 `evidence_quality_matrix.json` trennt echte PPO-/DQN-/Scripted-/Noop-Evidence von Kontext-, `tmp`- und Quarantaene-Spuren.
-- [ ] 93M.3.3 `handover_package.json` klassifiziert BT93M ohne Candidate-Sprache.
-- [ ] 93M.3.4 `data/training/ppo/bt94a/no_start_gate.json` nur dann oeffnen, wenn alle Gate-Inputs wirklich gruen sind; ansonsten bleibt No-Start frisch dokumentiert.
-- [ ] 93M.3.5 `holdout_lineage_report.json` pinnt Diagnose-Holdout, verbrauchte Seeds, reservierte Freeze-Seeds und `no-post-holdout-optimization`-Pflicht fuer spaetere BT94A-Freeze-Arbeit.
-- [ ] 93M.3.6 `comparison_policy_decision.json` schreibt die verbindliche Vergleichspolitik und blockiert `BT93P`/`BT94A`, wenn weder Same-Matrix-DQN noch User-Ersatzpolitik vorliegt.
+- [x] 93M.3.1 `precomparison_refresh_report.json` aus BT93L/BT93M-Artefakten neu schreiben. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_comparator_no_start_refresh.py --write-report` -> `data/training/ppo/bt93m/precomparison_refresh_report.json`, `resultClass=precomparison-refresh-dqn-anchor-blocked`)
+- [x] 93M.3.2 `evidence_quality_matrix.json` trennt echte PPO-/DQN-/Scripted-/Noop-Evidence von Kontext-, `tmp`- und Quarantaene-Spuren. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_comparator_no_start_refresh.py --write-report` -> `data/training/ppo/bt93m/evidence_quality_matrix.json`, `resultClass=evidence-quality-red-diagnose-only`, `summary.bt94a-blocker=4`)
+- [x] 93M.3.3 `handover_package.json` klassifiziert BT93M ohne Candidate-Sprache. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_comparator_no_start_refresh.py --write-report` -> `data/training/ppo/bt93m/handover_package.json`, `resultClass=gate-fresh-dqn-anchor-blocked`)
+- [x] 93M.3.4 `data/training/ppo/bt94a/no_start_gate.json` nur dann oeffnen, wenn alle Gate-Inputs wirklich gruen sind; ansonsten bleibt No-Start frisch dokumentiert. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt94a_gate_check.py --write-report` -> `data/training/ppo/bt94a/no_start_gate.json`, `currentHandoverSource.blockId=BT93M`, `claimable=false`)
+- [x] 93M.3.5 `holdout_lineage_report.json` pinnt Diagnose-Holdout, verbrauchte Seeds, reservierte Freeze-Seeds und `no-post-holdout-optimization`-Pflicht fuer spaetere BT94A-Freeze-Arbeit. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_comparator_no_start_refresh.py --write-report` -> `data/training/ppo/bt93m/holdout_lineage_report.json`, `resultClass=holdout-lineage-pinned-freeze-reserved`, `reservedFreezeSeeds=[960,961]`)
+- [x] 93M.3.6 `comparison_policy_decision.json` schreibt die verbindliche Vergleichspolitik und blockiert `BT93P`/`BT94A`, wenn weder Same-Matrix-DQN noch User-Ersatzpolitik vorliegt. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_comparator_no_start_refresh.py --write-report` -> `data/training/ppo/bt93m/comparison_policy_decision.json`, `comparisonPolicyDecision=dqn-anchor-blocked`, `nonBlockingForPositiveReentry=false`)
 
 Pflicht-Evidence:
 
@@ -3806,7 +3806,7 @@ Rollout-Intake-Pflichtpaket:
 | 17 | `BT93J` als roten Diagnoseabschluss schliessen. | `93J.5c != green-for-93J.6`; `post_longrun_decision_report.json` meldet `phase93J6Allowed=false`. | `BT93J.99=diagnose-loop-required`; kein Pilot, kein Holdout, kein BT94A-Refresh gruen. |
 | 18 | `BT93K-Survival-First-Objective-Reset` abgeschlossen. | `BT93J.99=diagnose-loop-required`; neuer User-Intake 2026-04-27; BT94A bleibt rot; 3M/4-Env-Zusatzspur ist quarantiniert. | `BT93K.99=diagnose-loop-required`; `data/training/ppo/bt93k/handover_package.json` meldet `bt94aHandover.ready=false`; `data/training/ppo/bt94a/no_start_gate.json` bleibt `claimable=false`. |
 | 19 | `BT93L-Objective-Reachability` abgeschlossen. | `93L.99=diagnose-loop-required`; BT94A bleibt geschlossen, Follow-up `BT93M` braucht manual intake. | Abschluss als ehrliches `diagnose-loop-required`; kein Freeze, Candidate, Holdout, Promote oder Rollout-Signal. |
-| 20 | `BT93M Gate-Wahrheit, Holdout-Lineage und DQN-Same-Matrix-Anker` claimen: Start mit `93M.1`, kein PPO-Longrun. | `BT93L.99=diagnose-loop-required`; User-Intake 2026-04-29 ist aufgenommen; offen sind `deathBefore60Count=1`, `extension50kAllowed=false`, fehlender DQN-Same-Matrix-Anker, unklare Holdout-Lineage und roter BT94A-No-Start. | Frische Gate-Quelle, Diagnose-/Freeze-Holdout-Trennung, DQN-Same-Matrix-Anker oder Ergebnis `dqn-anchor-blocked`; kein BT94A-Claim. |
+| 20 | `BT93M` Abschluss-Gate `93M.99` claimen; kein PPO-Longrun. | `93M.1` bis `93M.3` sind abgeschlossen; `comparison_policy_decision.json` meldet `dqn-anchor-blocked`; BT94A-No-Start ist frisch rot. | Ergebnis `gate-fresh-dqn-anchor-blocked` oder ehrlicher Stop; kein BT94A-Claim. |
 | 21 | Nur nach `BT93M.99`: `BT93N DeathBefore60-Stability, MaxStep-Plateau und Terminal-Root-Cause`. | Gate-Wahrheit ist frisch; DQN-Anker liegt vor oder `dqn-anchor-blocked` ist als User-Entscheid offen; Freeze-Holdout bleibt unberuehrt. | DeathBefore60-Ursache, MaxStep-Plateau-Klassifikation, Stabilitaetsfix und 10k->50k->100k-Leiter mit Stop-Gates; kein Candidate. |
 | 22 | Nur nach gruenem `BT93N.99`: `BT93O Action-/Objective-Quality, Reward-Ordering und Anti-Plateau`. | `death-before60-still-blocking` und `maxstep-plateau-still-blocking` sind nicht aktiv; Safety-/Runtime-Raten sind gruen. | Action-/Objective-Qualitaet unter Szenario-Druck, Noop-/Random-/Semantic-Cycle-/Scripted-Reward-Ordering, MaxStep-Ausschluss und Anti-Collapse-Metriken. |
 | 23 | Nur nach gruenem `BT93O.99`: `BT93P PPO Trainingsleiter und BT94A-Reentry-Gate`. | Action-/Objective-/Reward-Ordering-/Anti-Plateau-Gates sind gruen; Holdout bleibt reserviert; Statistikvertrag ist vor dem Lauf fixiert. | 200k->500k->1M Evidence-Leiter mit Baseline-Vergleich gegen Noop, Random, Semantic-Cycle, Scripted und DQN-Anker-Status; Ergebnis `BT94A-ready` oder ehrlicher Folgeblocker. |

@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 295,
+          "concreteCount": 301,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 433,
+          "concreteCount": 439,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 291,
+          "concreteCount": 297,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 290,
+          "concreteCount": 296,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 932,
+          "concreteCount": 938,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 940,
+          "concreteCount": 946,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1485,7 +1485,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93M.3",
+        "currentPhase": "93M.99",
         "scopeDeclarations": [
           "data/bot_validation_report.json",
           "data/performance_ki_baseline_report.json",
@@ -1506,13 +1506,14 @@
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
           "package.json",
+          "python/scripts/bt93m_comparator_no_start_refresh.py",
           "python/scripts/bt93m_dqn_same_matrix_anchor.py",
           "python/scripts/bt93m_start_truth.py",
           "python/scripts/bt94a_gate_check.py"
         ],
         "scopeResolution": {
-          "concreteCount": 17,
-          "plannedCount": 5
+          "concreteCount": 23,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -4510,7 +4511,7 @@
       "id": "BT93M.3",
       "type": "phase",
       "title": "Comparator- und No-Start-Refresh",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.3"
@@ -12145,8 +12146,8 @@
     {
       "id": "BT93M.3.1",
       "type": "subphase",
-      "title": "`precomparison_refresh_report.json` aus BT93L/BT93M-Artefakten neu schreiben.",
-      "status": "open",
+      "title": "`precomparison_refresh_report.json` aus BT93L/BT93M-Artefakten neu schreiben. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_comparator_no_start_refresh.py --write-report` -> `data/training/ppo/bt93m/precomparison_refresh_report.json`, `resultClass=precomparison-refresh-dqn-anchor-blocked`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.3",
@@ -12156,8 +12157,8 @@
     {
       "id": "BT93M.3.2",
       "type": "subphase",
-      "title": "`evidence_quality_matrix.json` trennt echte PPO-/DQN-/Scripted-/Noop-Evidence von Kontext-, `tmp`- und Quarantaene-Spuren.",
-      "status": "open",
+      "title": "`evidence_quality_matrix.json` trennt echte PPO-/DQN-/Scripted-/Noop-Evidence von Kontext-, `tmp`- und Quarantaene-Spuren. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_comparator_no_start_refresh.py --write-report` -> `data/training/ppo/bt93m/evidence_quality_matrix.json`, `resultClass=evidence-quality-red-diagnose-only`, `summary.bt94a-blocker=4`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.3",
@@ -12167,8 +12168,8 @@
     {
       "id": "BT93M.3.3",
       "type": "subphase",
-      "title": "`handover_package.json` klassifiziert BT93M ohne Candidate-Sprache.",
-      "status": "open",
+      "title": "`handover_package.json` klassifiziert BT93M ohne Candidate-Sprache. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_comparator_no_start_refresh.py --write-report` -> `data/training/ppo/bt93m/handover_package.json`, `resultClass=gate-fresh-dqn-anchor-blocked`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.3",
@@ -12178,8 +12179,8 @@
     {
       "id": "BT93M.3.4",
       "type": "subphase",
-      "title": "`data/training/ppo/bt94a/no_start_gate.json` nur dann oeffnen, wenn alle Gate-Inputs wirklich gruen sind; ansonsten bleibt No-Start frisch dokumentiert.",
-      "status": "open",
+      "title": "`data/training/ppo/bt94a/no_start_gate.json` nur dann oeffnen, wenn alle Gate-Inputs wirklich gruen sind; ansonsten bleibt No-Start frisch dokumentiert. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt94a_gate_check.py --write-report` -> `data/training/ppo/bt94a/no_start_gate.json`, `currentHandoverSource.blockId=BT93M`, `claimable=false`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.3",
@@ -12189,8 +12190,8 @@
     {
       "id": "BT93M.3.5",
       "type": "subphase",
-      "title": "`holdout_lineage_report.json` pinnt Diagnose-Holdout, verbrauchte Seeds, reservierte Freeze-Seeds und `no-post-holdout-optimization`-Pflicht fuer spaetere BT94A-Freeze-Arbeit.",
-      "status": "open",
+      "title": "`holdout_lineage_report.json` pinnt Diagnose-Holdout, verbrauchte Seeds, reservierte Freeze-Seeds und `no-post-holdout-optimization`-Pflicht fuer spaetere BT94A-Freeze-Arbeit. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_comparator_no_start_refresh.py --write-report` -> `data/training/ppo/bt93m/holdout_lineage_report.json`, `resultClass=holdout-lineage-pinned-freeze-reserved`, `reservedFreezeSeeds=[960,961]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.3",
@@ -12200,8 +12201,8 @@
     {
       "id": "BT93M.3.6",
       "type": "subphase",
-      "title": "`comparison_policy_decision.json` schreibt die verbindliche Vergleichspolitik und blockiert `BT93P`/`BT94A`, wenn weder Same-Matrix-DQN noch User-Ersatzpolitik vorliegt.",
-      "status": "open",
+      "title": "`comparison_policy_decision.json` schreibt die verbindliche Vergleichspolitik und blockiert `BT93P`/`BT94A`, wenn weder Same-Matrix-DQN noch User-Ersatzpolitik vorliegt. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_comparator_no_start_refresh.py --write-report` -> `data/training/ppo/bt93m/comparison_policy_decision.json`, `comparisonPolicyDecision=dqn-anchor-blocked`, `nonBlockingForPositiveReentry=false`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.3",
@@ -26009,9 +26010,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93M"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -26066,9 +26073,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93M"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -26123,9 +26136,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93M"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -26138,9 +26157,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93M"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -26153,9 +26178,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93M"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -33200,6 +33231,27 @@
           "BT93D",
           "BT93E",
           "BT93L"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93m_comparator_no_start_refresh.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93M"
         ],
         "exists": true
       }
@@ -69424,6 +69476,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
       "type": "scope",
       "hint": null,
@@ -69442,6 +69503,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93m/evidence_quality_matrix.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -69452,6 +69522,33 @@
     {
       "from": "BT90",
       "to": "data/training/ppo/bt93m/gate_source_freshness_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93m/handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93m/holdout_lineage_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93m/precomparison_refresh_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -70523,6 +70620,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93m_comparator_no_start_refresh.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -72276,6 +72382,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
       "type": "scope",
       "hint": null,
@@ -72294,6 +72409,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93m/evidence_quality_matrix.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -72304,6 +72428,33 @@
     {
       "from": "BT91",
       "to": "data/training/ppo/bt93m/gate_source_freshness_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93m/handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93m/holdout_lineage_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93m/precomparison_refresh_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -73357,6 +73508,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93m_comparator_no_start_refresh.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -76308,6 +76468,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
       "type": "scope",
       "hint": null,
@@ -76326,6 +76495,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93m/evidence_quality_matrix.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -76336,6 +76514,33 @@
     {
       "from": "BT92",
       "to": "data/training/ppo/bt93m/gate_source_freshness_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93m/handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93m/holdout_lineage_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93m/precomparison_refresh_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -77398,6 +77603,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93m_comparator_no_start_refresh.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79450,6 +79664,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
       "type": "scope",
       "hint": null,
@@ -79468,6 +79691,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93m/evidence_quality_matrix.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -79478,6 +79710,33 @@
     {
       "from": "BT93B",
       "to": "data/training/ppo/bt93m/gate_source_freshness_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93m/handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93m/holdout_lineage_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93m/precomparison_refresh_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -80540,6 +80799,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93m_comparator_no_start_refresh.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88996,6 +89264,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
       "type": "scope",
       "hint": null,
@@ -89014,6 +89291,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93m/evidence_quality_matrix.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -89024,6 +89310,33 @@
     {
       "from": "BT93D",
       "to": "data/training/ppo/bt93m/gate_source_freshness_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93m/handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93m/holdout_lineage_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93m/precomparison_refresh_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -90086,6 +90399,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93m_comparator_no_start_refresh.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97717,6 +98039,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
       "type": "scope",
       "hint": null,
@@ -97735,6 +98066,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93m/evidence_quality_matrix.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -97745,6 +98085,33 @@
     {
       "from": "BT93E",
       "to": "data/training/ppo/bt93m/gate_source_freshness_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93m/handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93m/holdout_lineage_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93m/precomparison_refresh_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98816,6 +99183,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93m_comparator_no_start_refresh.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -116124,6 +116500,15 @@
     {
       "from": "BT93M",
       "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93M",
+      "to": "python/scripts/bt93m_comparator_no_start_refresh.py",
       "type": "scope",
       "hint": null,
       "attributes": {
