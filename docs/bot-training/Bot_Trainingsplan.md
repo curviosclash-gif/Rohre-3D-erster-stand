@@ -1,6 +1,6 @@
 # Bot Trainingsplan (Aktiver Master)
 
-Stand: 2026-04-29
+Stand: 2026-04-30
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
@@ -46,7 +46,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Training
 - `BT94A` bleibt geschlossen: der letzte Gate-Stand schreibt weiter `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression` und offene Blocker; Reentry laeuft jetzt nur ueber `BT93P.4=BT94A-ready`.
 - Der 1000000-Step-Longrun aus `BT93J.5c` ist Diagnose-Evidence mit Steps-Fortschritt, aber rotem Semantikurteil: `naturalTerminalCount=0`, `playerDeadOnly=true`, Progress-/Objective-Rewards `0`.
 - Die User-owned 3M/4-Env-Zusatzspur vom 2026-04-27 ist quarantiniert: Snapshots sind nur Diagnose, kein Closure-, Candidate-, Freeze-, Baseline-, Holdout-, Promote-, PPO-Validate- oder BT94A-Signal.
-- Der Intake `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` ist als Reparaturkette `BT93M` bis `BT93P` vor `BT94A` aufgenommen; `BT93M.99` ist `gate-fresh-dqn-anchor-blocked`, `BT93N.3` ist `death-before60-still-blocking`, `93N.4`/`BT93O`/`BT94A` bleiben blockiert.
+- Der Intake `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` ist als Reparaturkette `BT93M` bis `BT93P` vor `BT94A` aufgenommen; `BT93M.99` ist `gate-fresh-dqn-anchor-blocked`, `BT93N.99` endet `diagnose-loop-required` mit `gateClass=death-before60-still-blocking`; `BT93O`/`BT93P`/`BT94A` bleiben blockiert.
 - Die BT93L-Baseline-Matrix zeigt ein hartes Reward-Ordnungsrisiko: `random` und `semantic-cycle` erreichen in Kurzfenstern teilweise gleichwertige oder bessere Progress-/Objective-Signale als `scripted-reachability`; bis `BT93O` das mit laengeren Szenariofenstern widerlegt oder repariert, bleibt das ein aktiver Blocker fuer `BT93P` und `BT94A`.
 - Kein BT94A, kein Candidate, kein Freeze, kein Holdout, kein Promote, kein Rollout und kein weiterer Blind-Longrun vor frischem `BT93P.4=BT94A-ready` plus gruenem `bt94a_gate_check.py`.
 
@@ -272,7 +272,7 @@ Mikro-Claim-Regel:
 | BT93K | BT93J.99 (`diagnose-loop-required`) + `data/training/ppo/bt93j/post_longrun_decision_report.json` + User-Intake 2026-04-27 | hard | ja | Survival-First Objective Reset: Signalwahrheit, Supervisor, Mode-/Map-Reality und 2/4/6-Env-Smokes vor jedem neuen Longrun |
 | BT93L | BT93K.99 (`diagnose-loop-required`) + `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` + User-Replan 2026-04-28 | hard | ja | Objective-Reachability, Taskvertrag, Reward-Balance, Action-Effekt-Evidence und Baseline-Matrix vor jedem weiteren PPO-Longrun |
 | BT93M | BT93L.99 (`diagnose-loop-required`) + `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` | hard | ja | Gate-Wahrheit, frische Handover-Quelle und DQN-Same-Matrix-Anker; kein Kandidat, Freeze oder PPO-Longrun |
-| BT93N | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | hard | nein | DeathBefore60-Root-Cause, Stabilitaetsfix und 10k->50k->100k-Leiter nur nach Zwischen-Gates |
+| BT93N | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | hard | ja | BT93M lieferte `dqn-anchor-blocked` als harten Loader-/Vergleichspolitikblocker; BT93N ist diagnose-only abgeschlossen |
 | BT93O | BT93N.99 ohne `death-before60-still-blocking` | hard | nein | Action-/Objective-Qualitaet und Anti-Plateau; kein Candidate-Signal |
 | BT93P | BT93O.99 + gruenes Action-/Objective-/Anti-Plateau-Gate | hard | nein | 200k->500k->1M Trainingsleiter mit Statistik und frischem BT94A-Reentry-Gate |
 | BT94A | BT93P.4 (ready signal) + `bt94a_gate_check.py` (`claimable=true`) | hard | nein | BT94A bleibt vor `94A.1` geschlossen, bis `BT93P` und das Gate `claimable=true` schreiben; Kandidatenlaeufe/Freeze bleiben vorher verboten |
@@ -329,7 +329,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93K | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; kein BT94A-Claim |
 | Bot-Codex | BT93L | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; BT94A bleibt geschlossen |
 | Bot-Codex | BT93M | 2026-04-29 | frei | abgeschlossen 2026-04-29 als `gate-fresh-dqn-anchor-blocked`; BT93N nur diagnose-only/Loader/User-Entscheid |
-| Bot-Codex | BT93N | 2026-04-29 | claimed | 93N.4 abgeschlossen: `death-before60-still-blocking`; 93N.99 offen |
+| Bot-Codex | BT93N | 2026-04-29 | frei | abgeschlossen 2026-04-30 als `diagnose-loop-required`; BT93O bleibt durch `death-before60-still-blocking` blockiert |
 | - | BT93O | - | frei | wartet auf BT93N.99 |
 | - | BT93P | - | frei | wartet auf BT93O.99 |
 | - | BT94A | - | frei | wartet auf `BT93P.4=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
@@ -842,7 +842,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93K | Survival-First Objective Reset | completed | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
 | BT93L | Objective-Reachability und Survival-Task-Definition | completed | P1 | BT93K.99 (`diagnose-loop-required`) + Diagnosebericht 2026-04-28 | 93L.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` |
 | BT93M | Gate-Wahrheit und DQN-Same-Matrix-Anker | completed | P1 | BT93L.99 (`diagnose-loop-required`) + User-Intake 2026-04-29 | 93M.99 abgeschlossen: `gate-fresh-dqn-anchor-blocked` | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
-| BT93N | DeathBefore60-Stability und Terminal-Root-Cause | active | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.99 offen | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
+| BT93N | DeathBefore60-Stability und Terminal-Root-Cause | completed | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.99 abgeschlossen; `diagnose-loop-required`, BT93O/BT94A bleiben blockiert | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93O | Action-/Objective-Quality und Anti-Plateau | planned | P2 | BT93N.99 ohne `death-before60-still-blocking` | 93O.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93P | PPO Trainingsleiter und BT94A-Reentry-Gate | planned | P2 | BT93O.99 + gruene Action-/Objective-/Anti-Plateau-Gates | 93P.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93P.4 (`BT94A-ready`) + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
@@ -3106,7 +3106,7 @@ Pflicht-Evidence:
 
 Quelle: `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md`
 
-<!-- LOCK: Bot-Codex seit 2026-04-29, Phase 93N.99 -->
+<!-- LOCK: frei; abgeschlossen 2026-04-30 als 93N.99 diagnose-loop-required -->
 
 Scope:
 
@@ -3127,20 +3127,20 @@ Primaerer Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 `death_before60_trace_report.json` klassifiziert fruehe Tode mit letzten Beobachtungen, Actions, Rewards, Safety, Threat, Position/Heading, Progress/Objective und TerminalReason.
-- [ ] DoD.2 Dominante Ursache ist belegt oder der Messpfad endet ehrlich `measurement-invalid`; kein Fix ohne Ursache.
-- [ ] DoD.3 Stabilitaetsfix ist einer erlaubten Klasse zugeordnet: Reward, Curriculum, Action, Terminal oder Runner.
-- [ ] DoD.4 10k Micro-PPO wiederholt die BT93L-Matrix; 50k ist nur nach gruenem 10k erlaubt, 100k nur nach gruenem 50k.
-- [ ] DoD.5 Train und Eval zeigen keine Safety-/Runtime-Regression: `runtimeErrorCount=0`, `invalidActionRate=0`, `postDecodeClampRate=0`, `sanitizerRate=0`.
-- [ ] DoD.6 Progress-/Objective-Signal faellt nicht wieder auf null; MaxStep-only oder Player-Dead-only bleibt rot.
-- [ ] DoD.7 Ergebnis ist `stability-ladder-green`, `reward-redesign-required`, `action-space-required`, `terminal-semantics-required` oder `diagnose-loop-required`.
-- [ ] DoD.8 `maxstep_plateau_trace_report.json` klassifiziert MaxStep-only Episoden getrennt von fruehen Toden; lange Episoden ohne Ziel-/Threat-/Progress-Semantik koennen kein gruenes Stability-Gate erzeugen.
-- [ ] DoD.9 50k/100k wird nur erlaubt, wenn DeathBefore60 und MaxStep-Plateau gemeinsam besser werden oder ein task-spezifischer Survival-Vertrag begruendet, warum MaxStep neutral bleibt.
-- [ ] DoD.10 DeathBefore60-Reparatur braucht Vorher/Nachher-Vergleich auf derselben Matrix; ein einzelner gruener 10k-Lauf ohne Trace-Ursache und ohne Plateau-Entscheidung bleibt Diagnose.
-- [ ] DoD.11 Wenn weniger als 60 abgeschlossene Diagnose-Episoden oder weniger als 5 fruehe Todes-/Plateau-Samples vorliegen, muss der Block `measurement-invalid` oder `insufficient-samples` begruenden statt einen Fix freizugeben.
-- [ ] DoD.12 Genau eine Fix-Klasse pro Reparaturclaim: Reward, Curriculum, Action, Terminal oder Runner. Gemischte Fixes sind nur mit eigenem Folgeblock erlaubt.
-- [ ] DoD.13 Ursache, Samplezahl, Unsicherheit und Confidence-Klasse werden vor dem Fix geschrieben; schwache oder widerspruechliche Ursachen enden `measurement-invalid`, nicht "Fix trotzdem".
-- [ ] DoD.14 Pre-/Post-Fix-Deltas muessen dieselbe Matrix, dieselben Seeds, denselben Reward-Vertrag und dieselben Terminal-Regeln verwenden; sonst ist der Vergleich ungueltig.
+- [x] DoD.1 `death_before60_trace_report.json` klassifiziert fruehe Tode mit letzten Beobachtungen, Actions, Rewards, Safety, Threat, Position/Heading, Progress/Objective und TerminalReason. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `dodCoverage.DoD.1=true`)
+- [x] DoD.2 Dominante Ursache ist belegt oder der Messpfad endet ehrlich `measurement-invalid`; kein Fix ohne Ursache. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `rootCause=wall/trail`, `dodCoverage.DoD.2=true`)
+- [x] DoD.3 Stabilitaetsfix ist einer erlaubten Klasse zugeordnet: Reward, Curriculum, Action, Terminal oder Runner. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `selectedFixClass=Reward`, `dodCoverage.DoD.3=true`)
+- [x] DoD.4 10k Micro-PPO wiederholt die BT93L-Matrix; 50k ist nur nach gruenem 10k erlaubt, 100k nur nach gruenem 50k. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `dodCoverage.DoD.4=true`, `gateClass=death-before60-still-blocking`)
+- [x] DoD.5 Train und Eval zeigen keine Safety-/Runtime-Regression: `runtimeErrorCount=0`, `invalidActionRate=0`, `postDecodeClampRate=0`, `sanitizerRate=0`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `safetyRuntimeGreen=true`, `dodCoverage.DoD.5=true`)
+- [x] DoD.6 Progress-/Objective-Signal faellt nicht wieder auf null; MaxStep-only oder Player-Dead-only bleibt rot. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `dodCoverage.DoD.6=true`, `terminalDisclosure.disclosedAsBlocking=true`)
+- [x] DoD.7 Ergebnis ist `stability-ladder-green`, `reward-redesign-required`, `action-space-required`, `terminal-semantics-required` oder `diagnose-loop-required`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `resultClass=diagnose-loop-required`, `gateClass=death-before60-still-blocking`)
+- [x] DoD.8 `maxstep_plateau_trace_report.json` klassifiziert MaxStep-only Episoden getrennt von fruehen Toden; lange Episoden ohne Ziel-/Threat-/Progress-Semantik koennen kein gruenes Stability-Gate erzeugen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `dodCoverage.DoD.8=true`)
+- [x] DoD.9 50k/100k wird nur erlaubt, wenn DeathBefore60 und MaxStep-Plateau gemeinsam besser werden oder ein task-spezifischer Survival-Vertrag begruendet, warum MaxStep neutral bleibt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `dodCoverage.DoD.9=true`, `summary.blocksNext=BT93O,BT93P,BT94A`)
+- [x] DoD.10 DeathBefore60-Reparatur braucht Vorher/Nachher-Vergleich auf derselben Matrix; ein einzelner gruener 10k-Lauf ohne Trace-Ursache und ohne Plateau-Entscheidung bleibt Diagnose. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `dodCoverage.DoD.10=true`)
+- [x] DoD.11 Wenn weniger als 60 abgeschlossene Diagnose-Episoden oder weniger als 5 fruehe Todes-/Plateau-Samples vorliegen, muss der Block `measurement-invalid` oder `insufficient-samples` begruenden statt einen Fix freizugeben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `sampleQuality.diagnosticEpisodes=60`, `sampleQuality.earlyDeathSamples=6`)
+- [x] DoD.12 Genau eine Fix-Klasse pro Reparaturclaim: Reward, Curriculum, Action, Terminal oder Runner. Gemischte Fixes sind nur mit eigenem Folgeblock erlaubt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `selectedFixClass=Reward`, `dodCoverage.DoD.12=true`)
+- [x] DoD.13 Ursache, Samplezahl, Unsicherheit und Confidence-Klasse werden vor dem Fix geschrieben; schwache oder widerspruechliche Ursachen enden `measurement-invalid`, nicht "Fix trotzdem". (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `rootCause=wall/trail`, `dodCoverage.DoD.13=true`)
+- [x] DoD.14 Pre-/Post-Fix-Deltas muessen dieselbe Matrix, dieselben Seeds, denselben Reward-Vertrag und dieselben Terminal-Regeln verwenden; sonst ist der Vergleich ungueltig. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `dodCoverage.DoD.14=true`)
 
 ### 93N.1 Death Trace Instrumentation
 
@@ -3218,11 +3218,11 @@ Pflicht-Evidence:
 
 ### 93N.99 Abschluss-Gate
 
-- [ ] 93N.99.1 Alle Phasen 93N.1 bis 93N.4 sind mit versionierter Evidence dokumentiert.
-- [ ] 93N.99.2 Ergebnis nennt die Ursache und die Gate-Klasse; `death-before60-still-blocking` oeffnet weder BT93O noch BT94A.
-- [ ] 93N.99.3 Keine Safety-/Runtime-/Terminal-Regression wurde verschwiegen.
-- [ ] 93N.99.4 Kein Candidate-, Freeze-, Holdout-, Promote-, Rollout- oder BT94A-Signal wurde erzeugt.
-- [ ] 93N.99.5 BT93O startet nur, wenn DeathBefore60, Plateau-Entscheidung, Progress-/Objective-Signal und Sampleguete gemeinsam non-blocking sind; sonst bleibt der naechste Schritt ein enger Root-Cause-Folgeblock.
+- [x] 93N.99.1 Alle Phasen 93N.1 bis 93N.4 sind mit versionierter Evidence dokumentiert. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `phaseCoverage.93N.99.1=true`)
+- [x] 93N.99.2 Ergebnis nennt die Ursache und die Gate-Klasse; `death-before60-still-blocking` oeffnet weder BT93O noch BT94A. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `rootCause=wall/trail`, `gateClass=death-before60-still-blocking`, `bt94aClosed=true`)
+- [x] 93N.99.3 Keine Safety-/Runtime-/Terminal-Regression wurde verschwiegen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `noHiddenRegression=true`, `safetyRuntimeGreen=true`)
+- [x] 93N.99.4 Kein Candidate-, Freeze-, Holdout-, Promote-, Rollout- oder BT94A-Signal wurde erzeugt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `guardrails.candidateRun=false`, `guardrails.bt94aClaimAllowed=false`)
+- [x] 93N.99.5 BT93O startet nur, wenn DeathBefore60, Plateau-Entscheidung, Progress-/Objective-Signal und Sampleguete gemeinsam non-blocking sind; sonst bleibt der naechste Schritt ein enger Root-Cause-Folgeblock. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_closure_gate.py --write-report` -> `data/training/ppo/bt93n/closure_gate_report.json`, `bt93oStartBlocked=true`, `summary.blocksNext=BT93O,BT93P,BT94A`)
 
 ### Risiko-Register BT93N
 

@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2402,
-    "rawCoveredFileCount": 1923,
+    "trackedFileCount": 2405,
+    "rawCoveredFileCount": 1926,
     "rawCoveragePercent": 80.1,
-    "adjustedTrackedFileCount": 1499,
-    "adjustedCoveredFileCount": 1264,
-    "adjustedCoveragePercent": 84.3,
+    "adjustedTrackedFileCount": 1502,
+    "adjustedCoveredFileCount": 1267,
+    "adjustedCoveragePercent": 84.4,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
     "classifications": [
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 231,
-        "coveredCount": 210
+        "count": 233,
+        "coveredCount": 212
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 875,
-        "coveredCount": 859
+        "count": 876,
+        "coveredCount": 860
       },
       {
         "classification": "product-docs",
@@ -7560,6 +7560,29 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93n/closure_gate_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93n/death_before60_trace_report.json",
       "tracked": true,
       "coveredInCore": true,
@@ -7699,6 +7722,29 @@
     },
     {
       "path": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93n/runs/bt93n-stability-ladder-no-run/stage_decision.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -18101,6 +18147,29 @@
         "BT93D",
         "BT93E",
         "BT93M"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93n_closure_gate.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
       ],
       "surfaces": [],
       "classification": "product-code",
