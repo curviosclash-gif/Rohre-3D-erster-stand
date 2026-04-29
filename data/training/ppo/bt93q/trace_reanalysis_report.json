@@ -1,0 +1,1404 @@
+{
+  "blockId": "BT93Q",
+  "blockedActions": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k extension"
+  ],
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93q_trace_reanalysis.py --write-report"
+  },
+  "coveredSignals": [
+    "Early-Death vs non-event-control",
+    "Action-Tails",
+    "WallDistance",
+    "LocalOpenness",
+    "CollisionRisk",
+    "DeadEndRisk",
+    "Reward-Tails",
+    "TerminalReason"
+  ],
+  "diagnosticDecision": {
+    "blocksNext": [
+      "Action fix before 93Q.4",
+      "Reward fix before danger-ordering proof",
+      "Safety-mask fix before action-effect proof",
+      "BT93O claim",
+      "BT93P claim",
+      "BT94A claim",
+      "candidate run",
+      "freeze candidate",
+      "holdout consumption",
+      "promote",
+      "rollout",
+      "PPO-Validate or BT95 handoff signal",
+      "50k/100k/200k extension"
+    ],
+    "fixAllowedFrom93Q2Alone": false,
+    "opensNext": [
+      "93Q.3",
+      "93Q.4"
+    ],
+    "resultClass": "trace-reanalysis-complete-with-telemetry-gap",
+    "traceReanalysisComplete": true
+  },
+  "earlyDeathVsControl": {
+    "controlFinalCollisionRisk": {
+      "count": 12,
+      "max": 0.95,
+      "mean": 0.95,
+      "median": 0.95,
+      "min": 0.95,
+      "p10": 0.95,
+      "p90": 0.95
+    },
+    "controlFinalWallDistanceFront": {
+      "count": 12,
+      "max": 0.05,
+      "mean": 0.05,
+      "median": 0.05,
+      "min": 0.05,
+      "p10": 0.05,
+      "p90": 0.05
+    },
+    "controlPolicyCounts": {
+      "scripted-reachability-positive-control": 12
+    },
+    "controlStepStats": {
+      "count": 12,
+      "max": 107.0,
+      "mean": 82.083333,
+      "median": 82.5,
+      "min": 61.0,
+      "p10": 61.0,
+      "p90": 106.0
+    },
+    "controlTerminalReasons": {
+      "player-dead": 12
+    },
+    "earlyDeathFinalCollisionRisk": {
+      "count": 6,
+      "max": 1.0,
+      "mean": 0.812262,
+      "median": 0.95,
+      "min": 0.510266,
+      "p10": 0.510266,
+      "p90": 0.95
+    },
+    "earlyDeathFinalWallDistanceFront": {
+      "count": 6,
+      "max": 0.642857,
+      "mean": 0.23631,
+      "median": 0.05,
+      "min": 0.0,
+      "p10": 0.0,
+      "p90": 0.625
+    },
+    "earlyDeathPolicyCounts": {
+      "random-control": 4,
+      "semantic-cycle-control": 2
+    },
+    "earlyDeathStepStats": {
+      "count": 6,
+      "max": 58.0,
+      "mean": 47.0,
+      "median": 45.5,
+      "min": 34.0,
+      "p10": 34.0,
+      "p90": 58.0
+    },
+    "earlyDeathTerminalReasons": {
+      "player-dead": 6
+    },
+    "interpretation": "Early deaths and later non-event controls both end player-dead; late controls are retained as positive controls, not discarded."
+  },
+  "generatedAt": "2026-04-29T23:31:14Z",
+  "generatedBy": "python/scripts/bt93q_trace_reanalysis.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "d8f4b4a8dd91a61ccfe6da01d506413a17040001"
+  },
+  "groups": {
+    "all": {
+      "deathClassCounts": {
+        "null": 12,
+        "unclassified": 2,
+        "wall/trail": 4
+      },
+      "episodeRewardTotal": {
+        "count": 18,
+        "max": 17.197349,
+        "mean": 2.507603,
+        "median": -0.779653,
+        "min": -6.96109,
+        "p10": -4.984779,
+        "p90": 11.985622
+      },
+      "finalActionCounts": {
+        "boost": 1,
+        "noop": 1,
+        "pitch-down": 3,
+        "pitch-up": 3,
+        "roll-left": 1,
+        "roll-right": 1,
+        "shoot-mg": 2,
+        "yaw-left": 3,
+        "yaw-right": 3
+      },
+      "localOpenness": {
+        "delta": {
+          "count": 216,
+          "max": 0.035,
+          "mean": -0.004762,
+          "median": 0.0,
+          "min": -0.05,
+          "p10": -0.014286,
+          "p90": 0.0
+        },
+        "ratio": {
+          "count": 216,
+          "max": 0.602857,
+          "mean": 0.402249,
+          "median": 0.395,
+          "min": 0.22,
+          "p10": 0.315,
+          "p90": 0.53
+        },
+        "ratioFinal": {
+          "count": 18,
+          "max": 0.552857,
+          "mean": 0.376865,
+          "median": 0.37,
+          "min": 0.22,
+          "p10": 0.277143,
+          "p90": 0.445
+        }
+      },
+      "longestRepeatedTailAction": {
+        "length": 4,
+        "semanticAction": "yaw-left"
+      },
+      "name": "all",
+      "policyCounts": {
+        "random-control": 4,
+        "scripted-reachability-positive-control": 12,
+        "semantic-cycle-control": 2
+      },
+      "reachabilityTail": {
+        "objectiveEventRows": 6,
+        "objectiveSignalReachableRows": 6,
+        "progressEventRows": 6,
+        "progressSignalReachableRows": 6
+      },
+      "rewardTail": {
+        "breakdownTotals": {
+          "baseStep": -3.456,
+          "checkpointReached": 5.1,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": -81.0,
+          "lowHealthThreat": -3.167067,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 2.376,
+          "survivalPressureBonus": 0.904671,
+          "trailRisk": 0.0,
+          "wallRisk": -14.00257,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "checkpointRows": 6,
+        "cumulativeReward": {
+          "count": 216,
+          "max": 22.686124,
+          "mean": 7.009878,
+          "median": 3.646828,
+          "min": -6.96109,
+          "p10": -0.341396,
+          "p90": 18.30049
+        },
+        "lossRows": 18,
+        "negativeComponentTotals": {
+          "baseStep": -3.456,
+          "loss": -81.0,
+          "lowHealthThreat": -3.167067,
+          "wallRisk": -14.00257
+        },
+        "positiveComponentTotals": {
+          "checkpointReached": 5.1,
+          "survival": 2.376,
+          "survivalPressureBonus": 0.904671
+        },
+        "rowReward": {
+          "count": 216,
+          "max": 0.825624,
+          "mean": -0.43169,
+          "median": -0.07105,
+          "min": -4.782,
+          "p10": -0.074775,
+          "p90": -0.021688
+        },
+        "trailRiskRows": 0,
+        "wallRiskRows": 214
+      },
+      "risk": {
+        "collisionRisk": {
+          "count": 216,
+          "max": 1.0,
+          "mean": 0.844823,
+          "median": 0.9,
+          "min": 0.470607,
+          "p10": 0.514145,
+          "p90": 0.95
+        },
+        "collisionRiskFinal": {
+          "count": 18,
+          "max": 1.0,
+          "mean": 0.904087,
+          "median": 0.95,
+          "min": 0.510266,
+          "p10": 0.95,
+          "p90": 0.95
+        },
+        "deadEndRisk": {
+          "count": 216,
+          "max": 1.0,
+          "mean": 0.894775,
+          "median": 1.0,
+          "min": 0.397143,
+          "p10": 0.47,
+          "p90": 1.0
+        },
+        "deadEndRiskFinal": {
+          "count": 18,
+          "max": 1.0,
+          "mean": 0.94123,
+          "median": 1.0,
+          "min": 0.447143,
+          "p10": 1.0,
+          "p90": 1.0
+        },
+        "pressureLevel": {
+          "count": 216,
+          "max": 0.697824,
+          "mean": 0.426499,
+          "median": 0.3885,
+          "min": 0.336,
+          "p10": 0.357,
+          "p90": 0.626202
+        },
+        "threatHorizon": {
+          "count": 216,
+          "max": 1.0,
+          "mean": 0.880471,
+          "median": 0.92,
+          "min": 0.4324,
+          "p10": 0.75,
+          "p90": 0.95
+        }
+      },
+      "safety": {
+        "maxInvalidActionRate": 0.0,
+        "maxPostDecodeClampRate": 0.0,
+        "maxPreSamplingMaskRate": 1.0,
+        "maxSanitizerRate": 0.0,
+        "maxVetoRate": 0.0,
+        "vetoActiveRows": 173,
+        "vetoEventRows": 0
+      },
+      "sampleCount": 18,
+      "sampleKindCounts": {
+        "early-death-before60": 6,
+        "non-event-control": 12
+      },
+      "steps": {
+        "count": 18,
+        "max": 107.0,
+        "mean": 70.388889,
+        "median": 68.5,
+        "min": 34.0,
+        "p10": 43.0,
+        "p90": 95.0
+      },
+      "tailActionCounts": {
+        "boost": 27,
+        "noop": 5,
+        "pitch-down": 27,
+        "pitch-up": 24,
+        "roll-left": 28,
+        "roll-right": 25,
+        "shoot-mg": 25,
+        "yaw-left": 31,
+        "yaw-right": 24
+      },
+      "tailRowCount": 216,
+      "terminalReasonCounts": {
+        "player-dead": 18
+      },
+      "terminalRows": {
+        "terminalReasonCounts": {
+          "player-dead": 18
+        },
+        "terminatedRows": 18,
+        "truncatedRows": 0
+      },
+      "wallDistance": {
+        "down": {
+          "count": 216,
+          "max": 0.5,
+          "mean": 0.252778,
+          "median": 0.25,
+          "min": 0.0,
+          "p10": 0.05,
+          "p90": 0.45
+        },
+        "front": {
+          "count": 216,
+          "max": 0.875,
+          "mean": 0.180407,
+          "median": 0.1,
+          "min": 0.0,
+          "p10": 0.05,
+          "p90": 0.642857
+        },
+        "frontFinal": {
+          "count": 18,
+          "max": 0.642857,
+          "mean": 0.112103,
+          "median": 0.05,
+          "min": 0.0,
+          "p10": 0.05,
+          "p90": 0.05
+        },
+        "left": {
+          "count": 216,
+          "max": 1.0,
+          "mean": 0.763872,
+          "median": 0.875,
+          "min": 0.25,
+          "p10": 0.35,
+          "p90": 1.0
+        },
+        "right": {
+          "count": 216,
+          "max": 1.0,
+          "mean": 0.513228,
+          "median": 0.5,
+          "min": 0.0,
+          "p10": 0.05,
+          "p90": 1.0
+        },
+        "up": {
+          "count": 216,
+          "max": 0.571429,
+          "mean": 0.300959,
+          "median": 0.3,
+          "min": 0.05,
+          "p10": 0.1,
+          "p90": 0.5
+        }
+      }
+    },
+    "earlyDeathBefore60": {
+      "deathClassCounts": {
+        "unclassified": 2,
+        "wall/trail": 4
+      },
+      "episodeRewardTotal": {
+        "count": 6,
+        "max": 17.197349,
+        "mean": 6.129883,
+        "median": 8.337437,
+        "min": -4.984779,
+        "p10": -4.984779,
+        "p90": 11.985622
+      },
+      "finalActionCounts": {
+        "noop": 1,
+        "pitch-down": 2,
+        "shoot-mg": 1,
+        "yaw-left": 1,
+        "yaw-right": 1
+      },
+      "localOpenness": {
+        "delta": {
+          "count": 72,
+          "max": 0.032143,
+          "mean": -0.005734,
+          "median": 0.0,
+          "min": -0.05,
+          "p10": -0.02,
+          "p90": 0.0
+        },
+        "ratio": {
+          "count": 72,
+          "max": 0.602857,
+          "mean": 0.42878,
+          "median": 0.395,
+          "min": 0.245,
+          "p10": 0.33,
+          "p90": 0.581429
+        },
+        "ratioFinal": {
+          "count": 6,
+          "max": 0.552857,
+          "mean": 0.394881,
+          "median": 0.357143,
+          "min": 0.277143,
+          "p10": 0.277143,
+          "p90": 0.505
+        }
+      },
+      "longestRepeatedTailAction": {
+        "length": 4,
+        "semanticAction": "yaw-left"
+      },
+      "name": "earlyDeathBefore60",
+      "policyCounts": {
+        "random-control": 4,
+        "semantic-cycle-control": 2
+      },
+      "reachabilityTail": {
+        "objectiveEventRows": 2,
+        "objectiveSignalReachableRows": 2,
+        "progressEventRows": 2,
+        "progressSignalReachableRows": 2
+      },
+      "rewardTail": {
+        "breakdownTotals": {
+          "baseStep": -1.152,
+          "checkpointReached": 1.7,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": -27.0,
+          "lowHealthThreat": -0.887067,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.792,
+          "survivalPressureBonus": 0.262546,
+          "trailRisk": 0.0,
+          "wallRisk": -3.75057,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "checkpointRows": 2,
+        "cumulativeReward": {
+          "count": 72,
+          "max": 22.686124,
+          "mean": 10.470223,
+          "median": 11.081824,
+          "min": -4.984779,
+          "p10": -0.116589,
+          "p90": 22.203674
+        },
+        "lossRows": 6,
+        "negativeComponentTotals": {
+          "baseStep": -1.152,
+          "loss": -27.0,
+          "lowHealthThreat": -0.887067,
+          "wallRisk": -3.75057
+        },
+        "positiveComponentTotals": {
+          "checkpointReached": 1.7,
+          "survival": 0.792,
+          "survivalPressureBonus": 0.262546
+        },
+        "rowReward": {
+          "count": 72,
+          "max": 0.825624,
+          "mean": -0.417154,
+          "median": -0.067325,
+          "min": -4.782,
+          "p10": -0.074775,
+          "p90": -0.021594
+        },
+        "trailRiskRows": 0,
+        "wallRiskRows": 70
+      },
+      "risk": {
+        "collisionRisk": {
+          "count": 72,
+          "max": 1.0,
+          "mean": 0.754608,
+          "median": 0.85,
+          "min": 0.470607,
+          "p10": 0.491154,
+          "p90": 0.95
+        },
+        "collisionRiskFinal": {
+          "count": 6,
+          "max": 1.0,
+          "mean": 0.812262,
+          "median": 0.95,
+          "min": 0.510266,
+          "p10": 0.510266,
+          "p90": 0.95
+        },
+        "deadEndRisk": {
+          "count": 72,
+          "max": 1.0,
+          "mean": 0.753978,
+          "median": 1.0,
+          "min": 0.397143,
+          "p10": 0.418571,
+          "p90": 1.0
+        },
+        "deadEndRiskFinal": {
+          "count": 6,
+          "max": 1.0,
+          "mean": 0.82369,
+          "median": 1.0,
+          "min": 0.447143,
+          "p10": 0.447143,
+          "p90": 1.0
+        },
+        "pressureLevel": {
+          "count": 72,
+          "max": 0.697799,
+          "mean": 0.486457,
+          "median": 0.43774,
+          "min": 0.336,
+          "p10": 0.370219,
+          "p90": 0.636917
+        },
+        "threatHorizon": {
+          "count": 72,
+          "max": 1.0,
+          "mean": 0.804331,
+          "median": 0.92,
+          "min": 0.4324,
+          "p10": 0.478049,
+          "p90": 0.95
+        }
+      },
+      "safety": {
+        "maxInvalidActionRate": 0.0,
+        "maxPostDecodeClampRate": 0.0,
+        "maxPreSamplingMaskRate": 1.0,
+        "maxSanitizerRate": 0.0,
+        "maxVetoRate": 0.0,
+        "vetoActiveRows": 41,
+        "vetoEventRows": 0
+      },
+      "sampleCount": 6,
+      "sampleKindCounts": {
+        "early-death-before60": 6
+      },
+      "steps": {
+        "count": 6,
+        "max": 58.0,
+        "mean": 47.0,
+        "median": 45.5,
+        "min": 34.0,
+        "p10": 34.0,
+        "p90": 58.0
+      },
+      "tailActionCounts": {
+        "boost": 8,
+        "noop": 5,
+        "pitch-down": 10,
+        "pitch-up": 5,
+        "roll-left": 10,
+        "roll-right": 8,
+        "shoot-mg": 8,
+        "yaw-left": 12,
+        "yaw-right": 6
+      },
+      "tailRowCount": 72,
+      "terminalReasonCounts": {
+        "player-dead": 6
+      },
+      "terminalRows": {
+        "terminalReasonCounts": {
+          "player-dead": 6
+        },
+        "terminatedRows": 6,
+        "truncatedRows": 0
+      },
+      "wallDistance": {
+        "down": {
+          "count": 72,
+          "max": 0.45,
+          "mean": 0.216667,
+          "median": 0.175,
+          "min": 0.0,
+          "p10": 0.0,
+          "p90": 0.45
+        },
+        "front": {
+          "count": 72,
+          "max": 0.875,
+          "mean": 0.321081,
+          "median": 0.15,
+          "min": 0.0,
+          "p10": 0.05,
+          "p90": 0.75
+        },
+        "frontFinal": {
+          "count": 6,
+          "max": 0.642857,
+          "mean": 0.23631,
+          "median": 0.05,
+          "min": 0.0,
+          "p10": 0.0,
+          "p90": 0.625
+        },
+        "left": {
+          "count": 72,
+          "max": 1.0,
+          "mean": 0.878274,
+          "median": 1.0,
+          "min": 0.35,
+          "p10": 0.35,
+          "p90": 1.0
+        },
+        "right": {
+          "count": 72,
+          "max": 1.0,
+          "mean": 0.388889,
+          "median": 0.3,
+          "min": 0.0,
+          "p10": 0.0,
+          "p90": 1.0
+        },
+        "up": {
+          "count": 72,
+          "max": 0.571429,
+          "mean": 0.338988,
+          "median": 0.375,
+          "min": 0.1,
+          "p10": 0.1,
+          "p90": 0.571429
+        }
+      }
+    },
+    "latePlayerDeadControl": {
+      "deathClassCounts": {
+        "null": 12
+      },
+      "episodeRewardTotal": {
+        "count": 12,
+        "max": 13.51849,
+        "mean": 0.696463,
+        "median": -1.705435,
+        "min": -6.96109,
+        "p10": -5.226482,
+        "p90": 9.239094
+      },
+      "finalActionCounts": {
+        "boost": 1,
+        "pitch-down": 1,
+        "pitch-up": 3,
+        "roll-left": 1,
+        "roll-right": 1,
+        "shoot-mg": 1,
+        "yaw-left": 2,
+        "yaw-right": 2
+      },
+      "localOpenness": {
+        "delta": {
+          "count": 144,
+          "max": 0.035,
+          "mean": -0.004276,
+          "median": 0.0,
+          "min": -0.045,
+          "p10": -0.01,
+          "p90": 0.0
+        },
+        "ratio": {
+          "count": 144,
+          "max": 0.475,
+          "mean": 0.388983,
+          "median": 0.395,
+          "min": 0.22,
+          "p10": 0.31,
+          "p90": 0.455
+        },
+        "ratioFinal": {
+          "count": 12,
+          "max": 0.445,
+          "mean": 0.367857,
+          "median": 0.38,
+          "min": 0.22,
+          "p10": 0.27,
+          "p90": 0.445
+        }
+      },
+      "longestRepeatedTailAction": {
+        "length": 2,
+        "semanticAction": "pitch-up"
+      },
+      "name": "latePlayerDeadControl",
+      "policyCounts": {
+        "scripted-reachability-positive-control": 12
+      },
+      "reachabilityTail": {
+        "objectiveEventRows": 4,
+        "objectiveSignalReachableRows": 4,
+        "progressEventRows": 4,
+        "progressSignalReachableRows": 4
+      },
+      "rewardTail": {
+        "breakdownTotals": {
+          "baseStep": -2.304,
+          "checkpointReached": 3.4,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": -54.0,
+          "lowHealthThreat": -2.28,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 1.584,
+          "survivalPressureBonus": 0.642125,
+          "trailRisk": 0.0,
+          "wallRisk": -10.252,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "checkpointRows": 4,
+        "cumulativeReward": {
+          "count": 144,
+          "max": 19.007265,
+          "mean": 5.279706,
+          "median": 3.226115,
+          "min": -6.96109,
+          "p10": -1.614828,
+          "p90": 14.522169
+        },
+        "lossRows": 12,
+        "negativeComponentTotals": {
+          "baseStep": -2.304,
+          "loss": -54.0,
+          "lowHealthThreat": -2.28,
+          "wallRisk": -10.252
+        },
+        "positiveComponentTotals": {
+          "checkpointReached": 3.4,
+          "survival": 1.584,
+          "survivalPressureBonus": 0.642125
+        },
+        "rowReward": {
+          "count": 144,
+          "max": 0.7864,
+          "mean": -0.438957,
+          "median": -0.07105,
+          "min": -4.782,
+          "p10": -0.074775,
+          "p90": -0.0636
+        },
+        "trailRiskRows": 0,
+        "wallRiskRows": 144
+      },
+      "risk": {
+        "collisionRisk": {
+          "count": 144,
+          "max": 0.95,
+          "mean": 0.889931,
+          "median": 0.9,
+          "min": 0.8,
+          "p10": 0.85,
+          "p90": 0.95
+        },
+        "collisionRiskFinal": {
+          "count": 12,
+          "max": 0.95,
+          "mean": 0.95,
+          "median": 0.95,
+          "min": 0.95,
+          "p10": 0.95,
+          "p90": 0.95
+        },
+        "deadEndRisk": {
+          "count": 144,
+          "max": 1.0,
+          "mean": 0.965174,
+          "median": 1.0,
+          "min": 0.525,
+          "p10": 1.0,
+          "p90": 1.0
+        },
+        "deadEndRiskFinal": {
+          "count": 12,
+          "max": 1.0,
+          "mean": 1.0,
+          "median": 1.0,
+          "min": 1.0,
+          "p10": 1.0,
+          "p90": 1.0
+        },
+        "pressureLevel": {
+          "count": 144,
+          "max": 0.697824,
+          "mean": 0.396519,
+          "median": 0.378,
+          "min": 0.336,
+          "p10": 0.357,
+          "p90": 0.399
+        },
+        "threatHorizon": {
+          "count": 144,
+          "max": 0.95,
+          "mean": 0.918542,
+          "median": 0.92,
+          "min": 0.8,
+          "p10": 0.92,
+          "p90": 0.95
+        }
+      },
+      "safety": {
+        "maxInvalidActionRate": 0.0,
+        "maxPostDecodeClampRate": 0.0,
+        "maxPreSamplingMaskRate": 1.0,
+        "maxSanitizerRate": 0.0,
+        "maxVetoRate": 0.0,
+        "vetoActiveRows": 132,
+        "vetoEventRows": 0
+      },
+      "sampleCount": 12,
+      "sampleKindCounts": {
+        "non-event-control": 12
+      },
+      "steps": {
+        "count": 12,
+        "max": 107.0,
+        "mean": 82.083333,
+        "median": 82.5,
+        "min": 61.0,
+        "p10": 61.0,
+        "p90": 106.0
+      },
+      "tailActionCounts": {
+        "boost": 19,
+        "pitch-down": 17,
+        "pitch-up": 19,
+        "roll-left": 18,
+        "roll-right": 17,
+        "shoot-mg": 17,
+        "yaw-left": 19,
+        "yaw-right": 18
+      },
+      "tailRowCount": 144,
+      "terminalReasonCounts": {
+        "player-dead": 12
+      },
+      "terminalRows": {
+        "terminalReasonCounts": {
+          "player-dead": 12
+        },
+        "terminatedRows": 12,
+        "truncatedRows": 0
+      },
+      "wallDistance": {
+        "down": {
+          "count": 144,
+          "max": 0.5,
+          "mean": 0.270833,
+          "median": 0.275,
+          "min": 0.05,
+          "p10": 0.1,
+          "p90": 0.45
+        },
+        "front": {
+          "count": 144,
+          "max": 0.2,
+          "mean": 0.110069,
+          "median": 0.1,
+          "min": 0.05,
+          "p10": 0.05,
+          "p90": 0.15
+        },
+        "frontFinal": {
+          "count": 12,
+          "max": 0.05,
+          "mean": 0.05,
+          "median": 0.05,
+          "min": 0.05,
+          "p10": 0.05,
+          "p90": 0.05
+        },
+        "left": {
+          "count": 144,
+          "max": 1.0,
+          "mean": 0.706672,
+          "median": 0.75,
+          "min": 0.25,
+          "p10": 0.35,
+          "p90": 1.0
+        },
+        "right": {
+          "count": 144,
+          "max": 1.0,
+          "mean": 0.575397,
+          "median": 0.625,
+          "min": 0.0,
+          "p10": 0.05,
+          "p90": 1.0
+        },
+        "up": {
+          "count": 144,
+          "max": 0.5,
+          "mean": 0.281944,
+          "median": 0.275,
+          "min": 0.05,
+          "p10": 0.1,
+          "p90": 0.45
+        }
+      }
+    },
+    "nonEventControl": {
+      "deathClassCounts": {
+        "null": 12
+      },
+      "episodeRewardTotal": {
+        "count": 12,
+        "max": 13.51849,
+        "mean": 0.696463,
+        "median": -1.705435,
+        "min": -6.96109,
+        "p10": -5.226482,
+        "p90": 9.239094
+      },
+      "finalActionCounts": {
+        "boost": 1,
+        "pitch-down": 1,
+        "pitch-up": 3,
+        "roll-left": 1,
+        "roll-right": 1,
+        "shoot-mg": 1,
+        "yaw-left": 2,
+        "yaw-right": 2
+      },
+      "localOpenness": {
+        "delta": {
+          "count": 144,
+          "max": 0.035,
+          "mean": -0.004276,
+          "median": 0.0,
+          "min": -0.045,
+          "p10": -0.01,
+          "p90": 0.0
+        },
+        "ratio": {
+          "count": 144,
+          "max": 0.475,
+          "mean": 0.388983,
+          "median": 0.395,
+          "min": 0.22,
+          "p10": 0.31,
+          "p90": 0.455
+        },
+        "ratioFinal": {
+          "count": 12,
+          "max": 0.445,
+          "mean": 0.367857,
+          "median": 0.38,
+          "min": 0.22,
+          "p10": 0.27,
+          "p90": 0.445
+        }
+      },
+      "longestRepeatedTailAction": {
+        "length": 2,
+        "semanticAction": "pitch-up"
+      },
+      "name": "nonEventControl",
+      "policyCounts": {
+        "scripted-reachability-positive-control": 12
+      },
+      "reachabilityTail": {
+        "objectiveEventRows": 4,
+        "objectiveSignalReachableRows": 4,
+        "progressEventRows": 4,
+        "progressSignalReachableRows": 4
+      },
+      "rewardTail": {
+        "breakdownTotals": {
+          "baseStep": -2.304,
+          "checkpointReached": 3.4,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": -54.0,
+          "lowHealthThreat": -2.28,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 1.584,
+          "survivalPressureBonus": 0.642125,
+          "trailRisk": 0.0,
+          "wallRisk": -10.252,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "checkpointRows": 4,
+        "cumulativeReward": {
+          "count": 144,
+          "max": 19.007265,
+          "mean": 5.279706,
+          "median": 3.226115,
+          "min": -6.96109,
+          "p10": -1.614828,
+          "p90": 14.522169
+        },
+        "lossRows": 12,
+        "negativeComponentTotals": {
+          "baseStep": -2.304,
+          "loss": -54.0,
+          "lowHealthThreat": -2.28,
+          "wallRisk": -10.252
+        },
+        "positiveComponentTotals": {
+          "checkpointReached": 3.4,
+          "survival": 1.584,
+          "survivalPressureBonus": 0.642125
+        },
+        "rowReward": {
+          "count": 144,
+          "max": 0.7864,
+          "mean": -0.438957,
+          "median": -0.07105,
+          "min": -4.782,
+          "p10": -0.074775,
+          "p90": -0.0636
+        },
+        "trailRiskRows": 0,
+        "wallRiskRows": 144
+      },
+      "risk": {
+        "collisionRisk": {
+          "count": 144,
+          "max": 0.95,
+          "mean": 0.889931,
+          "median": 0.9,
+          "min": 0.8,
+          "p10": 0.85,
+          "p90": 0.95
+        },
+        "collisionRiskFinal": {
+          "count": 12,
+          "max": 0.95,
+          "mean": 0.95,
+          "median": 0.95,
+          "min": 0.95,
+          "p10": 0.95,
+          "p90": 0.95
+        },
+        "deadEndRisk": {
+          "count": 144,
+          "max": 1.0,
+          "mean": 0.965174,
+          "median": 1.0,
+          "min": 0.525,
+          "p10": 1.0,
+          "p90": 1.0
+        },
+        "deadEndRiskFinal": {
+          "count": 12,
+          "max": 1.0,
+          "mean": 1.0,
+          "median": 1.0,
+          "min": 1.0,
+          "p10": 1.0,
+          "p90": 1.0
+        },
+        "pressureLevel": {
+          "count": 144,
+          "max": 0.697824,
+          "mean": 0.396519,
+          "median": 0.378,
+          "min": 0.336,
+          "p10": 0.357,
+          "p90": 0.399
+        },
+        "threatHorizon": {
+          "count": 144,
+          "max": 0.95,
+          "mean": 0.918542,
+          "median": 0.92,
+          "min": 0.8,
+          "p10": 0.92,
+          "p90": 0.95
+        }
+      },
+      "safety": {
+        "maxInvalidActionRate": 0.0,
+        "maxPostDecodeClampRate": 0.0,
+        "maxPreSamplingMaskRate": 1.0,
+        "maxSanitizerRate": 0.0,
+        "maxVetoRate": 0.0,
+        "vetoActiveRows": 132,
+        "vetoEventRows": 0
+      },
+      "sampleCount": 12,
+      "sampleKindCounts": {
+        "non-event-control": 12
+      },
+      "steps": {
+        "count": 12,
+        "max": 107.0,
+        "mean": 82.083333,
+        "median": 82.5,
+        "min": 61.0,
+        "p10": 61.0,
+        "p90": 106.0
+      },
+      "tailActionCounts": {
+        "boost": 19,
+        "pitch-down": 17,
+        "pitch-up": 19,
+        "roll-left": 18,
+        "roll-right": 17,
+        "shoot-mg": 17,
+        "yaw-left": 19,
+        "yaw-right": 18
+      },
+      "tailRowCount": 144,
+      "terminalReasonCounts": {
+        "player-dead": 12
+      },
+      "terminalRows": {
+        "terminalReasonCounts": {
+          "player-dead": 12
+        },
+        "terminatedRows": 12,
+        "truncatedRows": 0
+      },
+      "wallDistance": {
+        "down": {
+          "count": 144,
+          "max": 0.5,
+          "mean": 0.270833,
+          "median": 0.275,
+          "min": 0.05,
+          "p10": 0.1,
+          "p90": 0.45
+        },
+        "front": {
+          "count": 144,
+          "max": 0.2,
+          "mean": 0.110069,
+          "median": 0.1,
+          "min": 0.05,
+          "p10": 0.05,
+          "p90": 0.15
+        },
+        "frontFinal": {
+          "count": 12,
+          "max": 0.05,
+          "mean": 0.05,
+          "median": 0.05,
+          "min": 0.05,
+          "p10": 0.05,
+          "p90": 0.05
+        },
+        "left": {
+          "count": 144,
+          "max": 1.0,
+          "mean": 0.706672,
+          "median": 0.75,
+          "min": 0.25,
+          "p10": 0.35,
+          "p90": 1.0
+        },
+        "right": {
+          "count": 144,
+          "max": 1.0,
+          "mean": 0.575397,
+          "median": 0.625,
+          "min": 0.0,
+          "p10": 0.05,
+          "p90": 1.0
+        },
+        "up": {
+          "count": 144,
+          "max": 0.5,
+          "mean": 0.281944,
+          "median": 0.275,
+          "min": 0.05,
+          "p10": 0.1,
+          "p90": 0.45
+        }
+      }
+    }
+  },
+  "guardrails": {
+    "actionFixApplied": false,
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rewardFixApplied": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "safetyFixApplied": false,
+    "terminalRunnerFixApplied": false,
+    "trainingStarted": false
+  },
+  "matrixContext": {
+    "bt93nClosureGateClass": "death-before60-still-blocking",
+    "bt93nMicroPpoResultClass": "death-before60-still-blocking",
+    "bt93nRootCause": "wall/trail",
+    "bt93nTraceResultClass": "death-before60-root-cause-classified",
+    "bt94aClaimable": false
+  },
+  "nextAllowedActions": [
+    "BT93Q.3 deterministic-policy-collapse diagnosis",
+    "BT93Q.4 wall/trail action-effect stress matrix",
+    "BT93Q.5 exactly one fix class only after cause evidence",
+    "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+  ],
+  "ok": true,
+  "phaseCoverage": {
+    "93Q.2.1": true,
+    "93Q.2.2": true,
+    "93Q.2.3": true,
+    "93Q.2.4": true
+  },
+  "phaseId": "93Q.2",
+  "resultClass": "trace-reanalysis-complete-with-telemetry-gap",
+  "sampleCounts": {
+    "earlyDeathBefore60": 6,
+    "latePlayerDeadControl": 12,
+    "nonEventControl": 12,
+    "rawSampleCount": 18,
+    "traceTailRows": 216
+  },
+  "schemaVersion": "bt93q-trace-reanalysis-v1",
+  "sourceArtifacts": {
+    "bt93nClosureGate": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/closure_gate_report.json",
+      "phaseId": "93N.99",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93N red closure gate",
+      "sha256": "606b45c98569eb4fc2a88c997ec7ccff43c3f8551b013e5e3bfdf22e8b841a1e",
+      "tracked": true
+    },
+    "bt93nDeathTrace": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/death_before60_trace_report.json",
+      "phaseId": "93N.1",
+      "resultClass": "death-before60-root-cause-classified",
+      "role": "BT93N death-before-60 trace aggregate",
+      "sha256": "7766984f4d02ffed3d70dae2318cd76d06da4486ba1162aa3a649c3447cb1bda",
+      "tracked": true
+    },
+    "bt93nDeathTraceSamples": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93n/death_before60_trace_samples.jsonl",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93N raw JSONL trace samples",
+      "sha256": "cda12e585253ece1b52e7d779ccc8b020d19a68008bb65b809369aa9d060fffd",
+      "tracked": true
+    },
+    "bt93nMicroPpoRepeat": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "phaseId": "93N.3",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N 10k micro-PPO repeat context",
+      "sha256": "96f046445da1518eeb9519958b179107326294d6ad83a6bfa074089f52aaa631",
+      "tracked": true
+    },
+    "bt93nRewardTerminalDelta": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
+      "phaseId": "93N.2",
+      "resultClass": "reward-fix-delta-green-diagnose-only",
+      "role": "BT93N reward/terminal delta context",
+      "sha256": "270c21992dae1eb6fafa0ed6d5edac85d657de22e77a15ebd3b7c90dd4918a59",
+      "tracked": true
+    },
+    "bt93qFindingRegister": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/finding_register.json",
+      "phaseId": "93Q.1",
+      "resultClass": "finding-register-locked",
+      "role": "BT93Q.1 finding register",
+      "sha256": "ee806424c47e5066425e9a39500486590457af49280aa30310a1e4a9d4c8f2be",
+      "tracked": true
+    },
+    "bt93qHypothesisLock": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/hypothesis_lock.json",
+      "phaseId": "93Q.1",
+      "resultClass": "hypotheses-locked-before-fix",
+      "role": "BT93Q.1 hypothesis lock",
+      "sha256": "8583b4f9643cac99021728f1616c124f4a97625e384fefc7c7feede946a45803",
+      "tracked": true
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A closed no-start gate",
+      "sha256": "27dd958fe5463f6f688384957e31cbd4d163c81b07058dd3c0a1a6be9eda7f70",
+      "tracked": true
+    }
+  },
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true
+}

@@ -1,0 +1,270 @@
+{
+  "blockId": "BT93Q",
+  "blockedActions": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k extension"
+  ],
+  "blocksNext": [
+    "Action/reward/safety fix before 93Q.4 cause proof",
+    "BT93O claim until 93Q.99 non-blocking classification",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k extension"
+  ],
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93q_trace_reanalysis.py --write-report"
+  },
+  "generatedAt": "2026-04-29T23:31:14Z",
+  "generatedBy": "python/scripts/bt93q_trace_reanalysis.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "d8f4b4a8dd91a61ccfe6da01d506413a17040001"
+  },
+  "guardrails": {
+    "actionFixApplied": false,
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rewardFixApplied": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "safetyFixApplied": false,
+    "terminalRunnerFixApplied": false,
+    "trainingStarted": false
+  },
+  "nextAllowedActions": [
+    "BT93Q.3 deterministic-policy-collapse diagnosis",
+    "BT93Q.4 wall/trail action-effect stress matrix",
+    "BT93Q.5 exactly one fix class only after cause evidence",
+    "BT93Q.6 maximum 10k micro-PPO recheck only after 93Q.4/93Q.5 gate evidence"
+  ],
+  "nextDiagnosisTelemetryDecision": {
+    "decision": "93Q.3 may proceed on policy-collapse evidence. 93Q.4 may use existing wall/openness/risk proxies, but any unresolved action-effect class must be marked observation-telemetry-required unless raw pose/heading/velocity/trail/escape-lane fields are added in a later allowed fix phase.",
+    "fieldDecisions": [
+      {
+        "allowedPhase": "93Q.5 observation/telemetry fix only if 93Q.3/93Q.4 still need it",
+        "fieldGroup": "rawPose",
+        "reason": "State-effect proof cannot reconstruct actual trajectory when rawPoseAvailable=false for every trace row.",
+        "requiredForNextDiagnosis": true,
+        "status": "missing"
+      },
+      {
+        "allowedPhase": "93Q.5 observation/telemetry fix",
+        "fieldGroup": "heading",
+        "reason": "targetAlignmentDelta is present, but raw heading/yaw is absent for wall/trail escape-direction proof.",
+        "requiredForNextDiagnosis": true,
+        "status": "proxy-only"
+      },
+      {
+        "allowedPhase": "93Q.5 observation/telemetry fix",
+        "fieldGroup": "velocity",
+        "reason": "speedRatio/speedDelta exist, but raw velocity vector is absent for action-effect attribution.",
+        "requiredForNextDiagnosis": true,
+        "status": "proxy-only"
+      },
+      {
+        "allowedPhase": "93Q.5 observation/telemetry fix",
+        "fieldGroup": "trailDistance",
+        "reason": "Trail-specific proximity is not exposed; trail risk is only inferable through reward/risk proxies.",
+        "requiredForNextDiagnosis": true,
+        "status": "missing"
+      },
+      {
+        "allowedPhase": "93Q.5 observation/telemetry fix",
+        "fieldGroup": "escapeLane",
+        "reason": "Escape-lane availability is not exposed for left/right/forward action-effect classification.",
+        "requiredForNextDiagnosis": true,
+        "status": "missing"
+      }
+    ],
+    "fixClassIfStillBlocking": "Observation/Telemetry",
+    "observationTelemetryFixAllowedNow": false,
+    "requiredFieldGroups": [
+      "rawPose",
+      "heading",
+      "velocity",
+      "trailDistance",
+      "escapeLane"
+    ]
+  },
+  "ok": true,
+  "opensNext": [
+    "93Q.3",
+    "93Q.4"
+  ],
+  "phaseCoverage": {
+    "93Q.2.1": true,
+    "93Q.2.2": true,
+    "93Q.2.3": true,
+    "93Q.2.4": true
+  },
+  "phaseId": "93Q.2",
+  "resultClass": "observation-telemetry-required",
+  "schemaVersion": "bt93q-observation-telemetry-gap-report-v1",
+  "sourceArtifacts": {
+    "bt93nClosureGate": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/closure_gate_report.json",
+      "phaseId": "93N.99",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93N red closure gate",
+      "sha256": "606b45c98569eb4fc2a88c997ec7ccff43c3f8551b013e5e3bfdf22e8b841a1e",
+      "tracked": true
+    },
+    "bt93nDeathTrace": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/death_before60_trace_report.json",
+      "phaseId": "93N.1",
+      "resultClass": "death-before60-root-cause-classified",
+      "role": "BT93N death-before-60 trace aggregate",
+      "sha256": "7766984f4d02ffed3d70dae2318cd76d06da4486ba1162aa3a649c3447cb1bda",
+      "tracked": true
+    },
+    "bt93nDeathTraceSamples": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93n/death_before60_trace_samples.jsonl",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93N raw JSONL trace samples",
+      "sha256": "cda12e585253ece1b52e7d779ccc8b020d19a68008bb65b809369aa9d060fffd",
+      "tracked": true
+    },
+    "bt93nMicroPpoRepeat": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "phaseId": "93N.3",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N 10k micro-PPO repeat context",
+      "sha256": "96f046445da1518eeb9519958b179107326294d6ad83a6bfa074089f52aaa631",
+      "tracked": true
+    },
+    "bt93nRewardTerminalDelta": {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
+      "phaseId": "93N.2",
+      "resultClass": "reward-fix-delta-green-diagnose-only",
+      "role": "BT93N reward/terminal delta context",
+      "sha256": "270c21992dae1eb6fafa0ed6d5edac85d657de22e77a15ebd3b7c90dd4918a59",
+      "tracked": true
+    },
+    "bt93qFindingRegister": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/finding_register.json",
+      "phaseId": "93Q.1",
+      "resultClass": "finding-register-locked",
+      "role": "BT93Q.1 finding register",
+      "sha256": "ee806424c47e5066425e9a39500486590457af49280aa30310a1e4a9d4c8f2be",
+      "tracked": true
+    },
+    "bt93qHypothesisLock": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/hypothesis_lock.json",
+      "phaseId": "93Q.1",
+      "resultClass": "hypotheses-locked-before-fix",
+      "role": "BT93Q.1 hypothesis lock",
+      "sha256": "8583b4f9643cac99021728f1616c124f4a97625e384fefc7c7feede946a45803",
+      "tracked": true
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A closed no-start gate",
+      "sha256": "27dd958fe5463f6f688384957e31cbd4d163c81b07058dd3c0a1a6be9eda7f70",
+      "tracked": true
+    }
+  },
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "telemetryCompleteness": {
+    "availableProxyFields": {
+      "collisionRisk": 216,
+      "deadEndRisk": 216,
+      "localOpennessDelta": 216,
+      "localOpennessRatio": 216,
+      "pressureLevel": 216,
+      "speedDelta": 216,
+      "speedRatio": 216,
+      "targetAlignment": 216,
+      "targetAlignmentDelta": 216,
+      "targetDistanceDelta": 216,
+      "targetDistanceRatio": 216,
+      "threatHorizon": 216,
+      "wallDistanceFront": 216,
+      "wallDistanceLeft": 216,
+      "wallDistanceRight": 216
+    },
+    "missingRawOrScenarioFields": {
+      "escapeLaneForwardOpen": true,
+      "escapeLaneLeftOpen": true,
+      "escapeLaneRightOpen": true,
+      "heading": true,
+      "rawPose": true,
+      "rawX": true,
+      "rawY": true,
+      "rawZ": true,
+      "trailDistance": true,
+      "trailHeadingDelta": true,
+      "velocity": true
+    },
+    "proxyOnlyStateEffectProof": true,
+    "rawPoseAvailableAllFalse": true,
+    "rawPoseAvailableEvaluated": true,
+    "rawPoseAvailableValues": {
+      "False": 216
+    },
+    "rawPoseSourceValues": {
+      "observation-v2-runtime-near target/heading proxy; raw xyz/heading is not exposed": 216
+    },
+    "rowCount": 216
+  }
+}

@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 322,
+          "concreteCount": 326,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 460,
+          "concreteCount": 464,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 318,
+          "concreteCount": 322,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 317,
+          "concreteCount": 321,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 959,
+          "concreteCount": 963,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 967,
+          "concreteCount": 971,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1647,7 +1647,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93Q.2",
+        "currentPhase": "93Q.3",
         "scopeDeclarations": [
           "data/training/ppo/bt93q/action_effect_stress_report.json",
           "data/training/ppo/bt93q/closure_gate_report.json",
@@ -1665,11 +1665,12 @@
           "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "package.json",
-          "python/scripts/bt93q_finding_register.py"
+          "python/scripts/bt93q_finding_register.py",
+          "python/scripts/bt93q_trace_reanalysis.py"
         ],
         "scopeResolution": {
-          "concreteCount": 5,
-          "plannedCount": 12
+          "concreteCount": 9,
+          "plannedCount": 9
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -4731,7 +4732,7 @@
       "id": "BT93Q.2",
       "type": "phase",
       "title": "Trace-Reanalyse und Telemetrie-Vollstaendigkeit",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.2"
@@ -13443,8 +13444,8 @@
     {
       "id": "BT93Q.2.1",
       "type": "subphase",
-      "title": "`trace_reanalysis_report.json` wertet BT93N-Rohsamples erneut aus: Early-Death vs. non-event-control, Action-Tails, WallDistance, LocalOpenness, CollisionRisk, DeadEndRisk, Reward-Tails, TerminalReason.",
-      "status": "open",
+      "title": "`trace_reanalysis_report.json` wertet BT93N-Rohsamples erneut aus: Early-Death vs. non-event-control, Action-Tails, WallDistance, LocalOpenness, CollisionRisk, DeadEndRisk, Reward-Tails, TerminalReason. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/trace_reanalysis_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.2",
@@ -13454,8 +13455,8 @@
     {
       "id": "BT93Q.2.2",
       "type": "subphase",
-      "title": "`player_dead_control_report.json` trennt fruehe Tode von spaeteren Player-Dead-Kontrollen; spaete positive-control Tode duerfen nicht ignoriert werden.",
-      "status": "open",
+      "title": "`player_dead_control_report.json` trennt fruehe Tode von spaeteren Player-Dead-Kontrollen; spaete positive-control Tode duerfen nicht ignoriert werden. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/player_dead_control_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.2",
@@ -13465,8 +13466,8 @@
     {
       "id": "BT93Q.2.3",
       "type": "subphase",
-      "title": "`observation_telemetry_gap_report.json` bewertet `rawPoseAvailable=false` und entscheidet, ob Raw-Pose/Heading/Velocity oder Trail-/Escape-Lane-Felder fuer die naechste Diagnose zwingend sind.",
-      "status": "open",
+      "title": "`observation_telemetry_gap_report.json` bewertet `rawPoseAvailable=false` und entscheidet, ob Raw-Pose/Heading/Velocity oder Trail-/Escape-Lane-Felder fuer die naechste Diagnose zwingend sind. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/observation_telemetry_gap_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.2",
@@ -13476,8 +13477,8 @@
     {
       "id": "BT93Q.2.4",
       "type": "subphase",
-      "title": "Kein Action-, Reward- oder Safety-Fix vor Abschluss von 93Q.2.",
-      "status": "open",
+      "title": "Kein Action-, Reward- oder Safety-Fix vor Abschluss von 93Q.2. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/trace_reanalysis_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.2",
@@ -27312,9 +27313,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -27327,9 +27334,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -27357,9 +27370,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -34283,6 +34302,27 @@
     },
     {
       "id": "python/scripts/bt93q_finding_register.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93q_trace_reanalysis.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -70666,6 +70706,33 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93q/player_dead_control_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -71810,6 +71877,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93q_trace_reanalysis.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -73761,6 +73837,33 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93q/player_dead_control_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -74887,6 +74990,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93q_trace_reanalysis.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78036,6 +78148,33 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93q/player_dead_control_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -79171,6 +79310,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93q_trace_reanalysis.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81421,6 +81569,33 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93q/player_dead_control_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -82556,6 +82731,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93q_trace_reanalysis.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91210,6 +91394,33 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93q/player_dead_control_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -92345,6 +92556,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93q_trace_reanalysis.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -100174,6 +100394,33 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93q/player_dead_control_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -101318,6 +101565,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93q_trace_reanalysis.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -126498,6 +126754,15 @@
     {
       "from": "BT93Q",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Q",
+      "to": "python/scripts/bt93q_trace_reanalysis.py",
       "type": "scope",
       "hint": null,
       "attributes": {

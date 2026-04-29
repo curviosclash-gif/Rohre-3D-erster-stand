@@ -3274,12 +3274,12 @@ Primaerer Scope:
 ### Definition of Done (DoD)
 
 - [x] DoD.1 `finding_register.json` uebernimmt alle Befunde B.01 bis B.09 aus dem Intake mit Quelle, Feldwert, Blockwirkung und erlaubter naechster Aktion. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_finding_register.py --write-report` -> `data/training/ppo/bt93q/finding_register.json`)
-- [ ] DoD.2 `trace_reanalysis_report.json` trennt Early-Death, spaete Player-Dead-Controls, Wall-/Trail-Naehesignale, Safety-Diagnostik, Action-Tails und Reward-Tails.
+- [x] DoD.2 `trace_reanalysis_report.json` trennt Early-Death, spaete Player-Dead-Controls, Wall-/Trail-Naehesignale, Safety-Diagnostik, Action-Tails und Reward-Tails. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/trace_reanalysis_report.json`)
 - [ ] DoD.3 `policy_collapse_report.json` beweist oder widerlegt den deterministischen `yaw-right`-Collapse gegen Stochastic-/Eval-Mode, Logit-/Entropy-Snapshot und Action-Distribution.
 - [ ] DoD.4 `walltrail_scenario_manifest.json` pinnt mehrere kleine Szenarioklassen mit Seeds, Startzustand, erwarteter Escape-Wirkung, Abbruchkriterium, Positiv- und Negativkontrolle.
 - [ ] DoD.5 `action_effect_stress_report.json` beweist fuer vorhandene Actions, ob sie Wand-/Trail-Gefahr real reduzieren koennen: WallDistance, LocalOpenness, ThreatHorizon, CollisionRisk, Heading-/Target-Delta und TerminalRisk.
 - [ ] DoD.6 Neue Sidecar-Actions sind nur erlaubt, wenn DoD.5 eine konkrete Action-Wirkungsluecke belegt; jede neue Action braucht Safety-Raten 0/0/0 und realen Zustandsgewinn.
-- [ ] DoD.7 `observation_telemetry_gap_report.json` nennt, ob Raw-Pose, Heading, Velocity, Trail-Distance oder Escape-Lane-Felder fehlen; fehlende Felder sind ein Blocker oder ein enger Trainings-Telemetrie-Fix.
+- [x] DoD.7 `observation_telemetry_gap_report.json` nennt, ob Raw-Pose, Heading, Velocity, Trail-Distance oder Escape-Lane-Felder fehlen; fehlende Felder sind ein Blocker oder ein enger Trainings-Telemetrie-Fix. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/observation_telemetry_gap_report.json`)
 - [ ] DoD.8 `safety_action_contract_report.json` klaert, ob `vetoActive=true` nur Diagnose ist oder eine handlungswirksame Maske/Policy braucht; keine produktive Runtime-Safety-Umschaltung in BT93Q.
 - [ ] DoD.9 `reward_pressure_ordering_report.json` beweist oder widerlegt, dass Progress-/Checkpoint-Reward nahe lethalem Wall-/Trail-Druck falsch ordnet.
 - [ ] DoD.10 Nur eine Fix-Klasse pro Subphase: Action, Observation/Telemetry, Reward, Safety-Mask oder Terminal/Runner. Gemischte Fixes brauchen getrennte Teilphasen und getrennte Reports.
@@ -3303,10 +3303,10 @@ Pflicht-Evidence:
 
 ### 93Q.2 Trace-Reanalyse und Telemetrie-Vollstaendigkeit
 
-- [ ] 93Q.2.1 `trace_reanalysis_report.json` wertet BT93N-Rohsamples erneut aus: Early-Death vs. non-event-control, Action-Tails, WallDistance, LocalOpenness, CollisionRisk, DeadEndRisk, Reward-Tails, TerminalReason.
-- [ ] 93Q.2.2 `player_dead_control_report.json` trennt fruehe Tode von spaeteren Player-Dead-Kontrollen; spaete positive-control Tode duerfen nicht ignoriert werden.
-- [ ] 93Q.2.3 `observation_telemetry_gap_report.json` bewertet `rawPoseAvailable=false` und entscheidet, ob Raw-Pose/Heading/Velocity oder Trail-/Escape-Lane-Felder fuer die naechste Diagnose zwingend sind.
-- [ ] 93Q.2.4 Kein Action-, Reward- oder Safety-Fix vor Abschluss von 93Q.2.
+- [x] 93Q.2.1 `trace_reanalysis_report.json` wertet BT93N-Rohsamples erneut aus: Early-Death vs. non-event-control, Action-Tails, WallDistance, LocalOpenness, CollisionRisk, DeadEndRisk, Reward-Tails, TerminalReason. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/trace_reanalysis_report.json`)
+- [x] 93Q.2.2 `player_dead_control_report.json` trennt fruehe Tode von spaeteren Player-Dead-Kontrollen; spaete positive-control Tode duerfen nicht ignoriert werden. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/player_dead_control_report.json`)
+- [x] 93Q.2.3 `observation_telemetry_gap_report.json` bewertet `rawPoseAvailable=false` und entscheidet, ob Raw-Pose/Heading/Velocity oder Trail-/Escape-Lane-Felder fuer die naechste Diagnose zwingend sind. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/observation_telemetry_gap_report.json`)
+- [x] 93Q.2.4 Kein Action-, Reward- oder Safety-Fix vor Abschluss von 93Q.2. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_trace_reanalysis.py --write-report` -> `data/training/ppo/bt93q/trace_reanalysis_report.json`)
 
 Pflicht-Evidence:
 

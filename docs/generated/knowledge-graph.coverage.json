@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2409,
-    "rawCoveredFileCount": 1930,
+    "trackedFileCount": 2413,
+    "rawCoveredFileCount": 1934,
     "rawCoveragePercent": 80.1,
-    "adjustedTrackedFileCount": 1506,
-    "adjustedCoveredFileCount": 1271,
+    "adjustedTrackedFileCount": 1510,
+    "adjustedCoveredFileCount": 1275,
     "adjustedCoveragePercent": 84.4,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 235,
-        "coveredCount": 214
+        "count": 238,
+        "coveredCount": 217
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 877,
-        "coveredCount": 861
+        "count": 878,
+        "coveredCount": 862
       },
       {
         "classification": "product-docs",
@@ -7837,6 +7837,75 @@
     },
     {
       "path": "data/training/ppo/bt93q/hypothesis_lock.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/player_dead_control_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/trace_reanalysis_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -18338,6 +18407,29 @@
     },
     {
       "path": "python/scripts/bt93q_finding_register.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93q_trace_reanalysis.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
