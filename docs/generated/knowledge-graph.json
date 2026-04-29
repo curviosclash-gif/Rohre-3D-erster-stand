@@ -4343,7 +4343,7 @@
       "id": "V104.3",
       "type": "phase",
       "title": "Menu- und Start-Controller auf Snapshot-/Intent-Pfade heben",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.3"
@@ -11528,8 +11528,8 @@
     {
       "id": "V104.3.2",
       "type": "subphase",
-      "title": "Listener-, Toast-, Menu-Chrome-, Start-Setup- und Surface-Policy-Pfade so ordnen, dass neue UI-Funktionen zuerst in kleinen Ops-/Adapter-Modulen oder Ports landen statt die drei Controller wieder aufzublasen.",
-      "status": "open",
+      "title": "Listener-, Toast-, Menu-Chrome-, Start-Setup- und Surface-Policy-Pfade so ordnen, dass neue UI-Funktionen zuerst in kleinen Ops-/Adapter-Modulen oder Ports landen statt die drei Controller wieder aufzublasen. (abgeschlossen: 2026-04-29; evidence: `npm run graph:build && npm run graph:check && npm run plan:check && npm run docs:sync && npm run docs:check` -> gruen; neue Ops-/Binding-Seams in `src/ui/menu/MenuChromeStateOps.js`, `src/ui/menu/StatusToastOps.js`, `src/ui/start-setup/StartSetupControlBindings.js` aktiv verdrahtet)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.3",
@@ -11539,8 +11539,8 @@
     {
       "id": "V104.4.1",
       "type": "subphase",
-      "title": "`MatchFlowUiController` und `ArcadeVehicleManager` fuer den migrierten Scope auf kleine Controller- oder Runtime-Ports sowie Feature-Adapter reduzieren; direkte breite Runtime-/State-Zugriffe werden entfernt oder klar als Restadapter begrenzt.",
-      "status": "open",
+      "title": "`MatchFlowUiController` und `ArcadeVehicleManager` fuer den migrierten Scope auf kleine Controller- oder Runtime-Ports sowie Feature-Adapter reduzieren; direkte breite Runtime-/State-Zugriffe werden entfernt oder klar als Restadapter begrenzt. (abgeschlossen: 2026-04-29; evidence: `npm run graph:build && npm run graph:check && npm run plan:check` -> Knowledge-Graph aktualisiert/validiert, Plan-Check gruen; Match-Feedback/Death-Toast ueber `createMatchFlowUiControllerPort`, Vehicle-Profile-Store primar ueber `runtimeAccess.getSettingsStore()`)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.4",
