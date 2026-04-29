@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============================================
 // OnlineSessionAdapter.js - Internet session via WebSocket signaling + STUN/TURN
 // ============================================

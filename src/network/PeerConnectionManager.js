@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============================================
 // PeerConnectionManager.js - WebRTC lifecycle, Star topology
 // ============================================

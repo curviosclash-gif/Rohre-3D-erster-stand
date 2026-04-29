@@ -2299,7 +2299,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 267,
+          "concreteCount": 268,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -4323,7 +4323,7 @@
       "id": "V104.1",
       "type": "phase",
       "title": "Rest-Hotspots und Zielvertraege inventarisieren",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.1"
@@ -11451,8 +11451,8 @@
     {
       "id": "V104.1.1",
       "type": "subphase",
-      "title": "Reale breite Konsumenten von `GameRuntimeBundle`, `GameRuntimePorts`, `UIManager`, `UIStartSyncController`, `UINavigationLifecycleController`, `ArcadeVehicleManager`, `MatchFlowUiController` und `PlatformCapabilityRegistry` inventarisieren: Alias-Reads, direkte Mutationen, Global-Zugriffe, Fallback-Helfer und implizite Reach-Throughs.",
-      "status": "open",
+      "title": "Reale breite Konsumenten von `GameRuntimeBundle`, `GameRuntimePorts`, `UIManager`, `UIStartSyncController`, `UINavigationLifecycleController`, `ArcadeVehicleManager`, `MatchFlowUiController` und `PlatformCapabilityRegistry` inventarisieren: Alias-Reads, direkte Mutationen, Global-Zugriffe, Fallback-Helfer und implizite Reach-Throughs. (abgeschlossen: 2026-04-29; evidence: `Get-ChildItem -Recurse -File src,tests,scripts,docs/referenz | Select-String -Pattern 'GameRuntimeBundle|GAME_RUNTIME_LEGACY_ALIAS_SPECS|resolveRuntimeIntentAdapter|UIManager|UIStartSyncController|UINavigationLifecycleController|ArcadeVehicleManager|MatchFlowUiController|PlatformCapabilityRegistry|curviosApp|__CURVIOS_APP__'` -> produktive + testseitige Konsumentenlisten fuer alle Hotspots erstellt)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.1",
@@ -11462,8 +11462,8 @@
     {
       "id": "V104.1.2",
       "type": "subphase",
-      "title": "Zielmatrix fuer jeden Rest-Hotspot festlegen und in Blockdatei plus Architekturkontext spiegeln: welcher Snapshot, welcher Intent-Port, welcher Feature-Adapter und welcher Restadapter bis zum Sunset erlaubt bleibt; Scope-Grenzen zu `V100` und `V102` explizit mitschneiden.",
-      "status": "open",
+      "title": "Zielmatrix fuer jeden Rest-Hotspot festlegen und in Blockdatei plus Architekturkontext spiegeln: welcher Snapshot, welcher Intent-Port, welcher Feature-Adapter und welcher Restadapter bis zum Sunset erlaubt bleibt; Scope-Grenzen zu `V100` und `V102` explizit mitschneiden. (abgeschlossen: 2026-04-29; evidence: `Get-Content -Raw docs/plaene/aktiv/V104.md` + `Get-Content -Raw docs/referenz/ai_architecture_context.md` -> konsistente Zielmatrix inkl. Scope-Grenzen und Sunset-Kriterien in beiden Quellen gespiegelt)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.1",
@@ -11473,8 +11473,8 @@
     {
       "id": "V104.1.3",
       "type": "subphase",
-      "title": "Produktive Konsumenten, Test-Harness-Konsumenten und reine Plan-/Contract-Nennungen fuer die Dead-Code-Kandidaten gegeneinander auswerten; dabei die drei Klassen `duplicate-backed`, `legacy-with-replacement` und `unverified-altpath` verbindlich vergeben.",
-      "status": "open",
+      "title": "Produktive Konsumenten, Test-Harness-Konsumenten und reine Plan-/Contract-Nennungen fuer die Dead-Code-Kandidaten gegeneinander auswerten; dabei die drei Klassen `duplicate-backed`, `legacy-with-replacement` und `unverified-altpath` verbindlich vergeben. (abgeschlossen: 2026-04-29; evidence: `node scripts/query-knowledge-graph.mjs files-for-block V104 --json` + Pattern-Scan ueber `src/tests/docs` -> Dead-Code-Kandidaten in Konsumententypen getrennt und Klassen finalisiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.1",
@@ -11484,8 +11484,8 @@
     {
       "id": "V104.1.4",
       "type": "subphase",
-      "title": "Fuer jeden Kandidaten die Loeschregel dokumentieren: Entfernen nur bei nachgewiesenem juengerem besseren Pfad mit echten Konsumenten; sonst explizite Markierung als `legacy`, `compatibility path`, `shim` oder `plan-drift` statt stiller Entfernung.",
-      "status": "open",
+      "title": "Fuer jeden Kandidaten die Loeschregel dokumentieren: Entfernen nur bei nachgewiesenem juengerem besseren Pfad mit echten Konsumenten; sonst explizite Markierung als `legacy`, `compatibility path`, `shim` oder `plan-drift` statt stiller Entfernung. (abgeschlossen: 2026-04-29; evidence: `Get-Content -Raw docs/plaene/aktiv/V104.md` -> Loeschregeln je Klasse/Kandidat explizit dokumentiert, keine stillen Removes vorgesehen)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.1",
@@ -26446,6 +26446,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Kompletter_Spielwissensgraph_V107.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -136480,6 +136495,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Kompletter_Spielwissensgraph_V107.md",
       "type": "scope",
       "hint": null,
       "attributes": {

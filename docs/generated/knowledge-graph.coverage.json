@@ -8,27 +8,12 @@
       "id": "GIT-HISTORY-HOTSPOTS",
       "title": "Git-History Hotspots ausserhalb des Core-Graphen",
       "coverageSource": "git-history",
-      "fileCount": 8,
+      "fileCount": 6,
       "files": [
         {
           "path": "docs/referenz/architektur_ausfuehrlich.md",
-          "changeCount": 27,
-          "dirty": true
-        },
-        {
-          "path": "package-lock.json",
-          "changeCount": 7,
-          "dirty": true
-        },
-        {
-          "path": "data/contracts/browser-demo-surface-policy.export.v1.json",
-          "changeCount": 2,
-          "dirty": true
-        },
-        {
-          "path": "src/core/TestApiBridge.js",
-          "changeCount": 1,
-          "dirty": true
+          "changeCount": 28,
+          "dirty": false
         },
         {
           "path": "README.md",
@@ -38,6 +23,11 @@
         {
           "path": "src/core/config/SettingsRuntimeContract.js",
           "changeCount": 9,
+          "dirty": false
+        },
+        {
+          "path": "package-lock.json",
+          "changeCount": 8,
           "dirty": false
         },
         {
@@ -150,14 +140,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2400,
-    "rawCoveredFileCount": 1921,
+    "trackedFileCount": 2401,
+    "rawCoveredFileCount": 1920,
     "rawCoveragePercent": 80,
-    "adjustedTrackedFileCount": 1497,
-    "adjustedCoveredFileCount": 1262,
-    "adjustedCoveragePercent": 84.3,
-    "uncoveredFileCount": 479,
-    "uncoveredActiveFileCount": 235,
+    "adjustedTrackedFileCount": 1498,
+    "adjustedCoveredFileCount": 1261,
+    "adjustedCoveragePercent": 84.2,
+    "uncoveredFileCount": 481,
+    "uncoveredActiveFileCount": 237,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -199,13 +189,13 @@
         "classification": "product-code",
         "excludedFromCoverage": false,
         "count": 837,
-        "coveredCount": 823
+        "coveredCount": 821
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 357,
-        "coveredCount": 171
+        "count": 358,
+        "coveredCount": 172
       },
       {
         "classification": "prototype",
@@ -3615,24 +3605,14 @@
       "path": "data/contracts/browser-demo-surface-policy.export.v1.json",
       "tracked": true,
       "coveredInCore": false,
-      "coveredByOverlay": true,
-      "covered": true,
-      "coverageSources": [
-        "git-history"
-      ],
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "product-code",
       "excludedFromCoverage": false,
-      "excludeReason": null,
-      "overlays": [
-        {
-          "blockId": "GIT-HISTORY-HOTSPOTS",
-          "coverageSource": "git-history",
-          "changeCount": 2,
-          "dirty": true
-        }
-      ]
+      "excludeReason": null
     },
     {
       "path": "data/maps/.gitkeep",
@@ -13977,6 +13957,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/Feature_Kompletter_Spielwissensgraph_V107.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/Feature_Legacy_Runtime_Surface_Sunset_V91.md",
       "tracked": true,
       "coveredInCore": true,
@@ -14566,8 +14563,8 @@
         {
           "blockId": "GIT-HISTORY-HOTSPOTS",
           "coverageSource": "git-history",
-          "changeCount": 27,
-          "dirty": true
+          "changeCount": 28,
+          "dirty": false
         }
       ]
     },
@@ -15938,8 +15935,8 @@
         {
           "blockId": "GIT-HISTORY-HOTSPOTS",
           "coverageSource": "git-history",
-          "changeCount": 7,
-          "dirty": true
+          "changeCount": 8,
+          "dirty": false
         }
       ]
     },
@@ -22601,24 +22598,14 @@
       "path": "src/core/TestApiBridge.js",
       "tracked": true,
       "coveredInCore": false,
-      "coveredByOverlay": true,
-      "covered": true,
-      "coverageSources": [
-        "git-history"
-      ],
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "product-code",
       "excludedFromCoverage": false,
-      "excludeReason": null,
-      "overlays": [
-        {
-          "blockId": "GIT-HISTORY-HOTSPOTS",
-          "coverageSource": "git-history",
-          "changeCount": 1,
-          "dirty": true
-        }
-      ]
+      "excludeReason": null
     },
     {
       "path": "src/core/three-disposal.js",

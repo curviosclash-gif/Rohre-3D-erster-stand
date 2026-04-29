@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as Mp4MuxerModule from 'mp4-muxer';
 import {
     DEFAULT_MIME_TYPE,

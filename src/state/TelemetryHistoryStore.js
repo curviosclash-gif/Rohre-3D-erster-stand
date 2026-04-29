@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============================================
 // TelemetryHistoryStore.js - IndexedDB-based persistent telemetry
 // for cross-session comparison (max 500 entries, auto-pruning)

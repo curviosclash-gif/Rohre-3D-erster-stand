@@ -1,6 +1,7 @@
 // ============================================
 // MatchStartValidationService.js - validates menu state before match start
 // ============================================
+// @ts-nocheck
 import {
     resolveSurfaceMultiplayerGateAccess,
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';

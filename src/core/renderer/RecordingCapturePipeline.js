@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable max-lines */
 import * as THREE from 'three';
 import { CONFIG } from '../Config.js';

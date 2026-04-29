@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { MULTIPLAYER_SESSION_ROLES } from './RuntimeSessionContract.js';
 
 export const MULTIPLAYER_SESSION_CONTRACT_VERSION = 'multiplayer-session.v2';

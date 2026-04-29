@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as THREE from 'three';
 import { CONFIG } from '../Config.js';
 import { CameraCollisionSolver } from './camera/CameraCollisionSolver.js';

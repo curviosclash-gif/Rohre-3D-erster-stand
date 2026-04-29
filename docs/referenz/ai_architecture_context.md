@@ -772,6 +772,22 @@ Architekturprinzip: Alle Surface-Entscheide laufen ueber die obigen Resolver aus
 - Wenn eine bestehende Public-Methode nur Leaf-Charakter hat, bleibt sie Legacy-kompatibel, ist aber kein Ziel fuer neue Features. Konkret sollen neue Session-bezogene Features an `switchSessionType()` oder einen neuen intentartigen Einstieg andocken, nicht direkt an `saveSessionDraft()` oder `applySessionDraft()`.
 - Tests fuer neue Settings-Erweiterungen verankern den Vertrag am schmalsten sinnvollen Punkt: Runtime-/Apply-Pfade in `tests/runtime-settings-live-apply.contract.test.mjs`, Manager-/Facade-Vertraege in einer dedizierten Settings-Contract-Datei. Der in `V103` reservierte Pfad `tests/settings-manager.contract.test.mjs` bleibt dafuer der bevorzugte Zielort, falls neue Manager-spezifische Contract-Coverage noetig wird.
 
+### 4.6.7 V104 Inventar- und Sunset-Snapshot (Stand 2026-04-29)
+
+- Zielbild bleibt `Contract -> Snapshot -> Intent-Port -> Feature-Adapter`; `V104.1` hat den Ist-Konsumentenabgleich fuer Runtime-/UI-God-Objects gegen Produktpfade, Harness-Pfade und Legacy-Reste aktualisiert.
+- `GameRuntimeBundle` bleibt produktiv nur als Runtime-Assembly-/Legacy-Container in `GameBootstrap`, `GameRuntimeFacade`, `GameRuntimeCoordinator` und `MatchSessionRuntimeBridge` akzeptiert; neue Featurearbeit darf dort keine neuen Alias-/Wrapper-Aufrufer platzieren.
+- `GameRuntimePorts` fuehrt weiterhin explizite Transition-Fallbacks (`legacy-game-slot:runtimeCoordinator`/`legacy-game-slot:runtimeFacade`); der Pfad bleibt Migrationsadapter, nicht Default-Entry fuer neue Runtime-Intents.
+- `MatchFlowUiController` ist weiter oeffentliche UI-Fassade, traegt aber noch `this.game`-basierte Runtime-Weitergabe in Subcontroller; Folgearbeit in `V104.3`/`V104.4` reduziert diese Restbreite auf Snapshot-/Port-Inputs.
+- `PlatformCapabilityRegistry` bleibt zentraler Resolver; direkter `curviosApp`-/`__CURVIOS_APP__`-Read ist ausschliesslich in `resolvePlatformRuntimeKind()` als guard-markierte Migrationsschuld erlaubt und wird langfristig in dedizierte Plattformadapter verschoben.
+
+Dead-Code-/Legacy-Einordnung (V104.1.3/1.4):
+
+| Klasse | Kandidaten (Auszug) | Regel |
+| --- | --- | --- |
+| `duplicate-backed` | `src/state/MatchLifecycleStateTransitions.js`, `src/core/runtime/GameStateIds.js`, `src/core/input/GamepadInputSource.js`, `src/core/input/KeyboardInputSource.js` | Entfernen erst nach belegter Vollmigration auf juengeren Ersatzpfad plus gruene Contract-/Runtime-Checks |
+| `legacy-with-replacement` | `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/vehicle-manager/**` | Kein Remove ohne produktiv verdrahteten Ersatz (Workshop-/Menu-Wiring + Verify-Evidence) |
+| `unverified-altpath` | `src/ui/hangar/HangarShellLayoutContract.js`, `src/ui/hangar/HangarVerificationTargetContract.js`, `src/shared/contracts/FightHangarBalanceContract.js`, `src/core/MatchKernelReplayAdapter.js`, `src/ui/NetworkHud.js`, `src/core/lobby/LocalMatchLobby.js`, `src/core/player/PlayerRole.js` | Nicht still entfernen; explizit als legacy/compatibility/plan-drift markieren bis Nachfolger oder Retirement-Entscheid belegt ist |
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |

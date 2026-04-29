@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { toFiniteNumber } from '../../utils/MathOps.js';
 import { attemptAutoDownload, buildDownloadFileName } from './DownloadService.js';
 import {

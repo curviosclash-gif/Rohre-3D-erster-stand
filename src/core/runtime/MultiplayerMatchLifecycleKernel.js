@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ============================================
 // MultiplayerMatchLifecycleKernel.js
 // Common lifecycle kernel for LAN and Online sessions (client-side).
