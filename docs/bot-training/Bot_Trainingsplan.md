@@ -3044,13 +3044,13 @@ Pflicht-Evidence:
 
 ### 93M.2 Same-Matrix-DQN-Anker
 
-- [ ] 93M.2.1 DQN-Champion deterministisch laden oder einen harten Loader-/Artefaktblocker mit Pfad, erwarteter Signatur und Fehlerklasse dokumentieren.
-- [ ] 93M.2.2 Exakt dieselbe BT93L-Matrix verwenden: Seeds, Mode, Map, Reward-Profil, Terminal-/Truncation-Semantik und maxSteps.
-- [ ] 93M.2.3 DQN-Report schreibt Modellhash, Confighash, Matrixhash, Semantikfenster und Vergleichsrahmen.
-- [ ] 93M.2.4 Historische Reports wie `data/bot_validation_report.json` oder `data/performance_ki_baseline_report.json` nur als Kontext markieren, nie als Same-Matrix-Anker.
-- [ ] 93M.2.5 DQN-Loader-Fehler muessen Pfad, erwartete Signatur, tatsaechliche Struktur, fehlende Felder und naechste Reparaturoption nennen; "nicht gefunden" ohne Loader-Diagnose ist kein ausreichender Blocker.
-- [ ] 93M.2.6 Wenn der DQN-Anker nicht ladbar ist, muss der Report genau eine Entscheidung vorbereiten: Loader-Fix-Block, explizite neue Vergleichspolitik oder `dqn-anchor-blocked`; stille Fortsetzung nach `BT93P` ist verboten.
-- [ ] 93M.2.7 Ein DQN-Loader-Fix darf nicht in BT93N/O/P versteckt werden; entweder eigener Fix-Block oder explizite User-Ersatzpolitik, sonst bleibt die Kette diagnose-only.
+- [x] 93M.2.1 DQN-Champion deterministisch laden oder einen harten Loader-/Artefaktblocker mit Pfad, erwarteter Signatur und Fehlerklasse dokumentieren. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `resultClass=dqn-anchor-blocked`)
+- [x] 93M.2.2 Exakt dieselbe BT93L-Matrix verwenden: Seeds, Mode, Map, Reward-Profil, Terminal-/Truncation-Semantik und maxSteps. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_manifest.json`, `matrix.matrixId=bt93l-reachability-diagnostic-matrix-v1`, `semanticWindow=runtime-near-headless-v1`)
+- [x] 93M.2.3 DQN-Report schreibt Modellhash, Confighash, Matrixhash, Semantikfenster und Vergleichsrahmen. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `modelHash=null`, `configHash` gesetzt, `matrixHash` gesetzt)
+- [x] 93M.2.4 Historische Reports wie `data/bot_validation_report.json` oder `data/performance_ki_baseline_report.json` nur als Kontext markieren, nie als Same-Matrix-Anker. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `historicalReportsUsedAsAnchor=false`)
+- [x] 93M.2.5 DQN-Loader-Fehler muessen Pfad, erwartete Signatur, tatsaechliche Struktur, fehlende Felder und naechste Reparaturoption nennen; "nicht gefunden" ohne Loader-Diagnose ist kein ausreichender Blocker. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `loadAttempts` mit `artifact-not-found` und `checkpoint-network-state-missing`)
+- [x] 93M.2.6 Wenn der DQN-Anker nicht ladbar ist, muss der Report genau eine Entscheidung vorbereiten: Loader-Fix-Block, explizite neue Vergleichspolitik oder `dqn-anchor-blocked`; stille Fortsetzung nach `BT93P` ist verboten. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `comparisonPolicyDecision=dqn-anchor-blocked`)
+- [x] 93M.2.7 Ein DQN-Loader-Fix darf nicht in BT93N/O/P versteckt werden; entweder eigener Fix-Block oder explizite User-Ersatzpolitik, sonst bleibt die Kette diagnose-only. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `blockedActions` enthaelt `BT93P BT94A-ready`)
 
 Empfohlener Command:
 

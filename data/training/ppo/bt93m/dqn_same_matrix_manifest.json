@@ -1,0 +1,232 @@
+{
+  "baselineMatrixDqnAnchor": {
+    "blockingFor": [
+      "BT94A comparison",
+      "candidate/freeze claim",
+      "promotion"
+    ],
+    "historicalSources": [
+      {
+        "exists": true,
+        "isFile": true,
+        "ok": null,
+        "path": "data/bot_validation_report.json",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "historical DQN or KI baseline context",
+        "sha256": "e7808327e12ec1332f2ab6906cfd3b5a1360871fb0a4c6f64dbb7112b50aea57"
+      },
+      {
+        "exists": true,
+        "isFile": true,
+        "ok": null,
+        "path": "data/performance_ki_baseline_report.json",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "historical DQN or KI baseline context",
+        "sha256": "2aabae2661ac5303752d175d22e18ff8fa8b3aca336305cddc0948726172935e"
+      }
+    ],
+    "historicalSourcesPresent": true,
+    "notBlockingFor": [
+      "BT93L.6 micro-PPO signal probe"
+    ],
+    "reason": "historical DQN reports are not produced on the BT93L task/reward/terminal matrix",
+    "sameMatrix": false,
+    "status": "missing-same-matrix-blocking"
+  },
+  "blockId": "BT93M",
+  "candidateCheckpoints": [
+    {
+      "exists": false,
+      "path": "data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json",
+      "role": "expected-bt11-champion-checkpoint",
+      "sha256": null
+    },
+    {
+      "exists": true,
+      "path": "data/training/models/BT20_REFERENCE_ONLY_1777474973139/checkpoint.json",
+      "role": "fallback-inspection-checkpoint",
+      "sha256": "40f6de9a7baf86d3dd06a917e7fee42047594d793f74cb16b631a1453d2ba7ea"
+    }
+  ],
+  "configPath": "python/configs/ppo_bt93m_dqn_same_matrix.json",
+  "configSha256": "e7dcbff961763f732a61d35729999e10c06d209f3651c3dc795a96281abb04e9",
+  "expectedChampion": {
+    "baselineId": "bt11-fight-champion-2026-03-24",
+    "checkpointPath": "data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json",
+    "evalPath": "data/training/runs/BT11_FIGHT_20260324T014853-r4042/eval.json",
+    "gatePath": "data/training/runs/BT11_FIGHT_20260324T014853-r4042/gate.json",
+    "runPath": "data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json",
+    "stamp": "BT11_FIGHT_20260324T014853-r4042"
+  },
+  "expectedCheckpointSignature": {
+    "requiredNetworkFields": [
+      "online.layers[] or online.weightsInputHidden/weightsHiddenOutput",
+      "target.layers[] or target.weightsInputHidden/weightsHiddenOutput"
+    ],
+    "requiredTopLevelFields": [
+      "contractVersion",
+      "online",
+      "target"
+    ],
+    "supportedContractVersions": [
+      "v36-dqn-checkpoint-v2",
+      "v35-dqn-checkpoint-v1",
+      "v34-dqn-checkpoint-v1"
+    ]
+  },
+  "generatedAt": "2026-04-29T17:02:34Z",
+  "generatedBy": "python/scripts/bt93m_dqn_same_matrix_anchor.py",
+  "historicalReportPolicy": {
+    "allowedAs": [
+      "historical context"
+    ],
+    "forbiddenAs": [
+      "same-matrix DQN anchor",
+      "BT94A opening evidence",
+      "candidate evidence",
+      "freeze evidence",
+      "promote evidence"
+    ]
+  },
+  "historicalReports": [
+    {
+      "blockId": null,
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/runs/BT20_REFERENCE_ONLY_1777474973139/benchmark-manifest.json",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "context-only historical report",
+      "sha256": "ee60b6b23b4ca8eadb38759a14803b30d4d2bf7cc5714085ae31f93b70c1e59e"
+    },
+    {
+      "blockId": null,
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/bot_validation_report.json",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "context-only historical report",
+      "sha256": "e7808327e12ec1332f2ab6906cfd3b5a1360871fb0a4c6f64dbb7112b50aea57"
+    },
+    {
+      "blockId": null,
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/performance_ki_baseline_report.json",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "context-only historical report",
+      "sha256": "2aabae2661ac5303752d175d22e18ff8fa8b3aca336305cddc0948726172935e"
+    }
+  ],
+  "matrix": {
+    "controlSeeds": [
+      944,
+      945,
+      946
+    ],
+    "diagnosticEvalSeeds": [
+      944,
+      945,
+      946
+    ],
+    "diagnosticTrainSeeds": [
+      934,
+      935,
+      936,
+      937
+    ],
+    "domainModes": [
+      "classic-3d"
+    ],
+    "gameMode": "CLASSIC",
+    "holdoutSeeds": [
+      960,
+      961
+    ],
+    "holdoutStatus": "reserved-unused-in-BT93L.1-through-BT93L.6",
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "maxStepsPerEpisode": 180,
+    "microPpoEnvCount": 2,
+    "microPpoFirstProbeTimesteps": 10000,
+    "modeId": "runtime-near-headless-v1",
+    "modePath": "normal",
+    "planarMode": false,
+    "primaryMap": "standard",
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "matrixHash": "a8e17c34cc152bf73d6e6d43e11aa12b3cffae9a2caf26601ebd22b94d4b7bad",
+  "phaseId": "93M.2",
+  "sameMatrixRequirements": {
+    "controlSeeds": [
+      944,
+      945,
+      946
+    ],
+    "diagnosticTrainSeeds": [
+      934,
+      935,
+      936,
+      937
+    ],
+    "domainModes": [
+      "classic-3d"
+    ],
+    "gameMode": "CLASSIC",
+    "holdoutStatus": "reserved-unused-in-BT93L.1-through-BT93L.6",
+    "mapKey": "standard",
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "maxStepsPerEpisode": 180,
+    "modeId": "runtime-near-headless-v1",
+    "planarMode": false,
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "schemaVersion": "bt93m-dqn-same-matrix-manifest-v1",
+  "sourceArtifacts": {
+    "baselineMatrixReport": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L baseline matrix",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013"
+    },
+    "startTruth": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/start_truth.json",
+      "phaseId": "93M.1",
+      "resultClass": "start-truth-pinned-red",
+      "role": "BT93M.1 start truth",
+      "sha256": "8406aa83297361b4b1ffd64e2ceed863f88d8b5d3cdb3e041c08b8cabe2e2399"
+    },
+    "taskMetricContract": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L task metric contract",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0"
+    }
+  }
+}

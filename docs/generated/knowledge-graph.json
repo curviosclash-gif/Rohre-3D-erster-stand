@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 291,
+          "concreteCount": 295,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 429,
+          "concreteCount": 433,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 287,
+          "concreteCount": 291,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 286,
+          "concreteCount": 290,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 928,
+          "concreteCount": 932,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 936,
+          "concreteCount": 940,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1485,7 +1485,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93M.2",
+        "currentPhase": "93M.3",
         "scopeDeclarations": [
           "data/bot_validation_report.json",
           "data/performance_ki_baseline_report.json",
@@ -1511,8 +1511,8 @@
           "python/scripts/bt94a_gate_check.py"
         ],
         "scopeResolution": {
-          "concreteCount": 14,
-          "plannedCount": 8
+          "concreteCount": 17,
+          "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -4500,7 +4500,7 @@
       "id": "BT93M.2",
       "type": "phase",
       "title": "Same-Matrix-DQN-Anker",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.2"
@@ -12068,8 +12068,8 @@
     {
       "id": "BT93M.2.1",
       "type": "subphase",
-      "title": "DQN-Champion deterministisch laden oder einen harten Loader-/Artefaktblocker mit Pfad, erwarteter Signatur und Fehlerklasse dokumentieren.",
-      "status": "open",
+      "title": "DQN-Champion deterministisch laden oder einen harten Loader-/Artefaktblocker mit Pfad, erwarteter Signatur und Fehlerklasse dokumentieren. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `resultClass=dqn-anchor-blocked`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.2",
@@ -12079,8 +12079,8 @@
     {
       "id": "BT93M.2.2",
       "type": "subphase",
-      "title": "Exakt dieselbe BT93L-Matrix verwenden: Seeds, Mode, Map, Reward-Profil, Terminal-/Truncation-Semantik und maxSteps.",
-      "status": "open",
+      "title": "Exakt dieselbe BT93L-Matrix verwenden: Seeds, Mode, Map, Reward-Profil, Terminal-/Truncation-Semantik und maxSteps. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_manifest.json`, `matrix.matrixId=bt93l-reachability-diagnostic-matrix-v1`, `semanticWindow=runtime-near-headless-v1`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.2",
@@ -12090,8 +12090,8 @@
     {
       "id": "BT93M.2.3",
       "type": "subphase",
-      "title": "DQN-Report schreibt Modellhash, Confighash, Matrixhash, Semantikfenster und Vergleichsrahmen.",
-      "status": "open",
+      "title": "DQN-Report schreibt Modellhash, Confighash, Matrixhash, Semantikfenster und Vergleichsrahmen. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `modelHash=null`, `configHash` gesetzt, `matrixHash` gesetzt)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.2",
@@ -12101,8 +12101,8 @@
     {
       "id": "BT93M.2.4",
       "type": "subphase",
-      "title": "Historische Reports wie `data/bot_validation_report.json` oder `data/performance_ki_baseline_report.json` nur als Kontext markieren, nie als Same-Matrix-Anker.",
-      "status": "open",
+      "title": "Historische Reports wie `data/bot_validation_report.json` oder `data/performance_ki_baseline_report.json` nur als Kontext markieren, nie als Same-Matrix-Anker. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `historicalReportsUsedAsAnchor=false`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.2",
@@ -12112,8 +12112,8 @@
     {
       "id": "BT93M.2.5",
       "type": "subphase",
-      "title": "DQN-Loader-Fehler muessen Pfad, erwartete Signatur, tatsaechliche Struktur, fehlende Felder und naechste Reparaturoption nennen; \"nicht gefunden\" ohne Loader-Diagnose ist kein ausreichender Blocker.",
-      "status": "open",
+      "title": "DQN-Loader-Fehler muessen Pfad, erwartete Signatur, tatsaechliche Struktur, fehlende Felder und naechste Reparaturoption nennen; \"nicht gefunden\" ohne Loader-Diagnose ist kein ausreichender Blocker. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `loadAttempts` mit `artifact-not-found` und `checkpoint-network-state-missing`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.2",
@@ -12123,8 +12123,8 @@
     {
       "id": "BT93M.2.6",
       "type": "subphase",
-      "title": "Wenn der DQN-Anker nicht ladbar ist, muss der Report genau eine Entscheidung vorbereiten: Loader-Fix-Block, explizite neue Vergleichspolitik oder `dqn-anchor-blocked`; stille Fortsetzung nach `BT93P` ist verboten.",
-      "status": "open",
+      "title": "Wenn der DQN-Anker nicht ladbar ist, muss der Report genau eine Entscheidung vorbereiten: Loader-Fix-Block, explizite neue Vergleichspolitik oder `dqn-anchor-blocked`; stille Fortsetzung nach `BT93P` ist verboten. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `comparisonPolicyDecision=dqn-anchor-blocked`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.2",
@@ -12134,8 +12134,8 @@
     {
       "id": "BT93M.2.7",
       "type": "subphase",
-      "title": "Ein DQN-Loader-Fix darf nicht in BT93N/O/P versteckt werden; entweder eigener Fix-Block oder explizite User-Ersatzpolitik, sonst bleibt die Kette diagnose-only.",
-      "status": "open",
+      "title": "Ein DQN-Loader-Fix darf nicht in BT93N/O/P versteckt werden; entweder eigener Fix-Block oder explizite User-Ersatzpolitik, sonst bleibt die Kette diagnose-only. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_dqn_same_matrix_anchor.py --write-report` -> `data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json`, `blockedActions` enthaelt `BT93P BT94A-ready`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.2",
@@ -26024,9 +26024,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93M"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -26039,9 +26045,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93M"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -31430,6 +31442,26 @@
       }
     },
     {
+      "id": "python/configs/ppo_bt93m_dqn_same_matrix.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "python/configs/ppo_user_owned_survival_3m_4env_longrun.json",
       "type": "file",
       "title": null,
@@ -33182,9 +33214,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93M"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -69386,6 +69424,24 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -69702,6 +69758,15 @@
     {
       "from": "BT90",
       "to": "python/configs/ppo_bt93k_longrun_ladder.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/configs/ppo_bt93m_dqn_same_matrix.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -70458,6 +70523,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93m_dqn_same_matrix_anchor.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -72202,6 +72276,24 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -72500,6 +72592,15 @@
     {
       "from": "BT91",
       "to": "python/configs/ppo_bt93k_longrun_ladder.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/configs/ppo_bt93m_dqn_same_matrix.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -73256,6 +73357,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93m_dqn_same_matrix_anchor.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -76198,6 +76308,24 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -76505,6 +76633,15 @@
     {
       "from": "BT92",
       "to": "python/configs/ppo_bt93k_longrun_ladder.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/configs/ppo_bt93m_dqn_same_matrix.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -77261,6 +77398,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93m_dqn_same_matrix_anchor.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79304,6 +79450,24 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -79611,6 +79775,15 @@
     {
       "from": "BT93B",
       "to": "python/configs/ppo_bt93k_longrun_ladder.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/configs/ppo_bt93m_dqn_same_matrix.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -80367,6 +80540,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93m_dqn_same_matrix_anchor.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88814,6 +88996,24 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -89121,6 +89321,15 @@
     {
       "from": "BT93D",
       "to": "python/configs/ppo_bt93k_longrun_ladder.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/configs/ppo_bt93m_dqn_same_matrix.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -89877,6 +90086,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93m_dqn_same_matrix_anchor.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97499,6 +97717,24 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93m/evidence_quarantine_report.json",
       "type": "scope",
       "hint": null,
@@ -97815,6 +98051,15 @@
     {
       "from": "BT93E",
       "to": "python/configs/ppo_bt93k_longrun_ladder.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/configs/ppo_bt93m_dqn_same_matrix.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98571,6 +98816,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93m_dqn_same_matrix_anchor.py",
       "type": "scope",
       "hint": null,
       "attributes": {

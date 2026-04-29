@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "bt93m-dqn-same-matrix-config-v1",
+  "blockId": "BT93M",
+  "phaseId": "93M.2",
+  "matrixSource": "data/training/ppo/bt93l/task_metric_contract.json",
+  "baselineMatrixSource": "data/training/ppo/bt93l/baseline_matrix_report.json",
+  "expectedChampion": {
+    "baselineId": "bt11-fight-champion-2026-03-24",
+    "stamp": "BT11_FIGHT_20260324T014853-r4042",
+    "checkpointPath": "data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json",
+    "runPath": "data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json",
+    "evalPath": "data/training/runs/BT11_FIGHT_20260324T014853-r4042/eval.json",
+    "gatePath": "data/training/runs/BT11_FIGHT_20260324T014853-r4042/gate.json"
+  },
+  "fallbackInspection": [
+    "data/training/models/BT20_REFERENCE_ONLY_1777474973139/checkpoint.json",
+    "data/training/runs/BT20_REFERENCE_ONLY_1777474973139/benchmark-manifest.json",
+    "data/bot_validation_report.json",
+    "data/performance_ki_baseline_report.json"
+  ],
+  "expectedCheckpointSignature": {
+    "supportedContractVersions": [
+      "v36-dqn-checkpoint-v2",
+      "v35-dqn-checkpoint-v1",
+      "v34-dqn-checkpoint-v1"
+    ],
+    "requiredTopLevelFields": [
+      "contractVersion",
+      "online",
+      "target"
+    ],
+    "requiredNetworkFields": [
+      "online.layers[] or online.weightsInputHidden/weightsHiddenOutput",
+      "target.layers[] or target.weightsInputHidden/weightsHiddenOutput"
+    ]
+  },
+  "sameMatrixRequirements": {
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "semanticWindow": "runtime-near-headless-v1",
+    "modeId": "runtime-near-headless-v1",
+    "domainModes": [
+      "classic-3d"
+    ],
+    "mapKey": "standard",
+    "gameMode": "CLASSIC",
+    "planarMode": false,
+    "maxStepsPerEpisode": 180,
+    "controlSeeds": [
+      944,
+      945,
+      946
+    ],
+    "diagnosticTrainSeeds": [
+      934,
+      935,
+      936,
+      937
+    ],
+    "holdoutStatus": "reserved-unused-in-BT93L.1-through-BT93L.6"
+  },
+  "historicalReportPolicy": {
+    "allowedAs": [
+      "historical context"
+    ],
+    "forbiddenAs": [
+      "same-matrix DQN anchor",
+      "BT94A opening evidence",
+      "candidate evidence",
+      "freeze evidence",
+      "promote evidence"
+    ]
+  }
+}

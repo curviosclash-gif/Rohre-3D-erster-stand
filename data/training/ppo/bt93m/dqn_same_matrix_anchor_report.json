@@ -1,0 +1,221 @@
+{
+  "blockId": "BT93M",
+  "blockedActions": [
+    "BT93P BT94A-ready",
+    "BT94A candidate run",
+    "freeze candidate",
+    "promotion",
+    "rollout-ready wording"
+  ],
+  "comparisonPolicyDecision": "dqn-anchor-blocked",
+  "configHash": "e7dcbff961763f732a61d35729999e10c06d209f3651c3dc795a96281abb04e9",
+  "decision": {
+    "blockingReason": "No loadable DQN checkpoint exists for the BT93L/BT93M matrix: the documented BT11 champion checkpoint path is absent and the only versioned checkpoint-like fallback lacks online/target network state.",
+    "blocksPositiveReentry": true,
+    "nextRepairOptions": [
+      {
+        "id": "restore-bt11-checkpoint-artifact",
+        "requiredEvidence": [
+          "versioned checkpoint at data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json",
+          "contractVersion plus online/target network states",
+          "same BT93L matrix manifest hash"
+        ],
+        "type": "loader-fix-block"
+      },
+      {
+        "id": "approve-replacement-comparison-policy",
+        "requiredEvidence": [
+          "new policy id",
+          "why DQN anchor is impossible or intentionally replaced",
+          "effect on BT93P and BT94A gates"
+        ],
+        "type": "explicit-user-decision"
+      },
+      {
+        "id": "stop-as-dqn-anchor-blocked",
+        "requiredEvidence": [
+          "this report",
+          "comparison_policy_decision.json in BT93M.3"
+        ],
+        "type": "hard-stop"
+      }
+    ],
+    "status": "dqn-anchor-blocked"
+  },
+  "generatedAt": "2026-04-29T17:02:34Z",
+  "generatedBy": "python/scripts/bt93m_dqn_same_matrix_anchor.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "c9ff5c5df2f9f2451958677d04aa7691af14c48d"
+  },
+  "guardrails": {
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "historicalReportsUsedAsAnchor": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "historicalReportHandling": {
+    "data/bot_validation_report.json": "context-only, not same-matrix DQN anchor",
+    "data/performance_ki_baseline_report.json": "context-only, not same-matrix DQN anchor"
+  },
+  "loadAttempts": [
+    {
+      "actualStructure": null,
+      "errorClass": "artifact-not-found",
+      "exists": false,
+      "expectedSignature": "DQN checkpoint JSON with contractVersion plus online/target network states",
+      "loadAttempted": false,
+      "loadOk": false,
+      "missingFields": [
+        "file"
+      ],
+      "path": "data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json",
+      "role": "expected-bt11-champion-checkpoint"
+    },
+    {
+      "actualStructure": {
+        "checkpointKeys": null,
+        "contractVersion": "v36-dqn-checkpoint-v2",
+        "keys": [
+          "contractVersion"
+        ],
+        "onlineKeys": null,
+        "targetKeys": null,
+        "type": "object"
+      },
+      "errorClass": "checkpoint-network-state-missing",
+      "exists": true,
+      "expectedSignature": {
+        "contractVersion": [
+          "v34-dqn-checkpoint-v1",
+          "v35-dqn-checkpoint-v1",
+          "v36-dqn-checkpoint-v2"
+        ],
+        "networkFormat": "layers[] or v34 flat weights/bias fields",
+        "requiredFields": [
+          "online",
+          "target"
+        ]
+      },
+      "loadAttempted": true,
+      "loadOk": false,
+      "missingFields": [
+        "online",
+        "target"
+      ],
+      "modelMetadata": {
+        "actionCount": null,
+        "contractVersion": "v36-dqn-checkpoint-v2",
+        "envSteps": null,
+        "observationLength": null,
+        "optimizerSteps": null
+      },
+      "path": "data/training/models/BT20_REFERENCE_ONLY_1777474973139/checkpoint.json",
+      "role": "fallback-inspection-checkpoint",
+      "sha256": "40f6de9a7baf86d3dd06a917e7fee42047594d793f74cb16b631a1453d2ba7ea"
+    }
+  ],
+  "manifestHash": "10afc4fa1f257252332645bb5caeab755081f00019b824b7ca3ba358092c6bc3",
+  "manifestPath": "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
+  "matrix": {
+    "controlSeeds": [
+      944,
+      945,
+      946
+    ],
+    "diagnosticEvalSeeds": [
+      944,
+      945,
+      946
+    ],
+    "diagnosticTrainSeeds": [
+      934,
+      935,
+      936,
+      937
+    ],
+    "domainModes": [
+      "classic-3d"
+    ],
+    "gameMode": "CLASSIC",
+    "holdoutSeeds": [
+      960,
+      961
+    ],
+    "holdoutStatus": "reserved-unused-in-BT93L.1-through-BT93L.6",
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "maxStepsPerEpisode": 180,
+    "microPpoEnvCount": 2,
+    "microPpoFirstProbeTimesteps": 10000,
+    "modeId": "runtime-near-headless-v1",
+    "modePath": "normal",
+    "planarMode": false,
+    "primaryMap": "standard",
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "matrixHash": "a8e17c34cc152bf73d6e6d43e11aa12b3cffae9a2caf26601ebd22b94d4b7bad",
+  "modelHash": null,
+  "nextAllowedActions": [
+    "BT93M.3 comparator/no-start refresh with comparisonPolicyDecision=dqn-anchor-blocked",
+    "document BT93N/O as diagnose-only unless user approves a replacement policy or restores a loadable DQN anchor"
+  ],
+  "ok": true,
+  "phaseCoverage": {
+    "93M.2.1": true,
+    "93M.2.2": true,
+    "93M.2.3": true,
+    "93M.2.4": true,
+    "93M.2.5": true,
+    "93M.2.6": true,
+    "93M.2.7": true
+  },
+  "phaseId": "93M.2",
+  "resultClass": "dqn-anchor-blocked",
+  "sameMatrixDqnAnchorPresent": false,
+  "schemaVersion": "bt93m-dqn-same-matrix-anchor-report-v1",
+  "sourceArtifacts": {
+    "baselineMatrixReport": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L baseline matrix",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013"
+    },
+    "startTruth": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/start_truth.json",
+      "phaseId": "93M.1",
+      "resultClass": "start-truth-pinned-red",
+      "role": "BT93M.1 start truth",
+      "sha256": "8406aa83297361b4b1ffd64e2ceed863f88d8b5d3cdb3e041c08b8cabe2e2399"
+    },
+    "taskMetricContract": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L task metric contract",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0"
+    }
+  }
+}
