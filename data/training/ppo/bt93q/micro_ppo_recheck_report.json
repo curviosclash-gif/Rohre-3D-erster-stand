@@ -1,0 +1,341 @@
+{
+  "actualModelTimesteps": 0,
+  "blockId": "BT93Q",
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700"
+  },
+  "contract": {
+    "lockedBeforeRun": true,
+    "path": "data/training/ppo/bt93q/micro_ppo_recheck_contract.json",
+    "sha256": "e436227857fe072b2e3c89c098fb2de047197e83f07633194c7f09a56e7f6a56",
+    "statisticalCorridor": {
+      "afterTheFactThresholdChangesAllowed": false,
+      "deathBefore60EvalMax": 0,
+      "deathBefore60TrainMax": 0,
+      "deterministicEvalSingleActionShareMax": 0.85,
+      "invalidActionRateMax": 0.0,
+      "lockedBeforeRun": true,
+      "objectiveSignalReachableMinEval": 1,
+      "objectiveSignalReachableMinTrain": 1,
+      "postDecodeClampRateMax": 0.0,
+      "progressSignalReachableMinEval": 1,
+      "progressSignalReachableMinTrain": 1,
+      "repeatedActionStreakMax": 600,
+      "runtimeErrorCountMax": 0,
+      "sanitizerRateMax": 0.0
+    }
+  },
+  "decision": {
+    "blocksNext": [
+      "93Q.99 green closure",
+      "BT93O claim",
+      "BT93P claim",
+      "BT94A claim",
+      "candidate run",
+      "freeze candidate",
+      "holdout consumption",
+      "promote",
+      "rollout",
+      "PPO-Validate or BT95 handoff signal",
+      "50k/100k/200k extension"
+    ],
+    "candidateRun": false,
+    "extension50kAllowed": false,
+    "extension50kExecuted": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "nextAllowedActions": [
+      "close BT93Q honestly with the red result class",
+      "do not claim BT93O while policy/action/telemetry blockers remain active",
+      "do not start a 50k/100k/200k extension in BT93Q"
+    ],
+    "opensNext": [],
+    "recheckStarted": false,
+    "resultClass": "policy-collapse-active"
+  },
+  "evalSummary": {
+    "actionDistribution": {},
+    "deathBefore60Count": null,
+    "entropyLogitSnapshot": {},
+    "executed": false,
+    "notMeasuredReason": "start-gate-blocked",
+    "objectiveSignalReachableCount": null,
+    "playerDeadShare": null,
+    "progressSignalReachableCount": null,
+    "repeatedActionStreaks": {},
+    "rewardBreakdownTotals": {},
+    "runtimeErrorCount": null,
+    "safetyMaxRates": {
+      "invalidActionRate": null,
+      "postDecodeClampRate": null,
+      "sanitizerRate": null
+    }
+  },
+  "generatedAt": "2026-04-29T23:57:58Z",
+  "generatedBy": "python/scripts/bt93q_micro_ppo_recheck.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "69942c9c443779eeb2fd1029c876797796eafc2e"
+  },
+  "greenCriteria": {
+    "deathBefore60EvalEqualsZero": null,
+    "deathBefore60TrainEqualsZero": null,
+    "deterministicEvalDistributionNonCollapsed": null,
+    "green": false,
+    "notGreenReason": "policy-collapse-active",
+    "progressOrObjectiveNonzero": null
+  },
+  "guardrails": {
+    "baselineRun": false,
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingRunKind": "not-started-start-gate-blocked",
+    "trainingStarted": false
+  },
+  "invalidations": [
+    {
+      "id": "policyCollapseResolvedOrExplained",
+      "resultClass": "policy-collapse-active"
+    },
+    {
+      "id": "stressMatrixHasNoActionSpaceBlocker",
+      "resultClass": "action-space-required"
+    },
+    {
+      "id": "fixDeltaAllowsMicroRecheck",
+      "resultClass": "micro-ppo-recheck-not-allowed"
+    },
+    {
+      "id": "postFixResultNotInsufficient",
+      "resultClass": "action-fix-insufficient"
+    },
+    {
+      "id": "telemetryGapNonBlocking",
+      "resultClass": "observation-telemetry-required"
+    }
+  ],
+  "matrixId": "bt93q-walltrail-policy-recheck-v1",
+  "ok": true,
+  "phaseCoverage": {
+    "93Q.6.1": true,
+    "93Q.6.2": true,
+    "93Q.6.3": true,
+    "93Q.6.4": true,
+    "93Q.6.5": true
+  },
+  "phaseId": "93Q.6",
+  "policyIds": {
+    "eval": "ppo-bt93q-micro-10k-deterministic",
+    "train": "ppo-bt93q-micro-10k-stochastic"
+  },
+  "requestedTimesteps": 10000,
+  "resultClass": "policy-collapse-active",
+  "sampleCounts": {
+    "actualModelTimesteps": 0,
+    "evalCompletedEpisodes": 0,
+    "evalSeeds": [
+      944,
+      945,
+      946
+    ],
+    "evalSteps": 0,
+    "requestedTimesteps": 10000,
+    "trainCompletedEpisodes": 0,
+    "trainSteps": 0
+  },
+  "schemaVersion": "bt93q-micro-ppo-recheck-report-v1",
+  "semanticWindow": "bt93q-walltrail-10k-diagnostic-window",
+  "sourceArtifacts": {
+    "actionSurface": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93Q sidecar masked semantic action surface",
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "tracked": true
+    },
+    "curviosEnv": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/curvios_env.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "Python sidecar environment",
+      "sha256": "2a12d75b327b10daef853cc242e6d81fb87c4ee838756d6cef1905d19de94d59",
+      "tracked": true
+    },
+    "fixDelta": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/fix_delta_report.json",
+      "phaseId": "93Q.5",
+      "resultClass": "action-fix-insufficient",
+      "role": "BT93Q.5 post-fix delta decision",
+      "sha256": "8a3df8cd4696a893c785278e913dd0b98efa42deebe148ba1dffd307d7c354a1",
+      "tracked": true
+    },
+    "fixManifest": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/fix_manifest.json",
+      "phaseId": "93Q.5",
+      "resultClass": "action-fix-locked-before-recheck",
+      "role": "BT93Q.5 selected narrow fix manifest",
+      "sha256": "38d90e97a3f17cf028d0b2f312bfdc885170cd4e32e1823c9769a39bed663e9e",
+      "tracked": true
+    },
+    "headlessRunner": {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "JS headless lane runner",
+      "sha256": "d6a2917a001a310010a98ee150726af110f1444b0716e6ac3a35815253144360",
+      "tracked": true
+    },
+    "microPpoRecheckContract": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/micro_ppo_recheck_contract.json",
+      "phaseId": "93Q.6",
+      "resultClass": null,
+      "role": "BT93Q.6 pre-run recheck contract",
+      "sha256": "e436227857fe072b2e3c89c098fb2de047197e83f07633194c7f09a56e7f6a56",
+      "tracked": false
+    },
+    "policyCollapse": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "phaseId": "93Q.3",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q.3 deterministic policy-collapse decision",
+      "sha256": "8b6fbfdbf2285e6f58c8104fad408fc1e6b2677fde394a617b78170137af035d",
+      "tracked": true
+    },
+    "scenarioManifest": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+      "phaseId": "93Q.4",
+      "resultClass": null,
+      "role": "BT93Q.4 pinned wall/trail scenario matrix",
+      "sha256": "abe7a51ae263951ffb869662acc1998fede0377c1e4b8d4d51c69427196a2719",
+      "tracked": true
+    },
+    "telemetryGap": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "phaseId": "93Q.2",
+      "resultClass": "observation-telemetry-required",
+      "role": "BT93Q.2 observation/telemetry gap decision",
+      "sha256": "1442849162125578f468ed0937ca08611267dad1b1d0d0da059ac0007d749241",
+      "tracked": true
+    },
+    "walltrailStress": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "phaseId": "93Q.4",
+      "resultClass": "action-space-required",
+      "role": "BT93Q.4 action-effect stress matrix",
+      "sha256": "21f6ea262bb4123bb9a05003d92982802f236a6fc3a71f3480961979b8a33d87",
+      "tracked": true
+    }
+  },
+  "startGate": {
+    "blockers": [
+      {
+        "id": "policyCollapseResolvedOrExplained",
+        "resultClass": "policy-collapse-active"
+      },
+      {
+        "id": "stressMatrixHasNoActionSpaceBlocker",
+        "resultClass": "action-space-required"
+      },
+      {
+        "id": "fixDeltaAllowsMicroRecheck",
+        "resultClass": "micro-ppo-recheck-not-allowed"
+      },
+      {
+        "id": "postFixResultNotInsufficient",
+        "resultClass": "action-fix-insufficient"
+      },
+      {
+        "id": "telemetryGapNonBlocking",
+        "resultClass": "observation-telemetry-required"
+      }
+    ],
+    "checks": {
+      "fixClassLocked": true,
+      "fixDeltaAllowsMicroRecheck": false,
+      "policyCollapseResolvedOrExplained": false,
+      "postFixResultNotInsufficient": false,
+      "sourceFilesReady": true,
+      "sourceFilesVersioned": true,
+      "stressMatrixHasNoActionSpaceBlocker": false,
+      "telemetryGapNonBlocking": false
+    },
+    "passed": false,
+    "sourceResultClasses": {
+      "fixDelta": "action-fix-insufficient",
+      "fixManifest": "action-fix-locked-before-recheck",
+      "policyCollapse": "policy-collapse-active",
+      "telemetryGap": "observation-telemetry-required",
+      "walltrailStress": "action-space-required"
+    }
+  },
+  "trainSummary": {
+    "actionDistribution": {},
+    "deathBefore60Count": null,
+    "entropyLogitSnapshot": {},
+    "executed": false,
+    "notMeasuredReason": "start-gate-blocked",
+    "objectiveSignalReachableCount": null,
+    "playerDeadShare": null,
+    "progressSignalReachableCount": null,
+    "repeatedActionStreaks": {},
+    "rewardBreakdownTotals": {},
+    "runtimeErrorCount": null,
+    "safetyMaxRates": {
+      "invalidActionRate": null,
+      "postDecodeClampRate": null,
+      "sanitizerRate": null
+    }
+  }
+}

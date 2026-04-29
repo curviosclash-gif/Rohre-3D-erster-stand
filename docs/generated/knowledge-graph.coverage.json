@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2421,
-    "rawCoveredFileCount": 1942,
+    "trackedFileCount": 2424,
+    "rawCoveredFileCount": 1945,
     "rawCoveragePercent": 80.2,
-    "adjustedTrackedFileCount": 1518,
-    "adjustedCoveredFileCount": 1283,
+    "adjustedTrackedFileCount": 1521,
+    "adjustedCoveredFileCount": 1286,
     "adjustedCoveragePercent": 84.5,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 243,
-        "coveredCount": 222
+        "count": 245,
+        "coveredCount": 224
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 881,
-        "coveredCount": 865
+        "count": 882,
+        "coveredCount": 866
       },
       {
         "classification": "product-docs",
@@ -7906,6 +7906,52 @@
     },
     {
       "path": "data/training/ppo/bt93q/hypothesis_lock.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/micro_ppo_recheck_contract.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/micro_ppo_recheck_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -18545,6 +18591,29 @@
     },
     {
       "path": "python/scripts/bt93q_finding_register.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93q_micro_ppo_recheck.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

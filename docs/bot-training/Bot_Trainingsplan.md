@@ -333,7 +333,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93L | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; BT94A bleibt geschlossen |
 | Bot-Codex | BT93M | 2026-04-29 | frei | abgeschlossen 2026-04-29 als `gate-fresh-dqn-anchor-blocked`; BT93N nur diagnose-only/Loader/User-Entscheid |
 | Bot-Codex | BT93N | 2026-04-29 | frei | abgeschlossen 2026-04-30 als `diagnose-loop-required`; BT93Q folgt, BT93O bleibt blockiert |
-| Bot-Codex | BT93Q | 2026-04-30 | in-bearbeitung | naechste Subphase 93Q.2 Trace-Reanalyse |
+| Bot-Codex | BT93Q | 2026-04-30 | in-bearbeitung | naechste Subphase 93Q.99 Abschluss-Gate; DoD.8/DoD.9 offen |
 | - | BT93O | - | frei | wartet auf BT93Q.99 |
 | - | BT93P | - | frei | wartet auf BT93O.99 |
 | - | BT94A | - | frei | wartet auf `BT93P.4=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
@@ -847,7 +847,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93L | Objective-Reachability und Survival-Task-Definition | completed | P1 | BT93K.99 (`diagnose-loop-required`) + Diagnosebericht 2026-04-28 | 93L.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` |
 | BT93M | Gate-Wahrheit und DQN-Same-Matrix-Anker | completed | P1 | BT93L.99 (`diagnose-loop-required`) + User-Intake 2026-04-29 | 93M.99 abgeschlossen: `gate-fresh-dqn-anchor-blocked` | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93N | DeathBefore60-Stability und Terminal-Root-Cause | completed | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.99 abgeschlossen; `diagnose-loop-required`, BT93Q ist naechster Repair, BT93O/BT94A bleiben blockiert | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
-| BT93Q | DeathBefore60 Wall/Trail Policy Repair | active | P1 | BT93N.99 (`diagnose-loop-required`, `death-before60-still-blocking`) | 93Q.2 | `docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md` |
+| BT93Q | DeathBefore60 Wall/Trail Policy Repair | active | P1 | BT93N.99 (`diagnose-loop-required`, `death-before60-still-blocking`) | 93Q.99 | `docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md` |
 | BT93O | Action-/Objective-Quality und Anti-Plateau | planned | P2 | BT93Q.99 `walltrail-policy-green` oder DeathBefore60 non-blocking | 93O.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93P | PPO Trainingsleiter und BT94A-Reentry-Gate | planned | P2 | BT93O.99 + gruene Action-/Objective-/Anti-Plateau-Gates | 93P.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93P.4 (`BT94A-ready`) + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
@@ -3283,8 +3283,8 @@ Primaerer Scope:
 - [ ] DoD.8 `safety_action_contract_report.json` klaert, ob `vetoActive=true` nur Diagnose ist oder eine handlungswirksame Maske/Policy braucht; keine produktive Runtime-Safety-Umschaltung in BT93Q.
 - [ ] DoD.9 `reward_pressure_ordering_report.json` beweist oder widerlegt, dass Progress-/Checkpoint-Reward nahe lethalem Wall-/Trail-Druck falsch ordnet.
 - [x] DoD.10 Nur eine Fix-Klasse pro Subphase: Action, Observation/Telemetry, Reward, Safety-Mask oder Terminal/Runner. Gemischte Fixes brauchen getrennte Teilphasen und getrennte Reports. (abgeschlossen: 2026-04-30; evidence: `data/training/ppo/bt93q/fix_manifest.json` (`fixClass=Action`, `oneFixClassOnly=true`))
-- [ ] DoD.11 `micro_ppo_recheck_report.json` laeuft maximal 10k Timesteps und nur nach gruener Stress-/Fix-Evidence. Keine 50k/100k in BT93Q.
-- [ ] DoD.12 Recheck-Gate bleibt hart: Train und Eval `deathBefore60Count=0` oder vorher gepinnter, statistisch begruendeter Korridor; nachtraegliche Toleranzen sind ungueltig.
+- [x] DoD.11 `micro_ppo_recheck_report.json` laeuft maximal 10k Timesteps und nur nach gruener Stress-/Fix-Evidence. Keine 50k/100k in BT93Q. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_report.json` (`actualModelTimesteps=0`, `recheckStarted=false`, `resultClass=policy-collapse-active`))
+- [x] DoD.12 Recheck-Gate bleibt hart: Train und Eval `deathBefore60Count=0` oder vorher gepinnter, statistisch begruendeter Korridor; nachtraegliche Toleranzen sind ungueltig. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_contract.json`, `micro_ppo_recheck_report.json` (`lockedBeforeRun=true`, `afterTheFactThresholdChangesAllowed=false`, `green=false`))
 - [ ] DoD.13 `handover_package.json` klassifiziert ehrlich: `walltrail-policy-green`, `death-before60-still-blocking`, `action-space-required`, `observation-telemetry-required`, `reward-redesign-required`, `terminal-semantics-required` oder `measurement-invalid`.
 - [ ] DoD.14 BT93Q erzeugt kein `BT94A-ready`, solange DQN-Anker/Ersatzpolitik, BT93O, BT93P und `bt94a_gate_check.py` nicht gruen sind.
 - [ ] DoD.15 `closure_gate_report.json` belegt, dass kein Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate- oder Runtime-Handoff-Signal erzeugt wurde.
@@ -3354,11 +3354,11 @@ Pflicht-Evidence:
 
 ### 93Q.6 10k Micro-PPO Recheck
 
-- [ ] 93Q.6.1 Recheck startet nur, wenn 93Q.4/93Q.5 eine konkrete Ursache und einen engen Fix belegen.
-- [ ] 93Q.6.2 `micro_ppo_recheck_contract.json` pinnt Matrix, Reward-Profil, Action-Surface, Seeds, Eval-Seeds, maxSteps, Statistik-Korridor und verbotene nachtraegliche Schwellenanpassung.
-- [ ] 93Q.6.3 Maximal 10k Timesteps; keine 50k/100k-Erweiterung im selben Block.
-- [ ] 93Q.6.4 Report schreibt Train/Eval DeathBefore60, PlayerDeadShare, Action-Distribution, repeated-action streaks, Entropy/Logit-Snapshot, Progress-/Objective-Raten, RewardBreakdown, Safety-Raten und Runtime Errors.
-- [ ] 93Q.6.5 Gruen nur bei `deathBefore60Train=0`, `deathBefore60Eval=0`, nicht-kollabierter Deterministic-Eval-Action-Distribution oder vorher gepinntem, begruendetem Korridor, plus Progress/Objectives nonzero.
+- [x] 93Q.6.1 Recheck startet nur, wenn 93Q.4/93Q.5 eine konkrete Ursache und einen engen Fix belegen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_report.json` (`startGate.passed=false`, `recheckStarted=false`))
+- [x] 93Q.6.2 `micro_ppo_recheck_contract.json` pinnt Matrix, Reward-Profil, Action-Surface, Seeds, Eval-Seeds, maxSteps, Statistik-Korridor und verbotene nachtraegliche Schwellenanpassung. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_contract.json` (`phaseCoverage.93Q.6.2=true`))
+- [x] 93Q.6.3 Maximal 10k Timesteps; keine 50k/100k-Erweiterung im selben Block. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_report.json` (`requestedTimesteps=10000`, `actualModelTimesteps=0`, `extension50kExecuted=false`))
+- [x] 93Q.6.4 Report schreibt Train/Eval DeathBefore60, PlayerDeadShare, Action-Distribution, repeated-action streaks, Entropy/Logit-Snapshot, Progress-/Objective-Raten, RewardBreakdown, Safety-Raten und Runtime Errors. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_report.json` (`trainSummary.notMeasuredReason=start-gate-blocked`, `evalSummary.notMeasuredReason=start-gate-blocked`))
+- [x] 93Q.6.5 Gruen nur bei `deathBefore60Train=0`, `deathBefore60Eval=0`, nicht-kollabierter Deterministic-Eval-Action-Distribution oder vorher gepinntem, begruendetem Korridor, plus Progress/Objectives nonzero. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_report.json` (`greenCriteria.green=false`, `resultClass=policy-collapse-active`))
 
 Pflicht-Evidence:
 

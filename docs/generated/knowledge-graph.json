@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 334,
+          "concreteCount": 337,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 472,
+          "concreteCount": 475,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 330,
+          "concreteCount": 333,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 329,
+          "concreteCount": 332,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 971,
+          "concreteCount": 974,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 979,
+          "concreteCount": 982,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1647,7 +1647,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93Q.6",
+        "currentPhase": "93Q.99",
         "scopeDeclarations": [
           "data/training/ppo/bt93q/action_effect_stress_report.json",
           "data/training/ppo/bt93q/closure_gate_report.json",
@@ -1667,13 +1667,14 @@
           "package.json",
           "python/scripts/bt93q_action_fix.py",
           "python/scripts/bt93q_finding_register.py",
+          "python/scripts/bt93q_micro_ppo_recheck.py",
           "python/scripts/bt93q_policy_collapse.py",
           "python/scripts/bt93q_trace_reanalysis.py",
           "python/scripts/bt93q_walltrail_stress.py"
         ],
         "scopeResolution": {
-          "concreteCount": 17,
-          "plannedCount": 4
+          "concreteCount": 20,
+          "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -4775,7 +4776,7 @@
       "id": "BT93Q.6",
       "type": "phase",
       "title": "10k Micro-PPO Recheck",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.6"
@@ -13656,8 +13657,8 @@
     {
       "id": "BT93Q.6.1",
       "type": "subphase",
-      "title": "Recheck startet nur, wenn 93Q.4/93Q.5 eine konkrete Ursache und einen engen Fix belegen.",
-      "status": "open",
+      "title": "Recheck startet nur, wenn 93Q.4/93Q.5 eine konkrete Ursache und einen engen Fix belegen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_report.json` (`startGate.passed=false`, `recheckStarted=false`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.6",
@@ -13667,8 +13668,8 @@
     {
       "id": "BT93Q.6.2",
       "type": "subphase",
-      "title": "`micro_ppo_recheck_contract.json` pinnt Matrix, Reward-Profil, Action-Surface, Seeds, Eval-Seeds, maxSteps, Statistik-Korridor und verbotene nachtraegliche Schwellenanpassung.",
-      "status": "open",
+      "title": "`micro_ppo_recheck_contract.json` pinnt Matrix, Reward-Profil, Action-Surface, Seeds, Eval-Seeds, maxSteps, Statistik-Korridor und verbotene nachtraegliche Schwellenanpassung. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_contract.json` (`phaseCoverage.93Q.6.2=true`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.6",
@@ -13678,8 +13679,8 @@
     {
       "id": "BT93Q.6.3",
       "type": "subphase",
-      "title": "Maximal 10k Timesteps; keine 50k/100k-Erweiterung im selben Block.",
-      "status": "open",
+      "title": "Maximal 10k Timesteps; keine 50k/100k-Erweiterung im selben Block. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_report.json` (`requestedTimesteps=10000`, `actualModelTimesteps=0`, `extension50kExecuted=false`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.6",
@@ -13689,8 +13690,8 @@
     {
       "id": "BT93Q.6.4",
       "type": "subphase",
-      "title": "Report schreibt Train/Eval DeathBefore60, PlayerDeadShare, Action-Distribution, repeated-action streaks, Entropy/Logit-Snapshot, Progress-/Objective-Raten, RewardBreakdown, Safety-Raten und Runtime Errors.",
-      "status": "open",
+      "title": "Report schreibt Train/Eval DeathBefore60, PlayerDeadShare, Action-Distribution, repeated-action streaks, Entropy/Logit-Snapshot, Progress-/Objective-Raten, RewardBreakdown, Safety-Raten und Runtime Errors. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_report.json` (`trainSummary.notMeasuredReason=start-gate-blocked`, `evalSummary.notMeasuredReason=start-gate-blocked`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.6",
@@ -13700,8 +13701,8 @@
     {
       "id": "BT93Q.6.5",
       "type": "subphase",
-      "title": "Gruen nur bei `deathBefore60Train=0`, `deathBefore60Eval=0`, nicht-kollabierter Deterministic-Eval-Action-Distribution oder vorher gepinntem, begruendetem Korridor, plus Progress/Objectives nonzero.",
-      "status": "open",
+      "title": "Gruen nur bei `deathBefore60Train=0`, `deathBefore60Eval=0`, nicht-kollabierter Deterministic-Eval-Action-Distribution oder vorher gepinntem, begruendetem Korridor, plus Progress/Objectives nonzero. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_micro_ppo_recheck.py --write-report --total-timesteps 10000 --eval-steps-per-seed 2700` -> `data/training/ppo/bt93q/micro_ppo_recheck_report.json` (`greenCriteria.green=false`, `resultClass=policy-collapse-active`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.6",
@@ -27304,9 +27305,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -27319,9 +27326,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -34356,6 +34369,27 @@
     },
     {
       "id": "python/scripts/bt93q_finding_register.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93q_micro_ppo_recheck.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -70829,6 +70863,24 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
       "type": "scope",
       "hint": null,
@@ -72027,6 +72079,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93q_micro_ppo_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -74032,6 +74093,24 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
       "type": "scope",
       "hint": null,
@@ -75212,6 +75291,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93q_micro_ppo_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78415,6 +78503,24 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
       "type": "scope",
       "hint": null,
@@ -79604,6 +79710,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93q_micro_ppo_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81908,6 +82023,24 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
       "type": "scope",
       "hint": null,
@@ -83097,6 +83230,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93q_micro_ppo_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91805,6 +91947,24 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
       "type": "scope",
       "hint": null,
@@ -92994,6 +93154,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93q_micro_ppo_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -100877,6 +101046,24 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93q/micro_ppo_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
       "type": "scope",
       "hint": null,
@@ -102075,6 +102262,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93q_micro_ppo_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -127291,6 +127487,15 @@
     {
       "from": "BT93Q",
       "to": "python/scripts/bt93q_finding_register.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Q",
+      "to": "python/scripts/bt93q_micro_ppo_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
