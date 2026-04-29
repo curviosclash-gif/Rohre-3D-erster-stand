@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 331,
+          "concreteCount": 334,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 469,
+          "concreteCount": 472,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 327,
+          "concreteCount": 330,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 326,
+          "concreteCount": 329,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 968,
+          "concreteCount": 971,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 976,
+          "concreteCount": 979,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1647,7 +1647,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93Q.5",
+        "currentPhase": "93Q.6",
         "scopeDeclarations": [
           "data/training/ppo/bt93q/action_effect_stress_report.json",
           "data/training/ppo/bt93q/closure_gate_report.json",
@@ -1665,14 +1665,15 @@
           "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "package.json",
+          "python/scripts/bt93q_action_fix.py",
           "python/scripts/bt93q_finding_register.py",
           "python/scripts/bt93q_policy_collapse.py",
           "python/scripts/bt93q_trace_reanalysis.py",
           "python/scripts/bt93q_walltrail_stress.py"
         ],
         "scopeResolution": {
-          "concreteCount": 14,
-          "plannedCount": 6
+          "concreteCount": 17,
+          "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -4764,7 +4765,7 @@
       "id": "BT93Q.5",
       "type": "phase",
       "title": "Fix nach belegter Ursache",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.5"
@@ -13589,8 +13590,8 @@
     {
       "id": "BT93Q.5.1",
       "type": "subphase",
-      "title": "Action-Fix nur bei `action-space-required`: Sidecar-only Compound-Actions wie `turn-left-boost`, `turn-right-boost`, `brake`, `evade-left`, `evade-right` oder `danger-turn-away` einfuehren und testen.",
-      "status": "open",
+      "title": "Action-Fix nur bei `action-space-required`: Sidecar-only Compound-Actions wie `turn-left-boost`, `turn-right-boost`, `brake`, `evade-left`, `evade-right` oder `danger-turn-away` einfuehren und testen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_action_fix.py --write-report --repeat-steps 4` -> `data/training/ppo/bt93q/fix_manifest.json`, `fix_delta_report.json` (`fixClass=Action`, `preResultClass=action-space-required`, `resultClass=action-fix-insufficient`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.5",
@@ -13600,8 +13601,8 @@
     {
       "id": "BT93Q.5.2",
       "type": "subphase",
-      "title": "Observation-/Telemetry-Fix nur bei `observation-telemetry-required`: Raw-Pose/Heading/Velocity/TrailDistance/EscapeLane-Felder in Trainingsreports sichtbar machen, ohne produktive Runtime-API zu erweitern.",
-      "status": "open",
+      "title": "Observation-/Telemetry-Fix nur bei `observation-telemetry-required`: Raw-Pose/Heading/Velocity/TrailDistance/EscapeLane-Felder in Trainingsreports sichtbar machen, ohne produktive Runtime-API zu erweitern. (abgeschlossen: 2026-04-30; evidence: `data/training/ppo/bt93q/fix_manifest.json` (`fixClass=Action`; Observation/Telemetry nicht gewaehlt, keine produktive Runtime-API erweitert))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.5",
@@ -13611,8 +13612,8 @@
     {
       "id": "BT93Q.5.3",
       "type": "subphase",
-      "title": "Reward-Fix nur bei `reward-redesign-required`: danger-aware Progress-/Checkpoint-Ordering reparieren, ohne Noop/MaxStep zu belohnen.",
-      "status": "open",
+      "title": "Reward-Fix nur bei `reward-redesign-required`: danger-aware Progress-/Checkpoint-Ordering reparieren, ohne Noop/MaxStep zu belohnen. (abgeschlossen: 2026-04-30; evidence: `data/training/ppo/bt93q/fix_manifest.json` (`fixClass=Action`; Reward nicht gewaehlt))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.5",
@@ -13622,8 +13623,8 @@
     {
       "id": "BT93Q.5.4",
       "type": "subphase",
-      "title": "Safety-Mask-Fix nur bei belegter Safety-Wirkungsluecke: trainingsseitige Pre-sampling-Danger-Mask oder Emergency-Action-Policy dokumentieren; keine produktive Runtime-Umschaltung.",
-      "status": "open",
+      "title": "Safety-Mask-Fix nur bei belegter Safety-Wirkungsluecke: trainingsseitige Pre-sampling-Danger-Mask oder Emergency-Action-Policy dokumentieren; keine produktive Runtime-Umschaltung. (abgeschlossen: 2026-04-30; evidence: `data/training/ppo/bt93q/fix_manifest.json` (`fixClass=Action`; Safety-Mask nicht gewaehlt, `runtimeSurfacesTouched=[]`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.5",
@@ -13633,8 +13634,8 @@
     {
       "id": "BT93Q.5.5",
       "type": "subphase",
-      "title": "Terminal-/Runner-Fix nur bei echter Klassifikationsdrift: `player-dead`, `truncated`, `max-steps`, `match-ended` muessen im Raw-Trace widerspruechlich sein.",
-      "status": "open",
+      "title": "Terminal-/Runner-Fix nur bei echter Klassifikationsdrift: `player-dead`, `truncated`, `max-steps`, `match-ended` muessen im Raw-Trace widerspruechlich sein. (abgeschlossen: 2026-04-30; evidence: `data/training/ppo/bt93q/fix_manifest.json` (`fixClass=Action`; Terminal/Runner nicht gewaehlt))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.5",
@@ -13644,8 +13645,8 @@
     {
       "id": "BT93Q.5.6",
       "type": "subphase",
-      "title": "`fix_manifest.json` pinnt genau eine Fix-Klasse, geaenderte Dateien, erwartete Metrikrichtung und Falsifikationsregeln vor Recheck.",
-      "status": "open",
+      "title": "`fix_manifest.json` pinnt genau eine Fix-Klasse, geaenderte Dateien, erwartete Metrikrichtung und Falsifikationsregeln vor Recheck. (abgeschlossen: 2026-04-30; evidence: `data/training/ppo/bt93q/fix_manifest.json` (`fixClass=Action`, `changedFiles`, `expectedMetricDirection`, `falsificationRules`); `data/training/ppo/bt93q/fix_delta_report.json` (`microPpoRecheckAllowed=false`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.5",
@@ -27225,9 +27226,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -27240,9 +27247,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -34316,6 +34329,27 @@
           "BT93D",
           "BT93E",
           "BT93N"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93q_action_fix.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Q"
         ],
         "exists": true
       }
@@ -70768,6 +70802,24 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93q/fix_delta_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93q/hypothesis_lock.json",
       "type": "scope",
       "hint": null,
@@ -71957,6 +72009,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93n_stability_ladder.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93q_action_fix.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -73944,6 +74005,24 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93q/fix_delta_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93q/hypothesis_lock.json",
       "type": "scope",
       "hint": null,
@@ -75115,6 +75194,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93n_stability_ladder.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93q_action_fix.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78300,6 +78388,24 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93q/fix_delta_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93q/hypothesis_lock.json",
       "type": "scope",
       "hint": null,
@@ -79480,6 +79586,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93n_stability_ladder.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93q_action_fix.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81766,6 +81881,24 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93q/fix_delta_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93q/hypothesis_lock.json",
       "type": "scope",
       "hint": null,
@@ -82946,6 +83079,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93n_stability_ladder.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93q_action_fix.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91636,6 +91778,24 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93q/fix_delta_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93q/hypothesis_lock.json",
       "type": "scope",
       "hint": null,
@@ -92816,6 +92976,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93n_stability_ladder.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93q_action_fix.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -100681,6 +100850,24 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93q/fix_delta_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93q/hypothesis_lock.json",
       "type": "scope",
       "hint": null,
@@ -101870,6 +102057,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93n_stability_ladder.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93q_action_fix.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -127077,6 +127273,15 @@
     {
       "from": "BT93Q",
       "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Q",
+      "to": "python/scripts/bt93q_action_fix.py",
       "type": "scope",
       "hint": null,
       "attributes": {

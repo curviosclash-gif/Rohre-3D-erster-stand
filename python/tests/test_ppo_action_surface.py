@@ -79,8 +79,25 @@ def test_masked_semantic_action_surface_applies_pre_sampling_mask_by_constructio
 def test_masked_semantic_manifest_excludes_inventory_indexed_actions() -> None:
     manifest = build_action_surface_manifest(PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID)
     excluded = set(manifest["excludedInventoryIndexedActions"])
+    semantic_actions = set(manifest["semanticActions"])
 
     assert manifest["gymSpace"] == "Discrete"
     assert manifest["policyLevelMasking"]["preSamplingAppliedInCurrentSb3Path"] is True
     assert "shootItem" in excluded
     assert "shootItemIndex" in excluded
+    assert {"turn-left-boost", "turn-right-boost", "evade-left", "evade-right"}.issubset(semantic_actions)
+
+
+def test_walltrail_compound_actions_decode_to_sidecar_only_payloads() -> None:
+    env = CurviosMaskedSemanticActionWrapper(ProbeEnv())
+    env.reset(seed=934)
+    semantic_actions = build_action_surface_manifest(PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID)["semanticActions"]
+    turn_left_boost_token = semantic_actions.index("turn-left-boost")
+
+    env.step(turn_left_boost_token)
+    action = env.env.actions[-1]
+
+    assert action["yawLeft"] is True
+    assert action["boost"] is True
+    assert action["shootItemIndex"] == -1
+    assert action["useItem"] == -1

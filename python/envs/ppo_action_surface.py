@@ -14,7 +14,7 @@ from bridge.authority_snapshot import ACTION_BOOLEAN_FIELDS, ACTION_INDEX_FIELDS
 from bridge.contract_v1 import EXPECTED_OBSERVATION_LENGTH, sanitize_action_payload
 
 PPO_ACTION_SURFACE_ID = "bt93c-multidiscrete-action-v1"
-PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID = "bt93g-masked-semantic-action-v1"
+PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID = "bt93q-walltrail-semantic-action-v1"
 PPO_INDEX_HEAD_SPACE_SIZE = 257
 PPO_INDEX_NOOP_TOKEN = 0
 PPO_INDEX_NOOP_VALUE = -1
@@ -32,6 +32,10 @@ MASKED_SEMANTIC_ACTIONS = (
     ("roll-right", {"rollRight": True}),
     ("boost", {"boost": True}),
     ("shoot-mg", {"shootMG": True}),
+    ("turn-left-boost", {"yawLeft": True, "boost": True}),
+    ("turn-right-boost", {"yawRight": True, "boost": True}),
+    ("evade-left", {"yawLeft": True, "rollLeft": True}),
+    ("evade-right", {"yawRight": True, "rollRight": True}),
 )
 
 

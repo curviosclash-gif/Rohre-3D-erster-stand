@@ -1,0 +1,212 @@
+{
+  "actionSurface": {
+    "manifest": {
+      "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+      "excludedInventoryIndexedActions": [
+        "dropItem",
+        "nextItem",
+        "shootItem",
+        "shootItemIndex",
+        "useItem"
+      ],
+      "gymSpace": "Discrete",
+      "policyLevelMasking": {
+        "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+        "mixedWithPostDecodeClamp": false,
+        "preSamplingAppliedInCurrentSb3Path": true,
+        "preSamplingByConstruction": true,
+        "source": "info.match.inventoryLength from the JS-authoritative transition payload",
+        "specified": true
+      },
+      "rawBoundarySurfaceTraining": false,
+      "sb3Trainable": true,
+      "semanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg",
+        "turn-left-boost",
+        "turn-right-boost",
+        "evade-left",
+        "evade-right"
+      ],
+      "surfaceId": "bt93q-walltrail-semantic-action-v1",
+      "telemetry": [
+        "policyLevelMask",
+        "preSamplingMaskRate",
+        "postDecodeClampRate",
+        "invalidActionRate",
+        "vetoRate",
+        "sanitizerRate",
+        "noopRate"
+      ]
+    },
+    "semanticActions": [
+      "noop",
+      "yaw-left",
+      "yaw-right",
+      "pitch-up",
+      "pitch-down",
+      "roll-left",
+      "roll-right",
+      "boost",
+      "shoot-mg",
+      "turn-left-boost",
+      "turn-right-boost",
+      "evade-left",
+      "evade-right"
+    ],
+    "surfaceId": "bt93q-walltrail-semantic-action-v1"
+  },
+  "blockId": "BT93Q",
+  "blockedActions": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k extension"
+  ],
+  "changedFiles": [
+    "python/envs/ppo_action_surface.py",
+    "python/tests/test_ppo_action_surface.py"
+  ],
+  "expectedMetricDirection": {
+    "escape-right-open": {
+      "collisionRisk": "decrease-or-stabilize",
+      "invalidActionRate": "0",
+      "localOpennessRatio": "increase-or-stabilize",
+      "postDecodeClampRate": "0",
+      "sanitizerRate": "0",
+      "terminalRisk": "decrease-or-stabilize",
+      "wallDistanceRight": "increase-or-stabilize"
+    }
+  },
+  "falsificationRules": [
+    "no new action succeeds on escape-right-open",
+    "any new action has invalidActionRate, postDecodeClampRate, or sanitizerRate > 0",
+    "post stress report remains action-space-required for the same target scenario",
+    "policy-collapse-active remains a separate blocker for 93Q.6"
+  ],
+  "fixClass": "Action",
+  "generatedAt": "2026-04-29T23:52:53Z",
+  "generatedBy": "python/scripts/bt93q_action_fix.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "649346304b4e693a3234a3b793b2330f8ecd61cf"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoTrainingStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "newSemanticActions": [
+    "turn-left-boost",
+    "turn-right-boost",
+    "evade-left",
+    "evade-right"
+  ],
+  "nextAllowedActions": [
+    "write fix_delta_report.json",
+    "do not start 93Q.6 while policy-collapse-active remains unresolved"
+  ],
+  "ok": true,
+  "oneFixClassOnly": true,
+  "phaseCoverage": {
+    "93Q.5.1": true,
+    "93Q.5.2": true,
+    "93Q.5.3": true,
+    "93Q.5.4": true,
+    "93Q.5.5": true,
+    "93Q.5.6": true
+  },
+  "phaseId": "93Q.5",
+  "resultClass": "action-fix-locked-before-recheck",
+  "schemaVersion": "bt93q-fix-manifest-v1",
+  "selectedBecause": {
+    "policyCollapseStillBlocking": true,
+    "preReportPath": "data/training/ppo/bt93q/action_effect_stress_report.json",
+    "preResultClass": "action-space-required",
+    "targetPreClassResult": "action-space-required",
+    "targetScenarioId": "escape-right-open"
+  },
+  "sourceArtifacts": {
+    "actionSurface": {
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93Q.5 changed sidecar action surface",
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "tracked": true
+    },
+    "actionSurfaceTest": {
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/tests/test_ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "focused action-surface contract test updated for new actions",
+      "sha256": "11ba00508f244a3999da5d33a8662401a4fb2ffd7341e449d98e226c32ff09fe",
+      "tracked": true
+    },
+    "policyCollapse": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "phaseId": "93Q.3",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q.3 policy-collapse blocker",
+      "sha256": "8b6fbfdbf2285e6f58c8104fad408fc1e6b2677fde394a617b78170137af035d",
+      "tracked": true
+    },
+    "preActionEffectStress": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "phaseId": "93Q.4",
+      "resultClass": "action-space-required",
+      "role": "BT93Q.4 pre-fix action-space evidence",
+      "sha256": "21f6ea262bb4123bb9a05003d92982802f236a6fc3a71f3480961979b8a33d87",
+      "tracked": true
+    },
+    "telemetryGap": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "phaseId": "93Q.2",
+      "resultClass": "observation-telemetry-required",
+      "role": "BT93Q.2 telemetry gap",
+      "sha256": "1442849162125578f468ed0937ca08611267dad1b1d0d0da059ac0007d749241",
+      "tracked": true
+    }
+  },
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true
+}

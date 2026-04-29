@@ -1,0 +1,428 @@
+{
+  "blockId": "BT93Q",
+  "blockedActions": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k extension"
+  ],
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93q_action_fix.py --write-report --repeat-steps 4"
+  },
+  "decision": {
+    "blocksNext": [
+      "93Q.6 10k micro-PPO recheck while policy-collapse-active remains unresolved",
+      "BT93O claim",
+      "BT93P claim",
+      "BT94A claim",
+      "candidate run",
+      "freeze candidate",
+      "holdout consumption",
+      "promote",
+      "rollout",
+      "PPO-Validate or BT95 handoff signal",
+      "50k/100k/200k extension"
+    ],
+    "microPpoRecheckAllowed": false,
+    "opensNext": [
+      "93Q.6 contract only if policy collapse is later resolved or explicitly explained"
+    ],
+    "policyCollapseStillBlocking": true,
+    "targetScenarioRepaired": false
+  },
+  "dodCoverage": {
+    "DoD.10": true,
+    "DoD.11": false,
+    "DoD.12": false,
+    "DoD.6": true
+  },
+  "fixClass": "Action",
+  "generatedAt": "2026-04-29T23:52:53Z",
+  "generatedBy": "python/scripts/bt93q_action_fix.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "649346304b4e693a3234a3b793b2330f8ecd61cf"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoTrainingStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93Q.5.1": true,
+    "93Q.5.2": true,
+    "93Q.5.3": true,
+    "93Q.5.4": true,
+    "93Q.5.5": true,
+    "93Q.5.6": true
+  },
+  "phaseId": "93Q.5",
+  "post": {
+    "classResultCounts": {
+      "action-space-required": 1,
+      "existing-action-effect-observed": 7,
+      "negative-control-stable": 1
+    },
+    "newActionSuccessesByScenario": {
+      "escape-left-open": [
+        "turn-right-boost"
+      ],
+      "frontal-near-wall": [
+        "turn-right-boost"
+      ],
+      "narrowing-corridor": [
+        "turn-left-boost",
+        "evade-left"
+      ],
+      "no-danger-control": [
+        "evade-right"
+      ],
+      "side-wall-left": [
+        "evade-right"
+      ],
+      "side-wall-right": [
+        "turn-left-boost",
+        "turn-right-boost"
+      ],
+      "trail-ahead": [
+        "evade-right"
+      ],
+      "trail-side": [
+        "turn-left-boost",
+        "turn-right-boost",
+        "evade-left"
+      ]
+    },
+    "resultClass": "action-space-required",
+    "sampleCounts": {
+      "actionCount": 13,
+      "probeCount": 117,
+      "repeatSteps": 4,
+      "scenarioCount": 9
+    },
+    "targetScenario": {
+      "classResult": "action-space-required",
+      "newActionResults": {
+        "evade-left": {
+          "metricDeltas": {
+            "boostActive": 0.0,
+            "healthRatio": 0.0,
+            "localOpennessRatio": -0.07,
+            "pressureLevel": 0.094654,
+            "projectileThreat": 0.0,
+            "speedRatio": 0.0,
+            "targetAlignment": -0.256424,
+            "targetDistanceRatio": 0.003739,
+            "targetInFront": -1.0,
+            "wallDistanceFront": -0.228571,
+            "wallDistanceLeft": 0.0,
+            "wallDistanceRight": -0.121429
+          },
+          "ok": true,
+          "riskDeltas": {
+            "collisionRisk": 0.478239,
+            "deadEndRisk": 0.49,
+            "terminalRisk": 0.49,
+            "threatHorizon": 0.4508
+          },
+          "successEvaluation": {
+            "collisionRiskSinks": false,
+            "controlStable": false,
+            "localOpennessStableOrRises": false,
+            "rewardOnlyRejected": false,
+            "rewardTotal": -0.120719,
+            "success": false,
+            "terminalObserved": false,
+            "terminalRiskSinksOrStable": false,
+            "wallDistanceDelta": -0.121429,
+            "wallDistanceRises": false
+          }
+        },
+        "evade-right": {
+          "metricDeltas": {
+            "boostActive": 0.0,
+            "healthRatio": 0.0,
+            "localOpennessRatio": 0.002857,
+            "pressureLevel": 0.000484,
+            "projectileThreat": 0.0,
+            "speedRatio": 0.0,
+            "targetAlignment": 0.197914,
+            "targetDistanceRatio": -0.001345,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 0.0,
+            "wallDistanceLeft": 0.0,
+            "wallDistanceRight": 0.014286
+          },
+          "ok": true,
+          "riskDeltas": {
+            "collisionRisk": 0.422427,
+            "deadEndRisk": 0.337143,
+            "terminalRisk": 0.422427,
+            "threatHorizon": 0.310171
+          },
+          "successEvaluation": {
+            "collisionRiskSinks": false,
+            "controlStable": false,
+            "localOpennessStableOrRises": true,
+            "rewardOnlyRejected": true,
+            "rewardTotal": 0.839463,
+            "success": false,
+            "terminalObserved": false,
+            "terminalRiskSinksOrStable": false,
+            "wallDistanceDelta": 0.014286,
+            "wallDistanceRises": false
+          }
+        },
+        "turn-left-boost": {
+          "metricDeltas": {
+            "boostActive": 0.0,
+            "healthRatio": 0.0,
+            "localOpennessRatio": -0.075,
+            "pressureLevel": 0.164059,
+            "projectileThreat": 0.0,
+            "speedRatio": 0.0,
+            "targetAlignment": -0.191032,
+            "targetDistanceRatio": -0.018221,
+            "targetInFront": -1.0,
+            "wallDistanceFront": -0.375,
+            "wallDistanceLeft": 0.0,
+            "wallDistanceRight": 0.0
+          },
+          "ok": true,
+          "riskDeltas": {
+            "collisionRisk": 0.455545,
+            "deadEndRisk": 0.485,
+            "terminalRisk": 0.485,
+            "threatHorizon": 0.4462
+          },
+          "successEvaluation": {
+            "collisionRiskSinks": false,
+            "controlStable": false,
+            "localOpennessStableOrRises": false,
+            "rewardOnlyRejected": true,
+            "rewardTotal": 3.329762,
+            "success": false,
+            "terminalObserved": false,
+            "terminalRiskSinksOrStable": false,
+            "wallDistanceDelta": 0.0,
+            "wallDistanceRises": false
+          }
+        },
+        "turn-right-boost": {
+          "metricDeltas": {
+            "boostActive": 0.0,
+            "healthRatio": 0.0,
+            "localOpennessRatio": 0.004286,
+            "pressureLevel": 0.000238,
+            "projectileThreat": 0.0,
+            "speedRatio": 0.0,
+            "targetAlignment": 0.215763,
+            "targetDistanceRatio": -0.000662,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 0.0,
+            "wallDistanceLeft": 0.021429,
+            "wallDistanceRight": 0.0
+          },
+          "ok": true,
+          "riskDeltas": {
+            "collisionRisk": 0.449444,
+            "deadEndRisk": 0.365714,
+            "terminalRisk": 0.449444,
+            "threatHorizon": 0.336457
+          },
+          "successEvaluation": {
+            "collisionRiskSinks": false,
+            "controlStable": false,
+            "localOpennessStableOrRises": true,
+            "rewardOnlyRejected": false,
+            "rewardTotal": -0.009034,
+            "success": false,
+            "terminalObserved": false,
+            "terminalRiskSinksOrStable": false,
+            "wallDistanceDelta": 0.0,
+            "wallDistanceRises": false
+          }
+        }
+      },
+      "scenarioId": "escape-right-open",
+      "successfulActions": []
+    }
+  },
+  "pre": {
+    "classResultCounts": {
+      "action-space-required": 1,
+      "existing-action-effect-observed": 7,
+      "negative-control-stable": 1
+    },
+    "resultClass": "action-space-required",
+    "targetScenario": {
+      "classResult": "action-space-required",
+      "scenarioId": "escape-right-open",
+      "successfulActions": []
+    }
+  },
+  "resultClass": "action-fix-insufficient",
+  "safety": {
+    "newActionsSafetyAndGain": {
+      "allActionsSafetyZero": true,
+      "allActionsStateGainObserved": true,
+      "perAction": {
+        "evade-left": {
+          "safetyZero": true,
+          "stateGainObserved": true,
+          "stateGainSignals": [
+            "localOpennessRatio",
+            "terminalRisk",
+            "wallDistanceLeft",
+            "wallDistanceRight"
+          ],
+          "successScenarioIds": [
+            "narrowing-corridor",
+            "trail-side"
+          ],
+          "targetScenarioStateGainObserved": false
+        },
+        "evade-right": {
+          "safetyZero": true,
+          "stateGainObserved": true,
+          "stateGainSignals": [
+            "collisionRisk",
+            "localOpennessRatio",
+            "terminalRisk",
+            "wallDistanceFront",
+            "wallDistanceRight"
+          ],
+          "successScenarioIds": [
+            "side-wall-left",
+            "trail-ahead",
+            "no-danger-control"
+          ],
+          "targetScenarioStateGainObserved": true
+        },
+        "turn-left-boost": {
+          "safetyZero": true,
+          "stateGainObserved": true,
+          "stateGainSignals": [
+            "localOpennessRatio",
+            "terminalRisk",
+            "wallDistanceLeft",
+            "wallDistanceRight"
+          ],
+          "successScenarioIds": [
+            "side-wall-right",
+            "narrowing-corridor",
+            "trail-side"
+          ],
+          "targetScenarioStateGainObserved": false
+        },
+        "turn-right-boost": {
+          "safetyZero": true,
+          "stateGainObserved": true,
+          "stateGainSignals": [
+            "collisionRisk",
+            "localOpennessRatio",
+            "terminalRisk",
+            "wallDistanceFront",
+            "wallDistanceLeft"
+          ],
+          "successScenarioIds": [
+            "frontal-near-wall",
+            "side-wall-right",
+            "trail-side",
+            "escape-left-open"
+          ],
+          "targetScenarioStateGainObserved": true
+        }
+      },
+      "targetScenarioStateGainActions": [
+        "turn-right-boost",
+        "evade-right"
+      ]
+    },
+    "newActionsSafetyZero": true,
+    "requiredZeroRates": [
+      "invalidActionRate",
+      "postDecodeClampRate",
+      "sanitizerRate"
+    ]
+  },
+  "schemaVersion": "bt93q-fix-delta-report-v1",
+  "sourceArtifacts": {
+    "actionSurface": {
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93Q.5 changed sidecar action surface",
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "tracked": true
+    },
+    "actionSurfaceTest": {
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/tests/test_ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "focused action-surface contract test updated for new actions",
+      "sha256": "11ba00508f244a3999da5d33a8662401a4fb2ffd7341e449d98e226c32ff09fe",
+      "tracked": true
+    },
+    "policyCollapse": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "phaseId": "93Q.3",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q.3 policy-collapse blocker",
+      "sha256": "8b6fbfdbf2285e6f58c8104fad408fc1e6b2677fde394a617b78170137af035d",
+      "tracked": true
+    },
+    "preActionEffectStress": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "phaseId": "93Q.4",
+      "resultClass": "action-space-required",
+      "role": "BT93Q.4 pre-fix action-space evidence",
+      "sha256": "21f6ea262bb4123bb9a05003d92982802f236a6fc3a71f3480961979b8a33d87",
+      "tracked": true
+    },
+    "telemetryGap": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "phaseId": "93Q.2",
+      "resultClass": "observation-telemetry-required",
+      "role": "BT93Q.2 telemetry gap",
+      "sha256": "1442849162125578f468ed0937ca08611267dad1b1d0d0da059ac0007d749241",
+      "tracked": true
+    }
+  },
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true
+}
