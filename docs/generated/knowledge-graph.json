@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 314,
+          "concreteCount": 316,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 452,
+          "concreteCount": 454,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 310,
+          "concreteCount": 312,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 309,
+          "concreteCount": 311,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 951,
+          "concreteCount": 953,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 959,
+          "concreteCount": 961,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1534,7 +1534,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93N.4",
+        "currentPhase": "93N.99",
         "scopeDeclarations": [
           "data/training/ppo/bt93n/death_before60_trace_report.json",
           "data/training/ppo/bt93n/death_before60_trace_samples.jsonl",
@@ -1550,14 +1550,15 @@
           "python/scripts/bt93n_death_trace_probe.py",
           "python/scripts/bt93n_micro_ppo_repeat.py",
           "python/scripts/bt93n_stability_fix.py",
+          "python/scripts/bt93n_stability_ladder.py",
           "python/tests/test_curvios_env.py",
           "python/tests/test_ppo_action_surface.py",
           "tests/training-environment.contract.test.mjs",
           "tests/training-reward-survival.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 16,
-          "plannedCount": 1
+          "concreteCount": 18,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -4565,7 +4566,7 @@
       "id": "BT93N.4",
       "type": "phase",
       "title": "50k/100k Stability Ladder",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.4"
@@ -12513,8 +12514,8 @@
     {
       "id": "BT93N.4.1",
       "type": "subphase",
-      "title": "50k nur nach gruenem 10k; 100k nur nach gruenem 50k.",
-      "status": "open",
+      "title": "50k nur nach gruenem 10k; 100k nur nach gruenem 50k. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `resultClass=death-before60-still-blocking`, `extension50kAllowed=false`, `executedStages=0`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.4",
@@ -12524,8 +12525,8 @@
     {
       "id": "BT93N.4.2",
       "type": "subphase",
-      "title": "Jede Stufe schreibt Modellhash, ConfigHash, VecNormalizeHash, OptimizerHash, Reward-Breakdown, KL/Entropy/Clip/Value/GradNorm.",
-      "status": "open",
+      "title": "Jede Stufe schreibt Modellhash, ConfigHash, VecNormalizeHash, OptimizerHash, Reward-Breakdown, KL/Entropy/Clip/Value/GradNorm. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `phaseCoverage.93N.4.2=true`, Stufen nicht ausgefuehrt wegen rotem 10k-Gate)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.4",
@@ -12535,8 +12536,8 @@
     {
       "id": "BT93N.4.3",
       "type": "subphase",
-      "title": "Jede Stufe schreibt DeathBefore60, Terminal-Klassen, Progress-/Objective-Raten, Action-Entropy und Failure-Klassen.",
-      "status": "open",
+      "title": "Jede Stufe schreibt DeathBefore60, Terminal-Klassen, Progress-/Objective-Raten, Action-Entropy und Failure-Klassen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `phaseCoverage.93N.4.3=true`, `train/eval deathBefore60=27/11` aus 10k-Quelle blockiert)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.4",
@@ -12546,8 +12547,8 @@
     {
       "id": "BT93N.4.4",
       "type": "subphase",
-      "title": "Holdout bleibt unbenutzt; `latest_*` darf nicht alleinige Evidence sein.",
-      "status": "open",
+      "title": "Holdout bleibt unbenutzt; `latest_*` darf nicht alleinige Evidence sein. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `holdoutUsed=false`, `latestOnlyEvidenceUsed=false`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.4",
@@ -12557,8 +12558,8 @@
     {
       "id": "BT93N.4.5",
       "type": "subphase",
-      "title": "Jede Stufe schreibt eine Plateau-Entscheidung: `plateau-improving`, `plateau-neutral-by-contract`, `plateau-still-blocking` oder `measurement-invalid`.",
-      "status": "open",
+      "title": "Jede Stufe schreibt eine Plateau-Entscheidung: `plateau-improving`, `plateau-neutral-by-contract`, `plateau-still-blocking` oder `measurement-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `plateauDecision=not-run-10k-gate-blocked`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.4",
@@ -12568,8 +12569,8 @@
     {
       "id": "BT93N.4.6",
       "type": "subphase",
-      "title": "50k/100k sind rot, wenn Eval-Samplezahl, Streuung oder Ereignisdeckung die vorab gepinnte Mindeststatistik unterschreiten; Laufgroesse darf fehlende Ereignisse nicht kaschieren.",
-      "status": "open",
+      "title": "50k/100k sind rot, wenn Eval-Samplezahl, Streuung oder Ereignisdeckung die vorab gepinnte Mindeststatistik unterschreiten; Laufgroesse darf fehlende Ereignisse nicht kaschieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `phaseCoverage.93N.4.6=true`, `blocksNext=BT93O,BT93P,BT94A`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93N",
         "phaseCode": "93N.4",
@@ -26413,9 +26414,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93N"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -33451,6 +33458,27 @@
     },
     {
       "id": "python/scripts/bt93n_stability_fix.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93N"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93n_stability_ladder.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -69789,6 +69817,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93n/stability_ladder_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -70906,6 +70943,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93n_stability_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93n_stability_ladder.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -72812,6 +72858,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93n/stability_ladder_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -73911,6 +73966,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93n_stability_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93n_stability_ladder.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -77015,6 +77079,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93n/stability_ladder_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -78123,6 +78196,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93n_stability_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93n_stability_ladder.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -80328,6 +80410,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93n/stability_ladder_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -81436,6 +81527,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93n_stability_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93n_stability_ladder.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -90045,6 +90145,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93n/stability_ladder_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -91153,6 +91262,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93n_stability_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93n_stability_ladder.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98937,6 +99055,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93n/stability_ladder_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -100054,6 +100181,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93n_stability_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93n_stability_ladder.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -117857,6 +117993,15 @@
     {
       "from": "BT93N",
       "to": "python/scripts/bt93n_stability_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93N",
+      "to": "python/scripts/bt93n_stability_ladder.py",
       "type": "scope",
       "hint": null,
       "attributes": {

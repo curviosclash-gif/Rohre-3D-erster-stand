@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2400,
-    "rawCoveredFileCount": 1921,
-    "rawCoveragePercent": 80,
-    "adjustedTrackedFileCount": 1497,
-    "adjustedCoveredFileCount": 1262,
+    "trackedFileCount": 2402,
+    "rawCoveredFileCount": 1923,
+    "rawCoveragePercent": 80.1,
+    "adjustedTrackedFileCount": 1499,
+    "adjustedCoveredFileCount": 1264,
     "adjustedCoveragePercent": 84.3,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 230,
-        "coveredCount": 209
+        "count": 231,
+        "coveredCount": 210
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 874,
-        "coveredCount": 858
+        "count": 875,
+        "coveredCount": 859
       },
       {
         "classification": "product-docs",
@@ -7722,6 +7722,29 @@
     },
     {
       "path": "data/training/ppo/bt93n/stability_fix_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93n/stability_ladder_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -18132,6 +18155,29 @@
     },
     {
       "path": "python/scripts/bt93n_stability_fix.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93N"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93n_stability_ladder.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

@@ -1,0 +1,267 @@
+{
+  "blockId": "BT93N",
+  "commands": {
+    "write": "python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run"
+  },
+  "decision": {
+    "blocksNext": [
+      "BT93O",
+      "BT93P",
+      "BT94A"
+    ],
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "extension100kAllowed": false,
+    "extension100kExecuted": false,
+    "extension50kAllowed": false,
+    "extension50kExecuted": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "nextAllowedActions": [
+      "close BT93N honestly as diagnose-loop-required/death-before60-still-blocking",
+      "write a narrow follow-up/root-cause block or resolve the DQN anchor/replacement-policy blocker",
+      "do not claim BT93O, BT93P, BT94A, candidate, freeze, holdout, promote, or rollout from this report"
+    ],
+    "opensNext": [],
+    "resultClass": "death-before60-still-blocking"
+  },
+  "generatedAt": "2026-04-29T22:26:12Z",
+  "generatedBy": "python/scripts/bt93n_stability_ladder.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "b5f518fa3209c23a4ce7542a0de5754b83a34d6c"
+  },
+  "guardrails": {
+    "baselineRun": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingRunKind": "bt93n-stability-ladder-no-run",
+    "trainingStarted": false
+  },
+  "invalidations": [
+    {
+      "id": "micro-ppo-10k-not-green",
+      "observed": {
+        "evalDeathBefore60Count": 11,
+        "extension50kAllowed": false,
+        "resultClass": "death-before60-still-blocking",
+        "trainDeathBefore60Count": 27
+      },
+      "resultClass": "death-before60-still-blocking",
+      "source": "data/training/ppo/bt93n/micro_ppo_repeat_report.json"
+    },
+    {
+      "id": "comparison-policy-positive-reentry-blocked",
+      "observed": "dqn-anchor-blocked",
+      "resultClass": "dqn-anchor-blocked",
+      "source": "data/training/ppo/bt93m/comparison_policy_decision.json"
+    }
+  ],
+  "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+  "ok": true,
+  "phaseCoverage": {
+    "93N.4.1": true,
+    "93N.4.2": true,
+    "93N.4.3": true,
+    "93N.4.4": true,
+    "93N.4.5": true,
+    "93N.4.6": true
+  },
+  "phaseId": "93N.4",
+  "resultClass": "death-before60-still-blocking",
+  "runId": "bt93n-stability-ladder-no-run",
+  "sampleCounts": {
+    "executedStages": 0,
+    "holdoutUsed": false,
+    "latestOnlyEvidenceUsed": false,
+    "plannedStages": [
+      50000,
+      100000
+    ],
+    "sourceEvalCompletedEpisodes": 79,
+    "sourceTrainCompletedEpisodes": 134
+  },
+  "schemaVersion": "bt93n-stability-ladder-report-v1",
+  "semanticWindow": "runtime-near-headless-v1",
+  "sourceArtifacts": {
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A closed no-start gate",
+      "sha256": "27dd958fe5463f6f688384957e31cbd4d163c81b07058dd3c0a1a6be9eda7f70"
+    },
+    "comparisonPolicyDecision": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "phaseId": "93M.3.6",
+      "resultClass": "comparison-policy-blocks-positive-reentry",
+      "role": "BT93M comparison policy decision",
+      "sha256": "eadd182f737d7b477a4143df0cc721875caf31cd47bcb5942f2649f2d80609b5"
+    },
+    "fixManifest": {
+      "blockId": "BT93N",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/fix_manifest.json",
+      "phaseId": "93N.2",
+      "resultClass": "reward-fix-manifest-pinned",
+      "role": "BT93N.2 selected fix manifest",
+      "sha256": "a4d2bf16df00d54769e296f7eea366ece4544d501503c4ea406627dc3932e2eb"
+    },
+    "microPpoRepeatReport": {
+      "blockId": "BT93N",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "phaseId": "93N.3",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N.3 10k gate source",
+      "sha256": "96f046445da1518eeb9519958b179107326294d6ad83a6bfa074089f52aaa631"
+    },
+    "rewardTerminalDelta": {
+      "blockId": "BT93N",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/reward_terminal_delta_report.json",
+      "phaseId": "93N.2",
+      "resultClass": "reward-fix-delta-green-diagnose-only",
+      "role": "BT93N.2 pre/post delta source",
+      "sha256": "270c21992dae1eb6fafa0ed6d5edac85d657de22e77a15ebd3b7c90dd4918a59"
+    },
+    "stageDecision": {
+      "blockId": "BT93N",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93n/runs/bt93n-stability-ladder-no-run/stage_decision.json",
+      "phaseId": "93N.4",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N.4 no-run stage decision",
+      "sha256": "0f5bd2192e2e46389158bd2a73ba28c88505916c4749b94cd7f3bd7c0dc76392"
+    },
+    "taskMetricContract": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L task/matrix contract",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0"
+    },
+    "toleranceContract": {
+      "blockId": "BT93N",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
+      "phaseId": "93N.3",
+      "resultClass": null,
+      "role": "BT93N.3 pre-run tolerance contract",
+      "sha256": "5aabef2b066807fee8d88036607c99b0df217ae56bd24ed4047d86e4311e9254"
+    }
+  },
+  "stageExecution": [
+    {
+      "actionEntropy": null,
+      "blockedBeforeRun": true,
+      "blockedReason": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False",
+      "blockingSources": [
+        "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+        "data/training/ppo/bt93m/comparison_policy_decision.json"
+      ],
+      "configHash": null,
+      "deathBefore60Count": null,
+      "executed": false,
+      "failureClasses": {},
+      "modelHash": null,
+      "objectiveEventShare": null,
+      "optimizerHash": null,
+      "plateauDecision": "not-run-10k-gate-blocked",
+      "ppoMetrics": {
+        "clipFraction": null,
+        "entropy": null,
+        "gradNorm": null,
+        "kl": null,
+        "notApplicableBecause": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False",
+        "valueLoss": null
+      },
+      "progressEventShare": null,
+      "rewardBreakdown": null,
+      "sampleQuality": {
+        "dispersionMeasured": false,
+        "evalSampleCountOk": false,
+        "eventCoverageMeasured": false,
+        "redReason": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False"
+      },
+      "terminalClassCounts": {},
+      "timesteps": 50000,
+      "vecNormalizeHash": null
+    },
+    {
+      "actionEntropy": null,
+      "blockedBeforeRun": true,
+      "blockedReason": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False",
+      "blockingSources": [
+        "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+        "data/training/ppo/bt93m/comparison_policy_decision.json"
+      ],
+      "configHash": null,
+      "deathBefore60Count": null,
+      "executed": false,
+      "failureClasses": {},
+      "modelHash": null,
+      "objectiveEventShare": null,
+      "optimizerHash": null,
+      "plateauDecision": "not-run-10k-gate-blocked",
+      "ppoMetrics": {
+        "clipFraction": null,
+        "entropy": null,
+        "gradNorm": null,
+        "kl": null,
+        "notApplicableBecause": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False",
+        "valueLoss": null
+      },
+      "progressEventShare": null,
+      "rewardBreakdown": null,
+      "sampleQuality": {
+        "dispersionMeasured": false,
+        "evalSampleCountOk": false,
+        "eventCoverageMeasured": false,
+        "redReason": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False"
+      },
+      "terminalClassCounts": {},
+      "timesteps": 100000,
+      "vecNormalizeHash": null
+    }
+  ],
+  "stageExecutionAllowed": false
+}

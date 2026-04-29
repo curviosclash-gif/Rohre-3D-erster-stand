@@ -1,0 +1,112 @@
+{
+  "blockId": "BT93N",
+  "generatedAt": "2026-04-29T22:26:12Z",
+  "generatedBy": "python/scripts/bt93n_stability_ladder.py",
+  "guardrails": {
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "productiveRuntimeChanged": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "invalidations": [
+    {
+      "id": "micro-ppo-10k-not-green",
+      "observed": {
+        "evalDeathBefore60Count": 11,
+        "extension50kAllowed": false,
+        "resultClass": "death-before60-still-blocking",
+        "trainDeathBefore60Count": 27
+      },
+      "resultClass": "death-before60-still-blocking",
+      "source": "data/training/ppo/bt93n/micro_ppo_repeat_report.json"
+    },
+    {
+      "id": "comparison-policy-positive-reentry-blocked",
+      "observed": "dqn-anchor-blocked",
+      "resultClass": "dqn-anchor-blocked",
+      "source": "data/training/ppo/bt93m/comparison_policy_decision.json"
+    }
+  ],
+  "phaseId": "93N.4",
+  "resultClass": "death-before60-still-blocking",
+  "runId": "bt93n-stability-ladder-no-run",
+  "schemaVersion": "bt93n-stability-ladder-stage-decision-v1",
+  "stageExecution": [
+    {
+      "actionEntropy": null,
+      "blockedBeforeRun": true,
+      "blockedReason": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False",
+      "blockingSources": [
+        "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+        "data/training/ppo/bt93m/comparison_policy_decision.json"
+      ],
+      "configHash": null,
+      "deathBefore60Count": null,
+      "executed": false,
+      "failureClasses": {},
+      "modelHash": null,
+      "objectiveEventShare": null,
+      "optimizerHash": null,
+      "plateauDecision": "not-run-10k-gate-blocked",
+      "ppoMetrics": {
+        "clipFraction": null,
+        "entropy": null,
+        "gradNorm": null,
+        "kl": null,
+        "notApplicableBecause": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False",
+        "valueLoss": null
+      },
+      "progressEventShare": null,
+      "rewardBreakdown": null,
+      "sampleQuality": {
+        "dispersionMeasured": false,
+        "evalSampleCountOk": false,
+        "eventCoverageMeasured": false,
+        "redReason": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False"
+      },
+      "terminalClassCounts": {},
+      "timesteps": 50000,
+      "vecNormalizeHash": null
+    },
+    {
+      "actionEntropy": null,
+      "blockedBeforeRun": true,
+      "blockedReason": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False",
+      "blockingSources": [
+        "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+        "data/training/ppo/bt93m/comparison_policy_decision.json"
+      ],
+      "configHash": null,
+      "deathBefore60Count": null,
+      "executed": false,
+      "failureClasses": {},
+      "modelHash": null,
+      "objectiveEventShare": null,
+      "optimizerHash": null,
+      "plateauDecision": "not-run-10k-gate-blocked",
+      "ppoMetrics": {
+        "clipFraction": null,
+        "entropy": null,
+        "gradNorm": null,
+        "kl": null,
+        "notApplicableBecause": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False",
+        "valueLoss": null
+      },
+      "progressEventShare": null,
+      "rewardBreakdown": null,
+      "sampleQuality": {
+        "dispersionMeasured": false,
+        "evalSampleCountOk": false,
+        "eventCoverageMeasured": false,
+        "redReason": "BT93N.3 did not open the 50k extension: resultClass=death-before60-still-blocking, extension50kAllowed=False"
+      },
+      "terminalClassCounts": {},
+      "timesteps": 100000,
+      "vecNormalizeHash": null
+    }
+  ],
+  "stageExecutionAllowed": false
+}

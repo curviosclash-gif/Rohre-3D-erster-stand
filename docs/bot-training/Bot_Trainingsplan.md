@@ -329,7 +329,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93K | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; kein BT94A-Claim |
 | Bot-Codex | BT93L | 2026-04-28 | frei | abgeschlossen 2026-04-28 als `diagnose-loop-required`; BT94A bleibt geschlossen |
 | Bot-Codex | BT93M | 2026-04-29 | frei | abgeschlossen 2026-04-29 als `gate-fresh-dqn-anchor-blocked`; BT93N nur diagnose-only/Loader/User-Entscheid |
-| Bot-Codex | BT93N | 2026-04-29 | claimed | 93N.3 abgeschlossen: `death-before60-still-blocking`; 93N.4 blockiert |
+| Bot-Codex | BT93N | 2026-04-29 | claimed | 93N.4 abgeschlossen: `death-before60-still-blocking`; 93N.99 offen |
 | - | BT93O | - | frei | wartet auf BT93N.99 |
 | - | BT93P | - | frei | wartet auf BT93O.99 |
 | - | BT94A | - | frei | wartet auf `BT93P.4=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
@@ -842,7 +842,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93K | Survival-First Objective Reset | completed | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
 | BT93L | Objective-Reachability und Survival-Task-Definition | completed | P1 | BT93K.99 (`diagnose-loop-required`) + Diagnosebericht 2026-04-28 | 93L.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` |
 | BT93M | Gate-Wahrheit und DQN-Same-Matrix-Anker | completed | P1 | BT93L.99 (`diagnose-loop-required`) + User-Intake 2026-04-29 | 93M.99 abgeschlossen: `gate-fresh-dqn-anchor-blocked` | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
-| BT93N | DeathBefore60-Stability und Terminal-Root-Cause | planned | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
+| BT93N | DeathBefore60-Stability und Terminal-Root-Cause | active | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.99 offen | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93O | Action-/Objective-Quality und Anti-Plateau | planned | P2 | BT93N.99 ohne `death-before60-still-blocking` | 93O.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93P | PPO Trainingsleiter und BT94A-Reentry-Gate | planned | P2 | BT93O.99 + gruene Action-/Objective-/Anti-Plateau-Gates | 93P.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93P.4 (`BT94A-ready`) + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
@@ -3106,7 +3106,7 @@ Pflicht-Evidence:
 
 Quelle: `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md`
 
-<!-- LOCK: Bot-Codex seit 2026-04-29, Phase 93N.2 -->
+<!-- LOCK: Bot-Codex seit 2026-04-29, Phase 93N.99 -->
 
 Scope:
 
@@ -3204,12 +3204,12 @@ Pflicht-Evidence:
 
 ### 93N.4 50k/100k Stability Ladder
 
-- [ ] 93N.4.1 50k nur nach gruenem 10k; 100k nur nach gruenem 50k.
-- [ ] 93N.4.2 Jede Stufe schreibt Modellhash, ConfigHash, VecNormalizeHash, OptimizerHash, Reward-Breakdown, KL/Entropy/Clip/Value/GradNorm.
-- [ ] 93N.4.3 Jede Stufe schreibt DeathBefore60, Terminal-Klassen, Progress-/Objective-Raten, Action-Entropy und Failure-Klassen.
-- [ ] 93N.4.4 Holdout bleibt unbenutzt; `latest_*` darf nicht alleinige Evidence sein.
-- [ ] 93N.4.5 Jede Stufe schreibt eine Plateau-Entscheidung: `plateau-improving`, `plateau-neutral-by-contract`, `plateau-still-blocking` oder `measurement-invalid`.
-- [ ] 93N.4.6 50k/100k sind rot, wenn Eval-Samplezahl, Streuung oder Ereignisdeckung die vorab gepinnte Mindeststatistik unterschreiten; Laufgroesse darf fehlende Ereignisse nicht kaschieren.
+- [x] 93N.4.1 50k nur nach gruenem 10k; 100k nur nach gruenem 50k. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `resultClass=death-before60-still-blocking`, `extension50kAllowed=false`, `executedStages=0`)
+- [x] 93N.4.2 Jede Stufe schreibt Modellhash, ConfigHash, VecNormalizeHash, OptimizerHash, Reward-Breakdown, KL/Entropy/Clip/Value/GradNorm. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `phaseCoverage.93N.4.2=true`, Stufen nicht ausgefuehrt wegen rotem 10k-Gate)
+- [x] 93N.4.3 Jede Stufe schreibt DeathBefore60, Terminal-Klassen, Progress-/Objective-Raten, Action-Entropy und Failure-Klassen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `phaseCoverage.93N.4.3=true`, `train/eval deathBefore60=27/11` aus 10k-Quelle blockiert)
+- [x] 93N.4.4 Holdout bleibt unbenutzt; `latest_*` darf nicht alleinige Evidence sein. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `holdoutUsed=false`, `latestOnlyEvidenceUsed=false`)
+- [x] 93N.4.5 Jede Stufe schreibt eine Plateau-Entscheidung: `plateau-improving`, `plateau-neutral-by-contract`, `plateau-still-blocking` oder `measurement-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `plateauDecision=not-run-10k-gate-blocked`)
+- [x] 93N.4.6 50k/100k sind rot, wenn Eval-Samplezahl, Streuung oder Ereignisdeckung die vorab gepinnte Mindeststatistik unterschreiten; Laufgroesse darf fehlende Ereignisse nicht kaschieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93n_stability_ladder.py --write-report --run-id bt93n-stability-ladder-no-run` -> `data/training/ppo/bt93n/stability_ladder_report.json`, `phaseCoverage.93N.4.6=true`, `blocksNext=BT93O,BT93P,BT94A`)
 
 Pflicht-Evidence:
 
