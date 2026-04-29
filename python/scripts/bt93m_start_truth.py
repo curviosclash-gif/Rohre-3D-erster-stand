@@ -424,22 +424,29 @@ def build_gate_source_freshness_report() -> dict[str, Any]:
     bt94a_state = _bt94a_state(no_start)
     current = bt94a_state["currentHandoverSource"]
     source_state = current.get("sourceState") if isinstance(current.get("sourceState"), Mapping) else {}
+    bt93m_handover_path = BT93M_ROOT / "handover_package.json"
+    allowed_sources = {
+        _rel(START_TRUTH_PATH): "BT93M start_truth.json",
+        _rel(bt93m_handover_path): "BT93M handover_package.json",
+    }
+    current_source = str(current.get("sourceArtifact") or "").replace("\\", "/")
     expected_source = {
         "blockId": "BT93M",
         "phaseId": "93M.1",
         "sourceArtifact": _rel(START_TRUTH_PATH),
         "resultField": "resultClass",
+        "alsoAllowedAfter93M3": _rel(bt93m_handover_path),
     }
     fresh = (
         current.get("blockId") == "BT93M"
-        and str(current.get("sourceArtifact") or "").replace("\\", "/") == _rel(START_TRUTH_PATH)
+        and current_source in allowed_sources
     )
     red_but_fresh = fresh and bt94a_state["claimable"] is False
     stale_reason = None
     if not fresh:
         stale_reason = (
             f"bt94a_gate_check.py still reports {current.get('blockId')} from "
-            f"{current.get('sourceArtifact')} instead of BT93M start_truth.json."
+            f"{current.get('sourceArtifact')} instead of a BT93M start_truth/handover source."
         )
     return {
         "schemaVersion": "bt93m-gate-source-freshness-v1",
@@ -451,6 +458,7 @@ def build_gate_source_freshness_report() -> dict[str, Any]:
         "resultClass": "gate-source-fresh-red" if fresh else "gate-source-stale-blocker",
         "currentHandoverSource": current,
         "expectedHandoverSource": expected_source,
+        "acceptedFreshSource": allowed_sources.get(current_source),
         "fresh": fresh,
         "staleReason": stale_reason,
         "resultField": source_state.get("resultClass") if source_state else no_start.get("resultClass"),

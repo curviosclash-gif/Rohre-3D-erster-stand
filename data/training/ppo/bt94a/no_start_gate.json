@@ -41,7 +41,7 @@
       "path": "data/training/ppo/bt93m/handover_package.json",
       "phaseId": "93M.3",
       "resultClass": "gate-fresh-dqn-anchor-blocked",
-      "sha256": "4e7dc2fdaf6a38dd3b3d396b35e07c1956f3cc025d8ffc39ebd1c6282e716dfb"
+      "sha256": "fc7f20a835915ba1c5488f22f77f9c13344dff1f3b7a0e2ed5bc6d27b7e38616"
     },
     "matrixId": "bt93c-dqn-ppo-precomparison-v1",
     "modelPackage": {
@@ -156,7 +156,7 @@
       "path": "data/training/ppo/bt93m/handover_package.json",
       "phaseId": "93M.3",
       "resultClass": "gate-fresh-dqn-anchor-blocked",
-      "sha256": "4e7dc2fdaf6a38dd3b3d396b35e07c1956f3cc025d8ffc39ebd1c6282e716dfb"
+      "sha256": "fc7f20a835915ba1c5488f22f77f9c13344dff1f3b7a0e2ed5bc6d27b7e38616"
     },
     "supersedesDetectedSource": {
       "blockId": "BT93I",
@@ -166,9 +166,9 @@
       "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
     }
   },
-  "generatedAt": "2026-04-29T20:50:14Z",
+  "generatedAt": "2026-04-29T21:07:07Z",
   "generatedBy": "python/scripts/bt94a_gate_check.py",
-  "gitSha": "ee3e48fddff33d6c836c351edfe2917168c1d995",
+  "gitSha": "695b4c0b5cbdbedc3f128a630ff659001e226a56",
   "matrixDefinitionAllowed": false,
   "nextGate": {
     "fallback": "user-owned replan or return to PPO diagnosis before candidate ablations",
@@ -198,7 +198,7 @@
   "sourceArtifacts": {
     "currentHandoverSource": {
       "path": "data/training/ppo/bt93m/handover_package.json",
-      "sha256": "4e7dc2fdaf6a38dd3b3d396b35e07c1956f3cc025d8ffc39ebd1c6282e716dfb"
+      "sha256": "fc7f20a835915ba1c5488f22f77f9c13344dff1f3b7a0e2ed5bc6d27b7e38616"
     },
     "evidenceQualityMatrix": {
       "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",

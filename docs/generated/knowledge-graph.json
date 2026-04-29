@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 301,
+          "concreteCount": 303,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 439,
+          "concreteCount": 441,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 297,
+          "concreteCount": 299,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 296,
+          "concreteCount": 298,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 938,
+          "concreteCount": 940,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 946,
+          "concreteCount": 948,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1476,7 +1476,7 @@
       "id": "BT93M",
       "type": "block",
       "title": "Gate-Wahrheit und DQN-Same-Matrix-Anker",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "source": [
           "bot-training-plan",
@@ -1492,6 +1492,7 @@
           "data/training/ppo/bt93l/baseline_matrix_report.json",
           "data/training/ppo/bt93l/handover_package.json",
           "data/training/ppo/bt93l/micro_ppo_signal_report.json",
+          "data/training/ppo/bt93m/closure_gate_report.json",
           "data/training/ppo/bt93m/comparison_policy_decision.json",
           "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
           "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
@@ -1506,13 +1507,14 @@
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
           "package.json",
+          "python/scripts/bt93m_closure_gate.py",
           "python/scripts/bt93m_comparator_no_start_refresh.py",
           "python/scripts/bt93m_dqn_same_matrix_anchor.py",
           "python/scripts/bt93m_start_truth.py",
           "python/scripts/bt94a_gate_check.py"
         ],
         "scopeResolution": {
-          "concreteCount": 23,
+          "concreteCount": 25,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -4521,7 +4523,7 @@
       "id": "BT93M.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.99"
@@ -12212,8 +12214,8 @@
     {
       "id": "BT93M.99.1",
       "type": "subphase",
-      "title": "Alle Phasen 93M.1 bis 93M.3 sind mit versionierter Evidence dokumentiert.",
-      "status": "open",
+      "title": "Alle Phasen 93M.1 bis 93M.3 sind mit versionierter Evidence dokumentiert. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_closure_gate.py --write-report` -> `data/training/ppo/bt93m/closure_gate_report.json`, `phaseCoverage.93M.99.1=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.99",
@@ -12223,8 +12225,8 @@
     {
       "id": "BT93M.99.2",
       "type": "subphase",
-      "title": "Ergebnis ist `gate-fresh-dqn-anchor-ready`, `gate-fresh-dqn-anchor-blocked` oder `diagnose-loop-required`.",
-      "status": "open",
+      "title": "Ergebnis ist `gate-fresh-dqn-anchor-ready`, `gate-fresh-dqn-anchor-blocked` oder `diagnose-loop-required`. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_closure_gate.py --write-report` -> `data/training/ppo/bt93m/closure_gate_report.json`, `resultClass=gate-fresh-dqn-anchor-blocked`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.99",
@@ -12234,8 +12236,8 @@
     {
       "id": "BT93M.99.3",
       "type": "subphase",
-      "title": "BT94A bleibt geschlossen, solange `no_start_gate.json` nicht `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `bt94aBlockerCount=0` schreibt.",
-      "status": "open",
+      "title": "BT94A bleibt geschlossen, solange `no_start_gate.json` nicht `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `bt94aBlockerCount=0` schreibt. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_closure_gate.py --write-report` -> `data/training/ppo/bt93m/closure_gate_report.json`, `bt94aClosed=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.99",
@@ -12245,8 +12247,8 @@
     {
       "id": "BT93M.99.4",
       "type": "subphase",
-      "title": "Kein PPO-Longrun, Candidate, Freeze, Holdout, Promote, Rollout oder Runtime-Handoff wurde in BT93M erzeugt.",
-      "status": "open",
+      "title": "Kein PPO-Longrun, Candidate, Freeze, Holdout, Promote, Rollout oder Runtime-Handoff wurde in BT93M erzeugt. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_closure_gate.py --write-report` -> `data/training/ppo/bt93m/closure_gate_report.json`, `diagnosticOnly=true`, `forbiddenProductiveSurfaceTouched=[]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.99",
@@ -12256,8 +12258,8 @@
     {
       "id": "BT93M.99.5",
       "type": "subphase",
-      "title": "Der Plan benennt nach BT93M den einzigen zulaessigen naechsten Pfad: `BT93N` mit Anker/Ersatzpolitik, Loader-Fix-Block oder Stop als `dqn-anchor-blocked`; kein impliziter \"wir testen trotzdem\"-Pfad.",
-      "status": "open",
+      "title": "Der Plan benennt nach BT93M den einzigen zulaessigen naechsten Pfad: `BT93N` mit Anker/Ersatzpolitik, Loader-Fix-Block oder Stop als `dqn-anchor-blocked`; kein impliziter \"wir testen trotzdem\"-Pfad. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_closure_gate.py --write-report` -> `data/training/ppo/bt93m/closure_gate_report.json`, `nextPathExplicit=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.99",
@@ -12267,8 +12269,8 @@
     {
       "id": "BT93M.99.6",
       "type": "subphase",
-      "title": "Wenn `comparison_policy_decision.json` nicht non-blocking ist, duerfen BT93N/O nur Diagnose-/Repair-Artefakte erzeugen; BT93P bleibt fuer `BT94A-ready` geschlossen.",
-      "status": "open",
+      "title": "Wenn `comparison_policy_decision.json` nicht non-blocking ist, duerfen BT93N/O nur Diagnose-/Repair-Artefakte erzeugen; BT93P bleibt fuer `BT94A-ready` geschlossen. (abgeschlossen: 2026-04-29; evidence: `python python/scripts/bt93m_closure_gate.py --write-report` -> `data/training/ppo/bt93m/closure_gate_report.json`, `positiveReentryBlocked=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93M",
         "phaseCode": "93M.99",
@@ -26001,6 +26003,27 @@
       }
     },
     {
+      "id": "data/training/ppo/bt93m/closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93M"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/training/ppo/bt93m/comparison_policy_decision.json",
       "type": "file",
       "title": null,
@@ -33231,6 +33254,27 @@
           "BT93D",
           "BT93E",
           "BT93L"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93m_closure_gate.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93M"
         ],
         "exists": true
       }
@@ -69476,6 +69520,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93m/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
       "type": "scope",
       "hint": null,
@@ -70620,6 +70673,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93m_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -72382,6 +72444,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93m/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
       "type": "scope",
       "hint": null,
@@ -73508,6 +73579,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93m_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -76468,6 +76548,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93m/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
       "type": "scope",
       "hint": null,
@@ -77603,6 +77692,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93m_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79664,6 +79762,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93m/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
       "type": "scope",
       "hint": null,
@@ -80799,6 +80906,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93m_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -89264,6 +89380,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93m/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
       "type": "scope",
       "hint": null,
@@ -90399,6 +90524,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93m_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98039,6 +98173,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93m/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
       "type": "scope",
       "hint": null,
@@ -99183,6 +99326,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93l_task_metric_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93m_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -116382,6 +116534,15 @@
     },
     {
       "from": "BT93M",
+      "to": "data/training/ppo/bt93m/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93M",
       "to": "data/training/ppo/bt93m/comparison_policy_decision.json",
       "type": "scope",
       "hint": null,
@@ -116500,6 +116661,15 @@
     {
       "from": "BT93M",
       "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93M",
+      "to": "python/scripts/bt93m_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {

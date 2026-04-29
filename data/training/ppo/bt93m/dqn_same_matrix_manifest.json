@@ -76,7 +76,7 @@
       "v34-dqn-checkpoint-v1"
     ]
   },
-  "generatedAt": "2026-04-29T17:02:34Z",
+  "generatedAt": "2026-04-29T21:07:01Z",
   "generatedBy": "python/scripts/bt93m_dqn_same_matrix_anchor.py",
   "historicalReportPolicy": {
     "allowedAs": [
@@ -214,7 +214,7 @@
       "phaseId": "93M.1",
       "resultClass": "start-truth-pinned-red",
       "role": "BT93M.1 start truth",
-      "sha256": "8406aa83297361b4b1ffd64e2ceed863f88d8b5d3cdb3e041c08b8cabe2e2399"
+      "sha256": "448fa7b978f206f3207faecf397daebc1699527c562245f881577151a869e395"
     },
     "taskMetricContract": {
       "blockId": "BT93L",

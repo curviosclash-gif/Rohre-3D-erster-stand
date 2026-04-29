@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2387,
-    "rawCoveredFileCount": 1908,
+    "trackedFileCount": 2389,
+    "rawCoveredFileCount": 1910,
     "rawCoveragePercent": 79.9,
-    "adjustedTrackedFileCount": 1484,
-    "adjustedCoveredFileCount": 1249,
+    "adjustedTrackedFileCount": 1486,
+    "adjustedCoveredFileCount": 1251,
     "adjustedCoveragePercent": 84.2,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 221,
-        "coveredCount": 200
+        "count": 222,
+        "coveredCount": 201
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 870,
-        "coveredCount": 854
+        "count": 871,
+        "coveredCount": 855
       },
       {
         "classification": "product-docs",
@@ -7300,6 +7300,29 @@
         "BT93D",
         "BT93E",
         "BT93L"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93m/closure_gate_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93M"
       ],
       "surfaces": [],
       "classification": "other",
@@ -17779,6 +17802,29 @@
         "BT93D",
         "BT93E",
         "BT93L"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93m_closure_gate.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93M"
       ],
       "surfaces": [],
       "classification": "product-code",

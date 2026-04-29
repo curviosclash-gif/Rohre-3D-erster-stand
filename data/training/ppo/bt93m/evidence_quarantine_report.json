@@ -1,6 +1,6 @@
 {
   "blockId": "BT93M",
-  "generatedAt": "2026-04-29T16:43:27Z",
+  "generatedAt": "2026-04-29T21:07:01Z",
   "generatedBy": "python/scripts/bt93m_start_truth.py",
   "nextAllowedUse": [
     "reference as quarantined context",

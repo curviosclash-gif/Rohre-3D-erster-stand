@@ -42,11 +42,11 @@
     ],
     "status": "dqn-anchor-blocked"
   },
-  "generatedAt": "2026-04-29T17:02:34Z",
+  "generatedAt": "2026-04-29T21:07:01Z",
   "generatedBy": "python/scripts/bt93m_dqn_same_matrix_anchor.py",
   "git": {
     "branch": "bot-training",
-    "sha": "c9ff5c5df2f9f2451958677d04aa7691af14c48d"
+    "sha": "695b4c0b5cbdbedc3f128a630ff659001e226a56"
   },
   "guardrails": {
     "bt94aClaimAllowed": false,
@@ -122,7 +122,7 @@
       "sha256": "40f6de9a7baf86d3dd06a917e7fee42047594d793f74cb16b631a1453d2ba7ea"
     }
   ],
-  "manifestHash": "10afc4fa1f257252332645bb5caeab755081f00019b824b7ca3ba358092c6bc3",
+  "manifestHash": "5cc25cd627cbdf09887a418936b1754b2c3c7f1a3765a6ad664801138032ffa8",
   "manifestPath": "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
   "matrix": {
     "controlSeeds": [
@@ -203,7 +203,7 @@
       "phaseId": "93M.1",
       "resultClass": "start-truth-pinned-red",
       "role": "BT93M.1 start truth",
-      "sha256": "8406aa83297361b4b1ffd64e2ceed863f88d8b5d3cdb3e041c08b8cabe2e2399"
+      "sha256": "448fa7b978f206f3207faecf397daebc1699527c562245f881577151a869e395"
     },
     "taskMetricContract": {
       "blockId": "BT93L",
