@@ -407,7 +407,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
 | Bot-Codex | BT93RR | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S |
 | Bot-Codex | BT93S | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `matrix-redesign-required`; oeffnet keinen Folgeblock |
-| Bot-Codex | BT93S2 | 2026-04-30 | active | 93S2.1 abgeschlossen; naechster Scope 93S2.2 Matrix-v2 Contract und Scenario Search |
+| Bot-Codex | BT93S2 | 2026-04-30 | active | 93S2.2 abgeschlossen; naechster Scope 93S2.3 Existing-Action Effect v2 |
 | - | BT93T | - | frei | blockiert, bis BT93S2.99 `observation-telemetry-required` schreibt |
 | - | BT93U | - | frei | wartet auf BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -3828,10 +3828,10 @@ Scope-Dateien:
 ### Definition of Done (DoD)
 
 - [x] DoD.S2R1 Startvertrag lockt alle BT93S-/BT93RR-Quellen mit Hashes, Resultklassen, SampleCounts, Matrix-ID, ActionSurfaceId, Policy-Lineage, ClaimFlags und aktiven Blockern. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_start_contract.py --write-report` -> `data/training/ppo/bt93s2/start_contract.json`)
-- [ ] DoD.S2R2 Matrix v2 trennt Control-Semantik sauber: `no-danger-control` ist ein Stabilitaets-/Non-Success-Control, kein Escape-Erfolgsszenario.
-- [ ] DoD.S2R3 Matrix v2 hat fuer jede Action-Effect-Szenarioklasse eine Positive-Control mit echter Zustandswirkung und eine Negative-Control, die nicht versehentlich Erfolg zaehlt.
-- [ ] DoD.S2R4 `escape-right-open` wird auf v2 mit mindestens einer real wirksamen bestehenden oder kontrolliert neu begruendeten Action belegt; sonst endet der Block `action-space-required`.
-- [ ] DoD.S2R5 Success-Definition bleibt zustandsbasiert: WallDistance, LocalOpenness, CollisionRisk, TerminalRisk, Heading-/Target-Delta und Trail-Druck; Reward-only, command-flag-only, target-distance-only, single-step und maxSteps-only bleiben verboten.
+- [x] DoD.S2R2 Matrix v2 trennt Control-Semantik sauber: `no-danger-control` ist ein Stabilitaets-/Non-Success-Control, kein Escape-Erfolgsszenario. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_scenario_matrix_v2.py --write-reports` -> `data/training/ppo/bt93s2/scenario_search_report.json`; `data/training/ppo/bt93s2/scenario_matrix_v2_contract.json`)
+- [x] DoD.S2R3 Matrix v2 hat fuer jede Action-Effect-Szenarioklasse eine Positive-Control mit echter Zustandswirkung und eine Negative-Control, die nicht versehentlich Erfolg zaehlt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_scenario_matrix_v2.py --write-reports` -> `data/training/ppo/bt93s2/scenario_search_report.json`; `data/training/ppo/bt93s2/scenario_matrix_v2_contract.json`)
+- [x] DoD.S2R4 `escape-right-open` wird auf v2 mit mindestens einer real wirksamen bestehenden oder kontrolliert neu begruendeten Action belegt; sonst endet der Block `action-space-required`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_scenario_matrix_v2.py --write-reports` -> `data/training/ppo/bt93s2/scenario_search_report.json`; `data/training/ppo/bt93s2/scenario_matrix_v2_contract.json`)
+- [x] DoD.S2R5 Success-Definition bleibt zustandsbasiert: WallDistance, LocalOpenness, CollisionRisk, TerminalRisk, Heading-/Target-Delta und Trail-Druck; Reward-only, command-flag-only, target-distance-only, single-step und maxSteps-only bleiben verboten. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_scenario_matrix_v2.py --write-reports` -> `data/training/ppo/bt93s2/scenario_search_report.json`; `data/training/ppo/bt93s2/scenario_matrix_v2_contract.json`)
 - [ ] DoD.S2R6 Action-Surface-Aenderungen sind nur nach v2-Action-Gap erlaubt; jede Aenderung invalidiert alte Policy-Selection/Comparator-Artefakte und darf nicht `action-selection-green` oeffnen.
 - [ ] DoD.S2R7 Policy-Selection-Recheck nutzt dieselbe v2-Matrix, dieselbe Retrain-Lineage, gepinnte Seeds, keine Trainingsepisoden, keine Holdouts und feste Schwellen (`effectiveSelectionShare >= 0.25`, `top2EffectiveShare >= 0.50`) pro relevanter Szenariofamilie.
 - [ ] DoD.S2R8 Telemetrie darf `BT93T` nur oeffnen, wenn Matrix-/Action-Space-/Selection-Blocker geschlossen sind und nur Trail-/Escape-Attribution fehlt.
@@ -3850,10 +3850,10 @@ Pflicht-Evidence:
 
 ### 93S2.2 Matrix-v2 Contract und Scenario Search
 
-- [ ] 93S2.2.1 `no-danger-control` in `controlKind=neutral-stability-control` umstellen: Erfolg ist Stabilitaet/keine Risikoerhoehung, nicht Escape.
-- [ ] 93S2.2.2 `escape-right-open` per deterministischer Scenario-Search reparieren: Predicate, Warmup, Seeds und Positive-Control muessen vor Messung validiert sein.
-- [ ] 93S2.2.3 Alle Wall-/Trail-/Escape-Szenarien bekommen Positive-Control, Negative-Control, Mindestfenster, Revalidation-Predicate, Seed-Plan, verbotene Success-Proxies und Drift-/Invalidation-Liste.
-- [ ] 93S2.2.4 Scenario-Search trennt Discovery-Seeds und Validation-Seeds, damit der Matrix-Fix nicht nur auf bekannte Seeds ueberfitten kann.
+- [x] 93S2.2.1 `no-danger-control` in `controlKind=neutral-stability-control` umstellen: Erfolg ist Stabilitaet/keine Risikoerhoehung, nicht Escape. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_scenario_matrix_v2.py --write-reports` -> `data/training/ppo/bt93s2/scenario_matrix_v2_contract.json`)
+- [x] 93S2.2.2 `escape-right-open` per deterministischer Scenario-Search reparieren: Predicate, Warmup, Seeds und Positive-Control muessen vor Messung validiert sein. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_scenario_matrix_v2.py --write-reports` -> `data/training/ppo/bt93s2/scenario_search_report.json`)
+- [x] 93S2.2.3 Alle Wall-/Trail-/Escape-Szenarien bekommen Positive-Control, Negative-Control, Mindestfenster, Revalidation-Predicate, Seed-Plan, verbotene Success-Proxies und Drift-/Invalidation-Liste. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_scenario_matrix_v2.py --write-reports` -> `data/training/ppo/bt93s2/scenario_matrix_v2_contract.json`)
+- [x] 93S2.2.4 Scenario-Search trennt Discovery-Seeds und Validation-Seeds, damit der Matrix-Fix nicht nur auf bekannte Seeds ueberfitten kann. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_scenario_matrix_v2.py --write-reports` -> `data/training/ppo/bt93s2/scenario_search_report.json`)
 
 Pflicht-Evidence:
 

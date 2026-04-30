@@ -1,0 +1,1362 @@
+{
+  "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+  "allowNext": [
+    "93S2.3 Existing-Action Effect v2"
+  ],
+  "blockId": "BT93S2",
+  "blocksNext": [
+    "BT93T claim until BT93S2.99=observation-telemetry-required",
+    "BT93U claim until BT93S2.99=action-selection-green",
+    "BT93V claim",
+    "BT93W claim",
+    "BT93O claim",
+    "BT93X full claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "50k/100k/200k/500k/1M extension",
+    "reward fix from BT93S2.2",
+    "telemetry fix from BT93S2.2",
+    "action-surface change from BT93S2.2"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93s2NextPhaseAllowed": true,
+    "bt93tClaimAllowed": false,
+    "bt93uClaimAllowed": false,
+    "bt93vClaimAllowed": false,
+    "bt93wClaimAllowed": false,
+    "bt93xFullClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffAllowed": false,
+    "candidateRunsAllowed": false,
+    "freezeAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "ppoValidateSignalAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "tests": "user-owned except closure gate scripts",
+    "write": "python python/scripts/bt93s2_scenario_matrix_v2.py --write-reports"
+  },
+  "contractId": "bt93s2-walltrail-action-effect-window-v2",
+  "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+  "dodCoverage": {
+    "DoD.S2R2": true,
+    "DoD.S2R3": true,
+    "DoD.S2R4": true,
+    "DoD.S2R5": true
+  },
+  "generatedAt": "2026-04-30T16:32:41Z",
+  "generatedBy": "python/scripts/bt93s2_scenario_matrix_v2.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "0b9cbbe9b933850e0c70f300ac64e6c5d590e58c"
+  },
+  "guardrails": {
+    "actionSurfaceChanged": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "newOptimizerUpdates": 0,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "qualityClaimAllowed": false,
+    "rewardFixApplied": false,
+    "runtimeSurfacesTouched": [],
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "invalidations": [
+    {
+      "reason": "Replaced by BT93S2 matrix-v2 contract for future action-effect and policy-selection evidence.",
+      "scope": "BT93S v1 matrix"
+    },
+    {
+      "reason": "Reclassified as neutral-stability-control; it cannot contribute action-selection-green.",
+      "scope": "no-danger-control action green"
+    }
+  ],
+  "matrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+  "missingScenarios": [],
+  "nextAllowedActions": [
+    "Run 93S2.3 against scenario_matrix_v2_contract.json; do not train or consume holdout."
+  ],
+  "ok": true,
+  "opensNext": [
+    "93S2.3 Existing-Action Effect v2"
+  ],
+  "phaseCoverage": {
+    "93S2.2.1": true,
+    "93S2.2.2": true,
+    "93S2.2.3": true,
+    "93S2.2.4": true
+  },
+  "phaseId": "93S2.2",
+  "reportHash": "b559877b0b0b7ea823a260073e64dcf38334884cbf6767b34619b57d65f7860b",
+  "resultClass": "scenario-matrix-v2-contract-green",
+  "sampleCounts": {
+    "candidateSeedCount": 26,
+    "contractScenarioCount": 9,
+    "discoverySeedCount": 17,
+    "holdoutEpisodes": 0,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "rejectedCandidateSeedCount": 1,
+    "scenarioCount": 9,
+    "validationSeedCount": 9
+  },
+  "scenarioSearchResults": [
+    {
+      "candidateCount": 3,
+      "candidates": [
+        {
+          "predicatePass": true,
+          "seed": 934,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.495,
+            "pressureLevel": 0.607855,
+            "targetAlignment": 0.399107,
+            "targetDistanceRatio": 0.186514,
+            "wallDistanceFront": 0.25,
+            "wallDistanceLeft": 0.75,
+            "wallDistanceRight": 0.875
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 1934,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.456429,
+            "pressureLevel": 0.63715,
+            "targetAlignment": 0.591229,
+            "targetDistanceRatio": 0.338472,
+            "wallDistanceFront": 0.05,
+            "wallDistanceLeft": 0.875,
+            "wallDistanceRight": 0.714286
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 2934,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.48,
+            "pressureLevel": 0.513469,
+            "targetAlignment": 0.057322,
+            "targetDistanceRatio": 0.390364,
+            "wallDistanceFront": 0.3,
+            "wallDistanceLeft": 0.45,
+            "wallDistanceRight": 1.0
+          }
+        }
+      ],
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "wall-pressure-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "turn-right-boost",
+            "evade-right"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "front wall non-regression or improvement",
+          "terminal-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "rejectedCandidateCount": 0,
+      "rejectedCandidates": [],
+      "scenarioId": "frontal-near-wall",
+      "scenarioKind": "wall-pressure-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          934,
+          1934
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2934
+        ]
+      },
+      "sourceWarmup": {
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "v2Predicate": {
+        "expression": "wallDistanceFront <= 0.90 or min(wallDistanceLeft, wallDistanceRight) <= 0.50",
+        "predicateId": "frontal-near-wall-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "candidateCount": 3,
+      "candidates": [
+        {
+          "predicatePass": true,
+          "seed": 942,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.58,
+            "pressureLevel": 0.238681,
+            "targetAlignment": 0.905679,
+            "targetDistanceRatio": 0.336997,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.35
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 1942,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.61,
+            "pressureLevel": 0.264664,
+            "targetAlignment": 0.775185,
+            "targetDistanceRatio": 0.264823,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.75,
+            "wallDistanceRight": 0.75
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 2942,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.638571,
+            "pressureLevel": 0.1827,
+            "targetAlignment": 0.738994,
+            "targetDistanceRatio": 0.492499,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.642857
+          }
+        }
+      ],
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "wall-pressure-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-left",
+            "roll-left",
+            "evade-left"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "nearest side-wall distance improvement",
+          "collision-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "rejectedCandidateCount": 0,
+      "rejectedCandidates": [],
+      "scenarioId": "side-wall-left",
+      "scenarioKind": "wall-pressure-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          942,
+          1942
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2942
+        ]
+      },
+      "sourceWarmup": {
+        "warmupAction": "noop",
+        "warmupSteps": 2
+      },
+      "v2Predicate": {
+        "expression": "min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "predicateId": "side-wall-left-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "candidateCount": 3,
+      "candidates": [
+        {
+          "predicatePass": true,
+          "seed": 930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.585,
+            "pressureLevel": 0.305602,
+            "targetAlignment": 0.160979,
+            "targetDistanceRatio": 0.296938,
+            "wallDistanceFront": 0.875,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.5
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 1930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.51,
+            "pressureLevel": 0.371507,
+            "targetAlignment": 0.125289,
+            "targetDistanceRatio": 0.259702,
+            "wallDistanceFront": 0.75,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.25
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 2930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.56,
+            "pressureLevel": 0.24066,
+            "targetAlignment": -0.158428,
+            "targetDistanceRatio": 0.331501,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.25
+          }
+        }
+      ],
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "wall-pressure-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "turn-right-boost",
+            "evade-left"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "right-wall distance improvement",
+          "collision-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "rejectedCandidateCount": 0,
+      "rejectedCandidates": [],
+      "scenarioId": "side-wall-right",
+      "scenarioKind": "wall-pressure-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          930,
+          1930
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2930
+        ]
+      },
+      "sourceWarmup": {
+        "warmupAction": "boost",
+        "warmupSteps": 7
+      },
+      "v2Predicate": {
+        "expression": "min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "predicateId": "side-wall-right-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "candidateCount": 3,
+      "candidates": [
+        {
+          "predicatePass": true,
+          "seed": 934,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.505714,
+            "pressureLevel": 0.503014,
+            "targetAlignment": 0.005759,
+            "targetDistanceRatio": 0.269407,
+            "wallDistanceFront": 0.428571,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.5
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 1934,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.62,
+            "pressureLevel": 0.295741,
+            "targetAlignment": 0.747319,
+            "targetDistanceRatio": 0.324331,
+            "wallDistanceFront": 0.875,
+            "wallDistanceLeft": 0.75,
+            "wallDistanceRight": 0.875
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 2934,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.444286,
+            "pressureLevel": 0.634686,
+            "targetAlignment": -0.690927,
+            "targetDistanceRatio": 0.228651,
+            "wallDistanceFront": 0.15,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.45
+          }
+        }
+      ],
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "local-openness-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "turn-right-boost",
+            "evade-right",
+            "pitch-down"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "local-openness improvement",
+          "dead-end-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "rejectedCandidateCount": 0,
+      "rejectedCandidates": [],
+      "scenarioId": "narrowing-corridor",
+      "scenarioKind": "local-openness-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          934,
+          1934
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2934
+        ]
+      },
+      "sourceWarmup": {
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "v2Predicate": {
+        "expression": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "predicateId": "narrowing-corridor-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "candidateCount": 3,
+      "candidates": [
+        {
+          "predicatePass": true,
+          "seed": 930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.487143,
+            "pressureLevel": 0.66766,
+            "targetAlignment": 0.650435,
+            "targetDistanceRatio": 0.19539,
+            "wallDistanceFront": 0.1,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.714286
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 1930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.575,
+            "pressureLevel": 0.363517,
+            "targetAlignment": -0.99186,
+            "targetDistanceRatio": 0.136065,
+            "wallDistanceFront": 0.875,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.35
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 2930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.434286,
+            "pressureLevel": 0.63247,
+            "targetAlignment": -0.103552,
+            "targetDistanceRatio": 0.293139,
+            "wallDistanceFront": 0.1,
+            "wallDistanceLeft": 0.45,
+            "wallDistanceRight": 1.0
+          }
+        }
+      ],
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "trail-pressure-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-left",
+            "yaw-right",
+            "pitch-down"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "pressureLevel decrease",
+          "front-wall non-regression",
+          "terminal-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "rejectedCandidateCount": 0,
+      "rejectedCandidates": [],
+      "scenarioId": "trail-ahead",
+      "scenarioKind": "trail-pressure-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          930,
+          1930
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2930
+        ]
+      },
+      "sourceWarmup": {
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "v2Predicate": {
+        "expression": "pressureLevel >= 0.25 and (wallDistanceFront <= 0.90 or min(wallDistanceLeft, wallDistanceRight) <= 0.65)",
+        "predicateId": "trail-ahead-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "candidateCount": 3,
+      "candidates": [
+        {
+          "predicatePass": true,
+          "seed": 934,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.61,
+            "pressureLevel": 0.286296,
+            "targetAlignment": 0.886354,
+            "targetDistanceRatio": 0.204732,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.45,
+            "wallDistanceRight": 1.0
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 1934,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.47,
+            "pressureLevel": 0.573775,
+            "targetAlignment": -0.215792,
+            "targetDistanceRatio": 0.164515,
+            "wallDistanceFront": 0.35,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.4
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 2934,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.424286,
+            "pressureLevel": 0.595639,
+            "targetAlignment": 0.292968,
+            "targetDistanceRatio": 0.337113,
+            "wallDistanceFront": 0.15,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.35
+          }
+        }
+      ],
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "trail-pressure-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "evade-left",
+            "evade-right",
+            "yaw-right"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "pressureLevel decrease",
+          "nearest side-wall non-regression",
+          "terminal-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "rejectedCandidateCount": 0,
+      "rejectedCandidates": [],
+      "scenarioId": "trail-side",
+      "scenarioKind": "trail-pressure-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          934,
+          1934
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2934
+        ]
+      },
+      "sourceWarmup": {
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "v2Predicate": {
+        "expression": "pressureLevel >= 0.25 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "predicateId": "trail-side-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "candidateCount": 3,
+      "candidates": [
+        {
+          "predicatePass": true,
+          "seed": 930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.524286,
+            "pressureLevel": 0.421104,
+            "targetAlignment": 0.169881,
+            "targetDistanceRatio": 0.330265,
+            "wallDistanceFront": 0.571429,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.45
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 1930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.612857,
+            "pressureLevel": 0.382283,
+            "targetAlignment": 0.271036,
+            "targetDistanceRatio": 0.22977,
+            "wallDistanceFront": 0.75,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.714286
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 2930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.46,
+            "pressureLevel": 0.589066,
+            "targetAlignment": -0.191768,
+            "targetDistanceRatio": 0.12204,
+            "wallDistanceFront": 0.35,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.35
+          }
+        }
+      ],
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "escape-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-left",
+            "turn-left-boost",
+            "evade-right"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "left lane preserved",
+          "collision-risk non-regression",
+          "terminal-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "rejectedCandidateCount": 0,
+      "rejectedCandidates": [],
+      "scenarioId": "escape-left-open",
+      "scenarioKind": "escape-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          930,
+          1930
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2930
+        ]
+      },
+      "sourceWarmup": {
+        "warmupAction": "pitch-up",
+        "warmupSteps": 7
+      },
+      "v2Predicate": {
+        "expression": "wallDistanceLeft >= 0.80 and min(wallDistanceFront, wallDistanceRight) <= 0.75",
+        "predicateId": "escape-left-open-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "candidateCount": 3,
+      "candidates": [
+        {
+          "predicatePass": true,
+          "seed": 930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.56,
+            "pressureLevel": 0.245144,
+            "targetAlignment": 0.998333,
+            "targetDistanceRatio": 0.319045,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.25,
+            "wallDistanceRight": 1.0
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 1930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.6,
+            "pressureLevel": 0.28044,
+            "targetAlignment": 0.832159,
+            "targetDistanceRatio": 0.221001,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.45
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 2930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.62,
+            "pressureLevel": 0.24067,
+            "targetAlignment": 0.967904,
+            "targetDistanceRatio": 0.331473,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.55,
+            "wallDistanceRight": 1.0
+          }
+        }
+      ],
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "escape-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "roll-right",
+            "turn-right-boost",
+            "evade-right"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "right lane preserved",
+          "collision-risk non-regression",
+          "terminal-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "rejectedCandidateCount": 0,
+      "rejectedCandidates": [],
+      "scenarioId": "escape-right-open",
+      "scenarioKind": "escape-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          930,
+          1930
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2930
+        ]
+      },
+      "sourceWarmup": {
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      },
+      "v2Predicate": {
+        "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+        "predicateId": "escape-right-open-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "candidateCount": 2,
+      "candidates": [
+        {
+          "predicatePass": true,
+          "seed": 930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.61,
+            "pressureLevel": 0.343596,
+            "targetAlignment": 0.821994,
+            "targetDistanceRatio": 0.220565,
+            "wallDistanceFront": 0.85,
+            "wallDistanceLeft": 0.7,
+            "wallDistanceRight": 0.95
+          }
+        },
+        {
+          "predicatePass": true,
+          "seed": 1930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.61,
+            "pressureLevel": 0.303249,
+            "targetAlignment": 0.603523,
+            "targetDistanceRatio": 0.274309,
+            "wallDistanceFront": 0.9,
+            "wallDistanceLeft": 0.6,
+            "wallDistanceRight": 1.0
+          }
+        }
+      ],
+      "controls": {
+        "actionGreenEvidenceAllowed": false,
+        "controlKind": "neutral-stability-control",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": false
+        },
+        "negativeControls": {
+          "actions": [
+            "boost",
+            "shoot-mg"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "neutral-stability",
+          "mustShowStateEffectBeforeGreen": false
+        },
+        "requiredStateEffects": [
+          "minimum window completed",
+          "no terminal",
+          "risk does not increase"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "rejectedCandidateCount": 1,
+      "rejectedCandidates": [
+        {
+          "predicatePass": false,
+          "seed": 2930,
+          "startMetrics": {
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.59,
+            "pressureLevel": 0.404908,
+            "targetAlignment": -0.809181,
+            "targetDistanceRatio": 0.108589,
+            "wallDistanceFront": 0.8,
+            "wallDistanceLeft": 0.6,
+            "wallDistanceRight": 1.0
+          }
+        }
+      ],
+      "scenarioId": "no-danger-control",
+      "scenarioKind": "neutral-stability-control",
+      "seedPlan": {
+        "discoverySeeds": [
+          930
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          1930
+        ]
+      },
+      "sourceWarmup": {
+        "warmupAction": "noop",
+        "warmupSteps": 0
+      },
+      "v2Predicate": {
+        "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+        "predicateId": "no-danger-control-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    }
+  ],
+  "schemaVersion": "bt93s2-scenario-search-report-v1",
+  "searchSourcePolicy": {
+    "notUsedForPositiveEvidence": true,
+    "reason": "BT93S.99 invalidated v1 positive evidence; S2 revalidates start-state seeds before fresh v2 action-effect measurement.",
+    "source": "data/training/ppo/bt93s/scenario_window_contract.json",
+    "use": "fresh deterministic reset/warmup seed validation only"
+  },
+  "sourceArtifacts": [
+    {
+      "blockId": "BT93S2",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2/start_contract.json",
+      "phaseId": "93S2.1",
+      "resultClass": "start-contract-locked",
+      "role": "BT93S2.1 source lock opening only 93S2.2",
+      "schemaVersion": "bt93s2-start-contract-v1",
+      "sha256": "078488d50fa13edaee26f4a2b798f2d96690c856209bb762501945d461fa4ce0",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93S",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "phaseId": "93S.1",
+      "resultClass": "scenario-window-contract-green",
+      "role": "BT93S.1 v1 matrix source, retained as context only",
+      "schemaVersion": "bt93s-scenario-window-contract-v1",
+      "sha256": "2334cb20a0d20ad9279f7609e9bddb03d81a238539c1fdb0b5c615ce7bfcb2f0",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93S",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "phaseId": "93S.1",
+      "resultClass": "scenario-window-contract-green",
+      "role": "BT93S.1 v1 effect-window alias, retained as context only",
+      "schemaVersion": "bt93s-scenario-window-contract-v1",
+      "sha256": "2334cb20a0d20ad9279f7609e9bddb03d81a238539c1fdb0b5c615ce7bfcb2f0",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93S",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "phaseId": "93S.2",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.2 historical probes used only for deterministic seed discovery",
+      "schemaVersion": "bt93s-existing-action-effect-report-v1",
+      "sha256": "e6537e1c388bb9ed84d541c5124e396ce4218d82216418d88b8eb37145f55094",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93S",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
+      "phaseId": "93S.99",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.99 red closure source for scenario blockers",
+      "schemaVersion": "bt93s-closure-gate-report-v1",
+      "sha256": "8d40084b0bf7afc191b8b4860c3df06cc3064a84e3a6fd5986c5edbe0525a4fa",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current PPO action-surface decoder, read-only",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/curvios_env.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "Python sidecar environment, read-only",
+      "schemaVersion": null,
+      "sha256": "2a12d75b327b10daef853cc242e6d81fb87c4ee838756d6cef1905d19de94d59",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "JS-authoritative headless transition path, read-only",
+      "schemaVersion": null,
+      "sha256": "d6a2917a001a310010a98ee150726af110f1444b0716e6ac3a35815253144360",
+      "tracked": true
+    }
+  ],
+  "sourceContractId": "bt93s-walltrail-action-effect-window-v1",
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "sourceMatrixId": "bt93s-walltrail-action-effect-matrix-v1",
+  "startContractOk": true
+}
