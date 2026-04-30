@@ -1,0 +1,440 @@
+{
+  "actionSurface": {
+    "current": {
+      "actionCount": 13,
+      "path": "python/envs/ppo_action_surface.py",
+      "semanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg",
+        "turn-left-boost",
+        "turn-right-boost",
+        "evade-left",
+        "evade-right"
+      ],
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "surfaceIds": {
+        "maskedSemantic": "bt93q-walltrail-semantic-action-v1",
+        "multiDiscrete": "bt93c-multidiscrete-action-v1"
+      }
+    },
+    "driftDetected": true,
+    "policyEvidence": {
+      "actionCount": 9,
+      "path": "python/envs/ppo_action_surface.py",
+      "semanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg"
+      ],
+      "sha256": "4e12c93bd532178f3759234d5217f1cd58a4f4bfaec9c6f7be8ffa708564847b"
+    }
+  },
+  "allowNext": [
+    "93R.99 red closure preparation if user accepts model-artifact-missing as BT93R outcome",
+    "or restore exact BT93N model/config/vecnormalize/surface-hash package before any 93R.4 fix"
+  ],
+  "artifactLineage": {
+    "actionSurfaceDriftDetected": true,
+    "missingRequiredArtifactKeys": [
+      "model",
+      "config",
+      "vecnormalize"
+    ],
+    "modelPackagePersisted": false,
+    "realModelLogitsAvailable": false,
+    "selectedPolicySource": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+    "surfaceHashRestorationRequired": true
+  },
+  "blockId": "BT93R",
+  "blocksNext": [
+    "93R.4 decoder/normalize/eval-mode fix without restored selected BT93N lineage",
+    "BT93S until 93R.99 reaches R-Allowlist",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k/500k/1M extension"
+  ],
+  "candidateRootCauses": [
+    {
+      "class": "eval-argmax-collapse",
+      "evidence": [
+        "deterministic eval is single-action yaw-right in BT93Q/BT93N count evidence",
+        "real model logits are unavailable, so a fixable eval-mode bug is not proven"
+      ],
+      "nextAction": "Do not implement eval-mode fix without restored selected model/logit evidence.",
+      "selected": false,
+      "status": "observed-but-not-selected"
+    },
+    {
+      "class": "model-artifact-missing",
+      "evidence": [
+        "missing selected BT93N artifact keys: model, config, vecnormalize",
+        "real logits/probs and VecNormalize comparison are unavailable for the selected policy lineage"
+      ],
+      "nextAction": "Recover or regenerate the exact selected BT93N package before any decoder/normalize/eval fix.",
+      "selected": true,
+      "status": "selected-red"
+    },
+    {
+      "class": "decoder-bug",
+      "evidence": [
+        "token 2 maps to yaw-right under zero-based mapping in current and policy-evidence action lists",
+        "action-surface hash drift exists but does not prove a decoder bug for the observed argmax token"
+      ],
+      "nextAction": "Keep decoder fix blocked unless a loadable lineage package shows an index mismatch.",
+      "selected": false,
+      "status": "not-proven"
+    },
+    {
+      "class": "normalize-mismatch",
+      "evidence": [
+        "selected BT93N vecnormalize artifact is missing",
+        "normalize/config drift cannot be separated from missing lineage"
+      ],
+      "nextAction": "Restore vecnormalize/config first; then classify drift in a fresh lineage-valid counterprobe.",
+      "selected": false,
+      "status": "untestable"
+    },
+    {
+      "class": "reward-pressure-collapse",
+      "evidence": [
+        "BT93Q reward ordering remains red, but reward fixes are forbidden in BT93R."
+      ],
+      "nextAction": "Keep reward ordering for BT93U after BT93R/S/T gates.",
+      "selected": false,
+      "status": "deferred-to-bt93u"
+    },
+    {
+      "class": "action-selection-blindness",
+      "evidence": [
+        "BT93Q action-space/action-selection blockers are active, but action fixes are forbidden in BT93R."
+      ],
+      "nextAction": "Keep action-effect and action-selection work for BT93S.",
+      "selected": false,
+      "status": "deferred-to-bt93s"
+    },
+    {
+      "class": "entropy-config-collapse",
+      "evidence": [
+        "stochastic train normalized entropy is broad in count evidence",
+        "real logits/KL/value/advantage data are unavailable"
+      ],
+      "nextAction": "Do not tune entropy config without a lineage-valid mini-repro.",
+      "selected": false,
+      "status": "not-proven"
+    },
+    {
+      "class": "reward-scale-collapse",
+      "evidence": [
+        "No BT93R-owned reward-scale evidence exists; reward-scale work belongs to reward ordering."
+      ],
+      "nextAction": "Defer to BT93U if reward ordering remains red.",
+      "selected": false,
+      "status": "deferred-to-bt93u"
+    },
+    {
+      "class": "rollout-bootstrap-drift",
+      "evidence": [
+        "No loadable selected model package or rollout/bootstrap trace exists for BT93R.3."
+      ],
+      "nextAction": "Do not infer rollout drift from proxy counts.",
+      "selected": false,
+      "status": "not-proven"
+    },
+    {
+      "class": "action-repeat-or-seed-correlation",
+      "evidence": [
+        "repeated-action streak is observed across eval seeds",
+        "seed/temperature/truncation separation is impossible without selected artifacts"
+      ],
+      "nextAction": "Treat as symptom, not fix class, until lineage-valid counterprobe exists.",
+      "selected": false,
+      "status": "observed-but-not-causal"
+    },
+    {
+      "class": "truncation-terminal-bias",
+      "evidence": [
+        "Terminal/truncation evidence is not separable from the missing policy package in BT93R.3."
+      ],
+      "nextAction": "Keep terminal sanity for BT93V unless a BT93R lineage-valid repro proves eval truncation bias.",
+      "selected": false,
+      "status": "not-proven"
+    },
+    {
+      "class": "measurement-invalid",
+      "evidence": [
+        "current action-surface hash/action count drift from BT93Q policy evidence",
+        "measurement remains invalid for fix proof until selected model/config/vecnormalize/surface hash align"
+      ],
+      "nextAction": "Use as closure blocker if model package is restored but surface lineage still drifts.",
+      "selected": false,
+      "status": "secondary-blocker"
+    }
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93r_policy_collapse_root_cause.py --write-report"
+  },
+  "counterprobeSeparation": {
+    "deterministicEval": {
+      "argmaxAction": "yaw-right",
+      "collapseObserved": true,
+      "repeatedActionStreakLowerBound": 8100.0,
+      "singleActionEvalShare": 1.0,
+      "source": "BT93N micro_ppo_repeat_report.evalSummary.seedSummaries[].actionCounts"
+    },
+    "identicalSeedMatrixRunExecuted": false,
+    "normalizeEvalTemperatureSeedTruncation": {
+      "evalModeComparable": false,
+      "normalizeStateComparable": false,
+      "reason": "Config, VecNormalize and real logits/probs are unavailable for the selected BT93N policy lineage.",
+      "seedComparable": false,
+      "temperatureComparable": false,
+      "truncationComparable": false
+    },
+    "notExecutedReason": "Selected BT93N model/config/vecnormalize are missing; running deterministic/stochastic counterprobes would create non-lineage evidence.",
+    "stochasticEval": {
+      "available": false,
+      "reason": "No loadable selected model/logit artifact exists for same-seed stochastic eval."
+    },
+    "stochasticTrain": {
+      "argmaxAction": "yaw-right",
+      "broadDistributionObserved": true,
+      "normalizedEntropy": 0.990638,
+      "source": "BT93N micro_ppo_repeat_report.trainSummary.actionCounts"
+    }
+  },
+  "decoderActionMapping": {
+    "argmaxActionFromEvidence": "yaw-right",
+    "argmaxToken": "2",
+    "currentSurfaceZeroBased": {
+      "oneBasedAction": "yaw-left",
+      "oneBasedIndexValid": true,
+      "token": "2",
+      "zeroBasedAction": "yaw-right",
+      "zeroBasedIndexValid": true
+    },
+    "decoderBugProven": false,
+    "decoderBugReason": "Token 2 maps to yaw-right in both current and BT93Q policy-evidence action lists; the blocker is lineage drift plus missing selected policy artifacts, not a proven off-by-one decoder bug.",
+    "policyEvidenceSurfaceZeroBased": {
+      "oneBasedAction": "yaw-left",
+      "oneBasedIndexValid": true,
+      "token": "2",
+      "zeroBasedAction": "yaw-right",
+      "zeroBasedIndexValid": true
+    },
+    "tokenMappingConsistentForObservedArgmax": true
+  },
+  "dodCoverage": {
+    "DoD.R3": true
+  },
+  "generatedAt": "2026-04-30T07:35:25Z",
+  "generatedBy": "python/scripts/bt93r_policy_collapse_root_cause.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "2d6795bc53b07018b315ceb40bd3c7431fe9b9f6",
+    "sha": "a711c59df3f122dde643c6e1d0dd4dec59bc7061"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "matrixId": "bt93q-walltrail-policy-recheck-v1",
+  "ok": true,
+  "opensNext": [],
+  "phaseCoverage": {
+    "93R.3.1": true,
+    "93R.3.2": true,
+    "93R.3.3": true
+  },
+  "phaseId": "93R.3",
+  "policyIds": {
+    "eval": "ppo-bt93n-micro-10k-deterministic",
+    "train": "ppo-bt93n-micro-10k-stochastic"
+  },
+  "recommendations": [
+    {
+      "action": "Restore the exact BT93N package before any fix attempt.",
+      "rank": 1,
+      "why": "The collapse-producing model, config, vecnormalize and surface hash are the missing proof line."
+    },
+    {
+      "action": "If restoration is impossible, close BT93R red as model-artifact-missing/policy-evidence-invalid.",
+      "rank": 2,
+      "why": "A decoder, normalize or eval-mode change would be unprovable against the selected policy lineage."
+    },
+    {
+      "action": "Keep BT93S/O/P/94A blocked.",
+      "rank": 3,
+      "why": "BT93R has not produced an R-Allowlist result class or a counterprobe-green artifact."
+    }
+  ],
+  "resultClass": "model-artifact-missing",
+  "rootCauseClassification": {
+    "fixClassPinned": null,
+    "fixImplementationAllowed": false,
+    "redClosurePrepared": true,
+    "selectedClass": "model-artifact-missing",
+    "selectedClassCount": 1,
+    "selectedClasses": [
+      "model-artifact-missing"
+    ],
+    "why": "The selected BT93N policy package is missing model/config/vecnormalize, so decoder, normalize and eval-mode fixes cannot be proven against the policy that produced the collapse."
+  },
+  "sampleCounts": {
+    "bt93nActualModelTimesteps": 10112,
+    "bt93qDeterministicEvalActionRows": 8100,
+    "bt93qStochasticTrainActionRows": 10112,
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 0,
+    "newTrainingEpisodes": 0
+  },
+  "schemaVersion": "bt93r-policy-collapse-root-cause-report-v1",
+  "semanticWindow": "bt93q-walltrail-10k-diagnostic-window",
+  "sourceArtifacts": [
+    {
+      "blockId": "BT93R",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93rHandoverLock",
+      "ok": true,
+      "path": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "phaseId": "93R.1",
+      "resultClass": "handover-lock-green",
+      "role": "BT93R.1 handover lock",
+      "schemaVersion": "bt93r-handover-lock-report-v1",
+      "sha256": "9eaa4bb6608af6f7deb6d0a0d4de13b983f7a03a108fd11ecc94e5bce1d7a143",
+      "sizeBytes": 18143,
+      "sourceKey": "bt93rHandoverLock",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93R",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93rPolicyArtifact",
+      "ok": true,
+      "path": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "phaseId": "93R.2",
+      "resultClass": "policy-evidence-invalid",
+      "role": "BT93R.2 policy artifact capability report",
+      "schemaVersion": "bt93r-policy-artifact-report-v1",
+      "sha256": "fe9b7c4ca44b5022ea9279251aee0c1cf75b34108d6320e12cd48f311b9fb7c9",
+      "sizeBytes": 38391,
+      "sourceKey": "bt93rPolicyArtifact",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qPolicyCollapse",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "phaseId": "93Q.3",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q deterministic policy-collapse evidence",
+      "schemaVersion": "bt93q-policy-collapse-report-v1",
+      "sha256": "8b6fbfdbf2285e6f58c8104fad408fc1e6b2677fde394a617b78170137af035d",
+      "sizeBytes": 18211,
+      "sourceKey": "bt93qPolicyCollapse",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93nMicroPpoRepeat",
+      "ok": true,
+      "path": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "phaseId": "93N.3",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N 10k micro-PPO source run",
+      "schemaVersion": "bt93n-micro-ppo-repeat-report-v1",
+      "sha256": "96f046445da1518eeb9519958b179107326294d6ad83a6bfa074089f52aaa631",
+      "sizeBytes": 82300,
+      "sourceKey": "bt93nMicroPpoRepeat",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "key": "ppoActionSurface",
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current PPO action-surface source",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sizeBytes": 22887,
+      "sourceKey": "ppoActionSurface",
+      "tracked": true
+    }
+  ],
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "summary": {
+    "actionSurfaceDriftDetected": true,
+    "decoderBugProven": false,
+    "deterministicCollapseObserved": true,
+    "deterministicDominantAction": "yaw-right",
+    "evalModeBugProven": false,
+    "nextBestAction": "Restore exact BT93N lineage package or close BT93R red; do not implement a fix from proxy evidence.",
+    "normalizeMismatchProven": false,
+    "resultClass": "model-artifact-missing",
+    "selectedModelPackageMissing": true,
+    "selectedRootCauseClass": "model-artifact-missing"
+  },
+  "thresholdsLockedBeforeRun": {
+    "afterTheFactThresholdChangesAllowed": false,
+    "notApplicableReason": "93R.3 is a report-only root-cause classifier and runs no new PPO eval/training sample."
+  }
+}
