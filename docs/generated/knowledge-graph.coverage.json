@@ -135,14 +135,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2472,
+    "trackedFileCount": 2473,
     "rawCoveredFileCount": 1992,
-    "rawCoveragePercent": 80.6,
-    "adjustedTrackedFileCount": 1569,
+    "rawCoveragePercent": 80.5,
+    "adjustedTrackedFileCount": 1570,
     "adjustedCoveredFileCount": 1333,
-    "adjustedCoveragePercent": 85,
-    "uncoveredFileCount": 480,
-    "uncoveredActiveFileCount": 236,
+    "adjustedCoveragePercent": 84.9,
+    "uncoveredFileCount": 481,
+    "uncoveredActiveFileCount": 237,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -189,7 +189,7 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 371,
+        "count": 372,
         "coveredCount": 185
       },
       {
@@ -11712,6 +11712,19 @@
     },
     {
       "path": "docs/Fehlerberichte/2026-04-29_v90-90.2.2-build-typecheck-architecture-blocked.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/Fehlerberichte/2026-04-30_bt93r-reentry-master-checklist-missing.md",
       "tracked": true,
       "coveredInCore": false,
       "coveredByOverlay": false,
