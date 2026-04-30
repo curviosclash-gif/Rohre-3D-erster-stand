@@ -1,0 +1,124 @@
+{
+  "activeLineage": {
+    "activeCount": 1,
+    "lineageId": "bt93y-retrain-lineage-v1",
+    "lineageKind": "new-retrain-lineage-not-bt93n",
+    "notBt93nLineage": true,
+    "ready": true,
+    "sourceKind": "retrain-lineage-ready",
+    "sourcePath": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+    "sourceResultClass": "retrain-lineage-ready"
+  },
+  "blockId": "BT93Y",
+  "blockedActions": [
+    "BT93S claim before BT93R-Reentry.99 in R-Allowlist",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "50k/100k/200k/500k/1M extension"
+  ],
+  "blockingStatus": {
+    "bt93oBlockedUntil": "BT93W.99=bt93o-precondition-green",
+    "bt93pBlockedUntil": "BT93O.99=bt93o-quality-green and BT93X.99=bt93p-starttruth-green",
+    "bt93rReentryBlocked": false,
+    "bt93sBlockedUntil": "BT93R-Reentry.99 in R-Allowlist",
+    "bt94aBlockedUntil": "BT93P.4=BT94A-ready plus green no-start gate",
+    "candidateFreezePromoteRolloutBlocked": true
+  },
+  "generatedAt": "2026-04-30T11:03:30Z",
+  "generatedBy": "python/scripts/bt93y_closure_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "6853d4293821d8116048a456494571f87ed53e14",
+    "sha": "bdc9ec6e67d57dcea999ffc5926772ebeb2af3e6"
+  },
+  "nextAllowedActions": [
+    "BT93R-Reentry artifact-probe/root-cause/counterprobe claim"
+  ],
+  "nonGoalsPreserved": [
+    "no BT93S/O/P/94A claim",
+    "no candidate or freeze",
+    "no holdout consumption",
+    "no promote or rollout wording",
+    "no PPO-Validate or BT95 handoff signal",
+    "no productive runtime integration"
+  ],
+  "ok": true,
+  "phaseId": "93Y.99",
+  "recommendations": [
+    {
+      "action": "Claim only BT93R-Reentry as the next /fix-planung task.",
+      "rank": 1,
+      "why": "BT93Y.99 opens exactly the artifact-probe/root-cause/counterprobe path for the active retrain lineage."
+    },
+    {
+      "action": "Keep BT93S blocked until the new BT93R-Reentry.99 reaches the R-Allowlist.",
+      "rank": 2,
+      "why": "Action-selection work needs a concrete policy-collapse class and counterprobe result first."
+    },
+    {
+      "action": "Do not start BT93O, BT93P, BT94A, candidate, freeze, holdout, promote, rollout, or PPO-Validate work.",
+      "rank": 3,
+      "why": "Those gates still require R-Allowlist, S/T/U/V/W, O-quality, X-starttruth, and P.4 evidence."
+    }
+  ],
+  "replacementPolicy": {
+    "decision": "approved",
+    "historicalDqnBotReportsUse": "context-only",
+    "owner": "user",
+    "policyId": "bt93x-rcp1-same-matrix-control-suite-no-bt11",
+    "scope": {
+      "allowedFor": [
+        "BT93X starttruth",
+        "BT93P starttruth"
+      ],
+      "bt93pMayUseAfter": [
+        "BT93X.99=bt93p-starttruth-green",
+        "pinned statistics contract remains unchanged"
+      ],
+      "forbiddenFor": [
+        "candidate",
+        "freeze",
+        "holdout-consumption",
+        "promote",
+        "rollout",
+        "DQN sunset",
+        "productive handoff",
+        "PPO-Validate",
+        "BT95 handoff"
+      ],
+      "fullBt93xMayUseAfter": [
+        "BT93Y.99 green",
+        "BT93R-Reentry.99 in R-Allowlist",
+        "BT93W.99=bt93o-precondition-green",
+        "BT93O.99=bt93o-quality-green"
+      ]
+    }
+  },
+  "resultClass": "retrain-lineage-ready-bt93r-reentry-ready",
+  "schemaVersion": "bt93y-handover-package-v1",
+  "sourceClosureReport": {
+    "path": "data/training/ppo/bt93y/bt93y_closure_gate_report.json",
+    "sha256AfterWrite": "cf4e829ab6c57bab67f2278ccb917f4563919590afe44a3fc3c18c2283f9572d"
+  },
+  "summary": {
+    "blockersForNextFixPlanung": [],
+    "bt93rReentryAllowed": true,
+    "finalResult": "retrain-lineage-ready-bt93r-reentry-ready",
+    "nextBestAction": "Claim BT93R-Reentry only; BT93S/O/P/94A remain blocked.",
+    "remainingBlockersAfterNextFixPlanung": [
+      "BT93S still needs BT93R-Reentry.99 in R-Allowlist",
+      "BT93O still needs BT93W.99=bt93o-precondition-green",
+      "BT93P still needs BT93O.99 and BT93X.99",
+      "BT94A still needs BT93P.4=BT94A-ready plus green gate"
+    ]
+  }
+}
