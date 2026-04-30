@@ -135,14 +135,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2429,
-    "rawCoveredFileCount": 1950,
+    "trackedFileCount": 2433,
+    "rawCoveredFileCount": 1953,
     "rawCoveragePercent": 80.3,
-    "adjustedTrackedFileCount": 1526,
-    "adjustedCoveredFileCount": 1291,
+    "adjustedTrackedFileCount": 1530,
+    "adjustedCoveredFileCount": 1294,
     "adjustedCoveragePercent": 84.6,
-    "uncoveredFileCount": 479,
-    "uncoveredActiveFileCount": 235,
+    "uncoveredFileCount": 480,
+    "uncoveredActiveFileCount": 236,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -177,20 +177,20 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 249,
-        "coveredCount": 228
+        "count": 250,
+        "coveredCount": 229
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 883,
-        "coveredCount": 867
+        "count": 884,
+        "coveredCount": 868
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 367,
-        "coveredCount": 182
+        "count": 369,
+        "coveredCount": 183
       },
       {
         "classification": "prototype",
@@ -8181,6 +8181,29 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt94a/no_start_gate.json",
       "tracked": true,
       "coveredInCore": true,
@@ -10572,6 +10595,13 @@
         "BT93O",
         "BT93P",
         "BT93Q",
+        "BT93R",
+        "BT93S",
+        "BT93T",
+        "BT93U",
+        "BT93V",
+        "BT93W",
+        "BT93X",
         "BT94A",
         "BT94B",
         "BT95"
@@ -11086,6 +11116,19 @@
     },
     {
       "path": "docs/Fehlerberichte/2026-04-29_v90-90.2.2-build-typecheck-architecture-blocked.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/Fehlerberichte/2026-04-30_pf0-bt94a-no-start-stale.md",
       "tracked": true,
       "coveredInCore": false,
       "coveredByOverlay": false,
@@ -13420,6 +13463,7 @@
       ],
       "scopeBlocks": [
         "BT93M",
+        "BT93N",
         "BT93O",
         "BT94A",
         "BT94B",
@@ -13442,6 +13486,27 @@
       ],
       "scopeBlocks": [
         "BT93O",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "BT93N",
+        "BT93O",
+        "BT94A",
         "V77"
       ],
       "surfaces": [],
@@ -18798,6 +18863,29 @@
     },
     {
       "path": "python/scripts/bt93q_walltrail_stress.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93r_preflight_gate_sync.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

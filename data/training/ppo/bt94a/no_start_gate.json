@@ -166,9 +166,9 @@
       "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
     }
   },
-  "generatedAt": "2026-04-29T21:07:07Z",
+  "generatedAt": "2026-04-30T06:27:33Z",
   "generatedBy": "python/scripts/bt94a_gate_check.py",
-  "gitSha": "695b4c0b5cbdbedc3f128a630ff659001e226a56",
+  "gitSha": "2d6795bc53b07018b315ceb40bd3c7431fe9b9f6",
   "matrixDefinitionAllowed": false,
   "nextGate": {
     "fallback": "user-owned replan or return to PPO diagnosis before candidate ablations",

@@ -1,24 +1,24 @@
 ﻿# Bot Trainings Roadmap (Survival 2026-Q2)
 
-Stand: 2026-04-29
+Stand: 2026-04-30
 Horizon: 2026-03-22 bis 2026-06-30
 Quelle fuer operative Phase-Checks: `docs/bot-training/Bot_Trainingsplan.md`
 
-## Operative Aktualisierung 2026-04-29
+## Operative Aktualisierung 2026-04-30
 
 Diese Roadmap ist nur noch der Langhorizont. Fuer den PPO-Pfad sind die alten C2-C5-Formulierungen zu grob und duerfen nicht als Freigabe fuer neue Langlaeufe, Kandidaten oder Promotions gelesen werden.
 
 Aktiver PPO-Fokus:
 
-- `BT93M` bis `BT93P` sind Root-Cause-Reparatur: Gate-Wahrheit, Same-Matrix-DQN-Anker, DeathBefore60, Action-/Objective-Qualitaet, Reward-Ordering, MaxStep-Plateau und Mindeststatistik.
-- Bis `BT93P.4=BT94A-ready` plus `data/training/ppo/bt94a/no_start_gate.json` mit `claimable=true` bleibt jeder PPO-Langlauf ueber die gepinnte Reparaturleiter hinaus verboten.
+- `BT93M` bis `BT93Q` sind rot abgeschlossen; der aktive Reparaturfokus ist jetzt `PF.0`, `BT93R` bis `BT93W`, fruehes read-only `BT93X.0`, danach `BT93O`, voller `BT93X` und erst dann `BT93P`.
+- Bis `BT93O.99=bt93o-quality-green`, `BT93X.99=bt93p-starttruth-green`, `BT93P.4=BT94A-ready` plus `data/training/ppo/bt94a/no_start_gate.json` mit `claimable=true` bleibt jeder PPO-Langlauf ueber die gepinnte Reparaturleiter hinaus verboten.
 - Q2-Zielwerte bleiben Produktziele, aber keine Promotionsregel: `promote` braucht BT94A-Freeze, BT94B-A/B-Evidence, gruene PPO-Validate-Lane, Holdout, Statistik und expliziten User-Entscheid.
 - BT93J/BT93K/BT93L haben gezeigt, dass Steps, Durchsatz, CUDA, Smokes und Plan-Gates keine Bot-Qualitaet beweisen. Die Roadmap wertet ab sofort nur noch versionierte Semantik-/Run-/Validate-Evidence aus `docs/bot-training/Bot_Trainingsplan.md`.
 
 Aktuelle No-Go-Regeln:
 
 - Kein Candidate, Freeze, Promote, Rollout oder BT95-Handoff aus Diagnose-, Scaffold-, `tmp/**`-, `latest_*`-, Durchsatz- oder Drei-Run-Zwischenevidence.
-- Kein BT94A-Start ohne geloestes Reward-Ordering gegen Noop/Random/Semantic-Cycle/Scripted, Same-Matrix-DQN- oder Ersatzvergleich, Holdout-Lineage und Statistikvertrag.
+- Kein BT94A-Start ohne geloestes Policy-Collapse-, Action-, Telemetry-, Reward-, Safety-/Terminal-, Objective-/Anti-Plateau- und Comparator-Gate; Same-Matrix-DQN- oder User-Ersatzvergleich, Holdout-Lineage und Statistikvertrag muessen aus BT93X/BT93P frisch sein.
 - Kein Runtime-Sunset fuer DQN ohne separaten operativen Rollout-Block mit Export/Load, JS-Inference, Registry, Latenzbudget, Rollback und PPO-Validate.
 - Kein Report-only-Fortschritt: PPO-Artefakte muessen blockierende Konsequenzen, Sampleguete, Matrix-ID, Semantikfenster, Vergleichspolitik und naechste erlaubte Aktionen maschinenlesbar schreiben.
 - Kein Fix ohne Ursache: Reward-, Action-, Terminal-, Curriculum- und Runner-Fixes werden erst nach Trace-/Stress-/Ordering-Evidence gestartet und duerfen nicht in gemischten Reparaturclaims verschwimmen.
@@ -99,7 +99,7 @@ Aktueller Laufstand:
 | C3 | 2026-03-27 bis 2026-03-31 | Safety-Policy + Risk-Gates | `avgStepsPerEpisode>=155`, no gate regressions |
 | C4 | 2026-04-01 bis 2026-04-10 | Curriculum (einfach->mittel->voll) | `avgStepsPerEpisode>=165` |
 | C5 | 2026-04-11 bis 2026-04-25 | Replay-Priorisierung + Hyperparameter | `avgStepsPerEpisode>=175`, `averageBotSurvival>=40` |
-| C6 | 2026-04-26 bis 2026-06-30 | Root-Cause-Reparatur, Statistik, PPO-Validate und spaeterer Rollout-Schutz | Q2 Zielkorridor nur nach BT93M-P, BT94A/B und gruener PPO-Validate belastbar |
+| C6 | 2026-04-26 bis 2026-06-30 | Root-Cause-Reparatur, Statistik, PPO-Validate und spaeterer Rollout-Schutz | Q2 Zielkorridor nur nach BT93R-X, BT93P, BT94A/B und gruener PPO-Validate belastbar |
 
 ## Roadmap-Phasen
 

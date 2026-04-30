@@ -1,0 +1,531 @@
+{
+  "allowNext": [
+    "repair PF.0 blocker only",
+    "refresh bt94a_gate_check source priority before BT93R.1"
+  ],
+  "blockId": "PF.0",
+  "blocksNext": [
+    "BT93R.1 claim while PF.0 is not preflight-green or explicitly excepted",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k/500k/1M extension"
+  ],
+  "branch": "bot-training",
+  "bt93qState": {
+    "activeBlockers": [
+      "action-space-required",
+      "observation-telemetry-required",
+      "policy-collapse-active",
+      "reward-redesign-required",
+      "safety-action-contract-diagnostic-only"
+    ],
+    "bt93oClaimAllowed": false,
+    "closureResultClass": "policy-collapse-active",
+    "handoverResultClass": "policy-collapse-active",
+    "opensNext": []
+  },
+  "bt94aNoStartFreshness": {
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "expectedCurrentSource": {
+      "blockId": "BT93Q",
+      "path": "data/training/ppo/bt93q/handover_package.json",
+      "phaseId": "93Q.99",
+      "resultClass": "policy-collapse-active",
+      "sha256": "6730aac188855620a2eb8176e6555145cb1d70ea255cf3e83aa1840e95ca80c4"
+    },
+    "freshForRx": false,
+    "gateCommand": {
+      "command": "C:\\Users\\Justin Wolff\\AppData\\Local\\Programs\\Python\\Python312\\python.exe python/scripts/bt94a_gate_check.py --write-report",
+      "exitCode": 0,
+      "ok": true,
+      "stderrTail": [],
+      "stdoutTail": [
+        "      \"sha256\": \"f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11\"",
+        "    },",
+        "    \"handoverReport\": {",
+        "      \"path\": \"data/training/ppo/bt93c/handover_report.json\",",
+        "      \"sha256\": \"f7554bef13fd37a5bc4a24061a5422ebe23c460c2f0e070b4521425665bebd68\"",
+        "    },",
+        "    \"precomparisonReport\": {",
+        "      \"path\": \"data/training/ppo/bt93c/precomparison_report.json\",",
+        "      \"sha256\": \"7ff00d1c24d345642e521b76a89f7746a9d5dc0748adaeaa39f51caa12bcb1fb\"",
+        "    }",
+        "  }",
+        "}"
+      ]
+    },
+    "matrixDefinitionAllowed": false,
+    "observedCurrentSource": "BT93M",
+    "ok": true,
+    "resultClass": "blocked-no-start",
+    "staleReason": "no_start_gate currentHandoverSource does not follow R-X priority BT93P -> BT93X -> BT93O -> BT93W -> BT93Q."
+  },
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rClaimAllowed": false,
+    "bt93x0ReadOnlyAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false
+  },
+  "commands": {
+    "bt94aGateCheck": {
+      "command": "C:\\Users\\Justin Wolff\\AppData\\Local\\Programs\\Python\\Python312\\python.exe python/scripts/bt94a_gate_check.py --write-report",
+      "exitCode": 0,
+      "ok": true,
+      "stderrTail": [],
+      "stdoutTail": [
+        "      \"sha256\": \"f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11\"",
+        "    },",
+        "    \"handoverReport\": {",
+        "      \"path\": \"data/training/ppo/bt93c/handover_report.json\",",
+        "      \"sha256\": \"f7554bef13fd37a5bc4a24061a5422ebe23c460c2f0e070b4521425665bebd68\"",
+        "    },",
+        "    \"precomparisonReport\": {",
+        "      \"path\": \"data/training/ppo/bt93c/precomparison_report.json\",",
+        "      \"sha256\": \"7ff00d1c24d345642e521b76a89f7746a9d5dc0748adaeaa39f51caa12bcb1fb\"",
+        "    }",
+        "  }",
+        "}"
+      ]
+    },
+    "docsCheck": {
+      "command": "npm.cmd run docs:check",
+      "exitCode": 0,
+      "ok": true,
+      "stderrTail": [],
+      "stdoutTail": [
+        "",
+        "[docs] mode=check",
+        "[docs] updated=0",
+        "[docs] missing=0",
+        "[docs] onboarding=0",
+        "[docs] legacy=0",
+        "[docs] mojibake=0",
+        "",
+        "> cuviosclash@0.9.0 plan:check",
+        "> node scripts/validate-umsetzungsplan.mjs",
+        "",
+        "Master plan validation passed."
+      ]
+    },
+    "docsSync": {
+      "command": "npm.cmd run docs:sync",
+      "exitCode": 0,
+      "ok": true,
+      "stderrTail": [],
+      "stdoutTail": [
+        "> cuviosclash@0.9.0 docs:sync",
+        "> node scripts/docs-freshness.mjs --write",
+        "",
+        "[docs] mode=sync",
+        "[docs] updated=0",
+        "[docs] missing=0",
+        "[docs] onboarding=0",
+        "[docs] legacy=0",
+        "[docs] mojibake=0"
+      ]
+    },
+    "guardMain": {
+      "command": "npm.cmd run guard:main",
+      "exitCode": 0,
+      "ok": true,
+      "stderrTail": [],
+      "stdoutTail": [
+        "> cuviosclash@0.9.0 guard:main",
+        "> npm run git:acl:heal && node scripts/ensure-main-branch.mjs",
+        "",
+        "",
+        "> cuviosclash@0.9.0 git:acl:heal",
+        "> node scripts/heal-git-acl-windows.mjs",
+        "",
+        "[git-acl-heal] ok:no_explicit_deny"
+      ]
+    },
+    "planCheck": {
+      "command": "npm.cmd run plan:check",
+      "exitCode": 0,
+      "ok": true,
+      "stderrTail": [],
+      "stdoutTail": [
+        "> cuviosclash@0.9.0 plan:check",
+        "> node scripts/validate-umsetzungsplan.mjs",
+        "",
+        "Master plan validation passed."
+      ]
+    }
+  },
+  "docsCheck": {
+    "command": "npm.cmd run docs:check",
+    "exitCode": 0,
+    "ok": true,
+    "stderrTail": [],
+    "stdoutTail": [
+      "",
+      "[docs] mode=check",
+      "[docs] updated=0",
+      "[docs] missing=0",
+      "[docs] onboarding=0",
+      "[docs] legacy=0",
+      "[docs] mojibake=0",
+      "",
+      "> cuviosclash@0.9.0 plan:check",
+      "> node scripts/validate-umsetzungsplan.mjs",
+      "",
+      "Master plan validation passed."
+    ]
+  },
+  "docsSync": {
+    "command": "npm.cmd run docs:sync",
+    "exitCode": 0,
+    "ok": true,
+    "stderrTail": [],
+    "stdoutTail": [
+      "> cuviosclash@0.9.0 docs:sync",
+      "> node scripts/docs-freshness.mjs --write",
+      "",
+      "[docs] mode=sync",
+      "[docs] updated=0",
+      "[docs] missing=0",
+      "[docs] onboarding=0",
+      "[docs] legacy=0",
+      "[docs] mojibake=0"
+    ]
+  },
+  "generatedAt": "2026-04-30T06:27:34Z",
+  "generatedBy": "python/scripts/bt93r_preflight_gate_sync.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "2d6795bc53b07018b315ceb40bd3c7431fe9b9f6",
+    "sha": "2d6795bc53b07018b315ceb40bd3c7431fe9b9f6"
+  },
+  "graphOpenDeps": {
+    "commands": {
+      "BT93O": {
+        "command": "node scripts/query-knowledge-graph.mjs open-deps BT93O --json",
+        "exitCode": 0,
+        "ok": true,
+        "stderrTail": [],
+        "stdoutTail": [
+          "  \"blockId\": \"BT93O\",",
+          "  \"openDependencies\": [",
+          "    {",
+          "      \"dependsOn\": \"BT93W\",",
+          "      \"source\": \"master-table\",",
+          "      \"hard\": true,",
+          "      \"fulfilled\": false,",
+          "      \"hint\": \"Action-/Objective-Qualitaet und Anti-Plateau; einzig gruener Ausgang `bt93o-quality-green`\",",
+          "      \"dependsPhase\": \"93W.99\"",
+          "    }",
+          "  ]",
+          "}"
+        ]
+      },
+      "BT93P": {
+        "command": "node scripts/query-knowledge-graph.mjs open-deps BT93P --json",
+        "exitCode": 0,
+        "ok": true,
+        "stderrTail": [],
+        "stdoutTail": [
+          "      \"dependsPhase\": \"93O.99\"",
+          "    },",
+          "    {",
+          "      \"dependsOn\": \"BT93X\",",
+          "      \"source\": \"master-table\",",
+          "      \"hard\": true,",
+          "      \"fulfilled\": false,",
+          "      \"hint\": \"200k->500k->1M Trainingsleiter mit Statistik und frischem BT94A-Reentry-Gate\",",
+          "      \"dependsPhase\": \"93X.99\"",
+          "    }",
+          "  ]",
+          "}"
+        ]
+      },
+      "BT94A": {
+        "command": "node scripts/query-knowledge-graph.mjs open-deps BT94A --json",
+        "exitCode": 0,
+        "ok": true,
+        "stderrTail": [],
+        "stdoutTail": [
+          "  \"blockId\": \"BT94A\",",
+          "  \"openDependencies\": [",
+          "    {",
+          "      \"dependsOn\": \"BT93P\",",
+          "      \"source\": \"master-table\",",
+          "      \"hard\": true,",
+          "      \"fulfilled\": false,",
+          "      \"hint\": \"BT94A bleibt vor `94A.1` geschlossen, bis R-X/O/P und das Gate frisch gruen sind; Kandidatenlaeufe/Freeze bleiben vorher verboten\",",
+          "      \"dependsPhase\": \"93P.4\"",
+          "    }",
+          "  ]",
+          "}"
+        ]
+      }
+    },
+    "observed": {
+      "BT93O": {
+        "expectedAny": [
+          "BT93W"
+        ],
+        "observed": [
+          "BT93W"
+        ],
+        "ok": true,
+        "payload": {
+          "blockId": "BT93O",
+          "openDependencies": [
+            {
+              "dependsOn": "BT93W",
+              "dependsPhase": "93W.99",
+              "fulfilled": false,
+              "hard": true,
+              "hint": "Action-/Objective-Qualitaet und Anti-Plateau; einzig gruener Ausgang `bt93o-quality-green`",
+              "source": "master-table"
+            }
+          ],
+          "query": "open-deps"
+        }
+      },
+      "BT93P": {
+        "expectedAny": [
+          "BT93O",
+          "BT93X"
+        ],
+        "observed": [
+          "BT93O",
+          "BT93X"
+        ],
+        "ok": true,
+        "payload": {
+          "blockId": "BT93P",
+          "openDependencies": [
+            {
+              "dependsOn": "BT93O",
+              "dependsPhase": "93O.99",
+              "fulfilled": false,
+              "hard": true,
+              "hint": "200k->500k->1M Trainingsleiter mit Statistik und frischem BT94A-Reentry-Gate",
+              "source": "master-table"
+            },
+            {
+              "dependsOn": "BT93X",
+              "dependsPhase": "93X.99",
+              "fulfilled": false,
+              "hard": true,
+              "hint": "200k->500k->1M Trainingsleiter mit Statistik und frischem BT94A-Reentry-Gate",
+              "source": "master-table"
+            }
+          ],
+          "query": "open-deps"
+        }
+      },
+      "BT94A": {
+        "expectedAny": [
+          "BT93P"
+        ],
+        "observed": [
+          "BT93P"
+        ],
+        "ok": true,
+        "payload": {
+          "blockId": "BT94A",
+          "openDependencies": [
+            {
+              "dependsOn": "BT93P",
+              "dependsPhase": "93P.4",
+              "fulfilled": false,
+              "hard": true,
+              "hint": "BT94A bleibt vor `94A.1` geschlossen, bis R-X/O/P und das Gate frisch gruen sind; Kandidatenlaeufe/Freeze bleiben vorher verboten",
+              "source": "master-table"
+            }
+          ],
+          "query": "open-deps"
+        }
+      }
+    },
+    "ok": true,
+    "stale": []
+  },
+  "guardMain": {
+    "branch": "bot-training",
+    "expectedBranch": "bot-training",
+    "guardCommand": {
+      "command": "npm.cmd run guard:main",
+      "exitCode": 0,
+      "ok": true,
+      "stderrTail": [],
+      "stdoutTail": [
+        "> cuviosclash@0.9.0 guard:main",
+        "> npm run git:acl:heal && node scripts/ensure-main-branch.mjs",
+        "",
+        "",
+        "> cuviosclash@0.9.0 git:acl:heal",
+        "> node scripts/heal-git-acl-windows.mjs",
+        "",
+        "[git-acl-heal] ok:no_explicit_deny"
+      ]
+    },
+    "nonMainAllowedByKickoff": true,
+    "ok": true
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "nextAllowedAction": "repair PF.0 blocker only",
+  "ok": true,
+  "opensNext": [],
+  "phaseId": "PF.0",
+  "planCheck": {
+    "command": "npm.cmd run plan:check",
+    "exitCode": 0,
+    "ok": true,
+    "stderrTail": [],
+    "stdoutTail": [
+      "> cuviosclash@0.9.0 plan:check",
+      "> node scripts/validate-umsetzungsplan.mjs",
+      "",
+      "Master plan validation passed."
+    ]
+  },
+  "resultClass": "bt94a-no-start-stale",
+  "roadmapSync": {
+    "missingTerms": [],
+    "ok": true,
+    "planMissingTerms": [],
+    "requiredTermsPresent": [
+      "BT93O.99=bt93o-quality-green",
+      "BT93R",
+      "BT93W",
+      "BT93X.0",
+      "PF.0"
+    ],
+    "staleReleaseTerms": []
+  },
+  "roadmapSyncRequired": false,
+  "sampleCounts": {
+    "bt93nDiagnosticEpisodes": 60,
+    "bt93qActiveBlockerCount": 5,
+    "evalEpisodes": 0,
+    "holdoutEpisodes": 0,
+    "trainingEpisodes": 0
+  },
+  "schemaVersion": "bt93r-preflight-gate-sync-v1",
+  "sourceArtifacts": [
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "docs/bot-training/Bot_Trainingsplan.md",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "active bot-training master plan",
+      "sha256": "10789613d503c88f84b6fbb6f177723f1e76ac252b4d02429723ee7b5d511326"
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "docs/bot-training/Bot_Trainings_Roadmap.md",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "bot-training roadmap",
+      "sha256": "f242489be00c4e63ac23fc8d2f31052379f1aef70f3be0464e394e418736ea4c"
+    },
+    {
+      "blockId": "BT94A",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A no-start gate",
+      "sha256": "1748b4751b7a351e438e97029ff3a7d870b949d393caf697bd5eecff2922caee"
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/closure_gate_report.json",
+      "phaseId": "93Q.99",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q.99 closure gate",
+      "sha256": "93402f0305c183060f93e9c098d3bfe0c043504613f03e4648dfad8c47367ae4"
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/handover_package.json",
+      "phaseId": "93Q.99",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q handover",
+      "sha256": "6730aac188855620a2eb8176e6555145cb1d70ea255cf3e83aa1840e95ca80c4"
+    },
+    {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93n/closure_gate_report.json",
+      "phaseId": "93N.99",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93N.99 closure gate",
+      "sha256": "606b45c98569eb4fc2a88c997ec7ccff43c3f8551b013e5e3bfdf22e8b841a1e"
+    }
+  ],
+  "terminalRawSanity": {
+    "bt93nGateClass": "death-before60-still-blocking",
+    "bt93nRootCause": "wall/trail",
+    "bt93qActiveBlockers": [
+      "action-space-required",
+      "observation-telemetry-required",
+      "policy-collapse-active",
+      "reward-redesign-required",
+      "safety-action-contract-diagnostic-only"
+    ],
+    "interpretation": "Terminal/player-dead state is already disclosed as blocking diagnosis input; PF.0 does not treat it as quality.",
+    "knownWallTrailRootDisclosed": true,
+    "ok": true,
+    "resultClass": "terminal-raw-sanity-nonblocking-for-preflight",
+    "terminalDisclosure": {
+      "disclosedAsBlocking": true,
+      "evalPlayerDeadShare": 1.0,
+      "terminalReasonCounts": {
+        "player-dead": 60
+      },
+      "trainPlayerDeadShare": 1.0
+    }
+  },
+  "thresholdsLockedBeforeRun": {
+    "afterTheFactThresholdChangesAllowed": false,
+    "notApplicableReason": "PF.0 is read-only governance preflight and runs no PPO training or eval sample."
+  }
+}

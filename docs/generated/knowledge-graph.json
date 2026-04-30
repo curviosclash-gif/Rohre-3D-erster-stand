@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 342,
+          "concreteCount": 344,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 480,
+          "concreteCount": 482,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 338,
+          "concreteCount": 340,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 337,
+          "concreteCount": 339,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 979,
+          "concreteCount": 981,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 987,
+          "concreteCount": 989,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1548,6 +1548,8 @@
           "data/training/ppo/bt93n/stability_fix_report.json",
           "data/training/ppo/bt93n/stability_ladder_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
+          "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
+          "docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md",
           "python/scripts/bt93n_closure_gate.py",
           "python/scripts/bt93n_death_trace_probe.py",
           "python/scripts/bt93n_micro_ppo_repeat.py",
@@ -1559,7 +1561,7 @@
           "tests/training-reward-survival.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 21,
+          "concreteCount": 23,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -1588,10 +1590,11 @@
           "data/training/ppo/bt93o/reward_ordering_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
-          "docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md"
+          "docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md",
+          "docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md"
         ],
         "scopeResolution": {
-          "concreteCount": 3,
+          "concreteCount": 4,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1641,8 +1644,7 @@
       "status": "done",
       "attributes": {
         "source": [
-          "bot-training-plan",
-          "dependency-target"
+          "bot-training-plan"
         ],
         "priority": null,
         "owner": null,
@@ -1665,6 +1667,7 @@
           "data/training/ppo/bt93q/safety_action_contract_report.json",
           "data/training/ppo/bt93q/trace_reanalysis_report.json",
           "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+          "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "package.json",
           "python/scripts/bt93q_action_fix.py",
@@ -1673,11 +1676,224 @@
           "python/scripts/bt93q_micro_ppo_recheck.py",
           "python/scripts/bt93q_policy_collapse.py",
           "python/scripts/bt93q_trace_reanalysis.py",
-          "python/scripts/bt93q_walltrail_stress.py"
+          "python/scripts/bt93q_walltrail_stress.py",
+          "python/scripts/bt93r_preflight_gate_sync.py"
         ],
         "scopeResolution": {
-          "concreteCount": 25,
+          "concreteCount": 27,
           "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "BT93R",
+      "type": "block",
+      "title": "Policy-Artefakt und deterministic-collapse Repair",
+      "status": "open",
+      "attributes": {
+        "source": [
+          "bot-training-plan",
+          "dependency-target"
+        ],
+        "priority": null,
+        "owner": null,
+        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
+        "currentPhase": "93R.1",
+        "scopeDeclarations": [
+          "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+          "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+          "data/training/ppo/bt93r/collapse_counterprobe_report.json",
+          "data/training/ppo/bt93r/collapse_root_cause_report.json",
+          "data/training/ppo/bt93r/policy_artifact_report.json",
+          "docs/bot-training/Bot_Trainingsplan.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 5
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "BT93S",
+      "type": "block",
+      "title": "Wall-/Trail Action-Effekt und Action-Selection Repair",
+      "status": "open",
+      "attributes": {
+        "source": [
+          "bot-training-plan",
+          "dependency-target"
+        ],
+        "priority": null,
+        "owner": null,
+        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
+        "currentPhase": "93S.1",
+        "scopeDeclarations": [
+          "data/training/ppo/bt93s/action_surface_decision.json",
+          "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
+          "data/training/ppo/bt93s/existing_action_effect_report.json",
+          "data/training/ppo/bt93s/policy_selection_report.json",
+          "data/training/ppo/bt93s/scenario_window_contract.json",
+          "docs/bot-training/Bot_Trainingsplan.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 5
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "BT93T",
+      "type": "block",
+      "title": "Training-only Raw-/Trail-/Escape-Lane Telemetry Repair",
+      "status": "open",
+      "attributes": {
+        "source": [
+          "bot-training-plan",
+          "dependency-target"
+        ],
+        "priority": null,
+        "owner": null,
+        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
+        "currentPhase": "93T.1",
+        "scopeDeclarations": [
+          "data/training/ppo/bt93t/bt93t_closure_gate_report.json",
+          "data/training/ppo/bt93t/instrumentation_report.json",
+          "data/training/ppo/bt93t/scenario_recheck_report.json",
+          "data/training/ppo/bt93t/telemetry_contract.json",
+          "docs/bot-training/Bot_Trainingsplan.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 4
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "BT93U",
+      "type": "block",
+      "title": "Danger-aware Reward- und Objective-Ordering Repair",
+      "status": "open",
+      "attributes": {
+        "source": [
+          "bot-training-plan",
+          "dependency-target"
+        ],
+        "priority": null,
+        "owner": null,
+        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
+        "currentPhase": "93U.1",
+        "scopeDeclarations": [
+          "data/training/ppo/bt93u/baseline_reproduction_report.json",
+          "data/training/ppo/bt93u/bt93u_closure_gate_report.json",
+          "data/training/ppo/bt93u/objective_contract_report.json",
+          "data/training/ppo/bt93u/reward_fix_manifest.json",
+          "data/training/ppo/bt93u/reward_sensitivity_probe_report.json",
+          "docs/bot-training/Bot_Trainingsplan.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 5
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "BT93V",
+      "type": "block",
+      "title": "Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision",
+      "status": "open",
+      "attributes": {
+        "source": [
+          "bot-training-plan",
+          "dependency-target"
+        ],
+        "priority": null,
+        "owner": null,
+        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
+        "currentPhase": "93V.1",
+        "scopeDeclarations": [
+          "data/training/ppo/bt93v/bt93v_closure_gate_report.json",
+          "data/training/ppo/bt93v/safety_diagnostic_contract_report.json",
+          "data/training/ppo/bt93v/sidecar_mask_decision_report.json",
+          "data/training/ppo/bt93v/terminal_sanity_report.json",
+          "docs/bot-training/Bot_Trainingsplan.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 4
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "BT93W",
+      "type": "block",
+      "title": "Integrierter WallTrail 10k Recheck und BT93O-Startgate",
+      "status": "open",
+      "attributes": {
+        "source": [
+          "bot-training-plan",
+          "dependency-target"
+        ],
+        "priority": null,
+        "owner": null,
+        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
+        "currentPhase": "93W.1",
+        "scopeDeclarations": [
+          "data/training/ppo/bt93w/bt93w_closure_gate_report.json",
+          "data/training/ppo/bt93w/bt93w_handover_package.json",
+          "data/training/ppo/bt93w/bt93w_micro_recheck_contract.json",
+          "data/training/ppo/bt93w/bt93w_micro_recheck_report.json",
+          "data/training/ppo/bt93w/bt93w_start_gate_report.json",
+          "docs/bot-training/Bot_Trainingsplan.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 5
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "BT93X",
+      "type": "block",
+      "title": "Same-Matrix-DQN oder Ersatzvergleich + BT93P Starttruth",
+      "status": "open",
+      "attributes": {
+        "source": [
+          "bot-training-plan",
+          "dependency-target"
+        ],
+        "priority": null,
+        "owner": null,
+        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
+        "currentPhase": "93X.1",
+        "scopeDeclarations": [
+          "data/training/ppo/bt93x/bt93p_starttruth_report.json",
+          "data/training/ppo/bt93x/bt93x_closure_gate_report.json",
+          "data/training/ppo/bt93x/bt93x_handover_package.json",
+          "data/training/ppo/bt93x/bt94a_no_start_refresh_report.json",
+          "data/training/ppo/bt93x/comparator_inventory_report.json",
+          "data/training/ppo/bt93x/comparison_policy_decision.json",
+          "data/training/ppo/bt93x/gate_checker_source_mapping.json",
+          "data/training/ppo/bt93x/replacement_policy_decision.json",
+          "data/training/ppo/bt93x/same_matrix_dqn_report.json",
+          "docs/bot-training/Bot_Trainingsplan.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 9
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -1702,10 +1918,11 @@
           "data/training/ppo/candidates/**",
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md",
-          "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md"
+          "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
+          "docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md"
         ],
         "scopeResolution": {
-          "concreteCount": 3,
+          "concreteCount": 4,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2625,7 +2842,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 274,
+          "concreteCount": 275,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -4793,6 +5010,336 @@
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.99"
+      }
+    },
+    {
+      "id": "BT93R.1",
+      "type": "phase",
+      "title": "Handover- und Hypothesen-Lock",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.1"
+      }
+    },
+    {
+      "id": "BT93R.2",
+      "type": "phase",
+      "title": "Model-/Logit-/Normalize-Artefaktfaehigkeit",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.2"
+      }
+    },
+    {
+      "id": "BT93R.3",
+      "type": "phase",
+      "title": "Collapse-Root-Cause",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.3"
+      }
+    },
+    {
+      "id": "BT93R.4",
+      "type": "phase",
+      "title": "Enger Collapse-Fix",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.4"
+      }
+    },
+    {
+      "id": "BT93R.99",
+      "type": "phase",
+      "title": "Counterprobe und Abschluss",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.99"
+      }
+    },
+    {
+      "id": "BT93S.1",
+      "type": "phase",
+      "title": "Szenariofenster und Controls",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.1"
+      }
+    },
+    {
+      "id": "BT93S.2",
+      "type": "phase",
+      "title": "Existing-Action Effekt",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.2"
+      }
+    },
+    {
+      "id": "BT93S.3",
+      "type": "phase",
+      "title": "Sidecar-Action Entscheidung",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.3"
+      }
+    },
+    {
+      "id": "BT93S.4",
+      "type": "phase",
+      "title": "Policy-Selection",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.4"
+      }
+    },
+    {
+      "id": "BT93S.99",
+      "type": "phase",
+      "title": "Abschluss",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.99"
+      }
+    },
+    {
+      "id": "BT93T.1",
+      "type": "phase",
+      "title": "Telemetry Contract",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.1"
+      }
+    },
+    {
+      "id": "BT93T.2",
+      "type": "phase",
+      "title": "Instrumentation",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.2"
+      }
+    },
+    {
+      "id": "BT93T.3",
+      "type": "phase",
+      "title": "Scenario-Recheck",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.3"
+      }
+    },
+    {
+      "id": "BT93T.99",
+      "type": "phase",
+      "title": "Abschluss",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.99"
+      }
+    },
+    {
+      "id": "BT93U.1",
+      "type": "phase",
+      "title": "Baseline-Reproduktion",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.1"
+      }
+    },
+    {
+      "id": "BT93U.2",
+      "type": "phase",
+      "title": "Reward-Fix Manifest",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.2"
+      }
+    },
+    {
+      "id": "BT93U.3",
+      "type": "phase",
+      "title": "Danger-aware Reward Repair",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.3"
+      }
+    },
+    {
+      "id": "BT93U.4",
+      "type": "phase",
+      "title": "Objective-/Progress-Vertrag",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.4"
+      }
+    },
+    {
+      "id": "BT93U.5",
+      "type": "phase",
+      "title": "Reward-Sensitivity-Probe",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.5"
+      }
+    },
+    {
+      "id": "BT93U.99",
+      "type": "phase",
+      "title": "Abschluss",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.99"
+      }
+    },
+    {
+      "id": "BT93V.1",
+      "type": "phase",
+      "title": "Safety Diagnostic Contract",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.1"
+      }
+    },
+    {
+      "id": "BT93V.2",
+      "type": "phase",
+      "title": "Terminal-Sanity",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.2"
+      }
+    },
+    {
+      "id": "BT93V.3",
+      "type": "phase",
+      "title": "Sidecar-Mask Decision",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.3"
+      }
+    },
+    {
+      "id": "BT93V.99",
+      "type": "phase",
+      "title": "Abschluss",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.99"
+      }
+    },
+    {
+      "id": "BT93W.1",
+      "type": "phase",
+      "title": "Integrated Startgate",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.1"
+      }
+    },
+    {
+      "id": "BT93W.2",
+      "type": "phase",
+      "title": "Micro-Recheck Contract",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.2"
+      }
+    },
+    {
+      "id": "BT93W.3",
+      "type": "phase",
+      "title": "10k Execution",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.3"
+      }
+    },
+    {
+      "id": "BT93W.4",
+      "type": "phase",
+      "title": "Closure und BT93O-Handoff",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.4"
+      }
+    },
+    {
+      "id": "BT93W.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.99"
+      }
+    },
+    {
+      "id": "BT93X.1",
+      "type": "phase",
+      "title": "Comparator-Inventory",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.1"
+      }
+    },
+    {
+      "id": "BT93X.2",
+      "type": "phase",
+      "title": "Same-Matrix-DQN Loader oder Ersatzpolitik",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2"
+      }
+    },
+    {
+      "id": "BT93X.3",
+      "type": "phase",
+      "title": "BT93P Starttruth und No-Start Refresh",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3"
+      }
+    },
+    {
+      "id": "BT93X.99",
+      "type": "phase",
+      "title": "Abschluss",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.99"
       }
     },
     {
@@ -13042,6 +13589,17 @@
       }
     },
     {
+      "id": "BT93O.99.7",
+      "type": "subphase",
+      "title": "`bt93o-quality-green` ist der einzige gruene Ausgang und oeffnet nur `BT93X`, nicht direkt `BT93P` oder `BT94A`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93O",
+        "phaseCode": "93O.99",
+        "subphaseCode": "93O.99.7"
+      }
+    },
+    {
       "id": "BT93P.1.1",
       "type": "subphase",
       "title": "2-Env-CPU-Referenz mit festen Seeds, fester Matrix und immutable Run-ID definieren.",
@@ -13339,6 +13897,17 @@
       }
     },
     {
+      "id": "BT93P.4.7",
+      "type": "subphase",
+      "title": "`bt94a_gate_check.py` muss Source-Prioritaet BT93P.4 vor BT93X vor BT93O vor BT93W vor BT93Q nutzen; BT93M/BT93I/BT93C sind nur historische Kontextquellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93P",
+        "phaseCode": "93P.4",
+        "subphaseCode": "93P.4.7"
+      }
+    },
+    {
       "id": "BT93P.99.1",
       "type": "subphase",
       "title": "Alle Phasen 93P.1 bis 93P.4 sind mit versionierter Evidence dokumentiert.",
@@ -13402,6 +13971,17 @@
         "blockId": "BT93P",
         "phaseCode": "93P.99",
         "subphaseCode": "93P.99.6"
+      }
+    },
+    {
+      "id": "BT93P.99.7",
+      "type": "subphase",
+      "title": "`BT94A-ready` ist verboten, wenn `bt93p_starttruth_report.json`, `comparison_policy_decision.json` oder `gate_checker_source_mapping.json` aus BT93X fehlen oder rot sind.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93P",
+        "phaseCode": "93P.99",
+        "subphaseCode": "93P.99.7"
       }
     },
     {
@@ -13765,6 +14345,963 @@
         "blockId": "BT93Q",
         "phaseCode": "93Q.99",
         "subphaseCode": "93Q.99.5"
+      }
+    },
+    {
+      "id": "BT93R.1.1",
+      "type": "subphase",
+      "title": "BT93Q-Handover, Closure, Policy-Collapse, Action-Effect, Telemetry-Gap, Reward-Ordering und Safety-Contract lesen und hashen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.1",
+        "subphaseCode": "93R.1.1"
+      }
+    },
+    {
+      "id": "BT93R.1.2",
+      "type": "subphase",
+      "title": "H1 bis H7 als aktive Hypothesen mit Fixklasse und verbotenen Aktionen pinnen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.1",
+        "subphaseCode": "93R.1.2"
+      }
+    },
+    {
+      "id": "BT93R.1.3",
+      "type": "subphase",
+      "title": "`qualityClaimAllowed=false`, `bt93oClaimAllowed=false`, `bt93pClaimAllowed=false`, `bt94aClaimAllowed=false`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.1",
+        "subphaseCode": "93R.1.3"
+      }
+    },
+    {
+      "id": "BT93R.2.1",
+      "type": "subphase",
+      "title": "Modell-, Config-, VecNormalize-/Normalizer- und Action-Surface-Hashes schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.2",
+        "subphaseCode": "93R.2.1"
+      }
+    },
+    {
+      "id": "BT93R.2.2",
+      "type": "subphase",
+      "title": "Deterministic und stochastic Eval mit Logits, Entropy, Margin, Top-2 und repeated-action streak ausgeben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.2",
+        "subphaseCode": "93R.2.2"
+      }
+    },
+    {
+      "id": "BT93R.2.3",
+      "type": "subphase",
+      "title": "Fehlende Artefakte enden `model-artifact-missing` oder `policy-evidence-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.2",
+        "subphaseCode": "93R.2.3"
+      }
+    },
+    {
+      "id": "BT93R.3.1",
+      "type": "subphase",
+      "title": "Decoder-/Action-Index-Mapping gegen Action-Surface pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.3",
+        "subphaseCode": "93R.3.1"
+      }
+    },
+    {
+      "id": "BT93R.3.2",
+      "type": "subphase",
+      "title": "Normalize-/Eval-Mode-/Temperature-/Seed-/Truncation-Gegenproben trennen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.3",
+        "subphaseCode": "93R.3.2"
+      }
+    },
+    {
+      "id": "BT93R.3.3",
+      "type": "subphase",
+      "title": "Root-Cause als genau eine Fixklasse oder `policy-collapse-active` dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.3",
+        "subphaseCode": "93R.3.3"
+      }
+    },
+    {
+      "id": "BT93R.4.1",
+      "type": "subphase",
+      "title": "Nur belegten Decoder-, Normalize- oder Eval-Mode-Fix umsetzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.4",
+        "subphaseCode": "93R.4.1"
+      }
+    },
+    {
+      "id": "BT93R.4.2",
+      "type": "subphase",
+      "title": "Kein Reward-, Action- oder Telemetry-Fix in BT93R.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.4",
+        "subphaseCode": "93R.4.2"
+      }
+    },
+    {
+      "id": "BT93R.4.3",
+      "type": "subphase",
+      "title": "Revert-Kriterium und invalidierte Vergleichsartefakte schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.4",
+        "subphaseCode": "93R.4.3"
+      }
+    },
+    {
+      "id": "BT93R.99.1",
+      "type": "subphase",
+      "title": "Counterprobe nutzt gleiche Matrix, gleiche Seeds oder begruendete Diagnoseabweichung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.99",
+        "subphaseCode": "93R.99.1"
+      }
+    },
+    {
+      "id": "BT93R.99.2",
+      "type": "subphase",
+      "title": "Gruen heisst `policy-collapse-green`, `decoder-fix-counterprobe-green`, `normalize-fix-counterprobe-green` oder `eval-mode-bug-fixed-counterprobe-green`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.99",
+        "subphaseCode": "93R.99.2"
+      }
+    },
+    {
+      "id": "BT93R.99.3",
+      "type": "subphase",
+      "title": "Rot heisst `policy-collapse-active`, `policy-evidence-invalid`, `model-artifact-missing`, `normalize-mismatch` oder `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.99",
+        "subphaseCode": "93R.99.3"
+      }
+    },
+    {
+      "id": "BT93S.1.1",
+      "type": "subphase",
+      "title": "Wall-/Trail-/Escape-Klassen aus BT93Q uebernehmen und fehlende Controls ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.1",
+        "subphaseCode": "93S.1.1"
+      }
+    },
+    {
+      "id": "BT93S.1.2",
+      "type": "subphase",
+      "title": "Matrix-ID, Action-Surface-ID und Mindestfenster vor Messung pinnen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.1",
+        "subphaseCode": "93S.1.2"
+      }
+    },
+    {
+      "id": "BT93S.2.1",
+      "type": "subphase",
+      "title": "Bestehende Actions ohne PPO-Training gegen Szenariofenster messen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.2",
+        "subphaseCode": "93S.2.1"
+      }
+    },
+    {
+      "id": "BT93S.2.2",
+      "type": "subphase",
+      "title": "Command-Flags ohne Zustandswirkung als `action-effect-weak` klassifizieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.2",
+        "subphaseCode": "93S.2.2"
+      }
+    },
+    {
+      "id": "BT93S.3.1",
+      "type": "subphase",
+      "title": "Neue oder Compound-Actions nur bei belegter Action-Luecke einfuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.3",
+        "subphaseCode": "93S.3.1"
+      }
+    },
+    {
+      "id": "BT93S.3.2",
+      "type": "subphase",
+      "title": "Safety-Raten und Decoder-/Action-Surface-Drift als Pflichtfelder schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.3",
+        "subphaseCode": "93S.3.2"
+      }
+    },
+    {
+      "id": "BT93S.4.1",
+      "type": "subphase",
+      "title": "Pruefen, ob Policy wirksame Actions unter Gefahr auswaehlt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.4",
+        "subphaseCode": "93S.4.1"
+      }
+    },
+    {
+      "id": "BT93S.4.2",
+      "type": "subphase",
+      "title": "Fehlende Telemetrie nach BT93T routen; sonst `action-selection-required`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.4",
+        "subphaseCode": "93S.4.2"
+      }
+    },
+    {
+      "id": "BT93S.99.1",
+      "type": "subphase",
+      "title": "Closure-Report schreibt erlaubte Resultklasse und naechste Aktion.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.99",
+        "subphaseCode": "93S.99.1"
+      }
+    },
+    {
+      "id": "BT93S.99.2",
+      "type": "subphase",
+      "title": "`BT93U` bleibt geschlossen, wenn Telemetrie oder Selection rot ist.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.99",
+        "subphaseCode": "93S.99.2"
+      }
+    },
+    {
+      "id": "BT93T.1.1",
+      "type": "subphase",
+      "title": "Felder, Quellen, Missing-Raten und IDs vor Implementierung pinnen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.1",
+        "subphaseCode": "93T.1.1"
+      }
+    },
+    {
+      "id": "BT93T.1.2",
+      "type": "subphase",
+      "title": "Runtime-Surfaces als verboten markieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.1",
+        "subphaseCode": "93T.1.2"
+      }
+    },
+    {
+      "id": "BT93T.2.1",
+      "type": "subphase",
+      "title": "Training-only Reports/Scenario-Traces erweitern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.2",
+        "subphaseCode": "93T.2.1"
+      }
+    },
+    {
+      "id": "BT93T.2.2",
+      "type": "subphase",
+      "title": "Observation-/Normalize-Smokes ausfuehren oder blockierend dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.2",
+        "subphaseCode": "93T.2.2"
+      }
+    },
+    {
+      "id": "BT93T.3.1",
+      "type": "subphase",
+      "title": "BT93S-Szenarien mit neuer Telemetrie erneut messen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.3",
+        "subphaseCode": "93T.3.1"
+      }
+    },
+    {
+      "id": "BT93T.3.2",
+      "type": "subphase",
+      "title": "Recheck zeigt nutzbare Attribution oder `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.3",
+        "subphaseCode": "93T.3.2"
+      }
+    },
+    {
+      "id": "BT93T.99.1",
+      "type": "subphase",
+      "title": "Closure schreibt `telemetry-green`, `observation-telemetry-required`, `telemetry-layer-drift`, `scenario-matrix-invalid` oder `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.99",
+        "subphaseCode": "93T.99.1"
+      }
+    },
+    {
+      "id": "BT93T.99.2",
+      "type": "subphase",
+      "title": "Bei `telemetry-green` ist S-Recheck vor BT93U Pflicht.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.99",
+        "subphaseCode": "93T.99.2"
+      }
+    },
+    {
+      "id": "BT93U.1.1",
+      "type": "subphase",
+      "title": "Noop, Random, Semantic-Cycle, Scripted und aktuelle Policy auf gleicher Matrix messen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.1",
+        "subphaseCode": "93U.1.1"
+      }
+    },
+    {
+      "id": "BT93U.1.2",
+      "type": "subphase",
+      "title": "Seed-/Szenario-Rohwerte, Effektgroesse und Unsicherheitsklasse schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.1",
+        "subphaseCode": "93U.1.2"
+      }
+    },
+    {
+      "id": "BT93U.2.1",
+      "type": "subphase",
+      "title": "Fixklasse, RewardProfileId, betroffene Dateien und verbotene Dateien pinnen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.2",
+        "subphaseCode": "93U.2.1"
+      }
+    },
+    {
+      "id": "BT93U.2.2",
+      "type": "subphase",
+      "title": "Schwellen vor der Probe locken; nachtraegliche Anpassung invalidiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.2",
+        "subphaseCode": "93U.2.2"
+      }
+    },
+    {
+      "id": "BT93U.3.1",
+      "type": "subphase",
+      "title": "Nur die belegte Reward-Ordnungsursache reparieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.3",
+        "subphaseCode": "93U.3.1"
+      }
+    },
+    {
+      "id": "BT93U.3.2",
+      "type": "subphase",
+      "title": "Matrix-/Reward-Drift und invalidierte Vergleichsartefakte dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.3",
+        "subphaseCode": "93U.3.2"
+      }
+    },
+    {
+      "id": "BT93U.4.1",
+      "type": "subphase",
+      "title": "Objective, Progress, Threat-Reduction und Death-/Terminal-Klassen als Vertragsfelder schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.4",
+        "subphaseCode": "93U.4.1"
+      }
+    },
+    {
+      "id": "BT93U.4.2",
+      "type": "subphase",
+      "title": "Positive Controls muessen echte Env-Step-Signale erreichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.4",
+        "subphaseCode": "93U.4.2"
+      }
+    },
+    {
+      "id": "BT93U.5.1",
+      "type": "subphase",
+      "title": "Repaired Reward gegen Simple-Baselines und Scripted messen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.5",
+        "subphaseCode": "93U.5.1"
+      }
+    },
+    {
+      "id": "BT93U.5.2",
+      "type": "subphase",
+      "title": "Random/Semantic-Cycle-Paritaet endet `reward-redesign-required` oder `matrix-redesign-required`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.5",
+        "subphaseCode": "93U.5.2"
+      }
+    },
+    {
+      "id": "BT93U.99.1",
+      "type": "subphase",
+      "title": "Closure schreibt `reward-ordering-green`, `reward-redesign-required`, `matrix-redesign-required`, `objective-contract-required` oder `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.99",
+        "subphaseCode": "93U.99.1"
+      }
+    },
+    {
+      "id": "BT93U.99.2",
+      "type": "subphase",
+      "title": "`BT93V` startet nur bei `reward-ordering-green`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.99",
+        "subphaseCode": "93U.99.2"
+      }
+    },
+    {
+      "id": "BT93V.1.1",
+      "type": "subphase",
+      "title": "Safety-Felder mit Nenner und Missing-Raten pinnen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.1",
+        "subphaseCode": "93V.1.1"
+      }
+    },
+    {
+      "id": "BT93V.1.2",
+      "type": "subphase",
+      "title": "Diagnose-only vs handlungswirksame training-only Maske klassifizieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.1",
+        "subphaseCode": "93V.1.2"
+      }
+    },
+    {
+      "id": "BT93V.2.1",
+      "type": "subphase",
+      "title": "BT93N/Q/R/S/T/U Terminal- und Raw-Quellen vergleichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.2",
+        "subphaseCode": "93V.2.1"
+      }
+    },
+    {
+      "id": "BT93V.2.2",
+      "type": "subphase",
+      "title": "Kontradiktionen enden `terminal-semantics-required`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.2",
+        "subphaseCode": "93V.2.2"
+      }
+    },
+    {
+      "id": "BT93V.3.1",
+      "type": "subphase",
+      "title": "Falls Safety handlungswirksam werden muss, nur Folgeblocker ausweisen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.3",
+        "subphaseCode": "93V.3.1"
+      }
+    },
+    {
+      "id": "BT93V.3.2",
+      "type": "subphase",
+      "title": "Keine Runtime-Umschaltung oder Registry-/Strategy-Aenderung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.3",
+        "subphaseCode": "93V.3.2"
+      }
+    },
+    {
+      "id": "BT93V.99.1",
+      "type": "subphase",
+      "title": "Closure schreibt `safety-diagnostic-nonblocking`, `safety-sidecar-mask-required`, `terminal-semantics-required`, `runtime-safety-drift-blocked` oder `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.99",
+        "subphaseCode": "93V.99.1"
+      }
+    },
+    {
+      "id": "BT93V.99.2",
+      "type": "subphase",
+      "title": "`terminal-nonblocking` ist eigenes Feld, nicht aus Safety-Gruen abgeleitet.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.99",
+        "subphaseCode": "93V.99.2"
+      }
+    },
+    {
+      "id": "BT93W.1.1",
+      "type": "subphase",
+      "title": "R/S/T/U/V-Handover lesen und Hashes pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.1",
+        "subphaseCode": "93W.1.1"
+      }
+    },
+    {
+      "id": "BT93W.1.2",
+      "type": "subphase",
+      "title": "Keine stale BT93N/Q-Quelle darf als repariert gelten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.1",
+        "subphaseCode": "93W.1.2"
+      }
+    },
+    {
+      "id": "BT93W.1.3",
+      "type": "subphase",
+      "title": "Holdout bleibt unberuehrt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.1",
+        "subphaseCode": "93W.1.3"
+      }
+    },
+    {
+      "id": "BT93W.2.1",
+      "type": "subphase",
+      "title": "Seeds, Eval-Seeds, Scenario-Matrix, maxSteps und Mindeststatistik pinnen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.2",
+        "subphaseCode": "93W.2.1"
+      }
+    },
+    {
+      "id": "BT93W.2.2",
+      "type": "subphase",
+      "title": "DeathBefore60-Korridor vor Start festlegen; Default ist Train/Eval 0.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.2",
+        "subphaseCode": "93W.2.2"
+      }
+    },
+    {
+      "id": "BT93W.2.3",
+      "type": "subphase",
+      "title": "Deterministic single-action share, repeated-action streak und Missing-Raten pinnen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.2",
+        "subphaseCode": "93W.2.3"
+      }
+    },
+    {
+      "id": "BT93W.3.1",
+      "type": "subphase",
+      "title": "Max 10k Timesteps, kein Auto-Extend.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.3",
+        "subphaseCode": "93W.3.1"
+      }
+    },
+    {
+      "id": "BT93W.3.2",
+      "type": "subphase",
+      "title": "Finaler Runner-Report Pflicht; Heartbeats/Snapshots reichen nicht.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.3",
+        "subphaseCode": "93W.3.2"
+      }
+    },
+    {
+      "id": "BT93W.3.3",
+      "type": "subphase",
+      "title": "Wenn Startgate rot ist, `actualModelTimesteps=0`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.3",
+        "subphaseCode": "93W.3.3"
+      }
+    },
+    {
+      "id": "BT93W.4.1",
+      "type": "subphase",
+      "title": "Closure klassifiziert final.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.4",
+        "subphaseCode": "93W.4.1"
+      }
+    },
+    {
+      "id": "BT93W.4.2",
+      "type": "subphase",
+      "title": "`bt93oClaimAllowed=true` nur bei `bt93o-precondition-green`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.4",
+        "subphaseCode": "93W.4.2"
+      }
+    },
+    {
+      "id": "BT93W.4.3",
+      "type": "subphase",
+      "title": "Handover nennt offene DQN-/Ersatzvergleichspflicht fuer BT93X.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.4",
+        "subphaseCode": "93W.4.3"
+      }
+    },
+    {
+      "id": "BT93W.99.1",
+      "type": "subphase",
+      "title": "Alle Phasen 93W.1 bis 93W.4 sind mit versionierter Evidence dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.99",
+        "subphaseCode": "93W.99.1"
+      }
+    },
+    {
+      "id": "BT93W.99.2",
+      "type": "subphase",
+      "title": "Ergebnis ist `bt93o-precondition-green` oder ein konkreter roter Folgeblocker; kein anderes Ergebnis oeffnet BT93O.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.99",
+        "subphaseCode": "93W.99.2"
+      }
+    },
+    {
+      "id": "BT93W.99.3",
+      "type": "subphase",
+      "title": "Kein Candidate-, Freeze-, Holdout-, Promote-, Rollout-, BT93P- oder BT94A-Signal wurde erzeugt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.99",
+        "subphaseCode": "93W.99.3"
+      }
+    },
+    {
+      "id": "BT93W.99.4",
+      "type": "subphase",
+      "title": "`bt93oClaimAllowed=true` ist nur bei `bt93o-precondition-green` erlaubt; sonst bleiben BT93O, BT93X, BT93P und BT94A geschlossen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.99",
+        "subphaseCode": "93W.99.4"
+      }
+    },
+    {
+      "id": "BT93X.1.1",
+      "type": "subphase",
+      "title": "Alle historischen DQN-/KI-Reports inventarisieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.1",
+        "subphaseCode": "93X.1.1"
+      }
+    },
+    {
+      "id": "BT93X.1.2",
+      "type": "subphase",
+      "title": "Matrix-/Reward-/Terminal-/Observation-Semantik gegen BT93W/O vergleichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.1",
+        "subphaseCode": "93X.1.2"
+      }
+    },
+    {
+      "id": "BT93X.1.3",
+      "type": "subphase",
+      "title": "Nicht same-matrix Quellen als historische Kontextquellen markieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.1",
+        "subphaseCode": "93X.1.3"
+      }
+    },
+    {
+      "id": "BT93X.1.4",
+      "type": "subphase",
+      "title": "Entscheidung vorbereiten: DQN-Loader fixen oder Ersatzpolitik user-owned klaeren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.1",
+        "subphaseCode": "93X.1.4"
+      }
+    },
+    {
+      "id": "BT93X.2.1",
+      "type": "subphase",
+      "title": "Wenn DQN loader moeglich ist: Same-Matrix-DQN gegen BT93W/O-Matrix laden, evaluieren und Hashes schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2",
+        "subphaseCode": "93X.2.1"
+      }
+    },
+    {
+      "id": "BT93X.2.2",
+      "type": "subphase",
+      "title": "Wenn DQN loader blockiert ist: technischen Blocker dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2",
+        "subphaseCode": "93X.2.2"
+      }
+    },
+    {
+      "id": "BT93X.2.3",
+      "type": "subphase",
+      "title": "Ersatzpolitik nur mit explizitem User- oder Planentscheid vorbereiten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2",
+        "subphaseCode": "93X.2.3"
+      }
+    },
+    {
+      "id": "BT93X.2.4",
+      "type": "subphase",
+      "title": "Ersatzpolitik darf BT94A-Freeze nicht ersetzen, nur BT93P-Start methodisch absichern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2",
+        "subphaseCode": "93X.2.4"
+      }
+    },
+    {
+      "id": "BT93X.2.5",
+      "type": "subphase",
+      "title": "Ohne User- oder Planentscheid endet der Block `replacement-policy-user-decision-required`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2",
+        "subphaseCode": "93X.2.5"
+      }
+    },
+    {
+      "id": "BT93X.3.1",
+      "type": "subphase",
+      "title": "`bt93p_starttruth_report.json` prueft BT93W gruen, BT93O gruen, Comparator ready, Holdout unverbraucht und Statistikvertrag vorhanden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3",
+        "subphaseCode": "93X.3.1"
+      }
+    },
+    {
+      "id": "BT93X.3.2",
+      "type": "subphase",
+      "title": "`bt94a_gate_check.py` bleibt rot, solange `BT93P.4` fehlt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3",
+        "subphaseCode": "93X.3.2"
+      }
+    },
+    {
+      "id": "BT93X.3.3",
+      "type": "subphase",
+      "title": "`no_start_gate.json` darf nur frische Quellen nennen; stale BT93I/M/C-Quellen sind historische Kontextfelder.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3",
+        "subphaseCode": "93X.3.3"
+      }
+    },
+    {
+      "id": "BT93X.3.4",
+      "type": "subphase",
+      "title": "BT93P darf nur starten, wenn alle Starttruth-Checks gruen sind.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3",
+        "subphaseCode": "93X.3.4"
+      }
+    },
+    {
+      "id": "BT93X.3.5",
+      "type": "subphase",
+      "title": "Gate-Checker-Feldmapping schreibt Quellen fuer `bt93pReady`, `bt94aReady`, `claimable`, `candidateRunsAllowed`, `matrixDefinitionAllowed`, `bt94aBlockerCount`, Comparator-Status und Holdout-Lineage.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3",
+        "subphaseCode": "93X.3.5"
+      }
+    },
+    {
+      "id": "BT93X.99.1",
+      "type": "subphase",
+      "title": "Comparator ready oder BT93P gesperrt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.99",
+        "subphaseCode": "93X.99.1"
+      }
+    },
+    {
+      "id": "BT93X.99.2",
+      "type": "subphase",
+      "title": "BT94A bleibt geschlossen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.99",
+        "subphaseCode": "93X.99.2"
+      }
+    },
+    {
+      "id": "BT93X.99.3",
+      "type": "subphase",
+      "title": "Kein Holdout-Verbrauch.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.99",
+        "subphaseCode": "93X.99.3"
+      }
+    },
+    {
+      "id": "BT93X.99.4",
+      "type": "subphase",
+      "title": "Gruen heisst nur `bt93p-starttruth-green`; Comparator-ready allein ist ein Subfeld und kein Abschlussresult.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.99",
+        "subphaseCode": "93X.99.4"
       }
     },
     {
@@ -27500,6 +29037,582 @@
       }
     },
     {
+      "id": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93R"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93R"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93r/collapse_counterprobe_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93R"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93r/collapse_root_cause_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93R"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93R"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s/action_surface_decision.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s/policy_selection_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93t/bt93t_closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93T"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93t/instrumentation_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93T"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93t/scenario_recheck_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93T"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93t/telemetry_contract.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93T"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93u/baseline_reproduction_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93U"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93u/bt93u_closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93U"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93u/objective_contract_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93U"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93u/reward_fix_manifest.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93U"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93u/reward_sensitivity_probe_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93U"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93v/bt93v_closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93V"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93v/safety_diagnostic_contract_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93V"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93v/sidecar_mask_decision_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93V"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93v/terminal_sanity_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93V"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93w/bt93w_closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93W"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93w/bt93w_handover_package.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93W"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93w/bt93w_micro_recheck_contract.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93W"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93w/bt93w_micro_recheck_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93W"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93w/bt93w_start_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93W"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93x/bt93p_starttruth_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93X"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93x/bt93x_closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93X"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93x/bt93x_handover_package.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93X"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93x/bt94a_no_start_refresh_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93X"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93x/comparator_inventory_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93X"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93x/comparison_policy_decision.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93X"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93x/gate_checker_source_mapping.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93X"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93x/replacement_policy_decision.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93X"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93x/same_matrix_dqn_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93X"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "file",
       "title": null,
@@ -28030,6 +30143,13 @@
           "BT93O",
           "BT93P",
           "BT93Q",
+          "BT93R",
+          "BT93S",
+          "BT93T",
+          "BT93U",
+          "BT93V",
+          "BT93W",
+          "BT93X",
           "BT94A",
           "BT94B",
           "BT95"
@@ -30077,6 +32197,7 @@
         ],
         "scopeBlocks": [
           "BT93M",
+          "BT93N",
           "BT93O",
           "BT94A",
           "BT94B",
@@ -30097,6 +32218,25 @@
         ],
         "scopeBlocks": [
           "BT93O",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "BT93N",
+          "BT93O",
+          "BT94A",
           "V77"
         ],
         "exists": true
@@ -34531,6 +36671,27 @@
     },
     {
       "id": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93r_preflight_gate_sync.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -71040,6 +73201,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -72238,6 +74408,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93r_preflight_gate_sync.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -74315,6 +76494,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -75495,6 +77683,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93r_preflight_gate_sync.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78770,6 +80967,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -79959,6 +82165,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93r_preflight_gate_sync.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -82335,6 +84550,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -83524,6 +85748,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93r_preflight_gate_sync.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -92304,6 +94537,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -93493,6 +95735,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93r_preflight_gate_sync.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -101448,6 +103699,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -102646,6 +104906,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93r_preflight_gate_sync.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -120448,6 +122717,24 @@
     },
     {
       "from": "BT93N",
+      "to": "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93N",
+      "to": "docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93N",
       "to": "python/scripts/bt93n_closure_gate.py",
       "type": "scope",
       "hint": null,
@@ -120921,15 +123208,15 @@
     },
     {
       "from": "BT93O",
-      "to": "BT93Q",
+      "to": "BT93W",
       "type": "depends_on",
       "source": "master-table",
       "hard": true,
       "fulfilled": false,
-      "hint": "Action-/Objective-Qualitaet und Anti-Plateau; kein Candidate-Signal",
+      "hint": "Action-/Objective-Qualitaet und Anti-Plateau; einzig gruener Ausgang `bt93o-quality-green`",
       "attributes": {
-        "dependsPhase": "93Q.99",
-        "rawToken": "BT93Q.99",
+        "dependsPhase": "93W.99",
+        "rawToken": "BT93W.99",
         "sourceBreakdown": [
           "master-table"
         ],
@@ -121002,6 +123289,15 @@
     {
       "from": "BT93O",
       "to": "docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93O",
+      "to": "docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -121295,6 +123591,17 @@
       }
     },
     {
+      "from": "BT93O.99",
+      "to": "BT93O.99.7",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93O",
+        "phaseCode": "93O.99",
+        "subphaseCode": "93O.99.7"
+      }
+    },
+    {
       "from": "BT93P",
       "to": "BT93O",
       "type": "depends_on",
@@ -121359,6 +123666,23 @@
       "attributes": {
         "blockId": "BT93P",
         "phaseCode": "93P.99"
+      }
+    },
+    {
+      "from": "BT93P",
+      "to": "BT93X",
+      "type": "depends_on",
+      "source": "master-table",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "200k->500k->1M Trainingsleiter mit Statistik und frischem BT94A-Reentry-Gate",
+      "attributes": {
+        "dependsPhase": "93X.99",
+        "rawToken": "BT93X.99",
+        "sourceBreakdown": [
+          "master-table"
+        ],
+        "canonicalToken": true
       }
     },
     {
@@ -127527,6 +129851,17 @@
       }
     },
     {
+      "from": "BT93P.4",
+      "to": "BT93P.4.7",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93P",
+        "phaseCode": "93P.4",
+        "subphaseCode": "93P.4.7"
+      }
+    },
+    {
       "from": "BT93P.99",
       "to": "BT93P.99.1",
       "type": "contains_subphase",
@@ -127593,13 +129928,24 @@
       }
     },
     {
+      "from": "BT93P.99",
+      "to": "BT93P.99.7",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93P",
+        "phaseCode": "93P.99",
+        "subphaseCode": "93P.99.7"
+      }
+    },
+    {
       "from": "BT93Q",
       "to": "BT93N",
       "type": "depends_on",
       "source": "master-table",
       "hard": true,
-      "fulfilled": false,
-      "hint": "Wall-/Trail-Policy-Repair vor jedem BT93O-Claim; kein 50k/100k, Candidate, Freeze oder Reentry-Signal",
+      "fulfilled": true,
+      "hint": "abgeschlossen rot als `policy-collapse-active`; kein BT93O-, BT93P- oder BT94A-Signal",
       "attributes": {
         "dependsPhase": "93N.99",
         "rawToken": "BT93N.99",
@@ -127825,6 +130171,15 @@
     },
     {
       "from": "BT93Q",
+      "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Q",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
       "type": "scope",
       "hint": null,
@@ -127898,6 +130253,15 @@
     {
       "from": "BT93Q",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Q",
+      "to": "python/scripts/bt93r_preflight_gate_sync.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -128268,13 +130632,1798 @@
       }
     },
     {
+      "from": "BT93R",
+      "to": "BT93R.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.1"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "BT93R.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.2"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "BT93R.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.3"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "BT93R.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.4"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "BT93R.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.99"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "data/training/ppo/bt93r/collapse_counterprobe_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "data/training/ppo/bt93r/collapse_root_cause_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R.1",
+      "to": "BT93R.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.1",
+        "subphaseCode": "93R.1.1"
+      }
+    },
+    {
+      "from": "BT93R.1",
+      "to": "BT93R.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.1",
+        "subphaseCode": "93R.1.2"
+      }
+    },
+    {
+      "from": "BT93R.1",
+      "to": "BT93R.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.1",
+        "subphaseCode": "93R.1.3"
+      }
+    },
+    {
+      "from": "BT93R.2",
+      "to": "BT93R.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.2",
+        "subphaseCode": "93R.2.1"
+      }
+    },
+    {
+      "from": "BT93R.2",
+      "to": "BT93R.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.2",
+        "subphaseCode": "93R.2.2"
+      }
+    },
+    {
+      "from": "BT93R.2",
+      "to": "BT93R.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.2",
+        "subphaseCode": "93R.2.3"
+      }
+    },
+    {
+      "from": "BT93R.3",
+      "to": "BT93R.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.3",
+        "subphaseCode": "93R.3.1"
+      }
+    },
+    {
+      "from": "BT93R.3",
+      "to": "BT93R.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.3",
+        "subphaseCode": "93R.3.2"
+      }
+    },
+    {
+      "from": "BT93R.3",
+      "to": "BT93R.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.3",
+        "subphaseCode": "93R.3.3"
+      }
+    },
+    {
+      "from": "BT93R.4",
+      "to": "BT93R.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.4",
+        "subphaseCode": "93R.4.1"
+      }
+    },
+    {
+      "from": "BT93R.4",
+      "to": "BT93R.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.4",
+        "subphaseCode": "93R.4.2"
+      }
+    },
+    {
+      "from": "BT93R.4",
+      "to": "BT93R.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.4",
+        "subphaseCode": "93R.4.3"
+      }
+    },
+    {
+      "from": "BT93R.99",
+      "to": "BT93R.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.99",
+        "subphaseCode": "93R.99.1"
+      }
+    },
+    {
+      "from": "BT93R.99",
+      "to": "BT93R.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.99",
+        "subphaseCode": "93R.99.2"
+      }
+    },
+    {
+      "from": "BT93R.99",
+      "to": "BT93R.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93R",
+        "phaseCode": "93R.99",
+        "subphaseCode": "93R.99.3"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "BT93R",
+      "type": "depends_on",
+      "source": "master-table",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Wall-/Trail Action-Effekt und Action-Selection Repair",
+      "attributes": {
+        "dependsPhase": "93R.99",
+        "rawToken": "BT93R.99",
+        "sourceBreakdown": [
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "BT93S.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.1"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "BT93S.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.2"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "BT93S.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.3"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "BT93S.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.4"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "BT93S.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.99"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "data/training/ppo/bt93s/action_surface_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "data/training/ppo/bt93s/policy_selection_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S.1",
+      "to": "BT93S.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.1",
+        "subphaseCode": "93S.1.1"
+      }
+    },
+    {
+      "from": "BT93S.1",
+      "to": "BT93S.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.1",
+        "subphaseCode": "93S.1.2"
+      }
+    },
+    {
+      "from": "BT93S.2",
+      "to": "BT93S.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.2",
+        "subphaseCode": "93S.2.1"
+      }
+    },
+    {
+      "from": "BT93S.2",
+      "to": "BT93S.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.2",
+        "subphaseCode": "93S.2.2"
+      }
+    },
+    {
+      "from": "BT93S.3",
+      "to": "BT93S.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.3",
+        "subphaseCode": "93S.3.1"
+      }
+    },
+    {
+      "from": "BT93S.3",
+      "to": "BT93S.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.3",
+        "subphaseCode": "93S.3.2"
+      }
+    },
+    {
+      "from": "BT93S.4",
+      "to": "BT93S.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.4",
+        "subphaseCode": "93S.4.1"
+      }
+    },
+    {
+      "from": "BT93S.4",
+      "to": "BT93S.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.4",
+        "subphaseCode": "93S.4.2"
+      }
+    },
+    {
+      "from": "BT93S.99",
+      "to": "BT93S.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.99",
+        "subphaseCode": "93S.99.1"
+      }
+    },
+    {
+      "from": "BT93S.99",
+      "to": "BT93S.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S",
+        "phaseCode": "93S.99",
+        "subphaseCode": "93S.99.2"
+      }
+    },
+    {
+      "from": "BT93T",
+      "to": "BT93S",
+      "type": "depends_on",
+      "source": "master-table",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "training-only Raw-/Trail-/Escape-Lane-Telemetrie; danach S-Recheck",
+      "attributes": {
+        "dependsPhase": "93S.99",
+        "rawToken": "BT93S.99",
+        "sourceBreakdown": [
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "BT93T",
+      "to": "BT93T.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.1"
+      }
+    },
+    {
+      "from": "BT93T",
+      "to": "BT93T.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.2"
+      }
+    },
+    {
+      "from": "BT93T",
+      "to": "BT93T.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.3"
+      }
+    },
+    {
+      "from": "BT93T",
+      "to": "BT93T.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.99"
+      }
+    },
+    {
+      "from": "BT93T",
+      "to": "data/training/ppo/bt93t/bt93t_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93T",
+      "to": "data/training/ppo/bt93t/instrumentation_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93T",
+      "to": "data/training/ppo/bt93t/scenario_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93T",
+      "to": "data/training/ppo/bt93t/telemetry_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93T",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93T.1",
+      "to": "BT93T.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.1",
+        "subphaseCode": "93T.1.1"
+      }
+    },
+    {
+      "from": "BT93T.1",
+      "to": "BT93T.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.1",
+        "subphaseCode": "93T.1.2"
+      }
+    },
+    {
+      "from": "BT93T.2",
+      "to": "BT93T.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.2",
+        "subphaseCode": "93T.2.1"
+      }
+    },
+    {
+      "from": "BT93T.2",
+      "to": "BT93T.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.2",
+        "subphaseCode": "93T.2.2"
+      }
+    },
+    {
+      "from": "BT93T.3",
+      "to": "BT93T.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.3",
+        "subphaseCode": "93T.3.1"
+      }
+    },
+    {
+      "from": "BT93T.3",
+      "to": "BT93T.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.3",
+        "subphaseCode": "93T.3.2"
+      }
+    },
+    {
+      "from": "BT93T.99",
+      "to": "BT93T.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.99",
+        "subphaseCode": "93T.99.1"
+      }
+    },
+    {
+      "from": "BT93T.99",
+      "to": "BT93T.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93T",
+        "phaseCode": "93T.99",
+        "subphaseCode": "93T.99.2"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "BT93T",
+      "type": "depends_on",
+      "source": "master-table",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Danger-aware Reward- und Objective-Ordering Repair",
+      "attributes": {
+        "dependsPhase": "93T.99",
+        "rawToken": "BT93T.99",
+        "sourceBreakdown": [
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "BT93U.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.1"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "BT93U.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.2"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "BT93U.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.3"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "BT93U.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.4"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "BT93U.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.5"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "BT93U.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.99"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "data/training/ppo/bt93u/baseline_reproduction_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "data/training/ppo/bt93u/bt93u_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "data/training/ppo/bt93u/objective_contract_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "data/training/ppo/bt93u/reward_fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "data/training/ppo/bt93u/reward_sensitivity_probe_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93U",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93U.1",
+      "to": "BT93U.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.1",
+        "subphaseCode": "93U.1.1"
+      }
+    },
+    {
+      "from": "BT93U.1",
+      "to": "BT93U.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.1",
+        "subphaseCode": "93U.1.2"
+      }
+    },
+    {
+      "from": "BT93U.2",
+      "to": "BT93U.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.2",
+        "subphaseCode": "93U.2.1"
+      }
+    },
+    {
+      "from": "BT93U.2",
+      "to": "BT93U.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.2",
+        "subphaseCode": "93U.2.2"
+      }
+    },
+    {
+      "from": "BT93U.3",
+      "to": "BT93U.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.3",
+        "subphaseCode": "93U.3.1"
+      }
+    },
+    {
+      "from": "BT93U.3",
+      "to": "BT93U.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.3",
+        "subphaseCode": "93U.3.2"
+      }
+    },
+    {
+      "from": "BT93U.4",
+      "to": "BT93U.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.4",
+        "subphaseCode": "93U.4.1"
+      }
+    },
+    {
+      "from": "BT93U.4",
+      "to": "BT93U.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.4",
+        "subphaseCode": "93U.4.2"
+      }
+    },
+    {
+      "from": "BT93U.5",
+      "to": "BT93U.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.5",
+        "subphaseCode": "93U.5.1"
+      }
+    },
+    {
+      "from": "BT93U.5",
+      "to": "BT93U.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.5",
+        "subphaseCode": "93U.5.2"
+      }
+    },
+    {
+      "from": "BT93U.99",
+      "to": "BT93U.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.99",
+        "subphaseCode": "93U.99.1"
+      }
+    },
+    {
+      "from": "BT93U.99",
+      "to": "BT93U.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93U",
+        "phaseCode": "93U.99",
+        "subphaseCode": "93U.99.2"
+      }
+    },
+    {
+      "from": "BT93V",
+      "to": "BT93U",
+      "type": "depends_on",
+      "source": "master-table",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision",
+      "attributes": {
+        "dependsPhase": "93U.99",
+        "rawToken": "BT93U.99",
+        "sourceBreakdown": [
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "BT93V",
+      "to": "BT93V.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.1"
+      }
+    },
+    {
+      "from": "BT93V",
+      "to": "BT93V.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.2"
+      }
+    },
+    {
+      "from": "BT93V",
+      "to": "BT93V.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.3"
+      }
+    },
+    {
+      "from": "BT93V",
+      "to": "BT93V.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.99"
+      }
+    },
+    {
+      "from": "BT93V",
+      "to": "data/training/ppo/bt93v/bt93v_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93V",
+      "to": "data/training/ppo/bt93v/safety_diagnostic_contract_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93V",
+      "to": "data/training/ppo/bt93v/sidecar_mask_decision_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93V",
+      "to": "data/training/ppo/bt93v/terminal_sanity_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93V",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93V.1",
+      "to": "BT93V.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.1",
+        "subphaseCode": "93V.1.1"
+      }
+    },
+    {
+      "from": "BT93V.1",
+      "to": "BT93V.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.1",
+        "subphaseCode": "93V.1.2"
+      }
+    },
+    {
+      "from": "BT93V.2",
+      "to": "BT93V.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.2",
+        "subphaseCode": "93V.2.1"
+      }
+    },
+    {
+      "from": "BT93V.2",
+      "to": "BT93V.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.2",
+        "subphaseCode": "93V.2.2"
+      }
+    },
+    {
+      "from": "BT93V.3",
+      "to": "BT93V.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.3",
+        "subphaseCode": "93V.3.1"
+      }
+    },
+    {
+      "from": "BT93V.3",
+      "to": "BT93V.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.3",
+        "subphaseCode": "93V.3.2"
+      }
+    },
+    {
+      "from": "BT93V.99",
+      "to": "BT93V.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.99",
+        "subphaseCode": "93V.99.1"
+      }
+    },
+    {
+      "from": "BT93V.99",
+      "to": "BT93V.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93V",
+        "phaseCode": "93V.99",
+        "subphaseCode": "93V.99.2"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "BT93V",
+      "type": "depends_on",
+      "source": "master-table",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "integrierter WallTrail-10k-Recheck und BT93O-Startgate",
+      "attributes": {
+        "dependsPhase": "93V.99",
+        "rawToken": "BT93V.99",
+        "sourceBreakdown": [
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "BT93W.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.1"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "BT93W.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.2"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "BT93W.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.3"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "BT93W.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.4"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "BT93W.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.99"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "data/training/ppo/bt93w/bt93w_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "data/training/ppo/bt93w/bt93w_handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "data/training/ppo/bt93w/bt93w_micro_recheck_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "data/training/ppo/bt93w/bt93w_micro_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "data/training/ppo/bt93w/bt93w_start_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93W.1",
+      "to": "BT93W.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.1",
+        "subphaseCode": "93W.1.1"
+      }
+    },
+    {
+      "from": "BT93W.1",
+      "to": "BT93W.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.1",
+        "subphaseCode": "93W.1.2"
+      }
+    },
+    {
+      "from": "BT93W.1",
+      "to": "BT93W.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.1",
+        "subphaseCode": "93W.1.3"
+      }
+    },
+    {
+      "from": "BT93W.2",
+      "to": "BT93W.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.2",
+        "subphaseCode": "93W.2.1"
+      }
+    },
+    {
+      "from": "BT93W.2",
+      "to": "BT93W.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.2",
+        "subphaseCode": "93W.2.2"
+      }
+    },
+    {
+      "from": "BT93W.2",
+      "to": "BT93W.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.2",
+        "subphaseCode": "93W.2.3"
+      }
+    },
+    {
+      "from": "BT93W.3",
+      "to": "BT93W.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.3",
+        "subphaseCode": "93W.3.1"
+      }
+    },
+    {
+      "from": "BT93W.3",
+      "to": "BT93W.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.3",
+        "subphaseCode": "93W.3.2"
+      }
+    },
+    {
+      "from": "BT93W.3",
+      "to": "BT93W.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.3",
+        "subphaseCode": "93W.3.3"
+      }
+    },
+    {
+      "from": "BT93W.4",
+      "to": "BT93W.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.4",
+        "subphaseCode": "93W.4.1"
+      }
+    },
+    {
+      "from": "BT93W.4",
+      "to": "BT93W.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.4",
+        "subphaseCode": "93W.4.2"
+      }
+    },
+    {
+      "from": "BT93W.4",
+      "to": "BT93W.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.4",
+        "subphaseCode": "93W.4.3"
+      }
+    },
+    {
+      "from": "BT93W.99",
+      "to": "BT93W.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.99",
+        "subphaseCode": "93W.99.1"
+      }
+    },
+    {
+      "from": "BT93W.99",
+      "to": "BT93W.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.99",
+        "subphaseCode": "93W.99.2"
+      }
+    },
+    {
+      "from": "BT93W.99",
+      "to": "BT93W.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.99",
+        "subphaseCode": "93W.99.3"
+      }
+    },
+    {
+      "from": "BT93W.99",
+      "to": "BT93W.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93W",
+        "phaseCode": "93W.99",
+        "subphaseCode": "93W.99.4"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "BT93O",
+      "type": "depends_on",
+      "source": "master-table",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Same-Matrix-DQN oder User-Ersatzvergleich plus `bt93p-starttruth-green`",
+      "attributes": {
+        "dependsPhase": "93O.99",
+        "rawToken": "BT93O.99",
+        "sourceBreakdown": [
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "BT93X.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.1"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "BT93X.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "BT93X.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "BT93X.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.99"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "data/training/ppo/bt93x/bt93p_starttruth_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "data/training/ppo/bt93x/bt93x_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "data/training/ppo/bt93x/bt93x_handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "data/training/ppo/bt93x/bt94a_no_start_refresh_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "data/training/ppo/bt93x/comparator_inventory_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "data/training/ppo/bt93x/comparison_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "data/training/ppo/bt93x/gate_checker_source_mapping.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "data/training/ppo/bt93x/replacement_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "data/training/ppo/bt93x/same_matrix_dqn_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93X",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93X.1",
+      "to": "BT93X.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.1",
+        "subphaseCode": "93X.1.1"
+      }
+    },
+    {
+      "from": "BT93X.1",
+      "to": "BT93X.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.1",
+        "subphaseCode": "93X.1.2"
+      }
+    },
+    {
+      "from": "BT93X.1",
+      "to": "BT93X.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.1",
+        "subphaseCode": "93X.1.3"
+      }
+    },
+    {
+      "from": "BT93X.1",
+      "to": "BT93X.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.1",
+        "subphaseCode": "93X.1.4"
+      }
+    },
+    {
+      "from": "BT93X.2",
+      "to": "BT93X.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2",
+        "subphaseCode": "93X.2.1"
+      }
+    },
+    {
+      "from": "BT93X.2",
+      "to": "BT93X.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2",
+        "subphaseCode": "93X.2.2"
+      }
+    },
+    {
+      "from": "BT93X.2",
+      "to": "BT93X.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2",
+        "subphaseCode": "93X.2.3"
+      }
+    },
+    {
+      "from": "BT93X.2",
+      "to": "BT93X.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2",
+        "subphaseCode": "93X.2.4"
+      }
+    },
+    {
+      "from": "BT93X.2",
+      "to": "BT93X.2.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.2",
+        "subphaseCode": "93X.2.5"
+      }
+    },
+    {
+      "from": "BT93X.3",
+      "to": "BT93X.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3",
+        "subphaseCode": "93X.3.1"
+      }
+    },
+    {
+      "from": "BT93X.3",
+      "to": "BT93X.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3",
+        "subphaseCode": "93X.3.2"
+      }
+    },
+    {
+      "from": "BT93X.3",
+      "to": "BT93X.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3",
+        "subphaseCode": "93X.3.3"
+      }
+    },
+    {
+      "from": "BT93X.3",
+      "to": "BT93X.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3",
+        "subphaseCode": "93X.3.4"
+      }
+    },
+    {
+      "from": "BT93X.3",
+      "to": "BT93X.3.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.3",
+        "subphaseCode": "93X.3.5"
+      }
+    },
+    {
+      "from": "BT93X.99",
+      "to": "BT93X.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.99",
+        "subphaseCode": "93X.99.1"
+      }
+    },
+    {
+      "from": "BT93X.99",
+      "to": "BT93X.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.99",
+        "subphaseCode": "93X.99.2"
+      }
+    },
+    {
+      "from": "BT93X.99",
+      "to": "BT93X.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.99",
+        "subphaseCode": "93X.99.3"
+      }
+    },
+    {
+      "from": "BT93X.99",
+      "to": "BT93X.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93X",
+        "phaseCode": "93X.99",
+        "subphaseCode": "93X.99.4"
+      }
+    },
+    {
       "from": "BT94A",
       "to": "BT93P",
       "type": "depends_on",
       "source": "master-table",
       "hard": true,
       "fulfilled": false,
-      "hint": "BT94A bleibt vor `94A.1` geschlossen, bis `BT93P` und das Gate `claimable=true` schreiben; Kandidatenlaeufe/Freeze bleiben vorher verboten",
+      "hint": "BT94A bleibt vor `94A.1` geschlossen, bis R-X/O/P und das Gate frisch gruen sind; Kandidatenlaeufe/Freeze bleiben vorher verboten",
       "attributes": {
         "dependsPhase": "93P.4",
         "rawToken": "BT93P.4",
@@ -128355,6 +132504,15 @@
     {
       "from": "BT94A",
       "to": "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT94A",
+      "to": "docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -159417,6 +163575,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md",
       "type": "scope",
       "hint": null,
       "attributes": {
