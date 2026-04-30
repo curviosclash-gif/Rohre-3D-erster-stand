@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2439,
-    "rawCoveredFileCount": 1959,
+    "trackedFileCount": 2442,
+    "rawCoveredFileCount": 1962,
     "rawCoveragePercent": 80.3,
-    "adjustedTrackedFileCount": 1536,
-    "adjustedCoveredFileCount": 1300,
-    "adjustedCoveragePercent": 84.6,
+    "adjustedTrackedFileCount": 1539,
+    "adjustedCoveredFileCount": 1303,
+    "adjustedCoveragePercent": 84.7,
     "uncoveredFileCount": 480,
     "uncoveredActiveFileCount": 236,
     "classifications": [
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 253,
-        "coveredCount": 232
+        "count": 255,
+        "coveredCount": 234
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 887,
-        "coveredCount": 871
+        "count": 888,
+        "coveredCount": 872
       },
       {
         "classification": "product-docs",
@@ -8181,6 +8181,29 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93R"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
       "tracked": true,
       "coveredInCore": true,
@@ -8220,6 +8243,29 @@
         "BT93D",
         "BT93E",
         "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93r/collapse_counterprobe_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93R"
       ],
       "surfaces": [],
       "classification": "other",
@@ -18947,6 +18993,29 @@
         "BT93D",
         "BT93E",
         "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93r_closure_gate.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93R"
       ],
       "surfaces": [],
       "classification": "product-code",

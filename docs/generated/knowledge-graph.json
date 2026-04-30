@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 350,
+          "concreteCount": 353,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 488,
+          "concreteCount": 491,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 346,
+          "concreteCount": 349,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 345,
+          "concreteCount": 348,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 987,
+          "concreteCount": 990,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 995,
+          "concreteCount": 998,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1691,7 +1691,7 @@
       "id": "BT93R",
       "type": "block",
       "title": "Policy-Artefakt und deterministic-collapse Repair",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "source": [
           "bot-training-plan",
@@ -1700,7 +1700,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93R.4",
+        "currentPhase": "93R.99",
         "scopeDeclarations": [
           "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
           "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
@@ -1709,13 +1709,14 @@
           "data/training/ppo/bt93r/policy_artifact_report.json",
           "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
+          "python/scripts/bt93r_closure_gate.py",
           "python/scripts/bt93r_handover_lock.py",
           "python/scripts/bt93r_policy_artifact_probe.py",
           "python/scripts/bt93r_policy_collapse_root_cause.py"
         ],
         "scopeResolution": {
-          "concreteCount": 7,
-          "plannedCount": 3
+          "concreteCount": 10,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5050,7 +5051,7 @@
       "id": "BT93R.4",
       "type": "phase",
       "title": "Enger Collapse-Fix",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.4"
@@ -5060,7 +5061,7 @@
       "id": "BT93R.99",
       "type": "phase",
       "title": "Counterprobe und Abschluss",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.99"
@@ -14453,8 +14454,8 @@
     {
       "id": "BT93R.4.1",
       "type": "subphase",
-      "title": "Nur belegten Decoder-, Normalize- oder Eval-Mode-Fix umsetzen.",
-      "status": "open",
+      "title": "Nur belegten Decoder-, Normalize- oder Eval-Mode-Fix umsetzen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_closure_gate.py --write-report` -> `data/training/ppo/bt93r/collapse_counterprobe_report.json` (`phaseCoverage.93R.4.1=true`; kein Fix umgesetzt, weil kein belegter Decoder-/Normalize-/Eval-Mode-Fix ohne BT93N-Lineage beweisfaehig ist))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.4",
@@ -14464,8 +14465,8 @@
     {
       "id": "BT93R.4.2",
       "type": "subphase",
-      "title": "Kein Reward-, Action- oder Telemetry-Fix in BT93R.",
-      "status": "open",
+      "title": "Kein Reward-, Action- oder Telemetry-Fix in BT93R. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_closure_gate.py --write-report` -> `data/training/ppo/bt93r/collapse_counterprobe_report.json` (`phaseCoverage.93R.4.2=true`; `runtimeSurfacesTouched=[]`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.4",
@@ -14475,8 +14476,8 @@
     {
       "id": "BT93R.4.3",
       "type": "subphase",
-      "title": "Revert-Kriterium und invalidierte Vergleichsartefakte schreiben.",
-      "status": "open",
+      "title": "Revert-Kriterium und invalidierte Vergleichsartefakte schreiben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_closure_gate.py --write-report` -> `data/training/ppo/bt93r/collapse_counterprobe_report.json` (`phaseCoverage.93R.4.3=true`; Proxy-/Kontextpakete fuer Fix-Beweis invalidiert))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.4",
@@ -14486,8 +14487,8 @@
     {
       "id": "BT93R.99.1",
       "type": "subphase",
-      "title": "Counterprobe nutzt gleiche Matrix, gleiche Seeds oder begruendete Diagnoseabweichung.",
-      "status": "open",
+      "title": "Counterprobe nutzt gleiche Matrix, gleiche Seeds oder begruendete Diagnoseabweichung. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_closure_gate.py --write-report` -> `data/training/ppo/bt93r/bt93r_closure_gate_report.json` (`phaseCoverage.93R.99.1=true`; Diagnoseabweichung ohne neue Samples, da BT93N-Lineage fehlt))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.99",
@@ -14497,8 +14498,8 @@
     {
       "id": "BT93R.99.2",
       "type": "subphase",
-      "title": "Gruen heisst `policy-collapse-green`, `decoder-fix-counterprobe-green`, `normalize-fix-counterprobe-green` oder `eval-mode-bug-fixed-counterprobe-green`.",
-      "status": "open",
+      "title": "Gruen heisst `policy-collapse-green`, `decoder-fix-counterprobe-green`, `normalize-fix-counterprobe-green` oder `eval-mode-bug-fixed-counterprobe-green`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_closure_gate.py --write-report` -> `data/training/ppo/bt93r/bt93r_closure_gate_report.json` (`phaseCoverage.93R.99.2=true`; kein Gruen-Claim))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.99",
@@ -14508,8 +14509,8 @@
     {
       "id": "BT93R.99.3",
       "type": "subphase",
-      "title": "Rot heisst `policy-collapse-active`, `policy-evidence-invalid`, `model-artifact-missing`, `normalize-mismatch` oder `measurement-invalid`.",
-      "status": "open",
+      "title": "Rot heisst `policy-collapse-active`, `policy-evidence-invalid`, `model-artifact-missing`, `normalize-mismatch` oder `measurement-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_closure_gate.py --write-report` -> `data/training/ppo/bt93r/bt93r_closure_gate_report.json` (`phaseCoverage.93R.99.3=true`; `resultClass=model-artifact-missing`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.99",
@@ -29050,9 +29051,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93R"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -29107,9 +29114,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93R"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -36723,6 +36736,27 @@
           "BT93D",
           "BT93E",
           "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93r_closure_gate.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93R"
         ],
         "exists": true
       }
@@ -73301,6 +73335,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
       "type": "scope",
       "hint": null,
@@ -73311,6 +73354,15 @@
     {
       "from": "BT90",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93r/collapse_counterprobe_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -74535,6 +74587,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -76648,6 +76709,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
       "type": "scope",
       "hint": null,
@@ -76658,6 +76728,15 @@
     {
       "from": "BT91",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93r/collapse_counterprobe_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -77864,6 +77943,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81175,6 +81263,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
       "type": "scope",
       "hint": null,
@@ -81185,6 +81282,15 @@
     {
       "from": "BT92",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93r/collapse_counterprobe_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -82400,6 +82506,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84812,6 +84927,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
       "type": "scope",
       "hint": null,
@@ -84822,6 +84946,15 @@
     {
       "from": "BT93B",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93r/collapse_counterprobe_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -86037,6 +86170,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -94853,6 +94995,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
       "type": "scope",
       "hint": null,
@@ -94863,6 +95014,15 @@
     {
       "from": "BT93D",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93r/collapse_counterprobe_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -96078,6 +96238,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -104069,6 +104238,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
       "type": "scope",
       "hint": null,
@@ -104079,6 +104257,15 @@
     {
       "from": "BT93E",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93r/collapse_counterprobe_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -105303,6 +105490,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -131162,6 +131358,15 @@
     {
       "from": "BT93R",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "python/scripts/bt93r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
