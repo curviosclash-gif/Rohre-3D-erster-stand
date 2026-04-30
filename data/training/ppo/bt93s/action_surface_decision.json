@@ -1,0 +1,347 @@
+{
+  "actionSurfaceDecision": {
+    "actionEffectGapScenarioIds": [
+      "escape-right-open"
+    ],
+    "compoundActionsAlreadyPresent": [
+      "turn-left-boost",
+      "turn-right-boost",
+      "evade-left",
+      "evade-right"
+    ],
+    "decision": "defer-action-surface-change-until-matrix-redesign",
+    "implementationStatus": "decision-only-no-action-surface-file-change",
+    "matrixRedesignScenarioIds": [
+      "no-danger-control"
+    ],
+    "newActionIntroduced": false,
+    "newOrCompoundActionsOnlyWithActionGapEvidence": true,
+    "proposedNewActions": [],
+    "reason": "BT93S.2 contains an action gap, but no-danger-control is matrix-redesign-required; changing the action surface now would create a new comparator before the matrix/control contract is valid.",
+    "telemetryStillLimitedScenarioIds": [
+      "trail-ahead",
+      "trail-side"
+    ]
+  },
+  "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+  "actionSurfaceManifest": {
+    "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+    "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "decoderPath": "python/envs/ppo_action_surface.py",
+    "excludedInventoryIndexedActions": [
+      "dropItem",
+      "nextItem",
+      "shootItem",
+      "shootItemIndex",
+      "useItem"
+    ],
+    "gymSpace": "Discrete",
+    "policyLevelMasking": {
+      "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+      "mixedWithPostDecodeClamp": false,
+      "preSamplingAppliedInCurrentSb3Path": true,
+      "preSamplingByConstruction": true,
+      "source": "info.match.inventoryLength from the JS-authoritative transition payload",
+      "specified": true
+    },
+    "rawBoundarySurfaceTraining": false,
+    "sb3Trainable": true,
+    "semanticActions": [
+      "noop",
+      "yaw-left",
+      "yaw-right",
+      "pitch-up",
+      "pitch-down",
+      "roll-left",
+      "roll-right",
+      "boost",
+      "shoot-mg",
+      "turn-left-boost",
+      "turn-right-boost",
+      "evade-left",
+      "evade-right"
+    ],
+    "surfaceId": "bt93q-walltrail-semantic-action-v1",
+    "telemetry": [
+      "policyLevelMask",
+      "preSamplingMaskRate",
+      "postDecodeClampRate",
+      "invalidActionRate",
+      "vetoRate",
+      "sanitizerRate",
+      "noopRate"
+    ]
+  },
+  "allowNext": [
+    "93S.4 Policy-Selection guard/report using this decision"
+  ],
+  "blockId": "BT93S",
+  "blocksNext": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "50k/100k/200k/500k/1M extension",
+    "reward fix from BT93S.3",
+    "telemetry fix from BT93S.3",
+    "policy-selection green before 93S.4",
+    "BT93U until 93S.99 proves action-selection-green and no telemetry blocker"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93tClaimAllowed": false,
+    "bt93uClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRunsAllowed": false,
+    "freezeAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93s_action_surface_decision.py --write-report"
+  },
+  "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+  "generatedAt": "2026-04-30T14:21:53Z",
+  "generatedBy": "python/scripts/bt93s_action_surface_decision.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "d4c1287c6299dc1e879618ab3e621ea7f0ce89c4"
+  },
+  "guardrails": {
+    "actionSurfaceChanged": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "rewardFixApplied": false,
+    "runtimeSurfacesTouched": [],
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "invalidatedComparisonArtifacts": [],
+  "matrixId": "bt93s-walltrail-action-effect-matrix-v1",
+  "ok": true,
+  "phaseCoverage": {
+    "93S.3.1": true,
+    "93S.3.2": true,
+    "DoD.S3": true
+  },
+  "phaseId": "93S.3",
+  "reportHash": "a765a5044bd76bd3ce3d89959c513e7756b76eed1ebfc16cf47b3f89630beaf9",
+  "resultClass": "matrix-redesign-required",
+  "safetyRates": {
+    "allRequiredRatesPresent": true,
+    "allRequiredRatesZero": true,
+    "maxRates": {
+      "invalidActionRate": 0.0,
+      "postDecodeClampRate": 0.0,
+      "sanitizerRate": 0.0,
+      "vetoRate": 0.0
+    },
+    "nonzeroRateSamples": [],
+    "probeCount": 351,
+    "telemetryRowCount": 351
+  },
+  "sampleCounts": {
+    "actionCount": 13,
+    "minimumWindowFailureCount": 12,
+    "probeCount": 351,
+    "repeatStepsByScenario": {
+      "escape-left-open": 24,
+      "escape-right-open": 24,
+      "frontal-near-wall": 24,
+      "narrowing-corridor": 24,
+      "no-danger-control": 24,
+      "side-wall-left": 24,
+      "side-wall-right": 24,
+      "trail-ahead": 24,
+      "trail-side": 24
+    },
+    "scenarioCount": 9,
+    "seedCountsByScenario": {
+      "escape-left-open": 3,
+      "escape-right-open": 3,
+      "frontal-near-wall": 3,
+      "narrowing-corridor": 3,
+      "no-danger-control": 3,
+      "side-wall-left": 3,
+      "side-wall-right": 3,
+      "trail-ahead": 3,
+      "trail-side": 3
+    },
+    "warmupTerminalBeforeActionCount": 2
+  },
+  "schemaVersion": "bt93s-action-surface-decision-v1",
+  "sourceArtifacts": {
+    "actionEffectWindowManifest": {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "phaseId": "93S.1",
+      "resultClass": "scenario-window-contract-green",
+      "role": "BT93S.1 action-effect window alias",
+      "schemaVersion": "bt93s-scenario-window-contract-v1",
+      "sha256": "2334cb20a0d20ad9279f7609e9bddb03d81a238539c1fdb0b5c615ce7bfcb2f0",
+      "tracked": true
+    },
+    "actionSurface": {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current masked semantic PPO action surface",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "tracked": true
+    },
+    "bt93rrHandover": {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
+      "phaseId": "93RR.99",
+      "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+      "role": "BT93RR R-Allowlist handover opening only BT93S",
+      "schemaVersion": "bt93rr-reentry-handover-package-v1",
+      "sha256": "8c14379b6fe6388bbf689929e151511105fe09fac823790983634b3beedcfa12",
+      "tracked": true
+    },
+    "curviosEnv": {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/curvios_env.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "Python sidecar environment",
+      "schemaVersion": null,
+      "sha256": "2a12d75b327b10daef853cc242e6d81fb87c4ee838756d6cef1905d19de94d59",
+      "tracked": true
+    },
+    "existingActionEffect": {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.2"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.2"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "phaseId": "93S.2",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.2 existing-action effect evidence",
+      "schemaVersion": "bt93s-existing-action-effect-report-v1",
+      "sha256": "e6537e1c388bb9ed84d541c5124e396ce4218d82216418d88b8eb37145f55094",
+      "tracked": true
+    },
+    "headlessRunner": {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "JS-authoritative headless transition path",
+      "schemaVersion": null,
+      "sha256": "d6a2917a001a310010a98ee150726af110f1444b0716e6ac3a35815253144360",
+      "tracked": true
+    },
+    "scenarioWindowContract": {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "phaseId": "93S.1",
+      "resultClass": "scenario-window-contract-green",
+      "role": "BT93S.1 pinned scenario-window contract",
+      "schemaVersion": "bt93s-scenario-window-contract-v1",
+      "sha256": "2334cb20a0d20ad9279f7609e9bddb03d81a238539c1fdb0b5c615ce7bfcb2f0",
+      "tracked": true
+    }
+  },
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "surfaceDrift": {
+    "actionSurfaceChangedSince93S1": false,
+    "actionSurfaceChangedSince93S2": false,
+    "currentActionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+    "currentDecoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "decoderChangedSince93S1": false,
+    "decoderChangedSince93S2": false,
+    "effectReportActionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+    "effectReportDecoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "scenarioContractActionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+    "scenarioContractDecoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9"
+  }
+}

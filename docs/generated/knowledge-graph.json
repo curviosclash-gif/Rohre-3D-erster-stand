@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 397,
+          "concreteCount": 399,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 535,
+          "concreteCount": 537,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 393,
+          "concreteCount": 395,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 392,
+          "concreteCount": 394,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1034,
+          "concreteCount": 1036,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1042,
+          "concreteCount": 1044,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1772,7 +1772,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S.3",
+        "currentPhase": "93S.4",
         "scopeDeclarations": [
           "data/training/ppo/bt93s/action_surface_decision.json",
           "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
@@ -1780,12 +1780,13 @@
           "data/training/ppo/bt93s/policy_selection_report.json",
           "data/training/ppo/bt93s/scenario_window_contract.json",
           "docs/bot-training/Bot_Trainingsplan.md",
+          "python/scripts/bt93s_action_surface_decision.py",
           "python/scripts/bt93s_existing_action_effect.py",
           "python/scripts/bt93s_scenario_window_contract.py"
         ],
         "scopeResolution": {
-          "concreteCount": 5,
-          "plannedCount": 3
+          "concreteCount": 7,
+          "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5223,7 +5224,7 @@
       "id": "BT93S.3",
       "type": "phase",
       "title": "Sidecar-Action Entscheidung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.3"
@@ -14932,8 +14933,8 @@
     {
       "id": "BT93S.3.1",
       "type": "subphase",
-      "title": "Neue oder Compound-Actions nur bei belegter Action-Luecke einfuehren.",
-      "status": "open",
+      "title": "Neue oder Compound-Actions nur bei belegter Action-Luecke einfuehren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_action_surface_decision.py --write-report` -> `data/training/ppo/bt93s/action_surface_decision.json`, `actionEffectGapScenarioIds=[escape-right-open]`, `newActionIntroduced=false`, `decision=defer-action-surface-change-until-matrix-redesign`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.3",
@@ -14943,8 +14944,8 @@
     {
       "id": "BT93S.3.2",
       "type": "subphase",
-      "title": "Safety-Raten und Decoder-/Action-Surface-Drift als Pflichtfelder schreiben.",
-      "status": "open",
+      "title": "Safety-Raten und Decoder-/Action-Surface-Drift als Pflichtfelder schreiben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_action_surface_decision.py --write-report` -> `data/training/ppo/bt93s/action_surface_decision.json`, `maxRates.invalidActionRate=0`, `maxRates.postDecodeClampRate=0`, `maxRates.sanitizerRate=0`, `decoderChangedSince93S2=false`, `actionSurfaceChangedSince93S2=false`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.3",
@@ -30092,9 +30093,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -38317,6 +38324,27 @@
           "BT93D",
           "BT93E",
           "BT93RR"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s_action_surface_decision.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S"
         ],
         "exists": true
       }
@@ -75758,6 +75786,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s/action_surface_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
       "type": "scope",
       "hint": null,
@@ -77253,6 +77290,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s_action_surface_decision.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79528,6 +79574,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s/action_surface_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
       "type": "scope",
       "hint": null,
@@ -81005,6 +81060,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s_action_surface_decision.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84478,6 +84542,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s/action_surface_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
       "type": "scope",
       "hint": null,
@@ -85964,6 +86037,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s_action_surface_decision.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88538,6 +88620,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s/action_surface_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
       "type": "scope",
       "hint": null,
@@ -90024,6 +90115,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s_action_surface_decision.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -99002,6 +99102,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s/action_surface_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
       "type": "scope",
       "hint": null,
@@ -100488,6 +100597,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s_action_surface_decision.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -108641,6 +108759,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s/action_surface_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
       "type": "scope",
       "hint": null,
@@ -110136,6 +110263,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s_action_surface_decision.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -136721,6 +136857,15 @@
     {
       "from": "BT93S",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "python/scripts/bt93s_action_surface_decision.py",
       "type": "scope",
       "hint": null,
       "attributes": {

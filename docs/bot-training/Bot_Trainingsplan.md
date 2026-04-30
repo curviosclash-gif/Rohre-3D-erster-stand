@@ -3744,7 +3744,7 @@ Scope:
 
 - [x] DoD.S1 Szenariofenster haben Startzustand, erwartete Zustandswirkung, Positiv-/Negativkontrolle und verbotene Success-Proxies. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_scenario_window_contract.py --write-reports` -> `data/training/ppo/bt93s/scenario_window_contract.json`, `resultClass=scenario-window-contract-green`)
 - [x] DoD.S2 Existing-Action-Effekt misst WallDistance, LocalOpenness, CollisionRisk, TerminalRisk, Heading-/Target-Delta und Trail-Druck. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_existing_action_effect.py --reclassify-existing --write-report` -> `data/training/ppo/bt93s/existing_action_effect_report.json`, `phaseCoverage.DoD.S2=true`, `probeCount=351`, `resultClass=matrix-redesign-required`)
-- [ ] DoD.S3 Sidecar-Action-Entscheidung pinnt Action-Surface-ID, Decoder-Hash und invalidierte Vergleichsartefakte.
+- [x] DoD.S3 Sidecar-Action-Entscheidung pinnt Action-Surface-ID, Decoder-Hash und invalidierte Vergleichsartefakte. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_action_surface_decision.py --write-report` -> `data/training/ppo/bt93s/action_surface_decision.json`, `resultClass=matrix-redesign-required`, `actionSurfaceId=bt93q-walltrail-semantic-action-v1`, `decoderChangedSince93S2=false`)
 - [ ] DoD.S4 Policy-Selection beweist, ob die reparierte Policy die wirksamen Actions auch waehlt.
 - [ ] DoD.S5 Gruen ist nur `action-selection-green`; `action-space-required`, `action-selection-required`, `matrix-redesign-required`, `observation-telemetry-required` oder `measurement-invalid` blockieren U/W/O.
 
@@ -3760,8 +3760,8 @@ Scope:
 
 ### 93S.3 Sidecar-Action Entscheidung
 
-- [ ] 93S.3.1 Neue oder Compound-Actions nur bei belegter Action-Luecke einfuehren.
-- [ ] 93S.3.2 Safety-Raten und Decoder-/Action-Surface-Drift als Pflichtfelder schreiben.
+- [x] 93S.3.1 Neue oder Compound-Actions nur bei belegter Action-Luecke einfuehren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_action_surface_decision.py --write-report` -> `data/training/ppo/bt93s/action_surface_decision.json`, `actionEffectGapScenarioIds=[escape-right-open]`, `newActionIntroduced=false`, `decision=defer-action-surface-change-until-matrix-redesign`)
+- [x] 93S.3.2 Safety-Raten und Decoder-/Action-Surface-Drift als Pflichtfelder schreiben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_action_surface_decision.py --write-report` -> `data/training/ppo/bt93s/action_surface_decision.json`, `maxRates.invalidActionRate=0`, `maxRates.postDecodeClampRate=0`, `maxRates.sanitizerRate=0`, `decoderChangedSince93S2=false`, `actionSurfaceChangedSince93S2=false`)
 
 ### 93S.4 Policy-Selection
 
