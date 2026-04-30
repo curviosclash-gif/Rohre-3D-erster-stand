@@ -1,0 +1,514 @@
+{
+  "activeLineage": {
+    "activeCount": 1,
+    "lineageId": "bt93y-retrain-lineage-v1",
+    "lineageKind": "new-retrain-lineage-not-bt93n",
+    "loaderSmokeReport": {
+      "path": "data/training/ppo/bt93y/retrain_loader_smoke_report.json",
+      "resultClass": "retrain-loader-smoke-green",
+      "sha256": "91a300c319f9a3c9b0d7790b5bc94850e475e019388ed05d73d69cbbaf20a837"
+    },
+    "modelPackage": {
+      "artifactManifest": {
+        "blockId": "BT93Y",
+        "exists": true,
+        "isFile": true,
+        "key": "artifactManifest",
+        "ok": true,
+        "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/artifact_manifest.json",
+        "phaseId": "93Y.3",
+        "resultClass": null,
+        "role": "BT93Y.3 retrain package artifactManifest",
+        "schemaVersion": "bt93y-retrain-artifact-manifest-v1",
+        "sha256": "c57ee3cc970b7aca33b8a1cab590c748e245fdcf5ab0e2830e4163cff78be7d4",
+        "sizeBytes": 6762,
+        "tracked": true
+      },
+      "config": {
+        "blockId": "BT93Y",
+        "exists": true,
+        "isFile": true,
+        "key": "config",
+        "ok": null,
+        "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/config.json",
+        "phaseId": "93Y.3",
+        "resultClass": null,
+        "role": "BT93Y.3 retrain package config",
+        "schemaVersion": "bt93y-retrain-lineage-config-v1",
+        "sha256": "997a8f83e9d179be6cb0dbb311c6047d25cb8a7aa88874405e399f33be917b69",
+        "sizeBytes": 2597,
+        "tracked": true
+      },
+      "model": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "model",
+        "ok": null,
+        "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/model.zip",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93Y.3 retrain package model",
+        "schemaVersion": null,
+        "sha256": "75075c65d08b113b8914b55553b04889d7a57c536a36303a820f620572c9f5f8",
+        "sizeBytes": 240642,
+        "tracked": true
+      },
+      "normalizer": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "normalizer",
+        "ok": null,
+        "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93Y.3 retrain package normalizer",
+        "schemaVersion": null,
+        "sha256": "4a4b144a7bde775bfcaa639de8c68a67b1ec6bfb057c84c7f2d290330f39604a",
+        "sizeBytes": 3647,
+        "tracked": true
+      },
+      "optimizerState": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "optimizerState",
+        "ok": null,
+        "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/optimizer_state.pt",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93Y.3 retrain package optimizerState",
+        "schemaVersion": null,
+        "sha256": "47364a4ddb9b1e07083a564de3ab6207fc819400a335a2b3b3ba4784b66a78e5",
+        "sizeBytes": 151047,
+        "tracked": true
+      },
+      "trainingReport": {
+        "blockId": "BT93Y",
+        "exists": true,
+        "isFile": true,
+        "key": "trainingReport",
+        "ok": true,
+        "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/training_report.json",
+        "phaseId": "93Y.3",
+        "resultClass": null,
+        "role": "BT93Y.3 retrain package trainingReport",
+        "schemaVersion": "bt93y-retrain-training-report-v1",
+        "sha256": "5e4d353e04b30ddc6b0e4d8fe33845d205cb08d48d5bea8f9339e757dede924a",
+        "sizeBytes": 17682,
+        "tracked": true
+      },
+      "vecnormalize": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "vecnormalize",
+        "ok": null,
+        "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93Y.3 retrain package vecnormalize",
+        "schemaVersion": null,
+        "sha256": "4a4b144a7bde775bfcaa639de8c68a67b1ec6bfb057c84c7f2d290330f39604a",
+        "sizeBytes": 3647,
+        "tracked": true
+      }
+    },
+    "notBt93nLineage": true,
+    "packageManifest": {
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/artifact_manifest.json",
+      "sha256": "c57ee3cc970b7aca33b8a1cab590c748e245fdcf5ab0e2830e4163cff78be7d4",
+      "summary": {
+        "lineageKind": "new-retrain-lineage-not-bt93n",
+        "sampleCounts": {
+          "actualModelTimesteps": 512,
+          "requestedTimesteps": 512,
+          "trainCompletedEpisodes": 7,
+          "trainSteps": 512
+        }
+      }
+    },
+    "policyId": "bt93y-retrain-lineage-v1",
+    "policyProbeReport": {
+      "path": "data/training/ppo/bt93y/retrain_policy_probe_report.json",
+      "resultClass": "retrain-lineage-ready",
+      "sha256": "51465b2147b2715e2ddb84f1dc2584da01d13295f0f8f389bc6399edea1bc062"
+    },
+    "ready": true,
+    "sourceKind": "retrain-lineage-ready",
+    "sourcePath": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+    "sourceResultClass": "retrain-lineage-ready"
+  },
+  "allowNext": [
+    "93Y.99 closure gate"
+  ],
+  "blockId": "BT93Y",
+  "blocksNext": [
+    "BT93R-Reentry claim before BT93Y.99",
+    "BT93S claim before BT93R-Reentry.99 in R-Allowlist",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration"
+  ],
+  "bt93y99ClosureInput": {
+    "bt93rReentryAllowedOnClosure": true,
+    "requiresBt93y99ClosureGates": true,
+    "resultClassOnClosure": "retrain-lineage-ready-bt93r-reentry-ready"
+  },
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93y_reentry_package.py --write-reports"
+  },
+  "dodCoverage": {
+    "DoD.Y6-input": true,
+    "DoD.Y7": true
+  },
+  "generatedAt": "2026-04-30T10:53:24Z",
+  "generatedBy": "python/scripts/bt93y_reentry_package.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "02436a9853ef30dcbb33555796644d4c95798e5a"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffSignal": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "freezeCandidate": false,
+    "holdoutConsumptionAllowed": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promoteAllowed": false,
+    "promotionAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "manifestArtifact": {
+    "blockId": "BT93Y",
+    "ok": true,
+    "path": "data/training/ppo/bt93y/bt93r_reentry_manifest.json",
+    "phaseId": "93Y.5",
+    "resultClass": "retrain-lineage-ready-bt93r-reentry-ready",
+    "role": "BT93Y.5 BT93R-Reentry manifest",
+    "schemaVersion": "bt93y-bt93r-reentry-manifest-v1",
+    "sha256": "524086ea0d83ff9f85865327bc5c731f202271601d262f1668d7ab95255ac734",
+    "trackedAfterCommitRequired": true
+  },
+  "ok": true,
+  "opensNext": [
+    "93Y.99"
+  ],
+  "phaseCoverage": {
+    "93Y.5.1": true,
+    "93Y.5.2": true,
+    "93Y.5.3": true,
+    "93Y.5.4": true,
+    "93Y.5.5": true
+  },
+  "phaseId": "93Y.5",
+  "reentryPlan": {
+    "allowedOnlyAfter": [
+      "BT93Y.99 green with bt93rReentryAllowed=true"
+    ],
+    "forbiddenDuringReentryPlanning": [
+      "broad fix bundle",
+      "training extension",
+      "BT93S claim",
+      "BT93O claim",
+      "BT93P claim",
+      "BT94A claim",
+      "candidate/freeze/holdout/promote/rollout wording"
+    ],
+    "historicalBt93rStatus": "BT93R.99 remains red as model-artifact-missing",
+    "stageOrder": [
+      "artifact-probe",
+      "root-cause",
+      "counterprobe"
+    ],
+    "stages": [
+      {
+        "fixWorkAllowed": false,
+        "id": "artifact-probe",
+        "order": 1,
+        "purpose": "Load the active lineage package and verify model, normalizer, config, optimizer and action-surface hashes.",
+        "requiredOutput": "BT93R-Reentry artifact-probe report with concrete package/loader status."
+      },
+      {
+        "fixWorkAllowed": false,
+        "id": "root-cause",
+        "order": 2,
+        "purpose": "Classify the deterministic-collapse/root-cause signature against BT93N/Q/R evidence.",
+        "requiredOutput": "BT93R-Reentry root-cause report naming one concrete fix class or a red blocker."
+      },
+      {
+        "fixWorkAllowed": "only-after-root-cause-fix-class",
+        "id": "counterprobe",
+        "order": 3,
+        "purpose": "Run only the counterprobe enabled by the named fix class; no broad repair bundle is allowed.",
+        "requiredOutput": "BT93R-Reentry.99 in R-Allowlist or a concrete red blocker."
+      }
+    ],
+    "targetBlock": "BT93R-Reentry"
+  },
+  "resultClass": "retrain-lineage-ready-bt93r-reentry-ready",
+  "sampleCounts": {
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 0,
+    "newTrainingEpisodes": 0,
+    "notApplicableReason": "93Y.5 packages a diagnostic BT93R-Reentry plan only; it does not run training, eval or holdout samples.",
+    "steps": 0
+  },
+  "schemaVersion": "bt93y-bt93r-reentry-gate-report-v1",
+  "sourceArtifacts": [
+    {
+      "actualFields": {
+        "phaseId": "93Y.2"
+      },
+      "blockId": "BT93Y",
+      "exists": true,
+      "expectedFields": {
+        "phaseId": "93Y.2"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/exact_lineage_manifest.json",
+      "phaseId": "93Y.2",
+      "resultClass": "exact-lineage-unavailable",
+      "role": "BT93Y.2 exact-lineage manifest",
+      "schemaVersion": "bt93y-exact-lineage-manifest-v1",
+      "sha256": "1890b7cbf21bd1db7c4aa72472d323d2954c9de6dd543d0055a590fe7ef21d8e",
+      "sizeBytes": 19173,
+      "sourceKey": "bt93yExactLineageManifest",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "phaseId": "93Y.3"
+      },
+      "blockId": "BT93Y",
+      "exists": true,
+      "expectedFields": {
+        "phaseId": "93Y.3"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "phaseId": "93Y.3",
+      "resultClass": "retrain-lineage-ready",
+      "role": "BT93Y.3 retrain-lineage manifest",
+      "schemaVersion": "bt93y-retrain-lineage-manifest-v1",
+      "sha256": "fea37024ff686fd84fc73a5d6dfecca663606acbb0316ef8a1fceb4dfae89737",
+      "sizeBytes": 14589,
+      "sourceKey": "bt93yRetrainLineageManifest",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "phaseId": "93Y.3",
+        "resultClass": "retrain-loader-smoke-green"
+      },
+      "blockId": "BT93Y",
+      "exists": true,
+      "expectedFields": {
+        "phaseId": "93Y.3",
+        "resultClass": "retrain-loader-smoke-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/retrain_loader_smoke_report.json",
+      "phaseId": "93Y.3",
+      "resultClass": "retrain-loader-smoke-green",
+      "role": "BT93Y.3 retrain loader smoke",
+      "schemaVersion": "bt93y-retrain-loader-smoke-v1",
+      "sha256": "593da762d3d690548849f372d30be2a1ad28a215e716a1171480c66ea42100d5",
+      "sizeBytes": 5791,
+      "sourceKey": "bt93yRetrainLoaderSmoke",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "phaseId": "93Y.3",
+        "resultClass": "retrain-lineage-ready"
+      },
+      "blockId": "BT93Y",
+      "exists": true,
+      "expectedFields": {
+        "phaseId": "93Y.3",
+        "resultClass": "retrain-lineage-ready"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/retrain_policy_probe_report.json",
+      "phaseId": "93Y.3",
+      "resultClass": "retrain-lineage-ready",
+      "role": "BT93Y.3 retrain policy probe",
+      "schemaVersion": "bt93y-retrain-policy-probe-report-v1",
+      "sha256": "e20d512b1c748fb9b5e45d1141a245bb81e08231eaedcd074636d6ccef3c3340",
+      "sizeBytes": 300861,
+      "sourceKey": "bt93yRetrainPolicyProbe",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "phaseId": "93Y.4",
+        "resultClass": "replacement-policy-approved"
+      },
+      "blockId": "BT93Y",
+      "exists": true,
+      "expectedFields": {
+        "phaseId": "93Y.4",
+        "resultClass": "replacement-policy-approved"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/replacement_policy_lock_report.json",
+      "phaseId": "93Y.4",
+      "resultClass": "replacement-policy-approved",
+      "role": "BT93Y.4 replacement-policy lock",
+      "schemaVersion": "bt93y-replacement-policy-lock-report-v1",
+      "sha256": "5988a40ae52ec09d782e0fa921140e3e996975508a4039438b25110b7811a874",
+      "sizeBytes": 16737,
+      "sourceKey": "bt93yReplacementPolicyLock",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "phaseId": "93Y.4",
+        "resultClass": "replacement-policy-approved"
+      },
+      "blockId": "BT93X",
+      "exists": true,
+      "expectedFields": {
+        "phaseId": "93Y.4",
+        "resultClass": "replacement-policy-approved"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93x/replacement_policy_decision.json",
+      "phaseId": "93Y.4",
+      "resultClass": "replacement-policy-approved",
+      "role": "BT93X replacement-policy decision from BT93Y.4",
+      "schemaVersion": "bt93x-replacement-policy-decision-v1",
+      "sha256": "a410d85a4d0b4977ee3b2f3326b09ab2996b68f9a29ce6c22f8b1108ed7761e8",
+      "sizeBytes": 8362,
+      "sourceKey": "bt93xReplacementPolicyDecision",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "phaseId": "93R.99",
+        "resultClass": "model-artifact-missing"
+      },
+      "blockId": "BT93R",
+      "exists": true,
+      "expectedFields": {
+        "phaseId": "93R.99",
+        "resultClass": "model-artifact-missing"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "phaseId": "93R.99",
+      "resultClass": "model-artifact-missing",
+      "role": "Historical BT93R.99 red closure",
+      "schemaVersion": "bt93r-closure-gate-report-v1",
+      "sha256": "947a93757f71ae28baa715bd923de5666b52fca1a3a47992f23dd02c66f272d3",
+      "sizeBytes": 8945,
+      "sourceKey": "bt93rClosureGate",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "phaseId": "93R.2",
+        "resultClass": "policy-evidence-invalid"
+      },
+      "blockId": "BT93R",
+      "exists": true,
+      "expectedFields": {
+        "phaseId": "93R.2",
+        "resultClass": "policy-evidence-invalid"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "phaseId": "93R.2",
+      "resultClass": "policy-evidence-invalid",
+      "role": "Historical BT93R artifact blocker",
+      "schemaVersion": "bt93r-policy-artifact-report-v1",
+      "sha256": "fe9b7c4ca44b5022ea9279251aee0c1cf75b34108d6320e12cd48f311b9fb7c9",
+      "sizeBytes": 38391,
+      "sourceKey": "bt93rPolicyArtifact",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "comparisonPolicyDecision": "dqn-anchor-blocked",
+        "phaseId": "93X.0"
+      },
+      "blockId": "BT93X.0",
+      "exists": true,
+      "expectedFields": {
+        "comparisonPolicyDecision": "dqn-anchor-blocked",
+        "phaseId": "93X.0"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+      "phaseId": "93X.0",
+      "resultClass": "early-comparator-preflight-complete",
+      "role": "BT93X.0 read-only comparator preflight",
+      "schemaVersion": "bt93x-early-comparator-preflight-report-v1",
+      "sha256": "bbb474bc083c9c3503b6371f5eda7cce63786aadfc617f387f7b8c0fc65c0e00",
+      "sizeBytes": 16158,
+      "sourceKey": "bt93x0EarlyComparatorPreflight",
+      "tracked": true
+    }
+  ],
+  "sourceFilesReady": true,
+  "summary": {
+    "bt93rReentryClaimAllowedNow": false,
+    "bt93rReentryMayOpenAfterBt93y99": true,
+    "bt93rReentryPackageReady": true,
+    "bt93sBlockedUntil": "BT93R-Reentry.99 in R-Allowlist",
+    "candidateFreezePromoteRolloutSignals": false,
+    "nextBestAction": "Close BT93Y with 93Y.99; then claim only BT93R-Reentry."
+  }
+}
