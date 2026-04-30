@@ -1,0 +1,554 @@
+{
+  "actionSurfaceHashLock": {
+    "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+    "bt93sScenarioDecoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "bt93yRetrainSourceSha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "currentSourceSha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "decoderPath": "python/envs/ppo_action_surface.py",
+    "hashesMatch": true
+  },
+  "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+  "activeBlockers": [
+    "action-selection-required",
+    "action-space-required",
+    "matrix-redesign-required",
+    "observation-telemetry-required"
+  ],
+  "allowNext": [
+    "93S2.2 Matrix-v2 Contract und Scenario Search"
+  ],
+  "allowedResultClasses": [
+    "action-selection-green",
+    "observation-telemetry-required",
+    "matrix-redesign-required",
+    "action-space-required",
+    "action-selection-required",
+    "action-surface-lineage-invalidated",
+    "measurement-invalid"
+  ],
+  "blockId": "BT93S2",
+  "blocksNext": [
+    "BT93T claim until BT93S2.99=observation-telemetry-required",
+    "BT93U claim until BT93S2.99=action-selection-green",
+    "BT93V claim",
+    "BT93W claim",
+    "BT93O claim",
+    "BT93X full claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "50k/100k/200k/500k/1M extension",
+    "reward fix from BT93S2.1",
+    "telemetry fix from BT93S2.1",
+    "action-surface change from BT93S2.1"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93s2NextPhaseAllowed": true,
+    "bt93tClaimAllowed": false,
+    "bt93uClaimAllowed": false,
+    "bt93vClaimAllowed": false,
+    "bt93wClaimAllowed": false,
+    "bt93xFullClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffAllowed": false,
+    "candidateRunsAllowed": false,
+    "freezeAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "ppoValidateSignalAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "tests": "user-owned except closure gate scripts",
+    "write": "python python/scripts/bt93s2_start_contract.py --write-report"
+  },
+  "dodCoverage": {
+    "DoD.S2R1": true
+  },
+  "generatedAt": "2026-04-30T15:58:04Z",
+  "generatedBy": "python/scripts/bt93s2_start_contract.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "a2854edc5a0ec2d0b46d332faf79a98d5bb4265a",
+    "sha": "9a489c5ba5e28549b55316d621966cae208eb7eb"
+  },
+  "guardrails": {
+    "actionSurfaceChanged": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "newOptimizerUpdates": 0,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "qualityClaimAllowed": false,
+    "rewardFixApplied": false,
+    "runtimeSurfacesTouched": [],
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "invalidatedBt93sReports": [
+    {
+      "invalidatedFor": "BT93S2 positive matrix evidence",
+      "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "reason": "BT93S.99 found no-danger-control matrix/control semantics invalid.",
+      "retainAs": "historical source for v2 redesign"
+    },
+    {
+      "invalidatedFor": "BT93S2 positive action-effect evidence",
+      "path": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "reason": "Effect windows belong to the v1 matrix stopped by matrix-redesign-required.",
+      "retainAs": "historical source for v2 effect-window redesign"
+    },
+    {
+      "invalidatedFor": "action-selection-green and BT93U opening",
+      "path": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "reason": "Existing action-effect was measured on the invalid v1 control matrix.",
+      "retainAs": "source evidence for escape-right-open action-space gap"
+    },
+    {
+      "invalidatedFor": "final BT93S2 action-surface decision",
+      "path": "data/training/ppo/bt93s/action_surface_decision.json",
+      "reason": "S2 must re-decide after matrix-v2 and action-effect-v2 evidence.",
+      "retainAs": "source decision explaining why BT93S deferred action-surface change"
+    },
+    {
+      "invalidatedFor": "BT93U opening",
+      "path": "data/training/ppo/bt93s/policy_selection_report.json",
+      "reason": "Policy selection before matrix-v2/action-effect-v2 cannot be positive S2 evidence.",
+      "retainAs": "source evidence for v1 selection blockers"
+    },
+    {
+      "invalidatedFor": "BT93U opening",
+      "path": "data/training/ppo/bt93s/action_selection_report.json",
+      "reason": "Alias inherits the policy-selection invalidation.",
+      "retainAs": "alias of v1 policy-selection source"
+    }
+  ],
+  "invalidations": [
+    {
+      "reason": "BT93S.99 ended matrix-redesign-required; BT93S reports may seed BT93S2 but cannot open BT93T/U.",
+      "scope": "BT93S positive evidence"
+    },
+    {
+      "reason": "Only BT93S2.99 may open BT93T or BT93U with the allowed result-class contract.",
+      "scope": "BT93T/BT93U opening"
+    }
+  ],
+  "matrixId": "bt93s2-walltrail-action-effect-matrix-v2-pending",
+  "ok": true,
+  "opensNext": [],
+  "phaseCoverage": {
+    "93S2.1.1": true,
+    "93S2.1.2": true,
+    "93S2.1.3": true
+  },
+  "phaseId": "93S2.1",
+  "policyLineageLock": {
+    "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+    "bt93rrAndHandoverAgree": true,
+    "bt93rrClosureResultClass": "eval-mode-bug-fixed-counterprobe-green",
+    "bt93rrHandoverResultClass": "eval-mode-bug-fixed-counterprobe-green",
+    "bt93yRetrainResultClass": "retrain-lineage-ready",
+    "lineageId": "bt93y-retrain-lineage-v1",
+    "lineageKind": "new-retrain-lineage-not-bt93n",
+    "matrixHash": "a8e17c34cc152bf73d6e6d43e11aa12b3cffae9a2caf26601ebd22b94d4b7bad",
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "notBt93nLineage": true,
+    "rewardProfileId": "bt93n-wall-trail-stability-v1",
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "recommendations": [
+    {
+      "action": "Run 93S2.2 Matrix-v2 Contract und Scenario Search.",
+      "rank": "1",
+      "why": "The red BT93S sources are locked, versioned, and invalidated for positive evidence; v2 must repair no-danger-control and escape-right-open before action-effect or selection can be judged."
+    }
+  ],
+  "reportHash": "ef6d158a797aceb598a256d83b00330529f76c23bb96a3ec060ab2c42b1ba38b",
+  "resultClass": "start-contract-locked",
+  "sampleCounts": {
+    "contractScenarioCount": 9,
+    "holdoutEpisodes": 0,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "probeCount": 351,
+    "scenarioCount": 9,
+    "selectionStepCount": 607
+  },
+  "scenarioBlockers": {
+    "actionEffectGapScenarioIds": [
+      "escape-right-open"
+    ],
+    "matrixRedesignScenarioIds": [
+      "no-danger-control"
+    ],
+    "selectionBlockers": [
+      "narrowing-corridor",
+      "side-wall-left",
+      "side-wall-right"
+    ],
+    "telemetryLimitedScenarioIds": [
+      "trail-ahead",
+      "trail-side"
+    ]
+  },
+  "scenarioIds": {
+    "actionEffectGap": [
+      "escape-right-open"
+    ],
+    "matrixRedesign": [
+      "no-danger-control"
+    ],
+    "selectionBlockers": [
+      "narrowing-corridor",
+      "side-wall-left",
+      "side-wall-right"
+    ],
+    "telemetryLimited": [
+      "trail-ahead",
+      "trail-side"
+    ]
+  },
+  "schemaVersion": "bt93s2-start-contract-v1",
+  "sourceArtifacts": [
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.99",
+        "resultClass": "matrix-redesign-required"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.99",
+        "resultClass": "matrix-redesign-required"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
+      "phaseId": "93S.99",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.99 red closure source for BT93S2",
+      "schemaVersion": "bt93s-closure-gate-report-v1",
+      "sha256": "8d40084b0bf7afc191b8b4860c3df06cc3064a84e3a6fd5986c5edbe0525a4fa",
+      "sourceKey": "bt93sClosure",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1",
+        "resultClass": "scenario-window-contract-green"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1",
+        "resultClass": "scenario-window-contract-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "phaseId": "93S.1",
+      "resultClass": "scenario-window-contract-green",
+      "role": "BT93S.1 scenario-window contract source",
+      "schemaVersion": "bt93s-scenario-window-contract-v1",
+      "sha256": "2334cb20a0d20ad9279f7609e9bddb03d81a238539c1fdb0b5c615ce7bfcb2f0",
+      "sourceKey": "bt93sScenarioContract",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1",
+        "resultClass": "scenario-window-contract-green"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1",
+        "resultClass": "scenario-window-contract-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "phaseId": "93S.1",
+      "resultClass": "scenario-window-contract-green",
+      "role": "BT93S.1 action-effect manifest alias",
+      "schemaVersion": "bt93s-scenario-window-contract-v1",
+      "sha256": "2334cb20a0d20ad9279f7609e9bddb03d81a238539c1fdb0b5c615ce7bfcb2f0",
+      "sourceKey": "bt93sActionEffectManifest",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.2"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.2"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "phaseId": "93S.2",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.2 existing-action effect source",
+      "schemaVersion": "bt93s-existing-action-effect-report-v1",
+      "sha256": "e6537e1c388bb9ed84d541c5124e396ce4218d82216418d88b8eb37145f55094",
+      "sourceKey": "bt93sExistingActionEffect",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.3",
+        "resultClass": "matrix-redesign-required"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.3",
+        "resultClass": "matrix-redesign-required"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/action_surface_decision.json",
+      "phaseId": "93S.3",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.3 action-surface decision source",
+      "schemaVersion": "bt93s-action-surface-decision-v1",
+      "sha256": "c18471a95de7f2acc1d9bed42e7f03a8f61014db044105920f92833133f2c499",
+      "sourceKey": "bt93sActionSurfaceDecision",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.4",
+        "resultClass": "matrix-redesign-required"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.4",
+        "resultClass": "matrix-redesign-required"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/policy_selection_report.json",
+      "phaseId": "93S.4",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.4 policy-selection source",
+      "schemaVersion": "bt93s-policy-selection-report-v1",
+      "sha256": "e408f96ac21898b739c88d92d95e8122529fc5e48853125e6236cec759e1eb8a",
+      "sourceKey": "bt93sPolicySelection",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.4",
+        "resultClass": "matrix-redesign-required"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.4",
+        "resultClass": "matrix-redesign-required"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/action_selection_report.json",
+      "phaseId": "93S.4",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.4 action-selection alias source",
+      "schemaVersion": "bt93s-policy-selection-report-v1",
+      "sha256": "e408f96ac21898b739c88d92d95e8122529fc5e48853125e6236cec759e1eb8a",
+      "sourceKey": "bt93sActionSelectionAlias",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "phaseId": "93RR.99",
+      "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+      "role": "BT93RR.99 R-Allowlist closure source",
+      "schemaVersion": "bt93rr-reentry-closure-gate-report-v1",
+      "sha256": "b3b4712987cbd353254e3e05beba1ebf3e30faa49d7a8673e75d729470fa5ea2",
+      "sourceKey": "bt93rrClosure",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
+      "phaseId": "93RR.99",
+      "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+      "role": "BT93RR.99 handover source",
+      "schemaVersion": "bt93rr-reentry-handover-package-v1",
+      "sha256": "8c14379b6fe6388bbf689929e151511105fe09fac823790983634b3beedcfa12",
+      "sourceKey": "bt93rrHandover",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93Y",
+        "ok": true,
+        "resultClass": "retrain-lineage-ready"
+      },
+      "blockId": "BT93Y",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93Y",
+        "ok": true,
+        "resultClass": "retrain-lineage-ready"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "phaseId": "93Y.3",
+      "resultClass": "retrain-lineage-ready",
+      "role": "BT93Y retrain-lineage policy source",
+      "schemaVersion": "bt93y-retrain-lineage-manifest-v1",
+      "sha256": "fea37024ff686fd84fc73a5d6dfecca663606acbb0316ef8a1fceb4dfae89737",
+      "sourceKey": "bt93yRetrainLineage",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current PPO action-surface decoder",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sourceKey": "ppoActionSurface",
+      "tracked": true
+    }
+  ],
+  "sourceContractId": "bt93s-walltrail-action-effect-window-v1",
+  "sourceContractMatches": true,
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "sourceMatrixId": "bt93s-walltrail-action-effect-matrix-v1",
+  "summary": {
+    "blockers": [
+      "action-selection-required",
+      "action-space-required",
+      "matrix-redesign-required",
+      "observation-telemetry-required"
+    ],
+    "bt93oP94aStillClosed": true,
+    "bt93tAllowed": false,
+    "bt93uAllowed": false,
+    "finalResult": "start-contract-locked",
+    "nextBestAction": "93S2.2"
+  },
+  "upstreamClaimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93tClaimAllowed": false,
+    "bt93uClaimAllowed": false,
+    "bt93wClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffAllowed": false,
+    "candidateRunsAllowed": false,
+    "freezeAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "ppoValidateSignalAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  }
+}

@@ -407,7 +407,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
 | Bot-Codex | BT93RR | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S |
 | Bot-Codex | BT93S | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `matrix-redesign-required`; oeffnet keinen Folgeblock |
-| - | BT93S2 | - | frei | naechster claimbarer Scope; repariert Matrix-/Control-v2 und Action-Effect vor BT93T/U |
+| Bot-Codex | BT93S2 | 2026-04-30 | active | 93S2.1 abgeschlossen; naechster Scope 93S2.2 Matrix-v2 Contract und Scenario Search |
 | - | BT93T | - | frei | blockiert, bis BT93S2.99 `observation-telemetry-required` schreibt |
 | - | BT93U | - | frei | wartet auf BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -933,7 +933,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93Y | PPO Lineage-Recovery/Retraining und Ersatzvergleich | completed | P0 | BT93R.99 `model-artifact-missing` + X0-Preflight-Report `dqn-loader-fix-required` | 93Y.99 abgeschlossen: `retrain-lineage-ready-bt93r-reentry-ready`, oeffnet nur BT93R-Reentry | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
 | BT93RR | Policy-Artefakt Reentry auf neuer Retrain-Lineage (`BT93R-Reentry`) | completed | P0 | BT93Y.99 `retrain-lineage-ready-bt93r-reentry-ready` + `bt93rReentryAllowed=true` | 93RR.99 abgeschlossen: `eval-mode-bug-fixed-counterprobe-green`, oeffnet nur BT93S | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
 | BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | completed | P1 | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | 93S.99 abgeschlossen: `matrix-redesign-required`, oeffnet nichts | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
-| BT93S2 | Matrix-/Action-Effect Repair nach rotem BT93S | planned | P0 | BT93S.99=`matrix-redesign-required` + User-Intake 2026-04-30 | 93S2.1 | `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md` |
+| BT93S2 | Matrix-/Action-Effect Repair nach rotem BT93S | planned | P0 | BT93S.99=`matrix-redesign-required` + User-Intake 2026-04-30 | 93S2.2 (93S2.1 abgeschlossen: `start-contract-locked`) | `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md` |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | BT93S2.99=`observation-telemetry-required` | blockiert bis BT93S2 nur Telemetrie oeffnet | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | BT93S2.99=`action-selection-green` oder BT93T.99=`telemetry-green` + S2-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93V | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision | planned | P1 | BT93U.99=`reward-ordering-green` | 93V.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3805,7 +3805,7 @@ Pflicht-Evidence:
 
 Quelle: `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-04-30 -->
 
 Scope:
 
@@ -3827,7 +3827,7 @@ Scope-Dateien:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.S2R1 Startvertrag lockt alle BT93S-/BT93RR-Quellen mit Hashes, Resultklassen, SampleCounts, Matrix-ID, ActionSurfaceId, Policy-Lineage, ClaimFlags und aktiven Blockern.
+- [x] DoD.S2R1 Startvertrag lockt alle BT93S-/BT93RR-Quellen mit Hashes, Resultklassen, SampleCounts, Matrix-ID, ActionSurfaceId, Policy-Lineage, ClaimFlags und aktiven Blockern. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_start_contract.py --write-report` -> `data/training/ppo/bt93s2/start_contract.json`)
 - [ ] DoD.S2R2 Matrix v2 trennt Control-Semantik sauber: `no-danger-control` ist ein Stabilitaets-/Non-Success-Control, kein Escape-Erfolgsszenario.
 - [ ] DoD.S2R3 Matrix v2 hat fuer jede Action-Effect-Szenarioklasse eine Positive-Control mit echter Zustandswirkung und eine Negative-Control, die nicht versehentlich Erfolg zaehlt.
 - [ ] DoD.S2R4 `escape-right-open` wird auf v2 mit mindestens einer real wirksamen bestehenden oder kontrolliert neu begruendeten Action belegt; sonst endet der Block `action-space-required`.
@@ -3840,9 +3840,9 @@ Scope-Dateien:
 
 ### 93S2.1 Startvertrag und Invalidation Lock
 
-- [ ] 93S2.1.1 `bt93s2_start_contract.py` liest `BT93S.99`, `93S.1` bis `93S.4`, `BT93RR.99`, Policy-Lineage und ActionSurface-Hash.
-- [ ] 93S2.1.2 Report schreibt alle aktiven Blocker, Szenario-IDs, invalidierte BT93S-Reports, verbotene Folgeaktionen und erlaubte Resultklassen.
-- [ ] 93S2.1.3 Wenn eine Quelle fehlt, untracked ist oder nicht zu `BT93S.99=matrix-redesign-required` passt, endet die Phase `measurement-invalid`.
+- [x] 93S2.1.1 `bt93s2_start_contract.py` liest `BT93S.99`, `93S.1` bis `93S.4`, `BT93RR.99`, Policy-Lineage und ActionSurface-Hash. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_start_contract.py --write-report` -> `data/training/ppo/bt93s2/start_contract.json`)
+- [x] 93S2.1.2 Report schreibt alle aktiven Blocker, Szenario-IDs, invalidierte BT93S-Reports, verbotene Folgeaktionen und erlaubte Resultklassen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_start_contract.py --write-report` -> `data/training/ppo/bt93s2/start_contract.json`)
+- [x] 93S2.1.3 Wenn eine Quelle fehlt, untracked ist oder nicht zu `BT93S.99=matrix-redesign-required` passt, endet die Phase `measurement-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_start_contract.py --write-report` -> `data/training/ppo/bt93s2/start_contract.json`)
 
 Pflicht-Evidence:
 
