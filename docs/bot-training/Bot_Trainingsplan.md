@@ -407,7 +407,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
 | Bot-Codex | BT93RR | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S |
 | Bot-Codex | BT93S | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `matrix-redesign-required`; oeffnet keinen Folgeblock |
-| Bot-Codex | BT93S2 | 2026-04-30 | active | 93S2.2 abgeschlossen; naechster Scope 93S2.3 Existing-Action Effect v2 |
+| Bot-Codex | BT93S2 | 2026-04-30 | active | 93S2.3 abgeschlossen als `measurement-invalid`; kein 93S2.4-Start vor enger Matrix-/Control-Reparatur |
 | - | BT93T | - | frei | blockiert, bis BT93S2.99 `observation-telemetry-required` schreibt |
 | - | BT93U | - | frei | wartet auf BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -933,7 +933,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93Y | PPO Lineage-Recovery/Retraining und Ersatzvergleich | completed | P0 | BT93R.99 `model-artifact-missing` + X0-Preflight-Report `dqn-loader-fix-required` | 93Y.99 abgeschlossen: `retrain-lineage-ready-bt93r-reentry-ready`, oeffnet nur BT93R-Reentry | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
 | BT93RR | Policy-Artefakt Reentry auf neuer Retrain-Lineage (`BT93R-Reentry`) | completed | P0 | BT93Y.99 `retrain-lineage-ready-bt93r-reentry-ready` + `bt93rReentryAllowed=true` | 93RR.99 abgeschlossen: `eval-mode-bug-fixed-counterprobe-green`, oeffnet nur BT93S | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
 | BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | completed | P1 | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | 93S.99 abgeschlossen: `matrix-redesign-required`, oeffnet nichts | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
-| BT93S2 | Matrix-/Action-Effect Repair nach rotem BT93S | planned | P0 | BT93S.99=`matrix-redesign-required` + User-Intake 2026-04-30 | 93S2.2 (93S2.1 abgeschlossen: `start-contract-locked`) | `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md` |
+| BT93S2 | Matrix-/Action-Effect Repair nach rotem BT93S | planned | P0 | BT93S.99=`matrix-redesign-required` + User-Intake 2026-04-30 | 93S2.3 abgeschlossen: `measurement-invalid`, oeffnet nichts | `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md` |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | BT93S2.99=`observation-telemetry-required` | blockiert bis BT93S2 nur Telemetrie oeffnet | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | BT93S2.99=`action-selection-green` oder BT93T.99=`telemetry-green` + S2-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93V | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision | planned | P1 | BT93U.99=`reward-ordering-green` | 93V.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3862,10 +3862,10 @@ Pflicht-Evidence:
 
 ### 93S2.3 Existing-Action Effect v2
 
-- [ ] 93S2.3.1 Bestehende Actions ohne PPO-Training gegen v2 messen.
-- [ ] 93S2.3.2 `escape-right-open`, Side-Wall und Narrowing-Szenarien muessen echte Zustandswirkung zeigen oder exakt als `action-space-required` klassifiziert werden.
-- [ ] 93S2.3.3 `no-danger-control` darf keine Action-Gruen-Evidence liefern; es prueft nur, dass Controls nicht faelschlich Erfolg erzeugen.
-- [ ] 93S2.3.4 Command-Flag-Only, Reward-Only und MaxStep-Proxies werden maschinenlesbar abgelehnt.
+- [x] 93S2.3.1 Bestehende Actions ohne PPO-Training gegen v2 messen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_existing_action_effect_v2.py --write-report` -> `data/training/ppo/bt93s2/existing_action_effect_v2_report.json`, `probeCount=338`, `newTrainingEpisodes=0`, `holdoutEpisodes=0`, `resultClass=measurement-invalid`)
+- [x] 93S2.3.2 `escape-right-open`, Side-Wall und Narrowing-Szenarien muessen echte Zustandswirkung zeigen oder exakt als `action-space-required` klassifiziert werden. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_existing_action_effect_v2.py --write-report` -> `data/training/ppo/bt93s2/existing_action_effect_v2_report.json`, `actionSpaceRequiredScenarioIds=[escape-right-open]`, `side-wall-left/side-wall-right/narrowing-corridor=existing-action-effect-observed`)
+- [x] 93S2.3.3 `no-danger-control` darf keine Action-Gruen-Evidence liefern; es prueft nur, dass Controls nicht faelschlich Erfolg erzeugen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_existing_action_effect_v2.py --write-report` -> `data/training/ppo/bt93s2/existing_action_effect_v2_report.json`, `noDangerControl.actionGreenEvidenceProduced=false`, `classResult=neutral-control-unstable`)
+- [x] 93S2.3.4 Command-Flag-Only, Reward-Only und MaxStep-Proxies werden maschinenlesbar abgelehnt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_existing_action_effect_v2.py --write-report` -> `data/training/ppo/bt93s2/existing_action_effect_v2_report.json`, `forbiddenProxyRejection.successRequiresStateEffect=true`, `opensNext=[]`)
 
 Pflicht-Evidence:
 

@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 409,
+          "concreteCount": 411,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 547,
+          "concreteCount": 549,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 405,
+          "concreteCount": 407,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 404,
+          "concreteCount": 406,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1046,
+          "concreteCount": 1048,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1054,
+          "concreteCount": 1056,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1806,7 +1806,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2.3",
+        "currentPhase": "93S2.4",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2/action_surface_repair_decision.json",
           "data/training/ppo/bt93s2/bt93s2_closure_gate_report.json",
@@ -1816,12 +1816,13 @@
           "data/training/ppo/bt93s2/scenario_search_report.json",
           "data/training/ppo/bt93s2/start_contract.json",
           "docs/bot-training/Bot_Trainingsplan.md",
+          "python/scripts/bt93s2_existing_action_effect_v2.py",
           "python/scripts/bt93s2_scenario_matrix_v2.py",
           "python/scripts/bt93s2_start_contract.py"
         ],
         "scopeResolution": {
-          "concreteCount": 6,
-          "plannedCount": 4
+          "concreteCount": 8,
+          "plannedCount": 3
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5309,7 +5310,7 @@
       "id": "BT93S2.3",
       "type": "phase",
       "title": "Existing-Action Effect v2",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2",
         "phaseCode": "93S2.3"
@@ -15182,8 +15183,8 @@
     {
       "id": "BT93S2.3.1",
       "type": "subphase",
-      "title": "Bestehende Actions ohne PPO-Training gegen v2 messen.",
-      "status": "open",
+      "title": "Bestehende Actions ohne PPO-Training gegen v2 messen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_existing_action_effect_v2.py --write-report` -> `data/training/ppo/bt93s2/existing_action_effect_v2_report.json`, `probeCount=338`, `newTrainingEpisodes=0`, `holdoutEpisodes=0`, `resultClass=measurement-invalid`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2",
         "phaseCode": "93S2.3",
@@ -15193,8 +15194,8 @@
     {
       "id": "BT93S2.3.2",
       "type": "subphase",
-      "title": "`escape-right-open`, Side-Wall und Narrowing-Szenarien muessen echte Zustandswirkung zeigen oder exakt als `action-space-required` klassifiziert werden.",
-      "status": "open",
+      "title": "`escape-right-open`, Side-Wall und Narrowing-Szenarien muessen echte Zustandswirkung zeigen oder exakt als `action-space-required` klassifiziert werden. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_existing_action_effect_v2.py --write-report` -> `data/training/ppo/bt93s2/existing_action_effect_v2_report.json`, `actionSpaceRequiredScenarioIds=[escape-right-open]`, `side-wall-left/side-wall-right/narrowing-corridor=existing-action-effect-observed`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2",
         "phaseCode": "93S2.3",
@@ -15204,8 +15205,8 @@
     {
       "id": "BT93S2.3.3",
       "type": "subphase",
-      "title": "`no-danger-control` darf keine Action-Gruen-Evidence liefern; es prueft nur, dass Controls nicht faelschlich Erfolg erzeugen.",
-      "status": "open",
+      "title": "`no-danger-control` darf keine Action-Gruen-Evidence liefern; es prueft nur, dass Controls nicht faelschlich Erfolg erzeugen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_existing_action_effect_v2.py --write-report` -> `data/training/ppo/bt93s2/existing_action_effect_v2_report.json`, `noDangerControl.actionGreenEvidenceProduced=false`, `classResult=neutral-control-unstable`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2",
         "phaseCode": "93S2.3",
@@ -15215,8 +15216,8 @@
     {
       "id": "BT93S2.3.4",
       "type": "subphase",
-      "title": "Command-Flag-Only, Reward-Only und MaxStep-Proxies werden maschinenlesbar abgelehnt.",
-      "status": "open",
+      "title": "Command-Flag-Only, Reward-Only und MaxStep-Proxies werden maschinenlesbar abgelehnt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2_existing_action_effect_v2.py --write-report` -> `data/training/ppo/bt93s2/existing_action_effect_v2_report.json`, `forbiddenProxyRejection.successRequiresStateEffect=true`, `opensNext=[]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2",
         "phaseCode": "93S2.3",
@@ -30607,9 +30608,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -38959,6 +38966,27 @@
           "BT93D",
           "BT93E",
           "BT93S"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2"
         ],
         "exists": true
       }
@@ -76454,6 +76482,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v2_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -78003,6 +78040,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s_scenario_window_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -80332,6 +80378,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v2_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -81863,6 +81918,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s_scenario_window_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -85390,6 +85454,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v2_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -86930,6 +87003,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s_scenario_window_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -89558,6 +89640,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v2_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -91098,6 +91189,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s_scenario_window_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -100130,6 +100230,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v2_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -101670,6 +101779,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s_scenario_window_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -109877,6 +109995,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v2_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -111426,6 +111553,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s_scenario_window_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -138326,6 +138462,15 @@
     {
       "from": "BT93S2",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2",
+      "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
       "type": "scope",
       "hint": null,
       "attributes": {
