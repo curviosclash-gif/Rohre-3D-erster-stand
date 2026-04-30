@@ -400,7 +400,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93R | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `model-artifact-missing`; kein R-Allowlist-Ergebnis, BT93S bleibt blockiert |
 | Bot-Codex | BT93X.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als read-only `dqn-loader-fix-required`; oeffnet nichts |
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
-| Bot-Codex | BT93RR | 2026-04-30 | active | 93RR.1 Artifact-Probe und Handover-Lock; kein BT93S/O/P/94A-Signal |
+| Bot-Codex | BT93RR | 2026-04-30 | active | 93RR.2 Collapse-Root-Cause; kein BT93S/O/P/94A-Signal |
 | - | BT93S | - | frei | wartet auf BT93Y.99 plus erneutes BT93RR.99 in R-Allowlist |
 | - | BT93T | - | frei | wartet auf Telemetry-Start aus BT93S |
 | - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
@@ -925,7 +925,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93R | Policy-Artefakt und deterministic-collapse Repair | completed | P1 | PF.0 `preflight-green` oder dokumentierte User-Ausnahme | 93R.99 abgeschlossen: `model-artifact-missing`; kein R-Allowlist-Ergebnis | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93X.0 | Early Comparator Preflight | completed | P1 | PF.0 `preflight-green`; read-only | 93X.0 abgeschlossen: `dqn-loader-fix-required`; oeffnet nichts | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93Y | PPO Lineage-Recovery/Retraining und Ersatzvergleich | completed | P0 | BT93R.99 `model-artifact-missing` + X0-Preflight-Report `dqn-loader-fix-required` | 93Y.99 abgeschlossen: `retrain-lineage-ready-bt93r-reentry-ready`, oeffnet nur BT93R-Reentry | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
-| BT93RR | Policy-Artefakt Reentry auf neuer Retrain-Lineage (`BT93R-Reentry`) | planned | P0 | BT93Y.99 `retrain-lineage-ready-bt93r-reentry-ready` + `bt93rReentryAllowed=true` | 93RR.1 | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
+| BT93RR | Policy-Artefakt Reentry auf neuer Retrain-Lineage (`BT93R-Reentry`) | planned | P0 | BT93Y.99 `retrain-lineage-ready-bt93r-reentry-ready` + `bt93rReentryAllowed=true` | 93RR.2 | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
 | BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | planned | P1 | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | 93S.1 gesperrt | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | BT93S.99=`observation-telemetry-required` oder Telemetry-Start | 93T.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | BT93T.99=`telemetry-green` + S-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3663,8 +3663,8 @@ Primaerer Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.RR1 Reentry-Handover pinnt `BT93Y.99`, aktive Lineage, Matrix-ID, ActionSurfaceId, RewardProfileId, SemanticWindow, verbotene Signale und erlaubte Resultklassen.
-- [ ] DoD.RR2 Artifact-Probe laedt Modell, Config, VecNormalize, Optimizer-State und Action-Surface deterministisch oder endet `policy-evidence-invalid`.
+- [x] DoD.RR1 Reentry-Handover pinnt `BT93Y.99`, aktive Lineage, Matrix-ID, ActionSurfaceId, RewardProfileId, SemanticWindow, verbotene Signale und erlaubte Resultklassen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_handover_lock.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json`, `resultClass=reentry-handover-lock-green`)
+- [x] DoD.RR2 Artifact-Probe laedt Modell, Config, VecNormalize, Optimizer-State und Action-Surface deterministisch oder endet `policy-evidence-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_artifact_probe.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json`, `resultClass=artifact-probe-green`)
 - [ ] DoD.RR3 Root-Cause trennt deterministic eval, stochastic eval, train sampling, decoder/argmax, entropy/logits, normalize-state, action mapping, reward pressure und truncation/terminal bias.
 - [ ] DoD.RR4 Counterprobe nutzt dieselbe Matrix und mindestens Eval-Seeds 944, 945, 946 plus kleine zusaetzliche Seed-Kontrolle; maximal 1k Diagnose-Timesteps, kein Qualitaetsclaim.
 - [ ] DoD.RR5 Gruen ist nur `policy-collapse-green`, `decoder-fix-counterprobe-green`, `normalize-fix-counterprobe-green` oder `eval-mode-bug-fixed-counterprobe-green`.
@@ -3673,10 +3673,10 @@ Primaerer Scope:
 
 ### 93RR.1 Artifact-Probe und Handover-Lock
 
-- [ ] 93RR.1.1 `bt93r_reentry_handover_lock_report.json` liest und hasht BT93Y-Closure, Reentry-Manifest, Retrain-Lineage, Replacement-Policy und alte rote BT93R-/BT93X.0-Quellen.
-- [ ] 93RR.1.2 `bt93r_reentry_artifact_probe_report.json` laedt Modell, Config, VecNormalize, Optimizer-State, Observation-Length, ActionSurfaceId und Decoder-Mapping.
-- [ ] 93RR.1.3 Reentry schreibt echte Logits/Action-Probs fuer gepinnte Observation-Samples; Proxy-Counts bleiben als Fix-Beweis ungueltig.
-- [ ] 93RR.1.4 Wenn Lineage, Hashes, Loader oder Action-Surface nicht urteilsfaehig sind, endet die Phase `policy-evidence-invalid` oder `measurement-invalid`.
+- [x] 93RR.1.1 `bt93r_reentry_handover_lock_report.json` liest und hasht BT93Y-Closure, Reentry-Manifest, Retrain-Lineage, Replacement-Policy und alte rote BT93R-/BT93X.0-Quellen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_handover_lock.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json`, `phaseCoverage.93RR.1.1=true`)
+- [x] 93RR.1.2 `bt93r_reentry_artifact_probe_report.json` laedt Modell, Config, VecNormalize, Optimizer-State, Observation-Length, ActionSurfaceId und Decoder-Mapping. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_artifact_probe.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json`, `loaderSmoke.modelLoaded=true`, `optimizerStateLoaded=true`)
+- [x] 93RR.1.3 Reentry schreibt echte Logits/Action-Probs fuer gepinnte Observation-Samples; Proxy-Counts bleiben als Fix-Beweis ungueltig. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_artifact_probe.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json`, `observationProbe.realPolicyDistributionAvailable=true`, `sampleCounts.observationSamples=3`)
+- [x] 93RR.1.4 Wenn Lineage, Hashes, Loader oder Action-Surface nicht urteilsfaehig sind, endet die Phase `policy-evidence-invalid` oder `measurement-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_artifact_probe.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json`, `resultClass=artifact-probe-green`)
 
 Pflicht-Evidence:
 

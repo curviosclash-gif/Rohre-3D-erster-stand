@@ -1,0 +1,654 @@
+{
+  "actionSurface": {
+    "decoderMapping": [
+      {
+        "semanticAction": "noop",
+        "token": 0
+      },
+      {
+        "semanticAction": "yaw-left",
+        "token": 1
+      },
+      {
+        "semanticAction": "yaw-right",
+        "token": 2
+      },
+      {
+        "semanticAction": "pitch-up",
+        "token": 3
+      },
+      {
+        "semanticAction": "pitch-down",
+        "token": 4
+      },
+      {
+        "semanticAction": "roll-left",
+        "token": 5
+      },
+      {
+        "semanticAction": "roll-right",
+        "token": 6
+      },
+      {
+        "semanticAction": "boost",
+        "token": 7
+      },
+      {
+        "semanticAction": "shoot-mg",
+        "token": 8
+      },
+      {
+        "semanticAction": "turn-left-boost",
+        "token": 9
+      },
+      {
+        "semanticAction": "turn-right-boost",
+        "token": 10
+      },
+      {
+        "semanticAction": "evade-left",
+        "token": 11
+      },
+      {
+        "semanticAction": "evade-right",
+        "token": 12
+      }
+    ],
+    "decoderMappingMatchesConfig": true,
+    "expectedSourceSha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "gymSpace": "Discrete",
+    "hashMatchesConfig": true,
+    "semanticActionCount": 13,
+    "semanticActions": [
+      "noop",
+      "yaw-left",
+      "yaw-right",
+      "pitch-up",
+      "pitch-down",
+      "roll-left",
+      "roll-right",
+      "boost",
+      "shoot-mg",
+      "turn-left-boost",
+      "turn-right-boost",
+      "evade-left",
+      "evade-right"
+    ],
+    "sourcePath": "python/envs/ppo_action_surface.py",
+    "sourceSha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "surfaceId": "bt93q-walltrail-semantic-action-v1"
+  },
+  "allowNext": [
+    "93RR.2 collapse-root-cause"
+  ],
+  "blockId": "BT93RR",
+  "blocksNext": [
+    "BT93S claim before BT93R-Reentry.99 in R-Allowlist",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "reward/action/telemetry/safety fix during 93RR.1"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93r_reentry_artifact_probe.py --write-report"
+  },
+  "elapsedMs": 4283.0242,
+  "generatedAt": "2026-04-30T12:11:13Z",
+  "generatedBy": "python/scripts/bt93r_reentry_artifact_probe.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "e0ef6e64eaf7d1f69e9a6f507059b6ed8fbdc00f"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffSignal": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promoteAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "lineage": {
+    "lineageId": "bt93y-retrain-lineage-v1",
+    "lineageKind": "new-retrain-lineage-not-bt93n",
+    "matrixHash": "a8e17c34cc152bf73d6e6d43e11aa12b3cffae9a2caf26601ebd22b94d4b7bad",
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "notBt93nLineage": true,
+    "rewardProfileId": "bt93n-wall-trail-stability-v1",
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "loaderSmoke": {
+    "configLoaded": true,
+    "errors": [],
+    "forwardPassOk": true,
+    "handoverLockGreen": true,
+    "modelLoadAttempted": true,
+    "modelLoaded": true,
+    "normalizerLoaded": true,
+    "optimizerStateLoaded": true
+  },
+  "modelSummary": {
+    "actionSpace": "Discrete(13)",
+    "device": "cpu",
+    "nEnv": 1,
+    "numTimesteps": 512,
+    "observationLength": 64,
+    "observationSpace": "Box(-inf, inf, (64,), float32)",
+    "policyClass": "ActorCriticPolicy"
+  },
+  "observationProbe": {
+    "notQualityEvidenceReason": "Observation samples prove loader/logit availability only; no quality or survival judgement is made in 93RR.1.",
+    "qualityClaimAllowed": false,
+    "realPolicyDistributionAvailable": true,
+    "samples": [
+      {
+        "deterministicAction": "evade-right",
+        "deterministicActionToken": 12,
+        "distribution": {
+          "argmaxAction": "evade-right",
+          "argmaxMargin": 0.00044,
+          "argmaxProbability": 0.081594,
+          "argmaxToken": 12,
+          "entropy": 2.564335,
+          "rankedActions": [
+            {
+              "logit": -2.506001,
+              "probability": 0.081594,
+              "semanticAction": "evade-right",
+              "token": 12
+            },
+            {
+              "logit": -2.511406,
+              "probability": 0.081154,
+              "semanticAction": "boost",
+              "token": 7
+            },
+            {
+              "logit": -2.531077,
+              "probability": 0.079573,
+              "semanticAction": "roll-right",
+              "token": 6
+            },
+            {
+              "logit": -2.541346,
+              "probability": 0.07876,
+              "semanticAction": "shoot-mg",
+              "token": 8
+            },
+            {
+              "logit": -2.550648,
+              "probability": 0.078031,
+              "semanticAction": "turn-left-boost",
+              "token": 9
+            },
+            {
+              "logit": -2.560819,
+              "probability": 0.077241,
+              "semanticAction": "turn-right-boost",
+              "token": 10
+            },
+            {
+              "logit": -2.569389,
+              "probability": 0.076582,
+              "semanticAction": "noop",
+              "token": 0
+            },
+            {
+              "logit": -2.573318,
+              "probability": 0.076282,
+              "semanticAction": "roll-left",
+              "token": 5
+            },
+            {
+              "logit": -2.579755,
+              "probability": 0.075793,
+              "semanticAction": "pitch-down",
+              "token": 4
+            },
+            {
+              "logit": -2.59576,
+              "probability": 0.074589,
+              "semanticAction": "evade-left",
+              "token": 11
+            },
+            {
+              "logit": -2.606618,
+              "probability": 0.073784,
+              "semanticAction": "yaw-right",
+              "token": 2
+            },
+            {
+              "logit": -2.609999,
+              "probability": 0.073535,
+              "semanticAction": "pitch-up",
+              "token": 3
+            },
+            {
+              "logit": -2.616182,
+              "probability": 0.073081,
+              "semanticAction": "yaw-left",
+              "token": 1
+            }
+          ],
+          "secondBestAction": "boost",
+          "secondBestProbability": 0.081154,
+          "secondBestToken": 7
+        },
+        "observationLength": 64,
+        "observationShape": [
+          1,
+          64
+        ],
+        "seed": 944
+      },
+      {
+        "deterministicAction": "shoot-mg",
+        "deterministicActionToken": 8,
+        "distribution": {
+          "argmaxAction": "shoot-mg",
+          "argmaxMargin": 0.001095,
+          "argmaxProbability": 0.07942,
+          "argmaxToken": 8,
+          "entropy": 2.564751,
+          "rankedActions": [
+            {
+              "logit": -2.533009,
+              "probability": 0.07942,
+              "semanticAction": "shoot-mg",
+              "token": 8
+            },
+            {
+              "logit": -2.546891,
+              "probability": 0.078325,
+              "semanticAction": "noop",
+              "token": 0
+            },
+            {
+              "logit": -2.547266,
+              "probability": 0.078295,
+              "semanticAction": "boost",
+              "token": 7
+            },
+            {
+              "logit": -2.550595,
+              "probability": 0.078035,
+              "semanticAction": "turn-left-boost",
+              "token": 9
+            },
+            {
+              "logit": -2.550696,
+              "probability": 0.078027,
+              "semanticAction": "roll-right",
+              "token": 6
+            },
+            {
+              "logit": -2.551481,
+              "probability": 0.077966,
+              "semanticAction": "pitch-down",
+              "token": 4
+            },
+            {
+              "logit": -2.557491,
+              "probability": 0.077499,
+              "semanticAction": "evade-right",
+              "token": 12
+            },
+            {
+              "logit": -2.570034,
+              "probability": 0.076533,
+              "semanticAction": "yaw-left",
+              "token": 1
+            },
+            {
+              "logit": -2.579509,
+              "probability": 0.075811,
+              "semanticAction": "yaw-right",
+              "token": 2
+            },
+            {
+              "logit": -2.582528,
+              "probability": 0.075583,
+              "semanticAction": "roll-left",
+              "token": 5
+            },
+            {
+              "logit": -2.587545,
+              "probability": 0.075204,
+              "semanticAction": "pitch-up",
+              "token": 3
+            },
+            {
+              "logit": -2.59391,
+              "probability": 0.074727,
+              "semanticAction": "evade-left",
+              "token": 11
+            },
+            {
+              "logit": -2.595963,
+              "probability": 0.074574,
+              "semanticAction": "turn-right-boost",
+              "token": 10
+            }
+          ],
+          "secondBestAction": "noop",
+          "secondBestProbability": 0.078325,
+          "secondBestToken": 0
+        },
+        "observationLength": 64,
+        "observationShape": [
+          1,
+          64
+        ],
+        "seed": 945
+      },
+      {
+        "deterministicAction": "shoot-mg",
+        "deterministicActionToken": 8,
+        "distribution": {
+          "argmaxAction": "shoot-mg",
+          "argmaxMargin": 7e-05,
+          "argmaxProbability": 0.079297,
+          "argmaxToken": 8,
+          "entropy": 2.564698,
+          "rankedActions": [
+            {
+              "logit": -2.534549,
+              "probability": 0.079297,
+              "semanticAction": "shoot-mg",
+              "token": 8
+            },
+            {
+              "logit": -2.535437,
+              "probability": 0.079227,
+              "semanticAction": "evade-right",
+              "token": 12
+            },
+            {
+              "logit": -2.544684,
+              "probability": 0.078498,
+              "semanticAction": "roll-right",
+              "token": 6
+            },
+            {
+              "logit": -2.544984,
+              "probability": 0.078474,
+              "semanticAction": "turn-left-boost",
+              "token": 9
+            },
+            {
+              "logit": -2.547569,
+              "probability": 0.078272,
+              "semanticAction": "boost",
+              "token": 7
+            },
+            {
+              "logit": -2.557113,
+              "probability": 0.077528,
+              "semanticAction": "noop",
+              "token": 0
+            },
+            {
+              "logit": -2.557811,
+              "probability": 0.077474,
+              "semanticAction": "pitch-down",
+              "token": 4
+            },
+            {
+              "logit": -2.576369,
+              "probability": 0.07605,
+              "semanticAction": "yaw-left",
+              "token": 1
+            },
+            {
+              "logit": -2.579611,
+              "probability": 0.075803,
+              "semanticAction": "yaw-right",
+              "token": 2
+            },
+            {
+              "logit": -2.583495,
+              "probability": 0.07551,
+              "semanticAction": "pitch-up",
+              "token": 3
+            },
+            {
+              "logit": -2.590745,
+              "probability": 0.074964,
+              "semanticAction": "roll-left",
+              "token": 5
+            },
+            {
+              "logit": -2.593758,
+              "probability": 0.074739,
+              "semanticAction": "evade-left",
+              "token": 11
+            },
+            {
+              "logit": -2.601483,
+              "probability": 0.074164,
+              "semanticAction": "turn-right-boost",
+              "token": 10
+            }
+          ],
+          "secondBestAction": "evade-right",
+          "secondBestProbability": 0.079227,
+          "secondBestToken": 12
+        },
+        "observationLength": 64,
+        "observationShape": [
+          1,
+          64
+        ],
+        "seed": 946
+      }
+    ],
+    "seeds": [
+      944,
+      945,
+      946
+    ]
+  },
+  "ok": true,
+  "opensNext": [
+    "93RR.2"
+  ],
+  "optimizerState": {
+    "loaded": true,
+    "paramGroupCount": 1,
+    "stateEntryCount": 12,
+    "topLevelKeys": [
+      "param_groups",
+      "state"
+    ],
+    "type": "dict"
+  },
+  "phaseCoverage": {
+    "93RR.1.1": true,
+    "93RR.1.2": true,
+    "93RR.1.3": true,
+    "93RR.1.4": true,
+    "DoD.RR2": true
+  },
+  "phaseId": "93RR.1",
+  "resultClass": "artifact-probe-green",
+  "sampleCounts": {
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 0,
+    "newTrainingEpisodes": 0,
+    "observationSamples": 3,
+    "probeSeeds": [
+      944,
+      945,
+      946
+    ],
+    "steps": 0
+  },
+  "schemaVersion": "bt93rr-reentry-artifact-probe-report-v1",
+  "sourceArtifacts": [
+    {
+      "blockId": "BT93RR",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "phaseId": "93RR.1",
+      "resultClass": "reentry-handover-lock-green",
+      "role": "BT93RR.1 handover lock",
+      "schemaVersion": "bt93rr-reentry-handover-lock-report-v1",
+      "sha256": "2673af47d1dcb319899e7f2e5b18be677254c15a9347f26d3538325632769350",
+      "sizeBytes": 14502,
+      "sourceKey": "bt93rrHandoverLock",
+      "tracked": false
+    },
+    {
+      "blockId": "BT93Y",
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/config.json",
+      "phaseId": "93Y.3",
+      "resultClass": null,
+      "role": "BT93Y retrain-lineage config",
+      "schemaVersion": "bt93y-retrain-lineage-config-v1",
+      "sha256": "997a8f83e9d179be6cb0dbb311c6047d25cb8a7aa88874405e399f33be917b69",
+      "sizeBytes": 2597,
+      "sourceKey": "bt93yConfig",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/model.zip",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93Y retrain-lineage model",
+      "schemaVersion": null,
+      "sha256": "75075c65d08b113b8914b55553b04889d7a57c536a36303a820f620572c9f5f8",
+      "sizeBytes": 240642,
+      "sourceKey": "bt93yModel",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93Y retrain-lineage VecNormalize",
+      "schemaVersion": null,
+      "sha256": "4a4b144a7bde775bfcaa639de8c68a67b1ec6bfb057c84c7f2d290330f39604a",
+      "sizeBytes": 3647,
+      "sourceKey": "bt93yVecNormalize",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/optimizer_state.pt",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93Y retrain-lineage optimizer state",
+      "schemaVersion": null,
+      "sha256": "47364a4ddb9b1e07083a564de3ab6207fc819400a335a2b3b3ba4784b66a78e5",
+      "sizeBytes": 151047,
+      "sourceKey": "bt93yOptimizerState",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Y",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/artifact_manifest.json",
+      "phaseId": "93Y.3",
+      "resultClass": null,
+      "role": "BT93Y retrain-lineage artifact manifest",
+      "schemaVersion": "bt93y-retrain-artifact-manifest-v1",
+      "sha256": "c57ee3cc970b7aca33b8a1cab590c748e245fdcf5ab0e2830e4163cff78be7d4",
+      "sizeBytes": 6762,
+      "sourceKey": "bt93yPackageManifest",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Y",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/training_report.json",
+      "phaseId": "93Y.3",
+      "resultClass": null,
+      "role": "BT93Y retrain-lineage training report",
+      "schemaVersion": "bt93y-retrain-training-report-v1",
+      "sha256": "5e4d353e04b30ddc6b0e4d8fe33845d205cb08d48d5bea8f9339e757dede924a",
+      "sizeBytes": 17682,
+      "sourceKey": "bt93yTrainingReport",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current PPO action-surface source",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sizeBytes": 22887,
+      "sourceKey": "ppoActionSurface",
+      "tracked": true
+    }
+  ],
+  "summary": {
+    "actionSurfaceMatchesConfig": true,
+    "bt93oStartDecision": "blocked",
+    "bt93pStartDecision": "blocked",
+    "bt93sStartDecision": "blocked until BT93R-Reentry.99 in R-Allowlist",
+    "bt94aStartDecision": "blocked",
+    "finalResult": "artifact-probe-green",
+    "modelLoadable": true,
+    "nextBestAction": "Run 93RR.2 collapse-root-cause only; no fix work yet.",
+    "optimizerStateLoadable": true,
+    "realLogitsAvailable": true
+  }
+}
