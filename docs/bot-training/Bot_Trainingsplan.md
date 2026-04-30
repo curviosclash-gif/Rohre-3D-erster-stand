@@ -3956,7 +3956,7 @@ Scope-Dateien:
 
 - [x] DoD.S2R-R1 Quellen aus S2.1-S2.3 sind mit Hash, Git-SHA, Resultklassen, SampleCounts, Matrix-ID, ActionSurfaceId, Decoder-Hash und ClaimFlags gelockt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_failure_taxonomy.py --write-report` -> `data/training/ppo/bt93s2r/failure_taxonomy_report.json`)
 - [x] DoD.S2R-R2 Failure-Taxonomie enthaelt alle S2.3-Befunde: `escape-left-open negative-control-failed`, `escape-right-open action-space-required candidate`, `no-danger-control neutral-control-unstable`, `side-wall-left direction/control mismatch`, `predicateFailureCount=48`, `minimumWindowFailureCount=12`, `commandFlagWithoutStateEffectCount=118`, `rewardOnlyRejectedCount=77`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_failure_taxonomy.py --write-report` -> `data/training/ppo/bt93s2r/failure_taxonomy_report.json`)
-- [ ] DoD.S2R-R3 Trace-Audit reproduziert die roten Seeds/Actions und benennt pro Befund genau eine primaere Root-Cause-Klasse oder `measurement-invalid`.
+- [x] DoD.S2R-R3 Trace-Audit reproduziert die roten Seeds/Actions und benennt pro Befund genau eine primaere Root-Cause-Klasse oder `measurement-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)
 - [ ] DoD.S2R-R4 Matrix-/Control-v3 trennt passive Drift von echter gerichteter Escape-Wirkung; `noop` darf nie Escape-Erfolg sein.
 - [ ] DoD.S2R-R5 `escape-right-open` wird erst als echte Action-Space-Luecke bewertet, wenn v3-Predicate, Warmup, Positive-Control, Negative-Control und Minimum-Window gruen sind.
 - [ ] DoD.S2R-R6 `side-wall-left` hat konsistente Label-/Koordinaten-/Control-Semantik; ein falsches Direction-Gruen stoppt rot.
@@ -3978,11 +3978,11 @@ Evidence:
 
 ### 93S2R.2 Targeted Trace Audit
 
-- [ ] 93S2R.2.1 `escape-left-open` fuer `noop` und positive Controls mit State-/Risk-/Heading-/Reward-/Command-Trace reproduzieren.
-- [ ] 93S2R.2.2 `escape-right-open` fuer positive Controls reproduzieren und Predicate-/Window-Fairness von echter Action-Space-Luecke trennen.
-- [ ] 93S2R.2.3 `no-danger-control` fuer `noop`, `boost`, `shoot-mg` reproduzieren und Neutral-Stabilitaet klaeren.
-- [ ] 93S2R.2.4 `side-wall-left` fuer positive Controls und `yaw-right` reproduzieren und Direction-Drift klaeren.
-- [ ] 93S2R.2.5 Predicate-/Minimum-Window-Failures gegen Session-ID, Warmup, MaxSteps, Seed-Split und Revalidation-Paritaet pruefen.
+- [x] 93S2R.2.1 `escape-left-open` fuer `noop` und positive Controls mit State-/Risk-/Heading-/Reward-/Command-Trace reproduzieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)
+- [x] 93S2R.2.2 `escape-right-open` fuer positive Controls reproduzieren und Predicate-/Window-Fairness von echter Action-Space-Luecke trennen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)
+- [x] 93S2R.2.3 `no-danger-control` fuer `noop`, `boost`, `shoot-mg` reproduzieren und Neutral-Stabilitaet klaeren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)
+- [x] 93S2R.2.4 `side-wall-left` fuer positive Controls und `yaw-right` reproduzieren und Direction-Drift klaeren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)
+- [x] 93S2R.2.5 Predicate-/Minimum-Window-Failures gegen Session-ID, Warmup, MaxSteps, Seed-Split und Revalidation-Paritaet pruefen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)
 
 Evidence:
 

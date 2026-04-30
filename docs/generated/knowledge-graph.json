@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 413,
+          "concreteCount": 415,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 551,
+          "concreteCount": 553,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 409,
+          "concreteCount": 411,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 408,
+          "concreteCount": 410,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1050,
+          "concreteCount": 1052,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1058,
+          "concreteCount": 1060,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1840,7 +1840,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2R.2",
+        "currentPhase": "93S2R.3",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json",
           "data/training/ppo/bt93s2r/failure_taxonomy_report.json",
@@ -1848,11 +1848,12 @@
           "data/training/ppo/bt93s2r/scenario_matrix_v3_contract.json",
           "data/training/ppo/bt93s2r/targeted_trace_audit_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
-          "python/scripts/bt93s2r_failure_taxonomy.py"
+          "python/scripts/bt93s2r_failure_taxonomy.py",
+          "python/scripts/bt93s2r_targeted_trace_audit.py"
         ],
         "scopeResolution": {
-          "concreteCount": 3,
-          "plannedCount": 4
+          "concreteCount": 5,
+          "plannedCount": 3
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5390,7 +5391,7 @@
       "id": "BT93S2R.2",
       "type": "phase",
       "title": "Targeted Trace Audit",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.2"
@@ -15472,8 +15473,8 @@
     {
       "id": "BT93S2R.2.1",
       "type": "subphase",
-      "title": "`escape-left-open` fuer `noop` und positive Controls mit State-/Risk-/Heading-/Reward-/Command-Trace reproduzieren.",
-      "status": "open",
+      "title": "`escape-left-open` fuer `noop` und positive Controls mit State-/Risk-/Heading-/Reward-/Command-Trace reproduzieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.2",
@@ -15483,8 +15484,8 @@
     {
       "id": "BT93S2R.2.2",
       "type": "subphase",
-      "title": "`escape-right-open` fuer positive Controls reproduzieren und Predicate-/Window-Fairness von echter Action-Space-Luecke trennen.",
-      "status": "open",
+      "title": "`escape-right-open` fuer positive Controls reproduzieren und Predicate-/Window-Fairness von echter Action-Space-Luecke trennen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.2",
@@ -15494,8 +15495,8 @@
     {
       "id": "BT93S2R.2.3",
       "type": "subphase",
-      "title": "`no-danger-control` fuer `noop`, `boost`, `shoot-mg` reproduzieren und Neutral-Stabilitaet klaeren.",
-      "status": "open",
+      "title": "`no-danger-control` fuer `noop`, `boost`, `shoot-mg` reproduzieren und Neutral-Stabilitaet klaeren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.2",
@@ -15505,8 +15506,8 @@
     {
       "id": "BT93S2R.2.4",
       "type": "subphase",
-      "title": "`side-wall-left` fuer positive Controls und `yaw-right` reproduzieren und Direction-Drift klaeren.",
-      "status": "open",
+      "title": "`side-wall-left` fuer positive Controls und `yaw-right` reproduzieren und Direction-Drift klaeren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.2",
@@ -15516,8 +15517,8 @@
     {
       "id": "BT93S2R.2.5",
       "type": "subphase",
-      "title": "Predicate-/Minimum-Window-Failures gegen Session-ID, Warmup, MaxSteps, Seed-Split und Revalidation-Paritaet pruefen.",
-      "status": "open",
+      "title": "Predicate-/Minimum-Window-Failures gegen Session-ID, Warmup, MaxSteps, Seed-Split und Revalidation-Paritaet pruefen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_targeted_trace_audit.py --write-report` -> `data/training/ppo/bt93s2r/targeted_trace_audit_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.2",
@@ -31095,9 +31096,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -39454,6 +39461,27 @@
     },
     {
       "id": "python/scripts/bt93s2r_failure_taxonomy.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r_targeted_trace_audit.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -76967,6 +76995,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r/targeted_trace_audit_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -78525,6 +78562,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r_failure_taxonomy.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -80881,6 +80927,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r/targeted_trace_audit_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -82421,6 +82476,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r_failure_taxonomy.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -85975,6 +86039,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r/targeted_trace_audit_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -87524,6 +87597,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r_failure_taxonomy.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -90179,6 +90261,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r/targeted_trace_audit_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -91728,6 +91819,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r_failure_taxonomy.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -100787,6 +100887,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r/targeted_trace_audit_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -102336,6 +102445,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r_failure_taxonomy.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -110570,6 +110688,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r/targeted_trace_audit_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -112128,6 +112255,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r_failure_taxonomy.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -139403,6 +139539,15 @@
     {
       "from": "BT93S2R",
       "to": "python/scripts/bt93s2r_failure_taxonomy.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R",
+      "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
       "type": "scope",
       "hint": null,
       "attributes": {
