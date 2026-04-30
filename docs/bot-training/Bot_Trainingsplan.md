@@ -327,7 +327,7 @@ Mikro-Claim-Regel:
 | BT93U | BT93T.99=`telemetry-green` + S-Recheck `action-selection-green` | hard | nein | Danger-aware Reward- und Objective-Ordering Repair |
 | BT93V | BT93U.99=`reward-ordering-green` | hard | nein | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision |
 | BT93W | BT93V.99=`safety-diagnostic-nonblocking` + `terminal-nonblocking` | hard | nein | integrierter WallTrail-10k-Recheck und BT93O-Startgate |
-| BT93X.0 | PF.0 `preflight-green`; read-only | soft | ja | frueher Comparator-Preflight ohne positives Startsignal |
+| BT93X.0 | PF.0 `preflight-green`; read-only | soft | ja | abgeschlossen read-only als `dqn-loader-fix-required`; kein positives Startsignal |
 | BT93O | BT93W.99 `bt93o-precondition-green` | hard | nein | Action-/Objective-Qualitaet und Anti-Plateau; einzig gruener Ausgang `bt93o-quality-green` |
 | BT93X | BT93O.99 `bt93o-quality-green` + 93X.0 completed | hard | nein | Same-Matrix-DQN oder User-Ersatzvergleich plus `bt93p-starttruth-green` |
 | BT93P | BT93O.99 `bt93o-quality-green` + BT93X.99 `bt93p-starttruth-green` | hard | nein | 200k->500k->1M Trainingsleiter mit Statistik und frischem BT94A-Reentry-Gate |
@@ -394,7 +394,7 @@ Mikro-Claim-Regel:
 | - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
 | - | BT93W | - | frei | wartet auf `safety-diagnostic-nonblocking` und `terminal-nonblocking` |
-| - | BT93X.0 | - | frei | read-only Comparator-Preflight nach PF.0; oeffnet nichts |
+| Bot-Codex | BT93X.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als read-only `dqn-loader-fix-required`; oeffnet nichts |
 | - | BT93O | - | frei | wartet auf BT93W.99 `bt93o-precondition-green` |
 | - | BT93X | - | frei | wartet auf BT93O.99 `bt93o-quality-green` plus 93X.0 |
 | - | BT93P | - | frei | wartet auf BT93O.99 `bt93o-quality-green` und BT93X.99 `bt93p-starttruth-green` |
@@ -917,7 +917,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | BT93T.99=`telemetry-green` + S-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93V | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision | planned | P1 | BT93U.99=`reward-ordering-green` | 93V.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93W | Integrierter WallTrail 10k Recheck und BT93O-Startgate | planned | P1 | BT93V.99=`safety-diagnostic-nonblocking` + `terminal-nonblocking` | 93W.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
-| BT93X.0 | Early Comparator Preflight | planned | P1 | PF.0 `preflight-green`; read-only | 93X.0 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
+| BT93X.0 | Early Comparator Preflight | completed | P1 | PF.0 `preflight-green`; read-only | 93X.0 abgeschlossen | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93O | Action-/Objective-Quality und Anti-Plateau | planned | P2 | BT93W.99 `bt93o-precondition-green` | 93O.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93X | Same-Matrix-DQN oder Ersatzvergleich + BT93P Starttruth | planned | P1 | BT93O.99 `bt93o-quality-green` + 93X.0 completed | 93X.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93P | PPO Trainingsleiter und BT94A-Reentry-Gate | planned | P2 | BT93O.99 `bt93o-quality-green` + BT93X.99 `bt93p-starttruth-green` | 93P.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3951,20 +3951,20 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.X0.1 Historische DQN-/KI-Reports sind read-only inventarisiert und nicht als same-matrix verkauft.
-- [ ] DoD.X0.2 Loader-Blocker fuer Checkpoint-Format, Observation-Length, Action-Surface, Reward-/Terminal-Semantik, Matrix-ID und Normalizer-Frage sind klassifiziert.
-- [ ] DoD.X0.3 Fruehes Ergebnis schreibt `dqn-loader-fix-required`, `replacement-policy-user-decision-required` oder `comparison-preflight-nonblocking` als Preflight-Feld, aber kein Starttruth.
-- [ ] DoD.X0.4 `BT93R-W`, `BT93O`, `BT93P` und `BT94A` bleiben geschlossen.
+- [x] DoD.X0.1 Historische DQN-/KI-Reports sind read-only inventarisiert und nicht als same-matrix verkauft. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93x_early_comparator_preflight.py --write-report` -> `data/training/ppo/bt93x/early_comparator_preflight_report.json`, `historicalReportsUsedAsSameMatrixAnchor=false`)
+- [x] DoD.X0.2 Loader-Blocker fuer Checkpoint-Format, Observation-Length, Action-Surface, Reward-/Terminal-Semantik, Matrix-ID und Normalizer-Frage sind klassifiziert. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93x_early_comparator_preflight.py --write-report` -> `data/training/ppo/bt93x/early_comparator_preflight_report.json`, `loaderBlockers[]`)
+- [x] DoD.X0.3 Fruehes Ergebnis schreibt `dqn-loader-fix-required`, `replacement-policy-user-decision-required` oder `comparison-preflight-nonblocking` als Preflight-Feld, aber kein Starttruth. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93x_early_comparator_preflight.py --write-report` -> `data/training/ppo/bt93x/early_comparator_preflight_report.json`, `preflightField=dqn-loader-fix-required`)
+- [x] DoD.X0.4 `BT93R-W`, `BT93O`, `BT93P` und `BT94A` bleiben geschlossen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93x_early_comparator_preflight.py --write-report` -> `data/training/ppo/bt93x/early_comparator_preflight_report.json`, `bt93pClaimAllowed=false`, `bt94aClaimAllowed=false`)
 
 ### 93X.0.1 Comparator Inventory
 
-- [ ] 93X.0.1.1 Historische DQN-/Bot-/KI-Reports inventarisieren.
-- [ ] 93X.0.1.2 Nicht same-matrix Quellen als Kontext markieren.
+- [x] 93X.0.1.1 Historische DQN-/Bot-/KI-Reports inventarisieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93x_early_comparator_preflight.py --write-report` -> `data/training/ppo/bt93x/early_comparator_preflight_report.json`, `phaseCoverage.93X.0.1.1=true`)
+- [x] 93X.0.1.2 Nicht same-matrix Quellen als Kontext markieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93x_early_comparator_preflight.py --write-report` -> `data/training/ppo/bt93x/early_comparator_preflight_report.json`, `phaseCoverage.93X.0.1.2=true`)
 
 ### 93X.0.2 Loader-Blocker-Fruehklassifikation
 
-- [ ] 93X.0.2.1 Technische Loader- und Semantik-Blocker klassifizieren.
-- [ ] 93X.0.2.2 Replacement-Policy-Bedarf als User-owned markieren.
+- [x] 93X.0.2.1 Technische Loader- und Semantik-Blocker klassifizieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93x_early_comparator_preflight.py --write-report` -> `data/training/ppo/bt93x/early_comparator_preflight_report.json`, `phaseCoverage.93X.0.2.1=true`)
+- [x] 93X.0.2.2 Replacement-Policy-Bedarf als User-owned markieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93x_early_comparator_preflight.py --write-report` -> `data/training/ppo/bt93x/early_comparator_preflight_report.json`, `phaseCoverage.93X.0.2.2=true`)
 
 Pflicht-Evidence:
 

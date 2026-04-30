@@ -1,0 +1,434 @@
+{
+  "allowNext": [
+    "keep 93X.0 as read-only context for later full BT93X",
+    "restore DQN checkpoint or approve replacement policy in a separate user-owned decision path",
+    "restore exact BT93N PPO lineage package before rerunning BT93R"
+  ],
+  "blockId": "BT93X.0",
+  "blocksNext": [
+    "BT93P BT94A-ready",
+    "BT94A claim",
+    "BT94A candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "PPO-Validate/promote signal",
+    "rollout-ready wording",
+    "full BT93X starttruth before BT93O.99=bt93o-quality-green"
+  ],
+  "bt94aState": {
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "matrixDefinitionAllowed": false,
+    "resultClass": "blocked-no-start"
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93x_early_comparator_preflight.py --write-report"
+  },
+  "comparisonPolicyDecision": "dqn-anchor-blocked",
+  "dodCoverage": {
+    "DoD.X0.1": true,
+    "DoD.X0.2": true,
+    "DoD.X0.3": true,
+    "DoD.X0.4": true
+  },
+  "generatedAt": "2026-04-30T08:45:14Z",
+  "generatedBy": "python/scripts/bt93x_early_comparator_preflight.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "edbf59c164ee8e6238de9c637bb620ef130b8db6"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rToBt93wBypassed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "readOnly": true,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "historicalEvidencePolicy": {
+    "contextOnlyRows": 5,
+    "historicalReportsUsedAsSameMatrixAnchor": false,
+    "rule": "Historical DQN/bot/KI reports stay read-only context until a loadable same-matrix checkpoint or explicit replacement policy exists."
+  },
+  "inventory": {
+    "candidateCheckpoints": [
+      {
+        "errorClass": "artifact-not-found",
+        "exists": false,
+        "loadOk": false,
+        "missingFields": [
+          "file"
+        ],
+        "path": "data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json",
+        "role": "expected-bt11-champion-checkpoint",
+        "sameMatrixCandidate": true
+      },
+      {
+        "errorClass": "checkpoint-network-state-missing",
+        "exists": true,
+        "loadOk": false,
+        "missingFields": [
+          "online",
+          "target"
+        ],
+        "modelMetadata": {
+          "actionCount": null,
+          "contractVersion": "v36-dqn-checkpoint-v2",
+          "envSteps": null,
+          "observationLength": null,
+          "optimizerSteps": null
+        },
+        "path": "data/training/models/BT20_REFERENCE_ONLY_1777474973139/checkpoint.json",
+        "role": "fallback-inspection-checkpoint",
+        "sameMatrixCandidate": true,
+        "sha256": "40f6de9a7baf86d3dd06a917e7fee42047594d793f74cb16b631a1453d2ba7ea"
+      }
+    ],
+    "historicalReports": [
+      {
+        "exists": true,
+        "path": "data/training/runs/BT20_REFERENCE_ONLY_1777474973139/benchmark-manifest.json",
+        "reason": "historical report is not a loadable same-matrix DQN checkpoint",
+        "role": "context-only historical report",
+        "sameMatrixUse": "forbidden-context-only",
+        "sha256": "ee60b6b23b4ca8eadb38759a14803b30d4d2bf7cc5714085ae31f93b70c1e59e",
+        "sourceResultClass": null
+      },
+      {
+        "exists": true,
+        "path": "data/bot_validation_report.json",
+        "reason": "historical report is not a loadable same-matrix DQN checkpoint",
+        "role": "context-only historical report",
+        "sameMatrixUse": "forbidden-context-only",
+        "sha256": "e7808327e12ec1332f2ab6906cfd3b5a1360871fb0a4c6f64dbb7112b50aea57",
+        "sourceResultClass": null
+      },
+      {
+        "exists": true,
+        "path": "data/performance_ki_baseline_report.json",
+        "reason": "historical report is not a loadable same-matrix DQN checkpoint",
+        "role": "context-only historical report",
+        "sameMatrixUse": "forbidden-context-only",
+        "sha256": "2aabae2661ac5303752d175d22e18ff8fa8b3aca336305cddc0948726172935e",
+        "sourceResultClass": null
+      },
+      {
+        "exists": true,
+        "path": "data/bot_validation_report.json",
+        "reason": "historical DQN/bot reports cannot replace a same-matrix loader proof",
+        "role": "historical bot validation report",
+        "sameMatrixUse": "forbidden-context-only",
+        "sha256": "e7808327e12ec1332f2ab6906cfd3b5a1360871fb0a4c6f64dbb7112b50aea57",
+        "sourceResultClass": null
+      },
+      {
+        "exists": true,
+        "path": "data/performance_ki_baseline_report.json",
+        "reason": "historical DQN/bot reports cannot replace a same-matrix loader proof",
+        "role": "historical KI performance baseline report",
+        "sameMatrixUse": "forbidden-context-only",
+        "sha256": "2aabae2661ac5303752d175d22e18ff8fa8b3aca336305cddc0948726172935e",
+        "sourceResultClass": null
+      }
+    ],
+    "runtimeReadOnlySources": [
+      {
+        "blockId": null,
+        "closureCapable": false,
+        "exists": true,
+        "isFile": true,
+        "ok": null,
+        "path": "src/entities/ai/inference/LocalDqnInference.js",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "productive DQN inference source, read-only",
+        "schemaVersion": null,
+        "sha256": "72b0c9fa496d3ce8e21fd33b57fc0d8ca45f2f6756b0caaf892866f23f0a13a5",
+        "tracked": true
+      },
+      {
+        "blockId": null,
+        "closureCapable": false,
+        "exists": true,
+        "isFile": true,
+        "ok": null,
+        "path": "src/entities/ai/BotPolicyRegistry.js",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "productive bot policy registry, read-only",
+        "schemaVersion": null,
+        "sha256": "96e8d368a26b090bd7ceb60d5c88c267ba53c3270d3c84b9c9ce704b70e93fa1",
+        "tracked": true
+      },
+      {
+        "blockId": null,
+        "closureCapable": false,
+        "exists": true,
+        "isFile": true,
+        "ok": null,
+        "path": "src/entities/ai/ObservationBridgePolicy.js",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "productive observation bridge, read-only",
+        "schemaVersion": null,
+        "sha256": "a0a5f1974b0f2d201f5865910fad000175a950de8b4d81ba13c8d729a2ba19cd",
+        "tracked": true
+      }
+    ]
+  },
+  "loaderBlockers": [
+    {
+      "detail": "No loadable DQN checkpoint exists for the BT93L/BT93M matrix: the documented BT11 champion checkpoint path is absent and the only versioned checkpoint-like fallback lacks online/target network state.",
+      "evidence": "BT93M.2 loadAttempts",
+      "id": "checkpoint-format",
+      "status": "blocked"
+    },
+    {
+      "detail": "observation length cannot be bound to BT93L/BT93M matrix without a loadable checkpoint",
+      "evidence": "no loadable same-matrix DQN checkpoint metadata",
+      "id": "observation-length",
+      "status": "blocked"
+    },
+    {
+      "detail": "DQN action count/surface cannot be compared to PPO semantic action surface yet",
+      "evidence": "no loadable same-matrix DQN checkpoint metadata",
+      "id": "action-surface",
+      "status": "blocked"
+    },
+    {
+      "detail": "historical DQN/bot reports are context only and cannot prove same reward/terminal semantics",
+      "evidence": "BT93M comparison policy decision",
+      "id": "reward-terminal-semantics",
+      "status": "blocked"
+    },
+    {
+      "detail": "No loadable DQN checkpoint exists for the BT93L/BT93M matrix: the documented BT11 champion checkpoint path is absent and the only versioned checkpoint-like fallback lacks online/target network state.",
+      "evidence": "BT93M comparison policy decision",
+      "id": "matrix-id",
+      "status": "blocked"
+    },
+    {
+      "detail": "full BT93X must document how non-normalized DQN observations compare to PPO normalized inputs",
+      "evidence": "PPO uses VecNormalize lineage; DQN anchor has no matching normalize-state contract",
+      "id": "normalizer",
+      "status": "not-applicable-for-dqn-but-blocked-for-cross-policy-comparison"
+    }
+  ],
+  "matrixHash": "a8e17c34cc152bf73d6e6d43e11aa12b3cffae9a2caf26601ebd22b94d4b7bad",
+  "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+  "ok": true,
+  "phaseCoverage": {
+    "93X.0.1.1": true,
+    "93X.0.1.2": true,
+    "93X.0.2.1": true,
+    "93X.0.2.2": true
+  },
+  "phaseId": "93X.0",
+  "preflightField": "dqn-loader-fix-required",
+  "recommendations": [
+    {
+      "action": "Do not claim BT93S/O/P/94A from comparator evidence.",
+      "rank": 1,
+      "why": "BT93R.99 is model-artifact-missing and the R-Allowlist is not satisfied."
+    },
+    {
+      "action": "Recover exact BT93N PPO lineage first: model.zip, config, VecNormalize and action-surface hash.",
+      "rank": 2,
+      "why": "Decoder, normalize and eval-mode fixes are not provable from reports-only lineage."
+    },
+    {
+      "action": "If BT93N lineage cannot be restored, create a narrow lineage-recovery/retraining intake.",
+      "rank": 3,
+      "why": "BT93S requires an R-Allowlist result, and the current comparator state is still dqn-loader-fix-required."
+    },
+    {
+      "action": "Resolve DQN comparator separately before full BT93X/BT93P.",
+      "rank": 4,
+      "why": "The BT11 champion checkpoint is absent or not loadable on the same matrix."
+    }
+  ],
+  "resultClass": "early-comparator-preflight-complete",
+  "sameMatrixDqnAnchorPresent": false,
+  "schemaVersion": "bt93x-early-comparator-preflight-report-v1",
+  "semanticWindow": "runtime-near-headless-v1",
+  "sourceArtifacts": {
+    "botPolicyRegistry": {
+      "blockId": null,
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "src/entities/ai/BotPolicyRegistry.js",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "productive bot policy registry, read-only",
+      "schemaVersion": null,
+      "sha256": "96e8d368a26b090bd7ceb60d5c88c267ba53c3270d3c84b9c9ce704b70e93fa1",
+      "tracked": true
+    },
+    "bt93lBaselineMatrix": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L baseline/control matrix",
+      "schemaVersion": "bt93l-baseline-matrix-report-v1",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013",
+      "tracked": true
+    },
+    "bt93lTaskMetricContract": {
+      "blockId": "BT93L",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/task_metric_contract.json",
+      "phaseId": "93L.1",
+      "resultClass": "task-metric-contract-pinned",
+      "role": "BT93L task and matrix contract",
+      "schemaVersion": "bt93l-task-metric-contract-v1",
+      "sha256": "39272f21e5711d3a460f18d1444f6ce3186e15c43b6b885d171148258eea4ae0",
+      "tracked": true
+    },
+    "bt93mComparisonPolicyDecision": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "phaseId": "93M.3.6",
+      "resultClass": "comparison-policy-blocks-positive-reentry",
+      "role": "BT93M comparison policy decision",
+      "schemaVersion": "bt93m-comparison-policy-decision-v1",
+      "sha256": "eadd182f737d7b477a4143df0cc721875caf31cd47bcb5942f2649f2d80609b5",
+      "tracked": true
+    },
+    "bt93mDqnAnchorManifest": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93m/dqn_same_matrix_manifest.json",
+      "phaseId": "93M.2",
+      "resultClass": null,
+      "role": "BT93M same-matrix DQN manifest",
+      "schemaVersion": "bt93m-dqn-same-matrix-manifest-v1",
+      "sha256": "5cc25cd627cbdf09887a418936b1754b2c3c7f1a3765a6ad664801138032ffa8",
+      "tracked": true
+    },
+    "bt93mDqnAnchorReport": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/dqn_same_matrix_anchor_report.json",
+      "phaseId": "93M.2",
+      "resultClass": "dqn-anchor-blocked",
+      "role": "BT93M same-matrix DQN anchor diagnosis",
+      "schemaVersion": "bt93m-dqn-same-matrix-anchor-report-v1",
+      "sha256": "a5eeb7580c72ba22a874cb0df6a1d73b314b22efa0e769165acfbc1e54a9f03d",
+      "tracked": true
+    },
+    "bt93mPrecomparisonRefresh": {
+      "blockId": "BT93M",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/precomparison_refresh_report.json",
+      "phaseId": "93M.3.1",
+      "resultClass": "precomparison-refresh-dqn-anchor-blocked",
+      "role": "BT93M precomparison refresh",
+      "schemaVersion": "bt93m-precomparison-refresh-v1",
+      "sha256": "4599195e16e3d91a26c1df25aeb2d003052e7c8a8b23b5735615bd5a96db0d0c",
+      "tracked": true
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "closureCapable": true,
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A no-start gate",
+      "schemaVersion": null,
+      "sha256": "4cab3718b6ced442defd5e9f98a2d2086d992c0e2c1ea305912daa373ba85add",
+      "tracked": true
+    },
+    "dqnInferenceSource": {
+      "blockId": null,
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "src/entities/ai/inference/LocalDqnInference.js",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "productive DQN inference source, read-only",
+      "schemaVersion": null,
+      "sha256": "72b0c9fa496d3ce8e21fd33b57fc0d8ca45f2f6756b0caaf892866f23f0a13a5",
+      "tracked": true
+    },
+    "historicalBotValidation": {
+      "blockId": null,
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/bot_validation_report.json",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "historical bot validation report",
+      "schemaVersion": null,
+      "sha256": "e7808327e12ec1332f2ab6906cfd3b5a1360871fb0a4c6f64dbb7112b50aea57",
+      "tracked": true
+    },
+    "historicalPerformanceKiBaseline": {
+      "blockId": null,
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/performance_ki_baseline_report.json",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "historical KI performance baseline report",
+      "schemaVersion": null,
+      "sha256": "2aabae2661ac5303752d175d22e18ff8fa8b3aca336305cddc0948726172935e",
+      "tracked": true
+    },
+    "observationBridgePolicy": {
+      "blockId": null,
+      "closureCapable": false,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "src/entities/ai/ObservationBridgePolicy.js",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "productive observation bridge, read-only",
+      "schemaVersion": null,
+      "sha256": "a0a5f1974b0f2d201f5865910fad000175a950de8b4d81ba13c8d729a2ba19cd",
+      "tracked": true
+    }
+  }
+}

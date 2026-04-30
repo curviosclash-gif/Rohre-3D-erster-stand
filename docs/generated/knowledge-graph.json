@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 353,
+          "concreteCount": 355,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 491,
+          "concreteCount": 493,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 349,
+          "concreteCount": 351,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 348,
+          "concreteCount": 350,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 990,
+          "concreteCount": 992,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 998,
+          "concreteCount": 1000,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1860,10 +1860,12 @@
           "data/training/ppo/bt93w/bt93w_micro_recheck_contract.json",
           "data/training/ppo/bt93w/bt93w_micro_recheck_report.json",
           "data/training/ppo/bt93w/bt93w_start_gate_report.json",
-          "docs/bot-training/Bot_Trainingsplan.md"
+          "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+          "docs/bot-training/Bot_Trainingsplan.md",
+          "python/scripts/bt93x_early_comparator_preflight.py"
         ],
         "scopeResolution": {
-          "concreteCount": 1,
+          "concreteCount": 3,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -29618,6 +29620,27 @@
       }
     },
     {
+      "id": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93W"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/training/ppo/bt93x/gate_checker_source_mapping.json",
       "type": "file",
       "title": null,
@@ -36841,6 +36864,27 @@
           "BT93D",
           "BT93E",
           "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93W"
         ],
         "exists": true
       }
@@ -73389,6 +73433,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -74632,6 +74685,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93r_preflight_gate_sync.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93x_early_comparator_preflight.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -76763,6 +76825,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -77988,6 +78059,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93r_preflight_gate_sync.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93x_early_comparator_preflight.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81317,6 +81397,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -82551,6 +82640,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93r_preflight_gate_sync.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93x_early_comparator_preflight.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84981,6 +85079,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -86215,6 +86322,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93r_preflight_gate_sync.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93x_early_comparator_preflight.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -95049,6 +95165,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -96283,6 +96408,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93r_preflight_gate_sync.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93x_early_comparator_preflight.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -104292,6 +104426,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -105535,6 +105678,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93r_preflight_gate_sync.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93x_early_comparator_preflight.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -132553,7 +132705,25 @@
     },
     {
       "from": "BT93W",
+      "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93W",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93W",
+      "to": "python/scripts/bt93x_early_comparator_preflight.py",
       "type": "scope",
       "hint": null,
       "attributes": {
