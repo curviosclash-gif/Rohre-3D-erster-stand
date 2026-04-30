@@ -1,0 +1,262 @@
+{
+  "allowNext": [
+    "93Y.5 BT93R-Reentry package",
+    "later full BT93X only after BT93O.99=bt93o-quality-green and all R-X dependencies are green"
+  ],
+  "approved": true,
+  "blockId": "BT93X",
+  "blocksNext": [
+    "BT93R-Reentry before BT93Y.99",
+    "BT93S claim",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "comparisonPolicy": {
+    "activeLineage": {
+      "lineageId": "bt93y-retrain-lineage-v1",
+      "lineageKind": "new-retrain-lineage-not-bt93n",
+      "policyId": "bt93y-retrain-lineage-v1",
+      "ready": true,
+      "sourcePath": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "sourceResultClass": "retrain-lineage-ready"
+    },
+    "orderingRules": [
+      "noop must remain non-success and clearly worse than controlled progress policies",
+      "random and semantic-cycle must not match or exceed PPO or scripted-reachability on required metrics",
+      "scripted-reachability proves task reachability only and does not replace a champion DQN"
+    ],
+    "policyIds": [
+      "noop",
+      "random",
+      "semantic-cycle",
+      "scripted-reachability",
+      "bt93y-retrain-lineage-v1"
+    ],
+    "ppoLineagePolicyId": "bt93y-retrain-lineage-v1",
+    "requiredControlPolicies": [
+      "noop",
+      "random",
+      "semantic-cycle",
+      "scripted-reachability"
+    ],
+    "scriptedReachabilityRole": "task-sanity-control-not-historical-champion"
+  },
+  "decision": "approved",
+  "decisionId": "UOD-2",
+  "generatedAt": "2026-04-30T10:32:32Z",
+  "generatedBy": "python/scripts/bt93y_replacement_policy_lock.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "fe4c143a04795cb13a8f2d0225606c088957e3b9"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffSignal": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "freezeCandidate": false,
+    "holdoutConsumptionAllowed": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promoteAllowed": false,
+    "promotionAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "historicalEvidencePolicy": {
+    "historicalDqnBotReportsUse": "context-only",
+    "historicalReportsUsedAsSameMatrixAnchor": false,
+    "reports": [
+      {
+        "exists": true,
+        "path": "data/bot_validation_report.json",
+        "sameMatrixUse": "forbidden-context-only",
+        "sha256": "e7808327e12ec1332f2ab6906cfd3b5a1360871fb0a4c6f64dbb7112b50aea57"
+      },
+      {
+        "exists": true,
+        "path": "data/performance_ki_baseline_report.json",
+        "sameMatrixUse": "forbidden-context-only",
+        "sha256": "2aabae2661ac5303752d175d22e18ff8fa8b3aca336305cddc0948726172935e"
+      }
+    ]
+  },
+  "invalidations": [
+    {
+      "id": "historical-dqn-used-as-anchor",
+      "resultClass": "measurement-invalid"
+    },
+    {
+      "id": "missing-matrix-id-or-hash",
+      "resultClass": "comparison-policy-not-ready"
+    },
+    {
+      "id": "missing-semantic-window-action-surface-or-reward-profile",
+      "resultClass": "comparison-policy-not-ready"
+    },
+    {
+      "id": "missing-seeds-episodes-median-iqr-or-minimum-delta",
+      "resultClass": "comparison-policy-not-ready"
+    },
+    {
+      "id": "sample-count-below-minimum",
+      "resultClass": "comparison-policy-not-ready"
+    },
+    {
+      "id": "random-or-semantic-cycle-parity-with-ppo-or-scripted",
+      "resultClass": "measurement-invalid"
+    },
+    {
+      "id": "noop-success-or-noop-not-clearly-worse",
+      "resultClass": "measurement-invalid"
+    },
+    {
+      "id": "post-hoc-threshold-change",
+      "resultClass": "measurement-invalid"
+    },
+    {
+      "id": "freeze-holdout-consumed-or-optimized-against",
+      "resultClass": "measurement-invalid"
+    },
+    {
+      "id": "candidate-freeze-promote-rollout-or-dqn-sunset-wording",
+      "resultClass": "measurement-invalid"
+    }
+  ],
+  "matrixContract": {
+    "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+    "matrixHash": "a8e17c34cc152bf73d6e6d43e11aa12b3cffae9a2caf26601ebd22b94d4b7bad",
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "rewardProfileId": "bt93n-wall-trail-stability-v1",
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "ok": true,
+  "owner": "user",
+  "phaseId": "93Y.4",
+  "policyId": "bt93x-rcp1-same-matrix-control-suite-no-bt11",
+  "replacementReason": "BT11/DQN same-matrix checkpoint is absent or not loadable; historical reports are context-only.",
+  "replaces": "BT11-same-matrix-DQN-anchor",
+  "resultClass": "replacement-policy-approved",
+  "sampleCounts": {
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 0,
+    "newTrainingEpisodes": 0,
+    "notApplicableReason": "93Y.4 is a user-owned comparison-policy lock without training, eval or holdout samples.",
+    "steps": 0
+  },
+  "schemaVersion": "bt93x-replacement-policy-decision-v1",
+  "scope": {
+    "allowedFor": [
+      "BT93X starttruth",
+      "BT93P starttruth"
+    ],
+    "bt93pMayUseAfter": [
+      "BT93X.99=bt93p-starttruth-green",
+      "pinned statistics contract remains unchanged"
+    ],
+    "forbiddenFor": [
+      "candidate",
+      "freeze",
+      "holdout-consumption",
+      "promote",
+      "rollout",
+      "DQN sunset",
+      "productive handoff",
+      "PPO-Validate",
+      "BT95 handoff"
+    ],
+    "fullBt93xMayUseAfter": [
+      "BT93Y.99 green",
+      "BT93R-Reentry.99 in R-Allowlist",
+      "BT93W.99=bt93o-precondition-green",
+      "BT93O.99=bt93o-quality-green"
+    ]
+  },
+  "sourceDecision": {
+    "decision": "approved",
+    "owner": "user",
+    "path": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
+    "policyId": "bt93x-rcp1-same-matrix-control-suite-no-bt11"
+  },
+  "statisticsContract": {
+    "actionSurfaceIdRequired": true,
+    "comparisonSeeds": [
+      944,
+      945,
+      946
+    ],
+    "holdoutLineage": {
+      "diagnosticComparisonMayUsePinnedComparisonSeeds": true,
+      "freezeHoldoutConsumptionAllowed": false,
+      "freezeHoldoutStatus": "reserved-unused-in-BT93L.1-through-BT93L.6",
+      "noPostHoldoutOptimizationRequired": true
+    },
+    "iqrRequired": true,
+    "lockedBeforeRun": true,
+    "matrixHashRequired": true,
+    "matrixIdRequired": true,
+    "medianRequired": true,
+    "minCompletedEpisodesPerPolicy": 15,
+    "minimumDeltas": {
+      "deathBefore60RateRegressionAllowed": 0.0,
+      "medianStepsPerEpisodeRelativeVsSimpleControls": 0.3,
+      "noopMustRemainNonSuccess": true,
+      "objectiveEventCountAbsoluteVsNoop": 1,
+      "randomOrSemanticCycleMayNotMeetOrExceedPpoOnRequiredMetrics": true
+    },
+    "postHocThresholdChangeInvalidates": true,
+    "requiredMetrics": [
+      "avgStepsPerEpisode",
+      "medianStepsPerEpisode",
+      "iqrStepsPerEpisode",
+      "deathBefore60Rate",
+      "objectiveEventCount",
+      "progressEventCount",
+      "naturalTerminalCount",
+      "runtimeErrorCount",
+      "invalidActionRate"
+    ],
+    "reservedFreezeHoldoutSeeds": [
+      960,
+      961
+    ],
+    "rewardProfileIdRequired": true,
+    "semanticWindowRequired": true
+  },
+  "summary": {
+    "activeLineageReady": true,
+    "historicalReportsContextOnly": true,
+    "nextBestAction": "Run 93Y.5; do not start BT93R-Reentry/S/O/P/94A yet.",
+    "replacementPolicyApproved": true,
+    "sameMatrixDqnAnchorPresent": false
+  }
+}

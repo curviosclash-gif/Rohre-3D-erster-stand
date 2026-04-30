@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 372,
+          "concreteCount": 375,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 510,
+          "concreteCount": 513,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 368,
+          "concreteCount": 371,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 367,
+          "concreteCount": 370,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1009,
+          "concreteCount": 1012,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1017,
+          "concreteCount": 1020,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1902,8 +1902,8 @@
           "docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md"
         ],
         "scopeResolution": {
-          "concreteCount": 3,
-          "plannedCount": 9
+          "concreteCount": 4,
+          "plannedCount": 8
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -1922,7 +1922,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93Y.4",
+        "currentPhase": "93Y.5",
         "scopeDeclarations": [
           "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
           "data/training/ppo/bt93x/early_comparator_preflight_report.json",
@@ -1943,12 +1943,13 @@
           "docs/bot-training/Bot_Trainingsplan.md",
           "python/scripts/bt93y_exact_lineage_recovery.py",
           "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+          "python/scripts/bt93y_replacement_policy_lock.py",
           "python/scripts/bt93y_retrain_lineage.py",
           "tmp/**"
         ],
         "scopeResolution": {
-          "concreteCount": 655,
-          "plannedCount": 6
+          "concreteCount": 658,
+          "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5431,7 +5432,7 @@
       "id": "BT93Y.4",
       "type": "phase",
       "title": "Ersatzvergleichspolitik locken",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.4"
@@ -15631,8 +15632,8 @@
     {
       "id": "BT93Y.4.1",
       "type": "subphase",
-      "title": "`replacement_policy_decision.json` schreibt `owner=user`, `decision=approved`, `policyId`, `replaces=BT11-same-matrix-DQN-anchor`.",
-      "status": "open",
+      "title": "`replacement_policy_decision.json` schreibt `owner=user`, `decision=approved`, `policyId`, `replaces=BT11-same-matrix-DQN-anchor`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_replacement_policy_lock.py --write-reports` -> `data/training/ppo/bt93x/replacement_policy_decision.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.4",
@@ -15642,8 +15643,8 @@
     {
       "id": "BT93Y.4.2",
       "type": "subphase",
-      "title": "Scope bleibt begrenzt auf `BT93X`/`BT93P`-Starttruth; Promote, Rollout, DQN-Sunset und Produkt-Handoff bleiben verboten.",
-      "status": "open",
+      "title": "Scope bleibt begrenzt auf `BT93X`/`BT93P`-Starttruth; Promote, Rollout, DQN-Sunset und Produkt-Handoff bleiben verboten. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_replacement_policy_lock.py --write-reports` -> `data/training/ppo/bt93y/replacement_policy_lock_report.json`, `phaseCoverage.93Y.4.2=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.4",
@@ -15653,8 +15654,8 @@
     {
       "id": "BT93Y.4.3",
       "type": "subphase",
-      "title": "Pflichtvergleich mit `noop`, `random`, `semantic-cycle`, `scripted-reachability` und recovered/retrained PPO-Lineage ist maschinenlesbar.",
-      "status": "open",
+      "title": "Pflichtvergleich mit `noop`, `random`, `semantic-cycle`, `scripted-reachability` und recovered/retrained PPO-Lineage ist maschinenlesbar. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_replacement_policy_lock.py --write-reports` -> `data/training/ppo/bt93x/replacement_policy_decision.json`, `comparisonPolicy.policyIds`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.4",
@@ -15664,8 +15665,8 @@
     {
       "id": "BT93Y.4.4",
       "type": "subphase",
-      "title": "Mindeststatistik, Matrix-ID, Matrix-Hash, Semantikfenster, Seeds, Episoden, Median/IQR, Mindestdelta, Holdout-Lineage und Invalidierungsregeln werden gepinnt.",
-      "status": "open",
+      "title": "Mindeststatistik, Matrix-ID, Matrix-Hash, Semantikfenster, Seeds, Episoden, Median/IQR, Mindestdelta, Holdout-Lineage und Invalidierungsregeln werden gepinnt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_replacement_policy_lock.py --write-reports` -> `data/training/ppo/bt93x/replacement_policy_decision.json`, `statisticsContract.lockedBeforeRun=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.4",
@@ -15675,8 +15676,8 @@
     {
       "id": "BT93Y.4.5",
       "type": "subphase",
-      "title": "Historische DQN-/Bot-Reports werden explizit als `context-only` markiert.",
-      "status": "open",
+      "title": "Historische DQN-/Bot-Reports werden explizit als `context-only` markiert. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_replacement_policy_lock.py --write-reports` -> `data/training/ppo/bt93y/replacement_policy_lock_report.json`, `historicalEvidencePolicy.historicalDqnBotReportsUse=context-only`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.4",
@@ -30160,10 +30161,16 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93X",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -30335,9 +30342,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -37791,6 +37804,27 @@
     },
     {
       "id": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Y"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93y_replacement_policy_lock.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -75025,6 +75059,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93x/replacement_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -75053,6 +75096,15 @@
     {
       "from": "BT90",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/replacement_policy_lock_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -76421,6 +76473,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93y_replacement_policy_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78570,6 +78631,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93x/replacement_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -78598,6 +78668,15 @@
     {
       "from": "BT91",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/replacement_policy_lock_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79948,6 +80027,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93y_replacement_policy_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83295,6 +83383,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93x/replacement_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -83323,6 +83420,15 @@
     {
       "from": "BT92",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/replacement_policy_lock_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84682,6 +84788,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93y_replacement_policy_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -87130,6 +87245,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93x/replacement_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -87158,6 +87282,15 @@
     {
       "from": "BT93B",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/replacement_policy_lock_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88517,6 +88650,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93y_replacement_policy_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97369,6 +97511,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93x/replacement_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -97397,6 +97548,15 @@
     {
       "from": "BT93D",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/replacement_policy_lock_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98756,6 +98916,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93y_replacement_policy_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -106783,6 +106952,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93x/replacement_policy_decision.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -106811,6 +106989,15 @@
     {
       "from": "BT93E",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/replacement_policy_lock_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -108179,6 +108366,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93y_replacement_policy_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -136055,6 +136251,15 @@
     {
       "from": "BT93Y",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Y",
+      "to": "python/scripts/bt93y_replacement_policy_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {

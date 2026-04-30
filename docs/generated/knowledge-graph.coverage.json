@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2462,
-    "rawCoveredFileCount": 1982,
+    "trackedFileCount": 2465,
+    "rawCoveredFileCount": 1985,
     "rawCoveragePercent": 80.5,
-    "adjustedTrackedFileCount": 1559,
-    "adjustedCoveredFileCount": 1323,
+    "adjustedTrackedFileCount": 1562,
+    "adjustedCoveredFileCount": 1326,
     "adjustedCoveragePercent": 84.9,
     "uncoveredFileCount": 480,
     "uncoveredActiveFileCount": 236,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 270,
-        "coveredCount": 249
+        "count": 272,
+        "coveredCount": 251
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 892,
-        "coveredCount": 876
+        "count": 893,
+        "coveredCount": 877
       },
       {
         "classification": "product-docs",
@@ -8344,6 +8344,30 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93x/replacement_policy_decision.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93X",
+        "BT93Y"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "tracked": true,
       "coveredInCore": true,
@@ -8414,6 +8438,29 @@
     },
     {
       "path": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Y"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93y/replacement_policy_lock_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -19525,6 +19572,29 @@
     },
     {
       "path": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Y"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93y_replacement_policy_lock.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
