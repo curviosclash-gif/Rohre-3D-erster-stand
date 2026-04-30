@@ -1,0 +1,1018 @@
+{
+  "actionSurface": {
+    "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+    "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "decoderPath": "python/envs/ppo_action_surface.py",
+    "excludedInventoryIndexedActions": [
+      "dropItem",
+      "nextItem",
+      "shootItem",
+      "shootItemIndex",
+      "useItem"
+    ],
+    "gymSpace": "Discrete",
+    "policyLevelMasking": {
+      "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+      "mixedWithPostDecodeClamp": false,
+      "preSamplingAppliedInCurrentSb3Path": true,
+      "preSamplingByConstruction": true,
+      "source": "info.match.inventoryLength from the JS-authoritative transition payload",
+      "specified": true
+    },
+    "rawBoundarySurfaceTraining": false,
+    "sb3Trainable": true,
+    "semanticActions": [
+      "noop",
+      "yaw-left",
+      "yaw-right",
+      "pitch-up",
+      "pitch-down",
+      "roll-left",
+      "roll-right",
+      "boost",
+      "shoot-mg",
+      "turn-left-boost",
+      "turn-right-boost",
+      "evade-left",
+      "evade-right"
+    ],
+    "surfaceId": "bt93q-walltrail-semantic-action-v1",
+    "telemetry": [
+      "policyLevelMask",
+      "preSamplingMaskRate",
+      "postDecodeClampRate",
+      "invalidActionRate",
+      "vetoRate",
+      "sanitizerRate",
+      "noopRate"
+    ]
+  },
+  "aliasesWrittenByWriteReports": [
+    "data/training/ppo/bt93s/scenario_window_contract.json",
+    "data/training/ppo/bt93s/action_effect_window_manifest.json"
+  ],
+  "blockId": "BT93S",
+  "blocksNext": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "50k/100k/200k/500k/1M extension",
+    "reward fix from BT93S.1",
+    "telemetry fix from BT93S.1"
+  ],
+  "contractHash": "a744d406833f7ee53fce67f30cd2dde9774d58a1c9982753423358c0d565c8ed",
+  "contractId": "bt93s-walltrail-action-effect-window-v1",
+  "generatedAt": "2026-04-30T13:40:02Z",
+  "generatedBy": "python/scripts/bt93s_scenario_window_contract.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "fc527ae05b2528b542df399dad1dcff30b84e523"
+  },
+  "guardrails": {
+    "actionSurfaceChanged": false,
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "promoteAllowed": false,
+    "rewardFixApplied": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "lineage": {
+    "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+    "bt93qScenarioManifest": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+    "bt93rrHandover": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
+    "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "rewardProfileId": "bt93n-wall-trail-stability-v1",
+    "upstreamMatrixId": "bt93l-reachability-diagnostic-matrix-v1"
+  },
+  "matrixId": "bt93s-walltrail-action-effect-matrix-v1",
+  "missingScenarios": [],
+  "nextAllowedActions": [
+    "Run BT93S.2 existing-action effect measurement on this pinned scenario contract."
+  ],
+  "ok": true,
+  "opensNext": [
+    "93S.2 Existing-Action Effekt"
+  ],
+  "phaseCoverage": {
+    "93S.1.1": true,
+    "93S.1.2": true,
+    "93S.1.3": true,
+    "93S.1.4": true,
+    "93S.1.5": true,
+    "DoD.S1": true
+  },
+  "phaseId": "93S.1",
+  "resultClass": "scenario-window-contract-green",
+  "scenarioClasses": [
+    "frontal-near-wall",
+    "side-wall-left",
+    "side-wall-right",
+    "narrowing-corridor",
+    "trail-ahead",
+    "trail-side",
+    "escape-left-open",
+    "escape-right-open",
+    "no-danger-control"
+  ],
+  "scenarioCount": 9,
+  "scenarios": [
+    {
+      "controls": {
+        "expectedStateEffect": {
+          "positiveControlRationale": "turn/roll away from frontal wall pressure",
+          "primaryImprovement": [
+            "wallDistanceFront increase",
+            "collisionRisk decrease",
+            "terminalRisk decrease"
+          ],
+          "telemetryLimit": null
+        },
+        "forbiddenSuccessProxies": [
+          "reward-only or target-distance-only",
+          "single-step delta",
+          "command flag without state effect",
+          "target-distance-only improvement under higher terminal risk",
+          "maxSteps survival without objective or risk improvement"
+        ],
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "failureResultClass": "measurement-invalid",
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "roll-right"
+          ],
+          "failureResultClass": "matrix-redesign-required",
+          "mustShowExpectedEffectBeforeGreen": true
+        }
+      },
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "sourceMaxSteps": 20,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "id": "frontal-near-wall",
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "seedPlan": {
+        "justification": "BT93Q supplied deterministic wall/trail fixtures; BT93S expands each class to three deterministic seeds and revalidates predicates before effect claims.",
+        "mode": "deterministic-expanded-from-bt93q",
+        "seeds": [
+          934,
+          1934,
+          2934
+        ],
+        "sourceSeed": 934
+      },
+      "source": {
+        "blockId": "BT93Q",
+        "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+        "predicate": "wallDistanceFront <= 0.20",
+        "sourceSeed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "wallDistanceFront <= 0.20",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      }
+    },
+    {
+      "controls": {
+        "expectedStateEffect": {
+          "positiveControlRationale": "move away from left wall pressure",
+          "primaryImprovement": [
+            "wallDistanceLeft increase",
+            "collisionRisk decrease"
+          ],
+          "telemetryLimit": null
+        },
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "single-step delta",
+          "command flag without state effect",
+          "target-distance-only improvement under higher terminal risk",
+          "maxSteps survival without objective or risk improvement"
+        ],
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "failureResultClass": "measurement-invalid",
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "roll-right"
+          ],
+          "failureResultClass": "matrix-redesign-required",
+          "mustShowExpectedEffectBeforeGreen": true
+        }
+      },
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "sourceMaxSteps": 20,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "noop",
+        "warmupSteps": 2
+      },
+      "id": "side-wall-left",
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "seedPlan": {
+        "justification": "BT93Q supplied deterministic wall/trail fixtures; BT93S expands each class to three deterministic seeds and revalidates predicates before effect claims.",
+        "mode": "deterministic-expanded-from-bt93q",
+        "seeds": [
+          942,
+          1942,
+          2942
+        ],
+        "sourceSeed": 942
+      },
+      "source": {
+        "blockId": "BT93Q",
+        "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+        "predicate": "wallDistanceLeft <= 0.25",
+        "sourceSeed": 942,
+        "warmupAction": "noop",
+        "warmupSteps": 2
+      },
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "wallDistanceLeft <= 0.25",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 942,
+        "warmupAction": "noop",
+        "warmupSteps": 2
+      }
+    },
+    {
+      "controls": {
+        "expectedStateEffect": {
+          "positiveControlRationale": "move away from right wall pressure",
+          "primaryImprovement": [
+            "wallDistanceRight increase",
+            "collisionRisk decrease"
+          ],
+          "telemetryLimit": null
+        },
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "single-step delta",
+          "command flag without state effect",
+          "target-distance-only improvement under higher terminal risk",
+          "maxSteps survival without objective or risk improvement"
+        ],
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "failureResultClass": "measurement-invalid",
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-left",
+            "roll-left"
+          ],
+          "failureResultClass": "matrix-redesign-required",
+          "mustShowExpectedEffectBeforeGreen": true
+        }
+      },
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "sourceMaxSteps": 20,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "boost",
+        "warmupSteps": 7
+      },
+      "id": "side-wall-right",
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "seedPlan": {
+        "justification": "BT93Q supplied deterministic wall/trail fixtures; BT93S expands each class to three deterministic seeds and revalidates predicates before effect claims.",
+        "mode": "deterministic-expanded-from-bt93q",
+        "seeds": [
+          930,
+          1930,
+          2930
+        ],
+        "sourceSeed": 930
+      },
+      "source": {
+        "blockId": "BT93Q",
+        "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+        "predicate": "wallDistanceRight <= 0.25",
+        "sourceSeed": 930,
+        "warmupAction": "boost",
+        "warmupSteps": 7
+      },
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "wallDistanceRight <= 0.25",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "boost",
+        "warmupSteps": 7
+      }
+    },
+    {
+      "controls": {
+        "expectedStateEffect": {
+          "positiveControlRationale": "choose wider escape lane rather than target-only progress",
+          "primaryImprovement": [
+            "localOpennessRatio increase",
+            "deadEndRisk decrease",
+            "terminalRisk decrease"
+          ],
+          "telemetryLimit": null
+        },
+        "forbiddenSuccessProxies": [
+          "single target metric",
+          "single-step delta",
+          "command flag without state effect",
+          "target-distance-only improvement under higher terminal risk",
+          "maxSteps survival without objective or risk improvement"
+        ],
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "failureResultClass": "measurement-invalid",
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "roll-right"
+          ],
+          "failureResultClass": "matrix-redesign-required",
+          "mustShowExpectedEffectBeforeGreen": true
+        }
+      },
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "sourceMaxSteps": 20,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "id": "narrowing-corridor",
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "seedPlan": {
+        "justification": "BT93Q supplied deterministic wall/trail fixtures; BT93S expands each class to three deterministic seeds and revalidates predicates before effect claims.",
+        "mode": "deterministic-expanded-from-bt93q",
+        "seeds": [
+          934,
+          1934,
+          2934
+        ],
+        "sourceSeed": 934
+      },
+      "source": {
+        "blockId": "BT93Q",
+        "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+        "predicate": "wallDistanceFront <= 0.35 and one side wall <= 0.35 and localOpennessRatio <= 0.45",
+        "sourceSeed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "wallDistanceFront <= 0.35 and one side wall <= 0.35 and localOpennessRatio <= 0.45",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      }
+    },
+    {
+      "controls": {
+        "expectedStateEffect": {
+          "positiveControlRationale": "escape ahead/trail pressure without using reward-only proxy",
+          "primaryImprovement": [
+            "pressureLevel decrease",
+            "wallDistanceFront non-regression",
+            "terminalRisk decrease"
+          ],
+          "telemetryLimit": "trailDistance not exposed before BT93T; pressure/front-wall proxy only"
+        },
+        "forbiddenSuccessProxies": [
+          "reward-only; trailDistance is not exposed",
+          "single-step delta",
+          "command flag without state effect",
+          "target-distance-only improvement under higher terminal risk",
+          "maxSteps survival without objective or risk improvement"
+        ],
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "failureResultClass": "measurement-invalid",
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-left",
+            "roll-left"
+          ],
+          "failureResultClass": "matrix-redesign-required",
+          "mustShowExpectedEffectBeforeGreen": true
+        }
+      },
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "sourceMaxSteps": 20,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "id": "trail-ahead",
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "seedPlan": {
+        "justification": "BT93Q supplied deterministic wall/trail fixtures; BT93S expands each class to three deterministic seeds and revalidates predicates before effect claims.",
+        "mode": "deterministic-expanded-from-bt93q",
+        "seeds": [
+          930,
+          1930,
+          2930
+        ],
+        "sourceSeed": 930
+      },
+      "source": {
+        "blockId": "BT93Q",
+        "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+        "predicate": "pressureLevel >= 0.50 and wallDistanceFront <= 0.40",
+        "sourceSeed": 930,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "pressureLevel >= 0.50 and wallDistanceFront <= 0.40",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      }
+    },
+    {
+      "controls": {
+        "expectedStateEffect": {
+          "positiveControlRationale": "escape side trail pressure without using reward-only proxy",
+          "primaryImprovement": [
+            "pressureLevel decrease",
+            "side-wall distance non-regression",
+            "terminalRisk decrease"
+          ],
+          "telemetryLimit": "trailDistance not exposed before BT93T; pressure/side-wall proxy only"
+        },
+        "forbiddenSuccessProxies": [
+          "reward-only; trailDistance is not exposed",
+          "single-step delta",
+          "command flag without state effect",
+          "target-distance-only improvement under higher terminal risk",
+          "maxSteps survival without objective or risk improvement"
+        ],
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "failureResultClass": "measurement-invalid",
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "roll-right"
+          ],
+          "failureResultClass": "matrix-redesign-required",
+          "mustShowExpectedEffectBeforeGreen": true
+        }
+      },
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "sourceMaxSteps": 20,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "id": "trail-side",
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "seedPlan": {
+        "justification": "BT93Q supplied deterministic wall/trail fixtures; BT93S expands each class to three deterministic seeds and revalidates predicates before effect claims.",
+        "mode": "deterministic-expanded-from-bt93q",
+        "seeds": [
+          934,
+          1934,
+          2934
+        ],
+        "sourceSeed": 934
+      },
+      "source": {
+        "blockId": "BT93Q",
+        "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+        "predicate": "pressureLevel >= 0.40 and side wall <= 0.30",
+        "sourceSeed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "pressureLevel >= 0.40 and side wall <= 0.30",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      }
+    },
+    {
+      "controls": {
+        "expectedStateEffect": {
+          "positiveControlRationale": "use left-side opening under pressure",
+          "primaryImprovement": [
+            "left escape lane preserved",
+            "terminalRisk decrease",
+            "collisionRisk decrease"
+          ],
+          "telemetryLimit": null
+        },
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "single-step delta",
+          "command flag without state effect",
+          "target-distance-only improvement under higher terminal risk",
+          "maxSteps survival without objective or risk improvement"
+        ],
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "failureResultClass": "measurement-invalid",
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-left",
+            "roll-left"
+          ],
+          "failureResultClass": "matrix-redesign-required",
+          "mustShowExpectedEffectBeforeGreen": true
+        }
+      },
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "sourceMaxSteps": 20,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 7
+      },
+      "id": "escape-left-open",
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "seedPlan": {
+        "justification": "BT93Q supplied deterministic wall/trail fixtures; BT93S expands each class to three deterministic seeds and revalidates predicates before effect claims.",
+        "mode": "deterministic-expanded-from-bt93q",
+        "seeds": [
+          930,
+          1930,
+          2930
+        ],
+        "sourceSeed": 930
+      },
+      "source": {
+        "blockId": "BT93Q",
+        "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+        "predicate": "wallDistanceLeft >= 0.80 and front/right not both fully open",
+        "sourceSeed": 930,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 7
+      },
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "wallDistanceLeft >= 0.80 and front/right not both fully open",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 7
+      }
+    },
+    {
+      "controls": {
+        "expectedStateEffect": {
+          "positiveControlRationale": "hard BT93S target blocker: use right-side opening under pressure",
+          "primaryImprovement": [
+            "right escape lane preserved",
+            "terminalRisk decrease",
+            "collisionRisk decrease"
+          ],
+          "telemetryLimit": null
+        },
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "single-step delta",
+          "command flag without state effect",
+          "target-distance-only improvement under higher terminal risk",
+          "maxSteps survival without objective or risk improvement"
+        ],
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "failureResultClass": "measurement-invalid",
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "roll-right"
+          ],
+          "failureResultClass": "matrix-redesign-required",
+          "mustShowExpectedEffectBeforeGreen": true
+        }
+      },
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "sourceMaxSteps": 20,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      },
+      "id": "escape-right-open",
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "seedPlan": {
+        "justification": "BT93Q supplied deterministic wall/trail fixtures; BT93S expands each class to three deterministic seeds and revalidates predicates before effect claims.",
+        "mode": "deterministic-expanded-from-bt93q",
+        "seeds": [
+          930,
+          1930,
+          2930
+        ],
+        "sourceSeed": 930
+      },
+      "source": {
+        "blockId": "BT93Q",
+        "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+        "predicate": "wallDistanceRight >= 0.80 and left/front not both fully open",
+        "sourceSeed": 930,
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      },
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "wallDistanceRight >= 0.80 and left/front not both fully open",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      }
+    },
+    {
+      "controls": {
+        "expectedStateEffect": {
+          "positiveControlRationale": "no-danger rows may not manufacture escape success",
+          "primaryImprovement": [
+            "stability without rescue claim",
+            "terminalRisk non-regression"
+          ],
+          "telemetryLimit": null
+        },
+        "forbiddenSuccessProxies": [
+          "rescue claim in no-danger state",
+          "single-step delta",
+          "command flag without state effect",
+          "target-distance-only improvement under higher terminal risk",
+          "maxSteps survival without objective or risk improvement"
+        ],
+        "negativeControls": {
+          "actions": [
+            "boost",
+            "shoot-mg"
+          ],
+          "failureResultClass": "measurement-invalid",
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "noop"
+          ],
+          "failureResultClass": "matrix-redesign-required",
+          "mustShowExpectedEffectBeforeGreen": true
+        }
+      },
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "sourceMaxSteps": 20,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "noop",
+        "warmupSteps": 0
+      },
+      "id": "no-danger-control",
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "seedPlan": {
+        "justification": "BT93Q supplied deterministic wall/trail fixtures; BT93S expands each class to three deterministic seeds and revalidates predicates before effect claims.",
+        "mode": "deterministic-expanded-from-bt93q",
+        "seeds": [
+          930,
+          1930,
+          2930
+        ],
+        "sourceSeed": 930
+      },
+      "source": {
+        "blockId": "BT93Q",
+        "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+        "predicate": "front/left/right open and pressureLevel <= 0.40",
+        "sourceSeed": 930,
+        "warmupAction": "noop",
+        "warmupSteps": 0
+      },
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "front/left/right open and pressureLevel <= 0.40",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "noop",
+        "warmupSteps": 0
+      }
+    }
+  ],
+  "schemaVersion": "bt93s-scenario-window-contract-v1",
+  "sourceArtifacts": [
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+      "phaseId": "93Q.4",
+      "resultClass": null,
+      "role": "BT93Q scenario classes",
+      "schemaVersion": "bt93q-walltrail-scenario-manifest-v1",
+      "sha256": "abe7a51ae263951ffb869662acc1998fede0377c1e4b8d4d51c69427196a2719",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "phaseId": "93Q.4",
+      "resultClass": "action-space-required",
+      "role": "BT93Q prior 4-step action-effect diagnostic",
+      "schemaVersion": "bt93q-action-effect-stress-report-v1",
+      "sha256": "21f6ea262bb4123bb9a05003d92982802f236a6fc3a71f3480961979b8a33d87",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93RR",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
+      "phaseId": "93RR.99",
+      "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+      "role": "BT93RR R-Allowlist handover opening only BT93S",
+      "schemaVersion": "bt93rr-reentry-handover-package-v1",
+      "sha256": "8c14379b6fe6388bbf689929e151511105fe09fac823790983634b3beedcfa12",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current PPO action surface decoder",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "tracked": true
+    }
+  ],
+  "surfaceDrift": {
+    "consequence": "BT93S pins the current decoder/actionSurfaceId; old matrix, baseline, and comparator artifacts remain context-only until re-evaluated on the pinned BT93S surface.",
+    "currentSemanticActions": [
+      "noop",
+      "yaw-left",
+      "yaw-right",
+      "pitch-up",
+      "pitch-down",
+      "roll-left",
+      "roll-right",
+      "boost",
+      "shoot-mg",
+      "turn-left-boost",
+      "turn-right-boost",
+      "evade-left",
+      "evade-right"
+    ],
+    "currentSurfaceId": "bt93q-walltrail-semantic-action-v1",
+    "semanticVocabularyChangedSinceBt93qManifest": true,
+    "sourceBt93qSurfaceId": "bt93g-masked-semantic-action-v1",
+    "sourceSemanticActions": [
+      "noop",
+      "yaw-left",
+      "yaw-right",
+      "pitch-up",
+      "pitch-down",
+      "roll-left",
+      "roll-right",
+      "boost",
+      "shoot-mg"
+    ],
+    "surfaceIdChangedSinceBt93qManifest": true
+  },
+  "windowContract": {
+    "earlyAbortEnabled": true,
+    "effectWindowSteps": 24,
+    "forbiddenSuccessProxyPolicy": "reward/command/maxSteps/single-step deltas cannot establish action quality",
+    "minimumCompletedSteps": 8,
+    "negativeControlsMustNotPass": true,
+    "positiveControlsRequiredBeforeGreen": true,
+    "terminalAbortEnabled": true,
+    "warmupPreservedFromBt93q": true
+  }
+}

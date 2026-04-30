@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 392,
+          "concreteCount": 395,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 530,
+          "concreteCount": 533,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 388,
+          "concreteCount": 391,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 387,
+          "concreteCount": 390,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1029,
+          "concreteCount": 1032,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1037,
+          "concreteCount": 1040,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1772,18 +1772,19 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S.1",
+        "currentPhase": "93S.2",
         "scopeDeclarations": [
           "data/training/ppo/bt93s/action_surface_decision.json",
           "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
           "data/training/ppo/bt93s/existing_action_effect_report.json",
           "data/training/ppo/bt93s/policy_selection_report.json",
           "data/training/ppo/bt93s/scenario_window_contract.json",
-          "docs/bot-training/Bot_Trainingsplan.md"
+          "docs/bot-training/Bot_Trainingsplan.md",
+          "python/scripts/bt93s_scenario_window_contract.py"
         ],
         "scopeResolution": {
-          "concreteCount": 1,
-          "plannedCount": 5
+          "concreteCount": 3,
+          "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5201,7 +5202,7 @@
       "id": "BT93S.1",
       "type": "phase",
       "title": "Szenariofenster und Controls",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.1"
@@ -14886,8 +14887,8 @@
     {
       "id": "BT93S.1.1",
       "type": "subphase",
-      "title": "Wall-/Trail-/Escape-Klassen aus BT93Q uebernehmen und fehlende Controls ergaenzen.",
-      "status": "open",
+      "title": "Wall-/Trail-/Escape-Klassen aus BT93Q uebernehmen und fehlende Controls ergaenzen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_scenario_window_contract.py --write-reports` -> `data/training/ppo/bt93s/scenario_window_contract.json`, `phaseCoverage.93S.1.1=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.1",
@@ -14897,8 +14898,8 @@
     {
       "id": "BT93S.1.2",
       "type": "subphase",
-      "title": "Matrix-ID, Action-Surface-ID und Mindestfenster vor Messung pinnen.",
-      "status": "open",
+      "title": "Matrix-ID, Action-Surface-ID und Mindestfenster vor Messung pinnen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_scenario_window_contract.py --write-reports` -> `data/training/ppo/bt93s/scenario_window_contract.json`, `matrixId=bt93s-walltrail-action-effect-matrix-v1`, `actionSurfaceId=bt93q-walltrail-semantic-action-v1`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.1",
@@ -30061,6 +30062,26 @@
       }
     },
     {
+      "id": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/training/ppo/bt93s/action_surface_decision.json",
       "type": "file",
       "title": null,
@@ -30130,9 +30151,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -38283,6 +38310,27 @@
           "BT93D",
           "BT93E",
           "BT93RR"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s_scenario_window_contract.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S"
         ],
         "exists": true
       }
@@ -75673,6 +75721,24 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -77150,6 +77216,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s_scenario_window_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79398,6 +79473,24 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -80857,6 +80950,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s_scenario_window_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84303,6 +84405,24 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -85771,6 +85891,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s_scenario_window_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88318,6 +88447,24 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -89786,6 +89933,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s_scenario_window_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98737,6 +98893,24 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -100205,6 +100379,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s_scenario_window_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -108331,6 +108514,24 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -109808,6 +110009,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s_scenario_window_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -136375,6 +136585,15 @@
     {
       "from": "BT93S",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "python/scripts/bt93s_scenario_window_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
