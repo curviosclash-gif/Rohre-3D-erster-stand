@@ -401,7 +401,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93X.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als read-only `dqn-loader-fix-required`; oeffnet nichts |
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
 | Bot-Codex | BT93RR | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S |
-| - | BT93S | - | frei | geoeffnet durch BT93RR.99 in R-Allowlist; naechster Fix-Planung-Scope |
+| Bot-Codex | BT93S | 2026-04-30 | claimed | geoeffnet durch BT93RR.99 in R-Allowlist; naechster Fix-Planung-Scope |
 | - | BT93T | - | frei | wartet auf Telemetry-Start aus BT93S |
 | - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
