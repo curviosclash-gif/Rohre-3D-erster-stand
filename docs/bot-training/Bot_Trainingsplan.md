@@ -413,7 +413,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93RR | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S |
 | Bot-Codex | BT93S | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `matrix-redesign-required`; oeffnet keinen Folgeblock |
 | - | BT93S2 | 2026-04-30 | blockiert | bis 93S2.3 abgeschlossen als `measurement-invalid`; kein Claim vor `BT93S2R.99=matrix-control-reentry-green` plus frischem S2.3-Recheck |
-| - | BT93S2R | - | frei | naechster erlaubter Claim: Matrix-/Control-Reentry vor jedem S2.3-Recheck oder 93S2.4-Start |
+| Bot-Codex | BT93S2R | 2026-04-30 | active | Matrix-/Control-Reentry vor jedem S2.3-Recheck oder 93S2.4-Start |
 | - | BT93T | - | frei | blockiert, bis BT93S2R gruen ist und frischer BT93S2-Recheck `observation-telemetry-required` schreibt |
 | - | BT93U | - | frei | wartet auf BT93S2R-Gruen plus frisches BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -3934,7 +3934,7 @@ Pflicht-Evidence:
 
 Quelle: `docs/plaene/neu/BT93S2R_Matrix_Control_Reentry_Replan_2026-04-30.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex active 2026-04-30 -->
 
 Scope:
 
