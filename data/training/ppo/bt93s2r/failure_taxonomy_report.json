@@ -1,0 +1,939 @@
+{
+  "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+  "allowNext": [
+    "93S2R.2 Targeted Trace Audit"
+  ],
+  "allowedClosureResultClasses": [
+    "matrix-control-reentry-green",
+    "escape-left-control-required",
+    "escape-right-scenario-required",
+    "side-wall-direction-contract-required",
+    "neutral-control-required",
+    "predicate-window-required",
+    "measurement-invalid"
+  ],
+  "blockId": "BT93S2R",
+  "blocksNext": [
+    "93S2.4 start before BT93S2R.99=matrix-control-reentry-green plus fresh BT93S2.3-Recheck",
+    "BT93T claim before fresh S2-Recheck opens only observation telemetry",
+    "BT93U claim before fresh S2-Recheck opens action-selection-green",
+    "BT93V claim",
+    "BT93W claim",
+    "BT93O claim",
+    "BT93X full claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "50k/100k/200k/500k/1M extension",
+    "reward fix from BT93S2R.1",
+    "telemetry fix from BT93S2R.1",
+    "action-surface change from BT93S2R.1"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93s2Phase4Allowed": false,
+    "bt93s2RecheckAllowed": false,
+    "bt93s2rNextPhaseAllowed": true,
+    "bt93tClaimAllowed": false,
+    "bt93uClaimAllowed": false,
+    "bt93vClaimAllowed": false,
+    "bt93wClaimAllowed": false,
+    "bt93xFullClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffAllowed": false,
+    "candidateRunsAllowed": false,
+    "freezeAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "ppoValidateSignalAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "classResultCounts": {
+    "action-effect-weak": 1,
+    "existing-action-effect-observed": 6,
+    "measurement-invalid": 1,
+    "neutral-control-unstable": 1
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "tests": "user-owned except closure gate scripts",
+    "write": "python python/scripts/bt93s2r_failure_taxonomy.py --write-report"
+  },
+  "contractId": "bt93s2-walltrail-action-effect-window-v2",
+  "controlScenarioIds": [
+    "escape-left-open",
+    "escape-right-open",
+    "no-danger-control",
+    "side-wall-left"
+  ],
+  "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+  "dodCoverage": {
+    "DoD.S2R-R1": true,
+    "DoD.S2R-R2": true
+  },
+  "failureTaxonomy": [
+    {
+      "blocks": [
+        "93S2.4",
+        "BT93T",
+        "BT93U",
+        "BT93W",
+        "BT93O",
+        "BT93P",
+        "BT94A"
+      ],
+      "evidence": {
+        "actionGreenEvidenceProduced": true,
+        "negativeControlActions": [
+          "noop"
+        ],
+        "noopPassedAsSuccess": true,
+        "positiveControlActions": [
+          "yaw-left",
+          "turn-left-boost",
+          "evade-right"
+        ],
+        "probeCounts": {
+          "actionNames": [
+            "boost",
+            "evade-left",
+            "evade-right",
+            "noop",
+            "pitch-down",
+            "pitch-up",
+            "roll-left",
+            "roll-right",
+            "shoot-mg",
+            "turn-left-boost",
+            "turn-right-boost",
+            "yaw-left",
+            "yaw-right"
+          ],
+          "minimumWindowFailureCount": 2,
+          "predicateFailureCount": 18,
+          "probeCount": 39,
+          "seeds": [
+            930,
+            1930,
+            2930
+          ]
+        },
+        "successfulActions": [
+          "boost",
+          "evade-left",
+          "evade-right",
+          "noop",
+          "pitch-down",
+          "roll-left",
+          "roll-right",
+          "shoot-mg",
+          "turn-left-boost",
+          "yaw-left",
+          "yaw-right"
+        ]
+      },
+      "id": "escape-left-open negative-control-failed",
+      "requiresTraceAuditBeforeFix": true,
+      "resultClass": "measurement-invalid",
+      "rootCauseCandidate": "negative-control-failed",
+      "scenarioId": "escape-left-open",
+      "traceFocus": [
+        "reproduce noop against passive baseline",
+        "separate passive drift from directed left escape",
+        "compare positive controls against same seed/window"
+      ]
+    },
+    {
+      "blocks": [
+        "93S2.4 direct surface decision",
+        "BT93U",
+        "BT93W",
+        "BT93O",
+        "BT93P",
+        "BT94A"
+      ],
+      "evidence": {
+        "actionGreenEvidenceProduced": false,
+        "listedAsActionSpaceRequired": true,
+        "negativeControlActions": [
+          "noop"
+        ],
+        "positiveControlActions": [
+          "yaw-right",
+          "roll-right",
+          "turn-right-boost",
+          "evade-right"
+        ],
+        "probeCounts": {
+          "actionNames": [
+            "boost",
+            "evade-left",
+            "evade-right",
+            "noop",
+            "pitch-down",
+            "pitch-up",
+            "roll-left",
+            "roll-right",
+            "shoot-mg",
+            "turn-left-boost",
+            "turn-right-boost",
+            "yaw-left",
+            "yaw-right"
+          ],
+          "minimumWindowFailureCount": 0,
+          "predicateFailureCount": 15,
+          "probeCount": 39,
+          "seeds": [
+            930,
+            1930,
+            2930
+          ]
+        },
+        "successfulActions": [],
+        "weakActions": [
+          "boost",
+          "evade-left",
+          "evade-right",
+          "pitch-down",
+          "pitch-up",
+          "roll-left",
+          "roll-right",
+          "shoot-mg",
+          "turn-left-boost",
+          "turn-right-boost",
+          "yaw-left",
+          "yaw-right"
+        ]
+      },
+      "id": "escape-right-open action-space-required candidate",
+      "requiresTraceAuditBeforeFix": true,
+      "resultClass": "action-effect-weak",
+      "rootCauseCandidate": "action-space-required-candidate",
+      "scenarioId": "escape-right-open",
+      "traceFocus": [
+        "prove predicate/window fairness before action-space judgement",
+        "compare yaw-right roll-right turn-right-boost evade-right",
+        "keep as candidate only until trace audit"
+      ]
+    },
+    {
+      "blocks": [
+        "BT93S2.3-Recheck green",
+        "BT93T",
+        "BT93U",
+        "BT93W",
+        "BT93O",
+        "BT93P",
+        "BT94A"
+      ],
+      "evidence": {
+        "actionGreenEvidenceAllowed": false,
+        "actionGreenEvidenceProduced": false,
+        "negativeControlActions": [
+          "boost",
+          "shoot-mg"
+        ],
+        "negativeControlFailed": false,
+        "neutralStableActions": [],
+        "positiveControlActions": [
+          "noop"
+        ],
+        "probeCounts": {
+          "actionNames": [
+            "boost",
+            "evade-left",
+            "evade-right",
+            "noop",
+            "pitch-down",
+            "pitch-up",
+            "roll-left",
+            "roll-right",
+            "shoot-mg",
+            "turn-left-boost",
+            "turn-right-boost",
+            "yaw-left",
+            "yaw-right"
+          ],
+          "minimumWindowFailureCount": 0,
+          "predicateFailureCount": 1,
+          "probeCount": 26,
+          "seeds": [
+            930,
+            1930
+          ]
+        },
+        "weakActions": [
+          "boost",
+          "evade-left",
+          "evade-right",
+          "pitch-down",
+          "pitch-up",
+          "roll-left",
+          "roll-right",
+          "shoot-mg",
+          "turn-left-boost",
+          "turn-right-boost",
+          "yaw-left",
+          "yaw-right"
+        ]
+      },
+      "id": "no-danger-control neutral-control-unstable",
+      "requiresTraceAuditBeforeFix": true,
+      "resultClass": "neutral-control-unstable",
+      "rootCauseCandidate": "neutral-control-required",
+      "scenarioId": "no-danger-control",
+      "traceFocus": [
+        "reproduce noop neutral stability",
+        "prove boost and shoot-mg stay negative controls",
+        "prevent neutral control from producing action-green evidence"
+      ]
+    },
+    {
+      "blocks": [
+        "BT93S2.3-Recheck green",
+        "BT93T",
+        "BT93U",
+        "BT93W",
+        "BT93O",
+        "BT93P",
+        "BT94A"
+      ],
+      "evidence": {
+        "actionGreenEvidenceProduced": true,
+        "missingPositiveSuccessfulActions": [
+          "evade-left",
+          "roll-left",
+          "yaw-left"
+        ],
+        "negativeControlActions": [
+          "noop"
+        ],
+        "positiveControlActions": [
+          "yaw-left",
+          "roll-left",
+          "evade-left"
+        ],
+        "probeCounts": {
+          "actionNames": [
+            "boost",
+            "evade-left",
+            "evade-right",
+            "noop",
+            "pitch-down",
+            "pitch-up",
+            "roll-left",
+            "roll-right",
+            "shoot-mg",
+            "turn-left-boost",
+            "turn-right-boost",
+            "yaw-left",
+            "yaw-right"
+          ],
+          "minimumWindowFailureCount": 0,
+          "predicateFailureCount": 0,
+          "probeCount": 39,
+          "seeds": [
+            942,
+            1942,
+            2942
+          ]
+        },
+        "successfulActions": [
+          "yaw-right"
+        ],
+        "unexpectedSuccessfulActions": [
+          "yaw-right"
+        ],
+        "yawRightOnlySuccess": true
+      },
+      "id": "side-wall-left direction/control mismatch",
+      "requiresTraceAuditBeforeFix": true,
+      "resultClass": "existing-action-effect-observed",
+      "rootCauseCandidate": "side-wall-direction-contract-required",
+      "scenarioId": "side-wall-left",
+      "traceFocus": [
+        "verify left/right coordinate label",
+        "compare yaw-left roll-left evade-left against yaw-right",
+        "stop as direction-contract red if label/control cannot be reconciled"
+      ]
+    },
+    {
+      "blocks": [
+        "matrix-control-reentry-green",
+        "BT93S2.3-Recheck green",
+        "BT93T/U/W/O/P/94A"
+      ],
+      "evidence": {
+        "expectedPredicateFailureCount": 48,
+        "matchesExpected": true,
+        "predicateFailureCount": 48
+      },
+      "id": "predicateFailureCount=48",
+      "requiresTraceAuditBeforeFix": true,
+      "resultClass": "measurement-invalid",
+      "rootCauseCandidate": "predicate-window-required",
+      "scenarioId": null,
+      "traceFocus": [
+        "session-id",
+        "warmup",
+        "seed split",
+        "revalidation parity"
+      ]
+    },
+    {
+      "blocks": [
+        "matrix-control-reentry-green",
+        "BT93S2.3-Recheck green",
+        "BT93T/U/W/O/P/94A"
+      ],
+      "evidence": {
+        "expectedMinimumWindowFailureCount": 12,
+        "matchesExpected": true,
+        "minimumWindowFailureCount": 12
+      },
+      "id": "minimumWindowFailureCount=12",
+      "requiresTraceAuditBeforeFix": true,
+      "resultClass": "measurement-invalid",
+      "rootCauseCandidate": "predicate-window-required",
+      "scenarioId": null,
+      "traceFocus": [
+        "minimum completed steps",
+        "terminal abort",
+        "maxSteps",
+        "warmup"
+      ]
+    },
+    {
+      "blocks": [
+        "reward-only or command-flag-only success",
+        "action-quality claim from command flags"
+      ],
+      "evidence": {
+        "commandFlagOnlyRejected": true,
+        "commandFlagWithoutStateEffectCount": 118,
+        "expectedCommandFlagWithoutStateEffectCount": 118,
+        "matchesExpected": true
+      },
+      "id": "commandFlagWithoutStateEffectCount=118",
+      "requiresTraceAuditBeforeFix": true,
+      "resultClass": "proxy-hygiene-retained",
+      "rootCauseCandidate": "proxy-success-rejection-required",
+      "scenarioId": null,
+      "traceFocus": [
+        "keep command flag without state effect rejected"
+      ]
+    },
+    {
+      "blocks": [
+        "reward-only success",
+        "maxSteps-only survival success",
+        "BT94A quality claim"
+      ],
+      "evidence": {
+        "expectedRewardOnlyRejectedCount": 77,
+        "matchesExpected": true,
+        "rewardOnlyRejected": true,
+        "rewardOnlyRejectedCount": 77,
+        "terminalOrMaxStepsOnlySuccessCount": 0
+      },
+      "id": "rewardOnlyRejectedCount=77",
+      "requiresTraceAuditBeforeFix": true,
+      "resultClass": "proxy-hygiene-retained",
+      "rootCauseCandidate": "proxy-success-rejection-required",
+      "scenarioId": null,
+      "traceFocus": [
+        "keep reward-only and maxSteps-only rejected"
+      ]
+    }
+  ],
+  "generatedAt": "2026-04-30T20:45:00Z",
+  "generatedBy": "python/scripts/bt93s2r_failure_taxonomy.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "a2854edc5a0ec2d0b46d332faf79a98d5bb4265a",
+    "sha": "f8a27cdfa2255513c29dca438fbe56eaec86fda6"
+  },
+  "guardrails": {
+    "actionSurfaceChanged": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "qualityClaimAllowed": false,
+    "rewardFixApplied": false,
+    "runtimeSurfacesTouched": [],
+    "safetyFixApplied": false,
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "invalidations": [
+    {
+      "reason": "BT93S2.3 is measurement-invalid; 93S2.4 remains blocked until BT93S2R.99 green plus fresh S2.3-Recheck.",
+      "scope": "BT93S2.3 normal continuation"
+    },
+    {
+      "reason": "Action-space-required is only a candidate until predicate/window fairness is proven by targeted trace audit.",
+      "scope": "escape-right-open action-space judgement"
+    },
+    {
+      "reason": "Successful action yaw-right contradicts left-side positive controls yaw-left/roll-left/evade-left.",
+      "scope": "side-wall-left positive evidence"
+    }
+  ],
+  "matrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+  "missingExpectedFailures": [],
+  "nextAllowedActions": [
+    "Run 93S2R.2 targeted trace audit against the locked taxonomy."
+  ],
+  "ok": true,
+  "opensNext": [
+    "93S2R.2 Targeted Trace Audit"
+  ],
+  "phaseCoverage": {
+    "93S2R.1.1": true,
+    "93S2R.1.2": true,
+    "93S2R.1.3": true
+  },
+  "phaseId": "93S2R.1",
+  "proxyHygiene": {
+    "commandFlagOnlyRejected": true,
+    "commandFlagWithoutStateEffectCount": 118,
+    "maxStepsOnlyRejected": true,
+    "rewardOnlyRejected": true,
+    "rewardOnlyRejectedCount": 77,
+    "successRequiresStateEffect": true,
+    "terminalOrMaxStepsOnlySuccessCount": 0
+  },
+  "recommendations": [
+    {
+      "action": "Run 93S2R.2 Targeted Trace Audit.",
+      "rank": "1",
+      "why": "S2.3 is preserved as measurement-invalid and the exact red findings are now locked; fixes need root-cause trace evidence before any v3 matrix edit."
+    }
+  ],
+  "reportHash": "e41815c49966f08f5a3c2321af4552266cdaa7fa041fb63cbe3858c76bd7662f",
+  "resultClass": "failure-taxonomy-source-lock-green",
+  "s2_3RedSourcePreserved": true,
+  "sampleCounts": {
+    "actionCount": 13,
+    "holdoutEpisodes": 0,
+    "minimumWindowFailureCount": 12,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "predicateFailureCount": 48,
+    "probeCount": 338,
+    "scenarioCount": 9,
+    "seedCountsByScenario": {
+      "escape-left-open": 3,
+      "escape-right-open": 3,
+      "frontal-near-wall": 3,
+      "narrowing-corridor": 3,
+      "no-danger-control": 2,
+      "side-wall-left": 3,
+      "side-wall-right": 3,
+      "trail-ahead": 3,
+      "trail-side": 3
+    }
+  },
+  "scenarioIds": [
+    "escape-left-open",
+    "escape-right-open",
+    "frontal-near-wall",
+    "narrowing-corridor",
+    "no-danger-control",
+    "side-wall-left",
+    "side-wall-right",
+    "trail-ahead",
+    "trail-side"
+  ],
+  "schemaVersion": "bt93s2r-failure-taxonomy-v1",
+  "scriptHashes": {
+    "bt93s2ExistingActionEffectV2": "9f6bba2f29e7ea02c46337b652b8919338ce490fc8c741cf800677c478fba6f6",
+    "bt93s2ScenarioMatrixV2": "44ffb8553c77b78d1aad183fc6f6fc7c84eedc4c89795e36d32170b825f579aa",
+    "bt93s2StartContract": "12ccc6b32ab412919e4ffd9a6f7943e6f05c6a63ca06811273090a5eb7fbb6a7",
+    "bt93s2rFailureTaxonomy": "594263d779966fb9099c97b62aedbc22c0de71ab24b77c6d3c4abb020906387e"
+  },
+  "sourceArtifacts": [
+    {
+      "actualFields": {
+        "blockId": "BT93S2",
+        "ok": true,
+        "phaseId": "93S2.1",
+        "resultClass": "start-contract-locked"
+      },
+      "blockId": "BT93S2",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2",
+        "ok": true,
+        "phaseId": "93S2.1",
+        "resultClass": "start-contract-locked"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2/start_contract.json",
+      "phaseId": "93S2.1",
+      "resultClass": "start-contract-locked",
+      "role": "BT93S2.1 source lock",
+      "schemaVersion": "bt93s2-start-contract-v1",
+      "sha256": "078488d50fa13edaee26f4a2b798f2d96690c856209bb762501945d461fa4ce0",
+      "sourceKey": "bt93s2StartContract",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2",
+        "ok": true,
+        "phaseId": "93S2.2",
+        "resultClass": "scenario-matrix-v2-contract-green"
+      },
+      "blockId": "BT93S2",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2",
+        "ok": true,
+        "phaseId": "93S2.2",
+        "resultClass": "scenario-matrix-v2-contract-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
+      "phaseId": "93S2.2",
+      "resultClass": "scenario-matrix-v2-contract-green",
+      "role": "BT93S2.2 matrix-v2 contract",
+      "schemaVersion": "bt93s2-scenario-matrix-v2-contract-v1",
+      "sha256": "d16f718812556a984c789d8559a51cc68cf91eefc9e774ed821fe33bb83890c8",
+      "sourceKey": "bt93s2ScenarioMatrixV2",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2",
+        "ok": true,
+        "phaseId": "93S2.2",
+        "resultClass": "scenario-matrix-v2-contract-green"
+      },
+      "blockId": "BT93S2",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2",
+        "ok": true,
+        "phaseId": "93S2.2",
+        "resultClass": "scenario-matrix-v2-contract-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2/scenario_search_report.json",
+      "phaseId": "93S2.2",
+      "resultClass": "scenario-matrix-v2-contract-green",
+      "role": "BT93S2.2 deterministic scenario search",
+      "schemaVersion": "bt93s2-scenario-search-report-v1",
+      "sha256": "ac4a1c7ef958ae4f695aa079647a31a557a59d5801e3e414a205b750a103fba4",
+      "sourceKey": "bt93s2ScenarioSearch",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2",
+        "ok": false,
+        "phaseId": "93S2.3",
+        "resultClass": "measurement-invalid"
+      },
+      "blockId": "BT93S2",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2",
+        "ok": false,
+        "phaseId": "93S2.3",
+        "resultClass": "measurement-invalid"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": false,
+      "path": "data/training/ppo/bt93s2/existing_action_effect_v2_report.json",
+      "phaseId": "93S2.3",
+      "resultClass": "measurement-invalid",
+      "role": "BT93S2.3 red measurement source",
+      "schemaVersion": "bt93s2-existing-action-effect-v2-report-v1",
+      "sha256": "5e55722633329afd035c078cbdb3786d65724357bce083249c6b8079eec49ee8",
+      "sourceKey": "bt93s2ExistingActionEffectV2",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.99",
+        "resultClass": "matrix-redesign-required"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.99",
+        "resultClass": "matrix-redesign-required"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
+      "phaseId": "93S.99",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.99 red source before BT93S2",
+      "schemaVersion": "bt93s-closure-gate-report-v1",
+      "sha256": "8d40084b0bf7afc191b8b4860c3df06cc3064a84e3a6fd5986c5edbe0525a4fa",
+      "sourceKey": "bt93sClosure",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "phaseId": "93RR.99",
+      "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+      "role": "BT93RR.99 green R-Reentry source",
+      "schemaVersion": "bt93rr-reentry-closure-gate-report-v1",
+      "sha256": "b3b4712987cbd353254e3e05beba1ebf3e30faa49d7a8673e75d729470fa5ea2",
+      "sourceKey": "bt93rrClosure",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
+      "phaseId": "93RR.99",
+      "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+      "role": "BT93RR.99 handover package",
+      "schemaVersion": "bt93rr-reentry-handover-package-v1",
+      "sha256": "8c14379b6fe6388bbf689929e151511105fe09fac823790983634b3beedcfa12",
+      "sourceKey": "bt93rrHandover",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93Y",
+        "ok": true,
+        "resultClass": "retrain-lineage-ready"
+      },
+      "blockId": "BT93Y",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93Y",
+        "ok": true,
+        "resultClass": "retrain-lineage-ready"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "phaseId": "93Y.3",
+      "resultClass": "retrain-lineage-ready",
+      "role": "BT93Y retrain lineage source",
+      "schemaVersion": "bt93y-retrain-lineage-manifest-v1",
+      "sha256": "fea37024ff686fd84fc73a5d6dfecca663606acbb0316ef8a1fceb4dfae89737",
+      "sourceKey": "bt93yRetrainLineage",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "read-only PPO action-surface decoder",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sourceKey": "ppoActionSurface",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/curvios_env.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "read-only Python sidecar env",
+      "schemaVersion": null,
+      "sha256": "2a12d75b327b10daef853cc242e6d81fb87c4ee838756d6cef1905d19de94d59",
+      "sourceKey": "curviosEnv",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "read-only JS-authoritative lane runner",
+      "schemaVersion": null,
+      "sha256": "d6a2917a001a310010a98ee150726af110f1444b0716e6ac3a35815253144360",
+      "sourceKey": "headlessRunner",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2_start_contract.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93S2.1 generating script hash",
+      "schemaVersion": null,
+      "sha256": "12ccc6b32ab412919e4ffd9a6f7943e6f05c6a63ca06811273090a5eb7fbb6a7",
+      "sourceKey": "bt93s2StartScript",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2_scenario_matrix_v2.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93S2.2 generating script hash",
+      "schemaVersion": null,
+      "sha256": "44ffb8553c77b78d1aad183fc6f6fc7c84eedc4c89795e36d32170b825f579aa",
+      "sourceKey": "bt93s2MatrixScript",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93S2.3 generating script hash",
+      "schemaVersion": null,
+      "sha256": "9f6bba2f29e7ea02c46337b652b8919338ce490fc8c741cf800677c478fba6f6",
+      "sourceKey": "bt93s2EffectScript",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2r_failure_taxonomy.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93S2R.1 generating script hash",
+      "schemaVersion": null,
+      "sha256": "594263d779966fb9099c97b62aedbc22c0de71ab24b77c6d3c4abb020906387e",
+      "sourceKey": "bt93s2rTaxonomyScript",
+      "tracked": true
+    }
+  ],
+  "sourceContractMatches": true,
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "sourceResultClasses": {
+    "bt93rrClosure": "eval-mode-bug-fixed-counterprobe-green",
+    "bt93s2ExistingActionEffectV2": "measurement-invalid",
+    "bt93s2ScenarioMatrixV2": "scenario-matrix-v2-contract-green",
+    "bt93s2ScenarioSearch": "scenario-matrix-v2-contract-green",
+    "bt93s2StartContract": "start-contract-locked",
+    "bt93sClosure": "matrix-redesign-required"
+  },
+  "summary": {
+    "blockers": [],
+    "bt93oP94aStillClosed": true,
+    "bt93s2RecheckAllowed": false,
+    "bt93tAllowed": false,
+    "bt93uAllowed": false,
+    "finalResult": "failure-taxonomy-source-lock-green",
+    "nextBestAction": "93S2R.2",
+    "sourceLocked": true
+  }
+}
