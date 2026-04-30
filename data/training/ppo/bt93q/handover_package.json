@@ -1,0 +1,106 @@
+{
+  "activeBlockers": [
+    "action-space-required",
+    "observation-telemetry-required",
+    "policy-collapse-active",
+    "reward-redesign-required",
+    "safety-action-contract-diagnostic-only"
+  ],
+  "blockId": "BT93Q",
+  "blocksNext": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k extension"
+  ],
+  "bt93oClaimAllowed": false,
+  "bt93pClaimAllowed": false,
+  "bt94aClaimAllowed": false,
+  "bt94aNoStartState": {
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "matrixDefinitionAllowed": false,
+    "resultClass": "blocked-no-start"
+  },
+  "candidateFreezeAllowed": false,
+  "candidateRunsAllowed": false,
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93q_closure_gate.py --write-report"
+  },
+  "dqnAnchorStatus": {
+    "comparisonPolicyDecision": "dqn-anchor-blocked",
+    "nonBlockingForPositiveReentry": false,
+    "sameMatrixDqnAnchorPresent": false
+  },
+  "generatedAt": "2026-04-30T00:05:23Z",
+  "generatedBy": "python/scripts/bt93q_closure_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "e74fe048b6b081a6ea63500f006168cdcc26b538"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": []
+  },
+  "holdoutUsed": false,
+  "matrixId": "bt93q-walltrail-policy-recheck-v1",
+  "nextRecommendedActions": [
+    {
+      "action": "Replan a narrow BT93Q follow-up before BT93O instead of claiming BT93O.",
+      "id": "R1",
+      "why": "BT93Q.99 closes red; the deterministic eval policy is still collapsed and action/reward/telemetry blockers remain active."
+    },
+    {
+      "action": "Fix deterministic policy-collapse and prove non-collapsed action distribution before any further PPO recheck.",
+      "id": "R2",
+      "why": "micro_ppo_recheck_report.json blocked the 10k run with resultClass=policy-collapse-active."
+    },
+    {
+      "action": "Repair wall/trail action effect or action selection after the failed Action fix.",
+      "id": "R3",
+      "why": "fix_delta_report.json remains action-fix-insufficient and action_effect_stress_report.json still reports action-space-required."
+    },
+    {
+      "action": "Expose or derive the missing training-only raw/trail/escape-lane telemetry before interpreting trail behavior as solved.",
+      "id": "R4",
+      "why": "observation_telemetry_gap_report.json remains observation-telemetry-required."
+    },
+    {
+      "action": "Redesign danger-aware reward ordering in a separate fix class.",
+      "id": "R5",
+      "why": "reward_pressure_ordering_report.json shows positive reward under worsening wall/trail pressure without real success."
+    }
+  ],
+  "ok": true,
+  "opensNext": [],
+  "phaseId": "93Q.99",
+  "resultClass": "policy-collapse-active",
+  "schemaVersion": "bt93q-handover-package-v1",
+  "semanticWindow": "bt93q-walltrail-10k-diagnostic-window",
+  "summary": {
+    "bt93oStartDecision": "blocked",
+    "bt93oStartReason": "BT93Q did not close walltrail-policy-green; policy/action/telemetry/reward blockers remain active.",
+    "finalResult": "policy-collapse-active",
+    "noCandidateFreezeHoldoutPromoteRolloutSignal": true,
+    "noRuntimeSignal": true
+  }
+}

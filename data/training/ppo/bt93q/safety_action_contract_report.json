@@ -1,0 +1,66 @@
+{
+  "blockId": "BT93Q",
+  "blocksNext": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k extension"
+  ],
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93q_closure_gate.py --write-report"
+  },
+  "contractDecision": {
+    "bt93oBlockedUntilSafetyIsActionEffective": true,
+    "handlungswirksameMaskOrPolicyRequiredBeforeGreen": true,
+    "productiveRuntimeSafetySwitchAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "safetyMaskFixSelectedIn93Q": false,
+    "vetoActiveIsDiagnosticOnly": true
+  },
+  "evidence": {
+    "maxVetoRate": 0.0,
+    "microRecheckStarted": false,
+    "newActionsSafetyZero": true,
+    "vetoActiveRows": 173,
+    "vetoEventRows": 0
+  },
+  "generatedAt": "2026-04-30T00:05:23Z",
+  "generatedBy": "python/scripts/bt93q_closure_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "e74fe048b6b081a6ea63500f006168cdcc26b538"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": []
+  },
+  "nextAllowedActions": [
+    "treat safety veto fields as diagnostics until a later pre-sampling mask/emergency policy proves state effect",
+    "do not change productive runtime safety in BT93Q"
+  ],
+  "ok": true,
+  "phaseCoverage": {
+    "DoD.8": true
+  },
+  "phaseId": "93Q.99",
+  "resultClass": "safety-diagnostic-only",
+  "schemaVersion": "bt93q-safety-action-contract-report-v1"
+}

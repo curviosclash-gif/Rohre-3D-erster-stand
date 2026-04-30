@@ -1,0 +1,448 @@
+{
+  "blockId": "BT93Q",
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93q_closure_gate.py --write-report"
+  },
+  "decision": {
+    "blocksNext": [
+      "BT93O claim",
+      "BT93P claim",
+      "BT94A claim",
+      "candidate run",
+      "freeze candidate",
+      "holdout consumption",
+      "promote",
+      "rollout",
+      "PPO-Validate or BT95 handoff signal",
+      "50k/100k/200k extension"
+    ],
+    "bt93oClaimAllowed": false,
+    "nextAllowedActions": [
+      "separate reward-ordering repair before any BT93O quality claim",
+      "keep reward totals out of quality evidence while wall/trail pressure rows receive positive reward"
+    ],
+    "progressOrCheckpointRewardWronglyOrderedNearPressure": true,
+    "resultClass": "reward-redesign-required",
+    "rewardFixAllowedWithoutNewPlan": false
+  },
+  "generatedAt": "2026-04-30T00:05:23Z",
+  "generatedBy": "python/scripts/bt93q_closure_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "e74fe048b6b081a6ea63500f006168cdcc26b538"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": []
+  },
+  "matrixId": "bt93q-walltrail-policy-recheck-v1",
+  "ok": true,
+  "phaseCoverage": {
+    "DoD.9": true
+  },
+  "phaseId": "93Q.99",
+  "pressureEvidence": {
+    "breakdownTotals": {
+      "baseStep": -3.456,
+      "checkpointReached": 5.1,
+      "crash": 0.0,
+      "damageDealt": 0.0,
+      "damageTaken": 0.0,
+      "external": 0.0,
+      "itemPickup": 0.0,
+      "itemUse": 0.0,
+      "kill": 0.0,
+      "loss": -81.0,
+      "lowHealthThreat": -3.167067,
+      "opponentRisk": 0.0,
+      "parcoursCompleted": 0.0,
+      "stuck": 0.0,
+      "survival": 2.376,
+      "survivalPressureBonus": 0.904671,
+      "trailRisk": 0.0,
+      "wallRisk": -14.00257,
+      "win": 0.0,
+      "wrongOrder": 0.0
+    },
+    "checkpointRows": 6,
+    "negativeComponentTotals": {
+      "baseStep": -3.456,
+      "loss": -81.0,
+      "lowHealthThreat": -3.167067,
+      "wallRisk": -14.00257
+    },
+    "positiveComponentTotals": {
+      "checkpointReached": 5.1,
+      "survival": 2.376,
+      "survivalPressureBonus": 0.904671
+    },
+    "positiveRiskyRewardActionRowCount": 29,
+    "positiveRiskyRewardActionRows": [
+      {
+        "action": "boost",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.312069,
+        "riskDeltas": {
+          "collisionRisk": 0.002826,
+          "deadEndRisk": 0.01,
+          "terminalRisk": 0.002826,
+          "threatHorizon": 0.007215
+        },
+        "scenarioId": "escape-left-open"
+      },
+      {
+        "action": "roll-left",
+        "rewardOnlyRejected": false,
+        "rewardTotal": 1.642126,
+        "riskDeltas": {
+          "collisionRisk": 0.02221,
+          "deadEndRisk": 0.035,
+          "terminalRisk": -0.014081,
+          "threatHorizon": -0.014081
+        },
+        "scenarioId": "escape-left-open"
+      },
+      {
+        "action": "pitch-up",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.388612,
+        "riskDeltas": {
+          "collisionRisk": 0.40807,
+          "deadEndRisk": 0.41,
+          "terminalRisk": 0.41,
+          "threatHorizon": 0.3772
+        },
+        "scenarioId": "escape-right-open"
+      },
+      {
+        "action": "roll-left",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.388526,
+        "riskDeltas": {
+          "collisionRisk": 0.406748,
+          "deadEndRisk": 0.45,
+          "terminalRisk": 0.595686,
+          "threatHorizon": 0.595686
+        },
+        "scenarioId": "escape-right-open"
+      },
+      {
+        "action": "boost",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.164225,
+        "riskDeltas": {
+          "collisionRisk": 0.05,
+          "deadEndRisk": 0.034286,
+          "terminalRisk": 0.05,
+          "threatHorizon": 0.05
+        },
+        "scenarioId": "frontal-near-wall"
+      },
+      {
+        "action": "pitch-down",
+        "rewardOnlyRejected": false,
+        "rewardTotal": 0.829593,
+        "riskDeltas": {
+          "collisionRisk": -0.019774,
+          "deadEndRisk": -0.005,
+          "terminalRisk": 0.007964,
+          "threatHorizon": 0.007964
+        },
+        "scenarioId": "frontal-near-wall"
+      },
+      {
+        "action": "roll-left",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 0.599325,
+        "riskDeltas": {
+          "collisionRisk": 0.05,
+          "deadEndRisk": -0.004286,
+          "terminalRisk": 0.05,
+          "threatHorizon": 0.05
+        },
+        "scenarioId": "frontal-near-wall"
+      },
+      {
+        "action": "yaw-right",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 1.43815,
+        "riskDeltas": {
+          "collisionRisk": 0.05,
+          "deadEndRisk": 0.485,
+          "terminalRisk": 0.2,
+          "threatHorizon": 0.12
+        },
+        "scenarioId": "frontal-near-wall"
+      },
+      {
+        "action": "boost",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 2.407309,
+        "riskDeltas": {
+          "collisionRisk": 0.010462,
+          "deadEndRisk": 0.010714,
+          "terminalRisk": 0.005488,
+          "threatHorizon": 0.005488
+        },
+        "scenarioId": "narrowing-corridor"
+      },
+      {
+        "action": "pitch-up",
+        "rewardOnlyRejected": false,
+        "rewardTotal": 3.268877,
+        "riskDeltas": {
+          "collisionRisk": 0.066631,
+          "deadEndRisk": 0.075,
+          "terminalRisk": -0.014307,
+          "threatHorizon": -0.014307
+        },
+        "scenarioId": "narrowing-corridor"
+      },
+      {
+        "action": "roll-right",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.313045,
+        "riskDeltas": {
+          "collisionRisk": 0.002538,
+          "deadEndRisk": 0.024286,
+          "terminalRisk": 0.014792,
+          "threatHorizon": 0.022343
+        },
+        "scenarioId": "narrowing-corridor"
+      },
+      {
+        "action": "shoot-mg",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.235,
+        "riskDeltas": {
+          "collisionRisk": 0.013981,
+          "deadEndRisk": 0.014286,
+          "terminalRisk": 0.013981,
+          "threatHorizon": 0.053143
+        },
+        "scenarioId": "narrowing-corridor"
+      },
+      {
+        "action": "yaw-right",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.388813,
+        "riskDeltas": {
+          "collisionRisk": 0.002694,
+          "deadEndRisk": 0.01,
+          "terminalRisk": 0.030453,
+          "threatHorizon": 0.030453
+        },
+        "scenarioId": "narrowing-corridor"
+      },
+      {
+        "action": "boost",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.379121,
+        "riskDeltas": {
+          "collisionRisk": 0.433079,
+          "deadEndRisk": 0.415,
+          "terminalRisk": 0.598584,
+          "threatHorizon": 0.598584
+        },
+        "scenarioId": "no-danger-control"
+      },
+      {
+        "action": "pitch-down",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.388492,
+        "riskDeltas": {
+          "collisionRisk": 0.405529,
+          "deadEndRisk": 0.43,
+          "terminalRisk": 0.564445,
+          "threatHorizon": 0.564445
+        },
+        "scenarioId": "no-danger-control"
+      },
+      {
+        "action": "pitch-up",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 1.680595,
+        "riskDeltas": {
+          "collisionRisk": 0.458431,
+          "deadEndRisk": 0.425,
+          "terminalRisk": 0.661085,
+          "threatHorizon": 0.661085
+        },
+        "scenarioId": "no-danger-control"
+      },
+      {
+        "action": "yaw-right",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.350134,
+        "riskDeltas": {
+          "collisionRisk": 0.435474,
+          "deadEndRisk": 0.445,
+          "terminalRisk": 0.445,
+          "threatHorizon": 0.4094
+        },
+        "scenarioId": "no-danger-control"
+      },
+      {
+        "action": "roll-left",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.35196,
+        "riskDeltas": {
+          "collisionRisk": 0.003845,
+          "deadEndRisk": -0.014285,
+          "terminalRisk": 0.008565,
+          "threatHorizon": 0.008565
+        },
+        "scenarioId": "side-wall-left"
+      },
+      {
+        "action": "roll-right",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.351895,
+        "riskDeltas": {
+          "collisionRisk": 0.003631,
+          "deadEndRisk": -0.014286,
+          "terminalRisk": 0.010273,
+          "threatHorizon": 0.010273
+        },
+        "scenarioId": "side-wall-left"
+      },
+      {
+        "action": "shoot-mg",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.320758,
+        "riskDeltas": {
+          "collisionRisk": 0.02315,
+          "deadEndRisk": 0.025,
+          "terminalRisk": 0.025,
+          "threatHorizon": 0.023
+        },
+        "scenarioId": "side-wall-left"
+      },
+      {
+        "action": "yaw-left",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.387519,
+        "riskDeltas": {
+          "collisionRisk": 0.002789,
+          "deadEndRisk": 0.0,
+          "terminalRisk": 0.036649,
+          "threatHorizon": 0.036649
+        },
+        "scenarioId": "side-wall-left"
+      },
+      {
+        "action": "boost",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 0.74673,
+        "riskDeltas": {
+          "collisionRisk": 0.004127,
+          "deadEndRisk": 0.017143,
+          "terminalRisk": 0.017143,
+          "threatHorizon": 0.015771
+        },
+        "scenarioId": "side-wall-right"
+      },
+      {
+        "action": "pitch-down",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 0.75687,
+        "riskDeltas": {
+          "collisionRisk": 0.14455,
+          "deadEndRisk": 0.104286,
+          "terminalRisk": 0.14455,
+          "threatHorizon": 0.194229
+        },
+        "scenarioId": "side-wall-right"
+      },
+      {
+        "action": "pitch-up",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.340159,
+        "riskDeltas": {
+          "collisionRisk": 0.023426,
+          "deadEndRisk": 0.015,
+          "terminalRisk": 0.015,
+          "threatHorizon": 0.0138
+        },
+        "scenarioId": "side-wall-right"
+      },
+      {
+        "action": "boost",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.322695,
+        "riskDeltas": {
+          "collisionRisk": 0.022477,
+          "deadEndRisk": 0.015,
+          "terminalRisk": 0.022477,
+          "threatHorizon": 0.0138
+        },
+        "scenarioId": "trail-ahead"
+      },
+      {
+        "action": "pitch-down",
+        "rewardOnlyRejected": false,
+        "rewardTotal": 2.46987,
+        "riskDeltas": {
+          "collisionRisk": -0.049127,
+          "deadEndRisk": -0.060714,
+          "terminalRisk": 0.004157,
+          "threatHorizon": 0.004157
+        },
+        "scenarioId": "trail-ahead"
+      },
+      {
+        "action": "roll-left",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 0.66265,
+        "riskDeltas": {
+          "collisionRisk": 0.028571,
+          "deadEndRisk": -0.004286,
+          "terminalRisk": 0.028571,
+          "threatHorizon": 0.028571
+        },
+        "scenarioId": "trail-ahead"
+      },
+      {
+        "action": "roll-right",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.267346,
+        "riskDeltas": {
+          "collisionRisk": 0.010557,
+          "deadEndRisk": 0.010714,
+          "terminalRisk": 0.004102,
+          "threatHorizon": 0.004102
+        },
+        "scenarioId": "trail-ahead"
+      },
+      {
+        "action": "shoot-mg",
+        "rewardOnlyRejected": true,
+        "rewardTotal": 3.280384,
+        "riskDeltas": {
+          "collisionRisk": -0.000724,
+          "deadEndRisk": 0.000714,
+          "terminalRisk": 0.010287,
+          "threatHorizon": 0.010287
+        },
+        "scenarioId": "trail-ahead"
+      }
+    ],
+    "tailRows": 216,
+    "wallRiskRows": 214
+  },
+  "resultClass": "reward-redesign-required",
+  "schemaVersion": "bt93q-reward-pressure-ordering-report-v1",
+  "semanticWindow": "bt93q-walltrail-10k-diagnostic-window"
+}

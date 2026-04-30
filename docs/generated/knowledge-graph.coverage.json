@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2424,
-    "rawCoveredFileCount": 1945,
-    "rawCoveragePercent": 80.2,
-    "adjustedTrackedFileCount": 1521,
-    "adjustedCoveredFileCount": 1286,
-    "adjustedCoveragePercent": 84.5,
+    "trackedFileCount": 2429,
+    "rawCoveredFileCount": 1950,
+    "rawCoveragePercent": 80.3,
+    "adjustedTrackedFileCount": 1526,
+    "adjustedCoveredFileCount": 1291,
+    "adjustedCoveragePercent": 84.6,
     "uncoveredFileCount": 479,
     "uncoveredActiveFileCount": 235,
     "classifications": [
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 245,
-        "coveredCount": 224
+        "count": 249,
+        "coveredCount": 228
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 882,
-        "coveredCount": 866
+        "count": 883,
+        "coveredCount": 867
       },
       {
         "classification": "product-docs",
@@ -7836,6 +7836,29 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93q/closure_gate_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93q/finding_register.json",
       "tracked": true,
       "coveredInCore": true,
@@ -7883,6 +7906,29 @@
     },
     {
       "path": "data/training/ppo/bt93q/fix_manifest.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/handover_package.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -8021,6 +8067,52 @@
     },
     {
       "path": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93q/safety_action_contract_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -18568,6 +18660,29 @@
     },
     {
       "path": "python/scripts/bt93q_action_fix.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Q"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93q_closure_gate.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

@@ -1,0 +1,254 @@
+{
+  "activeBlockers": [
+    "action-space-required",
+    "observation-telemetry-required",
+    "policy-collapse-active",
+    "reward-redesign-required",
+    "safety-action-contract-diagnostic-only"
+  ],
+  "blockId": "BT93Q",
+  "blocksNext": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k extension"
+  ],
+  "bt93oClaimAllowed": false,
+  "bt93pClaimAllowed": false,
+  "bt94aClaimAllowed": false,
+  "candidateFreezeAllowed": false,
+  "candidateRunsAllowed": false,
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93q_closure_gate.py --write-report"
+  },
+  "dodCoverage": {
+    "DoD.1": true,
+    "DoD.10": true,
+    "DoD.11": true,
+    "DoD.12": true,
+    "DoD.13": true,
+    "DoD.14": true,
+    "DoD.15": true,
+    "DoD.2": true,
+    "DoD.3": true,
+    "DoD.4": true,
+    "DoD.5": true,
+    "DoD.6": true,
+    "DoD.7": true,
+    "DoD.8": true,
+    "DoD.9": true
+  },
+  "forbiddenSignalCheck": {
+    "ok": true,
+    "unexpectedOpenGuardrails": {}
+  },
+  "generatedArtifacts": {
+    "closureGateReport": "data/training/ppo/bt93q/closure_gate_report.json",
+    "handoverPackage": "data/training/ppo/bt93q/handover_package.json",
+    "rewardPressureOrdering": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+    "safetyActionContract": "data/training/ppo/bt93q/safety_action_contract_report.json"
+  },
+  "generatedAt": "2026-04-30T00:05:23Z",
+  "generatedBy": "python/scripts/bt93q_closure_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "c434e01f0e3dcc853cbe718930357c7c223fd209",
+    "sha": "e74fe048b6b081a6ea63500f006168cdcc26b538"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": []
+  },
+  "holdoutUsed": false,
+  "ok": true,
+  "opensNext": [],
+  "phaseCoverage": {
+    "93Q.99.1": true,
+    "93Q.99.2": true,
+    "93Q.99.3": true,
+    "93Q.99.4": true,
+    "93Q.99.5": true
+  },
+  "phaseId": "93Q.99",
+  "phasesClosed": true,
+  "resultClass": "policy-collapse-active",
+  "schemaVersion": "bt93q-closure-gate-report-v1",
+  "sourceArtifacts": {
+    "actionEffectStress": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "phaseId": "93Q.4",
+      "resultClass": "action-space-required",
+      "role": "BT93Q.4 action-effect stress report",
+      "sha256": "21f6ea262bb4123bb9a05003d92982802f236a6fc3a71f3480961979b8a33d87",
+      "tracked": true
+    },
+    "bt93mComparisonPolicy": {
+      "blockId": "BT93M",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93m/comparison_policy_decision.json",
+      "phaseId": "93M.3.6",
+      "resultClass": "comparison-policy-blocks-positive-reentry",
+      "role": "DQN anchor / replacement-policy blocker",
+      "sha256": "eadd182f737d7b477a4143df0cc721875caf31cd47bcb5942f2649f2d80609b5",
+      "tracked": true
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A still-closed gate",
+      "sha256": "27dd958fe5463f6f688384957e31cbd4d163c81b07058dd3c0a1a6be9eda7f70",
+      "tracked": true
+    },
+    "findingRegister": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/finding_register.json",
+      "phaseId": "93Q.1",
+      "resultClass": "finding-register-locked",
+      "role": "BT93Q.1 finding register",
+      "sha256": "ee806424c47e5066425e9a39500486590457af49280aa30310a1e4a9d4c8f2be",
+      "tracked": true
+    },
+    "fixDelta": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/fix_delta_report.json",
+      "phaseId": "93Q.5",
+      "resultClass": "action-fix-insufficient",
+      "role": "BT93Q.5 fix delta report",
+      "sha256": "8a3df8cd4696a893c785278e913dd0b98efa42deebe148ba1dffd307d7c354a1",
+      "tracked": true
+    },
+    "fixManifest": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/fix_manifest.json",
+      "phaseId": "93Q.5",
+      "resultClass": "action-fix-locked-before-recheck",
+      "role": "BT93Q.5 single-fix manifest",
+      "sha256": "38d90e97a3f17cf028d0b2f312bfdc885170cd4e32e1823c9769a39bed663e9e",
+      "tracked": true
+    },
+    "microPpoContract": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/micro_ppo_recheck_contract.json",
+      "phaseId": "93Q.6",
+      "resultClass": null,
+      "role": "BT93Q.6 locked 10k recheck contract",
+      "sha256": "e436227857fe072b2e3c89c098fb2de047197e83f07633194c7f09a56e7f6a56",
+      "tracked": true
+    },
+    "microPpoRecheck": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/micro_ppo_recheck_report.json",
+      "phaseId": "93Q.6",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q.6 guarded 10k recheck report",
+      "sha256": "3ca2a752c611f1ab2f99af81fecdbc7309f030c12b946d79e5c0b31b79317fa2",
+      "tracked": true
+    },
+    "observationTelemetryGap": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "phaseId": "93Q.2",
+      "resultClass": "observation-telemetry-required",
+      "role": "BT93Q.2 observation and telemetry gap report",
+      "sha256": "1442849162125578f468ed0937ca08611267dad1b1d0d0da059ac0007d749241",
+      "tracked": true
+    },
+    "policyCollapse": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "phaseId": "93Q.3",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q.3 deterministic policy-collapse report",
+      "sha256": "8b6fbfdbf2285e6f58c8104fad408fc1e6b2677fde394a617b78170137af035d",
+      "tracked": true
+    },
+    "scenarioManifest": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
+      "phaseId": "93Q.4",
+      "resultClass": null,
+      "role": "BT93Q.4 pinned wall/trail scenarios",
+      "sha256": "abe7a51ae263951ffb869662acc1998fede0377c1e4b8d4d51c69427196a2719",
+      "tracked": true
+    },
+    "traceReanalysis": {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93q/trace_reanalysis_report.json",
+      "phaseId": "93Q.2",
+      "resultClass": "trace-reanalysis-complete-with-telemetry-gap",
+      "role": "BT93Q.2 trace/tail reanalysis",
+      "sha256": "086a62eb602ef28caffbd1525199d1522691c39d360c4f60b58d1b79e9dad849",
+      "tracked": true
+    }
+  },
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "summary": {
+    "activeBlockers": [
+      "action-space-required",
+      "observation-telemetry-required",
+      "policy-collapse-active",
+      "reward-redesign-required",
+      "safety-action-contract-diagnostic-only"
+    ],
+    "bt93oStartDecision": "blocked",
+    "finalResult": "policy-collapse-active",
+    "recommendedNext": "Create/claim a narrow follow-up repair for policy collapse, action effect, telemetry, and reward ordering before BT93O."
+  }
+}

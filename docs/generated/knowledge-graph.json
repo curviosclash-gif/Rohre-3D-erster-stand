@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 337,
+          "concreteCount": 342,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 475,
+          "concreteCount": 480,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 333,
+          "concreteCount": 338,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 332,
+          "concreteCount": 337,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 974,
+          "concreteCount": 979,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 982,
+          "concreteCount": 987,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1638,7 +1638,7 @@
       "id": "BT93Q",
       "type": "block",
       "title": "DeathBefore60 Wall/Trail Policy Repair",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "source": [
           "bot-training-plan",
@@ -1661,11 +1661,14 @@
           "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
           "data/training/ppo/bt93q/player_dead_control_report.json",
           "data/training/ppo/bt93q/policy_collapse_report.json",
+          "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+          "data/training/ppo/bt93q/safety_action_contract_report.json",
           "data/training/ppo/bt93q/trace_reanalysis_report.json",
           "data/training/ppo/bt93q/walltrail_scenario_manifest.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "package.json",
           "python/scripts/bt93q_action_fix.py",
+          "python/scripts/bt93q_closure_gate.py",
           "python/scripts/bt93q_finding_register.py",
           "python/scripts/bt93q_micro_ppo_recheck.py",
           "python/scripts/bt93q_policy_collapse.py",
@@ -1673,8 +1676,8 @@
           "python/scripts/bt93q_walltrail_stress.py"
         ],
         "scopeResolution": {
-          "concreteCount": 20,
-          "plannedCount": 2
+          "concreteCount": 25,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -4786,7 +4789,7 @@
       "id": "BT93Q.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.99"
@@ -13712,8 +13715,8 @@
     {
       "id": "BT93Q.99.1",
       "type": "subphase",
-      "title": "Alle Phasen 93Q.1 bis 93Q.6 sind mit versionierter Evidence dokumentiert oder als bewusst nicht gestartet begruendet.",
-      "status": "open",
+      "title": "Alle Phasen 93Q.1 bis 93Q.6 sind mit versionierter Evidence dokumentiert oder als bewusst nicht gestartet begruendet. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_closure_gate.py --write-report` -> `data/training/ppo/bt93q/closure_gate_report.json` (`phaseCoverage.93Q.99.1=true`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.99",
@@ -13723,8 +13726,8 @@
     {
       "id": "BT93Q.99.2",
       "type": "subphase",
-      "title": "Ergebnis ist ehrlich klassifiziert: `walltrail-policy-green`, `death-before60-still-blocking`, `policy-collapse-active`, `action-space-required`, `observation-telemetry-required`, `reward-redesign-required`, `terminal-semantics-required` oder `measurement-invalid`.",
-      "status": "open",
+      "title": "Ergebnis ist ehrlich klassifiziert: `walltrail-policy-green`, `death-before60-still-blocking`, `policy-collapse-active`, `action-space-required`, `observation-telemetry-required`, `reward-redesign-required`, `terminal-semantics-required` oder `measurement-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_closure_gate.py --write-report` -> `data/training/ppo/bt93q/closure_gate_report.json` (`resultClass=policy-collapse-active`, `activeBlockers=5`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.99",
@@ -13734,8 +13737,8 @@
     {
       "id": "BT93Q.99.3",
       "type": "subphase",
-      "title": "BT93O startet nur, wenn DeathBefore60 non-blocking, deterministic policy non-collapsed oder erklaert, Action-/Observation-/Reward-Stress gruen und Safety-/Runtime-Raten 0/0/0 sind.",
-      "status": "open",
+      "title": "BT93O startet nur, wenn DeathBefore60 non-blocking, deterministic policy non-collapsed oder erklaert, Action-/Observation-/Reward-Stress gruen und Safety-/Runtime-Raten 0/0/0 sind. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_closure_gate.py --write-report` -> `data/training/ppo/bt93q/closure_gate_report.json` (`bt93oClaimAllowed=false`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.99",
@@ -13745,8 +13748,8 @@
     {
       "id": "BT93Q.99.4",
       "type": "subphase",
-      "title": "BT93P und BT94A bleiben geschlossen, solange DQN-/Ersatzpolitik, BT93O und BT93P nicht gruen sind.",
-      "status": "open",
+      "title": "BT93P und BT94A bleiben geschlossen, solange DQN-/Ersatzpolitik, BT93O und BT93P nicht gruen sind. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_closure_gate.py --write-report` -> `data/training/ppo/bt93q/closure_gate_report.json` (`bt93pClaimAllowed=false`, `bt94aClaimAllowed=false`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.99",
@@ -13756,8 +13759,8 @@
     {
       "id": "BT93Q.99.5",
       "type": "subphase",
-      "title": "Kein Candidate-, Freeze-, Holdout-, Promote-, Rollout-, PPO-Validate- oder BT95-Handoff-Signal wurde erzeugt.",
-      "status": "open",
+      "title": "Kein Candidate-, Freeze-, Holdout-, Promote-, Rollout-, PPO-Validate- oder BT95-Handoff-Signal wurde erzeugt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93q_closure_gate.py --write-report` -> `data/training/ppo/bt93q/closure_gate_report.json` (`phaseCoverage.93Q.99.5=true`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Q",
         "phaseCode": "93Q.99",
@@ -27191,9 +27194,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -27269,9 +27278,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Q"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -27381,6 +27396,48 @@
     },
     {
       "id": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93q/safety_action_contract_report.json",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -34348,6 +34405,27 @@
     },
     {
       "id": "python/scripts/bt93q_action_fix.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93q_closure_gate.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -70827,6 +70905,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93q/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -70846,6 +70933,15 @@
     {
       "from": "BT90",
       "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93q/handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -70900,6 +70996,24 @@
     {
       "from": "BT90",
       "to": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93q/safety_action_contract_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -72070,6 +72184,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93q_action_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93q_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -74057,6 +74180,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93q/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -74076,6 +74208,15 @@
     {
       "from": "BT91",
       "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93q/handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -74130,6 +74271,24 @@
     {
       "from": "BT91",
       "to": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93q/safety_action_contract_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -75282,6 +75441,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93q_action_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93q_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78467,6 +78635,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93q/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -78486,6 +78663,15 @@
     {
       "from": "BT92",
       "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93q/handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78540,6 +78726,24 @@
     {
       "from": "BT92",
       "to": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93q/safety_action_contract_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79701,6 +79905,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93q_action_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93q_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81987,6 +82200,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93q/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -82006,6 +82228,15 @@
     {
       "from": "BT93B",
       "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93q/handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -82060,6 +82291,24 @@
     {
       "from": "BT93B",
       "to": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93q/safety_action_contract_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83221,6 +83470,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93q_action_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93q_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91911,6 +92169,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93q/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -91930,6 +92197,15 @@
     {
       "from": "BT93D",
       "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93q/handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91984,6 +92260,24 @@
     {
       "from": "BT93D",
       "to": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93q/safety_action_contract_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -93145,6 +93439,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93q_action_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93q_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -101010,6 +101313,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93q/closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93q/finding_register.json",
       "type": "scope",
       "hint": null,
@@ -101029,6 +101341,15 @@
     {
       "from": "BT93E",
       "to": "data/training/ppo/bt93q/fix_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93q/handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -101083,6 +101404,24 @@
     {
       "from": "BT93E",
       "to": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93q/safety_action_contract_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -102253,6 +102592,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93q_action_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93q_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -127441,6 +127789,24 @@
     },
     {
       "from": "BT93Q",
+      "to": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Q",
+      "to": "data/training/ppo/bt93q/safety_action_contract_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Q",
       "to": "data/training/ppo/bt93q/trace_reanalysis_report.json",
       "type": "scope",
       "hint": null,
@@ -127478,6 +127844,15 @@
     {
       "from": "BT93Q",
       "to": "python/scripts/bt93q_action_fix.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Q",
+      "to": "python/scripts/bt93q_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
