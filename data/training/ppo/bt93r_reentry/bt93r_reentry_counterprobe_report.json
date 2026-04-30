@@ -1,0 +1,4642 @@
+{
+  "allowNext": [
+    "93RR.99 closure gate"
+  ],
+  "blockId": "BT93RR",
+  "blocksNext": [
+    "BT93S claim before BT93R-Reentry.99 in R-Allowlist",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "reward/action/telemetry/safety fix during 93RR.3"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93r_reentry_counterprobe.py --write-report"
+  },
+  "counterprobeContract": {
+    "evalSeeds": [
+      944,
+      945,
+      946,
+      947
+    ],
+    "fixClass": "eval-mode-counterprobe",
+    "maxDiagnosticTimesteps": 1000,
+    "noRewardActionTelemetryBundle": true,
+    "phase": "93RR.3",
+    "qualityClaimAllowed": false,
+    "rootAllowsCounterprobe": true,
+    "rootCauseResultClass": "eval-argmax-collapse",
+    "rootCauseSource": "data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json",
+    "sameMatrixRequired": true,
+    "stepsPerSeed": 250
+  },
+  "counterprobeMode": {
+    "combinedActionDistribution": {
+      "argmaxAction": "boost",
+      "argmaxCount": 98,
+      "argmaxShare": 0.098,
+      "argmaxToken": "7",
+      "counts": {
+        "0": 73,
+        "1": 68,
+        "10": 89,
+        "11": 85,
+        "12": 83,
+        "2": 73,
+        "3": 75,
+        "4": 78,
+        "5": 57,
+        "6": 78,
+        "7": 98,
+        "8": 82,
+        "9": 61
+      },
+      "entropy": 2.555191,
+      "marginShare": 0.009,
+      "normalizedEntropy": 0.996195,
+      "probabilities": {
+        "0": 0.073,
+        "1": 0.068,
+        "10": 0.089,
+        "11": 0.085,
+        "12": 0.083,
+        "2": 0.073,
+        "3": 0.075,
+        "4": 0.078,
+        "5": 0.057,
+        "6": 0.078,
+        "7": 0.098,
+        "8": 0.082,
+        "9": 0.061
+      },
+      "rankedActions": [
+        {
+          "count": 98,
+          "semanticAction": "boost",
+          "share": 0.098,
+          "token": "7"
+        },
+        {
+          "count": 89,
+          "semanticAction": "turn-right-boost",
+          "share": 0.089,
+          "token": "10"
+        },
+        {
+          "count": 85,
+          "semanticAction": "evade-left",
+          "share": 0.085,
+          "token": "11"
+        },
+        {
+          "count": 83,
+          "semanticAction": "evade-right",
+          "share": 0.083,
+          "token": "12"
+        },
+        {
+          "count": 82,
+          "semanticAction": "shoot-mg",
+          "share": 0.082,
+          "token": "8"
+        },
+        {
+          "count": 78,
+          "semanticAction": "pitch-down",
+          "share": 0.078,
+          "token": "4"
+        },
+        {
+          "count": 78,
+          "semanticAction": "roll-right",
+          "share": 0.078,
+          "token": "6"
+        },
+        {
+          "count": 75,
+          "semanticAction": "pitch-up",
+          "share": 0.075,
+          "token": "3"
+        },
+        {
+          "count": 73,
+          "semanticAction": "noop",
+          "share": 0.073,
+          "token": "0"
+        },
+        {
+          "count": 73,
+          "semanticAction": "yaw-right",
+          "share": 0.073,
+          "token": "2"
+        },
+        {
+          "count": 68,
+          "semanticAction": "yaw-left",
+          "share": 0.068,
+          "token": "1"
+        },
+        {
+          "count": 61,
+          "semanticAction": "turn-left-boost",
+          "share": 0.061,
+          "token": "9"
+        },
+        {
+          "count": 57,
+          "semanticAction": "roll-left",
+          "share": 0.057,
+          "token": "5"
+        }
+      ],
+      "secondBestAction": "turn-right-boost",
+      "secondBestCount": 89,
+      "secondBestShare": 0.089,
+      "secondBestToken": "10",
+      "total": 1000
+    },
+    "combinedSummary": {
+      "completedEpisodes": 12,
+      "deathBefore60Count": 2,
+      "maxStepShare": 0.0,
+      "objectiveEventShare": 1.0,
+      "objectiveSignalReachableCount": 159,
+      "objectiveSignalStepShare": 0.159,
+      "playerDeadShare": 1.0,
+      "progressEventShare": 1.0,
+      "progressSignalReachableCount": 159,
+      "progressSignalStepShare": 0.159,
+      "rewardBreakdownTotals": {
+        "baseStep": -16.0,
+        "checkpointReached": 114.48,
+        "crash": 0.0,
+        "damageDealt": 0.0,
+        "damageTaken": 0.0,
+        "earlyDeath": -39.733334,
+        "external": 0.0,
+        "itemPickup": 0.0,
+        "itemUse": 0.0,
+        "kill": 0.0,
+        "loss": -66.0,
+        "lowHealthThreat": -1.928,
+        "opponentRisk": 0.0,
+        "parcoursCompleted": 0.0,
+        "stuck": 0.0,
+        "survival": 9.88,
+        "survivalPressureBonus": 1.595311,
+        "trailRisk": 0.0,
+        "wallRisk": -44.783381,
+        "win": 0.0,
+        "wrongOrder": 0.0
+      },
+      "runtimeErrorCount": 0,
+      "safetyMaxRates": {
+        "invalidActionRate": 0.0,
+        "noopRate": 1.0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "vetoRate": 0.0
+      },
+      "seedSummaries": [
+        {
+          "actionCounts": {
+            "0": 19,
+            "1": 11,
+            "10": 19,
+            "11": 18,
+            "12": 25,
+            "2": 17,
+            "3": 26,
+            "4": 17,
+            "5": 21,
+            "6": 22,
+            "7": 28,
+            "8": 13,
+            "9": 14
+          },
+          "avgStepsPerEpisode": 76.666667,
+          "completedEpisodes": 3,
+          "deathBefore60Count": 0,
+          "label": "rr3-eval-mode-counterprobe-944",
+          "maxStepShare": 0.0,
+          "objectiveEventCounts": {
+            "local-openness-improved": 13,
+            "target-alignment-improved": 3,
+            "target-distance-improved": 11
+          },
+          "objectiveEventShare": 1.0,
+          "objectiveSignalReachableCount": 27,
+          "objectiveSignalStepShare": 0.108,
+          "playerDeadShare": 1.0,
+          "progressEventCounts": {
+            "local-openness-improved": 13,
+            "target-alignment-improved": 3,
+            "target-distance-improved": 11
+          },
+          "progressEventShare": 1.0,
+          "progressSignalReachableCount": 27,
+          "progressSignalStepShare": 0.108,
+          "rewardBreakdownTotals": {
+            "baseStep": -4.0,
+            "checkpointReached": 19.44,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "earlyDeath": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.5,
+            "lowHealthThreat": -0.57,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 2.47,
+            "survivalPressureBonus": 0.451643,
+            "trailRisk": 0.0,
+            "wallRisk": -14.217118,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "runtimeErrorCount": 0,
+          "safetyMaxRates": {
+            "invalidActionRate": 0.0,
+            "noopRate": 1.0,
+            "postDecodeClampRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "sanitizerRate": 0.0,
+            "vetoRate": 0.0
+          },
+          "sampleRows": [
+            {
+              "actionToken": 0,
+              "episodeStep": 1,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.00529,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 1,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 6,
+              "episodeStep": 2,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714716,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 2,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 1,
+              "episodeStep": 3,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714721,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 3,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 12,
+              "episodeStep": 4,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714727,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 4,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 6,
+              "episodeStep": 5,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714732,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 5,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 12,
+              "episodeStep": 6,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714737,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 6,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 9,
+              "episodeStep": 7,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714741,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 7,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 10,
+              "episodeStep": 8,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714745,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 8,
+              "terminalReason": null,
+              "truncatedReason": null
+            }
+          ],
+          "sampleRowsTruncated": 24,
+          "stagnationShare": 0.0,
+          "terminalReasonCounts": {
+            "player-dead": 3
+          },
+          "totalSteps": 250,
+          "truncatedReasonCounts": {}
+        },
+        {
+          "actionCounts": {
+            "0": 17,
+            "1": 22,
+            "10": 22,
+            "11": 20,
+            "12": 19,
+            "2": 14,
+            "3": 16,
+            "4": 24,
+            "5": 13,
+            "6": 19,
+            "7": 23,
+            "8": 23,
+            "9": 18
+          },
+          "avgStepsPerEpisode": 79.333333,
+          "completedEpisodes": 3,
+          "deathBefore60Count": 1,
+          "label": "rr3-eval-mode-counterprobe-945",
+          "maxStepShare": 0.0,
+          "objectiveEventCounts": {
+            "local-openness-improved": 18,
+            "target-alignment-improved": 2,
+            "target-distance-improved": 14
+          },
+          "objectiveEventShare": 1.0,
+          "objectiveSignalReachableCount": 32,
+          "objectiveSignalStepShare": 0.128,
+          "playerDeadShare": 1.0,
+          "progressEventCounts": {
+            "local-openness-improved": 18,
+            "target-alignment-improved": 2,
+            "target-distance-improved": 14
+          },
+          "progressEventShare": 1.0,
+          "progressSignalReachableCount": 32,
+          "progressSignalStepShare": 0.128,
+          "rewardBreakdownTotals": {
+            "baseStep": -4.0,
+            "checkpointReached": 23.04,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "earlyDeath": -19.466667,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.5,
+            "lowHealthThreat": -0.57,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 2.47,
+            "survivalPressureBonus": 0.410066,
+            "trailRisk": 0.0,
+            "wallRisk": -11.471436,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "runtimeErrorCount": 0,
+          "safetyMaxRates": {
+            "invalidActionRate": 0.0,
+            "noopRate": 0.076923,
+            "postDecodeClampRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "sanitizerRate": 0.0,
+            "vetoRate": 0.0
+          },
+          "sampleRows": [
+            {
+              "actionToken": 9,
+              "episodeStep": 1,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.701246,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 1,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 10,
+              "episodeStep": 2,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714827,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 2,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 11,
+              "episodeStep": 3,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.018748,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 3,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 3,
+              "episodeStep": 4,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.018745,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 4,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 10,
+              "episodeStep": 5,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714833,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 5,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 3,
+              "episodeStep": 6,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005165,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 6,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 9,
+              "episodeStep": 7,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.018741,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 7,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 9,
+              "episodeStep": 8,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.032319,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 8,
+              "terminalReason": null,
+              "truncatedReason": null
+            }
+          ],
+          "sampleRowsTruncated": 24,
+          "stagnationShare": 0.0,
+          "terminalReasonCounts": {
+            "player-dead": 3
+          },
+          "totalSteps": 250,
+          "truncatedReasonCounts": {}
+        },
+        {
+          "actionCounts": {
+            "0": 17,
+            "1": 17,
+            "10": 27,
+            "11": 24,
+            "12": 21,
+            "2": 15,
+            "3": 22,
+            "4": 17,
+            "5": 8,
+            "6": 19,
+            "7": 21,
+            "8": 23,
+            "9": 19
+          },
+          "avgStepsPerEpisode": 73.333333,
+          "completedEpisodes": 3,
+          "deathBefore60Count": 0,
+          "label": "rr3-eval-mode-counterprobe-946",
+          "maxStepShare": 0.0,
+          "objectiveEventCounts": {
+            "local-openness-improved": 27,
+            "target-alignment-improved": 14,
+            "target-distance-improved": 11
+          },
+          "objectiveEventShare": 1.0,
+          "objectiveSignalReachableCount": 47,
+          "objectiveSignalStepShare": 0.188,
+          "playerDeadShare": 1.0,
+          "progressEventCounts": {
+            "local-openness-improved": 27,
+            "target-alignment-improved": 14,
+            "target-distance-improved": 11
+          },
+          "progressEventShare": 1.0,
+          "progressSignalReachableCount": 47,
+          "progressSignalStepShare": 0.188,
+          "rewardBreakdownTotals": {
+            "baseStep": -4.0,
+            "checkpointReached": 33.84,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "earlyDeath": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.5,
+            "lowHealthThreat": -0.464,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 2.47,
+            "survivalPressureBonus": 0.41336,
+            "trailRisk": 0.0,
+            "wallRisk": -11.372824,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "runtimeErrorCount": 0,
+          "safetyMaxRates": {
+            "invalidActionRate": 0.0,
+            "noopRate": 0.5,
+            "postDecodeClampRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "sanitizerRate": 0.0,
+            "vetoRate": 0.0
+          },
+          "sampleRows": [
+            {
+              "actionToken": 6,
+              "episodeStep": 1,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714716,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 1,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 0,
+              "episodeStep": 2,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005279,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 2,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 6,
+              "episodeStep": 3,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714725,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 3,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 12,
+              "episodeStep": 4,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714729,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 4,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 5,
+              "episodeStep": 5,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714733,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 5,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 8,
+              "episodeStep": 6,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714737,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 6,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 7,
+              "episodeStep": 7,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.00526,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 7,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 12,
+              "episodeStep": 8,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005258,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 8,
+              "terminalReason": null,
+              "truncatedReason": null
+            }
+          ],
+          "sampleRowsTruncated": 24,
+          "stagnationShare": 0.0,
+          "terminalReasonCounts": {
+            "player-dead": 3
+          },
+          "totalSteps": 250,
+          "truncatedReasonCounts": {}
+        },
+        {
+          "actionCounts": {
+            "0": 20,
+            "1": 18,
+            "10": 21,
+            "11": 23,
+            "12": 18,
+            "2": 27,
+            "3": 11,
+            "4": 20,
+            "5": 15,
+            "6": 18,
+            "7": 26,
+            "8": 23,
+            "9": 10
+          },
+          "avgStepsPerEpisode": 69.0,
+          "completedEpisodes": 3,
+          "deathBefore60Count": 1,
+          "label": "rr3-eval-mode-counterprobe-947",
+          "maxStepShare": 0.0,
+          "objectiveEventCounts": {
+            "local-openness-improved": 9,
+            "target-alignment-improved": 4,
+            "target-distance-improved": 42
+          },
+          "objectiveEventShare": 1.0,
+          "objectiveSignalReachableCount": 53,
+          "objectiveSignalStepShare": 0.212,
+          "playerDeadShare": 1.0,
+          "progressEventCounts": {
+            "local-openness-improved": 9,
+            "target-alignment-improved": 4,
+            "target-distance-improved": 42
+          },
+          "progressEventShare": 1.0,
+          "progressSignalReachableCount": 53,
+          "progressSignalStepShare": 0.212,
+          "rewardBreakdownTotals": {
+            "baseStep": -4.0,
+            "checkpointReached": 38.16,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "earlyDeath": -20.266667,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.5,
+            "lowHealthThreat": -0.324,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 2.47,
+            "survivalPressureBonus": 0.320242,
+            "trailRisk": 0.0,
+            "wallRisk": -7.722003,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "runtimeErrorCount": 0,
+          "safetyMaxRates": {
+            "invalidActionRate": 0.0,
+            "noopRate": 0.5,
+            "postDecodeClampRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "sanitizerRate": 0.0,
+            "vetoRate": 0.0
+          },
+          "sampleRows": [
+            {
+              "actionToken": 9,
+              "episodeStep": 1,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005044,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 1,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 0,
+              "episodeStep": 2,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005044,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 2,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 3,
+              "episodeStep": 3,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005044,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 3,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 6,
+              "episodeStep": 4,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005043,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 4,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 12,
+              "episodeStep": 5,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005043,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 5,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 11,
+              "episodeStep": 6,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005042,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 6,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 0,
+              "episodeStep": 7,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005042,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 7,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 10,
+              "episodeStep": 8,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005041,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 8,
+              "terminalReason": null,
+              "truncatedReason": null
+            }
+          ],
+          "sampleRowsTruncated": 24,
+          "stagnationShare": 0.0,
+          "terminalReasonCounts": {
+            "player-dead": 3
+          },
+          "totalSteps": 250,
+          "truncatedReasonCounts": {}
+        }
+      ],
+      "stagnationShare": 0.0,
+      "terminalReasonCounts": {
+        "player-dead": 12
+      },
+      "totalSteps": 1000,
+      "truncatedReasonCounts": {}
+    },
+    "deterministicPolicyPredict": false,
+    "errors": [],
+    "maxRepeatedActionStreak": 4,
+    "maxSeedTopActionShare": 0.112,
+    "modeId": "eval-mode-counterprobe",
+    "runtimeErrorCount": 0,
+    "seedReports": [
+      {
+        "actionDistribution": {
+          "argmaxAction": "boost",
+          "argmaxCount": 28,
+          "argmaxShare": 0.112,
+          "argmaxToken": "7",
+          "counts": {
+            "0": 19,
+            "1": 11,
+            "10": 19,
+            "11": 18,
+            "12": 25,
+            "2": 17,
+            "3": 26,
+            "4": 17,
+            "5": 21,
+            "6": 22,
+            "7": 28,
+            "8": 13,
+            "9": 14
+          },
+          "entropy": 2.532122,
+          "marginShare": 0.008,
+          "normalizedEntropy": 0.987202,
+          "probabilities": {
+            "0": 0.076,
+            "1": 0.044,
+            "10": 0.076,
+            "11": 0.072,
+            "12": 0.1,
+            "2": 0.068,
+            "3": 0.104,
+            "4": 0.068,
+            "5": 0.084,
+            "6": 0.088,
+            "7": 0.112,
+            "8": 0.052,
+            "9": 0.056
+          },
+          "rankedActions": [
+            {
+              "count": 28,
+              "semanticAction": "boost",
+              "share": 0.112,
+              "token": "7"
+            },
+            {
+              "count": 26,
+              "semanticAction": "pitch-up",
+              "share": 0.104,
+              "token": "3"
+            },
+            {
+              "count": 25,
+              "semanticAction": "evade-right",
+              "share": 0.1,
+              "token": "12"
+            },
+            {
+              "count": 22,
+              "semanticAction": "roll-right",
+              "share": 0.088,
+              "token": "6"
+            },
+            {
+              "count": 21,
+              "semanticAction": "roll-left",
+              "share": 0.084,
+              "token": "5"
+            },
+            {
+              "count": 19,
+              "semanticAction": "noop",
+              "share": 0.076,
+              "token": "0"
+            },
+            {
+              "count": 19,
+              "semanticAction": "turn-right-boost",
+              "share": 0.076,
+              "token": "10"
+            },
+            {
+              "count": 18,
+              "semanticAction": "evade-left",
+              "share": 0.072,
+              "token": "11"
+            },
+            {
+              "count": 17,
+              "semanticAction": "yaw-right",
+              "share": 0.068,
+              "token": "2"
+            },
+            {
+              "count": 17,
+              "semanticAction": "pitch-down",
+              "share": 0.068,
+              "token": "4"
+            },
+            {
+              "count": 14,
+              "semanticAction": "turn-left-boost",
+              "share": 0.056,
+              "token": "9"
+            },
+            {
+              "count": 13,
+              "semanticAction": "shoot-mg",
+              "share": 0.052,
+              "token": "8"
+            },
+            {
+              "count": 11,
+              "semanticAction": "yaw-left",
+              "share": 0.044,
+              "token": "1"
+            }
+          ],
+          "secondBestAction": "pitch-up",
+          "secondBestCount": 26,
+          "secondBestShare": 0.104,
+          "secondBestToken": "3",
+          "total": 250
+        },
+        "deterministicPolicyPredict": false,
+        "distributionSnapshots": [
+          {
+            "argmaxAction": "roll-right",
+            "argmaxMargin": 0.000379,
+            "argmaxProbability": 0.079363,
+            "argmaxToken": 6,
+            "entropy": 2.564675,
+            "normalizedEntropy": 0.999893,
+            "probabilities": {
+              "0": 0.07867,
+              "1": 0.076916,
+              "10": 0.074503,
+              "11": 0.074816,
+              "12": 0.078984,
+              "2": 0.075553,
+              "3": 0.075068,
+              "4": 0.07532,
+              "5": 0.075319,
+              "6": 0.079363,
+              "7": 0.07878,
+              "8": 0.078943,
+              "9": 0.077765
+            },
+            "rankedActions": [
+              {
+                "logit": -2.533725,
+                "probability": 0.079363,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.538507,
+                "probability": 0.078984,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.539025,
+                "probability": 0.078943,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.541101,
+                "probability": 0.07878,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.542495,
+                "probability": 0.07867,
+                "semanticAction": "noop",
+                "token": 0
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.078984,
+            "secondBestToken": 12,
+            "selectedAction": "noop",
+            "selectedActionProbability": 0.07867,
+            "selectedActionToken": 0,
+            "stepIndex": 0,
+            "valueEstimate": -0.065878
+          },
+          {
+            "argmaxAction": "roll-right",
+            "argmaxMargin": 0.000331,
+            "argmaxProbability": 0.079252,
+            "argmaxToken": 6,
+            "entropy": 2.564702,
+            "normalizedEntropy": 0.999903,
+            "probabilities": {
+              "0": 0.078342,
+              "1": 0.075877,
+              "10": 0.074486,
+              "11": 0.074689,
+              "12": 0.078922,
+              "2": 0.075227,
+              "3": 0.075459,
+              "4": 0.076035,
+              "5": 0.076078,
+              "6": 0.079252,
+              "7": 0.078663,
+              "8": 0.078795,
+              "9": 0.078174
+            },
+            "rankedActions": [
+              {
+                "logit": -2.535119,
+                "probability": 0.079252,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.539299,
+                "probability": 0.078922,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.540906,
+                "probability": 0.078795,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.542577,
+                "probability": 0.078663,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.546674,
+                "probability": 0.078342,
+                "semanticAction": "noop",
+                "token": 0
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.078922,
+            "secondBestToken": 12,
+            "selectedAction": "roll-right",
+            "selectedActionProbability": 0.079252,
+            "selectedActionToken": 6,
+            "stepIndex": 1,
+            "valueEstimate": -0.100919
+          },
+          {
+            "argmaxAction": "roll-right",
+            "argmaxMargin": 0.000333,
+            "argmaxProbability": 0.07923,
+            "argmaxToken": 6,
+            "entropy": 2.564705,
+            "normalizedEntropy": 0.999905,
+            "probabilities": {
+              "0": 0.078345,
+              "1": 0.075888,
+              "10": 0.074503,
+              "11": 0.074695,
+              "12": 0.078897,
+              "2": 0.075225,
+              "3": 0.075463,
+              "4": 0.076048,
+              "5": 0.076088,
+              "6": 0.07923,
+              "7": 0.078646,
+              "8": 0.078802,
+              "9": 0.078167
+            },
+            "rankedActions": [
+              {
+                "logit": -2.535395,
+                "probability": 0.07923,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.539606,
+                "probability": 0.078897,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.540822,
+                "probability": 0.078802,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.542795,
+                "probability": 0.078646,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.546629,
+                "probability": 0.078345,
+                "semanticAction": "noop",
+                "token": 0
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.078897,
+            "secondBestToken": 12,
+            "selectedAction": "yaw-left",
+            "selectedActionProbability": 0.075888,
+            "selectedActionToken": 1,
+            "stepIndex": 2,
+            "valueEstimate": -0.102407
+          },
+          {
+            "argmaxAction": "roll-right",
+            "argmaxMargin": 0.000201,
+            "argmaxProbability": 0.079025,
+            "argmaxToken": 6,
+            "entropy": 2.564734,
+            "normalizedEntropy": 0.999916,
+            "probabilities": {
+              "0": 0.078371,
+              "1": 0.07602,
+              "10": 0.074521,
+              "11": 0.074772,
+              "12": 0.078606,
+              "2": 0.075358,
+              "3": 0.075631,
+              "4": 0.076162,
+              "5": 0.076159,
+              "6": 0.079025,
+              "7": 0.078436,
+              "8": 0.078824,
+              "9": 0.078116
+            },
+            "rankedActions": [
+              {
+                "logit": -2.537993,
+                "probability": 0.079025,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.540544,
+                "probability": 0.078824,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.543313,
+                "probability": 0.078606,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.545469,
+                "probability": 0.078436,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.546304,
+                "probability": 0.078371,
+                "semanticAction": "noop",
+                "token": 0
+              }
+            ],
+            "secondBestAction": "shoot-mg",
+            "secondBestProbability": 0.078824,
+            "secondBestToken": 8,
+            "selectedAction": "evade-right",
+            "selectedActionProbability": 0.078606,
+            "selectedActionToken": 12,
+            "stepIndex": 3,
+            "valueEstimate": -0.143374
+          },
+          {
+            "argmaxAction": "roll-right",
+            "argmaxMargin": 0.000337,
+            "argmaxProbability": 0.079191,
+            "argmaxToken": 6,
+            "entropy": 2.564709,
+            "normalizedEntropy": 0.999906,
+            "probabilities": {
+              "0": 0.078352,
+              "1": 0.075909,
+              "10": 0.074533,
+              "11": 0.074707,
+              "12": 0.078853,
+              "2": 0.075222,
+              "3": 0.07547,
+              "4": 0.076073,
+              "5": 0.076106,
+              "6": 0.079191,
+              "7": 0.078615,
+              "8": 0.078813,
+              "9": 0.078155
+            },
+            "rankedActions": [
+              {
+                "logit": -2.535897,
+                "probability": 0.079191,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.540166,
+                "probability": 0.078853,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.540673,
+                "probability": 0.078813,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.54319,
+                "probability": 0.078615,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.546546,
+                "probability": 0.078352,
+                "semanticAction": "noop",
+                "token": 0
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.078853,
+            "secondBestToken": 12,
+            "selectedAction": "roll-right",
+            "selectedActionProbability": 0.079191,
+            "selectedActionToken": 6,
+            "stepIndex": 4,
+            "valueEstimate": -0.104986
+          },
+          {
+            "argmaxAction": "roll-right",
+            "argmaxMargin": 0.000339,
+            "argmaxProbability": 0.079173,
+            "argmaxToken": 6,
+            "entropy": 2.564712,
+            "normalizedEntropy": 0.999907,
+            "probabilities": {
+              "0": 0.078355,
+              "1": 0.075918,
+              "10": 0.074547,
+              "11": 0.074712,
+              "12": 0.078834,
+              "2": 0.07522,
+              "3": 0.075473,
+              "4": 0.076084,
+              "5": 0.076114,
+              "6": 0.079173,
+              "7": 0.078602,
+              "8": 0.078819,
+              "9": 0.07815
+            },
+            "rankedActions": [
+              {
+                "logit": -2.53612,
+                "probability": 0.079173,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.540411,
+                "probability": 0.078834,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.540605,
+                "probability": 0.078819,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.543362,
+                "probability": 0.078602,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.546506,
+                "probability": 0.078355,
+                "semanticAction": "noop",
+                "token": 0
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.078834,
+            "secondBestToken": 12,
+            "selectedAction": "evade-right",
+            "selectedActionProbability": 0.078834,
+            "selectedActionToken": 12,
+            "stepIndex": 5,
+            "valueEstimate": -0.105811
+          },
+          {
+            "argmaxAction": "roll-right",
+            "argmaxMargin": 0.000272,
+            "argmaxProbability": 0.079404,
+            "argmaxToken": 6,
+            "entropy": 2.564675,
+            "normalizedEntropy": 0.999893,
+            "probabilities": {
+              "0": 0.078365,
+              "1": 0.075761,
+              "10": 0.074535,
+              "11": 0.074623,
+              "12": 0.079133,
+              "2": 0.07504,
+              "3": 0.075253,
+              "4": 0.075999,
+              "5": 0.076045,
+              "6": 0.079404,
+              "7": 0.078831,
+              "8": 0.078797,
+              "9": 0.078213
+            },
+            "rankedActions": [
+              {
+                "logit": -2.533204,
+                "probability": 0.079404,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.536629,
+                "probability": 0.079133,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.540452,
+                "probability": 0.078831,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.540876,
+                "probability": 0.078797,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.546372,
+                "probability": 0.078365,
+                "semanticAction": "noop",
+                "token": 0
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.079133,
+            "secondBestToken": 12,
+            "selectedAction": "turn-left-boost",
+            "selectedActionProbability": 0.078213,
+            "selectedActionToken": 9,
+            "stepIndex": 6,
+            "valueEstimate": -0.033543
+          },
+          {
+            "argmaxAction": "roll-right",
+            "argmaxMargin": 0.000285,
+            "argmaxProbability": 0.079258,
+            "argmaxToken": 6,
+            "entropy": 2.564688,
+            "normalizedEntropy": 0.999898,
+            "probabilities": {
+              "0": 0.078695,
+              "1": 0.076952,
+              "10": 0.074581,
+              "11": 0.074848,
+              "12": 0.07887,
+              "2": 0.075537,
+              "3": 0.075076,
+              "4": 0.075409,
+              "5": 0.075355,
+              "6": 0.079258,
+              "7": 0.078694,
+              "8": 0.078973,
+              "9": 0.077751
+            },
+            "rankedActions": [
+              {
+                "logit": -2.535046,
+                "probability": 0.079258,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.538654,
+                "probability": 0.078973,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.539956,
+                "probability": 0.07887,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.542171,
+                "probability": 0.078695,
+                "semanticAction": "noop",
+                "token": 0
+              },
+              {
+                "logit": -2.542184,
+                "probability": 0.078694,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "shoot-mg",
+            "secondBestProbability": 0.078973,
+            "secondBestToken": 8,
+            "selectedAction": "turn-right-boost",
+            "selectedActionProbability": 0.074581,
+            "selectedActionToken": 10,
+            "stepIndex": 7,
+            "valueEstimate": -0.06134
+          }
+        ],
+        "error": null,
+        "modeId": "eval-mode-counterprobe",
+        "repeatedActionStreak": {
+          "maxLength": 4,
+          "semanticAction": "pitch-up",
+          "shareOfProbe": 0.016,
+          "token": 3
+        },
+        "requestedSteps": 250,
+        "seed": 944,
+        "summary": {
+          "actionCounts": {
+            "0": 19,
+            "1": 11,
+            "10": 19,
+            "11": 18,
+            "12": 25,
+            "2": 17,
+            "3": 26,
+            "4": 17,
+            "5": 21,
+            "6": 22,
+            "7": 28,
+            "8": 13,
+            "9": 14
+          },
+          "avgStepsPerEpisode": 76.666667,
+          "completedEpisodes": 3,
+          "deathBefore60Count": 0,
+          "label": "rr3-eval-mode-counterprobe-944",
+          "maxStepShare": 0.0,
+          "objectiveEventCounts": {
+            "local-openness-improved": 13,
+            "target-alignment-improved": 3,
+            "target-distance-improved": 11
+          },
+          "objectiveEventShare": 1.0,
+          "objectiveSignalReachableCount": 27,
+          "objectiveSignalStepShare": 0.108,
+          "playerDeadShare": 1.0,
+          "progressEventCounts": {
+            "local-openness-improved": 13,
+            "target-alignment-improved": 3,
+            "target-distance-improved": 11
+          },
+          "progressEventShare": 1.0,
+          "progressSignalReachableCount": 27,
+          "progressSignalStepShare": 0.108,
+          "rewardBreakdownTotals": {
+            "baseStep": -4.0,
+            "checkpointReached": 19.44,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "earlyDeath": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.5,
+            "lowHealthThreat": -0.57,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 2.47,
+            "survivalPressureBonus": 0.451643,
+            "trailRisk": 0.0,
+            "wallRisk": -14.217118,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "runtimeErrorCount": 0,
+          "safetyMaxRates": {
+            "invalidActionRate": 0.0,
+            "noopRate": 1.0,
+            "postDecodeClampRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "sanitizerRate": 0.0,
+            "vetoRate": 0.0
+          },
+          "sampleRows": [
+            {
+              "actionToken": 0,
+              "episodeStep": 1,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.00529,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 1,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 6,
+              "episodeStep": 2,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714716,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 2,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 1,
+              "episodeStep": 3,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714721,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 3,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 12,
+              "episodeStep": 4,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714727,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 4,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 6,
+              "episodeStep": 5,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714732,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 5,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 12,
+              "episodeStep": 6,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714737,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 6,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 9,
+              "episodeStep": 7,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714741,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 7,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 10,
+              "episodeStep": 8,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714745,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 8,
+              "terminalReason": null,
+              "truncatedReason": null
+            }
+          ],
+          "sampleRowsTruncated": 24,
+          "stagnationShare": 0.0,
+          "terminalReasonCounts": {
+            "player-dead": 3
+          },
+          "totalSteps": 250,
+          "truncatedReasonCounts": {}
+        },
+        "vecNormalizeTraining": false
+      },
+      {
+        "actionDistribution": {
+          "argmaxAction": "pitch-down",
+          "argmaxCount": 24,
+          "argmaxShare": 0.096,
+          "argmaxToken": "4",
+          "counts": {
+            "0": 17,
+            "1": 22,
+            "10": 22,
+            "11": 20,
+            "12": 19,
+            "2": 14,
+            "3": 16,
+            "4": 24,
+            "5": 13,
+            "6": 19,
+            "7": 23,
+            "8": 23,
+            "9": 18
+          },
+          "entropy": 2.548825,
+          "marginShare": 0.004,
+          "normalizedEntropy": 0.993713,
+          "probabilities": {
+            "0": 0.068,
+            "1": 0.088,
+            "10": 0.088,
+            "11": 0.08,
+            "12": 0.076,
+            "2": 0.056,
+            "3": 0.064,
+            "4": 0.096,
+            "5": 0.052,
+            "6": 0.076,
+            "7": 0.092,
+            "8": 0.092,
+            "9": 0.072
+          },
+          "rankedActions": [
+            {
+              "count": 24,
+              "semanticAction": "pitch-down",
+              "share": 0.096,
+              "token": "4"
+            },
+            {
+              "count": 23,
+              "semanticAction": "boost",
+              "share": 0.092,
+              "token": "7"
+            },
+            {
+              "count": 23,
+              "semanticAction": "shoot-mg",
+              "share": 0.092,
+              "token": "8"
+            },
+            {
+              "count": 22,
+              "semanticAction": "yaw-left",
+              "share": 0.088,
+              "token": "1"
+            },
+            {
+              "count": 22,
+              "semanticAction": "turn-right-boost",
+              "share": 0.088,
+              "token": "10"
+            },
+            {
+              "count": 20,
+              "semanticAction": "evade-left",
+              "share": 0.08,
+              "token": "11"
+            },
+            {
+              "count": 19,
+              "semanticAction": "roll-right",
+              "share": 0.076,
+              "token": "6"
+            },
+            {
+              "count": 19,
+              "semanticAction": "evade-right",
+              "share": 0.076,
+              "token": "12"
+            },
+            {
+              "count": 18,
+              "semanticAction": "turn-left-boost",
+              "share": 0.072,
+              "token": "9"
+            },
+            {
+              "count": 17,
+              "semanticAction": "noop",
+              "share": 0.068,
+              "token": "0"
+            },
+            {
+              "count": 16,
+              "semanticAction": "pitch-up",
+              "share": 0.064,
+              "token": "3"
+            },
+            {
+              "count": 14,
+              "semanticAction": "yaw-right",
+              "share": 0.056,
+              "token": "2"
+            },
+            {
+              "count": 13,
+              "semanticAction": "roll-left",
+              "share": 0.052,
+              "token": "5"
+            }
+          ],
+          "secondBestAction": "boost",
+          "secondBestCount": 23,
+          "secondBestShare": 0.092,
+          "secondBestToken": "7",
+          "total": 250
+        },
+        "deterministicPolicyPredict": false,
+        "distributionSnapshots": [
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000471,
+            "argmaxProbability": 0.079143,
+            "argmaxToken": 8,
+            "entropy": 2.564746,
+            "normalizedEntropy": 0.999921,
+            "probabilities": {
+              "0": 0.078528,
+              "1": 0.077051,
+              "10": 0.074431,
+              "11": 0.074923,
+              "12": 0.078153,
+              "2": 0.075901,
+              "3": 0.075407,
+              "4": 0.076334,
+              "5": 0.075363,
+              "6": 0.078672,
+              "7": 0.078381,
+              "8": 0.079143,
+              "9": 0.077715
+            },
+            "rankedActions": [
+              {
+                "logit": -2.536503,
+                "probability": 0.079143,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.542468,
+                "probability": 0.078672,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.544301,
+                "probability": 0.078528,
+                "semanticAction": "noop",
+                "token": 0
+              },
+              {
+                "logit": -2.546174,
+                "probability": 0.078381,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.549083,
+                "probability": 0.078153,
+                "semanticAction": "evade-right",
+                "token": 12
+              }
+            ],
+            "secondBestAction": "roll-right",
+            "secondBestProbability": 0.078672,
+            "secondBestToken": 6,
+            "selectedAction": "turn-left-boost",
+            "selectedActionProbability": 0.077715,
+            "selectedActionToken": 9,
+            "stepIndex": 0,
+            "valueEstimate": -0.127693
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000502,
+            "argmaxProbability": 0.078991,
+            "argmaxToken": 8,
+            "entropy": 2.564799,
+            "normalizedEntropy": 0.999941,
+            "probabilities": {
+              "0": 0.078489,
+              "1": 0.077275,
+              "10": 0.074842,
+              "11": 0.075242,
+              "12": 0.077834,
+              "2": 0.07606,
+              "3": 0.075479,
+              "4": 0.076563,
+              "5": 0.075509,
+              "6": 0.07824,
+              "7": 0.078059,
+              "8": 0.078991,
+              "9": 0.077416
+            },
+            "rankedActions": [
+              {
+                "logit": -2.538416,
+                "probability": 0.078991,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.544793,
+                "probability": 0.078489,
+                "semanticAction": "noop",
+                "token": 0
+              },
+              {
+                "logit": -2.547972,
+                "probability": 0.07824,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.550287,
+                "probability": 0.078059,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.553177,
+                "probability": 0.077834,
+                "semanticAction": "evade-right",
+                "token": 12
+              }
+            ],
+            "secondBestAction": "noop",
+            "secondBestProbability": 0.078489,
+            "secondBestToken": 0,
+            "selectedAction": "turn-right-boost",
+            "selectedActionProbability": 0.074842,
+            "selectedActionToken": 10,
+            "stepIndex": 1,
+            "valueEstimate": -0.004671
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000494,
+            "argmaxProbability": 0.079144,
+            "argmaxToken": 8,
+            "entropy": 2.564748,
+            "normalizedEntropy": 0.999921,
+            "probabilities": {
+              "0": 0.07855,
+              "1": 0.077063,
+              "10": 0.074453,
+              "11": 0.074922,
+              "12": 0.078107,
+              "2": 0.075878,
+              "3": 0.075389,
+              "4": 0.076375,
+              "5": 0.075381,
+              "6": 0.07865,
+              "7": 0.07838,
+              "8": 0.079144,
+              "9": 0.077708
+            },
+            "rankedActions": [
+              {
+                "logit": -2.53649,
+                "probability": 0.079144,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.542745,
+                "probability": 0.07865,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.544025,
+                "probability": 0.07855,
+                "semanticAction": "noop",
+                "token": 0
+              },
+              {
+                "logit": -2.546185,
+                "probability": 0.07838,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.549671,
+                "probability": 0.078107,
+                "semanticAction": "evade-right",
+                "token": 12
+              }
+            ],
+            "secondBestAction": "roll-right",
+            "secondBestProbability": 0.07865,
+            "secondBestToken": 6,
+            "selectedAction": "evade-left",
+            "selectedActionProbability": 0.074922,
+            "selectedActionToken": 11,
+            "stepIndex": 2,
+            "valueEstimate": -0.125421
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000521,
+            "argmaxProbability": 0.078885,
+            "argmaxToken": 8,
+            "entropy": 2.564804,
+            "normalizedEntropy": 0.999943,
+            "probabilities": {
+              "0": 0.078364,
+              "1": 0.076199,
+              "10": 0.074631,
+              "11": 0.075027,
+              "12": 0.07761,
+              "2": 0.075521,
+              "3": 0.076006,
+              "4": 0.077319,
+              "5": 0.07651,
+              "6": 0.078175,
+              "7": 0.07785,
+              "8": 0.078885,
+              "9": 0.077903
+            },
+            "rankedActions": [
+              {
+                "logit": -2.539764,
+                "probability": 0.078885,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.546386,
+                "probability": 0.078364,
+                "semanticAction": "noop",
+                "token": 0
+              },
+              {
+                "logit": -2.548809,
+                "probability": 0.078175,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.552291,
+                "probability": 0.077903,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.552966,
+                "probability": 0.07785,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "noop",
+            "secondBestProbability": 0.078364,
+            "secondBestToken": 0,
+            "selectedAction": "pitch-up",
+            "selectedActionProbability": 0.076006,
+            "selectedActionToken": 3,
+            "stepIndex": 3,
+            "valueEstimate": 0.061753
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000511,
+            "argmaxProbability": 0.078884,
+            "argmaxToken": 8,
+            "entropy": 2.564804,
+            "normalizedEntropy": 0.999943,
+            "probabilities": {
+              "0": 0.078373,
+              "1": 0.076204,
+              "10": 0.074637,
+              "11": 0.075029,
+              "12": 0.077587,
+              "2": 0.075511,
+              "3": 0.075997,
+              "4": 0.077337,
+              "5": 0.076519,
+              "6": 0.078168,
+              "7": 0.07785,
+              "8": 0.078884,
+              "9": 0.077904
+            },
+            "rankedActions": [
+              {
+                "logit": -2.539771,
+                "probability": 0.078884,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.546273,
+                "probability": 0.078373,
+                "semanticAction": "noop",
+                "token": 0
+              },
+              {
+                "logit": -2.54889,
+                "probability": 0.078168,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.552277,
+                "probability": 0.077904,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.552974,
+                "probability": 0.07785,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "noop",
+            "secondBestProbability": 0.078373,
+            "secondBestToken": 0,
+            "selectedAction": "turn-right-boost",
+            "selectedActionProbability": 0.074637,
+            "selectedActionToken": 10,
+            "stepIndex": 4,
+            "valueEstimate": 0.062607
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000524,
+            "argmaxProbability": 0.079142,
+            "argmaxToken": 8,
+            "entropy": 2.564751,
+            "normalizedEntropy": 0.999923,
+            "probabilities": {
+              "0": 0.078577,
+              "1": 0.07708,
+              "10": 0.074482,
+              "11": 0.074925,
+              "12": 0.078038,
+              "2": 0.075853,
+              "3": 0.075373,
+              "4": 0.076429,
+              "5": 0.075408,
+              "6": 0.078618,
+              "7": 0.078377,
+              "8": 0.079142,
+              "9": 0.077699
+            },
+            "rankedActions": [
+              {
+                "logit": -2.536515,
+                "probability": 0.079142,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.543156,
+                "probability": 0.078618,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.543683,
+                "probability": 0.078577,
+                "semanticAction": "noop",
+                "token": 0
+              },
+              {
+                "logit": -2.546225,
+                "probability": 0.078377,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.550563,
+                "probability": 0.078038,
+                "semanticAction": "evade-right",
+                "token": 12
+              }
+            ],
+            "secondBestAction": "roll-right",
+            "secondBestProbability": 0.078618,
+            "secondBestToken": 6,
+            "selectedAction": "pitch-up",
+            "selectedActionProbability": 0.075373,
+            "selectedActionToken": 3,
+            "stepIndex": 5,
+            "valueEstimate": -0.126577
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000473,
+            "argmaxProbability": 0.079056,
+            "argmaxToken": 8,
+            "entropy": 2.564751,
+            "normalizedEntropy": 0.999923,
+            "probabilities": {
+              "0": 0.078431,
+              "1": 0.07599,
+              "10": 0.074306,
+              "11": 0.074707,
+              "12": 0.077845,
+              "2": 0.075317,
+              "3": 0.075854,
+              "4": 0.077262,
+              "5": 0.076275,
+              "6": 0.078582,
+              "7": 0.078174,
+              "8": 0.079056,
+              "9": 0.078201
+            },
+            "rankedActions": [
+              {
+                "logit": -2.537605,
+                "probability": 0.079056,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.54361,
+                "probability": 0.078582,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.545542,
+                "probability": 0.078431,
+                "semanticAction": "noop",
+                "token": 0
+              },
+              {
+                "logit": -2.548469,
+                "probability": 0.078201,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.548815,
+                "probability": 0.078174,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "roll-right",
+            "secondBestProbability": 0.078582,
+            "secondBestToken": 6,
+            "selectedAction": "turn-left-boost",
+            "selectedActionProbability": 0.078201,
+            "selectedActionToken": 9,
+            "stepIndex": 6,
+            "valueEstimate": -0.034169
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.00019,
+            "argmaxProbability": 0.078883,
+            "argmaxToken": 8,
+            "entropy": 2.564798,
+            "normalizedEntropy": 0.999941,
+            "probabilities": {
+              "0": 0.078693,
+              "1": 0.077364,
+              "10": 0.074953,
+              "11": 0.07527,
+              "12": 0.077739,
+              "2": 0.075856,
+              "3": 0.075362,
+              "4": 0.076612,
+              "5": 0.075554,
+              "6": 0.078236,
+              "7": 0.078062,
+              "8": 0.078883,
+              "9": 0.077416
+            },
+            "rankedActions": [
+              {
+                "logit": -2.539788,
+                "probability": 0.078883,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.542203,
+                "probability": 0.078693,
+                "semanticAction": "noop",
+                "token": 0
+              },
+              {
+                "logit": -2.548025,
+                "probability": 0.078236,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.550256,
+                "probability": 0.078062,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.554393,
+                "probability": 0.077739,
+                "semanticAction": "evade-right",
+                "token": 12
+              }
+            ],
+            "secondBestAction": "noop",
+            "secondBestProbability": 0.078693,
+            "secondBestToken": 0,
+            "selectedAction": "turn-left-boost",
+            "selectedActionProbability": 0.077416,
+            "selectedActionToken": 9,
+            "stepIndex": 7,
+            "valueEstimate": 0.103839
+          }
+        ],
+        "error": null,
+        "modeId": "eval-mode-counterprobe",
+        "repeatedActionStreak": {
+          "maxLength": 2,
+          "semanticAction": "turn-left-boost",
+          "shareOfProbe": 0.008,
+          "token": 9
+        },
+        "requestedSteps": 250,
+        "seed": 945,
+        "summary": {
+          "actionCounts": {
+            "0": 17,
+            "1": 22,
+            "10": 22,
+            "11": 20,
+            "12": 19,
+            "2": 14,
+            "3": 16,
+            "4": 24,
+            "5": 13,
+            "6": 19,
+            "7": 23,
+            "8": 23,
+            "9": 18
+          },
+          "avgStepsPerEpisode": 79.333333,
+          "completedEpisodes": 3,
+          "deathBefore60Count": 1,
+          "label": "rr3-eval-mode-counterprobe-945",
+          "maxStepShare": 0.0,
+          "objectiveEventCounts": {
+            "local-openness-improved": 18,
+            "target-alignment-improved": 2,
+            "target-distance-improved": 14
+          },
+          "objectiveEventShare": 1.0,
+          "objectiveSignalReachableCount": 32,
+          "objectiveSignalStepShare": 0.128,
+          "playerDeadShare": 1.0,
+          "progressEventCounts": {
+            "local-openness-improved": 18,
+            "target-alignment-improved": 2,
+            "target-distance-improved": 14
+          },
+          "progressEventShare": 1.0,
+          "progressSignalReachableCount": 32,
+          "progressSignalStepShare": 0.128,
+          "rewardBreakdownTotals": {
+            "baseStep": -4.0,
+            "checkpointReached": 23.04,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "earlyDeath": -19.466667,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.5,
+            "lowHealthThreat": -0.57,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 2.47,
+            "survivalPressureBonus": 0.410066,
+            "trailRisk": 0.0,
+            "wallRisk": -11.471436,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "runtimeErrorCount": 0,
+          "safetyMaxRates": {
+            "invalidActionRate": 0.0,
+            "noopRate": 0.076923,
+            "postDecodeClampRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "sanitizerRate": 0.0,
+            "vetoRate": 0.0
+          },
+          "sampleRows": [
+            {
+              "actionToken": 9,
+              "episodeStep": 1,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.701246,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 1,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 10,
+              "episodeStep": 2,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714827,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 2,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 11,
+              "episodeStep": 3,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.018748,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 3,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 3,
+              "episodeStep": 4,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.018745,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 4,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 10,
+              "episodeStep": 5,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714833,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 5,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 3,
+              "episodeStep": 6,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005165,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 6,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 9,
+              "episodeStep": 7,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.018741,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 7,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 9,
+              "episodeStep": 8,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.032319,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 8,
+              "terminalReason": null,
+              "truncatedReason": null
+            }
+          ],
+          "sampleRowsTruncated": 24,
+          "stagnationShare": 0.0,
+          "terminalReasonCounts": {
+            "player-dead": 3
+          },
+          "totalSteps": 250,
+          "truncatedReasonCounts": {}
+        },
+        "vecNormalizeTraining": false
+      },
+      {
+        "actionDistribution": {
+          "argmaxAction": "turn-right-boost",
+          "argmaxCount": 27,
+          "argmaxShare": 0.108,
+          "argmaxToken": "10",
+          "counts": {
+            "0": 17,
+            "1": 17,
+            "10": 27,
+            "11": 24,
+            "12": 21,
+            "2": 15,
+            "3": 22,
+            "4": 17,
+            "5": 8,
+            "6": 19,
+            "7": 21,
+            "8": 23,
+            "9": 19
+          },
+          "entropy": 2.533905,
+          "marginShare": 0.012,
+          "normalizedEntropy": 0.987897,
+          "probabilities": {
+            "0": 0.068,
+            "1": 0.068,
+            "10": 0.108,
+            "11": 0.096,
+            "12": 0.084,
+            "2": 0.06,
+            "3": 0.088,
+            "4": 0.068,
+            "5": 0.032,
+            "6": 0.076,
+            "7": 0.084,
+            "8": 0.092,
+            "9": 0.076
+          },
+          "rankedActions": [
+            {
+              "count": 27,
+              "semanticAction": "turn-right-boost",
+              "share": 0.108,
+              "token": "10"
+            },
+            {
+              "count": 24,
+              "semanticAction": "evade-left",
+              "share": 0.096,
+              "token": "11"
+            },
+            {
+              "count": 23,
+              "semanticAction": "shoot-mg",
+              "share": 0.092,
+              "token": "8"
+            },
+            {
+              "count": 22,
+              "semanticAction": "pitch-up",
+              "share": 0.088,
+              "token": "3"
+            },
+            {
+              "count": 21,
+              "semanticAction": "boost",
+              "share": 0.084,
+              "token": "7"
+            },
+            {
+              "count": 21,
+              "semanticAction": "evade-right",
+              "share": 0.084,
+              "token": "12"
+            },
+            {
+              "count": 19,
+              "semanticAction": "roll-right",
+              "share": 0.076,
+              "token": "6"
+            },
+            {
+              "count": 19,
+              "semanticAction": "turn-left-boost",
+              "share": 0.076,
+              "token": "9"
+            },
+            {
+              "count": 17,
+              "semanticAction": "noop",
+              "share": 0.068,
+              "token": "0"
+            },
+            {
+              "count": 17,
+              "semanticAction": "yaw-left",
+              "share": 0.068,
+              "token": "1"
+            },
+            {
+              "count": 17,
+              "semanticAction": "pitch-down",
+              "share": 0.068,
+              "token": "4"
+            },
+            {
+              "count": 15,
+              "semanticAction": "yaw-right",
+              "share": 0.06,
+              "token": "2"
+            },
+            {
+              "count": 8,
+              "semanticAction": "roll-left",
+              "share": 0.032,
+              "token": "5"
+            }
+          ],
+          "secondBestAction": "evade-left",
+          "secondBestCount": 24,
+          "secondBestShare": 0.096,
+          "secondBestToken": "11",
+          "total": 250
+        },
+        "deterministicPolicyPredict": false,
+        "distributionSnapshots": [
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.00048,
+            "argmaxProbability": 0.079248,
+            "argmaxToken": 8,
+            "entropy": 2.56473,
+            "normalizedEntropy": 0.999915,
+            "probabilities": {
+              "0": 0.077254,
+              "1": 0.076197,
+              "10": 0.073575,
+              "11": 0.074966,
+              "12": 0.078768,
+              "2": 0.07661,
+              "3": 0.07639,
+              "4": 0.077134,
+              "5": 0.075103,
+              "6": 0.078425,
+              "7": 0.078112,
+              "8": 0.079248,
+              "9": 0.078217
+            },
+            "rankedActions": [
+              {
+                "logit": -2.535168,
+                "probability": 0.079248,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.541243,
+                "probability": 0.078768,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.545616,
+                "probability": 0.078425,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.548274,
+                "probability": 0.078217,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.549611,
+                "probability": 0.078112,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.078768,
+            "secondBestToken": 12,
+            "selectedAction": "roll-right",
+            "selectedActionProbability": 0.078425,
+            "selectedActionToken": 6,
+            "stepIndex": 0,
+            "valueEstimate": -0.441866
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000158,
+            "argmaxProbability": 0.078931,
+            "argmaxToken": 8,
+            "entropy": 2.564706,
+            "normalizedEntropy": 0.999905,
+            "probabilities": {
+              "0": 0.077075,
+              "1": 0.075247,
+              "10": 0.073397,
+              "11": 0.074737,
+              "12": 0.078767,
+              "2": 0.076057,
+              "3": 0.076883,
+              "4": 0.077847,
+              "5": 0.075814,
+              "6": 0.078429,
+              "7": 0.078043,
+              "8": 0.078931,
+              "9": 0.078773
+            },
+            "rankedActions": [
+              {
+                "logit": -2.539179,
+                "probability": 0.078931,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.541182,
+                "probability": 0.078773,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.541266,
+                "probability": 0.078767,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.545557,
+                "probability": 0.078429,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.550494,
+                "probability": 0.078043,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "turn-left-boost",
+            "secondBestProbability": 0.078773,
+            "secondBestToken": 9,
+            "selectedAction": "noop",
+            "selectedActionProbability": 0.077075,
+            "selectedActionToken": 0,
+            "stepIndex": 1,
+            "valueEstimate": -0.269332
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000157,
+            "argmaxProbability": 0.078934,
+            "argmaxToken": 8,
+            "entropy": 2.564707,
+            "normalizedEntropy": 0.999905,
+            "probabilities": {
+              "0": 0.077088,
+              "1": 0.075249,
+              "10": 0.073404,
+              "11": 0.074731,
+              "12": 0.078739,
+              "2": 0.076051,
+              "3": 0.076875,
+              "4": 0.077869,
+              "5": 0.075822,
+              "6": 0.078419,
+              "7": 0.078041,
+              "8": 0.078934,
+              "9": 0.078777
+            },
+            "rankedActions": [
+              {
+                "logit": -2.539137,
+                "probability": 0.078934,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.541133,
+                "probability": 0.078777,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.541612,
+                "probability": 0.078739,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.545684,
+                "probability": 0.078419,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.550527,
+                "probability": 0.078041,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "turn-left-boost",
+            "secondBestProbability": 0.078777,
+            "secondBestToken": 9,
+            "selectedAction": "roll-right",
+            "selectedActionProbability": 0.078419,
+            "selectedActionToken": 6,
+            "stepIndex": 2,
+            "valueEstimate": -0.263888
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000156,
+            "argmaxProbability": 0.078937,
+            "argmaxToken": 8,
+            "entropy": 2.564707,
+            "normalizedEntropy": 0.999906,
+            "probabilities": {
+              "0": 0.077101,
+              "1": 0.075251,
+              "10": 0.07341,
+              "11": 0.074726,
+              "12": 0.078711,
+              "2": 0.076047,
+              "3": 0.076868,
+              "4": 0.07789,
+              "5": 0.07583,
+              "6": 0.07841,
+              "7": 0.078038,
+              "8": 0.078937,
+              "9": 0.078781
+            },
+            "rankedActions": [
+              {
+                "logit": -2.539101,
+                "probability": 0.078937,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.541084,
+                "probability": 0.078781,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.541968,
+                "probability": 0.078711,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.54581,
+                "probability": 0.07841,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.55056,
+                "probability": 0.078038,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "turn-left-boost",
+            "secondBestProbability": 0.078781,
+            "secondBestToken": 9,
+            "selectedAction": "evade-right",
+            "selectedActionProbability": 0.078711,
+            "selectedActionToken": 12,
+            "stepIndex": 3,
+            "valueEstimate": -0.258894
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000167,
+            "argmaxProbability": 0.078943,
+            "argmaxToken": 8,
+            "entropy": 2.564707,
+            "normalizedEntropy": 0.999906,
+            "probabilities": {
+              "0": 0.077097,
+              "1": 0.07524,
+              "10": 0.073426,
+              "11": 0.074728,
+              "12": 0.078745,
+              "2": 0.076034,
+              "3": 0.076853,
+              "4": 0.077885,
+              "5": 0.075816,
+              "6": 0.078415,
+              "7": 0.07804,
+              "8": 0.078943,
+              "9": 0.078776
+            },
+            "rankedActions": [
+              {
+                "logit": -2.539029,
+                "probability": 0.078943,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.541144,
+                "probability": 0.078776,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.541538,
+                "probability": 0.078745,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.545746,
+                "probability": 0.078415,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.550536,
+                "probability": 0.07804,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "turn-left-boost",
+            "secondBestProbability": 0.078776,
+            "secondBestToken": 9,
+            "selectedAction": "roll-left",
+            "selectedActionProbability": 0.075816,
+            "selectedActionToken": 5,
+            "stepIndex": 4,
+            "valueEstimate": -0.252419
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000165,
+            "argmaxProbability": 0.078945,
+            "argmaxToken": 8,
+            "entropy": 2.564708,
+            "normalizedEntropy": 0.999906,
+            "probabilities": {
+              "0": 0.07711,
+              "1": 0.075243,
+              "10": 0.073431,
+              "11": 0.074723,
+              "12": 0.078716,
+              "2": 0.076031,
+              "3": 0.076848,
+              "4": 0.077906,
+              "5": 0.075825,
+              "6": 0.078405,
+              "7": 0.078037,
+              "8": 0.078945,
+              "9": 0.07878
+            },
+            "rankedActions": [
+              {
+                "logit": -2.538999,
+                "probability": 0.078945,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.541092,
+                "probability": 0.07878,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.541905,
+                "probability": 0.078716,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.545869,
+                "probability": 0.078405,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.550568,
+                "probability": 0.078037,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "turn-left-boost",
+            "secondBestProbability": 0.07878,
+            "secondBestToken": 9,
+            "selectedAction": "shoot-mg",
+            "selectedActionProbability": 0.078945,
+            "selectedActionToken": 8,
+            "stepIndex": 5,
+            "valueEstimate": -0.248134
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000597,
+            "argmaxProbability": 0.079275,
+            "argmaxToken": 8,
+            "entropy": 2.564734,
+            "normalizedEntropy": 0.999916,
+            "probabilities": {
+              "0": 0.077298,
+              "1": 0.076203,
+              "10": 0.073625,
+              "11": 0.074943,
+              "12": 0.078677,
+              "2": 0.076576,
+              "3": 0.076336,
+              "4": 0.077227,
+              "5": 0.075124,
+              "6": 0.078386,
+              "7": 0.078109,
+              "8": 0.079275,
+              "9": 0.078221
+            },
+            "rankedActions": [
+              {
+                "logit": -2.534837,
+                "probability": 0.079275,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.5424,
+                "probability": 0.078677,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.546113,
+                "probability": 0.078386,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.548215,
+                "probability": 0.078221,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.54965,
+                "probability": 0.078109,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.078677,
+            "secondBestToken": 12,
+            "selectedAction": "boost",
+            "selectedActionProbability": 0.078109,
+            "selectedActionToken": 7,
+            "stepIndex": 6,
+            "valueEstimate": -0.424482
+          },
+          {
+            "argmaxAction": "shoot-mg",
+            "argmaxMargin": 0.000665,
+            "argmaxProbability": 0.079254,
+            "argmaxToken": 8,
+            "entropy": 2.564747,
+            "normalizedEntropy": 0.999921,
+            "probabilities": {
+              "0": 0.077201,
+              "1": 0.076233,
+              "10": 0.07369,
+              "11": 0.075002,
+              "12": 0.078589,
+              "2": 0.076668,
+              "3": 0.076419,
+              "4": 0.077314,
+              "5": 0.075162,
+              "6": 0.078281,
+              "7": 0.078061,
+              "8": 0.079254,
+              "9": 0.078126
+            },
+            "rankedActions": [
+              {
+                "logit": -2.535103,
+                "probability": 0.079254,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.54353,
+                "probability": 0.078589,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.547449,
+                "probability": 0.078281,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.549429,
+                "probability": 0.078126,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              },
+              {
+                "logit": -2.55026,
+                "probability": 0.078061,
+                "semanticAction": "boost",
+                "token": 7
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.078589,
+            "secondBestToken": 12,
+            "selectedAction": "evade-right",
+            "selectedActionProbability": 0.078589,
+            "selectedActionToken": 12,
+            "stepIndex": 7,
+            "valueEstimate": -0.424566
+          }
+        ],
+        "error": null,
+        "modeId": "eval-mode-counterprobe",
+        "repeatedActionStreak": {
+          "maxLength": 2,
+          "semanticAction": "evade-left",
+          "shareOfProbe": 0.008,
+          "token": 11
+        },
+        "requestedSteps": 250,
+        "seed": 946,
+        "summary": {
+          "actionCounts": {
+            "0": 17,
+            "1": 17,
+            "10": 27,
+            "11": 24,
+            "12": 21,
+            "2": 15,
+            "3": 22,
+            "4": 17,
+            "5": 8,
+            "6": 19,
+            "7": 21,
+            "8": 23,
+            "9": 19
+          },
+          "avgStepsPerEpisode": 73.333333,
+          "completedEpisodes": 3,
+          "deathBefore60Count": 0,
+          "label": "rr3-eval-mode-counterprobe-946",
+          "maxStepShare": 0.0,
+          "objectiveEventCounts": {
+            "local-openness-improved": 27,
+            "target-alignment-improved": 14,
+            "target-distance-improved": 11
+          },
+          "objectiveEventShare": 1.0,
+          "objectiveSignalReachableCount": 47,
+          "objectiveSignalStepShare": 0.188,
+          "playerDeadShare": 1.0,
+          "progressEventCounts": {
+            "local-openness-improved": 27,
+            "target-alignment-improved": 14,
+            "target-distance-improved": 11
+          },
+          "progressEventShare": 1.0,
+          "progressSignalReachableCount": 47,
+          "progressSignalStepShare": 0.188,
+          "rewardBreakdownTotals": {
+            "baseStep": -4.0,
+            "checkpointReached": 33.84,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "earlyDeath": 0.0,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.5,
+            "lowHealthThreat": -0.464,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 2.47,
+            "survivalPressureBonus": 0.41336,
+            "trailRisk": 0.0,
+            "wallRisk": -11.372824,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "runtimeErrorCount": 0,
+          "safetyMaxRates": {
+            "invalidActionRate": 0.0,
+            "noopRate": 0.5,
+            "postDecodeClampRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "sanitizerRate": 0.0,
+            "vetoRate": 0.0
+          },
+          "sampleRows": [
+            {
+              "actionToken": 6,
+              "episodeStep": 1,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714716,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 1,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 0,
+              "episodeStep": 2,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005279,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 2,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 6,
+              "episodeStep": 3,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714725,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 3,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 12,
+              "episodeStep": 4,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714729,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 4,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 5,
+              "episodeStep": 5,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714733,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 5,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 8,
+              "episodeStep": 6,
+              "objectiveSignalReachable": true,
+              "progressSignalReachable": true,
+              "reward": 0.714737,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 6,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 7,
+              "episodeStep": 7,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.00526,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 7,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 12,
+              "episodeStep": 8,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005258,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 8,
+              "terminalReason": null,
+              "truncatedReason": null
+            }
+          ],
+          "sampleRowsTruncated": 24,
+          "stagnationShare": 0.0,
+          "terminalReasonCounts": {
+            "player-dead": 3
+          },
+          "totalSteps": 250,
+          "truncatedReasonCounts": {}
+        },
+        "vecNormalizeTraining": false
+      },
+      {
+        "actionDistribution": {
+          "argmaxAction": "yaw-right",
+          "argmaxCount": 27,
+          "argmaxShare": 0.108,
+          "argmaxToken": "2",
+          "counts": {
+            "0": 20,
+            "1": 18,
+            "10": 21,
+            "11": 23,
+            "12": 18,
+            "2": 27,
+            "3": 11,
+            "4": 20,
+            "5": 15,
+            "6": 18,
+            "7": 26,
+            "8": 23,
+            "9": 10
+          },
+          "entropy": 2.530266,
+          "marginShare": 0.004,
+          "normalizedEntropy": 0.986478,
+          "probabilities": {
+            "0": 0.08,
+            "1": 0.072,
+            "10": 0.084,
+            "11": 0.092,
+            "12": 0.072,
+            "2": 0.108,
+            "3": 0.044,
+            "4": 0.08,
+            "5": 0.06,
+            "6": 0.072,
+            "7": 0.104,
+            "8": 0.092,
+            "9": 0.04
+          },
+          "rankedActions": [
+            {
+              "count": 27,
+              "semanticAction": "yaw-right",
+              "share": 0.108,
+              "token": "2"
+            },
+            {
+              "count": 26,
+              "semanticAction": "boost",
+              "share": 0.104,
+              "token": "7"
+            },
+            {
+              "count": 23,
+              "semanticAction": "shoot-mg",
+              "share": 0.092,
+              "token": "8"
+            },
+            {
+              "count": 23,
+              "semanticAction": "evade-left",
+              "share": 0.092,
+              "token": "11"
+            },
+            {
+              "count": 21,
+              "semanticAction": "turn-right-boost",
+              "share": 0.084,
+              "token": "10"
+            },
+            {
+              "count": 20,
+              "semanticAction": "noop",
+              "share": 0.08,
+              "token": "0"
+            },
+            {
+              "count": 20,
+              "semanticAction": "pitch-down",
+              "share": 0.08,
+              "token": "4"
+            },
+            {
+              "count": 18,
+              "semanticAction": "yaw-left",
+              "share": 0.072,
+              "token": "1"
+            },
+            {
+              "count": 18,
+              "semanticAction": "roll-right",
+              "share": 0.072,
+              "token": "6"
+            },
+            {
+              "count": 18,
+              "semanticAction": "evade-right",
+              "share": 0.072,
+              "token": "12"
+            },
+            {
+              "count": 15,
+              "semanticAction": "roll-left",
+              "share": 0.06,
+              "token": "5"
+            },
+            {
+              "count": 11,
+              "semanticAction": "pitch-up",
+              "share": 0.044,
+              "token": "3"
+            },
+            {
+              "count": 10,
+              "semanticAction": "turn-left-boost",
+              "share": 0.04,
+              "token": "9"
+            }
+          ],
+          "secondBestAction": "boost",
+          "secondBestCount": 26,
+          "secondBestShare": 0.104,
+          "secondBestToken": "7",
+          "total": 250
+        },
+        "deterministicPolicyPredict": false,
+        "distributionSnapshots": [
+          {
+            "argmaxAction": "boost",
+            "argmaxMargin": 0.000153,
+            "argmaxProbability": 0.080648,
+            "argmaxToken": 7,
+            "entropy": 2.564559,
+            "normalizedEntropy": 0.999848,
+            "probabilities": {
+              "0": 0.076496,
+              "1": 0.074009,
+              "10": 0.077369,
+              "11": 0.075272,
+              "12": 0.080495,
+              "2": 0.074559,
+              "3": 0.074158,
+              "4": 0.075685,
+              "5": 0.07641,
+              "6": 0.07915,
+              "7": 0.080648,
+              "8": 0.078226,
+              "9": 0.077523
+            },
+            "rankedActions": [
+              {
+                "logit": -2.517661,
+                "probability": 0.080648,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.519559,
+                "probability": 0.080495,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.536405,
+                "probability": 0.07915,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.548158,
+                "probability": 0.078226,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.557183,
+                "probability": 0.077523,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.080495,
+            "secondBestToken": 12,
+            "selectedAction": "turn-left-boost",
+            "selectedActionProbability": 0.077523,
+            "selectedActionToken": 9,
+            "stepIndex": 0,
+            "valueEstimate": -0.220516
+          },
+          {
+            "argmaxAction": "boost",
+            "argmaxMargin": 0.000145,
+            "argmaxProbability": 0.080671,
+            "argmaxToken": 7,
+            "entropy": 2.564554,
+            "normalizedEntropy": 0.999846,
+            "probabilities": {
+              "0": 0.076488,
+              "1": 0.073994,
+              "10": 0.077371,
+              "11": 0.075262,
+              "12": 0.080526,
+              "2": 0.074545,
+              "3": 0.074148,
+              "4": 0.075668,
+              "5": 0.076408,
+              "6": 0.079159,
+              "7": 0.080671,
+              "8": 0.07825,
+              "9": 0.07751
+            },
+            "rankedActions": [
+              {
+                "logit": -2.517375,
+                "probability": 0.080671,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.519175,
+                "probability": 0.080526,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.536297,
+                "probability": 0.079159,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.547846,
+                "probability": 0.07825,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.557352,
+                "probability": 0.07751,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.080526,
+            "secondBestToken": 12,
+            "selectedAction": "noop",
+            "selectedActionProbability": 0.076488,
+            "selectedActionToken": 0,
+            "stepIndex": 1,
+            "valueEstimate": -0.218153
+          },
+          {
+            "argmaxAction": "boost",
+            "argmaxMargin": 0.000188,
+            "argmaxProbability": 0.080577,
+            "argmaxToken": 7,
+            "entropy": 2.56456,
+            "normalizedEntropy": 0.999848,
+            "probabilities": {
+              "0": 0.076564,
+              "1": 0.073729,
+              "10": 0.077218,
+              "11": 0.0751,
+              "12": 0.080388,
+              "2": 0.074628,
+              "3": 0.074183,
+              "4": 0.07587,
+              "5": 0.076752,
+              "6": 0.079163,
+              "7": 0.080577,
+              "8": 0.078158,
+              "9": 0.07767
+            },
+            "rankedActions": [
+              {
+                "logit": -2.518548,
+                "probability": 0.080577,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.520887,
+                "probability": 0.080388,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.536245,
+                "probability": 0.079163,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.549021,
+                "probability": 0.078158,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.555285,
+                "probability": 0.07767,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.080388,
+            "secondBestToken": 12,
+            "selectedAction": "pitch-up",
+            "selectedActionProbability": 0.074183,
+            "selectedActionToken": 3,
+            "stepIndex": 2,
+            "valueEstimate": -0.288721
+          },
+          {
+            "argmaxAction": "boost",
+            "argmaxMargin": 0.000144,
+            "argmaxProbability": 0.080537,
+            "argmaxToken": 7,
+            "entropy": 2.564566,
+            "normalizedEntropy": 0.999851,
+            "probabilities": {
+              "0": 0.076587,
+              "1": 0.073792,
+              "10": 0.077227,
+              "11": 0.075152,
+              "12": 0.080393,
+              "2": 0.074656,
+              "3": 0.07418,
+              "4": 0.075854,
+              "5": 0.076695,
+              "6": 0.079183,
+              "7": 0.080537,
+              "8": 0.078102,
+              "9": 0.077641
+            },
+            "rankedActions": [
+              {
+                "logit": -2.519036,
+                "probability": 0.080537,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.520823,
+                "probability": 0.080393,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.535991,
+                "probability": 0.079183,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.549742,
+                "probability": 0.078102,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.555665,
+                "probability": 0.077641,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.080393,
+            "secondBestToken": 12,
+            "selectedAction": "roll-right",
+            "selectedActionProbability": 0.079183,
+            "selectedActionToken": 6,
+            "stepIndex": 3,
+            "valueEstimate": -0.23393
+          },
+          {
+            "argmaxAction": "boost",
+            "argmaxMargin": 0.000145,
+            "argmaxProbability": 0.080536,
+            "argmaxToken": 7,
+            "entropy": 2.564566,
+            "normalizedEntropy": 0.999851,
+            "probabilities": {
+              "0": 0.076587,
+              "1": 0.073794,
+              "10": 0.077228,
+              "11": 0.075153,
+              "12": 0.080391,
+              "2": 0.074657,
+              "3": 0.07418,
+              "4": 0.075856,
+              "5": 0.076695,
+              "6": 0.079182,
+              "7": 0.080536,
+              "8": 0.0781,
+              "9": 0.07764
+            },
+            "rankedActions": [
+              {
+                "logit": -2.519049,
+                "probability": 0.080536,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.520856,
+                "probability": 0.080391,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.536006,
+                "probability": 0.079182,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.54976,
+                "probability": 0.0781,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.555666,
+                "probability": 0.07764,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.080391,
+            "secondBestToken": 12,
+            "selectedAction": "evade-right",
+            "selectedActionProbability": 0.080391,
+            "selectedActionToken": 12,
+            "stepIndex": 4,
+            "valueEstimate": -0.233897
+          },
+          {
+            "argmaxAction": "boost",
+            "argmaxMargin": 0.000162,
+            "argmaxProbability": 0.080519,
+            "argmaxToken": 7,
+            "entropy": 2.564571,
+            "normalizedEntropy": 0.999853,
+            "probabilities": {
+              "0": 0.076595,
+              "1": 0.073819,
+              "10": 0.077223,
+              "11": 0.075165,
+              "12": 0.080357,
+              "2": 0.074672,
+              "3": 0.074186,
+              "4": 0.075877,
+              "5": 0.076692,
+              "6": 0.079171,
+              "7": 0.080519,
+              "8": 0.078081,
+              "9": 0.077642
+            },
+            "rankedActions": [
+              {
+                "logit": -2.519264,
+                "probability": 0.080519,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.521279,
+                "probability": 0.080357,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.536139,
+                "probability": 0.079171,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.550004,
+                "probability": 0.078081,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.55565,
+                "probability": 0.077642,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.080357,
+            "secondBestToken": 12,
+            "selectedAction": "evade-left",
+            "selectedActionProbability": 0.075165,
+            "selectedActionToken": 11,
+            "stepIndex": 5,
+            "valueEstimate": -0.233288
+          },
+          {
+            "argmaxAction": "boost",
+            "argmaxMargin": 0.00015,
+            "argmaxProbability": 0.080533,
+            "argmaxToken": 7,
+            "entropy": 2.564568,
+            "normalizedEntropy": 0.999851,
+            "probabilities": {
+              "0": 0.076588,
+              "1": 0.0738,
+              "10": 0.077229,
+              "11": 0.075157,
+              "12": 0.080382,
+              "2": 0.07466,
+              "3": 0.074181,
+              "4": 0.075861,
+              "5": 0.076695,
+              "6": 0.079178,
+              "7": 0.080533,
+              "8": 0.078096,
+              "9": 0.07764
+            },
+            "rankedActions": [
+              {
+                "logit": -2.519093,
+                "probability": 0.080533,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.520961,
+                "probability": 0.080382,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.536059,
+                "probability": 0.079178,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.549819,
+                "probability": 0.078096,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.555669,
+                "probability": 0.07764,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.080382,
+            "secondBestToken": 12,
+            "selectedAction": "noop",
+            "selectedActionProbability": 0.076588,
+            "selectedActionToken": 0,
+            "stepIndex": 6,
+            "valueEstimate": -0.233796
+          },
+          {
+            "argmaxAction": "boost",
+            "argmaxMargin": 0.000153,
+            "argmaxProbability": 0.080531,
+            "argmaxToken": 7,
+            "entropy": 2.564568,
+            "normalizedEntropy": 0.999851,
+            "probabilities": {
+              "0": 0.076589,
+              "1": 0.073803,
+              "10": 0.077231,
+              "11": 0.07516,
+              "12": 0.080377,
+              "2": 0.074662,
+              "3": 0.074181,
+              "4": 0.075863,
+              "5": 0.076695,
+              "6": 0.079175,
+              "7": 0.080531,
+              "8": 0.078093,
+              "9": 0.07764
+            },
+            "rankedActions": [
+              {
+                "logit": -2.519118,
+                "probability": 0.080531,
+                "semanticAction": "boost",
+                "token": 7
+              },
+              {
+                "logit": -2.521025,
+                "probability": 0.080377,
+                "semanticAction": "evade-right",
+                "token": 12
+              },
+              {
+                "logit": -2.536092,
+                "probability": 0.079175,
+                "semanticAction": "roll-right",
+                "token": 6
+              },
+              {
+                "logit": -2.549855,
+                "probability": 0.078093,
+                "semanticAction": "shoot-mg",
+                "token": 8
+              },
+              {
+                "logit": -2.555672,
+                "probability": 0.07764,
+                "semanticAction": "turn-left-boost",
+                "token": 9
+              }
+            ],
+            "secondBestAction": "evade-right",
+            "secondBestProbability": 0.080377,
+            "secondBestToken": 12,
+            "selectedAction": "turn-right-boost",
+            "selectedActionProbability": 0.077231,
+            "selectedActionToken": 10,
+            "stepIndex": 7,
+            "valueEstimate": -0.233741
+          }
+        ],
+        "error": null,
+        "modeId": "eval-mode-counterprobe",
+        "repeatedActionStreak": {
+          "maxLength": 2,
+          "semanticAction": "evade-right",
+          "shareOfProbe": 0.008,
+          "token": 12
+        },
+        "requestedSteps": 250,
+        "seed": 947,
+        "summary": {
+          "actionCounts": {
+            "0": 20,
+            "1": 18,
+            "10": 21,
+            "11": 23,
+            "12": 18,
+            "2": 27,
+            "3": 11,
+            "4": 20,
+            "5": 15,
+            "6": 18,
+            "7": 26,
+            "8": 23,
+            "9": 10
+          },
+          "avgStepsPerEpisode": 69.0,
+          "completedEpisodes": 3,
+          "deathBefore60Count": 1,
+          "label": "rr3-eval-mode-counterprobe-947",
+          "maxStepShare": 0.0,
+          "objectiveEventCounts": {
+            "local-openness-improved": 9,
+            "target-alignment-improved": 4,
+            "target-distance-improved": 42
+          },
+          "objectiveEventShare": 1.0,
+          "objectiveSignalReachableCount": 53,
+          "objectiveSignalStepShare": 0.212,
+          "playerDeadShare": 1.0,
+          "progressEventCounts": {
+            "local-openness-improved": 9,
+            "target-alignment-improved": 4,
+            "target-distance-improved": 42
+          },
+          "progressEventShare": 1.0,
+          "progressSignalReachableCount": 53,
+          "progressSignalStepShare": 0.212,
+          "rewardBreakdownTotals": {
+            "baseStep": -4.0,
+            "checkpointReached": 38.16,
+            "crash": 0.0,
+            "damageDealt": 0.0,
+            "damageTaken": 0.0,
+            "earlyDeath": -20.266667,
+            "external": 0.0,
+            "itemPickup": 0.0,
+            "itemUse": 0.0,
+            "kill": 0.0,
+            "loss": -16.5,
+            "lowHealthThreat": -0.324,
+            "opponentRisk": 0.0,
+            "parcoursCompleted": 0.0,
+            "stuck": 0.0,
+            "survival": 2.47,
+            "survivalPressureBonus": 0.320242,
+            "trailRisk": 0.0,
+            "wallRisk": -7.722003,
+            "win": 0.0,
+            "wrongOrder": 0.0
+          },
+          "runtimeErrorCount": 0,
+          "safetyMaxRates": {
+            "invalidActionRate": 0.0,
+            "noopRate": 0.5,
+            "postDecodeClampRate": 0.0,
+            "preSamplingMaskRate": 1.0,
+            "sanitizerRate": 0.0,
+            "vetoRate": 0.0
+          },
+          "sampleRows": [
+            {
+              "actionToken": 9,
+              "episodeStep": 1,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005044,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 1,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 0,
+              "episodeStep": 2,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005044,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 2,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 3,
+              "episodeStep": 3,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005044,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 3,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 6,
+              "episodeStep": 4,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005043,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 4,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 12,
+              "episodeStep": 5,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005043,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 5,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 11,
+              "episodeStep": 6,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005042,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 6,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 0,
+              "episodeStep": 7,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005042,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 7,
+              "terminalReason": null,
+              "truncatedReason": null
+            },
+            {
+              "actionToken": 10,
+              "episodeStep": 8,
+              "objectiveSignalReachable": false,
+              "progressSignalReachable": false,
+              "reward": -0.005041,
+              "safety": {
+                "invalidActionRate": 0.0,
+                "postDecodeClampRate": 0.0,
+                "sanitizerRate": 0.0
+              },
+              "step": 8,
+              "terminalReason": null,
+              "truncatedReason": null
+            }
+          ],
+          "sampleRowsTruncated": 24,
+          "stagnationShare": 0.0,
+          "terminalReasonCounts": {
+            "player-dead": 3
+          },
+          "totalSteps": 250,
+          "truncatedReasonCounts": {}
+        },
+        "vecNormalizeTraining": false
+      }
+    ],
+    "stepsPerSeed": 250,
+    "vecNormalizeTraining": false
+  },
+  "deathBefore60": {
+    "avgStepsPerEpisode": null,
+    "deathBefore60Count": 2,
+    "interpretation": "DeathBefore60 is measured for continuity only; 93RR.3 success is limited to eval-mode collapse counterprobe criteria.",
+    "measured": true,
+    "playerDeadShare": 1.0,
+    "usedAsSuccessCriterion": false
+  },
+  "elapsedMs": 36184.9728,
+  "generatedAt": "2026-04-30T13:17:00Z",
+  "generatedBy": "python/scripts/bt93r_reentry_counterprobe.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "5115ef4e201c7c2a85d7093d1fc55392c266b1cb"
+  },
+  "greenCriteria": {
+    "diagnosticTimestepsWithinLimit": true,
+    "no2700RepeatedActionStreak": true,
+    "noCounterprobeRuntimeErrors": true,
+    "noFullSingleActionDominance": true,
+    "repeatedActionStreakBelowProbeLength": true,
+    "runtimeErrorCountZero": true,
+    "secondBestProbabilityNonZero": true
+  },
+  "guardrails": {
+    "actionFixApplied": false,
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffSignal": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "codeFixApplied": false,
+    "counterprobeFixClass": "eval-mode-counterprobe",
+    "counterprobeOnly": true,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": true,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promoteAllowed": false,
+    "qualityClaimAllowed": false,
+    "rewardFixApplied": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "safetyFixApplied": false,
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "lineage": {
+    "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+    "lineageId": "bt93y-retrain-lineage-v1",
+    "lineageKind": "new-retrain-lineage-not-bt93n",
+    "matrixHash": "a8e17c34cc152bf73d6e6d43e11aa12b3cffae9a2caf26601ebd22b94d4b7bad",
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "notBt93nLineage": true,
+    "rewardProfileId": "bt93n-wall-trail-stability-v1",
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "modelLoadError": null,
+  "ok": true,
+  "opensNext": [
+    "93RR.99"
+  ],
+  "phaseCoverage": {
+    "93RR.3.1": true,
+    "93RR.3.2": true,
+    "93RR.3.3": true,
+    "93RR.3.4": true,
+    "DoD.RR4": true
+  },
+  "phaseId": "93RR.3",
+  "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+  "sampleCounts": {
+    "diagnosticSteps": 1000,
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 12,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "perMode": {
+      "eval-mode-counterprobe": {
+        "completedEpisodes": 12,
+        "steps": 1000
+      }
+    }
+  },
+  "schemaVersion": "bt93rr-reentry-counterprobe-report-v1",
+  "sourceArtifacts": [
+    {
+      "blockId": "BT93RR",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json",
+      "phaseId": "93RR.2",
+      "resultClass": "eval-argmax-collapse",
+      "role": "BT93RR.2 root-cause report",
+      "schemaVersion": "bt93rr-reentry-root-cause-report-v1",
+      "sha256": "01a22366331fec1be33b949f93e2fabb7994a43f7835072f2ca911c635363f74",
+      "sizeBytes": 283602,
+      "sourceKey": "bt93rrRootCause",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93RR",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "phaseId": "93RR.1",
+      "resultClass": "reentry-handover-lock-green",
+      "role": "BT93RR.1 handover lock",
+      "schemaVersion": "bt93rr-reentry-handover-lock-report-v1",
+      "sha256": "2673af47d1dcb319899e7f2e5b18be677254c15a9347f26d3538325632769350",
+      "sizeBytes": 14502,
+      "sourceKey": "bt93rrHandoverLock",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93RR",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json",
+      "phaseId": "93RR.1",
+      "resultClass": "artifact-probe-green",
+      "role": "BT93RR.1 artifact probe",
+      "schemaVersion": "bt93rr-reentry-artifact-probe-report-v1",
+      "sha256": "81928cd477c833612ba0d8d748c7b6e069948b08a0d8f533b2631185fdf7b4fb",
+      "sizeBytes": 19232,
+      "sourceKey": "bt93rrArtifactProbe",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Y",
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/config.json",
+      "phaseId": "93Y.3",
+      "resultClass": null,
+      "role": "BT93Y retrain-lineage config",
+      "schemaVersion": "bt93y-retrain-lineage-config-v1",
+      "sha256": "997a8f83e9d179be6cb0dbb311c6047d25cb8a7aa88874405e399f33be917b69",
+      "sizeBytes": 2597,
+      "sourceKey": "bt93yConfig",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/model.zip",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93Y retrain-lineage model",
+      "schemaVersion": null,
+      "sha256": "75075c65d08b113b8914b55553b04889d7a57c536a36303a820f620572c9f5f8",
+      "sizeBytes": 240642,
+      "sourceKey": "bt93yModel",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93Y retrain-lineage VecNormalize",
+      "schemaVersion": null,
+      "sha256": "4a4b144a7bde775bfcaa639de8c68a67b1ec6bfb057c84c7f2d290330f39604a",
+      "sizeBytes": 3647,
+      "sourceKey": "bt93yVecNormalize",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Y",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/training_report.json",
+      "phaseId": "93Y.3",
+      "resultClass": null,
+      "role": "BT93Y retrain-lineage training report",
+      "schemaVersion": "bt93y-retrain-training-report-v1",
+      "sha256": "5e4d353e04b30ddc6b0e4d8fe33845d205cb08d48d5bea8f9339e757dede924a",
+      "sizeBytes": 17682,
+      "sourceKey": "bt93yTrainingReport",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current PPO action-surface source",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sizeBytes": 22887,
+      "sourceKey": "ppoActionSurface",
+      "tracked": true
+    }
+  ],
+  "sourceFilesReady": true,
+  "summary": {
+    "bt93oStartDecision": "blocked",
+    "bt93pStartDecision": "blocked",
+    "bt93sStartDecision": "blocked until BT93R-Reentry.99 in R-Allowlist",
+    "bt94aStartDecision": "blocked",
+    "counterprobeFixClass": "eval-mode-counterprobe",
+    "criteriaGreen": true,
+    "finalResult": "eval-mode-bug-fixed-counterprobe-green",
+    "nextBestAction": "Run 93RR.99 closure gate; only closure may decide whether BT93S opens.",
+    "rootCause": "eval-argmax-collapse"
+  }
+}

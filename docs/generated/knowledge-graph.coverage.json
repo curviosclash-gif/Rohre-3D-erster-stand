@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2479,
-    "rawCoveredFileCount": 1998,
+    "trackedFileCount": 2481,
+    "rawCoveredFileCount": 2000,
     "rawCoveragePercent": 80.6,
-    "adjustedTrackedFileCount": 1576,
-    "adjustedCoveredFileCount": 1339,
+    "adjustedTrackedFileCount": 1578,
+    "adjustedCoveredFileCount": 1341,
     "adjustedCoveragePercent": 85,
     "uncoveredFileCount": 481,
     "uncoveredActiveFileCount": 237,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 279,
-        "coveredCount": 258
+        "count": 280,
+        "coveredCount": 259
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 898,
-        "coveredCount": 882
+        "count": 899,
+        "coveredCount": 883
       },
       {
         "classification": "product-docs",
@@ -8182,6 +8182,29 @@
     },
     {
       "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93RR"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -19719,6 +19742,29 @@
     },
     {
       "path": "python/scripts/bt93r_reentry_artifact_probe.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93RR"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93r_reentry_counterprobe.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
