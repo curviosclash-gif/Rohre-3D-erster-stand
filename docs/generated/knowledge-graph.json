@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 361,
+          "concreteCount": 372,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 499,
+          "concreteCount": 510,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 357,
+          "concreteCount": 368,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 356,
+          "concreteCount": 367,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 998,
+          "concreteCount": 1009,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1006,
+          "concreteCount": 1017,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1922,7 +1922,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93Y.3",
+        "currentPhase": "93Y.4",
         "scopeDeclarations": [
           "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
           "data/training/ppo/bt93x/early_comparator_preflight_report.json",
@@ -1943,11 +1943,12 @@
           "docs/bot-training/Bot_Trainingsplan.md",
           "python/scripts/bt93y_exact_lineage_recovery.py",
           "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+          "python/scripts/bt93y_retrain_lineage.py",
           "tmp/**"
         ],
         "scopeResolution": {
-          "concreteCount": 650,
-          "plannedCount": 10
+          "concreteCount": 655,
+          "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5420,7 +5421,7 @@
       "id": "BT93Y.3",
       "type": "phase",
       "title": "Enge Retraining-Lineage",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.3"
@@ -15553,8 +15554,8 @@
     {
       "id": "BT93Y.3.1",
       "type": "subphase",
-      "title": "Retraining-Startcontract pinnt Lineage-ID, Matrix, Semantikfenster, Action-Surface, Reward-Profil, Seeds, maximal 10k Timesteps, Stop-Regeln und Nicht-Ziele.",
-      "status": "open",
+      "title": "Retraining-Startcontract pinnt Lineage-ID, Matrix, Semantikfenster, Action-Surface, Reward-Profil, Seeds, maximal 10k Timesteps, Stop-Regeln und Nicht-Ziele. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_retrain_lineage.py --write-reports --total-timesteps 512 --probe-steps-per-seed 32` -> `data/training/ppo/bt93y/retrain_start_contract.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.3",
@@ -15564,8 +15565,8 @@
     {
       "id": "BT93Y.3.2",
       "type": "subphase",
-      "title": "Mini-Retraining erzeugt Modell, Config, VecNormalize/Normalizer, Optimizer-State, Action-Surface-Hash und Loader-Smoke.",
-      "status": "open",
+      "title": "Mini-Retraining erzeugt Modell, Config, VecNormalize/Normalizer, Optimizer-State, Action-Surface-Hash und Loader-Smoke. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_retrain_lineage.py --write-reports --total-timesteps 512 --probe-steps-per-seed 32` -> `data/training/ppo/bt93y/retrain_loader_smoke_report.json`, `resultClass=retrain-loader-smoke-green`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.3",
@@ -15575,8 +15576,8 @@
     {
       "id": "BT93Y.3.3",
       "type": "subphase",
-      "title": "Deterministic- und stochastic-Eval erzeugen echte Logit- oder Policy-Distribution-Evidence aus dem geladenen Modell.",
-      "status": "open",
+      "title": "Deterministic- und stochastic-Eval erzeugen echte Logit- oder Policy-Distribution-Evidence aus dem geladenen Modell. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_retrain_lineage.py --write-reports --total-timesteps 512 --probe-steps-per-seed 32` -> `data/training/ppo/bt93y/retrain_policy_probe_report.json`, `policyDistributionEvidence.realPolicyDistributionAvailable=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.3",
@@ -15586,8 +15587,8 @@
     {
       "id": "BT93Y.3.4",
       "type": "subphase",
-      "title": "Fehlersignatur wird nur klassifiziert, nicht repariert: DeathBefore60, Wall/Trail, deterministic-collapse, Action-Surface und Reward-Ordering.",
-      "status": "open",
+      "title": "Fehlersignatur wird nur klassifiziert, nicht repariert: DeathBefore60, Wall/Trail, deterministic-collapse, Action-Surface und Reward-Ordering. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_retrain_lineage.py --write-reports --total-timesteps 512 --probe-steps-per-seed 32` -> `data/training/ppo/bt93y/retrain_policy_probe_report.json`, `failureSignatureClassification`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.3",
@@ -15597,8 +15598,8 @@
     {
       "id": "BT93Y.3.5",
       "type": "subphase",
-      "title": "Wenn die neue Lineage nicht mit BT93N/Q vergleichbar ist, endet sie `retrain-lineage-not-comparable`.",
-      "status": "open",
+      "title": "Wenn die neue Lineage nicht mit BT93N/Q vergleichbar ist, endet sie `retrain-lineage-not-comparable`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_retrain_lineage.py --write-reports --total-timesteps 512 --probe-steps-per-seed 32` -> `data/training/ppo/bt93y/retrain_lineage_manifest.json`; branch-not-taken: `resultClass=retrain-lineage-ready`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.3",
@@ -15608,8 +15609,8 @@
     {
       "id": "BT93Y.3.6",
       "type": "subphase",
-      "title": "Wenn die neue Lineage loadbar und vergleichbar ist, endet sie `retrain-lineage-ready`.",
-      "status": "open",
+      "title": "Wenn die neue Lineage loadbar und vergleichbar ist, endet sie `retrain-lineage-ready`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_retrain_lineage.py --write-reports --total-timesteps 512 --probe-steps-per-seed 32` -> `data/training/ppo/bt93y/retrain_lineage_manifest.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.3",
@@ -15619,8 +15620,8 @@
     {
       "id": "BT93Y.3.7",
       "type": "subphase",
-      "title": "Wenn das Micro-Budget nicht reicht, bleibt das Ergebnis rot; kein Auto-Extend und keine Hyperparameter-Suche.",
-      "status": "open",
+      "title": "Wenn das Micro-Budget nicht reicht, bleibt das Ergebnis rot; kein Auto-Extend und keine Hyperparameter-Suche. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_retrain_lineage.py --write-reports --total-timesteps 512 --probe-steps-per-seed 32` -> `data/training/ppo/bt93y/retrain_start_contract.json`, `requestedTimesteps=512`, `autoExtendAllowed=false`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.3",
@@ -30349,9 +30350,135 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/artifact_manifest.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/config.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/model.zip",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/optimizer_state.pt",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/training_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
+        ],
+        "exists": true
       }
     },
     {
@@ -30364,9 +30491,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -30379,9 +30512,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -30394,9 +30533,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -37646,6 +37791,27 @@
     },
     {
       "id": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Y"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93y_retrain_lineage.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -74895,6 +75061,96 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/artifact_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/config.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/model.zip",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/optimizer_state.pt",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/training_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/retrain_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/retrain_policy_probe_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/retrain_start_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -76165,6 +76421,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93y_retrain_lineage.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78341,6 +78606,96 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/artifact_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/config.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/model.zip",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/optimizer_state.pt",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/training_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/retrain_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/retrain_policy_probe_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/retrain_start_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -79593,6 +79948,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93y_retrain_lineage.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -82967,6 +83331,96 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/artifact_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/config.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/model.zip",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/optimizer_state.pt",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/training_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/retrain_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/retrain_policy_probe_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/retrain_start_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -84228,6 +84682,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93y_retrain_lineage.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -86703,6 +87166,96 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/artifact_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/config.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/model.zip",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/optimizer_state.pt",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/training_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/retrain_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/retrain_policy_probe_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/retrain_start_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -87964,6 +88517,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93y_retrain_lineage.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -96843,6 +97405,96 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/artifact_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/config.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/model.zip",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/optimizer_state.pt",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/training_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/retrain_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/retrain_policy_probe_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/retrain_start_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -98104,6 +98756,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93y_retrain_lineage.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -106158,6 +106819,96 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/artifact_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/config.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/model.zip",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/optimizer_state.pt",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/training_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/retrain_lineage/bt93y-retrain-lineage-v1/vecnormalize.pkl",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/retrain_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/retrain_policy_probe_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/retrain_start_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -107428,6 +108179,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93y_retrain_lineage.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -135060,7 +135820,7 @@
       "source": "master-table",
       "hard": true,
       "fulfilled": true,
-      "hint": "Lineage-Recovery/Retraining, Ersatzvergleichspolitik und neuer BT93R-Reentry; aktueller naechster Scope ist 93Y.3",
+      "hint": "Lineage-Recovery/Retraining, Ersatzvergleichspolitik und neuer BT93R-Reentry; aktueller naechster Scope ist 93Y.4",
       "attributes": {
         "dependsPhase": "93R.99",
         "rawToken": "BT93R.99",
@@ -135295,6 +136055,15 @@
     {
       "from": "BT93Y",
       "to": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Y",
+      "to": "python/scripts/bt93y_retrain_lineage.py",
       "type": "scope",
       "hint": null,
       "attributes": {

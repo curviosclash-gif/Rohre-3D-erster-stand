@@ -1,0 +1,628 @@
+{
+  "actualModelTimesteps": 512,
+  "blockId": "BT93Y",
+  "callback": {
+    "loggerSnapshots": [
+      {},
+      {
+        "train/approx_kl": 6.685592234134674e-05,
+        "train/clip_fraction": 0.0,
+        "train/clip_range": 0.2,
+        "train/entropy_loss": -2.5648938417434692,
+        "train/explained_variance": -0.4153149127960205,
+        "train/learning_rate": 0.0003,
+        "train/loss": 6.654218673706055,
+        "train/n_updates": 2,
+        "train/policy_gradient_loss": -0.0027236156165599823,
+        "train/value_loss": 12.119083881378174
+      },
+      {
+        "train/approx_kl": 1.93743035197258e-05,
+        "train/clip_fraction": 0.0,
+        "train/clip_range": 0.2,
+        "train/entropy_loss": -2.5648171305656433,
+        "train/explained_variance": -0.44241273403167725,
+        "train/learning_rate": 0.0003,
+        "train/loss": 2.144059419631958,
+        "train/n_updates": 4,
+        "train/policy_gradient_loss": -0.000822726171463728,
+        "train/value_loss": 4.394420266151428
+      }
+    ],
+    "rolloutCount": 3,
+    "stopReason": "requested-micro-budget-reached"
+  },
+  "elapsedSeconds": 18.834381,
+  "generatedAt": "2026-04-30T10:22:47Z",
+  "generatedBy": "python/scripts/bt93y_retrain_lineage.py",
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffSignal": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutConsumptionAllowed": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promoteAllowed": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": true
+  },
+  "lineageId": "bt93y-retrain-lineage-v1",
+  "ok": true,
+  "optimizerUpdates": 6,
+  "phaseId": "93Y.3",
+  "requestedTimesteps": 512,
+  "runKind": "artifact-logit-micro-retrain",
+  "schemaVersion": "bt93y-retrain-training-report-v1",
+  "stepsPerSecond": 27.184328,
+  "trainSummary": {
+    "actionCounts": {
+      "0": 37,
+      "1": 33,
+      "10": 41,
+      "11": 40,
+      "12": 46,
+      "2": 31,
+      "3": 44,
+      "4": 41,
+      "5": 35,
+      "6": 43,
+      "7": 51,
+      "8": 39,
+      "9": 31
+    },
+    "avgStepsPerEpisode": 65.142857,
+    "completedEpisodes": 7,
+    "deathBefore60Count": 3,
+    "label": "train",
+    "maxStepShare": 0.0,
+    "objectiveEventCounts": {
+      "local-openness-improved": 43,
+      "target-alignment-improved": 8,
+      "target-distance-improved": 29
+    },
+    "objectiveEventShare": 1.0,
+    "objectiveSignalReachableCount": 71,
+    "objectiveSignalStepShare": 0.138672,
+    "playerDeadShare": 1.0,
+    "progressEventCounts": {
+      "local-openness-improved": 43,
+      "target-alignment-improved": 8,
+      "target-distance-improved": 29
+    },
+    "progressEventShare": 1.0,
+    "progressSignalReachableCount": 71,
+    "progressSignalStepShare": 0.138672,
+    "rewardBreakdownTotals": {
+      "baseStep": -8.192,
+      "checkpointReached": 51.12,
+      "crash": 0.0,
+      "damageDealt": 0.0,
+      "damageTaken": 0.0,
+      "earlyDeath": -55.466667,
+      "external": 0.0,
+      "itemPickup": 0.0,
+      "itemUse": 0.0,
+      "kill": 0.0,
+      "loss": -38.5,
+      "lowHealthThreat": -1.052581,
+      "opponentRisk": 0.0,
+      "parcoursCompleted": 0.0,
+      "stuck": 0.0,
+      "survival": 5.05,
+      "survivalPressureBonus": 0.883875,
+      "trailRisk": 0.0,
+      "wallRisk": -26.212234,
+      "win": 0.0,
+      "wrongOrder": 0.0
+    },
+    "runtimeErrorCount": 0,
+    "safetyMaxRates": {
+      "invalidActionRate": 0.0,
+      "noopRate": 1.0,
+      "postDecodeClampRate": 0.0,
+      "preSamplingMaskRate": 1.0,
+      "sanitizerRate": 0.0,
+      "vetoRate": 0.0
+    },
+    "sampleRows": [
+      {
+        "actionToken": 0,
+        "episodeStep": 1,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.005247,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 1,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 6,
+        "episodeStep": 2,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.005245,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 2,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 1,
+        "episodeStep": 3,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.005244,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 3,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 12,
+        "episodeStep": 4,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.005244,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 4,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 6,
+        "episodeStep": 5,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.005243,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 5,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 12,
+        "episodeStep": 6,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.005243,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 6,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 9,
+        "episodeStep": 7,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.005243,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 7,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 10,
+        "episodeStep": 8,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.005244,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 8,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 12,
+        "episodeStep": 9,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.005245,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 9,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 3,
+        "episodeStep": 10,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.005246,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 10,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 2,
+        "episodeStep": 11,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.018825,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 11,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 1,
+        "episodeStep": 12,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.018827,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 12,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 2,
+        "episodeStep": 13,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.01883,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 13,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 10,
+        "episodeStep": 14,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.018834,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 14,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 1,
+        "episodeStep": 15,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.018838,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 15,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 11,
+        "episodeStep": 16,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.018843,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 16,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 12,
+        "episodeStep": 17,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.018848,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 17,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 7,
+        "episodeStep": 18,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.018854,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 18,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 2,
+        "episodeStep": 19,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.01886,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 19,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 12,
+        "episodeStep": 20,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.032443,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 20,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 4,
+        "episodeStep": 21,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.03245,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 21,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 5,
+        "episodeStep": 22,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.032457,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 22,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 3,
+        "episodeStep": 23,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.032464,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 23,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 10,
+        "episodeStep": 24,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.032471,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 24,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 12,
+        "episodeStep": 25,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.032477,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 25,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 11,
+        "episodeStep": 26,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.032484,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 26,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 10,
+        "episodeStep": 27,
+        "objectiveSignalReachable": true,
+        "progressSignalReachable": true,
+        "reward": 0.687511,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 27,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 1,
+        "episodeStep": 28,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.032495,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 28,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 3,
+        "episodeStep": 29,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.046012,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 29,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 3,
+        "episodeStep": 30,
+        "objectiveSignalReachable": true,
+        "progressSignalReachable": true,
+        "reward": 0.683615,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 30,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 11,
+        "episodeStep": 31,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.03639,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 31,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 6,
+        "episodeStep": 32,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.044107,
+        "safety": {
+          "invalidActionRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "sanitizerRate": 0.0
+        },
+        "step": 32,
+        "terminalReason": null,
+        "truncatedReason": null
+      }
+    ],
+    "stagnationShare": 0.0,
+    "terminalReasonCounts": {
+      "player-dead": 7
+    },
+    "totalSteps": 512,
+    "truncatedReasonCounts": {}
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "actionSurface": {
+    "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+    "excludedInventoryIndexedActions": [
+      "dropItem",
+      "nextItem",
+      "shootItem",
+      "shootItemIndex",
+      "useItem"
+    ],
+    "gymSpace": "Discrete",
+    "policyLevelMasking": {
+      "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+      "mixedWithPostDecodeClamp": false,
+      "preSamplingAppliedInCurrentSb3Path": true,
+      "preSamplingByConstruction": true,
+      "source": "info.match.inventoryLength from the JS-authoritative transition payload",
+      "specified": true
+    },
+    "rawBoundarySurfaceTraining": false,
+    "sb3Trainable": true,
+    "semanticActions": [
+      "noop",
+      "yaw-left",
+      "yaw-right",
+      "pitch-up",
+      "pitch-down",
+      "roll-left",
+      "roll-right",
+      "boost",
+      "shoot-mg",
+      "turn-left-boost",
+      "turn-right-boost",
+      "evade-left",
+      "evade-right"
+    ],
+    "sourcePath": "python/envs/ppo_action_surface.py",
+    "sourceSha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+    "surfaceId": "bt93q-walltrail-semantic-action-v1",
+    "telemetry": [
+      "policyLevelMask",
+      "preSamplingMaskRate",
+      "postDecodeClampRate",
+      "invalidActionRate",
+      "vetoRate",
+      "sanitizerRate",
+      "noopRate"
+    ]
+  },
+  "algorithm": {
+    "batchSize": 64,
+    "clipRange": 0.2,
+    "device": "auto",
+    "entCoef": 0.0,
+    "gaeLambda": 0.95,
+    "gamma": 0.99,
+    "learningRate": 0.0003,
+    "model": "stable_baselines3.PPO",
+    "nEpochs": 2,
+    "nSteps": 128,
+    "policy": "MlpPolicy",
+    "vfCoef": 0.5
+  },
+  "blockId": "BT93Y",
+  "lineageId": "bt93y-retrain-lineage-v1",
+  "lineageKind": "new-retrain-lineage-not-bt93n",
+  "matrixHash": "a8e17c34cc152bf73d6e6d43e11aa12b3cffae9a2caf26601ebd22b94d4b7bad",
+  "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+  "phaseId": "93Y.3",
+  "rewardProfileId": "bt93n-wall-trail-stability-v1",
+  "runContract": {
+    "autoExtendAllowed": false,
+    "holdoutUsed": false,
+    "hyperparameterSearchAllowed": false,
+    "maxAllowedTimesteps": 10000,
+    "maxStepsPerEpisode": 180,
+    "probeStepsPerSeedPerMode": 32,
+    "qualityJudgementAllowed": false,
+    "requestedTimesteps": 512
+  },
+  "schemaVersion": "bt93y-retrain-lineage-config-v1",
+  "seeds": {
+    "probeSeeds": [
+      944,
+      945,
+      946
+    ],
+    "trainSeed": 934
+  },
+  "semanticWindow": "runtime-near-headless-v1"
+}
