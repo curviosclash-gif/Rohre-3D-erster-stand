@@ -52,7 +52,8 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Training
 - Der Intake `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` ist als P0-Interposer nach rotem `BT93R.99=model-artifact-missing` und `BT93X.0=dqn-loader-fix-required` aufgenommen; `BT93Y.99` ist als `retrain-lineage-ready-bt93r-reentry-ready` abgeschlossen; naechste claimbare Arbeit ist nur der neue `BT93R-Reentry`, nicht `BT93S/O/X/P/94A`.
 - `BT93Y` trennt exakte BT93N-Lineage-Recovery von neuer Retraining-Lineage und lockt die Ersatzvergleichspolitik `bt93x-rcp1-same-matrix-control-suite-no-bt11`; ein gruener `BT93Y.99` oeffnet nur einen neuen `BT93R-Reentry`-Probe-/Root-Cause-/Counterprobe-Claim.
 - `BT93RR.99` (`BT93R-Reentry`) ist als `eval-mode-bug-fixed-counterprobe-green` abgeschlossen und oeffnet nur `BT93S`; `BT93O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout und PPO-Validate bleiben geschlossen.
-- `BT93S.99` ist als `matrix-redesign-required` abgeschlossen; aktive Blocker sind `matrix-redesign-required`, `action-space-required`, `action-selection-required` und `observation-telemetry-required`. `BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout und PPO-Validate bleiben geschlossen; naechste zielfuehrende Handlung ist ein enger User-Intake/Replan fuer BT93S-Matrix-/Action-Effect-Repair, nicht der naechste bestehende R-X-Block.
+- `BT93S.99` ist als `matrix-redesign-required` abgeschlossen; aktive Blocker sind `matrix-redesign-required`, `action-space-required`, `action-selection-required` und `observation-telemetry-required`. `BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout und PPO-Validate bleiben geschlossen; der benoetigte enge Replan ist jetzt als `BT93S2` aufgenommen.
+- Der User-Intake `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md` ist als direkter Zwischenblock `BT93S2` aufgenommen. `BT93S2` repariert Matrix-/Control-Vertrag und Action-Effekt vor jeder Telemetry-/Reward-/Safety-/Quality-Fortsetzung; `BT93T` oeffnet nur bei `BT93S2.99=observation-telemetry-required`, `BT93U` nur bei `BT93S2.99=action-selection-green`.
 - Die BT93L-Baseline-Matrix zeigt ein hartes Reward-Ordnungsrisiko: `random` und `semantic-cycle` erreichen in Kurzfenstern teilweise gleichwertige oder bessere Progress-/Objective-Signale als `scripted-reachability`; `BT93U`/`BT93O` muessen das mit gepinnten Szenariofenstern widerlegen oder reparieren, sonst bleiben `BT93P` und `BT94A` blockiert.
 - Kein BT94A, kein Candidate, kein Freeze, kein Holdout, kein Promote, kein Rollout und kein weiterer Blind-Longrun vor `BT93O.99=bt93o-quality-green`, `BT93X.99=bt93p-starttruth-green`, frischem `BT93P.4=BT94A-ready` plus gruenem `bt94a_gate_check.py`.
 
@@ -100,12 +101,13 @@ Verbindliche Reihenfolge:
 4. `BT93Y` ist nach rotem `BT93R.99=model-artifact-missing` und `BT93X.0=dqn-loader-fix-required` der einzige P0-Zwischenblock: Lineage-Recovery oder enges Retraining, Ersatzvergleichspolitik und Reentry-Paket.
 5. Ein neuer `BT93R-Reentry` darf erst nach gruenem `BT93Y.99` laufen und bleibt auf Artifact-Probe, Root-Cause und Counterprobe begrenzt.
 6. `BT93S` klaert Wall-/Trail Action-Effekt und Action-Selection erst nach `BT93Y.99` plus erneutem `BT93R-Reentry.99` in R-Allowlist.
-7. `BT93T` ergaenzt nur bei Telemetriebedarf training-only Raw-/Trail-/Escape-Lane-Telemetrie; danach ist ein S-Recheck Pflicht.
-8. `BT93U` repariert danger-aware Reward- und Objective-Ordering.
-9. `BT93V` trennt Safety-Diagnostik, Terminal-Sanity und Sidecar-Mask-Entscheid.
-10. `BT93W` fuehrt maximal einen 10k-Recheck aus und oeffnet nur bei `bt93o-precondition-green` die BT93O-Claim-Pruefung.
-11. `BT93O` ist danach nur noch Qualitaets-/Anti-Plateau-Gate und kann ausschliesslich `bt93o-quality-green` als gruenes Ergebnis liefern.
-12. `BT93X` klaert Same-Matrix-DQN oder explizite Ersatzvergleichspolitik und oeffnet `BT93P` nur mit `bt93p-starttruth-green`.
+7. `BT93S2` repariert nach rotem `BT93S.99=matrix-redesign-required` zuerst Matrix-/Control-Vertrag, `escape-right-open` Action-Effekt und Policy-Selection-Recheck; `BT93T/U/W/O/P/94A` bleiben geschlossen.
+8. `BT93T` ergaenzt nur bei Telemetriebedarf training-only Raw-/Trail-/Escape-Lane-Telemetrie; danach ist ein S2-Recheck Pflicht.
+9. `BT93U` repariert danger-aware Reward- und Objective-Ordering.
+10. `BT93V` trennt Safety-Diagnostik, Terminal-Sanity und Sidecar-Mask-Entscheid.
+11. `BT93W` fuehrt maximal einen 10k-Recheck aus und oeffnet nur bei `bt93o-precondition-green` die BT93O-Claim-Pruefung.
+12. `BT93O` ist danach nur noch Qualitaets-/Anti-Plateau-Gate und kann ausschliesslich `bt93o-quality-green` als gruenes Ergebnis liefern.
+13. `BT93X` klaert Same-Matrix-DQN oder explizite Ersatzvergleichspolitik und oeffnet `BT93P` nur mit `bt93p-starttruth-green`.
 
 Result-Class- und Dependency-Vertrag:
 
@@ -115,10 +117,11 @@ Result-Class- und Dependency-Vertrag:
 | BT93R/BT93X.0 -> BT93Y | rotes `BT93R.99=model-artifact-missing` plus `BT93X.0=dqn-loader-fix-required` liegen versioniert vor | fehlende R-/X0-Quelle, unklare User-Entscheidung, `measurement-invalid` |
 | BT93Y -> BT93R-Reentry | `bt93rReentryAllowed=true` plus `exact-lineage-restored-bt93r-reentry-ready` oder `retrain-lineage-ready-bt93r-reentry-ready` | `lineage-recovery-blocked`, `lineage-package-invalid`, `retrain-lineage-not-comparable`, `replacement-policy-decision-missing`, `bt93r-reentry-blocked`, `measurement-invalid` |
 | BT93R-Reentry -> BT93S | `policy-collapse-green`, `decoder-fix-counterprobe-green`, `normalize-fix-counterprobe-green`, `eval-mode-bug-fixed-counterprobe-green` | `policy-collapse-active`, `policy-evidence-invalid`, `model-artifact-missing`, `normalize-mismatch`, `measurement-invalid` |
-| BT93S -> BT93T | nur bei `observation-telemetry-required` als Messpfad | Action-/Selection-Fixblocker bleiben fuer U/W/O rot |
-| BT93S -> BT93U | `action-selection-green` und kein offener Telemetry-Blocker | `action-selection-required`, `action-space-required`, `matrix-redesign-required`, `observation-telemetry-required`, `measurement-invalid` |
-| BT93T -> BT93S-Recheck | `telemetry-green` und vorheriger S-Blocker war Telemetry | jeder rote T-Ausgang |
-| BT93T -> BT93U | `telemetry-green` plus frischer S-Recheck `action-selection-green` | `observation-telemetry-required`, `telemetry-layer-drift`, `scenario-matrix-invalid`, `measurement-invalid` |
+| BT93S -> BT93S2 | `matrix-redesign-required` aus `BT93S.99` plus User-Intake `BT93S2` | fehlender User-Intake, `measurement-invalid`, Action-Surface-Lineage unklar |
+| BT93S2 -> BT93T | nur bei `observation-telemetry-required`, wenn Matrix-/Action-/Selection-Blocker geschlossen sind | `matrix-redesign-required`, `action-space-required`, `action-selection-required`, `action-surface-lineage-invalidated`, `measurement-invalid` |
+| BT93S2 -> BT93U | `action-selection-green` und kein offener Telemetry-/Matrix-/Action-Space-Blocker | `action-selection-required`, `action-space-required`, `matrix-redesign-required`, `observation-telemetry-required`, `action-surface-lineage-invalidated`, `measurement-invalid` |
+| BT93T -> BT93S2-Recheck | `telemetry-green` und vorheriger S2-Blocker war ausschliesslich Telemetry | jeder rote T-Ausgang |
+| BT93T -> BT93U | `telemetry-green` plus frischer S2-Recheck `action-selection-green` | `observation-telemetry-required`, `telemetry-layer-drift`, `scenario-matrix-invalid`, `measurement-invalid` |
 | BT93U -> BT93V | `reward-ordering-green` | `reward-redesign-required`, `matrix-redesign-required`, `objective-contract-required`, `measurement-invalid` |
 | BT93V -> BT93W | `safety-diagnostic-nonblocking` und `terminal-nonblocking` | `safety-sidecar-mask-required`, `terminal-semantics-required`, `runtime-safety-drift-blocked`, `measurement-invalid` |
 | BT93W -> BT93O | `bt93o-precondition-green` | jeder andere W-Result |
@@ -334,8 +337,9 @@ Mikro-Claim-Regel:
 | BT93Y | BT93R.99 `model-artifact-missing` + X0-Preflight-Report `dqn-loader-fix-required` + User-Intake 2026-04-30 | hard | ja | Lineage-Recovery/Retraining, Ersatzvergleichspolitik und neuer BT93R-Reentry; 93Y.99 abgeschlossen, einziger naechster Scope ist neuer BT93R-Reentry |
 | BT93RR | BT93Y.99 mit `bt93rReentryAllowed=true` und `retrain-lineage-ready-bt93r-reentry-ready` | hard | ja | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S, alter roter `BT93R` bleibt historische Wahrheit |
 | BT93S | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | hard | ja | abgeschlossen rot als `matrix-redesign-required`; oeffnet keinen Folgeblock |
-| BT93T | BT93S.99=`observation-telemetry-required` oder eigener Telemetry-Start | hard | nein | blockiert, weil BT93S.99 `matrix-redesign-required` statt `observation-telemetry-required` schreibt |
-| BT93U | BT93T.99=`telemetry-green` + S-Recheck `action-selection-green` | hard | nein | Danger-aware Reward- und Objective-Ordering Repair |
+| BT93S2 | BT93S.99=`matrix-redesign-required` + User-Intake 2026-04-30 | hard | ja | neuer Zwischenblock fuer Matrix-/Control-v2, Action-Effect und Policy-Selection-Recheck; naechster claimbarer Scope |
+| BT93T | BT93S2.99=`observation-telemetry-required` | hard | nein | blockiert, bis BT93S2 nur noch Telemetrie als offenen S-Blocker meldet |
+| BT93U | BT93S2.99=`action-selection-green` oder BT93T.99=`telemetry-green` + S2-Recheck `action-selection-green` | hard | nein | Danger-aware Reward- und Objective-Ordering Repair |
 | BT93V | BT93U.99=`reward-ordering-green` | hard | nein | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision |
 | BT93W | BT93V.99=`safety-diagnostic-nonblocking` + `terminal-nonblocking` | hard | nein | integrierter WallTrail-10k-Recheck und BT93O-Startgate |
 | BT93O | BT93W.99 `bt93o-precondition-green` | hard | nein | Action-/Objective-Qualitaet und Anti-Plateau; einzig gruener Ausgang `bt93o-quality-green` |
@@ -403,8 +407,9 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
 | Bot-Codex | BT93RR | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S |
 | Bot-Codex | BT93S | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `matrix-redesign-required`; oeffnet keinen Folgeblock |
-| - | BT93T | - | frei | blockiert, weil BT93S.99 nicht `observation-telemetry-required` ist |
-| - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
+| - | BT93S2 | - | frei | naechster claimbarer Scope; repariert Matrix-/Control-v2 und Action-Effect vor BT93T/U |
+| - | BT93T | - | frei | blockiert, bis BT93S2.99 `observation-telemetry-required` schreibt |
+| - | BT93U | - | frei | wartet auf BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
 | - | BT93W | - | frei | wartet auf `safety-diagnostic-nonblocking` und `terminal-nonblocking` |
 | - | BT93O | - | frei | wartet auf BT93W.99 `bt93o-precondition-green` |
@@ -928,8 +933,9 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93Y | PPO Lineage-Recovery/Retraining und Ersatzvergleich | completed | P0 | BT93R.99 `model-artifact-missing` + X0-Preflight-Report `dqn-loader-fix-required` | 93Y.99 abgeschlossen: `retrain-lineage-ready-bt93r-reentry-ready`, oeffnet nur BT93R-Reentry | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
 | BT93RR | Policy-Artefakt Reentry auf neuer Retrain-Lineage (`BT93R-Reentry`) | completed | P0 | BT93Y.99 `retrain-lineage-ready-bt93r-reentry-ready` + `bt93rReentryAllowed=true` | 93RR.99 abgeschlossen: `eval-mode-bug-fixed-counterprobe-green`, oeffnet nur BT93S | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
 | BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | completed | P1 | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | 93S.99 abgeschlossen: `matrix-redesign-required`, oeffnet nichts | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
-| BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | BT93S.99=`observation-telemetry-required` oder Telemetry-Start | blockiert durch `BT93S.99=matrix-redesign-required` | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
-| BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | BT93T.99=`telemetry-green` + S-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
+| BT93S2 | Matrix-/Action-Effect Repair nach rotem BT93S | planned | P0 | BT93S.99=`matrix-redesign-required` + User-Intake 2026-04-30 | 93S2.1 | `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md` |
+| BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | BT93S2.99=`observation-telemetry-required` | blockiert bis BT93S2 nur Telemetrie oeffnet | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
+| BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | BT93S2.99=`action-selection-green` oder BT93T.99=`telemetry-green` + S2-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93V | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision | planned | P1 | BT93U.99=`reward-ordering-green` | 93V.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93W | Integrierter WallTrail 10k Recheck und BT93O-Startgate | planned | P1 | BT93V.99=`safety-diagnostic-nonblocking` + `terminal-nonblocking` | 93W.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93O | Action-/Objective-Quality und Anti-Plateau | planned | P2 | BT93W.99 `bt93o-precondition-green` | 93O.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3795,6 +3801,124 @@ Pflicht-Evidence:
 
 ---
 
+## Block BT93S2: Matrix-/Action-Effect Repair nach rotem BT93S
+
+Quelle: `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md`
+
+<!-- LOCK: frei -->
+
+Scope:
+
+- `BT93S2` repariert die von `BT93S.99=matrix-redesign-required` gestoppte Matrix-/Action-Kette vor `BT93T`, `BT93U`, `BT93W`, `BT93O`, `BT93P` und `BT94A`.
+- Startbefunde aus `bt93s_closure_gate_report.json`: `no-danger-control` ist Matrix-/Control-rot, `escape-right-open` hat keine erfolgreiche bestehende Action, `narrowing-corridor`/`side-wall-left`/`side-wall-right` sind Selection-rot, `trail-ahead`/`trail-side` sind telemetry-limited.
+- `BT93T` darf nur bei `BT93S2.99=observation-telemetry-required` starten; `BT93U` darf nur bei `BT93S2.99=action-selection-green` starten.
+- Kein PPO-Langlauf, kein Reward-Fix, kein DQN-/Comparator-Fix, kein BT93O/P/94A-Signal.
+
+Scope-Dateien:
+
+| Pfad | Modus | Zweck |
+| --- | --- | --- |
+| `python/scripts/bt93s2_*.py` | write | Startvertrag, Matrix-v2, Action-Effect-v2, Action-Surface-Decision, Policy-Recheck, Closure |
+| `data/training/ppo/bt93s2/**` | write | versionierte S2-Evidence |
+| `python/scripts/bt93s_*.py` | read/conditional write | Vorlage oder gezielte v2-Erweiterung |
+| `python/envs/ppo_action_surface.py` | conditional write | nur bei belegter v2-Action-Surface-Luecke; dann Lineage-Invalidierung |
+| `data/training/ppo/bt93s/**`, `data/training/ppo/bt93r_reentry/**`, `data/training/ppo/bt93y/**` | read | Source-Artefakte und Hashes |
+| produktive Runtime-/AI-Hub-/Strategy-/Registry-/Matchstart-Surfaces | read-only | Layer-Grenze; keine Runtime-Umschaltung |
+
+### Definition of Done (DoD)
+
+- [ ] DoD.S2R1 Startvertrag lockt alle BT93S-/BT93RR-Quellen mit Hashes, Resultklassen, SampleCounts, Matrix-ID, ActionSurfaceId, Policy-Lineage, ClaimFlags und aktiven Blockern.
+- [ ] DoD.S2R2 Matrix v2 trennt Control-Semantik sauber: `no-danger-control` ist ein Stabilitaets-/Non-Success-Control, kein Escape-Erfolgsszenario.
+- [ ] DoD.S2R3 Matrix v2 hat fuer jede Action-Effect-Szenarioklasse eine Positive-Control mit echter Zustandswirkung und eine Negative-Control, die nicht versehentlich Erfolg zaehlt.
+- [ ] DoD.S2R4 `escape-right-open` wird auf v2 mit mindestens einer real wirksamen bestehenden oder kontrolliert neu begruendeten Action belegt; sonst endet der Block `action-space-required`.
+- [ ] DoD.S2R5 Success-Definition bleibt zustandsbasiert: WallDistance, LocalOpenness, CollisionRisk, TerminalRisk, Heading-/Target-Delta und Trail-Druck; Reward-only, command-flag-only, target-distance-only, single-step und maxSteps-only bleiben verboten.
+- [ ] DoD.S2R6 Action-Surface-Aenderungen sind nur nach v2-Action-Gap erlaubt; jede Aenderung invalidiert alte Policy-Selection/Comparator-Artefakte und darf nicht `action-selection-green` oeffnen.
+- [ ] DoD.S2R7 Policy-Selection-Recheck nutzt dieselbe v2-Matrix, dieselbe Retrain-Lineage, gepinnte Seeds, keine Trainingsepisoden, keine Holdouts und feste Schwellen (`effectiveSelectionShare >= 0.25`, `top2EffectiveShare >= 0.50`) pro relevanter Szenariofamilie.
+- [ ] DoD.S2R8 Telemetrie darf `BT93T` nur oeffnen, wenn Matrix-/Action-Space-/Selection-Blocker geschlossen sind und nur Trail-/Escape-Attribution fehlt.
+- [ ] DoD.S2R9 Closure-Gate schreibt genau eine erlaubte Resultklasse und haelt `BT93W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate und BT95 immer geschlossen.
+- [ ] DoD.S2R10 Meta-Gate `npm.cmd run gates:pre-commit` ist gruen; Tests und Trainingslaeufe bleiben user-owned ausser fuer `*.99` noetige Diagnose-Skripte.
+
+### 93S2.1 Startvertrag und Invalidation Lock
+
+- [ ] 93S2.1.1 `bt93s2_start_contract.py` liest `BT93S.99`, `93S.1` bis `93S.4`, `BT93RR.99`, Policy-Lineage und ActionSurface-Hash.
+- [ ] 93S2.1.2 Report schreibt alle aktiven Blocker, Szenario-IDs, invalidierte BT93S-Reports, verbotene Folgeaktionen und erlaubte Resultklassen.
+- [ ] 93S2.1.3 Wenn eine Quelle fehlt, untracked ist oder nicht zu `BT93S.99=matrix-redesign-required` passt, endet die Phase `measurement-invalid`.
+
+Pflicht-Evidence:
+
+- `data/training/ppo/bt93s2/start_contract.json`
+
+### 93S2.2 Matrix-v2 Contract und Scenario Search
+
+- [ ] 93S2.2.1 `no-danger-control` in `controlKind=neutral-stability-control` umstellen: Erfolg ist Stabilitaet/keine Risikoerhoehung, nicht Escape.
+- [ ] 93S2.2.2 `escape-right-open` per deterministischer Scenario-Search reparieren: Predicate, Warmup, Seeds und Positive-Control muessen vor Messung validiert sein.
+- [ ] 93S2.2.3 Alle Wall-/Trail-/Escape-Szenarien bekommen Positive-Control, Negative-Control, Mindestfenster, Revalidation-Predicate, Seed-Plan, verbotene Success-Proxies und Drift-/Invalidation-Liste.
+- [ ] 93S2.2.4 Scenario-Search trennt Discovery-Seeds und Validation-Seeds, damit der Matrix-Fix nicht nur auf bekannte Seeds ueberfitten kann.
+
+Pflicht-Evidence:
+
+- `data/training/ppo/bt93s2/scenario_search_report.json`
+- `data/training/ppo/bt93s2/scenario_matrix_v2_contract.json`
+
+### 93S2.3 Existing-Action Effect v2
+
+- [ ] 93S2.3.1 Bestehende Actions ohne PPO-Training gegen v2 messen.
+- [ ] 93S2.3.2 `escape-right-open`, Side-Wall und Narrowing-Szenarien muessen echte Zustandswirkung zeigen oder exakt als `action-space-required` klassifiziert werden.
+- [ ] 93S2.3.3 `no-danger-control` darf keine Action-Gruen-Evidence liefern; es prueft nur, dass Controls nicht faelschlich Erfolg erzeugen.
+- [ ] 93S2.3.4 Command-Flag-Only, Reward-Only und MaxStep-Proxies werden maschinenlesbar abgelehnt.
+
+Pflicht-Evidence:
+
+- `data/training/ppo/bt93s2/existing_action_effect_v2_report.json`
+
+### 93S2.4 Action-Surface Repair Decision
+
+- [ ] 93S2.4.1 Wenn v2 noch `action-space-required` meldet, Root-Cause trennen: Matrix bleibt falsch, bestehende Action-Semantik ist zu schwach, Decoder/Mapping ist falsch, oder neue Compound-Action ist wirklich erforderlich.
+- [ ] 93S2.4.2 Jede erlaubte Action-Surface-Aenderung bekommt neue `actionSurfaceId`, Decoder-Hash, Safety-Raten, Compatibility-Statement, invalidierte Reports und Policy-Lineage-Invalidierung.
+- [ ] 93S2.4.3 Wenn Action-Surface geaendert wird, endet BT93S2 nicht gruen, sondern `action-surface-lineage-invalidated`.
+- [ ] 93S2.4.4 Wenn keine Aenderung noetig ist, wird die unveraenderte ActionSurfaceId als Recheck-Basis gepinnt.
+
+Pflicht-Evidence:
+
+- `data/training/ppo/bt93s2/action_surface_repair_decision.json`
+
+### 93S2.5 Policy-Selection Recheck v2
+
+- [ ] 93S2.5.1 Nur starten, wenn v2-Matrix und Action-Effect urteilsfaehig sind und die ActionSurface-Lineage nicht invalidiert wurde.
+- [ ] 93S2.5.2 Recheck misst `narrowing-corridor`, `side-wall-left`, `side-wall-right`, `escape-left/right`, `frontal-near-wall`, Trail-Szenarien und Controls getrennt.
+- [ ] 93S2.5.3 Pro Szenariofamilie muessen effektive Actions als Top2 und in realer Auswahl ausreichend erscheinen; Aggregat-Gruen allein ist ungueltig.
+- [ ] 93S2.5.4 `trail-ahead`/`trail-side` duerfen nur dann `observation-telemetry-required` erzeugen, wenn alle nicht-telemetry Blocker gruen sind.
+
+Pflicht-Evidence:
+
+- `data/training/ppo/bt93s2/policy_selection_v2_report.json`
+
+### 93S2.99 Abschluss
+
+- [ ] 93S2.99.1 Closure liest alle S2-Reports, schreibt eine erlaubte Resultklasse, `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SampleCounts, SourceArtifacts und Invalidations.
+- [ ] 93S2.99.2 `BT93T` oeffnet nur bei `observation-telemetry-required`; `BT93U` oeffnet nur bei `action-selection-green`.
+- [ ] 93S2.99.3 Jedes rote Ergebnis oeffnet keinen bestehenden Folgeblock und schreibt den naechsten engen Reparaturbedarf.
+- [ ] 93S2.99.4 Abschluss-Gate: `npm.cmd run gates:pre-commit`.
+
+Pflicht-Evidence:
+
+- `data/training/ppo/bt93s2/bt93s2_closure_gate_report.json`
+
+### Risiko-Register BT93S2
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Matrix wird auf bekannte Seeds ueberfitten | kritisch | RL/QA | Discovery-/Validation-Seeds trennen, Seed-Plan vor Messung locken | v2-Gruen nur auf alten 930/934/942-Fenstern |
+| `no-danger-control` wird erneut als Action-Erfolg gelesen | kritisch | Governance/RL | `controlKind=neutral-stability-control`, keine Action-Gruen-Evidence aus Control | Control liefert `successfulActions` |
+| Action-Surface-Aenderung macht alte Policy-Evidence ungueltig | kritisch | RL/Governance | `action-surface-lineage-invalidated`, kein Selection-Gruen nach Surface-Drift | neue ActionSurfaceId ohne Reentry |
+| Telemetriebedarf ueberdeckt Matrix-/Action-Fehler | hoch | QA | Telemetry darf nur oeffnen, wenn andere Blocker gruen sind | `BT93T` trotz `matrix-redesign-required` |
+| Policy-Selection wird aggregiert schoengerechnet | hoch | QA | Per-Szenariofamilie Schwellen; Aggregat reicht nicht | Top2/EffectiveShare nur global gruen |
+| Reward-/MaxStep-Proxies werden als Action-Wirkung gelesen | hoch | RL | verbotene Proxies in jedem Report, State-Effect-Pflicht | Reward steigt ohne Risk-/Wall-/Trail-Verbesserung |
+| Runtime-Grenze wird verletzt | kritisch | Architektur | produktive Surfaces read-only, Scope-Report und Guardrails | Runtime-/AI-Hub-Datei im Diff |
+| Der Block wird zu breit und mischt Reward/Training hinein | hoch | Governance | Nicht-Ziele, Resultklassen und Closure-Gate blockieren Training/Reward | Reward-Fix oder PPO-Lauf im S2-Diff |
+
+---
+
 ## Block BT93T: Training-only Raw-/Trail-/Escape-Lane Telemetry Repair
 
 Quelle: `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md`
@@ -3803,16 +3927,16 @@ Quelle: `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-3
 
 Scope:
 
-- `BT93T` ergaenzt nur training-only Telemetrie, wenn BT93S ohne Raw-/Trail-/Escape-Felder nicht urteilsfaehig ist.
+- `BT93T` ergaenzt nur training-only Telemetrie, wenn BT93S2 nach reparierter Matrix-/Action-Wirkung ohne Raw-/Trail-/Escape-Felder nicht urteilsfaehig ist.
 - Produktive Observation-/Runtime-API bleibt read-only; Observation-Length, VecNormalize und Schema-Smokes sind Pflicht.
-- Nach `telemetry-green` muss BT93S rechecken, bevor BT93U starten darf.
+- Nach `telemetry-green` muss BT93S2 rechecken, bevor BT93U starten darf.
 
 ### Definition of Done (DoD)
 
 - [ ] DoD.T1 `telemetry_contract.json` pinnt RawPose, Heading, Velocity, TrailDistance, EscapeLane, Missing-Raten und Schema-ID.
 - [ ] DoD.T2 Instrumentation beruehrt nur Training-/Reportpfade oder meldet `telemetry-layer-drift`.
 - [ ] DoD.T3 Observation-Length, VecNormalize-/Normalizer-Kompatibilitaet und alte Reports bleiben getrennt.
-- [ ] DoD.T4 Szenario-Recheck zeigt, dass Telemetrie Action-/Reward-Attribution ermoeglicht.
+- [ ] DoD.T4 Szenario-Recheck zeigt, dass Telemetrie Action-/Reward-Attribution fuer die BT93S2-v2-Matrix ermoeglicht.
 - [ ] DoD.T5 Gruen ist nur `telemetry-green`; andere Resultklassen blockieren S/U/W/O.
 
 ### 93T.1 Telemetry Contract
@@ -3827,13 +3951,13 @@ Scope:
 
 ### 93T.3 Scenario-Recheck
 
-- [ ] 93T.3.1 BT93S-Szenarien mit neuer Telemetrie erneut messen.
+- [ ] 93T.3.1 BT93S2-v2-Szenarien mit neuer Telemetrie erneut messen.
 - [ ] 93T.3.2 Recheck zeigt nutzbare Attribution oder `measurement-invalid`.
 
 ### 93T.99 Abschluss
 
 - [ ] 93T.99.1 Closure schreibt `telemetry-green`, `observation-telemetry-required`, `telemetry-layer-drift`, `scenario-matrix-invalid` oder `measurement-invalid`.
-- [ ] 93T.99.2 Bei `telemetry-green` ist S-Recheck vor BT93U Pflicht.
+- [ ] 93T.99.2 Bei `telemetry-green` ist S2-Recheck vor BT93U Pflicht.
 
 Pflicht-Evidence:
 
@@ -3848,7 +3972,7 @@ Pflicht-Evidence:
 | --- | --- | --- | --- | --- |
 | Training-only Telemetrie veraendert Runtime-Vertrag | kritisch | Architektur/RL | Runtime read-only, Schema-Smoke | produktive Observation-Breite driftet |
 | Missing-Raten bleiben unsichtbar | hoch | QA | Missing-Raten im Contract und Report | Aggregatwerte ohne Nenner |
-| S-Recheck wird uebersprungen | hoch | Governance | U-Depends-On verlangt S-Recheck | T gruen oeffnet direkt U |
+| S2-Recheck wird uebersprungen | hoch | Governance | U-Depends-On verlangt S2-Recheck | T gruen oeffnet direkt U |
 
 ---
 
@@ -4943,8 +5067,8 @@ Rollout-Intake-Pflichtpaket:
 | 25 | `BT93X.0 Early Comparator Preflight` abgeschlossen. | PF.0 `preflight-green`; read-only. | `early_comparator_preflight_report.json` meldet `dqn-loader-fix-required`; BT11/DQN-Anker bleibt nicht starttruth-faehig. |
 | 26 | `BT93Y.99` Abschluss-Gate abgeschlossen. | `BT93Y.5=retrain-lineage-ready-bt93r-reentry-ready`; Reentry-Paket durfte vor 93Y.99 keinen echten R-Claim starten. | `bt93y_closure_gate_report.json` meldet `bt93rReentryAllowed=true` und `retrain-lineage-ready-bt93r-reentry-ready`; `/fix-planung` GO nur fuer neuen `BT93R-Reentry`, kein `BT93S/O/X/P/94A`. |
 | 27 | Neuer `BT93R-Reentry` als Artifact-Probe, Root-Cause und Counterprobe abgeschlossen. | `BT93Y.99` schreibt `bt93rReentryAllowed=true` plus gruene BT93Y-Resultklasse. | `BT93RR.99=eval-mode-bug-fixed-counterprobe-green`; oeffnet nur `BT93S`, alter roter `BT93R.99` bleibt historische Wahrheit. |
-| 28 | `BT93S` abgeschlossen rot; R-X-Leiter stoppt vor `BT93T/U/W`. | `BT93RR.99` war in R-Allowlist; BT93S.99 schreibt aber `matrix-redesign-required`. | `bt93s_closure_gate_report.json` meldet `opensNext=[]`; naechste zielfuehrende Handlung ist enger User-Intake/Replan fuer BT93S-Matrix-/Action-Effect-Repair, kein weiterer bestehender R-X-Claim. |
-| 29 | Nur nach `BT93W.99=bt93o-precondition-green`: `BT93O Action-/Objective-Quality und Anti-Plateau`. | R-Reentry/S/T/U/V/W sind gruen, gleiche IDs oder Drift-Invalidierung liegen vor. | Einziger gruener Ausgang `bt93o-quality-green`; kein BT93P-/BT94A-Signal. |
+| 28 | `BT93S2 Matrix-/Action-Effect Repair` claimen. | `BT93S.99=matrix-redesign-required`; User-Intake `BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md` ist aufgenommen. | Matrix-/Control-v2, `escape-right-open` Action-Effect, Action-Surface-Lineage-Entscheid und Policy-Selection-Recheck; Ergebnis `action-selection-green`, `observation-telemetry-required` oder enger roter Folgeblocker. |
+| 29 | Nur nach `BT93W.99=bt93o-precondition-green`: `BT93O Action-/Objective-Quality und Anti-Plateau`. | R-Reentry/S2/T/U/V/W sind gruen, gleiche IDs oder Drift-Invalidierung liegen vor. | Einziger gruener Ausgang `bt93o-quality-green`; kein BT93P-/BT94A-Signal. |
 | 30 | Nur nach `BT93O.99=bt93o-quality-green`: voller `BT93X Same-Matrix-DQN oder Ersatzvergleich + BT93P Starttruth`. | `93X.0` ist abgeschlossen, Ersatzvergleichspolitik aus BT93Y ist gelockt, BT93O-Qualitaetsbasis steht. | `bt93p-starttruth-green` oder konkreter Comparator-/DQN-/User-Entscheid-Blocker; BT94A bleibt rot. |
 | 31 | Nur nach `BT93O.99=bt93o-quality-green` und `BT93X.99=bt93p-starttruth-green`: `BT93P PPO Trainingsleiter und BT94A-Reentry-Gate`. | Comparator/Ersatzvergleich, Holdout, Statistikvertrag, Reward-Ordering und Fehlersignatur-Widerlegung sind startfaehig. | 200k->500k->1M Evidence-Leiter; Ergebnis `BT94A-ready` oder ehrlicher Folgeblocker. |
 | 32 | Erst bei `BT93P.4=BT94A-ready` plus gruenem Gate: `94A.1` claimen. | `no_start_gate.json` meldet `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true`, `precomparison != ppo-regression`; Source-Prioritaet ist BT93P.4 -> BT93X -> BT93O -> BT93W -> BT93R-Reentry -> BT93Y -> BT93Q. | Ablationsmatrix und Entscheidungsregeln fuer BT94A; weiterhin kein Freeze vor `94A.3` und kein BT94B-Handover ohne echten PPO-Validate-Load. |
@@ -4953,7 +5077,7 @@ No-Go vor Bot-Training:
 
 - Kein `baseline`-, `pilot`- oder Langlauf, solange frisches `freezeOk=true`, Clean-Env, Action-Surface, Startmanifest, Baseline-ID, Audit-Delta und ab BT93K Preflight-/Supervisor-/Signal-Gates nicht belegt sind; die 93J.5c-Diagnose-Ausnahme ist abgeschlossen und wird nicht wiederholt.
 - Kein weiterer PPO-Lauf aus BT93L; `BT93M` ist Gate-/DQN-Anker-Arbeit ohne PPO-Qualitaetslauf, `BT93N` und `BT93Q` sind rot abgeschlossen, `BT93W` darf erst nach BT93Y, R-Reentry und S/T/U/V-Gruen maximal einen 10k-Recheck starten.
-- Kein BT93T-/BT93U-/BT93W-/BT93O-/BT93P-/BT94A-Start aus `BT93S.99=matrix-redesign-required`; der naechste Schritt braucht einen engen User-Intake/Replan fuer BT93S-Matrix-/Action-Effect-Repair.
+- Kein BT93T-/BT93U-/BT93W-/BT93O-/BT93P-/BT94A-Start aus `BT93S.99=matrix-redesign-required`; naechster erlaubter Scope ist `BT93S2` fuer Matrix-/Action-Effect-Repair. `BT93T` oeffnet nur bei `BT93S2.99=observation-telemetry-required`, `BT93U` nur bei `BT93S2.99=action-selection-green`.
 - Kein BT93O-Start, solange `BT93W.99` nicht `bt93o-precondition-green` schreibt; `BT93Q.99`, Plantext, `walltrail-policy-green`-Altformeln oder einzelne non-blocking Teilfelder reichen nach rotem BT93Q nicht.
 - Keine 50k-/100k-/200k-Erweiterung, solange MaxStep-Plateau, DeathBefore60, Objective-/Progress-Signal und Survival gemeinsam nicht besser oder sauber neutral klassifiziert sind.
 - Kein BT93P-Start, solange `BT93O.99` nicht `bt93o-quality-green` und `BT93X.99` nicht `bt93p-starttruth-green` schreiben; Reward-Ordering muss zeigen: Noop < Random/Semantic-Cycle < Scripted/learned, und Comparator/Ersatzvergleich, Holdout und Statistik muessen startfaehig sein.
