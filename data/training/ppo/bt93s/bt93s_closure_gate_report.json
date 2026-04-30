@@ -1,0 +1,372 @@
+{
+  "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+  "activeBlockers": [
+    "action-selection-required",
+    "action-space-required",
+    "matrix-redesign-required",
+    "observation-telemetry-required"
+  ],
+  "allowNext": [
+    "Manual replan/intake for BT93S matrix redesign before BT93T/U/W/O"
+  ],
+  "blockId": "BT93S",
+  "blockingStatus": {
+    "bt93oStartDecision": "blocked",
+    "bt93pStartDecision": "blocked",
+    "bt93tStartDecision": "blocked",
+    "bt93uStartDecision": "blocked",
+    "bt93wStartDecision": "blocked",
+    "bt94aStartDecision": "blocked",
+    "candidateFreezePromoteRolloutDecision": "blocked"
+  },
+  "blocksNext": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "50k/100k/200k/500k/1M extension"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93tClaimAllowed": false,
+    "bt93uClaimAllowed": false,
+    "bt93wClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffAllowed": false,
+    "candidateRunsAllowed": false,
+    "freezeAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "ppoValidateSignalAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "tests": "user-owned except closure gate script",
+    "write": "python python/scripts/bt93s_closure_gate.py --write-report"
+  },
+  "contractId": "bt93s-walltrail-action-effect-window-v1",
+  "dodCoverage": {
+    "DoD.S1": true,
+    "DoD.S2": true,
+    "DoD.S3": true,
+    "DoD.S4": true,
+    "DoD.S5": true
+  },
+  "generatedAt": "2026-04-30T14:45:30Z",
+  "generatedBy": "python/scripts/bt93s_closure_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "6853d4293821d8116048a456494571f87ed53e14",
+    "sha": "b0887a8e1c467c4b27e442be36f111e79fdb343b"
+  },
+  "guardrails": {
+    "actionSurfaceChanged": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "newOptimizerUpdates": 0,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "qualityClaimAllowed": false,
+    "rewardFixApplied": false,
+    "runtimeSurfacesTouched": [],
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "matrixId": "bt93s-walltrail-action-effect-matrix-v1",
+  "ok": true,
+  "opensNext": [],
+  "phaseCoverage": {
+    "93S.99.1": true,
+    "93S.99.2": true
+  },
+  "phaseId": "93S.99",
+  "recommendations": [
+    {
+      "action": "Add a narrow matrix-redesign/action-effect follow-up before continuing the R-X ladder.",
+      "rank": "1",
+      "why": "BT93S found the pinned matrix itself invalid for at least one control/effect window; BT93T only covers telemetry gaps and cannot repair matrix validity."
+    },
+    {
+      "action": "Keep BT93T, BT93U, BT93W, BT93O, BT93P and BT94A closed.",
+      "rank": "2",
+      "why": "The closure result is not observation-telemetry-required or action-selection-green."
+    }
+  ],
+  "resultClass": "matrix-redesign-required",
+  "sampleCounts": {
+    "contractScenarioCount": 9,
+    "holdoutEpisodes": 0,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "probeCount": 351,
+    "scenarioCount": 9,
+    "selectionStepCount": 607
+  },
+  "scenarioBlockers": {
+    "actionEffectGapScenarioIds": [
+      "escape-right-open"
+    ],
+    "matrixRedesignScenarioIds": [
+      "no-danger-control"
+    ],
+    "selectionBlockers": [
+      "narrowing-corridor",
+      "side-wall-left",
+      "side-wall-right"
+    ],
+    "telemetryLimitedScenarioIds": [
+      "trail-ahead",
+      "trail-side"
+    ]
+  },
+  "schemaVersion": "bt93s-closure-gate-report-v1",
+  "semanticWindow": {
+    "effectWindowStepsByScenario": {
+      "escape-left-open": 24,
+      "escape-right-open": 24,
+      "frontal-near-wall": 24,
+      "narrowing-corridor": 24,
+      "no-danger-control": 24,
+      "side-wall-left": 24,
+      "side-wall-right": 24,
+      "trail-ahead": 24,
+      "trail-side": 24
+    },
+    "source": "data/training/ppo/bt93s/scenario_window_contract.json"
+  },
+  "sourceArtifacts": [
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1",
+        "resultClass": "scenario-window-contract-green"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1",
+        "resultClass": "scenario-window-contract-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+      "phaseId": "93S.1",
+      "resultClass": "scenario-window-contract-green",
+      "role": "BT93S.1 pinned scenario-window contract",
+      "schemaVersion": "bt93s-scenario-window-contract-v1",
+      "sha256": "2334cb20a0d20ad9279f7609e9bddb03d81a238539c1fdb0b5c615ce7bfcb2f0",
+      "sizeBytes": 33832,
+      "sourceKey": "scenarioWindowContract",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1",
+        "resultClass": "scenario-window-contract-green"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.1",
+        "resultClass": "scenario-window-contract-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/action_effect_window_manifest.json",
+      "phaseId": "93S.1",
+      "resultClass": "scenario-window-contract-green",
+      "role": "BT93S.1 action-effect manifest alias",
+      "schemaVersion": "bt93s-scenario-window-contract-v1",
+      "sha256": "2334cb20a0d20ad9279f7609e9bddb03d81a238539c1fdb0b5c615ce7bfcb2f0",
+      "sizeBytes": 33832,
+      "sourceKey": "actionEffectWindowManifest",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.2"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.2"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "phaseId": "93S.2",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.2 existing-action effect report",
+      "schemaVersion": "bt93s-existing-action-effect-report-v1",
+      "sha256": "e6537e1c388bb9ed84d541c5124e396ce4218d82216418d88b8eb37145f55094",
+      "sizeBytes": 3604411,
+      "sourceKey": "existingActionEffect",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.3"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.3"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/action_surface_decision.json",
+      "phaseId": "93S.3",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.3 action-surface decision",
+      "schemaVersion": "bt93s-action-surface-decision-v1",
+      "sha256": "c18471a95de7f2acc1d9bed42e7f03a8f61014db044105920f92833133f2c499",
+      "sizeBytes": 11138,
+      "sourceKey": "actionSurfaceDecision",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.4"
+      },
+      "blockId": "BT93S",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S",
+        "ok": true,
+        "phaseId": "93S.4"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s/policy_selection_report.json",
+      "phaseId": "93S.4",
+      "resultClass": "matrix-redesign-required",
+      "role": "BT93S.4 policy-selection report",
+      "schemaVersion": "bt93s-policy-selection-report-v1",
+      "sha256": "e408f96ac21898b739c88d92d95e8122529fc5e48853125e6236cec759e1eb8a",
+      "sizeBytes": 2514850,
+      "sourceKey": "policySelection",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "phaseId": "93RR.99",
+      "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+      "role": "BT93RR.99 R-Allowlist closure",
+      "schemaVersion": "bt93rr-reentry-closure-gate-report-v1",
+      "sha256": "b3b4712987cbd353254e3e05beba1ebf3e30faa49d7a8673e75d729470fa5ea2",
+      "sizeBytes": 12686,
+      "sourceKey": "bt93rrClosure",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.99",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
+      "phaseId": "93RR.99",
+      "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+      "role": "BT93RR.99 handover opening only BT93S",
+      "schemaVersion": "bt93rr-reentry-handover-package-v1",
+      "sha256": "8c14379b6fe6388bbf689929e151511105fe09fac823790983634b3beedcfa12",
+      "sizeBytes": 5064,
+      "sourceKey": "bt93rrHandover",
+      "tracked": true
+    }
+  ],
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "sourceResultClasses": {
+    "actionSurfaceDecision": "matrix-redesign-required",
+    "bt93rrClosure": "eval-mode-bug-fixed-counterprobe-green",
+    "bt93rrHandover": "eval-mode-bug-fixed-counterprobe-green",
+    "existingActionEffect": "matrix-redesign-required",
+    "policySelection": "matrix-redesign-required",
+    "scenarioWindowContract": "scenario-window-contract-green"
+  },
+  "summary": {
+    "blockersRemain": [
+      "action-selection-required",
+      "action-space-required",
+      "matrix-redesign-required",
+      "observation-telemetry-required"
+    ],
+    "bt93sClosedRed": true,
+    "finalResult": "matrix-redesign-required",
+    "nextBestAction": "Manual replan/intake for BT93S matrix redesign before BT93T/U/W/O",
+    "why": "BT93S found the pinned matrix itself invalid for at least one control/effect window; BT93T only covers telemetry gaps and cannot repair matrix validity."
+  },
+  "thresholdsLockedBeforeRun": {
+    "greenOnlyWhen": "action-selection-green",
+    "matrixRedesignPrecedence": true,
+    "noRewardOrMaxStepSuccessProxy": true,
+    "policySource": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+    "redResultsBlockBT93UWTOP94A": true,
+    "source": "data/training/ppo/bt93s/scenario_window_contract.json",
+    "telemetryCanOnlyOpen": "BT93T"
+  }
+}
