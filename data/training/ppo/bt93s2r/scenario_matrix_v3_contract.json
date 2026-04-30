@@ -1,0 +1,1917 @@
+{
+  "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+  "allowNext": [
+    "93S2R.4 Matrix-Control Reentry Gate"
+  ],
+  "blockId": "BT93S2R",
+  "blocksNext": [
+    "93S2.4 start before BT93S2R.99=matrix-control-reentry-green plus fresh BT93S2.3-Recheck",
+    "BT93T claim before fresh S2-Recheck opens only observation telemetry",
+    "BT93U claim before fresh S2-Recheck opens action-selection-green",
+    "BT93V claim",
+    "BT93W claim",
+    "BT93O claim",
+    "BT93X full claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "50k/100k/200k/500k/1M extension",
+    "reward fix from BT93S2R.3",
+    "telemetry fix from BT93S2R.3",
+    "action-surface change from BT93S2R.3"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93s2Phase4Allowed": false,
+    "bt93s2RecheckAllowed": false,
+    "bt93s2rNextPhaseAllowed": true,
+    "bt93tClaimAllowed": false,
+    "bt93uClaimAllowed": false,
+    "bt93vClaimAllowed": false,
+    "bt93wClaimAllowed": false,
+    "bt93xFullClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffAllowed": false,
+    "candidateRunsAllowed": false,
+    "freezeAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "ppoValidateSignalAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "next": "python python/scripts/bt93s2r_matrix_control_reentry_gate.py --write-report",
+    "tests": "user-owned except closure gate scripts",
+    "write": "python python/scripts/bt93s2r_matrix_control_v3.py --write-report"
+  },
+  "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+  "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+  "dodCoverage": {
+    "DoD.S2R-R4": true,
+    "DoD.S2R-R5": true,
+    "DoD.S2R-R6": true,
+    "DoD.S2R-R7": true,
+    "DoD.S2R-R9": true
+  },
+  "generatedAt": "2026-04-30T21:38:46Z",
+  "generatedBy": "python/scripts/bt93s2r_matrix_control_v3.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "a2854edc5a0ec2d0b46d332faf79a98d5bb4265a",
+    "sha": "62c600196ef2b1ffc11b590c738890f4363b5535"
+  },
+  "guardrails": {
+    "actionSurfaceChanged": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "qualityClaimAllowed": false,
+    "rewardFixApplied": false,
+    "runtimeSurfacesTouched": [],
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "invalidations": [
+    {
+      "reason": "A fresh S2.3-Recheck is still required; the v3 contract alone is not action-quality or policy-selection evidence.",
+      "scope": "BT93S2.3 normal continuation"
+    },
+    {
+      "reason": "Action-space-required remains deferred until v3 predicate/window fairness is measured by the reentry gate and fresh S2.3-Recheck.",
+      "scope": "escape-right-open action-space judgement"
+    },
+    {
+      "reason": "BT93S2R.3 is matrix/control-only and produced no runtime, reward, telemetry, holdout or PPO-training evidence.",
+      "scope": "product/runtime/training"
+    }
+  ],
+  "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+  "nextAllowedActions": [
+    "Run 93S2R.4 matrix-control reentry gate against scenario_matrix_v3_contract.json; do not start 93S2.4 or BT93T/U/W/O/P/94A."
+  ],
+  "ok": true,
+  "opensNext": [
+    "93S2R.4 Matrix-Control Reentry Gate"
+  ],
+  "phaseCoverage": {
+    "93S2R.3.1": true,
+    "93S2R.3.2": true,
+    "93S2R.3.3": true,
+    "93S2R.3.4": true,
+    "93S2R.3.5": true,
+    "93S2R.3.6": true
+  },
+  "phaseId": "93S2R.3",
+  "predicateWindowAudit": {
+    "sourceFindingId": "93S2R.2.5 predicate/minimum-window trace",
+    "sourceMinimumWindowFailureCount": 12,
+    "sourcePredicateFailureCount": 48,
+    "sourceResultClass": "predicate-window-required",
+    "v3GateRequirement": {
+      "measurementInvalidCount": 0,
+      "minimumWindowFailureCount": 0,
+      "predicateFailureCount": 0
+    }
+  },
+  "recommendations": [
+    {
+      "action": "Execute 93S2R.4 reentry gate against v3.",
+      "rank": "1",
+      "why": "The contract now encodes the trace-backed fixes, but only the reentry gate can prove zero predicate/window, negative-control, direction and measurement-invalid counts."
+    }
+  ],
+  "reportHash": "8baba49ca38aca05e8e5deee79164e41bf04ba56ee0d3dc21ab2073a922d1705",
+  "resultClass": "matrix-control-v3-contract-green",
+  "rootCauseClasses": [
+    "escape-left-control-required",
+    "escape-right-scenario-required",
+    "neutral-control-required",
+    "predicate-window-required",
+    "side-wall-direction-contract-required"
+  ],
+  "sampleCounts": {
+    "holdoutEpisodes": 0,
+    "minimumWindowFailureCount": 12,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "predicateFailureCount": 48,
+    "scenarioCount": 9,
+    "sourceProbeCount": 338,
+    "targetTraceProbeCount": 42
+  },
+  "scenarioClasses": [
+    "frontal-near-wall",
+    "side-wall-left",
+    "side-wall-right",
+    "narrowing-corridor",
+    "trail-ahead",
+    "trail-side",
+    "escape-left-open",
+    "escape-right-open",
+    "no-danger-control"
+  ],
+  "scenarioCount": 9,
+  "scenarios": [
+    {
+      "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+      "controlKind": "wall-pressure-action-effect",
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "wall-pressure-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "turn-right-boost",
+            "evade-right"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "front wall non-regression or improvement",
+          "terminal-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "id": "frontal-near-wall",
+      "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+      "predicate": {
+        "expression": "wallDistanceFront <= 0.90 or min(wallDistanceLeft, wallDistanceRight) <= 0.50",
+        "predicateId": "frontal-near-wall-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "scenarioKind": "wall-pressure-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          934,
+          1934
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2934
+        ]
+      },
+      "source": {
+        "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+        "sourceMatrixId": null,
+        "sourcePredicate": "wallDistanceFront <= 0.20",
+        "sourceWarmupAction": "pitch-up",
+        "sourceWarmupSteps": 8
+      },
+      "sourceContractId": "bt93s2-walltrail-action-effect-window-v2",
+      "sourceMatrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "wallDistanceFront <= 0.90 or min(wallDistanceLeft, wallDistanceRight) <= 0.50",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "successContract": {
+        "directActionSurfaceJudgementAllowed": false,
+        "evaluationOrder": [
+          "source artifacts fresh and versioned",
+          "predicate revalidated immediately before measurement",
+          "minimum completed window satisfied",
+          "negative controls fail before positive controls are judged",
+          "state effect is compared against passive baseline",
+          "risk and terminal non-regression are enforced",
+          "forbidden success proxies are rejected"
+        ],
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "measurementInvalidIf": [
+          "predicateFailureCount > 0",
+          "minimumWindowFailureCount > 0",
+          "negative control passes as success",
+          "direction contract mismatch",
+          "reward-only, command-flag-only, target-distance-only, single-step or maxSteps-only success"
+        ],
+        "recheckScope": "BT93S2.3-Recheck only",
+        "scenarioId": "frontal-near-wall",
+        "sourceFindingId": null,
+        "status": "retained-from-v2",
+        "version": "bt93s2r-v3"
+      },
+      "v3Repair": {
+        "appliedFixes": [],
+        "reason": "BT93S2R.3 scope is limited to S2.3 measurement-invalid root causes.",
+        "status": "retained-from-v2"
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+      "controlKind": "wall-pressure-action-effect",
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "wall-pressure-action-effect",
+        "counterDirectionControls": {
+          "actions": [
+            "yaw-left",
+            "roll-left",
+            "evade-left"
+          ],
+          "mustNotPassAsLeftWallEscape": true,
+          "source": "BT93S2R.2 side-wall-left trace found these v2 positives missing"
+        },
+        "directionContract": {
+          "expectedEscapeDirection": "right",
+          "label": "side-wall-left",
+          "positiveControlsMustMatchExpectedDirection": true,
+          "primaryMetric": "wallDistanceLeft",
+          "secondaryMetric": "localOpennessRatio",
+          "unexpectedSuccessfulActionFromTrace": [
+            "yaw-right"
+          ],
+          "wallSide": "left"
+        },
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "roll-right",
+            "turn-right-boost",
+            "evade-right"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "rightward-away-from-left-wall-state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "left-wall clearance or local openness improves",
+          "rightward control direction matches side-wall-left label",
+          "collision-risk non-regression",
+          "terminal-risk non-regression",
+          "leftward controls cannot count as side-wall-left positive evidence"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "noop",
+        "warmupSteps": 2
+      },
+      "id": "side-wall-left",
+      "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+      "predicate": {
+        "expression": "min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "predicateId": "side-wall-left-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "scenarioKind": "wall-pressure-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          942,
+          1942
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2942
+        ]
+      },
+      "source": {
+        "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+        "sourceMatrixId": null,
+        "sourcePredicate": "wallDistanceLeft <= 0.25",
+        "sourceWarmupAction": "noop",
+        "sourceWarmupSteps": 2
+      },
+      "sourceContractId": "bt93s2-walltrail-action-effect-window-v2",
+      "sourceMatrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 942,
+        "warmupAction": "noop",
+        "warmupSteps": 2
+      },
+      "successContract": {
+        "directActionSurfaceJudgementAllowed": false,
+        "directionContract": {
+          "expectedEscapeDirection": "right",
+          "label": "side-wall-left",
+          "positiveControlsMustMatchExpectedDirection": true,
+          "primaryMetric": "wallDistanceLeft",
+          "secondaryMetric": "localOpennessRatio",
+          "unexpectedSuccessfulActionFromTrace": [
+            "yaw-right"
+          ],
+          "wallSide": "left"
+        },
+        "evaluationOrder": [
+          "source artifacts fresh and versioned",
+          "predicate revalidated immediately before measurement",
+          "minimum completed window satisfied",
+          "negative controls fail before positive controls are judged",
+          "state effect is compared against passive baseline",
+          "risk and terminal non-regression are enforced",
+          "forbidden success proxies are rejected"
+        ],
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "measurementInvalidIf": [
+          "predicateFailureCount > 0",
+          "minimumWindowFailureCount > 0",
+          "negative control passes as success",
+          "direction contract mismatch",
+          "reward-only, command-flag-only, target-distance-only, single-step or maxSteps-only success"
+        ],
+        "recheckScope": "BT93S2.3-Recheck only",
+        "rootCauseClass": "side-wall-direction-contract-required",
+        "scenarioId": "side-wall-left",
+        "sourceFindingId": "93S2R.2.4 side-wall-left direction/control trace",
+        "status": "direction-contract-repaired",
+        "version": "bt93s2r-v3"
+      },
+      "v3Repair": {
+        "appliedFixes": [
+          "side-wall-left is interpreted as left wall present, escape direction right",
+          "rightward controls become positives because yaw-right was the only trace-green action",
+          "leftward controls become counter-direction controls until a fresh S2.3 recheck proves otherwise"
+        ],
+        "evidence": {
+          "findingId": "93S2R.2.4 side-wall-left direction/control trace",
+          "missingPositiveSuccessfulActions": [
+            "evade-left",
+            "roll-left",
+            "yaw-left"
+          ],
+          "primaryRootCauseClass": "side-wall-direction-contract-required",
+          "successfulActions": [
+            "yaw-right"
+          ],
+          "unexpectedSuccessfulActions": [
+            "yaw-right"
+          ]
+        },
+        "status": "direction-contract-repaired"
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+      "controlKind": "wall-pressure-action-effect",
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "wall-pressure-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "turn-right-boost",
+            "evade-left"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "right-wall distance improvement",
+          "collision-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "boost",
+        "warmupSteps": 7
+      },
+      "id": "side-wall-right",
+      "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+      "predicate": {
+        "expression": "min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "predicateId": "side-wall-right-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "scenarioKind": "wall-pressure-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          930,
+          1930
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2930
+        ]
+      },
+      "source": {
+        "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+        "sourceMatrixId": null,
+        "sourcePredicate": "wallDistanceRight <= 0.25",
+        "sourceWarmupAction": "boost",
+        "sourceWarmupSteps": 7
+      },
+      "sourceContractId": "bt93s2-walltrail-action-effect-window-v2",
+      "sourceMatrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "boost",
+        "warmupSteps": 7
+      },
+      "successContract": {
+        "directActionSurfaceJudgementAllowed": false,
+        "evaluationOrder": [
+          "source artifacts fresh and versioned",
+          "predicate revalidated immediately before measurement",
+          "minimum completed window satisfied",
+          "negative controls fail before positive controls are judged",
+          "state effect is compared against passive baseline",
+          "risk and terminal non-regression are enforced",
+          "forbidden success proxies are rejected"
+        ],
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "measurementInvalidIf": [
+          "predicateFailureCount > 0",
+          "minimumWindowFailureCount > 0",
+          "negative control passes as success",
+          "direction contract mismatch",
+          "reward-only, command-flag-only, target-distance-only, single-step or maxSteps-only success"
+        ],
+        "recheckScope": "BT93S2.3-Recheck only",
+        "scenarioId": "side-wall-right",
+        "sourceFindingId": null,
+        "status": "retained-from-v2",
+        "version": "bt93s2r-v3"
+      },
+      "v3Repair": {
+        "appliedFixes": [],
+        "reason": "BT93S2R.3 scope is limited to S2.3 measurement-invalid root causes.",
+        "status": "retained-from-v2"
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+      "controlKind": "local-openness-action-effect",
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "local-openness-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "turn-right-boost",
+            "evade-right",
+            "pitch-down"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "local-openness improvement",
+          "dead-end-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "id": "narrowing-corridor",
+      "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+      "predicate": {
+        "expression": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "predicateId": "narrowing-corridor-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "scenarioKind": "local-openness-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          934,
+          1934
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2934
+        ]
+      },
+      "source": {
+        "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+        "sourceMatrixId": null,
+        "sourcePredicate": "wallDistanceFront <= 0.35 and one side wall <= 0.35 and localOpennessRatio <= 0.45",
+        "sourceWarmupAction": "pitch-up",
+        "sourceWarmupSteps": 6
+      },
+      "sourceContractId": "bt93s2-walltrail-action-effect-window-v2",
+      "sourceMatrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "successContract": {
+        "directActionSurfaceJudgementAllowed": false,
+        "evaluationOrder": [
+          "source artifacts fresh and versioned",
+          "predicate revalidated immediately before measurement",
+          "minimum completed window satisfied",
+          "negative controls fail before positive controls are judged",
+          "state effect is compared against passive baseline",
+          "risk and terminal non-regression are enforced",
+          "forbidden success proxies are rejected"
+        ],
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "measurementInvalidIf": [
+          "predicateFailureCount > 0",
+          "minimumWindowFailureCount > 0",
+          "negative control passes as success",
+          "direction contract mismatch",
+          "reward-only, command-flag-only, target-distance-only, single-step or maxSteps-only success"
+        ],
+        "recheckScope": "BT93S2.3-Recheck only",
+        "scenarioId": "narrowing-corridor",
+        "sourceFindingId": null,
+        "status": "retained-from-v2",
+        "version": "bt93s2r-v3"
+      },
+      "v3Repair": {
+        "appliedFixes": [],
+        "reason": "BT93S2R.3 scope is limited to S2.3 measurement-invalid root causes.",
+        "status": "retained-from-v2"
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+      "controlKind": "trail-pressure-action-effect",
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "trail-pressure-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-left",
+            "yaw-right",
+            "pitch-down"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "pressureLevel decrease",
+          "front-wall non-regression",
+          "terminal-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "id": "trail-ahead",
+      "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+      "predicate": {
+        "expression": "pressureLevel >= 0.25 and (wallDistanceFront <= 0.90 or min(wallDistanceLeft, wallDistanceRight) <= 0.65)",
+        "predicateId": "trail-ahead-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "scenarioKind": "trail-pressure-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          930,
+          1930
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2930
+        ]
+      },
+      "source": {
+        "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+        "sourceMatrixId": null,
+        "sourcePredicate": "pressureLevel >= 0.50 and wallDistanceFront <= 0.40",
+        "sourceWarmupAction": "pitch-up",
+        "sourceWarmupSteps": 8
+      },
+      "sourceContractId": "bt93s2-walltrail-action-effect-window-v2",
+      "sourceMatrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "pressureLevel >= 0.25 and (wallDistanceFront <= 0.90 or min(wallDistanceLeft, wallDistanceRight) <= 0.65)",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 8
+      },
+      "successContract": {
+        "directActionSurfaceJudgementAllowed": false,
+        "evaluationOrder": [
+          "source artifacts fresh and versioned",
+          "predicate revalidated immediately before measurement",
+          "minimum completed window satisfied",
+          "negative controls fail before positive controls are judged",
+          "state effect is compared against passive baseline",
+          "risk and terminal non-regression are enforced",
+          "forbidden success proxies are rejected"
+        ],
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "measurementInvalidIf": [
+          "predicateFailureCount > 0",
+          "minimumWindowFailureCount > 0",
+          "negative control passes as success",
+          "direction contract mismatch",
+          "reward-only, command-flag-only, target-distance-only, single-step or maxSteps-only success"
+        ],
+        "recheckScope": "BT93S2.3-Recheck only",
+        "scenarioId": "trail-ahead",
+        "sourceFindingId": null,
+        "status": "retained-from-v2",
+        "version": "bt93s2r-v3"
+      },
+      "v3Repair": {
+        "appliedFixes": [],
+        "reason": "BT93S2R.3 scope is limited to S2.3 measurement-invalid root causes.",
+        "status": "retained-from-v2"
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+      "controlKind": "trail-pressure-action-effect",
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "trail-pressure-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "positiveControls": {
+          "actions": [
+            "evade-left",
+            "evade-right",
+            "yaw-right"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "state-effect",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "pressureLevel decrease",
+          "nearest side-wall non-regression",
+          "terminal-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "id": "trail-side",
+      "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+      "predicate": {
+        "expression": "pressureLevel >= 0.25 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "predicateId": "trail-side-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "scenarioKind": "trail-pressure-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          934,
+          1934
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2934
+        ]
+      },
+      "source": {
+        "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+        "sourceMatrixId": null,
+        "sourcePredicate": "pressureLevel >= 0.40 and side wall <= 0.30",
+        "sourceWarmupAction": "pitch-up",
+        "sourceWarmupSteps": 6
+      },
+      "sourceContractId": "bt93s2-walltrail-action-effect-window-v2",
+      "sourceMatrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "pressureLevel >= 0.25 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 934,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "successContract": {
+        "directActionSurfaceJudgementAllowed": false,
+        "evaluationOrder": [
+          "source artifacts fresh and versioned",
+          "predicate revalidated immediately before measurement",
+          "minimum completed window satisfied",
+          "negative controls fail before positive controls are judged",
+          "state effect is compared against passive baseline",
+          "risk and terminal non-regression are enforced",
+          "forbidden success proxies are rejected"
+        ],
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "measurementInvalidIf": [
+          "predicateFailureCount > 0",
+          "minimumWindowFailureCount > 0",
+          "negative control passes as success",
+          "direction contract mismatch",
+          "reward-only, command-flag-only, target-distance-only, single-step or maxSteps-only success"
+        ],
+        "recheckScope": "BT93S2.3-Recheck only",
+        "scenarioId": "trail-side",
+        "sourceFindingId": null,
+        "status": "retained-from-v2",
+        "version": "bt93s2r-v3"
+      },
+      "v3Repair": {
+        "appliedFixes": [],
+        "reason": "BT93S2R.3 scope is limited to S2.3 measurement-invalid root causes.",
+        "status": "retained-from-v2"
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+      "controlKind": "escape-action-effect",
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "escape-action-effect",
+        "counterDirectionControls": {
+          "actions": [
+            "evade-right",
+            "roll-right",
+            "yaw-right"
+          ],
+          "mustNotRescueLeftEscape": true
+        },
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true,
+          "noopSuccessCountFromTrace": 1,
+          "passiveBaselineAction": "noop"
+        },
+        "passiveBaselineComparison": {
+          "baselineAction": "noop",
+          "baselineSuccessIsMeasurementInvalid": true,
+          "candidateMustBeatBaseline": true,
+          "enabled": true,
+          "primaryMetrics": [
+            "wallDistanceLeft",
+            "localOpennessRatio"
+          ],
+          "riskMetrics": [
+            "collisionRisk",
+            "terminalRisk",
+            "trailPressureProxy"
+          ]
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-left",
+            "turn-left-boost",
+            "evade-left"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "directed-state-effect-vs-passive-baseline",
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "requiredStateEffects": [
+          "left-side clearance or local openness improves versus noop passive baseline",
+          "collision-risk non-regression versus noop passive baseline",
+          "terminal-risk non-regression versus noop passive baseline",
+          "no command-flag-only or reward-only success"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 7
+      },
+      "id": "escape-left-open",
+      "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+      "predicate": {
+        "expression": "wallDistanceLeft >= 0.80 and min(wallDistanceFront, wallDistanceRight) <= 0.75",
+        "predicateId": "escape-left-open-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "scenarioKind": "escape-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          930,
+          1930
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2930
+        ]
+      },
+      "source": {
+        "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+        "sourceMatrixId": null,
+        "sourcePredicate": "wallDistanceLeft >= 0.80 and front/right not both fully open",
+        "sourceWarmupAction": "pitch-up",
+        "sourceWarmupSteps": 7
+      },
+      "sourceContractId": "bt93s2-walltrail-action-effect-window-v2",
+      "sourceMatrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "wallDistanceLeft >= 0.80 and min(wallDistanceFront, wallDistanceRight) <= 0.75",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 7
+      },
+      "successContract": {
+        "directActionSurfaceJudgementAllowed": false,
+        "directedEffect": {
+          "expectedEscapeDirection": "left",
+          "fallbackMetric": "localOpennessRatio",
+          "metric": "wallDistanceLeft",
+          "mustBeatPassiveBaseline": true
+        },
+        "evaluationOrder": [
+          "source artifacts fresh and versioned",
+          "predicate revalidated immediately before measurement",
+          "minimum completed window satisfied",
+          "negative controls fail before positive controls are judged",
+          "state effect is compared against passive baseline",
+          "risk and terminal non-regression are enforced",
+          "forbidden success proxies are rejected"
+        ],
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "measurementInvalidIf": [
+          "predicateFailureCount > 0",
+          "minimumWindowFailureCount > 0",
+          "negative control passes as success",
+          "direction contract mismatch",
+          "reward-only, command-flag-only, target-distance-only, single-step or maxSteps-only success"
+        ],
+        "recheckScope": "BT93S2.3-Recheck only",
+        "rootCauseClass": "escape-left-control-required",
+        "scenarioId": "escape-left-open",
+        "sourceFindingId": "93S2R.2.1 escape-left-open negative-control trace",
+        "status": "repaired",
+        "version": "bt93s2r-v3"
+      },
+      "v3Repair": {
+        "appliedFixes": [
+          "noop remains the passive baseline and can never count as escape success",
+          "left escape positive controls are directionally left-biased",
+          "counter-direction actions are retained only as controls, not as left escape positives",
+          "success must beat the noop baseline with risk non-regression"
+        ],
+        "evidence": {
+          "findingId": "93S2R.2.1 escape-left-open negative-control trace",
+          "noopSuccessCount": 1,
+          "primaryRootCauseClass": "escape-left-control-required"
+        },
+        "status": "repaired-from-trace"
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+      "controlKind": "escape-action-effect",
+      "controls": {
+        "actionGreenEvidenceAllowed": true,
+        "controlKind": "escape-action-effect",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true
+        },
+        "negativeControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "passiveBaselineComparison": {
+          "baselineAction": "noop",
+          "baselineSuccessIsMeasurementInvalid": true,
+          "candidateMustBeatBaseline": true,
+          "enabled": true,
+          "primaryMetrics": [
+            "wallDistanceRight",
+            "localOpennessRatio"
+          ],
+          "riskMetrics": [
+            "collisionRisk",
+            "terminalRisk",
+            "trailPressureProxy"
+          ]
+        },
+        "positiveControls": {
+          "actions": [
+            "yaw-right",
+            "roll-right",
+            "turn-right-boost",
+            "evade-right"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "right-directed-state-effect-after-fair-window",
+          "fairWindowActionsFromTrace": [
+            "roll-right"
+          ],
+          "mustShowStateEffectBeforeGreen": true
+        },
+        "predicateWindowFairness": {
+          "actionSpaceJudgement": "deferred-until-v3-predicate-window-fairness",
+          "currentlyFairActionsFromTrace": [
+            "roll-right"
+          ],
+          "minimumWindowPassRequired": true,
+          "perActionSeedPredicatePassRequired": true,
+          "positiveControlsMustAllBeMeasurableBeforeActionSpaceJudgement": true,
+          "traceMinimumWindowFailureCount": 0,
+          "tracePredicateFailureCount": 4
+        },
+        "requiredStateEffects": [
+          "right lane preserved",
+          "collision-risk non-regression",
+          "terminal-risk non-regression"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": true,
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      },
+      "id": "escape-right-open",
+      "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+      "predicate": {
+        "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+        "predicateId": "escape-right-open-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "scenarioKind": "escape-action-effect",
+      "seedPlan": {
+        "discoverySeeds": [
+          930,
+          1930
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          2930
+        ]
+      },
+      "source": {
+        "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+        "sourceMatrixId": null,
+        "sourcePredicate": "wallDistanceRight >= 0.80 and left/front not both fully open",
+        "sourceWarmupAction": "yaw-left",
+        "sourceWarmupSteps": 0
+      },
+      "sourceContractId": "bt93s2-walltrail-action-effect-window-v2",
+      "sourceMatrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      },
+      "successContract": {
+        "actionSpaceDecisionAllowedInS2R": false,
+        "directActionSurfaceJudgementAllowed": false,
+        "directedEffect": {
+          "expectedEscapeDirection": "right",
+          "fallbackMetric": "localOpennessRatio",
+          "metric": "wallDistanceRight",
+          "mustBeatPassiveBaseline": true
+        },
+        "evaluationOrder": [
+          "source artifacts fresh and versioned",
+          "predicate revalidated immediately before measurement",
+          "minimum completed window satisfied",
+          "negative controls fail before positive controls are judged",
+          "state effect is compared against passive baseline",
+          "risk and terminal non-regression are enforced",
+          "forbidden success proxies are rejected"
+        ],
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "measurementInvalidIf": [
+          "predicateFailureCount > 0",
+          "minimumWindowFailureCount > 0",
+          "negative control passes as success",
+          "direction contract mismatch",
+          "reward-only, command-flag-only, target-distance-only, single-step or maxSteps-only success"
+        ],
+        "recheckScope": "BT93S2.3-Recheck only",
+        "rootCauseClass": "escape-right-scenario-required",
+        "scenarioId": "escape-right-open",
+        "sourceFindingId": "93S2R.2.2 escape-right-open predicate/window trace",
+        "status": "repaired-for-fair-recheck",
+        "version": "bt93s2r-v3"
+      },
+      "v3Repair": {
+        "appliedFixes": [
+          "action-space judgement stays deferred until every positive control has predicate/window fairness",
+          "per-action seed windows must pass predicate and minimum-window checks before success is judged",
+          "right escape success must beat noop baseline with risk non-regression"
+        ],
+        "evidence": {
+          "actionSpaceJudgement": "deferred-until-v3-predicate-window-fairness",
+          "fairWindowActionsFromTrace": [
+            "roll-right"
+          ],
+          "findingId": "93S2R.2.2 escape-right-open predicate/window trace",
+          "primaryRootCauseClass": "escape-right-scenario-required"
+        },
+        "status": "repaired-for-fair-recheck"
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    },
+    {
+      "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+      "controlKind": "neutral-stability-control",
+      "controls": {
+        "actionGreenEvidenceAllowed": false,
+        "controlKind": "neutral-stability-control",
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "minimumWindow": {
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": false
+        },
+        "negativeControls": {
+          "actions": [
+            "boost",
+            "shoot-mg"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "mustNotPassAsSuccess": true
+        },
+        "neutralWindow": {
+          "actionGreenEvidenceProducedMustBe": false,
+          "maxSteps": 24,
+          "minimumCompletedSteps": 8,
+          "requiresNoTerminal": true,
+          "requiresPredicatePass": true,
+          "riskDeltaTolerance": 0.08,
+          "stableAction": "noop",
+          "wallDistanceDeltaTolerance": 0.08
+        },
+        "positiveControls": {
+          "actions": [
+            "noop"
+          ],
+          "actionsExistInPinnedSurface": true,
+          "controlSuccessKind": "neutral-stability-only",
+          "mustNotProduceActionGreenEvidence": true,
+          "mustShowStateEffectBeforeGreen": false
+        },
+        "requiredStateEffects": [
+          "noop completes neutral window",
+          "no terminal",
+          "collision-risk and terminal-risk stay within neutral tolerance",
+          "boost and shoot-mg remain negative controls",
+          "no action-green evidence is produced"
+        ]
+      },
+      "driftInvalidations": [
+        "BT93S v1 positive evidence cannot open BT93T/BT93U after matrix-redesign-required.",
+        "Any changed action surface invalidates BT93S2 policy-selection and comparator evidence.",
+        "Reward-only, command-flag-only, single-step, target-distance-only and maxSteps-only outcomes are not action-effect success."
+      ],
+      "effectWindow": {
+        "earlyAbortOnTerminal": true,
+        "maxSteps": 24,
+        "minimumCompletedSteps": 8,
+        "terminalAbortIsFailureUnlessScenarioDefinesTerminalControl": false,
+        "warmupAction": "noop",
+        "warmupSteps": 0
+      },
+      "id": "no-danger-control",
+      "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+      "predicate": {
+        "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+        "predicateId": "no-danger-control-v2-start-predicate",
+        "revalidatedBeforeMeasurement": true
+      },
+      "requiredMetrics": [
+        "wallDistanceFront",
+        "wallDistanceLeft",
+        "wallDistanceRight",
+        "localOpennessRatio",
+        "collisionRisk",
+        "terminalRisk",
+        "headingDelta",
+        "targetDelta",
+        "pressureLevel",
+        "trailPressureProxy"
+      ],
+      "scenarioKind": "neutral-stability-control",
+      "seedPlan": {
+        "discoverySeeds": [
+          930
+        ],
+        "discoveryValidationSeparated": true,
+        "mode": "deterministic-discovery-validation-split-from-bt93s2-search",
+        "noHoldoutSeeds": true,
+        "source": "data/training/ppo/bt93s/existing_action_effect_report.json",
+        "usedForTraining": false,
+        "validationSeeds": [
+          1930
+        ]
+      },
+      "source": {
+        "path": "data/training/ppo/bt93s/scenario_window_contract.json",
+        "sourceMatrixId": null,
+        "sourcePredicate": "front/left/right open and pressureLevel <= 0.40",
+        "sourceWarmupAction": "noop",
+        "sourceWarmupSteps": 0
+      },
+      "sourceContractId": "bt93s2-walltrail-action-effect-window-v2",
+      "sourceMatrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+      "startState": {
+        "domainMode": "classic-3d",
+        "gameMode": "CLASSIC",
+        "kind": "seed-plus-warmup-action",
+        "mapKey": "standard",
+        "requiredPredicate": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+        "revalidateBeforeMeasurement": true,
+        "rewardProfileId": "bt93l-objective-reachability-v1",
+        "seed": 930,
+        "warmupAction": "noop",
+        "warmupSteps": 0
+      },
+      "successContract": {
+        "directActionSurfaceJudgementAllowed": false,
+        "evaluationOrder": [
+          "source artifacts fresh and versioned",
+          "predicate revalidated immediately before measurement",
+          "minimum completed window satisfied",
+          "negative controls fail before positive controls are judged",
+          "state effect is compared against passive baseline",
+          "risk and terminal non-regression are enforced",
+          "forbidden success proxies are rejected"
+        ],
+        "forbiddenSuccessProxies": [
+          "reward-only",
+          "command-flag-only",
+          "target-distance-only",
+          "single-step delta",
+          "maxSteps-only survival",
+          "progress event without state-risk improvement"
+        ],
+        "measurementInvalidIf": [
+          "predicateFailureCount > 0",
+          "minimumWindowFailureCount > 0",
+          "negative control passes as success",
+          "direction contract mismatch",
+          "reward-only, command-flag-only, target-distance-only, single-step or maxSteps-only success"
+        ],
+        "neutralControl": {
+          "actionGreenEvidenceAllowed": false,
+          "actionGreenEvidenceProducedMustBe": false,
+          "noopIsNeutralStableOnly": true,
+          "noopIsNeverActionQualityEvidence": true
+        },
+        "recheckScope": "BT93S2.3-Recheck only",
+        "rootCauseClass": "neutral-control-required",
+        "scenarioId": "no-danger-control",
+        "sourceFindingId": "93S2R.2.3 no-danger-control neutral trace",
+        "status": "neutral-contract-repaired",
+        "version": "bt93s2r-v3"
+      },
+      "v3Repair": {
+        "appliedFixes": [
+          "noop is evaluated as neutral stability, not as action success",
+          "boost and shoot-mg stay negative controls",
+          "no-danger-control cannot produce action-green evidence"
+        ],
+        "evidence": {
+          "actionGreenEvidenceProduced": false,
+          "findingId": "93S2R.2.3 no-danger-control neutral trace",
+          "primaryRootCauseClass": "neutral-control-required"
+        },
+        "status": "neutral-contract-repaired"
+      },
+      "validation": {
+        "discoveryValidationSeparated": true,
+        "noDangerControlReclassified": true,
+        "ok": true,
+        "positiveControlDefinitionValidated": true,
+        "predicateValidated": true
+      }
+    }
+  ],
+  "schemaVersion": "bt93s2r-matrix-control-v3-contract-v1",
+  "scriptHashes": {
+    "bt93s2ExistingActionEffectV2": "9f6bba2f29e7ea02c46337b652b8919338ce490fc8c741cf800677c478fba6f6",
+    "bt93s2ScenarioMatrixV2": "44ffb8553c77b78d1aad183fc6f6fc7c84eedc4c89795e36d32170b825f579aa",
+    "bt93s2rFailureTaxonomy": "594263d779966fb9099c97b62aedbc22c0de71ab24b77c6d3c4abb020906387e",
+    "bt93s2rMatrixControlV3": "66db520ddadfc29c78f587a352d7b6762608c10f1fe313b030b700efb2942f27",
+    "bt93s2rTargetedTraceAudit": "8d84814d37a4112c4d65712ea40219e5d1b347bb0d93baed8eecbeea941bbd2c"
+  },
+  "sourceArtifacts": [
+    {
+      "blockId": "BT93S2R",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2r/failure_taxonomy_report.json",
+      "phaseId": "93S2R.1",
+      "resultClass": "failure-taxonomy-source-lock-green",
+      "role": "BT93S2R.1 source lock",
+      "schemaVersion": "bt93s2r-failure-taxonomy-v1",
+      "sha256": "53e3b5f490eb780103a2070d292c7f5c99ae34278e6b0e30e1ede87742d3937c",
+      "sourceKey": "failureTaxonomy",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93S2R",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2r/targeted_trace_audit_report.json",
+      "phaseId": "93S2R.2",
+      "resultClass": "targeted-trace-audit-green",
+      "role": "BT93S2R.2 root-cause audit",
+      "schemaVersion": "bt93s2r-targeted-trace-audit-v1",
+      "sha256": "67d4e124e936b4bff5799ead802ef3487e161fe2aba6cb0a1b0850ba1a69457d",
+      "sourceKey": "targetedTraceAudit",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93S2",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
+      "phaseId": "93S2.2",
+      "resultClass": "scenario-matrix-v2-contract-green",
+      "role": "BT93S2.2 matrix-v2 contract source",
+      "schemaVersion": "bt93s2-scenario-matrix-v2-contract-v1",
+      "sha256": "d16f718812556a984c789d8559a51cc68cf91eefc9e774ed821fe33bb83890c8",
+      "sourceKey": "scenarioMatrixV2",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93S2",
+      "exists": true,
+      "isFile": true,
+      "ok": false,
+      "path": "data/training/ppo/bt93s2/existing_action_effect_v2_report.json",
+      "phaseId": "93S2.3",
+      "resultClass": "measurement-invalid",
+      "role": "BT93S2.3 locked red measurement source",
+      "schemaVersion": "bt93s2-existing-action-effect-v2-report-v1",
+      "sha256": "5e55722633329afd035c078cbdb3786d65724357bce083249c6b8079eec49ee8",
+      "sourceKey": "existingActionEffectV2",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "read-only PPO action-surface decoder",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sourceKey": "actionSurface",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2_scenario_matrix_v2.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93S2.2 generating script hash",
+      "schemaVersion": null,
+      "sha256": "44ffb8553c77b78d1aad183fc6f6fc7c84eedc4c89795e36d32170b825f579aa",
+      "sourceKey": "bt93s2MatrixScript",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93S2.3 generating script hash",
+      "schemaVersion": null,
+      "sha256": "9f6bba2f29e7ea02c46337b652b8919338ce490fc8c741cf800677c478fba6f6",
+      "sourceKey": "bt93s2EffectScript",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2r_failure_taxonomy.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93S2R.1 generating script hash",
+      "schemaVersion": null,
+      "sha256": "594263d779966fb9099c97b62aedbc22c0de71ab24b77c6d3c4abb020906387e",
+      "sourceKey": "bt93s2rTaxonomyScript",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2r_targeted_trace_audit.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93S2R.2 generating script hash",
+      "schemaVersion": null,
+      "sha256": "8d84814d37a4112c4d65712ea40219e5d1b347bb0d93baed8eecbeea941bbd2c",
+      "sourceKey": "bt93s2rTraceAuditScript",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2r_matrix_control_v3.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "BT93S2R.3 generating script hash",
+      "schemaVersion": null,
+      "sha256": "66db520ddadfc29c78f587a352d7b6762608c10f1fe313b030b700efb2942f27",
+      "sourceKey": "bt93s2rMatrixV3Script",
+      "tracked": false
+    }
+  ],
+  "sourceContractId": "bt93s2-walltrail-action-effect-window-v2",
+  "sourceContractMatches": true,
+  "sourceFilesReady": true,
+  "sourceMatrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+  "summary": {
+    "blockers": [],
+    "bt93oP94aStillClosed": true,
+    "bt93s2Phase4Allowed": false,
+    "bt93s2RecheckAllowed": false,
+    "bt93tAllowed": false,
+    "bt93uAllowed": false,
+    "finalResult": "matrix-control-v3-contract-green",
+    "matrixControlV3Ready": true,
+    "nextBestAction": "93S2R.4"
+  },
+  "targetScenarioIds": [
+    "escape-left-open",
+    "escape-right-open",
+    "no-danger-control",
+    "side-wall-left"
+  ],
+  "windowContract": {
+    "directionContractRequiredForSideWall": true,
+    "effectWindowSteps": 24,
+    "forbiddenSuccessProxyPolicy": "reward-only, command-flag-only, target-distance-only, single-step delta, maxSteps-only survival, progress event without state-risk improvement",
+    "minimumCompletedSteps": 8,
+    "minimumWindowFailureCountMustBeZero": true,
+    "negativeControlsMustNotPass": true,
+    "neutralControlsCannotCreateActionGreen": true,
+    "passiveBaselineComparisonRequiredForEscape": true,
+    "positiveControlsRequiredBeforeGreen": true,
+    "predicateFailureCountMustBeZero": true,
+    "predicateRevalidationRequired": true
+  }
+}
