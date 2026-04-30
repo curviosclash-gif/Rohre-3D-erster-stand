@@ -1,0 +1,261 @@
+{
+  "activeBlockers": [
+    "action-surface-lineage-drift",
+    "model-artifact-missing",
+    "real-model-logits-unavailable",
+    "selected-bt93n-model-package-missing"
+  ],
+  "allowNext": [
+    "restore exact BT93N lineage package, then rerun BT93R artifact/root-cause/counterprobe",
+    "or create a narrow lineage-recovery/retraining intake with explicit user decision",
+    "93X.0 may remain read-only by PF.0, but it cannot bypass the BT93R red result"
+  ],
+  "blockId": "BT93R",
+  "blocksNext": [
+    "93R.4 decoder/normalize/eval-mode fix without restored selected BT93N lineage",
+    "BT93S until 93R.99 reaches R-Allowlist",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k/500k/1M extension"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93r_closure_gate.py --write-report"
+  },
+  "dodCoverage": {
+    "DoD.R4": true,
+    "DoD.R5": true,
+    "DoD.R6": true
+  },
+  "generatedArtifacts": {
+    "closureGateReport": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+    "collapseCounterprobe": "data/training/ppo/bt93r/collapse_counterprobe_report.json"
+  },
+  "generatedAt": "2026-04-30T07:54:28Z",
+  "generatedBy": "python/scripts/bt93r_closure_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "2d6795bc53b07018b315ceb40bd3c7431fe9b9f6",
+    "sha": "5f1a68e12679e8636892656a6bc5ee05e2ea2549"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "lineageDecision": {
+    "closureReason": "BT93R cannot prove decoder, normalize, or eval-mode fixes without the exact collapse-producing model.zip, config, VecNormalize, and BT93Q surface hash.",
+    "exactBt93nLineagePackageRestored": false,
+    "missingRequiredArtifactKeys": [
+      "model",
+      "config",
+      "vecnormalize"
+    ],
+    "modelPackagePersisted": false,
+    "realModelLogitsAvailable": false,
+    "surfaceHashRestorationRequired": true
+  },
+  "matrixId": "bt93q-walltrail-policy-recheck-v1",
+  "ok": true,
+  "opensNext": [],
+  "phaseCoverage": {
+    "93R.99.1": true,
+    "93R.99.2": true,
+    "93R.99.3": true
+  },
+  "phaseId": "93R.99",
+  "policyIds": {
+    "eval": "ppo-bt93n-micro-10k-deterministic",
+    "train": "ppo-bt93n-micro-10k-stochastic"
+  },
+  "recommendations": [
+    {
+      "action": "Restore exact BT93N lineage package: model.zip, config, VecNormalize, and BT93Q surface hash.",
+      "rank": 1,
+      "why": "Only that package can make decoder, normalize, eval-mode, or logit counterprobes provable."
+    },
+    {
+      "action": "Keep BT93S, BT93O, BT93P, and BT94A blocked from BT93R.",
+      "rank": 2,
+      "why": "BT93R.99 did not produce an R-Allowlist result class."
+    },
+    {
+      "action": "Run 93X.0 only as read-only comparator inventory if useful.",
+      "rank": 3,
+      "why": "It can classify the DQN/replacement-policy blocker early, but cannot open training claims."
+    }
+  ],
+  "resultClass": "model-artifact-missing",
+  "resultContract": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rResultInRAllowlist": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "greenAllowlist": [
+      "decoder-fix-counterprobe-green",
+      "eval-mode-bug-fixed-counterprobe-green",
+      "normalize-fix-counterprobe-green",
+      "policy-collapse-green"
+    ],
+    "redAllowlist": [
+      "measurement-invalid",
+      "model-artifact-missing",
+      "normalize-mismatch",
+      "policy-collapse-active",
+      "policy-evidence-invalid"
+    ]
+  },
+  "sampleCounts": {
+    "actualModelTimesteps": 0,
+    "bt93nActualModelTimesteps": 10112,
+    "bt93qDeterministicEvalActionRows": 8100,
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 0,
+    "newTrainingEpisodes": 0
+  },
+  "schemaVersion": "bt93r-closure-gate-report-v1",
+  "selectedRootCauseClass": "model-artifact-missing",
+  "semanticWindow": "bt93q-walltrail-10k-diagnostic-window",
+  "sourceArtifacts": [
+    {
+      "blockId": "BT93R",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93rHandoverLock",
+      "ok": true,
+      "path": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "phaseId": "93R.1",
+      "resultClass": "handover-lock-green",
+      "role": "BT93R.1 handover lock",
+      "schemaVersion": "bt93r-handover-lock-report-v1",
+      "sha256": "9eaa4bb6608af6f7deb6d0a0d4de13b983f7a03a108fd11ecc94e5bce1d7a143",
+      "sizeBytes": 18143,
+      "sourceKey": "bt93rHandoverLock",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93R",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93rPolicyArtifact",
+      "ok": true,
+      "path": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "phaseId": "93R.2",
+      "resultClass": "policy-evidence-invalid",
+      "role": "BT93R.2 policy artifact capability report",
+      "schemaVersion": "bt93r-policy-artifact-report-v1",
+      "sha256": "fe9b7c4ca44b5022ea9279251aee0c1cf75b34108d6320e12cd48f311b9fb7c9",
+      "sizeBytes": 38391,
+      "sourceKey": "bt93rPolicyArtifact",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93R",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93rRootCause",
+      "ok": true,
+      "path": "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
+      "phaseId": "93R.3",
+      "resultClass": "model-artifact-missing",
+      "role": "BT93R.3 policy-collapse root-cause report",
+      "schemaVersion": "bt93r-policy-collapse-root-cause-report-v1",
+      "sha256": "fce8c2bbd94b0f0aea205154d720e8576888c992b4b5b57702225a491ea60465",
+      "sizeBytes": 15959,
+      "sourceKey": "bt93rRootCause",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93nMicroPpoRepeat",
+      "ok": true,
+      "path": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "phaseId": "93N.3",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N selected 10k micro-PPO source report",
+      "schemaVersion": "bt93n-micro-ppo-repeat-report-v1",
+      "sha256": "96f046445da1518eeb9519958b179107326294d6ad83a6bfa074089f52aaa631",
+      "sizeBytes": 82300,
+      "sourceKey": "bt93nMicroPpoRepeat",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qPolicyCollapse",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "phaseId": "93Q.3",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q deterministic policy-collapse evidence",
+      "schemaVersion": "bt93q-policy-collapse-report-v1",
+      "sha256": "8b6fbfdbf2285e6f58c8104fad408fc1e6b2677fde394a617b78170137af035d",
+      "sizeBytes": 18211,
+      "sourceKey": "bt93qPolicyCollapse",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "key": "ppoActionSurface",
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current PPO action-surface source",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sizeBytes": 22887,
+      "sourceKey": "ppoActionSurface",
+      "tracked": true
+    }
+  ],
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "summary": {
+    "bt93oStartDecision": "blocked",
+    "bt93pStartDecision": "blocked",
+    "bt93sStartDecision": "blocked",
+    "bt94aStartDecision": "blocked",
+    "finalResult": "model-artifact-missing",
+    "nextBestAction": "Restore exact BT93N lineage package; otherwise keep BT93R red and do not implement 93R.4."
+  }
+}
