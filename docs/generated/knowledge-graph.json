@@ -1700,7 +1700,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93R.2",
+        "currentPhase": "93R.3",
         "scopeDeclarations": [
           "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
           "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
@@ -1708,10 +1708,11 @@
           "data/training/ppo/bt93r/collapse_root_cause_report.json",
           "data/training/ppo/bt93r/policy_artifact_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
-          "python/scripts/bt93r_handover_lock.py"
+          "python/scripts/bt93r_handover_lock.py",
+          "python/scripts/bt93r_policy_artifact_probe.py"
         ],
         "scopeResolution": {
-          "concreteCount": 4,
+          "concreteCount": 5,
           "plannedCount": 3
         },
         "scopeOverlapAllowedWith": [],
@@ -5027,7 +5028,7 @@
       "id": "BT93R.2",
       "type": "phase",
       "title": "Model-/Logit-/Normalize-Artefaktfaehigkeit",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.2"
@@ -14384,8 +14385,8 @@
     {
       "id": "BT93R.2.1",
       "type": "subphase",
-      "title": "Modell-, Config-, VecNormalize-/Normalizer- und Action-Surface-Hashes schreiben.",
-      "status": "open",
+      "title": "Modell-, Config-, VecNormalize-/Normalizer- und Action-Surface-Hashes schreiben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_artifact_probe.py --write-report` -> `data/training/ppo/bt93r/policy_artifact_report.json` (`phaseCoverage.93R.2.1=true`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.2",
@@ -14395,8 +14396,8 @@
     {
       "id": "BT93R.2.2",
       "type": "subphase",
-      "title": "Deterministic und stochastic Eval mit Logits, Entropy, Margin, Top-2 und repeated-action streak ausgeben.",
-      "status": "open",
+      "title": "Deterministic und stochastic Eval mit Logits, Entropy, Margin, Top-2 und repeated-action streak ausgeben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_artifact_probe.py --write-report` -> `data/training/ppo/bt93r/policy_artifact_report.json` (`phaseCoverage.93R.2.2=true`; real logits unavailable, proxy rejected))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.2",
@@ -14406,8 +14407,8 @@
     {
       "id": "BT93R.2.3",
       "type": "subphase",
-      "title": "Fehlende Artefakte enden `model-artifact-missing` oder `policy-evidence-invalid`.",
-      "status": "open",
+      "title": "Fehlende Artefakte enden `model-artifact-missing` oder `policy-evidence-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_artifact_probe.py --write-report` -> `data/training/ppo/bt93r/policy_artifact_report.json` (`phaseCoverage.93R.2.3=true`; `resultClass=policy-evidence-invalid`; `opensNext=[]`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.2",
@@ -36739,7 +36740,8 @@
           "BT92",
           "BT93B",
           "BT93D",
-          "BT93E"
+          "BT93E",
+          "BT93R"
         ],
         "exists": true
       }
@@ -131008,6 +131010,15 @@
     {
       "from": "BT93R",
       "to": "python/scripts/bt93r_handover_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "python/scripts/bt93r_policy_artifact_probe.py",
       "type": "scope",
       "hint": null,
       "attributes": {

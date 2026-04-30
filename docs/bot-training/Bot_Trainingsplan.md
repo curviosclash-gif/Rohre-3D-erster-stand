@@ -3545,7 +3545,7 @@ Ergebnis: `PF.0=preflight-green`; `bt94a_gate_check.py` bildet die R-X-Prioritae
 
 Quelle: `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md`
 
-<!-- LOCK: Bot-Codex; seit 2026-04-30; naechste Phase 93R.2 -->
+<!-- LOCK: Bot-Codex; seit 2026-04-30; naechste Phase 93R.3; 93R.2=policy-evidence-invalid -->
 
 Scope:
 
@@ -3565,7 +3565,7 @@ Primaerer Scope:
 ### Definition of Done (DoD)
 
 - [x] DoD.R1 `handover_lock_report.json` pinnt BT93Q-Quellen, Hypothesen, verbotene Folgeaktionen und erlaubte Resultklassen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_handover_lock.py --write-report` -> `data/training/ppo/bt93r/bt93r_handover_lock_report.json`)
-- [ ] DoD.R2 Modell, Config, VecNormalize/Normalizer, Action-Surface und Logit-/Entropy-Ausgabe sind auffindbar oder `model-artifact-missing`.
+- [x] DoD.R2 Modell, Config, VecNormalize/Normalizer, Action-Surface und Logit-/Entropy-Ausgabe sind auffindbar oder `model-artifact-missing`/`policy-evidence-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_artifact_probe.py --write-report` -> `data/training/ppo/bt93r/policy_artifact_report.json` (`DoD.R2=true`; `resultClass=policy-evidence-invalid`))
 - [ ] DoD.R3 Collapse-Root-Cause trennt Decoder, Normalize-Mismatch, Eval-Mode-Bug, Reward-Scale, Action-Repeat, Seed-/Truncationseffekt und echtes Policy-Collapse.
 - [ ] DoD.R4 Jeder Fix ist genau eine Fixklasse mit erwarteter Metrikrichtung, Revert-Kriterium, betroffenen und verbotenen Dateien.
 - [ ] DoD.R5 Counterprobe belegt non-collapsed deterministic eval oder schreibt einen erlaubten roten R-Ausgang.
@@ -3579,9 +3579,9 @@ Primaerer Scope:
 
 ### 93R.2 Model-/Logit-/Normalize-Artefaktfaehigkeit
 
-- [ ] 93R.2.1 Modell-, Config-, VecNormalize-/Normalizer- und Action-Surface-Hashes schreiben.
-- [ ] 93R.2.2 Deterministic und stochastic Eval mit Logits, Entropy, Margin, Top-2 und repeated-action streak ausgeben.
-- [ ] 93R.2.3 Fehlende Artefakte enden `model-artifact-missing` oder `policy-evidence-invalid`.
+- [x] 93R.2.1 Modell-, Config-, VecNormalize-/Normalizer- und Action-Surface-Hashes schreiben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_artifact_probe.py --write-report` -> `data/training/ppo/bt93r/policy_artifact_report.json` (`phaseCoverage.93R.2.1=true`))
+- [x] 93R.2.2 Deterministic und stochastic Eval mit Logits, Entropy, Margin, Top-2 und repeated-action streak ausgeben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_artifact_probe.py --write-report` -> `data/training/ppo/bt93r/policy_artifact_report.json` (`phaseCoverage.93R.2.2=true`; real logits unavailable, proxy rejected))
+- [x] 93R.2.3 Fehlende Artefakte enden `model-artifact-missing` oder `policy-evidence-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_artifact_probe.py --write-report` -> `data/training/ppo/bt93r/policy_artifact_report.json` (`phaseCoverage.93R.2.3=true`; `resultClass=policy-evidence-invalid`; `opensNext=[]`))
 
 ### 93R.3 Collapse-Root-Cause
 
