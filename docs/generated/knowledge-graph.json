@@ -1724,6 +1724,37 @@
       }
     },
     {
+      "id": "BT93RR",
+      "type": "block",
+      "title": "BT93R-Reentry Policy-Artefakt auf neuer Retrain-Lineage",
+      "status": "open",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "priority": null,
+        "owner": null,
+        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
+        "currentPhase": "93RR.1",
+        "scopeDeclarations": [
+          "data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json",
+          "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+          "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
+          "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+          "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
+          "data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json",
+          "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+          "docs/bot-training/Bot_Trainingsplan.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 2,
+          "plannedCount": 6
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
       "id": "BT93S",
       "type": "block",
       "title": "Wall-/Trail Action-Effekt und Action-Selection Repair",
@@ -5119,6 +5150,46 @@
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.99"
+      }
+    },
+    {
+      "id": "BT93RR.1",
+      "type": "phase",
+      "title": "Artifact-Probe und Handover-Lock",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.1"
+      }
+    },
+    {
+      "id": "BT93RR.2",
+      "type": "phase",
+      "title": "Collapse-Root-Cause",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.2"
+      }
+    },
+    {
+      "id": "BT93RR.3",
+      "type": "phase",
+      "title": "Counterprobe",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.3"
+      }
+    },
+    {
+      "id": "BT93RR.99",
+      "type": "phase",
+      "title": "Abschluss",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.99"
       }
     },
     {
@@ -14629,6 +14700,182 @@
         "blockId": "BT93R",
         "phaseCode": "93R.99",
         "subphaseCode": "93R.99.3"
+      }
+    },
+    {
+      "id": "BT93RR.1.1",
+      "type": "subphase",
+      "title": "`bt93r_reentry_handover_lock_report.json` liest und hasht BT93Y-Closure, Reentry-Manifest, Retrain-Lineage, Replacement-Policy und alte rote BT93R-/BT93X.0-Quellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.1",
+        "subphaseCode": "93RR.1.1"
+      }
+    },
+    {
+      "id": "BT93RR.1.2",
+      "type": "subphase",
+      "title": "`bt93r_reentry_artifact_probe_report.json` laedt Modell, Config, VecNormalize, Optimizer-State, Observation-Length, ActionSurfaceId und Decoder-Mapping.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.1",
+        "subphaseCode": "93RR.1.2"
+      }
+    },
+    {
+      "id": "BT93RR.1.3",
+      "type": "subphase",
+      "title": "Reentry schreibt echte Logits/Action-Probs fuer gepinnte Observation-Samples; Proxy-Counts bleiben als Fix-Beweis ungueltig.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.1",
+        "subphaseCode": "93RR.1.3"
+      }
+    },
+    {
+      "id": "BT93RR.1.4",
+      "type": "subphase",
+      "title": "Wenn Lineage, Hashes, Loader oder Action-Surface nicht urteilsfaehig sind, endet die Phase `policy-evidence-invalid` oder `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.1",
+        "subphaseCode": "93RR.1.4"
+      }
+    },
+    {
+      "id": "BT93RR.2.1",
+      "type": "subphase",
+      "title": "Deterministic eval, stochastic eval und train sampling auf identischer Matrix und Seeds getrennt reporten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.2",
+        "subphaseCode": "93RR.2.1"
+      }
+    },
+    {
+      "id": "BT93RR.2.2",
+      "type": "subphase",
+      "title": "Entropy, KL, value loss, advantage distribution, action probabilities, argmax margin und repeated-action streaks schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.2",
+        "subphaseCode": "93RR.2.2"
+      }
+    },
+    {
+      "id": "BT93RR.2.3",
+      "type": "subphase",
+      "title": "Genau eine Ursache klassifizieren: `eval-argmax-collapse`, `decoder-bug`, `normalize-mismatch`, `reward-pressure-collapse`, `action-selection-blindness`, `entropy-config-collapse`, `reward-scale-collapse`, `rollout-bootstrap-drift`, `action-repeat-or-seed-correlation`, `truncation-terminal-bias`, `policy-collapse-active`, `policy-evidence-invalid` oder `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.2",
+        "subphaseCode": "93RR.2.3"
+      }
+    },
+    {
+      "id": "BT93RR.2.4",
+      "type": "subphase",
+      "title": "Fixarbeit bleibt verboten, bis Root-Cause genau eine erlaubte Fixklasse plus Counterprobe-Kriterium schreibt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.2",
+        "subphaseCode": "93RR.2.4"
+      }
+    },
+    {
+      "id": "BT93RR.3.1",
+      "type": "subphase",
+      "title": "Counterprobe fuehrt nur die in 93RR.2 gepinnte Fixklasse aus: Decoder-, Normalize- oder Eval-Mode-Counterprobe; keine Action-/Reward-/Telemetry-Buendelung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.3",
+        "subphaseCode": "93RR.3.1"
+      }
+    },
+    {
+      "id": "BT93RR.3.2",
+      "type": "subphase",
+      "title": "Gruen braucht keine 100%-Single-Action-Dominanz, keine 2700er repeated-action streaks, nonzero second-best probability und Runtime Errors 0.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.3",
+        "subphaseCode": "93RR.3.2"
+      }
+    },
+    {
+      "id": "BT93RR.3.3",
+      "type": "subphase",
+      "title": "DeathBefore60 wird gemessen, aber nicht als gesamter Reparaturerfolg geclaimt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.3",
+        "subphaseCode": "93RR.3.3"
+      }
+    },
+    {
+      "id": "BT93RR.3.4",
+      "type": "subphase",
+      "title": "Wenn Collapse bleibt, endet Reentry `policy-collapse-active`; wenn Evidence nicht urteilsfaehig ist, `policy-evidence-invalid` oder `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.3",
+        "subphaseCode": "93RR.3.4"
+      }
+    },
+    {
+      "id": "BT93RR.99.1",
+      "type": "subphase",
+      "title": "Closure schreibt `resultClass`, `allowNext[]`, `blocksNext[]`, `sampleCounts`, `claimFlags`, Guardrails und alle Source-Artefakte.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.99",
+        "subphaseCode": "93RR.99.1"
+      }
+    },
+    {
+      "id": "BT93RR.99.2",
+      "type": "subphase",
+      "title": "R-Allowlist oeffnet nur `BT93S`; kein Ergebnis oeffnet `BT93O`, `BT93P`, `BT94A`, Candidate, Freeze, Holdout, Promote, Rollout oder PPO-Validate.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.99",
+        "subphaseCode": "93RR.99.2"
+      }
+    },
+    {
+      "id": "BT93RR.99.3",
+      "type": "subphase",
+      "title": "Alter roter `BT93R.99=model-artifact-missing` bleibt referenziert, aber wird nicht nachtraeglich umgeschrieben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.99",
+        "subphaseCode": "93RR.99.3"
+      }
+    },
+    {
+      "id": "BT93RR.99.4",
+      "type": "subphase",
+      "title": "Abschluss-Gates: `npm.cmd run gates:pre-commit`; Tests/Trainingslaeufe bleiben user-owned ausser fuer dieses `*.99`-Gate noetige kleine Diagnose-Kommandos.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.99",
+        "subphaseCode": "93RR.99.4"
       }
     },
     {
@@ -29541,6 +29788,96 @@
       }
     },
     {
+      "id": "data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93RR"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93RR"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93RR"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93RR"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93RR"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93RR"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
       "type": "file",
       "title": null,
@@ -30396,6 +30733,7 @@
           "BT93B",
           "BT93D",
           "BT93E",
+          "BT93RR",
           "BT93Y"
         ],
         "exists": true
@@ -31116,6 +31454,7 @@
           "BT93P",
           "BT93Q",
           "BT93R",
+          "BT93RR",
           "BT93S",
           "BT93T",
           "BT93U",
@@ -134832,20 +135171,308 @@
       }
     },
     {
-      "from": "BT93S",
-      "to": "BT93R",
+      "from": "BT93RR",
+      "to": "BT93RR.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.1"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "BT93RR.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.2"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "BT93RR.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.3"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "BT93RR.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.99"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "BT93Y",
       "type": "depends_on",
       "source": "master-table",
       "hard": true,
-      "fulfilled": false,
-      "hint": "Wall-/Trail Action-Effekt und Action-Selection Repair",
+      "fulfilled": true,
+      "hint": "aktiviert 2026-04-30 als Maschinen-ID fuer Alias `BT93R-Reentry`; alter roter `BT93R` bleibt historische Wahrheit",
       "attributes": {
-        "dependsPhase": null,
-        "rawToken": "BT93R",
+        "dependsPhase": "93Y.99",
+        "rawToken": "BT93Y.99",
         "sourceBreakdown": [
           "master-table"
         ],
         "canonicalToken": true
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "data/training/ppo/bt93y/retrain_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93RR.1",
+      "to": "BT93RR.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.1",
+        "subphaseCode": "93RR.1.1"
+      }
+    },
+    {
+      "from": "BT93RR.1",
+      "to": "BT93RR.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.1",
+        "subphaseCode": "93RR.1.2"
+      }
+    },
+    {
+      "from": "BT93RR.1",
+      "to": "BT93RR.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.1",
+        "subphaseCode": "93RR.1.3"
+      }
+    },
+    {
+      "from": "BT93RR.1",
+      "to": "BT93RR.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.1",
+        "subphaseCode": "93RR.1.4"
+      }
+    },
+    {
+      "from": "BT93RR.2",
+      "to": "BT93RR.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.2",
+        "subphaseCode": "93RR.2.1"
+      }
+    },
+    {
+      "from": "BT93RR.2",
+      "to": "BT93RR.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.2",
+        "subphaseCode": "93RR.2.2"
+      }
+    },
+    {
+      "from": "BT93RR.2",
+      "to": "BT93RR.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.2",
+        "subphaseCode": "93RR.2.3"
+      }
+    },
+    {
+      "from": "BT93RR.2",
+      "to": "BT93RR.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.2",
+        "subphaseCode": "93RR.2.4"
+      }
+    },
+    {
+      "from": "BT93RR.3",
+      "to": "BT93RR.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.3",
+        "subphaseCode": "93RR.3.1"
+      }
+    },
+    {
+      "from": "BT93RR.3",
+      "to": "BT93RR.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.3",
+        "subphaseCode": "93RR.3.2"
+      }
+    },
+    {
+      "from": "BT93RR.3",
+      "to": "BT93RR.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.3",
+        "subphaseCode": "93RR.3.3"
+      }
+    },
+    {
+      "from": "BT93RR.3",
+      "to": "BT93RR.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.3",
+        "subphaseCode": "93RR.3.4"
+      }
+    },
+    {
+      "from": "BT93RR.99",
+      "to": "BT93RR.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.99",
+        "subphaseCode": "93RR.99.1"
+      }
+    },
+    {
+      "from": "BT93RR.99",
+      "to": "BT93RR.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.99",
+        "subphaseCode": "93RR.99.2"
+      }
+    },
+    {
+      "from": "BT93RR.99",
+      "to": "BT93RR.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.99",
+        "subphaseCode": "93RR.99.3"
+      }
+    },
+    {
+      "from": "BT93RR.99",
+      "to": "BT93RR.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93RR",
+        "phaseCode": "93RR.99",
+        "subphaseCode": "93RR.99.4"
       }
     },
     {

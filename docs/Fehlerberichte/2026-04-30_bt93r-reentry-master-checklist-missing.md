@@ -3,7 +3,7 @@
 - Datum: 2026-04-30
 - Block: BT93R-Reentry
 - Phase: Claim-Vorpruefung
-- Status: offen
+- Status: geschlossen
 
 ## Task-Kontext
 `BT93Y.99` ist gruen abgeschlossen und oeffnet laut `data/training/ppo/bt93y/bt93y_closure_gate_report.json` ausschliesslich `BT93R-Reentry`.
@@ -32,9 +32,8 @@ Die erste sichtbare offene Folgephase im Master ist `93S.1`, aber `BT93S` ist la
 - Kein BT93S-Start und keine Master-Block-Erfindung ausgefuehrt.
 
 ## Aktueller Status
-Bot-Training hat keinen Code-Blocker fuer `BT93R-Reentry`; der Blocker ist Plan-Intake/Checklist-Hygiene.
-Ohne aktive Reentry-Checkbox wuerde `/fix-planung` entweder den abgeschlossenen alten `BT93R` nachtraeglich umdeuten oder den hart blockierten `BT93S` starten.
+Geschlossen durch Master-Aktivierung: `docs/bot-training/Bot_Trainingsplan.md` enthaelt jetzt einen eigenen, freien `BT93RR`-Block mit operativem Alias `BT93R-Reentry`, DoD, Scope, Phasen `93RR.1` bis `93RR.99`, Lock-Status und Dependency-/Roadmap-Eintrag.
+Der alte rote `BT93R.99=model-artifact-missing` bleibt historische Wahrheit; `BT93S` bleibt bis `BT93RR.99 in R-Allowlist` blockiert.
 
 ## Naechster Schritt
-User-owned Intake in `docs/bot-training/Bot_Trainingsplan.md`: einen aktiven `BT93R-Reentry`-Block mit DoD, LOCK, Scope, Phasen `artifact-probe`, `root-cause`, `counterprobe`, `*.99` und Evidence-Pfaden integrieren.
-Danach ist der naechste `/fix-planung` wieder zielfuehrend und sollte nur diesen Reentry-Block claimen.
+Naechster `/fix-planung` kann `BT93RR`/`BT93R-Reentry` claimen und mit `93RR.1` starten.
