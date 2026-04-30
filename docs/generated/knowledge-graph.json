@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 344,
+          "concreteCount": 346,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 482,
+          "concreteCount": 484,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 340,
+          "concreteCount": 342,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 339,
+          "concreteCount": 341,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 981,
+          "concreteCount": 983,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 989,
+          "concreteCount": 991,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1700,18 +1700,19 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93R.1",
+        "currentPhase": "93R.2",
         "scopeDeclarations": [
           "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
           "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
           "data/training/ppo/bt93r/collapse_counterprobe_report.json",
           "data/training/ppo/bt93r/collapse_root_cause_report.json",
           "data/training/ppo/bt93r/policy_artifact_report.json",
-          "docs/bot-training/Bot_Trainingsplan.md"
+          "docs/bot-training/Bot_Trainingsplan.md",
+          "python/scripts/bt93r_handover_lock.py"
         ],
         "scopeResolution": {
-          "concreteCount": 1,
-          "plannedCount": 5
+          "concreteCount": 3,
+          "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5016,7 +5017,7 @@
       "id": "BT93R.1",
       "type": "phase",
       "title": "Handover- und Hypothesen-Lock",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.1"
@@ -14350,8 +14351,8 @@
     {
       "id": "BT93R.1.1",
       "type": "subphase",
-      "title": "BT93Q-Handover, Closure, Policy-Collapse, Action-Effect, Telemetry-Gap, Reward-Ordering und Safety-Contract lesen und hashen.",
-      "status": "open",
+      "title": "BT93Q-Handover, Closure, Policy-Collapse, Action-Effect, Telemetry-Gap, Reward-Ordering und Safety-Contract lesen und hashen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_handover_lock.py --write-report` -> `data/training/ppo/bt93r/bt93r_handover_lock_report.json` (`phaseCoverage.93R.1.1=true`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.1",
@@ -14361,8 +14362,8 @@
     {
       "id": "BT93R.1.2",
       "type": "subphase",
-      "title": "H1 bis H7 als aktive Hypothesen mit Fixklasse und verbotenen Aktionen pinnen.",
-      "status": "open",
+      "title": "H1 bis H7 als aktive Hypothesen mit Fixklasse und verbotenen Aktionen pinnen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_handover_lock.py --write-report` -> `data/training/ppo/bt93r/bt93r_handover_lock_report.json` (`phaseCoverage.93R.1.2=true`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.1",
@@ -14372,8 +14373,8 @@
     {
       "id": "BT93R.1.3",
       "type": "subphase",
-      "title": "`qualityClaimAllowed=false`, `bt93oClaimAllowed=false`, `bt93pClaimAllowed=false`, `bt94aClaimAllowed=false`.",
-      "status": "open",
+      "title": "`qualityClaimAllowed=false`, `bt93oClaimAllowed=false`, `bt93pClaimAllowed=false`, `bt94aClaimAllowed=false`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_handover_lock.py --write-report` -> `data/training/ppo/bt93r/bt93r_handover_lock_report.json` (`phaseCoverage.93R.1.3=true`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.1",
@@ -29061,9 +29062,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93R"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -36686,6 +36693,27 @@
           "BT93D",
           "BT93E",
           "BT93Q"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93r_handover_lock.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93R"
         ],
         "exists": true
       }
@@ -73201,6 +73229,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
       "type": "scope",
       "hint": null,
@@ -74408,6 +74445,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93r_handover_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -76494,6 +76540,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
       "type": "scope",
       "hint": null,
@@ -77683,6 +77738,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93r_handover_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -80967,6 +81031,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
       "type": "scope",
       "hint": null,
@@ -82165,6 +82238,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93r_handover_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84550,6 +84632,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
       "type": "scope",
       "hint": null,
@@ -85748,6 +85839,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93r_handover_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -94537,6 +94637,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
       "type": "scope",
       "hint": null,
@@ -95735,6 +95844,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93r_handover_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -103699,6 +103817,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json",
       "type": "scope",
       "hint": null,
@@ -104906,6 +105033,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93q_walltrail_stress.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93r_handover_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -130729,6 +130865,15 @@
     {
       "from": "BT93R",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "python/scripts/bt93r_handover_lock.py",
       "type": "scope",
       "hint": null,
       "attributes": {

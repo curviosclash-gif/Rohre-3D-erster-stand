@@ -1,0 +1,562 @@
+{
+  "actionSurface": {
+    "actionCount": 9,
+    "bt93qActionEffectResultClass": "action-space-required",
+    "path": "python/envs/ppo_action_surface.py",
+    "semanticActions": [
+      "noop",
+      "yaw-left",
+      "yaw-right",
+      "pitch-up",
+      "pitch-down",
+      "roll-left",
+      "roll-right",
+      "boost",
+      "shoot-mg"
+    ]
+  },
+  "activeBlockers": [
+    "action-space-required",
+    "observation-telemetry-required",
+    "policy-collapse-active",
+    "reward-redesign-required",
+    "safety-action-contract-diagnostic-only"
+  ],
+  "allowNext": [
+    "93R.2 model/logit/normalize artifact capability check",
+    "93R.3 root-cause separation only after 93R.2 source evidence"
+  ],
+  "blockId": "BT93R",
+  "blocksNext": [
+    "BT93S until 93R.99 reaches R-Allowlist",
+    "BT93O until BT93W.99=bt93o-precondition-green",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k/500k/1M extension"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93r_handover_lock.py --write-report"
+  },
+  "dodCoverage": {
+    "DoD.R1": true
+  },
+  "generatedAt": "2026-04-30T07:15:31Z",
+  "generatedBy": "python/scripts/bt93r_handover_lock.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "2d6795bc53b07018b315ceb40bd3c7431fe9b9f6",
+    "sha": "93180429fed348e55abd601f06e958232fe166ed"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "hypotheses": [
+    {
+      "active": true,
+      "bt93rFixClassAllowed": true,
+      "fixClass": "Policy-Collapse",
+      "forbiddenActions": [
+        "treat stochastic train entropy as quality evidence",
+        "counterprobe before model/logit/normalize evidence",
+        "PPO training run in 93R.1",
+        "quality claim from proxy counts",
+        "reward fix in BT93R",
+        "action fix in BT93R",
+        "observation/telemetry fix in BT93R",
+        "safety-mask fix in BT93R",
+        "terminal/runner fix in BT93R",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k/500k/1M extension"
+      ],
+      "id": "H1",
+      "nextAllowedActions": [
+        "93R.2 artifact/logit/normalize proof",
+        "93R.3 root-cause split"
+      ],
+      "observed": {
+        "combinedEvalRepeatedActionLowerBound": 8100,
+        "dominantAction": "yaw-right",
+        "modelPackagePersistedInBT93N": false,
+        "realModelLogitsAvailable": false,
+        "resultClass": "policy-collapse-active",
+        "singleActionEvalShare": 1.0
+      },
+      "sourceArtifactKeys": [
+        "bt93qPolicyCollapse",
+        "bt93qHandover",
+        "bt93qClosure"
+      ],
+      "sourceHypothesisTitle": "Deterministic Policy Collapse",
+      "title": "Deterministic eval collapse is a policy-artifact problem"
+    },
+    {
+      "active": true,
+      "bt93rFixClassAllowed": false,
+      "fixClass": "Action",
+      "forbiddenActions": [
+        "action-surface change in BT93R",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k/500k/1M extension"
+      ],
+      "id": "H2",
+      "nextAllowedActions": [
+        "defer to BT93S action-effect/action-selection repair"
+      ],
+      "observed": {
+        "activeBlockerPresent": true,
+        "classResultCounts": {
+          "action-space-required": 1,
+          "existing-action-effect-observed": 7,
+          "negative-control-stable": 1
+        },
+        "resultClass": "action-space-required"
+      },
+      "sourceArtifactKeys": [
+        "bt93qActionEffect",
+        "bt93qHandover",
+        "bt93qClosure"
+      ],
+      "sourceHypothesisTitle": "Atomic actions may be insufficient for escape",
+      "title": "Atomic or selected actions are insufficient for wall/trail escape"
+    },
+    {
+      "active": true,
+      "bt93rFixClassAllowed": false,
+      "fixClass": "Observation/Telemetry",
+      "forbiddenActions": [
+        "observation/telemetry change in BT93R",
+        "runtime observation change",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k/500k/1M extension"
+      ],
+      "id": "H3",
+      "nextAllowedActions": [
+        "defer to BT93T only if BT93S keeps telemetry as blocker"
+      ],
+      "observed": {
+        "rawPoseAvailableAllFalse": true,
+        "requiredFieldGroups": [
+          "rawPose",
+          "heading",
+          "velocity",
+          "trailDistance",
+          "escapeLane"
+        ],
+        "resultClass": "observation-telemetry-required"
+      },
+      "sourceArtifactKeys": [
+        "bt93qObservationTelemetryGap",
+        "bt93qHandover",
+        "bt93qClosure"
+      ],
+      "sourceHypothesisTitle": "Observation/trace geometry may be too weak",
+      "title": "Raw/trail/escape-lane telemetry gap limits attribution"
+    },
+    {
+      "active": true,
+      "bt93rFixClassAllowed": false,
+      "fixClass": "Safety-Mask",
+      "forbiddenActions": [
+        "safety-mask change in BT93R",
+        "productive runtime safety switch",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k/500k/1M extension"
+      ],
+      "id": "H4",
+      "nextAllowedActions": [
+        "defer safety/terminal split to BT93V"
+      ],
+      "observed": {
+        "productiveRuntimeSafetySwitchAllowed": false,
+        "resultClass": "safety-diagnostic-only",
+        "vetoActiveRows": 173,
+        "vetoEventRows": 0
+      },
+      "sourceArtifactKeys": [
+        "bt93qSafetyContract",
+        "bt93qHandover",
+        "bt93qClosure"
+      ],
+      "sourceHypothesisTitle": "Safety diagnostics are not action-effective",
+      "title": "Safety signal is diagnostic and not action-effective"
+    },
+    {
+      "active": true,
+      "bt93rFixClassAllowed": false,
+      "fixClass": "Reward",
+      "forbiddenActions": [
+        "reward redesign in BT93R",
+        "reward quality claim",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k/500k/1M extension"
+      ],
+      "id": "H5",
+      "nextAllowedActions": [
+        "defer danger-aware reward ordering to BT93U"
+      ],
+      "observed": {
+        "positiveRiskyRewardActionRowCount": 29,
+        "progressOrCheckpointRewardWronglyOrderedNearPressure": true,
+        "resultClass": "reward-redesign-required"
+      },
+      "sourceArtifactKeys": [
+        "bt93qRewardOrdering",
+        "bt93qHandover",
+        "bt93qClosure"
+      ],
+      "sourceHypothesisTitle": "Reward ordering may reward progress in danger",
+      "title": "Reward ordering rewards risky pressure rows"
+    },
+    {
+      "active": true,
+      "bt93rFixClassAllowed": false,
+      "fixClass": "Terminal/Runner",
+      "forbiddenActions": [
+        "terminal/runner fix in BT93R",
+        "ignore player-dead as non-blocking",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k/500k/1M extension"
+      ],
+      "id": "H6",
+      "nextAllowedActions": [
+        "defer terminal sanity to BT93V"
+      ],
+      "observed": {
+        "activeBlockers": [
+          "action-space-required",
+          "observation-telemetry-required",
+          "policy-collapse-active",
+          "reward-redesign-required",
+          "safety-action-contract-diagnostic-only"
+        ],
+        "bt93qResultClass": "policy-collapse-active",
+        "terminalSemanticsRequired": false
+      },
+      "sourceArtifactKeys": [
+        "bt93qClosure",
+        "bt93qHandover"
+      ],
+      "sourceHypothesisTitle": "Runner/terminal classification may be wrong",
+      "title": "Terminal/runner semantics may still be a blocker"
+    },
+    {
+      "active": true,
+      "bt93rFixClassAllowed": false,
+      "fixClass": "Comparator/DQN",
+      "forbiddenActions": [
+        "phantom same-matrix DQN anchor",
+        "BT94A-ready wording",
+        "BT93O claim",
+        "BT93P claim",
+        "BT94A claim",
+        "candidate run",
+        "freeze candidate",
+        "holdout consumption",
+        "promote",
+        "rollout",
+        "PPO-Validate or BT95 handoff signal",
+        "50k/100k/200k/500k/1M extension"
+      ],
+      "id": "H7",
+      "nextAllowedActions": [
+        "defer comparator preflight to 93X.0 and full comparator work to BT93X"
+      ],
+      "observed": {
+        "bt93pClaimAllowed": false,
+        "bt94aClaimAllowed": false,
+        "dqnAnchorStatus": {
+          "comparisonPolicyDecision": "dqn-anchor-blocked",
+          "nonBlockingForPositiveReentry": false,
+          "sameMatrixDqnAnchorPresent": false
+        }
+      },
+      "sourceArtifactKeys": [
+        "bt93qHandover",
+        "bt93qClosure"
+      ],
+      "sourceHypothesisTitle": "DQN anchor is missing independently",
+      "title": "Comparator/DQN anchor remains separate from policy-collapse repair"
+    }
+  ],
+  "hypothesisIds": [
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "H5",
+    "H6",
+    "H7"
+  ],
+  "matrixId": "bt93q-walltrail-policy-recheck-v1",
+  "ok": true,
+  "opensNext": [
+    "93R.2"
+  ],
+  "phaseCoverage": {
+    "93R.1.1": true,
+    "93R.1.2": true,
+    "93R.1.3": true
+  },
+  "phaseId": "93R.1",
+  "policyIds": {
+    "eval": "ppo-bt93n-micro-10k-deterministic",
+    "train": "ppo-bt93n-micro-10k-stochastic"
+  },
+  "resultClass": "handover-lock-green",
+  "rewardOrderingIds": {
+    "positiveRiskyRewardActionRowCount": 29,
+    "reportPath": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+    "resultClass": "reward-redesign-required"
+  },
+  "safetyIds": {
+    "reportPath": "data/training/ppo/bt93q/safety_action_contract_report.json",
+    "resultClass": "safety-diagnostic-only",
+    "vetoActiveIsDiagnosticOnly": true
+  },
+  "sampleCounts": {
+    "bt93qActionStressProbeCount": 81,
+    "bt93qDeterministicEvalActionRows": 8100,
+    "bt93qPositiveRiskyRewardActionRowCount": 29,
+    "bt93qStochasticTrainActionRows": 10112,
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 0,
+    "newTrainingEpisodes": 0
+  },
+  "schemaVersion": "bt93r-handover-lock-report-v1",
+  "semanticWindow": "bt93q-walltrail-10k-diagnostic-window",
+  "sourceArtifacts": [
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qHandover",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/handover_package.json",
+      "phaseId": "93Q.99",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q handover package",
+      "schemaVersion": "bt93q-handover-package-v1",
+      "sha256": "6730aac188855620a2eb8176e6555145cb1d70ea255cf3e83aa1840e95ca80c4",
+      "sourceGitSha": "e74fe048b6b081a6ea63500f006168cdcc26b538",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qClosure",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/closure_gate_report.json",
+      "phaseId": "93Q.99",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q.99 closure gate",
+      "schemaVersion": "bt93q-closure-gate-report-v1",
+      "sha256": "93402f0305c183060f93e9c098d3bfe0c043504613f03e4648dfad8c47367ae4",
+      "sourceGitSha": "e74fe048b6b081a6ea63500f006168cdcc26b538",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qPolicyCollapse",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "phaseId": "93Q.3",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q.3 deterministic policy-collapse report",
+      "schemaVersion": "bt93q-policy-collapse-report-v1",
+      "sha256": "8b6fbfdbf2285e6f58c8104fad408fc1e6b2677fde394a617b78170137af035d",
+      "sourceGitSha": "821259a57e52688c337d07c0c8341651585b9882",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qActionEffect",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/action_effect_stress_report.json",
+      "phaseId": "93Q.4",
+      "resultClass": "action-space-required",
+      "role": "BT93Q.4 action-effect stress report",
+      "schemaVersion": "bt93q-action-effect-stress-report-v1",
+      "sha256": "21f6ea262bb4123bb9a05003d92982802f236a6fc3a71f3480961979b8a33d87",
+      "sourceGitSha": "108aa5373b5c1cecef9db89044b44fb532c44998",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qObservationTelemetryGap",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+      "phaseId": "93Q.2",
+      "resultClass": "observation-telemetry-required",
+      "role": "BT93Q.2 observation telemetry gap report",
+      "schemaVersion": "bt93q-observation-telemetry-gap-report-v1",
+      "sha256": "1442849162125578f468ed0937ca08611267dad1b1d0d0da059ac0007d749241",
+      "sourceGitSha": "d8f4b4a8dd91a61ccfe6da01d506413a17040001",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qRewardOrdering",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/reward_pressure_ordering_report.json",
+      "phaseId": "93Q.99",
+      "resultClass": "reward-redesign-required",
+      "role": "BT93Q.99 reward pressure ordering report",
+      "schemaVersion": "bt93q-reward-pressure-ordering-report-v1",
+      "sha256": "5721fde0defa8865574fc4b49a25b9bd162048ea1aa1c8c3202213d156b9a576",
+      "sourceGitSha": "e74fe048b6b081a6ea63500f006168cdcc26b538",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qSafetyContract",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/safety_action_contract_report.json",
+      "phaseId": "93Q.99",
+      "resultClass": "safety-diagnostic-only",
+      "role": "BT93Q.99 safety action contract report",
+      "schemaVersion": "bt93q-safety-action-contract-report-v1",
+      "sha256": "06e208a842b8ad9e1ea8d7c49a878463b1c146d764b80bfe3689de685c2db548",
+      "sourceGitSha": "e74fe048b6b081a6ea63500f006168cdcc26b538",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qHypothesisLock",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/hypothesis_lock.json",
+      "phaseId": "93Q.1",
+      "resultClass": "hypotheses-locked-before-fix",
+      "role": "BT93Q.1 source hypothesis lock",
+      "schemaVersion": "bt93q-hypothesis-lock-v1",
+      "sha256": "8583b4f9643cac99021728f1616c124f4a97625e384fefc7c7feede946a45803",
+      "sourceGitSha": "c1767b9f416810a426e41fc70ab166b3e8110ea8",
+      "tracked": true
+    }
+  ],
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "sourceGuardrails": {
+    "ok": true,
+    "unexpectedOpenGuardrails": {}
+  },
+  "sourceResultsLocked": true,
+  "summary": {
+    "dominantDeterministicAction": "yaw-right",
+    "lockedResult": "BT93Q.99=policy-collapse-active",
+    "nextPhase": "93R.2",
+    "realModelLogitsAvailable": false,
+    "why": "BT93R must prove model/logit/normalize artifact capability before classifying or fixing collapse."
+  },
+  "telemetryIds": {
+    "rawPoseAvailableAllFalse": true,
+    "reportPath": "data/training/ppo/bt93q/observation_telemetry_gap_report.json",
+    "requiredFieldGroups": [
+      "rawPose",
+      "heading",
+      "velocity",
+      "trailDistance",
+      "escapeLane"
+    ],
+    "resultClass": "observation-telemetry-required"
+  },
+  "thresholdsLockedBeforeRun": {
+    "afterTheFactThresholdChangesAllowed": false,
+    "notApplicableReason": "93R.1 is a handover lock and runs no PPO training/eval sample."
+  }
+}
