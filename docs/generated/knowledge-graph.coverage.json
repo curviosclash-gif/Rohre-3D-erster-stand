@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2477,
-    "rawCoveredFileCount": 1996,
+    "trackedFileCount": 2479,
+    "rawCoveredFileCount": 1998,
     "rawCoveragePercent": 80.6,
-    "adjustedTrackedFileCount": 1574,
-    "adjustedCoveredFileCount": 1337,
-    "adjustedCoveragePercent": 84.9,
+    "adjustedTrackedFileCount": 1576,
+    "adjustedCoveredFileCount": 1339,
+    "adjustedCoveragePercent": 85,
     "uncoveredFileCount": 481,
     "uncoveredActiveFileCount": 237,
     "classifications": [
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 278,
-        "coveredCount": 257
+        "count": 279,
+        "coveredCount": 258
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 897,
-        "coveredCount": 881
+        "count": 898,
+        "coveredCount": 882
       },
       {
         "classification": "product-docs",
@@ -8205,6 +8205,29 @@
     },
     {
       "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93RR"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -19719,6 +19742,29 @@
     },
     {
       "path": "python/scripts/bt93r_reentry_handover_lock.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93RR"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93r_reentry_root_cause.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

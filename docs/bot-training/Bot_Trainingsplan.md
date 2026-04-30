@@ -400,7 +400,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93R | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `model-artifact-missing`; kein R-Allowlist-Ergebnis, BT93S bleibt blockiert |
 | Bot-Codex | BT93X.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als read-only `dqn-loader-fix-required`; oeffnet nichts |
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
-| Bot-Codex | BT93RR | 2026-04-30 | active | 93RR.2 Collapse-Root-Cause; kein BT93S/O/P/94A-Signal |
+| Bot-Codex | BT93RR | 2026-04-30 | active | 93RR.3 Eval-Mode-Counterprobe; kein BT93S/O/P/94A-Signal |
 | - | BT93S | - | frei | wartet auf BT93Y.99 plus erneutes BT93RR.99 in R-Allowlist |
 | - | BT93T | - | frei | wartet auf Telemetry-Start aus BT93S |
 | - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
@@ -3665,7 +3665,7 @@ Primaerer Scope:
 
 - [x] DoD.RR1 Reentry-Handover pinnt `BT93Y.99`, aktive Lineage, Matrix-ID, ActionSurfaceId, RewardProfileId, SemanticWindow, verbotene Signale und erlaubte Resultklassen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_handover_lock.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json`, `resultClass=reentry-handover-lock-green`)
 - [x] DoD.RR2 Artifact-Probe laedt Modell, Config, VecNormalize, Optimizer-State und Action-Surface deterministisch oder endet `policy-evidence-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_artifact_probe.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json`, `resultClass=artifact-probe-green`)
-- [ ] DoD.RR3 Root-Cause trennt deterministic eval, stochastic eval, train sampling, decoder/argmax, entropy/logits, normalize-state, action mapping, reward pressure und truncation/terminal bias.
+- [x] DoD.RR3 Root-Cause trennt deterministic eval, stochastic eval, train sampling, decoder/argmax, entropy/logits, normalize-state, action mapping, reward pressure und truncation/terminal bias. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_root_cause.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json`, `resultClass=eval-argmax-collapse`)
 - [ ] DoD.RR4 Counterprobe nutzt dieselbe Matrix und mindestens Eval-Seeds 944, 945, 946 plus kleine zusaetzliche Seed-Kontrolle; maximal 1k Diagnose-Timesteps, kein Qualitaetsclaim.
 - [ ] DoD.RR5 Gruen ist nur `policy-collapse-green`, `decoder-fix-counterprobe-green`, `normalize-fix-counterprobe-green` oder `eval-mode-bug-fixed-counterprobe-green`.
 - [ ] DoD.RR6 Rot ist `policy-collapse-active`, `policy-evidence-invalid`, `normalize-mismatch`, `model-artifact-missing` oder `measurement-invalid`.
@@ -3685,10 +3685,10 @@ Pflicht-Evidence:
 
 ### 93RR.2 Collapse-Root-Cause
 
-- [ ] 93RR.2.1 Deterministic eval, stochastic eval und train sampling auf identischer Matrix und Seeds getrennt reporten.
-- [ ] 93RR.2.2 Entropy, KL, value loss, advantage distribution, action probabilities, argmax margin und repeated-action streaks schreiben.
-- [ ] 93RR.2.3 Genau eine Ursache klassifizieren: `eval-argmax-collapse`, `decoder-bug`, `normalize-mismatch`, `reward-pressure-collapse`, `action-selection-blindness`, `entropy-config-collapse`, `reward-scale-collapse`, `rollout-bootstrap-drift`, `action-repeat-or-seed-correlation`, `truncation-terminal-bias`, `policy-collapse-active`, `policy-evidence-invalid` oder `measurement-invalid`.
-- [ ] 93RR.2.4 Fixarbeit bleibt verboten, bis Root-Cause genau eine erlaubte Fixklasse plus Counterprobe-Kriterium schreibt.
+- [x] 93RR.2.1 Deterministic eval, stochastic eval und train sampling auf identischer Matrix und Seeds getrennt reporten. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_root_cause.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json`, `phaseCoverage.93RR.2.1=true`)
+- [x] 93RR.2.2 Entropy, KL, value loss, advantage distribution, action probabilities, argmax margin und repeated-action streaks schreiben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_root_cause.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json`, `phaseCoverage.93RR.2.2=true`)
+- [x] 93RR.2.3 Genau eine Ursache klassifizieren: `eval-argmax-collapse`, `decoder-bug`, `normalize-mismatch`, `reward-pressure-collapse`, `action-selection-blindness`, `entropy-config-collapse`, `reward-scale-collapse`, `rollout-bootstrap-drift`, `action-repeat-or-seed-correlation`, `truncation-terminal-bias`, `policy-collapse-active`, `policy-evidence-invalid` oder `measurement-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_root_cause.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json`, `rootCause.exactRootCause=eval-argmax-collapse`)
+- [x] 93RR.2.4 Fixarbeit bleibt verboten, bis Root-Cause genau eine erlaubte Fixklasse plus Counterprobe-Kriterium schreibt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_root_cause.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json`, `counterprobeFixClass=eval-mode-counterprobe`)
 
 Pflicht-Evidence:
 
