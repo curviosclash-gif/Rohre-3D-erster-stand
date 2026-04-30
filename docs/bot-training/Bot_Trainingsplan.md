@@ -388,7 +388,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93N | 2026-04-29 | frei | abgeschlossen 2026-04-30 als `diagnose-loop-required`; BT93Q folgt, BT93O bleibt blockiert |
 | Bot-Codex | BT93Q | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `policy-collapse-active`; BT93O bleibt blockiert |
 | Bot-Codex | PF.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `preflight-green`; BT93R.1 und 93X.0 read-only sind startbar |
-| - | BT93R | - | frei | PF.0 `preflight-green`; naechste Phase 93R.1 |
+| Bot-Codex | BT93R | 2026-04-30 | claimed | PF.0 `preflight-green`; arbeitet an 93R.1 |
 | - | BT93S | - | frei | wartet auf BT93R.99 in R-Allowlist |
 | - | BT93T | - | frei | wartet auf Telemetry-Start aus BT93S |
 | - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
@@ -3483,7 +3483,7 @@ Pflicht-Evidence:
 
 Quelle: `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex; seit 2026-04-30; Phase 93R.1 -->
 
 Scope:
 
