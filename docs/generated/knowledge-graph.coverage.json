@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2447,
-    "rawCoveredFileCount": 1967,
+    "trackedFileCount": 2451,
+    "rawCoveredFileCount": 1971,
     "rawCoveragePercent": 80.4,
-    "adjustedTrackedFileCount": 1544,
-    "adjustedCoveredFileCount": 1308,
-    "adjustedCoveragePercent": 84.7,
+    "adjustedTrackedFileCount": 1548,
+    "adjustedCoveredFileCount": 1312,
+    "adjustedCoveragePercent": 84.8,
     "uncoveredFileCount": 480,
     "uncoveredActiveFileCount": 236,
     "classifications": [
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 257,
-        "coveredCount": 236
+        "count": 260,
+        "coveredCount": 239
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 890,
-        "coveredCount": 874
+        "count": 891,
+        "coveredCount": 875
       },
       {
         "classification": "product-docs",
@@ -8336,6 +8336,75 @@
         "BT93D",
         "BT93E",
         "BT93W",
+        "BT93Y"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Y"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93y/exact_lineage_loader_smoke_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Y"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93y/exact_lineage_manifest.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
         "BT93Y"
       ],
       "surfaces": [],
@@ -19201,6 +19270,29 @@
         "BT93D",
         "BT93E",
         "BT93W"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93y_exact_lineage_recovery.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Y"
       ],
       "surfaces": [],
       "classification": "product-code",

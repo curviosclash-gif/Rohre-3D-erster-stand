@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 357,
+          "concreteCount": 361,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 495,
+          "concreteCount": 499,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 353,
+          "concreteCount": 357,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 352,
+          "concreteCount": 356,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 994,
+          "concreteCount": 998,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1002,
+          "concreteCount": 1006,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1922,7 +1922,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93Y.2",
+        "currentPhase": "93Y.3",
         "scopeDeclarations": [
           "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
           "data/training/ppo/bt93x/early_comparator_preflight_report.json",
@@ -1941,12 +1941,13 @@
           "data/training/ppo/bt93y/retrain_policy_probe_report.json",
           "data/training/ppo/bt93y/retrain_start_contract.json",
           "docs/bot-training/Bot_Trainingsplan.md",
+          "python/scripts/bt93y_exact_lineage_recovery.py",
           "python/scripts/bt93y_lineage_recovery_decision_lock.py",
           "tmp/**"
         ],
         "scopeResolution": {
-          "concreteCount": 646,
-          "plannedCount": 13
+          "concreteCount": 650,
+          "plannedCount": 10
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5409,7 +5410,7 @@
       "id": "BT93Y.2",
       "type": "phase",
       "title": "Exakte BT93N-Lineage-Recovery",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.2"
@@ -15475,8 +15476,8 @@
     {
       "id": "BT93Y.2.1",
       "type": "subphase",
-      "title": "Externe Suchorte, Zeitfenster, erwartete Run-ID und erwartete Artefaktnamen dokumentieren.",
-      "status": "open",
+      "title": "Externe Suchorte, Zeitfenster, erwartete Run-ID und erwartete Artefaktnamen dokumentieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_exact_lineage_recovery.py --write-reports` -> `data/training/ppo/bt93y/exact_lineage_inventory_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.2",
@@ -15486,8 +15487,8 @@
     {
       "id": "BT93Y.2.2",
       "type": "subphase",
-      "title": "Gefundene Artefakte nur per Hash/Manifest aufnehmen; keine `latest_*`-Aufloesung akzeptieren.",
-      "status": "open",
+      "title": "Gefundene Artefakte nur per Hash/Manifest aufnehmen; keine `latest_*`-Aufloesung akzeptieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_exact_lineage_recovery.py --write-reports` -> `data/training/ppo/bt93y/exact_lineage_manifest.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.2",
@@ -15497,8 +15498,8 @@
     {
       "id": "BT93Y.2.3",
       "type": "subphase",
-      "title": "Loader-Smoke gegen Modell, Config und VecNormalize/Normalizer ohne neuen Trainingslauf ausfuehren.",
-      "status": "open",
+      "title": "Loader-Smoke gegen Modell, Config und VecNormalize/Normalizer ohne neuen Trainingslauf ausfuehren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_exact_lineage_recovery.py --write-reports` -> `data/training/ppo/bt93y/exact_lineage_loader_smoke_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.2",
@@ -15508,8 +15509,8 @@
     {
       "id": "BT93Y.2.4",
       "type": "subphase",
-      "title": "Action-Surface-Hash gegen selektierte BT93N/BT93Q-Evidence pruefen; Drift endet `surface-hash-mismatch`.",
-      "status": "open",
+      "title": "Action-Surface-Hash gegen selektierte BT93N/BT93Q-Evidence pruefen; Drift endet `surface-hash-mismatch`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_exact_lineage_recovery.py --write-reports` -> `data/training/ppo/bt93y/exact_lineage_inventory_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.2",
@@ -15519,8 +15520,8 @@
     {
       "id": "BT93Y.2.5",
       "type": "subphase",
-      "title": "Vollstaendige Recovery schreibt `exact-bt93n-lineage-restored`.",
-      "status": "open",
+      "title": "Vollstaendige Recovery schreibt `exact-bt93n-lineage-restored`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_exact_lineage_recovery.py --write-reports` -> `data/training/ppo/bt93y/exact_lineage_manifest.json`; branch-not-taken: `exactLineageUnavailable=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.2",
@@ -15530,8 +15531,8 @@
     {
       "id": "BT93Y.2.6",
       "type": "subphase",
-      "title": "Fehlende Recovery schreibt `exact-lineage-unavailable` und wechselt nur nach UOD-1 in 93Y.3.",
-      "status": "open",
+      "title": "Fehlende Recovery schreibt `exact-lineage-unavailable` und wechselt nur nach UOD-1 in 93Y.3. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_exact_lineage_recovery.py --write-reports` -> `data/training/ppo/bt93y/exact_lineage_manifest.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.2",
@@ -15541,8 +15542,8 @@
     {
       "id": "BT93Y.2.7",
       "type": "subphase",
-      "title": "Nicht gefundene externe Artefakte brauchen negative Evidence: Suchpfad, Zeitfenster, erwartete Dateinamen, Owner und Ablehnungsgrund.",
-      "status": "open",
+      "title": "Nicht gefundene externe Artefakte brauchen negative Evidence: Suchpfad, Zeitfenster, erwartete Dateinamen, Owner und Ablehnungsgrund. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_exact_lineage_recovery.py --write-reports` -> `data/training/ppo/bt93y/exact_lineage_inventory_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.2",
@@ -30249,9 +30250,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -30264,9 +30271,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -30279,9 +30292,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -37600,6 +37619,27 @@
           "BT93D",
           "BT93E",
           "BT93W"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93y_exact_lineage_recovery.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Y"
         ],
         "exists": true
       }
@@ -74819,6 +74859,33 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/exact_lineage_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/exact_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
       "type": "scope",
       "hint": null,
@@ -76080,6 +76147,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93y_exact_lineage_recovery.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78229,6 +78305,33 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/exact_lineage_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/exact_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
       "type": "scope",
       "hint": null,
@@ -79472,6 +79575,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93y_exact_lineage_recovery.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -82819,6 +82931,33 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/exact_lineage_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/exact_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
       "type": "scope",
       "hint": null,
@@ -84071,6 +84210,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93y_exact_lineage_recovery.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -86519,6 +86667,33 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/exact_lineage_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/exact_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
       "type": "scope",
       "hint": null,
@@ -87771,6 +87946,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93y_exact_lineage_recovery.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -96623,6 +96807,33 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/exact_lineage_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/exact_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
       "type": "scope",
       "hint": null,
@@ -97875,6 +98086,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93y_exact_lineage_recovery.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -105902,6 +106122,33 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/exact_lineage_loader_smoke_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/exact_lineage_manifest.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
       "type": "scope",
       "hint": null,
@@ -107163,6 +107410,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93y_exact_lineage_recovery.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -134804,7 +135060,7 @@
       "source": "master-table",
       "hard": true,
       "fulfilled": true,
-      "hint": "Lineage-Recovery/Retraining, Ersatzvergleichspolitik und neuer BT93R-Reentry; aktueller naechster Scope ist 93Y.2",
+      "hint": "Lineage-Recovery/Retraining, Ersatzvergleichspolitik und neuer BT93R-Reentry; aktueller naechster Scope ist 93Y.3",
       "attributes": {
         "dependsPhase": "93R.99",
         "rawToken": "BT93R.99",
@@ -135021,6 +135277,15 @@
     {
       "from": "BT93Y",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Y",
+      "to": "python/scripts/bt93y_exact_lineage_recovery.py",
       "type": "scope",
       "hint": null,
       "attributes": {

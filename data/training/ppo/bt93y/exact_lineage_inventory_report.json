@@ -1,0 +1,1862 @@
+{
+  "acceptedExactLineagePackages": [],
+  "allowNext": [
+    "93Y.3 narrow retraining lineage under UOD-1"
+  ],
+  "blockId": "BT93Y",
+  "blocksNext": [
+    "BT93R-Reentry until BT93Y.99 green",
+    "BT93S claim",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal"
+  ],
+  "branchOutcomes": {
+    "93Y.2.5.fullRecoveryWritten": false,
+    "93Y.2.5.notApplicableReason": "Full exact recovery branch was evaluated but not taken; 93Y.2.6 writes exact-lineage-unavailable.",
+    "93Y.2.6.exactLineageUnavailableWritten": true,
+    "93Y.2.7.negativeEvidenceWritten": true
+  },
+  "candidatePackages": [
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93b\\runs\\20260424T002459Z-fresh-smoke",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-24T14:46:58Z",
+          "path": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/training_report.json",
+          "sha256": "d8e51950d75a8e9c3760225947fc767d7da5b05e394199138dab4069779310b5",
+          "sizeBytes": 87197,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93b\\runs\\20260424T002459Z-fresh-smoke\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-24T14:46:58Z",
+          "path": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.pkl",
+          "sha256": "5251e3431e49a8a43f96ee44c51b8a3a0144c84e11656370cdc83b62087ae2e1",
+          "sizeBytes": 2790,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config",
+        "required-artifacts-untracked:vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93b\\runs\\20260424T003303Z-resume-smoke",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-24T14:46:58Z",
+          "path": "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/training_report.json",
+          "sha256": "f2291c873d24db76b8e7bb61d123c750abad12782321f548b308019fc3a0d119",
+          "sizeBytes": 89557,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93b\\runs\\20260424T003303Z-resume-smoke\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-24T14:46:58Z",
+          "path": "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/checkpoints/vecnormalize.pkl",
+          "sha256": "650b8cfe1431ec865a4cd3043e824e7565081236c856b69185f9149a535394ac",
+          "sizeBytes": 2792,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config",
+        "required-artifacts-untracked:vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "latestPointer": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/latest_model_package.json",
+          "sha256": "155e23cd849a4c629c45f91e0b8471be31236cdd0ce8c424c8d297237cbbdf64",
+          "sizeBytes": 633,
+          "tracked": true
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c",
+      "rejectionReasons": [
+        "latest-pointer-not-accepted",
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c\\runs\\20260424T163858Z-learner-smoke",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/artifact_manifest.json",
+          "sha256": "53a81416af6738f16235dce29d6b4db5d5fb545148b1ce492e5604e1442e7915",
+          "sizeBytes": 21915,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/training_report.json",
+          "sha256": "a6384813c8518cdca976fe3b180e7764667968dcf8c9950d99b9b9f3e0c8702c",
+          "sizeBytes": 21418,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c\\runs\\20260424T163858Z-learner-smoke\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/checkpoints/config.json",
+          "sha256": "3682b13c210ba632c8cfa870dc756be76428125f08558c8dbbed3a43a4de15fd",
+          "sizeBytes": 2284,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/checkpoints/model.zip",
+          "sha256": "eedfe8cc8f7f7c10d8e3603371f3e8237147d0fc816be1bd0ae4bd7ea81137a2",
+          "sizeBytes": 651989,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/checkpoints/optimizer_state.pt",
+          "sha256": "7673dafbea9f460c47c0701fb812e227805fe7b256748813cfe843c047d831a2",
+          "sizeBytes": 423978,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/checkpoints/vecnormalize.pkl",
+          "sha256": "46921e0d57cbdb150641317570bc0fcda6c73e1d82d15c9a72189cd7334d833b",
+          "sizeBytes": 3965,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c\\runs\\20260424T163911Z-resume-smoke",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163911Z-resume-smoke/artifact_manifest.json",
+          "sha256": "d78e2026457977703a1f43f88be8562171daed5ae38ee4e6f11e15549112ef2a",
+          "sizeBytes": 22867,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163911Z-resume-smoke/training_report.json",
+          "sha256": "ebacc79df5a6411777a3529d0e158186f77d3f782a9968c7ca1b42d2cf9d35d6",
+          "sizeBytes": 22371,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c/runs/20260424T163911Z-resume-smoke",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c\\runs\\20260424T163911Z-resume-smoke\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163911Z-resume-smoke/checkpoints/config.json",
+          "sha256": "3682b13c210ba632c8cfa870dc756be76428125f08558c8dbbed3a43a4de15fd",
+          "sizeBytes": 2284,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163911Z-resume-smoke/checkpoints/model.zip",
+          "sha256": "4f058af8d82c0508b777dcb2c28d2c2c62eb7142d7dd53101294fff4a3b1e8ee",
+          "sizeBytes": 652559,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163911Z-resume-smoke/checkpoints/optimizer_state.pt",
+          "sha256": "d34151f5cb00344c3029eb60be1ee5955a85a88cc53472b539fd3db1d49d066d",
+          "sizeBytes": 423978,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T163911Z-resume-smoke/checkpoints/vecnormalize.pkl",
+          "sha256": "c531df3793e13ff456025d63bfc3077bd986d7fa5ea5fef2b1c7c4f783da43ea",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c/runs/20260424T163911Z-resume-smoke/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c\\runs\\20260424T170052Z-diagnostics-smoke",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T170052Z-diagnostics-smoke/artifact_manifest.json",
+          "sha256": "f3f2c247de6caf0c1a77c29e85e8f015c7e2ad80937214cfbd2806b9727611e4",
+          "sizeBytes": 24800,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T170052Z-diagnostics-smoke/training_report.json",
+          "sha256": "b5180f68a5f3be6329d3571e47481a5ac56ce232a6d74fbeff0aafaa1f6d0d92",
+          "sizeBytes": 24231,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c/runs/20260424T170052Z-diagnostics-smoke",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c\\runs\\20260424T170052Z-diagnostics-smoke\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T170052Z-diagnostics-smoke/checkpoints/config.json",
+          "sha256": "87d4a1d5241038ad6d8add8e2cdd829da2e74066496143ec9af8212994636c55",
+          "sizeBytes": 2670,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T170052Z-diagnostics-smoke/checkpoints/model.zip",
+          "sha256": "53adb34596cc5af21e5dfd7e4c3e51e42fe57bb7c127c8fc8574e367e73a2de9",
+          "sizeBytes": 653688,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T170052Z-diagnostics-smoke/checkpoints/optimizer_state.pt",
+          "sha256": "5694d37b517362f1ec40805cf5305ad6db014306ff2bfc853e23b48a6462d042",
+          "sizeBytes": 424042,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T170052Z-diagnostics-smoke/checkpoints/vecnormalize.pkl",
+          "sha256": "1b30d177b2832fbefebf6033102aad8fece268b8ececb9f3fbc3df54f0485f15",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c/runs/20260424T170052Z-diagnostics-smoke/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c\\runs\\20260424T171554Z-pilot-train",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train/artifact_manifest.json",
+          "sha256": "74bdda2534be0fa40c71d6922e1df83b59034ecf74d0a28262d85ddb84244955",
+          "sizeBytes": 38011,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train/training_report.json",
+          "sha256": "d7151b8d9133582ff9640a5e8522cac4772622c033b246155bc03db80b1cc904",
+          "sizeBytes": 37403,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c\\runs\\20260424T171554Z-pilot-train\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train/checkpoints/config.json",
+          "sha256": "1105b706ef892707cf16070a677a0c26f8daf78f7a93d6f0d7b3ce1b88b3e0ef",
+          "sizeBytes": 2831,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train/checkpoints/model.zip",
+          "sha256": "cd1eb98f62fb62c4598cc734f8819760e76c4f29be77503117c09e2fb41d23e1",
+          "sizeBytes": 654257,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train/checkpoints/optimizer_state.pt",
+          "sha256": "2a27c2565578033cd091d457e81dbafba364d1d934f6423f6192115cabf25f3d",
+          "sizeBytes": 423978,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train/checkpoints/vecnormalize.pkl",
+          "sha256": "66b309ea8a3ef5726efa68409fc64585f0b27c7753f090bfe1034743450f0569",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c\\runs\\20260424T180033Z-baseline-train",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+          "sha256": "4eff0dd319f6c1590391ea17b736d5c8e20fc51e1263e02041ec1961d933a143",
+          "sizeBytes": 38065,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/training_report.json",
+          "sha256": "7e2e118c7be7d6a1ba1757f57b6a595c01453e4b547c2d4bd4d058f4847613e6",
+          "sizeBytes": 37439,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93c\\runs\\20260424T180033Z-baseline-train\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/config.json",
+          "sha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+          "sizeBytes": 3052,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/model.zip",
+          "sha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+          "sizeBytes": 654823,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/optimizer_state.pt",
+          "sha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+          "sizeBytes": 423978,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/vecnormalize.pkl",
+          "sha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93e",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "latestPointer": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93e/latest_model_package.json",
+          "sha256": "35176d24db507251d317648d74bdbf11402e5010d23413409408c9e7eb4524ab",
+          "sizeBytes": 654,
+          "tracked": true
+        }
+      },
+      "packageDir": "data/training/ppo/bt93e",
+      "rejectionReasons": [
+        "latest-pointer-not-accepted",
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93e\\runs\\20260424T221741Z-diagnostics-smoke",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/artifact_manifest.json",
+          "sha256": "50bbe31f3a31d6df33c2adaa29d39743fabeed9d2c6cba218f9e937ca7d63230",
+          "sizeBytes": 25358,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/training_report.json",
+          "sha256": "2f58099370548f5cfd6f9619d9bee9db09f214a6c8f6273fdf29c5d018b44f01",
+          "sizeBytes": 24663,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93e\\runs\\20260424T221741Z-diagnostics-smoke\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/config.json",
+          "sha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+          "sizeBytes": 3052,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/model.zip",
+          "sha256": "27d6a9f218f9a0f15774c5b51056844b78e7e8674951fb24cca4c438835b66ce",
+          "sizeBytes": 655388,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/optimizer_state.pt",
+          "sha256": "b2ea9c12adb2f749affd79ec395de02b441bb5a0e5be44cc0bc2f79c3fb41473",
+          "sizeBytes": 424042,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/vecnormalize.pkl",
+          "sha256": "a0e2d3c13d6f353de1a98669f6c7bbfe1da8a979a99555036c82fe3977bff326",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93f",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "latestPointer": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93f/latest_model_package.json",
+          "sha256": "dc09b14c52ceb509f676711c731ccb49c01e3bae3bf25ce7f37c32188cd3f748",
+          "sizeBytes": 654,
+          "tracked": true
+        }
+      },
+      "packageDir": "data/training/ppo/bt93f",
+      "rejectionReasons": [
+        "latest-pointer-not-accepted",
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93f\\runs\\20260425T082419Z-repair-diagnostic",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/artifact_manifest.json",
+          "sha256": "ddb87cfb7cd6cd9cfca568b95359ee00b4a72349685e9351aacdc4e31575806d",
+          "sizeBytes": 38939,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/training_report.json",
+          "sha256": "2b790b97a5441eb5766bb83209fef786acae77a3644dcac0be5cce34cda6da28",
+          "sizeBytes": 38247,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93f\\runs\\20260425T082419Z-repair-diagnostic\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints/config.json",
+          "sha256": "6c3b3ae2be309cbd2db70fa5e143df0f5b554a2ddc3f83bb46b0529a48ddb278",
+          "sizeBytes": 3485,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints/model.zip",
+          "sha256": "b57d05b027778a9ef8093871eb35c356024d15472ea7a0399c5921c581b1d529",
+          "sizeBytes": 655388,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints/optimizer_state.pt",
+          "sha256": "ebcb60676fb00da7169bde21e5b9ba394657a06d4fbaacc696452cb6dec9745b",
+          "sizeBytes": 424042,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints/vecnormalize.pkl",
+          "sha256": "8a700aa0e84a6579506f44c36f0dfc0f05783cfa028909f7e255f6e29e24a936",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93g",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "latestPointer": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/latest_model_package.json",
+          "sha256": "aed4ecf406930932905c8596ce015f147bd57351ab03e141a1c785aedee265a0",
+          "sizeBytes": 654,
+          "tracked": true
+        }
+      },
+      "packageDir": "data/training/ppo/bt93g",
+      "rejectionReasons": [
+        "latest-pointer-not-accepted",
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93g\\runs\\20260425T102258Z-technical-smoke",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke/artifact_manifest.json",
+          "sha256": "be95c89357dc3b219d23f22ca0a920f732dc8bca559c345837c36e337b0e6616",
+          "sizeBytes": 31802,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke/training_report.json",
+          "sha256": "6ae3accd35d62081a5fcc7a755d2df7f7303d2c7da17a1c6ce2c8f25f11d3ebc",
+          "sizeBytes": 31179,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93g\\runs\\20260425T102258Z-technical-smoke\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke/checkpoints/config.json",
+          "sha256": "4d4a968c9ecc1605f470dcdc2707f7cc7e7629f2a43331dd4c028771ab263e00",
+          "sizeBytes": 4555,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke/checkpoints/model.zip",
+          "sha256": "cad9636689841455930338a8116dfe464729ea07ea41e8cd184ec96ce5370bdc",
+          "sizeBytes": 238862,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke/checkpoints/optimizer_state.pt",
+          "sha256": "0e3d7fd7f947398f1f779bad49da0c687fc1e1f01806db1c251e09d7fd3f2e87",
+          "sizeBytes": 148906,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke/checkpoints/vecnormalize.pkl",
+          "sha256": "90f441975541d9e4e21a71f26862fb0c2146e6bd357d4f2024dcc3f4314338f8",
+          "sizeBytes": 3702,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93g\\runs\\20260425T102316Z-comparable-repair",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair/artifact_manifest.json",
+          "sha256": "9ce72fa6603199fd91368beacf148707aa021fbe40e87a2f1dd8ed94d7040955",
+          "sizeBytes": 33013,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair/training_report.json",
+          "sha256": "c9f1fa079b8707e70792e0ca1599a132627400b4873534748f4bc57a71be67d2",
+          "sizeBytes": 32285,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93g\\runs\\20260425T102316Z-comparable-repair\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair/checkpoints/config.json",
+          "sha256": "4d4a968c9ecc1605f470dcdc2707f7cc7e7629f2a43331dd4c028771ab263e00",
+          "sizeBytes": 4555,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair/checkpoints/model.zip",
+          "sha256": "e040c8996fa004fc97f44f078eed9f734adb481bb492e5257a08734c5a5576bc",
+          "sizeBytes": 239476,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair/checkpoints/optimizer_state.pt",
+          "sha256": "e39805a9fbcf114c162bc33bd1835f9d0837d99da5bcae256f4ca30b97eb261b",
+          "sizeBytes": 148906,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair/checkpoints/vecnormalize.pkl",
+          "sha256": "04f2953a65df85b9206cdc03ae8d32cf3d06b4d7b89588a71a55e8fcae918c87",
+          "sizeBytes": 3804,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93g\\runs\\20260425T102337Z-comparable-repair",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/artifact_manifest.json",
+          "sha256": "8ab517a58d3a0700effe4a8b5f3a4eb26497e8a57c348de7c6bb1fcb6418f019",
+          "sizeBytes": 33086,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/training_report.json",
+          "sha256": "c4a726931968a32f3550ab87d5a9e4ca2719b1f09996eb89ea3f8d07b27a869a",
+          "sizeBytes": 32334,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93g\\runs\\20260425T102337Z-comparable-repair\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints/config.json",
+          "sha256": "4d4a968c9ecc1605f470dcdc2707f7cc7e7629f2a43331dd4c028771ab263e00",
+          "sizeBytes": 4555,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints/model.zip",
+          "sha256": "379e7a32a74ba1e799c1cccc4b014f01b9dc4b1db9b5c3457b5001149940909d",
+          "sizeBytes": 240043,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints/optimizer_state.pt",
+          "sha256": "121c3358d0a08805008bde7aca055640904cd2c58ab2bd16f8c16b893113cc76",
+          "sizeBytes": 148906,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints/vecnormalize.pkl",
+          "sha256": "2b8e540dcc4f7df7cbfc2bed9213c6a621382132179afb38f4f9bbae85181a5c",
+          "sizeBytes": 3804,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93h",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "latestPointer": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93h/latest_model_package.json",
+          "sha256": "8ea0f87d328849e12c03f28704b289ec534f39236c716611c74a61f9e71143d5",
+          "sizeBytes": 717,
+          "tracked": true
+        }
+      },
+      "packageDir": "data/training/ppo/bt93h",
+      "rejectionReasons": [
+        "latest-pointer-not-accepted",
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93h\\runs\\20260425T113941Z-comparable-terminal-repair",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/artifact_manifest.json",
+          "sha256": "c20ea26085da9f60188fb2095dee7af5934137f577ace0c898cee72e1452d026",
+          "sizeBytes": 33008,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/training_report.json",
+          "sha256": "3bbc141d26f6fb519c8ab734567e1281e351d27da3f9aa9c71c9b4b1735cbc22",
+          "sizeBytes": 32260,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93h\\runs\\20260425T113941Z-comparable-terminal-repair\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/config.json",
+          "sha256": "a9a2016de27fa90ee93e6dab7a4268df6423c1383ce9004c23ef68d671c5d3b2",
+          "sizeBytes": 4450,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/model.zip",
+          "sha256": "2cb11aa2f16b9bb6a51077eb52df111f843db092803917a2f62265ecc4179441",
+          "sizeBytes": 240925,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/optimizer_state.pt",
+          "sha256": "cf72ed6a1da04173e859f5c75514561bc653b354e7846a768982358abd8fee40",
+          "sizeBytes": 149383,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/vecnormalize.pkl",
+          "sha256": "bd741262d44f344e2f29cf74e908055e1028b0cafbc26d43ac0a0445cc00978d",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93i",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "latestPointer": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93i/latest_model_package.json",
+          "sha256": "10899e5a181fa0d5bd2c7bcaef21fca6c4437829815c83dc11199fe3010630be",
+          "sizeBytes": 717,
+          "tracked": true
+        }
+      },
+      "packageDir": "data/training/ppo/bt93i",
+      "rejectionReasons": [
+        "latest-pointer-not-accepted",
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93i\\runs\\20260425T151155Z-terminal-curriculum-repair",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "artifactManifest": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json",
+          "sha256": "3468844a28aee30b038547b323c9360edc7ed9abe236c9bcbcec85dbeb8aa8b8",
+          "sizeBytes": 33490,
+          "tracked": false
+        },
+        "trainingReport": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+          "sha256": "f819b7d808b1694396112a41659bd2ae15a88b8fd7d082e45b8074a51b5928da",
+          "sizeBytes": 32932,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93i\\runs\\20260425T151155Z-terminal-curriculum-repair\\checkpoints",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "config": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/config.json",
+          "sha256": "4d0d0d259e5e7eb97f2f6a9a54506140ea3334fd41368e32d6705674ff7abda7",
+          "sizeBytes": 4704,
+          "tracked": false
+        },
+        "model": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/model.zip",
+          "sha256": "d5feac5d84924bcf8433c7adc93360a294bcddf3a807a3ef0907fe67e67a3371",
+          "sizeBytes": 244560,
+          "tracked": false
+        },
+        "optimizerState": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/optimizer_state.pt",
+          "sha256": "2d561f8836c81d776cedc4db1dd3c243d1521a654d2052eba418bc5e79f712ef",
+          "sizeBytes": 148970,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-25T23:32:01Z",
+          "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/vecnormalize.pkl",
+          "sha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25",
+          "sizeBytes": 3607,
+          "tracked": false
+        }
+      },
+      "packageDir": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints",
+      "rejectionReasons": [
+        "not-bt93n-selected-lineage",
+        "required-artifacts-untracked:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": true,
+      "requiredPackageTracked": false,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePackageDir": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93j",
+      "acceptedAsExactLineage": false,
+      "acceptsRecoveryArtifacts": true,
+      "files": {
+        "latestPointer": {
+          "exists": true,
+          "lastModifiedUtc": "2026-04-29T15:21:44Z",
+          "path": "data/training/ppo/bt93j/latest_model_package.json",
+          "sha256": "5dc773fcf74669087f6f4d48b5981ca6fcfbab600b8315dd7d83d4c72f308b72",
+          "sizeBytes": 766,
+          "tracked": true
+        }
+      },
+      "packageDir": "data/training/ppo/bt93j",
+      "rejectionReasons": [
+        "latest-pointer-not-accepted",
+        "not-bt93n-selected-lineage",
+        "missing-required:model,config,vecnormalize"
+      ],
+      "requiredPackageComplete": false,
+      "requiredPackageTracked": true,
+      "searchRoot": "data/training/ppo",
+      "searchRootRole": "repo-local PPO artifact context, exact BT93N only accepted"
+    }
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93y_exact_lineage_recovery.py --write-reports"
+  },
+  "expectedLineage": {
+    "actionSurfaceExpectedFromBt93Q": {
+      "actionCount": 9,
+      "path": "python/envs/ppo_action_surface.py",
+      "semanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg"
+      ],
+      "sha256": "4e12c93bd532178f3759234d5217f1cd58a4f4bfaec9c6f7be8ffa708564847b",
+      "source": "data/training/ppo/bt93q/policy_collapse_report.json"
+    },
+    "actualModelTimesteps": 10112,
+    "bt93qMatrixId": "bt93q-walltrail-policy-recheck-v1",
+    "bt93qSemanticWindow": "bt93q-walltrail-10k-diagnostic-window",
+    "currentActionSurface": {
+      "actionCount": 13,
+      "reportedSha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "semanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg",
+        "turn-left-boost",
+        "turn-right-boost",
+        "evade-left",
+        "evade-right"
+      ],
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "source": "python/envs/ppo_action_surface.py"
+    },
+    "expectedArtifactNames": {
+      "artifactManifest": [
+        "artifact_manifest.json"
+      ],
+      "config": [
+        "config.json",
+        "ppo_config.json",
+        "training_config.json",
+        "run_config.json"
+      ],
+      "model": [
+        "model.zip"
+      ],
+      "optimizerState": [
+        "optimizer_state.pt"
+      ],
+      "trainingReport": [
+        "training_report.json"
+      ],
+      "vecnormalize": [
+        "vecnormalize.pkl",
+        "vec_normalize.pkl",
+        "normalizer.pkl",
+        "normalize.pkl"
+      ]
+    },
+    "expectedPolicyIds": {
+      "eval": "ppo-bt93n-micro-10k-deterministic",
+      "train": "ppo-bt93n-micro-10k-stochastic"
+    },
+    "expectedRunId": "ppo-bt93n-micro-10k",
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "optionalArtifacts": [
+      "optimizerState",
+      "artifactManifest",
+      "trainingReport"
+    ],
+    "requiredArtifacts": [
+      "model",
+      "config",
+      "vecnormalize"
+    ],
+    "selectedBt93nPolicyEvidence": {
+      "missingRequiredArtifactKeysFromBT93R": [
+        "model",
+        "config",
+        "vecnormalize"
+      ],
+      "modelPackagePersisted": false,
+      "realModelLogitsAvailable": false,
+      "source": "data/training/ppo/bt93n/micro_ppo_repeat_report.json"
+    },
+    "semanticWindow": "runtime-near-headless-v1",
+    "sourceTimeWindow": {
+      "bt93nMicroGeneratedAt": "2026-04-29T22:17:13Z",
+      "bt93qCollapseGeneratedAt": "2026-04-29T23:34:01Z",
+      "bt93rPolicyArtifactGeneratedAt": "2026-04-30T07:25:20Z"
+    }
+  },
+  "generatedAt": "2026-04-30T10:00:31Z",
+  "generatedBy": "python/scripts/bt93y_exact_lineage_recovery.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "6853d4293821d8116048a456494571f87ed53e14",
+    "sha": "c50a9de22a8ae95e8c6ea976b599bf79dc529f67"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffSignal": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "lineageDecision": {
+    "exactBt93nLineageRestored": false,
+    "exactLineageUnavailable": true,
+    "exactRecoveryAttempted": true,
+    "mode": "exact-bt93n-lineage-recovery-before-any-r-s-o-p",
+    "newRetrainLineageMustNotBeLabeledAsBt93n": true,
+    "owner": "user",
+    "retrainingAllowedIfExactLineageUnavailable": true
+  },
+  "modelPackage": {
+    "activePackageDir": null,
+    "config": null,
+    "missingRequiredArtifactKeys": [
+      "model",
+      "config",
+      "vecnormalize"
+    ],
+    "model": null,
+    "normalizer": null,
+    "notApplicableReason": "No complete tracked exact BT93N model/config/vecnormalize package was found.",
+    "optimizerState": null,
+    "restored": false,
+    "vecnormalize": null
+  },
+  "negativeEvidence": [
+    {
+      "absolutePath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93n",
+      "acceptsRecoveryArtifacts": true,
+      "expectedArtifactNames": {
+        "artifactManifest": [
+          "artifact_manifest.json"
+        ],
+        "config": [
+          "config.json",
+          "ppo_config.json",
+          "training_config.json",
+          "run_config.json"
+        ],
+        "model": [
+          "model.zip"
+        ],
+        "optimizerState": [
+          "optimizer_state.pt"
+        ],
+        "trainingReport": [
+          "training_report.json"
+        ],
+        "vecnormalize": [
+          "vecnormalize.pkl",
+          "vec_normalize.pkl",
+          "normalizer.pkl",
+          "normalize.pkl"
+        ]
+      },
+      "expectedRunId": "ppo-bt93n-micro-10k",
+      "owner": "repo",
+      "reason": "no acceptable exact BT93N model/config/vecnormalize package found",
+      "searchRoot": "data/training/ppo/bt93n",
+      "searched": true
+    },
+    {
+      "absolutePath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93n\\runs",
+      "acceptsRecoveryArtifacts": true,
+      "expectedArtifactNames": {
+        "artifactManifest": [
+          "artifact_manifest.json"
+        ],
+        "config": [
+          "config.json",
+          "ppo_config.json",
+          "training_config.json",
+          "run_config.json"
+        ],
+        "model": [
+          "model.zip"
+        ],
+        "optimizerState": [
+          "optimizer_state.pt"
+        ],
+        "trainingReport": [
+          "training_report.json"
+        ],
+        "vecnormalize": [
+          "vecnormalize.pkl",
+          "vec_normalize.pkl",
+          "normalizer.pkl",
+          "normalize.pkl"
+        ]
+      },
+      "expectedRunId": "ppo-bt93n-micro-10k",
+      "owner": "repo",
+      "reason": "no acceptable exact BT93N model/config/vecnormalize package found",
+      "searchRoot": "data/training/ppo/bt93n/runs",
+      "searched": true
+    },
+    {
+      "absolutePath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\output\\training",
+      "acceptsRecoveryArtifacts": true,
+      "expectedArtifactNames": {
+        "artifactManifest": [
+          "artifact_manifest.json"
+        ],
+        "config": [
+          "config.json",
+          "ppo_config.json",
+          "training_config.json",
+          "run_config.json"
+        ],
+        "model": [
+          "model.zip"
+        ],
+        "optimizerState": [
+          "optimizer_state.pt"
+        ],
+        "trainingReport": [
+          "training_report.json"
+        ],
+        "vecnormalize": [
+          "vecnormalize.pkl",
+          "vec_normalize.pkl",
+          "normalizer.pkl",
+          "normalize.pkl"
+        ]
+      },
+      "expectedRunId": "ppo-bt93n-micro-10k",
+      "owner": "repo",
+      "reason": "search root missing",
+      "searchRoot": "output/training",
+      "searched": false
+    },
+    {
+      "absolutePath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo",
+      "acceptsRecoveryArtifacts": true,
+      "expectedArtifactNames": {
+        "artifactManifest": [
+          "artifact_manifest.json"
+        ],
+        "config": [
+          "config.json",
+          "ppo_config.json",
+          "training_config.json",
+          "run_config.json"
+        ],
+        "model": [
+          "model.zip"
+        ],
+        "optimizerState": [
+          "optimizer_state.pt"
+        ],
+        "trainingReport": [
+          "training_report.json"
+        ],
+        "vecnormalize": [
+          "vecnormalize.pkl",
+          "vec_normalize.pkl",
+          "normalizer.pkl",
+          "normalize.pkl"
+        ]
+      },
+      "expectedRunId": "ppo-bt93n-micro-10k",
+      "owner": "repo",
+      "reason": "no acceptable exact BT93N model/config/vecnormalize package found",
+      "searchRoot": "data/training/ppo",
+      "searched": true
+    },
+    {
+      "absolutePath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp",
+      "acceptsRecoveryArtifacts": false,
+      "expectedArtifactNames": {
+        "artifactManifest": [
+          "artifact_manifest.json"
+        ],
+        "config": [
+          "config.json",
+          "ppo_config.json",
+          "training_config.json",
+          "run_config.json"
+        ],
+        "model": [
+          "model.zip"
+        ],
+        "optimizerState": [
+          "optimizer_state.pt"
+        ],
+        "trainingReport": [
+          "training_report.json"
+        ],
+        "vecnormalize": [
+          "vecnormalize.pkl",
+          "vec_normalize.pkl",
+          "normalizer.pkl",
+          "normalize.pkl"
+        ]
+      },
+      "expectedRunId": "ppo-bt93n-micro-10k",
+      "owner": "repo",
+      "reason": "no acceptable exact BT93N model/config/vecnormalize package found",
+      "searchRoot": "tmp",
+      "searched": true
+    },
+    {
+      "absolutePath": null,
+      "acceptsRecoveryArtifacts": true,
+      "expectedArtifactNames": {
+        "artifactManifest": [
+          "artifact_manifest.json"
+        ],
+        "config": [
+          "config.json",
+          "ppo_config.json",
+          "training_config.json",
+          "run_config.json"
+        ],
+        "model": [
+          "model.zip"
+        ],
+        "optimizerState": [
+          "optimizer_state.pt"
+        ],
+        "trainingReport": [
+          "training_report.json"
+        ],
+        "vecnormalize": [
+          "vecnormalize.pkl",
+          "vec_normalize.pkl",
+          "normalizer.pkl",
+          "normalize.pkl"
+        ]
+      },
+      "expectedRunId": "ppo-bt93n-micro-10k",
+      "owner": "user",
+      "reason": "BT93Y_EXTERNAL_LINEAGE_ROOTS is empty; no off-workspace location was provided.",
+      "searchRoot": null,
+      "searched": false
+    }
+  ],
+  "ok": true,
+  "opensNext": [
+    "93Y.3"
+  ],
+  "phaseCoverage": {
+    "93Y.2.1": true,
+    "93Y.2.2": true,
+    "93Y.2.3": true,
+    "93Y.2.4": true,
+    "93Y.2.5": true,
+    "93Y.2.6": true,
+    "93Y.2.7": true
+  },
+  "phaseId": "93Y.2",
+  "replacementPolicy": {
+    "approved": true,
+    "historicalDqnBotReportsUse": "context-only",
+    "owner": "user",
+    "policyId": "bt93x-rcp1-same-matrix-control-suite-no-bt11",
+    "scope": [
+      "BT93X starttruth",
+      "BT93P starttruth"
+    ]
+  },
+  "resultClass": "exact-lineage-unavailable",
+  "sampleCounts": {
+    "acceptedExactLineagePackages": 0,
+    "candidatePackagesFound": 35,
+    "externalSearchRootsConfigured": 0,
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 0,
+    "newTrainingEpisodes": 0,
+    "steps": 0
+  },
+  "schemaVersion": "bt93y-exact-lineage-inventory-v1",
+  "searchRoots": [
+    {
+      "absolutePath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93n",
+      "acceptsRecoveryArtifacts": true,
+      "exists": true,
+      "owner": "repo",
+      "path": "data/training/ppo/bt93n",
+      "role": "repo-local BT93N evidence directory"
+    },
+    {
+      "absolutePath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93n\\runs",
+      "acceptsRecoveryArtifacts": true,
+      "exists": true,
+      "owner": "repo",
+      "path": "data/training/ppo/bt93n/runs",
+      "role": "repo-local BT93N run directory"
+    },
+    {
+      "absolutePath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\output\\training",
+      "acceptsRecoveryArtifacts": true,
+      "exists": false,
+      "owner": "repo",
+      "path": "output/training",
+      "role": "workspace output training directory"
+    },
+    {
+      "absolutePath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo",
+      "acceptsRecoveryArtifacts": true,
+      "exists": true,
+      "owner": "repo",
+      "path": "data/training/ppo",
+      "role": "repo-local PPO artifact context, exact BT93N only accepted"
+    },
+    {
+      "absolutePath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp",
+      "acceptsRecoveryArtifacts": false,
+      "exists": true,
+      "owner": "repo",
+      "path": "tmp",
+      "role": "tmp is scanned only as forbidden/non-closure context"
+    },
+    {
+      "absolutePath": null,
+      "acceptsRecoveryArtifacts": true,
+      "exists": false,
+      "notConfiguredReason": "BT93Y_EXTERNAL_LINEAGE_ROOTS is empty; no off-workspace location was provided.",
+      "owner": "user",
+      "path": null,
+      "role": "user-provided external lineage roots"
+    }
+  ],
+  "sourceArtifacts": [
+    {
+      "blockId": "BT93Y",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93yDecisionLock",
+      "ok": true,
+      "path": "data/training/ppo/bt93y/lineage_recovery_decision_lock.json",
+      "phaseId": "93Y.1",
+      "resultClass": "lineage-recovery-lock-green",
+      "role": "BT93Y.1 decision lock",
+      "schemaVersion": "bt93y-lineage-recovery-decision-lock-v1",
+      "sha256": "be2d887d028141a37d4ae11be2de46553a4169967bd07aa099cfff4b8efcbeb6",
+      "sizeBytes": 6311,
+      "tracked": true
+    },
+    {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93nMicroRepeat",
+      "ok": true,
+      "path": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "phaseId": "93N.3",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N.3 selected micro-PPO source",
+      "schemaVersion": "bt93n-micro-ppo-repeat-report-v1",
+      "sha256": "96f046445da1518eeb9519958b179107326294d6ad83a6bfa074089f52aaa631",
+      "sizeBytes": 82300,
+      "tracked": true
+    },
+    {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93nToleranceContract",
+      "ok": null,
+      "path": "data/training/ppo/bt93n/micro_ppo_tolerance_contract.json",
+      "phaseId": "93N.3",
+      "resultClass": null,
+      "role": "BT93N.3 pre-run tolerance contract",
+      "schemaVersion": "bt93n-micro-ppo-tolerance-contract-v1",
+      "sha256": "5aabef2b066807fee8d88036607c99b0df217ae56bd24ed4047d86e4311e9254",
+      "sizeBytes": 7093,
+      "tracked": true
+    },
+    {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93nClosure",
+      "ok": true,
+      "path": "data/training/ppo/bt93n/closure_gate_report.json",
+      "phaseId": "93N.99",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93N.99 red closure",
+      "schemaVersion": "bt93n-closure-gate-report-v1",
+      "sha256": "606b45c98569eb4fc2a88c997ec7ccff43c3f8551b013e5e3bfdf22e8b841a1e",
+      "sizeBytes": 10182,
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qPolicyCollapse",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "phaseId": "93Q.3",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q.3 collapse evidence",
+      "schemaVersion": "bt93q-policy-collapse-report-v1",
+      "sha256": "8b6fbfdbf2285e6f58c8104fad408fc1e6b2677fde394a617b78170137af035d",
+      "sizeBytes": 18211,
+      "tracked": true
+    },
+    {
+      "blockId": "BT93R",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93rPolicyArtifact",
+      "ok": true,
+      "path": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "phaseId": "93R.2",
+      "resultClass": "policy-evidence-invalid",
+      "role": "BT93R.2 artifact blocker",
+      "schemaVersion": "bt93r-policy-artifact-report-v1",
+      "sha256": "fe9b7c4ca44b5022ea9279251aee0c1cf75b34108d6320e12cd48f311b9fb7c9",
+      "sizeBytes": 38391,
+      "tracked": true
+    },
+    {
+      "blockId": "BT93R",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93rClosure",
+      "ok": true,
+      "path": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "phaseId": "93R.99",
+      "resultClass": "model-artifact-missing",
+      "role": "BT93R.99 red closure",
+      "schemaVersion": "bt93r-closure-gate-report-v1",
+      "sha256": "947a93757f71ae28baa715bd923de5666b52fca1a3a47992f23dd02c66f272d3",
+      "sizeBytes": 8945,
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "key": "currentPpoActionSurface",
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current PPO action-surface source",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sizeBytes": 22887,
+      "tracked": true
+    }
+  ],
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "summary": {
+    "acceptedExactLineagePackages": 0,
+    "candidatePackagesFound": 35,
+    "exactBt93nLineageRestored": false,
+    "finalResult": "exact-lineage-unavailable",
+    "missingRequiredArtifactKeys": [
+      "model",
+      "config",
+      "vecnormalize"
+    ],
+    "nextBestAction": "Proceed to 93Y.3 narrow retraining lineage; do not start BT93S/O/P/94A."
+  }
+}

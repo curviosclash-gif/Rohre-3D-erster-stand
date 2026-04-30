@@ -1,0 +1,122 @@
+{
+  "activePackageDir": null,
+  "allowNext": [
+    "93Y.3 narrow retraining lineage under UOD-1"
+  ],
+  "blockId": "BT93Y",
+  "blocksNext": [
+    "BT93R-Reentry until BT93Y.99 green",
+    "BT93S claim",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93y_exact_lineage_recovery.py --write-reports"
+  },
+  "generatedAt": "2026-04-30T10:00:31Z",
+  "generatedBy": "python/scripts/bt93y_exact_lineage_recovery.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "6853d4293821d8116048a456494571f87ed53e14",
+    "sha": "c50a9de22a8ae95e8c6ea976b599bf79dc529f67"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffSignal": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "lineageDecision": {
+    "exactBt93nLineageRestored": false,
+    "exactLineageUnavailable": true,
+    "exactRecoveryAttempted": true,
+    "mode": "exact-bt93n-lineage-recovery-before-any-r-s-o-p",
+    "newRetrainLineageMustNotBeLabeledAsBt93n": true,
+    "owner": "user",
+    "retrainingAllowedIfExactLineageUnavailable": true
+  },
+  "loaderSmoke": {
+    "attempted": false,
+    "configLoadAttempted": false,
+    "configLoaded": false,
+    "error": null,
+    "modelLoadAttempted": false,
+    "modelLoaded": false,
+    "normalizerLoadAttempted": false,
+    "normalizerLoaded": false,
+    "notApplicableReason": "exact BT93N lineage package unavailable; loader-smoke is recorded as skipped."
+  },
+  "modelPackage": {
+    "activePackageDir": null,
+    "config": null,
+    "missingRequiredArtifactKeys": [
+      "model",
+      "config",
+      "vecnormalize"
+    ],
+    "model": null,
+    "normalizer": null,
+    "notApplicableReason": "No complete tracked exact BT93N model/config/vecnormalize package was found.",
+    "optimizerState": null,
+    "restored": false,
+    "vecnormalize": null
+  },
+  "ok": true,
+  "opensNext": [
+    "93Y.3"
+  ],
+  "phaseId": "93Y.2",
+  "resultClass": "exact-lineage-unavailable",
+  "sampleCounts": {
+    "acceptedExactLineagePackages": 0,
+    "candidatePackagesFound": 35,
+    "externalSearchRootsConfigured": 0,
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 0,
+    "newTrainingEpisodes": 0,
+    "steps": 0
+  },
+  "schemaVersion": "bt93y-exact-lineage-loader-smoke-v1",
+  "sourceInventoryReport": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
+  "summary": {
+    "configLoaded": false,
+    "finalResult": "exact-lineage-unavailable",
+    "loaderSmokeAttempted": false,
+    "modelLoaded": false,
+    "nextBestAction": "Proceed to 93Y.3 narrow retraining lineage; do not start BT93S/O/P/94A.",
+    "normalizerLoaded": false
+  }
+}
