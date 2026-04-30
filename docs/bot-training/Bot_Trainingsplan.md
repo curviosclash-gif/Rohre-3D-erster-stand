@@ -388,7 +388,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93N | 2026-04-29 | frei | abgeschlossen 2026-04-30 als `diagnose-loop-required`; BT93Q folgt, BT93O bleibt blockiert |
 | Bot-Codex | BT93Q | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `policy-collapse-active`; BT93O bleibt blockiert |
 | Bot-Codex | PF.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `preflight-green`; BT93R.1 und 93X.0 read-only sind startbar |
-| Bot-Codex | BT93R | 2026-04-30 | claimed | 93R.1 abgeschlossen; naechste Phase 93R.2 |
+| Bot-Codex | BT93R | 2026-04-30 | claimed | 93R.3 abgeschlossen als `model-artifact-missing`; 93R.4 bleibt ohne BT93N-Lineage blockiert |
 | - | BT93S | - | frei | wartet auf BT93R.99 in R-Allowlist |
 | - | BT93T | - | frei | wartet auf Telemetry-Start aus BT93S |
 | - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
@@ -911,7 +911,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93N | DeathBefore60-Stability und Terminal-Root-Cause | completed | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.99 abgeschlossen; `diagnose-loop-required`, BT93Q ist naechster Repair, BT93O/BT94A bleiben blockiert | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93Q | DeathBefore60 Wall/Trail Policy Repair | completed | P1 | BT93N.99 (`diagnose-loop-required`, `death-before60-still-blocking`) | 93Q.99 abgeschlossen; `policy-collapse-active`, BT93O bleibt blockiert | `docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md` |
 | PF.0 | R-X Plan-, Branch-, Graph- und No-Start-Preflight | completed | P0 | BT93Q.99 `policy-collapse-active` | PF.0 abgeschlossen: `preflight-green`; BT93R.1 und 93X.0 read-only offen | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
-| BT93R | Policy-Artefakt und deterministic-collapse Repair | active | P1 | PF.0 `preflight-green` oder dokumentierte User-Ausnahme | 93R.2 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
+| BT93R | Policy-Artefakt und deterministic-collapse Repair | active | P1 | PF.0 `preflight-green` oder dokumentierte User-Ausnahme | 93R.4 blockiert: selected BT93N lineage missing | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | planned | P1 | BT93R.99 in R-Allowlist | 93S.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | BT93S.99=`observation-telemetry-required` oder Telemetry-Start | 93T.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | BT93T.99=`telemetry-green` + S-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3545,7 +3545,7 @@ Ergebnis: `PF.0=preflight-green`; `bt94a_gate_check.py` bildet die R-X-Prioritae
 
 Quelle: `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md`
 
-<!-- LOCK: Bot-Codex; seit 2026-04-30; naechste Phase 93R.3; 93R.2=policy-evidence-invalid -->
+<!-- LOCK: Bot-Codex; seit 2026-04-30; 93R.3=model-artifact-missing; 93R.4 nur nach wiederhergestelltem BT93N-Lineage-Paket oder roter Closure-Entscheidung -->
 
 Scope:
 
@@ -3566,7 +3566,7 @@ Primaerer Scope:
 
 - [x] DoD.R1 `handover_lock_report.json` pinnt BT93Q-Quellen, Hypothesen, verbotene Folgeaktionen und erlaubte Resultklassen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_handover_lock.py --write-report` -> `data/training/ppo/bt93r/bt93r_handover_lock_report.json`)
 - [x] DoD.R2 Modell, Config, VecNormalize/Normalizer, Action-Surface und Logit-/Entropy-Ausgabe sind auffindbar oder `model-artifact-missing`/`policy-evidence-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_artifact_probe.py --write-report` -> `data/training/ppo/bt93r/policy_artifact_report.json` (`DoD.R2=true`; `resultClass=policy-evidence-invalid`))
-- [ ] DoD.R3 Collapse-Root-Cause trennt Decoder, Normalize-Mismatch, Eval-Mode-Bug, Reward-Scale, Action-Repeat, Seed-/Truncationseffekt und echtes Policy-Collapse.
+- [x] DoD.R3 Collapse-Root-Cause trennt Decoder, Normalize-Mismatch, Eval-Mode-Bug, Reward-Scale, Action-Repeat, Seed-/Truncationseffekt und echtes Policy-Collapse. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_collapse_root_cause.py --write-report` -> `data/training/ppo/bt93r/policy_collapse_root_cause_report.json` (`DoD.R3=true`; `resultClass=model-artifact-missing`; `selectedRootCauseClass=model-artifact-missing`))
 - [ ] DoD.R4 Jeder Fix ist genau eine Fixklasse mit erwarteter Metrikrichtung, Revert-Kriterium, betroffenen und verbotenen Dateien.
 - [ ] DoD.R5 Counterprobe belegt non-collapsed deterministic eval oder schreibt einen erlaubten roten R-Ausgang.
 - [ ] DoD.R6 `BT93S` startet nur bei R-Allowlist; alle anderen Ergebnisse blockieren.
@@ -3585,9 +3585,9 @@ Primaerer Scope:
 
 ### 93R.3 Collapse-Root-Cause
 
-- [ ] 93R.3.1 Decoder-/Action-Index-Mapping gegen Action-Surface pruefen.
-- [ ] 93R.3.2 Normalize-/Eval-Mode-/Temperature-/Seed-/Truncation-Gegenproben trennen.
-- [ ] 93R.3.3 Root-Cause als genau eine Fixklasse oder `policy-collapse-active` dokumentieren.
+- [x] 93R.3.1 Decoder-/Action-Index-Mapping gegen Action-Surface pruefen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_collapse_root_cause.py --write-report` -> `data/training/ppo/bt93r/policy_collapse_root_cause_report.json` (`phaseCoverage.93R.3.1=true`; token 2 -> `yaw-right`, decoder bug not proven))
+- [x] 93R.3.2 Normalize-/Eval-Mode-/Temperature-/Seed-/Truncation-Gegenproben trennen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_collapse_root_cause.py --write-report` -> `data/training/ppo/bt93r/policy_collapse_root_cause_report.json` (`phaseCoverage.93R.3.2=true`; counterprobe not executed because selected BT93N model/config/vecnormalize are missing))
+- [x] 93R.3.3 Root-Cause als genau eine Fixklasse oder `policy-collapse-active` dokumentieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_collapse_root_cause.py --write-report` -> `data/training/ppo/bt93r/policy_collapse_root_cause_report.json` (`phaseCoverage.93R.3.3=true`; `selectedRootCauseClass=model-artifact-missing`; `fixImplementationAllowed=false`))
 
 ### 93R.4 Enger Collapse-Fix
 

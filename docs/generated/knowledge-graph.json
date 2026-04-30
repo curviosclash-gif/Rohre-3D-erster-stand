@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 348,
+          "concreteCount": 350,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 486,
+          "concreteCount": 488,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 344,
+          "concreteCount": 346,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 343,
+          "concreteCount": 345,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 985,
+          "concreteCount": 987,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 993,
+          "concreteCount": 995,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1700,19 +1700,21 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93R.3",
+        "currentPhase": "93R.4",
         "scopeDeclarations": [
           "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
           "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
           "data/training/ppo/bt93r/collapse_counterprobe_report.json",
           "data/training/ppo/bt93r/collapse_root_cause_report.json",
           "data/training/ppo/bt93r/policy_artifact_report.json",
+          "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "python/scripts/bt93r_handover_lock.py",
-          "python/scripts/bt93r_policy_artifact_probe.py"
+          "python/scripts/bt93r_policy_artifact_probe.py",
+          "python/scripts/bt93r_policy_collapse_root_cause.py"
         ],
         "scopeResolution": {
-          "concreteCount": 5,
+          "concreteCount": 7,
           "plannedCount": 3
         },
         "scopeOverlapAllowedWith": [],
@@ -5038,7 +5040,7 @@
       "id": "BT93R.3",
       "type": "phase",
       "title": "Collapse-Root-Cause",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.3"
@@ -14418,8 +14420,8 @@
     {
       "id": "BT93R.3.1",
       "type": "subphase",
-      "title": "Decoder-/Action-Index-Mapping gegen Action-Surface pruefen.",
-      "status": "open",
+      "title": "Decoder-/Action-Index-Mapping gegen Action-Surface pruefen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_collapse_root_cause.py --write-report` -> `data/training/ppo/bt93r/policy_collapse_root_cause_report.json` (`phaseCoverage.93R.3.1=true`; token 2 -> `yaw-right`, decoder bug not proven))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.3",
@@ -14429,8 +14431,8 @@
     {
       "id": "BT93R.3.2",
       "type": "subphase",
-      "title": "Normalize-/Eval-Mode-/Temperature-/Seed-/Truncation-Gegenproben trennen.",
-      "status": "open",
+      "title": "Normalize-/Eval-Mode-/Temperature-/Seed-/Truncation-Gegenproben trennen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_collapse_root_cause.py --write-report` -> `data/training/ppo/bt93r/policy_collapse_root_cause_report.json` (`phaseCoverage.93R.3.2=true`; counterprobe not executed because selected BT93N model/config/vecnormalize are missing))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.3",
@@ -14440,8 +14442,8 @@
     {
       "id": "BT93R.3.3",
       "type": "subphase",
-      "title": "Root-Cause als genau eine Fixklasse oder `policy-collapse-active` dokumentieren.",
-      "status": "open",
+      "title": "Root-Cause als genau eine Fixklasse oder `policy-collapse-active` dokumentieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_policy_collapse_root_cause.py --write-report` -> `data/training/ppo/bt93r/policy_collapse_root_cause_report.json` (`phaseCoverage.93R.3.3=true`; `selectedRootCauseClass=model-artifact-missing`; `fixImplementationAllowed=false`))",
+      "status": "done",
       "attributes": {
         "blockId": "BT93R",
         "phaseCode": "93R.3",
@@ -29147,6 +29149,27 @@
       }
     },
     {
+      "id": "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93R"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/training/ppo/bt93s/action_surface_decision.json",
       "type": "file",
       "title": null,
@@ -36727,6 +36750,27 @@
     },
     {
       "id": "python/scripts/bt93r_policy_artifact_probe.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93R"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93r_policy_collapse_root_cause.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -73284,6 +73328,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -74500,6 +74553,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93r_policy_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93r_policy_collapse_root_cause.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -76613,6 +76675,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -77811,6 +77882,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93r_policy_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93r_policy_collapse_root_cause.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81122,6 +81202,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -82329,6 +82418,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93r_policy_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93r_policy_collapse_root_cause.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84741,6 +84839,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -85948,6 +86055,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93r_policy_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93r_policy_collapse_root_cause.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -94764,6 +94880,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -95971,6 +96096,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93r_policy_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93r_policy_collapse_root_cause.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -103962,6 +104096,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -105178,6 +105321,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93r_policy_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93r_policy_collapse_root_cause.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -131000,6 +131152,15 @@
     },
     {
       "from": "BT93R",
+      "to": "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
       "type": "scope",
       "hint": null,
@@ -131019,6 +131180,15 @@
     {
       "from": "BT93R",
       "to": "python/scripts/bt93r_policy_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93R",
+      "to": "python/scripts/bt93r_policy_collapse_root_cause.py",
       "type": "scope",
       "hint": null,
       "attributes": {

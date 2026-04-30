@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2437,
-    "rawCoveredFileCount": 1957,
+    "trackedFileCount": 2439,
+    "rawCoveredFileCount": 1959,
     "rawCoveragePercent": 80.3,
-    "adjustedTrackedFileCount": 1534,
-    "adjustedCoveredFileCount": 1298,
+    "adjustedTrackedFileCount": 1536,
+    "adjustedCoveredFileCount": 1300,
     "adjustedCoveragePercent": 84.6,
     "uncoveredFileCount": 480,
     "uncoveredActiveFileCount": 236,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 252,
-        "coveredCount": 231
+        "count": 253,
+        "coveredCount": 232
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 886,
-        "coveredCount": 870
+        "count": 887,
+        "coveredCount": 871
       },
       {
         "classification": "product-docs",
@@ -8228,6 +8228,29 @@
     },
     {
       "path": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93R"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93r/policy_collapse_root_cause_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -18955,6 +18978,29 @@
     },
     {
       "path": "python/scripts/bt93r_policy_artifact_probe.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93R"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93r_policy_collapse_root_cause.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
