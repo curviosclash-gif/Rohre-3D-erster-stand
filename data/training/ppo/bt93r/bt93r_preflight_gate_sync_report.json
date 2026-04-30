@@ -1,22 +1,10 @@
 {
   "allowNext": [
-    "repair PF.0 blocker only",
-    "refresh bt94a_gate_check source priority before BT93R.1"
+    "BT93R.1",
+    "93X.0 read-only"
   ],
   "blockId": "PF.0",
-  "blocksNext": [
-    "BT93R.1 claim while PF.0 is not preflight-green or explicitly excepted",
-    "BT93O claim",
-    "BT93P claim",
-    "BT94A claim",
-    "candidate run",
-    "freeze candidate",
-    "holdout consumption",
-    "promote",
-    "rollout",
-    "PPO-Validate or BT95 handoff signal",
-    "50k/100k/200k/500k/1M extension"
-  ],
+  "blocksNext": [],
   "branch": "bot-training",
   "bt93qState": {
     "activeBlockers": [
@@ -42,7 +30,7 @@
       "resultClass": "policy-collapse-active",
       "sha256": "6730aac188855620a2eb8176e6555145cb1d70ea255cf3e83aa1840e95ca80c4"
     },
-    "freshForRx": false,
+    "freshForRx": true,
     "gateCommand": {
       "command": "C:\\Users\\Justin Wolff\\AppData\\Local\\Programs\\Python\\Python312\\python.exe python/scripts/bt94a_gate_check.py --write-report",
       "exitCode": 0,
@@ -64,16 +52,16 @@
       ]
     },
     "matrixDefinitionAllowed": false,
-    "observedCurrentSource": "BT93M",
+    "observedCurrentSource": "BT93Q",
     "ok": true,
     "resultClass": "blocked-no-start",
-    "staleReason": "no_start_gate currentHandoverSource does not follow R-X priority BT93P -> BT93X -> BT93O -> BT93W -> BT93Q."
+    "staleReason": null
   },
   "claimFlags": {
     "bt93oClaimAllowed": false,
     "bt93pClaimAllowed": false,
-    "bt93rClaimAllowed": false,
-    "bt93x0ReadOnlyAllowed": false,
+    "bt93rClaimAllowed": true,
+    "bt93x0ReadOnlyAllowed": true,
     "bt94aClaimAllowed": false,
     "candidateFreezeAllowed": false,
     "candidateRunsAllowed": false
@@ -202,12 +190,12 @@
       "[docs] mojibake=0"
     ]
   },
-  "generatedAt": "2026-04-30T06:27:34Z",
+  "generatedAt": "2026-04-30T07:05:20Z",
   "generatedBy": "python/scripts/bt93r_preflight_gate_sync.py",
   "git": {
     "branch": "bot-training",
     "mergeBaseOriginBotTraining": "2d6795bc53b07018b315ceb40bd3c7431fe9b9f6",
-    "sha": "2d6795bc53b07018b315ceb40bd3c7431fe9b9f6"
+    "sha": "63198fb5bd46572b07729e69529285499f99939f"
   },
   "graphOpenDeps": {
     "commands": {
@@ -394,9 +382,12 @@
     "runtimeSurfacesTouched": [],
     "trainingStarted": false
   },
-  "nextAllowedAction": "repair PF.0 blocker only",
+  "nextAllowedAction": "BT93R.1",
   "ok": true,
-  "opensNext": [],
+  "opensNext": [
+    "BT93R.1",
+    "93X.0 read-only"
+  ],
   "phaseId": "PF.0",
   "planCheck": {
     "command": "npm.cmd run plan:check",
@@ -410,7 +401,7 @@
       "Master plan validation passed."
     ]
   },
-  "resultClass": "bt94a-no-start-stale",
+  "resultClass": "preflight-green",
   "roadmapSync": {
     "missingTerms": [],
     "ok": true,
@@ -465,7 +456,7 @@
       "phaseId": "94A.1",
       "resultClass": "blocked-no-start",
       "role": "BT94A no-start gate",
-      "sha256": "1748b4751b7a351e438e97029ff3a7d870b949d393caf697bd5eecff2922caee"
+      "sha256": "4cab3718b6ced442defd5e9f98a2d2086d992c0e2c1ea305912daa373ba85add"
     },
     {
       "blockId": "BT93Q",

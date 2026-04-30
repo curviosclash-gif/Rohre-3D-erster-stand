@@ -35,12 +35,14 @@ Branch, Plan-/Docs-Gates, Knowledge-Graph, Roadmap und Terminal-Raw-Sanity sind 
 
 ## Status
 
-PF.0 ist rot abgeschlossen. `BT93R.1` und `93X.0` bleiben blockiert, bis `bt94a_gate_check.py` die R-X-Source-Prioritaet abbildet: `BT93P -> BT93X -> BT93O -> BT93W -> BT93Q`; BT93M/BT93I/BT93C duerfen nur Kontext sein.
+Behoben am 2026-04-30. `bt94a_gate_check.py` bildet die R-X-Source-Prioritaet ab: `BT93P -> BT93X -> BT93O -> BT93W -> BT93Q`; BT93M/BT93I/BT93C bleiben nur Kontext/Fallback.
+
+`data/training/ppo/bt94a/no_start_gate.json` nutzt aktuell `BT93Q.99` als frische Quelle und bleibt korrekt rot fuer BT94A. `data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json` meldet `resultClass=preflight-green`, `bt94aNoStartFresh=true`, `nextAllowedAction=BT93R.1`.
 
 ## Naechste Handlungsempfehlungen
 
-1. `python/scripts/bt94a_gate_check.py` um R-X-Source-Prioritaet erweitern, weil PF.0 nur an stale No-Start-Freshness scheitert.
-2. Danach `bt94a_gate_check.py --write-report` und `bt93r_preflight_gate_sync.py --write-report` erneut ausfuehren, weil nur ein frischer No-Start-Report `preflight-green` oder den naechsten echten Blocker erzeugen darf.
-3. Erst bei `PF.0=preflight-green` `BT93R.1` claimen; der naechste Bot-Training-Fix muss Policy-Collapse/Modell-/Logit-/Normalize-Evidence bearbeiten, keine PPO-Langlaeufe starten.
+1. `BT93R.1` claimen und Handover-/Hypothesen-Lock schreiben, weil PF.0 jetzt gruen ist.
+2. Parallel nur read-only `93X.0` ausfuehren, weil Comparator-Preflight nichts oeffnen darf.
+3. Keine PPO-Langlaeufe starten; der naechste Fix muss Policy-Collapse/Modell-/Logit-/Normalize-Evidence bearbeiten.
 
 Next Step: `/fix-planung`

@@ -1,8 +1,8 @@
 """BT94A claim gate check.
 
-This script records whether BT94A may start from the current refreshed BT93C
-handover inputs. It does not run candidate training and does not create a
-freeze candidate.
+This script records whether BT94A may start from the current refreshed gate
+source. It does not run candidate training and does not create a freeze
+candidate.
 """
 
 from __future__ import annotations
@@ -20,10 +20,17 @@ REPO_ROOT = PYTHON_ROOT.parent
 DEFAULT_BT93C_ROOT = REPO_ROOT / "data" / "training" / "ppo" / "bt93c"
 DEFAULT_OUTPUT = REPO_ROOT / "data" / "training" / "ppo" / "bt94a" / "no_start_gate.json"
 PPO_ROOT = REPO_ROOT / "data" / "training" / "ppo"
-BT93M_HANDOVER_SOURCE = PPO_ROOT / "bt93m" / "handover_package.json"
-BT93M_START_TRUTH_SOURCE = PPO_ROOT / "bt93m" / "start_truth.json"
-BT93L_HANDOVER_SOURCE = PPO_ROOT / "bt93l" / "handover_package.json"
-BT93I_CURRENT_SOURCE = REPO_ROOT / "data" / "training" / "ppo" / "bt93i" / "matrix_green_report.json"
+BT93P_HANDOVER_SOURCE = PPO_ROOT / "bt93p" / "handover_package.json"
+BT93X_HANDOVER_SOURCE = PPO_ROOT / "bt93x" / "handover_package.json"
+BT93O_HANDOVER_SOURCE = PPO_ROOT / "bt93o" / "handover_package.json"
+BT93W_HANDOVER_SOURCE = PPO_ROOT / "bt93w" / "handover_package.json"
+BT93Q_HANDOVER_SOURCE = PPO_ROOT / "bt93q" / "handover_package.json"
+HISTORICAL_FALLBACK_SOURCES = [
+    ("BT93M", PPO_ROOT / "bt93m" / "handover_package.json"),
+    ("BT93M", PPO_ROOT / "bt93m" / "start_truth.json"),
+    ("BT93L", PPO_ROOT / "bt93l" / "handover_package.json"),
+    ("BT93I", PPO_ROOT / "bt93i" / "matrix_green_report.json"),
+]
 SOURCE_ORDER = {
     "BT93C": 93.0,
     "BT93D": 93.1,
@@ -36,6 +43,12 @@ SOURCE_ORDER = {
     "BT93K": 93.8,
     "BT93L": 93.9,
     "BT93M": 94.0,
+    "BT93N": 94.1,
+    "BT93Q": 94.2,
+    "BT93W": 94.3,
+    "BT93O": 94.4,
+    "BT93X": 94.5,
+    "BT93P": 94.6,
 }
 
 
@@ -166,19 +179,29 @@ def _detect_handover_source(
 def _expected_handover_source() -> dict[str, Any]:
     candidates = [
         (
-            "BT93M",
-            BT93M_HANDOVER_SOURCE,
-            "BT93M handover_package.json exists and supersedes older repair handover sources.",
+            "BT93P",
+            BT93P_HANDOVER_SOURCE,
+            "BT93P.4 is the highest-priority BT94A gate source after the R-X repair chain.",
         ),
         (
-            "BT93M",
-            BT93M_START_TRUTH_SOURCE,
-            "BT93M start_truth.json exists and supersedes older repair handover sources for gate freshness.",
+            "BT93X",
+            BT93X_HANDOVER_SOURCE,
+            "BT93X.99 supersedes BT93O/W/Q for BT93P starttruth and BT94A no-start freshness.",
         ),
         (
-            "BT93L",
-            BT93L_HANDOVER_SOURCE,
-            "BT93L handover_package.json exists and supersedes BT93I/BT93C gate sources.",
+            "BT93O",
+            BT93O_HANDOVER_SOURCE,
+            "BT93O.99 supersedes BT93W/Q once action/objective quality is classified.",
+        ),
+        (
+            "BT93W",
+            BT93W_HANDOVER_SOURCE,
+            "BT93W.99 supersedes BT93Q once BT93O preconditions are classified.",
+        ),
+        (
+            "BT93Q",
+            BT93Q_HANDOVER_SOURCE,
+            "BT93Q.99 is the current R-X baseline source until BT93W/O/X/P handovers exist.",
         ),
     ]
     for block_id, path, reason in candidates:
@@ -188,17 +211,66 @@ def _expected_handover_source() -> dict[str, Any]:
                 "reason": reason,
                 "sourceArtifact": _rel(path),
             }
-    if BT93I_CURRENT_SOURCE.exists():
-        return {
-            "blockId": "BT93I",
-            "reason": "BT93I matrix_green_report.json exists and is the latest handover source.",
-            "sourceArtifact": _rel(BT93I_CURRENT_SOURCE),
-        }
+    for block_id, path in HISTORICAL_FALLBACK_SOURCES:
+        if path.exists():
+            return {
+                "blockId": block_id,
+                "reason": (
+                    "Historical fallback source found, but no R-X handover source exists. "
+                    "This cannot open BT94A and should be superseded by BT93Q/W/O/X/P."
+                ),
+                "sourceArtifact": _rel(path),
+            }
     return {
         "blockId": None,
-        "reason": "No newer repair-source artifact detected.",
+        "reason": "No repair-source artifact detected.",
         "sourceArtifact": None,
     }
+
+
+def _payload_claim_field(
+    payload: Mapping[str, Any],
+    bt94a: Mapping[str, Any],
+    decision: Mapping[str, Any],
+    no_start_state: Mapping[str, Any],
+    key: str,
+    decision_key: str | None = None,
+) -> Any:
+    if key in bt94a:
+        return bt94a.get(key)
+    if key in no_start_state:
+        return no_start_state.get(key)
+    if key in payload:
+        return payload.get(key)
+    if decision_key and decision_key in decision:
+        return decision.get(decision_key)
+    return decision.get(key)
+
+
+def _payload_bt94a_reason(
+    payload: Mapping[str, Any],
+    bt94a: Mapping[str, Any],
+    decision: Mapping[str, Any],
+) -> Any:
+    summary = payload.get("summary") if isinstance(payload.get("summary"), Mapping) else {}
+    return (
+        bt94a.get("reason")
+        or decision.get("blockingReason")
+        or decision.get("reason")
+        or summary.get("bt94aReason")
+        or summary.get("bt93oStartReason")
+        or summary.get("recommendedNext")
+    )
+
+
+def _payload_bt94a_ready(payload: Mapping[str, Any], bt94a: Mapping[str, Any], claimable: Any) -> Any:
+    if "ready" in bt94a:
+        return bt94a.get("ready")
+    if "bt94aReady" in payload:
+        return payload.get("bt94aReady")
+    if claimable is not None:
+        return bool(claimable)
+    return None
 
 
 def _source_rank(block_id: Any) -> float:
@@ -217,18 +289,13 @@ def _source_payload_summary(source: Mapping[str, Any]) -> dict[str, Any]:
     payload = _read_json_or_empty(source_path) if source_path else {}
     bt94a = payload.get("bt94aHandover") if isinstance(payload.get("bt94aHandover"), Mapping) else {}
     decision = payload.get("decision") if isinstance(payload.get("decision"), Mapping) else {}
-    claimable = bt94a["claimable"] if "claimable" in bt94a else decision.get("bt94aClaimAllowed")
-    candidate_runs = bt94a["candidateRunsAllowed"] if "candidateRunsAllowed" in bt94a else decision.get("candidateRunsAllowed")
-    matrix_definition = (
-        bt94a["matrixDefinitionAllowed"]
-        if "matrixDefinitionAllowed" in bt94a
-        else decision.get("matrixDefinitionAllowed")
-    )
-    candidate_freeze = (
-        bt94a["candidateFreezeAllowed"]
-        if "candidateFreezeAllowed" in bt94a
-        else decision.get("candidateFreezeAllowed")
-    )
+    no_start_state = payload.get("bt94aNoStartState") if isinstance(payload.get("bt94aNoStartState"), Mapping) else {}
+    claimable = _payload_claim_field(payload, bt94a, decision, no_start_state, "claimable", "bt94aClaimAllowed")
+    if claimable is None:
+        claimable = _payload_claim_field(payload, bt94a, decision, no_start_state, "bt94aClaimAllowed")
+    candidate_runs = _payload_claim_field(payload, bt94a, decision, no_start_state, "candidateRunsAllowed")
+    matrix_definition = _payload_claim_field(payload, bt94a, decision, no_start_state, "matrixDefinitionAllowed")
+    candidate_freeze = _payload_claim_field(payload, bt94a, decision, no_start_state, "candidateFreezeAllowed")
     return {
         "path": _rel(source_path) if source_path else None,
         "sha256": _sha256_file(source_path) if source_path and source_path.is_file() else None,
@@ -236,13 +303,13 @@ def _source_payload_summary(source: Mapping[str, Any]) -> dict[str, Any]:
         "blockId": payload.get("blockId") or source.get("blockId"),
         "phaseId": payload.get("phaseId") or source.get("phaseId"),
         "resultClass": payload.get("resultClass"),
-        "bt94aReady": bt94a.get("ready"),
+        "bt94aReady": _payload_bt94a_ready(payload, bt94a, claimable),
         "bt94aClaimAllowed": claimable,
         "candidateRunsAllowed": candidate_runs,
         "matrixDefinitionAllowed": matrix_definition,
         "candidateFreezeAllowed": candidate_freeze,
-        "bt94aGate": bt94a.get("gate"),
-        "bt94aReason": bt94a.get("reason") or decision.get("blockingReason") or decision.get("reason"),
+        "bt94aGate": bt94a.get("gate") or payload.get("bt94aGate"),
+        "bt94aReason": _payload_bt94a_reason(payload, bt94a, decision),
     }
 
 

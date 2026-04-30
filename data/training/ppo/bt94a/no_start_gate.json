@@ -29,19 +29,19 @@
     "handoverReady": false,
     "handoverResultClass": "diagnose",
     "latestSourceState": {
-      "blockId": "BT93M",
+      "blockId": "BT93Q",
       "bt94aClaimAllowed": false,
-      "bt94aGate": "closed-gate-fresh-dqn-anchor-blocked-by-bt93m",
+      "bt94aGate": null,
       "bt94aReady": false,
-      "bt94aReason": "BT93M refreshed the gate source, but Same-Matrix-DQN is blocked and DeathBefore60/extension/no-start blockers remain active.",
+      "bt94aReason": "BT93Q did not close walltrail-policy-green; policy/action/telemetry/reward blockers remain active.",
       "candidateFreezeAllowed": false,
       "candidateRunsAllowed": false,
-      "generatedBy": "python/scripts/bt93m_comparator_no_start_refresh.py",
+      "generatedBy": "python/scripts/bt93q_closure_gate.py",
       "matrixDefinitionAllowed": false,
-      "path": "data/training/ppo/bt93m/handover_package.json",
-      "phaseId": "93M.3",
-      "resultClass": "gate-fresh-dqn-anchor-blocked",
-      "sha256": "fc7f20a835915ba1c5488f22f77f9c13344dff1f3b7a0e2ed5bc6d27b7e38616"
+      "path": "data/training/ppo/bt93q/handover_package.json",
+      "phaseId": "93Q.99",
+      "resultClass": "policy-collapse-active",
+      "sha256": "6730aac188855620a2eb8176e6555145cb1d70ea255cf3e83aa1840e95ca80c4"
     },
     "matrixId": "bt93c-dqn-ppo-precomparison-v1",
     "modelPackage": {
@@ -76,20 +76,20 @@
     {
       "blocksStart": false,
       "id": "current_handover_source_is_latest",
-      "observed": "BT93M",
+      "observed": "BT93Q",
       "ok": true,
-      "required": "BT93M"
+      "required": "BT93Q"
     },
     {
       "blocksStart": true,
       "id": "current_handover_source_allows_bt94a",
       "observed": {
-        "blockId": "BT93M",
+        "blockId": "BT93Q",
         "bt94aClaimAllowed": false,
         "bt94aReady": false,
         "candidateRunsAllowed": false,
         "matrixDefinitionAllowed": false,
-        "resultClass": "gate-fresh-dqn-anchor-blocked"
+        "resultClass": "policy-collapse-active"
       },
       "ok": false,
       "required": "fresh source resultClass=BT94A-ready with bt94aHandover.ready=true and claimable=true"
@@ -125,7 +125,7 @@
   ],
   "claimable": false,
   "currentHandoverSource": {
-    "blockId": "BT93M",
+    "blockId": "BT93Q",
     "detectedBt93cInputSource": {
       "blockId": "BT93I",
       "fallbackUsed": false,
@@ -134,29 +134,29 @@
       "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
     },
     "expected": {
-      "blockId": "BT93M",
-      "reason": "BT93M handover_package.json exists and supersedes older repair handover sources.",
-      "sourceArtifact": "data/training/ppo/bt93m/handover_package.json"
+      "blockId": "BT93Q",
+      "reason": "BT93Q.99 is the current R-X baseline source until BT93W/O/X/P handovers exist.",
+      "sourceArtifact": "data/training/ppo/bt93q/handover_package.json"
     },
     "fallbackUsed": false,
     "fresh": true,
-    "generatedBy": "python/scripts/bt93m_comparator_no_start_refresh.py",
-    "phaseId": "93M.3",
-    "sourceArtifact": "data/training/ppo/bt93m/handover_package.json",
+    "generatedBy": "python/scripts/bt93q_closure_gate.py",
+    "phaseId": "93Q.99",
+    "sourceArtifact": "data/training/ppo/bt93q/handover_package.json",
     "sourceState": {
-      "blockId": "BT93M",
+      "blockId": "BT93Q",
       "bt94aClaimAllowed": false,
-      "bt94aGate": "closed-gate-fresh-dqn-anchor-blocked-by-bt93m",
+      "bt94aGate": null,
       "bt94aReady": false,
-      "bt94aReason": "BT93M refreshed the gate source, but Same-Matrix-DQN is blocked and DeathBefore60/extension/no-start blockers remain active.",
+      "bt94aReason": "BT93Q did not close walltrail-policy-green; policy/action/telemetry/reward blockers remain active.",
       "candidateFreezeAllowed": false,
       "candidateRunsAllowed": false,
-      "generatedBy": "python/scripts/bt93m_comparator_no_start_refresh.py",
+      "generatedBy": "python/scripts/bt93q_closure_gate.py",
       "matrixDefinitionAllowed": false,
-      "path": "data/training/ppo/bt93m/handover_package.json",
-      "phaseId": "93M.3",
-      "resultClass": "gate-fresh-dqn-anchor-blocked",
-      "sha256": "fc7f20a835915ba1c5488f22f77f9c13344dff1f3b7a0e2ed5bc6d27b7e38616"
+      "path": "data/training/ppo/bt93q/handover_package.json",
+      "phaseId": "93Q.99",
+      "resultClass": "policy-collapse-active",
+      "sha256": "6730aac188855620a2eb8176e6555145cb1d70ea255cf3e83aa1840e95ca80c4"
     },
     "supersedesDetectedSource": {
       "blockId": "BT93I",
@@ -166,9 +166,9 @@
       "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
     }
   },
-  "generatedAt": "2026-04-30T06:27:33Z",
+  "generatedAt": "2026-04-30T07:05:20Z",
   "generatedBy": "python/scripts/bt94a_gate_check.py",
-  "gitSha": "2d6795bc53b07018b315ceb40bd3c7431fe9b9f6",
+  "gitSha": "63198fb5bd46572b07729e69529285499f99939f",
   "matrixDefinitionAllowed": false,
   "nextGate": {
     "fallback": "user-owned replan or return to PPO diagnosis before candidate ablations",
@@ -189,7 +189,7 @@
       "BT94B handover",
       "promotion or rollout signal"
     ],
-    "reason": "BT93M refreshed the gate source, but Same-Matrix-DQN is blocked and DeathBefore60/extension/no-start blockers remain active.",
+    "reason": "BT93Q did not close walltrail-policy-green; policy/action/telemetry/reward blockers remain active.",
     "status": "BT94A remains closed before 94A.1"
   },
   "ok": true,
@@ -197,8 +197,8 @@
   "resultClass": "blocked-no-start",
   "sourceArtifacts": {
     "currentHandoverSource": {
-      "path": "data/training/ppo/bt93m/handover_package.json",
-      "sha256": "fc7f20a835915ba1c5488f22f77f9c13344dff1f3b7a0e2ed5bc6d27b7e38616"
+      "path": "data/training/ppo/bt93q/handover_package.json",
+      "sha256": "6730aac188855620a2eb8176e6555145cb1d70ea255cf3e83aa1840e95ca80c4"
     },
     "evidenceQualityMatrix": {
       "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",

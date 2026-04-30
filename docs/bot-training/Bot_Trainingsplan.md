@@ -387,8 +387,8 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93M | 2026-04-29 | frei | abgeschlossen 2026-04-29 als `gate-fresh-dqn-anchor-blocked`; BT93N nur diagnose-only/Loader/User-Entscheid |
 | Bot-Codex | BT93N | 2026-04-29 | frei | abgeschlossen 2026-04-30 als `diagnose-loop-required`; BT93Q folgt, BT93O bleibt blockiert |
 | Bot-Codex | BT93Q | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `policy-collapse-active`; BT93O bleibt blockiert |
-| Bot-Codex | PF.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `bt94a-no-start-stale`; BT93R bleibt blockiert |
-| - | BT93R | - | frei | wartet auf PF.0 `preflight-green` oder dokumentierte User-Ausnahme |
+| Bot-Codex | PF.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `preflight-green`; BT93R.1 und 93X.0 read-only sind startbar |
+| - | BT93R | - | frei | PF.0 `preflight-green`; naechste Phase 93R.1 |
 | - | BT93S | - | frei | wartet auf BT93R.99 in R-Allowlist |
 | - | BT93T | - | frei | wartet auf Telemetry-Start aus BT93S |
 | - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
@@ -910,7 +910,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93M | Gate-Wahrheit und DQN-Same-Matrix-Anker | completed | P1 | BT93L.99 (`diagnose-loop-required`) + User-Intake 2026-04-29 | 93M.99 abgeschlossen: `gate-fresh-dqn-anchor-blocked` | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93N | DeathBefore60-Stability und Terminal-Root-Cause | completed | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.99 abgeschlossen; `diagnose-loop-required`, BT93Q ist naechster Repair, BT93O/BT94A bleiben blockiert | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT93Q | DeathBefore60 Wall/Trail Policy Repair | completed | P1 | BT93N.99 (`diagnose-loop-required`, `death-before60-still-blocking`) | 93Q.99 abgeschlossen; `policy-collapse-active`, BT93O bleibt blockiert | `docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md` |
-| PF.0 | R-X Plan-, Branch-, Graph- und No-Start-Preflight | completed | P0 | BT93Q.99 `policy-collapse-active` | PF.0 abgeschlossen: `bt94a-no-start-stale` | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
+| PF.0 | R-X Plan-, Branch-, Graph- und No-Start-Preflight | completed | P0 | BT93Q.99 `policy-collapse-active` | PF.0 abgeschlossen: `preflight-green`; BT93R.1 und 93X.0 read-only offen | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93R | Policy-Artefakt und deterministic-collapse Repair | planned | P1 | PF.0 `preflight-green` oder dokumentierte User-Ausnahme | 93R.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | planned | P1 | BT93R.99 in R-Allowlist | 93S.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | BT93S.99=`observation-telemetry-required` oder Telemetry-Start | 93T.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3320,7 +3320,7 @@ Pflicht-Evidence:
 
 Quelle: `docs/plaene/neu/BT93Q_DeathBefore60_WallTrail_Policy_Repair_Intake_2026-04-30.md`
 
-<!-- LOCK: frei; abgeschlossen 2026-04-30 als PF.0 bt94a-no-start-stale -->
+<!-- LOCK: frei; abgeschlossen 2026-04-30 als 93Q.99 policy-collapse-active -->
 
 Scope:
 
@@ -3506,7 +3506,7 @@ Primaerer Scope:
 - [x] DoD.PF.1 Branch-/Main-Guard ist geprueft; falscher Branch endet `branch-guard-blocked`, ausser der User erlaubt eine dokumentierte Ausnahme. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_preflight_gate_sync.py --write-report` -> `data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json`)
 - [x] DoD.PF.2 `plan:check`, `docs:sync` und `docs:check` sind geprueft oder als blockierend dokumentiert. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_preflight_gate_sync.py --write-report` -> `data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json`)
 - [x] DoD.PF.3 Knowledge-Graph-Open-Deps fuer `BT93O`, `BT93P` und `BT94A` sind nicht stale; Drift endet `plan-graph-drift`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_preflight_gate_sync.py --write-report` -> `data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json`)
-- [x] DoD.PF.4 `bt94a_gate_check.py --write-report` ist frisch oder ehrlich als `bt94a-no-start-stale` blockiert. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_preflight_gate_sync.py --write-report` -> `data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json`)
+- [x] DoD.PF.4 `bt94a_gate_check.py --write-report` ist frisch oder ehrlich als `bt94a-no-start-stale` blockiert. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_preflight_gate_sync.py --write-report` -> `data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json`; Ergebnis nach Reparatur: `preflight-green`)
 - [x] DoD.PF.5 Roadmap und Masterplan nennen R-X als aktive Reparaturkette; alte `BT93M-P`-Kurzformeln duerfen keine Freigabe gegen R-X erzeugen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_preflight_gate_sync.py --write-report` -> `data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json`)
 - [x] DoD.PF.6 Terminal-Raw-Sanity aus BT93Q/BT93N zeigt keine bereits sichtbare Terminal-Kontradiktion; sonst wird Reward-/Action-Fix blockiert. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_preflight_gate_sync.py --write-report` -> `data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json`)
 - [x] DoD.PF.7 Report schreibt `branch`, `guardMain`, `planCheck`, `docsSync`, `docsCheck`, `graphOpenDeps`, `bt94aNoStartFreshness`, `roadmapSyncRequired`, `terminalRawSanity` und `nextAllowedAction`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_preflight_gate_sync.py --write-report` -> `data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json`)
@@ -3526,15 +3526,16 @@ Primaerer Scope:
 Pflicht-Evidence:
 
 - `data/training/ppo/bt93r/bt93r_preflight_gate_sync_report.json`
+- `data/training/ppo/bt94a/no_start_gate.json`
 - `docs/Fehlerberichte/2026-04-30_pf0-bt94a-no-start-stale.md`
 
-Ergebnis: `PF.0=bt94a-no-start-stale`; `BT93R.1` und `93X.0` bleiben geschlossen, bis `bt94a_gate_check.py` die R-X-Prioritaet (`BT93P -> BT93X -> BT93O -> BT93W -> BT93Q`) als frische No-Start-Quelle abbildet.
+Ergebnis: `PF.0=preflight-green`; `bt94a_gate_check.py` bildet die R-X-Prioritaet (`BT93P -> BT93X -> BT93O -> BT93W -> BT93Q`) ab, `no_start_gate.json` nutzt aktuell `BT93Q.99` als frische Quelle, `BT93R.1` und read-only `93X.0` sind geoeffnet. `BT93O`, `BT93P`, `BT94A`, Candidate, Freeze, Holdout, Promote und Rollout bleiben geschlossen.
 
 ### Risiko-Register PF.0
 
 | Risiko | Severity | Owner | Mitigation | Trigger |
 | --- | --- | --- | --- | --- |
-| Stale No-Start-Gate oeffnet falsche Folgearbeit | kritisch | Governance | `bt94a-no-start-stale` blockiert R-X | Gate nennt alte BT93I/M/C-Quelle als aktuelle Wahrheit |
+| Stale No-Start-Gate oeffnet falsche Folgearbeit | kritisch | Governance | R-X-Source-Prioritaet im Gate erzwingen; `bt94a-no-start-stale` blockiert R-X | Gate nennt alte BT93I/M/C-Quelle als aktuelle Wahrheit |
 | Branch-/Plan-Drift wird uebergangen | hoch | Governance | `branch-guard-blocked` oder `plan-graph-drift` | Guard oder Knowledge-Graph rot |
 | Roadmap bleibt zu breit | mittel | Planung | R-X-Fokus im Roadmap-Kopf fuehren | Roadmap liest BT93M-P als direkte Freigabe |
 
@@ -4668,8 +4669,8 @@ Rollout-Intake-Pflichtpaket:
 | 20 | `BT93M` Abschluss-Gate `93M.99` abgeschlossen; kein PPO-Longrun. | `93M.1` bis `93M.3` sind abgeschlossen; `comparison_policy_decision.json` meldet `dqn-anchor-blocked`; BT94A-No-Start ist frisch rot. | Ergebnis `gate-fresh-dqn-anchor-blocked`; kein BT94A-Claim, BT93N nur diagnose-only/Loader/User-Entscheid/Stop. |
 | 21 | Nur nach `BT93M.99`: `BT93N DeathBefore60-Stability, MaxStep-Plateau und Terminal-Root-Cause`. | Gate-Wahrheit ist frisch; DQN-Anker liegt vor oder `dqn-anchor-blocked` ist als User-Entscheid offen; Freeze-Holdout bleibt unberuehrt. | DeathBefore60-Ursache, MaxStep-Plateau-Klassifikation, Stabilitaetsfix und 10k->50k->100k-Leiter mit Stop-Gates; kein Candidate. |
 | 22 | `BT93Q DeathBefore60 Wall/Trail Policy Repair` abgeschlossen. | `gateClass=death-before60-still-blocking`, `rootCause=wall/trail`, deterministische Eval-Policy kollabiert auf `yaw-right`; 50k/100k wurden korrekt nicht gestartet. | `BT93Q.99=policy-collapse-active`; aktive Blocker `action-space-required`, `observation-telemetry-required`, `reward-redesign-required`, `safety-action-contract-diagnostic-only`; kein BT93O-/BT94A-Signal. |
-| 23 | `PF.0 R-X Plan-, Branch-, Graph- und No-Start-Preflight` abgeschlossen. | `BT93Q.99=policy-collapse-active`; neuer R-X-Intake ist aufgenommen. | `bt93r_preflight_gate_sync_report.json` meldet `bt94a-no-start-stale`; `BT93R.1` und `93X.0` bleiben geschlossen. |
-| 24 | Erst nach repariertem PF.0: `BT93R Policy-Artefakt und deterministic-collapse Repair`; parallel nur read-only `93X.0`. | BT94A-No-Start-Freshness ist gegen R-X geklaert. | Policy-/Logit-/Normalize-Evidence und Collapse-Counterprobe; kein PPO-Run in 93R.1. |
+| 23 | `PF.0 R-X Plan-, Branch-, Graph- und No-Start-Preflight` abgeschlossen. | `BT93Q.99=policy-collapse-active`; neuer R-X-Intake ist aufgenommen. | `bt93r_preflight_gate_sync_report.json` meldet `preflight-green`; `BT93R.1` und read-only `93X.0` sind geoeffnet. |
+| 24 | `BT93R Policy-Artefakt und deterministic-collapse Repair`; parallel nur read-only `93X.0`. | PF.0 `preflight-green`; BT94A-No-Start-Freshness ist gegen R-X geklaert. | Policy-/Logit-/Normalize-Evidence und Collapse-Counterprobe; kein PPO-Run in 93R.1. |
 | 25 | `BT93S` bis `BT93W` als enge Blocker-Resolution-Leiter. | `BT93R.99` in R-Allowlist; Telemetry-/Reward-/Safety-/Terminal-Depends-On jeweils gruen. | Action-Selection, Raw-/Trail-Telemetrie, Reward-Ordering, Safety-/Terminal-Sanity und maximal 10k-Recheck; Ziel nur `bt93o-precondition-green`. |
 | 26 | Nur nach `BT93W.99=bt93o-precondition-green`: `BT93O Action-/Objective-Quality und Anti-Plateau`. | R/S/T/U/V/W sind gruen, gleiche IDs oder Drift-Invalidierung liegen vor. | Einziger gruener Ausgang `bt93o-quality-green`; kein BT93P-/BT94A-Signal. |
 | 27 | Nur nach `BT93O.99=bt93o-quality-green`: voller `BT93X Same-Matrix-DQN oder Ersatzvergleich + BT93P Starttruth`. | `93X.0` ist abgeschlossen; BT93O-Qualitaetsbasis steht. | `bt93p-starttruth-green` oder konkreter Comparator-/DQN-/User-Entscheid-Blocker; BT94A bleibt rot. |
