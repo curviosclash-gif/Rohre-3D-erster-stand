@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 389,
+          "concreteCount": 392,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 527,
+          "concreteCount": 530,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 385,
+          "concreteCount": 388,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 384,
+          "concreteCount": 387,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1026,
+          "concreteCount": 1029,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1034,
+          "concreteCount": 1037,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1727,7 +1727,7 @@
       "id": "BT93RR",
       "type": "block",
       "title": "BT93R-Reentry Policy-Artefakt auf neuer Retrain-Lineage",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "source": [
           "bot-training-plan"
@@ -1746,13 +1746,14 @@
           "data/training/ppo/bt93y/retrain_lineage_manifest.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "python/scripts/bt93r_reentry_artifact_probe.py",
+          "python/scripts/bt93r_reentry_closure_gate.py",
           "python/scripts/bt93r_reentry_counterprobe.py",
           "python/scripts/bt93r_reentry_handover_lock.py",
           "python/scripts/bt93r_reentry_root_cause.py"
         ],
         "scopeResolution": {
-          "concreteCount": 10,
-          "plannedCount": 2
+          "concreteCount": 13,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5190,7 +5191,7 @@
       "id": "BT93RR.99",
       "type": "phase",
       "title": "Abschluss",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93RR",
         "phaseCode": "93RR.99"
@@ -14841,8 +14842,8 @@
     {
       "id": "BT93RR.99.1",
       "type": "subphase",
-      "title": "Closure schreibt `resultClass`, `allowNext[]`, `blocksNext[]`, `sampleCounts`, `claimFlags`, Guardrails und alle Source-Artefakte.",
-      "status": "open",
+      "title": "Closure schreibt `resultClass`, `allowNext[]`, `blocksNext[]`, `sampleCounts`, `claimFlags`, Guardrails und alle Source-Artefakte. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_closure_gate.py --write-reports` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json`, `phaseCoverage.93RR.99.1=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93RR",
         "phaseCode": "93RR.99",
@@ -14852,8 +14853,8 @@
     {
       "id": "BT93RR.99.2",
       "type": "subphase",
-      "title": "R-Allowlist oeffnet nur `BT93S`; kein Ergebnis oeffnet `BT93O`, `BT93P`, `BT94A`, Candidate, Freeze, Holdout, Promote, Rollout oder PPO-Validate.",
-      "status": "open",
+      "title": "R-Allowlist oeffnet nur `BT93S`; kein Ergebnis oeffnet `BT93O`, `BT93P`, `BT94A`, Candidate, Freeze, Holdout, Promote, Rollout oder PPO-Validate. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_closure_gate.py --write-reports` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json`, `openedBlocks=[BT93S]`, `blockedActions` includes BT93O/P/94A/candidate/freeze/holdout/promote/rollout/PPO-Validate)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93RR",
         "phaseCode": "93RR.99",
@@ -14863,8 +14864,8 @@
     {
       "id": "BT93RR.99.3",
       "type": "subphase",
-      "title": "Alter roter `BT93R.99=model-artifact-missing` bleibt referenziert, aber wird nicht nachtraeglich umgeschrieben.",
-      "status": "open",
+      "title": "Alter roter `BT93R.99=model-artifact-missing` bleibt referenziert, aber wird nicht nachtraeglich umgeschrieben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_closure_gate.py --write-reports` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json`, `historicalBt93R.preservedAsHistoricalTruth=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93RR",
         "phaseCode": "93RR.99",
@@ -14874,8 +14875,8 @@
     {
       "id": "BT93RR.99.4",
       "type": "subphase",
-      "title": "Abschluss-Gates: `npm.cmd run gates:pre-commit`; Tests/Trainingslaeufe bleiben user-owned ausser fuer dieses `*.99`-Gate noetige kleine Diagnose-Kommandos.",
-      "status": "open",
+      "title": "Abschluss-Gates: `npm.cmd run gates:pre-commit`; Tests/Trainingslaeufe bleiben user-owned ausser fuer dieses `*.99`-Gate noetige kleine Diagnose-Kommandos. (abgeschlossen: 2026-04-30; evidence: `npm.cmd run gates:pre-commit` -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93RR",
         "phaseCode": "93RR.99",
@@ -29822,9 +29823,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93RR"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -29879,9 +29886,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93RR"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -38171,6 +38184,27 @@
     },
     {
       "id": "python/scripts/bt93r_reentry_artifact_probe.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93RR"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93r_reentry_closure_gate.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -75540,6 +75574,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
       "type": "scope",
       "hint": null,
@@ -75550,6 +75593,15 @@
     {
       "from": "BT90",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -77062,6 +77114,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93r_reentry_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93r_reentry_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79238,6 +79299,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
       "type": "scope",
       "hint": null,
@@ -79248,6 +79318,15 @@
     {
       "from": "BT91",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -80742,6 +80821,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93r_reentry_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93r_reentry_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84116,6 +84204,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
       "type": "scope",
       "hint": null,
@@ -84126,6 +84223,15 @@
     {
       "from": "BT92",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -85629,6 +85735,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93r_reentry_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93r_reentry_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88104,6 +88219,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
       "type": "scope",
       "hint": null,
@@ -88114,6 +88238,15 @@
     {
       "from": "BT93B",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -89617,6 +89750,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93r_reentry_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93r_reentry_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98496,6 +98638,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
       "type": "scope",
       "hint": null,
@@ -98506,6 +98657,15 @@
     {
       "from": "BT93D",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -100009,6 +100169,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93r_reentry_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93r_reentry_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -108063,6 +108232,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
       "type": "scope",
       "hint": null,
@@ -108073,6 +108251,15 @@
     {
       "from": "BT93E",
       "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -109585,6 +109772,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93r_reentry_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93r_reentry_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -135761,7 +135957,7 @@
       "source": "master-table",
       "hard": true,
       "fulfilled": true,
-      "hint": "aktiviert 2026-04-30 als Maschinen-ID fuer Alias `BT93R-Reentry`; alter roter `BT93R` bleibt historische Wahrheit",
+      "hint": "abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S, alter roter `BT93R` bleibt historische Wahrheit",
       "attributes": {
         "dependsPhase": "93Y.99",
         "rawToken": "BT93Y.99",
@@ -135846,6 +136042,15 @@
     {
       "from": "BT93RR",
       "to": "python/scripts/bt93r_reentry_artifact_probe.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93RR",
+      "to": "python/scripts/bt93r_reentry_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -136111,8 +136316,8 @@
       "type": "depends_on",
       "source": "master-table",
       "hard": true,
-      "fulfilled": false,
-      "hint": "Wall-/Trail Action-Effekt und Action-Selection Repair",
+      "fulfilled": true,
+      "hint": "Wall-/Trail Action-Effekt und Action-Selection Repair ist naechster erlaubter Scope",
       "attributes": {
         "dependsPhase": "93Y.99",
         "rawToken": "BT93Y.99",

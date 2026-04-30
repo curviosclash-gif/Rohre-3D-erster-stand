@@ -51,7 +51,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Training
 - Der Intake `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` ist als Reparaturkette `PF.0`, `BT93R` bis `BT93W`, fruehes read-only `BT93X.0`, danach `BT93O` und voller `BT93X` vor `BT93P` aufgenommen; `BT93O` bleibt bis `BT93W.99=bt93o-precondition-green` geschlossen.
 - Der Intake `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` ist als P0-Interposer nach rotem `BT93R.99=model-artifact-missing` und `BT93X.0=dqn-loader-fix-required` aufgenommen; `BT93Y.99` ist als `retrain-lineage-ready-bt93r-reentry-ready` abgeschlossen; naechste claimbare Arbeit ist nur der neue `BT93R-Reentry`, nicht `BT93S/O/X/P/94A`.
 - `BT93Y` trennt exakte BT93N-Lineage-Recovery von neuer Retraining-Lineage und lockt die Ersatzvergleichspolitik `bt93x-rcp1-same-matrix-control-suite-no-bt11`; ein gruener `BT93Y.99` oeffnet nur einen neuen `BT93R-Reentry`-Probe-/Root-Cause-/Counterprobe-Claim.
-- `BT93Y.99` oeffnet nur einen neuen `BT93R-Reentry`, nicht `BT93S/O/X/P/94A`; `BT93S` bleibt bis erneutem `BT93R-Reentry.99` in R-Allowlist geschlossen.
+- `BT93RR.99` (`BT93R-Reentry`) ist als `eval-mode-bug-fixed-counterprobe-green` abgeschlossen und oeffnet nur `BT93S`; `BT93O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout und PPO-Validate bleiben geschlossen.
 - Die BT93L-Baseline-Matrix zeigt ein hartes Reward-Ordnungsrisiko: `random` und `semantic-cycle` erreichen in Kurzfenstern teilweise gleichwertige oder bessere Progress-/Objective-Signale als `scripted-reachability`; `BT93U`/`BT93O` muessen das mit gepinnten Szenariofenstern widerlegen oder reparieren, sonst bleiben `BT93P` und `BT94A` blockiert.
 - Kein BT94A, kein Candidate, kein Freeze, kein Holdout, kein Promote, kein Rollout und kein weiterer Blind-Longrun vor `BT93O.99=bt93o-quality-green`, `BT93X.99=bt93p-starttruth-green`, frischem `BT93P.4=BT94A-ready` plus gruenem `bt94a_gate_check.py`.
 
@@ -331,8 +331,8 @@ Mikro-Claim-Regel:
 | BT93R | PF.0 `preflight-green` oder dokumentierte User-Ausnahme | hard | ja | abgeschlossen rot als `model-artifact-missing`; kein R-Allowlist-Ergebnis, BT93S bleibt blockiert |
 | BT93X.0 | PF.0 `preflight-green`; read-only | soft | ja | abgeschlossen read-only als `dqn-loader-fix-required`; kein positives Startsignal |
 | BT93Y | BT93R.99 `model-artifact-missing` + X0-Preflight-Report `dqn-loader-fix-required` + User-Intake 2026-04-30 | hard | ja | Lineage-Recovery/Retraining, Ersatzvergleichspolitik und neuer BT93R-Reentry; 93Y.99 abgeschlossen, einziger naechster Scope ist neuer BT93R-Reentry |
-| BT93RR | BT93Y.99 mit `bt93rReentryAllowed=true` und `retrain-lineage-ready-bt93r-reentry-ready` | hard | ja | aktiviert 2026-04-30 als Maschinen-ID fuer Alias `BT93R-Reentry`; alter roter `BT93R` bleibt historische Wahrheit |
-| BT93S | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | hard | nein | Wall-/Trail Action-Effekt und Action-Selection Repair |
+| BT93RR | BT93Y.99 mit `bt93rReentryAllowed=true` und `retrain-lineage-ready-bt93r-reentry-ready` | hard | ja | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S, alter roter `BT93R` bleibt historische Wahrheit |
+| BT93S | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | hard | ja | Wall-/Trail Action-Effekt und Action-Selection Repair ist naechster erlaubter Scope |
 | BT93T | BT93S.99=`observation-telemetry-required` oder eigener Telemetry-Start | hard | nein | training-only Raw-/Trail-/Escape-Lane-Telemetrie; danach S-Recheck |
 | BT93U | BT93T.99=`telemetry-green` + S-Recheck `action-selection-green` | hard | nein | Danger-aware Reward- und Objective-Ordering Repair |
 | BT93V | BT93U.99=`reward-ordering-green` | hard | nein | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision |
@@ -400,8 +400,8 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93R | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `model-artifact-missing`; kein R-Allowlist-Ergebnis, BT93S bleibt blockiert |
 | Bot-Codex | BT93X.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als read-only `dqn-loader-fix-required`; oeffnet nichts |
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
-| Bot-Codex | BT93RR | 2026-04-30 | active | 93RR.99 Abschluss-Gate nach gruener Eval-Mode-Counterprobe; kein BT93S/O/P/94A-Signal vor Closure |
-| - | BT93S | - | frei | wartet auf BT93Y.99 plus erneutes BT93RR.99 in R-Allowlist |
+| Bot-Codex | BT93RR | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S |
+| - | BT93S | - | frei | geoeffnet durch BT93RR.99 in R-Allowlist; naechster Fix-Planung-Scope |
 | - | BT93T | - | frei | wartet auf Telemetry-Start aus BT93S |
 | - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -925,8 +925,8 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93R | Policy-Artefakt und deterministic-collapse Repair | completed | P1 | PF.0 `preflight-green` oder dokumentierte User-Ausnahme | 93R.99 abgeschlossen: `model-artifact-missing`; kein R-Allowlist-Ergebnis | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93X.0 | Early Comparator Preflight | completed | P1 | PF.0 `preflight-green`; read-only | 93X.0 abgeschlossen: `dqn-loader-fix-required`; oeffnet nichts | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93Y | PPO Lineage-Recovery/Retraining und Ersatzvergleich | completed | P0 | BT93R.99 `model-artifact-missing` + X0-Preflight-Report `dqn-loader-fix-required` | 93Y.99 abgeschlossen: `retrain-lineage-ready-bt93r-reentry-ready`, oeffnet nur BT93R-Reentry | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
-| BT93RR | Policy-Artefakt Reentry auf neuer Retrain-Lineage (`BT93R-Reentry`) | planned | P0 | BT93Y.99 `retrain-lineage-ready-bt93r-reentry-ready` + `bt93rReentryAllowed=true` | 93RR.99 | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
-| BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | planned | P1 | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | 93S.1 gesperrt | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
+| BT93RR | Policy-Artefakt Reentry auf neuer Retrain-Lineage (`BT93R-Reentry`) | completed | P0 | BT93Y.99 `retrain-lineage-ready-bt93r-reentry-ready` + `bt93rReentryAllowed=true` | 93RR.99 abgeschlossen: `eval-mode-bug-fixed-counterprobe-green`, oeffnet nur BT93S | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
+| BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | planned | P1 | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | 93S.1 offen | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | BT93S.99=`observation-telemetry-required` oder Telemetry-Start | 93T.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | BT93T.99=`telemetry-green` + S-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93V | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision | planned | P1 | BT93U.99=`reward-ordering-green` | 93V.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3667,9 +3667,9 @@ Primaerer Scope:
 - [x] DoD.RR2 Artifact-Probe laedt Modell, Config, VecNormalize, Optimizer-State und Action-Surface deterministisch oder endet `policy-evidence-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_artifact_probe.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json`, `resultClass=artifact-probe-green`)
 - [x] DoD.RR3 Root-Cause trennt deterministic eval, stochastic eval, train sampling, decoder/argmax, entropy/logits, normalize-state, action mapping, reward pressure und truncation/terminal bias. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_root_cause.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json`, `resultClass=eval-argmax-collapse`)
 - [x] DoD.RR4 Counterprobe nutzt dieselbe Matrix und mindestens Eval-Seeds 944, 945, 946 plus kleine zusaetzliche Seed-Kontrolle; maximal 1k Diagnose-Timesteps, kein Qualitaetsclaim. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_counterprobe.py --write-report` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json`, `phaseCoverage.DoD.RR4=true`, `sampleCounts.diagnosticSteps=1000`)
-- [ ] DoD.RR5 Gruen ist nur `policy-collapse-green`, `decoder-fix-counterprobe-green`, `normalize-fix-counterprobe-green` oder `eval-mode-bug-fixed-counterprobe-green`.
-- [ ] DoD.RR6 Rot ist `policy-collapse-active`, `policy-evidence-invalid`, `normalize-mismatch`, `model-artifact-missing` oder `measurement-invalid`.
-- [ ] DoD.RR7 `BT93S` bleibt geschlossen, wenn Reentry nicht in R-Allowlist endet; `BT93O/P/94A` bleiben in jedem Fall geschlossen.
+- [x] DoD.RR5 Gruen ist nur `policy-collapse-green`, `decoder-fix-counterprobe-green`, `normalize-fix-counterprobe-green` oder `eval-mode-bug-fixed-counterprobe-green`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_closure_gate.py --write-reports` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json`, `resultClass=eval-mode-bug-fixed-counterprobe-green`)
+- [x] DoD.RR6 Rot ist `policy-collapse-active`, `policy-evidence-invalid`, `normalize-mismatch`, `model-artifact-missing` oder `measurement-invalid`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_closure_gate.py --write-reports` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json`, `redResultClasses` pinned, `resultClass` green)
+- [x] DoD.RR7 `BT93S` bleibt geschlossen, wenn Reentry nicht in R-Allowlist endet; `BT93O/P/94A` bleiben in jedem Fall geschlossen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_closure_gate.py --write-reports` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json`, `openedBlocks=[BT93S]`, `bt93oClaimAllowed=false`, `bt93pClaimAllowed=false`, `bt94aClaimAllowed=false`)
 
 ### 93RR.1 Artifact-Probe und Handover-Lock
 
@@ -3707,10 +3707,10 @@ Pflicht-Evidence:
 
 ### 93RR.99 Abschluss
 
-- [ ] 93RR.99.1 Closure schreibt `resultClass`, `allowNext[]`, `blocksNext[]`, `sampleCounts`, `claimFlags`, Guardrails und alle Source-Artefakte.
-- [ ] 93RR.99.2 R-Allowlist oeffnet nur `BT93S`; kein Ergebnis oeffnet `BT93O`, `BT93P`, `BT94A`, Candidate, Freeze, Holdout, Promote, Rollout oder PPO-Validate.
-- [ ] 93RR.99.3 Alter roter `BT93R.99=model-artifact-missing` bleibt referenziert, aber wird nicht nachtraeglich umgeschrieben.
-- [ ] 93RR.99.4 Abschluss-Gates: `npm.cmd run gates:pre-commit`; Tests/Trainingslaeufe bleiben user-owned ausser fuer dieses `*.99`-Gate noetige kleine Diagnose-Kommandos.
+- [x] 93RR.99.1 Closure schreibt `resultClass`, `allowNext[]`, `blocksNext[]`, `sampleCounts`, `claimFlags`, Guardrails und alle Source-Artefakte. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_closure_gate.py --write-reports` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json`, `phaseCoverage.93RR.99.1=true`)
+- [x] 93RR.99.2 R-Allowlist oeffnet nur `BT93S`; kein Ergebnis oeffnet `BT93O`, `BT93P`, `BT94A`, Candidate, Freeze, Holdout, Promote, Rollout oder PPO-Validate. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_closure_gate.py --write-reports` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json`, `openedBlocks=[BT93S]`, `blockedActions` includes BT93O/P/94A/candidate/freeze/holdout/promote/rollout/PPO-Validate)
+- [x] 93RR.99.3 Alter roter `BT93R.99=model-artifact-missing` bleibt referenziert, aber wird nicht nachtraeglich umgeschrieben. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93r_reentry_closure_gate.py --write-reports` -> `data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json`, `historicalBt93R.preservedAsHistoricalTruth=true`)
+- [x] 93RR.99.4 Abschluss-Gates: `npm.cmd run gates:pre-commit`; Tests/Trainingslaeufe bleiben user-owned ausser fuer dieses `*.99`-Gate noetige kleine Diagnose-Kommandos. (abgeschlossen: 2026-04-30; evidence: `npm.cmd run gates:pre-commit` -> pass)
 
 Pflicht-Evidence:
 
@@ -4938,8 +4938,8 @@ Rollout-Intake-Pflichtpaket:
 | 24 | `BT93R Policy-Artefakt und deterministic-collapse Repair` abgeschlossen. | PF.0 `preflight-green`; BT94A-No-Start-Freshness ist gegen R-X geklaert. | `BT93R.99=model-artifact-missing`; kein R-Allowlist-Ergebnis, kein Decoder-/Normalize-/Eval-Mode-Fix beweisfaehig ohne exaktes BT93N-Lineage-Paket. |
 | 25 | `BT93X.0 Early Comparator Preflight` abgeschlossen. | PF.0 `preflight-green`; read-only. | `early_comparator_preflight_report.json` meldet `dqn-loader-fix-required`; BT11/DQN-Anker bleibt nicht starttruth-faehig. |
 | 26 | `BT93Y.99` Abschluss-Gate abgeschlossen. | `BT93Y.5=retrain-lineage-ready-bt93r-reentry-ready`; Reentry-Paket durfte vor 93Y.99 keinen echten R-Claim starten. | `bt93y_closure_gate_report.json` meldet `bt93rReentryAllowed=true` und `retrain-lineage-ready-bt93r-reentry-ready`; `/fix-planung` GO nur fuer neuen `BT93R-Reentry`, kein `BT93S/O/X/P/94A`. |
-| 27 | Neuer `BT93R-Reentry` als Artifact-Probe, Root-Cause und Counterprobe. | `BT93Y.99` schreibt `bt93rReentryAllowed=true` plus gruene BT93Y-Resultklasse. | Reentry endet in R-Allowlist oder rotem Blocker; alter roter `BT93R.99` bleibt historische Wahrheit. |
-| 28 | `BT93S` bis `BT93W` als enge Blocker-Resolution-Leiter. | Blockiert, solange `BT93Y.99` und erneutes `BT93R-Reentry.99` nicht gruen sind; Telemetry-/Reward-/Safety-/Terminal-Depends-On jeweils gruen. | Action-Selection, Raw-/Trail-Telemetrie, Reward-Ordering, Safety-/Terminal-Sanity und maximal 10k-Recheck; Ziel nur `bt93o-precondition-green`. |
+| 27 | Neuer `BT93R-Reentry` als Artifact-Probe, Root-Cause und Counterprobe abgeschlossen. | `BT93Y.99` schreibt `bt93rReentryAllowed=true` plus gruene BT93Y-Resultklasse. | `BT93RR.99=eval-mode-bug-fixed-counterprobe-green`; oeffnet nur `BT93S`, alter roter `BT93R.99` bleibt historische Wahrheit. |
+| 28 | `BT93S` bis `BT93W` als enge Blocker-Resolution-Leiter. | `BT93RR.99` ist in R-Allowlist; Telemetry-/Reward-/Safety-/Terminal-Depends-On jeweils gruen. | Action-Selection, Raw-/Trail-Telemetrie, Reward-Ordering, Safety-/Terminal-Sanity und maximal 10k-Recheck; Ziel nur `bt93o-precondition-green`. |
 | 29 | Nur nach `BT93W.99=bt93o-precondition-green`: `BT93O Action-/Objective-Quality und Anti-Plateau`. | R-Reentry/S/T/U/V/W sind gruen, gleiche IDs oder Drift-Invalidierung liegen vor. | Einziger gruener Ausgang `bt93o-quality-green`; kein BT93P-/BT94A-Signal. |
 | 30 | Nur nach `BT93O.99=bt93o-quality-green`: voller `BT93X Same-Matrix-DQN oder Ersatzvergleich + BT93P Starttruth`. | `93X.0` ist abgeschlossen, Ersatzvergleichspolitik aus BT93Y ist gelockt, BT93O-Qualitaetsbasis steht. | `bt93p-starttruth-green` oder konkreter Comparator-/DQN-/User-Entscheid-Blocker; BT94A bleibt rot. |
 | 31 | Nur nach `BT93O.99=bt93o-quality-green` und `BT93X.99=bt93p-starttruth-green`: `BT93P PPO Trainingsleiter und BT94A-Reentry-Gate`. | Comparator/Ersatzvergleich, Holdout, Statistikvertrag, Reward-Ordering und Fehlersignatur-Widerlegung sind startfaehig. | 200k->500k->1M Evidence-Leiter; Ergebnis `BT94A-ready` oder ehrlicher Folgeblocker. |
@@ -4949,7 +4949,7 @@ No-Go vor Bot-Training:
 
 - Kein `baseline`-, `pilot`- oder Langlauf, solange frisches `freezeOk=true`, Clean-Env, Action-Surface, Startmanifest, Baseline-ID, Audit-Delta und ab BT93K Preflight-/Supervisor-/Signal-Gates nicht belegt sind; die 93J.5c-Diagnose-Ausnahme ist abgeschlossen und wird nicht wiederholt.
 - Kein weiterer PPO-Lauf aus BT93L; `BT93M` ist Gate-/DQN-Anker-Arbeit ohne PPO-Qualitaetslauf, `BT93N` und `BT93Q` sind rot abgeschlossen, `BT93W` darf erst nach BT93Y, R-Reentry und S/T/U/V-Gruen maximal einen 10k-Recheck starten.
-- Kein `BT93S`-Start und keine S/O/P-Fixplanung; nach `BT93Y.99=retrain-lineage-ready-bt93r-reentry-ready` ist nur der neue `BT93R-Reentry` erlaubt, solange ein neuer `BT93R-Reentry.99` nicht in R-Allowlist endet.
+- Kein BT93O-/BT93P-/BT94A-Start aus `BT93RR.99`; der einzige neu erlaubte naechste Scope ist `BT93S`.
 - Kein BT93O-Start, solange `BT93W.99` nicht `bt93o-precondition-green` schreibt; `BT93Q.99`, Plantext, `walltrail-policy-green`-Altformeln oder einzelne non-blocking Teilfelder reichen nach rotem BT93Q nicht.
 - Keine 50k-/100k-/200k-Erweiterung, solange MaxStep-Plateau, DeathBefore60, Objective-/Progress-Signal und Survival gemeinsam nicht besser oder sauber neutral klassifiziert sind.
 - Kein BT93P-Start, solange `BT93O.99` nicht `bt93o-quality-green` und `BT93X.99` nicht `bt93p-starttruth-green` schreiben; Reward-Ordering muss zeigen: Noop < Random/Semantic-Cycle < Scripted/learned, und Comparator/Ersatzvergleich, Holdout und Statistik muessen startfaehig sein.

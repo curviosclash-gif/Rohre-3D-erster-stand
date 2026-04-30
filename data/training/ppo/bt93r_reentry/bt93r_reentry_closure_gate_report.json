@@ -1,0 +1,374 @@
+{
+  "allowNext": [
+    "BT93S claim: 93S.1 Wall-/Trail Action-Effekt und Action-Selection Repair"
+  ],
+  "blockId": "BT93RR",
+  "blockingStatus": {
+    "bt93oBlockedUntil": "BT93W.99=bt93o-precondition-green",
+    "bt93pBlockedUntil": "BT93O.99=bt93o-quality-green and BT93X.99=bt93p-starttruth-green",
+    "bt93sBlockedUntil": null,
+    "bt94aBlockedUntil": "BT93P.4=BT94A-ready plus green no-start gate",
+    "candidateFreezePromoteRolloutBlocked": true,
+    "ppoValidateBlocked": true
+  },
+  "blocksNext": [
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "50k/100k/200k/500k/1M extension",
+    "Reward/Action/Telemetry/Safety bundled fix from BT93RR"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93sClaimAllowed": true,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "tests": "user-owned except closure gate scripts",
+    "write": "python python/scripts/bt93r_reentry_closure_gate.py --write-reports"
+  },
+  "counterprobeResult": {
+    "counterprobeFixClass": "eval-mode-counterprobe",
+    "deathBefore60": {
+      "avgStepsPerEpisode": null,
+      "deathBefore60Count": 2,
+      "interpretation": "DeathBefore60 is measured for continuity only; 93RR.3 success is limited to eval-mode collapse counterprobe criteria.",
+      "measured": true,
+      "playerDeadShare": 1.0,
+      "usedAsSuccessCriterion": false
+    },
+    "greenCriteria": {
+      "diagnosticTimestepsWithinLimit": true,
+      "no2700RepeatedActionStreak": true,
+      "noCounterprobeRuntimeErrors": true,
+      "noFullSingleActionDominance": true,
+      "repeatedActionStreakBelowProbeLength": true,
+      "runtimeErrorCountZero": true,
+      "secondBestProbabilityNonZero": true
+    },
+    "ok": true,
+    "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
+    "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+    "rootCause": "eval-argmax-collapse"
+  },
+  "dodCoverage": {
+    "DoD.RR5": true,
+    "DoD.RR6": true,
+    "DoD.RR7": true
+  },
+  "generatedArtifacts": {
+    "closureGateReport": "data/training/ppo/bt93r_reentry/bt93r_reentry_closure_gate_report.json",
+    "handoverPackage": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_package.json"
+  },
+  "generatedAt": "2026-04-30T13:24:24Z",
+  "generatedBy": "python/scripts/bt93r_reentry_closure_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "6853d4293821d8116048a456494571f87ed53e14",
+    "sha": "71b633d082adee10031ddb27b335bdc3e247623c"
+  },
+  "greenResultClasses": [
+    "decoder-fix-counterprobe-green",
+    "eval-mode-bug-fixed-counterprobe-green",
+    "normalize-fix-counterprobe-green",
+    "policy-collapse-green"
+  ],
+  "guardrails": {
+    "actionFixApplied": false,
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93sClaimAllowed": true,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffSignal": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "counterprobeOnly": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutConsumptionAllowed": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promoteAllowed": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rewardFixApplied": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "safetyFixApplied": false,
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "historicalBt93R": {
+    "notRewritten": true,
+    "path": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+    "preservedAsHistoricalTruth": true,
+    "resultClass": "model-artifact-missing"
+  },
+  "lineage": {
+    "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+    "lineageId": "bt93y-retrain-lineage-v1",
+    "lineageKind": "new-retrain-lineage-not-bt93n",
+    "matrixHash": "a8e17c34cc152bf73d6e6d43e11aa12b3cffae9a2caf26601ebd22b94d4b7bad",
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "notBt93nLineage": true,
+    "rewardProfileId": "bt93n-wall-trail-stability-v1",
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "ok": true,
+  "opensNext": [
+    "BT93S"
+  ],
+  "phaseCoverage": {
+    "93RR.99.1": true,
+    "93RR.99.2": true,
+    "93RR.99.3": true,
+    "93RR.99.4": true
+  },
+  "phaseId": "93RR.99",
+  "rAllowlistResult": true,
+  "recommendations": [
+    {
+      "action": "Claim BT93S next.",
+      "rank": 1,
+      "why": "BT93RR.99 reached the R-Allowlist via eval-mode-bug-fixed-counterprobe-green and opens only BT93S."
+    },
+    {
+      "action": "Keep BT93O/P/94A closed.",
+      "rank": 2,
+      "why": "BT93S/T/U/V/W still need to prove action effect, telemetry need, reward ordering, safety/terminal sanity, and the integrated 10k gate."
+    },
+    {
+      "action": "Treat DeathBefore60 from 93RR.3 as measured continuity evidence, not quality success.",
+      "rank": 3,
+      "why": "The counterprobe repaired eval-mode collapse only; deathBefore60Count=2 and playerDeadShare=1.0 remain downstream repair context."
+    }
+  ],
+  "redResultClasses": [
+    "measurement-invalid",
+    "model-artifact-missing",
+    "normalize-mismatch",
+    "policy-collapse-active",
+    "policy-evidence-invalid"
+  ],
+  "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+  "sampleCounts": {
+    "diagnosticSteps": 1000,
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 12,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "perMode": {
+      "eval-mode-counterprobe": {
+        "completedEpisodes": 12,
+        "steps": 1000
+      }
+    }
+  },
+  "schemaVersion": "bt93rr-reentry-closure-gate-report-v1",
+  "sourceArtifacts": [
+    {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.1",
+        "resultClass": "reentry-handover-lock-green"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.1",
+        "resultClass": "reentry-handover-lock-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_handover_lock_report.json",
+      "phaseId": "93RR.1",
+      "resultClass": "reentry-handover-lock-green",
+      "role": "BT93RR.1 handover lock",
+      "schemaVersion": "bt93rr-reentry-handover-lock-report-v1",
+      "sha256": "2673af47d1dcb319899e7f2e5b18be677254c15a9347f26d3538325632769350",
+      "sizeBytes": 14502,
+      "sourceKey": "bt93rrHandoverLock",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.1",
+        "resultClass": "artifact-probe-green"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.1",
+        "resultClass": "artifact-probe-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_artifact_probe_report.json",
+      "phaseId": "93RR.1",
+      "resultClass": "artifact-probe-green",
+      "role": "BT93RR.1 artifact probe",
+      "schemaVersion": "bt93rr-reentry-artifact-probe-report-v1",
+      "sha256": "81928cd477c833612ba0d8d748c7b6e069948b08a0d8f533b2631185fdf7b4fb",
+      "sizeBytes": 19232,
+      "sourceKey": "bt93rrArtifactProbe",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.2",
+        "resultClass": "eval-argmax-collapse"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.2",
+        "resultClass": "eval-argmax-collapse"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_root_cause_report.json",
+      "phaseId": "93RR.2",
+      "resultClass": "eval-argmax-collapse",
+      "role": "BT93RR.2 root-cause report",
+      "schemaVersion": "bt93rr-reentry-root-cause-report-v1",
+      "sha256": "01a22366331fec1be33b949f93e2fabb7994a43f7835072f2ca911c635363f74",
+      "sizeBytes": 283602,
+      "sourceKey": "bt93rrRootCause",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.3",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "blockId": "BT93RR",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93RR",
+        "ok": true,
+        "phaseId": "93RR.3",
+        "resultClass": "eval-mode-bug-fixed-counterprobe-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r_reentry/bt93r_reentry_counterprobe_report.json",
+      "phaseId": "93RR.3",
+      "resultClass": "eval-mode-bug-fixed-counterprobe-green",
+      "role": "BT93RR.3 counterprobe report",
+      "schemaVersion": "bt93rr-reentry-counterprobe-report-v1",
+      "sha256": "7d784910af6cf3801d3aecae6fee6ae0dbfa9de6a174ae55b3aa6d3f4db92cf5",
+      "sizeBytes": 146561,
+      "sourceKey": "bt93rrCounterprobe",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93R",
+        "ok": true,
+        "phaseId": "93R.99",
+        "resultClass": "model-artifact-missing"
+      },
+      "blockId": "BT93R",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93R",
+        "ok": true,
+        "phaseId": "93R.99",
+        "resultClass": "model-artifact-missing"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "phaseId": "93R.99",
+      "resultClass": "model-artifact-missing",
+      "role": "historical BT93R.99 red closure",
+      "schemaVersion": "bt93r-closure-gate-report-v1",
+      "sha256": "947a93757f71ae28baa715bd923de5666b52fca1a3a47992f23dd02c66f272d3",
+      "sizeBytes": 8945,
+      "sourceKey": "bt93rHistoricalClosure",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93Y",
+        "ok": true,
+        "phaseId": "93Y.99",
+        "resultClass": "retrain-lineage-ready-bt93r-reentry-ready"
+      },
+      "blockId": "BT93Y",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93Y",
+        "ok": true,
+        "phaseId": "93Y.99",
+        "resultClass": "retrain-lineage-ready-bt93r-reentry-ready"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93y/bt93y_closure_gate_report.json",
+      "phaseId": "93Y.99",
+      "resultClass": "retrain-lineage-ready-bt93r-reentry-ready",
+      "role": "BT93Y.99 closure opening BT93R-Reentry",
+      "schemaVersion": "bt93y-closure-gate-report-v1",
+      "sha256": "89514dcb09cee544c75efa993b0aa209d0a88a5e5c006def188e4037926d8a00",
+      "sizeBytes": 17167,
+      "sourceKey": "bt93yClosure",
+      "tracked": true
+    }
+  ],
+  "sourceFilesReady": true,
+  "summary": {
+    "bt93oStartDecision": "blocked",
+    "bt93pStartDecision": "blocked",
+    "bt93sStartDecision": "allowed",
+    "bt94aStartDecision": "blocked",
+    "candidateFreezePromoteRolloutDecision": "blocked",
+    "finalResult": "eval-mode-bug-fixed-counterprobe-green",
+    "nextBestAction": "Claim BT93S via /fix-planung.",
+    "remainingBlockersAfterNextFixPlanung": [
+      "BT93O still needs BT93W.99=bt93o-precondition-green",
+      "BT93P still needs BT93O.99 and BT93X.99",
+      "BT94A still needs BT93P.4=BT94A-ready plus green gate",
+      "DeathBefore60/action-effect/reward-ordering/safety-terminal evidence remain downstream blockers"
+    ]
+  }
+}
