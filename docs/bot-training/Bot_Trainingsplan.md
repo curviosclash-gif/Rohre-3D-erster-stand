@@ -400,7 +400,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93R | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `model-artifact-missing`; kein R-Allowlist-Ergebnis, BT93S bleibt blockiert |
 | Bot-Codex | BT93X.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als read-only `dqn-loader-fix-required`; oeffnet nichts |
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
-| - | BT93RR | - | frei | aktiviert 2026-04-30 als Alias `BT93R-Reentry`; naechster `/fix-planung`-Claim, kein BT93S/O/P/94A-Signal |
+| Bot-Codex | BT93RR | 2026-04-30 | active | 93RR.1 Artifact-Probe und Handover-Lock; kein BT93S/O/P/94A-Signal |
 | - | BT93S | - | frei | wartet auf BT93Y.99 plus erneutes BT93RR.99 in R-Allowlist |
 | - | BT93T | - | frei | wartet auf Telemetry-Start aus BT93S |
 | - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
@@ -3638,7 +3638,7 @@ Ergebnis: `BT93R.99=model-artifact-missing`; activeBlockers sind `selected-bt93n
 
 Quelle: `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex active 2026-04-30 -->
 
 Block-ID: `BT93RR`
 Operativer Alias: `BT93R-Reentry`
