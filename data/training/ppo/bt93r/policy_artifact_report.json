@@ -1,0 +1,1111 @@
+{
+  "actionSurface": {
+    "current": {
+      "actionCount": 13,
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "key": "ppoActionSurface",
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current PPO action-surface source",
+      "schemaVersion": null,
+      "semanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg",
+        "turn-left-boost",
+        "turn-right-boost",
+        "evade-left",
+        "evade-right"
+      ],
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sizeBytes": 22887,
+      "surfaceIds": {
+        "maskedSemantic": "bt93q-walltrail-semantic-action-v1",
+        "multiDiscrete": "bt93c-multidiscrete-action-v1"
+      },
+      "tracked": true
+    },
+    "lineage": {
+      "currentActionCount": 13,
+      "currentPath": "python/envs/ppo_action_surface.py",
+      "currentSemanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg",
+        "turn-left-boost",
+        "turn-right-boost",
+        "evade-left",
+        "evade-right"
+      ],
+      "currentSha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "driftDetected": true,
+      "policyEvidenceActionCount": 9,
+      "policyEvidencePath": "python/envs/ppo_action_surface.py",
+      "policyEvidenceSemanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg"
+      ],
+      "policyEvidenceSha256": "4e12c93bd532178f3759234d5217f1cd58a4f4bfaec9c6f7be8ffa708564847b"
+    },
+    "policyEvidence": {
+      "actionCount": 9,
+      "path": "python/envs/ppo_action_surface.py",
+      "semanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg"
+      ],
+      "sourceSha256": "4e12c93bd532178f3759234d5217f1cd58a4f4bfaec9c6f7be8ffa708564847b"
+    }
+  },
+  "allowNext": [
+    "93R.3 root-cause classification may only record policy-evidence-invalid/model-artifact-missing"
+  ],
+  "artifactCapability": {
+    "deterministicAndStochasticRealEvalPossible": false,
+    "modelPackagePersisted": false,
+    "proxyCountsAreQualityEvidence": false,
+    "realModelLogitsAvailable": false,
+    "reason": "BT93N selected policy has no versioned model/config/vecnormalize package and current action surface drifts from the BT93Q policy evidence."
+  },
+  "blockId": "BT93R",
+  "blockingFindings": [
+    "selected-bt93n-model-package-missing",
+    "action-surface-lineage-drift",
+    "real-model-logits-unavailable"
+  ],
+  "blocksNext": [
+    "93R.4 fix implementation until real selected policy artifacts and root-cause class exist",
+    "BT93S until 93R.99 reaches R-Allowlist",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate or BT95 handoff signal",
+    "50k/100k/200k/500k/1M extension"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93r_policy_artifact_probe.py --write-report"
+  },
+  "contextModelPackages": {
+    "bt93cLatestModelPackage": {
+      "artifactManifest": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+      "artifacts": {
+        "config": {
+          "blockId": null,
+          "exists": false,
+          "isFile": false,
+          "key": "config",
+          "ok": null,
+          "path": null,
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93C context package config",
+          "schemaVersion": null,
+          "sha256": null,
+          "sizeBytes": null,
+          "tracked": false
+        },
+        "model": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "model",
+          "ok": null,
+          "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/model.zip",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93C context package model",
+          "schemaVersion": null,
+          "sha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+          "sizeBytes": 654823,
+          "tracked": false
+        },
+        "optimizerState": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "optimizerState",
+          "ok": null,
+          "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/optimizer_state.pt",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93C context package optimizer state",
+          "schemaVersion": null,
+          "sha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+          "sizeBytes": 423978,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "vecnormalize",
+          "ok": null,
+          "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/vecnormalize.pkl",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93C context package vecnormalize",
+          "schemaVersion": null,
+          "sha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "manifest": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "bt93c",
+        "ok": true,
+        "path": "data/training/ppo/bt93c/latest_model_package.json",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93C context package",
+        "schemaVersion": null,
+        "sha256": "155e23cd849a4c629c45f91e0b8471be31236cdd0ce8c424c8d297237cbbdf64",
+        "sizeBytes": 633,
+        "tracked": true
+      },
+      "ok": true,
+      "rejectionReason": "context-only package is not the selected BT93N/BT93Q policy lineage",
+      "report": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/training_report.json",
+      "runId": "20260424T180033Z-baseline-train",
+      "runKind": "baseline-train",
+      "usableFor93R2": false
+    },
+    "bt93eLatestModelPackage": {
+      "artifactManifest": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/artifact_manifest.json",
+      "artifacts": {
+        "config": {
+          "blockId": null,
+          "exists": false,
+          "isFile": false,
+          "key": "config",
+          "ok": null,
+          "path": null,
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93E context package config",
+          "schemaVersion": null,
+          "sha256": null,
+          "sizeBytes": null,
+          "tracked": false
+        },
+        "model": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "model",
+          "ok": null,
+          "path": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/model.zip",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93E context package model",
+          "schemaVersion": null,
+          "sha256": "27d6a9f218f9a0f15774c5b51056844b78e7e8674951fb24cca4c438835b66ce",
+          "sizeBytes": 655388,
+          "tracked": false
+        },
+        "optimizerState": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "optimizerState",
+          "ok": null,
+          "path": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/optimizer_state.pt",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93E context package optimizer state",
+          "schemaVersion": null,
+          "sha256": "b2ea9c12adb2f749affd79ec395de02b441bb5a0e5be44cc0bc2f79c3fb41473",
+          "sizeBytes": 424042,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "vecnormalize",
+          "ok": null,
+          "path": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/vecnormalize.pkl",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93E context package vecnormalize",
+          "schemaVersion": null,
+          "sha256": "a0e2d3c13d6f353de1a98669f6c7bbfe1da8a979a99555036c82fe3977bff326",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "manifest": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "bt93e",
+        "ok": true,
+        "path": "data/training/ppo/bt93e/latest_model_package.json",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93E context package",
+        "schemaVersion": null,
+        "sha256": "35176d24db507251d317648d74bdbf11402e5010d23413409408c9e7eb4524ab",
+        "sizeBytes": 654,
+        "tracked": true
+      },
+      "ok": true,
+      "rejectionReason": "context-only package is not the selected BT93N/BT93Q policy lineage",
+      "report": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/training_report.json",
+      "runId": "20260424T221741Z-diagnostics-smoke",
+      "runKind": "diagnostics-smoke",
+      "usableFor93R2": false
+    },
+    "bt93fLatestModelPackage": {
+      "artifactManifest": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/artifact_manifest.json",
+      "artifacts": {
+        "config": {
+          "blockId": null,
+          "exists": false,
+          "isFile": false,
+          "key": "config",
+          "ok": null,
+          "path": null,
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93F context package config",
+          "schemaVersion": null,
+          "sha256": null,
+          "sizeBytes": null,
+          "tracked": false
+        },
+        "model": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "model",
+          "ok": null,
+          "path": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints/model.zip",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93F context package model",
+          "schemaVersion": null,
+          "sha256": "b57d05b027778a9ef8093871eb35c356024d15472ea7a0399c5921c581b1d529",
+          "sizeBytes": 655388,
+          "tracked": false
+        },
+        "optimizerState": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "optimizerState",
+          "ok": null,
+          "path": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints/optimizer_state.pt",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93F context package optimizer state",
+          "schemaVersion": null,
+          "sha256": "ebcb60676fb00da7169bde21e5b9ba394657a06d4fbaacc696452cb6dec9745b",
+          "sizeBytes": 424042,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "vecnormalize",
+          "ok": null,
+          "path": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints/vecnormalize.pkl",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93F context package vecnormalize",
+          "schemaVersion": null,
+          "sha256": "8a700aa0e84a6579506f44c36f0dfc0f05783cfa028909f7e255f6e29e24a936",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "manifest": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "bt93f",
+        "ok": true,
+        "path": "data/training/ppo/bt93f/latest_model_package.json",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93F context package",
+        "schemaVersion": null,
+        "sha256": "dc09b14c52ceb509f676711c731ccb49c01e3bae3bf25ce7f37c32188cd3f748",
+        "sizeBytes": 654,
+        "tracked": true
+      },
+      "ok": true,
+      "rejectionReason": "context-only package is not the selected BT93N/BT93Q policy lineage",
+      "report": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/training_report.json",
+      "runId": "20260425T082419Z-repair-diagnostic",
+      "runKind": "repair-diagnostic",
+      "usableFor93R2": false
+    },
+    "bt93gLatestModelPackage": {
+      "artifactManifest": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/artifact_manifest.json",
+      "artifacts": {
+        "config": {
+          "blockId": null,
+          "exists": false,
+          "isFile": false,
+          "key": "config",
+          "ok": null,
+          "path": null,
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93G context package config",
+          "schemaVersion": null,
+          "sha256": null,
+          "sizeBytes": null,
+          "tracked": false
+        },
+        "model": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "model",
+          "ok": null,
+          "path": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints/model.zip",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93G context package model",
+          "schemaVersion": null,
+          "sha256": "379e7a32a74ba1e799c1cccc4b014f01b9dc4b1db9b5c3457b5001149940909d",
+          "sizeBytes": 240043,
+          "tracked": false
+        },
+        "optimizerState": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "optimizerState",
+          "ok": null,
+          "path": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints/optimizer_state.pt",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93G context package optimizer state",
+          "schemaVersion": null,
+          "sha256": "121c3358d0a08805008bde7aca055640904cd2c58ab2bd16f8c16b893113cc76",
+          "sizeBytes": 148906,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "vecnormalize",
+          "ok": null,
+          "path": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints/vecnormalize.pkl",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93G context package vecnormalize",
+          "schemaVersion": null,
+          "sha256": "2b8e540dcc4f7df7cbfc2bed9213c6a621382132179afb38f4f9bbae85181a5c",
+          "sizeBytes": 3804,
+          "tracked": false
+        }
+      },
+      "manifest": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "bt93g",
+        "ok": true,
+        "path": "data/training/ppo/bt93g/latest_model_package.json",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93G context package",
+        "schemaVersion": null,
+        "sha256": "aed4ecf406930932905c8596ce015f147bd57351ab03e141a1c785aedee265a0",
+        "sizeBytes": 654,
+        "tracked": true
+      },
+      "ok": true,
+      "rejectionReason": "context-only package is not the selected BT93N/BT93Q policy lineage",
+      "report": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/training_report.json",
+      "runId": "20260425T102337Z-comparable-repair",
+      "runKind": "comparable-repair",
+      "usableFor93R2": false
+    },
+    "bt93hLatestModelPackage": {
+      "artifactManifest": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/artifact_manifest.json",
+      "artifacts": {
+        "config": {
+          "blockId": null,
+          "exists": false,
+          "isFile": false,
+          "key": "config",
+          "ok": null,
+          "path": null,
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93H context package config",
+          "schemaVersion": null,
+          "sha256": null,
+          "sizeBytes": null,
+          "tracked": false
+        },
+        "model": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "model",
+          "ok": null,
+          "path": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/model.zip",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93H context package model",
+          "schemaVersion": null,
+          "sha256": "2cb11aa2f16b9bb6a51077eb52df111f843db092803917a2f62265ecc4179441",
+          "sizeBytes": 240925,
+          "tracked": false
+        },
+        "optimizerState": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "optimizerState",
+          "ok": null,
+          "path": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/optimizer_state.pt",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93H context package optimizer state",
+          "schemaVersion": null,
+          "sha256": "cf72ed6a1da04173e859f5c75514561bc653b354e7846a768982358abd8fee40",
+          "sizeBytes": 149383,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "vecnormalize",
+          "ok": null,
+          "path": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/vecnormalize.pkl",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93H context package vecnormalize",
+          "schemaVersion": null,
+          "sha256": "bd741262d44f344e2f29cf74e908055e1028b0cafbc26d43ac0a0445cc00978d",
+          "sizeBytes": 4033,
+          "tracked": false
+        }
+      },
+      "manifest": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "bt93h",
+        "ok": true,
+        "path": "data/training/ppo/bt93h/latest_model_package.json",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93H context package",
+        "schemaVersion": null,
+        "sha256": "8ea0f87d328849e12c03f28704b289ec534f39236c716611c74a61f9e71143d5",
+        "sizeBytes": 717,
+        "tracked": true
+      },
+      "ok": true,
+      "rejectionReason": "context-only package is not the selected BT93N/BT93Q policy lineage",
+      "report": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/training_report.json",
+      "runId": "20260425T113941Z-comparable-terminal-repair",
+      "runKind": "comparable-terminal-repair",
+      "usableFor93R2": false
+    },
+    "bt93iLatestModelPackage": {
+      "artifactManifest": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json",
+      "artifacts": {
+        "config": {
+          "blockId": null,
+          "exists": false,
+          "isFile": false,
+          "key": "config",
+          "ok": null,
+          "path": null,
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93I context package config",
+          "schemaVersion": null,
+          "sha256": null,
+          "sizeBytes": null,
+          "tracked": false
+        },
+        "model": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "model",
+          "ok": null,
+          "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/model.zip",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93I context package model",
+          "schemaVersion": null,
+          "sha256": "d5feac5d84924bcf8433c7adc93360a294bcddf3a807a3ef0907fe67e67a3371",
+          "sizeBytes": 244560,
+          "tracked": false
+        },
+        "optimizerState": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "optimizerState",
+          "ok": null,
+          "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/optimizer_state.pt",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93I context package optimizer state",
+          "schemaVersion": null,
+          "sha256": "2d561f8836c81d776cedc4db1dd3c243d1521a654d2052eba418bc5e79f712ef",
+          "sizeBytes": 148970,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "blockId": null,
+          "exists": true,
+          "isFile": true,
+          "key": "vecnormalize",
+          "ok": null,
+          "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/vecnormalize.pkl",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93I context package vecnormalize",
+          "schemaVersion": null,
+          "sha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25",
+          "sizeBytes": 3607,
+          "tracked": false
+        }
+      },
+      "manifest": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "bt93i",
+        "ok": true,
+        "path": "data/training/ppo/bt93i/latest_model_package.json",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93I context package",
+        "schemaVersion": null,
+        "sha256": "10899e5a181fa0d5bd2c7bcaef21fca6c4437829815c83dc11199fe3010630be",
+        "sizeBytes": 717,
+        "tracked": true
+      },
+      "ok": true,
+      "rejectionReason": "context-only package is not the selected BT93N/BT93Q policy lineage",
+      "report": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+      "runId": "20260425T151155Z-terminal-curriculum-repair",
+      "runKind": "terminal-curriculum-repair",
+      "usableFor93R2": false
+    },
+    "bt93jLatestModelPackage": {
+      "artifactManifest": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/artifact_manifest.json",
+      "artifacts": {
+        "config": {
+          "blockId": null,
+          "exists": false,
+          "isFile": false,
+          "key": "config",
+          "ok": null,
+          "path": null,
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93J user-owned diagnostic context package config",
+          "schemaVersion": null,
+          "sha256": null,
+          "sizeBytes": null,
+          "tracked": false
+        },
+        "model": {
+          "blockId": null,
+          "exists": false,
+          "isFile": false,
+          "key": "model",
+          "ok": null,
+          "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/checkpoints/model.zip",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93J user-owned diagnostic context package model",
+          "schemaVersion": null,
+          "sha256": null,
+          "sizeBytes": null,
+          "tracked": false
+        },
+        "optimizerState": {
+          "blockId": null,
+          "exists": false,
+          "isFile": false,
+          "key": "optimizerState",
+          "ok": null,
+          "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/checkpoints/optimizer_state.pt",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93J user-owned diagnostic context package optimizer state",
+          "schemaVersion": null,
+          "sha256": null,
+          "sizeBytes": null,
+          "tracked": false
+        },
+        "vecnormalize": {
+          "blockId": null,
+          "exists": false,
+          "isFile": false,
+          "key": "vecnormalize",
+          "ok": null,
+          "path": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/checkpoints/vecnormalize.pkl",
+          "phaseId": null,
+          "resultClass": null,
+          "role": "BT93J user-owned diagnostic context package vecnormalize",
+          "schemaVersion": null,
+          "sha256": null,
+          "sizeBytes": null,
+          "tracked": false
+        }
+      },
+      "manifest": {
+        "blockId": null,
+        "exists": true,
+        "isFile": true,
+        "key": "bt93j",
+        "ok": true,
+        "path": "data/training/ppo/bt93j/latest_model_package.json",
+        "phaseId": null,
+        "resultClass": null,
+        "role": "BT93J user-owned diagnostic context package",
+        "schemaVersion": null,
+        "sha256": "5dc773fcf74669087f6f4d48b5981ca6fcfbab600b8315dd7d83d4c72f308b72",
+        "sizeBytes": 766,
+        "tracked": true
+      },
+      "ok": true,
+      "rejectionReason": "context-only package is not the selected BT93N/BT93Q policy lineage",
+      "report": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/training_report.json",
+      "runId": "20260426T175502Z-bt93j-user-owned-1m-proof-longrun",
+      "runKind": "bt93j-user-owned-1m-proof-longrun",
+      "usableFor93R2": false
+    }
+  },
+  "dodCoverage": {
+    "DoD.R2": true
+  },
+  "evalLogitEvidence": {
+    "deterministic": {
+      "distribution": {
+        "argmaxAction": "yaw-right",
+        "argmaxShare": 1.0,
+        "argmaxToken": "2",
+        "entropy": -0.0,
+        "marginShare": 1.0,
+        "normalizedEntropy": -0.0,
+        "rankedActions": [
+          {
+            "count": 8100,
+            "semanticAction": "yaw-right",
+            "share": 1.0,
+            "token": "2"
+          }
+        ],
+        "secondBestAction": null,
+        "secondBestShare": 0.0,
+        "secondBestToken": null,
+        "total": 8100
+      },
+      "dominantAction": "yaw-right",
+      "realLogits": {
+        "available": false,
+        "reason": "selected BT93N policy package is not persisted; deterministic logits cannot be sampled"
+      },
+      "repeatedActionStreakLowerBound": 8100,
+      "singleActionEvalShare": 1.0,
+      "source": "BT93N micro_ppo_repeat_report.evalSummary.seedSummaries[].actionCounts",
+      "top2": {
+        "argmaxAction": "yaw-right",
+        "argmaxToken": "2",
+        "isProxy": true,
+        "margin": 8.999743,
+        "secondBestAction": "noop",
+        "secondBestToken": "0",
+        "source": "empirical-count-logit-proxy"
+      }
+    },
+    "proxyLimitation": "BT93N did not persist a model package; this proxy uses eval action counts with Laplace smoothing.",
+    "proxyRejectedAsModelLogitEvidence": true,
+    "realModelLogitsAvailable": false,
+    "stochastic": {
+      "distribution": {
+        "argmaxAction": "yaw-right",
+        "argmaxShare": 0.149723,
+        "argmaxToken": "2",
+        "entropy": 2.176654,
+        "marginShare": 0.016911,
+        "normalizedEntropy": 0.990638,
+        "rankedActions": [
+          {
+            "count": 1514,
+            "semanticAction": "yaw-right",
+            "share": 0.149723,
+            "token": "2"
+          },
+          {
+            "count": 1343,
+            "semanticAction": "pitch-down",
+            "share": 0.132812,
+            "token": "4"
+          },
+          {
+            "count": 1320,
+            "semanticAction": "boost",
+            "share": 0.130538,
+            "token": "7"
+          },
+          {
+            "count": 1163,
+            "semanticAction": "shoot-mg",
+            "share": 0.115012,
+            "token": "8"
+          },
+          {
+            "count": 1148,
+            "semanticAction": "yaw-left",
+            "share": 0.113528,
+            "token": "1"
+          },
+          {
+            "count": 1025,
+            "semanticAction": "pitch-up",
+            "share": 0.101365,
+            "token": "3"
+          },
+          {
+            "count": 941,
+            "semanticAction": "roll-left",
+            "share": 0.093058,
+            "token": "5"
+          },
+          {
+            "count": 889,
+            "semanticAction": "roll-right",
+            "share": 0.087915,
+            "token": "6"
+          },
+          {
+            "count": 769,
+            "semanticAction": "noop",
+            "share": 0.076048,
+            "token": "0"
+          }
+        ],
+        "secondBestAction": "pitch-down",
+        "secondBestShare": 0.132812,
+        "secondBestToken": "4",
+        "total": 10112
+      },
+      "loggerEntropy": {
+        "available": true,
+        "entropy": 1.999628,
+        "nUpdates": 156,
+        "normalizedEntropy": 0.91007,
+        "rawEntropyLoss": -1.9996279776096344,
+        "source": "stable_baselines3 logger train/entropy_loss from last rollout snapshot"
+      },
+      "realLogits": {
+        "available": false,
+        "reason": "BT93N persisted logger entropy and action counts, not a loadable model/logit snapshot"
+      },
+      "source": "BT93N micro_ppo_repeat_report.trainSummary.actionCounts",
+      "top2": {
+        "isProxy": true,
+        "source": "action-count distribution only"
+      }
+    }
+  },
+  "generatedAt": "2026-04-30T07:25:20Z",
+  "generatedBy": "python/scripts/bt93r_policy_artifact_probe.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "2d6795bc53b07018b315ceb40bd3c7431fe9b9f6",
+    "sha": "22dc210e524a3665b9b5ceb5841c7a9b17d484b5"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "candidateRunsAllowed": false,
+    "diagnosticOnly": true,
+    "fixApplied": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "matrixId": "bt93q-walltrail-policy-recheck-v1",
+  "ok": true,
+  "opensNext": [],
+  "phaseCoverage": {
+    "93R.2.1": true,
+    "93R.2.2": true,
+    "93R.2.3": true
+  },
+  "phaseId": "93R.2",
+  "policyIds": {
+    "eval": "ppo-bt93n-micro-10k-deterministic",
+    "train": "ppo-bt93n-micro-10k-stochastic"
+  },
+  "recommendations": [
+    {
+      "action": "Do not implement decoder/normalize/eval-mode fixes from this evidence.",
+      "rank": 1,
+      "why": "The selected BT93N/BT93Q policy is not loadable and real logits are unavailable."
+    },
+    {
+      "action": "Resolve selected policy lineage before any counterprobe.",
+      "rank": 2,
+      "why": "BT93J context manifests are not the selected BT93N policy lineage, and their actual model files are not versioned here."
+    },
+    {
+      "action": "Treat action-surface drift as a hard artifact blocker for BT93R.",
+      "rank": 3,
+      "why": "BT93Q policy evidence used a different semantic action list/hash than the current action-surface source."
+    }
+  ],
+  "resultClass": "policy-evidence-invalid",
+  "sampleCounts": {
+    "bt93nActualModelTimesteps": 10112,
+    "bt93qDeterministicEvalActionRows": 8100,
+    "bt93qStochasticTrainActionRows": 10112,
+    "holdoutEpisodes": 0,
+    "newEvalEpisodes": 0,
+    "newTrainingEpisodes": 0
+  },
+  "schemaVersion": "bt93r-policy-artifact-report-v1",
+  "selectedPolicyLineage": {
+    "missingRequiredArtifactKeys": [
+      "model",
+      "config",
+      "vecnormalize"
+    ],
+    "modelArtifactsField": null,
+    "modelPackageField": null,
+    "modelPackagePersistedInBT93N": false,
+    "realModelLogitsAvailableInBT93Q": false,
+    "selectedArtifacts": {
+      "config": {
+        "blockId": null,
+        "exists": false,
+        "isFile": false,
+        "key": "config",
+        "ok": null,
+        "path": null,
+        "phaseId": null,
+        "resultClass": null,
+        "role": "selected BT93N policy config",
+        "schemaVersion": null,
+        "sha256": null,
+        "sizeBytes": null,
+        "tracked": false
+      },
+      "model": {
+        "blockId": null,
+        "exists": false,
+        "isFile": false,
+        "key": "model",
+        "ok": null,
+        "path": null,
+        "phaseId": null,
+        "resultClass": null,
+        "role": "selected BT93N policy model",
+        "schemaVersion": null,
+        "sha256": null,
+        "sizeBytes": null,
+        "tracked": false
+      },
+      "normalizer": {
+        "blockId": null,
+        "exists": false,
+        "isFile": false,
+        "key": "normalizer",
+        "ok": null,
+        "path": null,
+        "phaseId": null,
+        "resultClass": null,
+        "role": "selected BT93N policy normalizer",
+        "schemaVersion": null,
+        "sha256": null,
+        "sizeBytes": null,
+        "tracked": false
+      },
+      "optimizerState": {
+        "blockId": null,
+        "exists": false,
+        "isFile": false,
+        "key": "optimizerState",
+        "ok": null,
+        "path": null,
+        "phaseId": null,
+        "resultClass": null,
+        "role": "selected BT93N policy optimizerState",
+        "schemaVersion": null,
+        "sha256": null,
+        "sizeBytes": null,
+        "tracked": false
+      },
+      "vecnormalize": {
+        "blockId": null,
+        "exists": false,
+        "isFile": false,
+        "key": "vecnormalize",
+        "ok": null,
+        "path": null,
+        "phaseId": null,
+        "resultClass": null,
+        "role": "selected BT93N policy vecnormalize",
+        "schemaVersion": null,
+        "sha256": null,
+        "sizeBytes": null,
+        "tracked": false
+      }
+    },
+    "source": "data/training/ppo/bt93n/micro_ppo_repeat_report.json"
+  },
+  "semanticWindow": "bt93q-walltrail-10k-diagnostic-window",
+  "sourceArtifacts": [
+    {
+      "blockId": "BT93R",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93rHandoverLock",
+      "ok": true,
+      "path": "data/training/ppo/bt93r/bt93r_handover_lock_report.json",
+      "phaseId": "93R.1",
+      "resultClass": "handover-lock-green",
+      "role": "BT93R.1 handover lock",
+      "schemaVersion": "bt93r-handover-lock-report-v1",
+      "sha256": "9eaa4bb6608af6f7deb6d0a0d4de13b983f7a03a108fd11ecc94e5bce1d7a143",
+      "sizeBytes": 18143,
+      "sourceKey": "bt93rHandoverLock",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93Q",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93qPolicyCollapse",
+      "ok": true,
+      "path": "data/training/ppo/bt93q/policy_collapse_report.json",
+      "phaseId": "93Q.3",
+      "resultClass": "policy-collapse-active",
+      "role": "BT93Q deterministic policy-collapse evidence",
+      "schemaVersion": "bt93q-policy-collapse-report-v1",
+      "sha256": "8b6fbfdbf2285e6f58c8104fad408fc1e6b2677fde394a617b78170137af035d",
+      "sizeBytes": 18211,
+      "sourceKey": "bt93qPolicyCollapse",
+      "tracked": true
+    },
+    {
+      "blockId": "BT93N",
+      "exists": true,
+      "isFile": true,
+      "key": "bt93nMicroPpoRepeat",
+      "ok": true,
+      "path": "data/training/ppo/bt93n/micro_ppo_repeat_report.json",
+      "phaseId": "93N.3",
+      "resultClass": "death-before60-still-blocking",
+      "role": "BT93N 10k micro-PPO source run",
+      "schemaVersion": "bt93n-micro-ppo-repeat-report-v1",
+      "sha256": "96f046445da1518eeb9519958b179107326294d6ad83a6bfa074089f52aaa631",
+      "sizeBytes": 82300,
+      "sourceKey": "bt93nMicroPpoRepeat",
+      "tracked": true
+    },
+    {
+      "blockId": null,
+      "exists": true,
+      "isFile": true,
+      "key": "ppoActionSurface",
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "current PPO action-surface source",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sizeBytes": 22887,
+      "sourceKey": "ppoActionSurface",
+      "tracked": true
+    }
+  ],
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "summary": {
+    "actionSurfaceDriftDetected": true,
+    "deterministicRepeatedActionStreakLowerBound": 8100,
+    "dominantDeterministicAction": "yaw-right",
+    "nextBestAction": "Close BT93R as red unless the selected BT93N policy package can be recovered and hashed.",
+    "realModelLogitsAvailable": false,
+    "resultClass": "policy-evidence-invalid",
+    "selectedModelPackageMissing": true
+  },
+  "thresholdsLockedBeforeRun": {
+    "afterTheFactThresholdChangesAllowed": false,
+    "notApplicableReason": "93R.2 is a report-only artifact capability probe and runs no new PPO eval/training sample."
+  }
+}

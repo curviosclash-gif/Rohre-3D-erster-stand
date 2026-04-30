@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 346,
+          "concreteCount": 348,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 484,
+          "concreteCount": 486,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 342,
+          "concreteCount": 344,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 341,
+          "concreteCount": 343,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 983,
+          "concreteCount": 985,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 991,
+          "concreteCount": 993,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1711,8 +1711,8 @@
           "python/scripts/bt93r_handover_lock.py"
         ],
         "scopeResolution": {
-          "concreteCount": 3,
-          "plannedCount": 4
+          "concreteCount": 4,
+          "plannedCount": 3
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -29134,9 +29134,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93R"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -36714,6 +36720,26 @@
           "BT93D",
           "BT93E",
           "BT93R"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93r_policy_artifact_probe.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
         ],
         "exists": true
       }
@@ -73247,6 +73273,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -74454,6 +74489,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93r_handover_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93r_policy_artifact_probe.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -76558,6 +76602,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -77747,6 +77800,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93r_handover_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93r_policy_artifact_probe.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81049,6 +81111,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -82247,6 +82318,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93r_handover_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93r_policy_artifact_probe.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84650,6 +84730,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -85848,6 +85937,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93r_handover_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93r_policy_artifact_probe.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -94655,6 +94753,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -95853,6 +95960,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93r_handover_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93r_policy_artifact_probe.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -103835,6 +103951,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93r/policy_artifact_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt94a/no_start_gate.json",
       "type": "scope",
       "hint": null,
@@ -105042,6 +105167,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93r_handover_lock.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93r_policy_artifact_probe.py",
       "type": "scope",
       "hint": null,
       "attributes": {
