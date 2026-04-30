@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2494,
-    "rawCoveredFileCount": 2013,
+    "trackedFileCount": 2496,
+    "rawCoveredFileCount": 2015,
     "rawCoveragePercent": 80.7,
-    "adjustedTrackedFileCount": 1591,
-    "adjustedCoveredFileCount": 1354,
+    "adjustedTrackedFileCount": 1593,
+    "adjustedCoveredFileCount": 1356,
     "adjustedCoveragePercent": 85.1,
     "uncoveredFileCount": 481,
     "uncoveredActiveFileCount": 237,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 288,
-        "coveredCount": 267
+        "count": 289,
+        "coveredCount": 268
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 904,
-        "coveredCount": 888
+        "count": 905,
+        "coveredCount": 889
       },
       {
         "classification": "product-docs",
@@ -8503,6 +8503,29 @@
     },
     {
       "path": "data/training/ppo/bt93s/action_surface_decision.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -20039,6 +20062,29 @@
     },
     {
       "path": "python/scripts/bt93s_action_surface_decision.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93s_closure_gate.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
