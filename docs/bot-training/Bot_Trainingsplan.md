@@ -401,7 +401,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93X.0 | 2026-04-30 | frei | abgeschlossen 2026-04-30 als read-only `dqn-loader-fix-required`; oeffnet nichts |
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
 | Bot-Codex | BT93RR | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S |
-| Bot-Codex | BT93S | 2026-04-30 | claimed | 93S.1/93S.2 abgeschlossen; 93S.3 Sidecar-Action Entscheidung ist offen |
+| Bot-Codex | BT93S | 2026-04-30 | claimed | 93S.1 bis 93S.4 abgeschlossen; 93S.99 Closure ist offen |
 | - | BT93T | - | frei | wartet auf Telemetry-Start aus BT93S |
 | - | BT93U | - | frei | wartet auf `telemetry-green` plus S-Recheck `action-selection-green` |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -926,7 +926,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93X.0 | Early Comparator Preflight | completed | P1 | PF.0 `preflight-green`; read-only | 93X.0 abgeschlossen: `dqn-loader-fix-required`; oeffnet nichts | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93Y | PPO Lineage-Recovery/Retraining und Ersatzvergleich | completed | P0 | BT93R.99 `model-artifact-missing` + X0-Preflight-Report `dqn-loader-fix-required` | 93Y.99 abgeschlossen: `retrain-lineage-ready-bt93r-reentry-ready`, oeffnet nur BT93R-Reentry | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
 | BT93RR | Policy-Artefakt Reentry auf neuer Retrain-Lineage (`BT93R-Reentry`) | completed | P0 | BT93Y.99 `retrain-lineage-ready-bt93r-reentry-ready` + `bt93rReentryAllowed=true` | 93RR.99 abgeschlossen: `eval-mode-bug-fixed-counterprobe-green`, oeffnet nur BT93S | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
-| BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | active | P1 | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | 93S.3 offen | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
+| BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | active | P1 | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | 93S.99 offen | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | BT93S.99=`observation-telemetry-required` oder Telemetry-Start | 93T.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | BT93T.99=`telemetry-green` + S-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93V | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision | planned | P1 | BT93U.99=`reward-ordering-green` | 93V.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3732,7 +3732,7 @@ Pflicht-Evidence:
 
 Quelle: `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md`
 
-<!-- LOCK: Bot-Codex; claimed 2026-04-30; 93S.1 und 93S.2 abgeschlossen, 93S.3 offen -->
+<!-- LOCK: Bot-Codex; claimed 2026-04-30; 93S.1 bis 93S.4 abgeschlossen, 93S.99 offen -->
 
 Scope:
 
@@ -3745,7 +3745,7 @@ Scope:
 - [x] DoD.S1 Szenariofenster haben Startzustand, erwartete Zustandswirkung, Positiv-/Negativkontrolle und verbotene Success-Proxies. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_scenario_window_contract.py --write-reports` -> `data/training/ppo/bt93s/scenario_window_contract.json`, `resultClass=scenario-window-contract-green`)
 - [x] DoD.S2 Existing-Action-Effekt misst WallDistance, LocalOpenness, CollisionRisk, TerminalRisk, Heading-/Target-Delta und Trail-Druck. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_existing_action_effect.py --reclassify-existing --write-report` -> `data/training/ppo/bt93s/existing_action_effect_report.json`, `phaseCoverage.DoD.S2=true`, `probeCount=351`, `resultClass=matrix-redesign-required`)
 - [x] DoD.S3 Sidecar-Action-Entscheidung pinnt Action-Surface-ID, Decoder-Hash und invalidierte Vergleichsartefakte. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_action_surface_decision.py --write-report` -> `data/training/ppo/bt93s/action_surface_decision.json`, `resultClass=matrix-redesign-required`, `actionSurfaceId=bt93q-walltrail-semantic-action-v1`, `decoderChangedSince93S2=false`)
-- [ ] DoD.S4 Policy-Selection beweist, ob die reparierte Policy die wirksamen Actions auch waehlt.
+- [x] DoD.S4 Policy-Selection beweist, ob die reparierte Policy die wirksamen Actions auch waehlt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_policy_selection.py --write-report` -> `data/training/ppo/bt93s/policy_selection_report.json`, `phaseCoverage.DoD.S4=true`, `selectionStepCount=607`, `resultClass=matrix-redesign-required`)
 - [ ] DoD.S5 Gruen ist nur `action-selection-green`; `action-space-required`, `action-selection-required`, `matrix-redesign-required`, `observation-telemetry-required` oder `measurement-invalid` blockieren U/W/O.
 
 ### 93S.1 Szenariofenster und Controls
@@ -3765,8 +3765,8 @@ Scope:
 
 ### 93S.4 Policy-Selection
 
-- [ ] 93S.4.1 Pruefen, ob Policy wirksame Actions unter Gefahr auswaehlt.
-- [ ] 93S.4.2 Fehlende Telemetrie nach BT93T routen; sonst `action-selection-required`.
+- [x] 93S.4.1 Pruefen, ob Policy wirksame Actions unter Gefahr auswaehlt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_policy_selection.py --write-report` -> `data/training/ppo/bt93s/policy_selection_report.json`, `phaseCoverage.93S.4.1=true`, `selectionStepCount=607`, `policyMode=stochastic-eval-mode-counterprobe`)
+- [x] 93S.4.2 Fehlende Telemetrie nach BT93T routen; sonst `action-selection-required`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_policy_selection.py --write-report` -> `data/training/ppo/bt93s/policy_selection_report.json`, `phaseCoverage.93S.4.2=true`, `telemetryLimitedScenarioIds=[trail-ahead,trail-side]`, `selectionBlockers=[narrowing-corridor,side-wall-left,side-wall-right]`, `resultClass=matrix-redesign-required`)
 
 ### 93S.99 Abschluss
 

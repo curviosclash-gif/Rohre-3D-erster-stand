@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 399,
+          "concreteCount": 402,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 537,
+          "concreteCount": 540,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 395,
+          "concreteCount": 398,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 394,
+          "concreteCount": 397,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1036,
+          "concreteCount": 1039,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1044,
+          "concreteCount": 1047,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1772,7 +1772,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S.4",
+        "currentPhase": "93S.99",
         "scopeDeclarations": [
           "data/training/ppo/bt93s/action_surface_decision.json",
           "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
@@ -1782,11 +1782,12 @@
           "docs/bot-training/Bot_Trainingsplan.md",
           "python/scripts/bt93s_action_surface_decision.py",
           "python/scripts/bt93s_existing_action_effect.py",
+          "python/scripts/bt93s_policy_selection.py",
           "python/scripts/bt93s_scenario_window_contract.py"
         ],
         "scopeResolution": {
-          "concreteCount": 7,
-          "plannedCount": 2
+          "concreteCount": 9,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5234,7 +5235,7 @@
       "id": "BT93S.4",
       "type": "phase",
       "title": "Policy-Selection",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.4"
@@ -14955,8 +14956,8 @@
     {
       "id": "BT93S.4.1",
       "type": "subphase",
-      "title": "Pruefen, ob Policy wirksame Actions unter Gefahr auswaehlt.",
-      "status": "open",
+      "title": "Pruefen, ob Policy wirksame Actions unter Gefahr auswaehlt. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_policy_selection.py --write-report` -> `data/training/ppo/bt93s/policy_selection_report.json`, `phaseCoverage.93S.4.1=true`, `selectionStepCount=607`, `policyMode=stochastic-eval-mode-counterprobe`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.4",
@@ -14966,8 +14967,8 @@
     {
       "id": "BT93S.4.2",
       "type": "subphase",
-      "title": "Fehlende Telemetrie nach BT93T routen; sonst `action-selection-required`.",
-      "status": "open",
+      "title": "Fehlende Telemetrie nach BT93T routen; sonst `action-selection-required`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_policy_selection.py --write-report` -> `data/training/ppo/bt93s/policy_selection_report.json`, `phaseCoverage.93S.4.2=true`, `telemetryLimitedScenarioIds=[trail-ahead,trail-side]`, `selectionBlockers=[narrowing-corridor,side-wall-left,side-wall-right]`, `resultClass=matrix-redesign-required`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.4",
@@ -30084,6 +30085,26 @@
       }
     },
     {
+      "id": "data/training/ppo/bt93s/action_selection_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/training/ppo/bt93s/action_surface_decision.json",
       "type": "file",
       "title": null,
@@ -30150,9 +30171,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -38351,6 +38378,27 @@
     },
     {
       "id": "python/scripts/bt93s_existing_action_effect.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s_policy_selection.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -75786,6 +75834,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s/action_selection_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s/action_surface_decision.json",
       "type": "scope",
       "hint": null,
@@ -75796,6 +75853,15 @@
     {
       "from": "BT90",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93s/policy_selection_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -77308,6 +77374,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s_existing_action_effect.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s_policy_selection.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79574,6 +79649,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s/action_selection_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s/action_surface_decision.json",
       "type": "scope",
       "hint": null,
@@ -79584,6 +79668,15 @@
     {
       "from": "BT91",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93s/policy_selection_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81078,6 +81171,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s_existing_action_effect.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s_policy_selection.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84542,6 +84644,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s/action_selection_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s/action_surface_decision.json",
       "type": "scope",
       "hint": null,
@@ -84552,6 +84663,15 @@
     {
       "from": "BT92",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93s/policy_selection_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -86055,6 +86175,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s_existing_action_effect.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s_policy_selection.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88620,6 +88749,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s/action_selection_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s/action_surface_decision.json",
       "type": "scope",
       "hint": null,
@@ -88630,6 +88768,15 @@
     {
       "from": "BT93B",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93s/policy_selection_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -90133,6 +90280,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s_existing_action_effect.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s_policy_selection.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -99102,6 +99258,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s/action_selection_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s/action_surface_decision.json",
       "type": "scope",
       "hint": null,
@@ -99112,6 +99277,15 @@
     {
       "from": "BT93D",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93s/policy_selection_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -100615,6 +100789,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s_existing_action_effect.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s_policy_selection.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -108759,6 +108942,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s/action_selection_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s/action_surface_decision.json",
       "type": "scope",
       "hint": null,
@@ -108769,6 +108961,15 @@
     {
       "from": "BT93E",
       "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93s/policy_selection_report.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -110281,6 +110482,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s_existing_action_effect.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s_policy_selection.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -136875,6 +137085,15 @@
     {
       "from": "BT93S",
       "to": "python/scripts/bt93s_existing_action_effect.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "python/scripts/bt93s_policy_selection.py",
       "type": "scope",
       "hint": null,
       "attributes": {

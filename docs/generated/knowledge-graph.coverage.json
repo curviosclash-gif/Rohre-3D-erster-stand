@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2491,
-    "rawCoveredFileCount": 2010,
+    "trackedFileCount": 2494,
+    "rawCoveredFileCount": 2013,
     "rawCoveragePercent": 80.7,
-    "adjustedTrackedFileCount": 1588,
-    "adjustedCoveredFileCount": 1351,
+    "adjustedTrackedFileCount": 1591,
+    "adjustedCoveredFileCount": 1354,
     "adjustedCoveragePercent": 85.1,
     "uncoveredFileCount": 481,
     "uncoveredActiveFileCount": 237,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 286,
-        "coveredCount": 265
+        "count": 288,
+        "coveredCount": 267
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 903,
-        "coveredCount": 887
+        "count": 904,
+        "coveredCount": 888
       },
       {
         "classification": "product-docs",
@@ -8480,6 +8480,28 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93s/action_selection_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93s/action_surface_decision.json",
       "tracked": true,
       "coveredInCore": true,
@@ -8504,6 +8526,29 @@
     },
     {
       "path": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93s/policy_selection_report.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -20017,6 +20062,29 @@
     },
     {
       "path": "python/scripts/bt93s_existing_action_effect.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93s_policy_selection.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
