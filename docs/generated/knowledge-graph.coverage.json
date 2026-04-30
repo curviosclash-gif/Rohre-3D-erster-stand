@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2505,
-    "rawCoveredFileCount": 2023,
+    "trackedFileCount": 2506,
+    "rawCoveredFileCount": 2024,
     "rawCoveragePercent": 80.8,
-    "adjustedTrackedFileCount": 1602,
-    "adjustedCoveredFileCount": 1364,
-    "adjustedCoveragePercent": 85.1,
+    "adjustedTrackedFileCount": 1603,
+    "adjustedCoveredFileCount": 1365,
+    "adjustedCoveragePercent": 85.2,
     "uncoveredFileCount": 482,
     "uncoveredActiveFileCount": 238,
     "classifications": [
@@ -189,8 +189,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 374,
-        "coveredCount": 186
+        "count": 375,
+        "coveredCount": 187
       },
       {
         "classification": "prototype",
@@ -11584,6 +11584,7 @@
         "BT93RR",
         "BT93S",
         "BT93S2",
+        "BT93S2R",
         "BT93T",
         "BT93U",
         "BT93V",
@@ -14548,6 +14549,23 @@
     },
     {
       "path": "docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/BT93S2R_Matrix_Control_Reentry_Replan_2026-04-30.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
