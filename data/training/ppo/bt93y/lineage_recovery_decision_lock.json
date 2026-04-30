@@ -1,0 +1,201 @@
+{
+  "allowNext": [
+    "93Y.2 exact BT93N lineage inventory and loader-smoke path",
+    "93Y.3 narrow retraining lineage only if exact lineage is unavailable under UOD-1",
+    "93Y.4 replacement-policy lock report before full BT93X/BT93P starttruth"
+  ],
+  "blockId": "BT93Y",
+  "blocksNext": [
+    "BT93S claim",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "write": "python python/scripts/bt93y_lineage_recovery_decision_lock.py --write-report"
+  },
+  "dodCoverage": {
+    "DoD.Y1": true,
+    "DoD.Y2": true,
+    "DoD.Y7": true
+  },
+  "forbiddenNextActions": [
+    "BT93S claim",
+    "BT93O claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration"
+  ],
+  "generatedAt": "2026-04-30T09:48:37Z",
+  "generatedBy": "python/scripts/bt93y_lineage_recovery_decision_lock.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "6853d4293821d8116048a456494571f87ed53e14",
+    "sha": "8de24549c1de54b8bedbe242a5c16b3807a4158a"
+  },
+  "guardrails": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93rReentryAllowed": false,
+    "bt93sClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffSignal": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "lineageDecision": {
+    "decisionId": "UOD-1",
+    "exactRecoveryAttempted": false,
+    "exactRecoveryRequiredBeforeRerun": true,
+    "lineageRecoveryBeforeAnyRSOP": true,
+    "mode": "lineage-recovery-before-any-r-s-o-p",
+    "newRetrainLineageMustNotBeLabeledAsBt93n": true,
+    "owner": "user",
+    "retrainingAllowedIfExactLineageUnavailable": true
+  },
+  "matrixHash": "a8e17c34cc152bf73d6e6d43e11aa12b3cffae9a2caf26601ebd22b94d4b7bad",
+  "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+  "ok": true,
+  "opensNext": [
+    "93Y.2"
+  ],
+  "phaseCoverage": {
+    "93Y.1.1": true,
+    "93Y.1.2": true,
+    "93Y.1.3": true,
+    "93Y.1.4": true,
+    "93Y.1.5": true
+  },
+  "phaseId": "93Y.1",
+  "replacementPolicy": {
+    "approved": true,
+    "decision": "approved",
+    "decisionId": "UOD-2",
+    "forbiddenUse": [
+      "candidate",
+      "freeze",
+      "promote",
+      "rollout",
+      "DQN sunset",
+      "productive handoff"
+    ],
+    "historicalDqnBotReportsUse": "context-only",
+    "owner": "user",
+    "policyId": "bt93x-rcp1-same-matrix-control-suite-no-bt11",
+    "replaces": "BT11-same-matrix-DQN-anchor",
+    "scope": [
+      "BT93X starttruth",
+      "BT93P starttruth"
+    ]
+  },
+  "resultClass": "lineage-recovery-lock-green",
+  "sampleCounts": {
+    "holdoutEpisodes": 0,
+    "missingRates": {},
+    "newEvalEpisodes": 0,
+    "newTrainingEpisodes": 0,
+    "notApplicableReason": "93Y.1 is a decision-lock phase without training or eval samples.",
+    "steps": 0
+  },
+  "schemaVersion": "bt93y-lineage-recovery-decision-lock-v1",
+  "semanticWindow": "runtime-near-headless-v1",
+  "sourceArtifacts": [
+    {
+      "actualFields": {
+        "phaseId": "93R.99",
+        "resultClass": "model-artifact-missing"
+      },
+      "blockId": "BT93R",
+      "exists": true,
+      "expectedFields": {
+        "phaseId": "93R.99",
+        "resultClass": "model-artifact-missing"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93r/bt93r_closure_gate_report.json",
+      "phaseId": "93R.99",
+      "resultClass": "model-artifact-missing",
+      "role": "BT93R.99 red closure gate",
+      "schemaVersion": "bt93r-closure-gate-report-v1",
+      "sha256": "947a93757f71ae28baa715bd923de5666b52fca1a3a47992f23dd02c66f272d3",
+      "sizeBytes": 8945,
+      "sourceKey": "bt93rClosureGate",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "comparisonPolicyDecision": "dqn-anchor-blocked",
+        "phaseId": "93X.0",
+        "preflightField": "dqn-loader-fix-required"
+      },
+      "blockId": "BT93X.0",
+      "exists": true,
+      "expectedFields": {
+        "comparisonPolicyDecision": "dqn-anchor-blocked",
+        "phaseId": "93X.0",
+        "preflightField": "dqn-loader-fix-required"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
+      "phaseId": "93X.0",
+      "resultClass": "early-comparator-preflight-complete",
+      "role": "BT93X.0 read-only early comparator preflight",
+      "schemaVersion": "bt93x-early-comparator-preflight-report-v1",
+      "sha256": "bbb474bc083c9c3503b6371f5eda7cce63786aadfc617f387f7b8c0fc65c0e00",
+      "sizeBytes": 16158,
+      "sourceKey": "bt93x0EarlyComparatorPreflight",
+      "tracked": true
+    }
+  ],
+  "sourceFilesFresh": true,
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "summary": {
+    "bt93rSourceResult": "model-artifact-missing",
+    "bt93x0ComparisonPolicyDecision": "dqn-anchor-blocked",
+    "bt93x0PreflightField": "dqn-loader-fix-required",
+    "lineageRecoveryBeforeAnyRSOP": true,
+    "nextBestAction": "Run 93Y.2 exact lineage inventory; do not start BT93S/O/P/94A.",
+    "replacementPolicyId": "bt93x-rcp1-same-matrix-control-suite-no-bt11"
+  }
+}
