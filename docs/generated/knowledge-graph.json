@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 395,
+          "concreteCount": 397,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 533,
+          "concreteCount": 535,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 391,
+          "concreteCount": 393,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 390,
+          "concreteCount": 392,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1032,
+          "concreteCount": 1034,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1040,
+          "concreteCount": 1042,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1772,7 +1772,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S.2",
+        "currentPhase": "93S.3",
         "scopeDeclarations": [
           "data/training/ppo/bt93s/action_surface_decision.json",
           "data/training/ppo/bt93s/bt93s_closure_gate_report.json",
@@ -1780,11 +1780,12 @@
           "data/training/ppo/bt93s/policy_selection_report.json",
           "data/training/ppo/bt93s/scenario_window_contract.json",
           "docs/bot-training/Bot_Trainingsplan.md",
+          "python/scripts/bt93s_existing_action_effect.py",
           "python/scripts/bt93s_scenario_window_contract.py"
         ],
         "scopeResolution": {
-          "concreteCount": 3,
-          "plannedCount": 4
+          "concreteCount": 5,
+          "plannedCount": 3
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5212,7 +5213,7 @@
       "id": "BT93S.2",
       "type": "phase",
       "title": "Existing-Action Effekt",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.2"
@@ -14909,8 +14910,8 @@
     {
       "id": "BT93S.2.1",
       "type": "subphase",
-      "title": "Bestehende Actions ohne PPO-Training gegen Szenariofenster messen.",
-      "status": "open",
+      "title": "Bestehende Actions ohne PPO-Training gegen Szenariofenster messen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_existing_action_effect.py --reclassify-existing --write-report` -> `data/training/ppo/bt93s/existing_action_effect_report.json`, `phaseCoverage.93S.2.1=true`, `sampleCounts.probeCount=351`, `guardrails.trainingStarted=false`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.2",
@@ -14920,8 +14921,8 @@
     {
       "id": "BT93S.2.2",
       "type": "subphase",
-      "title": "Command-Flags ohne Zustandswirkung als `action-effect-weak` klassifizieren.",
-      "status": "open",
+      "title": "Command-Flags ohne Zustandswirkung als `action-effect-weak` klassifizieren. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s_existing_action_effect.py --reclassify-existing --write-report` -> `data/training/ppo/bt93s/existing_action_effect_report.json`, `phaseCoverage.93S.2.2=true`, `actionEffectGapScenarioIds=[escape-right-open]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S",
         "phaseCode": "93S.2",
@@ -30121,9 +30122,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -38310,6 +38317,27 @@
           "BT93D",
           "BT93E",
           "BT93RR"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s_existing_action_effect.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S"
         ],
         "exists": true
       }
@@ -75730,6 +75758,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s/scenario_window_contract.json",
       "type": "scope",
       "hint": null,
@@ -77216,6 +77253,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s_existing_action_effect.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -79482,6 +79528,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s/scenario_window_contract.json",
       "type": "scope",
       "hint": null,
@@ -80950,6 +81005,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s_existing_action_effect.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84414,6 +84478,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s/scenario_window_contract.json",
       "type": "scope",
       "hint": null,
@@ -85891,6 +85964,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s_existing_action_effect.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88456,6 +88538,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s/scenario_window_contract.json",
       "type": "scope",
       "hint": null,
@@ -89933,6 +90024,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s_existing_action_effect.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98902,6 +99002,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s/scenario_window_contract.json",
       "type": "scope",
       "hint": null,
@@ -100379,6 +100488,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s_existing_action_effect.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -108523,6 +108641,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s/existing_action_effect_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s/scenario_window_contract.json",
       "type": "scope",
       "hint": null,
@@ -110009,6 +110136,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93r_reentry_root_cause.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s_existing_action_effect.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -136585,6 +136721,15 @@
     {
       "from": "BT93S",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S",
+      "to": "python/scripts/bt93s_existing_action_effect.py",
       "type": "scope",
       "hint": null,
       "attributes": {
