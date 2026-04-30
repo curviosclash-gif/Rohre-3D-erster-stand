@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2468,
-    "rawCoveredFileCount": 1988,
+    "trackedFileCount": 2472,
+    "rawCoveredFileCount": 1992,
     "rawCoveragePercent": 80.6,
-    "adjustedTrackedFileCount": 1565,
-    "adjustedCoveredFileCount": 1329,
-    "adjustedCoveragePercent": 84.9,
+    "adjustedTrackedFileCount": 1569,
+    "adjustedCoveredFileCount": 1333,
+    "adjustedCoveragePercent": 85,
     "uncoveredFileCount": 480,
     "uncoveredActiveFileCount": 236,
     "classifications": [
@@ -177,20 +177,20 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 274,
-        "coveredCount": 253
+        "count": 276,
+        "coveredCount": 255
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 894,
-        "coveredCount": 878
+        "count": 895,
+        "coveredCount": 879
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 370,
-        "coveredCount": 184
+        "count": 371,
+        "coveredCount": 185
       },
       {
         "classification": "prototype",
@@ -8414,6 +8414,52 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93y/bt93y_closure_gate_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Y"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93y/bt93y_handover_package.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Y"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "tracked": true,
       "coveredInCore": true,
@@ -11672,6 +11718,23 @@
       "covered": false,
       "coverageSources": [],
       "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/Fehlerberichte/2026-04-30_bt93y-99-build-typecheck-architecture-blocked.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT93Y"
+      ],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
@@ -19587,6 +19650,29 @@
         "BT93D",
         "BT93E",
         "BT93W"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93y_closure_gate.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93Y"
       ],
       "surfaces": [],
       "classification": "product-code",

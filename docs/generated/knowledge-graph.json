@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 378,
+          "concreteCount": 381,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 516,
+          "concreteCount": 519,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 374,
+          "concreteCount": 377,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 373,
+          "concreteCount": 376,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1015,
+          "concreteCount": 1018,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1023,
+          "concreteCount": 1026,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1913,7 +1913,7 @@
       "id": "BT93Y",
       "type": "block",
       "title": "PPO Lineage-Recovery/Retraining und Ersatzvergleich",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "source": [
           "bot-training-plan",
@@ -1941,6 +1941,8 @@
           "data/training/ppo/bt93y/retrain_policy_probe_report.json",
           "data/training/ppo/bt93y/retrain_start_contract.json",
           "docs/bot-training/Bot_Trainingsplan.md",
+          "docs/Fehlerberichte/2026-04-30_bt93y-99-build-typecheck-architecture-blocked.md",
+          "python/scripts/bt93y_closure_gate.py",
           "python/scripts/bt93y_exact_lineage_recovery.py",
           "python/scripts/bt93y_lineage_recovery_decision_lock.py",
           "python/scripts/bt93y_reentry_package.py",
@@ -1949,8 +1951,8 @@
           "tmp/**"
         ],
         "scopeResolution": {
-          "concreteCount": 661,
-          "plannedCount": 2
+          "concreteCount": 665,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5453,7 +5455,7 @@
       "id": "BT93Y.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.99"
@@ -15743,8 +15745,8 @@
     {
       "id": "BT93Y.99.1",
       "type": "subphase",
-      "title": "Alle Phasen 93Y.1 bis 93Y.5 sind mit Evidence dokumentiert oder ehrlich blockiert.",
-      "status": "open",
+      "title": "Alle Phasen 93Y.1 bis 93Y.5 sind mit Evidence dokumentiert oder ehrlich blockiert. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_closure_gate.py --write-reports` -> `data/training/ppo/bt93y/bt93y_closure_gate_report.json`, `phaseCoverage.93Y.99.1=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.99",
@@ -15754,8 +15756,8 @@
     {
       "id": "BT93Y.99.2",
       "type": "subphase",
-      "title": "Genau eine Lineage-Quelle ist aktiv: exakte BT93N-Recovery oder neue Retraining-Lineage.",
-      "status": "open",
+      "title": "Genau eine Lineage-Quelle ist aktiv: exakte BT93N-Recovery oder neue Retraining-Lineage. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_closure_gate.py --write-reports` -> `data/training/ppo/bt93y/bt93y_closure_gate_report.json`, `activeLineage.activeCount=1`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.99",
@@ -15765,8 +15767,8 @@
     {
       "id": "BT93Y.99.3",
       "type": "subphase",
-      "title": "Ersatzvergleichspolitik ist user-owned und maschinenlesbar entschieden.",
-      "status": "open",
+      "title": "Ersatzvergleichspolitik ist user-owned und maschinenlesbar entschieden. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_closure_gate.py --write-reports` -> `data/training/ppo/bt93y/bt93y_closure_gate_report.json`, `replacementPolicy.owner=user`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.99",
@@ -15776,8 +15778,8 @@
     {
       "id": "BT93Y.99.4",
       "type": "subphase",
-      "title": "`BT93Y.99` oeffnet nur den neuen `BT93R-Reentry`-Probepfad.",
-      "status": "open",
+      "title": "`BT93Y.99` oeffnet nur den neuen `BT93R-Reentry`-Probepfad. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_closure_gate.py --write-reports` -> `data/training/ppo/bt93y/bt93y_closure_gate_report.json`, `opensNext=[BT93R-Reentry]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.99",
@@ -15787,8 +15789,8 @@
     {
       "id": "BT93Y.99.5",
       "type": "subphase",
-      "title": "`BT93S`, `BT93O`, `BT93P`, `BT94A`, Candidate, Freeze, Holdout, Promote und Rollout bleiben geschlossen.",
-      "status": "open",
+      "title": "`BT93S`, `BT93O`, `BT93P`, `BT94A`, Candidate, Freeze, Holdout, Promote und Rollout bleiben geschlossen. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93y_closure_gate.py --write-reports` -> `data/training/ppo/bt93y/bt93y_closure_gate_report.json`, `claimFlags` non-Reentry false)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.99",
@@ -15798,8 +15800,8 @@
     {
       "id": "BT93Y.99.6",
       "type": "subphase",
-      "title": "Abschluss-Gates sind fuer den Blockabschluss vorgesehen: `npm.cmd run plan:check`, `npm.cmd run docs:sync`, `npm.cmd run docs:check`, `npm.cmd run build`; Tests und Trainingslaeufe bleiben user-owned.",
-      "status": "open",
+      "title": "Abschluss-Gates sind fuer den Blockabschluss vorgesehen: `npm.cmd run plan:check`, `npm.cmd run docs:sync`, `npm.cmd run docs:check`, `npm.cmd run build`; Tests und Trainingslaeufe bleiben user-owned. (abgeschlossen: 2026-04-30; evidence: `npm.cmd run gates:pre-commit` -> PASS; `npm.cmd run build` -> blockiert durch bestehenden `typecheck:architecture`, siehe `docs/Fehlerberichte/2026-04-30_bt93y-99-build-typecheck-architecture-blocked.md`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93Y",
         "phaseCode": "93Y.99",
@@ -30241,9 +30243,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -30256,9 +30264,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93Y"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -31235,6 +31249,21 @@
         ],
         "scopeBlocks": [
           "BT93K"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/Fehlerberichte/2026-04-30_bt93y-99-build-typecheck-architecture-blocked.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93Y"
         ],
         "exists": true
       }
@@ -37790,6 +37819,27 @@
           "BT93D",
           "BT93E",
           "BT93W"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93y_closure_gate.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93Y"
         ],
         "exists": true
       }
@@ -75120,6 +75170,24 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93y/bt93y_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "data/training/ppo/bt93y/bt93y_handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -76507,6 +76575,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93y_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -78719,6 +78796,24 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93y/bt93y_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "data/training/ppo/bt93y/bt93y_handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -80088,6 +80183,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93y_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83498,6 +83602,24 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93y/bt93y_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "data/training/ppo/bt93y/bt93y_handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -84876,6 +84998,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93y_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -87387,6 +87518,24 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93y/bt93y_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "data/training/ppo/bt93y/bt93y_handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -88765,6 +88914,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93y_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97680,6 +97838,24 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93y/bt93y_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "data/training/ppo/bt93y/bt93y_handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -99058,6 +99234,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93y_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -107148,6 +107333,24 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93y/bt93y_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "data/training/ppo/bt93y/bt93y_handover_package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93y/exact_lineage_inventory_report.json",
       "type": "scope",
       "hint": null,
@@ -108535,6 +108738,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93x_early_comparator_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93y_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -136212,7 +136424,7 @@
       "source": "master-table",
       "hard": true,
       "fulfilled": true,
-      "hint": "Lineage-Recovery/Retraining, Ersatzvergleichspolitik und neuer BT93R-Reentry; aktueller naechster Scope ist 93Y.99",
+      "hint": "Lineage-Recovery/Retraining, Ersatzvergleichspolitik und neuer BT93R-Reentry; 93Y.99 abgeschlossen, einziger naechster Scope ist neuer BT93R-Reentry",
       "attributes": {
         "dependsPhase": "93R.99",
         "rawToken": "BT93R.99",
@@ -136429,6 +136641,24 @@
     {
       "from": "BT93Y",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Y",
+      "to": "docs/Fehlerberichte/2026-04-30_bt93y-99-build-typecheck-architecture-blocked.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93Y",
+      "to": "python/scripts/bt93y_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
