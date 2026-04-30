@@ -10,14 +10,15 @@ Diese Roadmap ist nur noch der Langhorizont. Fuer den PPO-Pfad sind die alten C2
 
 Aktiver PPO-Fokus:
 
-- `BT93M` bis `BT93Q` sind rot abgeschlossen; der aktive Reparaturfokus ist jetzt `PF.0`, `BT93R` bis `BT93W`, fruehes read-only `BT93X.0`, danach `BT93O`, voller `BT93X` und erst dann `BT93P`.
-- Bis `BT93O.99=bt93o-quality-green`, `BT93X.99=bt93p-starttruth-green`, `BT93P.4=BT94A-ready` plus `data/training/ppo/bt94a/no_start_gate.json` mit `claimable=true` bleibt jeder PPO-Langlauf ueber die gepinnte Reparaturleiter hinaus verboten.
+- `BT93M` bis `BT93Q` sind rot abgeschlossen; `PF.0`, `BT93R` und fruehes read-only `BT93X.0` sind gelaufen. Der aktive Reparaturfokus ist jetzt `BT93Y` als Lineage-Recovery/Retraining- und Ersatzvergleichs-Interposer; erst danach darf ein neuer `BT93R-Reentry` die R-X-Leiter Richtung `BT93S` bis `BT93W`, `BT93O`, voller `BT93X` und `BT93P` wieder oeffnen.
+- Bis `BT93Y.99` nur einen neuen `BT93R-Reentry` oeffnet, danach `BT93O.99=bt93o-quality-green`, `BT93X.99=bt93p-starttruth-green`, `BT93P.4=BT94A-ready` plus `data/training/ppo/bt94a/no_start_gate.json` mit `claimable=true` vorliegen, bleibt jeder PPO-Langlauf ueber die gepinnte Reparaturleiter hinaus verboten.
 - Q2-Zielwerte bleiben Produktziele, aber keine Promotionsregel: `promote` braucht BT94A-Freeze, BT94B-A/B-Evidence, gruene PPO-Validate-Lane, Holdout, Statistik und expliziten User-Entscheid.
 - BT93J/BT93K/BT93L haben gezeigt, dass Steps, Durchsatz, CUDA, Smokes und Plan-Gates keine Bot-Qualitaet beweisen. Die Roadmap wertet ab sofort nur noch versionierte Semantik-/Run-/Validate-Evidence aus `docs/bot-training/Bot_Trainingsplan.md`.
 
 Aktuelle No-Go-Regeln:
 
 - Kein Candidate, Freeze, Promote, Rollout oder BT95-Handoff aus Diagnose-, Scaffold-, `tmp/**`-, `latest_*`-, Durchsatz- oder Drei-Run-Zwischenevidence.
+- Kein `BT93S`-, `BT93O`-, `BT93X`-, `BT93P`- oder BT94A-Fixplanungsstart vor `BT93Y.99` plus neuem `BT93R-Reentry.99` in R-Allowlist.
 - Kein BT94A-Start ohne geloestes Policy-Collapse-, Action-, Telemetry-, Reward-, Safety-/Terminal-, Objective-/Anti-Plateau- und Comparator-Gate; Same-Matrix-DQN- oder User-Ersatzvergleich, Holdout-Lineage und Statistikvertrag muessen aus BT93X/BT93P frisch sein.
 - Kein Runtime-Sunset fuer DQN ohne separaten operativen Rollout-Block mit Export/Load, JS-Inference, Registry, Latenzbudget, Rollback und PPO-Validate.
 - Kein Report-only-Fortschritt: PPO-Artefakte muessen blockierende Konsequenzen, Sampleguete, Matrix-ID, Semantikfenster, Vergleichspolitik und naechste erlaubte Aktionen maschinenlesbar schreiben.
