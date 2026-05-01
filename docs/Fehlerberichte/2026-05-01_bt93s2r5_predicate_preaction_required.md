@@ -89,3 +89,31 @@ Evidence:
 - `data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json`
 - Command: `python python/scripts/bt93s2r5_predicate_preaction_repair_contract.py --write-report`
 <!-- BT93S2R5.2-END -->
+
+<!-- BT93S2R5.3-START -->
+## 93S2R5.3 Enger Predicate-/StartState-/Warmup-Repair
+
+- Result: `resultClass=predicate-preaction-repair-applied`, `ok=True`
+- Repaired Rows: `33`; Repair-Gruppen: `4`
+- Predicate-/Warmup-Aenderungen: `0` / `0`
+- Candidate-Fails/Missing Rows: `0` / `0` / `11`
+- Neutral-Control/Action-/Reward-/Runtime-/Training-Signale: `0/0/0/0`
+
+| Scenario | Alt-Seed | Neu-Seed | Rows | Predicate Changed | Warmup Changed |
+| --- | ---: | ---: | ---: | --- | --- |
+| `escape-right-open` | `930` | `2930` | `8` | `False` | `False` |
+| `escape-right-open` | `1930` | `2930` | `9` | `False` | `False` |
+| `narrowing-corridor` | `1934` | `934` | `3` | `False` | `False` |
+| `no-danger-control` | `930` | `1930` | `13` | `False` | `False` |
+
+S2R5.3 materialisiert nur den gelockten Seed-/StartState-Repair-Contract.
+Alte rote S2R4.4-Reports bleiben Kontext, nicht Gruen. Gesperrt bleiben
+`93S2R4.5`, `93S2R3.3-Reentry`, `BT93S2.3-Recheck`, `93S2.4`,
+`BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout,
+PPO-Validate und BT95 bis zum spaeteren Empirical-/Closure-Gate.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r5/predicate_preaction_repair_report.json`
+- Command: `python python/scripts/bt93s2r5_predicate_preaction_repair.py --write-report`
+<!-- BT93S2R5.3-END -->
