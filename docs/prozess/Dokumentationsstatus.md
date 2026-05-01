@@ -1,11 +1,13 @@
 # Dokumentationsstatus
 
-Stand: 2026-04-30
+Stand: 2026-05-01
 Modus: sync
 Gate: PASS
 
 ## Automatisch aktualisiert
-- Keine inhaltlichen Datumsupdates noetig.
+- docs/referenz/ai_project_onboarding.md
+- docs/referenz/ai_architecture_context.md
+- docs/referenz/architektur_ausfuehrlich.md
 
 ## Pflichtdateien
 - Alle Pflichtdateien vorhanden.
@@ -20,4 +22,4 @@ Gate: PASS
 - Keine Mojibake-Muster gefunden.
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-04-30).
+- Dokumentation aktuell (geprueft am 2026-05-01).

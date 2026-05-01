@@ -940,7 +940,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93RR | Policy-Artefakt Reentry auf neuer Retrain-Lineage (`BT93R-Reentry`) | completed | P0 | BT93Y.99 `retrain-lineage-ready-bt93r-reentry-ready` + `bt93rReentryAllowed=true` | 93RR.99 abgeschlossen: `eval-mode-bug-fixed-counterprobe-green`, oeffnet nur BT93S | `docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md` |
 | BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | completed | P1 | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | 93S.99 abgeschlossen: `matrix-redesign-required`, oeffnet nichts | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93S2 | Matrix-/Action-Effect Repair nach rotem BT93S | planned | P0 | BT93S.99=`matrix-redesign-required` + User-Intake 2026-04-30 | 93S2.3 abgeschlossen: `measurement-invalid`, oeffnet nichts | `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md` |
-| BT93S2R | Matrix-/Control-Reentry nach S2.3 measurement-invalid | in_progress | P0 | BT93S2.3=`measurement-invalid` + User-Intake 2026-04-30 | 93S2R.4 | `docs/plaene/neu/BT93S2R_Matrix_Control_Reentry_Replan_2026-04-30.md` |
+| BT93S2R | Matrix-/Control-Reentry nach S2.3 measurement-invalid | in_progress | P0 | BT93S2.3=`measurement-invalid` + User-Intake 2026-04-30 | 93S2R.4 abgeschlossen: `matrix-control-reentry-green`; 93S2R.99 offen | `docs/plaene/neu/BT93S2R_Matrix_Control_Reentry_Replan_2026-04-30.md` |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | BT93S2R.99=`matrix-control-reentry-green` + frischer BT93S2-Recheck `observation-telemetry-required` | blockiert bis BT93S2 nur Telemetrie oeffnet | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | BT93S2R.99=`matrix-control-reentry-green` + frischer BT93S2.99=`action-selection-green` oder BT93T.99=`telemetry-green` + S2-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93V | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision | planned | P1 | BT93U.99=`reward-ordering-green` | 93V.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3961,7 +3961,7 @@ Scope-Dateien:
 - [x] DoD.S2R-R5 `escape-right-open` wird erst als echte Action-Space-Luecke bewertet, wenn v3-Predicate, Warmup, Positive-Control, Negative-Control und Minimum-Window gruen sind. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_matrix_control_v3.py --write-report` -> `data/training/ppo/bt93s2r/scenario_matrix_v3_contract.json`)
 - [x] DoD.S2R-R6 `side-wall-left` hat konsistente Label-/Koordinaten-/Control-Semantik; ein falsches Direction-Gruen stoppt rot. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_matrix_control_v3.py --write-report` -> `data/training/ppo/bt93s2r/scenario_matrix_v3_contract.json`)
 - [x] DoD.S2R-R7 `no-danger-control` ist neutral-stable, erzeugt aber `actionGreenEvidenceProduced=false`. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_matrix_control_v3.py --write-report` -> `data/training/ppo/bt93s2r/scenario_matrix_v3_contract.json`)
-- [ ] DoD.S2R-R8 Reentry-Gate schreibt `predicateFailureCount=0`, `minimumWindowFailureCount=0`, `measurementInvalidCount=0`, `negativeControlFailedCount=0`, `directionMismatchCount=0` oder endet rot.
+- [x] DoD.S2R-R8 Reentry-Gate schreibt `predicateFailureCount=0`, `minimumWindowFailureCount=0`, `measurementInvalidCount=0`, `negativeControlFailedCount=0`, `directionMismatchCount=0` oder endet rot. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r_matrix_control_reentry_gate.py --write-report` -> `data/training/ppo/bt93s2r/matrix_control_reentry_gate_report.json`)
 - [x] DoD.S2R-R9 Proxy-Hygiene bleibt hart: Reward-only, command-flag-only, target-distance-only, single-step und maxSteps-only bleiben verboten. (abgeschlossen: 2026-04-30; evidence: `python python/scripts/bt93s2r_matrix_control_v3.py --write-report` -> `data/training/ppo/bt93s2r/scenario_matrix_v3_contract.json`)
 - [ ] DoD.S2R-R10 Closure oeffnet nur `BT93S2.3-Recheck`; alle Folgeblocks und Produkt-/Rollout-Signale bleiben geschlossen.
 - [ ] DoD.S2R-R11 Meta-Gate `npm.cmd run gates:pre-commit` ist gruen.
@@ -4003,10 +4003,10 @@ Evidence:
 
 ### 93S2R.4 Matrix-Control Reentry Gate
 
-- [ ] 93S2R.4.1 `bt93s2r_matrix_control_reentry_gate.py` misst nur reparierte Control-/Predicate-/Window-Gates gegen v3.
-- [ ] 93S2R.4.2 Gruen verlangt alle Null-Counts: Predicate, Minimum-Window, Measurement-Invalid, Negative-Control-Fail, Direction-Mismatch.
-- [ ] 93S2R.4.3 `escape-right-open` wird bei validem v3 nur als Input fuer den frischen S2.3-Recheck festgehalten, nicht als Direkt-GO fuer Action-Surface.
-- [ ] 93S2R.4.4 Rote Ergebnisse oeffnen nichts und nennen den engsten Folge-Reparaturbedarf.
+- [x] 93S2R.4.1 `bt93s2r_matrix_control_reentry_gate.py` misst nur reparierte Control-/Predicate-/Window-Gates gegen v3. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r_matrix_control_reentry_gate.py --write-report` -> `data/training/ppo/bt93s2r/matrix_control_reentry_gate_report.json`)
+- [x] 93S2R.4.2 Gruen verlangt alle Null-Counts: Predicate, Minimum-Window, Measurement-Invalid, Negative-Control-Fail, Direction-Mismatch. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r_matrix_control_reentry_gate.py --write-report` -> `data/training/ppo/bt93s2r/matrix_control_reentry_gate_report.json`)
+- [x] 93S2R.4.3 `escape-right-open` wird bei validem v3 nur als Input fuer den frischen S2.3-Recheck festgehalten, nicht als Direkt-GO fuer Action-Surface. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r_matrix_control_reentry_gate.py --write-report` -> `data/training/ppo/bt93s2r/matrix_control_reentry_gate_report.json`)
+- [x] 93S2R.4.4 Rote Ergebnisse oeffnen nichts und nennen den engsten Folge-Reparaturbedarf. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r_matrix_control_reentry_gate.py --write-report` -> `data/training/ppo/bt93s2r/matrix_control_reentry_gate_report.json`)
 
 Evidence:
 

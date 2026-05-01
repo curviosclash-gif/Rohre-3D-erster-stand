@@ -1,0 +1,398 @@
+{
+  "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+  "allowNext": [
+    "93S2R.99 Closure"
+  ],
+  "blockId": "BT93S2R",
+  "blocksNext": [
+    "93S2.4 start before BT93S2R.99=matrix-control-reentry-green plus fresh BT93S2.3-Recheck",
+    "BT93T claim before fresh S2-Recheck opens only observation telemetry",
+    "BT93U claim before fresh S2-Recheck opens action-selection-green",
+    "BT93V claim",
+    "BT93W claim",
+    "BT93O claim",
+    "BT93X full claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "50k/100k/200k/500k/1M extension",
+    "reward fix from BT93S2R.4",
+    "telemetry fix from BT93S2R.4",
+    "action-surface change from BT93S2R.4"
+  ],
+  "claimFlags": {
+    "bt93oClaimAllowed": false,
+    "bt93pClaimAllowed": false,
+    "bt93s2Phase4Allowed": false,
+    "bt93s2RecheckAllowed": false,
+    "bt93s2RecheckReadyForClosure": true,
+    "bt93s2rClosureAllowed": true,
+    "bt93tClaimAllowed": false,
+    "bt93uClaimAllowed": false,
+    "bt93vClaimAllowed": false,
+    "bt93wClaimAllowed": false,
+    "bt93xFullClaimAllowed": false,
+    "bt94aClaimAllowed": false,
+    "bt95HandoffAllowed": false,
+    "candidateRunsAllowed": false,
+    "freezeAllowed": false,
+    "holdoutConsumptionAllowed": false,
+    "ppoValidateSignalAllowed": false,
+    "promoteAllowed": false,
+    "rolloutAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "next": "python python/scripts/bt93s2r_closure_gate.py --write-report",
+    "tests": "user-owned except closure gate scripts",
+    "write": "python python/scripts/bt93s2r_matrix_control_reentry_gate.py --write-report"
+  },
+  "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+  "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+  "gatePassed": true,
+  "generatedAt": "2026-05-01T07:20:08Z",
+  "generatedBy": "python/scripts/bt93s2r_matrix_control_reentry_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "a2854edc5a0ec2d0b46d332faf79a98d5bb4265a",
+    "sha": "a9fa5265c4d2d72072c3c4cdb9ba46355cd4cbe0"
+  },
+  "guardrails": {
+    "actionSurfaceChanged": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "qualityClaimAllowed": false,
+    "rewardFixApplied": false,
+    "runtimeSurfacesTouched": [],
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "historicalSourceCounts": {
+    "commandFlagWithoutStateEffectCount": null,
+    "minimumWindowFailureCount": 12,
+    "predicateFailureCount": 48,
+    "rewardOnlyRejectedCount": null,
+    "sourceProbeCount": 338
+  },
+  "invalidations": [
+    {
+      "reason": "93S2.4 remains closed until 93S2R.99 closes green and a fresh BT93S2.3-Recheck is produced.",
+      "scope": "BT93S2.3 normal continuation"
+    },
+    {
+      "reason": "BT93S2R.4 may pass matrix/control fairness only; action-space judgement is deferred to the fresh S2.3-Recheck.",
+      "scope": "escape-right-open action-surface judgement"
+    },
+    {
+      "reason": "BT93S2R.4 is a matrix/control evidence gate and produced no runtime, reward, telemetry, holdout or PPO-training evidence.",
+      "scope": "product/runtime/training"
+    }
+  ],
+  "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+  "nextAllowedActions": [
+    "Run 93S2R.99 closure; only a green closure may open BT93S2.3-Recheck."
+  ],
+  "ok": true,
+  "opensNext": [
+    "93S2R.99 Closure"
+  ],
+  "phaseId": "93S2R.4",
+  "prospectiveOpensNextAfterClosure": [
+    "BT93S2.3-Recheck"
+  ],
+  "recommendations": [
+    {
+      "action": "Run 93S2R.99 closure.",
+      "rank": "1",
+      "why": "The repaired v3 contract satisfies zero predicate/window, measurement-invalid, negative-control and direction-mismatch counts at the reentry gate."
+    },
+    {
+      "action": "Keep 93S2.4, BT93T/U/W/O/P/94A and all candidate/freeze/promote paths closed.",
+      "rank": "2",
+      "why": "BT93S2R.4 proves only matrix/control reentry readiness; action-quality and policy-selection evidence still require a fresh S2.3-Recheck."
+    }
+  ],
+  "reentryGate": {
+    "missingScenarios": [],
+    "reentryCounts": {
+      "directionMismatchCount": 0,
+      "escapeRightDirectSurfaceDecisionCount": 0,
+      "measurementInvalidCount": 0,
+      "minimumWindowFailureCount": 0,
+      "negativeControlFailedCount": 0,
+      "neutralControlFailedCount": 0,
+      "predicateFailureCount": 0,
+      "proxyHygieneFailureCount": 0
+    },
+    "scenarioGates": [
+      {
+        "directionContractOk": true,
+        "escapeRightDeferredForFreshRecheckOnly": true,
+        "gateGreen": true,
+        "measurementInvalidReasons": [],
+        "minimumWindowOk": true,
+        "negativeControlOk": true,
+        "neutralControlOk": true,
+        "predicateOk": true,
+        "proxyHygieneOk": true,
+        "scenarioId": "escape-left-open"
+      },
+      {
+        "directionContractOk": true,
+        "escapeRightDeferredForFreshRecheckOnly": true,
+        "gateGreen": true,
+        "measurementInvalidReasons": [],
+        "minimumWindowOk": true,
+        "negativeControlOk": true,
+        "neutralControlOk": true,
+        "predicateOk": true,
+        "proxyHygieneOk": true,
+        "scenarioId": "escape-right-open"
+      },
+      {
+        "directionContractOk": true,
+        "escapeRightDeferredForFreshRecheckOnly": true,
+        "gateGreen": true,
+        "measurementInvalidReasons": [],
+        "minimumWindowOk": true,
+        "negativeControlOk": true,
+        "neutralControlOk": true,
+        "predicateOk": true,
+        "proxyHygieneOk": true,
+        "scenarioId": "no-danger-control"
+      },
+      {
+        "directionContractOk": true,
+        "escapeRightDeferredForFreshRecheckOnly": true,
+        "gateGreen": true,
+        "measurementInvalidReasons": [],
+        "minimumWindowOk": true,
+        "negativeControlOk": true,
+        "neutralControlOk": true,
+        "predicateOk": true,
+        "proxyHygieneOk": true,
+        "scenarioId": "side-wall-left"
+      }
+    ],
+    "targetScenarioIds": [
+      "escape-left-open",
+      "escape-right-open",
+      "no-danger-control",
+      "side-wall-left"
+    ],
+    "windowContractOk": true,
+    "zeroCountGateGreen": true
+  },
+  "reportHash": "6888cc6ceb69b3138d2d8f6a9a73fd8d0acd7ca0efddcb6f69e4064603a74f71",
+  "resultClass": "matrix-control-reentry-green",
+  "sampleCounts": {
+    "directionMismatchCount": 0,
+    "gateScenarioCount": 4,
+    "holdoutEpisodes": 0,
+    "measurementInvalidCount": 0,
+    "minimumWindowFailureCount": 0,
+    "negativeControlFailedCount": 0,
+    "neutralControlFailedCount": 0,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "predicateFailureCount": 0,
+    "proxyHygieneFailureCount": 0,
+    "scenarioCount": 9,
+    "sourceProbeCount": 338,
+    "targetTraceProbeCount": 42
+  },
+  "schemaVersion": "bt93s2r-matrix-control-reentry-gate-v1",
+  "scriptHashes": {
+    "bt93s2rMatrixControlReentryGate": "ede46e539eebd8a55f865ec74befbd2ca50c1693f950f56efde73898f40b2b16"
+  },
+  "sourceArtifacts": [
+    {
+      "actualFields": {
+        "blockId": "BT93S2R",
+        "ok": true,
+        "phaseId": "93S2R.1",
+        "resultClass": "failure-taxonomy-source-lock-green"
+      },
+      "blockId": "BT93S2R",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2R",
+        "ok": true,
+        "phaseId": "93S2R.1",
+        "resultClass": "failure-taxonomy-source-lock-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2r/failure_taxonomy_report.json",
+      "phaseId": "93S2R.1",
+      "resultClass": "failure-taxonomy-source-lock-green",
+      "role": "BT93S2R.1 source lock",
+      "schemaVersion": "bt93s2r-failure-taxonomy-v1",
+      "sha256": "53e3b5f490eb780103a2070d292c7f5c99ae34278e6b0e30e1ede87742d3937c",
+      "sizeBytes": 28776,
+      "sourceKey": "failureTaxonomy",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2R",
+        "ok": true,
+        "phaseId": "93S2R.2",
+        "resultClass": "targeted-trace-audit-green"
+      },
+      "blockId": "BT93S2R",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2R",
+        "ok": true,
+        "phaseId": "93S2R.2",
+        "resultClass": "targeted-trace-audit-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2r/targeted_trace_audit_report.json",
+      "phaseId": "93S2R.2",
+      "resultClass": "targeted-trace-audit-green",
+      "role": "BT93S2R.2 root-cause audit",
+      "schemaVersion": "bt93s2r-targeted-trace-audit-v1",
+      "sha256": "67d4e124e936b4bff5799ead802ef3487e161fe2aba6cb0a1b0850ba1a69457d",
+      "sizeBytes": 274337,
+      "sourceKey": "targetedTraceAudit",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2R",
+        "ok": true,
+        "phaseId": "93S2R.3",
+        "resultClass": "matrix-control-v3-contract-green"
+      },
+      "blockId": "BT93S2R",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2R",
+        "ok": true,
+        "phaseId": "93S2R.3",
+        "resultClass": "matrix-control-v3-contract-green"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2r/scenario_matrix_v3_contract.json",
+      "phaseId": "93S2R.3",
+      "resultClass": "matrix-control-v3-contract-green",
+      "role": "BT93S2R.3 repaired matrix/control-v3 contract",
+      "schemaVersion": "bt93s2r-matrix-control-v3-contract-v1",
+      "sha256": "519a2197515b3faff378552e4c9b9538fe6ac4b7d63f3517738c8fa5d1f2b6ae",
+      "sizeBytes": 72261,
+      "sourceKey": "matrixV3Contract",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2",
+        "contractId": "bt93s2-walltrail-action-effect-window-v2",
+        "matrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+        "ok": true,
+        "phaseId": "93S2.2"
+      },
+      "blockId": "BT93S2",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2",
+        "contractId": "bt93s2-walltrail-action-effect-window-v2",
+        "matrixId": "bt93s2-walltrail-action-effect-matrix-v2",
+        "ok": true,
+        "phaseId": "93S2.2"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
+      "phaseId": "93S2.2",
+      "resultClass": "scenario-matrix-v2-contract-green",
+      "role": "BT93S2.2 matrix-v2 source truth",
+      "schemaVersion": "bt93s2-scenario-matrix-v2-contract-v1",
+      "sha256": "d16f718812556a984c789d8559a51cc68cf91eefc9e774ed821fe33bb83890c8",
+      "sizeBytes": 45982,
+      "sourceKey": "scenarioMatrixV2",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2",
+        "ok": false,
+        "phaseId": "93S2.3",
+        "resultClass": "measurement-invalid"
+      },
+      "blockId": "BT93S2",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2",
+        "ok": false,
+        "phaseId": "93S2.3",
+        "resultClass": "measurement-invalid"
+      },
+      "fresh": true,
+      "isFile": true,
+      "ok": false,
+      "path": "data/training/ppo/bt93s2/existing_action_effect_v2_report.json",
+      "phaseId": "93S2.3",
+      "resultClass": "measurement-invalid",
+      "role": "BT93S2.3 red measurement source",
+      "schemaVersion": "bt93s2-existing-action-effect-v2-report-v1",
+      "sha256": "5e55722633329afd035c078cbdb3786d65724357bce083249c6b8079eec49ee8",
+      "sizeBytes": 3577863,
+      "sourceKey": "existingActionEffectV2",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "resultClass": null,
+      "role": "read-only PPO action-surface decoder",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sizeBytes": 22887,
+      "sourceKey": "actionSurface",
+      "tracked": true
+    }
+  ],
+  "sourceContractMatches": true,
+  "sourceFilesReady": true,
+  "summary": {
+    "blockers": [],
+    "bt93oP94aStillClosed": true,
+    "bt93s2Phase4Allowed": false,
+    "bt93s2RecheckAllowed": false,
+    "bt93s2RecheckReadyForClosure": true,
+    "bt93tAllowed": false,
+    "bt93uAllowed": false,
+    "finalResult": "matrix-control-reentry-green",
+    "gatePassed": true,
+    "nextBestAction": "93S2R.99"
+  }
+}
