@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2546,
-    "rawCoveredFileCount": 2064,
+    "trackedFileCount": 2549,
+    "rawCoveredFileCount": 2067,
     "rawCoveragePercent": 81.1,
-    "adjustedTrackedFileCount": 1643,
-    "adjustedCoveredFileCount": 1405,
+    "adjustedTrackedFileCount": 1646,
+    "adjustedCoveredFileCount": 1408,
     "adjustedCoveragePercent": 85.5,
     "uncoveredFileCount": 482,
     "uncoveredActiveFileCount": 238,
@@ -177,20 +177,20 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 309,
-        "coveredCount": 288
+        "count": 310,
+        "coveredCount": 289
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 924,
-        "coveredCount": 908
+        "count": 925,
+        "coveredCount": 909
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 383,
-        "coveredCount": 195
+        "count": 384,
+        "coveredCount": 196
       },
       {
         "classification": "prototype",
@@ -9077,6 +9077,29 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R5"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "tracked": true,
       "coveredInCore": true,
@@ -12606,6 +12629,23 @@
       ],
       "scopeBlocks": [
         "BT93S2R4"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT93S2R5"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -21256,6 +21296,29 @@
         "BT93D",
         "BT93E",
         "BT93S2R4"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R5"
       ],
       "surfaces": [],
       "classification": "product-code",
