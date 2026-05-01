@@ -441,7 +441,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93S2R2 | 2026-05-01 | frei | abgeschlossen 2026-05-01 als `measurement-invalid`; `opensNext=[]`, enger Folge-Replan erforderlich |
 | Bot-Codex | BT93S2R3 | 2026-05-01 | frei | 93S2R3.2 abgeschlossen als `replay-determinism-required`; `opensNext=[]`, enger Folge-Replan erforderlich |
 | Bot-Codex | BT93S2R4 | 2026-05-01 | frei | `93S2R4.4` abgeschlossen als `predicate-window-required`; `opensNext=[]`; Folge-Replan `BT93S2R5` aufgenommen |
-| Bot-Codex | BT93S2R5 | 2026-05-01 | frei | `93S2R5.1` abgeschlossen als `predicate-preaction-failure-ledger-written`; naechster Scope: `93S2R5.2` Root-Cause-Entscheid und Repair-Contract |
+| Bot-Codex | BT93S2R5 | 2026-05-01 | active | `93S2R5.2` in Arbeit: Root-Cause-Entscheid und Repair-Contract; kein Downstream-Start |
 | - | BT93T | - | frei | blockiert, bis S2-Recheck nach allen Reentries `observation-telemetry-required` schreibt |
 | - | BT93U | - | frei | wartet auf frisches BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck nach allen Reentries |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -4438,7 +4438,7 @@ Harte Selbstpruefung des Replans:
 
 Quelle: `docs/plaene/neu/BT93S2R5_Predicate_PreAction_Validity_Repair_Intake_2026-05-01.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-05-01 -->
 
 Scope:
 
