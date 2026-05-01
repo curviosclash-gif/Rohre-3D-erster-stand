@@ -1968,6 +1968,36 @@
       }
     },
     {
+      "id": "BT93S2R5",
+      "type": "block",
+      "title": "Predicate-/PreAction-Validity Repair nach rotem S2R4.4",
+      "status": "open",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "priority": null,
+        "owner": null,
+        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
+        "currentPhase": "93S2R5.1",
+        "scopeDeclarations": [
+          "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
+          "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
+          "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
+          "data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json",
+          "data/training/ppo/bt93s2r5/predicate_preaction_repair_report.json",
+          "docs/bot-training/Bot_Trainingsplan.md",
+          "docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 6
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
       "id": "BT93T",
       "type": "block",
       "title": "Training-only Raw-/Trail-/Escape-Lane Telemetry Repair",
@@ -3115,7 +3145,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 281,
+          "concreteCount": 282,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5683,6 +5713,56 @@
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.99"
+      }
+    },
+    {
+      "id": "BT93S2R5.1",
+      "type": "phase",
+      "title": "Failure-Ledger und Metric-Margin-Audit",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.1"
+      }
+    },
+    {
+      "id": "BT93S2R5.2",
+      "type": "phase",
+      "title": "Root-Cause-Entscheid und Repair-Contract",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.2"
+      }
+    },
+    {
+      "id": "BT93S2R5.3",
+      "type": "phase",
+      "title": "Enger Predicate-/StartState-/Warmup-Repair",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.3"
+      }
+    },
+    {
+      "id": "BT93S2R5.4",
+      "type": "phase",
+      "title": "Empirical Recheck auf repariertem Vertrag",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.4"
+      }
+    },
+    {
+      "id": "BT93S2R5.99",
+      "type": "phase",
+      "title": "Closure",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.99"
       }
     },
     {
@@ -16391,7 +16471,7 @@
     {
       "id": "BT93S2R4.5.1",
       "type": "subphase",
-      "title": "Full-Gate laeuft auf mindestens 103 Rows x 3 Repeats (`replayAttemptCount>=309`) und schreibt alle S2R4-Null-Counts.",
+      "title": "Full-Gate startet erst nach `BT93S2R5.99=predicate-window-repair-green`, laeuft auf mindestens 103 Rows x 3 Repeats (`replayAttemptCount>=309`) und schreibt alle S2R4-Null-Counts.",
       "status": "open",
       "attributes": {
         "blockId": "BT93S2R4",
@@ -16463,6 +16543,204 @@
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.99",
         "subphaseCode": "93S2R4.99.4"
+      }
+    },
+    {
+      "id": "BT93S2R5.1.1",
+      "type": "subphase",
+      "title": "S2R4.4/S2R4.3/S2R4.2/S2R4.1/S2R3.2 Quellen mit Hash, ResultClass, ReportHash, Git-SHA und Count-Snapshot locken.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.1",
+        "subphaseCode": "93S2R5.1.1"
+      }
+    },
+    {
+      "id": "BT93S2R5.1.2",
+      "type": "subphase",
+      "title": "Alle 33 roten Rows erneut mit Metrics pro Repeat schreiben: Predicate-Operanden, Predicate-Margin, StartMetricsHash, WarmupKey, replaySpecId, sessionReplayId, ActionName und ActionToken.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.1",
+        "subphaseCode": "93S2R5.1.2"
+      }
+    },
+    {
+      "id": "BT93S2R5.1.3",
+      "type": "subphase",
+      "title": "Rote Rows nach Scenario/Seed/StartMetricsHash deduplizieren; Action darf nur dann Root-Cause sein, wenn StartMetrics vor Action actionabhaengig driften.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.1",
+        "subphaseCode": "93S2R5.1.3"
+      }
+    },
+    {
+      "id": "BT93S2R5.1.4",
+      "type": "subphase",
+      "title": "Fehlerbericht `docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md` mit Befundmatrix, No-Go-Status und Root-Cause-Hypothesen schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.1",
+        "subphaseCode": "93S2R5.1.4"
+      }
+    },
+    {
+      "id": "BT93S2R5.2.1",
+      "type": "subphase",
+      "title": "Pro unique rote Gruppe genau eine Repair-Klasse waehlen: `predicate-expression-stale`, `seed-startstate-invalid`, `warmup-contract-required`, `neutral-control-contract-required`, `escape-right-fairness-predicate-required`, `metric-sampling-contract-required` oder `scenario-contract-unrepairable`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.2",
+        "subphaseCode": "93S2R5.2.1"
+      }
+    },
+    {
+      "id": "BT93S2R5.2.2",
+      "type": "subphase",
+      "title": "Repair-Contract pinnt vor Umsetzung: alte und neue Predicate-Ausdruecke, alte und neue Warmup-/Seed-Werte, Kontrollschutz, Threshold-Margins, SourceHashes und Invalidations.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.2",
+        "subphaseCode": "93S2R5.2.2"
+      }
+    },
+    {
+      "id": "BT93S2R5.2.3",
+      "type": "subphase",
+      "title": "Wenn mehr als eine plausible Ursache ohne klare Primaerklasse bleibt, endet die Phase `measurement-invalid` und oeffnet nichts.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.2",
+        "subphaseCode": "93S2R5.2.3"
+      }
+    },
+    {
+      "id": "BT93S2R5.3.1",
+      "type": "subphase",
+      "title": "Reparatur exakt gemaess Repair-Contract anwenden; keine weitere Datei ausserhalb der erlaubten Scope-Liste beruehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.3",
+        "subphaseCode": "93S2R5.3.1"
+      }
+    },
+    {
+      "id": "BT93S2R5.3.2",
+      "type": "subphase",
+      "title": "`no-danger-control` als Neutral-Control sichern: kein Action-Gruen, kein Direction-Gruen, kein Reward-Gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.3",
+        "subphaseCode": "93S2R5.3.2"
+      }
+    },
+    {
+      "id": "BT93S2R5.3.3",
+      "type": "subphase",
+      "title": "`escape-right-open` Fairness sichern: gueltiges Predicate-Fenster fuer Positive Controls, aber kein Action-Space- oder Action-Quality-Urteil.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.3",
+        "subphaseCode": "93S2R5.3.3"
+      }
+    },
+    {
+      "id": "BT93S2R5.3.4",
+      "type": "subphase",
+      "title": "Repaired-Contract schreibt Lineage zu S2R4.4 und markiert alte rote Reports als Kontext, nicht als Gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.3",
+        "subphaseCode": "93S2R5.3.4"
+      }
+    },
+    {
+      "id": "BT93S2R5.4.1",
+      "type": "subphase",
+      "title": "Recheck laeuft auf mindestens 103 Rows x 3 Repeats und nutzt den in `93S2R5.2` gelockten Repair-Contract.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.4",
+        "subphaseCode": "93S2R5.4.1"
+      }
+    },
+    {
+      "id": "BT93S2R5.4.2",
+      "type": "subphase",
+      "title": "Gruen verlangt alle S2R5-DoD-6 Counts exakt 0.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.4",
+        "subphaseCode": "93S2R5.4.2"
+      }
+    },
+    {
+      "id": "BT93S2R5.4.3",
+      "type": "subphase",
+      "title": "Bei Rot schreibt der Report exakt die naechste enge Reparaturklasse und `opensNext=[]`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.4",
+        "subphaseCode": "93S2R5.4.3"
+      }
+    },
+    {
+      "id": "BT93S2R5.99.1",
+      "type": "subphase",
+      "title": "Closure schreibt genau eine Resultklasse: `predicate-window-repair-green`, `predicate-contract-required`, `seed-startstate-required`, `warmup-contract-required`, `neutral-control-contract-required`, `escape-right-fairness-predicate-required`, `metric-sampling-contract-required`, `scenario-contract-unrepairable`, `action-surface-lineage-invalidated` oder `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.99",
+        "subphaseCode": "93S2R5.99.1"
+      }
+    },
+    {
+      "id": "BT93S2R5.99.2",
+      "type": "subphase",
+      "title": "Closure schreibt `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SourceArtifacts, SampleCounts, Invalidations und klare NextAllowedActions.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.99",
+        "subphaseCode": "93S2R5.99.2"
+      }
+    },
+    {
+      "id": "BT93S2R5.99.3",
+      "type": "subphase",
+      "title": "Gruen oeffnet nur `93S2R4.5`; jede rote Resultklasse oeffnet nichts.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.99",
+        "subphaseCode": "93S2R5.99.3"
+      }
+    },
+    {
+      "id": "BT93S2R5.99.4",
+      "type": "subphase",
+      "title": "Abschluss-Gate: `npm.cmd run gates:pre-commit`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.99",
+        "subphaseCode": "93S2R5.99.4"
       }
     },
     {
@@ -32218,6 +32496,81 @@
       }
     },
     {
+      "id": "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R5"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R5"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R5"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R5"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s2r5/predicate_preaction_repair_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R5"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "data/training/ppo/bt93t/bt93t_closure_gate_report.json",
       "type": "file",
       "title": null,
@@ -33584,6 +33937,7 @@
           "BT93S2R2",
           "BT93S2R3",
           "BT93S2R4",
+          "BT93S2R5",
           "BT93T",
           "BT93U",
           "BT93V",
@@ -33793,6 +34147,21 @@
           "BT93S2R4"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R5"
+        ],
+        "exists": false
       }
     },
     {
@@ -35820,6 +36189,21 @@
     },
     {
       "id": "docs/plaene/neu/BT93S2R4_Replay_StartState_Determinism_Repair_Intake_2026-05-01.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/BT93S2R5_Predicate_PreAction_Validity_Repair_Intake_2026-05-01.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -143852,6 +144236,317 @@
       }
     },
     {
+      "from": "BT93S2R5",
+      "to": "BT93S2R5.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.1"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "BT93S2R5.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.2"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "BT93S2R5.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.3"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "BT93S2R5.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.4"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "BT93S2R5.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.99"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_repair_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R5.1",
+      "to": "BT93S2R5.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.1",
+        "subphaseCode": "93S2R5.1.1"
+      }
+    },
+    {
+      "from": "BT93S2R5.1",
+      "to": "BT93S2R5.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.1",
+        "subphaseCode": "93S2R5.1.2"
+      }
+    },
+    {
+      "from": "BT93S2R5.1",
+      "to": "BT93S2R5.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.1",
+        "subphaseCode": "93S2R5.1.3"
+      }
+    },
+    {
+      "from": "BT93S2R5.1",
+      "to": "BT93S2R5.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.1",
+        "subphaseCode": "93S2R5.1.4"
+      }
+    },
+    {
+      "from": "BT93S2R5.2",
+      "to": "BT93S2R5.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.2",
+        "subphaseCode": "93S2R5.2.1"
+      }
+    },
+    {
+      "from": "BT93S2R5.2",
+      "to": "BT93S2R5.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.2",
+        "subphaseCode": "93S2R5.2.2"
+      }
+    },
+    {
+      "from": "BT93S2R5.2",
+      "to": "BT93S2R5.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.2",
+        "subphaseCode": "93S2R5.2.3"
+      }
+    },
+    {
+      "from": "BT93S2R5.3",
+      "to": "BT93S2R5.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.3",
+        "subphaseCode": "93S2R5.3.1"
+      }
+    },
+    {
+      "from": "BT93S2R5.3",
+      "to": "BT93S2R5.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.3",
+        "subphaseCode": "93S2R5.3.2"
+      }
+    },
+    {
+      "from": "BT93S2R5.3",
+      "to": "BT93S2R5.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.3",
+        "subphaseCode": "93S2R5.3.3"
+      }
+    },
+    {
+      "from": "BT93S2R5.3",
+      "to": "BT93S2R5.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.3",
+        "subphaseCode": "93S2R5.3.4"
+      }
+    },
+    {
+      "from": "BT93S2R5.4",
+      "to": "BT93S2R5.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.4",
+        "subphaseCode": "93S2R5.4.1"
+      }
+    },
+    {
+      "from": "BT93S2R5.4",
+      "to": "BT93S2R5.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.4",
+        "subphaseCode": "93S2R5.4.2"
+      }
+    },
+    {
+      "from": "BT93S2R5.4",
+      "to": "BT93S2R5.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.4",
+        "subphaseCode": "93S2R5.4.3"
+      }
+    },
+    {
+      "from": "BT93S2R5.99",
+      "to": "BT93S2R5.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.99",
+        "subphaseCode": "93S2R5.99.1"
+      }
+    },
+    {
+      "from": "BT93S2R5.99",
+      "to": "BT93S2R5.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.99",
+        "subphaseCode": "93S2R5.99.2"
+      }
+    },
+    {
+      "from": "BT93S2R5.99",
+      "to": "BT93S2R5.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.99",
+        "subphaseCode": "93S2R5.99.3"
+      }
+    },
+    {
+      "from": "BT93S2R5.99",
+      "to": "BT93S2R5.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R5",
+        "phaseCode": "93S2R5.99",
+        "subphaseCode": "93S2R5.99.4"
+      }
+    },
+    {
       "from": "BT93T",
       "to": "BT93T.1",
       "type": "contains_phase",
@@ -182832,6 +183527,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/BT93S2R4_Replay_StartState_Determinism_Repair_Intake_2026-05-01.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/BT93S2R5_Predicate_PreAction_Validity_Repair_Intake_2026-05-01.md",
       "type": "scope",
       "hint": null,
       "attributes": {

@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2545,
-    "rawCoveredFileCount": 2063,
+    "trackedFileCount": 2546,
+    "rawCoveredFileCount": 2064,
     "rawCoveragePercent": 81.1,
-    "adjustedTrackedFileCount": 1642,
-    "adjustedCoveredFileCount": 1404,
+    "adjustedTrackedFileCount": 1643,
+    "adjustedCoveredFileCount": 1405,
     "adjustedCoveragePercent": 85.5,
     "uncoveredFileCount": 482,
     "uncoveredActiveFileCount": 238,
@@ -189,8 +189,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 382,
-        "coveredCount": 194
+        "count": 383,
+        "coveredCount": 195
       },
       {
         "classification": "prototype",
@@ -11956,6 +11956,7 @@
         "BT93S2R2",
         "BT93S2R3",
         "BT93S2R4",
+        "BT93S2R5",
         "BT93T",
         "BT93U",
         "BT93V",
@@ -15056,6 +15057,23 @@
     },
     {
       "path": "docs/plaene/neu/BT93S2R4_Replay_StartState_Determinism_Repair_Intake_2026-05-01.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/BT93S2R5_Predicate_PreAction_Validity_Repair_Intake_2026-05-01.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
