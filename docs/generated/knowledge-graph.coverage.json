@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2535,
-    "rawCoveredFileCount": 2053,
+    "trackedFileCount": 2538,
+    "rawCoveredFileCount": 2056,
     "rawCoveragePercent": 81,
-    "adjustedTrackedFileCount": 1632,
-    "adjustedCoveredFileCount": 1394,
+    "adjustedTrackedFileCount": 1635,
+    "adjustedCoveredFileCount": 1397,
     "adjustedCoveragePercent": 85.4,
     "uncoveredFileCount": 482,
     "uncoveredActiveFileCount": 238,
@@ -177,20 +177,20 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 305,
-        "coveredCount": 284
+        "count": 306,
+        "coveredCount": 285
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 920,
-        "coveredCount": 904
+        "count": 921,
+        "coveredCount": 905
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 380,
-        "coveredCount": 192
+        "count": 381,
+        "coveredCount": 193
       },
       {
         "classification": "prototype",
@@ -8985,6 +8985,29 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93s2r4/replay_root_cause_audit.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R4"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "tracked": true,
       "coveredInCore": true,
@@ -12479,6 +12502,23 @@
       ],
       "scopeBlocks": [
         "BT93S2R3"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/Fehlerberichte/2026-05-01_bt93s2r4_replay_determinism_required.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT93S2R4"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -21020,6 +21060,29 @@
         "BT93D",
         "BT93E",
         "BT93S2R3"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R4"
       ],
       "surfaces": [],
       "classification": "product-code",
