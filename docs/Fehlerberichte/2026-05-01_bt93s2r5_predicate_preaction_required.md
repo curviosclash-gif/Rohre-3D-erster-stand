@@ -117,3 +117,25 @@ Evidence:
 - `data/training/ppo/bt93s2r5/predicate_preaction_repair_report.json`
 - Command: `python python/scripts/bt93s2r5_predicate_preaction_repair.py --write-report`
 <!-- BT93S2R5.3-END -->
+
+<!-- BT93S2R5.4-START -->
+## 93S2R5.4 Empirical Recheck auf repariertem Vertrag
+
+- Result: `resultClass=predicate-window-repair-green`, `ok=True`
+- Rows/Repeats: `103` x `3` = `309`
+- Repaired Rows: `33`
+- Predicate/PreAction/Window/Warmup-Fails: `0` / `0` / `0` / `0`
+- Replay/StartMetrics/Warmup/Session-Drift: `0` / `0` / `0` / `0`
+- Repair-Contract-Hash-Mismatch: `0` / `0`
+
+S2R5.4 belegt nur Predicate-/PreAction-Validity auf dem reparierten Vertrag.
+`93S2R4.5`, `93S2R3.3-Reentry`, `BT93S2.3-Recheck`, `93S2.4`,
+`BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout,
+PPO-Validate und BT95 bleiben bis S2R5-Closure und spaeteren Full-Gates
+geschlossen.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json`
+- Command: `python python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py --write-report`
+<!-- BT93S2R5.4-END -->

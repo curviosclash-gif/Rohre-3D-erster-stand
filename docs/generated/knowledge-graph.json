@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 449,
+          "concreteCount": 451,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 587,
+          "concreteCount": 589,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 445,
+          "concreteCount": 447,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 444,
+          "concreteCount": 446,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1086,
+          "concreteCount": 1088,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1094,
+          "concreteCount": 1096,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1979,7 +1979,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2R5.4",
+        "currentPhase": "93S2R5.99",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
           "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
@@ -1988,13 +1988,14 @@
           "data/training/ppo/bt93s2r5/predicate_preaction_repair_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md",
+          "python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py",
           "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
           "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
           "python/scripts/bt93s2r5_predicate_preaction_repair.py"
         ],
         "scopeResolution": {
-          "concreteCount": 8,
-          "plannedCount": 2
+          "concreteCount": 10,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5752,7 +5753,7 @@
       "id": "BT93S2R5.4",
       "type": "phase",
       "title": "Empirical Recheck auf repariertem Vertrag",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.4"
@@ -16672,8 +16673,8 @@
     {
       "id": "BT93S2R5.4.1",
       "type": "subphase",
-      "title": "Recheck laeuft auf mindestens 103 Rows x 3 Repeats und nutzt den in `93S2R5.2` gelockten Repair-Contract.",
-      "status": "open",
+      "title": "Recheck laeuft auf mindestens 103 Rows x 3 Repeats und nutzt den in `93S2R5.2` gelockten Repair-Contract. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py --write-report` -> `data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json`, `contractRowCount=103`, `replayAttemptCount=309`, `repairedRowCount=33`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.4",
@@ -16683,8 +16684,8 @@
     {
       "id": "BT93S2R5.4.2",
       "type": "subphase",
-      "title": "Gruen verlangt alle S2R5-DoD-6 Counts exakt 0.",
-      "status": "open",
+      "title": "Gruen verlangt alle S2R5-DoD-6 Counts exakt 0. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py --write-report` -> `data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json`, `predicateFailureCount=0`, `measurementInvalidBeforeActionCount=0`, `minimumWindowFailureCount=0`, `warmupTerminalBeforeActionCount=0`, Replay-/StartMetrics-/Warmup-/Session-Drift `0`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.4",
@@ -16694,8 +16695,8 @@
     {
       "id": "BT93S2R5.4.3",
       "type": "subphase",
-      "title": "Bei Rot schreibt der Report exakt die naechste enge Reparaturklasse und `opensNext=[]`.",
-      "status": "open",
+      "title": "Bei Rot schreibt der Report exakt die naechste enge Reparaturklasse und `opensNext=[]`. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py --write-report` -> `data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json`, `resultClass=predicate-window-repair-green`, `opensNext=[\"93S2R5.99 Closure\"]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.4",
@@ -32523,9 +32524,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R5"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -41415,6 +41422,27 @@
           "BT93D",
           "BT93E",
           "BT93S2R4"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R5"
         ],
         "exists": true
       }
@@ -79112,6 +79140,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
       "type": "scope",
       "hint": null,
@@ -80832,6 +80869,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83350,6 +83396,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
       "type": "scope",
       "hint": null,
@@ -85052,6 +85107,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88768,6 +88832,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
       "type": "scope",
       "hint": null,
@@ -90479,6 +90552,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -93296,6 +93378,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
       "type": "scope",
       "hint": null,
@@ -95007,6 +95098,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -104228,6 +104328,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
       "type": "scope",
       "hint": null,
@@ -105939,6 +106048,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -114335,6 +114453,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
       "type": "scope",
       "hint": null,
@@ -116055,6 +116182,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -144750,6 +144886,15 @@
     {
       "from": "BT93S2R5",
       "to": "docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
