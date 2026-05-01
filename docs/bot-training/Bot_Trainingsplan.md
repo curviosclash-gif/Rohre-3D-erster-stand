@@ -434,7 +434,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93S2R | 2026-04-30 | frei | abgeschlossen 2026-05-01 als `matrix-control-reentry-green`; oeffnet nur `BT93S2.3-Recheck` |
 | Bot-Codex | BT93S2R2 | 2026-05-01 | frei | abgeschlossen 2026-05-01 als `measurement-invalid`; `opensNext=[]`, enger Folge-Replan erforderlich |
 | Bot-Codex | BT93S2R3 | 2026-05-01 | frei | 93S2R3.2 abgeschlossen als `replay-determinism-required`; `opensNext=[]`, enger Folge-Replan erforderlich |
-| Bot-Codex | BT93S2R4 | 2026-05-01 | frei | naechster claimbarer Scope: `93S2R4.1` Source-Lock und Root-Cause-Audit |
+| Bot-Codex | BT93S2R4 | 2026-05-01 | active | `93S2R4.1` Source-Lock und Root-Cause-Audit in Arbeit |
 | - | BT93T | - | frei | blockiert, bis S2-Recheck nach allen Reentries `observation-telemetry-required` schreibt |
 | - | BT93U | - | frei | wartet auf frisches BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck nach allen Reentries |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -4277,7 +4277,7 @@ Evidence:
 
 Quelle: `docs/plaene/neu/BT93S2R4_Replay_StartState_Determinism_Repair_Intake_2026-05-01.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-05-01 -->
 
 Scope:
 
