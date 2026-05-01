@@ -4091,7 +4091,7 @@ Scope-Dateien:
 - [x] DoD.S2R2-4 `escape-left-open` Negative-Control-First ist hart: `noop` und falsche Richtungen muessen vor positiven Actions als Nicht-Erfolg klassifiziert sein. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_predicate_window_repair.py --write-report` -> `data/training/ppo/bt93s2r2/predicate_window_repair_contract.json`)
 - [x] DoD.S2R2-5 `escape-right-open` darf erst als `action-space-required` bewertet werden, wenn alle positiven Controls auf gueltigem Predicate-/Minimum-Window-Fenster messbar waren. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_predicate_window_repair.py --write-report` -> `data/training/ppo/bt93s2r2/predicate_window_repair_contract.json`)
 - [x] DoD.S2R2-6 Retained-v2-Szenarien mit Predicate-/Window-Fails werden repariert oder blockierend klassifiziert; sie duerfen nicht als Kontext durchgewunken werden. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_predicate_window_repair.py --write-report` -> `data/training/ppo/bt93s2r2/predicate_window_repair_contract.json`)
-- [ ] DoD.S2R2-7 Empirical-Reentry-Gate schreibt echte Env-Proben und verlangt `predicateFailureCount=0`, `minimumWindowFailureCount=0`, `measurementInvalidCount=0`, `negativeControlFailedCount=0`, `directionMismatchCount=0`.
+- [x] DoD.S2R2-7 Empirical-Reentry-Gate schreibt echte Env-Proben und verlangt `predicateFailureCount=0`, `minimumWindowFailureCount=0`, `measurementInvalidCount=0`, `negativeControlFailedCount=0`, `directionMismatchCount=0`. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_empirical_reentry_gate.py --write-report` -> `data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json`, `resultClass=measurement-invalid`, `predicateFailureCount=39`, `minimumWindowFailureCount=11`, `measurementInvalidCount=49`, `negativeControlFailedCount=0`, `directionMismatchCount=24`)
 - [ ] DoD.S2R2-8 Closure oeffnet hoechstens einen neuen `BT93S2.3-Recheck`; `93S2.4` bleibt bis zu einem spaeteren Recheck mit `measurementValid=true` geschlossen.
 - [ ] DoD.S2R2-9 Meta-Gate `npm.cmd run gates:pre-commit` ist gruen oder ein exakter Gate-Blocker ist dokumentiert.
 
@@ -4118,9 +4118,9 @@ Evidence:
 
 ### 93S2R2.3 Empirical-Reentry Gate
 
-- [ ] 93S2R2.3.1 Reparierten Vertrag gegen echte Env-Proben validieren.
-- [ ] 93S2R2.3.2 Negative-Control-First fuer `escape-left-open`, Fairness-First fuer `escape-right-open` und Retained-v2-Revalidation maschinenlesbar zaehlen.
-- [ ] 93S2R2.3.3 Gruen verlangt alle Null-Counts und oeffnet nur `BT93S2.3-Recheck`.
+- [x] 93S2R2.3.1 Reparierten Vertrag gegen echte Env-Proben validieren. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_empirical_reentry_gate.py --write-report` -> `data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json`, `probeCount=338`, `newTrainingEpisodes=0`, `holdoutEpisodes=0`)
+- [x] 93S2R2.3.2 Negative-Control-First fuer `escape-left-open`, Fairness-First fuer `escape-right-open` und Retained-v2-Revalidation maschinenlesbar zaehlen. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_empirical_reentry_gate.py --write-report` -> `data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json`, `negativeControlFailedCount=0`, `escapeRightFairnessFailureCount=1`, `retainedV2MeasurementInvalidCount=28`)
+- [x] 93S2R2.3.3 Gruen verlangt alle Null-Counts und oeffnet nur `BT93S2.3-Recheck`. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_empirical_reentry_gate.py --write-report` -> `data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json`, `zeroCountGateGreen=false`, `opensNext=[]`, `blocksNext` haelt `93S2.4`, `BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate und BT95 geschlossen)
 
 Evidence:
 
