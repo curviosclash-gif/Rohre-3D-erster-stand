@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2516,
-    "rawCoveredFileCount": 2034,
-    "rawCoveragePercent": 80.8,
-    "adjustedTrackedFileCount": 1613,
-    "adjustedCoveredFileCount": 1375,
-    "adjustedCoveragePercent": 85.2,
+    "trackedFileCount": 2519,
+    "rawCoveredFileCount": 2037,
+    "rawCoveragePercent": 80.9,
+    "adjustedTrackedFileCount": 1616,
+    "adjustedCoveredFileCount": 1378,
+    "adjustedCoveragePercent": 85.3,
     "uncoveredFileCount": 482,
     "uncoveredActiveFileCount": 238,
     "classifications": [
@@ -177,20 +177,20 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 298,
-        "coveredCount": 277
+        "count": 299,
+        "coveredCount": 278
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 913,
-        "coveredCount": 897
+        "count": 914,
+        "coveredCount": 898
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 375,
-        "coveredCount": 187
+        "count": 376,
+        "coveredCount": 188
       },
       {
         "classification": "prototype",
@@ -8640,6 +8640,29 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "tracked": true,
       "coveredInCore": true,
@@ -14697,6 +14720,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/BT93S2R2_Recheck_Predicate_Window_Repair_Intake_2026-05-01.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/BT93Y_PPO_Lineage_Recovery_Retraining_ReplacementPolicy_Intake_2026-04-30.md",
       "tracked": true,
       "coveredInCore": true,
@@ -20433,6 +20473,29 @@
     },
     {
       "path": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93s2_existing_action_effect_v3_recheck.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

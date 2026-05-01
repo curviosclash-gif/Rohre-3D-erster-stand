@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 421,
+          "concreteCount": 423,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 559,
+          "concreteCount": 561,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 417,
+          "concreteCount": 419,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 416,
+          "concreteCount": 418,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1058,
+          "concreteCount": 1060,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1066,
+          "concreteCount": 1068,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1811,17 +1811,19 @@
           "data/training/ppo/bt93s2/action_surface_repair_decision.json",
           "data/training/ppo/bt93s2/bt93s2_closure_gate_report.json",
           "data/training/ppo/bt93s2/existing_action_effect_v2_report.json",
+          "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
           "data/training/ppo/bt93s2/policy_selection_v2_report.json",
           "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
           "data/training/ppo/bt93s2/scenario_search_report.json",
           "data/training/ppo/bt93s2/start_contract.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "python/scripts/bt93s2_existing_action_effect_v2.py",
+          "python/scripts/bt93s2_existing_action_effect_v3_recheck.py",
           "python/scripts/bt93s2_scenario_matrix_v2.py",
           "python/scripts/bt93s2_start_contract.py"
         ],
         "scopeResolution": {
-          "concreteCount": 8,
+          "concreteCount": 10,
           "plannedCount": 3
         },
         "scopeOverlapAllowedWith": [],
@@ -3010,7 +3012,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 278,
+          "concreteCount": 279,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -30946,6 +30948,27 @@
       }
     },
     {
+      "id": "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/training/ppo/bt93s2/policy_selection_v2_report.json",
       "type": "file",
       "title": null,
@@ -34623,6 +34646,21 @@
     },
     {
       "id": "docs/plaene/neu/BT93S2R_Matrix_Control_Reentry_Replan_2026-04-30.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/BT93S2R2_Recheck_Predicate_Window_Repair_Intake_2026-05-01.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -39419,6 +39457,27 @@
     },
     {
       "id": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2_existing_action_effect_v3_recheck.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -77043,6 +77102,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -78646,6 +78714,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2_existing_action_effect_v3_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81029,6 +81106,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -82614,6 +82700,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2_existing_action_effect_v3_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -86195,6 +86290,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -87789,6 +87893,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2_existing_action_effect_v3_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -90471,6 +90584,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -92065,6 +92187,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2_existing_action_effect_v3_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -101151,6 +101282,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -102745,6 +102885,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2_existing_action_effect_v3_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -111006,6 +111155,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2/scenario_matrix_v2_contract.json",
       "type": "scope",
       "hint": null,
@@ -112609,6 +112767,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2_existing_action_effect_v3_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -139517,6 +139684,15 @@
     },
     {
       "from": "BT93S2",
+      "to": "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2",
       "to": "data/training/ppo/bt93s2/policy_selection_v2_report.json",
       "type": "scope",
       "hint": null,
@@ -139563,6 +139739,15 @@
     {
       "from": "BT93S2",
       "to": "python/scripts/bt93s2_existing_action_effect_v2.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2",
+      "to": "python/scripts/bt93s2_existing_action_effect_v3_recheck.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -179185,6 +179370,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/BT93S2R_Matrix_Control_Reentry_Replan_2026-04-30.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/BT93S2R2_Recheck_Predicate_Window_Repair_Intake_2026-05-01.md",
       "type": "scope",
       "hint": null,
       "attributes": {
