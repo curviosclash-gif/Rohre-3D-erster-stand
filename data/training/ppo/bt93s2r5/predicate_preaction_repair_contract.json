@@ -1,0 +1,3557 @@
+{
+  "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+  "allowNext": [
+    "93S2R5.3 Enger Predicate-/StartState-/Warmup-Repair"
+  ],
+  "allowedFilesFor93S2R5_3": [
+    "python/scripts/bt93s2r5_*.py",
+    "data/training/ppo/bt93s2r5/**",
+    "docs/bot-training/Bot_Trainingsplan.md",
+    "docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md"
+  ],
+  "allowedRepairClasses": [
+    "predicate-expression-stale",
+    "seed-startstate-invalid",
+    "warmup-contract-required",
+    "neutral-control-contract-required",
+    "escape-right-fairness-predicate-required",
+    "metric-sampling-contract-required",
+    "scenario-contract-unrepairable"
+  ],
+  "blockId": "BT93S2R5",
+  "blockedFilesAndSurfaces": [
+    "python/envs/ppo_action_surface.py",
+    "reward logic",
+    "telemetry logic",
+    "PPO trainer/optimizer",
+    "productive Runtime-/AI-Hub-/Strategy-/Registry-/Matchstart surfaces",
+    "holdout artifacts"
+  ],
+  "blocksNext": [
+    "93S2R4.5 before BT93S2R5.99 predicate-window-repair-green",
+    "BT93S2R4.99 before BT93S2R5 and 93S2R4.5 green",
+    "93S2R3.3-Reentry before S2R5/S2R4 full gate green",
+    "BT93S2.3-Recheck before all S2R reentries green",
+    "93S2.4 start before measurementValid=true",
+    "BT93T/U/W/O/P/94A before S2R5/S2R4/S2R3/S2 gates",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "PPO training"
+  ],
+  "claimFlags": {
+    "actionSurfaceChangeAllowed": false,
+    "bt93oClaimable": false,
+    "bt93pClaimable": false,
+    "bt93s2FreshRecheckAllowed": false,
+    "bt93tClaimable": false,
+    "bt93uClaimable": false,
+    "bt93vClaimable": false,
+    "bt93wClaimable": false,
+    "bt93xFullClaimAllowed": false,
+    "bt94aClaimable": false,
+    "bt95HandoffAllowed": false,
+    "candidateRunsAllowed": false,
+    "envConditionalWriteAllowed": false,
+    "freezeAllowed": false,
+    "holdoutAllowed": false,
+    "phase93S2R3_3ReentryAllowed": false,
+    "phase93S2R4_5Allowed": false,
+    "phase93S2R4_99Allowed": false,
+    "phase93S2R5_2Allowed": false,
+    "phase93S2R5_3Allowed": true,
+    "phase93S2R5_4Allowed": false,
+    "phase93S2R5_99Allowed": false,
+    "phase93S2_4Allowed": false,
+    "ppoTrainingAllowed": false,
+    "ppoValidateSignalAllowed": false,
+    "promoteAllowed": false,
+    "rewardChangeAllowed": false,
+    "rolloutAllowed": false,
+    "runnerConditionalWriteAllowed": false,
+    "runtimeChangeAllowed": false,
+    "telemetryChangeAllowed": false
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "nextPhase": "python python/scripts/bt93s2r5_predicate_preaction_repair.py --write-report",
+    "tests": "contract probes replacement seeds for affected 33 rows once; no PPO training or holdout consumption",
+    "write": "python python/scripts/bt93s2r5_predicate_preaction_repair_contract.py --write-report"
+  },
+  "conditionalFilesFor93S2R5_3": [
+    {
+      "allowedOnlyIf": "93S2R5.3 needs an explicit S2R5 repaired-seed contract input for later S2R4.5 full gate",
+      "path": "python/scripts/bt93s2r4_predicate_window_stable_replay.py"
+    }
+  ],
+  "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+  "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+  "generatedAt": "2026-05-01T20:37:41Z",
+  "generatedBy": "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "3d8e7022988412210dedbbcc329058138aa4fe60",
+    "sha": "dfd6ee1727a26ecad863c0228d26dc546a0be3f7",
+    "statusShort": [
+      "M docs/lock-status/_locks-registry.json",
+      "?? python/scripts/bt93s2r5_predicate_preaction_repair_contract.py"
+    ]
+  },
+  "guardrails": {
+    "actionEffectEvaluated": false,
+    "actionEffectOverrideCount": 0,
+    "actionSurfaceChanged": false,
+    "candidateRun": false,
+    "envChanged": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "qualityClaimAllowed": false,
+    "rewardFixApplied": false,
+    "runnerChanged": false,
+    "runtimeSurfacesTouched": [],
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "invalidations": [
+    {
+      "active": true,
+      "reason": "S2R5.2 only locks the seed/start-state repair contract; repaired evidence and empirical gate are still missing.",
+      "scope": "93S2R4.5"
+    },
+    {
+      "active": true,
+      "reason": "Primary repair is seed-startstate-invalid for all groups; predicate expressions remain unchanged.",
+      "scope": "predicate threshold changes"
+    },
+    {
+      "active": true,
+      "reason": "Downstream remains closed until BT93S2R5.99 predicate-window-repair-green plus later S2R4 full gate/closure.",
+      "scope": "BT93S2.3-Recheck, 93S2.4, BT93T/U/W/O/P/94A, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate, BT95"
+    }
+  ],
+  "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+  "nextAllowedActions": [
+    "Run 93S2R5.3 to apply only the locked seed/start-state repair contract.",
+    "Do not change predicate thresholds, warmup, action surface, reward, telemetry, PPO trainer, runtime surfaces, or holdout state.",
+    "Do not start 93S2R4.5, 93S2R3.3-Reentry, BT93S2.3-Recheck, 93S2.4, BT93T/U/W/O/P/94A, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate or BT95."
+  ],
+  "noPostHocThresholdChange": true,
+  "ok": true,
+  "opensNext": [
+    "93S2R5.3 Enger Predicate-/StartState-/Warmup-Repair"
+  ],
+  "phaseCoverage": {
+    "93S2R5.2.1": true,
+    "93S2R5.2.2": true,
+    "93S2R5.2.3": true
+  },
+  "phaseId": "93S2R5.2",
+  "primaryRepairClassCounts": {
+    "seed-startstate-invalid": 4
+  },
+  "repairContractId": "bt93s2r2-predicate-window-repair-contract-v1",
+  "repairContractLockedBeforeImplementation": true,
+  "repairDecisions": [
+    {
+      "affectedActions": [
+        "boost",
+        "evade-right",
+        "pitch-up",
+        "roll-left",
+        "roll-right",
+        "shoot-mg",
+        "turn-right-boost",
+        "yaw-right"
+      ],
+      "ambiguous": false,
+      "candidateProbeRows": [
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "boost",
+          "actionToken": 7,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "953eaae0ec17ebfb8ca3195719d93abce2c4a19de0cf39ad0f38a7606b579b4b"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "evade-right",
+          "actionToken": 12,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "e4ec1197a376b1aa30cea4521626ee5bb4e6493fd05a66372debbcaad6b21088"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "pitch-up",
+          "actionToken": 3,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 11,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "53845781e6af8e45cb0bbb8d3e77afe117cd8cc5e2fbc190f6a0d6efcbfa2aab"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "roll-left",
+          "actionToken": 5,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "832ddddb796f5410546f23303676c0a7f9f104da385801f24119889fbdd84695"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "roll-right",
+          "actionToken": 6,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "8bae11d2ac721b699f2c4ba709901581545a2fcdfed0d8da3791861dbcf28062"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "shoot-mg",
+          "actionToken": 8,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "b8143c50a8f26cca268fd69d9fc174bdcdee7694afebc1a78125ca0158ecb1fa"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "turn-right-boost",
+          "actionToken": 10,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "b5e0a0d9c6ad6fc4676e13ecdda43d55d90e41df89b4a3a618c9d089ac758b1d"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "yaw-right",
+          "actionToken": 2,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "bbcee884d946a3bc3ad79b206d8cdb5ca6c9c307aeffdbe34a7120c83c92bedc"
+        }
+      ],
+      "candidateProbeSummary": {
+        "measurementInvalidBeforeActionCount": 0,
+        "minimumWindowFailureCount": 0,
+        "overallMarginMax": 0.15,
+        "overallMarginMin": 0.15,
+        "predicateFailureCount": 0,
+        "probeCount": 8,
+        "startMetricsHashCount": 1,
+        "warmupTerminalBeforeActionCount": 0
+      },
+      "controlProtection": {
+        "actionQualityJudgementAllowed": false,
+        "actionRootCauseAllowed": false,
+        "actionSpaceJudgementAllowed": false,
+        "escapeRightFairnessFirst": true,
+        "neutralControlActionGreenAllowed": null,
+        "neutralControlActionGreenProducedMustBe": null,
+        "noPostHocThresholdChange": true,
+        "positiveControlsRemainMeasurableBeforeActionSpaceJudgement": true,
+        "rewardJudgementAllowed": false
+      },
+      "decisionReason": "Seed 930 is deterministically outside the locked predicate window, while stable S2R4.4 seed(s) [2930] satisfy the unchanged scenario predicate.",
+      "groupId": "escape-right-open:930:73ff9e5226f7",
+      "newPredicate": {
+        "changed": false,
+        "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+        "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+        "predicateId": "escape-right-open-v2-start-predicate",
+        "reason": "Seed/start-state replacement keeps the predicate expression locked."
+      },
+      "newSeed": 2930,
+      "newWarmup": {
+        "changed": false,
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      },
+      "oldPredicate": {
+        "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+        "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+        "predicateId": "escape-right-open-v2-start-predicate",
+        "redOverallMarginMax": -0.05,
+        "redOverallMarginMin": -0.05
+      },
+      "oldSeed": 930,
+      "oldStartMetricsHash": "73ff9e5226f7b17e62c2f73651d4c0ac27848ffe5b2b31da0a91a72fc407ba85",
+      "oldWarmup": {
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      },
+      "primaryRepairClass": "seed-startstate-invalid",
+      "redRowCount": 8,
+      "rejectedCandidates": [
+        {
+          "rejectedBecause": "Existing stable S2R4.4 seeds satisfy the unchanged predicate; threshold loosening is unnecessary.",
+          "repairClass": "predicate-expression-stale"
+        },
+        {
+          "rejectedBecause": "warmupTerminalBeforeActionCount is zero and minimum-window failures are zero.",
+          "repairClass": "warmup-contract-required"
+        },
+        {
+          "rejectedBecause": "Fairness remains guarded, but the direct blocker is the invalid seed/start-state, not an action-space or predicate-threshold change.",
+          "repairClass": "escape-right-fairness-predicate-required"
+        }
+      ],
+      "scenarioId": "escape-right-open",
+      "seedContract": {
+        "changed": true,
+        "diagnosticSeedOnly": true,
+        "holdoutSeed": false,
+        "newSeed": 2930,
+        "oldSeed": 930,
+        "replacementSeedSource": "existing S2R4.4 stable predicate-pass seed plus S2R5.2 candidate probe"
+      },
+      "unknown": false
+    },
+    {
+      "affectedActions": [
+        "evade-left",
+        "evade-right",
+        "pitch-up",
+        "roll-left",
+        "roll-right",
+        "shoot-mg",
+        "turn-right-boost",
+        "yaw-left",
+        "yaw-right"
+      ],
+      "ambiguous": false,
+      "candidateProbeRows": [
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "evade-left",
+          "actionToken": 11,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "268eb0553dfad363bc98c7eb160a6ce130a2b2ffea98afd0c8b0feaf3e44e03d"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "evade-right",
+          "actionToken": 12,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "e4ec1197a376b1aa30cea4521626ee5bb4e6493fd05a66372debbcaad6b21088"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "pitch-up",
+          "actionToken": 3,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 11,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "53845781e6af8e45cb0bbb8d3e77afe117cd8cc5e2fbc190f6a0d6efcbfa2aab"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "roll-left",
+          "actionToken": 5,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "832ddddb796f5410546f23303676c0a7f9f104da385801f24119889fbdd84695"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "roll-right",
+          "actionToken": 6,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "8bae11d2ac721b699f2c4ba709901581545a2fcdfed0d8da3791861dbcf28062"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "shoot-mg",
+          "actionToken": 8,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "b8143c50a8f26cca268fd69d9fc174bdcdee7694afebc1a78125ca0158ecb1fa"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "turn-right-boost",
+          "actionToken": 10,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "b5e0a0d9c6ad6fc4676e13ecdda43d55d90e41df89b4a3a618c9d089ac758b1d"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "yaw-left",
+          "actionToken": 1,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "8a0762935f35c6d912a052fdf198a86a091c371010b757a52d72bb3247a19838"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "yaw-right",
+          "actionToken": 2,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "escape-right-open-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.85,
+                "clauseId": "wallDistanceRight>=0.40",
+                "margin": 0.45,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.4
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "wallDistanceFront>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.65,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.85,
+              "pressureLevel": 0.282173,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 0.85,
+              "wallDistanceRight": 0.85
+            },
+            "overallMargin": 0.15
+          },
+          "probeError": null,
+          "scenarioId": "escape-right-open",
+          "seed": 2930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.65,
+            "pressureLevel": 0.282173,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.051543,
+            "targetDistanceRatio": 0.216185,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 0.85,
+            "wallDistanceRight": 0.85
+          },
+          "startMetricsHash": "cb18b060f40ed001493d2de7c0dedbee7d6eb354bc1c4572fcab521a763ed3d8",
+          "warmup": {
+            "warmupAction": "yaw-left",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "bbcee884d946a3bc3ad79b206d8cdb5ca6c9c307aeffdbe34a7120c83c92bedc"
+        }
+      ],
+      "candidateProbeSummary": {
+        "measurementInvalidBeforeActionCount": 0,
+        "minimumWindowFailureCount": 0,
+        "overallMarginMax": 0.15,
+        "overallMarginMin": 0.15,
+        "predicateFailureCount": 0,
+        "probeCount": 9,
+        "startMetricsHashCount": 1,
+        "warmupTerminalBeforeActionCount": 0
+      },
+      "controlProtection": {
+        "actionQualityJudgementAllowed": false,
+        "actionRootCauseAllowed": false,
+        "actionSpaceJudgementAllowed": false,
+        "escapeRightFairnessFirst": true,
+        "neutralControlActionGreenAllowed": null,
+        "neutralControlActionGreenProducedMustBe": null,
+        "noPostHocThresholdChange": true,
+        "positiveControlsRemainMeasurableBeforeActionSpaceJudgement": true,
+        "rewardJudgementAllowed": false
+      },
+      "decisionReason": "Seed 1930 is deterministically outside the locked predicate window, while stable S2R4.4 seed(s) [2930] satisfy the unchanged scenario predicate.",
+      "groupId": "escape-right-open:1930:aaf78118e47d",
+      "newPredicate": {
+        "changed": false,
+        "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+        "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+        "predicateId": "escape-right-open-v2-start-predicate",
+        "reason": "Seed/start-state replacement keeps the predicate expression locked."
+      },
+      "newSeed": 2930,
+      "newWarmup": {
+        "changed": false,
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      },
+      "oldPredicate": {
+        "expression": "wallDistanceRight >= 0.40 and wallDistanceFront >= 0.85",
+        "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+        "predicateId": "escape-right-open-v2-start-predicate",
+        "redOverallMarginMax": -0.15,
+        "redOverallMarginMin": -0.15
+      },
+      "oldSeed": 1930,
+      "oldStartMetricsHash": "aaf78118e47da521ff25d1fe8c41949a87e78ad716408856e947c27ede2884c8",
+      "oldWarmup": {
+        "warmupAction": "yaw-left",
+        "warmupSteps": 0
+      },
+      "primaryRepairClass": "seed-startstate-invalid",
+      "redRowCount": 9,
+      "rejectedCandidates": [
+        {
+          "rejectedBecause": "Existing stable S2R4.4 seeds satisfy the unchanged predicate; threshold loosening is unnecessary.",
+          "repairClass": "predicate-expression-stale"
+        },
+        {
+          "rejectedBecause": "warmupTerminalBeforeActionCount is zero and minimum-window failures are zero.",
+          "repairClass": "warmup-contract-required"
+        },
+        {
+          "rejectedBecause": "Fairness remains guarded, but the direct blocker is the invalid seed/start-state, not an action-space or predicate-threshold change.",
+          "repairClass": "escape-right-fairness-predicate-required"
+        }
+      ],
+      "scenarioId": "escape-right-open",
+      "seedContract": {
+        "changed": true,
+        "diagnosticSeedOnly": true,
+        "holdoutSeed": false,
+        "newSeed": 2930,
+        "oldSeed": 1930,
+        "replacementSeedSource": "existing S2R4.4 stable predicate-pass seed plus S2R5.2 candidate probe"
+      },
+      "unknown": false
+    },
+    {
+      "affectedActions": [
+        "evade-left",
+        "evade-right",
+        "pitch-up"
+      ],
+      "ambiguous": false,
+      "candidateProbeRows": [
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "evade-left",
+          "actionToken": 11,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "narrowing-corridor-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.431429,
+                "clauseId": "localOpennessRatio<=0.64",
+                "margin": 0.208571,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.64
+              },
+              {
+                "actual": 0.2,
+                "clauseId": "minWallDistanceLeftRight<=0.75",
+                "margin": 0.55,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.75
+              }
+            ],
+            "expression": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.431429,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.2,
+              "pressureLevel": 0.584456,
+              "wallDistanceFront": 0.357143,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.2
+            },
+            "overallMargin": 0.208571
+          },
+          "probeError": null,
+          "scenarioId": "narrowing-corridor",
+          "seed": 934,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.431429,
+            "pressureLevel": 0.584456,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.991526,
+            "targetDistanceRatio": 0.126511,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 0.357143,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.2
+          },
+          "startMetricsHash": "81d0c125e451636858bd184b19bbb6ccc022d967ff0029b6edf5c2b14b6e7eae",
+          "warmup": {
+            "warmupAction": "pitch-up",
+            "warmupSteps": 6,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "4fb54d76c70ed95f383fe2668adf453481e96349ebd53de566bae74f0efe8a20"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "evade-right",
+          "actionToken": 12,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "narrowing-corridor-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.431429,
+                "clauseId": "localOpennessRatio<=0.64",
+                "margin": 0.208571,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.64
+              },
+              {
+                "actual": 0.2,
+                "clauseId": "minWallDistanceLeftRight<=0.75",
+                "margin": 0.55,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.75
+              }
+            ],
+            "expression": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.431429,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.2,
+              "pressureLevel": 0.584456,
+              "wallDistanceFront": 0.357143,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.2
+            },
+            "overallMargin": 0.208571
+          },
+          "probeError": null,
+          "scenarioId": "narrowing-corridor",
+          "seed": 934,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.431429,
+            "pressureLevel": 0.584456,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.991526,
+            "targetDistanceRatio": 0.126511,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 0.357143,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.2
+          },
+          "startMetricsHash": "81d0c125e451636858bd184b19bbb6ccc022d967ff0029b6edf5c2b14b6e7eae",
+          "warmup": {
+            "warmupAction": "pitch-up",
+            "warmupSteps": 6,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "1b038204ef05d671e4e50c7a5144cbbed52eb52dab5ba2a693f505d517e6ef14"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "pitch-up",
+          "actionToken": 3,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 11,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "narrowing-corridor-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.431429,
+                "clauseId": "localOpennessRatio<=0.64",
+                "margin": 0.208571,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.64
+              },
+              {
+                "actual": 0.2,
+                "clauseId": "minWallDistanceLeftRight<=0.75",
+                "margin": 0.55,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.75
+              }
+            ],
+            "expression": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.431429,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.2,
+              "pressureLevel": 0.584456,
+              "wallDistanceFront": 0.357143,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.2
+            },
+            "overallMargin": 0.208571
+          },
+          "probeError": null,
+          "scenarioId": "narrowing-corridor",
+          "seed": 934,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.431429,
+            "pressureLevel": 0.584456,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": -0.991526,
+            "targetDistanceRatio": 0.126511,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 0.357143,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.2
+          },
+          "startMetricsHash": "81d0c125e451636858bd184b19bbb6ccc022d967ff0029b6edf5c2b14b6e7eae",
+          "warmup": {
+            "warmupAction": "pitch-up",
+            "warmupSteps": 6,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "c5cd9fce56c72ad7f861b98b6ff68c5c1eded3fd09f73ee7c67b7027f62cfa9f"
+        }
+      ],
+      "candidateProbeSummary": {
+        "measurementInvalidBeforeActionCount": 0,
+        "minimumWindowFailureCount": 0,
+        "overallMarginMax": 0.208571,
+        "overallMarginMin": 0.208571,
+        "predicateFailureCount": 0,
+        "probeCount": 3,
+        "startMetricsHashCount": 1,
+        "warmupTerminalBeforeActionCount": 0
+      },
+      "controlProtection": {
+        "actionQualityJudgementAllowed": false,
+        "actionRootCauseAllowed": false,
+        "actionSpaceJudgementAllowed": false,
+        "escapeRightFairnessFirst": null,
+        "neutralControlActionGreenAllowed": null,
+        "neutralControlActionGreenProducedMustBe": null,
+        "noPostHocThresholdChange": true,
+        "positiveControlsRemainMeasurableBeforeActionSpaceJudgement": null,
+        "rewardJudgementAllowed": false
+      },
+      "decisionReason": "Seed 1934 is deterministically outside the locked predicate window, while stable S2R4.4 seed(s) [934, 2934] satisfy the unchanged scenario predicate.",
+      "groupId": "narrowing-corridor:1934:5d3e6edfe719",
+      "newPredicate": {
+        "changed": false,
+        "expression": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+        "predicateId": "narrowing-corridor-v2-start-predicate",
+        "reason": "Seed/start-state replacement keeps the predicate expression locked."
+      },
+      "newSeed": 934,
+      "newWarmup": {
+        "changed": false,
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "oldPredicate": {
+        "expression": "localOpennessRatio <= 0.64 and min(wallDistanceLeft, wallDistanceRight) <= 0.75",
+        "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+        "predicateId": "narrowing-corridor-v2-start-predicate",
+        "redOverallMarginMax": -0.008571,
+        "redOverallMarginMin": -0.008571
+      },
+      "oldSeed": 1934,
+      "oldStartMetricsHash": "5d3e6edfe719b8b7882fe1fe3b65b559193b09ebd3b2ea74715f010eecb3703f",
+      "oldWarmup": {
+        "warmupAction": "pitch-up",
+        "warmupSteps": 6
+      },
+      "primaryRepairClass": "seed-startstate-invalid",
+      "redRowCount": 3,
+      "rejectedCandidates": [
+        {
+          "rejectedBecause": "Existing stable S2R4.4 seeds satisfy the unchanged predicate; threshold loosening is unnecessary.",
+          "repairClass": "predicate-expression-stale"
+        },
+        {
+          "rejectedBecause": "warmupTerminalBeforeActionCount is zero and minimum-window failures are zero.",
+          "repairClass": "warmup-contract-required"
+        }
+      ],
+      "scenarioId": "narrowing-corridor",
+      "seedContract": {
+        "changed": true,
+        "diagnosticSeedOnly": true,
+        "holdoutSeed": false,
+        "newSeed": 934,
+        "oldSeed": 1934,
+        "replacementSeedSource": "existing S2R4.4 stable predicate-pass seed plus S2R5.2 candidate probe"
+      },
+      "unknown": false
+    },
+    {
+      "affectedActions": [
+        "boost",
+        "evade-left",
+        "evade-right",
+        "noop",
+        "pitch-down",
+        "pitch-up",
+        "roll-left",
+        "roll-right",
+        "shoot-mg",
+        "turn-left-boost",
+        "turn-right-boost",
+        "yaw-left",
+        "yaw-right"
+      ],
+      "ambiguous": false,
+      "candidateProbeRows": [
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "boost",
+          "actionToken": 7,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "5d94b622188df7ae5fc5f4556194ab6dbf79603de46694721fc3990d066a7870"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "evade-left",
+          "actionToken": 11,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "de4abc61f47a7e18221180590a24fe31df29b152662b07224f1768478ae62efa"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "evade-right",
+          "actionToken": 12,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "a944a9ad5655b163a30d0263d17814b9e2dd554874c380cac351473ace8197c7"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "noop",
+          "actionToken": 0,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "78d0653e65a434ef17a68da74a9a5e1aa2f84b325b0bac8102483f37d6d7af91"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "pitch-down",
+          "actionToken": 4,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "0c9a8d7b77279f2827a39dcaf53b5e8671c42f4f6de31f451ebcb963acafeac0"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "pitch-up",
+          "actionToken": 3,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "cc69934cd546bd434ed11bebe9289bf649335371a609f5ee5705d8d66d6224b0"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "roll-left",
+          "actionToken": 5,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "5b706a02234309f37498888f7ac03f64ff04edd0102b58483e157393d194a14e"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "roll-right",
+          "actionToken": 6,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "aa8f34174a9d784083836cb28831ba60439d2f98d09b2b97a6c4b90b1e145823"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "shoot-mg",
+          "actionToken": 8,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "f9598dfd2841b47f241f8abe2aba1920e24d6c0cdd5f6a4a5e06a85e1fb92974"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "turn-left-boost",
+          "actionToken": 9,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "02f38392f940079d88eee70b7ce811bf1cfc83b2591b6273e500b8e565ac29af"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "turn-right-boost",
+          "actionToken": 10,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "aa23cad745e15ab2569d9fa58b8ab0a89e3b5eae92b593d5f1e6914e3e31178a"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "yaw-left",
+          "actionToken": 1,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "04d591fc4af19061ea314ccd56f9f4a71051c471d2b1e90f46fd3d195eec6d61"
+        },
+        {
+          "actionEffectEvaluated": false,
+          "actionName": "yaw-right",
+          "actionToken": 2,
+          "minimumWindow": {
+            "completed": true,
+            "minimumCompletedSteps": 8,
+            "observedSteps": 24,
+            "requestedRepeatSteps": 24
+          },
+          "preActionValidity": {
+            "completedMinimumWindow": true,
+            "measurementInvalidBeforeAction": false,
+            "ok": true,
+            "predicatePass": true,
+            "warmupTerminalBeforeAction": false
+          },
+          "predicate": {
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "pass": true,
+            "predicateId": "no-danger-control-v2-start-predicate",
+            "revalidatedBeforeMeasurement": true
+          },
+          "predicateMargin": {
+            "clauses": [
+              {
+                "actual": 0.322557,
+                "clauseId": "pressureLevel<=0.38",
+                "margin": 0.057443,
+                "operator": "<=",
+                "pass": true,
+                "threshold": 0.38
+              },
+              {
+                "actual": 0.67,
+                "clauseId": "localOpennessRatio>=0.54",
+                "margin": 0.13,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.54
+              },
+              {
+                "actual": 1.0,
+                "clauseId": "maxWallDistance>=0.85",
+                "margin": 0.15,
+                "operator": ">=",
+                "pass": true,
+                "threshold": 0.85
+              }
+            ],
+            "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+            "failedClauseIds": [],
+            "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+            "operands": {
+              "localOpennessRatio": 0.67,
+              "maxWallDistance": 1.0,
+              "minWallDistanceLeftRight": 0.8,
+              "pressureLevel": 0.322557,
+              "wallDistanceFront": 1.0,
+              "wallDistanceLeft": 1.0,
+              "wallDistanceRight": 0.8
+            },
+            "overallMargin": 0.057443
+          },
+          "probeError": null,
+          "scenarioId": "no-danger-control",
+          "seed": 1930,
+          "startMetrics": {
+            "boostActive": 0.0,
+            "healthRatio": 1.0,
+            "localOpennessRatio": 0.67,
+            "pressureLevel": 0.322557,
+            "projectileThreat": 0.0,
+            "speedRatio": 1.0,
+            "targetAlignment": 0.301794,
+            "targetDistanceRatio": 0.104008,
+            "targetInFront": 0.0,
+            "wallDistanceFront": 1.0,
+            "wallDistanceLeft": 1.0,
+            "wallDistanceRight": 0.8
+          },
+          "startMetricsHash": "b7c919640881d22bbe743f2380ce09bec974fbcded5dfa10116ff1fb59049d79",
+          "warmup": {
+            "warmupAction": "noop",
+            "warmupSteps": 0,
+            "warmupTerminalBeforeAction": false
+          },
+          "warmupKey": "b3b26ffbbea5fc017836ce32cb902e52856a9736eddcfc6f1049667ebfa896e5"
+        }
+      ],
+      "candidateProbeSummary": {
+        "measurementInvalidBeforeActionCount": 0,
+        "minimumWindowFailureCount": 0,
+        "overallMarginMax": 0.057443,
+        "overallMarginMin": 0.057443,
+        "predicateFailureCount": 0,
+        "probeCount": 13,
+        "startMetricsHashCount": 1,
+        "warmupTerminalBeforeActionCount": 0
+      },
+      "controlProtection": {
+        "actionQualityJudgementAllowed": false,
+        "actionRootCauseAllowed": false,
+        "actionSpaceJudgementAllowed": false,
+        "escapeRightFairnessFirst": null,
+        "neutralControlActionGreenAllowed": false,
+        "neutralControlActionGreenProducedMustBe": false,
+        "noPostHocThresholdChange": true,
+        "positiveControlsRemainMeasurableBeforeActionSpaceJudgement": null,
+        "rewardJudgementAllowed": false
+      },
+      "decisionReason": "Seed 930 is deterministically outside the locked predicate window, while stable S2R4.4 seed(s) [1930] satisfy the unchanged scenario predicate.",
+      "groupId": "no-danger-control:930:a686f53acfe1",
+      "newPredicate": {
+        "changed": false,
+        "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+        "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+        "predicateId": "no-danger-control-v2-start-predicate",
+        "reason": "Seed/start-state replacement keeps the predicate expression locked."
+      },
+      "newSeed": 1930,
+      "newWarmup": {
+        "changed": false,
+        "warmupAction": "noop",
+        "warmupSteps": 0
+      },
+      "oldPredicate": {
+        "expression": "pressureLevel <= 0.38 and localOpennessRatio >= 0.54 and max(wallDistanceFront, wallDistanceLeft, wallDistanceRight) >= 0.85",
+        "function": "bt93s2_scenario_matrix_v2._predicate_ok",
+        "predicateId": "no-danger-control-v2-start-predicate",
+        "redOverallMarginMax": -0.00978,
+        "redOverallMarginMin": -0.00978
+      },
+      "oldSeed": 930,
+      "oldStartMetricsHash": "a686f53acfe12d1a863b272ebd8ed17c2c7ccee5b896626c97911937d9864193",
+      "oldWarmup": {
+        "warmupAction": "noop",
+        "warmupSteps": 0
+      },
+      "primaryRepairClass": "seed-startstate-invalid",
+      "redRowCount": 13,
+      "rejectedCandidates": [
+        {
+          "rejectedBecause": "Existing stable S2R4.4 seeds satisfy the unchanged predicate; threshold loosening is unnecessary.",
+          "repairClass": "predicate-expression-stale"
+        },
+        {
+          "rejectedBecause": "warmupTerminalBeforeActionCount is zero and minimum-window failures are zero.",
+          "repairClass": "warmup-contract-required"
+        },
+        {
+          "rejectedBecause": "Neutral-control semantics remain unchanged; replacement seed preserves action-green prohibition.",
+          "repairClass": "neutral-control-contract-required"
+        }
+      ],
+      "scenarioId": "no-danger-control",
+      "seedContract": {
+        "changed": true,
+        "diagnosticSeedOnly": true,
+        "holdoutSeed": false,
+        "newSeed": 1930,
+        "oldSeed": 930,
+        "replacementSeedSource": "existing S2R4.4 stable predicate-pass seed plus S2R5.2 candidate probe"
+      },
+      "unknown": false
+    }
+  ],
+  "reportHash": "2b57a10268cf51d5aec64ecaa2f196374bfdc30ec7a13e36b8532182720481d0",
+  "resultClass": "predicate-preaction-repair-contract-written",
+  "sampleCounts": {
+    "actionRootCauseAllowedGroupCount": 0,
+    "ambiguousPrimaryClassCount": 0,
+    "candidateMeasurementInvalidBeforeActionCount": 0,
+    "candidateMinimumWindowFailureCount": 0,
+    "candidatePredicateFailureCount": 0,
+    "candidateProbeCount": 33,
+    "candidateWarmupTerminalBeforeActionCount": 0,
+    "expectedRepairDecisionCount": 4,
+    "holdoutEpisodes": 0,
+    "invalidPrimaryClassCount": 0,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "repairDecisionCount": 4,
+    "seedStartStateInvalidCount": 4,
+    "sourceFailureLedgerRowCount": 33,
+    "sourceUniqueScenarioSeedStartMetricsGroupCount": 4,
+    "unknownRootCauseCount": 0
+  },
+  "schemaVersion": "bt93s2r5-predicate-preaction-repair-contract-v1",
+  "sourceArtifacts": [
+    {
+      "actualFields": {
+        "blockId": "BT93S2R5",
+        "claimFlags.phase93S2R5_2Allowed": true,
+        "ok": true,
+        "phaseId": "93S2R5.1",
+        "resultClass": "predicate-preaction-failure-ledger-written",
+        "sampleCounts.actionRootCauseAllowedGroupCount": 0,
+        "sampleCounts.failureLedgerRowCount": 33,
+        "sampleCounts.uniqueScenarioSeedStartMetricsGroupCount": 4
+      },
+      "blockId": "BT93S2R5",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2R5",
+        "claimFlags.phase93S2R5_2Allowed": true,
+        "ok": true,
+        "phaseId": "93S2R5.1",
+        "resultClass": "predicate-preaction-failure-ledger-written",
+        "sampleCounts.actionRootCauseAllowedGroupCount": 0,
+        "sampleCounts.failureLedgerRowCount": 33,
+        "sampleCounts.uniqueScenarioSeedStartMetricsGroupCount": 4
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2r5/predicate_preaction_failure_ledger.json",
+      "phaseId": "93S2R5.1",
+      "reportHash": "848d345f6f72655cf5cb896a1a2fdb8d12739ae3317e1bca29b456c9066e3e77",
+      "required": true,
+      "resultClass": "predicate-preaction-failure-ledger-written",
+      "role": "BT93S2R5.1 predicate/pre-action failure ledger",
+      "sampleCounts": {
+        "actionDependentStartMetricsDriftGroupCount": 0,
+        "actionRootCauseAllowedGroupCount": 0,
+        "actionRootCauseDisallowedGroupCount": 4,
+        "expectedReplayAttemptCount": 99,
+        "failureLedgerRowCount": 33,
+        "holdoutEpisodes": 0,
+        "measurementInvalidBeforeActionAttemptCount": 99,
+        "measurementInvalidBeforeActionRowCount": 33,
+        "minimumWindowFailureRowCount": 0,
+        "newOptimizerUpdates": 0,
+        "newTrainingEpisodes": 0,
+        "predicateFailureAttemptCount": 99,
+        "predicateFailureRowCount": 33,
+        "redRowIdCount": 33,
+        "repeatCount": 3,
+        "replayAttemptCount": 99,
+        "replaySpecIdRepeatMismatchCount": 0,
+        "sessionIdDriftCount": 0,
+        "sourceRedRowCount": 33,
+        "sourceReplaySpecIdRepeatMismatchCount": 0,
+        "sourceSessionIdDriftCount": 0,
+        "sourceStableReplayAttemptCount": 309,
+        "sourceStableReplayRowCount": 103,
+        "sourceStartMetricsHashRepeatMismatchCount": 0,
+        "sourceWarmupKeyRepeatMismatchCount": 0,
+        "startMetricsHashRepeatMismatchCount": 0,
+        "uniqueScenarioSeedStartMetricsGroupCount": 4,
+        "warmupKeyRepeatMismatchCount": 0,
+        "warmupTerminalBeforeActionRowCount": 0
+      },
+      "schemaVersion": "bt93s2r5-predicate-preaction-failure-ledger-v1",
+      "sha256": "22ee8835b7dfca4b77476f03dfa09e94555d49c915ad96c8cf1e9efe1db0d6c7",
+      "sourceKey": "s2r5FailureLedger",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+        "blockId": "BT93S2R",
+        "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+        "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+        "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+        "ok": true,
+        "phaseId": "93S2R.3",
+        "resultClass": "matrix-control-v3-contract-green"
+      },
+      "blockId": "BT93S2R",
+      "exists": true,
+      "expectedFields": {
+        "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+        "blockId": "BT93S2R",
+        "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+        "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+        "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+        "ok": true,
+        "phaseId": "93S2R.3",
+        "resultClass": "matrix-control-v3-contract-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2r/scenario_matrix_v3_contract.json",
+      "phaseId": "93S2R.3",
+      "reportHash": "8baba49ca38aca05e8e5deee79164e41bf04ba56ee0d3dc21ab2073a922d1705",
+      "required": true,
+      "resultClass": "matrix-control-v3-contract-green",
+      "role": "BT93S2R matrix/control-v3 contract",
+      "sampleCounts": {
+        "holdoutEpisodes": 0,
+        "minimumWindowFailureCount": 12,
+        "newOptimizerUpdates": 0,
+        "newTrainingEpisodes": 0,
+        "predicateFailureCount": 48,
+        "scenarioCount": 9,
+        "sourceProbeCount": 338,
+        "targetTraceProbeCount": 42
+      },
+      "schemaVersion": "bt93s2r-matrix-control-v3-contract-v1",
+      "sha256": "519a2197515b3faff378552e4c9b9538fe6ac4b7d63f3517738c8fa5d1f2b6ae",
+      "sourceKey": "s2rMatrixContract",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
+      "phaseId": null,
+      "reportHash": null,
+      "required": false,
+      "resultClass": null,
+      "role": "BT93S2R5.2 generator",
+      "sampleCounts": null,
+      "schemaVersion": null,
+      "sha256": "95b282c73b24cdda57e761af5957b0a19f79cc2bc83cb8594421f93e0e8e7a7d",
+      "sourceKey": "s2r5ContractScript",
+      "tracked": false
+    }
+  ],
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "sourceLocks": {
+    "currentSourceHashes": {
+      "s2r5ContractScript": "95b282c73b24cdda57e761af5957b0a19f79cc2bc83cb8594421f93e0e8e7a7d",
+      "s2r5FailureLedger": "22ee8835b7dfca4b77476f03dfa09e94555d49c915ad96c8cf1e9efe1db0d6c7",
+      "s2rMatrixContract": "519a2197515b3faff378552e4c9b9538fe6ac4b7d63f3517738c8fa5d1f2b6ae"
+    },
+    "failureLedgerReportHash": "848d345f6f72655cf5cb896a1a2fdb8d12739ae3317e1bca29b456c9066e3e77",
+    "failureLedgerRowsHash": "8f1673b6164167e3840505bb66364f6ed5bc25613c9c7073a3ec4110243cea0c",
+    "predicateFunction": "bt93s2_scenario_matrix_v2._predicate_ok",
+    "redRowIdsHash": "ae4b5d585aff36cf0934c714dbf9d63bd319a2c09829449ab95cb46b27f23571",
+    "upstreamSourceHashes": {
+      "actionSurface": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "headlessRunner": "178bc721898fb3b853e17f9411035bc58aa9e224f603d6ec477751edc82c01bf",
+      "pythonEnv": "2a12d75b327b10daef853cc242e6d81fb87c4ee838756d6cef1905d19de94d59",
+      "s2r3Preflight": "dc2b00c439b964cc2773e44452f60ea9e21bdc04591402ee3cae53ecb93e019b",
+      "s2r4DeterministicResetRepair": "67823c74d2ed82101923b2c17fdd80e65cb4ce8374efc9141aac32f659b1f498",
+      "s2r4IdentityContract": "48f8fcf0312152d28f1a4d8de0beab67e2c317e9beb1bee8e71100ec49956547",
+      "s2r4RootCauseAudit": "462d3a0e56d5696f08ad62bd1f73f4e453db28c97d350f01694b9dd261d21582",
+      "s2r4StableReplay": "5977a6a0b60d6726a416eba73913f64879f4e041bdf8edb0fb390c655fbea1d5",
+      "s2r5Script": "c477d1f379b57b4de7cfa3d051235feadd8523ab52af5d64f320c8686461b8e4",
+      "s2rMatrixContract": "519a2197515b3faff378552e4c9b9538fe6ac4b7d63f3517738c8fa5d1f2b6ae"
+    }
+  },
+  "stableSeedCandidatesByScenario": {
+    "escape-left-open": [
+      930,
+      1930,
+      2930
+    ],
+    "escape-right-open": [
+      2930
+    ],
+    "frontal-near-wall": [
+      1934,
+      2934
+    ],
+    "narrowing-corridor": [
+      934,
+      2934
+    ],
+    "no-danger-control": [
+      1930
+    ],
+    "side-wall-left": [
+      942,
+      1942
+    ],
+    "side-wall-right": [
+      1930
+    ],
+    "trail-ahead": [
+      930,
+      1930,
+      2930
+    ],
+    "trail-side": [
+      934,
+      1934,
+      2934
+    ]
+  }
+}

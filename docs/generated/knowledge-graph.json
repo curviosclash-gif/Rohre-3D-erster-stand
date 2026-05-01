@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 445,
+          "concreteCount": 447,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 583,
+          "concreteCount": 585,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 441,
+          "concreteCount": 443,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 440,
+          "concreteCount": 442,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1082,
+          "concreteCount": 1084,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1090,
+          "concreteCount": 1092,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1979,7 +1979,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2R5.2",
+        "currentPhase": "93S2R5.3",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
           "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
@@ -1988,11 +1988,12 @@
           "data/training/ppo/bt93s2r5/predicate_preaction_repair_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md",
-          "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py"
+          "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
+          "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py"
         ],
         "scopeResolution": {
-          "concreteCount": 4,
-          "plannedCount": 4
+          "concreteCount": 6,
+          "plannedCount": 3
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5730,7 +5731,7 @@
       "id": "BT93S2R5.2",
       "type": "phase",
       "title": "Root-Cause-Entscheid und Repair-Contract",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.2"
@@ -16593,8 +16594,8 @@
     {
       "id": "BT93S2R5.2.1",
       "type": "subphase",
-      "title": "Pro unique rote Gruppe genau eine Repair-Klasse waehlen: `predicate-expression-stale`, `seed-startstate-invalid`, `warmup-contract-required`, `neutral-control-contract-required`, `escape-right-fairness-predicate-required`, `metric-sampling-contract-required` oder `scenario-contract-unrepairable`.",
-      "status": "open",
+      "title": "Pro unique rote Gruppe genau eine Repair-Klasse waehlen: `predicate-expression-stale`, `seed-startstate-invalid`, `warmup-contract-required`, `neutral-control-contract-required`, `escape-right-fairness-predicate-required`, `metric-sampling-contract-required` oder `scenario-contract-unrepairable`. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r5_predicate_preaction_repair_contract.py --write-report` -> `data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json`, `seedStartStateInvalidCount=4`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.2",
@@ -16604,8 +16605,8 @@
     {
       "id": "BT93S2R5.2.2",
       "type": "subphase",
-      "title": "Repair-Contract pinnt vor Umsetzung: alte und neue Predicate-Ausdruecke, alte und neue Warmup-/Seed-Werte, Kontrollschutz, Threshold-Margins, SourceHashes und Invalidations.",
-      "status": "open",
+      "title": "Repair-Contract pinnt vor Umsetzung: alte und neue Predicate-Ausdruecke, alte und neue Warmup-/Seed-Werte, Kontrollschutz, Threshold-Margins, SourceHashes und Invalidations. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r5_predicate_preaction_repair_contract.py --write-report` -> `data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json`, `noPostHocThresholdChange=true`, Candidate-Fail-Counts `0`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.2",
@@ -16615,8 +16616,8 @@
     {
       "id": "BT93S2R5.2.3",
       "type": "subphase",
-      "title": "Wenn mehr als eine plausible Ursache ohne klare Primaerklasse bleibt, endet die Phase `measurement-invalid` und oeffnet nichts.",
-      "status": "open",
+      "title": "Wenn mehr als eine plausible Ursache ohne klare Primaerklasse bleibt, endet die Phase `measurement-invalid` und oeffnet nichts. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r5_predicate_preaction_repair_contract.py --write-report` -> `data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json`, `unknownRootCauseCount=0`, `ambiguousPrimaryClassCount=0`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.2",
@@ -32557,9 +32558,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R5"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -41407,6 +41414,27 @@
     },
     {
       "id": "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R5"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -79065,6 +79093,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -80767,6 +80804,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83267,6 +83313,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -84951,6 +85006,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88649,6 +88713,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -90342,6 +90415,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -93141,6 +93223,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -94834,6 +94925,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -104037,6 +104137,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -105730,6 +105839,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -114108,6 +114226,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -115810,6 +115937,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -144487,6 +144623,15 @@
     {
       "from": "BT93S2R5",
       "to": "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {

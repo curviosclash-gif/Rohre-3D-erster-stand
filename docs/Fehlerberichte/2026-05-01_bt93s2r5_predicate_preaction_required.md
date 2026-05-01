@@ -62,3 +62,30 @@ PreAction-StartMetrics haben.
 
 - Run 93S2R5.2 to choose exactly one repair class per unique Scenario/Seed/StartMetricsHash group and lock the repair contract.
 - Do not start 93S2R4.5, 93S2R3.3-Reentry, BT93S2.3-Recheck, 93S2.4, BT93T/U/W/O/P/94A, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate or BT95.
+
+<!-- BT93S2R5.2-START -->
+## 93S2R5.2 Root-Cause-Entscheid und Repair-Contract
+
+- Result: `resultClass=predicate-preaction-repair-contract-written`, `ok=True`
+- Primaerklasse: `seed-startstate-invalid` fuer `4` Gruppen
+- Unknown/Ambiguous: `0` / `0`
+- Candidate-Probes: `33`; Predicate/PreAction/Window/Warmup-Fails: `0` / `0` / `0` / `0`
+- Training/Holdout/Optimizer: `0/0/0`
+
+| Scenario | Alt-Seed | Neu-Seed | Primaerklasse | Betroffene Actions | Contract-Probes |
+| --- | ---: | ---: | --- | --- | ---: |
+| `escape-right-open` | `930` | `2930` | `seed-startstate-invalid` | `boost, evade-right, pitch-up, roll-left, roll-right, shoot-mg, turn-right-boost, yaw-right` | `8` |
+| `escape-right-open` | `1930` | `2930` | `seed-startstate-invalid` | `evade-left, evade-right, pitch-up, roll-left, roll-right, shoot-mg, turn-right-boost, yaw-left, yaw-right` | `9` |
+| `narrowing-corridor` | `1934` | `934` | `seed-startstate-invalid` | `evade-left, evade-right, pitch-up` | `3` |
+| `no-danger-control` | `930` | `1930` | `seed-startstate-invalid` | `boost, evade-left, evade-right, noop, pitch-down, pitch-up, roll-left, roll-right, shoot-mg, turn-left-boost, turn-right-boost, yaw-left, yaw-right` | `13` |
+
+Der Repair-Contract aendert keine Predicate-Schwellen und kein Warmup.
+Gesperrt bleiben `93S2R4.5`, `93S2R3.3-Reentry`, `BT93S2.3-Recheck`,
+`93S2.4`, `BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote,
+Rollout, PPO-Validate und BT95.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r5/predicate_preaction_repair_contract.json`
+- Command: `python python/scripts/bt93s2r5_predicate_preaction_repair_contract.py --write-report`
+<!-- BT93S2R5.2-END -->
