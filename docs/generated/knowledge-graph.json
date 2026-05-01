@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 453,
+          "concreteCount": 455,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 591,
+          "concreteCount": 593,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 449,
+          "concreteCount": 451,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 448,
+          "concreteCount": 450,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1090,
+          "concreteCount": 1092,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1098,
+          "concreteCount": 1100,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1941,7 +1941,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2R4.5",
+        "currentPhase": "93S2R4.99",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2r4/bt93s2r4_closure_gate_report.json",
           "data/training/ppo/bt93s2r4/deterministic_reset_repair_report.json",
@@ -1954,14 +1954,15 @@
           "docs/Fehlerberichte/2026-05-01_bt93s2r4_replay_determinism_required.md",
           "python/envs/curvios_env.py",
           "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+          "python/scripts/bt93s2r4_full_replay_preflight_gate.py",
           "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
           "python/scripts/bt93s2r4_replay_identity_contract.py",
           "python/scripts/bt93s2r4_replay_root_cause_audit.py",
           "scripts/training-headless-lane-runner.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 13,
-          "plannedCount": 2
+          "concreteCount": 15,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5704,7 +5705,7 @@
       "id": "BT93S2R4.5",
       "type": "phase",
       "title": "Full Replacement Preflight und S2R3-Reentry-Entscheid",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.5"
@@ -16476,8 +16477,8 @@
     {
       "id": "BT93S2R4.5.1",
       "type": "subphase",
-      "title": "Full-Gate startet erst nach `BT93S2R5.99=predicate-window-repair-green`, laeuft auf mindestens 103 Rows x 3 Repeats (`replayAttemptCount>=309`) und schreibt alle S2R4-Null-Counts.",
-      "status": "open",
+      "title": "Full-Gate startet erst nach `BT93S2R5.99=predicate-window-repair-green`, laeuft auf mindestens 103 Rows x 3 Repeats (`replayAttemptCount>=309`) und schreibt alle S2R4-Null-Counts. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r4_full_replay_preflight_gate.py --write-report` -> `data/training/ppo/bt93s2r4/full_replay_preflight_gate.json`, `replayAttemptCount=309`, `activeBlockers=[]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.5",
@@ -16487,8 +16488,8 @@
     {
       "id": "BT93S2R4.5.2",
       "type": "subphase",
-      "title": "Wenn gruen, oeffnet der Block nur `93S2R3.3-Reentry`; `BT93S2.3-Recheck`, `93S2.4`, `BT93T/U/W/O/P/94A` bleiben geschlossen.",
-      "status": "open",
+      "title": "Wenn gruen, oeffnet der Block nur `93S2R3.3-Reentry`; `BT93S2.3-Recheck`, `93S2.4`, `BT93T/U/W/O/P/94A` bleiben geschlossen. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r4_full_replay_preflight_gate.py --write-report` -> `data/training/ppo/bt93s2r4/full_replay_preflight_gate.json`, `eventualOpensAfterClosure=[\"93S2R3.3-Reentry\"]`, `opensNext=[\"93S2R4.99 Closure\"]`, Downstream-ClaimFlags `false`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.5",
@@ -16498,8 +16499,8 @@
     {
       "id": "BT93S2R4.5.3",
       "type": "subphase",
-      "title": "Wenn rot, schreibt der Block exakt den naechsten engen Reparaturbedarf und `opensNext=[]`.",
-      "status": "open",
+      "title": "Wenn rot, schreibt der Block exakt den naechsten engen Reparaturbedarf und `opensNext=[]`. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r4_full_replay_preflight_gate.py --write-report` -> `data/training/ppo/bt93s2r4/full_replay_preflight_gate.json`, `resultClass=replay-startstate-green`, `activeBlockers=[]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.5",
@@ -32432,9 +32433,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R4"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -41351,6 +41358,27 @@
     },
     {
       "id": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R4"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r4_full_replay_preflight_gate.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -79141,6 +79169,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r4/full_replay_preflight_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
       "type": "scope",
       "hint": null,
@@ -80879,6 +80916,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r4_full_replay_preflight_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83415,6 +83461,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r4/full_replay_preflight_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
       "type": "scope",
       "hint": null,
@@ -85135,6 +85190,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r4_full_replay_preflight_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88869,6 +88933,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r4/full_replay_preflight_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
       "type": "scope",
       "hint": null,
@@ -90598,6 +90671,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r4_full_replay_preflight_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -93433,6 +93515,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r4/full_replay_preflight_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
       "type": "scope",
       "hint": null,
@@ -95162,6 +95253,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r4_full_replay_preflight_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -104401,6 +104501,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r4/full_replay_preflight_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
       "type": "scope",
       "hint": null,
@@ -106130,6 +106239,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r4_full_replay_preflight_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -114544,6 +114662,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r4/full_replay_preflight_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
       "type": "scope",
       "hint": null,
@@ -116282,6 +116409,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r4_full_replay_preflight_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -144664,6 +144800,15 @@
     {
       "from": "BT93S2R4",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R4",
+      "to": "python/scripts/bt93s2r4_full_replay_preflight_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
