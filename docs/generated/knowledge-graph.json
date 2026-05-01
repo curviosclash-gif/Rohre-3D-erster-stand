@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 419,
+          "concreteCount": 421,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 557,
+          "concreteCount": 559,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 415,
+          "concreteCount": 417,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 414,
+          "concreteCount": 416,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1056,
+          "concreteCount": 1058,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1064,
+          "concreteCount": 1066,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1854,8 +1854,8 @@
           "python/scripts/bt93s2r_targeted_trace_audit.py"
         ],
         "scopeResolution": {
-          "concreteCount": 9,
-          "plannedCount": 1
+          "concreteCount": 10,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -31032,9 +31032,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -39469,6 +39475,26 @@
           "BT93D",
           "BT93E",
           "BT93S2"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r_closure_gate.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E"
         ],
         "exists": true
       }
@@ -77042,6 +77068,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2r/failure_taxonomy_report.json",
       "type": "scope",
       "hint": null,
@@ -78627,6 +78662,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2_start_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81010,6 +81054,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2r/failure_taxonomy_report.json",
       "type": "scope",
       "hint": null,
@@ -82577,6 +82630,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2_start_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -86158,6 +86220,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2r/failure_taxonomy_report.json",
       "type": "scope",
       "hint": null,
@@ -87734,6 +87805,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2_start_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -90416,6 +90496,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2r/failure_taxonomy_report.json",
       "type": "scope",
       "hint": null,
@@ -91992,6 +92081,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2_start_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -101078,6 +101176,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2r/failure_taxonomy_report.json",
       "type": "scope",
       "hint": null,
@@ -102654,6 +102761,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2_start_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -110915,6 +111031,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2r/failure_taxonomy_report.json",
       "type": "scope",
       "hint": null,
@@ -112500,6 +112625,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2_start_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
