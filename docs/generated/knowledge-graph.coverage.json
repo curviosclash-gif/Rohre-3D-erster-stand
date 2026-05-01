@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2519,
-    "rawCoveredFileCount": 2037,
+    "trackedFileCount": 2520,
+    "rawCoveredFileCount": 2038,
     "rawCoveragePercent": 80.9,
-    "adjustedTrackedFileCount": 1616,
-    "adjustedCoveredFileCount": 1378,
+    "adjustedTrackedFileCount": 1617,
+    "adjustedCoveredFileCount": 1379,
     "adjustedCoveragePercent": 85.3,
     "uncoveredFileCount": 482,
     "uncoveredActiveFileCount": 238,
@@ -189,8 +189,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 376,
-        "coveredCount": 188
+        "count": 377,
+        "coveredCount": 189
       },
       {
         "classification": "prototype",
@@ -11723,6 +11723,7 @@
         "BT93S",
         "BT93S2",
         "BT93S2R",
+        "BT93S2R2",
         "BT93T",
         "BT93U",
         "BT93V",
@@ -12305,6 +12306,23 @@
       "covered": false,
       "coverageSources": [],
       "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/Fehlerberichte/2026-05-01_bt93s2r2_recheck_measurement_invalid.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT93S2R2"
+      ],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
