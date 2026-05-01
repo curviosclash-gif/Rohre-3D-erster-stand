@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2522,
-    "rawCoveredFileCount": 2040,
+    "trackedFileCount": 2524,
+    "rawCoveredFileCount": 2042,
     "rawCoveragePercent": 80.9,
-    "adjustedTrackedFileCount": 1619,
-    "adjustedCoveredFileCount": 1381,
+    "adjustedTrackedFileCount": 1621,
+    "adjustedCoveredFileCount": 1383,
     "adjustedCoveragePercent": 85.3,
     "uncoveredFileCount": 482,
     "uncoveredActiveFileCount": 238,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 300,
-        "coveredCount": 279
+        "count": 301,
+        "coveredCount": 280
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 915,
-        "coveredCount": 899
+        "count": 916,
+        "coveredCount": 900
       },
       {
         "classification": "product-docs",
@@ -8848,6 +8848,29 @@
     },
     {
       "path": "data/training/ppo/bt93s2r2/failure_taxonomy_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R2"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93s2r2/predicate_window_repair_contract.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -20721,6 +20744,29 @@
     },
     {
       "path": "python/scripts/bt93s2r2_failure_taxonomy.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R2"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93s2r2_predicate_window_repair.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
