@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 437,
+          "concreteCount": 439,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 575,
+          "concreteCount": 577,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 433,
+          "concreteCount": 435,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 432,
+          "concreteCount": 434,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1074,
+          "concreteCount": 1076,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1082,
+          "concreteCount": 1084,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1941,7 +1941,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2R4.2",
+        "currentPhase": "93S2R4.3",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2r4/bt93s2r4_closure_gate_report.json",
           "data/training/ppo/bt93s2r4/deterministic_reset_repair_report.json",
@@ -1952,12 +1952,13 @@
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/Fehlerberichte/2026-05-01_bt93s2r4_replay_determinism_required.md",
           "python/envs/curvios_env.py",
+          "python/scripts/bt93s2r4_replay_identity_contract.py",
           "python/scripts/bt93s2r4_replay_root_cause_audit.py",
           "scripts/training-headless-lane-runner.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 6,
-          "plannedCount": 5
+          "concreteCount": 8,
+          "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5635,7 +5636,7 @@
       "id": "BT93S2R4.2",
       "type": "phase",
       "title": "Replay-Identity-Contract und Hash-Rezept-Reparatur",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.2"
@@ -16288,8 +16289,8 @@
     {
       "id": "BT93S2R4.2.1",
       "type": "subphase",
-      "title": "`replaySpecId` aus unveraenderlichen Inputs definieren und `startMetricsHash`/`warmupObservedHash` getrennt reporten.",
-      "status": "open",
+      "title": "`replaySpecId` aus unveraenderlichen Inputs definieren und `startMetricsHash`/`warmupObservedHash` getrennt reporten. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r4_replay_identity_contract.py --write-report` -> `data/training/ppo/bt93s2r4/replay_identity_contract.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.2",
@@ -16299,8 +16300,8 @@
     {
       "id": "BT93S2R4.2.2",
       "type": "subphase",
-      "title": "Hash-Rezept gegen S2R3.2 validieren: ID-Stabilitaet darf StartMetrics-Drift nicht verstecken, sondern muss sie als eigenes Feld zaehlen.",
-      "status": "open",
+      "title": "Hash-Rezept gegen S2R3.2 validieren: ID-Stabilitaet darf StartMetrics-Drift nicht verstecken, sondern muss sie als eigenes Feld zaehlen. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r4_replay_identity_contract.py --write-report` -> `data/training/ppo/bt93s2r4/replay_identity_contract.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.2",
@@ -16310,8 +16311,8 @@
     {
       "id": "BT93S2R4.2.3",
       "type": "subphase",
-      "title": "`thresholdsLockedBeforeRun` pinnt RepeatCount, RowCount, SourceHashes, Min-Window, Predicate-Funktion, EnvConfigHash und RunnerHash vor dem ersten Reparaturlauf.",
-      "status": "open",
+      "title": "`thresholdsLockedBeforeRun` pinnt RepeatCount, RowCount, SourceHashes, Min-Window, Predicate-Funktion, EnvConfigHash und RunnerHash vor dem ersten Reparaturlauf. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r4_replay_identity_contract.py --write-report` -> `data/training/ppo/bt93s2r4/replay_identity_contract.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.2",
@@ -32169,9 +32170,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R4"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -40889,6 +40896,27 @@
           "BT93D",
           "BT93E",
           "BT93S2R3"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r4_replay_identity_contract.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R4"
         ],
         "exists": true
       }
@@ -78508,6 +78536,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2r4/replay_root_cause_audit.json",
       "type": "scope",
       "hint": null,
@@ -80174,6 +80211,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r3_replay_predicate_window_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r4_replay_identity_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -82638,6 +82684,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2r4/replay_root_cause_audit.json",
       "type": "scope",
       "hint": null,
@@ -84286,6 +84341,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r3_replay_predicate_window_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r4_replay_identity_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -87948,6 +88012,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2r4/replay_root_cause_audit.json",
       "type": "scope",
       "hint": null,
@@ -89605,6 +89678,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r3_replay_predicate_window_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r4_replay_identity_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -92368,6 +92450,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2r4/replay_root_cause_audit.json",
       "type": "scope",
       "hint": null,
@@ -94025,6 +94116,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r3_replay_predicate_window_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r4_replay_identity_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -103192,6 +103292,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2r4/replay_root_cause_audit.json",
       "type": "scope",
       "hint": null,
@@ -104849,6 +104958,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r3_replay_predicate_window_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r4_replay_identity_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -113191,6 +113309,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2r4/replay_root_cause_audit.json",
       "type": "scope",
       "hint": null,
@@ -114857,6 +114984,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r3_replay_predicate_window_preflight.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r4_replay_identity_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -143158,6 +143294,15 @@
     {
       "from": "BT93S2R4",
       "to": "python/envs/curvios_env.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R4",
+      "to": "python/scripts/bt93s2r4_replay_identity_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
