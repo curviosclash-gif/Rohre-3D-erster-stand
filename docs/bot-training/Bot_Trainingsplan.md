@@ -947,7 +947,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93S | Wall-/Trail Action-Effekt und Action-Selection Repair | completed | P1 | BT93Y.99 mit `bt93rReentryAllowed=true` + erneutes BT93RR.99 in R-Allowlist | 93S.99 abgeschlossen: `matrix-redesign-required`, oeffnet nichts | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93S2 | Matrix-/Action-Effect Repair nach rotem BT93S | planned | P0 | BT93S.99=`matrix-redesign-required` + User-Intake 2026-04-30 | Recheck abgeschlossen rot; `93S2.4` bleibt bis neuem measurement-valid Recheck blockiert | `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md` |
 | BT93S2R | Matrix-/Control-Reentry nach S2.3 measurement-invalid | completed | P0 | BT93S2.3=`measurement-invalid` + User-Intake 2026-04-30 | 93S2R.99 abgeschlossen: `matrix-control-reentry-green`, oeffnet nur `BT93S2.3-Recheck` | `docs/plaene/neu/BT93S2R_Matrix_Control_Reentry_Replan_2026-04-30.md` |
-| BT93S2R2 | Predicate-/Window-Reentry nach rotem S2.3-Recheck | planned | P0 | BT93S2.3-Recheck=`measurement-invalid` + User-Intake 2026-05-01 | naechster claimbarer Scope; repariert nur empirische Messgueltigkeit und oeffnet maximal neuen `BT93S2.3-Recheck` | `docs/plaene/neu/BT93S2R2_Recheck_Predicate_Window_Repair_Intake_2026-05-01.md` |
+| BT93S2R2 | Predicate-/Window-Reentry nach rotem S2.3-Recheck | active | P0 | BT93S2.3-Recheck=`measurement-invalid` + User-Intake 2026-05-01 | 93S2R2.1 abgeschlossen; naechster Scope `93S2R2.2` Predicate-/Window-Root-Cause Repair | `docs/plaene/neu/BT93S2R2_Recheck_Predicate_Window_Repair_Intake_2026-05-01.md` |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | frischer BT93S2-Recheck nach allen Reentries `observation-telemetry-required` | blockiert bis BT93S2 nur Telemetrie oeffnet | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | frischer BT93S2.99=`action-selection-green` oder BT93T.99=`telemetry-green` + S2-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93V | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision | planned | P1 | BT93U.99=`reward-ordering-green` | 93V.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -4085,8 +4085,8 @@ Scope-Dateien:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.S2R2-1 Source-Lock pinnt Recheck-Report, Matrix-v3, Reentry-Gate, S2R-Closure, ActionSurfaceId, Decoder-Hash, Git-SHA und SampleCounts.
-- [ ] DoD.S2R2-2 Failure-Taxonomie benennt pro Szenario, Seed und Action genau eine primaere Root-Cause-Klasse: `predicate-expression-drift`, `predicate-function-drift`, `start-metrics-drift`, `warmup-seed-drift`, `minimum-window-fail`, `negative-control-fail`, `direction-contract-mismatch`, `neutral-control-unstable`, `env-measurement-drift`.
+- [x] DoD.S2R2-1 Source-Lock pinnt Recheck-Report, Matrix-v3, Reentry-Gate, S2R-Closure, ActionSurfaceId, Decoder-Hash, Git-SHA und SampleCounts. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_failure_taxonomy.py --write-report` -> `data/training/ppo/bt93s2r2/failure_taxonomy_report.json`)
+- [x] DoD.S2R2-2 Failure-Taxonomie benennt pro Szenario, Seed und Action genau eine primaere Root-Cause-Klasse: `predicate-expression-drift`, `predicate-function-drift`, `start-metrics-drift`, `warmup-seed-drift`, `minimum-window-fail`, `negative-control-fail`, `direction-contract-mismatch`, `neutral-control-unstable`, `env-measurement-drift`. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_failure_taxonomy.py --write-report` -> `data/training/ppo/bt93s2r2/failure_taxonomy_report.json`)
 - [ ] DoD.S2R2-3 Predicate-Ausdruck, Predicate-Funktion, StartMetrics, Warmup, Seeds und Session-ID werden vor jeder Action-Wirkung gegeneinander validiert; jede Uneinigkeit zaehlt als `measurement-invalid`.
 - [ ] DoD.S2R2-4 `escape-left-open` Negative-Control-First ist hart: `noop` und falsche Richtungen muessen vor positiven Actions als Nicht-Erfolg klassifiziert sein.
 - [ ] DoD.S2R2-5 `escape-right-open` darf erst als `action-space-required` bewertet werden, wenn alle positiven Controls auf gueltigem Predicate-/Minimum-Window-Fenster messbar waren.
@@ -4097,9 +4097,9 @@ Scope-Dateien:
 
 ### 93S2R2.1 Source-Lock und Failure-Taxonomie
 
-- [ ] 93S2R2.1.1 Quellen mit Hash, Git-SHA, Resultklassen, SampleCounts, MatrixId, ContractId, ActionSurfaceId und Decoder-Hash locken.
-- [ ] 93S2R2.1.2 Recheck-Failures pro Szenario, Seed, Action, Predicate, Minimum-Window, Negative-Control und Direction-Vertrag schreiben.
-- [ ] 93S2R2.1.3 Roten Status in `docs/Fehlerberichte/2026-05-01_bt93s2r2_recheck_measurement_invalid.md` aktualisieren.
+- [x] 93S2R2.1.1 Quellen mit Hash, Git-SHA, Resultklassen, SampleCounts, MatrixId, ContractId, ActionSurfaceId und Decoder-Hash locken. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_failure_taxonomy.py --write-report` -> `data/training/ppo/bt93s2r2/failure_taxonomy_report.json`)
+- [x] 93S2R2.1.2 Recheck-Failures pro Szenario, Seed, Action, Predicate, Minimum-Window, Negative-Control und Direction-Vertrag schreiben. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_failure_taxonomy.py --write-report` -> `data/training/ppo/bt93s2r2/failure_taxonomy_report.json`)
+- [x] 93S2R2.1.3 Roten Status in `docs/Fehlerberichte/2026-05-01_bt93s2r2_recheck_measurement_invalid.md` aktualisieren. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_failure_taxonomy.py --write-report` -> `docs/Fehlerberichte/2026-05-01_bt93s2r2_recheck_measurement_invalid.md`)
 
 Evidence:
 
