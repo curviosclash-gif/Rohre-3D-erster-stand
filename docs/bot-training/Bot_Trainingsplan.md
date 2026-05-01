@@ -412,7 +412,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93Y | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `retrain-lineage-ready-bt93r-reentry-ready`; naechster Fix-Planungs-GO-Scope ist neuer BT93R-Reentry |
 | Bot-Codex | BT93RR | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `eval-mode-bug-fixed-counterprobe-green`; oeffnet nur BT93S |
 | Bot-Codex | BT93S | 2026-04-30 | frei | abgeschlossen 2026-04-30 als `matrix-redesign-required`; oeffnet keinen Folgeblock |
-| - | BT93S2 | 2026-04-30 | frei | nur frischer `BT93S2.3-Recheck` offen; `93S2.4` bleibt bis nach diesem Recheck blockiert |
+| Bot-Codex | BT93S2 | 2026-05-01 | active | frischer `BT93S2.3-Recheck`; `93S2.4` bleibt bis nach diesem Recheck blockiert |
 | Bot-Codex | BT93S2R | 2026-04-30 | frei | abgeschlossen 2026-05-01 als `matrix-control-reentry-green`; oeffnet nur `BT93S2.3-Recheck` |
 | - | BT93T | - | frei | blockiert, bis BT93S2R gruen ist und frischer BT93S2-Recheck `observation-telemetry-required` schreibt |
 | - | BT93U | - | frei | wartet auf BT93S2R-Gruen plus frisches BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck |
