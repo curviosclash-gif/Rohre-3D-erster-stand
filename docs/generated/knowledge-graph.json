@@ -1832,7 +1832,7 @@
       "id": "BT93S2R",
       "type": "block",
       "title": "Matrix-/Control-Reentry nach S2.3 measurement-invalid",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "source": [
           "bot-training-plan"
@@ -1848,13 +1848,14 @@
           "data/training/ppo/bt93s2r/scenario_matrix_v3_contract.json",
           "data/training/ppo/bt93s2r/targeted_trace_audit_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
+          "python/scripts/bt93s2r_closure_gate.py",
           "python/scripts/bt93s2r_failure_taxonomy.py",
           "python/scripts/bt93s2r_matrix_control_reentry_gate.py",
           "python/scripts/bt93s2r_matrix_control_v3.py",
           "python/scripts/bt93s2r_targeted_trace_audit.py"
         ],
         "scopeResolution": {
-          "concreteCount": 10,
+          "concreteCount": 11,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5423,7 +5424,7 @@
       "id": "BT93S2R.99",
       "type": "phase",
       "title": "Abschluss",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.99"
@@ -15640,8 +15641,8 @@
     {
       "id": "BT93S2R.99.1",
       "type": "subphase",
-      "title": "Closure schreibt genau eine erlaubte Resultklasse, `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SampleCounts, SourceArtifacts und Invalidations.",
-      "status": "open",
+      "title": "Closure schreibt genau eine erlaubte Resultklasse, `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SampleCounts, SourceArtifacts und Invalidations. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r_closure_gate.py --write-report` -> `data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.99",
@@ -15651,8 +15652,8 @@
     {
       "id": "BT93S2R.99.2",
       "type": "subphase",
-      "title": "Nur `matrix-control-reentry-green` oeffnet `BT93S2.3-Recheck`.",
-      "status": "open",
+      "title": "Nur `matrix-control-reentry-green` oeffnet `BT93S2.3-Recheck`. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r_closure_gate.py --write-report` -> `data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.99",
@@ -15662,8 +15663,8 @@
     {
       "id": "BT93S2R.99.3",
       "type": "subphase",
-      "title": "Jeder rote Ausgang oeffnet keinen bestehenden Folgeblock.",
-      "status": "open",
+      "title": "Jeder rote Ausgang oeffnet keinen bestehenden Folgeblock. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r_closure_gate.py --write-report` -> `data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.99",
@@ -15673,8 +15674,8 @@
     {
       "id": "BT93S2R.99.4",
       "type": "subphase",
-      "title": "Abschluss-Gate: `npm.cmd run gates:pre-commit`.",
-      "status": "open",
+      "title": "Abschluss-Gate: `npm.cmd run gates:pre-commit`. (abgeschlossen: 2026-05-01; evidence: `npm.cmd run gates:pre-commit` -> all steps passed)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R",
         "phaseCode": "93S2R.99",
@@ -39494,7 +39495,8 @@
           "BT92",
           "BT93B",
           "BT93D",
-          "BT93E"
+          "BT93E",
+          "BT93S2R"
         ],
         "exists": true
       }
@@ -139936,6 +139938,15 @@
     {
       "from": "BT93S2R",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R",
+      "to": "python/scripts/bt93s2r_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
