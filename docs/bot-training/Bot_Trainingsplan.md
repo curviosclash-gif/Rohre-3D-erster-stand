@@ -426,7 +426,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93S2 | 2026-05-01 | frei | `BT93S2.3-Recheck` abgeschlossen als `measurement-invalid`; `93S2.4` bleibt blockiert, Reentry-Intake erforderlich |
 | Bot-Codex | BT93S2R | 2026-04-30 | frei | abgeschlossen 2026-05-01 als `matrix-control-reentry-green`; oeffnet nur `BT93S2.3-Recheck` |
 | Bot-Codex | BT93S2R2 | 2026-05-01 | frei | abgeschlossen 2026-05-01 als `measurement-invalid`; `opensNext=[]`, enger Folge-Replan erforderlich |
-| - | BT93S2R3 | - | frei | enger Folge-Replan aufgenommen; naechster `/fix-planung`-Scope, oeffnet maximal `BT93S2.3-Recheck` |
+| Bot-Codex | BT93S2R3 | 2026-05-01 | claimed | 93S2R3.1 Source-Lock und Failure-Ledger |
 | - | BT93T | - | frei | blockiert, bis S2-Recheck nach allen Reentries `observation-telemetry-required` schreibt |
 | - | BT93U | - | frei | wartet auf frisches BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck nach allen Reentries |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -4162,7 +4162,7 @@ Evidence:
 
 Quelle: `docs/plaene/neu/BT93S2R3_Predicate_Window_Env_Measurement_Reentry_Intake_2026-05-01.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-05-01 -->
 
 Scope:
 
