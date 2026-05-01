@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 431,
+          "concreteCount": 433,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 569,
+          "concreteCount": 571,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 427,
+          "concreteCount": 429,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 426,
+          "concreteCount": 428,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1068,
+          "concreteCount": 1070,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1076,
+          "concreteCount": 1078,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1909,7 +1909,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2R3.1",
+        "currentPhase": "93S2R3.2",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2r3/bt93s2r3_closure_gate_report.json",
           "data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json",
@@ -1917,11 +1917,12 @@
           "data/training/ppo/bt93s2r3/failure_ledger_report.json",
           "data/training/ppo/bt93s2r3/replay_predicate_window_preflight.json",
           "docs/bot-training/Bot_Trainingsplan.md",
-          "docs/Fehlerberichte/2026-05-01_bt93s2r3_measurement_reentry_required.md"
+          "docs/Fehlerberichte/2026-05-01_bt93s2r3_measurement_reentry_required.md",
+          "python/scripts/bt93s2r3_failure_ledger.py"
         ],
         "scopeResolution": {
-          "concreteCount": 1,
-          "plannedCount": 6
+          "concreteCount": 4,
+          "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5539,7 +5540,7 @@
       "id": "BT93S2R3.1",
       "type": "phase",
       "title": "Source-Lock und Failure-Ledger",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.1"
@@ -15983,8 +15984,8 @@
     {
       "id": "BT93S2R3.1.1",
       "type": "subphase",
-      "title": "Alle S2R2/S2R/S2-Quellen mit Hash, ResultClass, Count-Snapshot, Git-SHA und Lineage-Feldern locken.",
-      "status": "open",
+      "title": "Alle S2R2/S2R/S2-Quellen mit Hash, ResultClass, Count-Snapshot, Git-SHA und Lineage-Feldern locken. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r3_failure_ledger.py --write-report` -> `data/training/ppo/bt93s2r3/failure_ledger_report.json`, `sourceFilesReady=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.1",
@@ -15994,8 +15995,8 @@
     {
       "id": "BT93S2R3.1.2",
       "type": "subphase",
-      "title": "Jede der 103 Taxonomy-Failure-Rows in ein Ledger mit Scenario, Seed, Action, Primaerklasse, Sekundaerklasse, Retained-v2-Status, Direction-Erwartung und Replay-Key normalisieren.",
-      "status": "open",
+      "title": "Jede der 103 Taxonomy-Failure-Rows in ein Ledger mit Scenario, Seed, Action, Primaerklasse, Sekundaerklasse, Retained-v2-Status, Direction-Erwartung und Replay-Key normalisieren. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r3_failure_ledger.py --write-report` -> `data/training/ppo/bt93s2r3/failure_ledger_report.json`, `failureLedgerRowCount=103`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.1",
@@ -16005,8 +16006,8 @@
     {
       "id": "BT93S2R3.1.3",
       "type": "subphase",
-      "title": "Fehlerbericht `docs/Fehlerberichte/2026-05-01_bt93s2r3_measurement_reentry_required.md` mit Befundmatrix und No-Go-Status schreiben.",
-      "status": "open",
+      "title": "Fehlerbericht `docs/Fehlerberichte/2026-05-01_bt93s2r3_measurement_reentry_required.md` mit Befundmatrix und No-Go-Status schreiben. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r3_failure_ledger.py --write-report` -> `docs/Fehlerberichte/2026-05-01_bt93s2r3_measurement_reentry_required.md`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.1",
@@ -31762,9 +31763,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R3"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -33326,7 +33333,7 @@
         "scopeBlocks": [
           "BT93S2R3"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -40402,6 +40409,27 @@
           "BT93D",
           "BT93E",
           "BT93S2R2"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r3_failure_ledger.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R3"
         ],
         "exists": true
       }
@@ -77981,6 +78009,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -79620,6 +79657,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r3_failure_ledger.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -82057,6 +82103,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -83678,6 +83733,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r3_failure_ledger.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -87313,6 +87377,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -88943,6 +89016,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r3_failure_ledger.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91679,6 +91761,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -93309,6 +93400,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r3_failure_ledger.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -102449,6 +102549,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -104079,6 +104188,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r3_failure_ledger.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -112394,6 +112512,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93x/early_comparator_preflight_report.json",
       "type": "scope",
       "hint": null,
@@ -114033,6 +114160,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r3_failure_ledger.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -141990,6 +142126,15 @@
     {
       "from": "BT93S2R3",
       "to": "docs/Fehlerberichte/2026-05-01_bt93s2r3_measurement_reentry_required.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R3",
+      "to": "python/scripts/bt93s2r3_failure_ledger.py",
       "type": "scope",
       "hint": null,
       "attributes": {
