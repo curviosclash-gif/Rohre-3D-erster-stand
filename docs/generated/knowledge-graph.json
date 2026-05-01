@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 429,
+          "concreteCount": 431,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 567,
+          "concreteCount": 569,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 425,
+          "concreteCount": 427,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 424,
+          "concreteCount": 426,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1066,
+          "concreteCount": 1068,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1074,
+          "concreteCount": 1076,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1868,7 +1868,7 @@
       "id": "BT93S2R2",
       "type": "block",
       "title": "Predicate-/Window-Reentry nach rotem S2.3-Recheck",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "source": [
           "bot-training-plan"
@@ -1884,13 +1884,14 @@
           "data/training/ppo/bt93s2r2/predicate_window_repair_contract.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/Fehlerberichte/2026-05-01_bt93s2r2_recheck_measurement_invalid.md",
+          "python/scripts/bt93s2r2_closure_gate.py",
           "python/scripts/bt93s2r2_empirical_reentry_gate.py",
           "python/scripts/bt93s2r2_failure_taxonomy.py",
           "python/scripts/bt93s2r2_predicate_window_repair.py"
         ],
         "scopeResolution": {
-          "concreteCount": 8,
-          "plannedCount": 1
+          "concreteCount": 10,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5498,7 +5499,7 @@
       "id": "BT93S2R2.99",
       "type": "phase",
       "title": "Abschluss",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R2",
         "phaseCode": "93S2R2.99"
@@ -15858,8 +15859,8 @@
     {
       "id": "BT93S2R2.99.1",
       "type": "subphase",
-      "title": "Closure schreibt genau eine Resultklasse: `matrix-control-reentry-green`, `predicate-window-required`, `escape-control-required`, `neutral-control-required`, `measurement-invalid`.",
-      "status": "open",
+      "title": "Closure schreibt genau eine Resultklasse: `matrix-control-reentry-green`, `predicate-window-required`, `escape-control-required`, `neutral-control-required`, `measurement-invalid`. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_closure_gate.py --write-report` -> `data/training/ppo/bt93s2r2/bt93s2r2_closure_gate_report.json`, `resultClass=measurement-invalid`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R2",
         "phaseCode": "93S2R2.99",
@@ -15869,8 +15870,8 @@
     {
       "id": "BT93S2R2.99.2",
       "type": "subphase",
-      "title": "Closure schreibt `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SampleCounts, SourceArtifacts und Invalidations.",
-      "status": "open",
+      "title": "Closure schreibt `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SampleCounts, SourceArtifacts und Invalidations. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_closure_gate.py --write-report` -> `data/training/ppo/bt93s2r2/bt93s2r2_closure_gate_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R2",
         "phaseCode": "93S2R2.99",
@@ -15880,8 +15881,8 @@
     {
       "id": "BT93S2R2.99.3",
       "type": "subphase",
-      "title": "Kein BT93T/U/W/O/P/94A-, Candidate-, Freeze-, Holdout-, Promote-, Rollout-, PPO-Validate- oder BT95-Signal.",
-      "status": "open",
+      "title": "Kein BT93T/U/W/O/P/94A-, Candidate-, Freeze-, Holdout-, Promote-, Rollout-, PPO-Validate- oder BT95-Signal. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r2_closure_gate.py --write-report` -> `data/training/ppo/bt93s2r2/bt93s2r2_closure_gate_report.json`, `claimFlags.*Allowed=false`, `opensNext=[]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R2",
         "phaseCode": "93S2R2.99",
@@ -15891,8 +15892,8 @@
     {
       "id": "BT93S2R2.99.4",
       "type": "subphase",
-      "title": "Abschluss-Gate: `npm.cmd run gates:pre-commit`.",
-      "status": "open",
+      "title": "Abschluss-Gate: `npm.cmd run gates:pre-commit`. (abgeschlossen: 2026-05-01; evidence: `npm.cmd run gates:pre-commit` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R2",
         "phaseCode": "93S2R2.99",
@@ -31376,9 +31377,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R2"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -39949,6 +39956,27 @@
           "BT93D",
           "BT93E",
           "BT93S2R"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r2_closure_gate.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R2"
         ],
         "exists": true
       }
@@ -77555,6 +77583,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r2/bt93s2r2_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json",
       "type": "scope",
       "hint": null,
@@ -79185,6 +79222,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r2_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -81613,6 +81659,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r2/bt93s2r2_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json",
       "type": "scope",
       "hint": null,
@@ -83225,6 +83280,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r2_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -86851,6 +86915,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r2/bt93s2r2_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json",
       "type": "scope",
       "hint": null,
@@ -88472,6 +88545,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r2_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91199,6 +91281,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r2/bt93s2r2_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json",
       "type": "scope",
       "hint": null,
@@ -92820,6 +92911,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r2_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -101951,6 +102051,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r2/bt93s2r2_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json",
       "type": "scope",
       "hint": null,
@@ -103572,6 +103681,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r2_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -111878,6 +111996,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r2/bt93s2r2_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json",
       "type": "scope",
       "hint": null,
@@ -113508,6 +113635,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r_targeted_trace_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r2_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -141200,6 +141336,15 @@
     {
       "from": "BT93S2R2",
       "to": "docs/Fehlerberichte/2026-05-01_bt93s2r2_recheck_measurement_invalid.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R2",
+      "to": "python/scripts/bt93s2r2_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {

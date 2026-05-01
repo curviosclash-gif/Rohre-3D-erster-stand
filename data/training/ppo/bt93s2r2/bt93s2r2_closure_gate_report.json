@@ -1,0 +1,442 @@
+{
+  "actionSurfaceId": "bt93q-walltrail-semantic-action-v1",
+  "activeBlockers": [
+    "direction-contract-mismatch",
+    "escape-right-fairness-required",
+    "measurement-invalid",
+    "neutral-control-required",
+    "predicate-window-required",
+    "retained-v2-measurement-invalid"
+  ],
+  "allowNext": [
+    "Stop: no fresh BT93S2.3-Recheck or 93S2.4; create/claim a narrower Predicate-/Window-/Env-measurement follow-up"
+  ],
+  "blockId": "BT93S2R2",
+  "blockingStatus": {
+    "bt93oStartDecision": "blocked",
+    "bt93pStartDecision": "blocked",
+    "bt93s2FreshRecheckDecision": "blocked",
+    "bt93s2Phase4StartDecision": "blocked",
+    "bt93tStartDecision": "blocked",
+    "bt93uStartDecision": "blocked",
+    "bt93vStartDecision": "blocked",
+    "bt93wStartDecision": "blocked",
+    "bt93xFullStartDecision": "blocked",
+    "bt94aStartDecision": "blocked",
+    "bt95HandoffDecision": "blocked",
+    "candidateFreezePromoteRolloutDecision": "blocked",
+    "ppoValidateDecision": "blocked"
+  },
+  "blocksNext": [
+    "BT93S2.3-Recheck before BT93S2R2.99 green closure",
+    "93S2.4 start before fresh BT93S2.3-Recheck writes measurementValid=true",
+    "BT93T claim before fresh S2-Recheck opens only observation telemetry",
+    "BT93U claim before fresh S2-Recheck opens action-selection-green",
+    "BT93V claim",
+    "BT93W claim",
+    "BT93O claim",
+    "BT93X full claim",
+    "BT93P claim",
+    "BT94A claim",
+    "candidate run",
+    "freeze candidate",
+    "holdout consumption",
+    "promote",
+    "rollout",
+    "PPO-Validate signal",
+    "BT95 handoff signal",
+    "productive runtime integration",
+    "PPO training",
+    "50k/100k/200k/500k/1M extension",
+    "reward fix from BT93S2R2.99",
+    "telemetry fix from BT93S2R2.99",
+    "action-surface change from BT93S2R2.99"
+  ],
+  "claimFlags": {
+    "actionSurfaceChangeAllowed": false,
+    "bt93oClaimable": false,
+    "bt93pClaimable": false,
+    "bt93s2FreshRecheckAllowed": false,
+    "bt93s2FreshRecheckOnlyNext": false,
+    "bt93tClaimable": false,
+    "bt93uClaimable": false,
+    "bt93vClaimable": false,
+    "bt93wClaimable": false,
+    "bt93xFullClaimAllowed": false,
+    "bt94aClaimable": false,
+    "bt95HandoffAllowed": false,
+    "candidateRunsAllowed": false,
+    "freezeAllowed": false,
+    "holdoutAllowed": false,
+    "phase93S2_4Allowed": false,
+    "ppoTrainingAllowed": false,
+    "ppoValidateSignalAllowed": false,
+    "promoteAllowed": false,
+    "rewardChangeAllowed": false,
+    "rolloutAllowed": false,
+    "runtimeChangeAllowed": false,
+    "telemetryChangeAllowed": false
+  },
+  "classResultCounts": {
+    "action-effect-weak": 1,
+    "existing-action-effect-observed": 7,
+    "neutral-control-unstable": 1
+  },
+  "commands": {
+    "metaGate": "npm.cmd run gates:pre-commit",
+    "tests": "user-owned except closure gate scripts",
+    "write": "python python/scripts/bt93s2r2_closure_gate.py --write-report"
+  },
+  "contractId": "bt93s2r-walltrail-action-effect-window-v3",
+  "decoderHash": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+  "dodCoverage": {
+    "DoD.S2R2-8": true,
+    "DoD.S2R2-9": "covered-by-external-meta-gate"
+  },
+  "gatePassed": false,
+  "generatedAt": "2026-05-01T13:08:08Z",
+  "generatedBy": "python/scripts/bt93s2r2_closure_gate.py",
+  "git": {
+    "branch": "bot-training",
+    "mergeBaseOriginBotTraining": "e3067a07abbb4ed2fe9020d9c78fca9df137f303",
+    "sha": "fe3626d387c0e18580305204ccf6baca9636f3d4",
+    "statusShort": [
+      "?? python/scripts/bt93s2r2_closure_gate.py"
+    ]
+  },
+  "guardrails": {
+    "actionSurfaceChanged": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "newEvalRunStarted": false,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "ppoTrainingStarted": false,
+    "productiveRuntimeChanged": false,
+    "qualityClaimAllowed": false,
+    "rewardFixApplied": false,
+    "runtimeSurfacesTouched": [],
+    "telemetryFixApplied": false,
+    "trainingStarted": false
+  },
+  "invalidations": [
+    {
+      "active": true,
+      "reason": "Only a green BT93S2R2 closure may open a fresh Recheck; this closure is red.",
+      "scope": "BT93S2.3-Recheck"
+    },
+    {
+      "active": true,
+      "reason": "93S2.4 remains closed until a later fresh BT93S2.3-Recheck writes measurementValid=true.",
+      "scope": "93S2.4 normal continuation"
+    },
+    {
+      "active": true,
+      "reason": "BT93S2R2 is measurement-validity evidence only and cannot open downstream quality, reward, telemetry, safety, runtime or promotion paths.",
+      "scope": "BT93T/U/W/O/X/P/94A and candidate/freeze/holdout/promote/rollout/PPO-Validate/BT95"
+    }
+  ],
+  "matrixId": "bt93s2r-walltrail-action-effect-matrix-v3",
+  "ok": true,
+  "opensNext": [],
+  "phaseCoverage": {
+    "93S2R2.99.1": true,
+    "93S2R2.99.2": true,
+    "93S2R2.99.3": true,
+    "93S2R2.99.4": true
+  },
+  "phaseId": "93S2R2.99",
+  "recommendations": [
+    {
+      "action": "Do not start BT93S2.3-Recheck, 93S2.4, BT93T, BT93U, BT93W, BT93O, BT93P or BT94A.",
+      "rank": "1",
+      "why": "BT93S2R2.99 closes red as measurement-invalid; the empirical gate still has non-zero measurement blockers."
+    },
+    {
+      "action": "Prepare a narrow follow-up replan for predicate/window replay validity, direction contract, retained-v2 invalidations, escape-right fairness and neutral control.",
+      "rank": "2",
+      "why": "The remaining failures are still measurement validity failures, not PPO quality, reward ordering, telemetry need, or candidate evidence."
+    }
+  ],
+  "repairContractId": "bt93s2r2-predicate-window-repair-contract-v1",
+  "reportHash": "496b59812edebb85d613c4ff37de8a048f228dcf80aaaae17abf1268b30b57c1",
+  "resultClass": "measurement-invalid",
+  "sampleCounts": {
+    "actionCount": 13,
+    "directionMismatchCount": 24,
+    "escapeRightFairnessFailureCount": 1,
+    "holdoutEpisodes": 0,
+    "measurementInvalidCount": 49,
+    "minimumWindowFailureCount": 11,
+    "negativeControlFailedCount": 0,
+    "neutralControlRequiredCount": 1,
+    "newOptimizerUpdates": 0,
+    "newTrainingEpisodes": 0,
+    "predicateFailureCount": 39,
+    "probeCount": 338,
+    "retainedV2MeasurementInvalidCount": 28,
+    "scenarioCount": 9,
+    "sourceProbeCount": 338,
+    "taxonomyFailureRowCount": 103
+  },
+  "schemaVersion": "bt93s2r2-closure-gate-report-v1",
+  "sourceArtifacts": [
+    {
+      "actualFields": {
+        "blockId": "BT93S2",
+        "ok": false,
+        "phaseId": "93S2.3-Recheck",
+        "resultClass": "measurement-invalid",
+        "sampleCounts.minimumWindowFailureCount": 8,
+        "sampleCounts.predicateFailureCount": 36
+      },
+      "blockId": "BT93S2",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2",
+        "ok": false,
+        "phaseId": "93S2.3-Recheck",
+        "resultClass": "measurement-invalid",
+        "sampleCounts.minimumWindowFailureCount": 8,
+        "sampleCounts.predicateFailureCount": 36
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": false,
+      "path": "data/training/ppo/bt93s2/existing_action_effect_v3_recheck_report.json",
+      "phaseId": "93S2.3-Recheck",
+      "required": true,
+      "resultClass": "measurement-invalid",
+      "role": "red BT93S2.3-Recheck source",
+      "schemaVersion": "bt93s2-existing-action-effect-v3-recheck-report-v1",
+      "sha256": "b7f2f74def84beb958c6164e7084aadfd528237760ee7fb8b41660a2ba698537",
+      "sizeBytes": 3720368,
+      "sourceKey": "redRecheck",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2R",
+        "ok": true,
+        "phaseId": "93S2R.99",
+        "resultClass": "matrix-control-reentry-green"
+      },
+      "blockId": "BT93S2R",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2R",
+        "ok": true,
+        "phaseId": "93S2R.99",
+        "resultClass": "matrix-control-reentry-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2r/bt93s2r_closure_gate_report.json",
+      "phaseId": "93S2R.99",
+      "required": true,
+      "resultClass": "matrix-control-reentry-green",
+      "role": "BT93S2R green source closure",
+      "schemaVersion": "bt93s2r-closure-gate-report-v1",
+      "sha256": "f75d93a843dac054a676ed9f622e5739a4e79828acbbfd651558a8315aa73a15",
+      "sizeBytes": 13322,
+      "sourceKey": "s2rClosure",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2R2",
+        "ok": true,
+        "phaseId": "93S2R2.1",
+        "resultClass": "failure-taxonomy-source-lock-red-status-written"
+      },
+      "blockId": "BT93S2R2",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2R2",
+        "ok": true,
+        "phaseId": "93S2R2.1",
+        "resultClass": "failure-taxonomy-source-lock-red-status-written"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2r2/failure_taxonomy_report.json",
+      "phaseId": "93S2R2.1",
+      "required": true,
+      "resultClass": "failure-taxonomy-source-lock-red-status-written",
+      "role": "BT93S2R2.1 failure taxonomy",
+      "schemaVersion": 1,
+      "sha256": "846abd86692a08407c6354e1038f8650d0e1f280bfdaf8a80aca2c77e519f647",
+      "sizeBytes": 262446,
+      "sourceKey": "failureTaxonomy",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2R2",
+        "ok": true,
+        "phaseId": "93S2R2.2",
+        "resultClass": "predicate-window-repair-contract-green"
+      },
+      "blockId": "BT93S2R2",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2R2",
+        "ok": true,
+        "phaseId": "93S2R2.2",
+        "resultClass": "predicate-window-repair-contract-green"
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93s2r2/predicate_window_repair_contract.json",
+      "phaseId": "93S2R2.2",
+      "required": true,
+      "resultClass": "predicate-window-repair-contract-green",
+      "role": "BT93S2R2.2 predicate/window repair contract",
+      "schemaVersion": "bt93s2r2-predicate-window-repair-contract-v1",
+      "sha256": "1347893998c73af94e8171584e24b8c0a7347cdd216670db113a77dd58d4109e",
+      "sizeBytes": 392433,
+      "sourceKey": "predicateWindowRepair",
+      "tracked": true
+    },
+    {
+      "actualFields": {
+        "blockId": "BT93S2R2",
+        "phaseId": "93S2R2.3",
+        "resultClass": "measurement-invalid",
+        "sampleCounts.holdoutEpisodes": 0,
+        "sampleCounts.newTrainingEpisodes": 0
+      },
+      "blockId": "BT93S2R2",
+      "exists": true,
+      "expectedFields": {
+        "blockId": "BT93S2R2",
+        "phaseId": "93S2R2.3",
+        "resultClass": [
+          "escape-control-required",
+          "matrix-control-reentry-green",
+          "measurement-invalid",
+          "neutral-control-required",
+          "predicate-window-required"
+        ],
+        "sampleCounts.holdoutEpisodes": 0,
+        "sampleCounts.newTrainingEpisodes": 0
+      },
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": false,
+      "path": "data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json",
+      "phaseId": "93S2R2.3",
+      "required": true,
+      "resultClass": "measurement-invalid",
+      "role": "BT93S2R2.3 empirical reentry gate",
+      "schemaVersion": "bt93s2r2-empirical-reentry-gate-v1",
+      "sha256": "0ba311bf779ed66b7bfa2706b3431d8a1c2edbc35b77cd9247dd32aed31de177",
+      "sizeBytes": 4520260,
+      "sourceKey": "empiricalReentryGate",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/envs/ppo_action_surface.py",
+      "phaseId": null,
+      "required": true,
+      "resultClass": null,
+      "role": "read-only PPO action-surface decoder",
+      "schemaVersion": null,
+      "sha256": "970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9",
+      "sizeBytes": 22887,
+      "sourceKey": "actionSurface",
+      "tracked": true
+    },
+    {
+      "actualFields": {},
+      "blockId": null,
+      "exists": true,
+      "expectedFields": {},
+      "expectedOk": true,
+      "fresh": true,
+      "isFile": true,
+      "ok": null,
+      "path": "python/scripts/bt93s2r2_closure_gate.py",
+      "phaseId": null,
+      "required": false,
+      "resultClass": null,
+      "role": "BT93S2R2.99 closure generator",
+      "schemaVersion": null,
+      "sha256": "83bd501571b27bb383f1ae42bf754648cad1de0c40e3f44772db3f72a21f42c7",
+      "sizeBytes": 24851,
+      "sourceKey": "closureScript",
+      "tracked": false
+    }
+  ],
+  "sourceFilesReady": true,
+  "sourceFilesVersioned": true,
+  "sourceGate": {
+    "allowNext": [
+      "93S2R2.99 Abschluss"
+    ],
+    "gatePassed": false,
+    "ok": false,
+    "opensNext": [],
+    "path": "data/training/ppo/bt93s2r2/empirical_reentry_gate_report.json",
+    "resultClass": "measurement-invalid",
+    "zeroCountGateGreen": false
+  },
+  "sourceResultClasses": {
+    "closureScript": null,
+    "empiricalReentryGate": "measurement-invalid",
+    "failureTaxonomy": "failure-taxonomy-source-lock-red-status-written",
+    "predicateWindowRepair": "predicate-window-repair-contract-green",
+    "redRecheck": "measurement-invalid",
+    "s2rClosure": "matrix-control-reentry-green"
+  },
+  "summary": {
+    "blockersRemain": [
+      "direction-contract-mismatch",
+      "escape-right-fairness-required",
+      "measurement-invalid",
+      "neutral-control-required",
+      "predicate-window-required",
+      "retained-v2-measurement-invalid"
+    ],
+    "bt93s2r2ClosedGreen": false,
+    "bt93s2r2ClosedRed": true,
+    "empiricalCounts": {
+      "actionCount": 13,
+      "directionMismatchCount": 24,
+      "escapeRightFairnessFailureCount": 1,
+      "holdoutEpisodes": 0,
+      "measurementInvalidCount": 49,
+      "minimumWindowFailureCount": 11,
+      "negativeControlFailedCount": 0,
+      "neutralControlRequiredCount": 1,
+      "newOptimizerUpdates": 0,
+      "newTrainingEpisodes": 0,
+      "predicateFailureCount": 39,
+      "probeCount": 338,
+      "retainedV2MeasurementInvalidCount": 28,
+      "scenarioCount": 9,
+      "sourceProbeCount": 338,
+      "taxonomyFailureRowCount": 103
+    },
+    "finalResult": "measurement-invalid",
+    "nextBestAction": "Stop: no fresh BT93S2.3-Recheck or 93S2.4; create/claim a narrower Predicate-/Window-/Env-measurement follow-up"
+  }
+}
