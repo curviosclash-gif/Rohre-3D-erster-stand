@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 441,
+          "concreteCount": 443,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 579,
+          "concreteCount": 581,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 437,
+          "concreteCount": 439,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 436,
+          "concreteCount": 438,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1078,
+          "concreteCount": 1080,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1086,
+          "concreteCount": 1088,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1941,7 +1941,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2R4.4",
+        "currentPhase": "93S2R4.5",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2r4/bt93s2r4_closure_gate_report.json",
           "data/training/ppo/bt93s2r4/deterministic_reset_repair_report.json",
@@ -1950,16 +1950,18 @@
           "data/training/ppo/bt93s2r4/replay_identity_contract.json",
           "data/training/ppo/bt93s2r4/replay_root_cause_audit.json",
           "docs/bot-training/Bot_Trainingsplan.md",
+          "docs/Fehlerberichte/2026-05-01_bt93s2r4_predicate_window_required.md",
           "docs/Fehlerberichte/2026-05-01_bt93s2r4_replay_determinism_required.md",
           "python/envs/curvios_env.py",
           "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+          "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
           "python/scripts/bt93s2r4_replay_identity_contract.py",
           "python/scripts/bt93s2r4_replay_root_cause_audit.py",
           "scripts/training-headless-lane-runner.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 10,
-          "plannedCount": 3
+          "concreteCount": 13,
+          "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5657,7 +5659,7 @@
       "id": "BT93S2R4.4",
       "type": "phase",
       "title": "Predicate-/Window-Recheck auf stabiler Replay-Basis",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.4"
@@ -16356,8 +16358,8 @@
     {
       "id": "BT93S2R4.4.1",
       "type": "subphase",
-      "title": "Predicate-Ausdruck und Predicate-Funktion erst nach gruenem Replay-Repeat-Gate neu messen.",
-      "status": "open",
+      "title": "Predicate-Ausdruck und Predicate-Funktion erst nach gruenem Replay-Repeat-Gate neu messen. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r4_predicate_window_stable_replay.py --write-report` -> `data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.4",
@@ -16367,8 +16369,8 @@
     {
       "id": "BT93S2R4.4.2",
       "type": "subphase",
-      "title": "Minimum-Window und `measurementInvalidBeforeAction` auf allen 103 Rows neu zaehlen.",
-      "status": "open",
+      "title": "Minimum-Window und `measurementInvalidBeforeAction` auf allen 103 Rows neu zaehlen. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r4_predicate_window_stable_replay.py --write-report` -> `data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.4",
@@ -16378,8 +16380,8 @@
     {
       "id": "BT93S2R4.4.3",
       "type": "subphase",
-      "title": "Gruen verlangt `predicateFailureCount=0`, `minimumWindowFailureCount=0`, `measurementInvalidBeforeActionCount=0`, `warmupTerminalBeforeActionCount=0`.",
-      "status": "open",
+      "title": "Gruen verlangt `predicateFailureCount=0`, `minimumWindowFailureCount=0`, `measurementInvalidBeforeActionCount=0`, `warmupTerminalBeforeActionCount=0`; aktuelles Ergebnis ist rot mit `predicateFailureCount=33`, `measurementInvalidBeforeActionCount=33`, `opensNext=[]`. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r4_predicate_window_stable_replay.py --write-report` -> `data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R4",
         "phaseCode": "93S2R4.4",
@@ -32162,9 +32164,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R4"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -33753,6 +33761,21 @@
         ],
         "scopeBlocks": [
           "BT93S2R3"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/Fehlerberichte/2026-05-01_bt93s2r4_predicate_window_required.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R4"
         ],
         "exists": true
       }
@@ -40909,6 +40932,27 @@
     },
     {
       "id": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R4"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -78573,6 +78617,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
       "type": "scope",
       "hint": null,
@@ -80257,6 +80310,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -82739,6 +82801,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
       "type": "scope",
       "hint": null,
@@ -84405,6 +84476,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88085,6 +88165,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
       "type": "scope",
       "hint": null,
@@ -89760,6 +89849,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -92541,6 +92639,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
       "type": "scope",
       "hint": null,
@@ -94216,6 +94323,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -103401,6 +103517,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
       "type": "scope",
       "hint": null,
@@ -105076,6 +105201,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -113436,6 +113570,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
       "type": "scope",
       "hint": null,
@@ -115120,6 +115263,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -143420,6 +143572,15 @@
     },
     {
       "from": "BT93S2R4",
+      "to": "docs/Fehlerberichte/2026-05-01_bt93s2r4_predicate_window_required.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R4",
       "to": "docs/Fehlerberichte/2026-05-01_bt93s2r4_replay_determinism_required.md",
       "type": "scope",
       "hint": null,
@@ -143439,6 +143600,15 @@
     {
       "from": "BT93S2R4",
       "to": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R4",
+      "to": "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
       "type": "scope",
       "hint": null,
       "attributes": {

@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2542,
-    "rawCoveredFileCount": 2060,
-    "rawCoveragePercent": 81,
-    "adjustedTrackedFileCount": 1639,
-    "adjustedCoveredFileCount": 1401,
+    "trackedFileCount": 2545,
+    "rawCoveredFileCount": 2063,
+    "rawCoveragePercent": 81.1,
+    "adjustedTrackedFileCount": 1642,
+    "adjustedCoveredFileCount": 1404,
     "adjustedCoveragePercent": 85.5,
     "uncoveredFileCount": 482,
     "uncoveredActiveFileCount": 238,
@@ -177,20 +177,20 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 308,
-        "coveredCount": 287
+        "count": 309,
+        "coveredCount": 288
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 923,
-        "coveredCount": 907
+        "count": 924,
+        "coveredCount": 908
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 381,
-        "coveredCount": 193
+        "count": 382,
+        "coveredCount": 194
       },
       {
         "classification": "prototype",
@@ -9008,6 +9008,29 @@
       "excludeReason": null
     },
     {
+      "path": "data/training/ppo/bt93s2r4/predicate_window_stable_replay_report.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R4"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/training/ppo/bt93s2r4/replay_identity_contract.json",
       "tracked": true,
       "coveredInCore": true,
@@ -12548,6 +12571,23 @@
       ],
       "scopeBlocks": [
         "BT93S2R3"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/Fehlerberichte/2026-05-01_bt93s2r4_predicate_window_required.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT93S2R4"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -21114,6 +21154,29 @@
     },
     {
       "path": "python/scripts/bt93s2r4_deterministic_reset_repair.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R4"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93s2r4_predicate_window_stable_replay.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
