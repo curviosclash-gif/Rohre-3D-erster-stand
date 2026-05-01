@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 451,
+          "concreteCount": 453,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 589,
+          "concreteCount": 591,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 447,
+          "concreteCount": 449,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 446,
+          "concreteCount": 448,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1088,
+          "concreteCount": 1090,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1096,
+          "concreteCount": 1098,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1971,7 +1971,7 @@
       "id": "BT93S2R5",
       "type": "block",
       "title": "Predicate-/PreAction-Validity Repair nach rotem S2R4.4",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "source": [
           "bot-training-plan"
@@ -1988,14 +1988,15 @@
           "data/training/ppo/bt93s2r5/predicate_preaction_repair_report.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md",
+          "python/scripts/bt93s2r5_closure_gate.py",
           "python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py",
           "python/scripts/bt93s2r5_predicate_preaction_failure_ledger.py",
           "python/scripts/bt93s2r5_predicate_preaction_repair_contract.py",
           "python/scripts/bt93s2r5_predicate_preaction_repair.py"
         ],
         "scopeResolution": {
-          "concreteCount": 10,
-          "plannedCount": 1
+          "concreteCount": 12,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5763,7 +5764,7 @@
       "id": "BT93S2R5.99",
       "type": "phase",
       "title": "Closure",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.99"
@@ -16706,8 +16707,8 @@
     {
       "id": "BT93S2R5.99.1",
       "type": "subphase",
-      "title": "Closure schreibt genau eine Resultklasse: `predicate-window-repair-green`, `predicate-contract-required`, `seed-startstate-required`, `warmup-contract-required`, `neutral-control-contract-required`, `escape-right-fairness-predicate-required`, `metric-sampling-contract-required`, `scenario-contract-unrepairable`, `action-surface-lineage-invalidated` oder `measurement-invalid`.",
-      "status": "open",
+      "title": "Closure schreibt genau eine Resultklasse: `predicate-window-repair-green`, `predicate-contract-required`, `seed-startstate-required`, `warmup-contract-required`, `neutral-control-contract-required`, `escape-right-fairness-predicate-required`, `metric-sampling-contract-required`, `scenario-contract-unrepairable`, `action-surface-lineage-invalidated` oder `measurement-invalid`. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r5_closure_gate.py --write-report` -> `data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json`, `resultClass=predicate-window-repair-green`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.99",
@@ -16717,8 +16718,8 @@
     {
       "id": "BT93S2R5.99.2",
       "type": "subphase",
-      "title": "Closure schreibt `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SourceArtifacts, SampleCounts, Invalidations und klare NextAllowedActions.",
-      "status": "open",
+      "title": "Closure schreibt `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SourceArtifacts, SampleCounts, Invalidations und klare NextAllowedActions. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r5_closure_gate.py --write-report` -> `data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json`, `phaseCoverage.93S2R5.99.2=true`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.99",
@@ -16728,8 +16729,8 @@
     {
       "id": "BT93S2R5.99.3",
       "type": "subphase",
-      "title": "Gruen oeffnet nur `93S2R4.5`; jede rote Resultklasse oeffnet nichts.",
-      "status": "open",
+      "title": "Gruen oeffnet nur `93S2R4.5`; jede rote Resultklasse oeffnet nichts. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r5_closure_gate.py --write-report` -> `data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json`, `opensNext=[\"93S2R4.5\"]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.99",
@@ -16739,8 +16740,8 @@
     {
       "id": "BT93S2R5.99.4",
       "type": "subphase",
-      "title": "Abschluss-Gate: `npm.cmd run gates:pre-commit`.",
-      "status": "open",
+      "title": "Abschluss-Gate: `npm.cmd run gates:pre-commit`. (abgeschlossen: 2026-05-01; evidence: `npm.cmd run gates:pre-commit` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.99",
@@ -32509,9 +32510,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R5"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -41422,6 +41429,27 @@
           "BT93D",
           "BT93E",
           "BT93S2R4"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r5_closure_gate.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R5"
         ],
         "exists": true
       }
@@ -79140,6 +79168,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
       "type": "scope",
       "hint": null,
@@ -80869,6 +80906,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r5_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83396,6 +83442,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
       "type": "scope",
       "hint": null,
@@ -85107,6 +85162,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r5_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88832,6 +88896,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
       "type": "scope",
       "hint": null,
@@ -90552,6 +90625,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r5_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -93378,6 +93460,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
       "type": "scope",
       "hint": null,
@@ -95098,6 +95189,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r5_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -104328,6 +104428,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
       "type": "scope",
       "hint": null,
@@ -106048,6 +106157,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r5_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -114453,6 +114571,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json",
       "type": "scope",
       "hint": null,
@@ -116182,6 +116309,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r4_replay_root_cause_audit.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r5_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -144886,6 +145022,15 @@
     {
       "from": "BT93S2R5",
       "to": "docs/Fehlerberichte/2026-05-01_bt93s2r5_predicate_preaction_required.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R5",
+      "to": "python/scripts/bt93s2r5_closure_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {

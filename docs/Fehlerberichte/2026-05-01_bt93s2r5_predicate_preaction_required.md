@@ -139,3 +139,30 @@ Evidence:
 - `data/training/ppo/bt93s2r5/predicate_preaction_empirical_gate.json`
 - Command: `python python/scripts/bt93s2r5_predicate_preaction_empirical_gate.py --write-report`
 <!-- BT93S2R5.4-END -->
+
+<!-- BT93S2R5.99-START -->
+## 93S2R5.99 Closure
+
+- Result: `resultClass=predicate-window-repair-green`, `ok=True`, `gatePassed=True`
+- Rows/Repeats: `103` x `3` = `309`
+- Repaired Rows: `33`
+- Predicate/PreAction/Window/Warmup-Fails: `0` / `0` / `0` / `0`
+- Replay/StartMetrics/Warmup/Session-Drift: `0` / `0` / `0` / `0`
+- OpensNext: `['93S2R4.5']`
+
+S2R5.99 schliesst nur den Predicate-/PreAction-Validity-Interposer. Gruen
+oeffnet ausschliesslich `93S2R4.5`; `BT93S2R4.99`, `93S2R3.3-Reentry`,
+`BT93S2.3-Recheck`, `93S2.4`, `BT93T/U/W/O/P/94A`, Candidate, Freeze,
+Holdout, Promote, Rollout, PPO-Validate, BT95 und produktive Runtime bleiben
+geschlossen.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r5/bt93s2r5_closure_gate_report.json`
+- Command: `python python/scripts/bt93s2r5_closure_gate.py --write-report`
+
+Naechster Schritt:
+
+- Claim 93S2R4.5 via /fix-planung. Warum: S2R5 closed the predicate/pre-action blocker with 309/309 replay attempts and all required zero-count gates.
+- Keep S2R3-Reentry, BT93S2-Recheck, 93S2.4 and BT93T/U/W/O/P/94A closed until S2R4.5 and BT93S2R4.99 are green. Warum: S2R5 proves only predicate/pre-action validity; it is not action quality, reward ordering, telemetry, training, or candidate evidence.
+<!-- BT93S2R5.99-END -->
