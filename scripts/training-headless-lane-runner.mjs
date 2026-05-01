@@ -52,6 +52,9 @@ const DEFAULT_ACTION_TIMEOUT_MS = 2_000;
 const DEFAULT_ACK_TIMEOUT_MS = 2_000;
 const DEFAULT_BRIDGE_READY_TIMEOUT_MS = 8_000;
 const DEFAULT_STATS_TIMEOUT_MS = 2_000;
+const DETERMINISTIC_RANDOM_DEFAULT_ENABLED = true;
+const DETERMINISTIC_RANDOM_FNV_OFFSET = 2166136261;
+const DETERMINISTIC_RANDOM_FNV_PRIME = 16777619;
 const KERNEL_RUNNING_LIFECYCLES = new Set(['running', 'round_end', 'match_end']);
 export const BT93J_REWARD_CURRICULUM_PROOF_PROFILE_ID = 'bt93j-reward-curriculum-proof-v1';
 export const BT93L_OBJECTIVE_REACHABILITY_PROFILE_ID = 'bt93l-objective-reachability-v1';
@@ -204,6 +207,27 @@ function normalizeBooleanOption(value, fallback = false) {
     if (['1', 'true', 'yes', 'y', 'on'].includes(normalized)) return true;
     if (['0', 'false', 'no', 'n', 'off'].includes(normalized)) return false;
     return fallback;
+}
+
+function hashDeterministicRandomSeed(input) {
+    let hash = DETERMINISTIC_RANDOM_FNV_OFFSET;
+    const text = String(input || '');
+    for (let index = 0; index < text.length; index += 1) {
+        hash ^= text.charCodeAt(index);
+        hash = Math.imul(hash, DETERMINISTIC_RANDOM_FNV_PRIME);
+    }
+    return hash >>> 0;
+}
+
+function createDeterministicRandom(input) {
+    let state = hashDeterministicRandomSeed(input) || 0x9e3779b9;
+    return () => {
+        state = (state + 0x6D2B79F5) >>> 0;
+        let value = state;
+        value = Math.imul(value ^ (value >>> 15), value | 1);
+        value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+        return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+    };
 }
 
 function normalizeDomainMode(modeToken) {
@@ -906,6 +930,10 @@ export class HeadlessBoundaryController {
                 ? normalizeBooleanOption(options.planarMode, false)
                 : undefined,
             curriculumStepOffset: Math.max(0, Math.trunc(Number(options.curriculumStepOffset) || 0)),
+            deterministicRandom: normalizeBooleanOption(
+                options.deterministicRandom,
+                DETERMINISTIC_RANDOM_DEFAULT_ENABLED,
+            ),
         };
         this.readyPayload = null;
         this.settings = null;
@@ -915,6 +943,24 @@ export class HeadlessBoundaryController {
         this.trainingAdapter = null;
         this.facade = null;
         this.stepRunner = null;
+    }
+
+    async _withDeterministicRandom(scope, callback) {
+        if (this.options.deterministicRandom !== true) {
+            return callback();
+        }
+        const originalRandom = Math.random;
+        Math.random = createDeterministicRandom([
+            'headless-boundary',
+            this.options.sessionId,
+            this.options.seed,
+            scope,
+        ].join('|'));
+        try {
+            return await callback();
+        } finally {
+            Math.random = originalRandom;
+        }
     }
 
     async initialize() {
@@ -932,47 +978,49 @@ export class HeadlessBoundaryController {
         assert(bridgeReady === true, 'sidecar ready handshake failed');
         this.readyPayload = this.bridge.consumeLatestReadyPayload?.() || this.bridge.consumeLatestResponse?.() || null;
 
-        this.settings = createSmokeSettings(this.options);
-        this.runtimeConfig = createRuntimeConfigSnapshot(this.settings);
-        this.runtime = await Promise.resolve(createHeadlessMatchKernelRuntime({
-            settings: this.settings,
-            runtimeConfig: this.runtimeConfig,
-            requestedMapKey: this.runtimeConfig?.session?.mapKey,
-            profile: {
-                sessionId: this.options.sessionId,
-                fixedStepSeconds: MATCH_KERNEL_FIXED_STEP_SECONDS,
-                deterministic: true,
-            },
-        }));
-        this.trainingAdapter = createMatchKernelTrainingAdapter({
-            headlessRuntime: this.runtime,
-        });
-        this.stepRunner = new HeadlessLaneStepRunner({
-            runtime: this.runtime,
-            trainingAdapter: this.trainingAdapter,
-            runtimeConfig: this.runtimeConfig,
-            settings: this.settings,
-            maxSteps: this.options.maxSteps,
-            seed: this.options.seed,
-            episodeIdPrefix: this.options.episodeIdPrefix,
-            environmentProfile: this.options.environmentProfile,
-            laneWorkerCount: this.options.laneWorkerCount,
-            rewardProfileId: this.options.rewardProfileId,
-            curriculumStepOffset: this.options.curriculumStepOffset,
-        });
-        this.facade = new TrainingTransportFacade({
-            bridge: this.bridge,
-            stepRunner: this.stepRunner,
-            kernelProfile: this.runtime.getConsumerDescriptors?.()?.training?.profile || {
-                matchId: this.runtime.session?.effectiveMapKey || this.runtimeConfig?.session?.mapKey || 'standard',
-                modeId: this.runtime.session?.entityManager?.activeGameMode || this.runtimeConfig?.session?.activeGameMode || 'CLASSIC',
-            },
+        await this._withDeterministicRandom('initialize', async () => {
+            this.settings = createSmokeSettings(this.options);
+            this.runtimeConfig = createRuntimeConfigSnapshot(this.settings);
+            this.runtime = await Promise.resolve(createHeadlessMatchKernelRuntime({
+                settings: this.settings,
+                runtimeConfig: this.runtimeConfig,
+                requestedMapKey: this.runtimeConfig?.session?.mapKey,
+                profile: {
+                    sessionId: this.options.sessionId,
+                    fixedStepSeconds: MATCH_KERNEL_FIXED_STEP_SECONDS,
+                    deterministic: true,
+                },
+            }));
+            this.trainingAdapter = createMatchKernelTrainingAdapter({
+                headlessRuntime: this.runtime,
+            });
+            this.stepRunner = new HeadlessLaneStepRunner({
+                runtime: this.runtime,
+                trainingAdapter: this.trainingAdapter,
+                runtimeConfig: this.runtimeConfig,
+                settings: this.settings,
+                maxSteps: this.options.maxSteps,
+                seed: this.options.seed,
+                episodeIdPrefix: this.options.episodeIdPrefix,
+                environmentProfile: this.options.environmentProfile,
+                laneWorkerCount: this.options.laneWorkerCount,
+                rewardProfileId: this.options.rewardProfileId,
+                curriculumStepOffset: this.options.curriculumStepOffset,
+            });
+            this.facade = new TrainingTransportFacade({
+                bridge: this.bridge,
+                stepRunner: this.stepRunner,
+                kernelProfile: this.runtime.getConsumerDescriptors?.()?.training?.profile || {
+                    matchId: this.runtime.session?.effectiveMapKey || this.runtimeConfig?.session?.mapKey || 'standard',
+                    modeId: this.runtime.session?.entityManager?.activeGameMode || this.runtimeConfig?.session?.activeGameMode || 'CLASSIC',
+                },
+            });
         });
     }
 
     async reset() {
         drainBridge(this.bridge);
-        const packet = this.facade.reset();
+        const packet = await this._withDeterministicRandom('reset', () => this.facade.reset());
         const ack = await waitForTrainingAck(this.bridge, 'training-reset');
         return {
             ok: true,
@@ -986,9 +1034,10 @@ export class HeadlessBoundaryController {
         drainBridge(this.bridge);
         this.bridge.submitObservation(this.stepRunner.buildActionRequestPayload());
         const actionResponse = await waitForLatestAction(this.bridge);
-        const packet = this.facade.step({
+        const stepScope = `step:${this.stepRunner?.globalEnvSteps ?? 0}`;
+        const packet = await this._withDeterministicRandom(stepScope, () => this.facade.step({
             action: actionResponse.action,
-        });
+        }));
         const ack = await waitForTrainingAck(this.bridge, 'training-step');
         return {
             ok: true,
