@@ -79,3 +79,30 @@ Evidence:
 
 - Run 93S2R6.3 to apply only the locked full-matrix seed/start-state and minimum-window repair contract.
 - Do not start 93S2R6.4/99, 93S2R3.4-Recheck, 93S2R3.99, BT93S2.3-Recheck, 93S2.4, BT93T/U/W/O/P/94A, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate or BT95 yet.
+
+<!-- BT93S2R6.3-START -->
+## 93S2R6.3 Full-Matrix Repair Applied
+
+- Result: `resultClass=full-matrix-repair-applied`, `ok=True`
+- Materialisierte Sibling-Rows: `52` / `52`
+- Current-Red-Rows abgedeckt: `20` / `20`
+- Candidate Predicate/Measurement/Window/Warmup Fails: `0` / `0` / `0` / `0`
+- Predicate-/Warmup-/ActionSurface-/Reward-/Telemetry-/Runtime-/Training-/Holdout-Aenderungen: `0/0/0/0/0/0/0/0`
+
+| Scenario | SourceSeed | Replacement | Repair-Klasse | Sibling-Rows | Red-Rows | Candidate-Fails |
+| --- | ---: | ---: | --- | ---: | ---: | ---: |
+| `escape-right-open` | `930` | `2930` | `full-matrix-seed-startstate-required` | `13` | `5` | `0` |
+| `escape-right-open` | `1930` | `3930` | `full-matrix-seed-startstate-required` | `13` | `4` | `0` |
+| `narrowing-corridor` | `1934` | `934` | `retained-v2-seed-startstate-required` | `13` | `10` | `0` |
+| `narrowing-corridor` | `2934` | `5934` | `minimum-window-contract-required` | `13` | `1` | `0` |
+
+S2R6.3 materialisiert nur den gelockten Full-Matrix-Seed-/StartState-/Window-Repair.
+`escape-right-open` bleibt Fairness-first ohne Action-Space-Urteil. `narrowing-corridor`
+retained-v2 bleibt bis zum S2R6.4-Null-Count quarantined. Der Minimum-Window-Repair
+bleibt getrennt von Predicate-/Seed-Reparatur und invalidiert keine Direction-/Fairness-Evidence.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r6/full_matrix_repair_report.json`
+- Command: `python python/scripts/bt93s2r6_full_matrix_repair.py --write-report`
+<!-- BT93S2R6.3-END -->
