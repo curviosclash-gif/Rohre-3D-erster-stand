@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-04-29
+Stand: 2026-05-02
 
 ## 1. Architekturparadigma
 
@@ -784,9 +784,24 @@ Dead-Code-/Legacy-Einordnung (V104.1.3/1.4):
 
 | Klasse | Kandidaten (Auszug) | Regel |
 | --- | --- | --- |
-| `duplicate-backed` | `src/state/MatchLifecycleStateTransitions.js`, `src/core/runtime/GameStateIds.js`, `src/core/input/GamepadInputSource.js`, `src/core/input/KeyboardInputSource.js` | Entfernen erst nach belegter Vollmigration auf juengeren Ersatzpfad plus gruene Contract-/Runtime-Checks |
+| `duplicate-backed` | `src/state/MatchLifecycleStateTransitions.js`, `src/core/runtime/GameStateIds.js`, `src/core/input/GamepadInputSource.js`, `src/core/input/KeyboardInputSource.js` (alle in `V104 104.4.3` entfernt) | Entfernen nur nach belegter Vollmigration auf juengeren Ersatzpfad plus gruene Guard-/Runtime-Checks; fuer diese vier Kandidaten ist der Remove-Pfad am 2026-05-01 abgeschlossen |
 | `legacy-with-replacement` | `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/vehicle-manager/**` | Kein Remove ohne produktiv verdrahteten Ersatz (Workshop-/Menu-Wiring + Verify-Evidence) |
 | `unverified-altpath` | `src/ui/hangar/HangarShellLayoutContract.js`, `src/ui/hangar/HangarVerificationTargetContract.js`, `src/shared/contracts/FightHangarBalanceContract.js`, `src/core/MatchKernelReplayAdapter.js`, `src/ui/NetworkHud.js`, `src/core/lobby/LocalMatchLobby.js`, `src/core/player/PlayerRole.js` | Nicht still entfernen; explizit als legacy/compatibility/plan-drift markieren bis Nachfolger oder Retirement-Entscheid belegt ist |
+
+### 4.6.8 V108 Arcade Ghost Selbstduell (laengste Spur)
+
+- Neuer Contract-Pfad: `src/shared/contracts/ArcadeGhostDuelContract.js` normiert Menuewerte (`off`, `self_longest_ghost`) und kapselt Replay-Aktivierung.
+- Persistenz ist vom Leaderboard entkoppelt: `src/state/arcade/ArcadeGhostLibrary.js` speichert pro Route den laengsten validen Ghost (`longestGhostClip`, `durationMs`, `updatedAt`) unter `cuviosclash.arcade-ghost-library.v1`.
+- Runtime-Policy:
+  - `ghost_start` spielt nur bei aktivem `self_longest_ghost` und nur fuer die aktive Route.
+  - `finish` aktualisiert die Ghost-Library nur, wenn die neue Spur laenger ist (`durationMs`).
+  - Kein gespeicherter Clip fuehrt zu stillem Fallback ohne Fehlerflut.
+- Settings-/Intent-Schnitt bleibt unveraendert schlank:
+  - Persistenzfeld: `settings.localSettings.startSetup.arcadeGhostDuelMode`
+  - Change-Key: `startSetup.arcadeGhostDuelMode`
+  - Sync ueber bestehende `UISettingsSyncMap`/`syncSessionState`-Pfade
+- UI-Gating in `UIStartSyncController`: Option aktiv in allen Single-Mode-Pfaden (`normal`, `fight`, `arcade`), ausserhalb davon deaktiviert bei erhaltenem Stored-Value.
+- V104-Ueberlappung bleibt kontrolliert: Aenderungen in `UIStartSyncController` und `UIManager` erfolgen ohne neue produktive `this.game`-Kurzschluesse und ohne neue God-Object-Reachthrough-Ketten.
 
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 

@@ -1,6 +1,6 @@
 # Dokumentationsstatus
 
-Stand: 2026-04-29
+Stand: 2026-05-02
 Modus: sync
 Gate: PASS
 
@@ -20,4 +20,4 @@ Gate: PASS
 - docs/Fehlerberichte/2026-04-29_v104-v107-graph-check-orphan-dependency.md: Zeilen 5, 24
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-04-29).
+- Dokumentation aktuell (geprueft am 2026-05-02).

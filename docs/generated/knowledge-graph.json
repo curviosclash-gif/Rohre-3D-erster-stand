@@ -141,7 +141,7 @@
           "src/ui/hangar/HangarWorkshopPersistenceFacade.js"
         ],
         "scopeResolution": {
-          "concreteCount": 56,
+          "concreteCount": 57,
           "plannedCount": 0
         }
       }
@@ -172,7 +172,7 @@
           "src/ui/UIStartSyncController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 65,
+          "concreteCount": 67,
           "plannedCount": 0
         }
       }
@@ -388,7 +388,7 @@
           "src/shared/runtime/**"
         ],
         "scopeResolution": {
-          "concreteCount": 68,
+          "concreteCount": 69,
           "plannedCount": 0
         }
       }
@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 158,
+          "concreteCount": 161,
           "plannedCount": 0
         }
       }
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 465,
+          "concreteCount": 468,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -1589,6 +1589,50 @@
       }
     },
     {
+      "id": "V108",
+      "type": "block",
+      "title": "Arcade-Ghost Selbstduell (laengste Spur pro Route)",
+      "status": "done",
+      "attributes": {
+        "source": [
+          "block-plan"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "planFile": "docs/plaene/aktiv/V108.md",
+        "scopeDeclarations": [
+          "docs/plaene/aktiv/V108.md",
+          "docs/referenz/ai_architecture_context.md",
+          "index.html",
+          "src/core/arcade/ArcadeRunRuntime.js",
+          "src/core/RuntimeConfig.js",
+          "src/shared/contracts/ArcadeGhostDuelContract.js",
+          "src/state/arcade/ArcadeGhostLibrary.js",
+          "src/state/arcade/ArcadeRunState.js",
+          "src/ui/dom/GameUiDomRefs.js",
+          "src/ui/hangar/HangarSelectionWritebackContract.js",
+          "src/ui/menu/MenuArcadeGhostDuelBindings.js",
+          "src/ui/menu/MenuDefaultsEditorConfig.js",
+          "src/ui/menu/MenuGameplayBindings.js",
+          "src/ui/menu/MenuRecordingCameraBindingOps.js",
+          "src/ui/menu/MenuStateContracts.js",
+          "src/ui/SettingsChangeKeys.js",
+          "src/ui/start-setup/StartSetupUiOps.js",
+          "src/ui/UISettingsSyncMap.js",
+          "src/ui/UIStartSyncController.js",
+          "tests/arcade-ghost-library.contract.test.mjs",
+          "tests/core-targeted-surface.spec.js",
+          "tests/runtime-settings-live-apply.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 22,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
       "id": "V43",
       "type": "block",
       "title": "Projektstruktur Spiel Dev Ordner",
@@ -1873,7 +1917,7 @@
           "src/ui/UIStartSyncController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 75,
+          "concreteCount": 77,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2183,7 +2227,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 133,
+          "concreteCount": 134,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2299,7 +2343,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 271,
+          "concreteCount": 275,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2352,7 +2396,10 @@
       "status": "done",
       "attributes": {
         "source": [
-          "block-plan"
+          "archive-index",
+          "block-plan",
+          "dependency-target",
+          "legacy-plan"
         ],
         "priority": "P2",
         "owner": "frei",
@@ -2384,7 +2431,8 @@
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
+        "unknownFrontmatterFields": [],
+        "currentPhase": "82.99"
       }
     },
     {
@@ -2422,7 +2470,7 @@
           "src/ui/PauseOverlayController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 79,
+          "concreteCount": 80,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2456,7 +2504,7 @@
           "src/state/**"
         ],
         "scopeResolution": {
-          "concreteCount": 249,
+          "concreteCount": 251,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2496,7 +2544,7 @@
           "tests/persistence-version-migration.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 166,
+          "concreteCount": 170,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2742,7 +2790,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 245,
+          "concreteCount": 249,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -4377,6 +4425,76 @@
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.99"
+      }
+    },
+    {
+      "id": "V108.1",
+      "type": "phase",
+      "title": "Fachregel und Contracts fuer Selbstduell festziehen",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.1"
+      }
+    },
+    {
+      "id": "V108.2",
+      "type": "phase",
+      "title": "Persistenzpfad fuer Ghost-Library aufbauen",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.2"
+      }
+    },
+    {
+      "id": "V108.3",
+      "type": "phase",
+      "title": "Arcade-Runtime auf laengste-Spur-Policy umstellen",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.3"
+      }
+    },
+    {
+      "id": "V108.4",
+      "type": "phase",
+      "title": "Menueintegration und Settings-Sync",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.4"
+      }
+    },
+    {
+      "id": "V108.5",
+      "type": "phase",
+      "title": "Tests und Regression-Hardening",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.5"
+      }
+    },
+    {
+      "id": "V108.6",
+      "type": "phase",
+      "title": "Doku- und Governance-Abgleich",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.6"
+      }
+    },
+    {
+      "id": "V108.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.99"
       }
     },
     {
@@ -11550,8 +11668,8 @@
     {
       "id": "V104.4.2",
       "type": "subphase",
-      "title": "`PlatformCapabilityRegistry`, `SettingsRuntimeLimitsContract` und die beteiligten Electron-Bridges so schneiden, dass direkte `curviosApp`-/`__CURVIOS_APP__`-Reads nur noch im dedizierten Plattformadapterpfad leben und Resolverfunktionen mit reinen Inputs/Snapshots arbeiten.",
-      "status": "open",
+      "title": "`PlatformCapabilityRegistry`, `SettingsRuntimeLimitsContract` und die beteiligten Electron-Bridges so schneiden, dass direkte `curviosApp`-/`__CURVIOS_APP__`-Reads nur noch im dedizierten Plattformadapterpfad leben und Resolverfunktionen mit reinen Inputs/Snapshots arbeiten. (abgeschlossen: 2026-04-29; evidence: `Select-String -Path src/shared/contracts/PlatformCapabilityRegistry.js,src/shared/contracts/SettingsRuntimeLimitsContract.js,src/platform/electron/ElectronPlatformBridge.js -Pattern \"curviosApp|__CURVIOS_APP__\"` + `npm run graph:build && npm run graph:check && npm run plan:check` -> Global-Reads nur noch im Electron-Adapterpfad, Registry/Settings-Limits input-snapshot-basiert, Graph/Plan-Checks gruen)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.4",
@@ -11561,8 +11679,8 @@
     {
       "id": "V104.4.3",
       "type": "subphase",
-      "title": "Exakte Dubletten und Shims (`MatchLifecycleStateTransitions`, `src/core/runtime/GameStateIds.js`, alte InputSource-Klassen nur bei bestaetigtem Resolver-Ersatz) nach Konsumentenabgleich und zielgerichteten Guard-/Surface-Checks abbauen; jeder Remove-Pfad braucht vorher den Nachweis des produktiven Ersatzes.",
-      "status": "open",
+      "title": "Exakte Dubletten und Shims (`MatchLifecycleStateTransitions`, `src/core/runtime/GameStateIds.js`, alte InputSource-Klassen nur bei bestaetigtem Resolver-Ersatz) nach Konsumentenabgleich und zielgerichteten Guard-/Surface-Checks abbauen; jeder Remove-Pfad braucht vorher den Nachweis des produktiven Ersatzes. (abgeschlossen: 2026-05-01; evidence: `Get-ChildItem -Recurse -File src,tests,scripts | Select-String -Pattern \"MatchLifecycleStateTransitions\\\\.js|core/runtime/GameStateIds\\\\.js|GamepadInputSource\\\\.js|KeyboardInputSource\\\\.js\"` -> keine produktiven Konsumenten ausserhalb der entfernten Kandidaten + `npm run check:architecture:boundaries` -> passed + `npm run graph:build; npm run graph:check` -> passed + `npm run plan:check` -> Master plan validation passed)",
+      "status": "done",
       "attributes": {
         "blockId": "V104",
         "phaseCode": "104.4",
@@ -11633,6 +11751,226 @@
         "blockId": "V104",
         "phaseCode": "104.99",
         "subphaseCode": "104.99.2"
+      }
+    },
+    {
+      "id": "V108.1.1",
+      "type": "subphase",
+      "title": "Ghost-Duell-Enum und Defaults (`off`, `self_longest_ghost`) im Menue-Settingspfad definiert. (abgeschlossen: 2026-05-01; evidence: `git diff -- src/shared/contracts/ArcadeGhostDuelContract.js src/ui/menu/MenuDefaultsEditorConfig.js src/ui/menu/MenuStateContracts.js` -> Enum + Defaults + Normalisierung aktiv)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.1",
+        "subphaseCode": "108.1.1"
+      }
+    },
+    {
+      "id": "V108.1.2",
+      "type": "subphase",
+      "title": "Vergleichsmetrik `durationMs` in Contract und Tests als kanonischer Wert fixiert. (abgeschlossen: 2026-05-01; evidence: `git diff -- src/state/arcade/ArcadeGhostLibrary.js tests/arcade-ghost-library.contract.test.mjs` -> `durationMs`-Policy + Tests)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.1",
+        "subphaseCode": "108.1.2"
+      }
+    },
+    {
+      "id": "V108.1.3",
+      "type": "subphase",
+      "title": "Ueberlappung mit `V104` dokumentiert und Konfliktrisiko minimiert. (abgeschlossen: 2026-05-01; evidence: `node scripts/query-knowledge-graph.mjs why-file src/ui/UIStartSyncController.js --json` + `node scripts/query-knowledge-graph.mjs why-file src/ui/UIManager.js --json` -> Scope-V104 bestaetigt)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.1",
+        "subphaseCode": "108.1.3"
+      }
+    },
+    {
+      "id": "V108.2.1",
+      "type": "subphase",
+      "title": "Ghost-Library-State-Modul in `src/state/arcade/` eingefuehrt (`load/save/upsertLongest/getLongestByRoute`). (abgeschlossen: 2026-05-01; evidence: `git diff -- src/state/arcade/ArcadeGhostLibrary.js` -> Modul angelegt)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.2",
+        "subphaseCode": "108.2.1"
+      }
+    },
+    {
+      "id": "V108.2.2",
+      "type": "subphase",
+      "title": "Rueckwaertskompatible Initialisierung aus Rank-1-`ghostClip` umgesetzt. (abgeschlossen: 2026-05-01; evidence: `git diff -- src/core/arcade/ArcadeRunRuntime.js src/state/arcade/ArcadeGhostLibrary.js` -> `bootstrapGhostLibraryFromLeaderboard` integriert)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.2",
+        "subphaseCode": "108.2.2"
+      }
+    },
+    {
+      "id": "V108.2.3",
+      "type": "subphase",
+      "title": "Guarded Write fuer defekte Clips und ungueltige Dauerwerte umgesetzt. (abgeschlossen: 2026-05-01; evidence: `node --test tests/arcade-ghost-library.contract.test.mjs` -> Invalid-Clip/Duration-Faelle PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.2",
+        "subphaseCode": "108.2.3"
+      }
+    },
+    {
+      "id": "V108.3.1",
+      "type": "subphase",
+      "title": "`finish` schreibt Ghost + Dauer in Ghost-Library und ersetzt nur bei laengerer Spur. (abgeschlossen: 2026-05-01; evidence: `node --test tests/runtime-settings-live-apply.contract.test.mjs` -> \"Arcade finish updates longest ghost library by durationMs...\" PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.3",
+        "subphaseCode": "108.3.1"
+      }
+    },
+    {
+      "id": "V108.3.2",
+      "type": "subphase",
+      "title": "`ghost_start` spielt in `self_longest_ghost` die laengste Spur der aktiven Route ab. (abgeschlossen: 2026-05-01; evidence: `node --test tests/runtime-settings-live-apply.contract.test.mjs` -> \"Arcade ghost_start replays only...\" PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.3",
+        "subphaseCode": "108.3.2"
+      }
+    },
+    {
+      "id": "V108.3.3",
+      "type": "subphase",
+      "title": "Fallbackverhalten fixiert (kein Clip -> kein Playback). (abgeschlossen: 2026-05-01; evidence: `git diff -- src/core/arcade/ArcadeRunRuntime.js` -> guarded early returns ohne Fehlerflut)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.3",
+        "subphaseCode": "108.3.3"
+      }
+    },
+    {
+      "id": "V108.4.1",
+      "type": "subphase",
+      "title": "Menue-Control in `index.html` eingefuegt und DOM-Refs angebunden. (abgeschlossen: 2026-05-01; evidence: `git diff -- index.html src/ui/dom/GameUiDomRefs.js` -> Control + Refs)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.4",
+        "subphaseCode": "108.4.1"
+      }
+    },
+    {
+      "id": "V108.4.2",
+      "type": "subphase",
+      "title": "`SettingsChangeKeys` + `UISettingsSyncMap` erweitert; `MenuGameplayBindings` an Intent-Pfad gebunden. (abgeschlossen: 2026-05-01; evidence: `git diff -- src/ui/SettingsChangeKeys.js src/ui/UISettingsSyncMap.js src/ui/menu/MenuGameplayBindings.js` -> neuer Key + Sync + Binding)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.4",
+        "subphaseCode": "108.4.2"
+      }
+    },
+    {
+      "id": "V108.4.3",
+      "type": "subphase",
+      "title": "`UIStartSyncController`-Summary/Hints aktualisiert und Option ausserhalb `single` deaktiviert. (abgeschlossen: 2026-05-01; evidence: `git diff -- src/ui/UIStartSyncController.js` -> Hint/Disable/Summary-Gating)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.4",
+        "subphaseCode": "108.4.3"
+      }
+    },
+    {
+      "id": "V108.5.1",
+      "type": "subphase",
+      "title": "Contract-Tests fuer Ghost-Library ergaenzt. (abgeschlossen: 2026-05-01; evidence: `node --test tests/arcade-ghost-library.contract.test.mjs` -> PASS 4/4)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.5",
+        "subphaseCode": "108.5.1"
+      }
+    },
+    {
+      "id": "V108.5.2",
+      "type": "subphase",
+      "title": "`runtime-settings-live-apply.contract.test.mjs` um Ghost-Start/Finish-Faelle erweitert. (abgeschlossen: 2026-05-01; evidence: `node --test tests/runtime-settings-live-apply.contract.test.mjs` -> PASS 10/10)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.5",
+        "subphaseCode": "108.5.2"
+      }
+    },
+    {
+      "id": "V108.5.3",
+      "type": "subphase",
+      "title": "Surface-Test fuer Menuewahl + Persistenz + Gate-Activation ergaenzt. (abgeschlossen: 2026-05-01; evidence: `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-surface.spec.js --grep T20x2 --timeout=240000` -> PASS 1/1)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.5",
+        "subphaseCode": "108.5.3"
+      }
+    },
+    {
+      "id": "V108.6.1",
+      "type": "subphase",
+      "title": "Kanonische Blockdatei `docs/plaene/aktiv/V108.md` mit Scope/DoD/Verifikation gepflegt. (abgeschlossen: 2026-05-01; evidence: `Get-Content docs/plaene/aktiv/V108.md` -> Blockdatei vorhanden und vollstaendig)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.6",
+        "subphaseCode": "108.6.1"
+      }
+    },
+    {
+      "id": "V108.6.2",
+      "type": "subphase",
+      "title": "Architektur-Referenz fuer neue Ghost-Policy/Settingspfade gezielt nachgezogen. (abgeschlossen: 2026-05-01; evidence: `git diff -- docs/referenz/ai_architecture_context.md` -> V108-Hinweis hinzugefuegt)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.6",
+        "subphaseCode": "108.6.2"
+      }
+    },
+    {
+      "id": "V108.99.1",
+      "type": "subphase",
+      "title": "`npm run build`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` gruen. (abgeschlossen: 2026-05-01; evidence: `npm run build` + `npm run plan:check` + `npm run docs:sync` + `npm run docs:check` -> alle PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.99",
+        "subphaseCode": "108.99.1"
+      }
+    },
+    {
+      "id": "V108.99.2",
+      "type": "subphase",
+      "title": "Betroffene Contract-/Targeted-Tests fuer Ghost-Speicher und Menue-Sync gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-01; evidence: `node --test tests/arcade-ghost-library.contract.test.mjs` + `node --test tests/runtime-settings-live-apply.contract.test.mjs` + `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-surface.spec.js --grep T20x2 --timeout=240000` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.99",
+        "subphaseCode": "108.99.2"
+      }
+    },
+    {
+      "id": "V108.99.3",
+      "type": "subphase",
+      "title": "Kein neuer Architektur-Bypass (`this.game`) im geaenderten Produktpfad. (abgeschlossen: 2026-05-01; evidence: `node scripts/query-knowledge-graph.mjs scope-collisions --json` -> `collisions: []`; Produktpfad ohne neue `this.game`-Reachthroughs)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.99",
+        "subphaseCode": "108.99.3"
       }
     },
     {
@@ -24639,6 +24977,22 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V108.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V108",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V64.md",
       "type": "file",
       "title": null,
@@ -26385,6 +26739,21 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_Arcade_Ghost_Selbstduell_Laengste_Spur_V108.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Architecture_Guard_Typecheck_Regression_Recovery_V105.md",
       "type": "file",
       "title": null,
@@ -26847,6 +27216,7 @@
           "V101",
           "V103",
           "V104",
+          "V108",
           "V74",
           "V77",
           "V83",
@@ -27999,6 +28369,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V108",
           "V74"
         ],
         "exists": true
@@ -31518,10 +31889,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B04"
+          "B04",
+          "V108"
         ],
         "exists": true
       }
@@ -32022,7 +32395,7 @@
           "V104",
           "V60"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -32038,7 +32411,7 @@
           "V104",
           "V60"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -32828,7 +33201,7 @@
           "V77",
           "V89"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -33232,6 +33605,7 @@
         ],
         "scopeBlocks": [
           "V101",
+          "V108",
           "V69"
         ],
         "exists": true
@@ -36428,6 +36802,28 @@
       }
     },
     {
+      "id": "src/shared/contracts/ArcadeGhostDuelContract.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B11",
+          "V108",
+          "V74",
+          "V83",
+          "V84",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/shared/contracts/ArcadeHangarRulesContract.js",
       "type": "file",
       "title": null,
@@ -37752,6 +38148,26 @@
       }
     },
     {
+      "id": "src/state/arcade/ArcadeGhostLibrary.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B04",
+          "V108",
+          "V84",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/state/arcade/ArcadeGhostRecorder.js",
       "type": "file",
       "title": null,
@@ -37860,6 +38276,7 @@
         ],
         "scopeBlocks": [
           "B04",
+          "V108",
           "V82",
           "V84",
           "V85",
@@ -38136,7 +38553,7 @@
           "V84",
           "V91"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -38903,6 +39320,7 @@
         ],
         "scopeBlocks": [
           "B05",
+          "V108",
           "V91"
         ],
         "exists": true
@@ -39026,6 +39444,7 @@
         ],
         "scopeBlocks": [
           "B04",
+          "V108",
           "V76",
           "V91"
         ],
@@ -39428,6 +39847,27 @@
       }
     },
     {
+      "id": "src/ui/menu/MenuArcadeGhostDuelBindings.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B05",
+          "V108",
+          "V64",
+          "V77",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/ui/menu/MenuChromeStateOps.js",
       "type": "file",
       "title": null,
@@ -39523,6 +39963,7 @@
           "B05",
           "B07",
           "V101",
+          "V108",
           "V64",
           "V69",
           "V77",
@@ -39708,6 +40149,7 @@
         ],
         "scopeBlocks": [
           "B05",
+          "V108",
           "V60",
           "V63",
           "V64",
@@ -39944,6 +40386,27 @@
       }
     },
     {
+      "id": "src/ui/menu/MenuRecordingCameraBindingOps.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B05",
+          "V108",
+          "V64",
+          "V77",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/ui/menu/MenuRuntimeFeatureFlags.js",
       "type": "file",
       "title": null,
@@ -39995,6 +40458,7 @@
         ],
         "scopeBlocks": [
           "B05",
+          "V108",
           "V64",
           "V77",
           "V85",
@@ -40556,6 +41020,7 @@
         ],
         "scopeBlocks": [
           "B07",
+          "V108",
           "V91"
         ],
         "exists": true
@@ -40628,6 +41093,7 @@
         ],
         "scopeBlocks": [
           "B05",
+          "V108",
           "V76",
           "V77",
           "V91"
@@ -40737,6 +41203,7 @@
         ],
         "scopeBlocks": [
           "B07",
+          "V108",
           "V91"
         ],
         "exists": true
@@ -40755,6 +41222,7 @@
         "scopeBlocks": [
           "B05",
           "V104",
+          "V108",
           "V64",
           "V66",
           "V91"
@@ -40807,6 +41275,25 @@
           "B13",
           "BT91",
           "V88"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/arcade-ghost-library.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V108"
         ],
         "exists": true
       }
@@ -40976,6 +41463,7 @@
           "B13",
           "BT91",
           "V104",
+          "V108",
           "V88",
           "V89"
         ],
@@ -41154,6 +41642,23 @@
           "B13",
           "BT91",
           "V72"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/ghost-selfduel-allmaps.desktop.spec.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
         ],
         "exists": true
       }
@@ -41413,6 +41918,23 @@
     },
     {
       "id": "tests/online-signaling-config.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/parcours-progress-utils.contract.test.mjs",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -41702,6 +42224,7 @@
           "B13",
           "BT91",
           "V103",
+          "V108",
           "V97"
         ],
         "exists": true
@@ -57611,6 +58134,15 @@
     },
     {
       "from": "B04",
+      "to": "src/state/arcade/ArcadeGhostLibrary.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B04",
       "to": "src/state/arcade/ArcadeGhostRecorder.js",
       "type": "scope",
       "hint": null,
@@ -57971,6 +58503,15 @@
     },
     {
       "from": "B05",
+      "to": "src/ui/menu/MenuArcadeGhostDuelBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B05",
       "to": "src/ui/menu/MenuChromeStateOps.js",
       "type": "scope",
       "hint": null,
@@ -58188,6 +58729,15 @@
     {
       "from": "B05",
       "to": "src/ui/menu/MenuProfileBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B05",
+      "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -59394,6 +59944,15 @@
     {
       "from": "B11",
       "to": "src/platform/PlatformCapabilityAdapterSupport.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B11",
+      "to": "src/shared/contracts/ArcadeGhostDuelContract.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -60950,6 +61509,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/arcade-ghost-library.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/arcade-hangar-rules.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -61112,6 +61680,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/ghost-selfduel-allmaps.desktop.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/gpu.spec.js",
       "type": "scope",
       "hint": null,
@@ -61239,6 +61816,15 @@
     {
       "from": "B13",
       "to": "tests/online-signaling-config.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/parcours-progress-utils.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -69924,6 +70510,15 @@
     },
     {
       "from": "BT91",
+      "to": "tests/arcade-ghost-library.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "tests/arcade-hangar-rules.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -70086,6 +70681,15 @@
     },
     {
       "from": "BT91",
+      "to": "tests/ghost-selfduel-allmaps.desktop.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "tests/gpu.spec.js",
       "type": "scope",
       "hint": null,
@@ -70213,6 +70817,15 @@
     {
       "from": "BT91",
       "to": "tests/online-signaling-config.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "tests/parcours-progress-utils.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -119873,6 +120486,511 @@
       }
     },
     {
+      "from": "V108",
+      "to": "docs/plaene/aktiv/V108.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "index.html",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/core/arcade/ArcadeRunRuntime.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/core/RuntimeConfig.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/shared/contracts/ArcadeGhostDuelContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/state/arcade/ArcadeGhostLibrary.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/state/arcade/ArcadeRunState.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/dom/GameUiDomRefs.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/hangar/HangarSelectionWritebackContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/menu/MenuArcadeGhostDuelBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/menu/MenuDefaultsEditorConfig.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/menu/MenuGameplayBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/menu/MenuStateContracts.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/SettingsChangeKeys.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/start-setup/StartSetupUiOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/UISettingsSyncMap.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "src/ui/UIStartSyncController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "tests/arcade-ghost-library.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "tests/core-targeted-surface.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "tests/runtime-settings-live-apply.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "V108.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.1"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "V108.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.2"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "V108.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.3"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "V108.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.4"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "V108.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.5"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "V108.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.6"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "V108.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.99"
+      }
+    },
+    {
+      "from": "V108",
+      "to": "V82",
+      "type": "depends_on",
+      "source": "frontmatter",
+      "hard": false,
+      "fulfilled": false,
+      "hint": null,
+      "attributes": {
+        "dependsPhase": "82.99",
+        "rawToken": "V82.99",
+        "sourceBreakdown": [
+          "frontmatter"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V108.1",
+      "to": "V108.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.1",
+        "subphaseCode": "108.1.1"
+      }
+    },
+    {
+      "from": "V108.1",
+      "to": "V108.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.1",
+        "subphaseCode": "108.1.2"
+      }
+    },
+    {
+      "from": "V108.1",
+      "to": "V108.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.1",
+        "subphaseCode": "108.1.3"
+      }
+    },
+    {
+      "from": "V108.2",
+      "to": "V108.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.2",
+        "subphaseCode": "108.2.1"
+      }
+    },
+    {
+      "from": "V108.2",
+      "to": "V108.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.2",
+        "subphaseCode": "108.2.2"
+      }
+    },
+    {
+      "from": "V108.2",
+      "to": "V108.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.2",
+        "subphaseCode": "108.2.3"
+      }
+    },
+    {
+      "from": "V108.3",
+      "to": "V108.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.3",
+        "subphaseCode": "108.3.1"
+      }
+    },
+    {
+      "from": "V108.3",
+      "to": "V108.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.3",
+        "subphaseCode": "108.3.2"
+      }
+    },
+    {
+      "from": "V108.3",
+      "to": "V108.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.3",
+        "subphaseCode": "108.3.3"
+      }
+    },
+    {
+      "from": "V108.4",
+      "to": "V108.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.4",
+        "subphaseCode": "108.4.1"
+      }
+    },
+    {
+      "from": "V108.4",
+      "to": "V108.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.4",
+        "subphaseCode": "108.4.2"
+      }
+    },
+    {
+      "from": "V108.4",
+      "to": "V108.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.4",
+        "subphaseCode": "108.4.3"
+      }
+    },
+    {
+      "from": "V108.5",
+      "to": "V108.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.5",
+        "subphaseCode": "108.5.1"
+      }
+    },
+    {
+      "from": "V108.5",
+      "to": "V108.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.5",
+        "subphaseCode": "108.5.2"
+      }
+    },
+    {
+      "from": "V108.5",
+      "to": "V108.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.5",
+        "subphaseCode": "108.5.3"
+      }
+    },
+    {
+      "from": "V108.6",
+      "to": "V108.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.6",
+        "subphaseCode": "108.6.1"
+      }
+    },
+    {
+      "from": "V108.6",
+      "to": "V108.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.6",
+        "subphaseCode": "108.6.2"
+      }
+    },
+    {
+      "from": "V108.99",
+      "to": "V108.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.99",
+        "subphaseCode": "108.99.1"
+      }
+    },
+    {
+      "from": "V108.99",
+      "to": "V108.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.99",
+        "subphaseCode": "108.99.2"
+      }
+    },
+    {
+      "from": "V108.99",
+      "to": "V108.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V108",
+        "phaseCode": "108.99",
+        "subphaseCode": "108.99.3"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -123389,6 +124507,15 @@
     },
     {
       "from": "V64",
+      "to": "src/ui/menu/MenuArcadeGhostDuelBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V64",
       "to": "src/ui/menu/MenuChromeStateOps.js",
       "type": "scope",
       "hint": null,
@@ -123606,6 +124733,15 @@
     {
       "from": "V64",
       "to": "src/ui/menu/MenuProfileBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V64",
+      "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -133322,6 +134458,15 @@
     },
     {
       "from": "V74",
+      "to": "src/shared/contracts/ArcadeGhostDuelContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
       "to": "src/shared/contracts/ArcadeHangarRulesContract.js",
       "type": "scope",
       "hint": null,
@@ -135536,6 +136681,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V108.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V64.md",
       "type": "scope",
       "hint": null,
@@ -136571,6 +137725,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/neu/Feature_Arcade_Ghost_Selbstduell_Laengste_Spur_V108.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/neu/Feature_Architecture_Guard_Typecheck_Regression_Recovery_V105.md",
       "type": "scope",
       "hint": null,
@@ -137462,6 +138625,15 @@
     },
     {
       "from": "V77",
+      "to": "src/ui/menu/MenuArcadeGhostDuelBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "src/ui/menu/MenuChromeStateOps.js",
       "type": "scope",
       "hint": null,
@@ -137679,6 +138851,15 @@
     {
       "from": "V77",
       "to": "src/ui/menu/MenuProfileBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -139761,6 +140942,15 @@
     {
       "from": "V83",
       "to": "src/platform/PlatformCapabilityAdapterSupport.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
+      "to": "src/shared/contracts/ArcadeGhostDuelContract.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -141887,6 +143077,15 @@
     },
     {
       "from": "V84",
+      "to": "src/shared/contracts/ArcadeGhostDuelContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
       "to": "src/shared/contracts/ArcadeHangarRulesContract.js",
       "type": "scope",
       "hint": null,
@@ -142347,6 +143546,15 @@
     {
       "from": "V84",
       "to": "src/shared/contracts/TrainingRuntimeContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/state/arcade/ArcadeGhostLibrary.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -143419,6 +144627,15 @@
     },
     {
       "from": "V85",
+      "to": "src/shared/contracts/ArcadeGhostDuelContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
       "to": "src/shared/contracts/ArcadeHangarRulesContract.js",
       "type": "scope",
       "hint": null,
@@ -143905,6 +145122,15 @@
     },
     {
       "from": "V85",
+      "to": "src/state/arcade/ArcadeGhostLibrary.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
       "to": "src/state/arcade/ArcadeGhostRecorder.js",
       "type": "scope",
       "hint": null,
@@ -144005,6 +145231,15 @@
     {
       "from": "V85",
       "to": "src/ui/menu/MenuAccessPolicy.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/ui/menu/MenuArcadeGhostDuelBindings.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -144230,6 +145465,15 @@
     {
       "from": "V85",
       "to": "src/ui/menu/MenuProfileBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -147480,6 +148724,15 @@
     },
     {
       "from": "V91",
+      "to": "src/shared/contracts/ArcadeGhostDuelContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
       "to": "src/shared/contracts/ArcadeHangarRulesContract.js",
       "type": "scope",
       "hint": null,
@@ -147949,6 +149202,15 @@
     {
       "from": "V91",
       "to": "src/shared/runtime/GameRuntimePorts.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/state/arcade/ArcadeGhostLibrary.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -148785,6 +150047,15 @@
     },
     {
       "from": "V91",
+      "to": "src/ui/menu/MenuArcadeGhostDuelBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
       "to": "src/ui/menu/MenuChromeStateOps.js",
       "type": "scope",
       "hint": null,
@@ -149002,6 +150273,15 @@
     {
       "from": "V91",
       "to": "src/ui/menu/MenuProfileBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {

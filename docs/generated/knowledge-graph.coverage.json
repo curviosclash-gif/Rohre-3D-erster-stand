@@ -8,12 +8,32 @@
       "id": "GIT-HISTORY-HOTSPOTS",
       "title": "Git-History Hotspots ausserhalb des Core-Graphen",
       "coverageSource": "git-history",
-      "fileCount": 6,
+      "fileCount": 10,
       "files": [
         {
           "path": "docs/referenz/architektur_ausfuehrlich.md",
           "changeCount": 28,
-          "dirty": false
+          "dirty": true
+        },
+        {
+          "path": "src/state/MatchLifecycleStateTransitions.js",
+          "changeCount": 5,
+          "dirty": true
+        },
+        {
+          "path": "src/core/runtime/GameStateIds.js",
+          "changeCount": 3,
+          "dirty": true
+        },
+        {
+          "path": "src/core/input/GamepadInputSource.js",
+          "changeCount": 2,
+          "dirty": true
+        },
+        {
+          "path": "src/core/input/KeyboardInputSource.js",
+          "changeCount": 2,
+          "dirty": true
         },
         {
           "path": "README.md",
@@ -140,12 +160,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2406,
-    "rawCoveredFileCount": 1923,
-    "rawCoveragePercent": 79.9,
-    "adjustedTrackedFileCount": 1503,
-    "adjustedCoveredFileCount": 1264,
-    "adjustedCoveragePercent": 84.1,
+    "trackedFileCount": 2415,
+    "rawCoveredFileCount": 1932,
+    "rawCoveragePercent": 80,
+    "adjustedTrackedFileCount": 1512,
+    "adjustedCoveredFileCount": 1273,
+    "adjustedCoveragePercent": 84.2,
     "uncoveredFileCount": 483,
     "uncoveredActiveFileCount": 239,
     "classifications": [
@@ -188,14 +208,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 840,
-        "coveredCount": 824
+        "count": 847,
+        "coveredCount": 831
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 360,
-        "coveredCount": 172
+        "count": 362,
+        "coveredCount": 174
       },
       {
         "classification": "prototype",
@@ -11909,6 +11929,24 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V108.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V108",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V64.md",
       "tracked": true,
       "coveredInCore": true,
@@ -13885,6 +13923,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/Feature_Arcade_Ghost_Selbstduell_Laengste_Spur_V108.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/Feature_Architecture_Guard_Typecheck_Regression_Recovery_V105.md",
       "tracked": true,
       "coveredInCore": true,
@@ -14535,6 +14590,7 @@
         "V101",
         "V103",
         "V104",
+        "V108",
         "V74",
         "V77",
         "V83",
@@ -14590,7 +14646,7 @@
           "blockId": "GIT-HISTORY-HOTSPOTS",
           "coverageSource": "git-history",
           "changeCount": 28,
-          "dirty": false
+          "dirty": true
         }
       ]
     },
@@ -15906,6 +15962,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V108",
         "V74"
       ],
       "surfaces": [],
@@ -20149,10 +20206,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B04"
+        "B04",
+        "V108"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -20815,10 +20874,11 @@
     {
       "path": "src/core/input/GamepadInputSource.js",
       "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
+      "coveredInCore": false,
+      "coveredByOverlay": true,
       "covered": true,
       "coverageSources": [
+        "git-history",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -20828,15 +20888,24 @@
       "surfaces": [],
       "classification": "product-code",
       "excludedFromCoverage": false,
-      "excludeReason": null
+      "excludeReason": null,
+      "overlays": [
+        {
+          "blockId": "GIT-HISTORY-HOTSPOTS",
+          "coverageSource": "git-history",
+          "changeCount": 2,
+          "dirty": true
+        }
+      ]
     },
     {
       "path": "src/core/input/KeyboardInputSource.js",
       "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
+      "coveredInCore": false,
+      "coveredByOverlay": true,
       "covered": true,
       "coverageSources": [
+        "git-history",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -20846,7 +20915,15 @@
       "surfaces": [],
       "classification": "product-code",
       "excludedFromCoverage": false,
-      "excludeReason": null
+      "excludeReason": null,
+      "overlays": [
+        {
+          "blockId": "GIT-HISTORY-HOTSPOTS",
+          "coverageSource": "git-history",
+          "changeCount": 2,
+          "dirty": true
+        }
+      ]
     },
     {
       "path": "src/core/input/PlayerInputSource.js",
@@ -21809,11 +21886,12 @@
     {
       "path": "src/core/runtime/GameStateIds.js",
       "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
+      "coveredInCore": false,
+      "coveredByOverlay": true,
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "git-history",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -21826,7 +21904,15 @@
       "surfaces": [],
       "classification": "product-code",
       "excludedFromCoverage": false,
-      "excludeReason": null
+      "excludeReason": null,
+      "overlays": [
+        {
+          "blockId": "GIT-HISTORY-HOTSPOTS",
+          "coverageSource": "git-history",
+          "changeCount": 3,
+          "dirty": true
+        }
+      ]
     },
     {
       "path": "src/core/runtime/MatchFinalizeFlowService.js",
@@ -22269,6 +22355,7 @@
       ],
       "scopeBlocks": [
         "V101",
+        "V108",
         "V69"
       ],
       "surfaces": [],
@@ -25856,6 +25943,30 @@
       "excludeReason": null
     },
     {
+      "path": "src/shared/contracts/ArcadeGhostDuelContract.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B11",
+        "V108",
+        "V74",
+        "V83",
+        "V84",
+        "V85",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/shared/contracts/ArcadeHangarRulesContract.js",
       "tracked": true,
       "coveredInCore": true,
@@ -27335,6 +27446,28 @@
       "excludeReason": null
     },
     {
+      "path": "src/state/arcade/ArcadeGhostLibrary.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B04",
+        "V108",
+        "V84",
+        "V85",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/state/arcade/ArcadeGhostRecorder.js",
       "tracked": true,
       "coveredInCore": true,
@@ -27453,6 +27586,7 @@
       ],
       "scopeBlocks": [
         "B04",
+        "V108",
         "V82",
         "V84",
         "V85",
@@ -27746,11 +27880,12 @@
     {
       "path": "src/state/MatchLifecycleStateTransitions.js",
       "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
+      "coveredInCore": false,
+      "coveredByOverlay": true,
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "git-history",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -27762,7 +27897,15 @@
       "surfaces": [],
       "classification": "product-code",
       "excludedFromCoverage": false,
-      "excludeReason": null
+      "excludeReason": null,
+      "overlays": [
+        {
+          "blockId": "GIT-HISTORY-HOTSPOTS",
+          "coverageSource": "git-history",
+          "changeCount": 5,
+          "dirty": true
+        }
+      ]
     },
     {
       "path": "src/state/MatchSessionFactory.js",
@@ -28593,6 +28736,7 @@
       ],
       "scopeBlocks": [
         "B05",
+        "V108",
         "V91"
       ],
       "surfaces": [],
@@ -28730,6 +28874,7 @@
       ],
       "scopeBlocks": [
         "B04",
+        "V108",
         "V76",
         "V91"
       ],
@@ -29185,6 +29330,29 @@
       "excludeReason": null
     },
     {
+      "path": "src/ui/menu/MenuArcadeGhostDuelBindings.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B05",
+        "V108",
+        "V64",
+        "V77",
+        "V85",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/ui/menu/MenuChromeStateOps.js",
       "tracked": true,
       "coveredInCore": true,
@@ -29288,6 +29456,7 @@
         "B05",
         "B07",
         "V101",
+        "V108",
         "V64",
         "V69",
         "V77",
@@ -29491,6 +29660,7 @@
       ],
       "scopeBlocks": [
         "B05",
+        "V108",
         "V60",
         "V63",
         "V64",
@@ -29751,6 +29921,29 @@
       "excludeReason": null
     },
     {
+      "path": "src/ui/menu/MenuRecordingCameraBindingOps.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B05",
+        "V108",
+        "V64",
+        "V77",
+        "V85",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/ui/menu/MenuRuntimeFeatureFlags.js",
       "tracked": true,
       "coveredInCore": true,
@@ -29806,6 +29999,7 @@
       ],
       "scopeBlocks": [
         "B05",
+        "V108",
         "V64",
         "V77",
         "V85",
@@ -30425,6 +30619,7 @@
       ],
       "scopeBlocks": [
         "B07",
+        "V108",
         "V91"
       ],
       "surfaces": [],
@@ -30505,6 +30700,7 @@
       ],
       "scopeBlocks": [
         "B05",
+        "V108",
         "V76",
         "V77",
         "V91"
@@ -30633,6 +30829,7 @@
       ],
       "scopeBlocks": [
         "B07",
+        "V108",
         "V91"
       ],
       "surfaces": [],
@@ -30653,6 +30850,7 @@
       "scopeBlocks": [
         "B05",
         "V104",
+        "V108",
         "V64",
         "V66",
         "V91"
@@ -30828,6 +31026,27 @@
         "B13",
         "BT91",
         "V88"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/arcade-ghost-library.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V108"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31015,6 +31234,7 @@
         "B13",
         "BT91",
         "V104",
+        "V108",
         "V88",
         "V89"
       ],
@@ -31211,6 +31431,25 @@
         "B13",
         "BT91",
         "V72"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/ghost-selfduel-allmaps.desktop.spec.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31500,6 +31739,25 @@
     },
     {
       "path": "tests/online-signaling-config.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/parcours-progress-utils.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -31817,6 +32075,7 @@
         "B13",
         "BT91",
         "V103",
+        "V108",
         "V97"
       ],
       "surfaces": [],
