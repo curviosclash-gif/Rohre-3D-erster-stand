@@ -65,6 +65,7 @@ const TUNING_CONSOLE_CAPABILITY_ID = 'developer-tuning-console';
 const TUNING_CONSOLE_HOTKEY = 'F7';
 const DESKTOP_RENDERER_DIST_DIR_NAME = 'dist-app';
 const LEGACY_RENDERER_DIST_DIR_NAME = 'dist';
+const DESKTOP_STATIC_SERVER_DEFAULT_PORT = 38765;
 const MENU_DEFAULTS_OVERRIDE_FILE_NAME = 'menu-defaults.override.json';
 const SHARED_USER_DATA_DIR_NAME = 'curviosclash-app';
 const MAIN_SESSION_DATA_DIR_NAME = 'session-main';
@@ -433,7 +434,21 @@ async function startAppServer() {
             `Desktop renderer build missing at "${distIndexPath}". Run "npm run build:app" before starting Electron.${legacyHint}`
         );
     }
-    staticAppServer = await startStaticServer({ rootDir: distDir });
+    const preferredPortRaw = Number(process.env.CURVIOS_DESKTOP_STATIC_PORT);
+    const preferredPort = Number.isInteger(preferredPortRaw)
+        && preferredPortRaw > 0
+        && preferredPortRaw <= 65535
+        ? preferredPortRaw
+        : DESKTOP_STATIC_SERVER_DEFAULT_PORT;
+    try {
+        staticAppServer = await startStaticServer({ rootDir: distDir, port: preferredPort });
+    } catch (error) {
+        if (error?.code !== 'EADDRINUSE') {
+            throw error;
+        }
+        // Fallback keeps app start resilient if the preferred port is occupied.
+        staticAppServer = await startStaticServer({ rootDir: distDir, port: 0 });
+    }
     return staticAppServer;
 }
 
