@@ -135,11 +135,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2574,
-    "rawCoveredFileCount": 2084,
+    "trackedFileCount": 2576,
+    "rawCoveredFileCount": 2086,
     "rawCoveragePercent": 81,
-    "adjustedTrackedFileCount": 1671,
-    "adjustedCoveredFileCount": 1425,
+    "adjustedTrackedFileCount": 1673,
+    "adjustedCoveredFileCount": 1427,
     "adjustedCoveragePercent": 85.3,
     "uncoveredFileCount": 490,
     "uncoveredActiveFileCount": 246,
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 321,
-        "coveredCount": 300
+        "count": 322,
+        "coveredCount": 301
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 936,
-        "coveredCount": 920
+        "count": 937,
+        "coveredCount": 921
       },
       {
         "classification": "product-docs",
@@ -9284,6 +9284,29 @@
     },
     {
       "path": "data/training/ppo/bt93s2r6/full_matrix_failure_ledger.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R6"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -21765,6 +21788,29 @@
     },
     {
       "path": "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R6"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

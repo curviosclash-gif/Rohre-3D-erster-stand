@@ -491,7 +491,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 467,
+          "concreteCount": 469,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -526,7 +526,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 605,
+          "concreteCount": 607,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -561,7 +561,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 463,
+          "concreteCount": 465,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -642,7 +642,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 462,
+          "concreteCount": 464,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -763,7 +763,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1104,
+          "concreteCount": 1106,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -825,7 +825,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1112,
+          "concreteCount": 1114,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1770,7 +1770,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2R6.4",
+        "currentPhase": "93S2R6.99",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2r6/bt93s2r6_closure_gate_report.json",
           "data/training/ppo/bt93s2r6/full_matrix_failure_ledger.json",
@@ -1780,12 +1780,13 @@
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/Fehlerberichte/2026-05-02_bt93s2r6_full_matrix_predicate_required.md",
           "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+          "python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py",
           "python/scripts/bt93s2r6_full_matrix_repair_contract.py",
           "python/scripts/bt93s2r6_full_matrix_repair.py"
         ],
         "scopeResolution": {
-          "concreteCount": 8,
-          "plannedCount": 2
+          "concreteCount": 10,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5263,7 +5264,7 @@
       "id": "BT93S2R6.4",
       "type": "phase",
       "title": "Full-Matrix Recheck auf repariertem Vertrag",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R6",
         "phaseCode": "93S2R6.4"
@@ -15457,8 +15458,8 @@
     {
       "id": "BT93S2R6.4.1",
       "type": "subphase",
-      "title": "Recheck nutzt den gelockten Repair-Contract und laeuft auf der 9-Szenario/13-Action/338-Probe-Matrix; `probeCount < 338` ist `measurement-invalid`.",
-      "status": "open",
+      "title": "Recheck nutzt den gelockten Repair-Contract und laeuft auf der 9-Szenario/13-Action/338-Probe-Matrix; `probeCount < 338` ist `measurement-invalid`. (abgeschlossen: 2026-05-02; evidence: `python python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py --write-report` -> `data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json`, `phaseCoverage.93S2R6.4.1=true`, `probeCount=338`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R6",
         "phaseCode": "93S2R6.4",
@@ -15468,8 +15469,8 @@
     {
       "id": "BT93S2R6.4.2",
       "type": "subphase",
-      "title": "Gruen verlangt alle DoD.S2R6-10 Counts exakt 0; alte rote S2R3.4-Reports bleiben historische Quelle, nicht Gruen.",
-      "status": "open",
+      "title": "Gruen verlangt alle DoD.S2R6-10 Counts exakt 0; alte rote S2R3.4-Reports bleiben historische Quelle, nicht Gruen. (abgeschlossen: 2026-05-02; evidence: `python python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py --write-report` -> `data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json`, `phaseCoverage.93S2R6.4.2=true`, `rowResultCounts.full-matrix-predicate-row-green=338`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R6",
         "phaseCode": "93S2R6.4",
@@ -15479,8 +15480,8 @@
     {
       "id": "BT93S2R6.4.3",
       "type": "subphase",
-      "title": "Bei Rot schreibt der Report exakt die naechste enge Reparaturklasse und `opensNext=[]`.",
-      "status": "open",
+      "title": "Bei Rot schreibt der Report exakt die naechste enge Reparaturklasse und `opensNext=[]`. (abgeschlossen: 2026-05-02; evidence: `python python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py --write-report` -> `data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json`, `phaseCoverage.93S2R6.4.3=true`, Gruen oeffnet nur `93S2R6.99`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R6",
         "phaseCode": "93S2R6.4",
@@ -31457,9 +31458,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R6"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -40416,6 +40423,27 @@
     },
     {
       "id": "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R6"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -76575,6 +76603,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2r6/full_matrix_repair_contract.json",
       "type": "scope",
       "hint": null,
@@ -78376,6 +78413,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -80975,6 +81021,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2r6/full_matrix_repair_contract.json",
       "type": "scope",
       "hint": null,
@@ -82758,6 +82813,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -86555,6 +86619,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2r6/full_matrix_repair_contract.json",
       "type": "scope",
       "hint": null,
@@ -88347,6 +88420,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91245,6 +91327,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2r6/full_matrix_repair_contract.json",
       "type": "scope",
       "hint": null,
@@ -93037,6 +93128,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -102339,6 +102439,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2r6/full_matrix_repair_contract.json",
       "type": "scope",
       "hint": null,
@@ -104131,6 +104240,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -112608,6 +112726,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2r6/full_matrix_repair_contract.json",
       "type": "scope",
       "hint": null,
@@ -114409,6 +114536,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -143452,6 +143588,15 @@
     {
       "from": "BT93S2R6",
       "to": "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {

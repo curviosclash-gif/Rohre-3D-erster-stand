@@ -106,3 +106,22 @@ Evidence:
 - `data/training/ppo/bt93s2r6/full_matrix_repair_report.json`
 - Command: `python python/scripts/bt93s2r6_full_matrix_repair.py --write-report`
 <!-- BT93S2R6.3-END -->
+
+<!-- BT93S2R6.4-START -->
+## 93S2R6.4 Full-Matrix Predicate Repair Gate
+
+- Result: `resultClass=full-matrix-predicate-green`, `ok=True`
+- Full Matrix: `9` scenarios x `13` actions = `338` probes
+- Materialisierte Repairs: S2R5-only `13`, S2R6 `52`, kombiniert `65`
+- Null-Counts: predicate=`0`, window=`0`, measurement=`0`, retainedV2=`0`, direction=`0`, fairness=`0`, neutral=`0`, negative=`0`
+- Training/Holdout/Optimizer: `0` / `0` / `0`
+
+S2R6.4 ist nur Messgueltigkeit auf der reparierten Full-Matrix. Gruen oeffnet nur
+`93S2R6.99`; `93S2R3.4-Recheck`, S2-Recheck, Training, Candidate, Freeze,
+Holdout, Promote, Rollout, PPO-Validate und BT95 bleiben geschlossen.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json`
+- Command: `python python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py --write-report`
+<!-- BT93S2R6.4-END -->
