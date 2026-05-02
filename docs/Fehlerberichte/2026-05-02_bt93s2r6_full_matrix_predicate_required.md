@@ -50,7 +50,32 @@ S2R5-Gruen ist nur 103-Row-Subset-Evidence und kein 338-Probe-Full-Matrix-Gruen.
 - `data/training/ppo/bt93s2r6/full_matrix_failure_ledger.json`
 - Command: `python python/scripts/bt93s2r6_full_matrix_failure_ledger.py --write-report`
 
+## 93S2R6.2 Root-Cause-Entscheid und Repair-Contract
+
+- Result: `resultClass=full-matrix-repair-contract-written`, `ok=True`
+- Repair-Decisions: `4`
+- Candidate-Probes: `52`
+- Candidate Predicate/Measurement/Window/Warmup Fails: `0` / `0` / `0` / `0`
+- Primaerklassen: `full-matrix-seed-startstate-required=2`, `retained-v2-seed-startstate-required=1`, `minimum-window-contract-required=1`
+- Replacement-Seed-Duplikate/Training/Holdout: `0` / `0` / `0`
+
+| Scenario | SourceSeed | Replacement | Primaerklasse | Rote Actions | Candidate-Probes | Candidate observedStepsMin |
+| --- | ---: | ---: | --- | --- | ---: | ---: |
+| `escape-right-open` | `930` | `2930` | `full-matrix-seed-startstate-required` | `evade-left, noop, pitch-down, turn-left-boost, yaw-left` | `13` | `11` |
+| `escape-right-open` | `1930` | `3930` | `full-matrix-seed-startstate-required` | `boost, noop, pitch-down, turn-left-boost` | `13` | `24` |
+| `narrowing-corridor` | `1934` | `934` | `retained-v2-seed-startstate-required` | `boost, noop, pitch-down, roll-left, roll-right, shoot-mg, turn-left-boost, turn-right-boost, yaw-left, yaw-right` | `13` | `11` |
+| `narrowing-corridor` | `2934` | `5934` | `minimum-window-contract-required` | `pitch-up` | `13` | `11` |
+
+Der Contract aendert keine Predicate-Schwellen, keine ActionSurface, kein Reward,
+keine Telemetrie, keinen PPO-Trainer, keine Runtime-Surface und keine Holdout-Lineage.
+`narrowing-corridor` retained-v2 bleibt bis zum S2R6.4-Null-Count quarantined.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r6/full_matrix_repair_contract.json`
+- Command: `python python/scripts/bt93s2r6_full_matrix_repair_contract.py --write-report`
+
 ## Naechster Schritt
 
-- Run 93S2R6.2 to classify each unique red Scenario/Seed/StartState group with exactly one primary repair class and lock the repair contract.
-- Do not start 93S2R6.3/4/99, 93S2R3.4-Recheck, 93S2R3.99, BT93S2.3-Recheck, 93S2.4, BT93T/U/W/O/P/94A, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate or BT95 yet.
+- Run 93S2R6.3 to apply only the locked full-matrix seed/start-state and minimum-window repair contract.
+- Do not start 93S2R6.4/99, 93S2R3.4-Recheck, 93S2R3.99, BT93S2.3-Recheck, 93S2.4, BT93T/U/W/O/P/94A, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate or BT95 yet.

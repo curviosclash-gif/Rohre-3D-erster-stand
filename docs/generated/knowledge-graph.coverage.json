@@ -135,12 +135,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2570,
-    "rawCoveredFileCount": 2080,
+    "trackedFileCount": 2572,
+    "rawCoveredFileCount": 2082,
     "rawCoveragePercent": 80.9,
-    "adjustedTrackedFileCount": 1667,
-    "adjustedCoveredFileCount": 1421,
-    "adjustedCoveragePercent": 85.2,
+    "adjustedTrackedFileCount": 1669,
+    "adjustedCoveredFileCount": 1423,
+    "adjustedCoveragePercent": 85.3,
     "uncoveredFileCount": 490,
     "uncoveredActiveFileCount": 246,
     "classifications": [
@@ -177,14 +177,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 319,
-        "coveredCount": 298
+        "count": 320,
+        "coveredCount": 299
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 934,
-        "coveredCount": 918
+        "count": 935,
+        "coveredCount": 919
       },
       {
         "classification": "product-docs",
@@ -9284,6 +9284,29 @@
     },
     {
       "path": "data/training/ppo/bt93s2r6/full_matrix_failure_ledger.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R6"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/training/ppo/bt93s2r6/full_matrix_repair_contract.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -21719,6 +21742,29 @@
     },
     {
       "path": "python/scripts/bt93s2r6_full_matrix_failure_ledger.py",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "BT90",
+        "BT91",
+        "BT92",
+        "BT93B",
+        "BT93D",
+        "BT93E",
+        "BT93S2R6"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "python/scripts/bt93s2r6_full_matrix_repair_contract.py",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
