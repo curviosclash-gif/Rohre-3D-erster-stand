@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 457,
+          "concreteCount": 459,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 595,
+          "concreteCount": 597,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 453,
+          "concreteCount": 455,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 452,
+          "concreteCount": 454,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1094,
+          "concreteCount": 1096,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1102,
+          "concreteCount": 1104,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1909,7 +1909,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2R3.3",
+        "currentPhase": "93S2R3.4",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2r3/bt93s2r3_closure_gate_report.json",
           "data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json",
@@ -1918,12 +1918,13 @@
           "data/training/ppo/bt93s2r3/replay_predicate_window_preflight.json",
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/Fehlerberichte/2026-05-01_bt93s2r3_measurement_reentry_required.md",
+          "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
           "python/scripts/bt93s2r3_failure_ledger.py",
           "python/scripts/bt93s2r3_replay_predicate_window_preflight.py"
         ],
         "scopeResolution": {
-          "concreteCount": 6,
-          "plannedCount": 3
+          "concreteCount": 8,
+          "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5636,7 +5637,7 @@
       "id": "BT93S2R3.3",
       "type": "phase",
       "title": "Direction-, Escape-Fairness- und Neutral-Control-Contract",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.3"
@@ -16236,8 +16237,8 @@
     {
       "id": "BT93S2R3.3.1",
       "type": "subphase",
-      "title": "Pro Scenario/Action ExpectedDirection, verbotene Gegenrichtung, erlaubte StateEffect-Signale und Reward-/Command-Flag-Ausschluss pinnen.",
-      "status": "open",
+      "title": "Pro Scenario/Action ExpectedDirection, verbotene Gegenrichtung, erlaubte StateEffect-Signale und Reward-/Command-Flag-Ausschluss pinnen. (abgeschlossen: 2026-05-02; evidence: `python python/scripts/bt93s2r3_direction_fairness_neutral_contract.py --write-report` -> `data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json`, `directionContractRowCount=103`, `forbiddenDirectionMissingCount=0`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.3",
@@ -16247,8 +16248,8 @@
     {
       "id": "BT93S2R3.3.2",
       "type": "subphase",
-      "title": "`escape-right-open` Fairness-First messen: positive Controls muessen im gueltigen Fenster messbar sein, bevor `action-space-required` erlaubt ist.",
-      "status": "open",
+      "title": "`escape-right-open` Fairness-First messen: positive Controls muessen im gueltigen Fenster messbar sein, bevor `action-space-required` erlaubt ist. (abgeschlossen: 2026-05-02; evidence: `python python/scripts/bt93s2r3_direction_fairness_neutral_contract.py --write-report` -> `data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json`, `escapeRightPositiveControlValidWindowCount=12/12`, `actionSpaceRequiredAllowedByThisPhase=false`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.3",
@@ -16258,8 +16259,8 @@
     {
       "id": "BT93S2R3.3.3",
       "type": "subphase",
-      "title": "`no-danger-control` stabilisieren: Neutral-Control darf weder Success noch Direction-Gruen noch Action-Gruen erzeugen.",
-      "status": "open",
+      "title": "`no-danger-control` stabilisieren: Neutral-Control darf weder Success noch Direction-Gruen noch Action-Gruen erzeugen. (abgeschlossen: 2026-05-02; evidence: `python python/scripts/bt93s2r3_direction_fairness_neutral_contract.py --write-report` -> `data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json`, `noDangerControlValidWindowCount=26/26`, `neutralControlRequiredCount=0`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.3",
@@ -32326,9 +32327,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R3"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -41317,6 +41324,27 @@
           "BT93D",
           "BT93E",
           "BT93S2R2"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R3"
         ],
         "exists": true
       }
@@ -79170,6 +79198,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -80926,6 +80963,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83480,6 +83526,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -85218,6 +85273,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88970,6 +89034,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -90717,6 +90790,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -93570,6 +93652,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -95317,6 +95408,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -104574,6 +104674,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -106321,6 +106430,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -114753,6 +114871,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -116509,6 +116636,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r2_predicate_window_repair.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -144583,6 +144719,15 @@
     {
       "from": "BT93S2R3",
       "to": "docs/Fehlerberichte/2026-05-01_bt93s2r3_measurement_reentry_required.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R3",
+      "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
       "type": "scope",
       "hint": null,
       "attributes": {

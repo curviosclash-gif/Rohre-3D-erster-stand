@@ -58,3 +58,22 @@ ueberstimmen.
 
 - Stop S2R3 action-effect work and repair replay/predicate/window measurement before 93S2R3.3.
 - Do not start BT93S2.3-Recheck, 93S2.4, BT93T/U/W/O/P/94A, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate or BT95.
+
+<!-- BT93S2R3.3-START -->
+## 93S2R3.3 Direction-, Fairness- und Neutral-Control-Contract
+
+- Result: `resultClass=direction-fairness-neutral-contract-green`, `ok=True`
+- Direction-Rows: `103`; Reward-/Command-Success erlaubt: `0`
+- Escape-right positive Controls messbar: `12` / `12`
+- No-danger Neutral-Control: rows `26`, actionGreenProduced=`False`, directionGreenProduced=`False`
+- Source Full-Replay: `103` rows x `3` repeats = `309` attempts
+
+S2R3.3 pinnt nur Direction-/Fairness-/Neutral-Vertraege. Action-Space-Urteile,
+Reward-, Telemetry-, ActionSurface-, Training-, Holdout- und Runtime-Aenderungen
+bleiben verboten.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json`
+- Command: `python python/scripts/bt93s2r3_direction_fairness_neutral_contract.py --write-report`
+<!-- BT93S2R3.3-END -->
