@@ -135,14 +135,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2565,
-    "rawCoveredFileCount": 2083,
-    "rawCoveragePercent": 81.2,
-    "adjustedTrackedFileCount": 1662,
-    "adjustedCoveredFileCount": 1424,
-    "adjustedCoveragePercent": 85.7,
-    "uncoveredFileCount": 482,
-    "uncoveredActiveFileCount": 238,
+    "trackedFileCount": 2567,
+    "rawCoveredFileCount": 2077,
+    "rawCoveragePercent": 80.9,
+    "adjustedTrackedFileCount": 1664,
+    "adjustedCoveredFileCount": 1418,
+    "adjustedCoveragePercent": 85.2,
+    "uncoveredFileCount": 490,
+    "uncoveredActiveFileCount": 246,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -189,8 +189,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 384,
-        "coveredCount": 196
+        "count": 386,
+        "coveredCount": 190
       },
       {
         "classification": "prototype",
@@ -3586,7 +3586,6 @@
         "bot-training-plan"
       ],
       "scopeBlocks": [
-        "BT11",
         "BT93D",
         "BT93E",
         "BT93F",
@@ -11083,6 +11082,19 @@
       "excludeReason": null
     },
     {
+      "path": "docs/archive/plans/superseded/Bot_Trainingsplan_vor_PPO_only_2026-05-02.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/archive/plans/superseded/Feature_GLB_Map_Loader.md",
       "tracked": true,
       "coveredInCore": false,
@@ -12034,15 +12046,11 @@
     {
       "path": "docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md",
       "tracked": true,
-      "coveredInCore": true,
+      "coveredInCore": false,
       "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "BT12"
-      ],
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
@@ -12051,15 +12059,11 @@
     {
       "path": "docs/bot-training/Bot_Survival_Training_Plan_10h.md",
       "tracked": true,
-      "coveredInCore": true,
+      "coveredInCore": false,
       "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "BT11"
-      ],
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
@@ -12068,15 +12072,11 @@
     {
       "path": "docs/bot-training/Bot_Survival_Training_Plan_12h.md",
       "tracked": true,
-      "coveredInCore": true,
+      "coveredInCore": false,
       "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "BT10"
-      ],
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
@@ -12085,15 +12085,11 @@
     {
       "path": "docs/bot-training/Bot_Survival_Training_Plan_BT20.md",
       "tracked": true,
-      "coveredInCore": true,
+      "coveredInCore": false,
       "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "BT20"
-      ],
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
@@ -12102,15 +12098,24 @@
     {
       "path": "docs/bot-training/Bot_Trainings_Roadmap.md",
       "tracked": true,
-      "coveredInCore": true,
+      "coveredInCore": false,
       "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "BT15"
-      ],
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/bot-training/Bot_Trainingsplan_PPO_Uebernahmebericht_2026-05-02.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
@@ -12126,15 +12131,6 @@
         "bot-training-plan"
       ],
       "scopeBlocks": [
-        "BT10",
-        "BT11",
-        "BT12",
-        "BT15",
-        "BT20",
-        "BT30",
-        "BT40",
-        "BT73",
-        "BT80C",
         "BT90",
         "BT91",
         "BT92",
@@ -12164,6 +12160,7 @@
         "BT93S2R3",
         "BT93S2R4",
         "BT93S2R5",
+        "BT93S2R6",
         "BT93T",
         "BT93U",
         "BT93V",
@@ -13566,11 +13563,9 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "bot-training-plan",
         "scope-files"
       ],
       "scopeBlocks": [
-        "BT73",
         "V77"
       ],
       "surfaces": [],
@@ -14436,11 +14431,9 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "bot-training-plan",
         "scope-files"
       ],
       "scopeBlocks": [
-        "BT80C",
         "V77"
       ],
       "surfaces": [],
@@ -14472,11 +14465,9 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "bot-training-plan",
         "scope-files"
       ],
       "scopeBlocks": [
-        "BT80C",
         "V77"
       ],
       "surfaces": [],
@@ -15966,7 +15957,6 @@
         "scope-files"
       ],
       "scopeBlocks": [
-        "BT73",
         "BT90",
         "BT93K",
         "V101",
@@ -16110,15 +16100,11 @@
     {
       "path": "docs/tests/Testergebnisse_Phase4b_2026-03-23.md",
       "tracked": true,
-      "coveredInCore": true,
+      "coveredInCore": false,
       "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "BT11"
-      ],
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
@@ -16157,11 +16143,9 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "bot-training-plan",
         "scope-files"
       ],
       "scopeBlocks": [
-        "BT40",
         "V51",
         "V69",
         "V89",
@@ -35716,7 +35700,6 @@
       ],
       "scopeBlocks": [
         "B13",
-        "BT20",
         "BT91"
       ],
       "surfaces": [],
@@ -35736,7 +35719,6 @@
       ],
       "scopeBlocks": [
         "B13",
-        "BT80C",
         "BT91"
       ],
       "surfaces": [],
@@ -35776,7 +35758,6 @@
       ],
       "scopeBlocks": [
         "B13",
-        "BT80C",
         "BT91",
         "BT93E"
       ],
@@ -35797,7 +35778,6 @@
       ],
       "scopeBlocks": [
         "B13",
-        "BT80C",
         "BT91",
         "BT93E"
       ],
@@ -35841,7 +35821,6 @@
       ],
       "scopeBlocks": [
         "B13",
-        "BT80C",
         "BT91",
         "BT93E"
       ],
@@ -35862,7 +35841,6 @@
       ],
       "scopeBlocks": [
         "B13",
-        "BT20",
         "BT91",
         "BT93E",
         "BT93N"

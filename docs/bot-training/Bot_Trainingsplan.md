@@ -70,6 +70,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Training
 - `93S2R4.99` ist abgeschlossen: `bt93s2r4_closure_gate_report.json` schreibt `resultClass=replay-startstate-green`, `gatePassed=true`, `activeBlockers=[]`, `opensNext=["93S2R3.3-Reentry"]`. Naechster claimbarer Scope ist nur `93S2R3.3-Reentry`; `93S2R3.4/99`, `BT93S2.3-Recheck`, `93S2.4`, `BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate und BT95 bleiben geschlossen.
 - `93S2R3.3-Reentry` ist abgeschlossen: `direction_fairness_neutral_contract.json` schreibt `resultClass=direction-fairness-neutral-contract-green`, `directionContractRowCount=103`, `sourceFullReplayAttemptCount=309`, `escapeRightFairnessFailureCount=0`, `neutralControlRequiredCount=0`, `rewardOrCommandSuccessAllowedCount=0`, `opensNext=["93S2R3.4 Retained-v2-Quarantaene und Full-Scenario Empirical Gate"]`. Naechster claimbarer Scope ist nur `93S2R3.4`; `BT93S2.3-Recheck`, `93S2.4`, `BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate und BT95 bleiben bis `BT93S2R3.99=matrix-control-reentry-green` geschlossen.
 - `93S2R3.4` ist abgeschlossen als `predicate-window-required`: `empirical_zero_gate_report.json` schreibt `probeCount=338`, `scenarioCount=9`, `actionCount=13`, `predicateFailureCount=19`, `minimumWindowFailureCount=1`, `measurementInvalidCount=19`, `retainedV2MeasurementInvalidCount=10`, `directionMismatchCount=0`, `escapeRightFairnessFailureCount=0`, `neutralControlRequiredCount=0`, `negativeControlFailedCount=0`, `newTrainingEpisodes=0`, `holdoutEpisodes=0`, `opensNext=[]`. `93S2R3.99`, `BT93S2.3-Recheck`, `93S2.4`, `BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate und BT95 bleiben bis zu einem engen Predicate-/Retained-v2-Folge-Replan geschlossen.
+- Der direkte User-Replan 2026-05-02 ist als P0-Folgeblock `BT93S2R6` aufgenommen. Naechster claimbarer Scope ist nur `93S2R6.1`; `BT93S2R6` repariert ausschliesslich die Full-Matrix Predicate-/PreAction-, retained-v2- und Minimum-Window-Messgueltigkeit nach rotem `93S2R3.4`. `93S2R3.99`, `BT93S2.3-Recheck`, `93S2.4`, `BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate und BT95 bleiben bis `BT93S2R6.99=full-matrix-predicate-green` plus frischem `93S2R3.4-Recheck` geschlossen.
 - Die BT93L-Baseline-Matrix zeigt ein hartes Reward-Ordnungsrisiko: `random` und `semantic-cycle` erreichen in Kurzfenstern teilweise gleichwertige oder bessere Progress-/Objective-Signale als `scripted-reachability`; `BT93U`/`BT93O` muessen das mit gepinnten Szenariofenstern widerlegen oder reparieren, sonst bleiben `BT93P` und `BT94A` blockiert.
 - Kein BT94A, kein Candidate, kein Freeze, kein Holdout, kein Promote, kein Rollout und kein weiterer Blind-Longrun vor `BT93O.99=bt93o-quality-green`, `BT93X.99=bt93p-starttruth-green`, frischem `BT93P.4=BT94A-ready` plus gruenem `bt94a_gate_check.py`.
 
@@ -123,12 +124,13 @@ Verbindliche Reihenfolge:
 10. `BT93S2R3` repariert nach rotem `BT93S2R2.99=measurement-invalid` nur die verbliebene Predicate-/Window-/Env-Messgueltigkeit, Direction-Contract-Fails, Escape-Right-Fairness, Retained-v2-Invalidationen und Neutral-Control; nach rotem `93S2R3.2` laeuft kein S2R3.3, bis `BT93S2R4` gruen ist.
 11. `BT93S2R4` repariert nach `93S2R3.2=replay-determinism-required` nur Replay-/StartState-/EnvReset-/Warmup-/Seed-/Runner-Determinismus und Predicate-/Window-Vorbedingungen; nach rotem `93S2R4.4=predicate-window-required` oeffnet S2R4 selbst nichts.
 12. `BT93S2R5` repariert nach rotem `93S2R4.4` nur Predicate-/PreAction-Validity fuer `narrowing-corridor`, `escape-right-open` und `no-danger-control`; gruen oeffnet hoechstens `93S2R4.5`, nicht `93S2R3.3-Reentry`, nicht `BT93S2.3-Recheck` und nicht `93S2.4`.
-13. `BT93T` ergaenzt nur bei Telemetriebedarf training-only Raw-/Trail-/Escape-Lane-Telemetrie; danach ist ein S2-Recheck Pflicht.
-14. `BT93U` repariert danger-aware Reward- und Objective-Ordering.
-15. `BT93V` trennt Safety-Diagnostik, Terminal-Sanity und Sidecar-Mask-Entscheid.
-16. `BT93W` fuehrt maximal einen 10k-Recheck aus und oeffnet nur bei `bt93o-precondition-green` die BT93O-Claim-Pruefung.
-17. `BT93O` ist danach nur noch Qualitaets-/Anti-Plateau-Gate und kann ausschliesslich `bt93o-quality-green` als gruenes Ergebnis liefern.
-18. `BT93X` klaert Same-Matrix-DQN oder explizite Ersatzvergleichspolitik und oeffnet `BT93P` nur mit `bt93p-starttruth-green`.
+13. `BT93S2R6` repariert nach rotem `93S2R3.4=predicate-window-required` nur die Full-Matrix Predicate-/PreAction-, retained-v2- und Minimum-Window-Messgueltigkeit auf der 9-Szenario/13-Action/338-Probe-Matrix; gruen oeffnet hoechstens einen frischen `93S2R3.4-Recheck`, nicht `93S2R3.99`, nicht `BT93S2.3-Recheck` und nicht `93S2.4`.
+14. `BT93T` ergaenzt nur bei Telemetriebedarf training-only Raw-/Trail-/Escape-Lane-Telemetrie; danach ist ein S2-Recheck Pflicht.
+15. `BT93U` repariert danger-aware Reward- und Objective-Ordering.
+16. `BT93V` trennt Safety-Diagnostik, Terminal-Sanity und Sidecar-Mask-Entscheid.
+17. `BT93W` fuehrt maximal einen 10k-Recheck aus und oeffnet nur bei `bt93o-precondition-green` die BT93O-Claim-Pruefung.
+18. `BT93O` ist danach nur noch Qualitaets-/Anti-Plateau-Gate und kann ausschliesslich `bt93o-quality-green` als gruenes Ergebnis liefern.
+19. `BT93X` klaert Same-Matrix-DQN oder explizite Ersatzvergleichspolitik und oeffnet `BT93P` nur mit `bt93p-starttruth-green`.
 
 Result-Class- und Dependency-Vertrag:
 
@@ -150,7 +152,9 @@ Result-Class- und Dependency-Vertrag:
 | BT93S2R5 -> 93S2R4.5 | nur bei `predicate-window-repair-green` mit `replayAttemptCount>=309`, `predicateFailureCount=0`, `measurementInvalidBeforeActionCount=0`, `minimumWindowFailureCount=0`, `warmupTerminalBeforeActionCount=0`, Replay-/StartMetrics-/Warmup-/Session-Drift `0` | `predicate-contract-required`, `seed-startstate-required`, `warmup-contract-required`, `neutral-control-contract-required`, `escape-right-fairness-predicate-required`, `metric-sampling-contract-required`, `scenario-contract-unrepairable`, `action-surface-lineage-invalidated`, `measurement-invalid` |
 | BT93S2R4 -> 93S2R3.3-Reentry | erst nach `BT93S2R5.99=predicate-window-repair-green`, `93S2R4.5` gruen und `BT93S2R4.99=replay-startstate-green`; S2R4-Gruen oeffnet dann nur `93S2R3.3-Reentry` | `predicate-window-required`, fehlendes S2R5-Gruen, fehlendes S2R4.5-Full-Gate, `replay-determinism-required`, `env-reset-required`, `warmup-contract-required`, `seed-rng-required`, `headless-runner-required`, `hash-recipe-required`, `action-surface-lineage-invalidated`, `measurement-invalid` |
 | 93S2R3.3-Reentry -> 93S2R3.4 | nur bei `direction-fairness-neutral-contract-green`, `directionContractRowCount=103`, `escapeRightFairnessFailureCount=0`, `neutralControlRequiredCount=0`, `rewardOrCommandSuccessAllowedCount=0` | `direction-contract-required`, `escape-right-fairness-required`, `neutral-control-required`, `predicate-window-required`, `action-surface-lineage-invalidated`, `measurement-invalid` |
-| 93S2R3.4 -> 93S2R3.99 / BT93S2.3-Recheck | nur bei `matrix-control-reentry-green` mit `probeCount>=338`, `predicateFailureCount=0`, `minimumWindowFailureCount=0`, `measurementInvalidCount=0`, `directionMismatchCount=0`, `escapeRightFairnessFailureCount=0`, `retainedV2MeasurementInvalidCount=0`, `neutralControlRequiredCount=0`, `negativeControlFailedCount=0`, `newTrainingEpisodes=0`, `holdoutEpisodes=0` | aktuelles `predicate-window-required`, `predicateFailureCount=19`, `measurementInvalidCount=19`, `minimumWindowFailureCount=1`, `retainedV2MeasurementInvalidCount=10`, `opensNext=[]`; enger Predicate-/Retained-v2-Folge-Replan erforderlich |
+| 93S2R3.4 -> 93S2R3.99 / BT93S2.3-Recheck | nur bei `matrix-control-reentry-green` mit `probeCount>=338`, `predicateFailureCount=0`, `minimumWindowFailureCount=0`, `measurementInvalidCount=0`, `directionMismatchCount=0`, `escapeRightFairnessFailureCount=0`, `retainedV2MeasurementInvalidCount=0`, `neutralControlRequiredCount=0`, `negativeControlFailedCount=0`, `newTrainingEpisodes=0`, `holdoutEpisodes=0` | aktuelles `predicate-window-required`, `predicateFailureCount=19`, `measurementInvalidCount=19`, `minimumWindowFailureCount=1`, `retainedV2MeasurementInvalidCount=10`, `opensNext=[]`; direkte Weiterleitung bleibt blockiert, Reparatur nur ueber `BT93S2R6` plus frischem `93S2R3.4-Recheck` |
+| 93S2R3.4 -> BT93S2R6 | aktuelles `predicate-window-required`, `probeCount=338`, `predicateFailureCount=19`, `measurementInvalidCount=19`, `minimumWindowFailureCount=1`, `retainedV2MeasurementInvalidCount=10`, `opensNext=[]` plus direkter User-Replan 2026-05-02 | fehlender Source-Lock, Scope will Training/Reward/Telemetry/ActionSurface/Runtime statt Full-Matrix Predicate-/Retained-v2-/Window-Repair, rote Quelle nicht versioniert |
+| BT93S2R6 -> 93S2R3.4-Recheck | nur bei `full-matrix-predicate-green` mit `probeCount>=338`, `scenarioCount=9`, `actionCount=13`, `predicateFailureCount=0`, `minimumWindowFailureCount=0`, `measurementInvalidCount=0`, `retainedV2MeasurementInvalidCount=0`, `directionMismatchCount=0`, `escapeRightFairnessFailureCount=0`, `neutralControlRequiredCount=0`, `negativeControlFailedCount=0`, `newTrainingEpisodes=0`, `holdoutEpisodes=0` | `full-matrix-seed-startstate-required`, `retained-v2-seed-startstate-required`, `predicate-contract-required`, `minimum-window-contract-required`, `metric-sampling-contract-required`, `scenario-contract-unrepairable`, `action-surface-lineage-invalidated`, `measurement-invalid` |
 | BT93S2 -> BT93T | nur bei frischem S2-Recheck nach allen Reentries und `observation-telemetry-required`, wenn Matrix-/Action-/Selection-Blocker geschlossen sind | `matrix-redesign-required`, `action-space-required`, `action-selection-required`, `action-surface-lineage-invalidated`, `measurement-invalid`, fehlendes `93S2R3.99=matrix-control-reentry-green` nach rotem S2R2 |
 | BT93S2 -> BT93U | frischer S2-Recheck nach allen Reentries mit `action-selection-green` und kein offener Telemetry-/Matrix-/Action-Space-Blocker | `action-selection-required`, `action-space-required`, `matrix-redesign-required`, `observation-telemetry-required`, `action-surface-lineage-invalidated`, `measurement-invalid`, fehlendes `93S2R3.99=matrix-control-reentry-green` nach rotem S2R2 |
 | BT93T -> BT93S2-Recheck | `telemetry-green` und vorheriger S2-Blocker war ausschliesslich Telemetry | jeder rote T-Ausgang |
@@ -362,9 +366,10 @@ Mikro-Claim-Regel:
 | BT93S2 | BT93S.99=`matrix-redesign-required` + User-Intake 2026-04-30 | hard | ja | Matrix-/Control-v2 und Existing-Action-v2 bis 93S2.3 ausgefuehrt; 93S2.3 endet `measurement-invalid`, normaler 93S2.4-Start blockiert |
 | BT93S2R | BT93S2.3=`measurement-invalid` + User-Intake 2026-04-30 | hard | ja | neuer P0-Interposer fuer Matrix-/Control-Reentry; naechster claimbarer Scope; oeffnet maximal `BT93S2.3-Recheck` |
 | BT93S2R2 | BT93S2.3-Recheck=`measurement-invalid` + User-Intake 2026-05-01 | hard | ja | enger Predicate-/Window-/Control-Reentry gegen echte Env-Messung; oeffnet maximal neuen `BT93S2.3-Recheck`, kein `93S2.4` |
-| BT93S2R3 | BT93S2R2.99=`measurement-invalid` + User-Intake 2026-05-01 + BT93S2R4.99=`replay-startstate-green` | hard | ja | `93S2R3.3-Reentry` ist als einziger naechster Scope offen; danach bleiben S2-Recheck/93S2.4 bis frischer Reentry-Evidence geschlossen |
+| BT93S2R3 | BT93S2R2.99=`measurement-invalid` + User-Intake 2026-05-01 + BT93S2R4.99=`replay-startstate-green` | hard | ja | `93S2R3.4` ist rot als `predicate-window-required`; `opensNext=[]`, `93S2R3.99` bleibt bis `BT93S2R6.99` plus frischem `93S2R3.4-Recheck` geschlossen |
 | BT93S2R4 | 93S2R3.2=`replay-determinism-required` + User-Intake 2026-05-01 + BT93S2R5.99=`predicate-window-repair-green` | hard | ja | abgeschlossen 2026-05-02 als `replay-startstate-green`; oeffnet nur `93S2R3.3-Reentry`, kein S2-Recheck, kein Training, kein Candidate |
 | BT93S2R5 | 93S2R4.4=`predicate-window-required` + User-Intake 2026-05-01 | hard | ja | neuer P0-Interposer fuer Predicate-/PreAction-Validity; oeffnet maximal `93S2R4.5`, kein S2R3-Reentry, kein S2-Recheck und kein Downstream |
+| BT93S2R6 | 93S2R3.4=`predicate-window-required`, `opensNext=[]` + direkter User-Replan 2026-05-02 | hard | ja | neuer P0-Interposer fuer Full-Matrix Predicate-/Retained-v2-/Minimum-Window-Repair; oeffnet maximal `93S2R3.4-Recheck`, kein `93S2R3.99`, kein S2-Recheck und kein Downstream |
 | BT93T | BT93S2.99=`observation-telemetry-required` nach allen noetigen S2-Reentries und frischem S2-Recheck | hard | nein | blockiert, bis BT93S2 nur noch Telemetrie als offenen S-Blocker meldet |
 | BT93U | BT93S2.99=`action-selection-green` oder BT93T.99=`telemetry-green` + S2-Recheck `action-selection-green`; zuvor alle S2-Reentry-Blocker gruen | hard | nein | Danger-aware Reward- und Objective-Ordering Repair |
 | BT93V | BT93U.99=`reward-ordering-green` | hard | nein | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision |
@@ -421,9 +426,10 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93S2 | 2026-05-01 | frei | `BT93S2.3-Recheck` abgeschlossen als `measurement-invalid`; `93S2.4` bleibt blockiert, Reentry-Intake erforderlich |
 | Bot-Codex | BT93S2R | 2026-04-30 | frei | abgeschlossen 2026-05-01 als `matrix-control-reentry-green`; oeffnet nur `BT93S2.3-Recheck` |
 | Bot-Codex | BT93S2R2 | 2026-05-01 | frei | abgeschlossen 2026-05-01 als `measurement-invalid`; `opensNext=[]`, enger Folge-Replan erforderlich |
-| Bot-Codex | BT93S2R3 | 2026-05-01 | frei | `93S2R3.4` abgeschlossen als `predicate-window-required`; `opensNext=[]`, enger Predicate-/Retained-v2-Folge-Replan erforderlich; kein S2-Recheck/Downstream |
+| Bot-Codex | BT93S2R3 | 2026-05-01 | frei | `93S2R3.4` abgeschlossen als `predicate-window-required`; Folge-Replan `BT93S2R6` aufgenommen; `93S2R3.99` bleibt gesperrt |
 | Bot-Codex | BT93S2R4 | 2026-05-01 | frei | abgeschlossen 2026-05-02 als `replay-startstate-green`; oeffnet nur `93S2R3.3-Reentry` |
 | Bot-Codex | BT93S2R5 | 2026-05-01 | frei | abgeschlossen 2026-05-01 als `predicate-window-repair-green`; `93S2R4.5` ist gruen, Downstream bleibt bis S2R4.99 geschlossen |
+| Bot-Codex | BT93S2R6 | 2026-05-02 | frei | direkter User-Replan aufgenommen; naechster claimbarer Scope nur `93S2R6.1`; kein S2R3.99/S2-Recheck/Downstream |
 | - | BT93T | - | frei | blockiert, bis S2-Recheck nach allen Reentries `observation-telemetry-required` schreibt |
 | - | BT93U | - | frei | wartet auf frisches BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck nach allen Reentries |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -476,9 +482,10 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93S2 | Matrix-/Action-Effect Repair nach rotem BT93S | planned | P0 | BT93S.99=`matrix-redesign-required` + User-Intake 2026-04-30 | Recheck abgeschlossen rot; `93S2.4` bleibt bis neuem measurement-valid Recheck blockiert | `docs/plaene/neu/BT93S2_Matrix_Action_Effect_Repair_Replan_2026-04-30.md` |
 | BT93S2R | Matrix-/Control-Reentry nach S2.3 measurement-invalid | completed | P0 | BT93S2.3=`measurement-invalid` + User-Intake 2026-04-30 | 93S2R.99 abgeschlossen: `matrix-control-reentry-green`, oeffnet nur `BT93S2.3-Recheck` | `docs/plaene/neu/BT93S2R_Matrix_Control_Reentry_Replan_2026-04-30.md` |
 | BT93S2R2 | Predicate-/Window-Reentry nach rotem S2.3-Recheck | completed | P0 | BT93S2.3-Recheck=`measurement-invalid` + User-Intake 2026-05-01 | 93S2R2.99 abgeschlossen: `measurement-invalid`, `opensNext=[]`; kein frischer Recheck, enger Folge-Replan erforderlich | `docs/plaene/neu/BT93S2R2_Recheck_Predicate_Window_Repair_Intake_2026-05-01.md` |
-| BT93S2R3 | Predicate-/Window-/Env-Measurement Reentry nach rotem S2R2 | active | P0 | BT93S2R2.99=`measurement-invalid` + User-Intake 2026-05-01 + BT93S2R4.99=`replay-startstate-green` | 93S2R3.4 offen; einziger naechster Scope | `docs/plaene/neu/BT93S2R3_Predicate_Window_Env_Measurement_Reentry_Intake_2026-05-01.md` |
+| BT93S2R3 | Predicate-/Window-/Env-Measurement Reentry nach rotem S2R2 | blocked | P0 | BT93S2R2.99=`measurement-invalid` + User-Intake 2026-05-01 + BT93S2R4.99=`replay-startstate-green` | 93S2R3.4 rot; 93S2R3.99 gesperrt bis BT93S2R6.99 plus frischem 93S2R3.4-Recheck | `docs/plaene/neu/BT93S2R3_Predicate_Window_Env_Measurement_Reentry_Intake_2026-05-01.md` |
 | BT93S2R4 | Replay-/StartState-Determinism Repair nach rotem S2R3.2 | completed | P0 | 93S2R3.2=`replay-determinism-required`, `opensNext=[]` + User-Intake 2026-05-01 + BT93S2R5.99=`predicate-window-repair-green` | 93S2R4.99 abgeschlossen; `replay-startstate-green`, oeffnet nur `93S2R3.3-Reentry` | `docs/plaene/neu/BT93S2R4_Replay_StartState_Determinism_Repair_Intake_2026-05-01.md` |
 | BT93S2R5 | Predicate-/PreAction-Validity Repair nach rotem S2R4.4 | completed | P0 | 93S2R4.4=`predicate-window-required`, `opensNext=[]` + User-Intake 2026-05-01 | 93S2R5.99 abgeschlossen; `predicate-window-repair-green` | `docs/plaene/neu/BT93S2R5_Predicate_PreAction_Validity_Repair_Intake_2026-05-01.md` |
+| BT93S2R6 | Full-Matrix Predicate-/Retained-v2 Repair nach rotem S2R3.4 | planned | P0 | 93S2R3.4=`predicate-window-required`, `opensNext=[]` + direkter User-Replan 2026-05-02 | 93S2R6.1 offen; einziger naechster `/fix-planung`-Scope | direkter User-Intake im Abschnitt `BT93S2R6` dieses Dokuments |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | frischer BT93S2-Recheck nach allen Reentries `observation-telemetry-required` | blockiert bis BT93S2 nur Telemetrie oeffnet | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | frischer BT93S2.99=`action-selection-green` oder BT93T.99=`telemetry-green` + S2-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93V | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision | planned | P1 | BT93U.99=`reward-ordering-green` | 93V.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -3762,12 +3769,14 @@ Evidence:
 
 - `data/training/ppo/bt93s2r3/empirical_zero_gate_report.json`
 
-### 93S2R3.99 Closure
+### 93S2R3.99 Closure (gesperrt bis BT93S2R6.99 + 93S2R3.4-Recheck)
 
-- [ ] 93S2R3.99.1 Closure schreibt genau eine Resultklasse: `matrix-control-reentry-green`, `replay-determinism-required`, `predicate-window-required`, `direction-contract-required`, `escape-right-fairness-required`, `retained-v2-measurement-required`, `neutral-control-required`, `action-surface-lineage-invalidated` oder `measurement-invalid`.
-- [ ] 93S2R3.99.2 Closure schreibt `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SampleCounts, SourceArtifacts und Invalidations.
-- [ ] 93S2R3.99.3 Gruen oeffnet nur `BT93S2.3-Recheck`; jede rote Resultklasse oeffnet nichts und benennt den naechsten engen Reparaturbedarf.
-- [ ] 93S2R3.99.4 Abschluss-Gate: `npm.cmd run gates:pre-commit`.
+Sperre: `93S2R3.99` ist aktuell kein claimbarer `/fix-planung`-Scope. Erst `BT93S2R6.99=full-matrix-predicate-green` plus frischer `93S2R3.4-Recheck` duerfen diese Closure wieder in offene Checkboxes umwandeln.
+
+- NO-GO 93S2R3.99.1 Closure schreibt genau eine Resultklasse: `matrix-control-reentry-green`, `replay-determinism-required`, `predicate-window-required`, `direction-contract-required`, `escape-right-fairness-required`, `retained-v2-measurement-required`, `neutral-control-required`, `action-surface-lineage-invalidated` oder `measurement-invalid`.
+- NO-GO 93S2R3.99.2 Closure schreibt `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SampleCounts, SourceArtifacts und Invalidations.
+- NO-GO 93S2R3.99.3 Gruen oeffnet nur `BT93S2.3-Recheck`; jede rote Resultklasse oeffnet nichts und benennt den naechsten engen Reparaturbedarf.
+- NO-GO 93S2R3.99.4 Abschluss-Gate: `npm.cmd run gates:pre-commit`.
 
 Evidence:
 
@@ -4078,6 +4087,156 @@ Harte Selbstpruefung des Replans:
 | ActionSurface-/Reward-/Telemetry-Drift | kritisch | Governance | Scope-Dateien und SourceHashes pinnen | ActionSurface/Reward/Telemetry-Datei im Diff |
 | Full-Gate wird uebersprungen | kritisch | Governance | S2R5-Gruen oeffnet nur `93S2R4.5`, nicht S2R3 oder S2-Recheck | `93S2R3.3` oder S2-Recheck claimbar |
 | Alte rote Reports werden als neue Evidence gelesen | hoch | QA | S2R5 schreibt eigene Artefakte und markiert alte Reports nur als Quellen | S2R4.4-Report als Gruen |
+
+---
+
+## Block BT93S2R6: Full-Matrix Predicate-/Retained-v2 Repair nach rotem S2R3.4
+
+Quelle: direkter User-Intake/Replan 2026-05-02 in diesem Dokument, abgeleitet aus `data/training/ppo/bt93s2r3/empirical_zero_gate_report.json`.
+
+<!-- LOCK: frei -->
+
+Scope:
+
+- `BT93S2R6` repariert nur den roten `93S2R3.4=predicate-window-required` auf der vollstaendigen 9-Szenario/13-Action/338-Probe-Matrix.
+- Harte Startbefunde: `probeCount=338`, `scenarioCount=9`, `actionCount=13`, `predicateFailureCount=19`, `minimumWindowFailureCount=1`, `measurementInvalidCount=19`, `retainedV2MeasurementInvalidCount=10`, `directionMismatchCount=0`, `escapeRightFairnessFailureCount=0`, `neutralControlRequiredCount=0`, `negativeControlFailedCount=0`, `newTrainingEpisodes=0`, `holdoutEpisodes=0`, `opensNext=[]`.
+- Lineage-Lock aus `93S2R3.4`: `matrixId=bt93s2r-walltrail-action-effect-matrix-v3`, `contractId=bt93s2r-walltrail-action-effect-window-v3`, `repairContractId=bt93s2r2-predicate-window-repair-contract-v1`, `actionSurfaceId=bt93q-walltrail-semantic-action-v1`, `decoderHash=970cdbb342541554bc5a9222aeb58ee61f88634c3f89ff715a2d369af380c0a9`, `empiricalRowsHash=8f3665054a80054c145aaccfc158b95dd204986b1694fd0e0981e158708cddfd`, `reportHash=11726cf75018cc9441fcc07756e82af29a029ce5ba11c8243587ba0198d3d6a0`.
+- Die Reparatur ist kein Training, keine Reward-/Telemetry-/ActionSurface-Aenderung, kein Action-Quality-Urteil und keine produktive Runtime-/AI-Hub-/Strategy-/Registry-/Matchstart-Aenderung.
+- Gruen oeffnet nur einen frischen `93S2R3.4-Recheck`; `93S2R3.99`, `BT93S2.3-Recheck`, `93S2.4`, `BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout, PPO-Validate und BT95 bleiben geschlossen.
+
+Rote Startgruppen aus `93S2R3.4`:
+
+| Scenario | Seed / SourceSeed | StartMetricsHash | Count | Actions | Primaerer Befund |
+| --- | --- | --- | --- | --- | --- |
+| `escape-right-open` | `930 / 930` | `73ff9e5226f7b17e62c2f73651d4c0ac27848ffe5b2b31da0a91a72fc407ba85` | 5 | `evade-left`, `noop`, `pitch-down`, `turn-left-boost`, `yaw-left` | S2R5 deckt diese Full-Matrix-Quelle nicht ab; Predicate `wallDistanceRight >= 0.40 && wallDistanceFront >= 0.85` scheitert vor Action; `observedSteps=24` |
+| `escape-right-open` | `1930 / 1930` | `aaf78118e47da521ff25d1fe8c41949a87e78ad716408856e947c27ede2884c8` | 4 | `boost`, `noop`, `pitch-down`, `turn-left-boost` | gleicher Predicate-/PreAction-Blocker, nicht durch S2R5 repariert; `turn-left-boost` hat `observedSteps=22`, andere Actions `24` |
+| `narrowing-corridor` | `1934 / 1934` | `5d3e6edfe719b8b7882fe1fe3b65b559193b09ebd3b2ea74715f010eecb3703f` | 10 | `boost`, `noop`, `pitch-down`, `roll-left`, `roll-right`, `shoot-mg`, `turn-left-boost`, `turn-right-boost`, `yaw-left`, `yaw-right` | retained-v2 und PreAction-Messung ungueltig; Predicate `localOpennessRatio <= 0.64 && min(wallDistanceLeft, wallDistanceRight) <= 0.75` scheitert; `observedSteps=24` |
+| `narrowing-corridor` | `2934 / 2934` | `795d1d0b9945aef0d624b0aae25ca221f84dd2ce2901809fc2168eb201dcf17f` | 1 | `pitch-up` | Predicate passt, aber `minimumCompletedSteps=6 < 8`; eigener Minimum-Window-Blocker |
+
+Scope-Dateien:
+
+| Pfad | Modus | Zweck |
+| --- | --- | --- |
+| `python/scripts/bt93s2r6_*.py` | write | Failure-Ledger, Coverage-Audit, Root-Cause, Repair-Contract, Full-Matrix-Recheck, Closure |
+| `data/training/ppo/bt93s2r6/**` | write | versionierte S2R6-Evidence |
+| `docs/bot-training/Bot_Trainingsplan.md` | write | Status, Evidence, Gate-Result |
+| `docs/Fehlerberichte/2026-05-02_bt93s2r6_full_matrix_predicate_required.md` | write | Blocker-, Root-Cause- und No-Go-Status |
+| `data/training/ppo/bt93s2r3/**`, `data/training/ppo/bt93s2r5/**`, `data/training/ppo/bt93s2r4/**`, `data/training/ppo/bt93s2r2/**`, `data/training/ppo/bt93s2/**` | read | rote Quelle, S2R5-Abdeckungsgrenze, historische Contracts |
+| `python/scripts/bt93s2r3_empirical_zero_gate.py` | conditional write | nur um einen gelockten S2R6-Repair-Contract als explizite Recheck-Quelle zu konsumieren |
+| `python/scripts/bt93s2_scenario_matrix_v2.py`, `python/scripts/bt93s2r2_predicate_window_repair.py` | conditional write | nur falls Root-Cause einen Scenario-/Predicate-/Seed-Vertrag dort eindeutig belegt |
+| `python/envs/curvios_env.py` | conditional write | nur bei maschinenlesbarem `metric-sampling-contract-required` oder Minimum-Window-/Sampling-Root-Cause im Env-Harness |
+| `python/envs/ppo_action_surface.py` | read-only | ActionSurfaceId/Decoder-Hash pinnen; keine Semantik-Aenderung |
+| `scripts/training-headless-lane-runner.mjs` | read-only | Runner-Hash pinnen; S2R6 ist kein Runner-Fix ohne neue Root-Cause-Evidence |
+| produktive Runtime-/AI-Hub-/Strategy-/Registry-/Matchstart-Surfaces | read-only | Layer-Grenze |
+
+Conditional-write-Regel: Jede Aenderung ausserhalb `python/scripts/bt93s2r6_*.py` braucht vorher maschinenlesbare Root-Cause-Evidence aus `93S2R6.1/93S2R6.2`. Keine ActionSurface-, Reward-, Telemetry-, PPO-Training- oder produktive Runtime-Semantik darf in diesem Block geaendert werden.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.S2R6-1 Source-Lock pinnt `93S2R3.4`, `93S2R3.3-Reentry`, `BT93S2R5.99`, `BT93S2R4.99`, MatrixId, ContractId, ActionSurfaceId, Decoder-Hash, Git-SHA, ReportHashes, SampleCounts, PredicateIds, StartMetricsHashes, WarmupKeys und alle roten Row-IDs.
+- [ ] DoD.S2R6-2 Failure-Ledger schreibt alle 20 roten Rows und alle Geschwister-Rows derselben Scenario/Seed/StartMetricsHash/PredicateId/WarmupKey-Gruppe; nur rote Einzelaktionen zu reparieren ist ungueltig.
+- [ ] DoD.S2R6-3 Non-Coverage-Audit beweist explizit, warum S2R5 zwar 103 S2R4-Rows reparierte, aber die jetzigen Full-Matrix-Rows `escape-right-open:930/1930` und `narrowing-corridor:1934/2934` nicht vollstaendig abdeckte.
+- [ ] DoD.S2R6-4 Root-Cause-Report klassifiziert jede unique rote Gruppe mit genau einer Primaerklasse: `full-matrix-seed-startstate-required`, `retained-v2-seed-startstate-required`, `predicate-contract-required`, `minimum-window-contract-required`, `metric-sampling-contract-required`, `scenario-contract-unrepairable`, `action-surface-lineage-invalidated` oder `measurement-invalid`.
+- [ ] DoD.S2R6-5 Vor jeder Reparatur liegt ein gelockter Repair-Contract mit Candidate-Probes, Threshold-Margins, Kontrollschutz, Invalidation-Regeln und `noPostHocThresholdChange=true` vor.
+- [ ] DoD.S2R6-6 Reparatur umfasst alle betroffenen Full-Matrix-Geschwister einer ungueltigen Scenario/Seed/StartState-Gruppe, nicht nur die 20 roten Rows.
+- [ ] DoD.S2R6-7 Seed-/StartState-Replacements behalten `sourceSeed`, `diagnosticSeedReplacement`, StartMetricsHash-Lineage und Holdout-Sperre; Seed-Duplikate duerfen Varianz nicht verstecken.
+- [ ] DoD.S2R6-8 Der Minimum-Window-Fail `narrowing-corridor seed=2934 action=pitch-up` wird separat als Window-/Sampling-Vertrag geprueft und darf nicht in Predicate-Gruen verschwinden.
+- [ ] DoD.S2R6-9 Full-Matrix-Recheck laeuft auf mindestens derselben 338-Probe-Matrix mit `scenarioCount=9` und `actionCount=13`; niedrigere Counts sind `measurement-invalid`.
+- [ ] DoD.S2R6-10 Gruen verlangt exakt `predicateFailureCount=0`, `minimumWindowFailureCount=0`, `measurementInvalidCount=0`, `retainedV2MeasurementInvalidCount=0`, `directionMismatchCount=0`, `escapeRightFairnessFailureCount=0`, `neutralControlRequiredCount=0`, `negativeControlFailedCount=0`, `newTrainingEpisodes=0`, `holdoutEpisodes=0`.
+- [ ] DoD.S2R6-11 Closure schreibt genau eine erlaubte Resultklasse, `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SourceArtifacts, SampleCounts, Invalidations und klare `nextAllowedActions`.
+- [ ] DoD.S2R6-12 `npm.cmd run gates:pre-commit` ist gruen oder ein exakter Gate-Blocker ist dokumentiert.
+
+### 93S2R6.1 Full-Matrix Failure-Ledger und Non-Coverage-Audit
+
+- [ ] 93S2R6.1.1 `93S2R3.4`-Report, rote Rows, Full-Matrix-Contract, S2R5-Repair-Contract, S2R4-Replay-Gruen und S2R3-Direction-Gruen mit Hash und Count-Snapshot locken.
+- [ ] 93S2R6.1.2 Alle 20 roten Rows mit Scenario, Seed, SourceSeed, Action, PredicateId, Predicate-Operanden, Predicate-Margin, StartMetricsHash, WarmupKey, requestedRepeatSteps, observedSteps und retained-v2-Flag schreiben.
+- [ ] 93S2R6.1.3 Alle Full-Matrix-Geschwister-Rows derselben Scenario/Seed/StartMetricsHash/PredicateId/WarmupKey-Gruppe ermitteln; `siblingExpansionCount` ist Gate-Bestandteil.
+- [ ] 93S2R6.1.4 Fehlerbericht `docs/Fehlerberichte/2026-05-02_bt93s2r6_full_matrix_predicate_required.md` mit Befundmatrix, S2R5-Coverage-Gap, No-Go-Status und Root-Cause-Hypothesen schreiben.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r6/full_matrix_failure_ledger.json`
+- `docs/Fehlerberichte/2026-05-02_bt93s2r6_full_matrix_predicate_required.md`
+
+### 93S2R6.2 Root-Cause-Entscheid und Repair-Contract
+
+- [ ] 93S2R6.2.1 Jede unique rote Gruppe deduplizieren nach Scenario/Seed/SourceSeed/StartMetricsHash/PredicateId/WarmupKey und genau eine Repair-Klasse waehlen.
+- [ ] 93S2R6.2.2 Candidate-Probes pruefen alte und neue StartStates/Predicates/Window-Regeln vor Repair-Anwendung; positive, negative und neutral Controls bleiben gelockt.
+- [ ] 93S2R6.2.3 Repair-Contract pinnt erlaubte Dateiwrites, Invalidation-Regeln, Kontrollmargen, Replacement-Manifest, retained-v2-Quarantaene und `noPostHocThresholdChange=true`.
+- [ ] 93S2R6.2.4 Wenn mehr als eine plausible Primaerursache bleibt, endet die Phase `measurement-invalid` und oeffnet nichts.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r6/full_matrix_repair_contract.json`
+
+### 93S2R6.3 Enger Full-Matrix Predicate-/StartState-/Window-Repair
+
+- [ ] 93S2R6.3.1 Reparatur exakt gemaess `93S2R6.2` anwenden; keine weitere Datei ausserhalb der erlaubten Scope-Liste beruehren.
+- [ ] 93S2R6.3.2 `escape-right-open` bleibt Fairness-first: gueltiges Predicate-Fenster fuer Positive Controls, aber kein Action-Space- oder Action-Quality-Urteil.
+- [ ] 93S2R6.3.3 `narrowing-corridor` retained-v2 bleibt quarantined, bis die Full-Matrix-Rows und retained-v2-Rows beide Null-Counts schreiben.
+- [ ] 93S2R6.3.4 Minimum-Window-Reparatur wird separat von Predicate-/Seed-Reparatur reportet und invalidiert keine Direction-/Fairness-Gruen-Evidence.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r6/full_matrix_repair_report.json`
+
+### 93S2R6.4 Full-Matrix Recheck auf repariertem Vertrag
+
+- [ ] 93S2R6.4.1 Recheck nutzt den gelockten Repair-Contract und laeuft auf der 9-Szenario/13-Action/338-Probe-Matrix; `probeCount < 338` ist `measurement-invalid`.
+- [ ] 93S2R6.4.2 Gruen verlangt alle DoD.S2R6-10 Counts exakt 0; alte rote S2R3.4-Reports bleiben historische Quelle, nicht Gruen.
+- [ ] 93S2R6.4.3 Bei Rot schreibt der Report exakt die naechste enge Reparaturklasse und `opensNext=[]`.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json`
+
+### 93S2R6.99 Closure und Reentry-Freigabe
+
+- [ ] 93S2R6.99.1 Closure schreibt genau eine Resultklasse: `full-matrix-predicate-green`, `full-matrix-seed-startstate-required`, `retained-v2-seed-startstate-required`, `predicate-contract-required`, `minimum-window-contract-required`, `metric-sampling-contract-required`, `scenario-contract-unrepairable`, `action-surface-lineage-invalidated` oder `measurement-invalid`.
+- [ ] 93S2R6.99.2 Closure schreibt `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SampleCounts, SourceArtifacts, Invalidations und klare NextAllowedActions.
+- [ ] 93S2R6.99.3 Gruen oeffnet nur `93S2R3.4-Recheck`; jede rote Resultklasse oeffnet nichts.
+- [ ] 93S2R6.99.4 Abschluss-Gate: `npm.cmd run gates:pre-commit`.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r6/bt93s2r6_closure_gate_report.json`
+
+Result-Class-Vertrag:
+
+| ResultClass | Bedeutung | Erlaubt |
+| --- | --- | --- |
+| `full-matrix-predicate-green` | Full-Matrix Predicate-/PreAction-, retained-v2- und Minimum-Window-Messgueltigkeit ist auf 338 Proben gruen | nur `93S2R3.4-Recheck` |
+| `full-matrix-seed-startstate-required` | eine Full-Matrix-Seed-/StartState-Gruppe bleibt ungueltig | enger Folgefix, kein Next |
+| `retained-v2-seed-startstate-required` | retained-v2-Gruppe bleibt messungueltig oder nicht quarantined | enger retained-v2-Fix, kein Next |
+| `predicate-contract-required` | Predicate-Ausdruck, Operanden oder Margins bleiben ungueltig | enger Predicate-Fix, kein Next |
+| `minimum-window-contract-required` | Minimum-Window oder Repeat-/Observed-Step-Vertrag bleibt ungueltig | enger Window-/Sampling-Fix, kein Next |
+| `metric-sampling-contract-required` | Metriken vor Action sind nicht beweisfaehig | enger Diagnose-Harness-Fix, kein Next |
+| `scenario-contract-unrepairable` | kein enger Repair im erlaubten Scope beweisbar | User-Entscheid/Replan, kein Next |
+| `action-surface-lineage-invalidated` | ActionSurfaceId oder Decoder-Hash driftet | Stop, neuer Lineage-Entscheid |
+| `measurement-invalid` | Quellen, Versionierung, SampleCounts oder Messung ungueltig | nichts |
+
+Harte Selbstpruefung des Replans:
+
+- Fehler waere, nur die 20 roten Rows zu reparieren. Korrektur: S2R6 verlangt Sibling-Expansion auf alle Full-Matrix-Rows derselben invaliden Scenario/Seed/StartState-Gruppe.
+- Fehler waere, S2R5-Gruen als Beweis fuer die 338er Matrix zu lesen. Korrektur: S2R6 hat einen eigenen Non-Coverage-Audit und ein eigenes 338-Probe-Gate.
+- Fehler waere, Predicate-Schwellen kosmetisch zu lockern. Korrektur: Candidate-Probes, Margins, Controls und `noPostHocThresholdChange=true` sind vor Repair gesperrt.
+- Fehler waere, den `pitch-up`-Minimum-Window-Fail als Predicate-Fail zu verstecken. Korrektur: eigene Resultklasse und DoD fuer Minimum-Window.
+- Fehler waere, Seed-Replacement durch Seed-Duplikate zu verstecken. Korrektur: Replacement-Manifest mit `sourceSeed`, `diagnosticSeedReplacement`, Duplicate-Audit und Holdout-Sperre.
+- Fehler waere, nach S2R6-Gruen Bot-Training oder S2R3.99 direkt zu starten. Korrektur: Gruen oeffnet nur `93S2R3.4-Recheck`; erst dessen Gruen kann `BT93S2R3.99` wieder sinnvoll machen.
+
+### Risiko-Register BT93S2R6
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| S2R5-Teilmengenfehler wird wiederholt | kritisch | QA/RL | Full-Matrix-Sibling-Expansion und 338-Probe-Recheck | Repair deckt nur rote Einzelaktionen ab |
+| Predicate wird kosmetisch gelockert | kritisch | RL | Repair-Contract mit Margins, Controls und `noPostHocThresholdChange=true` | Predicate-Gruen ohne Candidate-Probes |
+| Retained-v2 kontaminiert Folgeentscheidungen | kritisch | QA | retained-v2-Quarantaene und eigener Null-Count | `retainedV2MeasurementInvalidCount > 0` |
+| Minimum-Window wird falsch klassifiziert | hoch | QA/RL | separate Window-/Sampling-Resultklasse | `minimumWindowFailureCount > 0` in gruenem Report |
+| Seed-Replacement versteckt Varianz | kritisch | Governance | Replacement-Manifest, Duplicate-Audit, Holdout-Sperre | sourceSeed verloren oder HoldoutSeed im Repair |
+| Alte rote Reports werden als neue Evidence gelesen | hoch | QA | S2R6 schreibt eigene Artefakte; alte Reports nur Quellen | S2R3.4-Report als Gruen |
+| ActionSurface-/Reward-/Telemetry-Drift | kritisch | Governance | Scope-Dateien und SourceHashes pinnen | ActionSurface/Reward/Telemetry-Datei im Diff |
+| Direct-Next wird zu frueh geoeffnet | kritisch | Governance | Closure oeffnet nur `93S2R3.4-Recheck` | `93S2R3.99`, S2-Recheck oder Downstream claimbar |
+| Full-Gate wird report-only | kritisch | QA | echte Env-Proben mit `probeCount>=338` | Contract-Gruen ohne 338 Proben |
 
 ---
 
@@ -5244,16 +5403,17 @@ Rollout-Intake-Pflichtpaket:
 | 40 | `93S2R5.99 Closure` abgeschlossen. | `93S2R5.4` oeffnete nur Closure; Closure musste ResultClass, ClaimFlags, SourceArtifacts, Invalidations und NextAllowedActions schreiben. | `bt93s2r5_closure_gate_report.json` meldet `predicate-window-repair-green`, `gatePassed=true`, `activeBlockers=[]`, `opensNext=["93S2R4.5"]`; naechster Scope nur `93S2R4.5`, kein S2R3-/S2-/Training-/Candidate-Signal. |
 | 41 | `93S2R4.5 Full Replacement Preflight` abgeschlossen. | `BT93S2R5.99=predicate-window-repair-green` oeffnete nur `93S2R4.5`; S2R4.99 und Downstream blieben bis Full-Gate geschlossen. | `full_replay_preflight_gate.json` meldet `replay-startstate-green`, `replayAttemptCount=309`, alle S2R4-Null-Counts `0`, `activeBlockers=[]`, `opensNext=["93S2R4.99 Closure"]`; S2R3-Reentry nur nach Closure. |
 | 42 | `93S2R4.99 Closure` abgeschlossen. | `93S2R4.5=replay-startstate-green` oeffnete nur Closure; Closure durfte maximal S2R3-Reentry oeffnen. | `bt93s2r4_closure_gate_report.json` meldet `replay-startstate-green`, `gatePassed=true`, `activeBlockers=[]`, `opensNext=["93S2R3.3-Reentry"]`; naechster Scope nur `93S2R3.3-Reentry`, kein S2-Recheck/Training/Candidate. |
-| 43 | Nur nach `BT93W.99=bt93o-precondition-green`: `BT93O Action-/Objective-Quality und Anti-Plateau`. | R-Reentry/S2/S2R/T/U/V/W sind gruen, gleiche IDs oder Drift-Invalidierung liegen vor. | Einziger gruener Ausgang `bt93o-quality-green`; kein BT93P-/BT94A-Signal. |
-| 44 | Nur nach `BT93O.99=bt93o-quality-green`: voller `BT93X Same-Matrix-DQN oder Ersatzvergleich + BT93P Starttruth`. | `93X.0` ist abgeschlossen, Ersatzvergleichspolitik aus BT93Y ist gelockt, BT93O-Qualitaetsbasis steht. | `bt93p-starttruth-green` oder konkreter Comparator-/DQN-/User-Entscheid-Blocker; BT94A bleibt rot. |
-| 45 | Nur nach `BT93O.99=bt93o-quality-green` und `BT93X.99=bt93p-starttruth-green`: `BT93P PPO Trainingsleiter und BT94A-Reentry-Gate`. | Comparator/Ersatzvergleich, Holdout, Statistikvertrag, Reward-Ordering und Fehlersignatur-Widerlegung sind startfaehig. | 200k->500k->1M Evidence-Leiter; Ergebnis `BT94A-ready` oder ehrlicher Folgeblocker. |
-| 46 | Erst bei `BT93P.4=BT94A-ready` plus gruenem Gate: `94A.1` claimen. | `no_start_gate.json` meldet `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true`, `precomparison != ppo-regression`; Source-Prioritaet ist BT93P.4 -> BT93X -> BT93O -> BT93W -> BT93R-Reentry -> BT93Y -> BT93Q. | Ablationsmatrix und Entscheidungsregeln fuer BT94A; weiterhin kein Freeze vor `94A.3` und kein BT94B-Handover ohne echten PPO-Validate-Load. |
+| 43 | `93S2R3.4` rot abgeschlossen und direkter `BT93S2R6`-Replan aufgenommen. | `empirical_zero_gate_report.json` meldet `predicate-window-required`, `probeCount=338`, `predicateFailureCount=19`, `measurementInvalidCount=19`, `minimumWindowFailureCount=1`, `retainedV2MeasurementInvalidCount=10`, `opensNext=[]`. | Naechster Scope nur `93S2R6.1`; `93S2R3.99`, S2-Recheck, Training und Candidate bleiben bis `BT93S2R6.99=full-matrix-predicate-green` plus frischem `93S2R3.4-Recheck` geschlossen. |
+| 44 | Nur nach `BT93W.99=bt93o-precondition-green`: `BT93O Action-/Objective-Quality und Anti-Plateau`. | R-Reentry/S2/S2R/T/U/V/W sind gruen, gleiche IDs oder Drift-Invalidierung liegen vor. | Einziger gruener Ausgang `bt93o-quality-green`; kein BT93P-/BT94A-Signal. |
+| 45 | Nur nach `BT93O.99=bt93o-quality-green`: voller `BT93X Same-Matrix-DQN oder Ersatzvergleich + BT93P Starttruth`. | `93X.0` ist abgeschlossen, Ersatzvergleichspolitik aus BT93Y ist gelockt, BT93O-Qualitaetsbasis steht. | `bt93p-starttruth-green` oder konkreter Comparator-/DQN-/User-Entscheid-Blocker; BT94A bleibt rot. |
+| 46 | Nur nach `BT93O.99=bt93o-quality-green` und `BT93X.99=bt93p-starttruth-green`: `BT93P PPO Trainingsleiter und BT94A-Reentry-Gate`. | Comparator/Ersatzvergleich, Holdout, Statistikvertrag, Reward-Ordering und Fehlersignatur-Widerlegung sind startfaehig. | 200k->500k->1M Evidence-Leiter; Ergebnis `BT94A-ready` oder ehrlicher Folgeblocker. |
+| 47 | Erst bei `BT93P.4=BT94A-ready` plus gruenem Gate: `94A.1` claimen. | `no_start_gate.json` meldet `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true`, `precomparison != ppo-regression`; Source-Prioritaet ist BT93P.4 -> BT93X -> BT93O -> BT93W -> BT93R-Reentry -> BT93Y -> BT93Q. | Ablationsmatrix und Entscheidungsregeln fuer BT94A; weiterhin kein Freeze vor `94A.3` und kein BT94B-Handover ohne echten PPO-Validate-Load. |
 
 No-Go vor Bot-Training:
 
 - Kein `baseline`-, `pilot`- oder Langlauf, solange frisches `freezeOk=true`, Clean-Env, Action-Surface, Startmanifest, Baseline-ID, Audit-Delta und ab BT93K Preflight-/Supervisor-/Signal-Gates nicht belegt sind; die 93J.5c-Diagnose-Ausnahme ist abgeschlossen und wird nicht wiederholt.
 - Kein weiterer PPO-Lauf aus BT93L; `BT93M` ist Gate-/DQN-Anker-Arbeit ohne PPO-Qualitaetslauf, `BT93N` und `BT93Q` sind rot abgeschlossen, `BT93W` darf erst nach BT93Y, R-Reentry und S/T/U/V-Gruen maximal einen 10k-Recheck starten.
-- Kein BT93T-/BT93U-/BT93W-/BT93O-/BT93P-/BT94A-Start aus `BT93S.99=matrix-redesign-required`, altem `BT93S2.3=measurement-invalid`, frischem `BT93S2.3-Recheck=measurement-invalid`, `BT93S2R2.99=measurement-invalid` oder rotem `BT93S2R3`. Stand 2026-05-02 ist `93S2R3.4=predicate-window-required` rot mit `opensNext=[]`; `93S2R3.99`, `BT93S2.3-Recheck` und `93S2.4` bleiben bis zu einem engen Predicate-/Retained-v2-Folge-Replan plus spaeterem `BT93S2R3.99=matrix-control-reentry-green` geschlossen. `BT93T` oeffnet nur bei frischem `BT93S2.99=observation-telemetry-required`, `BT93U` nur bei frischem `BT93S2.99=action-selection-green`.
+- Kein BT93T-/BT93U-/BT93W-/BT93O-/BT93P-/BT94A-Start aus `BT93S.99=matrix-redesign-required`, altem `BT93S2.3=measurement-invalid`, frischem `BT93S2.3-Recheck=measurement-invalid`, `BT93S2R2.99=measurement-invalid` oder rotem `BT93S2R3`. Stand 2026-05-02 ist `93S2R3.4=predicate-window-required` rot mit `opensNext=[]`; der enge Folge-Replan ist `BT93S2R6`, und nur `93S2R6.1` ist claimbar. `93S2R3.99`, `BT93S2.3-Recheck` und `93S2.4` bleiben bis `BT93S2R6.99=full-matrix-predicate-green`, frischem `93S2R3.4-Recheck` und spaeterem `BT93S2R3.99=matrix-control-reentry-green` geschlossen. `BT93T` oeffnet nur bei frischem `BT93S2.99=observation-telemetry-required`, `BT93U` nur bei frischem `BT93S2.99=action-selection-green`.
 - Kein BT93O-Start, solange `BT93W.99` nicht `bt93o-precondition-green` schreibt; `BT93Q.99`, Plantext, `walltrail-policy-green`-Altformeln oder einzelne non-blocking Teilfelder reichen nach rotem BT93Q nicht.
 - Keine 50k-/100k-/200k-Erweiterung, solange MaxStep-Plateau, DeathBefore60, Objective-/Progress-Signal und Survival gemeinsam nicht besser oder sauber neutral klassifiziert sind.
 - Kein BT93P-Start, solange `BT93O.99` nicht `bt93o-quality-green` und `BT93X.99` nicht `bt93p-starttruth-green` schreiben; Reward-Ordering muss zeigen: Noop < Random/Semantic-Cycle < Scripted/learned, und Comparator/Ersatzvergleich, Holdout und Statistik muessen startfaehig sein.

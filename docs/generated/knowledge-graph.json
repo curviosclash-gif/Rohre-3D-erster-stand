@@ -460,254 +460,6 @@
       }
     },
     {
-      "id": "BT10",
-      "type": "block",
-      "title": "12h Survival Operatorlauf",
-      "status": "active",
-      "attributes": {
-        "source": [
-          "bot-training-plan",
-          "dependency-target"
-        ],
-        "priority": null,
-        "owner": null,
-        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "referencePlanFile": "docs/bot-training/Bot_Survival_Training_Plan_12h.md",
-        "currentPhase": "10.1",
-        "scopeDeclarations": [
-          "docs/bot-training/Bot_Survival_Training_Plan_12h.md",
-          "docs/bot-training/Bot_Trainingsplan.md"
-        ],
-        "scopeResolution": {
-          "concreteCount": 2,
-          "plannedCount": 0
-        },
-        "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
-      }
-    },
-    {
-      "id": "BT11",
-      "type": "block",
-      "title": "10h Survival Folgefenster",
-      "status": "done",
-      "attributes": {
-        "source": [
-          "bot-training-plan",
-          "dependency-target"
-        ],
-        "priority": null,
-        "owner": null,
-        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "referencePlanFile": "docs/bot-training/Bot_Survival_Training_Plan_10h.md",
-        "currentPhase": "11.99",
-        "scopeDeclarations": [
-          "data/bot_validation_report.json",
-          "data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json",
-          "docs/bot-training/Bot_Survival_Training_Plan_10h.md",
-          "docs/bot-training/Bot_Trainingsplan.md",
-          "docs/tests/Testergebnisse_Phase4b_2026-03-23.md"
-        ],
-        "scopeResolution": {
-          "concreteCount": 4,
-          "plannedCount": 1
-        },
-        "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
-      }
-    },
-    {
-      "id": "BT12",
-      "type": "block",
-      "title": "10h Bot Folgefenster (Classic + Fight Matrix)",
-      "status": "active",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "priority": null,
-        "owner": null,
-        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "referencePlanFile": "docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md",
-        "currentPhase": "12.2",
-        "scopeDeclarations": [
-          "docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md",
-          "docs/bot-training/Bot_Trainingsplan.md",
-          "tmp/bot-validation-report.json"
-        ],
-        "scopeResolution": {
-          "concreteCount": 2,
-          "plannedCount": 1
-        },
-        "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
-      }
-    },
-    {
-      "id": "BT15",
-      "type": "block",
-      "title": "Zukunfts-Roadmap Survival (Q2)",
-      "status": "active",
-      "attributes": {
-        "source": [
-          "bot-training-plan",
-          "dependency-target"
-        ],
-        "priority": null,
-        "owner": null,
-        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "referencePlanFile": "docs/bot-training/Bot_Trainings_Roadmap.md",
-        "currentPhase": "15.2",
-        "scopeDeclarations": [
-          "docs/bot-training/Bot_Trainings_Roadmap.md",
-          "docs/bot-training/Bot_Trainingsplan.md"
-        ],
-        "scopeResolution": {
-          "concreteCount": 2,
-          "plannedCount": 0
-        },
-        "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
-      }
-    },
-    {
-      "id": "BT20",
-      "type": "block",
-      "title": "Survival-Policy und Reward-Shaping",
-      "status": "open",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "priority": null,
-        "owner": null,
-        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "referencePlanFile": "docs/bot-training/Bot_Survival_Training_Plan_BT20.md",
-        "currentPhase": "20.99",
-        "scopeDeclarations": [
-          "docs/bot-training/Bot_Survival_Training_Plan_BT20.md",
-          "docs/bot-training/Bot_Trainingsplan.md",
-          "tests/trainer-v36-action-safety.test.mjs",
-          "tests/training-reward-survival.test.mjs"
-        ],
-        "scopeResolution": {
-          "concreteCount": 4,
-          "plannedCount": 0
-        },
-        "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
-      }
-    },
-    {
-      "id": "BT30",
-      "type": "block",
-      "title": "Curriculum, Replay-Priorisierung und Hyperparameter",
-      "status": "open",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "priority": null,
-        "owner": null,
-        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "referencePlanFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "30.1",
-        "scopeDeclarations": [
-          "docs/bot-training/Bot_Trainingsplan.md"
-        ],
-        "scopeResolution": {
-          "concreteCount": 1,
-          "plannedCount": 0
-        },
-        "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
-      }
-    },
-    {
-      "id": "BT40",
-      "type": "block",
-      "title": "Eval-/Gate-Haertung und Regression-Schutz",
-      "status": "open",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "priority": null,
-        "owner": null,
-        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "referencePlanFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "40.1",
-        "scopeDeclarations": [
-          "docs/bot-training/Bot_Trainingsplan.md",
-          "docs/Umsetzungsplan.md"
-        ],
-        "scopeResolution": {
-          "concreteCount": 2,
-          "plannedCount": 0
-        },
-        "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
-      }
-    },
-    {
-      "id": "BT73",
-      "type": "block",
-      "title": "Deep-Survival-, Intent- und Resume-Haertung fuer Runtime, Training und Operatorpfade",
-      "status": "open",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "priority": null,
-        "owner": null,
-        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "referencePlanFile": "docs/plaene/alt/Feature_Bot_Tiefenverbesserung_Survival_Entscheidung_Operator_V73.md",
-        "currentPhase": "73.1",
-        "scopeDeclarations": [
-          "docs/bot-training/Bot_Trainingsplan.md",
-          "docs/plaene/alt/Feature_Bot_Tiefenverbesserung_Survival_Entscheidung_Operator_V73.md",
-          "docs/referenz/ai_architecture_context.md"
-        ],
-        "scopeResolution": {
-          "concreteCount": 3,
-          "plannedCount": 0
-        },
-        "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
-      }
-    },
-    {
-      "id": "BT80C",
-      "type": "block",
-      "title": "Algorithmus-Ausbau, High-Util-Training und Champion-Rollout",
-      "status": "open",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "priority": null,
-        "owner": null,
-        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "referencePlanFile": "docs/plaene/neu/BT80C_Validierungs_und_Promotionshaertung_2026-04-03.md",
-        "currentPhase": "80.7",
-        "scopeDeclarations": [
-          "docs/bot-training/Bot_Trainingsplan.md",
-          "docs/plaene/neu/BT80C_Classic3D_Validation_Natural_End_Overlap_2026-04-03.md",
-          "docs/plaene/neu/BT80C_Validierungs_und_Promotionshaertung_2026-04-03.md",
-          "tests/trainer-v36-algorithm-profile.test.mjs",
-          "tests/training-benchmark-artifacts.test.mjs",
-          "tests/training-e2e.test.mjs",
-          "tests/training-gate.test.mjs"
-        ],
-        "scopeResolution": {
-          "concreteCount": 7,
-          "plannedCount": 0
-        },
-        "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
-      }
-    },
-    {
       "id": "BT90",
       "type": "block",
       "title": "Python-Minimalbootstrap und Contract-Wahrheit",
@@ -2001,6 +1753,36 @@
         "scopeResolution": {
           "concreteCount": 12,
           "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "BT93S2R6",
+      "type": "block",
+      "title": "Full-Matrix Predicate-/Retained-v2 Repair nach rotem S2R3.4",
+      "status": "open",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "priority": null,
+        "owner": null,
+        "planFile": "docs/bot-training/Bot_Trainingsplan.md",
+        "currentPhase": "93S2R6.1",
+        "scopeDeclarations": [
+          "data/training/ppo/bt93s2r6/bt93s2r6_closure_gate_report.json",
+          "data/training/ppo/bt93s2r6/full_matrix_failure_ledger.json",
+          "data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json",
+          "data/training/ppo/bt93s2r6/full_matrix_repair_contract.json",
+          "data/training/ppo/bt93s2r6/full_matrix_repair_report.json",
+          "docs/bot-training/Bot_Trainingsplan.md",
+          "docs/Fehlerberichte/2026-05-02_bt93s2r6_full_matrix_predicate_required.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -3875,336 +3657,6 @@
       }
     },
     {
-      "id": "BT10.1",
-      "type": "phase",
-      "title": "Laufstabilitaet und Betrieb",
-      "status": "active",
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.1"
-      }
-    },
-    {
-      "id": "BT10.2",
-      "type": "phase",
-      "title": "Zwischenvalidierung waehrend Lauf",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.2"
-      }
-    },
-    {
-      "id": "BT10.99",
-      "type": "phase",
-      "title": "Abschluss-Gate",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.99"
-      }
-    },
-    {
-      "id": "BT11.1",
-      "type": "phase",
-      "title": "Plan und Laufstart",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.1"
-      }
-    },
-    {
-      "id": "BT11.2",
-      "type": "phase",
-      "title": "Laufmonitoring im 2h-Takt",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.2"
-      }
-    },
-    {
-      "id": "BT11.99",
-      "type": "phase",
-      "title": "Abschluss-Gate",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.99"
-      }
-    },
-    {
-      "id": "BT12.1",
-      "type": "phase",
-      "title": "Plan und Laufstart",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.1"
-      }
-    },
-    {
-      "id": "BT12.2",
-      "type": "phase",
-      "title": "Laufmonitoring im 2h-Takt",
-      "status": "active",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.2"
-      }
-    },
-    {
-      "id": "BT12.99",
-      "type": "phase",
-      "title": "Abschluss-Gate",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.99"
-      }
-    },
-    {
-      "id": "BT15.1",
-      "type": "phase",
-      "title": "Baseline und Zielkorridor",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.1"
-      }
-    },
-    {
-      "id": "BT15.2",
-      "type": "phase",
-      "title": "Operative Verzahnung BT10-BT40",
-      "status": "active",
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.2"
-      }
-    },
-    {
-      "id": "BT15.99",
-      "type": "phase",
-      "title": "Abschluss-Gate",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.99"
-      }
-    },
-    {
-      "id": "BT20.1",
-      "type": "phase",
-      "title": "Safety-Layer vor Action-Ausgabe",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.1"
-      }
-    },
-    {
-      "id": "BT20.2",
-      "type": "phase",
-      "title": "Reward-Shaping auf Ueberleben fokussieren",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.2"
-      }
-    },
-    {
-      "id": "BT20.99",
-      "type": "phase",
-      "title": "Abschluss-Gate",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.99"
-      }
-    },
-    {
-      "id": "BT30.1",
-      "type": "phase",
-      "title": "Curriculum-Stufen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.1"
-      }
-    },
-    {
-      "id": "BT30.2",
-      "type": "phase",
-      "title": "Replay und Hyperparameter",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.2"
-      }
-    },
-    {
-      "id": "BT30.99",
-      "type": "phase",
-      "title": "Abschluss-Gate",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.99"
-      }
-    },
-    {
-      "id": "BT40.1",
-      "type": "phase",
-      "title": "Survival-Metriken als First-Class-Gates",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.1"
-      }
-    },
-    {
-      "id": "BT40.2",
-      "type": "phase",
-      "title": "Test- und Operator-Haertung",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.2"
-      }
-    },
-    {
-      "id": "BT40.99",
-      "type": "phase",
-      "title": "Abschluss-Gate",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.99"
-      }
-    },
-    {
-      "id": "BT73.1",
-      "type": "phase",
-      "title": "Ground Truth, Failure-Taxonomie und Vergleichsbasis",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.1"
-      }
-    },
-    {
-      "id": "BT73.2",
-      "type": "phase",
-      "title": "Sensorik und internes Weltmodell vertiefen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.2"
-      }
-    },
-    {
-      "id": "BT73.3",
-      "type": "phase",
-      "title": "Entscheidungsarchitektur in Safety-, Intent- und Recovery-Layer aufteilen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.3"
-      }
-    },
-    {
-      "id": "BT73.4",
-      "type": "phase",
-      "title": "Reward-Shaping, Curriculum und Replay auf Survival-First ausrichten",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.4"
-      }
-    },
-    {
-      "id": "BT73.5",
-      "type": "phase",
-      "title": "Eval-, Gate- und Operator-Pfade haerten",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.5"
-      }
-    },
-    {
-      "id": "BT73.6",
-      "type": "phase",
-      "title": "Resume-, Bridge- und Reproduzierbarkeitsluecken schliessen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.6"
-      }
-    },
-    {
-      "id": "BT73.7",
-      "type": "phase",
-      "title": "Rollout, Fallback und Doku-Sync",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.7"
-      }
-    },
-    {
-      "id": "BT73.99",
-      "type": "phase",
-      "title": "Integrations- und Abschluss-Gate",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.99"
-      }
-    },
-    {
-      "id": "BT80.7",
-      "type": "phase",
-      "title": "Lernalgorithmus, Ablationen und Champion-Challenger-Regeln",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.7"
-      }
-    },
-    {
-      "id": "BT80.8",
-      "type": "phase",
-      "title": "Hardware-, Util- und Langlaufprofile",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.8"
-      }
-    },
-    {
-      "id": "BT80.9",
-      "type": "phase",
-      "title": "Rollout-, Promotion-, Fallback- und Gate-Haertung",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9"
-      }
-    },
-    {
-      "id": "BT80.99",
-      "type": "phase",
-      "title": "Abschluss-Gate",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.99"
-      }
-    },
-    {
       "id": "BT90.1",
       "type": "phase",
       "title": "Python-Minimalbootstrap",
@@ -5657,8 +5109,8 @@
     {
       "id": "BT93S2R3.99",
       "type": "phase",
-      "title": "Closure",
-      "status": "open",
+      "title": "Closure (gesperrt bis BT93S2R6.99 + 93S2R3.4-Recheck)",
+      "status": "unknown",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.99"
@@ -5772,6 +5224,56 @@
       "attributes": {
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.99"
+      }
+    },
+    {
+      "id": "BT93S2R6.1",
+      "type": "phase",
+      "title": "Full-Matrix Failure-Ledger und Non-Coverage-Audit",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.1"
+      }
+    },
+    {
+      "id": "BT93S2R6.2",
+      "type": "phase",
+      "title": "Root-Cause-Entscheid und Repair-Contract",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.2"
+      }
+    },
+    {
+      "id": "BT93S2R6.3",
+      "type": "phase",
+      "title": "Enger Full-Matrix Predicate-/StartState-/Window-Repair",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.3"
+      }
+    },
+    {
+      "id": "BT93S2R6.4",
+      "type": "phase",
+      "title": "Full-Matrix Recheck auf repariertem Vertrag",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.4"
+      }
+    },
+    {
+      "id": "BT93S2R6.99",
+      "type": "phase",
+      "title": "Closure und Reentry-Freigabe",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.99"
       }
     },
     {
@@ -8742,897 +8244,6 @@
       "attributes": {
         "blockId": "V98",
         "phaseCode": "98.99"
-      }
-    },
-    {
-      "id": "BT10.1.1",
-      "type": "subphase",
-      "title": "12h-Laufparameter fuer Stabilitaet haerten (Stage-Timeout, Backpressure, Retry, Learn-Profile) (abgeschlossen: 2026-03-22; evidence: npm run training:12h:survival -> commit 045de8b)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.1",
-        "subphaseCode": "10.1.1"
-      }
-    },
-    {
-      "id": "BT10.1.2",
-      "type": "subphase",
-      "title": "Aktiven Lauf ueberwachen und Zwischenstatus in Artefakten pruefen",
-      "status": "active",
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.1",
-        "subphaseCode": "10.1.2"
-      }
-    },
-    {
-      "id": "BT10.2.1",
-      "type": "subphase",
-      "title": "Alle 2h `bot:validate` refreshen und Report in Run-Ordner pinnen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.2",
-        "subphaseCode": "10.2.1"
-      }
-    },
-    {
-      "id": "BT10.2.2",
-      "type": "subphase",
-      "title": "Survival-KPI-Delta (`avgStepsPerEpisode`, `averageBotSurvival`) pro Checkpoint protokollieren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.2",
-        "subphaseCode": "10.2.2"
-      }
-    },
-    {
-      "id": "BT10.99.1",
-      "type": "subphase",
-      "title": "Finales `run -> eval -> gate` plus `bot:validate` mit passendem Report abschliessen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.99",
-        "subphaseCode": "10.99.1"
-      }
-    },
-    {
-      "id": "BT10.99.2",
-      "type": "subphase",
-      "title": "Finale Artefaktpfade + KPI-Vergleich dokumentieren und Lock freigeben",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.99",
-        "subphaseCode": "10.99.2"
-      }
-    },
-    {
-      "id": "BT11.1.1",
-      "type": "subphase",
-      "title": "10h-Trainingsplan mit KPI-/Checkpoint-Vorgaben anlegen (abgeschlossen: 2026-03-23; evidence: create 10h plan -> docs/bot-training/Bot_Survival_Training_Plan_10h.md)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.1",
-        "subphaseCode": "11.1.1"
-      }
-    },
-    {
-      "id": "BT11.1.2",
-      "type": "subphase",
-      "title": "10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren (abgeschlossen: 2026-03-23; evidence: npm run training:10h -- --series-stamp BT11_20260323T013933 --stop-on-fail false -> output/training/BT11_20260323T013933-10h.log, PID 9332)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.1",
-        "subphaseCode": "11.1.2"
-      }
-    },
-    {
-      "id": "BT11.1.3",
-      "type": "subphase",
-      "title": "Fight-Profil fuer 10h-Lauf festlegen (`hunt-3d`,`hunt-2d`, stabile Seeds/Timeouts) (abgeschlossen: 2026-03-24; evidence: update fight profile commands -> docs/bot-training/Bot_Survival_Training_Plan_10h.md)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.1",
-        "subphaseCode": "11.1.3"
-      }
-    },
-    {
-      "id": "BT11.1.4",
-      "type": "subphase",
-      "title": "Fight-10h-Lauf starten und Operator-Artefakte dokumentieren (abgeschlossen: 2026-03-24; evidence: npm run training:10h -- --series-stamp BT11_FIGHT_20260324T014853 --modes hunt-3d,hunt-2d --stop-on-fail false -> output/training/BT11_FIGHT_20260324T014853-10h.log, PID 2772)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.1",
-        "subphaseCode": "11.1.4"
-      }
-    },
-    {
-      "id": "BT11.2.1",
-      "type": "subphase",
-      "title": "Alle 2h `bot:validate` ausfuehren und Report im aktiven Run-Ordner pinnen (abgeschlossen: 2026-03-23; evidence: BOT_RUNNER_FORCE_KILL_PORT=false BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3 npm run bot:validate -> data/bot_validation_report.json, docs/tests/Testergebnisse_Phase4b_2026-03-23.md)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.2",
-        "subphaseCode": "11.2.1"
-      }
-    },
-    {
-      "id": "BT11.2.2",
-      "type": "subphase",
-      "title": "`avgStepsPerEpisode` und `averageBotSurvival` je Checkpoint gegen BT10-Baseline protokollieren (abgeschlossen: 2026-03-24; evidence: final checkpoint update -> `data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json`, `data/bot_validation_report.json`)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.2",
-        "subphaseCode": "11.2.2"
-      }
-    },
-    {
-      "id": "BT11.99.1",
-      "type": "subphase",
-      "title": "Finales `run -> eval -> gate` plus `bot:validate` mit gueltigem Report abschliessen (abgeschlossen: 2026-03-24; evidence: `npm run bot:validate` mit `BOT_RUNNER_FORCE_KILL_PORT=false BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3` -> `output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log`, `data/bot_validation_report.json`)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.99",
-        "subphaseCode": "11.99.1"
-      }
-    },
-    {
-      "id": "BT11.99.2",
-      "type": "subphase",
-      "title": "Finale KPI-Deltas, Artefaktpfade und Lock-Release dokumentieren (abgeschlossen: 2026-03-24; evidence: final KPI row + lock release -> `docs/bot-training/Bot_Trainingsplan.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h.md`)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.99",
-        "subphaseCode": "11.99.2"
-      }
-    },
-    {
-      "id": "BT12.1.1",
-      "type": "subphase",
-      "title": "10h-Folgeplan fuer Classic/Fight Matrix anlegen (abgeschlossen: 2026-03-24; evidence: create BT12 plan -> docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.1",
-        "subphaseCode": "12.1.1"
-      }
-    },
-    {
-      "id": "BT12.1.2",
-      "type": "subphase",
-      "title": "10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren (abgeschlossen: 2026-03-24; evidence: Start-Process `npm run training:10h -- --series-stamp BT12_20260324T152103 ...` -> `output/training/BT12_20260324T152103-10h.log`, PID `3476`)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.1",
-        "subphaseCode": "12.1.2"
-      }
-    },
-    {
-      "id": "BT12.1.3",
-      "type": "subphase",
-      "title": "Survival-First-Restart (Classic + Fight) mit 10h-Matrixlauf starten und dokumentieren (abgeschlossen: 2026-03-25; evidence: `npm run training:10h -- --series-stamp BT12_SURV_20260325T030951 --stop-on-fail false --stage-timeout-ms 5400000 --episodes 8 --seeds 11,23,37,41,53 --modes classic-3d,classic-2d,hunt-3d,hunt-2d --max-steps 240 --runner-profile learn --inject-invalid-actions false --step-timeout-retries 1 --timeout-step-ms 220 --timeout-episode-ms 240000 --timeout-run-ms 1200000 --bridge-max-pending-acks 1024 --bridge-backpressure-threshold 768 --bridge-drop-training-when-backlogged true` -> `output/training/BT12_SURV_20260325T030951-10h.log`, PID `5856`)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.1",
-        "subphaseCode": "12.1.3"
-      }
-    },
-    {
-      "id": "BT12.2.1",
-      "type": "subphase",
-      "title": "`bot:validate`-Checkpoint im 2h-Rhythmus mit stabilen Runtime-Parametern ausfuehren",
-      "status": "active",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.2",
-        "subphaseCode": "12.2.1"
-      }
-    },
-    {
-      "id": "BT12.2.2",
-      "type": "subphase",
-      "title": "`avgStepsPerEpisode` und `averageBotSurvival` je Checkpoint gegen BT11-Finalwerte protokollieren",
-      "status": "active",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.2",
-        "subphaseCode": "12.2.2"
-      }
-    },
-    {
-      "id": "BT12.2.3",
-      "type": "subphase",
-      "title": "Runner-Stabilisierung via `BOT_RUNNER_SERVER_MODE=preview` fuer Checkpoint-Validierung aktivieren (abgeschlossen: 2026-03-25; evidence: `BOT_RUNNER_SERVER_MODE=preview BOT_RUNNER_PREVIEW_BUILD=true BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3 BOT_RUNNER_TOTAL_TIMEOUT=900000 BOT_RUNNER_BOOT_TIMEOUT=240000 npm run bot:validate` -> `output/training/BT12_SURV_20260325T030951-botvalidate-cp03-preview.log`, `tmp/bot-validation-report.json`)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.2",
-        "subphaseCode": "12.2.3"
-      }
-    },
-    {
-      "id": "BT12.99.1",
-      "type": "subphase",
-      "title": "Finales `run -> eval -> gate` plus `bot:validate` mit gueltigem Report abschliessen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.99",
-        "subphaseCode": "12.99.1"
-      }
-    },
-    {
-      "id": "BT12.99.2",
-      "type": "subphase",
-      "title": "Finale KPI-Deltas, Artefaktpfade und Lock-Release dokumentieren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.99",
-        "subphaseCode": "12.99.2"
-      }
-    },
-    {
-      "id": "BT15.1.1",
-      "type": "subphase",
-      "title": "Baseline-Snapshot aus Trainingsartefakten in Roadmap dokumentieren (abgeschlossen: 2026-03-22; evidence: update roadmap baseline -> docs/bot-training/Bot_Trainings_Roadmap.md)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.1",
-        "subphaseCode": "15.1.1"
-      }
-    },
-    {
-      "id": "BT15.1.2",
-      "type": "subphase",
-      "title": "KPI-Zielkorridor und Trainingszyklen C1-C6 festlegen (abgeschlossen: 2026-03-22; evidence: define cycles/targets -> docs/bot-training/Bot_Trainings_Roadmap.md)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.1",
-        "subphaseCode": "15.1.2"
-      }
-    },
-    {
-      "id": "BT15.2.1",
-      "type": "subphase",
-      "title": "Promotion-/Rollback-Regeln fuer zyklische Trainingsfenster definieren (abgeschlossen: 2026-03-22; evidence: add promotion rollback rules -> docs/bot-training/Bot_Trainings_Roadmap.md)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.2",
-        "subphaseCode": "15.2.1"
-      }
-    },
-    {
-      "id": "BT15.2.2",
-      "type": "subphase",
-      "title": "Woechentliche Re-Planung in BT10-Checkpoint-Log und Weekly Review verankern",
-      "status": "active",
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.2",
-        "subphaseCode": "15.2.2"
-      }
-    },
-    {
-      "id": "BT15.99.1",
-      "type": "subphase",
-      "title": "Ersten kompletten Zyklus (C1) mit KPI-Delta dokumentieren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.99",
-        "subphaseCode": "15.99.1"
-      }
-    },
-    {
-      "id": "BT15.99.2",
-      "type": "subphase",
-      "title": "KW13-Roadmap-Review abschliessen und Lock auf `frei` setzen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.99",
-        "subphaseCode": "15.99.2"
-      }
-    },
-    {
-      "id": "BT20.1.1",
-      "type": "subphase",
-      "title": "Collision-Risk-Guards in Action-Entscheidung einbauen (Evasion hat Vorrang) (abgeschlossen: 2026-03-31; evidence: `node --test tests/trainer-v36-action-safety.test.mjs` -> PASS)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.1",
-        "subphaseCode": "20.1.1"
-      }
-    },
-    {
-      "id": "BT20.1.2",
-      "type": "subphase",
-      "title": "Risky-Action-Sperren bei hoher Bedrohung und niedriger Health einfuehren (abgeschlossen: 2026-03-31; evidence: `node --test tests/trainer-v36-action-safety.test.mjs` -> PASS)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.1",
-        "subphaseCode": "20.1.2"
-      }
-    },
-    {
-      "id": "BT20.2.1",
-      "type": "subphase",
-      "title": "Schrittweises Survival-Reward und klare Death-Penalty kalibrieren (abgeschlossen: 2026-03-31; evidence: `node --test tests/training-reward-survival.test.mjs` -> PASS)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.2",
-        "subphaseCode": "20.2.1"
-      }
-    },
-    {
-      "id": "BT20.2.2",
-      "type": "subphase",
-      "title": "Risk-Proximity-Penalties (Wall/Trail/Opponent) einfuehren und testen (abgeschlossen: 2026-03-31; evidence: `node --test tests/training-reward-survival.test.mjs` -> PASS)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.2",
-        "subphaseCode": "20.2.2"
-      }
-    },
-    {
-      "id": "BT20.99.1",
-      "type": "subphase",
-      "title": "A/B-Lauf gegen BT10-Baseline mit identischen Seeds/Modes durchfuehren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.99",
-        "subphaseCode": "20.99.1"
-      }
-    },
-    {
-      "id": "BT20.99.2",
-      "type": "subphase",
-      "title": "Verbesserung nur bei positivem Survival-Delta und stabilen Gates uebernehmen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.99",
-        "subphaseCode": "20.99.2"
-      }
-    },
-    {
-      "id": "BT30.1.1",
-      "type": "subphase",
-      "title": "Trainingsstufen (einfach -> mittel -> voll) als konfigurierte Sequenz definieren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.1",
-        "subphaseCode": "30.1.1"
-      }
-    },
-    {
-      "id": "BT30.1.2",
-      "type": "subphase",
-      "title": "Stage-spezifische Promotion-Regeln anhand Survival-KPIs implementieren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.1",
-        "subphaseCode": "30.1.2"
-      }
-    },
-    {
-      "id": "BT30.2.1",
-      "type": "subphase",
-      "title": "Priorisierte Samples fuer near-death/death-leading Situationen einfuehren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.2",
-        "subphaseCode": "30.2.1"
-      }
-    },
-    {
-      "id": "BT30.2.2",
-      "type": "subphase",
-      "title": "Survival-orientierte Hyperparameter-Tuning-Laeufe (gamma/epsilon/step-limits) automatisieren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.2",
-        "subphaseCode": "30.2.2"
-      }
-    },
-    {
-      "id": "BT30.99.1",
-      "type": "subphase",
-      "title": "Gewinner-Setting per reproduzierbarem Vergleichslauf bestimmen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.99",
-        "subphaseCode": "30.99.1"
-      }
-    },
-    {
-      "id": "BT30.99.2",
-      "type": "subphase",
-      "title": "Gewinner-Setting in Standard-Training-Skripten verankern und dokumentieren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.99",
-        "subphaseCode": "30.99.2"
-      }
-    },
-    {
-      "id": "BT40.1.1",
-      "type": "subphase",
-      "title": "`averageBotSurvival` in Eval/Gate standardmaessig erzwingen (kein `null` fuer Abschlusslaeufe)",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.1",
-        "subphaseCode": "40.1.1"
-      }
-    },
-    {
-      "id": "BT40.1.2",
-      "type": "subphase",
-      "title": "Gate-Fehlerbilder und Restore-Pfade fuer Latest/Checkpoint robustifizieren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.1",
-        "subphaseCode": "40.1.2"
-      }
-    },
-    {
-      "id": "BT40.2.1",
-      "type": "subphase",
-      "title": "Trainingsnahe Regressionstests fuer Survival-Deltas und Guardrails erweitern",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.2",
-        "subphaseCode": "40.2.1"
-      }
-    },
-    {
-      "id": "BT40.2.2",
-      "type": "subphase",
-      "title": "Operator-Runbook fuer Start/Resume/Stop/Recovery standardisieren",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.2",
-        "subphaseCode": "40.2.2"
-      }
-    },
-    {
-      "id": "BT40.99.1",
-      "type": "subphase",
-      "title": "`training-run/eval/gate`, `bot:validate`, trainingsnahe Tests und Build sind gruen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.99",
-        "subphaseCode": "40.99.1"
-      }
-    },
-    {
-      "id": "BT40.99.2",
-      "type": "subphase",
-      "title": "Plan-Doku, Lock-Bereinigung und Handoff an `docs/Umsetzungsplan.md` (nur Referenz) abgeschlossen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.99",
-        "subphaseCode": "40.99.2"
-      }
-    },
-    {
-      "id": "BT73.1.1",
-      "type": "subphase",
-      "title": "`bot:validate`, Eval und Recorder um Failure-Codes, Todesursachen, Exit-Qualitaet, Resume-Status und Szenarioklassen erweitern, damit Regressionen nicht mehr nur als Gesamtzahl sichtbar sind.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.1",
-        "subphaseCode": "73.1.1"
-      }
-    },
-    {
-      "id": "BT73.1.2",
-      "type": "subphase",
-      "title": "Decision-Trace-Artefakte fuer Hochrisiko-Momente einfuehren (letzte Sensoren, Intent, Action-Veto, Reward-Zerlegung), damit schlechte Bot-Entscheidungen reproduzierbar analysiert werden koennen.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.1",
-        "subphaseCode": "73.1.2"
-      }
-    },
-    {
-      "id": "BT73.1.3",
-      "type": "subphase",
-      "title": "Eine feste Vergleichsmatrix aus Maps, Seeds, Modi und Baseline-Stamps definieren, damit BT10/BT11/BT12/BT20 und Folgefenster mit denselben Bedingungen verglichen werden.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.1",
-        "subphaseCode": "73.1.3"
-      }
-    },
-    {
-      "id": "BT73.2.1",
-      "type": "subphase",
-      "title": "Threat-Horizon-, Dead-End-, Freiraum-, Gegnerdruck- und Exit-Signale in `BotSensingOps`/`BotThreatOps` zentralisieren, damit der Bot nicht erst am Kollisionspunkt reagiert.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.2",
-        "subphaseCode": "73.2.1"
-      }
-    },
-    {
-      "id": "BT73.2.2",
-      "type": "subphase",
-      "title": "Ein kleines internes Gedaechtnis fuer letzte Gefahr, letzte Recovery-Aktion, Portal-/Gate-Nutzung und Fehlschlaege einfuehren, ohne den Runtime-V1-Contract zu brechen.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.2",
-        "subphaseCode": "73.2.2"
-      }
-    },
-    {
-      "id": "BT73.2.3",
-      "type": "subphase",
-      "title": "Items, Portale, Gates, Shield und Modus-Sonderregeln als explizite Beobachtungs- und Policy-Semantik verdrahten, damit V69/V72-Aenderungen nicht als Seiteneffekt in die KI tropfen.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.2",
-        "subphaseCode": "73.2.3"
-      }
-    },
-    {
-      "id": "BT73.3.1",
-      "type": "subphase",
-      "title": "Einen klaren Safety-Veto-Layer vor der finalen Action-Ausgabe verankern, der Kollision, Low-HP-Risiko, Sackgassen und riskante Item-/Portal-Aktionen deterministisch blocken kann.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.3",
-        "subphaseCode": "73.3.1"
-      }
-    },
-    {
-      "id": "BT73.3.2",
-      "type": "subphase",
-      "title": "Einen Intent-Layer fuer `survive`, `reposition`, `engage`, `disengage`, `recover`, `use-item`, `take-portal`, `take-gate` einfuehren, damit Entscheidungen nicht nur aus losen Prioritaetslisten entstehen.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.3",
-        "subphaseCode": "73.3.2"
-      }
-    },
-    {
-      "id": "BT73.3.3",
-      "type": "subphase",
-      "title": "Recovery-/Stuck-Verhalten als expliziten Zustandsautomaten mit Eintritts- und Exit-Kriterien modellieren, statt Steckenbleiben nur post hoc zu zaehlen.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.3",
-        "subphaseCode": "73.3.3"
-      }
-    },
-    {
-      "id": "BT73.4.1",
-      "type": "subphase",
-      "title": "Reward-Zerlegung in Survival, sichere Flaechenkontrolle, gelungene Gefahren-Exits und schadensbezogene Rewards nur bei netto ueberlebensfoerderlichem Verhalten aufspalten.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.4",
-        "subphaseCode": "73.4.1"
-      }
-    },
-    {
-      "id": "BT73.4.2",
-      "type": "subphase",
-      "title": "Curriculum-Stufen von einfach zu voller 4-Mode-Matrix mit Promotion-/Rollback-Regeln an echte Survival- und Stability-KPIs koppeln statt nur an Steps oder Reward-Summen.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.4",
-        "subphaseCode": "73.4.2"
-      }
-    },
-    {
-      "id": "BT73.4.3",
-      "type": "subphase",
-      "title": "Priorisierte Replay-/Scenario-Samples fuer near-death, death-leading, low-HP-combat, Portal-/Gate-Entscheidungen und Item-Fehlgebrauch einfuehren.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.4",
-        "subphaseCode": "73.4.3"
-      }
-    },
-    {
-      "id": "BT73.5.1",
-      "type": "subphase",
-      "title": "`bot:validate` und `training:eval` um harte Guardrails fuer `averageBotSurvival != null`, Forced-/Timeout-Rates, Death-Cause-Verteilung und per-Szenario-Failures erweitern.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.5",
-        "subphaseCode": "73.5.1"
-      }
-    },
-    {
-      "id": "BT73.5.2",
-      "type": "subphase",
-      "title": "`training:gate` auf Vergleich gegen den letzten stabilen Referenzlauf plus Rolling-Window-Regeln ausrichten, damit einmalige Glueckslaeufe nicht promoted werden.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.5",
-        "subphaseCode": "73.5.2"
-      }
-    },
-    {
-      "id": "BT73.5.3",
-      "type": "subphase",
-      "title": "Einen einheitlichen Validate-Pfad fuer Preview, Publish und Operatorlauf bauen, damit Abschluss-Evidence nicht mehr von instabilen Dev-Server- oder Port-Konstellationen abhaengt.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.5",
-        "subphaseCode": "73.5.3"
-      }
-    },
-    {
-      "id": "BT73.6.1",
-      "type": "subphase",
-      "title": "Den `trainer-checkpoint-load`-/`trainer-checkpoint-load-latest`-Antwortpfad zwischen `training-run`, `WebSocketTrainerBridge` und `TrainerServer` instrumentieren, testen und reparieren.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.6",
-        "subphaseCode": "73.6.1"
-      }
-    },
-    {
-      "id": "BT73.6.2",
-      "type": "subphase",
-      "title": "Run-Manifeste fuer Resume-Quelle, Modell-/Config-Hash, Gate-Schwellen, Validate-Argumente und Szenario-Matrix standardisieren, damit spaetere KPI-Vergleiche belastbar bleiben.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.6",
-        "subphaseCode": "73.6.2"
-      }
-    },
-    {
-      "id": "BT73.6.3",
-      "type": "subphase",
-      "title": "Eine deterministische A/B-Lane fuer Baseline vs. Kandidat mit festen Seeds, identischem Modus-Mix und publishbarer Evidence etablieren.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.6",
-        "subphaseCode": "73.6.3"
-      }
-    },
-    {
-      "id": "BT73.7.1",
-      "type": "subphase",
-      "title": "Die tieferen KI-Aenderungen hinter klaren Tuning-/Strategy-Schaltern ausrollen, damit `rule-based`, `auto`, Bridge- und Fallback-Pfade kontrolliert verglichen und im Notfall sofort zurueckgenommen werden koennen.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.7",
-        "subphaseCode": "73.7.1"
-      }
-    },
-    {
-      "id": "BT73.7.2",
-      "type": "subphase",
-      "title": "Architektur-, Trainings-, Release- und QA-Dokumentation auf denselben Intent-, Failure- und Gate-Vertrag aktualisieren, damit Runtime, Training und Abnahme denselben Wissensstand teilen.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.7",
-        "subphaseCode": "73.7.2"
-      }
-    },
-    {
-      "id": "BT73.99.1",
-      "type": "subphase",
-      "title": "Feste Vergleichslaeufe gegen die Baseline sind gruen: kein Resume-Workaround mehr, keine Forced-/Timeout-Runden, `averageBotSurvival` mindestens auf BT11-Stabilniveau und Trend in Richtung Roadmap-Ziel.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.99",
-        "subphaseCode": "73.99.1"
-      }
-    },
-    {
-      "id": "BT73.99.2",
-      "type": "subphase",
-      "title": "Trainingsnahe Tests, `bot:validate`, `training:eval`, `training:gate`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind abgeschlossen; verbleibende Gameplay-/Bridge-Restpunkte sind dokumentiert, bevor `73.99` schliesst.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.99",
-        "subphaseCode": "73.99.2"
-      }
-    },
-    {
-      "id": "BT80.7.1",
-      "type": "subphase",
-      "title": "Algorithmusprofile (`champion-stable`, `challenger-balanced`, `challenger-high-util`, `ablation-no-per`) definieren und bis in Trainer-/Replay-/Reward-/Exploration-Defaults verdrahten (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/trainer-v36-algorithm-profile.test.mjs` -> PASS)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.7",
-        "subphaseCode": "80.7.1"
-      }
-    },
-    {
-      "id": "BT80.7.2",
-      "type": "subphase",
-      "title": "Challenger-/Ablation-/Reference-only-Rollen im Benchmark-Manifest und in der manuellen Promotion-Policy verankern, inklusive BT20-Blockade gegen Champion-Promotion (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-benchmark-artifacts.test.mjs` -> PASS)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.7",
-        "subphaseCode": "80.7.2"
-      }
-    },
-    {
-      "id": "BT80.7.3",
-      "type": "subphase",
-      "title": "BT80C-Legacy-Promotions-Evidence auf drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters schaerfen; Median-Delta statt Einzelrun als Entscheidungsbasis dokumentieren; fuer PPO ab `BT94B` gilt die haertere fuenf-Pass-Regel",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.7",
-        "subphaseCode": "80.7.3"
-      }
-    },
-    {
-      "id": "BT80.8.1",
-      "type": "subphase",
-      "title": "High-Util-Profile `overnight-high-util` und `marathon` mit harten Thermal-Ceilings statt reiner Beobachtung konfigurieren (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-benchmark-artifacts.test.mjs` -> PASS)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.8",
-        "subphaseCode": "80.8.1"
-      }
-    },
-    {
-      "id": "BT80.8.2",
-      "type": "subphase",
-      "title": "Hardware-Telemetrie fuer extern gelieferte Temperaturdaten auswertbar machen, ohne produktionsnahe Langlaeufe fuer diese Repo-Haertung zu starten (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-benchmark-artifacts.test.mjs` -> PASS)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.8",
-        "subphaseCode": "80.8.2"
-      }
-    },
-    {
-      "id": "BT80.8.3",
-      "type": "subphase",
-      "title": "Kandidatenleiter `candidate-smoke -> candidate-benchmark -> operator-high-util` hardware-passend definieren und Operator-Runbooks fuer Start/Resume/Pause/Stop/Recovery daran ausrichten",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.8",
-        "subphaseCode": "80.8.3"
-      }
-    },
-    {
-      "id": "BT80.9.1",
-      "type": "subphase",
-      "title": "`training-gate` um explizite Promotion-Entscheidung gegen den eingefrorenen BT11-Champion erweitern; synthetische und BT20-Referenzlaeufe bleiben geblockt (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-gate.test.mjs` -> PASS)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9",
-        "subphaseCode": "80.9.1"
-      }
-    },
-    {
-      "id": "BT80.9.2",
-      "type": "subphase",
-      "title": "`training-e2e` Dry-Run-Fallback so haerten, dass `write-latest=false` Validation-/Gate-Pfade sauber skippt statt false-positive Rot zu erzeugen (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-e2e.test.mjs` -> PASS)",
-      "status": "done",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9",
-        "subphaseCode": "80.9.2"
-      }
-    },
-    {
-      "id": "BT80.9.3",
-      "type": "subphase",
-      "title": "`bot:validate` als harte Vorbedingung fuer BT80C-Kandidatenevidence stabilisieren; drei reproduzierbare Validation-Paesse auf fixer Matrix verlangen. Stand 2026-04-03: Der operative Runtime-Bruch im normalen Matchstart-/Session-Scope ist behoben; `preview` erreicht wieder `PLAYING` mit echten Match-Refs/Spielern. Die verbleibende Arbeit war zunaechst im Trainingsscope: Runner-/`training-e2e`-Haertung akzeptiert jetzt explizite BT-Validation-Budgets ohne Preview-Prebuild-Overhead, aber `V1` der festen Matrix terminiert selbst mit `preview-build=false` und `BOT_RUNNER_MATCH_TIMEOUT=150000` nicht natuerlich (`PLAYING`, alle 3 Spieler `alive`, `roundsRecorded=0`). Zusatzdiagnose 2026-04-03: Lokale Preview-Proben auf BT-nahe `classic-3d`-Varianten (`standard`, `maze`, `complex`, Portale 0-6, 2-3 Bots) bleiben ebenfalls nach 40-45s in `PLAYING` und liefern weiterhin `roundsRecorded=0`. Damit ist der Restblocker im BT-Scope sauber eingegrenzt, ein sauberer Fix deutet aber wieder auf normalen Runtime-/Session-Scope fuer deterministische Seed-/Startbedingungen oder bewusst geaenderte Gameplay-Terminalsemantik. Vor solchen Eingriffen ist User-Freigabe noetig; Intake-Entwurf: `docs/plaene/neu/BT80C_Classic3D_Validation_Natural_End_Overlap_2026-04-03.md`.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9",
-        "subphaseCode": "80.9.3"
-      }
-    },
-    {
-      "id": "BT80.9.4",
-      "type": "subphase",
-      "title": "Benchmark-Reports um eindeutige Urteils- und Ursachenklassen (`promote/hold/rollback/diagnose`; `harness/runtime/algorithm/throughput/artifact`) schaerfen",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9",
-        "subphaseCode": "80.9.4"
-      }
-    },
-    {
-      "id": "BT80.9.5",
-      "type": "subphase",
-      "title": "Benchmark-Invalidierung bei Gameplay-/Observation-/Action-/Reward-/Validation-Semantikdrift explizit dokumentieren und im Prozess verankern",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9",
-        "subphaseCode": "80.9.5"
-      }
-    },
-    {
-      "id": "BT80.99.1",
-      "type": "subphase",
-      "title": "Kein Champion-Wechsel und kein High-Util-Operatorlauf ohne gruene Validation-Lane und drei vollstaendige BT80C-Legacy-Kandidatenlaeufe mit neuer Benchmark-Evidence; BT11 bleibt bis zu einer echten manuellen Promotion-Entscheidung Champion. Fuer PPO gilt ab `BT94B` die fuenf-Pass-Promote-Regel.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.99",
-        "subphaseCode": "80.99.1"
-      }
-    },
-    {
-      "id": "BT80.99.2",
-      "type": "subphase",
-      "title": "Abschluss-Checks, finale Doku-Synchronisierung, Runbooks und ehrliche Restpunkt-Dokumentation sind abgeschlossen.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.99",
-        "subphaseCode": "80.99.2"
       }
     },
     {
@@ -16302,50 +14913,6 @@
       }
     },
     {
-      "id": "BT93S2R3.99.1",
-      "type": "subphase",
-      "title": "Closure schreibt genau eine Resultklasse: `matrix-control-reentry-green`, `replay-determinism-required`, `predicate-window-required`, `direction-contract-required`, `escape-right-fairness-required`, `retained-v2-measurement-required`, `neutral-control-required`, `action-surface-lineage-invalidated` oder `measurement-invalid`.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT93S2R3",
-        "phaseCode": "93S2R3.99",
-        "subphaseCode": "93S2R3.99.1"
-      }
-    },
-    {
-      "id": "BT93S2R3.99.2",
-      "type": "subphase",
-      "title": "Closure schreibt `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SampleCounts, SourceArtifacts und Invalidations.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT93S2R3",
-        "phaseCode": "93S2R3.99",
-        "subphaseCode": "93S2R3.99.2"
-      }
-    },
-    {
-      "id": "BT93S2R3.99.3",
-      "type": "subphase",
-      "title": "Gruen oeffnet nur `BT93S2.3-Recheck`; jede rote Resultklasse oeffnet nichts und benennt den naechsten engen Reparaturbedarf.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT93S2R3",
-        "phaseCode": "93S2R3.99",
-        "subphaseCode": "93S2R3.99.3"
-      }
-    },
-    {
-      "id": "BT93S2R3.99.4",
-      "type": "subphase",
-      "title": "Abschluss-Gate: `npm.cmd run gates:pre-commit`.",
-      "status": "open",
-      "attributes": {
-        "blockId": "BT93S2R3",
-        "phaseCode": "93S2R3.99",
-        "subphaseCode": "93S2R3.99.4"
-      }
-    },
-    {
       "id": "BT93S2R4.1.1",
       "type": "subphase",
       "title": "Alle S2R3.2/S2R3.1/S2R2/S2R/S2-Quellen mit Hash, ResultClass, Count-Snapshot, Git-SHA, ReportHash und Lineage-Feldern locken. (abgeschlossen: 2026-05-01; evidence: `python python/scripts/bt93s2r4_replay_root_cause_audit.py --write-report` -> `data/training/ppo/bt93s2r4/replay_root_cause_audit.json`)",
@@ -16750,6 +15317,215 @@
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.99",
         "subphaseCode": "93S2R5.99.4"
+      }
+    },
+    {
+      "id": "BT93S2R6.1.1",
+      "type": "subphase",
+      "title": "`93S2R3.4`-Report, rote Rows, Full-Matrix-Contract, S2R5-Repair-Contract, S2R4-Replay-Gruen und S2R3-Direction-Gruen mit Hash und Count-Snapshot locken.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.1",
+        "subphaseCode": "93S2R6.1.1"
+      }
+    },
+    {
+      "id": "BT93S2R6.1.2",
+      "type": "subphase",
+      "title": "Alle 20 roten Rows mit Scenario, Seed, SourceSeed, Action, PredicateId, Predicate-Operanden, Predicate-Margin, StartMetricsHash, WarmupKey, requestedRepeatSteps, observedSteps und retained-v2-Flag schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.1",
+        "subphaseCode": "93S2R6.1.2"
+      }
+    },
+    {
+      "id": "BT93S2R6.1.3",
+      "type": "subphase",
+      "title": "Alle Full-Matrix-Geschwister-Rows derselben Scenario/Seed/StartMetricsHash/PredicateId/WarmupKey-Gruppe ermitteln; `siblingExpansionCount` ist Gate-Bestandteil.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.1",
+        "subphaseCode": "93S2R6.1.3"
+      }
+    },
+    {
+      "id": "BT93S2R6.1.4",
+      "type": "subphase",
+      "title": "Fehlerbericht `docs/Fehlerberichte/2026-05-02_bt93s2r6_full_matrix_predicate_required.md` mit Befundmatrix, S2R5-Coverage-Gap, No-Go-Status und Root-Cause-Hypothesen schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.1",
+        "subphaseCode": "93S2R6.1.4"
+      }
+    },
+    {
+      "id": "BT93S2R6.2.1",
+      "type": "subphase",
+      "title": "Jede unique rote Gruppe deduplizieren nach Scenario/Seed/SourceSeed/StartMetricsHash/PredicateId/WarmupKey und genau eine Repair-Klasse waehlen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.2",
+        "subphaseCode": "93S2R6.2.1"
+      }
+    },
+    {
+      "id": "BT93S2R6.2.2",
+      "type": "subphase",
+      "title": "Candidate-Probes pruefen alte und neue StartStates/Predicates/Window-Regeln vor Repair-Anwendung; positive, negative und neutral Controls bleiben gelockt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.2",
+        "subphaseCode": "93S2R6.2.2"
+      }
+    },
+    {
+      "id": "BT93S2R6.2.3",
+      "type": "subphase",
+      "title": "Repair-Contract pinnt erlaubte Dateiwrites, Invalidation-Regeln, Kontrollmargen, Replacement-Manifest, retained-v2-Quarantaene und `noPostHocThresholdChange=true`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.2",
+        "subphaseCode": "93S2R6.2.3"
+      }
+    },
+    {
+      "id": "BT93S2R6.2.4",
+      "type": "subphase",
+      "title": "Wenn mehr als eine plausible Primaerursache bleibt, endet die Phase `measurement-invalid` und oeffnet nichts.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.2",
+        "subphaseCode": "93S2R6.2.4"
+      }
+    },
+    {
+      "id": "BT93S2R6.3.1",
+      "type": "subphase",
+      "title": "Reparatur exakt gemaess `93S2R6.2` anwenden; keine weitere Datei ausserhalb der erlaubten Scope-Liste beruehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.3",
+        "subphaseCode": "93S2R6.3.1"
+      }
+    },
+    {
+      "id": "BT93S2R6.3.2",
+      "type": "subphase",
+      "title": "`escape-right-open` bleibt Fairness-first: gueltiges Predicate-Fenster fuer Positive Controls, aber kein Action-Space- oder Action-Quality-Urteil.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.3",
+        "subphaseCode": "93S2R6.3.2"
+      }
+    },
+    {
+      "id": "BT93S2R6.3.3",
+      "type": "subphase",
+      "title": "`narrowing-corridor` retained-v2 bleibt quarantined, bis die Full-Matrix-Rows und retained-v2-Rows beide Null-Counts schreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.3",
+        "subphaseCode": "93S2R6.3.3"
+      }
+    },
+    {
+      "id": "BT93S2R6.3.4",
+      "type": "subphase",
+      "title": "Minimum-Window-Reparatur wird separat von Predicate-/Seed-Reparatur reportet und invalidiert keine Direction-/Fairness-Gruen-Evidence.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.3",
+        "subphaseCode": "93S2R6.3.4"
+      }
+    },
+    {
+      "id": "BT93S2R6.4.1",
+      "type": "subphase",
+      "title": "Recheck nutzt den gelockten Repair-Contract und laeuft auf der 9-Szenario/13-Action/338-Probe-Matrix; `probeCount < 338` ist `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.4",
+        "subphaseCode": "93S2R6.4.1"
+      }
+    },
+    {
+      "id": "BT93S2R6.4.2",
+      "type": "subphase",
+      "title": "Gruen verlangt alle DoD.S2R6-10 Counts exakt 0; alte rote S2R3.4-Reports bleiben historische Quelle, nicht Gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.4",
+        "subphaseCode": "93S2R6.4.2"
+      }
+    },
+    {
+      "id": "BT93S2R6.4.3",
+      "type": "subphase",
+      "title": "Bei Rot schreibt der Report exakt die naechste enge Reparaturklasse und `opensNext=[]`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.4",
+        "subphaseCode": "93S2R6.4.3"
+      }
+    },
+    {
+      "id": "BT93S2R6.99.1",
+      "type": "subphase",
+      "title": "Closure schreibt genau eine Resultklasse: `full-matrix-predicate-green`, `full-matrix-seed-startstate-required`, `retained-v2-seed-startstate-required`, `predicate-contract-required`, `minimum-window-contract-required`, `metric-sampling-contract-required`, `scenario-contract-unrepairable`, `action-surface-lineage-invalidated` oder `measurement-invalid`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.99",
+        "subphaseCode": "93S2R6.99.1"
+      }
+    },
+    {
+      "id": "BT93S2R6.99.2",
+      "type": "subphase",
+      "title": "Closure schreibt `allowNext[]`, `opensNext[]`, `blocksNext[]`, ClaimFlags, SampleCounts, SourceArtifacts, Invalidations und klare NextAllowedActions.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.99",
+        "subphaseCode": "93S2R6.99.2"
+      }
+    },
+    {
+      "id": "BT93S2R6.99.3",
+      "type": "subphase",
+      "title": "Gruen oeffnet nur `93S2R3.4-Recheck`; jede rote Resultklasse oeffnet nichts.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.99",
+        "subphaseCode": "93S2R6.99.3"
+      }
+    },
+    {
+      "id": "BT93S2R6.99.4",
+      "type": "subphase",
+      "title": "Abschluss-Gate: `npm.cmd run gates:pre-commit`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.99",
+        "subphaseCode": "93S2R6.99.4"
       }
     },
     {
@@ -26804,7 +25580,6 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
-          "BT11",
           "BT93D",
           "BT93E",
           "BT93F",
@@ -32634,6 +31409,81 @@
       }
     },
     {
+      "id": "data/training/ppo/bt93s2r6/bt93s2r6_closure_gate_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R6"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s2r6/full_matrix_failure_ledger.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R6"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R6"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s2r6/full_matrix_repair_contract.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R6"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/training/ppo/bt93s2r6/full_matrix_repair_report.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R6"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "data/training/ppo/bt93t/bt93t_closure_gate_report.json",
       "type": "file",
       "title": null,
@@ -33654,21 +32504,6 @@
       }
     },
     {
-      "id": "data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "BT11"
-        ],
-        "exists": false
-      }
-    },
-    {
       "id": "dev/scripts/_forward-legacy-script.mjs",
       "type": "file",
       "title": null,
@@ -33879,81 +32714,6 @@
       }
     },
     {
-      "id": "docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "BT12"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "docs/bot-training/Bot_Survival_Training_Plan_10h.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "BT11"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "docs/bot-training/Bot_Survival_Training_Plan_12h.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "BT10"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "docs/bot-training/Bot_Survival_Training_Plan_BT20.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "BT20"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "docs/bot-training/Bot_Trainings_Roadmap.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "BT15"
-        ],
-        "exists": true
-      }
-    },
-    {
       "id": "docs/bot-training/Bot_Trainingsplan.md",
       "type": "file",
       "title": null,
@@ -33963,15 +32723,6 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
-          "BT10",
-          "BT11",
-          "BT12",
-          "BT15",
-          "BT20",
-          "BT30",
-          "BT40",
-          "BT73",
-          "BT80C",
           "BT90",
           "BT91",
           "BT92",
@@ -34001,6 +32752,7 @@
           "BT93S2R3",
           "BT93S2R4",
           "BT93S2R5",
+          "BT93S2R6",
           "BT93T",
           "BT93U",
           "BT93V",
@@ -34225,6 +32977,21 @@
           "BT93S2R5"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "docs/Fehlerberichte/2026-05-02_bt93s2r6_full_matrix_predicate_required.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT93S2R6"
+        ],
+        "exists": false
       }
     },
     {
@@ -34735,11 +33502,9 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "bot-training-plan",
           "scope-files"
         ],
         "scopeBlocks": [
-          "BT73",
           "V77"
         ],
         "exists": true
@@ -35503,11 +34268,9 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "bot-training-plan",
           "scope-files"
         ],
         "scopeBlocks": [
-          "BT80C",
           "V77"
         ],
         "exists": true
@@ -35535,11 +34298,9 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "bot-training-plan",
           "scope-files"
         ],
         "scopeBlocks": [
-          "BT80C",
           "V77"
         ],
         "exists": true
@@ -36756,7 +35517,6 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "BT73",
           "BT90",
           "BT93K",
           "V101",
@@ -36860,32 +35620,15 @@
       }
     },
     {
-      "id": "docs/tests/Testergebnisse_Phase4b_2026-03-23.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "BT11"
-        ],
-        "exists": true
-      }
-    },
-    {
       "id": "docs/Umsetzungsplan.md",
       "type": "file",
       "title": null,
       "status": "unknown",
       "attributes": {
         "source": [
-          "bot-training-plan",
           "scope-files"
         ],
         "scopeBlocks": [
-          "BT40",
           "V51",
           "V69",
           "V89",
@@ -53919,7 +52662,6 @@
         ],
         "scopeBlocks": [
           "B13",
-          "BT20",
           "BT91"
         ],
         "exists": true
@@ -53937,7 +52679,6 @@
         ],
         "scopeBlocks": [
           "B13",
-          "BT80C",
           "BT91"
         ],
         "exists": true
@@ -53989,7 +52730,6 @@
         ],
         "scopeBlocks": [
           "B13",
-          "BT80C",
           "BT91",
           "BT93E"
         ],
@@ -54008,7 +52748,6 @@
         ],
         "scopeBlocks": [
           "B13",
-          "BT80C",
           "BT91",
           "BT93E"
         ],
@@ -54048,7 +52787,6 @@
         ],
         "scopeBlocks": [
           "B13",
-          "BT80C",
           "BT91",
           "BT93E"
         ],
@@ -54067,7 +52805,6 @@
         ],
         "scopeBlocks": [
           "B13",
-          "BT20",
           "BT91",
           "BT93E",
           "BT93N"
@@ -54345,21 +53082,6 @@
           "V71"
         ],
         "exists": true
-      }
-    },
-    {
-      "id": "tmp/bot-validation-report.json",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "BT12"
-        ],
-        "exists": false
       }
     },
     {
@@ -75521,1607 +74243,6 @@
       "hint": null,
       "attributes": {
         "declaredBy": "audit-scope"
-      }
-    },
-    {
-      "from": "BT10",
-      "to": "BT10.1",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.1"
-      }
-    },
-    {
-      "from": "BT10",
-      "to": "BT10.2",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.2"
-      }
-    },
-    {
-      "from": "BT10",
-      "to": "BT10.99",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.99"
-      }
-    },
-    {
-      "from": "BT10",
-      "to": "docs/bot-training/Bot_Survival_Training_Plan_12h.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT10",
-      "to": "docs/bot-training/Bot_Trainingsplan.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT10.1",
-      "to": "BT10.1.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.1",
-        "subphaseCode": "10.1.1"
-      }
-    },
-    {
-      "from": "BT10.1",
-      "to": "BT10.1.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.1",
-        "subphaseCode": "10.1.2"
-      }
-    },
-    {
-      "from": "BT10.2",
-      "to": "BT10.2.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.2",
-        "subphaseCode": "10.2.1"
-      }
-    },
-    {
-      "from": "BT10.2",
-      "to": "BT10.2.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.2",
-        "subphaseCode": "10.2.2"
-      }
-    },
-    {
-      "from": "BT10.99",
-      "to": "BT10.99.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.99",
-        "subphaseCode": "10.99.1"
-      }
-    },
-    {
-      "from": "BT10.99",
-      "to": "BT10.99.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT10",
-        "phaseCode": "10.99",
-        "subphaseCode": "10.99.2"
-      }
-    },
-    {
-      "from": "BT11",
-      "to": "BT10",
-      "type": "depends_on",
-      "source": "master-table",
-      "hard": false,
-      "fulfilled": true,
-      "hint": "Folgefenster fuer 10h-Operatorlauf",
-      "attributes": {
-        "dependsPhase": null,
-        "rawToken": "BT10",
-        "sourceBreakdown": [
-          "master-table"
-        ],
-        "canonicalToken": true
-      }
-    },
-    {
-      "from": "BT11",
-      "to": "BT11.1",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.1"
-      }
-    },
-    {
-      "from": "BT11",
-      "to": "BT11.2",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.2"
-      }
-    },
-    {
-      "from": "BT11",
-      "to": "BT11.99",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.99"
-      }
-    },
-    {
-      "from": "BT11",
-      "to": "data/bot_validation_report.json",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT11",
-      "to": "data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT11",
-      "to": "docs/bot-training/Bot_Survival_Training_Plan_10h.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT11",
-      "to": "docs/bot-training/Bot_Trainingsplan.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT11",
-      "to": "docs/tests/Testergebnisse_Phase4b_2026-03-23.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT11.1",
-      "to": "BT11.1.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.1",
-        "subphaseCode": "11.1.1"
-      }
-    },
-    {
-      "from": "BT11.1",
-      "to": "BT11.1.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.1",
-        "subphaseCode": "11.1.2"
-      }
-    },
-    {
-      "from": "BT11.1",
-      "to": "BT11.1.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.1",
-        "subphaseCode": "11.1.3"
-      }
-    },
-    {
-      "from": "BT11.1",
-      "to": "BT11.1.4",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.1",
-        "subphaseCode": "11.1.4"
-      }
-    },
-    {
-      "from": "BT11.2",
-      "to": "BT11.2.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.2",
-        "subphaseCode": "11.2.1"
-      }
-    },
-    {
-      "from": "BT11.2",
-      "to": "BT11.2.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.2",
-        "subphaseCode": "11.2.2"
-      }
-    },
-    {
-      "from": "BT11.99",
-      "to": "BT11.99.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.99",
-        "subphaseCode": "11.99.1"
-      }
-    },
-    {
-      "from": "BT11.99",
-      "to": "BT11.99.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT11",
-        "phaseCode": "11.99",
-        "subphaseCode": "11.99.2"
-      }
-    },
-    {
-      "from": "BT12",
-      "to": "BT11",
-      "type": "depends_on",
-      "source": "master-table",
-      "hard": false,
-      "fulfilled": true,
-      "hint": "weiteres 10h-Folgefenster fuer Bot-Stabilisierung",
-      "attributes": {
-        "dependsPhase": null,
-        "rawToken": "BT11",
-        "sourceBreakdown": [
-          "master-table"
-        ],
-        "canonicalToken": true
-      }
-    },
-    {
-      "from": "BT12",
-      "to": "BT12.1",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.1"
-      }
-    },
-    {
-      "from": "BT12",
-      "to": "BT12.2",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.2"
-      }
-    },
-    {
-      "from": "BT12",
-      "to": "BT12.99",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.99"
-      }
-    },
-    {
-      "from": "BT12",
-      "to": "docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT12",
-      "to": "docs/bot-training/Bot_Trainingsplan.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT12",
-      "to": "tmp/bot-validation-report.json",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT12.1",
-      "to": "BT12.1.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.1",
-        "subphaseCode": "12.1.1"
-      }
-    },
-    {
-      "from": "BT12.1",
-      "to": "BT12.1.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.1",
-        "subphaseCode": "12.1.2"
-      }
-    },
-    {
-      "from": "BT12.1",
-      "to": "BT12.1.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.1",
-        "subphaseCode": "12.1.3"
-      }
-    },
-    {
-      "from": "BT12.2",
-      "to": "BT12.2.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.2",
-        "subphaseCode": "12.2.1"
-      }
-    },
-    {
-      "from": "BT12.2",
-      "to": "BT12.2.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.2",
-        "subphaseCode": "12.2.2"
-      }
-    },
-    {
-      "from": "BT12.2",
-      "to": "BT12.2.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.2",
-        "subphaseCode": "12.2.3"
-      }
-    },
-    {
-      "from": "BT12.99",
-      "to": "BT12.99.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.99",
-        "subphaseCode": "12.99.1"
-      }
-    },
-    {
-      "from": "BT12.99",
-      "to": "BT12.99.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT12",
-        "phaseCode": "12.99",
-        "subphaseCode": "12.99.2"
-      }
-    },
-    {
-      "from": "BT15",
-      "to": "BT10",
-      "type": "depends_on",
-      "source": "master-table",
-      "hard": false,
-      "fulfilled": true,
-      "hint": "Zukunftsplanung nutzt aktuelle Lauf-KPIs",
-      "attributes": {
-        "dependsPhase": null,
-        "rawToken": "BT10",
-        "sourceBreakdown": [
-          "master-table"
-        ],
-        "canonicalToken": true
-      }
-    },
-    {
-      "from": "BT15",
-      "to": "BT15.1",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.1"
-      }
-    },
-    {
-      "from": "BT15",
-      "to": "BT15.2",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.2"
-      }
-    },
-    {
-      "from": "BT15",
-      "to": "BT15.99",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.99"
-      }
-    },
-    {
-      "from": "BT15",
-      "to": "docs/bot-training/Bot_Trainings_Roadmap.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT15",
-      "to": "docs/bot-training/Bot_Trainingsplan.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT15.1",
-      "to": "BT15.1.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.1",
-        "subphaseCode": "15.1.1"
-      }
-    },
-    {
-      "from": "BT15.1",
-      "to": "BT15.1.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.1",
-        "subphaseCode": "15.1.2"
-      }
-    },
-    {
-      "from": "BT15.2",
-      "to": "BT15.2.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.2",
-        "subphaseCode": "15.2.1"
-      }
-    },
-    {
-      "from": "BT15.2",
-      "to": "BT15.2.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.2",
-        "subphaseCode": "15.2.2"
-      }
-    },
-    {
-      "from": "BT15.99",
-      "to": "BT15.99.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.99",
-        "subphaseCode": "15.99.1"
-      }
-    },
-    {
-      "from": "BT15.99",
-      "to": "BT15.99.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT15",
-        "phaseCode": "15.99",
-        "subphaseCode": "15.99.2"
-      }
-    },
-    {
-      "from": "BT20",
-      "to": "BT10",
-      "type": "depends_on",
-      "source": "master-table",
-      "hard": true,
-      "fulfilled": true,
-      "hint": "BT10-Baseline vorhanden; BT15 Zielkorridor in 15.1/15.2.1 dokumentiert",
-      "attributes": {
-        "dependsPhase": null,
-        "rawToken": "BT10",
-        "sourceBreakdown": [
-          "master-table"
-        ],
-        "canonicalToken": true
-      }
-    },
-    {
-      "from": "BT20",
-      "to": "BT15",
-      "type": "depends_on",
-      "source": "master-table",
-      "hard": true,
-      "fulfilled": true,
-      "hint": "BT10-Baseline vorhanden; BT15 Zielkorridor in 15.1/15.2.1 dokumentiert",
-      "attributes": {
-        "dependsPhase": null,
-        "rawToken": "BT15",
-        "sourceBreakdown": [
-          "master-table"
-        ],
-        "canonicalToken": true
-      }
-    },
-    {
-      "from": "BT20",
-      "to": "BT20.1",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.1"
-      }
-    },
-    {
-      "from": "BT20",
-      "to": "BT20.2",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.2"
-      }
-    },
-    {
-      "from": "BT20",
-      "to": "BT20.99",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.99"
-      }
-    },
-    {
-      "from": "BT20",
-      "to": "docs/bot-training/Bot_Survival_Training_Plan_BT20.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT20",
-      "to": "docs/bot-training/Bot_Trainingsplan.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT20",
-      "to": "tests/trainer-v36-action-safety.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT20",
-      "to": "tests/training-reward-survival.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT20.1",
-      "to": "BT20.1.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.1",
-        "subphaseCode": "20.1.1"
-      }
-    },
-    {
-      "from": "BT20.1",
-      "to": "BT20.1.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.1",
-        "subphaseCode": "20.1.2"
-      }
-    },
-    {
-      "from": "BT20.2",
-      "to": "BT20.2.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.2",
-        "subphaseCode": "20.2.1"
-      }
-    },
-    {
-      "from": "BT20.2",
-      "to": "BT20.2.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.2",
-        "subphaseCode": "20.2.2"
-      }
-    },
-    {
-      "from": "BT20.99",
-      "to": "BT20.99.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.99",
-        "subphaseCode": "20.99.1"
-      }
-    },
-    {
-      "from": "BT20.99",
-      "to": "BT20.99.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT20",
-        "phaseCode": "20.99",
-        "subphaseCode": "20.99.2"
-      }
-    },
-    {
-      "from": "BT30",
-      "to": "BT30.1",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.1"
-      }
-    },
-    {
-      "from": "BT30",
-      "to": "BT30.2",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.2"
-      }
-    },
-    {
-      "from": "BT30",
-      "to": "BT30.99",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.99"
-      }
-    },
-    {
-      "from": "BT30",
-      "to": "docs/bot-training/Bot_Trainingsplan.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT30.1",
-      "to": "BT30.1.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.1",
-        "subphaseCode": "30.1.1"
-      }
-    },
-    {
-      "from": "BT30.1",
-      "to": "BT30.1.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.1",
-        "subphaseCode": "30.1.2"
-      }
-    },
-    {
-      "from": "BT30.2",
-      "to": "BT30.2.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.2",
-        "subphaseCode": "30.2.1"
-      }
-    },
-    {
-      "from": "BT30.2",
-      "to": "BT30.2.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.2",
-        "subphaseCode": "30.2.2"
-      }
-    },
-    {
-      "from": "BT30.99",
-      "to": "BT30.99.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.99",
-        "subphaseCode": "30.99.1"
-      }
-    },
-    {
-      "from": "BT30.99",
-      "to": "BT30.99.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT30",
-        "phaseCode": "30.99",
-        "subphaseCode": "30.99.2"
-      }
-    },
-    {
-      "from": "BT40",
-      "to": "BT40.1",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.1"
-      }
-    },
-    {
-      "from": "BT40",
-      "to": "BT40.2",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.2"
-      }
-    },
-    {
-      "from": "BT40",
-      "to": "BT40.99",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.99"
-      }
-    },
-    {
-      "from": "BT40",
-      "to": "docs/bot-training/Bot_Trainingsplan.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT40",
-      "to": "docs/Umsetzungsplan.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT40.1",
-      "to": "BT40.1.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.1",
-        "subphaseCode": "40.1.1"
-      }
-    },
-    {
-      "from": "BT40.1",
-      "to": "BT40.1.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.1",
-        "subphaseCode": "40.1.2"
-      }
-    },
-    {
-      "from": "BT40.2",
-      "to": "BT40.2.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.2",
-        "subphaseCode": "40.2.1"
-      }
-    },
-    {
-      "from": "BT40.2",
-      "to": "BT40.2.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.2",
-        "subphaseCode": "40.2.2"
-      }
-    },
-    {
-      "from": "BT40.99",
-      "to": "BT40.99.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.99",
-        "subphaseCode": "40.99.1"
-      }
-    },
-    {
-      "from": "BT40.99",
-      "to": "BT40.99.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT40",
-        "phaseCode": "40.99",
-        "subphaseCode": "40.99.2"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "BT73.1",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.1"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "BT73.2",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.2"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "BT73.3",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.3"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "BT73.4",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.4"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "BT73.5",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.5"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "BT73.6",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.6"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "BT73.7",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.7"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "BT73.99",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.99"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "docs/bot-training/Bot_Trainingsplan.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "docs/plaene/alt/Feature_Bot_Tiefenverbesserung_Survival_Entscheidung_Operator_V73.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "docs/referenz/ai_architecture_context.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "V69",
-      "type": "depends_on",
-      "source": "master-table",
-      "hard": false,
-      "fulfilled": true,
-      "hint": "Fight/Hunt-Combat-Baseline aus V69 liefert die aktuelle Survival-/Item-Grundlage",
-      "attributes": {
-        "dependsPhase": "69.99",
-        "rawToken": "V69.99",
-        "sourceBreakdown": [
-          "master-table"
-        ],
-        "canonicalToken": true
-      }
-    },
-    {
-      "from": "BT73",
-      "to": "V72",
-      "type": "depends_on",
-      "source": "master-table",
-      "hard": false,
-      "fulfilled": false,
-      "hint": "Portal-/Gate-/Item-Vertraege aus V72 muessen fuer finale Bot-Semantik synchronisiert werden",
-      "attributes": {
-        "dependsPhase": null,
-        "rawToken": "V72",
-        "sourceBreakdown": [
-          "master-table"
-        ],
-        "canonicalToken": true
-      }
-    },
-    {
-      "from": "BT73.1",
-      "to": "BT73.1.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.1",
-        "subphaseCode": "73.1.1"
-      }
-    },
-    {
-      "from": "BT73.1",
-      "to": "BT73.1.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.1",
-        "subphaseCode": "73.1.2"
-      }
-    },
-    {
-      "from": "BT73.1",
-      "to": "BT73.1.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.1",
-        "subphaseCode": "73.1.3"
-      }
-    },
-    {
-      "from": "BT73.2",
-      "to": "BT73.2.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.2",
-        "subphaseCode": "73.2.1"
-      }
-    },
-    {
-      "from": "BT73.2",
-      "to": "BT73.2.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.2",
-        "subphaseCode": "73.2.2"
-      }
-    },
-    {
-      "from": "BT73.2",
-      "to": "BT73.2.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.2",
-        "subphaseCode": "73.2.3"
-      }
-    },
-    {
-      "from": "BT73.3",
-      "to": "BT73.3.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.3",
-        "subphaseCode": "73.3.1"
-      }
-    },
-    {
-      "from": "BT73.3",
-      "to": "BT73.3.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.3",
-        "subphaseCode": "73.3.2"
-      }
-    },
-    {
-      "from": "BT73.3",
-      "to": "BT73.3.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.3",
-        "subphaseCode": "73.3.3"
-      }
-    },
-    {
-      "from": "BT73.4",
-      "to": "BT73.4.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.4",
-        "subphaseCode": "73.4.1"
-      }
-    },
-    {
-      "from": "BT73.4",
-      "to": "BT73.4.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.4",
-        "subphaseCode": "73.4.2"
-      }
-    },
-    {
-      "from": "BT73.4",
-      "to": "BT73.4.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.4",
-        "subphaseCode": "73.4.3"
-      }
-    },
-    {
-      "from": "BT73.5",
-      "to": "BT73.5.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.5",
-        "subphaseCode": "73.5.1"
-      }
-    },
-    {
-      "from": "BT73.5",
-      "to": "BT73.5.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.5",
-        "subphaseCode": "73.5.2"
-      }
-    },
-    {
-      "from": "BT73.5",
-      "to": "BT73.5.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.5",
-        "subphaseCode": "73.5.3"
-      }
-    },
-    {
-      "from": "BT73.6",
-      "to": "BT73.6.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.6",
-        "subphaseCode": "73.6.1"
-      }
-    },
-    {
-      "from": "BT73.6",
-      "to": "BT73.6.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.6",
-        "subphaseCode": "73.6.2"
-      }
-    },
-    {
-      "from": "BT73.6",
-      "to": "BT73.6.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.6",
-        "subphaseCode": "73.6.3"
-      }
-    },
-    {
-      "from": "BT73.7",
-      "to": "BT73.7.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.7",
-        "subphaseCode": "73.7.1"
-      }
-    },
-    {
-      "from": "BT73.7",
-      "to": "BT73.7.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.7",
-        "subphaseCode": "73.7.2"
-      }
-    },
-    {
-      "from": "BT73.99",
-      "to": "BT73.99.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.99",
-        "subphaseCode": "73.99.1"
-      }
-    },
-    {
-      "from": "BT73.99",
-      "to": "BT73.99.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT73",
-        "phaseCode": "73.99",
-        "subphaseCode": "73.99.2"
-      }
-    },
-    {
-      "from": "BT80.7",
-      "to": "BT80.7.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.7",
-        "subphaseCode": "80.7.1"
-      }
-    },
-    {
-      "from": "BT80.7",
-      "to": "BT80.7.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.7",
-        "subphaseCode": "80.7.2"
-      }
-    },
-    {
-      "from": "BT80.7",
-      "to": "BT80.7.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.7",
-        "subphaseCode": "80.7.3"
-      }
-    },
-    {
-      "from": "BT80.8",
-      "to": "BT80.8.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.8",
-        "subphaseCode": "80.8.1"
-      }
-    },
-    {
-      "from": "BT80.8",
-      "to": "BT80.8.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.8",
-        "subphaseCode": "80.8.2"
-      }
-    },
-    {
-      "from": "BT80.8",
-      "to": "BT80.8.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.8",
-        "subphaseCode": "80.8.3"
-      }
-    },
-    {
-      "from": "BT80.9",
-      "to": "BT80.9.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9",
-        "subphaseCode": "80.9.1"
-      }
-    },
-    {
-      "from": "BT80.9",
-      "to": "BT80.9.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9",
-        "subphaseCode": "80.9.2"
-      }
-    },
-    {
-      "from": "BT80.9",
-      "to": "BT80.9.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9",
-        "subphaseCode": "80.9.3"
-      }
-    },
-    {
-      "from": "BT80.9",
-      "to": "BT80.9.4",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9",
-        "subphaseCode": "80.9.4"
-      }
-    },
-    {
-      "from": "BT80.9",
-      "to": "BT80.9.5",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9",
-        "subphaseCode": "80.9.5"
-      }
-    },
-    {
-      "from": "BT80.99",
-      "to": "BT80.99.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.99",
-        "subphaseCode": "80.99.1"
-      }
-    },
-    {
-      "from": "BT80.99",
-      "to": "BT80.99.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.99",
-        "subphaseCode": "80.99.2"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "BT80.7",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.7"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "BT80.8",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.8"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "BT80.9",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.9"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "BT80.99",
-      "type": "contains_phase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT80C",
-        "phaseCode": "80.99"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "docs/bot-training/Bot_Trainingsplan.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "docs/plaene/neu/BT80C_Classic3D_Validation_Natural_End_Overlap_2026-04-03.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "docs/plaene/neu/BT80C_Validierungs_und_Promotionshaertung_2026-04-03.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "tests/trainer-v36-algorithm-profile.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "tests/training-benchmark-artifacts.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "tests/training-e2e.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT80C",
-      "to": "tests/training-gate.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
       }
     },
     {
@@ -145030,50 +142151,6 @@
       }
     },
     {
-      "from": "BT93S2R3.99",
-      "to": "BT93S2R3.99.1",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT93S2R3",
-        "phaseCode": "93S2R3.99",
-        "subphaseCode": "93S2R3.99.1"
-      }
-    },
-    {
-      "from": "BT93S2R3.99",
-      "to": "BT93S2R3.99.2",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT93S2R3",
-        "phaseCode": "93S2R3.99",
-        "subphaseCode": "93S2R3.99.2"
-      }
-    },
-    {
-      "from": "BT93S2R3.99",
-      "to": "BT93S2R3.99.3",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT93S2R3",
-        "phaseCode": "93S2R3.99",
-        "subphaseCode": "93S2R3.99.3"
-      }
-    },
-    {
-      "from": "BT93S2R3.99",
-      "to": "BT93S2R3.99.4",
-      "type": "contains_subphase",
-      "hint": null,
-      "attributes": {
-        "blockId": "BT93S2R3",
-        "phaseCode": "93S2R3.99",
-        "subphaseCode": "93S2R3.99.4"
-      }
-    },
-    {
       "from": "BT93S2R4",
       "to": "BT93S2R4.1",
       "type": "contains_phase",
@@ -145849,6 +142926,328 @@
         "blockId": "BT93S2R5",
         "phaseCode": "93S2R5.99",
         "subphaseCode": "93S2R5.99.4"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "BT93S2R6.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.1"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "BT93S2R6.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.2"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "BT93S2R6.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.3"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "BT93S2R6.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.4"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "BT93S2R6.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.99"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "data/training/ppo/bt93s2r6/bt93s2r6_closure_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "data/training/ppo/bt93s2r6/full_matrix_failure_ledger.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "data/training/ppo/bt93s2r6/full_matrix_repair_contract.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "data/training/ppo/bt93s2r6/full_matrix_repair_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R6",
+      "to": "docs/Fehlerberichte/2026-05-02_bt93s2r6_full_matrix_predicate_required.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R6.1",
+      "to": "BT93S2R6.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.1",
+        "subphaseCode": "93S2R6.1.1"
+      }
+    },
+    {
+      "from": "BT93S2R6.1",
+      "to": "BT93S2R6.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.1",
+        "subphaseCode": "93S2R6.1.2"
+      }
+    },
+    {
+      "from": "BT93S2R6.1",
+      "to": "BT93S2R6.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.1",
+        "subphaseCode": "93S2R6.1.3"
+      }
+    },
+    {
+      "from": "BT93S2R6.1",
+      "to": "BT93S2R6.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.1",
+        "subphaseCode": "93S2R6.1.4"
+      }
+    },
+    {
+      "from": "BT93S2R6.2",
+      "to": "BT93S2R6.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.2",
+        "subphaseCode": "93S2R6.2.1"
+      }
+    },
+    {
+      "from": "BT93S2R6.2",
+      "to": "BT93S2R6.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.2",
+        "subphaseCode": "93S2R6.2.2"
+      }
+    },
+    {
+      "from": "BT93S2R6.2",
+      "to": "BT93S2R6.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.2",
+        "subphaseCode": "93S2R6.2.3"
+      }
+    },
+    {
+      "from": "BT93S2R6.2",
+      "to": "BT93S2R6.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.2",
+        "subphaseCode": "93S2R6.2.4"
+      }
+    },
+    {
+      "from": "BT93S2R6.3",
+      "to": "BT93S2R6.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.3",
+        "subphaseCode": "93S2R6.3.1"
+      }
+    },
+    {
+      "from": "BT93S2R6.3",
+      "to": "BT93S2R6.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.3",
+        "subphaseCode": "93S2R6.3.2"
+      }
+    },
+    {
+      "from": "BT93S2R6.3",
+      "to": "BT93S2R6.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.3",
+        "subphaseCode": "93S2R6.3.3"
+      }
+    },
+    {
+      "from": "BT93S2R6.3",
+      "to": "BT93S2R6.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.3",
+        "subphaseCode": "93S2R6.3.4"
+      }
+    },
+    {
+      "from": "BT93S2R6.4",
+      "to": "BT93S2R6.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.4",
+        "subphaseCode": "93S2R6.4.1"
+      }
+    },
+    {
+      "from": "BT93S2R6.4",
+      "to": "BT93S2R6.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.4",
+        "subphaseCode": "93S2R6.4.2"
+      }
+    },
+    {
+      "from": "BT93S2R6.4",
+      "to": "BT93S2R6.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.4",
+        "subphaseCode": "93S2R6.4.3"
+      }
+    },
+    {
+      "from": "BT93S2R6.99",
+      "to": "BT93S2R6.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.99",
+        "subphaseCode": "93S2R6.99.1"
+      }
+    },
+    {
+      "from": "BT93S2R6.99",
+      "to": "BT93S2R6.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.99",
+        "subphaseCode": "93S2R6.99.2"
+      }
+    },
+    {
+      "from": "BT93S2R6.99",
+      "to": "BT93S2R6.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.99",
+        "subphaseCode": "93S2R6.99.3"
+      }
+    },
+    {
+      "from": "BT93S2R6.99",
+      "to": "BT93S2R6.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "BT93S2R6",
+        "phaseCode": "93S2R6.99",
+        "subphaseCode": "93S2R6.99.4"
       }
     },
     {
