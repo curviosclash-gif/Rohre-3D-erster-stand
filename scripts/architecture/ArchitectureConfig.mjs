@@ -29,16 +29,8 @@ const legacyUiToStateImportEntries = [
         'Match flow UI still orchestrates state session lifecycle while command/reducer ownership is being consolidated.'
     ),
     pair(
-        createEdgeKey('src/ui/MatchFlowUiController.js', 'src/state/MatchLifecycleStateTransitions.js'),
-        'Match flow UI still consumes explicit lifecycle transition builders during the ongoing state/ui split.'
-    ),
-    pair(
         createEdgeKey('src/ui/MatchFlowUiController.js', 'src/state/RoundEndCoordinator.js'),
         'Match flow UI still calls round-end coordinator while transition responsibilities are incrementally moved to state orchestration.'
-    ),
-    pair(
-        createEdgeKey('src/ui/PauseOverlayController.js', 'src/state/MatchLifecycleStateTransitions.js'),
-        'Pause overlay still consumes lifecycle transition builders while pause ownership is migrated to command reducers.'
     ),
     pair(
         createEdgeKey('src/ui/SettingsStore.js', 'src/state/storage/StoragePlatform.js'),
