@@ -98,8 +98,28 @@ async function triggerRoundEndForPersistence(page) {
         const winner = players.find((entry) => entry && entry.isBot !== true) || players[0] || null;
         const preGhostState = game?.entityManager?.getLastRoundGhostState?.() || null;
         const preRecorder = game?.recorder?.getLastRoundMetrics?.() || null;
+        const preRecorderDebug = {
+            shouldCaptureFrames: game?.recorder?.shouldCaptureFrames?.() === true,
+            frameCaptureEnabled: game?.recorder?.isFrameCaptureEnabled?.() === true,
+            snapshotCount: Number(game?.recorder?._snapshotStore?.snapshotCount || 0),
+            frameCounter: Number(game?.recorder?._frameCounter || 0),
+            orderedSnapshotCount: Array.isArray(game?.recorder?._snapshotStore?.getOrderedSnapshots?.())
+                ? game.recorder._snapshotStore.getOrderedSnapshots().length
+                : 0,
+            roundStartTime: Number(game?.recorder?.roundStartTime || 0),
+        };
         game?.matchFlowUiController?.onRoundEnd?.(winner, { reason: 'ELIMINATION' });
         const postRecorder = game?.recorder?.getLastRoundMetrics?.() || null;
+        const postRecorderDebug = {
+            shouldCaptureFrames: game?.recorder?.shouldCaptureFrames?.() === true,
+            frameCaptureEnabled: game?.recorder?.isFrameCaptureEnabled?.() === true,
+            snapshotCount: Number(game?.recorder?._snapshotStore?.snapshotCount || 0),
+            frameCounter: Number(game?.recorder?._frameCounter || 0),
+            orderedSnapshotCount: Array.isArray(game?.recorder?._snapshotStore?.getOrderedSnapshots?.())
+                ? game.recorder._snapshotStore.getOrderedSnapshots().length
+                : 0,
+            roundStartTime: Number(game?.recorder?.roundStartTime || 0),
+        };
         const storageRaw = localStorage.getItem('cuviosclash.arcade-ghost-library.v1');
         let storageEntries = 0;
         try {
@@ -112,7 +132,9 @@ async function triggerRoundEndForPersistence(page) {
             gameState: String(game?.state || ''),
             preGhostState,
             preRecorder,
+            preRecorderDebug,
             postRecorder,
+            postRecorderDebug,
             storageEntries,
         };
     });
@@ -229,4 +251,3 @@ test('Ghost-Selbstduell Roundtrip persistiert und spielt auf Desktop-Electron in
 
     expect(failures, JSON.stringify(failures, null, 2)).toEqual([]);
 });
-
