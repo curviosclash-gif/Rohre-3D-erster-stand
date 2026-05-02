@@ -429,7 +429,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93S2R3 | 2026-05-01 | frei | `93S2R3.4` abgeschlossen als `predicate-window-required`; Folge-Replan `BT93S2R6` aufgenommen; `93S2R3.99` bleibt gesperrt |
 | Bot-Codex | BT93S2R4 | 2026-05-01 | frei | abgeschlossen 2026-05-02 als `replay-startstate-green`; oeffnet nur `93S2R3.3-Reentry` |
 | Bot-Codex | BT93S2R5 | 2026-05-01 | frei | abgeschlossen 2026-05-01 als `predicate-window-repair-green`; `93S2R4.5` ist gruen, Downstream bleibt bis S2R4.99 geschlossen |
-| Bot-Codex | BT93S2R6 | 2026-05-02 | frei | direkter User-Replan aufgenommen; naechster claimbarer Scope nur `93S2R6.1`; kein S2R3.99/S2-Recheck/Downstream |
+| Bot-Codex | BT93S2R6 | 2026-05-02 | claimed | direkter User-Replan aufgenommen; naechster claimbarer Scope nur `93S2R6.1`; kein S2R3.99/S2-Recheck/Downstream |
 | - | BT93T | - | frei | blockiert, bis S2-Recheck nach allen Reentries `observation-telemetry-required` schreibt |
 | - | BT93U | - | frei | wartet auf frisches BT93S2.99=`action-selection-green` oder `telemetry-green` plus S2-Recheck nach allen Reentries |
 | - | BT93V | - | frei | wartet auf `reward-ordering-green` |
@@ -485,7 +485,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93S2R3 | Predicate-/Window-/Env-Measurement Reentry nach rotem S2R2 | blocked | P0 | BT93S2R2.99=`measurement-invalid` + User-Intake 2026-05-01 + BT93S2R4.99=`replay-startstate-green` | 93S2R3.4 rot; 93S2R3.99 gesperrt bis BT93S2R6.99 plus frischem 93S2R3.4-Recheck | `docs/plaene/neu/BT93S2R3_Predicate_Window_Env_Measurement_Reentry_Intake_2026-05-01.md` |
 | BT93S2R4 | Replay-/StartState-Determinism Repair nach rotem S2R3.2 | completed | P0 | 93S2R3.2=`replay-determinism-required`, `opensNext=[]` + User-Intake 2026-05-01 + BT93S2R5.99=`predicate-window-repair-green` | 93S2R4.99 abgeschlossen; `replay-startstate-green`, oeffnet nur `93S2R3.3-Reentry` | `docs/plaene/neu/BT93S2R4_Replay_StartState_Determinism_Repair_Intake_2026-05-01.md` |
 | BT93S2R5 | Predicate-/PreAction-Validity Repair nach rotem S2R4.4 | completed | P0 | 93S2R4.4=`predicate-window-required`, `opensNext=[]` + User-Intake 2026-05-01 | 93S2R5.99 abgeschlossen; `predicate-window-repair-green` | `docs/plaene/neu/BT93S2R5_Predicate_PreAction_Validity_Repair_Intake_2026-05-01.md` |
-| BT93S2R6 | Full-Matrix Predicate-/Retained-v2 Repair nach rotem S2R3.4 | planned | P0 | 93S2R3.4=`predicate-window-required`, `opensNext=[]` + direkter User-Replan 2026-05-02 | 93S2R6.1 offen; einziger naechster `/fix-planung`-Scope | direkter User-Intake im Abschnitt `BT93S2R6` dieses Dokuments |
+| BT93S2R6 | Full-Matrix Predicate-/Retained-v2 Repair nach rotem S2R3.4 | active | P0 | 93S2R3.4=`predicate-window-required`, `opensNext=[]` + direkter User-Replan 2026-05-02 | 93S2R6.1 offen; einziger naechster `/fix-planung`-Scope | direkter User-Intake im Abschnitt `BT93S2R6` dieses Dokuments |
 | BT93T | Training-only Raw-/Trail-/Escape-Lane Telemetry Repair | planned | P1 | frischer BT93S2-Recheck nach allen Reentries `observation-telemetry-required` | blockiert bis BT93S2 nur Telemetrie oeffnet | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93U | Danger-aware Reward- und Objective-Ordering Repair | planned | P1 | frischer BT93S2.99=`action-selection-green` oder BT93T.99=`telemetry-green` + S2-Recheck `action-selection-green` | 93U.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
 | BT93V | Safety-Diagnostic, Terminal-Sanity und Sidecar-Mask Decision | planned | P1 | BT93U.99=`reward-ordering-green` | 93V.1 | `docs/plaene/neu/BT93R_Bis_BT93X_PPO_Blocker_Resolution_Replan_2026-04-30.md` |
@@ -4094,7 +4094,7 @@ Harte Selbstpruefung des Replans:
 
 Quelle: direkter User-Intake/Replan 2026-05-02 in diesem Dokument, abgeleitet aus `data/training/ppo/bt93s2r3/empirical_zero_gate_report.json`.
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-05-02 -->
 
 Scope:
 
