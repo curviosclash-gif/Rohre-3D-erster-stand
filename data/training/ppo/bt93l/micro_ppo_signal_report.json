@@ -1,0 +1,1421 @@
+{
+  "actualModelTimesteps": 10112,
+  "blockId": "BT93L",
+  "commands": {
+    "write": "python python/scripts/bt93l_micro_ppo_signal.py --write-report --total-timesteps 10000"
+  },
+  "decision": {
+    "allowedNextResultClasses": [
+      "signal-green",
+      "signal-red",
+      "reward-redesign-required",
+      "action-space-required",
+      "measurement-invalid"
+    ],
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "extension50kAllowed": false,
+    "extension50kExecuted": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "resultClass": "signal-green"
+  },
+  "elapsedSeconds": 356.644581,
+  "error": null,
+  "evalSummary": {
+    "deathBefore60Count": 0,
+    "objectiveSignalRate": 0.347222,
+    "objectiveSignalReachableCount": 25,
+    "progressSignalRate": 0.347222,
+    "progressSignalReachableCount": 25,
+    "runtimeErrorCount": 0,
+    "seedSummaries": [
+      {
+        "actionCounts": {
+          "2": 24
+        },
+        "avgStepsPerEpisode": 24.0,
+        "completedEpisodes": 1,
+        "deathBefore60Count": 0,
+        "label": "eval-944",
+        "objectiveEventCounts": {
+          "local-openness-improved": 4,
+          "target-distance-improved": 3
+        },
+        "objectiveSignalRate": 0.291667,
+        "objectiveSignalReachableCount": 7,
+        "progressEventCounts": {
+          "local-openness-improved": 4,
+          "target-distance-improved": 3
+        },
+        "progressSignalRate": 0.291667,
+        "progressSignalReachableCount": 7,
+        "rewardBreakdownTotals": {
+          "baseStep": -0.384,
+          "checkpointReached": 5.95,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.276,
+          "survivalPressureBonus": 0.056538,
+          "trailRisk": 0.0,
+          "wallRisk": -0.680857,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "runtimeErrorCount": 0,
+        "safetyMaxRates": {
+          "invalidActionRate": 0.0,
+          "noopRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "preSamplingMaskRate": 1.0,
+          "sanitizerRate": 0.0,
+          "vetoRate": 0.0
+        },
+        "sampleRows": [
+          {
+            "actionToken": 2,
+            "episodeStep": 1,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.837824,
+            "step": 1,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 2,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.83783,
+            "step": 2,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 3,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.837836,
+            "step": 3,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 4,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012159,
+            "step": 4,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 5,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012155,
+            "step": 5,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 6,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012151,
+            "step": 6,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 7,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012148,
+            "step": 7,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 8,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012146,
+            "step": 8,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 9,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012143,
+            "step": 9,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 10,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012141,
+            "step": 10,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 11,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.02185,
+            "step": 11,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 12,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.03156,
+            "step": 12,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 13,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.030171,
+            "step": 13,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 14,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.03572,
+            "step": 14,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 15,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.814281,
+            "step": 15,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 16,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.04125,
+            "step": 16,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 17,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.80875,
+            "step": 17,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 18,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.046571,
+            "step": 18,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 19,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.0487,
+            "step": 19,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 20,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.8013,
+            "step": 20,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 21,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.052425,
+            "step": 21,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 22,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.797575,
+            "step": 22,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 23,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.052425,
+            "step": 23,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 24,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.072,
+            "step": 24,
+            "terminalReason": null,
+            "truncatedReason": "max-steps"
+          }
+        ],
+        "terminalReasonCounts": {
+          "max-steps": 1
+        },
+        "totalSteps": 24
+      },
+      {
+        "actionCounts": {
+          "2": 24
+        },
+        "avgStepsPerEpisode": 24.0,
+        "completedEpisodes": 1,
+        "deathBefore60Count": 0,
+        "label": "eval-945",
+        "objectiveEventCounts": {
+          "local-openness-improved": 4
+        },
+        "objectiveSignalRate": 0.166667,
+        "objectiveSignalReachableCount": 4,
+        "progressEventCounts": {
+          "local-openness-improved": 4
+        },
+        "progressSignalRate": 0.166667,
+        "progressSignalReachableCount": 4,
+        "rewardBreakdownTotals": {
+          "baseStep": -0.384,
+          "checkpointReached": 3.4,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.276,
+          "survivalPressureBonus": 0.043168,
+          "trailRisk": 0.0,
+          "wallRisk": -0.14,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "runtimeErrorCount": 0,
+        "safetyMaxRates": {
+          "invalidActionRate": 0.0,
+          "noopRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "preSamplingMaskRate": 1.0,
+          "sanitizerRate": 0.0,
+          "vetoRate": 0.0
+        },
+        "sampleRows": [
+          {
+            "actionToken": 2,
+            "episodeStep": 1,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847693,
+            "step": 1,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 2,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002306,
+            "step": 2,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 3,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002305,
+            "step": 3,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 4,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002303,
+            "step": 4,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 5,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002301,
+            "step": 5,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 6,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002299,
+            "step": 6,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 7,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002297,
+            "step": 7,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 8,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002294,
+            "step": 8,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 9,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012003,
+            "step": 9,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 10,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012001,
+            "step": 10,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 11,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012,
+            "step": 11,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 12,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.011998,
+            "step": 12,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 13,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.011998,
+            "step": 13,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 14,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.011998,
+            "step": 14,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 15,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.011999,
+            "step": 15,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 16,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012001,
+            "step": 16,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 17,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012004,
+            "step": 17,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 18,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.837992,
+            "step": 18,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 19,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012013,
+            "step": 19,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 20,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.012019,
+            "step": 20,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 21,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.837976,
+            "step": 21,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 22,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.01203,
+            "step": 22,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 23,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847676,
+            "step": 23,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 24,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.016,
+            "step": 24,
+            "terminalReason": null,
+            "truncatedReason": "max-steps"
+          }
+        ],
+        "terminalReasonCounts": {
+          "max-steps": 1
+        },
+        "totalSteps": 24
+      },
+      {
+        "actionCounts": {
+          "2": 24
+        },
+        "avgStepsPerEpisode": 24.0,
+        "completedEpisodes": 1,
+        "deathBefore60Count": 0,
+        "label": "eval-946",
+        "objectiveEventCounts": {
+          "local-openness-improved": 4,
+          "target-alignment-improved": 10
+        },
+        "objectiveSignalRate": 0.583333,
+        "objectiveSignalReachableCount": 14,
+        "progressEventCounts": {
+          "local-openness-improved": 4,
+          "target-alignment-improved": 10
+        },
+        "progressSignalRate": 0.583333,
+        "progressSignalReachableCount": 14,
+        "rewardBreakdownTotals": {
+          "baseStep": -0.384,
+          "checkpointReached": 11.9,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.276,
+          "survivalPressureBonus": 0.030806,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "runtimeErrorCount": 0,
+        "safetyMaxRates": {
+          "invalidActionRate": 0.0,
+          "noopRate": 0.0,
+          "postDecodeClampRate": 0.0,
+          "preSamplingMaskRate": 1.0,
+          "sanitizerRate": 0.0,
+          "vetoRate": 0.0
+        },
+        "sampleRows": [
+          {
+            "actionToken": 2,
+            "episodeStep": 1,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847334,
+            "step": 1,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 2,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847334,
+            "step": 2,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 3,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847335,
+            "step": 3,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 4,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847335,
+            "step": 4,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 5,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847336,
+            "step": 5,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 6,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847336,
+            "step": 6,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 7,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847337,
+            "step": 7,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 8,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847337,
+            "step": 8,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 9,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847338,
+            "step": 9,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 10,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847338,
+            "step": 10,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 11,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847339,
+            "step": 11,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 12,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002661,
+            "step": 12,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 13,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.00266,
+            "step": 13,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 14,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002659,
+            "step": 14,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 15,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002659,
+            "step": 15,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 16,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002658,
+            "step": 16,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 17,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847343,
+            "step": 17,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 18,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002657,
+            "step": 18,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 19,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002657,
+            "step": 19,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 20,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847344,
+            "step": 20,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 21,
+            "objectiveSignalReachable": true,
+            "progressSignalReachable": true,
+            "reward": 0.847344,
+            "step": 21,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 22,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002656,
+            "step": 22,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 23,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.002657,
+            "step": 23,
+            "terminalReason": null,
+            "truncatedReason": null
+          },
+          {
+            "actionToken": 2,
+            "episodeStep": 24,
+            "objectiveSignalReachable": false,
+            "progressSignalReachable": false,
+            "reward": -0.016,
+            "step": 24,
+            "terminalReason": null,
+            "truncatedReason": "max-steps"
+          }
+        ],
+        "terminalReasonCounts": {
+          "max-steps": 1
+        },
+        "totalSteps": 24
+      }
+    ],
+    "totalSteps": 72
+  },
+  "generatedAt": "2026-04-28T20:04:50Z",
+  "generatedBy": "python/scripts/bt93l_micro_ppo_signal.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "218e82e6cf0011687ad9a40aa8341f5cff97b05a"
+  },
+  "guardrails": {
+    "baselineRun": false,
+    "bt94aClaimAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "ppoValidateSignal": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingRunKind": "bt93l-micro-ppo-signal-probe",
+    "trainingStarted": true
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93L.6.1": true,
+    "93L.6.2": true,
+    "93L.6.3": true,
+    "93L.6.4": true
+  },
+  "phaseId": "93L.6",
+  "ppoMetrics": {
+    "loggerSnapshots": [
+      {
+        "train/approx_kl": 0.00022698892280459404,
+        "train/clip_fraction": 0.0,
+        "train/clip_range": 0.2,
+        "train/entropy_loss": -1.958069086074829,
+        "train/explained_variance": 0.11619389057159424,
+        "train/learning_rate": 0.0003,
+        "train/loss": 2.8524768352508545,
+        "train/n_updates": 142,
+        "train/policy_gradient_loss": -0.0012433524243533611,
+        "train/value_loss": 5.981835722923279
+      },
+      {
+        "train/approx_kl": 0.00035126786679029465,
+        "train/clip_fraction": 0.0,
+        "train/clip_range": 0.2,
+        "train/entropy_loss": -1.9671567380428314,
+        "train/explained_variance": 0.08680427074432373,
+        "train/learning_rate": 0.0003,
+        "train/loss": 0.7450289726257324,
+        "train/n_updates": 144,
+        "train/policy_gradient_loss": -0.0015328321605920792,
+        "train/value_loss": 1.429516851902008
+      },
+      {
+        "train/approx_kl": 0.0006965990178287029,
+        "train/clip_fraction": 0.0,
+        "train/clip_range": 0.2,
+        "train/entropy_loss": -1.8840227723121643,
+        "train/explained_variance": 0.12938743829727173,
+        "train/learning_rate": 0.0003,
+        "train/loss": 4.259894847869873,
+        "train/n_updates": 146,
+        "train/policy_gradient_loss": -0.0036755544133484364,
+        "train/value_loss": 7.104662775993347
+      },
+      {
+        "train/approx_kl": 0.00046823080629110336,
+        "train/clip_fraction": 0.0,
+        "train/clip_range": 0.2,
+        "train/entropy_loss": -1.8542325794696808,
+        "train/explained_variance": 0.1040988564491272,
+        "train/learning_rate": 0.0003,
+        "train/loss": 4.553184986114502,
+        "train/n_updates": 148,
+        "train/policy_gradient_loss": -0.002446240046992898,
+        "train/value_loss": 8.62553858757019
+      },
+      {
+        "train/approx_kl": 0.00026122620329260826,
+        "train/clip_fraction": 0.0,
+        "train/clip_range": 0.2,
+        "train/entropy_loss": -1.8159268200397491,
+        "train/explained_variance": 0.153986394405365,
+        "train/learning_rate": 0.0003,
+        "train/loss": 2.0310189723968506,
+        "train/n_updates": 150,
+        "train/policy_gradient_loss": -0.0018467819318175316,
+        "train/value_loss": 3.842730939388275
+      },
+      {
+        "train/approx_kl": 0.00018809037283062935,
+        "train/clip_fraction": 0.0,
+        "train/clip_range": 0.2,
+        "train/entropy_loss": -1.8179600238800049,
+        "train/explained_variance": -0.05028331279754639,
+        "train/learning_rate": 0.0003,
+        "train/loss": 5.401994705200195,
+        "train/n_updates": 152,
+        "train/policy_gradient_loss": -0.000264566857367754,
+        "train/value_loss": 9.615607500076294
+      },
+      {
+        "train/approx_kl": 9.06200148165226e-05,
+        "train/clip_fraction": 0.0,
+        "train/clip_range": 0.2,
+        "train/entropy_loss": -1.7568588554859161,
+        "train/explained_variance": 0.1611226201057434,
+        "train/learning_rate": 0.0003,
+        "train/loss": 4.281566143035889,
+        "train/n_updates": 154,
+        "train/policy_gradient_loss": -0.00030548684298992157,
+        "train/value_loss": 8.165371060371399
+      },
+      {
+        "train/approx_kl": 4.662154242396355e-05,
+        "train/clip_fraction": 0.0,
+        "train/clip_range": 0.2,
+        "train/entropy_loss": -1.8001130521297455,
+        "train/explained_variance": 0.0456315279006958,
+        "train/learning_rate": 0.0003,
+        "train/loss": 0.6865209341049194,
+        "train/n_updates": 156,
+        "train/policy_gradient_loss": -7.827114313840866e-05,
+        "train/value_loss": 1.4617767184972763
+      }
+    ],
+    "model": "stable_baselines3.PPO",
+    "rolloutCount": 79,
+    "updates": 158
+  },
+  "preconditions": {
+    "actionEffectOk": true,
+    "baselineMatrixOk": true,
+    "holdoutUnused": true,
+    "progressReachabilityOk": true,
+    "rewardBalanceOk": true
+  },
+  "requestedTimesteps": 10000,
+  "resultClass": "signal-green",
+  "schemaVersion": "bt93l-micro-ppo-signal-report-v1",
+  "sourceArtifacts": {
+    "actionEffectReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/action_effect_report.json",
+      "phaseId": "93L.4",
+      "resultClass": "action-effect-green",
+      "role": "BT93L.4 action effect",
+      "sha256": "3cb30bf4f9c599aec547ad0106625be9eb63340a5a64bd7a61194169ddf486b8"
+    },
+    "baselineMatrixReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/baseline_matrix_report.json",
+      "phaseId": "93L.5",
+      "resultClass": "baseline-matrix-frozen-dqn-anchor-missing",
+      "role": "BT93L.5 baseline matrix",
+      "sha256": "de6b3208ef5a8d91991b540b036693e90e490045a3ac5a95d8c450152ba45013"
+    },
+    "progressReachabilityReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/progress_reachability_report.json",
+      "phaseId": "93L.2",
+      "resultClass": "progress-reachability-green",
+      "role": "BT93L.2 real env.step reachability",
+      "sha256": "330b0c15b5bce083d6697e5886d0fb2884237ee3cf2097c176e72e465f97b651"
+    },
+    "rewardBalanceReport": {
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93l/reward_balance_report.json",
+      "phaseId": "93L.3",
+      "resultClass": "reward-balance-green",
+      "role": "BT93L.3 reward balance",
+      "sha256": "25c8d417fdfa23e2f8cb6e0b9c548648f0780775acc78defab84fd03cd53569e"
+    }
+  },
+  "trainSummary": {
+    "actionCounts": {
+      "0": 923,
+      "1": 866,
+      "2": 2095,
+      "3": 1169,
+      "4": 1076,
+      "5": 1062,
+      "6": 976,
+      "7": 952,
+      "8": 993
+    },
+    "avgStepsPerEpisode": 23.985748,
+    "completedEpisodes": 421,
+    "deathBefore60Count": 1,
+    "label": "train-10k",
+    "objectiveEventCounts": {
+      "local-openness-improved": 695,
+      "target-alignment-improved": 513,
+      "target-distance-improved": 2231
+    },
+    "objectiveSignalRate": 0.296875,
+    "objectiveSignalReachableCount": 3002,
+    "progressEventCounts": {
+      "local-openness-improved": 695,
+      "target-alignment-improved": 513,
+      "target-distance-improved": 2231
+    },
+    "progressSignalRate": 0.296875,
+    "progressSignalReachableCount": 3002,
+    "rewardBreakdownTotals": {
+      "baseStep": -161.792,
+      "checkpointReached": 2551.7,
+      "crash": 0.0,
+      "damageDealt": 0.0,
+      "damageTaken": 0.0,
+      "external": 0.0,
+      "itemPickup": 0.0,
+      "itemUse": 0.0,
+      "kill": 0.0,
+      "loss": -4.5,
+      "lowHealthThreat": 0.0,
+      "opponentRisk": 0.0,
+      "parcoursCompleted": 0.0,
+      "stuck": 0.0,
+      "survival": 116.292,
+      "survivalPressureBonus": 18.047061,
+      "trailRisk": 0.0,
+      "wallRisk": -131.452043,
+      "win": 0.0,
+      "wrongOrder": 0.0
+    },
+    "runtimeErrorCount": 0,
+    "safetyMaxRates": {
+      "invalidActionRate": 0.0,
+      "noopRate": 0.333333,
+      "postDecodeClampRate": 0.0,
+      "preSamplingMaskRate": 1.0,
+      "sanitizerRate": 0.0,
+      "vetoRate": 0.0
+    },
+    "sampleRows": [
+      {
+        "actionToken": 3,
+        "episodeStep": 1,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.012058,
+        "step": 1,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 7,
+        "episodeStep": 2,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.012057,
+        "step": 2,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 0,
+        "episodeStep": 3,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.012057,
+        "step": 3,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 8,
+        "episodeStep": 4,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.021767,
+        "step": 4,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 1,
+        "episodeStep": 5,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.031476,
+        "step": 5,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 5,
+        "episodeStep": 6,
+        "objectiveSignalReachable": true,
+        "progressSignalReachable": true,
+        "reward": 0.825462,
+        "step": 6,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 0,
+        "episodeStep": 7,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.030085,
+        "step": 7,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 4,
+        "episodeStep": 8,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.030083,
+        "step": 8,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 0,
+        "episodeStep": 9,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.03008,
+        "step": 9,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 2,
+        "episodeStep": 10,
+        "objectiveSignalReachable": true,
+        "progressSignalReachable": true,
+        "reward": 0.825471,
+        "step": 10,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 6,
+        "episodeStep": 11,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.024527,
+        "step": 11,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 6,
+        "episodeStep": 12,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.024525,
+        "step": 12,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 0,
+        "episodeStep": 13,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.024524,
+        "step": 13,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 2,
+        "episodeStep": 14,
+        "objectiveSignalReachable": true,
+        "progressSignalReachable": true,
+        "reward": 0.836575,
+        "step": 14,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 4,
+        "episodeStep": 15,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.021749,
+        "step": 15,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 6,
+        "episodeStep": 16,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.021749,
+        "step": 16,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 6,
+        "episodeStep": 17,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.02175,
+        "step": 17,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 1,
+        "episodeStep": 18,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.031464,
+        "step": 18,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 0,
+        "episodeStep": 19,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.030079,
+        "step": 19,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 2,
+        "episodeStep": 20,
+        "objectiveSignalReachable": true,
+        "progressSignalReachable": true,
+        "reward": 0.831014,
+        "step": 20,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 8,
+        "episodeStep": 21,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.021766,
+        "step": 21,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 3,
+        "episodeStep": 22,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.021773,
+        "step": 22,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 8,
+        "episodeStep": 23,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.021781,
+        "step": 23,
+        "terminalReason": null,
+        "truncatedReason": null
+      },
+      {
+        "actionToken": 5,
+        "episodeStep": 24,
+        "objectiveSignalReachable": false,
+        "progressSignalReachable": false,
+        "reward": -0.036,
+        "step": 24,
+        "terminalReason": null,
+        "truncatedReason": "max-steps"
+      }
+    ],
+    "terminalReasonCounts": {
+      "max-steps": 420,
+      "player-dead": 1
+    },
+    "totalSteps": 10112
+  }
+}

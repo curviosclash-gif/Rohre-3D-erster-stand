@@ -1,0 +1,393 @@
+{
+  "blockId": "BT93L",
+  "generatedAt": "2026-04-28T19:19:10Z",
+  "generatedBy": "python/scripts/bt93l_task_metric_contract.py",
+  "git": {
+    "branch": "bot-training",
+    "sha": "47325981e9da8275968e5ea32e85448c9baacbfa"
+  },
+  "guardrails": {
+    "baselineRunsStarted": false,
+    "bt94aGateRefreshAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "holdoutUsed": false,
+    "pilotRunsStarted": false,
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": [],
+    "scopeFiles": [
+      "docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md",
+      "data/training/ppo/bt93l/**",
+      "python/scripts/bt93l_*.py",
+      "python/configs/ppo_bt93l*.json",
+      "scripts/training-headless-lane-runner.mjs",
+      "scripts/training-single-env-bridge.mjs",
+      "src/state/training/EpisodeController.js",
+      "src/state/training/RewardCalculator.js",
+      "python/envs/ppo_action_surface.py",
+      "python/train.py",
+      "python/eval.py",
+      "tests/training-*.mjs",
+      "python/tests/**"
+    ],
+    "trainingStarted": false
+  },
+  "matrix": {
+    "episode": {
+      "controllerTimeoutSeconds": 30,
+      "maxStepsInterpretation": "neutral truncation; never objective-complete and never quality-green by itself",
+      "maxStepsPerEpisode": 180,
+      "minimumCompletedEpisodesForRead": 15
+    },
+    "evaluation": {
+      "controls": [
+        "positive-control",
+        "noop-control",
+        "random-control"
+      ],
+      "evalMinCompletedEpisodes": 15,
+      "evalSteps": 2700,
+      "requiredReports": [
+        "progress_reachability_report.json",
+        "reward_balance_report.json",
+        "baseline_matrix_report.json"
+      ]
+    },
+    "maps": {
+      "primary": "standard",
+      "rule": "standard is the first reachability map; maze may be used only with identical task and terminal semantics",
+      "secondaryForMatrixConsistency": "maze"
+    },
+    "matrixId": "bt93l-reachability-diagnostic-matrix-v1",
+    "microPpo": {
+      "allowedOnlyAfter": [
+        "93L.2 green",
+        "93L.3 green"
+      ],
+      "envCount": 2,
+      "extensionTimesteps": 50000,
+      "firstProbeTimesteps": 10000,
+      "qualityBoundary": "signal probe only; no candidate, freeze, holdout, promote, PPO-Validate, or rollout signal",
+      "resultClasses": [
+        "signal-green",
+        "signal-red",
+        "reward-redesign-required",
+        "action-space-required",
+        "measurement-invalid"
+      ]
+    },
+    "mode": {
+      "domainModes": [
+        "classic-3d"
+      ],
+      "gameMode": "CLASSIC",
+      "modeId": "runtime-near-headless-v1",
+      "modePath": "normal",
+      "planarMode": false
+    },
+    "seeds": {
+      "controlSeeds": [
+        944,
+        945,
+        946
+      ],
+      "diagnosticEvalSeeds": [
+        944,
+        945,
+        946
+      ],
+      "diagnosticTrainSeeds": [
+        934,
+        935,
+        936,
+        937
+      ],
+      "holdoutSeeds": [
+        960,
+        961
+      ],
+      "holdoutStatus": "reserved-unused-in-BT93L.1-through-BT93L.6"
+    },
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "metricInterpretation": {
+    "averageBotSurvival": "survival diagnostic until PPO-Validate lane exists",
+    "avgStepsPerEpisode": "survival diagnostic until objective reachability and reward balance are green",
+    "maxSteps": "neutral truncation; cannot become quality-green without progress/objective evidence",
+    "noSilentRedefinition": true,
+    "objectiveSignalReachable": "true only from real env.step path and objective task semantics",
+    "playerDeadOnly": "red for objective/candidate readiness",
+    "progressSignalReachable": "true only from real env.step path; manual injection is counterprobe only",
+    "runtimeErrorCount": "hard stability metric; must be zero"
+  },
+  "nextGate": {
+    "phase": "93L.2",
+    "requires": [
+      "dead signal path documented",
+      "real progress/objective source defined",
+      "focused smoke proves realEnvStepPath=true",
+      "positive/noop/random controls reported"
+    ],
+    "trainingStartBlockedUntil": [
+      "progressSignalReachable=true",
+      "objectiveSignalReachable=true",
+      "realEnvStepPath=true"
+    ]
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93L.1.1": true,
+    "93L.1.2": true,
+    "93L.1.3": true,
+    "93L.1.4": true
+  },
+  "phaseId": "93L.1",
+  "resultClass": "task-metric-contract-pinned",
+  "schemaVersion": "bt93l-task-metric-contract-v1",
+  "sourceArtifacts": {
+    "bt93jLongrun": {
+      "blockId": "BT93J",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93j/user_owned_1m_longrun_report.json",
+      "phaseId": "93J.5c",
+      "resultClass": "reward-still-blocking",
+      "role": "BT93J user-owned 1M diagnostic longrun",
+      "runId": "20260426T175502Z-bt93j-user-owned-1m-proof-longrun",
+      "runKind": "bt93j-user-owned-1m-proof-longrun",
+      "sha256": "239fb23a15b0bba92f86ddccbf1d141d4ce162860092afc6a6de4220b4baa9a0"
+    },
+    "bt93jPostLongrunDecision": {
+      "blockId": "BT93J",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93j/post_longrun_decision_report.json",
+      "phaseId": "93J.7.1",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93J red post-longrun decision",
+      "sha256": "8ce6a9e37743c7303f08522cd225eaf3392618eb112efb384c17731d2689ee85"
+    },
+    "bt93kHandover": {
+      "blockId": "BT93K",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93k/handover_package.json",
+      "phaseId": "93K.7",
+      "resultClass": "diagnose-loop-required",
+      "role": "BT93K red handover into BT93L",
+      "sha256": "382b45a5bac869359e736b0cb4eec1537625ea5a057d5d79ccdf55b9bd7a6a94"
+    },
+    "bt93kSignalMetricContract": {
+      "blockId": "BT93K",
+      "exists": true,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt93k/signal_metric_contract.json",
+      "phaseId": "93K.1.2",
+      "resultClass": "signal-metric-contract-pinned",
+      "role": "BT93K pinned signal metric contract",
+      "sha256": "19f8be481f43822af50e6aa69950df620f844ef7c56d1d398c7db4bd3a126011"
+    },
+    "bt94aNoStartGate": {
+      "blockId": "BT94A",
+      "bt94aBlockerCount": 4,
+      "claimable": false,
+      "exists": true,
+      "handoverReady": false,
+      "isFile": true,
+      "ok": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "precomparisonResultClass": "ppo-regression",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A no-start gate",
+      "sha256": "288018064b50e130fb0fea7ded67b7ac2b29a6c393198a9a494417d16fd37062"
+    },
+    "diagnosisRestartPlan": {
+      "exists": true,
+      "isFile": true,
+      "path": "docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md",
+      "role": "BT93L diagnosis and restart source",
+      "sha256": "fd09ecf546303b72700449ddb09e9d31048a533b7de4c5acd5dcfee3ffbd667f"
+    }
+  },
+  "startState": {
+    "bt93j": {
+      "averageBotSurvivalObserved": 166.866667,
+      "avgStepsPerEpisodeObserved": 166.866667,
+      "completedEpisodeCount": 15,
+      "deathCauseCounts": {
+        "player-dead": 3
+      },
+      "longestEpisode": 180,
+      "longrunResultClass": "reward-still-blocking",
+      "maxStepEpisodes": 12,
+      "naturalTerminalCount": 0,
+      "objectiveReward": 0.0,
+      "playerDeadOnly": true,
+      "postDecisionResultClass": "diagnose-loop-required",
+      "progressReward": 0.0,
+      "redConclusion": "survival improved, but progress/objective rewards stayed zero and terminal evidence stayed player-dead-only or max-step dominated",
+      "sourceRunId": "20260426T175502Z-bt93j-user-owned-1m-proof-longrun",
+      "sourceRunKind": "bt93j-user-owned-1m-proof-longrun",
+      "terminalReasonCounts": {
+        "player-dead": 3
+      }
+    },
+    "bt93k": {
+      "blockedReasons": [
+        "avgStepsPerEpisodeObserved regressed against pinned start matrix"
+      ],
+      "bt94aReady": false,
+      "firstDiagnosticRun": {
+        "avgStepsPerEpisodeObserved": 78.015625,
+        "completedEpisodeCount": 256,
+        "naturalTerminalShare": 0.0,
+        "objectiveSignalNonZero": false,
+        "playerDeadOnly": true,
+        "progressSignalNonZero": false,
+        "runId": "20260428T123059Z-bt93k-20k-signal-smoke"
+      },
+      "handoverResultClass": "diagnose-loop-required",
+      "signalGate": {
+        "avgStepsNonRegression": false,
+        "longerRunAllowed": false,
+        "naturalTerminalSharePositive": false,
+        "objectiveSignalNonZero": false,
+        "progressSignalNonZero": false,
+        "technicalOk": true
+      },
+      "startMatrixId": "bt93k-start-matrix-from-bt93j-1m-v1"
+    },
+    "bt94aNoStartGate": {
+      "bt94aBlockerCount": 4,
+      "candidateFreezeAllowed": false,
+      "candidateRunsAllowed": false,
+      "claimable": false,
+      "handoverGate": "closed-diagnose-blocked-by-bt93i",
+      "handoverReady": false,
+      "matrixDefinitionAllowed": false,
+      "precomparisonResultClass": "ppo-regression",
+      "remainingGates": [
+        "F.05",
+        "F.19",
+        "F.27",
+        "F.31"
+      ],
+      "resultClass": "blocked-no-start"
+    },
+    "diagnosisSummary": {
+      "pinnedFindings": [
+        "PPO technically runs, but optimizes an insufficient signal",
+        "progress/objective rewards are dead in the normal PPO runner path",
+        "survival-only reward can produce max-step plateaus without gameplay quality",
+        "BT94A no-start is correct until reachability, terminal, reward, and comparison gates are green"
+      ],
+      "source": "docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md",
+      "sourceSha256": "fd09ecf546303b72700449ddb09e9d31048a533b7de4c5acd5dcfee3ffbd667f"
+    }
+  },
+  "taskDefinitions": {
+    "candidateFreezeTask": {
+      "entryConditions": [
+        "BT93L.99 resultClass == BT94A-ready",
+        "data/training/ppo/bt94a/no_start_gate.json claimable == true",
+        "candidateRunsAllowed == true",
+        "matrixDefinitionAllowed == true",
+        "bt94aBlockerCount == 0",
+        "precomparisonResultClass != ppo-regression"
+      ],
+      "forbiddenInBT93L": [
+        "candidate",
+        "freeze",
+        "holdout optimization",
+        "promote",
+        "rollout-ready",
+        "BT95-Handoff-ready"
+      ],
+      "purpose": "future BT94A candidate/freeze work; not claimable in BT93L.1"
+    },
+    "objectiveTask": {
+      "manualInjectionRule": "input.progressEvent/context.progressEvent is allowed only as counterprobe, never as reachability evidence",
+      "primaryMetrics": [
+        "progressSignalReachable",
+        "objectiveSignalReachable",
+        "realEnvStepPath",
+        "checkpointReachedReward",
+        "parcoursCompletedReward",
+        "objectiveCompleteCount"
+      ],
+      "purpose": "prove progress and objective signals in the real env.step path",
+      "successBoundary": [
+        "positive-control reaches progress/objective without manual signal injection",
+        "noop-control stays non-progress",
+        "random-control is reported separately and cannot be tuned post-hoc"
+      ]
+    },
+    "survivalTask": {
+      "explicitNonSuccess": [
+        "maxSteps-only plateau",
+        "playerDeadOnly=true",
+        "progressSignalReachable=false",
+        "objectiveSignalReachable=false"
+      ],
+      "primaryMetrics": [
+        "avgStepsPerEpisode",
+        "averageBotSurvival",
+        "completedEpisodeCount",
+        "deathBefore60Share",
+        "runtimeErrorCount"
+      ],
+      "purpose": "measure survival and safety without treating survival-only as gameplay quality",
+      "successBoundary": [
+        "runtimeErrorCount == 0",
+        "deathBefore60Share does not regress",
+        "avgStepsPerEpisode may improve only as diagnostic evidence until objective signals exist"
+      ]
+    }
+  },
+  "terminalSemantics": {
+    "forced-stop": {
+      "class": "operator-or-supervisor-stop",
+      "countsTowardNaturalTerminal": false,
+      "qualityMeaning": "measurement-invalid for quality unless graceful final report and final snapshots exist"
+    },
+    "max-steps": {
+      "class": "truncation",
+      "countsTowardNaturalTerminal": false,
+      "qualityMeaning": "neutral diagnostic cap; not objective-complete and not survival quality by itself"
+    },
+    "objective-complete": {
+      "class": "task-specific-natural-terminal",
+      "countsTowardNaturalTerminal": true,
+      "qualityMeaning": "objective-task success only when generated without manual injection"
+    },
+    "objective-progress": {
+      "class": "progress-signal",
+      "countsTowardNaturalTerminal": false,
+      "qualityMeaning": "nonterminal or intermediate objective evidence only when emitted by real env.step path"
+    },
+    "player-dead": {
+      "class": "failure-terminal",
+      "countsTowardNaturalTerminal": false,
+      "qualityMeaning": "red for objective/candidate readiness; survival diagnostics may report it separately"
+    },
+    "runtime-error": {
+      "class": "technical-failure",
+      "countsTowardNaturalTerminal": false,
+      "qualityMeaning": "red; runtimeErrorCount must remain zero"
+    },
+    "timeout": {
+      "class": "technical-failure",
+      "countsTowardNaturalTerminal": false,
+      "qualityMeaning": "measurement-invalid unless explicitly classified by a final runner report"
+    }
+  }
+}

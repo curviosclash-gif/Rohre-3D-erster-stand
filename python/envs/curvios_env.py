@@ -120,23 +120,45 @@ class _ControllerProcess:
         seed: int,
         session_id: str,
         node_executable: str = "node",
+        reward_profile_id: str | None = None,
+        map_key: str | None = None,
+        domain_mode: str | None = None,
+        game_mode: str | None = None,
+        planar_mode: bool | None = None,
+        mode_path: str | None = None,
+        curriculum_step_offset: int = 0,
     ) -> None:
         self._stderr_lines: list[str] = []
         self._responses: queue.Queue[dict[str, Any]] = queue.Queue()
         self._request_lock = threading.Lock()
+        command = [
+            node_executable,
+            str(CONTROLLER_SCRIPT_PATH),
+            "--port",
+            str(port),
+            "--max-steps",
+            str(max_steps),
+            "--seed",
+            str(seed),
+            "--session-id",
+            session_id,
+        ]
+        if reward_profile_id:
+            command.extend(["--reward-profile-id", str(reward_profile_id)])
+        if map_key:
+            command.extend(["--map-key", str(map_key)])
+        if domain_mode:
+            command.extend(["--domain-mode", str(domain_mode)])
+        if game_mode:
+            command.extend(["--game-mode", str(game_mode)])
+        if planar_mode is not None:
+            command.extend(["--planar-mode", "true" if planar_mode else "false"])
+        if mode_path:
+            command.extend(["--mode-path", str(mode_path)])
+        if curriculum_step_offset:
+            command.extend(["--curriculum-step-offset", str(int(curriculum_step_offset))])
         self._process = subprocess.Popen(
-            [
-                node_executable,
-                str(CONTROLLER_SCRIPT_PATH),
-                "--port",
-                str(port),
-                "--max-steps",
-                str(max_steps),
-                "--seed",
-                str(seed),
-                "--session-id",
-                session_id,
-            ],
+            command,
             cwd=str(REPO_ROOT),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
@@ -227,6 +249,13 @@ class CurviosEnv(gym.Env[np.ndarray, dict[str, Any]]):
         session_id: str = "bt92-curvios-env",
         node_executable: str = "node",
         controller_timeout_seconds: float = DEFAULT_COMMAND_TIMEOUT_SECONDS,
+        reward_profile_id: str | None = None,
+        map_key: str | None = None,
+        domain_mode: str | None = None,
+        game_mode: str | None = None,
+        planar_mode: bool | None = None,
+        mode_path: str | None = None,
+        curriculum_step_offset: int = 0,
     ) -> None:
         super().__init__()
         self._max_steps = int(max_steps)
@@ -234,6 +263,13 @@ class CurviosEnv(gym.Env[np.ndarray, dict[str, Any]]):
         self._session_id = session_id
         self._node_executable = node_executable
         self._controller_timeout_seconds = float(controller_timeout_seconds)
+        self._reward_profile_id = reward_profile_id
+        self._map_key = map_key
+        self._domain_mode = domain_mode
+        self._game_mode = game_mode
+        self._planar_mode = planar_mode
+        self._mode_path = mode_path
+        self._curriculum_step_offset = max(0, int(curriculum_step_offset))
         self._controller: _ControllerProcess | None = None
         self._sidecar: Bt92ControlledBridgeSidecar | None = None
         self._sidecar_runner: _SidecarRunner | None = None
@@ -275,6 +311,13 @@ class CurviosEnv(gym.Env[np.ndarray, dict[str, Any]]):
             seed=normalized_seed,
             session_id=f"{self._session_id}-{normalized_seed}",
             node_executable=self._node_executable,
+            reward_profile_id=self._reward_profile_id,
+            map_key=self._map_key,
+            domain_mode=self._domain_mode,
+            game_mode=self._game_mode,
+            planar_mode=self._planar_mode,
+            mode_path=self._mode_path,
+            curriculum_step_offset=self._curriculum_step_offset,
         )
         self._active_seed = normalized_seed
 
@@ -288,6 +331,9 @@ class CurviosEnv(gym.Env[np.ndarray, dict[str, Any]]):
         reward = float(payload.get("reward", 0.0))
         terminated = bool(payload.get("done"))
         truncated = bool(payload.get("truncated"))
+        metadata_payload = info_payload.get("metadata")
+        if not isinstance(metadata_payload, Mapping):
+            metadata_payload = {}
         info = {
             "contractVersion": payload.get("contractVersion"),
             "operation": payload.get("operation"),
@@ -297,12 +343,14 @@ class CurviosEnv(gym.Env[np.ndarray, dict[str, Any]]):
             "action": payload.get("action"),
             "domain": info_payload.get("domain"),
             "match": info_payload.get("match"),
-            "observationContext": info_payload.get("observationContext"),
+            "metadata": metadata_payload,
+            "observationContext": info_payload.get("observationContext") or metadata_payload.get("observationContext"),
             "kernelRuntime": payload.get("kernelRuntime"),
             "rewardBreakdown": info_payload.get("rewardBreakdown"),
             "terminalReason": info_payload.get("terminalReason"),
             "truncatedReason": info_payload.get("truncatedReason"),
-            "hybridDecision": info_payload.get("hybridDecision"),
+            "hybridDecision": info_payload.get("hybridDecision") or metadata_payload.get("hybridDecision"),
+            "effectiveEnvironment": metadata_payload.get("effectiveEnvironment"),
             "observationSchemaVersion": payload.get("observationSchemaVersion"),
             "observationLength": payload.get("observationLength"),
             "visibleFields": BT92_SINGLE_ENV_VISIBLE_FIELDS,

@@ -1,0 +1,441 @@
+{
+  "blockId": "BT93K",
+  "command": "python\\scripts\\bt93k_cuda_benchmark.py --write-report",
+  "commands": {
+    "cudaVenvInstall": "python -m venv tmp/bt93k-cuda-venv; tmp/bt93k-cuda-venv/Scripts/python.exe -m pip install --index-url https://download.pytorch.org/whl/cu121 torch==2.3.1; tmp/bt93k-cuda-venv/Scripts/python.exe -m pip install -r python/requirements-ppo.txt",
+    "write": "python python/scripts/bt93k_cuda_benchmark.py --write-report"
+  },
+  "config": {
+    "path": "python/configs/ppo_bt93k_cuda_benchmark.json",
+    "sha256": "5ae50ad2ed63a541e9d5766e047b24a22ccf0e6095e863616900099db1a87e0e"
+  },
+  "decision": {
+    "blockedReasons": [
+      "env-smoke wallclock improvement below 20 percent"
+    ],
+    "cudaRetained": false,
+    "policy": {
+      "minimumStableWallclockImprovement": 0.2,
+      "preferredWallclockImprovement": 0.3,
+      "qualityClaimAllowed": false,
+      "requiresCpuReferenceOk": true,
+      "requiresCudaTorchAvailable": true,
+      "requiresEnvSmokeArtifactIntegrity": true,
+      "requiresNoDeterminismProblems": true,
+      "requiresNoDriverProblems": true
+    },
+    "retentionReason": "CPU remains reference; CUDA is not retained because one or more infrastructure gates failed"
+  },
+  "envSmokeComparison": {
+    "cpu": {
+      "artifactIntegrityOk": true,
+      "command": {
+        "command": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\python\\.venv\\Scripts\\python.exe D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\python\\scripts\\bt93k_env_scale_smokes.py --write-report --output D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93k\\cuda_benchmark_cpu_env_scale_report.json",
+        "exitCode": 0,
+        "finishedAt": "2026-04-28T12:17:21Z",
+        "ok": true,
+        "startedAt": "2026-04-28T12:17:18Z",
+        "stderrTail": "",
+        "stdoutTail": "{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54813,\"sessionId\":\"20260428T121718Z-bt93k-env-scale-2env-smoke-env0-9540\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54814,\"sessionId\":\"20260428T121718Z-bt93k-env-scale-2env-smoke-env1-9541\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54822,\"sessionId\":\"20260428T121719Z-bt93k-env-scale-4env-smoke-env1-9741\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54821,\"sessionId\":\"20260428T121719Z-bt93k-env-scale-4env-smoke-env0-9740\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54823,\"sessionId\":\"20260428T121719Z-bt93k-env-scale-4env-smoke-env2-9742\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54825,\"sessionId\":\"20260428T121719Z-bt93k-env-scale-4env-smoke-env3-9743\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54837,\"sessionId\":\"20260428T121720Z-bt93k-env-scale-6env-smoke-env0-9940\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54841,\"sessionId\":\"20260428T121720Z-bt93k-env-scale-6env-smoke-env3-9943\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54838,\"sessionId\":\"20260428T121720Z-bt93k-env-scale-6env-smoke-env1-9941\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54843,\"sessionId\":\"20260428T121720Z-bt93k-env-scale-6env-smoke-env5-9945\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54845,\"sessionId\":\"20260428T121720Z-bt93k-env-scale-6env-smoke-env4-9944\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54840,\"sessionId\":\"20260428T121720Z-bt93k-env-scale-6env-smoke-env2-9942\"}\n{\n  \"ok\": true,\n  \"output\": \"data/training/ppo/bt93k/cuda_benchmark_cpu_env_scale_report.json\",\n  \"phaseCoverage\": {\n    \"93K.4.1\": true,\n    \"93K.4.2\": true,\n    \"93K.4.3\": true,\n    \"93K.4.4\": true\n  },\n  \"resultClass\": \"env-scale-smoke-ready\"\n}\n",
+        "wallClockSeconds": 2.657359
+      },
+      "output": "data/training/ppo/bt93k/cuda_benchmark_cpu_env_scale_report.json",
+      "outputSha256": "d2f7fad2b4a6d1343230c8fecdc2afef179077a67191887d3863f90b549c1711",
+      "phaseCoverage": {
+        "93K.4.1": true,
+        "93K.4.2": true,
+        "93K.4.3": true,
+        "93K.4.4": true
+      },
+      "reportOk": true,
+      "resultClass": "env-scale-smoke-ready",
+      "runs": [
+        {
+          "envCount": 2,
+          "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T121718Z-bt93k-env-scale-2env-smoke/eval_snapshot.json",
+          "evalSnapshotSha256": "cfaa1a5a0edddf6eada0ed461b432785c6471734c167e3dfb52db99782ca8f31",
+          "ok": true,
+          "runExitReport": "data/training/ppo/bt93k/runs/20260428T121718Z-bt93k-env-scale-2env-smoke/run_exit_report.json",
+          "runExitReportSha256": "cff948c34e922652f6d59482ad243c65304f387948baba074f249e4fb8c0396a",
+          "runtimeErrorCount": 0,
+          "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T121718Z-bt93k-env-scale-2env-smoke/snapshot_manifest.json",
+          "snapshotManifestSha256": "ec17992c29f836b9ef05558a936bddccbef4fcf49bed01deb8f9a12f07adb4a9",
+          "totalStepsObserved": 6
+        },
+        {
+          "envCount": 4,
+          "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T121719Z-bt93k-env-scale-4env-smoke/eval_snapshot.json",
+          "evalSnapshotSha256": "5bd46867d8445443924e814d261d57217eebd230a5ecf8c2f820c9848643c786",
+          "ok": true,
+          "runExitReport": "data/training/ppo/bt93k/runs/20260428T121719Z-bt93k-env-scale-4env-smoke/run_exit_report.json",
+          "runExitReportSha256": "0130f7a2a0518f43eea151794f3c2a023764ae7e9c72b4d29dfb5586c51eb184",
+          "runtimeErrorCount": 0,
+          "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T121719Z-bt93k-env-scale-4env-smoke/snapshot_manifest.json",
+          "snapshotManifestSha256": "232e3788c5e14c3f4a0478a6b03cd8df5575a90a54f6fc309ec74641bca500fb",
+          "totalStepsObserved": 12
+        },
+        {
+          "envCount": 6,
+          "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T121720Z-bt93k-env-scale-6env-smoke/eval_snapshot.json",
+          "evalSnapshotSha256": "4e8720bde52dd1b79754e172f3baeb1477b415c67f9204cf3bd9338bbda07050",
+          "ok": true,
+          "runExitReport": "data/training/ppo/bt93k/runs/20260428T121720Z-bt93k-env-scale-6env-smoke/run_exit_report.json",
+          "runExitReportSha256": "7630fc8427e59b3871da927c3dbaa32b29c818bab0a5c937ec6ebb50d1aebdef",
+          "runtimeErrorCount": 0,
+          "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T121720Z-bt93k-env-scale-6env-smoke/snapshot_manifest.json",
+          "snapshotManifestSha256": "45b2dde53a5bfcd1a8149c4e48b5f806dfcc381af63940c2cf39697d27346d53",
+          "totalStepsObserved": 18
+        }
+      ],
+      "summary": {
+        "allRunsOk": true,
+        "bt94aClaimAllowed": false,
+        "envCounts": [
+          2,
+          4,
+          6
+        ],
+        "qualityClaimAllowed": false,
+        "runCount": 3,
+        "totalStepsObserved": 36
+      }
+    },
+    "cuda": {
+      "artifactIntegrityOk": true,
+      "command": {
+        "command": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93k-cuda-venv\\Scripts\\python.exe D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\python\\scripts\\bt93k_env_scale_smokes.py --write-report --output D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\data\\training\\ppo\\bt93k\\cuda_benchmark_cuda_env_scale_report.json",
+        "exitCode": 0,
+        "finishedAt": "2026-04-28T12:17:23Z",
+        "ok": true,
+        "startedAt": "2026-04-28T12:17:21Z",
+        "stderrTail": "",
+        "stdoutTail": "{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54861,\"sessionId\":\"20260428T121721Z-bt93k-env-scale-2env-smoke-env0-9540\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54862,\"sessionId\":\"20260428T121721Z-bt93k-env-scale-2env-smoke-env1-9541\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54872,\"sessionId\":\"20260428T121722Z-bt93k-env-scale-4env-smoke-env3-9743\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54871,\"sessionId\":\"20260428T121722Z-bt93k-env-scale-4env-smoke-env1-9741\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54870,\"sessionId\":\"20260428T121722Z-bt93k-env-scale-4env-smoke-env2-9742\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54869,\"sessionId\":\"20260428T121722Z-bt93k-env-scale-4env-smoke-env0-9740\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54885,\"sessionId\":\"20260428T121722Z-bt93k-env-scale-6env-smoke-env0-9940\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54889,\"sessionId\":\"20260428T121722Z-bt93k-env-scale-6env-smoke-env3-9943\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54887,\"sessionId\":\"20260428T121722Z-bt93k-env-scale-6env-smoke-env2-9942\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54886,\"sessionId\":\"20260428T121722Z-bt93k-env-scale-6env-smoke-env1-9941\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54891,\"sessionId\":\"20260428T121722Z-bt93k-env-scale-6env-smoke-env4-9944\"}\n{\"type\":\"bt91-sidecar-listening\",\"host\":\"127.0.0.1\",\"port\":54893,\"sessionId\":\"20260428T121722Z-bt93k-env-scale-6env-smoke-env5-9945\"}\n{\n  \"ok\": true,\n  \"output\": \"data/training/ppo/bt93k/cuda_benchmark_cuda_env_scale_report.json\",\n  \"phaseCoverage\": {\n    \"93K.4.1\": true,\n    \"93K.4.2\": true,\n    \"93K.4.3\": true,\n    \"93K.4.4\": true\n  },\n  \"resultClass\": \"env-scale-smoke-ready\"\n}\n",
+        "wallClockSeconds": 2.687542
+      },
+      "output": "data/training/ppo/bt93k/cuda_benchmark_cuda_env_scale_report.json",
+      "outputSha256": "3f89dce886ed5c903a9e7bf6d00a40767209a2d63be6c425f16a0b173f33c4f0",
+      "phaseCoverage": {
+        "93K.4.1": true,
+        "93K.4.2": true,
+        "93K.4.3": true,
+        "93K.4.4": true
+      },
+      "reportOk": true,
+      "resultClass": "env-scale-smoke-ready",
+      "runs": [
+        {
+          "envCount": 2,
+          "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T121721Z-bt93k-env-scale-2env-smoke/eval_snapshot.json",
+          "evalSnapshotSha256": "a4ac18bc434da7a2a548a36b85bcfa5344964e9a3c25e9361a08b338f073ee1a",
+          "ok": true,
+          "runExitReport": "data/training/ppo/bt93k/runs/20260428T121721Z-bt93k-env-scale-2env-smoke/run_exit_report.json",
+          "runExitReportSha256": "a022d2d4f1ac12c11b034d11b1b53140a4e0dcceef9a70c04c27e03bfcacc620",
+          "runtimeErrorCount": 0,
+          "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T121721Z-bt93k-env-scale-2env-smoke/snapshot_manifest.json",
+          "snapshotManifestSha256": "8360152111150af8b04345eecf1b3df37c42e4cad181eb500619b02d985d27d5",
+          "totalStepsObserved": 6
+        },
+        {
+          "envCount": 4,
+          "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-4env-smoke/eval_snapshot.json",
+          "evalSnapshotSha256": "ca13f17f486460948a3050e041969a908c9f22c0b5c7fa5a3654bb2ffb93cb6e",
+          "ok": true,
+          "runExitReport": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-4env-smoke/run_exit_report.json",
+          "runExitReportSha256": "56ffcecd11c1079141a0dc9a86ae6910489a7af1b5f16e33d4773423fd0ed770",
+          "runtimeErrorCount": 0,
+          "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-4env-smoke/snapshot_manifest.json",
+          "snapshotManifestSha256": "4fc914d861ab6178af603a6d642e3eb9e101fc914bbdf0b3cf57462dbf026088",
+          "totalStepsObserved": 12
+        },
+        {
+          "envCount": 6,
+          "evalSnapshot": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-6env-smoke/eval_snapshot.json",
+          "evalSnapshotSha256": "674adb127b8b2c2057e583ac619d6657f97c6b0b3dcdccdedfa0e3ece28db5a5",
+          "ok": true,
+          "runExitReport": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-6env-smoke/run_exit_report.json",
+          "runExitReportSha256": "1fb75d6c33a5b9b63a9e032b9e8a4504c4711660f72a9f38cd30688f9192ac76",
+          "runtimeErrorCount": 0,
+          "snapshotManifest": "data/training/ppo/bt93k/runs/20260428T121722Z-bt93k-env-scale-6env-smoke/snapshot_manifest.json",
+          "snapshotManifestSha256": "97487d5f96e87cbd6558fbc6360a987f8ffb3ec331a37b8a9e9b410ff498289c",
+          "totalStepsObserved": 18
+        }
+      ],
+      "summary": {
+        "allRunsOk": true,
+        "bt94aClaimAllowed": false,
+        "envCounts": [
+          2,
+          4,
+          6
+        ],
+        "qualityClaimAllowed": false,
+        "runCount": 3,
+        "totalStepsObserved": 36
+      }
+    },
+    "envCounts": [
+      2,
+      4,
+      6
+    ],
+    "stepsPerEnv": 3,
+    "wallClockImprovement": -0.011358
+  },
+  "generatedAt": "2026-04-28T12:17:31Z",
+  "generatedBy": "python/scripts/bt93k_cuda_benchmark.py",
+  "gitSha": "93297b5ddf29de387e21d538c8ca7d99be445403",
+  "guardrails": {
+    "baselineRunsStarted": false,
+    "bt94aGateRefreshAllowed": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "comparisonStarted": false,
+    "cpuRemainsReferencePath": true,
+    "holdoutAllowed": false,
+    "infrastructureOnly": true,
+    "pilotRunsStarted": false,
+    "ppoValidateAllowed": false,
+    "promotionAllowed": false,
+    "qualityClaimAllowed": false,
+    "runtimeSurfacesTouched": [],
+    "trainingStarted": false
+  },
+  "nvidiaSmi": {
+    "available": true,
+    "command": {
+      "command": "nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader",
+      "exitCode": 0,
+      "finishedAt": "2026-04-28T12:17:18Z",
+      "ok": true,
+      "startedAt": "2026-04-28T12:17:18Z",
+      "stderrTail": "",
+      "stdoutTail": "NVIDIA GeForce GTX 1080, 582.28, 8192 MiB\n",
+      "wallClockSeconds": 0.039607
+    },
+    "gpus": [
+      {
+        "driverVersion": "582.28",
+        "memoryTotal": "8192 MiB",
+        "name": "NVIDIA GeForce GTX 1080"
+      }
+    ]
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93K.5.1": true,
+    "93K.5.2": true,
+    "93K.5.3": true
+  },
+  "phaseId": "93K.5",
+  "pythonEnvironments": {
+    "cpuReference": {
+      "cudaAvailable": false,
+      "deviceCount": 0,
+      "devices": [],
+      "exists": true,
+      "ok": true,
+      "path": "python/.venv/Scripts/python.exe",
+      "platform": "Windows-10-10.0.19045-SP0",
+      "probeCommand": {
+        "command": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\python\\.venv\\Scripts\\python.exe -c \nimport json\nimport platform\nimport sys\n\npayload = {\n    \"pythonExecutable\": sys.executable,\n    \"pythonVersion\": sys.version.split()[0],\n    \"platform\": platform.platform(),\n    \"torchImportOk\": False,\n    \"cudaAvailable\": False,\n    \"deviceCount\": 0,\n    \"devices\": [],\n}\ntry:\n    import torch\n    payload.update({\n        \"torchImportOk\": True,\n        \"torchVersion\": torch.__version__,\n        \"torchCudaVersion\": torch.version.cuda,\n        \"cudaAvailable\": bool(torch.cuda.is_available()),\n        \"deviceCount\": int(torch.cuda.device_count()),\n        \"devices\": [torch.cuda.get_device_name(index) for index in range(torch.cuda.device_count())],\n    })\nexcept Exception as exc:\n    payload[\"error\"] = repr(exc)\nprint(json.dumps(payload, sort_keys=True))\n",
+        "exitCode": 0,
+        "finishedAt": "2026-04-28T12:17:16Z",
+        "ok": true,
+        "startedAt": "2026-04-28T12:17:14Z",
+        "stderrTail": "",
+        "stdoutTail": "{\"cudaAvailable\": false, \"deviceCount\": 0, \"devices\": [], \"platform\": \"Windows-10-10.0.19045-SP0\", \"pythonExecutable\": \"D:\\\\Antigravity\\\\Projekte\\\\Neuer Ordner (6)\\\\python\\\\.venv\\\\Scripts\\\\python.exe\", \"pythonVersion\": \"3.12.10\", \"torchCudaVersion\": null, \"torchImportOk\": true, \"torchVersion\": \"2.3.1+cpu\"}\n",
+        "wallClockSeconds": 2.093319
+      },
+      "pythonExecutable": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\python\\.venv\\Scripts\\python.exe",
+      "pythonVersion": "3.12.10",
+      "torchCudaVersion": null,
+      "torchImportOk": true,
+      "torchVersion": "2.3.1+cpu"
+    },
+    "cudaIsolated": {
+      "cudaAvailable": true,
+      "deviceCount": 1,
+      "devices": [
+        "NVIDIA GeForce GTX 1080"
+      ],
+      "exists": true,
+      "ok": true,
+      "path": "tmp/bt93k-cuda-venv/Scripts/python.exe",
+      "platform": "Windows-10-10.0.19045-SP0",
+      "probeCommand": {
+        "command": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93k-cuda-venv\\Scripts\\python.exe -c \nimport json\nimport platform\nimport sys\n\npayload = {\n    \"pythonExecutable\": sys.executable,\n    \"pythonVersion\": sys.version.split()[0],\n    \"platform\": platform.platform(),\n    \"torchImportOk\": False,\n    \"cudaAvailable\": False,\n    \"deviceCount\": 0,\n    \"devices\": [],\n}\ntry:\n    import torch\n    payload.update({\n        \"torchImportOk\": True,\n        \"torchVersion\": torch.__version__,\n        \"torchCudaVersion\": torch.version.cuda,\n        \"cudaAvailable\": bool(torch.cuda.is_available()),\n        \"deviceCount\": int(torch.cuda.device_count()),\n        \"devices\": [torch.cuda.get_device_name(index) for index in range(torch.cuda.device_count())],\n    })\nexcept Exception as exc:\n    payload[\"error\"] = repr(exc)\nprint(json.dumps(payload, sort_keys=True))\n",
+        "exitCode": 0,
+        "finishedAt": "2026-04-28T12:17:18Z",
+        "ok": true,
+        "startedAt": "2026-04-28T12:17:16Z",
+        "stderrTail": "",
+        "stdoutTail": "{\"cudaAvailable\": true, \"deviceCount\": 1, \"devices\": [\"NVIDIA GeForce GTX 1080\"], \"platform\": \"Windows-10-10.0.19045-SP0\", \"pythonExecutable\": \"D:\\\\Antigravity\\\\Projekte\\\\Neuer Ordner (6)\\\\tmp\\\\bt93k-cuda-venv\\\\Scripts\\\\python.exe\", \"pythonVersion\": \"3.12.10\", \"torchCudaVersion\": \"12.1\", \"torchImportOk\": true, \"torchVersion\": \"2.3.1+cu121\"}\n",
+        "wallClockSeconds": 2.332363
+      },
+      "pythonExecutable": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93k-cuda-venv\\Scripts\\python.exe",
+      "pythonVersion": "3.12.10",
+      "torchCudaVersion": "12.1",
+      "torchImportOk": true,
+      "torchVersion": "2.3.1+cu121"
+    }
+  },
+  "resultClass": "cuda-not-retained",
+  "schemaVersion": "bt93k-cuda-benchmark-report-v1",
+  "sourceArtifacts": {
+    "envScaleConfig": {
+      "path": "python/configs/ppo_bt93k_env_scale_smoke.json",
+      "sha256": "12c20f4114d82602898489b35bb6f492d1577b0ccf53e3dea9760520d043df53"
+    },
+    "envScaleScript": {
+      "path": "python/scripts/bt93k_env_scale_smokes.py",
+      "sha256": "bfa4275c2c7098c04101ad13505e256ea021210cc675d0a49b832a86b547f399"
+    }
+  },
+  "summary": {
+    "blockedReasons": [
+      "env-smoke wallclock improvement below 20 percent"
+    ],
+    "cpuReferenceOk": true,
+    "cpuRemainsReferencePath": true,
+    "cudaRetained": false,
+    "cudaTorchAvailable": true,
+    "envSmokeArtifactIntegrityOk": true,
+    "envSmokeWallClockImprovement": -0.011358,
+    "qualityClaimAllowed": false,
+    "torchMedianWallClockImprovement": 0.41452,
+    "torchMinWallClockImprovement": 0.386937
+  },
+  "torchProbeComparison": {
+    "comparison": {
+      "allFinite": true,
+      "medianWallClockImprovement": 0.41452,
+      "minWallClockImprovement": 0.386937,
+      "rows": [
+        {
+          "cpuFinite": true,
+          "cpuWallClockSeconds": 0.069297,
+          "cudaFinite": true,
+          "cudaWallClockSeconds": 0.040572,
+          "envCount": 2,
+          "wallClockImprovement": 0.41452
+        },
+        {
+          "cpuFinite": true,
+          "cpuWallClockSeconds": 0.076337,
+          "cudaFinite": true,
+          "cudaWallClockSeconds": 0.040785,
+          "envCount": 4,
+          "wallClockImprovement": 0.465724
+        },
+        {
+          "cpuFinite": true,
+          "cpuWallClockSeconds": 0.064517,
+          "cudaFinite": true,
+          "cudaWallClockSeconds": 0.039553,
+          "envCount": 6,
+          "wallClockImprovement": 0.386937
+        }
+      ]
+    },
+    "cpu": {
+      "command": {
+        "command": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\python\\.venv\\Scripts\\python.exe -c \nimport json\nimport math\nimport sys\nimport time\n\nparams = json.loads(sys.argv[1])\nimport torch\n\ndevice = torch.device(params[\"device\"])\nif device.type == \"cuda\" and not torch.cuda.is_available():\n    raise RuntimeError(\"CUDA requested but torch.cuda.is_available() is false\")\n\ntorch.manual_seed(int(params[\"seed\"]))\nif device.type == \"cuda\":\n    torch.cuda.manual_seed_all(int(params[\"seed\"]))\n\ndef run_one(env_count):\n    batch_size = max(1, int(env_count) * int(params[\"stepsPerEnv\"]))\n    obs_dim = int(params[\"obsDim\"])\n    hidden_dim = int(params[\"hiddenDim\"])\n    action_dim = int(params[\"actionDim\"])\n    model = torch.nn.Sequential(\n        torch.nn.Linear(obs_dim, hidden_dim),\n        torch.nn.Tanh(),\n        torch.nn.Linear(hidden_dim, hidden_dim),\n        torch.nn.Tanh(),\n        torch.nn.Linear(hidden_dim, action_dim),\n    ).to(device)\n    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)\n    x = torch.randn((batch_size, obs_dim), device=device)\n    target = torch.arange(batch_size, device=device) % action_dim\n    for _ in range(int(params[\"warmupIterations\"])):\n        optimizer.zero_grad(set_to_none=True)\n        loss = torch.nn.functional.cross_entropy(model(x), target)\n        loss.backward()\n        optimizer.step()\n    if device.type == \"cuda\":\n        torch.cuda.synchronize()\n    started = time.perf_counter()\n    final_loss = None\n    for _ in range(int(params[\"iterations\"])):\n        optimizer.zero_grad(set_to_none=True)\n        logits = model(x)\n        loss = torch.nn.functional.cross_entropy(logits, target)\n        loss.backward()\n        optimizer.step()\n        final_loss = loss\n    if device.type == \"cuda\":\n        torch.cuda.synchronize()\n    wallclock = time.perf_counter() - started\n    checksum = 0.0\n    with torch.no_grad():\n        for parameter in model.parameters():\n            checksum += float(parameter.detach().float().sum().cpu().item())\n    final_loss_value = float(final_loss.detach().cpu().item()) if final_loss is not None else None\n    return {\n        \"envCount\": int(env_count),\n        \"batchSize\": batch_size,\n        \"wallClockSeconds\": round(wallclock, 6),\n        \"iterations\": int(params[\"iterations\"]),\n        \"iterationsPerSecond\": round(float(params[\"iterations\"]) / wallclock, 6) if wallclock > 0 else None,\n        \"finalLoss\": final_loss_value,\n        \"checksum\": round(checksum, 6),\n        \"finite\": bool(\n            final_loss_value is not None\n            and math.isfinite(final_loss_value)\n            and math.isfinite(checksum)\n        ),\n    }\n\npayload = {\n    \"device\": str(device),\n    \"torchVersion\": torch.__version__,\n    \"torchCudaVersion\": torch.version.cuda,\n    \"cudaAvailable\": bool(torch.cuda.is_available()),\n    \"deviceName\": torch.cuda.get_device_name(0) if device.type == \"cuda\" and torch.cuda.is_available() else None,\n    \"runs\": [run_one(count) for count in params[\"envCounts\"]],\n}\npayload[\"ok\"] = all(item[\"finite\"] for item in payload[\"runs\"])\nprint(json.dumps(payload, sort_keys=True))\n {\"actionDim\": 9, \"device\": \"cpu\", \"envCounts\": [2, 4, 6], \"hiddenDim\": 128, \"iterations\": 40, \"obsDim\": 96, \"seed\": 9350, \"stepsPerEnv\": 3, \"warmupIterations\": 5}",
+        "exitCode": 0,
+        "finishedAt": "2026-04-28T12:17:27Z",
+        "ok": true,
+        "startedAt": "2026-04-28T12:17:23Z",
+        "stderrTail": "",
+        "stdoutTail": "{\"cudaAvailable\": false, \"device\": \"cpu\", \"deviceName\": null, \"ok\": true, \"runs\": [{\"batchSize\": 6, \"checksum\": -5.523259, \"envCount\": 2, \"finalLoss\": 1.3440338373184204, \"finite\": true, \"iterations\": 40, \"iterationsPerSecond\": 577.228064, \"wallClockSeconds\": 0.069297}, {\"batchSize\": 12, \"checksum\": -7.692156, \"envCount\": 4, \"finalLoss\": 1.5008684396743774, \"finite\": true, \"iterations\": 40, \"iterationsPerSecond\": 523.990238, \"wallClockSeconds\": 0.076337}, {\"batchSize\": 18, \"checksum\": 8.718599, \"envCount\": 6, \"finalLoss\": 1.6097203493118286, \"finite\": true, \"iterations\": 40, \"iterationsPerSecond\": 619.996435, \"wallClockSeconds\": 0.064517}], \"torchCudaVersion\": null, \"torchVersion\": \"2.3.1+cpu\"}\n",
+        "wallClockSeconds": 3.463065
+      },
+      "cudaAvailable": false,
+      "device": "cpu",
+      "deviceName": null,
+      "ok": true,
+      "runs": [
+        {
+          "batchSize": 6,
+          "checksum": -5.523259,
+          "envCount": 2,
+          "finalLoss": 1.3440338373184204,
+          "finite": true,
+          "iterations": 40,
+          "iterationsPerSecond": 577.228064,
+          "wallClockSeconds": 0.069297
+        },
+        {
+          "batchSize": 12,
+          "checksum": -7.692156,
+          "envCount": 4,
+          "finalLoss": 1.5008684396743774,
+          "finite": true,
+          "iterations": 40,
+          "iterationsPerSecond": 523.990238,
+          "wallClockSeconds": 0.076337
+        },
+        {
+          "batchSize": 18,
+          "checksum": 8.718599,
+          "envCount": 6,
+          "finalLoss": 1.6097203493118286,
+          "finite": true,
+          "iterations": 40,
+          "iterationsPerSecond": 619.996435,
+          "wallClockSeconds": 0.064517
+        }
+      ],
+      "torchCudaVersion": null,
+      "torchVersion": "2.3.1+cpu"
+    },
+    "cuda": {
+      "command": {
+        "command": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93k-cuda-venv\\Scripts\\python.exe -c \nimport json\nimport math\nimport sys\nimport time\n\nparams = json.loads(sys.argv[1])\nimport torch\n\ndevice = torch.device(params[\"device\"])\nif device.type == \"cuda\" and not torch.cuda.is_available():\n    raise RuntimeError(\"CUDA requested but torch.cuda.is_available() is false\")\n\ntorch.manual_seed(int(params[\"seed\"]))\nif device.type == \"cuda\":\n    torch.cuda.manual_seed_all(int(params[\"seed\"]))\n\ndef run_one(env_count):\n    batch_size = max(1, int(env_count) * int(params[\"stepsPerEnv\"]))\n    obs_dim = int(params[\"obsDim\"])\n    hidden_dim = int(params[\"hiddenDim\"])\n    action_dim = int(params[\"actionDim\"])\n    model = torch.nn.Sequential(\n        torch.nn.Linear(obs_dim, hidden_dim),\n        torch.nn.Tanh(),\n        torch.nn.Linear(hidden_dim, hidden_dim),\n        torch.nn.Tanh(),\n        torch.nn.Linear(hidden_dim, action_dim),\n    ).to(device)\n    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)\n    x = torch.randn((batch_size, obs_dim), device=device)\n    target = torch.arange(batch_size, device=device) % action_dim\n    for _ in range(int(params[\"warmupIterations\"])):\n        optimizer.zero_grad(set_to_none=True)\n        loss = torch.nn.functional.cross_entropy(model(x), target)\n        loss.backward()\n        optimizer.step()\n    if device.type == \"cuda\":\n        torch.cuda.synchronize()\n    started = time.perf_counter()\n    final_loss = None\n    for _ in range(int(params[\"iterations\"])):\n        optimizer.zero_grad(set_to_none=True)\n        logits = model(x)\n        loss = torch.nn.functional.cross_entropy(logits, target)\n        loss.backward()\n        optimizer.step()\n        final_loss = loss\n    if device.type == \"cuda\":\n        torch.cuda.synchronize()\n    wallclock = time.perf_counter() - started\n    checksum = 0.0\n    with torch.no_grad():\n        for parameter in model.parameters():\n            checksum += float(parameter.detach().float().sum().cpu().item())\n    final_loss_value = float(final_loss.detach().cpu().item()) if final_loss is not None else None\n    return {\n        \"envCount\": int(env_count),\n        \"batchSize\": batch_size,\n        \"wallClockSeconds\": round(wallclock, 6),\n        \"iterations\": int(params[\"iterations\"]),\n        \"iterationsPerSecond\": round(float(params[\"iterations\"]) / wallclock, 6) if wallclock > 0 else None,\n        \"finalLoss\": final_loss_value,\n        \"checksum\": round(checksum, 6),\n        \"finite\": bool(\n            final_loss_value is not None\n            and math.isfinite(final_loss_value)\n            and math.isfinite(checksum)\n        ),\n    }\n\npayload = {\n    \"device\": str(device),\n    \"torchVersion\": torch.__version__,\n    \"torchCudaVersion\": torch.version.cuda,\n    \"cudaAvailable\": bool(torch.cuda.is_available()),\n    \"deviceName\": torch.cuda.get_device_name(0) if device.type == \"cuda\" and torch.cuda.is_available() else None,\n    \"runs\": [run_one(count) for count in params[\"envCounts\"]],\n}\npayload[\"ok\"] = all(item[\"finite\"] for item in payload[\"runs\"])\nprint(json.dumps(payload, sort_keys=True))\n {\"actionDim\": 9, \"device\": \"cuda\", \"envCounts\": [2, 4, 6], \"hiddenDim\": 128, \"iterations\": 40, \"obsDim\": 96, \"seed\": 9350, \"stepsPerEnv\": 3, \"warmupIterations\": 5}",
+        "exitCode": 0,
+        "finishedAt": "2026-04-28T12:17:31Z",
+        "ok": true,
+        "startedAt": "2026-04-28T12:17:27Z",
+        "stderrTail": "",
+        "stdoutTail": "{\"cudaAvailable\": true, \"device\": \"cuda\", \"deviceName\": \"NVIDIA GeForce GTX 1080\", \"ok\": true, \"runs\": [{\"batchSize\": 6, \"checksum\": -4.708843, \"envCount\": 2, \"finalLoss\": 1.2911858558654785, \"finite\": true, \"iterations\": 40, \"iterationsPerSecond\": 985.908897, \"wallClockSeconds\": 0.040572}, {\"batchSize\": 12, \"checksum\": -10.024175, \"envCount\": 4, \"finalLoss\": 1.6482800245285034, \"finite\": true, \"iterations\": 40, \"iterationsPerSecond\": 980.747919, \"wallClockSeconds\": 0.040785}, {\"batchSize\": 18, \"checksum\": 12.910299, \"envCount\": 6, \"finalLoss\": 1.6393080949783325, \"finite\": true, \"iterations\": 40, \"iterationsPerSecond\": 1011.293622, \"wallClockSeconds\": 0.039553}], \"torchCudaVersion\": \"12.1\", \"torchVersion\": \"2.3.1+cu121\"}\n",
+        "wallClockSeconds": 3.738252
+      },
+      "cudaAvailable": true,
+      "device": "cuda",
+      "deviceName": "NVIDIA GeForce GTX 1080",
+      "ok": true,
+      "runs": [
+        {
+          "batchSize": 6,
+          "checksum": -4.708843,
+          "envCount": 2,
+          "finalLoss": 1.2911858558654785,
+          "finite": true,
+          "iterations": 40,
+          "iterationsPerSecond": 985.908897,
+          "wallClockSeconds": 0.040572
+        },
+        {
+          "batchSize": 12,
+          "checksum": -10.024175,
+          "envCount": 4,
+          "finalLoss": 1.6482800245285034,
+          "finite": true,
+          "iterations": 40,
+          "iterationsPerSecond": 980.747919,
+          "wallClockSeconds": 0.040785
+        },
+        {
+          "batchSize": 18,
+          "checksum": 12.910299,
+          "envCount": 6,
+          "finalLoss": 1.6393080949783325,
+          "finite": true,
+          "iterations": 40,
+          "iterationsPerSecond": 1011.293622,
+          "wallClockSeconds": 0.039553
+        }
+      ],
+      "torchCudaVersion": "12.1",
+      "torchVersion": "2.3.1+cu121"
+    }
+  }
+}

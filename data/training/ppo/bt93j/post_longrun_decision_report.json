@@ -1,0 +1,122 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-27T20:09:35Z",
+  "generatedBy": "python/scripts/bt93j_post_longrun_decision.py",
+  "gitSha": "35e87290d680e3b43d93f86f990119be87b459c8",
+  "blockId": "BT93J",
+  "phaseId": "93J.7.1",
+  "resultClass": "diagnose-loop-required",
+  "sourceLongrun": {
+    "path": "data/training/ppo/bt93j/user_owned_1m_longrun_report.json",
+    "sha256": "239fb23a15b0bba92f86ddccbf1d141d4ce162860092afc6a6de4220b4baa9a0",
+    "runId": "20260426T175502Z-bt93j-user-owned-1m-proof-longrun",
+    "runKind": "bt93j-user-owned-1m-proof-longrun",
+    "longrunResultClass": "reward-still-blocking",
+    "requestedTimesteps": 1000000,
+    "actualProgressTimesteps": 1000000,
+    "modelNumTimesteps": 1004992
+  },
+  "decision": {
+    "phase93J6Allowed": false,
+    "phase93J6RequiredResult": "green-for-93J.6",
+    "phase93J6ObservedResult": "reward-still-blocking",
+    "bt94aClaimable": false,
+    "bt94aNoStartGateObservedClaimable": false,
+    "candidateRunsAllowed": false,
+    "freezeCandidateAllowed": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "holdoutConsumed": false,
+    "diagnoseLoopRequired": true,
+    "nextTrainingRequiresNewHypothesis": true
+  },
+  "survivalOutcome": {
+    "avgStepsPerEpisodeObserved": 166.866667,
+    "deltaVsStartAvgSteps": 94.033334,
+    "deltaVsDqnAnchor": 49.341667,
+    "longestEpisode": 180,
+    "maxStepEpisodes": 12,
+    "naturalTerminalCount": 0,
+    "playerDeadOnly": true,
+    "terminalReasonCounts": {
+      "player-dead": 3
+    },
+    "deathCauseCounts": {
+      "player-dead": 3
+    },
+    "terminalDiversified": false
+  },
+  "blockingFindings": [
+    {
+      "id": "longrun_not_green_for_93J_6",
+      "severity": "critical",
+      "observed": "reward-still-blocking",
+      "effect": "93J.6 remains closed; no pilot, holdout, BT94A refresh, candidate, freeze, promote, or rollout signal."
+    },
+    {
+      "id": "natural_terminal_zero",
+      "severity": "critical",
+      "observed": 0,
+      "effect": "F.19/F.31 remain blocking; max-step survival is not start-capable terminal evidence."
+    },
+    {
+      "id": "player_dead_only_terminal_matrix",
+      "severity": "critical",
+      "observed": true,
+      "effect": "The longrun improved survival duration but did not diversify terminal/death semantics."
+    },
+    {
+      "id": "steps_green_but_gate_red",
+      "severity": "high",
+      "observed": {
+        "avgStepsPerEpisodeObserved": 166.866667,
+        "deltaVsDqnAnchor": 49.341667
+      },
+      "effect": "F.05 is partly improved, but cannot close while F.19/F.31 remain red and no holdout was used."
+    }
+  ],
+  "rootCauseChain": [
+    {
+      "cause": "survival_plateau",
+      "evidence": "AvgSteps improved and many episodes reached the cap, but natural/objective/progress signals stayed zero.",
+      "consequence": "More blind longrun time is not the next best hypothesis."
+    },
+    {
+      "cause": "curriculum_clock_not_global",
+      "evidence": "BT93J proof diversity stage needs high total steps, while the runner previously used episodic tickIndex.",
+      "consequence": "Diversity pressure can stay inactive even across long wall-clock training."
+    },
+    {
+      "cause": "progress_event_unreachable",
+      "evidence": "checkpointReached/parcoursCompleted remained zero in every snapshot.",
+      "consequence": "Progress reward cannot guide PPO until reachability is proven in the actual runner path."
+    },
+    {
+      "cause": "mode_map_not_effective",
+      "evidence": "The headless runner used an effectively fixed standard/classic/3d lane.",
+      "consequence": "Mode or map claims need explicit effective-mode telemetry before any 6-env or longrun interpretation."
+    }
+  ],
+  "nextHypotheses": [
+    "repair global curriculum step accounting before the next longrun",
+    "prove progress/natural/objective reward reachability in a real runner smoke",
+    "make the PPO headless lane mode/map/planar explicit and report effective values",
+    "run a small 6-env smoke only after the signal path is nonzero",
+    "benchmark CUDA separately; do not switch device until CPU-vs-CUDA wallclock is measured"
+  ],
+  "phaseCoverage": {
+    "93J.7.1": true,
+    "93J.7.4": true
+  },
+  "guardrails": {
+    "diagnosticOnly": true,
+    "holdoutUsed": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "promotionAllowed": false,
+    "bt94aGateRefresh": false,
+    "ppoValidateEvidence": false,
+    "runtimeSurfacesTouched": [],
+    "productiveRuntimeChanged": false
+  }
+}

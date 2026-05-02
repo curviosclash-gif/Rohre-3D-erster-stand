@@ -1,0 +1,620 @@
+{
+  "blockId": "BT93J",
+  "checks": [
+    {
+      "id": "diagnostic_split_ready_for_r1",
+      "observed": {
+        "counterprobe": "93J.4 R1 micro-test must change only reward/curriculum pressure and is expected to improve terminal diversity or avgSteps trend while action telemetry remains green; otherwise the primary cause is refuted.",
+        "primaryCauseCount": 1,
+        "primaryCauseId": "reward-curriculum-survival-only-player-dead-policy",
+        "r1MicroTestAlreadyGreen": false,
+        "readyForRepair": true
+      },
+      "ok": true
+    },
+    {
+      "id": "reward_curriculum_primary_cause_still_active",
+      "observed": "reward-curriculum-primary-cause-ready-for-r1",
+      "ok": true
+    },
+    {
+      "id": "action_gate_stays_green",
+      "observed": "action-policy-diagnostics-green",
+      "ok": true
+    },
+    {
+      "id": "player_dead_terminal_gets_negative_loss_signal",
+      "observed": {
+        "delta": -1.5,
+        "episode": {
+          "done": true,
+          "terminalReason": "player-dead",
+          "truncated": false,
+          "truncatedReason": null
+        },
+        "id": "player-dead-terminal",
+        "legacy": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "survival": false
+          },
+          "total": 0
+        },
+        "r1": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": -1.5,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "crashed": false,
+            "lost": true,
+            "survival": false,
+            "totalEnvSteps": 1,
+            "won": false
+          },
+          "total": -1.5
+        }
+      },
+      "ok": true
+    },
+    {
+      "id": "r1_changes_only_player_death_terminal_reward",
+      "observed": {
+        "maxStepsDelta": 0,
+        "naturalDelta": 0,
+        "playerDeadDelta": -1.5,
+        "runningDelta": 0
+      },
+      "ok": true
+    },
+    {
+      "id": "natural_terminal_not_reclassified_as_loss",
+      "observed": {
+        "delta": 0,
+        "episode": {
+          "done": true,
+          "terminalReason": "match-ended",
+          "truncated": false,
+          "truncatedReason": null
+        },
+        "id": "natural-match-ended-terminal",
+        "legacy": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "survival": false
+          },
+          "total": 0
+        },
+        "r1": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "crashed": false,
+            "lost": false,
+            "survival": false,
+            "totalEnvSteps": 1,
+            "won": false
+          },
+          "total": 0
+        }
+      },
+      "ok": true
+    },
+    {
+      "id": "running_survival_reward_unchanged",
+      "observed": {
+        "delta": 0,
+        "episode": {
+          "done": false,
+          "terminalReason": null,
+          "truncated": false,
+          "truncatedReason": null
+        },
+        "id": "running-alive",
+        "legacy": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0.12,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "survival": true
+          },
+          "total": 0.12
+        },
+        "r1": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0.12,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "crashed": false,
+            "lost": false,
+            "survival": true,
+            "totalEnvSteps": 1,
+            "won": false
+          },
+          "total": 0.12
+        }
+      },
+      "ok": true
+    }
+  ],
+  "classification": {
+    "green": true,
+    "inconclusive": false,
+    "longRunAllowed": false,
+    "newRed": false,
+    "note": "A green R1 micro-test only proves reward-signal behavior; it is not policy quality evidence.",
+    "pilotAllowed": false,
+    "readyForTraining": false,
+    "sameRed": false,
+    "value": "green"
+  },
+  "commands": {
+    "nodeProbe": "node --input-type=module -e <bt93j r1 embedded reward probes>",
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93j_r1_micro_test.py --write-reports"
+  },
+  "generatedAt": "2026-04-25T23:54:34Z",
+  "generatedBy": "python/scripts/bt93j_r1_micro_test.py",
+  "gitSha": "8cc8ea38fb7f67641a83b6435c8c9fca6ab7a262",
+  "guardrails": {
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "noGo": [
+      "no BT94A claim, candidate run, freeze candidate, BT94B handover, promote, or rollout-ready result",
+      "no pilot, holdout, long-run, or BT94A gate refresh from BT93J.4",
+      "no productive RuntimeConfig, Strategy Flag, JS inference, model registry, rollback, Matchstart, AI-Hub, bridge, or authority change",
+      "R1 micro-test is reward-signal evidence only, not PPO-Validate or promotion evidence"
+    ],
+    "pilotStarted": false,
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "nodeProbe": {
+    "generatedBy": "python/scripts/bt93j_r1_micro_test.py::node-probe",
+    "ok": true,
+    "scenarios": [
+      {
+        "delta": 0,
+        "episode": {
+          "done": false,
+          "terminalReason": null,
+          "truncated": false,
+          "truncatedReason": null
+        },
+        "id": "running-alive",
+        "legacy": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0.12,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "survival": true
+          },
+          "total": 0.12
+        },
+        "r1": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0.12,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "crashed": false,
+            "lost": false,
+            "survival": true,
+            "totalEnvSteps": 1,
+            "won": false
+          },
+          "total": 0.12
+        }
+      },
+      {
+        "delta": -1.5,
+        "episode": {
+          "done": true,
+          "terminalReason": "player-dead",
+          "truncated": false,
+          "truncatedReason": null
+        },
+        "id": "player-dead-terminal",
+        "legacy": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "survival": false
+          },
+          "total": 0
+        },
+        "r1": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": -1.5,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "crashed": false,
+            "lost": true,
+            "survival": false,
+            "totalEnvSteps": 1,
+            "won": false
+          },
+          "total": -1.5
+        }
+      },
+      {
+        "delta": 0,
+        "episode": {
+          "done": true,
+          "terminalReason": "match-ended",
+          "truncated": false,
+          "truncatedReason": null
+        },
+        "id": "natural-match-ended-terminal",
+        "legacy": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "survival": false
+          },
+          "total": 0
+        },
+        "r1": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "crashed": false,
+            "lost": false,
+            "survival": false,
+            "totalEnvSteps": 1,
+            "won": false
+          },
+          "total": 0
+        }
+      },
+      {
+        "delta": 0,
+        "episode": {
+          "done": false,
+          "terminalReason": null,
+          "truncated": true,
+          "truncatedReason": "max-steps"
+        },
+        "id": "max-steps-truncated",
+        "legacy": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "survival": false
+          },
+          "total": 0
+        },
+        "r1": {
+          "components": {
+            "baseStep": 0,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "signals": {
+            "crashed": false,
+            "lost": false,
+            "survival": false,
+            "totalEnvSteps": 1,
+            "won": false
+          },
+          "total": 0
+        }
+      }
+    ]
+  },
+  "ok": true,
+  "phaseId": "93J.4",
+  "preconditionSource": "git-head-before-r1",
+  "r1": {
+    "changedFiles": [
+      "scripts/training-headless-lane-runner.mjs"
+    ],
+    "counterprobe": "93J.4 R1 micro-test must change only reward/curriculum pressure and is expected to improve terminal diversity or avgSteps trend while action telemetry remains green; otherwise the primary cause is refuted.",
+    "expectedEffect": "player-dead terminal samples receive a negative terminal loss signal; running survival and non-death natural terminals keep their previous reward shape.",
+    "id": "reward-terminal-loss-signal-r1",
+    "primaryCauseId": "reward-curriculum-survival-only-player-dead-policy",
+    "scope": "training-headless reward signal only",
+    "smallChange": "Headless training reward signals now pass lost=true for player-dead/death-like terminal episodes before RewardCalculator.compute()."
+  },
+  "resultClass": "green",
+  "sourceArtifacts": {
+    "actionDiagnostics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/action_policy_diagnostics.json",
+      "role": "BT93J action policy diagnostics",
+      "sha256": "57cea8615c52a934e29662342dd8d31f267d3b6f8acad561aa0372487803c186"
+    },
+    "diagnosticSplit": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/diagnostic_split_report.json",
+      "role": "BT93J diagnostic split before R1",
+      "sha256": "e1a2932b7e68ce446898865590cc79d9885a32e562b8ce90298995e3234692fc"
+    },
+    "headlessLaneRunner": {
+      "closureCapable": true,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "role": "BT93J R1 training reward signal implementation",
+      "sha256": "7749d99768a5dc077e9702e674eddc93a3e10fdba7397500302d67923a6bf265"
+    },
+    "rewardDiagnostics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
+      "role": "BT93J reward/curriculum diagnostics",
+      "sha256": "0d4c5d0c103431d6b11d255da9e7195b80c768cdd3bee43a8bb1dc8865ac970f"
+    }
+  }
+}

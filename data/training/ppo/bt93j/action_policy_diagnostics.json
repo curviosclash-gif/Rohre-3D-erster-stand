@@ -1,0 +1,1468 @@
+{
+  "actionPolicyGate": {
+    "diagnosis": "Action safety is not the active root cause: train/eval/holdout telemetry has zero invalid, sanitizer, post-decode clamp, and veto load, with pre-sampling masking applied by the masked semantic action vocabulary.",
+    "green": true,
+    "notCausal": true,
+    "readyForTraining": false
+  },
+  "blockId": "BT93J",
+  "bt93gActionMask": {
+    "evidenceLimits": {
+      "countsAsPpoValidateEvidence": false,
+      "countsAsPromotionEvidence": false,
+      "countsAsSurvivalQualityEvidence": false
+    },
+    "maskSourceContract": {
+      "preSamplingApplied": true,
+      "preSamplingByConstruction": true,
+      "source": "info.match.inventoryLength from the JS-authoritative transition payload",
+      "surfaceId": "bt93g-masked-semantic-action-v1"
+    },
+    "path": "data/training/ppo/bt93g/action_mask_report.json",
+    "resultClass": "masked-semantic-action-surface-pinned",
+    "telemetrySeparation": {
+      "invalidActionRate": 0.0,
+      "noRelabeling": true,
+      "postDecodeClampMixedWithPolicyMask": false,
+      "postDecodeClampRate": 0.0,
+      "safetyVetoRate": 0.0,
+      "sanitizerRate": 0.0
+    }
+  },
+  "commands": {
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93j_action_reward_diagnostics.py --write-reports"
+  },
+  "findingImpact": {
+    "F.05": "not-caused-by-action-safety-thresholds",
+    "F.19": "not-caused-by-action-safety-thresholds",
+    "F.27": "aggregate-still-blocked-until-reward-curriculum-or-training-root-cause-clears",
+    "F.30": "closed-for-bt93j-current-lane",
+    "F.31": "not-caused-by-action-safety-thresholds"
+  },
+  "generatedAt": "2026-04-25T23:39:46Z",
+  "generatedBy": "python/scripts/bt93j_action_reward_diagnostics.py",
+  "gitSha": "f6f1212afd73603de647a48142975524cbf6b26e",
+  "guardrails": {
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "noGo": [
+      "no BT94A claim, candidate run, freeze candidate, BT94B handover, promote, or rollout-ready result",
+      "no pilot, holdout, long-run, or fix from BT93J.3",
+      "no productive RuntimeConfig, Strategy Flag, JS inference, model registry, rollback, Matchstart, AI-Hub, bridge, or authority change",
+      "positive reward, clean action telemetry, or governance gates do not count as PPO-Validate, promotion, or rollout evidence"
+    ],
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "lanes": [
+    {
+      "actionSurface": {
+        "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+        "excludedInventoryIndexedActions": [
+          "dropItem",
+          "nextItem",
+          "shootItem",
+          "shootItemIndex",
+          "useItem"
+        ],
+        "gymSpace": "Discrete",
+        "policyLevelMasking": {
+          "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+          "mixedWithPostDecodeClamp": false,
+          "preSamplingAppliedInCurrentSb3Path": true,
+          "preSamplingByConstruction": true,
+          "source": "info.match.inventoryLength from the JS-authoritative transition payload",
+          "specified": true
+        },
+        "rawBoundarySurfaceTraining": false,
+        "sb3Trainable": true,
+        "semanticActions": [
+          "noop",
+          "yaw-left",
+          "yaw-right",
+          "pitch-up",
+          "pitch-down",
+          "roll-left",
+          "roll-right",
+          "boost",
+          "shoot-mg"
+        ],
+        "surfaceId": "bt93g-masked-semantic-action-v1",
+        "telemetry": [
+          "policyLevelMask",
+          "preSamplingMaskRate",
+          "postDecodeClampRate",
+          "invalidActionRate",
+          "vetoRate",
+          "sanitizerRate",
+          "noopRate"
+        ]
+      },
+      "fullStepTraceNote": "Historical reports persist action telemetry plus raw examples/infoTail, not a full per-step action replay.",
+      "fullStepTracePersisted": false,
+      "laneId": "bt93i-train",
+      "phaseId": "93I.3.2",
+      "report": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+      "role": "train",
+      "runId": "20260425T151155Z-terminal-curriculum-repair",
+      "runKind": "terminal-curriculum-repair",
+      "sampleLimit": 8,
+      "stepDiffSamples": [
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": true,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "envIndex": 0,
+          "exampleIndex": 0,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": true,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "preSamplingApplied": true,
+            "source": "masked semantic action vocabulary"
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 5,
+          "sanitizerEvents": [],
+          "semanticAction": "roll-left",
+          "source": "train-telemetry-rawActionExamples",
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": true
+          },
+          "envIndex": 0,
+          "exampleIndex": 1,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": true
+          },
+          "mask": {
+            "preSamplingApplied": true,
+            "source": "masked semantic action vocabulary"
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 2,
+          "sanitizerEvents": [],
+          "semanticAction": "yaw-right",
+          "source": "train-telemetry-rawActionExamples",
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "envIndex": 0,
+          "exampleIndex": 2,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "preSamplingApplied": true,
+            "source": "masked semantic action vocabulary"
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 4,
+          "sanitizerEvents": [],
+          "semanticAction": "pitch-down",
+          "source": "train-telemetry-rawActionExamples",
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": true,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "envIndex": 0,
+          "exampleIndex": 3,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": true,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "preSamplingApplied": true,
+            "source": "masked semantic action vocabulary"
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 3,
+          "sanitizerEvents": [],
+          "semanticAction": "pitch-up",
+          "source": "train-telemetry-rawActionExamples",
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": true,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "envIndex": 0,
+          "exampleIndex": 4,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": true,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "preSamplingApplied": true,
+            "source": "masked semantic action vocabulary"
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 5,
+          "sanitizerEvents": [],
+          "semanticAction": "roll-left",
+          "source": "train-telemetry-rawActionExamples",
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": true,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "envIndex": 0,
+          "exampleIndex": 5,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": true,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "preSamplingApplied": true,
+            "source": "masked semantic action vocabulary"
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 8,
+          "sanitizerEvents": [],
+          "semanticAction": "shoot-mg",
+          "source": "train-telemetry-rawActionExamples",
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": true,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "envIndex": 0,
+          "exampleIndex": 6,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": true,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "preSamplingApplied": true,
+            "source": "masked semantic action vocabulary"
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 8,
+          "sanitizerEvents": [],
+          "semanticAction": "shoot-mg",
+          "source": "train-telemetry-rawActionExamples",
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": true,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "envIndex": 0,
+          "exampleIndex": 7,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": true,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "preSamplingApplied": true,
+            "source": "masked semantic action vocabulary"
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 8,
+          "sanitizerEvents": [],
+          "semanticAction": "shoot-mg",
+          "source": "train-telemetry-rawActionExamples",
+          "vetoEvents": []
+        }
+      ],
+      "telemetry": {
+        "fieldCounts": {},
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "maskCount": 0,
+        "maskRate": 0.0,
+        "noopCount": 234,
+        "noopRate": 0.114258,
+        "postDecodeClampCount": 0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskCount": 2048,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "sanitizerReasons": {},
+        "totalActions": 2048,
+        "vetoCount": 0,
+        "vetoRate": 0.0
+      },
+      "thresholdStatus": {
+        "checks": [
+          {
+            "id": "invalidActionRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 0.0
+          },
+          {
+            "id": "sanitizerRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 0.0
+          },
+          {
+            "id": "preSamplingMaskRate",
+            "observed": 1.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 1.0
+          },
+          {
+            "id": "postDecodeClampRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 0.0
+          },
+          {
+            "id": "vetoRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "lt",
+            "threshold": 0.25
+          }
+        ],
+        "ok": true,
+        "thresholds": {
+          "invalidActionRateEq": 0.0,
+          "postDecodeClampRateEq": 0.0,
+          "preSamplingMaskRateEq": 1.0,
+          "sanitizerRateEq": 0.0,
+          "vetoRateLt": 0.25
+        }
+      }
+    },
+    {
+      "actionSurface": "bt93g-masked-semantic-action-v1",
+      "fullStepTraceNote": "Historical reports persist action telemetry plus raw examples/infoTail, not a full per-step action replay.",
+      "fullStepTracePersisted": false,
+      "laneId": "bt93i-eval",
+      "phaseId": "93I.4.1",
+      "report": "data/training/ppo/bt93i/runs/20260425T153044Z-terminal-curriculum-repair-eval/eval_report.json",
+      "role": "eval",
+      "runId": "20260425T153044Z-terminal-curriculum-repair-eval",
+      "runKind": "terminal-curriculum-repair-eval",
+      "sampleLimit": 4,
+      "stepDiffSamples": [
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "episodeId": "bt92-headless-944",
+          "episodeIndex": 1,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": true,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": true
+          },
+          "mask": {
+            "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+            "mixedWithPostDecodeClamp": false,
+            "preSamplingApplied": true,
+            "preSamplingByConstruction": true,
+            "semanticAllowedTokenCounts": {
+              "boost": 1,
+              "noop": 1,
+              "pitch-down": 1,
+              "pitch-up": 1,
+              "roll-left": 1,
+              "roll-right": 1,
+              "shoot-mg": 1,
+              "yaw-left": 1,
+              "yaw-right": 1
+            }
+          },
+          "postDecodeClamp": {
+            "count": 0,
+            "eventName": "maskEvents",
+            "mixedWithPolicyMask": false
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 4,
+          "sanitizedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "pitch-down",
+          "source": "eval-infoTail",
+          "stepIndex": 1,
+          "terminalReason": null,
+          "truncatedReason": null,
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "episodeId": "bt92-headless-945",
+          "episodeIndex": 1,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": true,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": true,
+            "yawRight": false
+          },
+          "mask": {
+            "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+            "mixedWithPostDecodeClamp": false,
+            "preSamplingApplied": true,
+            "preSamplingByConstruction": true,
+            "semanticAllowedTokenCounts": {
+              "boost": 1,
+              "noop": 1,
+              "pitch-down": 1,
+              "pitch-up": 1,
+              "roll-left": 1,
+              "roll-right": 1,
+              "shoot-mg": 1,
+              "yaw-left": 1,
+              "yaw-right": 1
+            }
+          },
+          "postDecodeClamp": {
+            "count": 0,
+            "eventName": "maskEvents",
+            "mixedWithPolicyMask": false
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 4,
+          "sanitizedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "pitch-down",
+          "source": "eval-infoTail",
+          "stepIndex": 1,
+          "terminalReason": null,
+          "truncatedReason": null,
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "episodeId": "bt92-headless-944",
+          "episodeIndex": 1,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": true,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": true
+          },
+          "mask": {
+            "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+            "mixedWithPostDecodeClamp": false,
+            "preSamplingApplied": true,
+            "preSamplingByConstruction": true,
+            "semanticAllowedTokenCounts": {
+              "boost": 1,
+              "noop": 1,
+              "pitch-down": 1,
+              "pitch-up": 1,
+              "roll-left": 1,
+              "roll-right": 1,
+              "shoot-mg": 1,
+              "yaw-left": 1,
+              "yaw-right": 1
+            }
+          },
+          "postDecodeClamp": {
+            "count": 0,
+            "eventName": "maskEvents",
+            "mixedWithPolicyMask": false
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 4,
+          "sanitizedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "pitch-down",
+          "source": "eval-infoTail",
+          "stepIndex": 2,
+          "terminalReason": null,
+          "truncatedReason": null,
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "episodeId": "bt92-headless-945",
+          "episodeIndex": 1,
+          "finalExecutedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": true,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": true,
+            "yawRight": false
+          },
+          "mask": {
+            "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+            "mixedWithPostDecodeClamp": false,
+            "preSamplingApplied": true,
+            "preSamplingByConstruction": true,
+            "semanticAllowedTokenCounts": {
+              "boost": 1,
+              "noop": 1,
+              "pitch-down": 1,
+              "pitch-up": 1,
+              "roll-left": 1,
+              "roll-right": 1,
+              "shoot-mg": 1,
+              "yaw-left": 1,
+              "yaw-right": 1
+            }
+          },
+          "postDecodeClamp": {
+            "count": 0,
+            "eventName": "maskEvents",
+            "mixedWithPolicyMask": false
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 4,
+          "sanitizedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "pitch-down",
+          "source": "eval-infoTail",
+          "stepIndex": 2,
+          "terminalReason": null,
+          "truncatedReason": null,
+          "vetoEvents": []
+        }
+      ],
+      "telemetry": {
+        "fieldCounts": {},
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "maskCount": 0,
+        "maskRate": 0.0,
+        "noopCount": 171,
+        "noopRate": 0.163793,
+        "postDecodeClampCount": 0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskCount": 1044,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "sanitizerReasons": {},
+        "totalActions": 1044,
+        "vetoCount": 0,
+        "vetoRate": 0.0
+      },
+      "thresholdStatus": {
+        "checks": [
+          {
+            "id": "invalidActionRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 0.0
+          },
+          {
+            "id": "sanitizerRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 0.0
+          },
+          {
+            "id": "preSamplingMaskRate",
+            "observed": 1.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 1.0
+          },
+          {
+            "id": "postDecodeClampRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 0.0
+          },
+          {
+            "id": "vetoRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "lt",
+            "threshold": 0.25
+          }
+        ],
+        "ok": true,
+        "thresholds": {
+          "invalidActionRateEq": 0.0,
+          "postDecodeClampRateEq": 0.0,
+          "preSamplingMaskRateEq": 1.0,
+          "sanitizerRateEq": 0.0,
+          "vetoRateLt": 0.25
+        }
+      }
+    },
+    {
+      "actionSurface": "bt93g-masked-semantic-action-v1",
+      "fullStepTraceNote": "Historical reports persist action telemetry plus raw examples/infoTail, not a full per-step action replay.",
+      "fullStepTracePersisted": false,
+      "laneId": "bt93i-holdout",
+      "phaseId": "93I.4.1",
+      "report": "data/training/ppo/bt93i/runs/20260425T153136Z-holdout-eval/eval_report.json",
+      "role": "holdout",
+      "runId": "20260425T153136Z-holdout-eval",
+      "runKind": "holdout-eval",
+      "sampleLimit": 4,
+      "stepDiffSamples": [
+        {
+          "decodedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "episodeId": "bt92-headless-960",
+          "episodeIndex": 1,
+          "finalExecutedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+            "mixedWithPostDecodeClamp": false,
+            "preSamplingApplied": true,
+            "preSamplingByConstruction": true,
+            "semanticAllowedTokenCounts": {
+              "boost": 1,
+              "noop": 1,
+              "pitch-down": 1,
+              "pitch-up": 1,
+              "roll-left": 1,
+              "roll-right": 1,
+              "shoot-mg": 1,
+              "yaw-left": 1,
+              "yaw-right": 1
+            }
+          },
+          "postDecodeClamp": {
+            "count": 0,
+            "eventName": "maskEvents",
+            "mixedWithPolicyMask": false
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 7,
+          "sanitizedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "boost",
+          "source": "eval-infoTail",
+          "stepIndex": 1,
+          "terminalReason": null,
+          "truncatedReason": null,
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "episodeId": "bt92-headless-961",
+          "episodeIndex": 1,
+          "finalExecutedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+            "mixedWithPostDecodeClamp": false,
+            "preSamplingApplied": true,
+            "preSamplingByConstruction": true,
+            "semanticAllowedTokenCounts": {
+              "boost": 1,
+              "noop": 1,
+              "pitch-down": 1,
+              "pitch-up": 1,
+              "roll-left": 1,
+              "roll-right": 1,
+              "shoot-mg": 1,
+              "yaw-left": 1,
+              "yaw-right": 1
+            }
+          },
+          "postDecodeClamp": {
+            "count": 0,
+            "eventName": "maskEvents",
+            "mixedWithPolicyMask": false
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 7,
+          "sanitizedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "boost",
+          "source": "eval-infoTail",
+          "stepIndex": 1,
+          "terminalReason": null,
+          "truncatedReason": null,
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "episodeId": "bt92-headless-960",
+          "episodeIndex": 1,
+          "finalExecutedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+            "mixedWithPostDecodeClamp": false,
+            "preSamplingApplied": true,
+            "preSamplingByConstruction": true,
+            "semanticAllowedTokenCounts": {
+              "boost": 1,
+              "noop": 1,
+              "pitch-down": 1,
+              "pitch-up": 1,
+              "roll-left": 1,
+              "roll-right": 1,
+              "shoot-mg": 1,
+              "yaw-left": 1,
+              "yaw-right": 1
+            }
+          },
+          "postDecodeClamp": {
+            "count": 0,
+            "eventName": "maskEvents",
+            "mixedWithPolicyMask": false
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 7,
+          "sanitizedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "boost",
+          "source": "eval-infoTail",
+          "stepIndex": 2,
+          "terminalReason": null,
+          "truncatedReason": null,
+          "vetoEvents": []
+        },
+        {
+          "decodedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "episodeId": "bt92-headless-961",
+          "episodeIndex": 1,
+          "finalExecutedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "mask": {
+            "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+            "mixedWithPostDecodeClamp": false,
+            "preSamplingApplied": true,
+            "preSamplingByConstruction": true,
+            "semanticAllowedTokenCounts": {
+              "boost": 1,
+              "noop": 1,
+              "pitch-down": 1,
+              "pitch-up": 1,
+              "roll-left": 1,
+              "roll-right": 1,
+              "shoot-mg": 1,
+              "yaw-left": 1,
+              "yaw-right": 1
+            }
+          },
+          "postDecodeClamp": {
+            "count": 0,
+            "eventName": "maskEvents",
+            "mixedWithPolicyMask": false
+          },
+          "postDecodeClampEvents": [],
+          "preSamplingAction": 7,
+          "sanitizedAction": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "boost",
+          "source": "eval-infoTail",
+          "stepIndex": 2,
+          "terminalReason": null,
+          "truncatedReason": null,
+          "vetoEvents": []
+        }
+      ],
+      "telemetry": {
+        "fieldCounts": {},
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "maskCount": 0,
+        "maskRate": 0.0,
+        "noopCount": 93,
+        "noopRate": 0.14006,
+        "postDecodeClampCount": 0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskCount": 664,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "sanitizerReasons": {},
+        "totalActions": 664,
+        "vetoCount": 0,
+        "vetoRate": 0.0
+      },
+      "thresholdStatus": {
+        "checks": [
+          {
+            "id": "invalidActionRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 0.0
+          },
+          {
+            "id": "sanitizerRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 0.0
+          },
+          {
+            "id": "preSamplingMaskRate",
+            "observed": 1.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 1.0
+          },
+          {
+            "id": "postDecodeClampRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "eq",
+            "threshold": 0.0
+          },
+          {
+            "id": "vetoRate",
+            "observed": 0.0,
+            "ok": true,
+            "operator": "lt",
+            "threshold": 0.25
+          }
+        ],
+        "ok": true,
+        "thresholds": {
+          "invalidActionRateEq": 0.0,
+          "postDecodeClampRateEq": 0.0,
+          "preSamplingMaskRateEq": 1.0,
+          "sanitizerRateEq": 0.0,
+          "vetoRateLt": 0.25
+        }
+      }
+    }
+  ],
+  "ok": true,
+  "phaseCoverage": {
+    "93J.3.1": true,
+    "93J.3.2": true
+  },
+  "phaseId": "93J.3",
+  "resultClass": "action-policy-diagnostics-green",
+  "sourceArtifacts": {
+    "bt93gActionMask": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/action_mask_report.json",
+      "role": "BT93G action mask report",
+      "sha256": "7a8ac47dd6ca79b0a9ae87f5cb10a091d59958d2cf3786d08cfdbd888bf05b9a"
+    },
+    "evalPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_terminal_curriculum_repair_eval.json",
+      "role": "BT93I eval pointer",
+      "sha256": "dfff5fd998e61e7c57530b3abc67a492f1eef5eb21afc110f9ddd1a7bb1e9ec6"
+    },
+    "evalReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T153044Z-terminal-curriculum-repair-eval/eval_report.json",
+      "role": "BT93I eval report",
+      "sha256": "b3609beb8c20a922f297bd47a4684ca7361c7cac03aff52bc60a403512158653"
+    },
+    "holdoutPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_holdout_eval.json",
+      "role": "BT93I holdout pointer",
+      "sha256": "5abf59cd3a0aa2ec379db2079a07b068d726ce070f1080cb976bec361e55ebf6"
+    },
+    "holdoutReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T153136Z-holdout-eval/eval_report.json",
+      "role": "BT93I holdout report",
+      "sha256": "f69fed6de58f77e440f1e1240ae898bb076e0d5fe08040d8e00a2d2a718d1af4"
+    },
+    "trainPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_terminal_curriculum_repair.json",
+      "role": "BT93I train pointer",
+      "sha256": "10899e5a181fa0d5bd2c7bcaef21fca6c4437829815c83dc11199fe3010630be"
+    },
+    "trainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+      "role": "BT93I train report",
+      "sha256": "f819b7d808b1694396112a41659bd2ae15a88b8fd7d082e45b8074a51b5928da"
+    }
+  },
+  "sourceContractChecks": {
+    "checks": {
+      "actionSurface": {
+        "PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID": true,
+        "build_masked_semantic_action_mask": true,
+        "postDecodeClampRate": true,
+        "preSamplingApplied": true,
+        "preSamplingByConstruction": true,
+        "sanitizerRate": true,
+        "vetoRate": true
+      },
+      "learnerSmoke": {
+        "actionTelemetry": true,
+        "invalidActionRate": true,
+        "postDecodeClampRate": true,
+        "preSamplingMaskRate": true,
+        "rewardSafetyDiagnostics": true
+      }
+    },
+    "ok": true,
+    "sourceArtifacts": {
+      "actionSurface": {
+        "closureCapable": true,
+        "path": "python/envs/ppo_action_surface.py",
+        "role": "PPO action surface",
+        "sha256": "4e12c93bd532178f3759234d5217f1cd58a4f4bfaec9c6f7be8ffa708564847b"
+      },
+      "learnerSmoke": {
+        "closureCapable": true,
+        "path": "python/scripts/bt93c_learner_smoke.py",
+        "role": "PPO train/eval diagnostics aggregation",
+        "sha256": "446358c4eb0c601619b83d9ec26f16c3cd1ea28a4985e1329e5869261e016c57"
+      }
+    }
+  },
+  "thresholds": {
+    "invalidActionRateEq": 0.0,
+    "postDecodeClampRateEq": 0.0,
+    "preSamplingMaskRateEq": 1.0,
+    "sanitizerRateEq": 0.0,
+    "vetoRateLt": 0.25
+  }
+}

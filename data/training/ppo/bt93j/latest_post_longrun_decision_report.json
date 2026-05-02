@@ -1,0 +1,6 @@
+{
+  "ok": true,
+  "resultClass": "diagnose-loop-required",
+  "report": "data/training/ppo/bt93j/post_longrun_decision_report.json",
+  "sha256": "8ce6a9e37743c7303f08522cd225eaf3392618eb112efb384c17731d2689ee85"
+}

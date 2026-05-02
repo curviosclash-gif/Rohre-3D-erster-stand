@@ -1,0 +1,714 @@
+{
+  "blockId": "BT93J",
+  "checks": [
+    {
+      "id": "r2_same_red_start_pinned",
+      "observed": {
+        "avgSteps": 72.833333,
+        "dqnAnchor": 117.525,
+        "playerDeadOnly": true,
+        "resultClass": "same-red"
+      },
+      "ok": true
+    },
+    {
+      "id": "survival_dominated_reward_start_pinned",
+      "observed": {
+        "baseStep": 0.0,
+        "checkpointReached": 0.0,
+        "crash": 0.0,
+        "damageDealt": 0.0,
+        "damageTaken": 0.0,
+        "external": 0.0,
+        "itemPickup": 0.0,
+        "itemUse": 0.0,
+        "kill": 0.0,
+        "loss": -9.0,
+        "lowHealthThreat": 0.0,
+        "opponentRisk": 0.0,
+        "parcoursCompleted": 0.0,
+        "stuck": 0.0,
+        "survival": 61.2,
+        "survivalPressureBonus": 0.0,
+        "trailRisk": 0.0,
+        "wallRisk": 0.0,
+        "win": 0.0,
+        "wrongOrder": 0.0
+      },
+      "ok": true
+    },
+    {
+      "id": "reward_curriculum_primary_cause_still_active",
+      "observed": "reward-curriculum-primary-cause-ready-for-r1",
+      "ok": true
+    },
+    {
+      "id": "action_safety_stays_green",
+      "observed": "action-policy-diagnostics-green",
+      "ok": true
+    },
+    {
+      "id": "proof_profile_is_configured",
+      "observed": {
+        "bt94aGateRefreshAllowed": false,
+        "holdoutAllowed": false,
+        "rewardProfileId": "bt93j-reward-curriculum-proof-v1",
+        "timesteps": 1000000
+      },
+      "ok": true
+    },
+    {
+      "id": "proof_lane_is_run_kind_bound",
+      "observed": {
+        "curviosEnv": "python/envs/curvios_env.py",
+        "headlessRunner": "scripts/training-headless-lane-runner.mjs",
+        "learnerSmoke": "python/scripts/bt93c_learner_smoke.py",
+        "singleEnvBridge": "scripts/training-single-env-bridge.mjs"
+      },
+      "ok": true
+    },
+    {
+      "id": "player_dead_only_is_net_negative",
+      "observed": {
+        "breakdown": {
+          "baseStep": -0.365,
+          "checkpointReached": 0,
+          "crash": 0,
+          "damageDealt": 0,
+          "damageTaken": 0,
+          "external": 0,
+          "itemPickup": 0,
+          "itemUse": 0,
+          "kill": 0,
+          "loss": -4,
+          "lowHealthThreat": 0,
+          "opponentRisk": 0,
+          "parcoursCompleted": 0,
+          "stuck": 0,
+          "survival": 2.88,
+          "survivalPressureBonus": 0,
+          "trailRisk": 0,
+          "wallRisk": 0,
+          "win": 0,
+          "wrongOrder": 0
+        },
+        "id": "player-dead-only-72-plus-death",
+        "runningSteps": 72,
+        "terminal": {
+          "components": {
+            "baseStep": -0.005,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": -4,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "episode": {
+            "done": true,
+            "terminalReason": "player-dead",
+            "truncated": false,
+            "truncatedReason": null
+          },
+          "signals": {
+            "crashed": false,
+            "lost": true,
+            "survival": false,
+            "totalEnvSteps": 73,
+            "won": false
+          },
+          "stage": "bt93j-proof-terminal-pressure",
+          "total": -4.005
+        },
+        "total": -1.485
+      },
+      "ok": true
+    },
+    {
+      "id": "natural_terminal_is_separately_positive",
+      "observed": {
+        "breakdown": {
+          "baseStep": -0.365,
+          "checkpointReached": 0,
+          "crash": 0,
+          "damageDealt": 0,
+          "damageTaken": 0,
+          "external": 0,
+          "itemPickup": 0,
+          "itemUse": 0,
+          "kill": 0,
+          "loss": 0,
+          "lowHealthThreat": 0,
+          "opponentRisk": 0,
+          "parcoursCompleted": 0,
+          "stuck": 0,
+          "survival": 2.88,
+          "survivalPressureBonus": 0,
+          "trailRisk": 0,
+          "wallRisk": 0,
+          "win": 2.5,
+          "wrongOrder": 0
+        },
+        "id": "natural-terminal-72-plus-match-ended",
+        "runningSteps": 72,
+        "terminal": {
+          "components": {
+            "baseStep": -0.005,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 2.5,
+            "wrongOrder": 0
+          },
+          "episode": {
+            "done": true,
+            "terminalReason": "match-ended",
+            "truncated": false,
+            "truncatedReason": null
+          },
+          "signals": {
+            "crashed": false,
+            "lost": false,
+            "survival": false,
+            "totalEnvSteps": 73,
+            "won": true
+          },
+          "stage": "bt93j-proof-terminal-pressure",
+          "total": 2.495
+        },
+        "total": 5.015
+      },
+      "ok": true
+    },
+    {
+      "id": "progress_reward_is_separately_visible",
+      "observed": {
+        "components": {
+          "baseStep": -0.005,
+          "checkpointReached": 0.75,
+          "crash": 0,
+          "damageDealt": 0,
+          "damageTaken": 0,
+          "external": 0,
+          "itemPickup": 0,
+          "itemUse": 0,
+          "kill": 0,
+          "loss": 0,
+          "lowHealthThreat": 0,
+          "opponentRisk": 0,
+          "parcoursCompleted": 0,
+          "stuck": 0,
+          "survival": 0.04,
+          "survivalPressureBonus": 0,
+          "trailRisk": 0,
+          "wallRisk": 0,
+          "win": 0,
+          "wrongOrder": 0
+        },
+        "episode": {
+          "done": false,
+          "terminalReason": null,
+          "truncated": false,
+          "truncatedReason": null
+        },
+        "id": "progress-event",
+        "signals": {
+          "checkpointReached": 1,
+          "crashed": false,
+          "lost": false,
+          "parcoursEnabled": true,
+          "survival": true,
+          "totalEnvSteps": 9,
+          "won": false
+        },
+        "stage": "bt93j-proof-terminal-pressure",
+        "total": 0.785
+      },
+      "ok": true
+    }
+  ],
+  "commands": {
+    "nodeProbe": "node --input-type=module -e <bt93j 93J.5b embedded reward probes>",
+    "userOwnedLongrun": "python\\.venv\\Scripts\\python.exe python\\train.py --profile bt93j --run-kind bt93j-user-owned-1m-proof-longrun --phase-id 93J.5c  --config python\\configs\\ppo_bt93j_reward_curriculum_proof_lane.json --artifact-root data\\training\\ppo\\bt93j --checkpoint data\\training\\ppo\\bt93j\\runs\\20260426T084300Z-bt93j-r2-micro-train-counterprobe\\artifact_manifest.json --total-timesteps 1000000",
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93j_reward_curriculum_proof_lane.py --write-reports"
+  },
+  "findingImpact": {
+    "F.05": "still-blocking-until-93J.5c-separates-undertraining-from-reward",
+    "F.19": "still-blocking-until-93J.5c-terminal-distribution-is-observed",
+    "F.27": "aggregate-still-blocked; BT94A remains closed",
+    "F.31": "still-blocking-until-player-dead-only-changes-in-93J.5c"
+  },
+  "generatedAt": "2026-04-26T10:49:25Z",
+  "generatedBy": "python/scripts/bt93j_reward_curriculum_proof_lane.py",
+  "gitSha": "68eddbba0d4e517746acb11bbd10da4c566db85f",
+  "guardrails": {
+    "bt94aGateRefresh": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "holdoutUsed": false,
+    "noGo": [
+      "no BT94A claim, candidate run, freeze candidate, BT94B handover, promote, or rollout-ready result",
+      "no holdout, pilot, baseline, PPO-Validate, or gate refresh from BT93J.5b",
+      "no productive RuntimeConfig, Strategy Flag, JS inference, model registry, rollback, Matchstart, AI-Hub, bridge, or authority change",
+      "BT93J.5b only prepares the explicit user-owned 93J.5c diagnostic longrun"
+    ],
+    "pilotStarted": false,
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93J.5b.1": true,
+    "93J.5b.2": true,
+    "93J.5b.3": true,
+    "93J.5b.4": true,
+    "93J.5b.5": true,
+    "93J.5b.6": true,
+    "93J.5b.7": true
+  },
+  "phaseId": "93J.5b",
+  "resultClass": "reward-curriculum-proof-lane-ready",
+  "rewardProfile": {
+    "active": true,
+    "intent": "BT93J.5b proof lane: player-dead-only must be net-negative; non-death natural terminal remains separately positive.",
+    "profileId": "bt93j-reward-curriculum-proof-v1",
+    "rewardCalculatorOptions": {
+      "curriculum": true,
+      "curriculumStages": [
+        {
+          "minSteps": 0,
+          "name": "bt93j-proof-terminal-pressure",
+          "weightOverrides": {
+            "baseStep": -0.005,
+            "checkpointReached": 0.75,
+            "loss": -4,
+            "survival": 0.04,
+            "survivalPressureBonus": 0.02,
+            "win": 2.5
+          }
+        },
+        {
+          "minSteps": 250000,
+          "name": "bt93j-proof-diversity-pressure",
+          "weightOverrides": {
+            "baseStep": -0.006,
+            "checkpointReached": 0.9,
+            "loss": -4.5,
+            "survival": 0.03,
+            "survivalPressureBonus": 0.015,
+            "win": 3
+          }
+        }
+      ],
+      "weights": {
+        "baseStep": -0.005,
+        "checkpointReached": 0.75,
+        "crash": -7,
+        "damageDealt": 0.02,
+        "damageTaken": -0.18,
+        "itemPickup": 0.08,
+        "itemUse": 0.03,
+        "kill": 1,
+        "loss": -4,
+        "lowHealthThreat": -0.3,
+        "opponentRisk": -0.1,
+        "parcoursCompleted": 2,
+        "stuck": -0.5,
+        "survival": 0.04,
+        "survivalPressureBonus": 0.02,
+        "trailRisk": -0.16,
+        "wallRisk": -0.1,
+        "win": 2.5,
+        "wrongOrder": -0.3
+      }
+    },
+    "runKindBound": [
+      "bt93j-user-owned-1m-proof-longrun"
+    ]
+  },
+  "rewardSmoke": {
+    "nodeProbe": {
+      "generatedBy": "python/scripts/bt93j_reward_curriculum_proof_lane.py::node-probe",
+      "ok": true,
+      "profile": {
+        "active": true,
+        "intent": "BT93J.5b proof lane: player-dead-only must be net-negative; non-death natural terminal remains separately positive.",
+        "profileId": "bt93j-reward-curriculum-proof-v1",
+        "rewardCalculatorOptions": {
+          "curriculum": true,
+          "curriculumStages": [
+            {
+              "minSteps": 0,
+              "name": "bt93j-proof-terminal-pressure",
+              "weightOverrides": {
+                "baseStep": -0.005,
+                "checkpointReached": 0.75,
+                "loss": -4,
+                "survival": 0.04,
+                "survivalPressureBonus": 0.02,
+                "win": 2.5
+              }
+            },
+            {
+              "minSteps": 250000,
+              "name": "bt93j-proof-diversity-pressure",
+              "weightOverrides": {
+                "baseStep": -0.006,
+                "checkpointReached": 0.9,
+                "loss": -4.5,
+                "survival": 0.03,
+                "survivalPressureBonus": 0.015,
+                "win": 3
+              }
+            }
+          ],
+          "weights": {
+            "baseStep": -0.005,
+            "checkpointReached": 0.75,
+            "crash": -7,
+            "damageDealt": 0.02,
+            "damageTaken": -0.18,
+            "itemPickup": 0.08,
+            "itemUse": 0.03,
+            "kill": 1,
+            "loss": -4,
+            "lowHealthThreat": -0.3,
+            "opponentRisk": -0.1,
+            "parcoursCompleted": 2,
+            "stuck": -0.5,
+            "survival": 0.04,
+            "survivalPressureBonus": 0.02,
+            "trailRisk": -0.16,
+            "wallRisk": -0.1,
+            "win": 2.5,
+            "wrongOrder": -0.3
+          }
+        },
+        "runKindBound": [
+          "bt93j-user-owned-1m-proof-longrun"
+        ]
+      },
+      "scenarios": [
+        {
+          "breakdown": {
+            "baseStep": -0.365,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": -4,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 2.88,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "id": "player-dead-only-72-plus-death",
+          "runningSteps": 72,
+          "terminal": {
+            "components": {
+              "baseStep": -0.005,
+              "checkpointReached": 0,
+              "crash": 0,
+              "damageDealt": 0,
+              "damageTaken": 0,
+              "external": 0,
+              "itemPickup": 0,
+              "itemUse": 0,
+              "kill": 0,
+              "loss": -4,
+              "lowHealthThreat": 0,
+              "opponentRisk": 0,
+              "parcoursCompleted": 0,
+              "stuck": 0,
+              "survival": 0,
+              "survivalPressureBonus": 0,
+              "trailRisk": 0,
+              "wallRisk": 0,
+              "win": 0,
+              "wrongOrder": 0
+            },
+            "episode": {
+              "done": true,
+              "terminalReason": "player-dead",
+              "truncated": false,
+              "truncatedReason": null
+            },
+            "signals": {
+              "crashed": false,
+              "lost": true,
+              "survival": false,
+              "totalEnvSteps": 73,
+              "won": false
+            },
+            "stage": "bt93j-proof-terminal-pressure",
+            "total": -4.005
+          },
+          "total": -1.485
+        },
+        {
+          "breakdown": {
+            "baseStep": -0.365,
+            "checkpointReached": 0,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 2.88,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 2.5,
+            "wrongOrder": 0
+          },
+          "id": "natural-terminal-72-plus-match-ended",
+          "runningSteps": 72,
+          "terminal": {
+            "components": {
+              "baseStep": -0.005,
+              "checkpointReached": 0,
+              "crash": 0,
+              "damageDealt": 0,
+              "damageTaken": 0,
+              "external": 0,
+              "itemPickup": 0,
+              "itemUse": 0,
+              "kill": 0,
+              "loss": 0,
+              "lowHealthThreat": 0,
+              "opponentRisk": 0,
+              "parcoursCompleted": 0,
+              "stuck": 0,
+              "survival": 0,
+              "survivalPressureBonus": 0,
+              "trailRisk": 0,
+              "wallRisk": 0,
+              "win": 2.5,
+              "wrongOrder": 0
+            },
+            "episode": {
+              "done": true,
+              "terminalReason": "match-ended",
+              "truncated": false,
+              "truncatedReason": null
+            },
+            "signals": {
+              "crashed": false,
+              "lost": false,
+              "survival": false,
+              "totalEnvSteps": 73,
+              "won": true
+            },
+            "stage": "bt93j-proof-terminal-pressure",
+            "total": 2.495
+          },
+          "total": 5.015
+        },
+        {
+          "components": {
+            "baseStep": -0.005,
+            "checkpointReached": 0.75,
+            "crash": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "external": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "kill": 0,
+            "loss": 0,
+            "lowHealthThreat": 0,
+            "opponentRisk": 0,
+            "parcoursCompleted": 0,
+            "stuck": 0,
+            "survival": 0.04,
+            "survivalPressureBonus": 0,
+            "trailRisk": 0,
+            "wallRisk": 0,
+            "win": 0,
+            "wrongOrder": 0
+          },
+          "episode": {
+            "done": false,
+            "terminalReason": null,
+            "truncated": false,
+            "truncatedReason": null
+          },
+          "id": "progress-event",
+          "signals": {
+            "checkpointReached": 1,
+            "crashed": false,
+            "lost": false,
+            "parcoursEnabled": true,
+            "survival": true,
+            "totalEnvSteps": 9,
+            "won": false
+          },
+          "stage": "bt93j-proof-terminal-pressure",
+          "total": 0.785
+        }
+      ]
+    },
+    "ok": true
+  },
+  "sourceArtifacts": {
+    "actionDiagnostics": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "data/training/ppo/bt93j/action_policy_diagnostics.json",
+      "role": "BT93J action safety diagnostics",
+      "sha256": "57cea8615c52a934e29662342dd8d31f267d3b6f8acad561aa0372487803c186"
+    },
+    "curviosEnv": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "python/envs/curvios_env.py",
+      "role": "BT93J.5b reward-profile bridge plumbing",
+      "sha256": "9f972b763294ace9a1f5af13fe4f599412983cfbbe3840696c4322129106dd2f"
+    },
+    "headlessLaneRunner": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "role": "BT93J.5b run-kind-bound reward profile",
+      "sha256": "888e86875674432ec8e33bdc1e8e7d08da73f544f59b48c6dd3c2fed4feeae1f"
+    },
+    "learnerSmoke": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "python/scripts/bt93c_learner_smoke.py",
+      "role": "BT93J.5b PPO train support",
+      "sha256": "8e7f256f9fb5d40d09a3c5f425f6499f4c46bc44d7f55c0e654d1b3fb6c8007c"
+    },
+    "matrixContract": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "data/training/ppo/bt93j/matrix_contract_report.json",
+      "role": "BT93J matrix contract",
+      "sha256": "5b85919191fd2a85f99e6d8d235c43082c7482b5522340e020b0adec6a10714a"
+    },
+    "proofConfig": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "python/configs/ppo_bt93j_reward_curriculum_proof_lane.json",
+      "role": "BT93J.5b PPO proof-lane config",
+      "sha256": "90f35f353babae5665c80806bea8d5678d9414e1e161637824127345c66d975f"
+    },
+    "r2Counterprobe": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "data/training/ppo/bt93j/r2_micro_train_counterprobe_report.json",
+      "role": "BT93J R2 same-red start finding",
+      "sha256": "551bb1c85ec1291ab37960ae6d09cf143bf4ac606eed95a578f7ee82c1c4b63a"
+    },
+    "rewardDiagnostics": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
+      "role": "BT93J reward/curriculum diagnostics",
+      "sha256": "0d4c5d0c103431d6b11d255da9e7195b80c768cdd3bee43a8bb1dc8865ac970f"
+    },
+    "singleEnvBridge": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "scripts/training-single-env-bridge.mjs",
+      "role": "BT93J.5b controller CLI plumbing",
+      "sha256": "68812f0ca15044f88691736ebb1c93f3d4db51a0d515a98b6e383573c67c853a"
+    },
+    "terminalSemantics": {
+      "closureCapable": true,
+      "exists": true,
+      "path": "data/training/ppo/bt93j/terminal_semantics_report.json",
+      "role": "BT93J terminal semantics",
+      "sha256": "533377bd01746d8a6ede25b928cc8fa9a4cf16adef733b972aae1d3d04e52d17"
+    }
+  },
+  "startFinding": {
+    "avgStepsPerEpisodeObserved": 72.833333,
+    "dqnAnchor": 117.525,
+    "r2ResultClass": "same-red",
+    "rewardBreakdownTotals": {
+      "baseStep": 0.0,
+      "checkpointReached": 0.0,
+      "crash": 0.0,
+      "damageDealt": 0.0,
+      "damageTaken": 0.0,
+      "external": 0.0,
+      "itemPickup": 0.0,
+      "itemUse": 0.0,
+      "kill": 0.0,
+      "loss": -9.0,
+      "lowHealthThreat": 0.0,
+      "opponentRisk": 0.0,
+      "parcoursCompleted": 0.0,
+      "stuck": 0.0,
+      "survival": 61.2,
+      "survivalPressureBonus": 0.0,
+      "trailRisk": 0.0,
+      "wallRisk": 0.0,
+      "win": 0.0,
+      "wrongOrder": 0.0
+    },
+    "terminalMatrix": {
+      "deathCauseCounts": {
+        "player-dead": 6
+      },
+      "maxSteps": 0,
+      "naturalTerminal": 0,
+      "naturalTerminalShare": 0.0,
+      "playerDeadOnly": true,
+      "runtimeErrorCount": 0,
+      "startCapableTerminalMatrix": false,
+      "terminalReasonCounts": {
+        "player-dead": 6
+      },
+      "truncatedReasonCounts": {}
+    }
+  }
+}

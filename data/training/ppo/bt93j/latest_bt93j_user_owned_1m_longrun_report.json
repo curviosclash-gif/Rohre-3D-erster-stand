@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "resultClass": "reward-still-blocking",
+  "runId": "20260426T175502Z-bt93j-user-owned-1m-proof-longrun",
+  "runKind": "bt93j-user-owned-1m-proof-longrun",
+  "report": "data/training/ppo/bt93j/user_owned_1m_longrun_report.json",
+  "sha256": "239fb23a15b0bba92f86ddccbf1d141d4ce162860092afc6a6de4220b4baa9a0"
+}
