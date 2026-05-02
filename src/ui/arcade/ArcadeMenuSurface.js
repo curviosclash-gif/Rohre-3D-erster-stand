@@ -5,6 +5,7 @@ import {
     getArcadeVehicleProfileRecord,
     readArcadeVehicleProfileRecord,
 } from '../../shared/contracts/ArcadeVehicleProfileContract.js';
+import { setupArcadeVehicleManager } from './ArcadeVehicleManager.js';
 const ARCADE_SEED_STORAGE_KEY = 'cuviosclash.arcade.seed.v1';
 const ARCADE_LAST_RUN_STORAGE_KEY = 'cuviosclash.arcade.last_run.v1';
 
@@ -133,6 +134,24 @@ function resolveVehicleMasteryMaxLevel() {
     return ARCADE_VEHICLE_PROFILE_MAX_LEVEL;
 }
 
+function ensureArcadeVehicleManager(ctx, refs) {
+    const ui = ctx?.ui || {};
+    const mount = refs?.vehicleManagerMount;
+    if (!mount || typeof mount.appendChild !== 'function') {
+        return null;
+    }
+    if (ui.__arcadeVehicleManager) {
+        return ui.__arcadeVehicleManager;
+    }
+    const manager = setupArcadeVehicleManager(ctx);
+    if (!manager?.container) {
+        return null;
+    }
+    mount.replaceChildren(manager.container);
+    ui.__arcadeVehicleManager = manager;
+    return manager;
+}
+
 function buildArcadeSurface(level3Body, ui) {
     const details = createElement('details', 'menu-section menu-accordion start-section-card arcade-inline-surface hidden');
     details.id = 'arcade-inline-surface';
@@ -212,6 +231,10 @@ function buildArcadeSurface(level3Body, ui) {
 
     body.appendChild(cardGrid);
 
+    const vehicleManagerMount = createElement('div', 'arcade-vehicle-manager-mount');
+    vehicleManagerMount.id = 'arcade-vehicle-manager-mount';
+    body.appendChild(vehicleManagerMount);
+
     const ctaRow = createElement('div', 'arcade-surface-cta');
     const startRunButton = createElement('button', 'start-btn', t('menu.arcade.start.label', 'Arcade Run starten'));
     startRunButton.type = 'button';
@@ -234,6 +257,7 @@ function buildArcadeSurface(level3Body, ui) {
     ui.arcadeSeedCopyButton = copySeedButton;
     ui.arcadeReplayButton = replayButton;
     ui.arcadeDailyButton = dailyButton;
+    ui.arcadeVehicleManagerMount = vehicleManagerMount;
 
     return {
         details,
@@ -250,6 +274,7 @@ function buildArcadeSurface(level3Body, ui) {
         copySeedButton,
         replayButton,
         dailyButton,
+        vehicleManagerMount,
     };
 }
 
@@ -276,6 +301,15 @@ export function setupArcadeMenuSurface(ctx = {}) {
     const eventTypes = ctx.eventTypes && typeof ctx.eventTypes === 'object' ? ctx.eventTypes : {};
     const bind = typeof ctx.bind === 'function' ? ctx.bind : null;
     const runtimeAccess = normalizeRuntimeAccess(ctx.runtimeAccess);
+    const vehicleManagerContext = {
+        ...ctx,
+        ui,
+        settings,
+        emit,
+        eventTypes,
+        bind,
+        runtimeAccess,
+    };
 
     if (!emit || !bind) return;
 
@@ -307,6 +341,8 @@ export function setupArcadeMenuSurface(ctx = {}) {
         refs.details.classList.toggle('hidden', !isArcade);
         refs.details.open = isArcade;
         if (!isArcade) return;
+
+        ensureArcadeVehicleManager(vehicleManagerContext, refs)?.syncDisplay?.();
 
         const mapKey = normalizeString(settings?.mapKey, 'standard');
         const vehicleId = normalizeString(settings?.vehicles?.PLAYER_1, 'ship5');

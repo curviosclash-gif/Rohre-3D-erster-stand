@@ -11,7 +11,9 @@ import {
     HANGAR_DESKTOP_ENTRY_IDS,
     resolveDesktopHangarEntryByMode,
 } from '../src/ui/hangar/HangarDesktopEntryContract.js';
+import { resolveArcadeVehicleManagerLegacyStatus } from '../src/ui/hangar/ArcadeVehicleManagerLegacyContract.js';
 import { resolveHangarLifecycleContract } from '../src/ui/hangar/HangarLifecycleContract.js';
+import { resolveHangarShellLayout } from '../src/ui/hangar/HangarShellLayoutContract.js';
 import {
     HANGAR_SELECTION_WRITEBACK_PATHS,
     readHangarMapSelection,
@@ -19,6 +21,7 @@ import {
     writeHangarMapSelection,
     writeHangarVehicleSelection,
 } from '../src/ui/hangar/HangarSelectionWritebackContract.js';
+import { listHangarVerificationTargets } from '../src/ui/hangar/HangarVerificationTargetContract.js';
 import { createHangarWorkshopPersistenceFacade } from '../src/ui/hangar/HangarWorkshopPersistenceFacade.js';
 
 test('V76.99.2 desktop hangar entry resolves stable fight/arcade open paths', () => {
@@ -132,4 +135,26 @@ test('V76.99.2 workshop persistence facade saves via named desktop capabilities'
             HANGAR_CAPABILITY_IDS.DELETE_CUSTOM_BLUEPRINT,
         ]
     );
+});
+
+test('V104.4.4 legacy arcade manager stays wired to ArcadeMenuSurface while hangar shell contracts remain contract-only', () => {
+    const legacyStatus = resolveArcadeVehicleManagerLegacyStatus();
+    const arcadeShellLayout = resolveHangarShellLayout(HANGAR_MODES.ARCADE);
+    const verificationTargets = listHangarVerificationTargets();
+
+    assert.equal(legacyStatus.runtimeStatus, 'productively-wired');
+    assert.equal(legacyStatus.activeProductSurface?.entryPath, 'src/ui/arcade/ArcadeMenuSurface.js');
+    assert.equal(legacyStatus.activeProductSurface?.entryAdapter, 'setupArcadeMenuSurface');
+    assert.equal(legacyStatus.activeProductSurface?.mountId, 'arcade-vehicle-manager-mount');
+
+    assert.equal(arcadeShellLayout.surfaceStatus?.runtimeStatus, 'contract-only');
+    assert.equal(arcadeShellLayout.surfaceStatus?.productivity, 'not-fully-productive');
+    assert.equal(arcadeShellLayout.surfaceStatus?.activeProductSurface, 'src/ui/arcade/ArcadeMenuSurface.js');
+
+    assert.ok(verificationTargets.length > 0);
+    verificationTargets.forEach((target) => {
+        assert.equal(target.surfaceStatus?.runtimeStatus, 'contract-only');
+        assert.equal(target.surfaceStatus?.productivity, 'not-fully-productive');
+        assert.equal(target.surfaceStatus?.activeProductSurface, 'src/ui/arcade/ArcadeMenuSurface.js');
+    });
 });

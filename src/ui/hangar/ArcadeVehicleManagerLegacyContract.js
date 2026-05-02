@@ -3,13 +3,21 @@ export const ARCADE_VEHICLE_MANAGER_LEGACY_CONTRACT_VERSION = 'arcade-vehicle-ma
 export const ARCADE_VEHICLE_MANAGER_LEGACY_STATUS = Object.freeze({
     status: 'legacy-embedded',
     scope: 'src/ui/arcade/ArcadeVehicleManager.js',
+    runtimeStatus: 'productively-wired',
+    productivity: 'legacy-compatibility-path',
+    activeProductSurface: Object.freeze({
+        entryPath: 'src/ui/arcade/ArcadeMenuSurface.js',
+        entryAdapter: 'setupArcadeMenuSurface',
+        modePath: 'arcade',
+        mountId: 'arcade-vehicle-manager-mount',
+    }),
     replacementPath: 'hangar-workshop.vehicle-lab',
     replacementContracts: Object.freeze([
         'HangarWorkshopModuleContract',
         'HangarWorkshopPersistenceFacade',
         'HangarLifecycleContract',
     ]),
-    note: 'Embedded Arcade vehicle manager remains a compatibility path until full workshop migration is complete.',
+    note: 'Embedded Arcade vehicle manager stays productively wired via ArcadeMenuSurface until the dedicated workshop path fully replaces it.',
 });
 
 export function resolveArcadeVehicleManagerLegacyStatus() {
@@ -18,4 +26,3 @@ export function resolveArcadeVehicleManagerLegacyStatus() {
         ...ARCADE_VEHICLE_MANAGER_LEGACY_STATUS,
     };
 }
-

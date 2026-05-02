@@ -1,5 +1,12 @@
 export const HANGAR_VERIFICATION_TARGET_CONTRACT_VERSION = 'hangar-verification-targets.v1';
 
+export const HANGAR_VERIFICATION_SURFACE_STATUS = Object.freeze({
+    runtimeStatus: 'contract-only',
+    productivity: 'not-fully-productive',
+    activeProductSurface: 'src/ui/arcade/ArcadeMenuSurface.js',
+    note: 'Verification targets describe the intended hangar shell and workshop split; the current productive UI path still runs through ArcadeMenuSurface plus desktop workshop adapters.',
+});
+
 export const HANGAR_VERIFICATION_TARGETS = Object.freeze({
     catalog: Object.freeze({
         id: 'catalog',
@@ -49,6 +56,6 @@ export function listHangarVerificationTargets() {
         title: target.title,
         focus: target.focus,
         recommendedSpecs: [...target.recommendedSpecs],
+        surfaceStatus: Object.freeze({ ...HANGAR_VERIFICATION_SURFACE_STATUS }),
     })));
 }
-

@@ -122,6 +122,13 @@ export const HANGAR_SHELL_MODE_REGION_EXTENSIONS = Object.freeze({
     ]),
 });
 
+export const HANGAR_SHELL_SURFACE_STATUS = Object.freeze({
+    runtimeStatus: 'contract-only',
+    productivity: 'not-fully-productive',
+    activeProductSurface: 'src/ui/arcade/ArcadeMenuSurface.js',
+    note: 'The shell layout is still a target contract; real desktop wiring continues through ArcadeMenuSurface plus workshop entry adapters until a dedicated hangar shell is shipped.',
+});
+
 function cloneCommonRegion(region) {
     return {
         id: region.id,
@@ -193,6 +200,7 @@ export function resolveHangarShellLayout(rawMode) {
         arcadeVehicleManagerLegacy: arcadeVehicleManagerLegacy
             ? Object.freeze({ ...arcadeVehicleManagerLegacy })
             : null,
+        surfaceStatus: Object.freeze({ ...HANGAR_SHELL_SURFACE_STATUS }),
         commonRegions: listHangarShellCommonRegions(),
         modeExtensions: listHangarShellModeRegionExtensions(mode),
         desktopLoop: desktopLoop
