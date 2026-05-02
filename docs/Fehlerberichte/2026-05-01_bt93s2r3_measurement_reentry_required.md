@@ -77,3 +77,22 @@ Evidence:
 - `data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json`
 - Command: `python python/scripts/bt93s2r3_direction_fairness_neutral_contract.py --write-report`
 <!-- BT93S2R3.3-END -->
+
+<!-- BT93S2R3.4-START -->
+## 93S2R3.4 Retained-v2-Quarantaene und Full-Scenario Empirical Gate
+
+- Result: `resultClass=predicate-window-required`, `ok=False`
+- Full Matrix: `9` scenarios x `13` actions = `338` probes
+- Repaired S2R5 Rows materialisiert: `33` / `33`
+- Null-Counts: predicate=`19`, window=`1`, measurement=`19`, direction=`0`, retainedV2=`10`, neutral=`0`, negative=`0`
+- Training/Holdout/Optimizer: `0` / `0` / `0`
+
+S2R3.4 belegt nur Messgueltigkeit auf der vollen Matrix. `BT93S2.3-Recheck`,
+`93S2.4`, Training, Candidate, Freeze, Holdout, Promote, Rollout und
+PPO-Validate bleiben bis `BT93S2R3.99=matrix-control-reentry-green` geschlossen.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r3/empirical_zero_gate_report.json`
+- Command: `python python/scripts/bt93s2r3_empirical_zero_gate.py --write-report`
+<!-- BT93S2R3.4-END -->

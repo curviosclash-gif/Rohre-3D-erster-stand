@@ -739,7 +739,7 @@
           "tests/training-environment.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 459,
+          "concreteCount": 461,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 597,
+          "concreteCount": 599,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -809,7 +809,7 @@
           "scripts/training-single-env-bridge.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 455,
+          "concreteCount": 457,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -890,7 +890,7 @@
           "python/train.py"
         ],
         "scopeResolution": {
-          "concreteCount": 454,
+          "concreteCount": 456,
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [],
@@ -1011,7 +1011,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1096,
+          "concreteCount": 1098,
           "plannedCount": 5
         },
         "scopeOverlapAllowedWith": [],
@@ -1073,7 +1073,7 @@
           "tmp/bt93c-clean-env-20260424T155919Z/Scripts/python.exe"
         ],
         "scopeResolution": {
-          "concreteCount": 1104,
+          "concreteCount": 1106,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [],
@@ -1909,7 +1909,7 @@
         "priority": null,
         "owner": null,
         "planFile": "docs/bot-training/Bot_Trainingsplan.md",
-        "currentPhase": "93S2R3.4",
+        "currentPhase": "93S2R3.99",
         "scopeDeclarations": [
           "data/training/ppo/bt93s2r3/bt93s2r3_closure_gate_report.json",
           "data/training/ppo/bt93s2r3/direction_fairness_neutral_contract.json",
@@ -1919,12 +1919,13 @@
           "docs/bot-training/Bot_Trainingsplan.md",
           "docs/Fehlerberichte/2026-05-01_bt93s2r3_measurement_reentry_required.md",
           "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
+          "python/scripts/bt93s2r3_empirical_zero_gate.py",
           "python/scripts/bt93s2r3_failure_ledger.py",
           "python/scripts/bt93s2r3_replay_predicate_window_preflight.py"
         ],
         "scopeResolution": {
-          "concreteCount": 8,
-          "plannedCount": 2
+          "concreteCount": 10,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -5647,7 +5648,7 @@
       "id": "BT93S2R3.4",
       "type": "phase",
       "title": "Retained-v2-Quarantaene und Full-Scenario Empirical Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.4"
@@ -16270,8 +16271,8 @@
     {
       "id": "BT93S2R3.4.1",
       "type": "subphase",
-      "title": "Alle retained-v2 Szenarien separat gegen die neuen Preflight- und Direction-Vertraege messen.",
-      "status": "open",
+      "title": "Alle retained-v2 Szenarien separat gegen die neuen Preflight- und Direction-Vertraege messen. (abgeschlossen: 2026-05-02; evidence: `python python/scripts/bt93s2r3_empirical_zero_gate.py --write-report` -> `data/training/ppo/bt93s2r3/empirical_zero_gate_report.json`, `retainedV2ScenarioCount=6`, `retainedV2ProbeCount=234`, `retainedV2MeasurementInvalidCount=10`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.4",
@@ -16281,8 +16282,8 @@
     {
       "id": "BT93S2R3.4.2",
       "type": "subphase",
-      "title": "Full-Scenario-Gate laeuft auf mindestens derselben 9-Szenario/13-Action/338-Probe-Matrix; niedrigere SampleCounts sind `measurement-invalid`.",
-      "status": "open",
+      "title": "Full-Scenario-Gate laeuft auf mindestens derselben 9-Szenario/13-Action/338-Probe-Matrix; niedrigere SampleCounts sind `measurement-invalid`. (abgeschlossen: 2026-05-02; evidence: `python python/scripts/bt93s2r3_empirical_zero_gate.py --write-report` -> `data/training/ppo/bt93s2r3/empirical_zero_gate_report.json`, `scenarioCount=9`, `actionCount=13`, `probeCount=338`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.4",
@@ -16292,8 +16293,8 @@
     {
       "id": "BT93S2R3.4.3",
       "type": "subphase",
-      "title": "Null-Count-Gate verlangt alle S2R3-DoD-9 Counts exakt 0.",
-      "status": "open",
+      "title": "Null-Count-Gate verlangt alle S2R3-DoD-9 Counts exakt 0. (abgeschlossen: 2026-05-02; evidence: `python python/scripts/bt93s2r3_empirical_zero_gate.py --write-report` -> `data/training/ppo/bt93s2r3/empirical_zero_gate_report.json`, `resultClass=predicate-window-required`, `predicateFailureCount=19`, `minimumWindowFailureCount=1`, `measurementInvalidCount=19`, `retainedV2MeasurementInvalidCount=10`, `opensNext=[]`)",
+      "status": "done",
       "attributes": {
         "blockId": "BT93S2R3",
         "phaseCode": "93S2R3.4",
@@ -32348,9 +32349,15 @@
           "bot-training-plan"
         ],
         "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
           "BT93S2R3"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -41330,6 +41337,27 @@
     },
     {
       "id": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "BT90",
+          "BT91",
+          "BT92",
+          "BT93B",
+          "BT93D",
+          "BT93E",
+          "BT93S2R3"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "python/scripts/bt93s2r3_empirical_zero_gate.py",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -79207,6 +79235,15 @@
     },
     {
       "from": "BT90",
+      "to": "data/training/ppo/bt93s2r3/empirical_zero_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -80972,6 +81009,15 @@
     {
       "from": "BT90",
       "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT90",
+      "to": "python/scripts/bt93s2r3_empirical_zero_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83535,6 +83581,15 @@
     },
     {
       "from": "BT91",
+      "to": "data/training/ppo/bt93s2r3/empirical_zero_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -85282,6 +85337,15 @@
     {
       "from": "BT91",
       "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "python/scripts/bt93s2r3_empirical_zero_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -89043,6 +89107,15 @@
     },
     {
       "from": "BT92",
+      "to": "data/training/ppo/bt93s2r3/empirical_zero_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -90799,6 +90872,15 @@
     {
       "from": "BT92",
       "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT92",
+      "to": "python/scripts/bt93s2r3_empirical_zero_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -93661,6 +93743,15 @@
     },
     {
       "from": "BT93B",
+      "to": "data/training/ppo/bt93s2r3/empirical_zero_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -95417,6 +95508,15 @@
     {
       "from": "BT93B",
       "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93B",
+      "to": "python/scripts/bt93s2r3_empirical_zero_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -104683,6 +104783,15 @@
     },
     {
       "from": "BT93D",
+      "to": "data/training/ppo/bt93s2r3/empirical_zero_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -106439,6 +106548,15 @@
     {
       "from": "BT93D",
       "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93D",
+      "to": "python/scripts/bt93s2r3_empirical_zero_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -114880,6 +114998,15 @@
     },
     {
       "from": "BT93E",
+      "to": "data/training/ppo/bt93s2r3/empirical_zero_gate_report.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
       "to": "data/training/ppo/bt93s2r3/failure_ledger_report.json",
       "type": "scope",
       "hint": null,
@@ -116645,6 +116772,15 @@
     {
       "from": "BT93E",
       "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93E",
+      "to": "python/scripts/bt93s2r3_empirical_zero_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -144728,6 +144864,15 @@
     {
       "from": "BT93S2R3",
       "to": "python/scripts/bt93s2r3_direction_fairness_neutral_contract.py",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT93S2R3",
+      "to": "python/scripts/bt93s2r3_empirical_zero_gate.py",
       "type": "scope",
       "hint": null,
       "attributes": {
