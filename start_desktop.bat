@@ -15,7 +15,7 @@ if not exist "%~dp0electron\node_modules\electron" (
     echo.
 )
 
-if not exist "%~dp0dist\index.html" (
+if not exist "%~dp0dist-app\index.html" (
     echo Desktop-Build fehlt. Erstelle ihn jetzt...
     call npm run app:start:build
     if errorlevel 1 goto :fail

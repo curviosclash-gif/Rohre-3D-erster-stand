@@ -9,6 +9,7 @@ node_modules/
 
 # Build-Output
 dist/
+dist-app/
 
 # Test-Ausgaben (nicht die Testdateien selbst!)
 playwright-report/

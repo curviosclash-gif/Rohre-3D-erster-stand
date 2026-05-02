@@ -74,8 +74,17 @@ export function createRendererShellServerConfig(env = process.env) {
     };
 }
 
-export function createRendererShellBuildConfig({ rootDir, chunkSizeWarningLimit }) {
+function resolveRendererBuildOutDir(env = process.env) {
+    const appMode = String(env?.VITE_APP_MODE || '').trim().toLowerCase();
+    if (appMode === 'app') {
+        return 'dist-app';
+    }
+    return 'dist';
+}
+
+export function createRendererShellBuildConfig({ rootDir, chunkSizeWarningLimit, env = process.env }) {
     return {
+        outDir: resolveRendererBuildOutDir(env),
         chunkSizeWarningLimit,
         rollupOptions: {
             input: Object.fromEntries(

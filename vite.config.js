@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -1170,23 +1170,32 @@ function playwrightHealthApiPlugin() {
     };
 }
 
-export default defineConfig({
-    plugins: [
-        playwrightHealthApiPlugin(),
-        editorDiskSaveApiPlugin(),
-        latestCheckpointApiPlugin(),
-        trainingDashboardApiPlugin(),
-        copyObjVehicleAssetsPlugin(),
-    ],
-    server: createRendererShellServerConfig(process.env),
-    build: createRendererShellBuildConfig({
-        rootDir: __dirname,
-        chunkSizeWarningLimit: CHUNK_SIZE_WARNING_LIMIT_KB,
-    }),
-    define: createRendererBuildDefines({
-        pkgVersion: pkg.version,
-        buildTime,
-        buildId,
-        env: process.env,
-    }),
+export default defineConfig(({ mode }) => {
+    const loadedEnv = loadEnv(mode, process.cwd(), '');
+    const resolvedEnv = {
+        ...process.env,
+        ...loadedEnv,
+    };
+
+    return {
+        plugins: [
+            playwrightHealthApiPlugin(),
+            editorDiskSaveApiPlugin(),
+            latestCheckpointApiPlugin(),
+            trainingDashboardApiPlugin(),
+            copyObjVehicleAssetsPlugin(),
+        ],
+        server: createRendererShellServerConfig(resolvedEnv),
+        build: createRendererShellBuildConfig({
+            rootDir: __dirname,
+            chunkSizeWarningLimit: CHUNK_SIZE_WARNING_LIMIT_KB,
+            env: resolvedEnv,
+        }),
+        define: createRendererBuildDefines({
+            pkgVersion: pkg.version,
+            buildTime,
+            buildId,
+            env: resolvedEnv,
+        }),
+    };
 });

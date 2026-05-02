@@ -23,7 +23,7 @@
       "recording-video-export-job.cjs",
       "static-server.cjs",
       "node_modules/ffmpeg-static/**/*",
-      "../dist/**/*",
+      "../dist-app/**/*",
       "../server/**/*.js",
       "../src/shared/contracts/**/*.js"
     ],

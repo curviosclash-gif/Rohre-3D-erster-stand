@@ -10,7 +10,7 @@ const OPTIONAL_DIRECTORY_ENTRIES = Object.freeze([
 ]);
 
 const COPY_ENTRIES = Object.freeze([
-    { source: 'dist', target: 'dist' },
+    { source: 'dist-app', target: 'dist-app' },
     { source: 'electron/launch.cjs', target: 'electron/launch.cjs' },
     { source: 'electron/main.cjs', target: 'electron/main.cjs' },
     { source: 'electron/preload.cjs', target: 'electron/preload.cjs' },
@@ -79,7 +79,7 @@ function writeGeneratedFiles(outDir) {
         '',
         '## Enthalten',
         '',
-        '- `dist/`: fertig gebauter Desktop-Renderer',
+        '- `dist-app/`: fertig gebauter Desktop-Renderer',
         '- `data/maps/` und `data/vehicles/`: Laufzeitdaten fuer Spielinhalte',
         '- `electron/`: Desktop-Launcher und Electron-Konfiguration',
         '- `server/`: LAN-Signaling fuer Multiplayer',
@@ -117,7 +117,7 @@ function main() {
     const requestedOutDir = parseOutDir(process.argv.slice(2));
     const outDir = path.resolve(repoRoot, requestedOutDir);
 
-    assertSourceExists(repoRoot, 'dist');
+    assertSourceExists(repoRoot, 'dist-app');
 
     rmSync(outDir, { recursive: true, force: true });
     mkdirSync(outDir, { recursive: true });
