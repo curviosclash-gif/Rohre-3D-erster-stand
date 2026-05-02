@@ -335,6 +335,17 @@ Mikro-Claim-Regel:
 
 | Block | Depends-On | Typ | Erfuellt | Hinweis |
 | --- | --- | --- | --- | --- |
+| BT10 | - | soft | ja | Operatorlauf kann isoliert laufen |
+| BT11 | BT10 Baseline-Laufdaten | soft | ja | Folgefenster fuer 10h-Operatorlauf |
+| BT12 | BT11 Abschlussartefakte | soft | ja | weiteres 10h-Folgefenster fuer Bot-Stabilisierung |
+| BT15 | BT10 Baseline-Laufdaten | soft | ja | Zukunftsplanung nutzt aktuelle Lauf-KPIs |
+| BT20 | BT10 Baseline-Laufdaten + BT15 Zyklenplan | hard | ja | BT10-Baseline vorhanden; BT15 Zielkorridor in 15.1/15.2.1 dokumentiert |
+| BT30 | 20.99 | hard | nein | startet erst nach Survival-Policy-Phase |
+| BT40 | 30.99 | hard | nein | Eval/Gate-Haertung nach Curriculum/Hyperparameter |
+| BT73 | 40.99 | hard | nein | Deep-Survival-/Intent-/Resume-Folgeblock baut auf den haerteten BT20-BT40-Gates auf |
+| BT73 | Fehlerbericht `2026-03-28_training_resume-command-timeout.md` | hard | nein | `trainer-checkpoint-load`/Preview-/Publish-Pfad muss vor Abschluss des Blocks belastbar sein |
+| BT73 | V69.99 | soft | ja | Fight/Hunt-Combat-Baseline aus V69 liefert die aktuelle Survival-/Item-Grundlage |
+| BT73 | V72 | soft | nein | Portal-/Gate-/Item-Vertraege aus V72 muessen fuer finale Bot-Semantik synchronisiert werden |
 | BT90 | V77.99, V91.99, V92.99 | hard | ja | PPO-Zweitpfad respektiert bestehende Surface-/Ownership-Ratchets und bleibt read-only gegen produktive Runtime-Surfaces |
 | BT91 | BT90.99 | hard | ja | Sidecar-Handshake, Contract-Smoke und 1-Worker-Lane sind versioniert dokumentiert; BTF-09 ordnet die Shutdown-Failure-Klasse ein |
 | BT92 | BT91.99 | hard | ja | gruene BT91-Evidence liefert Sidecar-/100-Step-Handover fuer die Single-Env-Minimalspur |
@@ -383,17 +394,33 @@ Mikro-Claim-Regel:
 
 | Pfadmuster | Block / Stream | Status | Hinweis |
 | --- | --- | --- | --- |
+| `scripts/training-*.mjs`, `scripts/bot-validation-*.mjs` | BT10-BT40, BT73 | offen | Orchestrierung, Eval, Gate, Validation |
+| `src/entities/ai/training/**`, `trainer/**` | BT20-BT30, BT73 | offen | Runner/Bridge/Trainer-Verhalten |
+| `src/state/training/**` | BT20-BT40, BT73 | offen | Gate-, KPI- und Reward-Logik |
+| `src/entities/ai/**`, `src/hunt/HuntBotPolicy.js`, `src/state/validation/**`, `tests/physics-policy.spec.js`, `tests/training-*.mjs`, `docs/referenz/ai_architecture_context.md`, `docs/bot-training/Bot_Trainings_Roadmap.md` | BT73 | offen | Deep-Survival-, Intent-, Resume- und Operator-Haertung fuer Runtime + Training |
+| `tests/trainer-*.mjs`, `tests/training-*.mjs` | BT10-BT40 | shared | Nur trainingsnahe Tests |
+| `docs/bot-training/Bot_Trainingsplan.md`, `docs/bot-training/Bot_Survival_Training_Plan_12h.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md` | BT10-BT40, BT73, BT80C, BT90-BT95 | shared | Masterplan + Detailplaene + PPO-Intake-Leiter |
 | `python/**`, `data/training/ppo/**` | BT90-BT95 | offen | neuer Sidecar-/PPO-Pfad ausserhalb der produktiven Runtime |
 | `python/scripts/**`, `python/tests/**`, `scripts/training-headless-bridge-smoke.mjs` | BT90-BT93A | offen | Boundary-Harness, Compliance-Smokes und nichtproduktive Mehr-Env-Orchestrierung |
 | `python/train.py`, `python/eval.py`, `python/configs/**`, `python/callbacks/**`, `python/requirements*.txt`, `python/envs/ppo_action_surface.py`, `python/scripts/bt93*.py`, `python/scripts/bt94a_gate_check.py` | BT93B-BT93X | offen | PPO-Scaffold, echter PPO-Learner, Eval-, Resume-, Diagnose-, Reparatur-, DQN-/Comparator-, Wall-/Trail-, Policy-Collapse-, Telemetry-, Reward-, Safety-/Terminal-, Quality- und Statistik-Lane ausserhalb der produktiven Runtime |
 | `scripts/training-headless-lane-runner.mjs`, `scripts/training-single-env-bridge.mjs`, `src/state/training/EpisodeController.js`, `src/state/training/RewardCalculator.js`, `tests/training-*.mjs` | BT93G-BT93X | offen | Enge Trainingssemantik fuer Natural-Terminal-/Death-/Reward-Rueckfuehrung, Progress-/Objective-Reachability, Action-Effekt-Smokes, Raw-/Trail-/Escape-Telemetrie, Mode-/Map-Smokes, Supervisor-Smokes und DeathBefore60-/Anti-Plateau-Diagnosen; keine produktive Matchstart-, AI-Hub- oder Runtime-Umschaltung |
 | `src/state/HeadlessMatchKernelRuntime.js`, `src/core/MatchKernelTrainingAdapter.js`, `src/entities/ai/training/TrainingTransportFacade.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/entities/ai/ObservationBridgePolicy.js`, `src/core/RuntimeConfig.js`, `src/entities/ai/BotPolicyRegistry.js`, `src/entities/ai/BotPolicyTypes.js`, `src/entities/ai/inference/LocalDqnInference.js`, `src/entities/ai/hybrid/HybridDecisionArchitecture.js`, `src/state/MatchSessionFactory.js` | BT90-BT95 | read-only | Layer-sicher konsumieren; keine produktive Runtime-, Matchstart- oder AI-Hub-Umschaltung |
 | `docs/plaene/neu/BT90_GoldStandard/**` | BT90-BT95 | referenz | Draft-, Audit- und Handoff-Material; keine aktiven Locks oder Evidence hier fuehren |
+| `data/training/**`, `output/training/**` | BT10 | shared | Laufartefakte, Logs, Serien |
 
 ## Lock-Status
 
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
+| Train-Ops | BT10 | 2026-03-22 | active | 2026-03-22 |
+| Bot-Codex | BT11 | 2026-03-23 | frei | 2026-03-24 (abgeschlossen) |
+| Bot-Codex | BT12 | 2026-03-25 | active | 2026-03-25 |
+| Train-Ops | BT15 | 2026-03-22 | active | 2026-03-24 |
+| Bot-Codex | BT20 | 2026-03-28 | active | 2026-03-28 |
+| Bot-B | BT30 | 2026-03-22 | frei | - |
+| Bot-C | BT40 | 2026-03-22 | frei | - |
+| - | BT73 | - | frei | Intake 2026-03-31 abgeschlossen; Claim nach BT20-/BT30-/BT40-Abstimmung |
+| Bot-Codex | BT80C | 2026-04-03 | active | 80.99 offen; 80.7-80.9 repo-technisch vorgezogen |
 | Bot-Codex | BT90 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT91 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT92 | 2026-04-23 | frei | 2026-04-23 (abgeschlossen) |
@@ -445,6 +472,482 @@ Mikro-Claim-Regel:
 
 ## Aktive Bloecke
 
+## Block BT10: 12h Survival Operatorlauf
+
+Plan-Datei: `docs/bot-training/Bot_Survival_Training_Plan_12h.md`
+
+<!-- LOCK: Bot-TrainOps seit 2026-03-22 -->
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle BT10-Phasen inkl. 10.99.* sind abgeschlossen.
+- [ ] DoD.2 `training:run/eval/gate` sowie `bot:validate` sind mit finalen Artefakten dokumentiert.
+- [ ] DoD.3 KPI-Vergleich gegen Baseline ist im Plan eingetragen.
+- [ ] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS.
+
+### 10.1 Laufstabilitaet und Betrieb
+
+- [x] 10.1.1 12h-Laufparameter fuer Stabilitaet haerten (Stage-Timeout, Backpressure, Retry, Learn-Profile) (abgeschlossen: 2026-03-22; evidence: npm run training:12h:survival -> commit 045de8b)
+- [/] 10.1.2 Aktiven Lauf ueberwachen und Zwischenstatus in Artefakten pruefen
+
+### 10.2 Zwischenvalidierung waehrend Lauf
+
+- [ ] 10.2.1 Alle 2h `bot:validate` refreshen und Report in Run-Ordner pinnen
+- [ ] 10.2.2 Survival-KPI-Delta (`avgStepsPerEpisode`, `averageBotSurvival`) pro Checkpoint protokollieren
+
+### Checkpoint-Log BT10 (laufend)
+
+| Datum | Typ | RunStamp | `avgStepsPerEpisode` | `averageBotSurvival` | `invalidActionRate` | Delta vs Baseline | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-03-22 | Baseline | `20260321T180755Z-r01` | `123.799` | `31.908458` | `0.247460` | Referenz | `data/training/runs/20260321T180755Z-r01/run.json` |
+| 2026-03-22 | Zwischenstand | `20260322T023812Z-r4344` | `124.138` | `null` | `0.000000` | `+0.274%` (`+0.339`) | `data/training/runs/20260322T023812Z-r4344/run.json` |
+
+### 10.99 Abschluss-Gate
+
+- [ ] 10.99.1 Finales `run -> eval -> gate` plus `bot:validate` mit passendem Report abschliessen
+- [ ] 10.99.2 Finale Artefaktpfade + KPI-Vergleich dokumentieren und Lock freigeben
+
+### Risiko-Register BT10
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Langlauf stoppt durch Timeout/Backpressure | hoch | Train-Ops | Guarded retries + Zwischencheck alle 2h | Unvollstaendige Laufserie |
+| KPI-Drift trotz gruenem Gate | mittel | Train-Ops | KPI-Deltas je Checkpoint protokollieren | Survival sinkt trotz Pass |
+| Artefakt-Luecken bei Resume | mittel | Trainer | latest/series pointers nach jedem Schritt pruefen | fehlende eval/gate Dateien |
+
+---
+
+## Block BT11: 10h Survival Folgefenster
+
+Plan-Datei: `docs/bot-training/Bot_Survival_Training_Plan_10h.md`
+
+<!-- LOCK: frei -->
+
+### Definition of Done (DoD)
+
+- [x] DoD.1 Alle BT11-Phasen inkl. 11.99.* sind abgeschlossen. (abgeschlossen: 2026-03-24; evidence: 11.99.1/11.99.2 -> final dokumentiert)
+- [x] DoD.2 `training:run/eval/gate` sowie `bot:validate` sind mit Artefaktpfaden dokumentiert. (abgeschlossen: 2026-03-24; evidence: `output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log`, `data/bot_validation_report.json`)
+- [x] DoD.3 KPI-Deltas gegen BT10-Baseline sind im Checkpoint-Log eingetragen. (abgeschlossen: 2026-03-24; evidence: Checkpoint-Log BT11 -> Steps `-5.068%`, Survival `+17.138%`)
+- [x] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS. (abgeschlossen: 2026-03-24; evidence: 11.99 Closure-Evidence -> Abschluss-Gate dokumentiert)
+
+### 11.1 Plan und Laufstart
+
+- [x] 11.1.1 10h-Trainingsplan mit KPI-/Checkpoint-Vorgaben anlegen (abgeschlossen: 2026-03-23; evidence: create 10h plan -> docs/bot-training/Bot_Survival_Training_Plan_10h.md)
+- [x] 11.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren (abgeschlossen: 2026-03-23; evidence: npm run training:10h -- --series-stamp BT11_20260323T013933 --stop-on-fail false -> output/training/BT11_20260323T013933-10h.log, PID 9332)
+- [x] 11.1.3 Fight-Profil fuer 10h-Lauf festlegen (`hunt-3d`,`hunt-2d`, stabile Seeds/Timeouts) (abgeschlossen: 2026-03-24; evidence: update fight profile commands -> docs/bot-training/Bot_Survival_Training_Plan_10h.md)
+- [x] 11.1.4 Fight-10h-Lauf starten und Operator-Artefakte dokumentieren (abgeschlossen: 2026-03-24; evidence: npm run training:10h -- --series-stamp BT11_FIGHT_20260324T014853 --modes hunt-3d,hunt-2d --stop-on-fail false -> output/training/BT11_FIGHT_20260324T014853-10h.log, PID 2772)
+
+### 11.2 Laufmonitoring im 2h-Takt
+
+- [x] 11.2.1 Alle 2h `bot:validate` ausfuehren und Report im aktiven Run-Ordner pinnen (abgeschlossen: 2026-03-23; evidence: BOT_RUNNER_FORCE_KILL_PORT=false BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3 npm run bot:validate -> data/bot_validation_report.json, docs/tests/Testergebnisse_Phase4b_2026-03-23.md)
+- [x] 11.2.2 `avgStepsPerEpisode` und `averageBotSurvival` je Checkpoint gegen BT10-Baseline protokollieren (abgeschlossen: 2026-03-24; evidence: final checkpoint update -> `data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json`, `data/bot_validation_report.json`)
+
+### Checkpoint-Log BT11 (laufend)
+
+| Datum | Typ | SeriesStamp | `avgStepsPerEpisode` | `averageBotSurvival` | `invalidActionRate` | Delta vs Baseline | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-03-23 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT10 | `docs/bot-training/Bot_Survival_Training_Plan_10h.md` |
+| 2026-03-23 | Laufstart | `BT11_20260323T013933` | `pending` | `pending` | `pending` | wird in 2h-Checkpoints gefuellt | `output/training/BT11_20260323T013933-10h.log` |
+| 2026-03-23 | Checkpoint C1 | `BT11_20260323T013933` | `126.444444` | `40.690933` | `0.248243` | Steps `+2.137%`, Survival `+27.524%` (vs BT10 Baseline) | `data/training/runs/BT11_20260323T013933-r2137/run.json`, `data/bot_validation_report.json`, `docs/tests/Testergebnisse_Phase4b_2026-03-23.md`; Hinweis: forced-round-rate `100%` |
+| 2026-03-24 | Fight-Plan aktualisiert | `BT11_FIGHT_pending` | `pending` | `pending` | `pending` | hunt-only Fenster vorbereitet | `docs/bot-training/Bot_Survival_Training_Plan_10h.md` |
+| 2026-03-24 | Fight-Laufstart | `BT11_FIGHT_20260324T014853` | `pending` | `pending` | `pending` | 10h-Operatorlauf aktiv; 2h-Checkpoints offen | `output/training/BT11_FIGHT_20260324T014853-10h.log`, PID `2772` |
+| 2026-03-24 | 10h-Loop abgeschlossen | `BT11_FIGHT_20260324T014853` | `117.525000` | `pending` | `1.000000` | Steps `-5.068%`, Survival offen (vs BT10 Baseline) | `data/training/series/BT11_FIGHT_20260324T014853/loop.json`, `data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json`, `data/training/runs/BT11_FIGHT_20260324T014853-r4042/eval.json`, `data/training/runs/BT11_FIGHT_20260324T014853-r4042/gate.json` |
+| 2026-03-24 | Abschlussvalidate blockiert | `BT11_FIGHT_20260324T014853` | `117.525000` | `null` | `1.000000` | `bot:validate` bricht in `app:game-instance` ab | `output/training/BT11_FIGHT_20260324T014853-botvalidate-final.log`; Hinweis: frueherer HUD-NPE gefixt via commit `40dc4ab` |
+| 2026-03-24 | Abschlussvalidate erfolgreich | `BT11_FIGHT_20260324T014853` | `117.525000` | `37.376986` | `1.000000` | Steps `-5.068%`, Survival `+17.138%` (vs BT10 Baseline) | `output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log`, `data/bot_validation_report.json`, `docs/tests/Testergebnisse_Phase4b_2026-03-24.md`; Hinweis: scenarioLimit `2`, forced-round-rate `85.714%` |
+
+### 11.99 Abschluss-Gate
+
+- [x] 11.99.1 Finales `run -> eval -> gate` plus `bot:validate` mit gueltigem Report abschliessen (abgeschlossen: 2026-03-24; evidence: `npm run bot:validate` mit `BOT_RUNNER_FORCE_KILL_PORT=false BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3` -> `output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log`, `data/bot_validation_report.json`)
+- [x] 11.99.2 Finale KPI-Deltas, Artefaktpfade und Lock-Release dokumentieren (abgeschlossen: 2026-03-24; evidence: final KPI row + lock release -> `docs/bot-training/Bot_Trainingsplan.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h.md`)
+
+### Risiko-Register BT11
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Lauf stoppt vor 10h durch Stage-Failure | hoch | Bot-Codex | `stop-on-fail` aus + Logmonitoring + Resume ueber latest checkpoint | `loop.json` zeigt fruehen stopReason |
+| KPI-Delta unklar ohne valide Zwischenreports | mittel | Bot-Codex | fester 2h Checkpoint-Rhythmus mit `bot:validate` | fehlendes `averageBotSurvival` im Abschluss |
+| Artefaktdrift zwischen runs/series/logs | mittel | Bot-Codex | SeriesStamp fixieren und Logpfad im Plan pinnen | mismatch zwischen `loop.json` und run stamps |
+| `bot:validate`-Boot timeout (`GAME_INSTANCE` bleibt `null`) | mittel | Bot-Codex | Runtime fallback ueber statischen Localhost-Server + Szenario-Limit-Fix (`8ef8b75`) fuer stabilen Abschlusslauf | erneuter Timeout bei Final-Validate trotz Fallback |
+
+---
+
+## Block BT12: 10h Bot Folgefenster (Classic + Fight Matrix)
+
+Plan-Datei: `docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md`
+
+<!-- LOCK: Bot-Codex seit 2026-03-25 -->
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle BT12-Phasen inkl. 12.99.* sind abgeschlossen.
+- [ ] DoD.2 `training:run/eval/gate` sowie `bot:validate` sind mit Artefaktpfaden dokumentiert.
+- [ ] DoD.3 KPI-Deltas gegen BT11-Abschlusswerte sind im Checkpoint-Log eingetragen.
+- [ ] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS.
+
+### 12.1 Plan und Laufstart
+
+- [x] 12.1.1 10h-Folgeplan fuer Classic/Fight Matrix anlegen (abgeschlossen: 2026-03-24; evidence: create BT12 plan -> docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md)
+- [x] 12.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren (abgeschlossen: 2026-03-24; evidence: Start-Process `npm run training:10h -- --series-stamp BT12_20260324T152103 ...` -> `output/training/BT12_20260324T152103-10h.log`, PID `3476`)
+- [x] 12.1.3 Survival-First-Restart (Classic + Fight) mit 10h-Matrixlauf starten und dokumentieren (abgeschlossen: 2026-03-25; evidence: `npm run training:10h -- --series-stamp BT12_SURV_20260325T030951 --stop-on-fail false --stage-timeout-ms 5400000 --episodes 8 --seeds 11,23,37,41,53 --modes classic-3d,classic-2d,hunt-3d,hunt-2d --max-steps 240 --runner-profile learn --inject-invalid-actions false --step-timeout-retries 1 --timeout-step-ms 220 --timeout-episode-ms 240000 --timeout-run-ms 1200000 --bridge-max-pending-acks 1024 --bridge-backpressure-threshold 768 --bridge-drop-training-when-backlogged true` -> `output/training/BT12_SURV_20260325T030951-10h.log`, PID `5856`)
+
+### 12.2 Laufmonitoring im 2h-Takt
+
+- [/] 12.2.1 `bot:validate`-Checkpoint im 2h-Rhythmus mit stabilen Runtime-Parametern ausfuehren
+- [/] 12.2.2 `avgStepsPerEpisode` und `averageBotSurvival` je Checkpoint gegen BT11-Finalwerte protokollieren
+- [x] 12.2.3 Runner-Stabilisierung via `BOT_RUNNER_SERVER_MODE=preview` fuer Checkpoint-Validierung aktivieren (abgeschlossen: 2026-03-25; evidence: `BOT_RUNNER_SERVER_MODE=preview BOT_RUNNER_PREVIEW_BUILD=true BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3 BOT_RUNNER_TOTAL_TIMEOUT=900000 BOT_RUNNER_BOOT_TIMEOUT=240000 npm run bot:validate` -> `output/training/BT12_SURV_20260325T030951-botvalidate-cp03-preview.log`, `tmp/bot-validation-report.json`)
+
+### Checkpoint-Log BT12 (laufend)
+
+| Datum | Typ | SeriesStamp | `avgStepsPerEpisode` | `averageBotSurvival` | `invalidActionRate` | Delta vs BT11-Final | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-03-24 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT11-Final (`117.525` / `37.376986`) | `docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md` |
+| 2026-03-24 | Laufstart + Warm-up | `BT12_20260324T152103` | `124.137500` | `-` | `0.000000` | Steps `+5.626%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_20260324T152103-10h.log`, `data/training/runs/BT12_20260324T152103-r01/run.json`, `data/training/runs/BT12_20260324T152103-r01/gate.json` |
+| 2026-03-24 | Checkpoint Validate fehlgeschlagen | `BT12_20260324T152103` | `-` | `-` | `-` | `n/a` | `output/training/BT12_20260324T152103-botvalidate-cp01.log` (`phase=app:game-instance`) |
+| 2026-03-24 | Checkpoint Validate Retry fehlgeschlagen | `BT12_20260324T152103` | `-` | `-` | `-` | `n/a` | `output/training/BT12_20260324T152103-botvalidate-cp01-retry.log` (`BOT_RUNNER_FORCE_KILL_PORT=false`, `phase=app:game-instance`) |
+| 2026-03-25 | Checkpoint Validate Port-Shift fehlgeschlagen | `BT12_20260324T152103` | `-` | `-` | `-` | `n/a` | `output/training/BT12_20260324T152103-botvalidate-cp02-port4275.log` (`BOT_RUNNER_PORT=4275`, `phase=app:game-instance`) |
+| 2026-03-25 | Survival-First-Restart Laufstart | `BT12_SURV_20260325T030951` | `pending` | `pending` | `pending` | neues 10h-Fenster gestartet | `output/training/BT12_SURV_20260325T030951-10h.log`, PID `5856` |
+| 2026-03-25 | Survival-First-Restart Warm-up | `BT12_SURV_20260325T030951` | `135.368750` | `pending` | `0.000000` | Steps `+15.183%`, Survival `pending` (vs BT11-Final) | `data/training/runs/BT12_SURV_20260325T030951-r08/run.json`, `data/training/runs/latest.json` |
+| 2026-03-25 | C1 Validate fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp01.log` (`BOT_RUNNER_FORCE_KILL_PORT=false`, `phase=app:game-instance`) |
+| 2026-03-25 | C1 Validate Retry fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp01-retry.log` (`BOT_RUNNER_PORT=4275`, `BOT_RUNNER_BOOT_TIMEOUT=300000`, `phase=app:game-instance`) |
+| 2026-03-25 | C2 Validate fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp02.log` (`BOT_RUNNER_BOOT_TIMEOUT=240000`, `phase=app:game-instance`) |
+| 2026-03-25 | C3 Validate erfolgreich (preview mode) | `BT12_SURV_20260325T030951` | `135.368750` | `38.770150` | `0.000000` | Steps `+15.183%`, Survival `+3.727%` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp03-preview.log`, `tmp/bot-validation-report.json`, `tmp/Testergebnisse_Phase4b_2026-03-25.md`; Hinweis: forced-round-rate `83.3%` |
+| 2026-03-27 | Abschlussvalidate erfolgreich, Gate weiter rot | `BT12b_SURVIVAL_20260327T035615-r491` | `124.137500` | `40.037833` | `0.000000` | Steps `+5.626%`, Survival `+7.119%` (vs BT11-Final) | `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/run.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/bot-validation-report.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/eval.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/gate.json`, `docs/tests/Testergebnisse_Phase4b_2026-03-27.md`; Hinweis: `bot:validate` PASS nach Portal-Visual-Fix, aber `training:gate` FAIL auf `forcedRoundRate=1.0` und `timeoutRoundRate=1.0` |
+| 2026-03-27 | Runner-Fix validiert, Gate weiter rot | `BT12b_SURVIVAL_20260327T035615-r491` | `124.137500` | `6.132433` | `1.000000` | Steps `+5.626%`, Survival `-83.593%` (vs BT11-Final) | `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/bot-validation-report.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/eval.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/gate.json`, `docs/tests/Testergebnisse_Phase4b_2026-03-27.md`; Hinweis: `bot:validate` jetzt ohne Forced-/Timeout-Rounds (`0/0`), aber `training:gate` FAIL auf `averageBotSurvival=6.132433 < 19.145075` |
+
+### 12.99 Abschluss-Gate
+
+- [ ] 12.99.1 Finales `run -> eval -> gate` plus `bot:validate` mit gueltigem Report abschliessen
+- [ ] 12.99.2 Finale KPI-Deltas, Artefaktpfade und Lock-Release dokumentieren
+
+### Risiko-Register BT12
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Lauf stoppt vor 10h durch Stage-Failure | hoch | Bot-Codex | `stop-on-fail=false`, Logmonitoring und Resume ueber latest checkpoint | `loop.json` mit vorzeitigem stopReason |
+| KPI-Regression in Fight oder Classic unentdeckt | hoch | Bot-Codex | Matrix-Run (`classic-*`,`hunt-*`) + 2h Checkpoints | Delta kippt in Teilmodus trotz gruenem Gate |
+| `bot:validate` Laufzeit > global timeout | mittel | Bot-Codex | scenarioLimit `2`, `BOT_RUNNER_TOTAL_TIMEOUT=600000` fuer Abschlusslauf | Abbruch bei `total-run timeout` |
+| `bot:validate` kann `GAME_INSTANCE` waehrend aktivem Loop nicht initialisieren | hoch | Bot-Codex | Checkpoint-Validate nach Loop-Ende oder auf separatem Port (`BOT_RUNNER_PORT`) ausfuehren | Timeout in `phase=app:game-instance` trotz laufendem Dev-Server |
+| Abschluss-Gate faellt nach Runner-Stabilisierung auf Survival-KPI | hoch | Bot-Codex | V1/V2-Survival unter natuerlichem Round-End analysieren und Policy/Training gegen fruehes Bot-Sterben nachziehen | `averageBotSurvival < 19.145075` |
+
+---
+
+## Block BT15: Zukunfts-Roadmap Survival (Q2)
+
+Plan-Datei: `docs/bot-training/Bot_Trainings_Roadmap.md`
+
+<!-- LOCK: Bot-TrainOps seit 2026-03-22 -->
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle BT15-Phasen inkl. 15.99.* sind abgeschlossen.
+- [ ] DoD.2 C1-C6 Zeitfenster, KPI-Zielkorridor und Entscheidungsregeln sind final dokumentiert.
+- [ ] DoD.3 Woechentliche Re-Planung ist an BT10-Checkpoint-Log und Weekly Review gekoppelt.
+- [ ] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS.
+
+### 15.1 Baseline und Zielkorridor
+
+- [x] 15.1.1 Baseline-Snapshot aus Trainingsartefakten in Roadmap dokumentieren (abgeschlossen: 2026-03-22; evidence: update roadmap baseline -> docs/bot-training/Bot_Trainings_Roadmap.md)
+- [x] 15.1.2 KPI-Zielkorridor und Trainingszyklen C1-C6 festlegen (abgeschlossen: 2026-03-22; evidence: define cycles/targets -> docs/bot-training/Bot_Trainings_Roadmap.md)
+
+### 15.2 Operative Verzahnung BT10-BT40
+
+- [x] 15.2.1 Promotion-/Rollback-Regeln fuer zyklische Trainingsfenster definieren (abgeschlossen: 2026-03-22; evidence: add promotion rollback rules -> docs/bot-training/Bot_Trainings_Roadmap.md)
+- [/] 15.2.2 Woechentliche Re-Planung in BT10-Checkpoint-Log und Weekly Review verankern
+
+### 15.99 Abschluss-Gate
+
+- [ ] 15.99.1 Ersten kompletten Zyklus (C1) mit KPI-Delta dokumentieren
+- [ ] 15.99.2 KW13-Roadmap-Review abschliessen und Lock auf `frei` setzen
+
+### Risiko-Register BT15
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Roadmap driftet von realen KPI-Trends weg | mittel | Train-Ops | weekly KPI checkpoint + zyklusweise Re-Baselining | Zielkorridor wird 2 Zyklen in Folge verfehlt |
+| Ueberoptimistische Zielwerte ohne Gate-Stabilitaet | hoch | Train-Ops/RL | harte Promotion-Regeln + rollback Pflicht | kurzfristige KPI-Spitze ohne Reproduzierbarkeit |
+| Plan bleibt statisch trotz neuer Artefakte | mittel | Train-Ops | BT10 Checkpoint-Log als Pflichtinput fuer BT15 updates | keine Roadmap-Aktualisierung nach Langlauf |
+
+---
+
+## Block BT20: Survival-Policy und Reward-Shaping
+
+Plan-Datei: `docs/bot-training/Bot_Survival_Training_Plan_BT20.md`
+
+<!-- LOCK: Bot-Codex seit 2026-03-27 -->
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle BT20-Phasen inkl. 20.99.* sind abgeschlossen.
+- [ ] DoD.2 A/B-Lauf gegen BT10-Baseline zeigt positives Survival-Delta.
+- [ ] DoD.3 Training-Gates und betroffene Tests sind PASS.
+- [ ] DoD.4 Evidence, Risikoabgleich und Doku-Gates sind abgeschlossen.
+
+### 20.1 Safety-Layer vor Action-Ausgabe
+
+- [x] 20.1.1 Collision-Risk-Guards in Action-Entscheidung einbauen (Evasion hat Vorrang) (abgeschlossen: 2026-03-31; evidence: `node --test tests/trainer-v36-action-safety.test.mjs` -> PASS)
+- [x] 20.1.2 Risky-Action-Sperren bei hoher Bedrohung und niedriger Health einfuehren (abgeschlossen: 2026-03-31; evidence: `node --test tests/trainer-v36-action-safety.test.mjs` -> PASS)
+
+### 20.2 Reward-Shaping auf Ueberleben fokussieren
+
+- [x] 20.2.1 Schrittweises Survival-Reward und klare Death-Penalty kalibrieren (abgeschlossen: 2026-03-31; evidence: `node --test tests/training-reward-survival.test.mjs` -> PASS)
+- [x] 20.2.2 Risk-Proximity-Penalties (Wall/Trail/Opponent) einfuehren und testen (abgeschlossen: 2026-03-31; evidence: `node --test tests/training-reward-survival.test.mjs` -> PASS)
+
+### Checkpoint-Log BT20 (laufend)
+
+| Datum | Typ | SeriesStamp | Resume-Quelle | Zielbild | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| 2026-03-27 | Plan erstellt | `pending` | `data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json` | Survival-First Resume-Fenster mit 4-Mode-Matrix vorbereiten | `docs/bot-training/Bot_Survival_Training_Plan_BT20.md` |
+| 2026-03-28 | 10h-Laufstart | `BT20_SURV_20260328T000841` | `data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json` | 10h-Operatorlauf aktiv; Resume ueber Startup-Checkpoint bestaetigt (`checkpointLoads=1`, `optimizerSteps=1588329`) | `output/training/BT20_SURV_20260328T000841-10h.log`, `data/training/runs/BT20_SURV_20260328T000841-r01/run.json`, `data/training/runs/BT20_SURV_20260328T000841-r01/trainer.json`, `data/training/runs/latest.json` |
+| 2026-03-31 | Safety/Reward rollout | `BT20_code_20260331` | `data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json` | Trainer-Action-Guards, fallback-korrigierte Observation-Heuristik und Survival-First Reward-Shaping sind vor dem naechsten A/B-Lauf aktiv | `trainer/session/ActionSanitizer.mjs`, `trainer/session/TrainerSession.mjs`, `src/state/training/RewardCalculator.js`, `src/entities/ai/training/TrainingAutomationRunner.js`, `tests/trainer-v36-action-safety.test.mjs`, `tests/training-reward-survival.test.mjs` |
+| 2026-03-31 | 10h-Restart aktiv | `BT20_SURV_20260331T043252` | `data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json` | 4-Mode-10h-Lauf mit externem Startup-Resume-Server aktiv; fruehe Runs `r01/r02` schreiben Artefakte und Gates gruen | `output/training/BT20_SURV_20260331T043252-10h.log`, `output/training/BT20_SURV_20260331T043252-trainer-server.log`, `data/training/runs/BT20_SURV_20260331T043252-r01/run.json`, `data/training/runs/BT20_SURV_20260331T043252-r02/gate.json`, `data/training/runs/latest.json` |
+
+### 20.99 Abschluss-Gate
+
+- [ ] 20.99.1 A/B-Lauf gegen BT10-Baseline mit identischen Seeds/Modes durchfuehren
+- [ ] 20.99.2 Verbesserung nur bei positivem Survival-Delta und stabilen Gates uebernehmen
+
+### Risiko-Register BT20
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Reward-Hacking statt Survival | hoch | RL | harte Survival-KPIs + adversarial seeds | hohe Reward-Werte bei kurzer Lebenszeit |
+| Overfitting auf einzelne Seeds | mittel | RL | seed/mode matrix im Gate fixieren | starke KPI-Schwankung |
+| Safety-Layer blockiert lernbare Aktionen | mittel | RL | thresholds iterativ + A/B checks | Policy wird zu konservativ |
+
+---
+
+## Block BT30: Curriculum, Replay-Priorisierung und Hyperparameter
+
+Plan-Datei: `docs/bot-training/Bot_Trainingsplan.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: 20.99 -->
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle BT30-Phasen inkl. 30.99.* sind abgeschlossen.
+- [ ] DoD.2 Gewinner-Setting ist reproduzierbar ueber Vergleichslaeufe.
+- [ ] DoD.3 Standard-Training-Skripte nutzen Gewinner-Setting.
+- [ ] DoD.4 Evidence + Doku-Gates sind abgeschlossen.
+
+### 30.1 Curriculum-Stufen
+
+- [ ] 30.1.1 Trainingsstufen (einfach -> mittel -> voll) als konfigurierte Sequenz definieren
+- [ ] 30.1.2 Stage-spezifische Promotion-Regeln anhand Survival-KPIs implementieren
+
+### 30.2 Replay und Hyperparameter
+
+- [ ] 30.2.1 Priorisierte Samples fuer near-death/death-leading Situationen einfuehren
+- [ ] 30.2.2 Survival-orientierte Hyperparameter-Tuning-Laeufe (gamma/epsilon/step-limits) automatisieren
+
+### 30.99 Abschluss-Gate
+
+- [ ] 30.99.1 Gewinner-Setting per reproduzierbarem Vergleichslauf bestimmen
+- [ ] 30.99.2 Gewinner-Setting in Standard-Training-Skripten verankern und dokumentieren
+
+### Risiko-Register BT30
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Curriculum-Promotion zu aggressiv | mittel | RL | Mindestdauer je Stage + rollback criteria | unstabile KPI-Verlaeufe |
+| Replay-Priorisierung erzeugt Bias | mittel | RL | gemischte sampling quotas | Performance in einfachen Szenen bricht ein |
+| Hyperparameter nicht reproduzierbar | hoch | Train-Ops | fixed seeds + run manifests + lockstep eval | Gewinnerlauf nicht reproduzierbar |
+
+---
+
+## Block BT40: Eval-/Gate-Haertung und Regression-Schutz
+
+Plan-Datei: `docs/bot-training/Bot_Trainingsplan.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: 30.99 -->
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle BT40-Phasen inkl. 40.99.* sind abgeschlossen.
+- [ ] DoD.2 Survival-Metriken sind als harte Gates verankert.
+- [ ] DoD.3 Trainingsnahe Regressionstests und Operator-Runbook sind aktualisiert.
+- [ ] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS.
+
+### 40.1 Survival-Metriken als First-Class-Gates
+
+- [ ] 40.1.1 `averageBotSurvival` in Eval/Gate standardmaessig erzwingen (kein `null` fuer Abschlusslaeufe)
+- [ ] 40.1.2 Gate-Fehlerbilder und Restore-Pfade fuer Latest/Checkpoint robustifizieren
+
+### 40.2 Test- und Operator-Haertung
+
+- [ ] 40.2.1 Trainingsnahe Regressionstests fuer Survival-Deltas und Guardrails erweitern
+- [ ] 40.2.2 Operator-Runbook fuer Start/Resume/Stop/Recovery standardisieren
+
+### 40.99 Abschluss-Gate
+
+- [ ] 40.99.1 `training-run/eval/gate`, `bot:validate`, trainingsnahe Tests und Build sind gruen
+- [ ] 40.99.2 Plan-Doku, Lock-Bereinigung und Handoff an `docs/Umsetzungsplan.md` (nur Referenz) abgeschlossen
+
+### Risiko-Register BT40
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| False-positive gates bei sporadischen KPI-Ausreissern | mittel | QA/RL | rolling window + min-run-count | gate flip-flops |
+| Restore-Pfad bricht bei latest pointer | hoch | Trainer | checkpoint fallback + smoke resume tests | training cannot resume |
+| Regressionstests zu langsam fuer Ops | mittel | QA | fast subset + nightly full suite | Ops delays |
+
+---
+
+## Block BT73: Deep-Survival-, Intent- und Resume-Haertung fuer Runtime, Training und Operatorpfade
+
+Plan-Datei: `docs/plaene/alt/Feature_Bot_Tiefenverbesserung_Survival_Entscheidung_Operator_V73.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: 40.99 -->
+
+Scope:
+
+- Runtime-Bot ueber Safety-, Intent-, Recovery- und Weltmodell-Semantik tiefer auf Survival-First ausrichten, ohne den Runtime-V1-Bridge-Vertrag still zu brechen.
+- Eval-, Gate-, Resume- und Operatorpfade so haerten, dass Survival-Fortschritt reproduzierbar ueber feste Vergleichsmatrizen statt ueber Einzelruns beurteilt wird.
+- Gameplay-Semantik aus V69 und V72 fuer Items, Shield, Portale und Gates als First-Class-Signal in Runtime, Training, QA und Release-Pfade uebernehmen.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 73.1 bis 73.7 und 73.99 sind abgeschlossen.
+- [ ] DoD.2 Runtime-Bot nutzt explizite Safety-, Intent- und Recovery-Logik statt nur reaktive Einzelheuristiken; Classic/Hunt teilen einen klar dokumentierten Kern.
+- [ ] DoD.3 Training und Reward-Shaping verbessern Survival auf einer festen Seed-/Mode-Matrix reproduzierbar und ohne Forced-/Timeout-Runden oder Reward-Hacking.
+- [ ] DoD.4 Eval-/Validation-Reports liefern Survival-Metriken, Todesursachen, Szenarioklassen, Resume-Gesundheit und Decision-Trace-Evidence pro Kandidatenlauf.
+- [ ] DoD.5 Resume-, Preview-Validate- und Publish-Pfade laufen ohne Sonderworkaround stabil; Artefakte und Run-Manifeste sind vollstaendig und reproduzierbar.
+- [ ] DoD.6 Trainingsnahe Tests, `bot:validate`, `training:eval`, `training:gate`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind gruen.
+
+Leitplanke 2026-04-04 (V84-Folgeverbrauch, Quelle: `docs/referenz/ai_architecture_context.md`, Abschnitte `4.6.1` und `4.6.2`): Preview-, Resume-, Eval- und Kandidatenlaeufe sollen denselben `MatchKernelTrainingAdapter` plus normalisierte `run_profile`-, `seed_envelope`-, `input_frame`- und `snapshot_envelope`-Vertraege nutzen. Neue Trainings- oder Validate-Harnesses fuehren keinen separaten Matchstart an `MatchSessionFactory` oder Renderer vorbei ein.
+
+### 73.1 Ground Truth, Failure-Taxonomie und Vergleichsbasis
+
+- [ ] 73.1.1 `bot:validate`, Eval und Recorder um Failure-Codes, Todesursachen, Exit-Qualitaet, Resume-Status und Szenarioklassen erweitern, damit Regressionen nicht mehr nur als Gesamtzahl sichtbar sind.
+- [ ] 73.1.2 Decision-Trace-Artefakte fuer Hochrisiko-Momente einfuehren (letzte Sensoren, Intent, Action-Veto, Reward-Zerlegung), damit schlechte Bot-Entscheidungen reproduzierbar analysiert werden koennen.
+- [ ] 73.1.3 Eine feste Vergleichsmatrix aus Maps, Seeds, Modi und Baseline-Stamps definieren, damit BT10/BT11/BT12/BT20 und Folgefenster mit denselben Bedingungen verglichen werden.
+
+### 73.2 Sensorik und internes Weltmodell vertiefen
+
+- [ ] 73.2.1 Threat-Horizon-, Dead-End-, Freiraum-, Gegnerdruck- und Exit-Signale in `BotSensingOps`/`BotThreatOps` zentralisieren, damit der Bot nicht erst am Kollisionspunkt reagiert.
+- [ ] 73.2.2 Ein kleines internes Gedaechtnis fuer letzte Gefahr, letzte Recovery-Aktion, Portal-/Gate-Nutzung und Fehlschlaege einfuehren, ohne den Runtime-V1-Contract zu brechen.
+- [ ] 73.2.3 Items, Portale, Gates, Shield und Modus-Sonderregeln als explizite Beobachtungs- und Policy-Semantik verdrahten, damit V69/V72-Aenderungen nicht als Seiteneffekt in die KI tropfen.
+
+### 73.3 Entscheidungsarchitektur in Safety-, Intent- und Recovery-Layer aufteilen
+
+- [ ] 73.3.1 Einen klaren Safety-Veto-Layer vor der finalen Action-Ausgabe verankern, der Kollision, Low-HP-Risiko, Sackgassen und riskante Item-/Portal-Aktionen deterministisch blocken kann.
+- [ ] 73.3.2 Einen Intent-Layer fuer `survive`, `reposition`, `engage`, `disengage`, `recover`, `use-item`, `take-portal`, `take-gate` einfuehren, damit Entscheidungen nicht nur aus losen Prioritaetslisten entstehen.
+- [ ] 73.3.3 Recovery-/Stuck-Verhalten als expliziten Zustandsautomaten mit Eintritts- und Exit-Kriterien modellieren, statt Steckenbleiben nur post hoc zu zaehlen.
+
+### 73.4 Reward-Shaping, Curriculum und Replay auf Survival-First ausrichten
+
+- [ ] 73.4.1 Reward-Zerlegung in Survival, sichere Flaechenkontrolle, gelungene Gefahren-Exits und schadensbezogene Rewards nur bei netto ueberlebensfoerderlichem Verhalten aufspalten.
+- [ ] 73.4.2 Curriculum-Stufen von einfach zu voller 4-Mode-Matrix mit Promotion-/Rollback-Regeln an echte Survival- und Stability-KPIs koppeln statt nur an Steps oder Reward-Summen.
+- [ ] 73.4.3 Priorisierte Replay-/Scenario-Samples fuer near-death, death-leading, low-HP-combat, Portal-/Gate-Entscheidungen und Item-Fehlgebrauch einfuehren.
+
+### 73.5 Eval-, Gate- und Operator-Pfade haerten
+
+- [ ] 73.5.1 `bot:validate` und `training:eval` um harte Guardrails fuer `averageBotSurvival != null`, Forced-/Timeout-Rates, Death-Cause-Verteilung und per-Szenario-Failures erweitern.
+- [ ] 73.5.2 `training:gate` auf Vergleich gegen den letzten stabilen Referenzlauf plus Rolling-Window-Regeln ausrichten, damit einmalige Glueckslaeufe nicht promoted werden.
+- [ ] 73.5.3 Einen einheitlichen Validate-Pfad fuer Preview, Publish und Operatorlauf bauen, damit Abschluss-Evidence nicht mehr von instabilen Dev-Server- oder Port-Konstellationen abhaengt.
+
+### 73.6 Resume-, Bridge- und Reproduzierbarkeitsluecken schliessen
+
+- [ ] 73.6.1 Den `trainer-checkpoint-load`-/`trainer-checkpoint-load-latest`-Antwortpfad zwischen `training-run`, `WebSocketTrainerBridge` und `TrainerServer` instrumentieren, testen und reparieren.
+- [ ] 73.6.2 Run-Manifeste fuer Resume-Quelle, Modell-/Config-Hash, Gate-Schwellen, Validate-Argumente und Szenario-Matrix standardisieren, damit spaetere KPI-Vergleiche belastbar bleiben.
+- [ ] 73.6.3 Eine deterministische A/B-Lane fuer Baseline vs. Kandidat mit festen Seeds, identischem Modus-Mix und publishbarer Evidence etablieren.
+
+### 73.7 Rollout, Fallback und Doku-Sync
+
+- [ ] 73.7.1 Die tieferen KI-Aenderungen hinter klaren Tuning-/Strategy-Schaltern ausrollen, damit `rule-based`, `auto`, Bridge- und Fallback-Pfade kontrolliert verglichen und im Notfall sofort zurueckgenommen werden koennen.
+- [ ] 73.7.2 Architektur-, Trainings-, Release- und QA-Dokumentation auf denselben Intent-, Failure- und Gate-Vertrag aktualisieren, damit Runtime, Training und Abnahme denselben Wissensstand teilen.
+
+### 73.99 Integrations- und Abschluss-Gate
+
+- [ ] 73.99.1 Feste Vergleichslaeufe gegen die Baseline sind gruen: kein Resume-Workaround mehr, keine Forced-/Timeout-Runden, `averageBotSurvival` mindestens auf BT11-Stabilniveau und Trend in Richtung Roadmap-Ziel.
+- [ ] 73.99.2 Trainingsnahe Tests, `bot:validate`, `training:eval`, `training:gate`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind abgeschlossen; verbleibende Gameplay-/Bridge-Restpunkte sind dokumentiert, bevor `73.99` schliesst.
+
+### Risiko-Register BT73
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Mehr Sensorik und Intent-Logik verlangsamt die Runtime-KI spuerbar | hoch | Runtime AI | Hotpaths in `*Ops.js` halten, Feature-Bundles messen und schwere Debug-Evidence auf Eval/Training begrenzen | Bot-Framezeit oder Tick-Latenz steigt deutlich |
+| Ein zu harter Safety-Layer macht die Policy passiv und blockiert Lernen | hoch | RL | Safety zuerst nur fuer klar katastrophale Aktionen als Veto nutzen und ueber A/B-Lane kalibrieren | Survival verbessert sich nicht, obwohl Fehler sinken |
+| Reward-Shaping optimiert auf Proxy-Werte statt auf echtes Ueberleben | hoch | RL | Rewards immer gegen `averageBotSurvival`, Death-Causes und feste Seed-/Mode-Matrix spiegeln | Hoher Reward bei schlechter Survival-Metrik |
+| Resume-/Bridge-Fixes destabilisieren den Trainingsbetrieb kurzfristig | hoch | Trainer | Smoke-Tests fuer `checkpoint-load`, `latest`, Preview-Validate und Publish-Lane vor Langlaeufen verpflichtend machen | Training kann nicht deterministisch fortgesetzt werden |
+| V72-Veraenderungen an Item-/Portal-/Gate-Vertraegen brechen Bot-Heuristiken | mittel | Gameplay + AI | Gemeinsame Capability-/Semantik-Quelle definieren und Cross-Plan-Abhaengigkeiten vor Merge pruefen | Bots reagieren falsch auf neue Items oder Portale |
+| Mehr Failure-Codes und Decision-Trace-Artefakte ueberladen Reports und Operatorpfade | mittel | QA/Ops | Kompakte Summary plus gezielte Drilldown-Artefakte statt unstrukturierter Log-Flut | Reports wachsen, aber Entscheidungen werden nicht klarer |
+
+---
+
+## Block BT80C: Algorithmus-Ausbau, High-Util-Training und Champion-Rollout
+
+Plan-Datei: `docs/plaene/neu/BT80C_Validierungs_und_Promotionshaertung_2026-04-03.md`
+
+<!-- LOCK: Bot-Codex seit 2026-04-03 -->
+<!-- DEPENDS-ON: BT80B.99 -->
+
+Scope:
+
+- BT80B-Haertung in Algorithmus-, Promotion-, Gate- und Hardwareprofilen fortziehen, ohne Temperatur-/Thermal-Guardrails weich zu machen.
+- BT11 bleibt eingefrorener Champion; BT20 bleibt Challenger-/Referenzlauf.
+- Validation-Harness und hardware-passende Kandidatenleiter vor neuen High-Util- oder Rollout-Schritten schliessen.
+- Benchmark-Evidence bleibt nur innerhalb desselben Gameplay-/Observation-/Action-/Reward-/Validation-Semantikfensters gueltig.
+- Repo-technische Haertung vorziehen, aber keine produktionsnahen Langlaeufe oder stillen Champion-Wechsel ohne frische Operator-Evidence anstossen.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 80.7 bis 80.99 sind abgeschlossen.
+- [ ] DoD.2 Champion-/Challenger-/Ablation-Rollen sind hart verdrahtet; BT11 bleibt Champion und BT20 bleibt Referenz.
+- [ ] DoD.3 Algorithmus-, Hardware-, Semantik- und Rollout-Vertraege sind als reproduzierbare Repo-Konfiguration dokumentiert.
+- [ ] DoD.4 Validation-Harness, Kandidatenleiter und Operator-Runbooks sind fuer BT80C dokumentiert und belastbar.
+- [ ] DoD.5 Trainingsnahe Tests sowie `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind gruen.
+
+### 80.7 Lernalgorithmus, Ablationen und Champion-Challenger-Regeln
+
+- [x] 80.7.1 Algorithmusprofile (`champion-stable`, `challenger-balanced`, `challenger-high-util`, `ablation-no-per`) definieren und bis in Trainer-/Replay-/Reward-/Exploration-Defaults verdrahten (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/trainer-v36-algorithm-profile.test.mjs` -> PASS)
+- [x] 80.7.2 Challenger-/Ablation-/Reference-only-Rollen im Benchmark-Manifest und in der manuellen Promotion-Policy verankern, inklusive BT20-Blockade gegen Champion-Promotion (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-benchmark-artifacts.test.mjs` -> PASS)
+- [ ] 80.7.3 BT80C-Legacy-Promotions-Evidence auf drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters schaerfen; Median-Delta statt Einzelrun als Entscheidungsbasis dokumentieren; fuer PPO ab `BT94B` gilt die haertere fuenf-Pass-Regel
+
+### 80.8 Hardware-, Util- und Langlaufprofile
+
+- [x] 80.8.1 High-Util-Profile `overnight-high-util` und `marathon` mit harten Thermal-Ceilings statt reiner Beobachtung konfigurieren (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-benchmark-artifacts.test.mjs` -> PASS)
+- [x] 80.8.2 Hardware-Telemetrie fuer extern gelieferte Temperaturdaten auswertbar machen, ohne produktionsnahe Langlaeufe fuer diese Repo-Haertung zu starten (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-benchmark-artifacts.test.mjs` -> PASS)
+- [ ] 80.8.3 Kandidatenleiter `candidate-smoke -> candidate-benchmark -> operator-high-util` hardware-passend definieren und Operator-Runbooks fuer Start/Resume/Pause/Stop/Recovery daran ausrichten
+
+### 80.9 Rollout-, Promotion-, Fallback- und Gate-Haertung
+
+- [x] 80.9.1 `training-gate` um explizite Promotion-Entscheidung gegen den eingefrorenen BT11-Champion erweitern; synthetische und BT20-Referenzlaeufe bleiben geblockt (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-gate.test.mjs` -> PASS)
+- [x] 80.9.2 `training-e2e` Dry-Run-Fallback so haerten, dass `write-latest=false` Validation-/Gate-Pfade sauber skippt statt false-positive Rot zu erzeugen (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-e2e.test.mjs` -> PASS)
+Hinweis 2026-04-04 (V84-Folgeverbrauch): Die stabile Kandidaten-Validation fuer `80.9.3` soll denselben headless-faehigen Kernelpfad wie Replay und Training konsumieren (`MatchKernelTrainingAdapter` plus normalisierte Seed/Input/Snapshot-Huellen), nicht einen davon getrennten Preview-Sonderpfad.
+- [ ] 80.9.3 `bot:validate` als harte Vorbedingung fuer BT80C-Kandidatenevidence stabilisieren; drei reproduzierbare Validation-Paesse auf fixer Matrix verlangen. Stand 2026-04-03: Der operative Runtime-Bruch im normalen Matchstart-/Session-Scope ist behoben; `preview` erreicht wieder `PLAYING` mit echten Match-Refs/Spielern. Die verbleibende Arbeit war zunaechst im Trainingsscope: Runner-/`training-e2e`-Haertung akzeptiert jetzt explizite BT-Validation-Budgets ohne Preview-Prebuild-Overhead, aber `V1` der festen Matrix terminiert selbst mit `preview-build=false` und `BOT_RUNNER_MATCH_TIMEOUT=150000` nicht natuerlich (`PLAYING`, alle 3 Spieler `alive`, `roundsRecorded=0`). Zusatzdiagnose 2026-04-03: Lokale Preview-Proben auf BT-nahe `classic-3d`-Varianten (`standard`, `maze`, `complex`, Portale 0-6, 2-3 Bots) bleiben ebenfalls nach 40-45s in `PLAYING` und liefern weiterhin `roundsRecorded=0`. Damit ist der Restblocker im BT-Scope sauber eingegrenzt, ein sauberer Fix deutet aber wieder auf normalen Runtime-/Session-Scope fuer deterministische Seed-/Startbedingungen oder bewusst geaenderte Gameplay-Terminalsemantik. Vor solchen Eingriffen ist User-Freigabe noetig; Intake-Entwurf: `docs/plaene/neu/BT80C_Classic3D_Validation_Natural_End_Overlap_2026-04-03.md`.
+- [ ] 80.9.4 Benchmark-Reports um eindeutige Urteils- und Ursachenklassen (`promote/hold/rollback/diagnose`; `harness/runtime/algorithm/throughput/artifact`) schaerfen
+- [ ] 80.9.5 Benchmark-Invalidierung bei Gameplay-/Observation-/Action-/Reward-/Validation-Semantikdrift explizit dokumentieren und im Prozess verankern
+
+### 80.99 Abschluss-Gate
+
+- [ ] 80.99.1 Kein Champion-Wechsel und kein High-Util-Operatorlauf ohne gruene Validation-Lane und drei vollstaendige BT80C-Legacy-Kandidatenlaeufe mit neuer Benchmark-Evidence; BT11 bleibt bis zu einer echten manuellen Promotion-Entscheidung Champion. Fuer PPO gilt ab `BT94B` die fuenf-Pass-Promote-Regel.
+- [ ] 80.99.2 Abschluss-Checks, finale Doku-Synchronisierung, Runbooks und ehrliche Restpunkt-Dokumentation sind abgeschlossen.
+
+### Checkpoint-Log BT80C
+
+| Datum | Typ | Stamp | Zielbild | Evidence |
+| --- | --- | --- | --- | --- |
+| 2026-04-02 | Repo-Haertung | `BT80C_repo_20260402` | Algorithmusprofile, PER-Aktivierung, Thermal-Ceilings und manuelle Promotion-Policy sind ohne Langlaufstart im Repo verdrahtet | commit `37bfeb3`, `tests/trainer-v36-algorithm-profile.test.mjs`, `tests/training-benchmark-artifacts.test.mjs`, `tests/training-gate.test.mjs`, `tests/training-e2e.test.mjs` |
+| 2026-04-03 | Plan-Nachschaerfung | `BT80C_plan_20260403` | Validation-Harness, Kandidatenleiter, Semantik-Freeze und Drei-Run-Promotionsregel sind vor weiteren BT80C-Operatorlaeufen priorisiert | `docs/plaene/neu/BT80C_Validierungs_und_Promotionshaertung_2026-04-03.md`, `docs/bot-training/Bot_Trainingsplan.md`, `docs/bot-training/Bot_Trainings_Roadmap.md` |
+| 2026-04-03 | 80.9.3 Scope-Analyse | `BT80C_80_9_3_scope_20260403` | Validation-Harness laesst sich im Trainingsscope nicht endgueltig reparieren, weil `startMatch()` im normalen Runtime-Startpfad auf `Missing interactive match runtime` faellt; BT80C braucht dafuer erst einen separaten Spielscope-Block | `docs/plaene/neu/BT80C_Runtime_Startpfad_Validation_Ueberlauf_2026-04-03.md`, `docs/Fehlerberichte/2026-04-02_bt80c-candidate-run-validation-blockers.md` |
+| 2026-04-03 | Runtime-Fix Rueckfluss | `BT80C_runtime_fix_20260403` | Der normale Matchstart-/Session-Pfad erreicht in `preview` wieder `PLAYING`; BT80C 80.9.3 ist damit zurueck im Trainingsscope und blockiert jetzt an natuerlichem Rundenabschluss statt an fehlender Runtime | `tmp/perf_phase28_5_lifecycle_trend.json`, `tmp/bt80c-repro-report.json`, `docs/Fehlerberichte/2026-04-02_bt80c-candidate-run-validation-blockers.md` |
+| 2026-04-03 | Runner-/Timeout-Haertung | `BT80C_80_9_3_timeout_hardening_20260403` | `bot-validation-runner` akzeptiert jetzt CLI-Budgets; `training-e2e` kann BT-Validation-Profile samt laengerem Stage-Budget weiterreichen; `quick-benchmark` nutzt dafuer `preview-build=false`. V1 bleibt dennoch selbst bei `150000ms` Aktivbudget in `PLAYING` und haelt 80.9.3 weiter im BT-Scope offen. | `scripts/bot-validation-runner.mjs`, `scripts/training-e2e.mjs`, `src/state/training/TrainingBenchmarkProfiles.js`, `tmp/bt80c-debug-report-90s-nobuild.json`, `tmp/bt80c-debug-report-150s-nobuild.json`, `tmp/bt80c-cli-smoke.json`, `docs/Fehlerberichte/2026-04-02_bt80c-candidate-run-validation-blockers.md` |
+| 2026-04-03 | Classic-3D Restdiagnose | `BT80C_80_9_3_classic3d_probe_20260403` | Nicht nur V1 `standard`, sondern auch BT-nahe `classic-3d`-Varianten (`maze`, `complex`, Portale 0-6, 2-3 Bots) bleiben im Validation-Pfad nach 40-45s in `PLAYING` bei `roundsRecorded=0`; fuer eine feste Lane fehlt damit vermutlich ein deterministischer Seed-/Starthebel ausserhalb des reinen BT-Harness. | `docs/plaene/neu/BT80C_Classic3D_Validation_Natural_End_Overlap_2026-04-03.md`, `docs/Fehlerberichte/2026-04-02_bt80c-candidate-run-validation-blockers.md` |
+
+### Risiko-Register BT80C
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Prioritized Replay oder neue Challenger-Defaults destabilisieren Resume-Ketten | hoch | Trainer | Checkpoint-Contract unveraendert halten, PER nur ueber Profile aktivieren und per Unit-Test absichern | Resume oder Replay-Stats kippen nach Profilwechsel |
+| Thermal-Ceilings bleiben folgenlos, wenn keine Temperaturquelle angeschlossen ist | mittel | Train-Ops | Externe Temperaturquelle ueber Telemetrie einspeisen; bis dahin Warning sichtbar halten und keine Marathon-Promotion freigeben | High-Util-Lauf ohne Temperaturwert |
+| Manual-Promotion wird im Alltag als automatischer Rollout missverstanden | hoch | QA/Ops | Gate-Report explizit auf `manual-promotion-required` bzw. `hold-champion` pinnen | Gruener Gate-Lauf wird als automatischer Champion-Wechsel interpretiert |
+| Validation-Harness bleibt wegen nicht terminierender Runden in der festen Matrix blockiert und blockiert vollstaendige BT80C-Evidence | hoch | QA/Ops | Runner-/E2E-Budgets reproduzierbar halten, Preview-Prebuild aus der Lane entfernen und den verbleibenden Matrix-/Round-End-Rest explizit als BT-Scope weiterbearbeiten | `bot:validate` bleibt trotz `PLAYING` bei allen Spielern `alive`, `roundsRecorded=0`, `forced-round` oder `timeout-round` |
+| Stille Gameplay-/Observation-/Action-/Reward-Aenderungen machen Champion- und Kandidatenvergleiche ungueltig | hoch | Planung + Runtime | Semantik-Freeze dokumentieren; bei Drift neuen Benchmark-Freeze verlangen | alter Champion schlaegt/neuer Kandidat verliert nur wegen geaenderter Semantik |
+
+---
 
 ## Geplante Folgeleiter: BT90 PPO-Zweitpfad
 
@@ -5272,13 +5775,32 @@ No-Go vor Bot-Training:
 - Kein Fix ohne Ursache und kein Multi-Fix-Blur: Reward-, Action-, Terminal-, Curriculum- und Runner-Fixes muessen aus Trace-/Stress-/Ordering-Evidence folgen und getrennt bewertet werden.
 - Kein positives Reentry-Signal ohne Simple-Baseline-Abstand, Same-Matrix-DQN-/Ersatzvergleichspolitik aus BT93X, Statistik-Lock, Gate-Freshness, Holdout-Lineage und BT93J/N/Q/R-X-Fehlersignatur-Widerlegung.
 
+## Backlog (priorisiert)
+
+| ID | Titel | Impact | Aufwand | Prioritaet | Naechster Schritt | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| BT50 | Opponent-Class Profiles fuer Survival-Spezialisierung | mittel | mittel | P2 | Profil-Entwurf + KPI-Hypothese | Offen |
+| BT60 | Langlauf-Curriculum ueber 24h mit Auto-Promotion | hoch | gross | P2 | Infra-Kosten und Zeitfenster pruefen | Offen |
+| BT70 | Offline-Policy-Benchmarking mit festen Seeds | mittel | klein | P1 | Benchmark harness standardisieren | Offen |
 
 ## Archivindex
 
 | Block/Plan | Grund | Archiv-Pfad |
 | --- | --- | --- |
-| Bot_Trainingsplan vor PPO-only-Zuschnitt | durch PPO-only Haupttrainingsplan ersetzt; historischer DQN-/Operator-/Survival-Mischplan bleibt read-only Archiv | `docs/archive/plans/superseded/Bot_Trainingsplan_vor_PPO_only_2026-05-02.md` |
+| - | noch keine abgeschlossenen BT-Rootplaene archiviert | `docs/archive/plans/completed/` |
 
+## Weekly Review (KW 12/2026)
+
+Stand: 2026-03-22
+
+- Abgeschlossen diese Woche: BT10.1.1 Stabilitaetsparameter gehaertet.
+- In Arbeit: BT10.1.2 Operatorlauf-Monitoring.
+- Naechste 3 Ziele:
+  1. BT10.2.1 periodische `bot:validate` Reports sichern.
+  2. BT10.2.2 KPI-Deltas pro Checkpoint dokumentieren.
+  3. BT15.2.2 woechentliche Roadmap-Replanung gegen Checkpoint-Log verankern.
+- Groesstes Risiko: Laufartefakte unvollstaendig bei langen Resume-Ketten.
+- Entscheidungsbedarf: feste 2h-Validierungszeitfenster und Owner festlegen.
 
 ## Dokumentations-Hook
 
@@ -5287,3 +5809,4 @@ Vor Task-Abschluss immer:
 - `npm run plan:check`
 - `npm run docs:sync`
 - `npm run docs:check`
+
