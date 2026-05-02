@@ -99,11 +99,8 @@ function resolveLimitOverridesForRuntime(rawOverrideDraft) {
 }
 
 export function readSettingsOverrideDraftFromRuntime(runtimeGlobal = globalThis) {
-    const root = runtimeGlobal && typeof runtimeGlobal === 'object'
-        ? runtimeGlobal
-        : (typeof globalThis !== 'undefined' ? globalThis : {});
-    const settingsDefaultsContract = root?.curviosApp?.settingsDefaults
-        || root?.curviosApp?.contracts?.settingsDefaults;
+    const root = runtimeGlobal && typeof runtimeGlobal === 'object' ? runtimeGlobal : {};
+    const settingsDefaultsContract = root?.settingsDefaultsContract;
     if (!settingsDefaultsContract || typeof settingsDefaultsContract.getOverrideSnapshot !== 'function') {
         return null;
     }

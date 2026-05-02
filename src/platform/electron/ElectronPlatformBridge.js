@@ -5,7 +5,6 @@ import {
 import {
     PLATFORM_RUNTIME_KINDS,
     resolveCapabilityProviderKind,
-    resolvePlatformRuntimeKind,
 } from '../../shared/contracts/PlatformCapabilityRegistry.js';
 import {
     createCapabilityAdapterDescriptor,
@@ -44,6 +43,19 @@ function resolveNamedContract(appRuntime, key) {
     return contract && typeof contract === 'object' ? contract : null;
 }
 
+export function resolveElectronRuntimeSnapshot(runtimeGlobal = globalThis) {
+    const globalRef = resolveRuntimeGlobal(runtimeGlobal);
+    const { appRuntime } = resolveAppRuntime(runtimeGlobal);
+    const isElectron = appRuntime?.isApp === true || globalRef?.__CURVIOS_APP__ === true;
+    const browserDemoSurfacePolicyContract = resolveNamedContract(appRuntime, 'browserDemoSurfacePolicy');
+    const settingsDefaultsContract = resolveNamedContract(appRuntime, 'settingsDefaults');
+    return Object.freeze({
+        runtimeKind: isElectron ? PLATFORM_RUNTIME_KINDS.ELECTRON : PLATFORM_RUNTIME_KINDS.WEB,
+        browserDemoSurfacePolicyContract,
+        settingsDefaultsContract,
+    });
+}
+
 function resolveNamedCapability(appRuntime, key) {
     const capabilities = appRuntime?.capabilities && typeof appRuntime.capabilities === 'object'
         ? appRuntime.capabilities
@@ -53,7 +65,7 @@ function resolveNamedCapability(appRuntime, key) {
 }
 
 export function isElectronPreloadRuntime(runtimeGlobal = globalThis) {
-    return resolvePlatformRuntimeKind({ runtimeGlobal }) === PLATFORM_RUNTIME_KINDS.ELECTRON;
+    return resolveElectronRuntimeSnapshot(runtimeGlobal).runtimeKind === PLATFORM_RUNTIME_KINDS.ELECTRON;
 }
 
 export function createElectronPreloadDiscoveryAdapter(runtimeGlobal = globalThis) {
@@ -328,7 +340,7 @@ export function getElectronPlatformCapabilitySnapshot(runtimeGlobal = globalThis
     const recordingAdapter = createElectronPreloadRecordingAdapter(runtimeGlobal);
 
     return createPlatformCapabilitySnapshot({
-        runtimeKind: resolvePlatformRuntimeKind({ runtimeGlobal }),
+        runtimeKind: resolveElectronRuntimeSnapshot(runtimeGlobal).runtimeKind,
         discovery: discoveryAdapter.capability,
         host: hostAdapter.capability,
         save: saveAdapter.capability,
@@ -346,3 +358,4 @@ export function isDesktopPlatformRuntime(runtimeGlobal = globalThis) {
 
 export const createElectronDiscoveryIntentBridge = createElectronPreloadDiscoveryAdapter;
 export const createElectronHostIntentBridge = createElectronPreloadHostAdapter;
+

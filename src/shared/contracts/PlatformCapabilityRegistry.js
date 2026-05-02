@@ -12,8 +12,8 @@
  * All exports from PlatformCapabilityData are re-exported here so existing
  * import sites do not need to change.
  *
- * curviosApp/__CURVIOS_APP__ reads in resolvePlatformRuntimeKind() are marked
- * migration-debt per V91 guard-matrix (surface: curviosApp, sunsetPhase: 91.3).
+ * Runtime-kind and override-draft resolution is input-driven. Platform-global
+ * reads belong to dedicated platform adapters (for example electron bridges).
  */
 export {
     PLATFORM_CAPABILITY_REGISTRY_CONTRACT_VERSION,
@@ -358,9 +358,12 @@ function resolveBrowserDemoSurfacePolicyOverrideDraft(options = {}) {
         });
     }
 
+    const platformRuntimeSnapshot = options.platformRuntimeSnapshot
+        && typeof options.platformRuntimeSnapshot === 'object'
+        ? options.platformRuntimeSnapshot
+        : null;
+    const browserDemoPolicyContract = platformRuntimeSnapshot?.browserDemoSurfacePolicyContract;
     const runtimeGlobal = resolveRuntimeGlobal(options.runtimeGlobal);
-    const browserDemoPolicyContract = runtimeGlobal?.curviosApp?.browserDemoSurfacePolicy
-        || runtimeGlobal?.curviosApp?.contracts?.browserDemoSurfacePolicy;
     if (!browserDemoPolicyContract || typeof browserDemoPolicyContract.getOverrideSnapshot !== 'function') {
         return resolveBrowserDemoSurfacePolicyOverrideDraftFromBuildArtifact(runtimeGlobal);
     }
@@ -709,12 +712,8 @@ export function resolvePlatformRuntimeKind(options = {}) {
     if (explicitRuntimeKind) {
         return explicitRuntimeKind;
     }
-    // migration-debt V91 guard-matrix surface:curviosApp sunsetPhase:91.3
-    // Direct curviosApp/__CURVIOS_APP__ read; allowed only in this file per guard-matrix allowedCallers.
-    const runtimeGlobal = resolveRuntimeGlobal(options.runtimeGlobal);
-    return runtimeGlobal?.curviosApp?.isApp === true || runtimeGlobal?.__CURVIOS_APP__ === true
-        ? PLATFORM_RUNTIME_KINDS.ELECTRON
-        : PLATFORM_RUNTIME_KINDS.WEB;
+    const snapshotRuntimeKind = normalizePlatformRuntimeKind(options?.platformRuntimeSnapshot?.runtimeKind, '');
+    return snapshotRuntimeKind || PLATFORM_RUNTIME_KINDS.WEB;
 }
 
 export function resolvePlatformProductSurfaceId(options = {}) {
