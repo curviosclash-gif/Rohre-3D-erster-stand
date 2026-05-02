@@ -151,6 +151,8 @@ export function createGameUiRefs(doc = document) {
         normalCameraThrusterExhaustIntensitySlider: doc.getElementById('normal-camera-thruster-exhaust-intensity-slider'),
         normalCameraThrusterExhaustIntensityLabel: doc.getElementById('normal-camera-thruster-exhaust-intensity-label'),
         normalCameraPerspectiveHint: doc.getElementById('normal-camera-perspective-hint'),
+        arcadeGhostDuelModeSelect: doc.getElementById('arcade-ghost-duel-mode-select'),
+        arcadeGhostDuelModeHint: doc.getElementById('arcade-ghost-duel-mode-hint'),
         themeModeSelect: doc.getElementById('theme-mode-select'),
         themeFieldHint: doc.getElementById('theme-field-hint'),
         matchFieldHint: doc.getElementById('match-field-hint'),

@@ -16,6 +16,7 @@ export function ensureStartSetupLocalState(settings) {
         mapFilter: 'all',
         vehicleSearch: '',
         vehicleFilter: 'all',
+        arcadeGhostDuelMode: 'off',
     };
 }
 

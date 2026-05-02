@@ -2,6 +2,7 @@ export const SETTINGS_CHANGE_KEYS = Object.freeze({
     SESSION_TYPE: 'session.type',
     MODE_PATH: 'session.modePath',
     MULTIPLAYER_TRANSPORT: 'multiplayer.transport',
+    ARCADE_GHOST_DUEL_MODE: 'startSetup.arcadeGhostDuelMode',
     LOCAL_THEME_MODE: 'local.themeMode',
     LOCAL_SHADOW_QUALITY: 'local.shadowQuality',
     MODE: 'mode',

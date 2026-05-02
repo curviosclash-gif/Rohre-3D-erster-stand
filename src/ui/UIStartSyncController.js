@@ -52,6 +52,16 @@ import {
     resolveRuntimeSessionContract,
 } from '../shared/contracts/RuntimeSessionContract.js';
 import { hasConfiguredOnlineSignalingUrl } from '../shared/contracts/OnlineSignalingConfig.js';
+import {
+    ARCADE_GHOST_DUEL_MODES,
+    normalizeArcadeGhostDuelMode,
+} from '../shared/contracts/ArcadeGhostDuelContract.js';
+
+function resolveArcadeGhostDuelModeLabel(mode) {
+    return mode === ARCADE_GHOST_DUEL_MODES.SELF_LONGEST_GHOST
+        ? 'Selbstduell (laengste Spur)'
+        : 'Aus';
+}
 
 export class UIStartSyncController {
     /**
@@ -357,6 +367,15 @@ export class UIStartSyncController {
             multiplayerTransport: settings?.localSettings?.multiplayerTransport,
         });
         const isMultiplayerSession = sessionType === MENU_SESSION_TYPES.MULTIPLAYER;
+        const configuredArcadeGhostDuelMode = normalizeArcadeGhostDuelMode(
+            startSetup.arcadeGhostDuelMode,
+            ARCADE_GHOST_DUEL_MODES.OFF
+        );
+        startSetup.arcadeGhostDuelMode = configuredArcadeGhostDuelMode;
+        const ghostDuelSelectable = sessionType === MENU_SESSION_TYPES.SINGLE;
+        const effectiveArcadeGhostDuelMode = ghostDuelSelectable
+            ? configuredArcadeGhostDuelMode
+            : ARCADE_GHOST_DUEL_MODES.OFF;
         const hasActiveLobbySession = isMultiplayerSession && multiplayerSessionState?.joined === true;
         const knownVehicleIds = new Set(this._vehiclePreviewEntries.map((entry) => entry.id));
         const appendVehicleOption = (select, vehicleId) => {
@@ -390,6 +409,22 @@ export class UIStartSyncController {
         }
         if (this.ui.vehicleFilterSelect && this.ui.vehicleFilterSelect.value !== startSetup.vehicleFilter) {
             this.ui.vehicleFilterSelect.value = startSetup.vehicleFilter;
+        }
+        if (this.ui.arcadeGhostDuelModeSelect) {
+            this.ui.arcadeGhostDuelModeSelect.value = configuredArcadeGhostDuelMode;
+            this.ui.arcadeGhostDuelModeSelect.disabled = !ghostDuelSelectable;
+            this.ui.arcadeGhostDuelModeSelect.title = ghostDuelSelectable
+                ? 'Spielt im Einzelspieler deine laengste gespeicherte Spur ab.'
+                : 'Nur im Einzelspieler aktiv.';
+        }
+        if (this.ui.arcadeGhostDuelModeHint) {
+            if (ghostDuelSelectable) {
+                this.ui.arcadeGhostDuelModeHint.textContent = `Aktiv: ${resolveArcadeGhostDuelModeLabel(configuredArcadeGhostDuelMode)}`;
+            } else if (configuredArcadeGhostDuelMode === ARCADE_GHOST_DUEL_MODES.SELF_LONGEST_GHOST) {
+                this.ui.arcadeGhostDuelModeHint.textContent = 'Gespeichert: Selbstduell ist aktiv, sobald Single gewaehlt ist.';
+            } else {
+                this.ui.arcadeGhostDuelModeHint.textContent = 'Nur im Einzelspieler aktiv.';
+            }
         }
 
         if (this.ui.mapSelect) {
@@ -533,6 +568,11 @@ export class UIStartSyncController {
                 { label: 'Spielstil', value: modeLabel },
                 { label: 'Map', value: mapPreview.name },
                 { label: 'P1', value: vehiclePreviewP1.label },
+                {
+                    label: 'Ghost',
+                    value: resolveArcadeGhostDuelModeLabel(effectiveArcadeGhostDuelMode),
+                    muted: !ghostDuelSelectable,
+                },
                 { label: 'Ansicht', value: themeLabel },
             ];
             if (sessionType === MENU_SESSION_TYPES.SPLITSCREEN) {

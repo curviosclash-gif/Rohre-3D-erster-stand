@@ -30,6 +30,93 @@ export class MatchFlowLifecycleController {
         return this.matchFlowUiController;
     }
 
+    _resolveGhostRouteContext() {
+        const game = this.game;
+        const explicitRouteId = String(game?.arena?.currentMapDefinition?.parcours?.routeId || '').trim();
+        const runtimeRouteId = String(game?.arena?.runtimeMapDefinition?.parcours?.routeId || '').trim();
+        const fallbackMapKeys = [
+            game?.arena?.currentMapKey,
+            game?.runtimeConfig?.session?.mapKey,
+            game?.settings?.mapKey,
+            game?.mapKey,
+        ];
+        const routeAliases = [];
+        const seen = new Set();
+        const pushCandidate = (value) => {
+            const candidate = String(value || '').trim();
+            if (!candidate || seen.has(candidate)) return;
+            seen.add(candidate);
+            routeAliases.push(candidate);
+        };
+
+        pushCandidate(explicitRouteId);
+        pushCandidate(runtimeRouteId);
+        for (let i = 0; i < fallbackMapKeys.length; i += 1) {
+            pushCandidate(fallbackMapKeys[i]);
+        }
+
+        return {
+            routeId: routeAliases[0] || '',
+            routeAliases,
+        };
+    }
+
+    _resolveGhostRouteId() {
+        return this._resolveGhostRouteContext().routeId;
+    }
+
+    _requestGhostPlaybackForActiveRoute() {
+        const routeContext = this._resolveGhostRouteContext();
+        const routeId = routeContext.routeId;
+        if (!routeId || typeof this.runtimePort?.applyArcadeParcoursEvent !== 'function') {
+            return null;
+        }
+        return this.runtimePort.applyArcadeParcoursEvent({
+            type: 'ghost_start',
+            routeId,
+            routeAliases: routeContext.routeAliases,
+            source: 'match_round_start',
+        });
+    }
+
+    _normalizeGhostClipForLibrary(ghostClip = null) {
+        if (!ghostClip || typeof ghostClip !== 'object') return null;
+        const sourceDuration = Number(ghostClip.sourceDuration);
+        if (!Number.isFinite(sourceDuration) || sourceDuration <= 0) return null;
+        return {
+            ...ghostClip,
+            sourceDuration,
+            displayDuration: sourceDuration,
+        };
+    }
+
+    _persistRoundGhostForActiveRoute() {
+        const game = this.game;
+        const routeContext = this._resolveGhostRouteContext();
+        const routeId = routeContext.routeId;
+        if (!routeId || typeof this.runtimePort?.applyArcadeParcoursEvent !== 'function') {
+            return null;
+        }
+        const rawGhostClip = getLastRoundGhostClip(this.runtimePort, game, {
+            maxSourceDuration: Number.POSITIVE_INFINITY,
+            displayDuration: game.roundPause,
+        });
+        const ghostClip = this._normalizeGhostClipForLibrary(rawGhostClip);
+        if (!ghostClip) return null;
+        const totalTimeMs = Math.max(1, Math.round(ghostClip.sourceDuration * 1000));
+        return this.runtimePort.applyArcadeParcoursEvent({
+            type: 'finish',
+            routeId,
+            routeAliases: routeContext.routeAliases,
+            totalTimeMs,
+            penaltyTimeMs: 0,
+            segmentSplitsMs: [],
+            ghostClip,
+            persistLibraryOnly: true,
+            source: 'match_round_end',
+        });
+    }
+
     startRound() {
         const controller = this.controller;
         const game = this.game;
@@ -46,6 +133,7 @@ export class MatchFlowLifecycleController {
         }
 
         this.sessionOrchestrator?.resetRoundRuntime?.();
+        this._requestGhostPlaybackForActiveRoute();
 
         game.gameLoop.setTimeScale(1.0);
         controller.applyMatchUiState(roundStartTransition.uiState);
@@ -65,6 +153,7 @@ export class MatchFlowLifecycleController {
         const ghostClip = getLastRoundGhostClip(this.runtimePort, game, {
             displayDuration: game.roundPause,
         });
+        this._persistRoundGhostForActiveRoute();
         const huntSummary = controller._getMatchRuntimeProjection()?.hunt?.scoreboardSummary || '';
         if (huntSummary) {
             if (!roundEndPlan.uiState) roundEndPlan.uiState = {};

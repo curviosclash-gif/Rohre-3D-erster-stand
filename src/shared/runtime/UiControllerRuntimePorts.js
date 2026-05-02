@@ -129,6 +129,9 @@ export function createMatchFlowUiControllerPort(ports = null) {
     if (typeof arcadePort?.requestReplayPlayback === 'function') {
         controllerPort.requestArcadeReplayPlayback = () => arcadePort.requestReplayPlayback();
     }
+    if (typeof arcadePort?.applyParcoursEvent === 'function') {
+        controllerPort.applyArcadeParcoursEvent = (data = null) => arcadePort.applyParcoursEvent(data);
+    }
     // Transition adapters keep recorder/arcade follow-up work behind narrow UI seams.
     if (typeof recordingPort?.finalizeRound === 'function') {
         controllerPort.finalizeRoundRecording = (winner, players, options = undefined) => recordingPort.finalizeRound(winner, players, options);

@@ -13,15 +13,20 @@ export class ArcadeGhostRecorder {
     }
 
     startRecording(playerIndex, nowMs) {
+        const nextPlayerIdx = Math.max(0, Math.floor(Number(playerIndex) || 0));
+        if (this._recording && this._playerIdx !== nextPlayerIdx) return false;
         this._recording = true;
         this._frames = [];
         this._startMs = nowMs;
         this._lastSampleMs = -Infinity;
-        this._playerIdx = Math.max(0, Math.floor(Number(playerIndex) || 0));
+        this._playerIdx = nextPlayerIdx;
+        return true;
     }
 
     sample(player, nowMs) {
         if (!this._recording) return;
+        const sampledPlayerIdx = Number(player?.index);
+        if (!Number.isInteger(sampledPlayerIdx) || sampledPlayerIdx !== this._playerIdx) return;
         if (nowMs - this._lastSampleMs < SAMPLE_INTERVAL_MS) return;
         if (this._frames.length >= MAX_SAMPLES) return;
         this._lastSampleMs = nowMs;

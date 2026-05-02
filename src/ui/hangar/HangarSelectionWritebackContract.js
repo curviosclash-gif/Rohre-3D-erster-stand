@@ -7,6 +7,10 @@ import {
     HANGAR_MODES,
     resolveHangarUserFlow,
 } from '../../shared/contracts/HangarModeContract.js';
+import {
+    ARCADE_GHOST_DUEL_MODES,
+    normalizeArcadeGhostDuelMode,
+} from '../../shared/contracts/ArcadeGhostDuelContract.js';
 
 export const HANGAR_SELECTION_WRITEBACK_VERSION = 'hangar-selection-writeback.v1';
 
@@ -34,6 +38,7 @@ export const HANGAR_SELECTION_WRITEBACK_PATHS = Object.freeze({
     MODE_ARCADE_VEHICLE_PLAYER_2: 'settings.localSettings.startSetup.modeSelections.arcade.vehicles.PLAYER_2',
     MODE_FIGHT_VEHICLE_PLAYER_1: 'settings.localSettings.startSetup.modeSelections.fight.vehicles.PLAYER_1',
     MODE_FIGHT_VEHICLE_PLAYER_2: 'settings.localSettings.startSetup.modeSelections.fight.vehicles.PLAYER_2',
+    START_SETUP_ARCADE_GHOST_DUEL_MODE: 'settings.localSettings.startSetup.arcadeGhostDuelMode',
 });
 
 export const HANGAR_START_SETUP_PERSISTED_FIELDS = Object.freeze({
@@ -45,6 +50,7 @@ export const HANGAR_START_SETUP_PERSISTED_FIELDS = Object.freeze({
     MAP_FILTER: 'mapFilter',
     VEHICLE_SEARCH: 'vehicleSearch',
     VEHICLE_FILTER: 'vehicleFilter',
+    ARCADE_GHOST_DUEL_MODE: 'arcadeGhostDuelMode',
 });
 
 const VALID_HANGAR_SELECTION_MODE_SET = new Set(Object.values(HANGAR_SELECTION_MODES));
@@ -123,6 +129,10 @@ export function ensureHangarSelectionWritebackState(settings) {
     if (typeof startSetup.mapFilter !== 'string') startSetup.mapFilter = 'all';
     if (typeof startSetup.vehicleSearch !== 'string') startSetup.vehicleSearch = '';
     if (typeof startSetup.vehicleFilter !== 'string') startSetup.vehicleFilter = 'all';
+    startSetup.arcadeGhostDuelMode = normalizeArcadeGhostDuelMode(
+        startSetup.arcadeGhostDuelMode,
+        ARCADE_GHOST_DUEL_MODES.OFF
+    );
     return startSetup;
 }
 

@@ -84,23 +84,7 @@ export class GameRuntimeArcadeSupport {
         this.resetRunState({ preserveRecords: true });
     }
 
-    startRunIfEnabled() {
-        const runtimeState = this.getRuntimeState();
-        const runtimeConfig = runtimeState?.runtimeConfig || null;
-        if (!runtimeConfig?.arcade?.enabled) {
-            return null;
-        }
-        const strategy = runtimeState?.entityManager?.gameModeStrategy || null;
-        this.arcadeRunRuntime.setStrategy(strategy);
-        const existing = this.arcadeRunRuntime.getStateSnapshot?.();
-        if (existing && String(existing.phase || '').toLowerCase() !== 'finished') {
-            return existing;
-        }
-        const encounterPlan = buildArcadeSectorPlan({
-            seed: runtimeConfig?.arcade?.seed,
-            sectorCount: runtimeConfig?.arcade?.sectorCount,
-            difficulty: runtimeConfig?.bot?.activeDifficulty || runtimeConfig?.bot?.difficulty || 'normal',
-        });
+    _bindParcoursCallbacks(runtimeState = this.getRuntimeState()) {
         const parcoursSystem = runtimeState?.entityManager?._parcoursProgressSystem;
         if (parcoursSystem && typeof parcoursSystem.setXpEventCallback === 'function') {
             parcoursSystem.setXpEventCallback(
@@ -121,6 +105,26 @@ export class GameRuntimeArcadeSupport {
                 (clip) => entityManager?.playLastRoundGhost?.(clip)
             );
         }
+    }
+
+    startRunIfEnabled() {
+        const runtimeState = this.getRuntimeState();
+        const runtimeConfig = runtimeState?.runtimeConfig || null;
+        this._bindParcoursCallbacks(runtimeState);
+        if (!runtimeConfig?.arcade?.enabled) {
+            return null;
+        }
+        const strategy = runtimeState?.entityManager?.gameModeStrategy || null;
+        this.arcadeRunRuntime.setStrategy(strategy);
+        const existing = this.arcadeRunRuntime.getStateSnapshot?.();
+        if (existing && String(existing.phase || '').toLowerCase() !== 'finished') {
+            return existing;
+        }
+        const encounterPlan = buildArcadeSectorPlan({
+            seed: runtimeConfig?.arcade?.seed,
+            sectorCount: runtimeConfig?.arcade?.sectorCount,
+            difficulty: runtimeConfig?.bot?.activeDifficulty || runtimeConfig?.bot?.difficulty || 'normal',
+        });
 
         return this.arcadeRunRuntime.startRun({
             entityManager: runtimeState?.entityManager || null,
@@ -170,6 +174,10 @@ export class GameRuntimeArcadeSupport {
 
     requestReplayPlayback() {
         return this.arcadeRunRuntime.requestReplayPlayback?.();
+    }
+
+    applyParcoursEvent(data = null) {
+        return this.arcadeRunRuntime.applyParcoursLeaderboardEvent(data);
     }
 
     recordRoundEndTelemetry(payload = null, { recordMenuTelemetry = null } = {}) {

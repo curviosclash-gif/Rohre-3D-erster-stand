@@ -37,6 +37,23 @@ test('MatchFlow UI controller port forwards runtime projections when provided', 
     assert.equal(port.getMatchRuntimeProjection(), runtimeProjection);
 });
 
+test('MatchFlow UI controller port forwards arcade parcours events when provided', () => {
+    const calls = [];
+    const payload = { type: 'ghost_start', routeId: 'map_maze' };
+    const port = createMatchFlowUiControllerPort({
+        arcadePort: {
+            applyParcoursEvent(data = null) {
+                calls.push(data);
+                return 'ok';
+            },
+        },
+    });
+
+    const result = port.applyArcadeParcoursEvent(payload);
+    assert.equal(result, 'ok');
+    assert.deepEqual(calls, [payload]);
+});
+
 test('MatchFlowLifecycleController delegates returnToMenu to the injected runtime port', () => {
     const calls = [];
     const lifecycleController = new MatchFlowLifecycleController({
@@ -64,6 +81,168 @@ test('MatchFlowLifecycleController delegates returnToMenu to the injected runtim
 
     assert.equal(result, 'runtime-port-return');
     assert.deepEqual(calls, [{ reason: 'contract-test' }]);
+});
+
+test('MatchFlowLifecycleController startRound requests ghost playback by active route/map key', () => {
+    const arcadeEventCalls = [];
+    let resetRoundRuntimeCalls = 0;
+    let timeScaleValue = null;
+    let updateScoreHudCalls = 0;
+    let updateCrosshairCalls = 0;
+    const game = {
+        arena: {
+            currentMapDefinition: {
+                parcours: {
+                    routeId: 'route_delta',
+                },
+            },
+            currentMapKey: 'maze',
+        },
+        entityManager: {
+            clearLastRoundGhost() {},
+        },
+        ui: {
+            crosshairP1: { style: {} },
+            crosshairP2: { style: {} },
+        },
+        gameLoop: {
+            setTimeScale(value) {
+                timeScaleValue = value;
+            },
+        },
+        hudRuntimeSystem: {
+            updateScoreHud() {
+                updateScoreHudCalls += 1;
+            },
+        },
+        crosshairSystem: {
+            updateCrosshairs() {
+                updateCrosshairCalls += 1;
+            },
+        },
+    };
+    const lifecycleController = new MatchFlowLifecycleController({
+        matchFlowUiController: {
+            applyLifecycleTransition() {},
+            _clearArcadeOverlayPanel() {},
+            applyMatchUiState() {},
+        },
+        game,
+        runtimePort: {
+            applyArcadeParcoursEvent(data = null) {
+                arcadeEventCalls.push(data);
+            },
+        },
+        sessionOrchestrator: {
+            resetRoundRuntime() {
+                resetRoundRuntimeCalls += 1;
+            },
+        },
+        deriveRoundStartTransition: () => ({ uiState: { visibility: {} } }),
+    });
+
+    lifecycleController.startRound();
+
+    assert.equal(resetRoundRuntimeCalls, 1);
+    assert.equal(timeScaleValue, 1.0);
+    assert.equal(updateScoreHudCalls, 1);
+    assert.equal(updateCrosshairCalls, 1);
+    assert.equal(game.ui.crosshairP1.style.display, 'none');
+    assert.equal(game.ui.crosshairP2.style.display, 'none');
+    assert.deepEqual(arcadeEventCalls, [{
+        type: 'ghost_start',
+        routeId: 'route_delta',
+        routeAliases: ['route_delta', 'maze'],
+        source: 'match_round_start',
+    }]);
+});
+
+test('MatchFlowLifecycleController persists longest round ghost per route on round end', () => {
+    const arcadeEventCalls = [];
+    const playedGhosts = [];
+    const telemetryCalls = [];
+    const previewGhostClip = {
+        frames: [{ time: 0, players: [{ idx: 0 }] }, { time: 2.4, players: [{ idx: 0 }] }],
+        players: [{ idx: 0 }],
+        sourceDuration: 2.4,
+        displayDuration: 2.4,
+    };
+    const libraryGhostClip = {
+        frames: [{ time: 0, players: [{ idx: 0 }] }, { time: 5.6, players: [{ idx: 0 }] }],
+        players: [{ idx: 0 }],
+        sourceDuration: 5.6,
+        displayDuration: 3,
+    };
+    const game = {
+        state: '',
+        roundPause: 0,
+        arena: {
+            currentMapDefinition: {
+                parcours: {
+                    routeId: 'route_sigma',
+                },
+            },
+            currentMapKey: 'trench',
+        },
+        entityManager: {
+            players: [{ index: 0 }],
+            playLastRoundGhost(clip) {
+                playedGhosts.push(clip);
+            },
+            clearLastRoundGhost() {},
+            getHumanPlayers() {
+                return [{ index: 0 }];
+            },
+        },
+        roundStateController: {},
+        numBots: 1,
+        winsNeeded: 5,
+        hudRuntimeSystem: {
+            updateScoreHud() {},
+        },
+    };
+    const lifecycleController = new MatchFlowLifecycleController({
+        matchFlowUiController: {
+            _getMatchRuntimeProjection() {
+                return null;
+            },
+            applyMatchUiState() {},
+        },
+        game,
+        runtimePort: {
+            getLastRoundGhostClip(_players, options = undefined) {
+                if (options?.maxSourceDuration === Number.POSITIVE_INFINITY) {
+                    return libraryGhostClip;
+                }
+                return previewGhostClip;
+            },
+            applyArcadeParcoursEvent(data = null) {
+                arcadeEventCalls.push(data);
+                return { ok: true };
+            },
+        },
+        telemetryController: {
+            recordRoundEndTelemetry(payload) {
+                telemetryCalls.push(payload);
+            },
+        },
+        coordinateRoundEnd: () => ({ transition: { roundPause: 3, nextState: 'ROUND_END' } }),
+    });
+
+    lifecycleController.onRoundEnd(null, null);
+
+    assert.equal(game.state, 'ROUND_END');
+    assert.equal(game.roundPause, 3);
+    assert.equal(playedGhosts.length, 1);
+    assert.equal(playedGhosts[0], previewGhostClip);
+    assert.equal(telemetryCalls.length, 1);
+    assert.equal(arcadeEventCalls.length, 1);
+    assert.equal(arcadeEventCalls[0]?.type, 'finish');
+    assert.equal(arcadeEventCalls[0]?.routeId, 'route_sigma');
+    assert.deepEqual(arcadeEventCalls[0]?.routeAliases, ['route_sigma', 'trench']);
+    assert.equal(arcadeEventCalls[0]?.persistLibraryOnly, true);
+    assert.equal(arcadeEventCalls[0]?.totalTimeMs, 5600);
+    assert.equal(arcadeEventCalls[0]?.ghostClip?.displayDuration, 5.6);
 });
 
 test('MatchFlowTelemetryController binds hunt feedback through the extracted telemetry seam', () => {
@@ -428,6 +607,29 @@ test('MatchKernel consumer registry exposes interactive adapter and descriptor',
     }
 });
 
+test('arcadePort.applyParcoursEvent delegates to coordinator before facade', () => {
+    const calls = [];
+    const payload = { type: 'ghost_start', routeId: 'map_orbit' };
+    const port = createArcadePort({
+        getRuntimeCoordinator: () => ({
+            applyArcadeParcoursEvent(data) {
+                calls.push(['coordinator', data]);
+                return 'coordinator';
+            },
+        }),
+        getRuntimeFacade: () => ({
+            applyArcadeParcoursEvent(data) {
+                calls.push(['facade', data]);
+                return 'facade';
+            },
+        }),
+    });
+
+    const result = port.applyParcoursEvent(payload);
+    assert.equal(result, 'coordinator');
+    assert.deepEqual(calls, [['coordinator', payload]]);
+});
+
 test('arcadePort.tickSuddenDeath delegates to coordinator before facade (91.3.2)', () => {
     const calls = [];
     const port = createArcadePort({
@@ -611,6 +813,10 @@ test('GameRuntimeFacade arcade helpers delegate to arcade support seam (92.4.2)'
                 calls.push(['start']);
                 return 'start-result';
             },
+            applyParcoursEvent(data = null) {
+                calls.push(['parcours', data]);
+                return { ok: true };
+            },
             getMenuSurfaceState() {
                 calls.push(['menu-state']);
                 return { phase: 'intermission' };
@@ -623,14 +829,20 @@ test('GameRuntimeFacade arcade helpers delegate to arcade support seam (92.4.2)'
     };
 
     const startResult = GameRuntimeFacade.prototype.startArcadeRunIfEnabled.call(runtimeFacadeContext);
+    const parcoursResult = GameRuntimeFacade.prototype.applyArcadeParcoursEvent.call(
+        runtimeFacadeContext,
+        { type: 'ghost_start', routeId: 'route_1' }
+    );
     const menuStateResult = GameRuntimeFacade.prototype.getArcadeMenuSurfaceState.call(runtimeFacadeContext);
     const replayResult = GameRuntimeFacade.prototype.requestArcadeReplayPlayback.call(runtimeFacadeContext);
 
     assert.equal(startResult, 'start-result');
+    assert.deepEqual(parcoursResult, { ok: true });
     assert.deepEqual(menuStateResult, { phase: 'intermission' });
     assert.deepEqual(replayResult, { code: 'ok' });
     assert.deepEqual(calls, [
         ['start'],
+        ['parcours', { type: 'ghost_start', routeId: 'route_1' }],
         ['menu-state'],
         ['replay'],
     ]);

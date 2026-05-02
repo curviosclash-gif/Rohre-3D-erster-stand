@@ -7,6 +7,10 @@ import {
 } from './config/SettingsRuntimeContract.js';
 import { normalizeSessionType } from '../composition/core-ui/CoreSettingsPorts.js';
 import {
+    ARCADE_GHOST_DUEL_MODES,
+    normalizeArcadeGhostDuelMode,
+} from '../shared/contracts/ArcadeGhostDuelContract.js';
+import {
     createDefaultRecordingCaptureSettings,
     normalizeRecordingCaptureSettings,
 } from '../shared/contracts/RecordingCaptureContract.js';
@@ -64,6 +68,16 @@ function resolveArcadeSeed(settings = null, activeGameMode = GAME_MODE_TYPES.CLA
     const numBots = clampInteger(source.numBots, 0, 12, 0);
     const modePath = String(source?.localSettings?.modePath || 'normal').trim().toLowerCase();
     return hashSeed(`${mapKey}|${activeGameMode}|${numBots}|${modePath}`);
+}
+
+function resolveArcadeGhostDuelMode(settings = null, { sessionType = '' } = {}) {
+    if (sessionType !== 'single') {
+        return ARCADE_GHOST_DUEL_MODES.OFF;
+    }
+    return normalizeArcadeGhostDuelMode(
+        settings?.localSettings?.startSetup?.arcadeGhostDuelMode,
+        ARCADE_GHOST_DUEL_MODES.OFF
+    );
 }
 
 function resolveBotDifficulty(requestedDifficulty, botConfig) {
@@ -281,6 +295,7 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
             comboDecayPerSecond: clampSettingValue(arcadeSource.comboDecayPerSecond, { min: 0, max: 10 }, 1),
             maxMultiplier: clampInteger(arcadeSource.maxMultiplier, 1, 25, 8),
             replayHooksEnabled: arcadeSource.replayHooksEnabled !== false,
+            ghostDuelMode: resolveArcadeGhostDuelMode(source, { sessionType }),
         },
         recording: normalizeRecordingCaptureSettings(recordingSource, createDefaultRecordingCaptureSettings()),
         cameraPerspective: normalizeCameraPerspectiveSettings(

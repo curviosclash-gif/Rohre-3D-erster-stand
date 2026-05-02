@@ -109,18 +109,11 @@ export function resolveMatchStartValidationIssue({
     }
 
     const modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
-    if (mapExists && !isMapEligibleForModePath(maps?.[mapKey], modePath)) {
-        if (modePath === 'arcade') {
-            return {
-                message: 'Start nicht moeglich: Arcade erlaubt nur Parcours-Maps.',
-                fieldKey: 'map',
-                fieldMessage: 'Bitte eine Parcours-Map auswaehlen.',
-            };
-        }
+    if (mapExists && mapKey !== 'custom' && !isMapEligibleForModePath(maps?.[mapKey], modePath)) {
         return {
-            message: 'Start nicht moeglich: Parcours-Maps sind nur im Arcade-Modus verfuegbar.',
+            message: 'Start nicht moeglich: Die gewaehlte Map ist in diesem Build nicht startbar.',
             fieldKey: 'map',
-            fieldMessage: 'Modus auf Arcade wechseln oder eine Standard-Map waehlen.',
+            fieldMessage: 'Andere Map waehlen oder Map-Daten pruefen.',
         };
     }
 

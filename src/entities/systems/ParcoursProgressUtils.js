@@ -209,7 +209,9 @@ export function buildRouteFromParcours(parcoursRaw) {
         wrongOrderPenaltyMs: Math.max(0, Math.trunc(toFiniteNumber(rawRules.wrongOrderPenaltyMs, 2000))),
         errorIndicatorMs: Math.max(0, Math.trunc(toFiniteNumber(rawRules.errorIndicatorMs, 1400))),
         animateCheckpoints: rawRules.animateCheckpoints !== false,
-        showGhost: rawRules.showGhost === true,
+        // Ghost playback/recording is default-on for parcours routes.
+        // Individual maps may opt out via `showGhost: false`.
+        showGhost: rawRules.showGhost !== false,
     };
 
     const rawCheckpoints = Array.isArray(parcoursRaw.checkpoints) ? parcoursRaw.checkpoints : [];

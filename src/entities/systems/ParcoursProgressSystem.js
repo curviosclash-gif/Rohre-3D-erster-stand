@@ -163,14 +163,16 @@ export class ParcoursProgressSystem {
         if (state.startedAtMs <= 0) {
             state.startedAtMs = now;
             if (this._route.rules.showGhost) {
-                if (this._ghostRecorder) {
-                    this._ghostRecorder.startRecording(player.index, now);
+                const recorderStarted = this._ghostRecorder
+                    ? this._ghostRecorder.startRecording(player.index, now) === true
+                    : false;
+                if (recorderStarted) {
+                    this._leaderboardCallback?.({
+                        type: 'ghost_start',
+                        playerIndex: player.index,
+                        routeId: this._route.routeId,
+                    });
                 }
-                this._leaderboardCallback?.({
-                    type: 'ghost_start',
-                    playerIndex: player.index,
-                    routeId: this._route.routeId,
-                });
             }
         }
         state.lastCheckpointAtMs = now;

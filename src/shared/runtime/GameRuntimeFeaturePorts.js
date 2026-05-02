@@ -20,6 +20,10 @@ export function createArcadePort({ getRuntimeCoordinator, getRuntimeFacade }) {
             return getRuntimeCoordinator()?.requestArcadeReplayPlayback?.()
                 ?? getRuntimeFacade()?.requestArcadeReplayPlayback?.();
         },
+        applyParcoursEvent(data = null) {
+            return getRuntimeCoordinator()?.applyArcadeParcoursEvent?.(data)
+                ?? getRuntimeFacade()?.applyArcadeParcoursEvent?.(data);
+        },
         applyPendingIntermissionEffects(players = []) {
             const safePlayers = Array.isArray(players) ? players : [];
             return getRuntimeFacade()?.arcadeRunRuntime?.applyPendingIntermissionEffects?.({

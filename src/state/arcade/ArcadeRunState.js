@@ -10,6 +10,7 @@ const DEFAULT_ARCADE_RUN_CONFIG = Object.freeze({
     comboDecayPerSecond: 1,
     maxMultiplier: 8,
     replayHooksEnabled: true,
+    ghostDuelMode: 'off',
 });
 
 export const ARCADE_RUN_PHASES = Object.freeze({
@@ -23,6 +24,7 @@ export const ARCADE_RUN_PHASES = Object.freeze({
 const ARCADE_PHASE_SET = new Set(Object.values(ARCADE_RUN_PHASES));
 
 import { toSafeNumber, clampNumber, clampInteger } from '../../shared/utils/ArcadeUtils.js';
+import { normalizeArcadeGhostDuelMode } from '../../shared/contracts/ArcadeGhostDuelContract.js';
 
 function deepClone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -78,6 +80,7 @@ export function createArcadeRunConfig(source = null) {
         comboDecayPerSecond: clampNumber(input.comboDecayPerSecond, 0, 10, DEFAULT_ARCADE_RUN_CONFIG.comboDecayPerSecond),
         maxMultiplier: clampInteger(input.maxMultiplier, 1, 25, DEFAULT_ARCADE_RUN_CONFIG.maxMultiplier),
         replayHooksEnabled: input.replayHooksEnabled !== false,
+        ghostDuelMode: normalizeArcadeGhostDuelMode(input.ghostDuelMode, DEFAULT_ARCADE_RUN_CONFIG.ghostDuelMode),
     };
 }
 

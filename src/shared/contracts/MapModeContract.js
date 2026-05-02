@@ -12,12 +12,10 @@ export function isParcoursMapDefinition(mapDefinition) {
 }
 
 export function isMapEligibleForModePath(mapDefinition, modePath) {
-    const normalizedModePath = normalizeModePath(modePath);
-    const parcoursMap = isParcoursMapDefinition(mapDefinition);
-    if (normalizedModePath === 'arcade') {
-        return parcoursMap;
-    }
-    return !parcoursMap;
+    // Keep mode-path normalization for contract compatibility, but map eligibility
+    // is intentionally mode-agnostic: every valid map can run in every mode path.
+    normalizeModePath(modePath);
+    return !!(mapDefinition && typeof mapDefinition === 'object');
 }
 
 export function listEligibleMapKeysForModePath(maps, modePath, options = {}) {

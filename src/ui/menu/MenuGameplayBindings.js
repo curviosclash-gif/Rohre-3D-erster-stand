@@ -9,8 +9,6 @@ import {
     RECORDING_HUD_MODE,
 } from '../../shared/contracts/RecordingCaptureContract.js';
 import {
-    CAMERA_PERSPECTIVE_EFFECT_INTENSITY_MAX,
-    CAMERA_PERSPECTIVE_EFFECT_INTENSITY_MIN,
     CAMERA_PERSPECTIVE_MODE,
     createDefaultCameraPerspectiveSettings,
 } from '../../shared/contracts/CameraPerspectiveContract.js';
@@ -20,6 +18,13 @@ import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigCont
 import { bindMenuMultiplayerTransportButtons } from './MenuMultiplayerTransportBindings.js';
 import { createRuntimeSettingsLimitsForRuntime } from '../../shared/contracts/SettingsRuntimeLimitsContract.js';
 import { bindMenuExtrasButtons } from './MenuExtrasBindings.js';
+import { bindArcadeGhostDuelModeSelect } from './MenuArcadeGhostDuelBindings.js';
+import {
+    readCameraPerspectiveIntensityFromSlider,
+    resolveNormalCameraPerspectiveLabel,
+    resolveRecordingHudLabel,
+    resolveRecordingProfileLabel,
+} from './MenuRecordingCameraBindingOps.js';
 import {
     HANGAR_SELECTION_PLAYER_SLOTS,
     writeHangarMapSelection,
@@ -54,35 +59,6 @@ export function setupMenuGameplayBindings(ctx) {
             settings.cameraPerspective = createDefaultCameraPerspectiveSettings();
         }
         return settings.cameraPerspective;
-    };
-    const resolveRecordingProfileLabel = (profile) => (
-        profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
-            ? 'YouTube Shorts'
-            : 'Standard'
-    );
-    const resolveRecordingHudLabel = (hudMode) => (
-        hudMode === RECORDING_HUD_MODE.WITH_HUD
-            ? 'mit HUD'
-            : 'clean'
-    );
-    const resolveNormalCameraPerspectiveLabel = (mode) => {
-        if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT) return 'Cinematic Soft';
-        if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION) return 'Cinematic Action';
-        return 'Klassisch';
-    };
-    const clampCameraPerspectiveIntensity = (value, fallback = 1) => {
-        const numeric = Number(value);
-        if (!Number.isFinite(numeric)) return fallback;
-        return clamp(
-            numeric,
-            CAMERA_PERSPECTIVE_EFFECT_INTENSITY_MIN,
-            CAMERA_PERSPECTIVE_EFFECT_INTENSITY_MAX
-        );
-    };
-    const readCameraPerspectiveIntensityFromSlider = (input, fallback = 1) => {
-        const sliderValue = Number(input?.value);
-        if (!Number.isFinite(sliderValue)) return fallback;
-        return clampCameraPerspectiveIntensity(sliderValue / 100, fallback);
     };
     const resolveCurrentHangarModePath = () => String(settings?.localSettings?.modePath || 'normal').trim().toLowerCase() || 'normal';
     const isFightModePathActive = () => resolveCurrentHangarModePath() === 'fight';
@@ -250,6 +226,7 @@ export function setupMenuGameplayBindings(ctx) {
             emitSettingsChangedImmediate([keys.LOCAL_THEME_MODE]);
         });
     }
+    bindArcadeGhostDuelModeSelect({ ui, settings, bind, emitSettingsChangedImmediate, keys });
 
     bind(ui.botSlider, 'input', () => {
         settings.numBots = clamp(parseInt(ui.botSlider.value, 10), sessionLimits.numBots.min, sessionLimits.numBots.max);

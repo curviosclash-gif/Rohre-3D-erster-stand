@@ -2,6 +2,10 @@ import { DEFAULT_SHADOW_QUALITY, normalizeShadowQuality } from '../../shared/con
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
 import { MULTIPLAYER_TRANSPORTS } from '../../shared/contracts/RuntimeSessionContract.js';
 import {
+    ARCADE_GHOST_DUEL_MODES,
+    normalizeArcadeGhostDuelMode,
+} from '../../shared/contracts/ArcadeGhostDuelContract.js';
+import {
     createMenuEventPlaylistStateDefaults,
     createMenuLocalSettingsDefaults,
     createMenuStartSetupDefaults,
@@ -119,6 +123,16 @@ function normalizeEventPlaylistState(eventPlaylistState = null) {
     };
 }
 
+function normalizeStartSetupState(startSetup = null) {
+    const defaults = createMenuStartSetupDefaults();
+    const nextState = cloneObject(startSetup, defaults);
+    nextState.arcadeGhostDuelMode = normalizeArcadeGhostDuelMode(
+        nextState.arcadeGhostDuelMode,
+        defaults.arcadeGhostDuelMode || ARCADE_GHOST_DUEL_MODES.OFF
+    );
+    return nextState;
+}
+
 export function createMenuFeatureFlags(flags = null) {
     const source = flags && typeof flags === 'object' ? flags : {};
     return {
@@ -157,7 +171,7 @@ function normalizeLocalSettingsState(localSettings = null) {
         ? normalizeMultiplayerTransport(source.multiplayerTransport, legacyMultiplayerTransport)
         : '';
     const modePath = normalizeModePath(source.modePath, defaults.modePath);
-    const startSetup = cloneObject(source.startSetup, createMenuStartSetupDefaults());
+    const startSetup = normalizeStartSetupState(source.startSetup);
     const toolsState = cloneObject(source.toolsState, createMenuToolsStateDefaults());
     toolsState.activeSection = VALID_LEVEL4_SECTION_SET.has(String(toolsState.activeSection || '').trim())
         ? String(toolsState.activeSection || '').trim()

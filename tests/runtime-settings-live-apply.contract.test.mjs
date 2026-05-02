@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { ArcadeRunRuntime } from '../src/core/arcade/ArcadeRunRuntime.js';
+import { ARCADE_GHOST_LIBRARY_STORAGE_KEY } from '../src/state/arcade/ArcadeGhostLibrary.js';
+import { getRuntimeMapCatalog } from '../src/shared/contracts/RuntimeMapCatalogContract.js';
 import { registerSessionMenuEventHandlers } from '../src/core/runtime/menu-handlers/SessionMenuEventHandlers.js';
 import { createRuntimeConfigSnapshot } from '../src/core/RuntimeConfig.js';
 import { createDefaultSettingsSnapshotForRuntime } from '../src/core/settings/SettingsDefaultsFacade.js';
@@ -192,6 +194,7 @@ test('Settings override validation reports explicit limit-rule errors only once 
 
 test('V95 Runtime-Integration: override baseSettings merges into defaults and limitOverrides clamp runtime values', () => {
     const previousCurviosApp = globalThis.curviosApp;
+    const previousSettingsDefaultsContract = globalThis.settingsDefaultsContract;
     globalThis.curviosApp = {
         settingsDefaults: {
             getOverrideSnapshot: () => ({
@@ -210,6 +213,7 @@ test('V95 Runtime-Integration: override baseSettings merges into defaults and li
             }),
         },
     };
+    globalThis.settingsDefaultsContract = globalThis.curviosApp.settingsDefaults;
     try {
         const defaults = createDefaultSettingsSnapshotForRuntime();
         assert.equal(defaults.gameplay.itemAmount, 5);
@@ -223,12 +227,19 @@ test('V95 Runtime-Integration: override baseSettings merges into defaults and li
         } else {
             globalThis.curviosApp = previousCurviosApp;
         }
+        if (previousSettingsDefaultsContract === undefined) {
+            delete globalThis.settingsDefaultsContract;
+        } else {
+            globalThis.settingsDefaultsContract = previousSettingsDefaultsContract;
+        }
     }
 });
 
 test('V95 Runtime-Integration: missing curviosApp global leaves code-defaults untouched', () => {
     const previousCurviosApp = globalThis.curviosApp;
+    const previousSettingsDefaultsContract = globalThis.settingsDefaultsContract;
     delete globalThis.curviosApp;
+    delete globalThis.settingsDefaultsContract;
     try {
         const defaults = createDefaultSettingsSnapshotForRuntime();
         assert.equal(defaults.__overrideSkipped, undefined);
@@ -237,7 +248,39 @@ test('V95 Runtime-Integration: missing curviosApp global leaves code-defaults un
         if (previousCurviosApp !== undefined) {
             globalThis.curviosApp = previousCurviosApp;
         }
+        if (previousSettingsDefaultsContract !== undefined) {
+            globalThis.settingsDefaultsContract = previousSettingsDefaultsContract;
+        }
     }
+});
+
+test('Arcade ghost duel mode stays enabled for all single mode paths', () => {
+    const normalSnapshot = createRuntimeConfigSnapshot({
+        localSettings: {
+            sessionType: 'single',
+            modePath: 'normal',
+            startSetup: { arcadeGhostDuelMode: 'self_longest_ghost' },
+        },
+    });
+    assert.equal(normalSnapshot.arcade.ghostDuelMode, 'self_longest_ghost');
+
+    const fightSnapshot = createRuntimeConfigSnapshot({
+        localSettings: {
+            sessionType: 'single',
+            modePath: 'fight',
+            startSetup: { arcadeGhostDuelMode: 'self_longest_ghost' },
+        },
+    });
+    assert.equal(fightSnapshot.arcade.ghostDuelMode, 'self_longest_ghost');
+
+    const multiplayerSnapshot = createRuntimeConfigSnapshot({
+        localSettings: {
+            sessionType: 'multiplayer',
+            modePath: 'arcade',
+            startSetup: { arcadeGhostDuelMode: 'self_longest_ghost' },
+        },
+    });
+    assert.equal(multiplayerSnapshot.arcade.ghostDuelMode, 'off');
 });
 
 test('Arcade deriveRoundEndPlan routes PARCOURS_COMPLETE through completeParcoursSector', () => {
@@ -334,4 +377,255 @@ test('Arcade parcours leaderboard persists penaltyTimeMs separately from totalTi
     assert.equal(lastWrite?.key, 'cuviosclash.parcours-leaderboard.v1');
     assert.equal(lastWrite?.value?.unit_route?.[0]?.totalTimeMs, 3210);
     assert.equal(lastWrite?.value?.unit_route?.[0]?.penaltyTimeMs, 2000);
+});
+
+test('Arcade ghost_start replays only in self_longest_ghost mode and uses longest route ghost', () => {
+    const runtime = new ArcadeRunRuntime();
+    runtime._enabled = true;
+    runtime._config = { ghostDuelMode: 'self_longest_ghost' };
+    runtime._state = {};
+    const ghostClip = {
+        frames: [{ time: 0, players: [{ idx: 0 }] }, { time: 3.4, players: [{ idx: 0 }] }],
+        players: [{ idx: 0, color: 0xffffff }],
+        sourceDuration: 3.4,
+        displayDuration: 3.4,
+    };
+    runtime._ghostLibrary = {
+        route_alpha: {
+            routeId: 'route_alpha',
+            longestGhostClip: ghostClip,
+            durationMs: 3400,
+            updatedAt: '2026-05-01T10:00:00.000Z',
+        },
+    };
+
+    const playedClips = [];
+    runtime.setGhostPlaybackHandler((clip) => {
+        playedClips.push(clip);
+    });
+
+    runtime.applyParcoursLeaderboardEvent({
+        type: 'ghost_start',
+        routeId: 'route_alpha',
+    });
+    assert.equal(playedClips.length, 1);
+    assert.equal(playedClips[0]?.frames?.length, 2);
+
+    runtime.applyParcoursLeaderboardEvent({
+        type: 'ghost_start',
+        routeId: 'route_unknown',
+        routeAliases: ['map_unknown', 'route_alpha'],
+    });
+    assert.equal(playedClips.length, 2);
+    assert.equal(playedClips[1]?.frames?.length, 2);
+
+    runtime._config.ghostDuelMode = 'off';
+    runtime.applyParcoursLeaderboardEvent({
+        type: 'ghost_start',
+        routeId: 'route_alpha',
+    });
+    assert.equal(playedClips.length, 2);
+});
+
+test('Ghost duel playback remains available for single non-arcade runs', () => {
+    const runtime = new ArcadeRunRuntime();
+    runtime._enabled = false;
+    runtime._config = { ghostDuelMode: 'self_longest_ghost' };
+    runtime._state = null;
+    runtime._ghostLibrary = {
+        map_maze: {
+            routeId: 'map_maze',
+            longestGhostClip: {
+                frames: [{ time: 0, players: [{ idx: 0 }] }, { time: 5.1, players: [{ idx: 0 }] }],
+                players: [{ idx: 0 }],
+                sourceDuration: 5.1,
+                displayDuration: 5.1,
+            },
+            durationMs: 5100,
+            updatedAt: '2026-05-01T10:00:00.000Z',
+        },
+    };
+
+    const playedClips = [];
+    runtime.setGhostPlaybackHandler((clip) => {
+        playedClips.push(clip);
+    });
+
+    runtime.applyParcoursLeaderboardEvent({
+        type: 'ghost_start',
+        routeId: 'map_maze',
+    });
+
+    assert.equal(playedClips.length, 1);
+    assert.equal(playedClips[0]?.sourceDuration, 5.1);
+});
+
+test('Ghost duel route aliases resolve playback across all runtime maps', () => {
+    const runtime = new ArcadeRunRuntime();
+    runtime._enabled = false;
+    runtime._config = { ghostDuelMode: 'self_longest_ghost' };
+    runtime._state = null;
+    runtime._leaderboard = {};
+    runtime._ghostLibrary = {};
+    runtime.settingsManager = {
+        store: {
+            saveJsonRecord() {},
+        },
+    };
+    const maps = getRuntimeMapCatalog();
+    const mapEntries = Object.entries(maps || {});
+    const clip = {
+        frames: [{ time: 0, players: [{ idx: 0 }] }, { time: 4.2, players: [{ idx: 0 }] }],
+        players: [{ idx: 0 }],
+        sourceDuration: 4.2,
+        displayDuration: 4.2,
+    };
+
+    for (let i = 0; i < mapEntries.length; i += 1) {
+        const [mapKey, mapDefinition] = mapEntries[i];
+        const routeId = String(mapDefinition?.parcours?.routeId || '').trim();
+        const primaryRouteId = routeId || mapKey;
+        const aliases = routeId ? [mapKey] : [];
+        runtime.applyParcoursLeaderboardEvent({
+            type: 'finish',
+            routeId: primaryRouteId,
+            routeAliases: aliases,
+            totalTimeMs: 4200,
+            penaltyTimeMs: 0,
+            segmentSplitsMs: [],
+            ghostClip: clip,
+            persistLibraryOnly: true,
+        });
+
+        let playbackCount = 0;
+        runtime.setGhostPlaybackHandler(() => {
+            playbackCount += 1;
+        });
+        runtime.applyParcoursLeaderboardEvent({
+            type: 'ghost_start',
+            routeId: mapKey,
+            routeAliases: routeId ? [routeId] : [],
+        });
+        assert.equal(
+            playbackCount,
+            1,
+            `Ghost playback alias lookup failed for map "${mapKey}" (route "${primaryRouteId}")`
+        );
+    }
+});
+
+test('Ghost library can persist finish clips in non-arcade library-only mode', () => {
+    const writes = [];
+    const runtime = new ArcadeRunRuntime();
+    runtime._enabled = false;
+    runtime._config = { ghostDuelMode: 'self_longest_ghost' };
+    runtime._state = null;
+    runtime._leaderboard = {};
+    runtime._ghostLibrary = {};
+    runtime.settingsManager = {
+        store: {
+            saveJsonRecord(key, value) {
+                writes.push({ key, value });
+            },
+        },
+    };
+
+    const result = runtime.applyParcoursLeaderboardEvent({
+        type: 'finish',
+        routeId: 'map_downtown',
+        routeAliases: ['downtown_alias'],
+        totalTimeMs: 6500,
+        penaltyTimeMs: 0,
+        segmentSplitsMs: [],
+        ghostClip: {
+            frames: [{ time: 0, players: [{ idx: 0 }] }, { time: 6.5, players: [{ idx: 0 }] }],
+            players: [{ idx: 0 }],
+            sourceDuration: 6.5,
+            displayDuration: 6.5,
+        },
+        persistLibraryOnly: true,
+    });
+
+    assert.equal(result?.inserted, false);
+    assert.equal(result?.persistLibraryOnly, true);
+    assert.deepEqual(result?.ghostRouteIds, ['map_downtown', 'downtown_alias']);
+    assert.equal(result?.longestGhostUpdated, true);
+    assert.equal(runtime._ghostLibrary.map_downtown.durationMs, 6500);
+    assert.equal(runtime._ghostLibrary.downtown_alias.durationMs, 6500);
+
+    const leaderboardWrites = writes.filter((entry) => entry.key === 'cuviosclash.parcours-leaderboard.v1');
+    const ghostLibraryWrites = writes.filter((entry) => entry.key === ARCADE_GHOST_LIBRARY_STORAGE_KEY);
+    assert.equal(leaderboardWrites.length, 0);
+    assert.equal(ghostLibraryWrites.length, 1);
+    assert.equal(ghostLibraryWrites[0]?.value?.map_downtown?.durationMs, 6500);
+    assert.equal(ghostLibraryWrites[0]?.value?.downtown_alias?.durationMs, 6500);
+});
+
+test('Arcade finish updates longest ghost library by durationMs and keeps shorter runs', () => {
+    const writes = [];
+    const runtime = new ArcadeRunRuntime();
+    runtime._enabled = true;
+    runtime._config = { ghostDuelMode: 'self_longest_ghost' };
+    runtime._state = {};
+    runtime._leaderboard = {};
+    runtime._ghostLibrary = {};
+    runtime._activeVehicleId = 'ship5';
+    runtime.settingsManager = {
+        store: {
+            saveJsonRecord(key, value) {
+                writes.push({ key, value });
+            },
+        },
+    };
+
+    const clipLong = {
+        frames: [{ time: 0, players: [{ idx: 0 }] }, { time: 4.8, players: [{ idx: 0 }] }],
+        players: [{ idx: 0 }],
+        sourceDuration: 4.8,
+        displayDuration: 4.8,
+    };
+    const clipShort = {
+        frames: [{ time: 0, players: [{ idx: 0 }] }, { time: 2.9, players: [{ idx: 0 }] }],
+        players: [{ idx: 0 }],
+        sourceDuration: 2.9,
+        displayDuration: 2.9,
+    };
+
+    const first = runtime.applyParcoursLeaderboardEvent({
+        type: 'finish',
+        routeId: 'route_alpha',
+        totalTimeMs: 4800,
+        penaltyTimeMs: 0,
+        segmentSplitsMs: [1200, 2400, 3600],
+        ghostClip: clipLong,
+    });
+    assert.equal(first?.longestGhostUpdated, true);
+    assert.equal(runtime._ghostLibrary.route_alpha.durationMs, 4800);
+
+    const second = runtime.applyParcoursLeaderboardEvent({
+        type: 'finish',
+        routeId: 'route_alpha',
+        totalTimeMs: 2900,
+        penaltyTimeMs: 0,
+        segmentSplitsMs: [800, 1600, 2400],
+        ghostClip: clipShort,
+    });
+    assert.equal(second?.longestGhostUpdated, false);
+    assert.equal(second?.longestGhostReason, 'not_longer');
+    assert.equal(runtime._ghostLibrary.route_alpha.durationMs, 4800);
+
+    const third = runtime.applyParcoursLeaderboardEvent({
+        type: 'finish',
+        routeId: 'route_alpha',
+        totalTimeMs: 5200,
+        penaltyTimeMs: 0,
+        segmentSplitsMs: [1300, 2600, 3900],
+        ghostClip: clipLong,
+    });
+    assert.equal(third?.longestGhostUpdated, true);
+    assert.equal(runtime._ghostLibrary.route_alpha.durationMs, 5200);
+
+    const ghostLibraryWrites = writes.filter((entry) => entry.key === ARCADE_GHOST_LIBRARY_STORAGE_KEY);
+    assert.equal(ghostLibraryWrites.length, 2);
+    assert.equal(ghostLibraryWrites[1]?.value?.route_alpha?.durationMs, 5200);
 });

@@ -98,6 +98,7 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             mapFilter: 'all',
             vehicleSearch: '',
             vehicleFilter: 'all',
+            arcadeGhostDuelMode: 'off',
         },
         toolsState: {
             level4Open: false,

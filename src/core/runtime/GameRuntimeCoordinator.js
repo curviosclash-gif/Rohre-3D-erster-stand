@@ -124,6 +124,10 @@ export class GameRuntimeCoordinator {
         return this.getRuntimeFacade()?.startArcadeRunIfEnabled?.();
     }
 
+    applyArcadeParcoursEvent(data = null) {
+        return this.getRuntimeFacade()?.applyArcadeParcoursEvent?.(data);
+    }
+
     restartRound() {
         return this.getRuntimeFacade()?.restartRound?.();
     }

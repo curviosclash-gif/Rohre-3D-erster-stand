@@ -187,6 +187,7 @@ export class GameRuntimeFacade {
     }
 
     startArcadeRunIfEnabled() { return this._arcadeSupport.startRunIfEnabled(); }
+    applyArcadeParcoursEvent(data = null) { return this._arcadeSupport.applyParcoursEvent(data); }
 
     _resetArcadeRunState() { this._arcadeSupport.resetRunState({ preserveRecords: true }); }
     getArcadeRunState() { return this._arcadeSupport.getRunState(); }
