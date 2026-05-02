@@ -125,3 +125,30 @@ Evidence:
 - `data/training/ppo/bt93s2r6/full_matrix_predicate_repair_gate.json`
 - Command: `python python/scripts/bt93s2r6_full_matrix_predicate_repair_gate.py --write-report`
 <!-- BT93S2R6.4-END -->
+
+<!-- BT93S2R6.99-START -->
+## 93S2R6.99 Closure
+
+- Result: `resultClass=full-matrix-predicate-green`, `ok=True`, `gatePassed=True`
+- Full Matrix: `9` scenarios x `13` actions = `338` probes
+- Materialisierte Repairs: S2R5 `33`, S2R6 `52`, kombiniert `65`
+- Null-Counts: predicate=`0`, window=`0`, measurement=`0`, retainedV2=`0`, direction=`0`, fairness=`0`, neutral=`0`, negative=`0`
+- Training/Holdout/Optimizer: `0` / `0` / `0`
+- OpensNext: `['93S2R3.4-Recheck']`
+
+S2R6.99 schliesst nur die Full-Matrix Predicate-/PreAction-, retained-v2- und
+Minimum-Window-Messgueltigkeit. Gruen oeffnet ausschliesslich einen frischen
+`93S2R3.4-Recheck`; `93S2R3.99`, `BT93S2.3-Recheck`, `93S2.4`,
+`BT93T/U/W/O/P/94A`, Candidate, Freeze, Holdout, Promote, Rollout,
+PPO-Validate, BT95 und produktive Runtime bleiben geschlossen.
+
+Evidence:
+
+- `data/training/ppo/bt93s2r6/bt93s2r6_closure_gate_report.json`
+- Command: `python python/scripts/bt93s2r6_closure_gate.py --write-report`
+
+Naechster Schritt:
+
+- Claim fresh 93S2R3.4-Recheck via /fix-planung. Warum: BT93S2R6.99 closes the full 9-scenario/13-action/338-probe predicate, retained-v2 and minimum-window repair with all required zero-count gates.
+- Keep 93S2R3.99, BT93S2.3-Recheck, 93S2.4 and BT93T/U/W/O/P/94A closed until the fresh S2R3.4-Recheck proves measurement validity. Warum: S2R6 green proves only measurement validity; it is not action quality, reward ordering, safety, PPO quality, candidate, holdout, runtime-load, or rollout evidence.
+<!-- BT93S2R6.99-END -->
