@@ -1,9 +1,13 @@
+/* eslint-disable max-lines */
 // ============================================
 // PlayerInputSystem.js - resolves human and bot player input
 // ============================================
 
 import { createLogger } from '../../shared/logging/Logger.js';
-import { createGameplayCameraState } from '../../shared/contracts/CameraModeContract.js';
+import {
+    createGameplayCameraState,
+    resolveCameraModeIndexFromModes,
+} from '../../shared/contracts/CameraModeContract.js';
 import { sanitizeBotAction } from '../ai/actions/BotActionContract.js';
 
 const logger = createLogger('PlayerInputSystem');
@@ -538,12 +542,24 @@ export class PlayerInputSystem {
         }
 
         const gameplayCameraState = createGameplayCameraState(player?.gameplayConfig || null);
+        const fallbackCameraModeIndex = resolveCameraModeIndexFromModes(
+            player?.gameplayConfig?.CAMERA?.MODES,
+            'THIRD_PERSON'
+        );
         player.cockpitCamera = gameplayCameraState.cockpitCamera;
-        player.cameraMode = gameplayCameraState.cameraModeIndex;
         if (player.index < entityManager.renderer.cameraModes.length) {
-            entityManager.renderer.cameraModes[player.index] = gameplayCameraState.cameraModeIndex;
+            if (!Number.isFinite(Number(entityManager.renderer.cameraModes[player.index]))) {
+                entityManager.renderer.cameraModes[player.index] = fallbackCameraModeIndex;
+            }
+            player.cameraMode = Number(entityManager.renderer.cameraModes[player.index]) || fallbackCameraModeIndex;
+        } else {
+            player.cameraMode = fallbackCameraModeIndex;
         }
         if (input.cameraSwitch) {
+            entityManager.renderer.cycleCamera(player.index);
+            if (player.index < entityManager.renderer.cameraModes.length) {
+                player.cameraMode = Number(entityManager.renderer.cameraModes[player.index]) || player.cameraMode;
+            }
             input.cameraSwitch = false;
         }
         return input;

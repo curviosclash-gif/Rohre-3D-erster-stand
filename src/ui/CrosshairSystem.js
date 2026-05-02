@@ -70,14 +70,20 @@ export class CrosshairSystem {
 
     _shouldShowScreenCrosshair(player, fallbackGameplayConfig = null) {
         if (!player) return false;
+        const gameplayConfig = fallbackGameplayConfig || resolveGameplayConfig(this.game);
+        const cameraModeId = String(
+            player?.cameraModeId
+            || gameplayConfig?.CAMERA?.MODES?.[player?.cameraMode]
+            || resolveGameplayCameraModeId(gameplayConfig)
+            || GAMEPLAY_CAMERA_MODE_ID
+        ).trim() || GAMEPLAY_CAMERA_MODE_ID;
         if (typeof player?.planarMode === 'boolean') {
             if (player.planarMode) return true;
-            return String(player?.cameraModeId || GAMEPLAY_CAMERA_MODE_ID) !== GAMEPLAY_CAMERA_MODE_ID;
+            return cameraModeId !== GAMEPLAY_CAMERA_MODE_ID;
         }
 
-        const gameplayConfig = fallbackGameplayConfig || resolveGameplayConfig(this.game);
         if (gameplayConfig.GAMEPLAY?.PLANAR_MODE === true) return true;
-        return resolveGameplayCameraModeId(gameplayConfig) !== GAMEPLAY_CAMERA_MODE_ID;
+        return cameraModeId !== GAMEPLAY_CAMERA_MODE_ID;
     }
 
     _updateCrosshairPosition(player, crosshairElement, projection = null) {

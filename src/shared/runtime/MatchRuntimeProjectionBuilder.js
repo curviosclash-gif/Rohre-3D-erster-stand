@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { GAME_STATE_IDS } from '../contracts/GameStateIds.js';
-import { createGameplayCameraState } from '../contracts/CameraModeContract.js';
 import { resolveGameplayConfig } from '../contracts/GameplayConfigContract.js';
 import { createMatchRuntimeProjection } from '../contracts/MatchRuntimeProjectionContract.js';
 
@@ -63,7 +62,7 @@ function buildPlayerHudProjection({ runtimeState, game, entityManager, player })
         entityRuntimeConfig: player?.entityRuntimeConfig || null,
     });
     const playerConfig = gameplayConfig?.PLAYER || {};
-    const gameplayCameraState = createGameplayCameraState(gameplayConfig);
+    const cameraModeId = gameplayConfig?.CAMERA?.MODES?.[player?.cameraMode] || 'THIRD_PERSON';
     const aimDirection = typeof player?.getAimDirection === 'function'
         ? player.getAimDirection(TMP_AIM_DIRECTION)
         : null;
@@ -90,7 +89,7 @@ function buildPlayerHudProjection({ runtimeState, game, entityManager, player })
         itemUseCooldownRemaining: Math.max(0, Number(player?.itemUseCooldownRemaining) || 0),
         shootCooldown: Math.max(0, Number(player?.shootCooldown) || 0),
         planarMode: gameplayConfig?.GAMEPLAY?.PLANAR_MODE === true,
-        cameraModeId: gameplayCameraState.cameraModeId,
+        cameraModeId: String(cameraModeId || 'THIRD_PERSON'),
         traversal: buildTraversalProjection(entityManager, player?.index),
     };
 }

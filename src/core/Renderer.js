@@ -9,9 +9,6 @@ import { RenderViewportSystem } from './renderer/RenderViewportSystem.js';
 import { SceneRootManager } from './renderer/SceneRootManager.js';
 import { RenderQualityController } from './renderer/RenderQualityController.js';
 import { RecordingCapturePipeline } from './renderer/RecordingCapturePipeline.js';
-import { createGameplayCameraState } from '../shared/contracts/CameraModeContract.js';
-
-const LIVE_GAMEPLAY_CAMERA_STATE = createGameplayCameraState(CONFIG);
 
 export class Renderer {
     constructor(canvas) {
@@ -95,12 +92,7 @@ export class Renderer {
     }
 
     createCamera(_index) {
-        const camera = this.cameraRigSystem.createCamera(this._getAspect());
-        const cameraIndex = this.cameras.length - 1;
-        if (cameraIndex >= 0) {
-            this.cameraModes[cameraIndex] = LIVE_GAMEPLAY_CAMERA_STATE.cameraModeIndex;
-        }
-        return camera;
+        return this.cameraRigSystem.createCamera(this._getAspect());
     }
 
     setSplitScreen(enabled) {
@@ -112,14 +104,11 @@ export class Renderer {
         if (!Number.isInteger(playerIndex) || playerIndex < 0 || playerIndex >= this.cameraModes.length) {
             return;
         }
-        this.cameraModes[playerIndex] = LIVE_GAMEPLAY_CAMERA_STATE.cameraModeIndex;
+        this.cameraRigSystem.cycleCamera(playerIndex);
     }
 
     getCameraMode(playerIndex) {
-        if (Number.isInteger(playerIndex) && playerIndex >= 0 && playerIndex < this.cameraModes.length) {
-            this.cameraModes[playerIndex] = LIVE_GAMEPLAY_CAMERA_STATE.cameraModeIndex;
-        }
-        return LIVE_GAMEPLAY_CAMERA_STATE.cameraModeId;
+        return this.cameraRigSystem.getCameraMode(playerIndex);
     }
 
     triggerCameraShake(playerIndex, intensity = 0.2, duration = 0.2) {

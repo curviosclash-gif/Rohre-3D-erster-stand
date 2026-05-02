@@ -168,6 +168,7 @@ export class HUD {
             : fallbackGameplayConfig.GAMEPLAY?.PLANAR_MODE === true;
         const cameraModeId = String(
             player?.cameraModeId
+            || fallbackGameplayConfig.CAMERA?.MODES?.[player?.cameraMode]
             || resolveGameplayCameraModeId(fallbackGameplayConfig)
             || GAMEPLAY_CAMERA_MODE_ID
         ).trim() || GAMEPLAY_CAMERA_MODE_ID;
