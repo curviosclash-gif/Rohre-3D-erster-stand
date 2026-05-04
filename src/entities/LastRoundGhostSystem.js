@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { validateGhostClip } from '../shared/contracts/GhostClipContract.js';
 
 const SHARED_GHOST_GEOMETRIES = {};
 
@@ -85,44 +86,24 @@ function disposeEntry(entry) {
     }
 }
 
-function getSnapshotPlayer(snapshot, playerIndex) {
-    const players = Array.isArray(snapshot?.players) ? snapshot.players : [];
-    for (let i = 0; i < players.length; i++) {
-        const candidate = players[i];
-        if (Number(candidate?.idx) === playerIndex) {
-            return candidate;
-        }
-    }
-    return null;
-}
-
-function resolveFramePair(frames, playbackTime) {
+function buildPlaybackFrames(frames) {
     const safeFrames = Array.isArray(frames) ? frames : [];
-    if (safeFrames.length === 0) {
-        return { previous: null, next: null, alpha: 0 };
-    }
-    if (safeFrames.length === 1) {
-        return { previous: safeFrames[0], next: safeFrames[0], alpha: 0 };
-    }
-
-    const clampedTime = Math.max(0, Number(playbackTime) || 0);
-    for (let i = 1; i < safeFrames.length; i++) {
-        const next = safeFrames[i];
-        if (clampedTime <= Number(next?.time) || i === safeFrames.length - 1) {
-            const previous = safeFrames[i - 1];
-            const prevTime = Number(previous?.time) || 0;
-            const nextTime = Number(next?.time) || prevTime;
-            const span = Math.max(0.0001, nextTime - prevTime);
-            return {
-                previous,
-                next,
-                alpha: THREE.MathUtils.clamp((clampedTime - prevTime) / span, 0, 1),
-            };
+    const playbackFrames = new Array(safeFrames.length);
+    for (let frameIndex = 0; frameIndex < safeFrames.length; frameIndex += 1) {
+        const sourceFrame = safeFrames[frameIndex];
+        const sourcePlayers = Array.isArray(sourceFrame?.players) ? sourceFrame.players : [];
+        const playerLookup = Object.create(null);
+        for (let poseIndex = 0; poseIndex < sourcePlayers.length; poseIndex += 1) {
+            const pose = sourcePlayers[poseIndex];
+            playerLookup[pose.idx] = pose;
         }
+        playbackFrames[frameIndex] = {
+            time: Number(sourceFrame?.time) || 0,
+            players: sourcePlayers,
+            playerLookup,
+        };
     }
-
-    const last = safeFrames[safeFrames.length - 1];
-    return { previous: last, next: last, alpha: 0 };
+    return playbackFrames;
 }
 
 export class LastRoundGhostSystem {
@@ -138,9 +119,12 @@ export class LastRoundGhostSystem {
         this._frames = [];
         this._active = false;
         this._elapsed = 0;
+        this._lastPlaybackTime = 0;
+        this._frameCursor = 1;
         this._displayDuration = 3;
         this._sourceDuration = 0;
         this._playbackRate = 1;
+        this._routeId = '';
         this._tmpQuatA = new THREE.Quaternion();
         this._tmpQuatB = new THREE.Quaternion();
     }
@@ -165,17 +149,22 @@ export class LastRoundGhostSystem {
         this._active = false;
         this._elapsed = 0;
         this._frames = [];
+        this._lastPlaybackTime = 0;
+        this._frameCursor = 1;
         this.root.visible = false;
+        this._routeId = '';
         this._clearEntries();
     }
 
     playClip(clip = null) {
         this.clear();
-        if (!clip || !Array.isArray(clip.frames) || clip.frames.length < 2) {
+        const clipValidation = validateGhostClip(clip);
+        if (!clipValidation.valid || !clipValidation.clip) {
             return false;
         }
+        const safeClip = clipValidation.clip;
 
-        const playerMeta = Array.isArray(clip.players) ? clip.players : [];
+        const playerMeta = Array.isArray(safeClip.players) ? safeClip.players : [];
         for (let i = 0; i < playerMeta.length; i++) {
             const entry = buildGhostEntry(playerMeta[i]);
             this._entries.push(entry);
@@ -187,11 +176,14 @@ export class LastRoundGhostSystem {
             return false;
         }
 
-        this._frames = clip.frames;
-        this._sourceDuration = Math.max(0.0001, Number(clip.sourceDuration) || Number(clip.frames[clip.frames.length - 1]?.time) || 0.0001);
-        this._displayDuration = Math.max(0.35, Number(clip.displayDuration) || this._sourceDuration);
+        this._frames = buildPlaybackFrames(safeClip.frames);
+        this._sourceDuration = Math.max(0.0001, Number(safeClip.sourceDuration) || Number(safeClip.frames[safeClip.frames.length - 1]?.time) || 0.0001);
+        this._displayDuration = Math.max(0.35, Number(safeClip.displayDuration) || this._sourceDuration);
         this._playbackRate = this._sourceDuration / this._displayDuration;
         this._active = true;
+        this._frameCursor = Math.min(1, Math.max(0, this._frames.length - 1));
+        this._lastPlaybackTime = 0;
+        this._routeId = typeof safeClip.routeId === 'string' ? safeClip.routeId : '';
         this._ensureAttached();
         this.root.visible = true;
         this.update(0);
@@ -208,12 +200,29 @@ export class LastRoundGhostSystem {
             ? (this._elapsed % this._displayDuration)
             : this._elapsed;
         const playbackTime = Math.min(this._sourceDuration, cycleTime * this._playbackRate);
-        const framePair = resolveFramePair(this._frames, playbackTime);
+        if (playbackTime < this._lastPlaybackTime) {
+            this._frameCursor = Math.min(1, Math.max(0, this._frames.length - 1));
+        }
+        while (
+            this._frameCursor < this._frames.length - 1
+            && playbackTime > (Number(this._frames[this._frameCursor]?.time) || 0)
+        ) {
+            this._frameCursor += 1;
+        }
+        const nextFrame = this._frames[this._frameCursor] || this._frames[this._frames.length - 1] || null;
+        const previousFrame = this._frames[Math.max(0, this._frameCursor - 1)] || nextFrame;
+        const previousTime = Number(previousFrame?.time) || 0;
+        const nextTime = Number(nextFrame?.time) || previousTime;
+        const alpha = nextTime > previousTime
+            ? THREE.MathUtils.clamp((playbackTime - previousTime) / (nextTime - previousTime), 0, 1)
+            : 0;
+        const bobPhase = this._elapsed * 4;
+        this._lastPlaybackTime = playbackTime;
 
         for (let i = 0; i < this._entries.length; i++) {
             const entry = this._entries[i];
-            const prevPose = getSnapshotPlayer(framePair.previous, entry.idx);
-            const nextPose = getSnapshotPlayer(framePair.next, entry.idx);
+            const prevPose = previousFrame?.playerLookup?.[entry.idx] || null;
+            const nextPose = nextFrame?.playerLookup?.[entry.idx] || null;
             const poseA = prevPose || nextPose;
             const poseB = nextPose || prevPose;
 
@@ -224,11 +233,11 @@ export class LastRoundGhostSystem {
 
             entry.group.visible = true;
             entry.group.position.set(
-                THREE.MathUtils.lerp(Number(poseA.x) || 0, Number(poseB.x) || 0, framePair.alpha),
-                THREE.MathUtils.lerp(Number(poseA.y) || 0, Number(poseB.y) || 0, framePair.alpha)
+                THREE.MathUtils.lerp(Number(poseA.x) || 0, Number(poseB.x) || 0, alpha),
+                THREE.MathUtils.lerp(Number(poseA.y) || 0, Number(poseB.y) || 0, alpha)
                     + 0.55
-                    + Math.sin(this._elapsed * 4 + entry.idx) * 0.08,
-                THREE.MathUtils.lerp(Number(poseA.z) || 0, Number(poseB.z) || 0, framePair.alpha)
+                    + Math.sin(bobPhase + entry.idx) * 0.08,
+                THREE.MathUtils.lerp(Number(poseA.z) || 0, Number(poseB.z) || 0, alpha)
             );
 
             this._tmpQuatA.set(
@@ -243,7 +252,7 @@ export class LastRoundGhostSystem {
                 Number(poseB.qz) || 0,
                 Number(poseB.qw) || 1
             );
-            entry.group.quaternion.copy(this._tmpQuatA).slerp(this._tmpQuatB, framePair.alpha);
+            entry.group.quaternion.copy(this._tmpQuatA).slerp(this._tmpQuatB, alpha);
         }
     }
 
@@ -262,8 +271,10 @@ export class LastRoundGhostSystem {
 
         return {
             active: this._active,
+            routeId: this._routeId,
             frameCount: this._frames.length,
             entryCount: this._entries.length,
+            frameCursor: this._frameCursor,
             elapsed: Number(this._elapsed.toFixed(3)),
             displayDuration: Number(this._displayDuration.toFixed(3)),
             sourceDuration: Number(this._sourceDuration.toFixed(3)),

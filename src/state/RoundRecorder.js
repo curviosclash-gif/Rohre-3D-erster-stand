@@ -3,6 +3,10 @@
 // ============================================
 
 import { createLogger } from '../shared/logging/Logger.js';
+import {
+    normalizeGhostClip,
+    normalizeGhostPlayerMeta,
+} from '../shared/contracts/GhostClipContract.js';
 import { RoundEventStore } from './recorder/RoundEventStore.js';
 
 const logger = createLogger('RoundRecorder');
@@ -208,11 +212,26 @@ export class RoundRecorder {
         if (!this.shouldCaptureFrames() || !Array.isArray(players)) return;
         this._frameCounter++;
         if (this._frameCounter % this._snapshotInterval !== 0) return;
+        this.captureSnapshotNow(players);
+    }
+
+    captureSnapshotNow(players = []) {
+        if (!this.shouldCaptureFrames() || !Array.isArray(players)) return false;
         this._snapshotStore.capture(players);
+        return true;
     }
 
     getLastRoundGhostClip(players = [], options = {}) {
-        const orderedSnapshots = this._snapshotStore.getOrderedSnapshots();
+        let orderedSnapshots = this._snapshotStore.getOrderedSnapshots();
+        if (orderedSnapshots.length < 2 && Array.isArray(players) && players.length > 0) {
+            this.captureSnapshotNow(players);
+            orderedSnapshots = this._snapshotStore.getOrderedSnapshots();
+            if (orderedSnapshots.length < 2) {
+                // Keep a deterministic fallback clip even under severe frame throttling.
+                this.captureSnapshotNow(players);
+                orderedSnapshots = this._snapshotStore.getOrderedSnapshots();
+            }
+        }
         if (orderedSnapshots.length < 2) return null;
 
         const maxSourceDuration = Math.max(0.5, Number(options.maxSourceDuration) || 12);
@@ -254,20 +273,22 @@ export class RoundRecorder {
         if (normalizedFrames.length < 2 || sourceDuration <= 0) return null;
 
         const clipPlayers = Array.isArray(players)
-            ? players.map((player) => ({
-                idx: Number(player?.index) || 0,
-                color: Number(player?.color) || 0xffffff,
-                isBot: !!player?.isBot,
-                modelScale: Math.max(0.6, Number(player?.modelScale) || 1),
-            }))
+            ? players
+                .map((player) => normalizeGhostPlayerMeta({
+                    idx: player?.index,
+                    color: player?.color,
+                    isBot: player?.isBot,
+                    modelScale: player?.modelScale,
+                }))
+                .filter(Boolean)
             : [];
 
-        return {
+        return normalizeGhostClip({
             sourceDuration,
             displayDuration: Math.max(0.5, Number(options.displayDuration) || 3),
             frames: normalizedFrames,
             players: clipPlayers,
-        };
+        });
     }
 
     dump() {

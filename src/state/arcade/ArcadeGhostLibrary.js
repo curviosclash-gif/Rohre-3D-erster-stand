@@ -1,3 +1,5 @@
+import { normalizeGhostClip, validateGhostClip } from '../../shared/contracts/GhostClipContract.js';
+
 const ARCADE_GHOST_LIBRARY_STORAGE_KEY = 'cuviosclash.arcade-ghost-library.v1';
 
 function normalizeString(value, fallback = '') {
@@ -18,27 +20,12 @@ function isPlainObject(value) {
     return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
-function normalizeGhostClip(ghostClip) {
-    if (!isPlainObject(ghostClip)) return null;
-    const frames = ghostClip.frames;
-    if (!Array.isArray(frames) || frames.length < 2) return null;
-    try {
-        return cloneObject(ghostClip);
-    } catch {
-        return null;
-    }
-}
-
 function deriveDurationMsFromGhostClip(ghostClip) {
-    if (!isPlainObject(ghostClip)) return 0;
     const sourceDurationMs = toSafeDurationMs(Number(ghostClip?.sourceDuration) * 1000);
     if (sourceDurationMs > 0) return sourceDurationMs;
     const displayDurationMs = toSafeDurationMs(Number(ghostClip?.displayDuration) * 1000);
     if (displayDurationMs > 0) return displayDurationMs;
-    const frames = Array.isArray(ghostClip.frames) ? ghostClip.frames : [];
-    if (frames.length < 2) return 0;
-    const tailTimeSeconds = Number(frames[frames.length - 1]?.time);
-    return toSafeDurationMs(tailTimeSeconds * 1000);
+    return 0;
 }
 
 function createGhostLibraryEntry(routeId, source = null) {
@@ -120,14 +107,15 @@ export function upsertLongestGhostByRoute(
         };
     }
 
-    const safeClip = normalizeGhostClip(ghostClip);
-    if (!safeClip) {
+    const clipValidation = validateGhostClip(ghostClip);
+    if (!clipValidation.valid || !clipValidation.clip) {
         return {
             ghostLibrary: normalizeGhostLibrary(ghostLibrary),
             changed: false,
-            reason: 'invalid_clip',
+            reason: clipValidation.reason === 'invalid_duration' ? 'invalid_duration' : 'invalid_clip',
         };
     }
+    const safeClip = clipValidation.clip;
 
     const explicitDurationMs = toSafeDurationMs(durationMs);
     const derivedDurationMs = deriveDurationMsFromGhostClip(safeClip);

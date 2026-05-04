@@ -28,17 +28,41 @@ export class ParcoursProgressSystem {
     setGhostRecorder(recorder) {
         this._ghostRecorder = recorder && typeof recorder.sample === 'function' ? recorder : null;
     }
+    _playerOwnsGhostRecording(player) {
+        if (!this._ghostRecorder?.isRecording || !player || !Number.isInteger(player.index)) return false;
+        return typeof this._ghostRecorder.isOwnedBy === 'function'
+            ? this._ghostRecorder.isOwnedBy(player.index)
+            : player?.isBot !== true;
+    }
+    _clearGhostRecording(reason = 'reset') {
+        if (!this._ghostRecorder) return;
+        if (typeof this._ghostRecorder.cancelRecording === 'function' && this._ghostRecorder.isRecording === true) {
+            this._ghostRecorder.cancelRecording(reason);
+            return;
+        }
+        this._ghostRecorder.reset?.();
+    }
+    _cancelGhostRecordingForPlayer(player, reason = 'cancelled') {
+        if (!this._ghostRecorder || player?.isBot === true || !Number.isInteger(player?.index)) return false;
+        if (!this._playerOwnsGhostRecording(player)) return false;
+        if (typeof this._ghostRecorder.cancelRecording === 'function') {
+            return this._ghostRecorder.cancelRecording(reason, player.index) === true;
+        }
+        this._ghostRecorder.reset?.();
+        return true;
+    }
     isEnabled() {
         return !!this._route;
     }
     reset() {
+        this._clearGhostRecording('parcours-reset');
         this._route = null;
         this._playerStates.clear();
         this._completionOrder.length = 0;
-        this._ghostRecorder?.reset?.();
         this.entityManager?.arena?._portalGateSystem?.checkpointRingRuntime?.setProgressProvider?.(null);
     }
     startRound(players = []) {
+        this._clearGhostRecording('round-start');
         this._route = buildRouteFromParcours(this.entityManager?.arena?.currentMapDefinition?.parcours);
         this._playerStates.clear();
         this._completionOrder.length = 0;
@@ -133,6 +157,7 @@ export class ParcoursProgressSystem {
         if (!state || state.completed) return;
 
         const reason = normalizeString(options.cause, 'death');
+        this._cancelGhostRecordingForPlayer(player, `death:${reason}`);
         if (this._route.rules.resetOnDeath) {
             resetParcoursProgressState(state, {
                 countReset: true,
@@ -162,9 +187,15 @@ export class ParcoursProgressSystem {
         this._setCheckpointCooldown(state, entry.id, now);
         if (state.startedAtMs <= 0) {
             state.startedAtMs = now;
-            if (this._route.rules.showGhost) {
+            const shouldStartGhostRecording = this._route.rules.showGhost && player?.isBot !== true;
+            if (shouldStartGhostRecording) {
                 const recorderStarted = this._ghostRecorder
-                    ? this._ghostRecorder.startRecording(player.index, now) === true
+                    ? this._ghostRecorder.startRecording(player.index, now, {
+                        routeId: this._route.routeId,
+                        isBot: player?.isBot === true,
+                        color: player?.color,
+                        modelScale: player?.modelScale,
+                    }) === true
                     : false;
                 if (recorderStarted) {
                     this._leaderboardCallback?.({
@@ -251,6 +282,7 @@ export class ParcoursProgressSystem {
     }
 
     _registerSegmentTimeout(player, state, now) {
+        this._cancelGhostRecordingForPlayer(player, 'segment-timeout');
         if (this._route?.rules?.resetToLastValid) {
             rewindParcoursProgressState(state, this._route, {
                 now,
@@ -310,8 +342,10 @@ export class ParcoursProgressSystem {
         if (finishXpResult?.earned > 0) {
             this._notifyPlayer(player, `+${finishXpResult.earned} XP (Parcours)`);
         }
-        const ghostClip = this._route.rules.showGhost
-            ? (this._ghostRecorder?.stopRecording?.() || null)
+        const shouldFinalizeGhost = this._route.rules.showGhost && player?.isBot !== true;
+        const recorderOwnedByPlayer = this._playerOwnsGhostRecording(player);
+        const ghostClip = shouldFinalizeGhost && recorderOwnedByPlayer
+            ? (this._ghostRecorder?.stopRecording?.(player.index) || null)
             : null;
         this._leaderboardCallback?.({
             type: 'finish',
@@ -339,7 +373,7 @@ export class ParcoursProgressSystem {
         const state = this._ensurePlayerState(player.index);
         if (!state || state.completed) return null;
 
-        if (state.startedAtMs > 0 && this._ghostRecorder?.isRecording) {
+        if (state.startedAtMs > 0 && this._playerOwnsGhostRecording(player)) {
             this._ghostRecorder.sample(player, now);
         }
 
