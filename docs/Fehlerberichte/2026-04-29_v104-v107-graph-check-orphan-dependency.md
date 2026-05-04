@@ -2,7 +2,7 @@
 
 ## Kontext
 - Arbeitsstand: Umsetzung `V104.1` (Inventarisierung + Zielmatrix + Dead-Code-Klassifizierung) inkl. Wissensgraph-Update.
-- User-Wunsch: vorhandene Zusatzänderungen aktiv mit einbeziehen und mit committen.
+- User-Wunsch: vorhandene Zusatzaenderungen aktiv mit einbeziehen und mit committen.
 
 ## Fehlerbild
 - `npm run graph:check` faellt reproduzierbar mit:
@@ -21,7 +21,7 @@
 - `scripts/check-knowledge-graph.mjs` (validiert Meta-Abhaengigkeit gegen Basis-Kante)
 
 ## Bereits versuchte Schritte
-- V107-Dependency-Zeilen im Master temporär wiederhergestellt und erneuter Build/Check.
+- V107-Dependency-Zeilen im Master temporaer wiederhergestellt und erneuter Build/Check.
 - Ergebnis unveraendert, da fuer `V107` weiterhin keine kanonische Basis-Kante im erwarteten Graph-Pfad vorhanden ist.
 
 ## Status
