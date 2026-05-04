@@ -36,83 +36,107 @@ function createFpsTracker(windowSize = FPS_TRACKER_WINDOW) {
     };
 }
 
-function isCinematicRecordingActive(game) {
-    const recorder = game?.mediaRecorderSystem;
+function isCinematicRecordingActive(recorder) {
     if (!recorder || recorder.isRecording?.() !== true) return false;
     const profile = recorder.getRecordingCaptureSettings?.()?.profile;
     return isCinematicCaptureProfile(profile);
 }
 
-function resolveEffectiveQualityLabel(game) {
-    const effectiveQuality = game?.renderer?.getQualityState?.()?.effectiveQuality;
+function resolveEffectiveQualityLabel(renderer, isLowQuality = false) {
+    const effectiveQuality = renderer?.getQualityState?.()?.effectiveQuality;
     if (effectiveQuality === 'LOW' || effectiveQuality === 'HIGH') {
         return effectiveQuality;
     }
-    return game?.isLowQuality ? 'LOW' : 'HIGH';
+    return isLowQuality ? 'LOW' : 'HIGH';
+}
+
+export function createRuntimeDiagnosticsRuntimeAccess(runtime) {
+    const game = runtime && typeof runtime === 'object' ? runtime : null;
+    return Object.freeze({
+        isKeyCaptureActive: () => !!game?.keyCapture,
+        getRenderer: () => game?.renderer || null,
+        getMediaRecorderSystem: () => game?.mediaRecorderSystem || null,
+        showStatusToast(message, durationMs, tone) {
+            game?._showStatusToast?.(message, durationMs, tone);
+        },
+        getRenderDelta: () => Number(game?._renderDelta),
+        getEntityManager: () => game?.entityManager || null,
+        getRuntimePerfProfiler: () => game?.runtimePerfProfiler || null,
+        getState: () => game?.state || null,
+    });
 }
 
 export class RuntimeDiagnosticsSystem {
-    constructor(game) {
-        this.game = game;
+    constructor(runtimeAccess = {}) {
+        this.runtimeAccess = runtimeAccess && typeof runtimeAccess === 'object'
+            ? runtimeAccess
+            : {};
         this._onKeyDown = (event) => this._handleKeyDown(event);
-
-        game._adaptiveTimer = 0;
-        game._statsTimer = 0;
-        game.isLowQuality = false;
-        game.stats = null;
-        game._fpsTracker = createFpsTracker();
+        this._adaptiveTimer = 0;
+        this._statsTimer = 0;
+        this._isLowQuality = false;
+        this._statsElement = null;
+        this._fpsTracker = createFpsTracker();
 
         window.addEventListener('keydown', this._onKeyDown);
     }
 
     _handleKeyDown(event) {
-        const game = this.game;
-        if (game.keyCapture) return;
+        if (this.runtimeAccess.isKeyCaptureActive?.()) return;
+
+        const renderer = this.runtimeAccess.getRenderer?.() || null;
+        const recorder = this.runtimeAccess.getMediaRecorderSystem?.() || null;
 
         if (event.code === 'KeyP') {
-            game.isLowQuality = !game.isLowQuality;
-            const quality = game.isLowQuality ? 'LOW' : 'HIGH';
-            game.renderer.setQuality(quality);
-            if (quality === 'LOW' && isCinematicRecordingActive(game)) {
-                game._showStatusToast('Grafik: Niedrig vorgemerkt (waehrend Cinematic-Aufnahme bleibt Hoch)');
+            this._isLowQuality = !this._isLowQuality;
+            const quality = this._isLowQuality ? 'LOW' : 'HIGH';
+            renderer?.setQuality?.(quality);
+            if (quality === 'LOW' && isCinematicRecordingActive(recorder)) {
+                this.runtimeAccess.showStatusToast?.(
+                    'Grafik: Niedrig vorgemerkt (waehrend Cinematic-Aufnahme bleibt Hoch)'
+                );
             } else {
-                game._showStatusToast(`Grafik: ${quality === 'LOW' ? 'Niedrig (Schnell)' : 'Hoch (Schoen)'}`);
+                this.runtimeAccess.showStatusToast?.(
+                    `Grafik: ${quality === 'LOW' ? 'Niedrig (Schnell)' : 'Hoch (Schoen)'}`
+                );
             }
             return;
         }
 
         if (event.code !== 'KeyO') return;
 
-        if (!game.stats) {
+        if (!this._statsElement) {
             // Intentional runtime-debug adapter: stats overlay stays in core and is not part of gameplay UI.
-            game.stats = document.createElement('div');
-            game.stats.style.cssText = 'position:fixed;top:10px;left:10px;color:#0f0;font:13px/1.5 monospace;z-index:1000;pointer-events:none;background:rgba(0,0,0,0.6);padding:8px 12px;border-radius:6px;min-width:200px;white-space:pre-wrap;';
-            document.body.appendChild(game.stats);
-            game._statsTimer = 0;
+            this._statsElement = document.createElement('div');
+            this._statsElement.style.cssText = 'position:fixed;top:10px;left:10px;color:#0f0;font:13px/1.5 monospace;z-index:1000;pointer-events:none;background:rgba(0,0,0,0.6);padding:8px 12px;border-radius:6px;min-width:200px;white-space:pre-wrap;';
+            document.body.appendChild(this._statsElement);
+            this._statsTimer = 0;
         } else {
-            game.stats.remove();
-            game.stats = null;
+            this._statsElement.remove();
+            this._statsElement = null;
         }
     }
 
     update(dt) {
-        const game = this.game;
-        const renderDt = Number(game?._renderDelta);
-        game._fpsTracker.update(Number.isFinite(renderDt) && renderDt > 0 ? renderDt : dt);
+        const renderer = this.runtimeAccess.getRenderer?.() || null;
+        const entityManager = this.runtimeAccess.getEntityManager?.() || null;
+        const recorder = this.runtimeAccess.getMediaRecorderSystem?.() || null;
+        const renderDt = this.runtimeAccess.getRenderDelta?.();
+        this._fpsTracker.update(Number.isFinite(renderDt) && renderDt > 0 ? renderDt : dt);
 
-        if (game.stats) {
-            game._statsTimer = (game._statsTimer || 0) + dt;
-            if (game._statsTimer >= 0.25) {
-                game._statsTimer = 0;
-                const info = game.renderer.renderer.info;
-                const fps = Math.round(game._fpsTracker.avg);
+        if (this._statsElement) {
+            this._statsTimer += dt;
+            if (this._statsTimer >= 0.25) {
+                this._statsTimer = 0;
+                const info = renderer.renderer.info;
+                const fps = Math.round(this._fpsTracker.avg);
                 const draws = info.render.calls || 0;
                 const tris = info.render.triangles || 0;
                 const geos = info.memory.geometries || 0;
                 const texs = info.memory.textures || 0;
-                const players = game.entityManager ? game.entityManager.players.filter((player) => player.alive).length : 0;
-                const quality = resolveEffectiveQualityLabel(game);
-                const perfSnapshot = game.runtimePerfProfiler?.getSnapshot?.({
+                const players = entityManager ? entityManager.players.filter((player) => player.alive).length : 0;
+                const quality = resolveEffectiveQualityLabel(renderer, this._isLowQuality);
+                const perfSnapshot = this.runtimeAccess.getRuntimePerfProfiler?.()?.getSnapshot?.({
                     windowSize: 240,
                     spikeEventsLimit: 0,
                 }) || null;
@@ -121,7 +145,7 @@ export class RuntimeDiagnosticsSystem {
                 const frameP99Ms = perfSnapshot?.frameMs?.p99 || 0;
                 const spikeRecent = perfSnapshot?.spikes?.recent || 0;
                 const spikeThreshold = perfSnapshot?.spikes?.thresholdMs || 0;
-                game.stats.innerHTML =
+                this._statsElement.innerHTML =
                     `<b style="color:${fps < 30 ? '#f44' : fps < 50 ? '#fa0' : '#0f0'}">FPS: ${fps}</b>\n` +
                     `Draw Calls: ${draws}\n` +
                     `Dreiecke: ${(tris / 1000).toFixed(1)}k\n` +
@@ -134,27 +158,27 @@ export class RuntimeDiagnosticsSystem {
             }
         }
 
-        game._adaptiveTimer = (game._adaptiveTimer || 0) + dt;
-        if (game._adaptiveTimer >= 3.0) {
-            game._adaptiveTimer = 0;
+        this._adaptiveTimer += dt;
+        if (this._adaptiveTimer >= 3.0) {
+            this._adaptiveTimer = 0;
             if (
-                game._fpsTracker.avg < 30
-                && !game.isLowQuality
-                && game.state === GAME_STATE_IDS.PLAYING
-                && !isCinematicRecordingActive(game)
+                this._fpsTracker.avg < 30
+                && !this._isLowQuality
+                && this.runtimeAccess.getState?.() === GAME_STATE_IDS.PLAYING
+                && !isCinematicRecordingActive(recorder)
             ) {
-                game.isLowQuality = true;
-                game.renderer.setQuality('LOW');
-                game._showStatusToast('Grafik automatisch reduziert');
+                this._isLowQuality = true;
+                renderer?.setQuality?.('LOW');
+                this.runtimeAccess.showStatusToast?.('Grafik automatisch reduziert');
             }
         }
     }
 
     dispose() {
         window.removeEventListener('keydown', this._onKeyDown);
-        if (this.game?.stats) {
-            this.game.stats.remove();
-            this.game.stats = null;
+        if (this._statsElement) {
+            this._statsElement.remove();
+            this._statsElement = null;
         }
     }
 }

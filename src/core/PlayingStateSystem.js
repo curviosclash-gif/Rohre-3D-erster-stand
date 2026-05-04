@@ -4,9 +4,47 @@
 
 import { SimStateSnapshot } from './SimStateSnapshot.js';
 
+export function createPlayingStateRuntimeAccess(runtime) {
+    const game = runtime && typeof runtime === 'object' ? runtime : null;
+    return Object.freeze({
+        getRenderFrameId: () => game?.gameLoop?.renderFrameId || 0,
+        wasPausePressed: () => game?.input?.wasPressed?.('Escape') === true,
+        pauseMatch() {
+            game?.matchFlowUiController?.pause?.();
+        },
+        updatePlanarAimAssist(dt) {
+            game?._updatePlanarAimAssist?.(dt);
+        },
+        getEntityManager: () => game?.entityManager || null,
+        getInput: () => game?.input || null,
+        getPowerupManager: () => game?.powerupManager || null,
+        getParticles: () => game?.particles || null,
+        getArena: () => game?.arena || null,
+        tickSuddenDeath(dt) {
+            game?.runtimePorts?.arcadePort?.tickSuddenDeath?.(dt);
+        },
+        updatePlayingHudTick(dt) {
+            game?.hudRuntimeSystem?.updatePlayingHudTick?.(dt);
+        },
+        applyPlayingTimeScaleFromEffects() {
+            game?._applyPlayingTimeScaleFromEffects?.();
+        },
+        getElapsedTime: () => game?.gameLoop?.elapsedTime || 0,
+        getHuntState: () => game?.huntState || null,
+        getRenderer: () => game?.renderer || null,
+        getRenderTiming: () => game?.gameLoop?.getRenderTiming?.() || null,
+        getFixedStep: () => Number(game?.gameLoop?.fixedStep) || (1 / 60),
+        getRuntimeProjectionPort: () => game?.runtimeBundle?.ports?.runtimeProjectionPort || null,
+        getRuntimePerfProfiler: () => game?.runtimePerfProfiler || null,
+        getCrosshairSystem: () => game?.crosshairSystem || null,
+    });
+}
+
 export class PlayingStateSystem {
-    constructor(game) {
-        this.game = game;
+    constructor(runtimeAccess = {}) {
+        this.runtimeAccess = runtimeAccess && typeof runtimeAccess === 'object'
+            ? runtimeAccess
+            : {};
         this._lastOverheatSnapshotVersion = -1;
         this._simSnapshot = null;
         this._simSnapshotTick = 0;
@@ -31,13 +69,14 @@ export class PlayingStateSystem {
     }
 
     _syncHuntOverheatSnapshot() {
-        const game = this.game;
-        if (!game.huntState || !game.entityManager?.getHuntOverheatSnapshot) return;
+        const huntState = this.runtimeAccess.getHuntState?.() || null;
+        const entityManager = this.runtimeAccess.getEntityManager?.() || null;
+        if (!huntState || !entityManager?.getHuntOverheatSnapshot) return;
 
-        const snapshot = game.entityManager.getHuntOverheatSnapshot();
+        const snapshot = entityManager.getHuntOverheatSnapshot();
         if (!snapshot || typeof snapshot !== 'object') {
-            if (game.huntState.overheatByPlayer !== snapshot) {
-                game.huntState.overheatByPlayer = snapshot || {};
+            if (huntState.overheatByPlayer !== snapshot) {
+                huntState.overheatByPlayer = snapshot || {};
             }
             this._lastOverheatSnapshotVersion = -1;
             return;
@@ -49,23 +88,23 @@ export class PlayingStateSystem {
                 return;
             }
             this._lastOverheatSnapshotVersion = version;
-        } else if (game.huntState.overheatByPlayer === snapshot) {
+        } else if (huntState.overheatByPlayer === snapshot) {
             return;
         }
 
-        game.huntState.overheatByPlayer = snapshot;
+        huntState.overheatByPlayer = snapshot;
     }
 
     update(dt) {
-        const game = this.game;
-        const renderFrameId = game.gameLoop?.renderFrameId || 0;
+        const entityManager = this.runtimeAccess.getEntityManager?.() || null;
+        const renderFrameId = this.runtimeAccess.getRenderFrameId?.() || 0;
 
-        if (game.input.wasPressed('Escape')) {
-            game.matchFlowUiController.pause();
+        if (this.runtimeAccess.wasPausePressed?.()) {
+            this.runtimeAccess.pauseMatch?.();
             return;
         }
 
-        game._updatePlanarAimAssist(dt);
+        this.runtimeAccess.updatePlanarAimAssist?.(dt);
 
         // V84: drive simulation through MatchKernel when an adapter is present;
         // fall back to direct calls for backwards compatibility during migration.
@@ -73,23 +112,23 @@ export class PlayingStateSystem {
             this._kernelAdapter.tick(dt, renderFrameId);
             this._syncHuntOverheatSnapshot();
         } else {
-            game.entityManager.update(dt, game.input, renderFrameId);
+            entityManager.update(dt, this.runtimeAccess.getInput?.(), renderFrameId);
             this._syncHuntOverheatSnapshot();
-            game.powerupManager.update(dt);
-            game.particles.update(dt);
-            game.arena.update(dt);
+            this.runtimeAccess.getPowerupManager?.()?.update?.(dt);
+            this.runtimeAccess.getParticles?.()?.update?.(dt);
+            this.runtimeAccess.getArena?.()?.update?.(dt);
         }
 
-        game.runtimePorts?.arcadePort?.tickSuddenDeath?.(dt);
-        game.hudRuntimeSystem.updatePlayingHudTick(dt);
-        game._applyPlayingTimeScaleFromEffects();
+        this.runtimeAccess.tickSuddenDeath?.(dt);
+        this.runtimeAccess.updatePlayingHudTick?.(dt);
+        this.runtimeAccess.applyPlayingTimeScaleFromEffects?.();
 
         // N6: opt-in sim state snapshot capture (zero-alloc when enabled)
         if (this._simSnapshot?.enabled) {
             this._simSnapshot.capture(
                 this._simSnapshotTick++,
-                game.gameLoop?.elapsedTime || 0,
-                game.entityManager
+                this.runtimeAccess.getElapsedTime?.() || 0,
+                entityManager
             );
         }
     }
@@ -118,20 +157,20 @@ export class PlayingStateSystem {
     }
 
     render(alpha = 1, renderDelta = null) {
-        const game = this.game;
-        if (!game?.entityManager) {
+        const entityManager = this.runtimeAccess.getEntityManager?.() || null;
+        if (!entityManager) {
             this._matchRenderProjection = null;
             return;
         }
 
         const numericAlpha = Number(alpha);
         const renderAlpha = Number.isFinite(numericAlpha) ? Math.max(0, Math.min(1, numericAlpha)) : 1;
-        const renderTiming = game?.gameLoop?.getRenderTiming?.() || null;
+        const renderTiming = this.runtimeAccess.getRenderTiming?.() || null;
         const numericRenderDelta = Number(renderTiming?.stabilizedDt ?? renderDelta);
         const cameraDt = Number.isFinite(numericRenderDelta)
             ? Math.max(1 / 240, Math.min(0.05, numericRenderDelta))
-            : (Number(game?.gameLoop?.fixedStep) || (1 / 60));
-        game?.renderer?.cameraRigSystem?.setFrameTiming?.({
+            : this.runtimeAccess.getFixedStep?.();
+        this.runtimeAccess.getRenderer?.()?.cameraRigSystem?.setFrameTiming?.({
             frameId: Number(renderTiming?.frameId) || 0,
             rawDt: Number(renderTiming?.rawDt),
             dt: cameraDt,
@@ -139,13 +178,14 @@ export class PlayingStateSystem {
             reason: renderTiming?.resetReason || '',
         });
 
-        game.entityManager.renderInterpolatedTransforms(renderAlpha);
-        this._matchRenderProjection = game?.runtimeBundle?.ports?.runtimeProjectionPort?.getMatchRenderProjection?.({
+        entityManager.renderInterpolatedTransforms(renderAlpha);
+        this._matchRenderProjection = this.runtimeAccess.getRuntimeProjectionPort?.()?.getMatchRenderProjection?.({
             renderAlpha,
         }) || null;
-        const cameraStart = game.runtimePerfProfiler?.startSample?.();
-        game.entityManager.updateCameras(cameraDt, renderAlpha, true, this._matchRenderProjection);
-        game.runtimePerfProfiler?.endSample?.('camera', cameraStart);
-        game.crosshairSystem.updateCrosshairs();
+        const runtimePerfProfiler = this.runtimeAccess.getRuntimePerfProfiler?.() || null;
+        const cameraStart = runtimePerfProfiler?.startSample?.();
+        entityManager.updateCameras(cameraDt, renderAlpha, true, this._matchRenderProjection);
+        runtimePerfProfiler?.endSample?.('camera', cameraStart);
+        this.runtimeAccess.getCrosshairSystem?.()?.updateCrosshairs?.();
     }
 }

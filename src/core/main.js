@@ -8,9 +8,12 @@ import { ProfileUiController } from '../composition/core-ui/CoreUiAppPorts.js';
 import { SettingsManager } from './SettingsManager.js';
 import { ProfileManager } from './ProfileManager.js';
 import { createRoundStateController } from '../state/RoundStateController.js';
-import { PlayingStateSystem } from './PlayingStateSystem.js';
+import {
+    createPlayingStateRuntimeAccess,
+    PlayingStateSystem,
+} from './PlayingStateSystem.js';
 import { RoundStateTickSystem } from '../state/RoundStateTickSystem.js';
-import { GameDebugApi } from './GameDebugApi.js';
+import { createGameDebugRuntimeAccess, GameDebugApi } from './GameDebugApi.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
@@ -48,7 +51,7 @@ export class Game {
         this.state = GAME_STATE_IDS.MENU;
         this.roundPause = 0;
         this.roundStateController = createRoundStateController({ defaultRoundPause: 3.0 });
-        this.playingStateSystem = new PlayingStateSystem(this);
+        this.playingStateSystem = new PlayingStateSystem(createPlayingStateRuntimeAccess(this));
         this.roundStateTickSystem = new RoundStateTickSystem({
             game: this,
             getLifecyclePort: () => this.runtimeCoordinator?.getPorts?.()?.lifecyclePort || null,
@@ -73,7 +76,7 @@ export class Game {
             showStatusToast: (message, durationMs, tone) => this._showStatusToast(message, durationMs, tone),
             initialBindings: this.settings.controls,
         });
-        this.debugApi = new GameDebugApi(this);
+        this.debugApi = new GameDebugApi(createGameDebugRuntimeAccess(this));
 
         // Debug Recorder
         this.recorder = new RoundRecorder();

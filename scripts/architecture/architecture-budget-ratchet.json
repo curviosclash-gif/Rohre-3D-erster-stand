@@ -1,20 +1,20 @@
 {
-  "updatedAt": "2026-04-20",
+  "updatedAt": "2026-05-04",
   "budgets": {
-    "constructorGameFiles": 8,
+    "constructorGameFiles": 0,
     "domAccessFiles": 8,
     "coreToUiImportEdges": 0,
-    "uiToCoreImportEdges": 1,
-    "uiToStateImportEdges": 7,
+    "uiToCoreImportEdges": 0,
+    "uiToStateImportEdges": 4,
     "stateToUiImportEdges": 0,
     "entitiesToCoreImportEdges": 3,
     "stateToCoreImportEdges": 0,
     "sharedContractsToCoreImportEdges": 0,
-    "legacySurface_game_runtimeBundle_totalFiles": 2,
-    "legacySurface_game_runtimeFacade_totalFiles": 3,
+    "legacySurface_game_runtimeBundle_totalFiles": 0,
+    "legacySurface_game_runtimeFacade_totalFiles": 2,
     "legacySurface_window_GAME_INSTANCE_totalFiles": 2,
-    "legacySurface_GameRuntimePorts_fallbacks_totalFiles": 1,
-    "legacySurface_curviosApp_totalFiles": 5,
+    "legacySurface_GameRuntimePorts_fallbacks_totalFiles": 0,
+    "legacySurface_curviosApp_totalFiles": 3,
     "legacySurface_ActiveRuntimeConfigStore_totalFiles": 3
   }
 }

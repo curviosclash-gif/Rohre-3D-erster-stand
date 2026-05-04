@@ -16,11 +16,36 @@ import {
     toInt,
 } from './debug/GameDebugTrainingFacade.js';
 
+export function createGameDebugRuntimeAccess(runtime) {
+    const game = runtime && typeof runtime === 'object' ? runtime : null;
+    return Object.freeze({
+        getRecorder: () => game?.recorder || null,
+        getRuntimePerfProfiler: () => game?.runtimePerfProfiler || null,
+        getMediaRecorderSystem: () => game?.mediaRecorderSystem || null,
+        setRecorderFrameCaptureEnabled(enabled) {
+            if (!game) return;
+            game._recorderFrameCaptureEnabled = !!enabled;
+            if (game.recorder?.setFrameCaptureEnabled) {
+                game.recorder.setFrameCaptureEnabled(game._recorderFrameCaptureEnabled);
+            }
+        },
+        showStatusToast(message, durationMs, tone) {
+            game?._showStatusToast?.(message, durationMs, tone);
+        },
+        applyValidationScenario(validationService, idOrIndex = 0) {
+            return validationService?.applyScenario?.(game, idOrIndex) || null;
+        },
+        getEntityManager: () => game?.entityManager || null,
+    });
+}
+
 export class GameDebugApi {
-    constructor(game) {
-        this.game = game || null;
+    constructor(runtimeAccess = {}) {
+        this.runtimeAccess = runtimeAccess && typeof runtimeAccess === 'object'
+            ? runtimeAccess
+            : {};
         this.validationService = new BotValidationService({
-            getRecorder: () => this.game?.recorder || null,
+            getRecorder: () => this.runtimeAccess.getRecorder?.() || null,
         });
         this.trainingController = new DeveloperTrainingController();
         this.trainingAutomationState = {
@@ -31,12 +56,11 @@ export class GameDebugApi {
     }
 
     getRuntimePerformanceSnapshot(options = {}) {
-        const game = this.game;
-        const profiler = game?.runtimePerfProfiler || null;
+        const profiler = this.runtimeAccess.getRuntimePerfProfiler?.() || null;
         const performance = typeof profiler?.getSnapshot === 'function'
             ? profiler.getSnapshot(options)
             : null;
-        const recorder = game?.mediaRecorderSystem?.getRecordingDiagnostics?.() || null;
+        const recorder = this.runtimeAccess.getMediaRecorderSystem?.()?.getRecordingDiagnostics?.() || null;
         return {
             performance,
             recorder,
@@ -44,7 +68,7 @@ export class GameDebugApi {
     }
 
     resetRuntimePerformanceSamples() {
-        const profiler = this.game?.runtimePerfProfiler || null;
+        const profiler = this.runtimeAccess.getRuntimePerfProfiler?.() || null;
         if (typeof profiler?.reset !== 'function') {
             return false;
         }
@@ -65,18 +89,13 @@ export class GameDebugApi {
     }
 
     setRecorderFrameCaptureEnabled(enabled) {
-        const game = this.game;
-        game._recorderFrameCaptureEnabled = !!enabled;
-        if (game.recorder?.setFrameCaptureEnabled) {
-            game.recorder.setFrameCaptureEnabled(game._recorderFrameCaptureEnabled);
-        }
+        this.runtimeAccess.setRecorderFrameCaptureEnabled?.(enabled);
     }
 
     captureBotBaseline(label = 'BASELINE') {
-        const game = this.game;
         const baseline = this.validationService.captureBaseline(label);
         const normalized = String(baseline?.label || label || 'BASELINE').toUpperCase();
-        game._showStatusToast(`Bot-Baseline gespeichert: ${normalized}`);
+        this.runtimeAccess.showStatusToast?.(`Bot-Baseline gespeichert: ${normalized}`);
         console.log(`[Validation] Baseline gespeichert (${normalized}):`, baseline);
         return baseline;
     }
@@ -98,11 +117,13 @@ export class GameDebugApi {
     }
 
     applyBotValidationScenario(idOrIndex = 0) {
-        const game = this.game;
-        const scenario = this.validationService.applyScenario(game, idOrIndex);
+        const scenario = this.runtimeAccess.applyValidationScenario?.(
+            this.validationService,
+            idOrIndex
+        ) || null;
         if (!scenario) return null;
 
-        game._showStatusToast(`Szenario ${scenario.id} geladen`);
+        this.runtimeAccess.showStatusToast?.(`Szenario ${scenario.id} geladen`);
         console.log('[Validation] scenario loaded:', scenario);
         return scenario;
     }
@@ -222,7 +243,7 @@ export class GameDebugApi {
     }
 
     getTrainerBridgeRuntimeSnapshot() {
-        const entityManager = this.game?.entityManager;
+        const entityManager = this.runtimeAccess.getEntityManager?.() || null;
         if (!entityManager || !(entityManager.botByPlayer instanceof Map)) {
             return {
                 available: false,

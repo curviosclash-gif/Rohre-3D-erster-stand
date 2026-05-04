@@ -1,31 +1,65 @@
 import { GLOBAL_KEY_BIND_ACTIONS, KEY_BIND_ACTIONS } from './KeybindActionCatalog.js';
 
+export function createKeybindEditorRuntimeAccess(runtime) {
+    const game = runtime && typeof runtime === 'object' ? runtime : null;
+    return Object.freeze({
+        getUi: () => game?.ui || null,
+        getState: () => game?.state || null,
+        getKeyCapture: () => game?.keyCapture || null,
+        setKeyCapture(keyCapture) {
+            if (!game) return;
+            game.keyCapture = keyCapture;
+        },
+        getControls: () => game?.settings?.controls || {},
+        ensurePlayerControls(playerKey) {
+            if (!game?.settings?.controls?.[playerKey]) {
+                if (!game.settings.controls) {
+                    game.settings.controls = {};
+                }
+                game.settings.controls[playerKey] = {};
+            }
+            return game?.settings?.controls?.[playerKey] || {};
+        },
+        onSettingsChanged() {
+            game?._onSettingsChanged?.();
+        },
+        applyPauseBindings() {
+            game?.input?.setBindings?.(game?.settings?.controls);
+        },
+        showStatusToast(message, durationMs, tone) {
+            game?._showStatusToast?.(message, durationMs, tone);
+        },
+    });
+}
+
 export class KeybindEditorController {
-    constructor(game) {
-        this.game = game;
+    constructor(runtimeAccess = {}) {
+        this.runtimeAccess = runtimeAccess && typeof runtimeAccess === 'object'
+            ? runtimeAccess
+            : {};
     }
 
     renderEditor() {
-        const game = this.game;
+        const ui = this.runtimeAccess.getUi?.() || null;
         const conflicts = this.collectKeyConflicts();
-        this.renderKeybindRows('PLAYER_1', game.ui.keybindP1, KEY_BIND_ACTIONS, conflicts);
-        this.renderKeybindRows('PLAYER_2', game.ui.keybindP2, KEY_BIND_ACTIONS, conflicts);
-        this.renderKeybindRows('GLOBAL', game.ui.keybindGlobal, GLOBAL_KEY_BIND_ACTIONS, conflicts);
+        this.renderKeybindRows('PLAYER_1', ui?.keybindP1, KEY_BIND_ACTIONS, conflicts);
+        this.renderKeybindRows('PLAYER_2', ui?.keybindP2, KEY_BIND_ACTIONS, conflicts);
+        this.renderKeybindRows('GLOBAL', ui?.keybindGlobal, GLOBAL_KEY_BIND_ACTIONS, conflicts);
         this.updateKeyConflictWarning(conflicts);
     }
 
     renderPauseEditor() {
-        const game = this.game;
+        const ui = this.runtimeAccess.getUi?.() || null;
         const conflicts = this.collectKeyConflicts();
-        this.renderKeybindRows('PLAYER_1', game.ui.pauseKeybindP1, KEY_BIND_ACTIONS, conflicts);
-        this.renderKeybindRows('PLAYER_2', game.ui.pauseKeybindP2, KEY_BIND_ACTIONS, conflicts);
-        this._updateWarningElement(game.ui.pauseKeybindWarning, conflicts);
+        this.renderKeybindRows('PLAYER_1', ui?.pauseKeybindP1, KEY_BIND_ACTIONS, conflicts);
+        this.renderKeybindRows('PLAYER_2', ui?.pauseKeybindP2, KEY_BIND_ACTIONS, conflicts);
+        this._updateWarningElement(ui?.pauseKeybindWarning, conflicts);
     }
 
     renderKeybindRows(playerKey, container, actions, conflicts) {
         if (!container) return;
 
-        const game = this.game;
+        const keyCapture = this.runtimeAccess.getKeyCapture?.() || null;
         container.innerHTML = '';
 
         for (const action of actions) {
@@ -48,7 +82,7 @@ export class KeybindEditorController {
                 button.classList.add('conflict');
             }
 
-            if (game.keyCapture && game.keyCapture.playerKey === playerKey && game.keyCapture.actionKey === action.key) {
+            if (keyCapture && keyCapture.playerKey === playerKey && keyCapture.actionKey === action.key) {
                 button.classList.add('listening');
                 button.textContent = 'Taste druecken...';
             }
@@ -60,25 +94,27 @@ export class KeybindEditorController {
     }
 
     startKeyCapture(playerKey, actionKey) {
-        this.game.keyCapture = { playerKey, actionKey };
+        this.runtimeAccess.setKeyCapture?.({ playerKey, actionKey });
         this.renderEditor();
         this.renderPauseEditor();
     }
 
     _isKeybindEditorVisible() {
-        const game = this.game;
-        if (game.ui.mainMenu && !game.ui.mainMenu.classList.contains('hidden')) {
+        const ui = this.runtimeAccess.getUi?.() || null;
+        const state = this.runtimeAccess.getState?.() || '';
+        if (ui?.mainMenu && !ui.mainMenu.classList.contains('hidden')) {
             return true;
         }
-        if (game.state === 'PAUSED' && game.ui.pauseSettingsPanel && !game.ui.pauseSettingsPanel.classList.contains('hidden')) {
+        if (state === 'PAUSED' && ui?.pauseSettingsPanel && !ui.pauseSettingsPanel.classList.contains('hidden')) {
             return true;
         }
         return false;
     }
 
     handleKeyCapture(event) {
-        const game = this.game;
-        if (!game.keyCapture || !this._isKeybindEditorVisible()) {
+        const keyCapture = this.runtimeAccess.getKeyCapture?.() || null;
+        const state = this.runtimeAccess.getState?.() || '';
+        if (!keyCapture || !this._isKeybindEditorVisible()) {
             return false;
         }
 
@@ -86,34 +122,33 @@ export class KeybindEditorController {
         event.stopPropagation();
 
         if (event.code === 'Escape') {
-            game.keyCapture = null;
+            this.runtimeAccess.setKeyCapture?.(null);
             this.renderEditor();
             this.renderPauseEditor();
             return true;
         }
 
-        this.setControlValue(game.keyCapture.playerKey, game.keyCapture.actionKey, event.code);
-        game.keyCapture = null;
-        game._onSettingsChanged();
-        if (game.state === 'PAUSED') {
-            game.input?.setBindings?.(game.settings.controls);
+        this.setControlValue(keyCapture.playerKey, keyCapture.actionKey, event.code);
+        this.runtimeAccess.setKeyCapture?.(null);
+        this.runtimeAccess.onSettingsChanged?.();
+        if (state === 'PAUSED') {
+            this.runtimeAccess.applyPauseBindings?.();
             this.renderPauseEditor();
         }
-        game._showStatusToast('Taste gespeichert!');
+        this.runtimeAccess.showStatusToast?.('Taste gespeichert!');
         return true;
     }
 
     getControlValue(playerKey, actionKey) {
-        const controls = this.game.settings?.controls || {};
+        const controls = this.runtimeAccess.getControls?.() || {};
         const playerControls = controls[playerKey] || {};
         return playerControls[actionKey] || '';
     }
 
     setControlValue(playerKey, actionKey, value) {
-        if (!this.game.settings.controls[playerKey]) {
-            this.game.settings.controls[playerKey] = {};
-        }
-        this.game.settings.controls[playerKey][actionKey] = value;
+        const playerControls = this.runtimeAccess.ensurePlayerControls?.(playerKey);
+        if (!playerControls) return;
+        playerControls[actionKey] = value;
     }
 
     collectKeyConflicts() {
@@ -151,7 +186,7 @@ export class KeybindEditorController {
     }
 
     updateKeyConflictWarning(conflicts) {
-        this._updateWarningElement(this.game.ui.keybindWarning, conflicts);
+        this._updateWarningElement(this.runtimeAccess.getUi?.()?.keybindWarning, conflicts);
     }
 
     formatKeyCode(code) {

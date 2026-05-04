@@ -3,9 +3,15 @@ import { GameLoop } from './GameLoop.js';
 import { InputManager } from './InputManager.js';
 import { ParticleSystem } from '../entities/Particles.js';
 import { AudioManager } from './Audio.js';
-import { RuntimeDiagnosticsSystem } from './RuntimeDiagnosticsSystem.js';
+import {
+    createRuntimeDiagnosticsRuntimeAccess,
+    RuntimeDiagnosticsSystem,
+} from './RuntimeDiagnosticsSystem.js';
 import { ScreenShake } from '../hunt/ScreenShake.js';
-import { PlanarAimAssistSystem } from './PlanarAimAssistSystem.js';
+import {
+    createPlanarAimAssistRuntimeAccess,
+    PlanarAimAssistSystem,
+} from './PlanarAimAssistSystem.js';
 import { MatchSessionRuntimeBridge } from './MatchSessionRuntimeBridge.js';
 import { BuildInfoController } from './BuildInfoController.js';
 import { MediaRecorderSystem } from './MediaRecorderSystem.js';
@@ -30,6 +36,7 @@ import {
 import {
     CrosshairSystem,
     createGameUiDomRefs,
+    createKeybindEditorRuntimeAccess,
     createHuntHudDomRefs,
     HUD,
     HudRuntimeSystem,
@@ -170,9 +177,18 @@ export function bootstrapGameRuntime(game, options = {}) {
         ports: runtimePorts,
         sessionOrchestrator: matchSessionOrchestrator,
     }));
-    registerRuntimeHandle('runtimeDiagnosticsSystem', new RuntimeDiagnosticsSystem(game));
-    registerRuntimeHandle('keybindEditorController', new KeybindEditorController(game));
-    registerRuntimeHandle('planarAimAssistSystem', new PlanarAimAssistSystem(game));
+    registerRuntimeHandle(
+        'runtimeDiagnosticsSystem',
+        new RuntimeDiagnosticsSystem(createRuntimeDiagnosticsRuntimeAccess(game))
+    );
+    registerRuntimeHandle(
+        'keybindEditorController',
+        new KeybindEditorController(createKeybindEditorRuntimeAccess(game))
+    );
+    registerRuntimeHandle(
+        'planarAimAssistSystem',
+        new PlanarAimAssistSystem(createPlanarAimAssistRuntimeAccess(game))
+    );
     registerRuntimeHandle('matchSessionRuntimeBridge', new MatchSessionRuntimeBridge({
         game,
         ports: runtimePorts,

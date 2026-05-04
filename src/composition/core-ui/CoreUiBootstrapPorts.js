@@ -1,6 +1,9 @@
 export { HUD } from '../../ui/HUD.js';
 export { MatchFlowUiController } from '../../ui/MatchFlowUiController.js';
-export { KeybindEditorController } from '../../ui/KeybindEditorController.js';
+export {
+    createKeybindEditorRuntimeAccess,
+    KeybindEditorController,
+} from '../../ui/KeybindEditorController.js';
 export { HuntHUD } from '../../ui/HuntHUD.js';
 export { HudRuntimeSystem } from '../../ui/HudRuntimeSystem.js';
 export { CrosshairSystem } from '../../ui/CrosshairSystem.js';

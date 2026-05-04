@@ -29,10 +29,6 @@ const legacyUiToStateImportEntries = [
         'Match flow UI still orchestrates state session lifecycle while command/reducer ownership is being consolidated.'
     ),
     pair(
-        createEdgeKey('src/ui/MatchFlowUiController.js', 'src/state/RoundEndCoordinator.js'),
-        'Match flow UI still calls round-end coordinator while transition responsibilities are incrementally moved to state orchestration.'
-    ),
-    pair(
         createEdgeKey('src/ui/SettingsStore.js', 'src/state/storage/StoragePlatform.js'),
         'UI settings store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
     ),
@@ -45,16 +41,7 @@ const legacyUiToStateImportEntries = [
 /** @type {[string, string][]} */
 const legacyCoreToUiImportEntries = [];
 
-export const LEGACY_CONSTRUCTOR_GAME_ALLOWLIST = new Map([
-    ['src/core/GameDebugApi.js', 'Legacy debug bridge still wraps the full runtime while V44 only forbids new wide constructors.'],
-    ['src/core/PlayingStateSystem.js', 'Existing playing loop shell still receives the game runtime directly.'],
-    ['src/core/PlanarAimAssistSystem.js', 'Planar aim hotpath still consumes the runtime facade directly.'],
-    ['src/core/RuntimeDiagnosticsSystem.js', 'Diagnostics overlay remains an infrastructure exception with runtime-wide read access.'],
-    ['src/ui/KeybindEditorController.js', 'Keybind editor remains a UI infrastructure shell around the runtime key capture path.'],
-    ['src/ui/UIManager.js', 'UIManager keeps a legacy game alias while sync responsibilities are being reduced.'],
-    ['src/ui/UIStartSyncController.js', 'Start sync controller still receives the runtime shell while V44 freezes new occurrences.'],
-    ['src/ui/UINavigationLifecycleController.js', 'Navigation lifecycle controller still receives the runtime shell while V44 freezes new occurrences.'],
-]);
+export const LEGACY_CONSTRUCTOR_GAME_ALLOWLIST = new Map([]);
 
 export const LEGACY_DOM_ACCESS_ALLOWLIST = new Map([
     ['src/core/AppInitializer.js', 'Bootstrap readiness check is infrastructure and still touches document directly.'],
@@ -68,12 +55,7 @@ export const LEGACY_DOM_ACCESS_ALLOWLIST = new Map([
 ]);
 
 /** @type {[string, string][]} */
-const legacyUiToCoreImportEntries = [
-    pair(
-        createEdgeKey('src/ui/KeybindEditorController.js', 'src/core/SettingsManager.js'),
-        'Keybind editor still relies on SettingsManager cloning helpers while the settings port transition is incremental.'
-    ),
-];
+const legacyUiToCoreImportEntries = [];
 
 /** @type {[string, string][]} */
 const legacyEntitiesToCoreImportEntries = [

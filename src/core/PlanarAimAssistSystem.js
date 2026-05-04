@@ -11,14 +11,30 @@
 import { CONFIG } from './Config.js';
 import { clamp } from '../utils/MathOps.js';
 
+export function createPlanarAimAssistRuntimeAccess(runtime) {
+    const game = runtime && typeof runtime === 'object' ? runtime : null;
+    return Object.freeze({
+        getControls: () => game?.settings?.controls || null,
+        getNumHumans: () => Number(game?.numHumans) || 0,
+        isInputDown(code) {
+            return game?.input?.isDown?.(code) === true;
+        },
+        getEntityManager: () => game?.entityManager || null,
+        getGameplayConfig: () => game?.runtimeConfig?.gameplay || null,
+        getGameLoop: () => game?.gameLoop || null,
+        getEntityRuntimeConfig: () => game?.entityRuntimeConfig || null,
+    });
+}
+
 export class PlanarAimAssistSystem {
-    constructor(game) {
-        this.game = game || null;
+    constructor(runtimeAccess = {}) {
+        this.runtimeAccess = runtimeAccess && typeof runtimeAccess === 'object'
+            ? runtimeAccess
+            : {};
     }
 
     getPlanarAimAxis(playerIndex) {
-        const game = this.game;
-        const controls = game?.settings?.controls;
+        const controls = this.runtimeAccess.getControls?.() || null;
         if (!controls) return 0;
 
         const p1 = controls.PLAYER_1;
@@ -26,27 +42,29 @@ export class PlanarAimAssistSystem {
         let up = false;
         let down = false;
 
-        if (game.numHumans === 1 && playerIndex === 0) {
-            up = game.input.isDown(p1.UP) || game.input.isDown(p2.UP);
-            down = game.input.isDown(p1.DOWN) || game.input.isDown(p2.DOWN);
+        if (this.runtimeAccess.getNumHumans?.() === 1 && playerIndex === 0) {
+            up = this.runtimeAccess.isInputDown?.(p1.UP) === true
+                || this.runtimeAccess.isInputDown?.(p2.UP) === true;
+            down = this.runtimeAccess.isInputDown?.(p1.DOWN) === true
+                || this.runtimeAccess.isInputDown?.(p2.DOWN) === true;
         } else {
             const map = playerIndex === 0 ? p1 : p2;
-            up = game.input.isDown(map.UP);
-            down = game.input.isDown(map.DOWN);
+            up = this.runtimeAccess.isInputDown?.(map.UP) === true;
+            down = this.runtimeAccess.isInputDown?.(map.DOWN) === true;
         }
 
         return (down ? 1 : 0) - (up ? 1 : 0);
     }
 
     updatePlanarAimAssist(dt) {
-        const game = this.game;
-        if (!game?.entityManager) return;
+        const entityManager = this.runtimeAccess.getEntityManager?.() || null;
+        if (!entityManager) return;
 
-        const gameplayConfig = game.runtimeConfig?.gameplay;
+        const gameplayConfig = this.runtimeAccess.getGameplayConfig?.() || null;
         const inputSpeed = gameplayConfig?.planarAimInputSpeed || CONFIG.GAMEPLAY.PLANAR_AIM_INPUT_SPEED || 1.5;
         const returnSpeed = gameplayConfig?.planarAimReturnSpeed || CONFIG.GAMEPLAY.PLANAR_AIM_RETURN_SPEED || 0.6;
         const isPlanar = gameplayConfig?.planarMode ?? !!CONFIG.GAMEPLAY.PLANAR_MODE;
-        const humans = game.entityManager.getHumanPlayers();
+        const humans = entityManager.getHumanPlayers();
 
         for (let i = 0; i < humans.length; i++) {
             const player = humans[i];
@@ -65,17 +83,19 @@ export class PlanarAimAssistSystem {
     }
 
     applyPlayingTimeScaleFromEffects() {
-        const game = this.game;
-        if (!game?.entityManager || !game?.gameLoop) return;
+        const entityManager = this.runtimeAccess.getEntityManager?.() || null;
+        const gameLoop = this.runtimeAccess.getGameLoop?.() || null;
+        if (!entityManager || !gameLoop) return;
 
-        game.gameLoop.setTimeScale(1.0);
-        const strategy = game.entityManager?.gameModeStrategy || null;
-        const modeType = String(strategy?.modeType || game?.entityRuntimeConfig?.HUNT?.ACTIVE_MODE || 'CLASSIC').trim().toUpperCase();
+        gameLoop.setTimeScale(1.0);
+        const strategy = entityManager.gameModeStrategy || null;
+        const entityRuntimeConfig = this.runtimeAccess.getEntityRuntimeConfig?.() || null;
+        const modeType = String(strategy?.modeType || entityRuntimeConfig?.HUNT?.ACTIVE_MODE || 'CLASSIC').trim().toUpperCase();
         if (modeType === 'HUNT') {
             return;
         }
 
-        const players = game.entityManager.players;
+        const players = entityManager.players;
         let slowestScale = 1.0;
         for (let p = 0; p < players.length; p++) {
             const player = players[p];
@@ -83,6 +103,6 @@ export class PlanarAimAssistSystem {
                 slowestScale = Math.min(slowestScale, player.slowTimeScale);
             }
         }
-        game.gameLoop.setTimeScale(slowestScale);
+        gameLoop.setTimeScale(slowestScale);
     }
 }
