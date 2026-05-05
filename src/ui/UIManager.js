@@ -45,6 +45,35 @@ function syncRangeInput(input, value, limits, fallback) {
     input.value = String(clampSettingValue(value, limits, fallback));
 }
 
+function createIdleMultiplayerSessionState() {
+    return {
+        joined: false,
+        connected: false,
+        lobbyCode: '',
+        role: 'offline',
+        isHost: false,
+        localReady: false,
+        memberCount: 0,
+        readyCount: 0,
+        allReady: false,
+        canStart: false,
+        hostPeerId: '',
+        pendingMatchCommandId: '',
+        members: [],
+        transport: '',
+    };
+}
+
+function normalizeMultiplayerSessionStateSnapshot(sessionState) {
+    const source = sessionState && typeof sessionState === 'object' ? sessionState : null;
+    if (!source) return createIdleMultiplayerSessionState();
+    return {
+        ...createIdleMultiplayerSessionState(),
+        ...source,
+        members: Array.isArray(source.members) ? source.members : [],
+    };
+}
+
 export class UIManager {
     constructor(deps = {}) {
         const game = deps.game || null;
@@ -84,7 +113,10 @@ export class UIManager {
         this._debugHintNodes = Array.isArray(this.ui.debugHints) ? this.ui.debugHints : [];
         this._runtimeSettingLimits = createRuntimeSettingsLimitsForRuntime();
         this._getGameplayConfig = () => resolveGameplayConfig(game);
-        this._readMenuMultiplayerSessionState = () => game?.menuMultiplayerBridge?.getSessionState?.() || null;
+        this._readMenuMultiplayerSessionState = () => normalizeMultiplayerSessionStateSnapshot(
+            game?.menuMultiplayerBridge?.getSessionState?.()
+        );
+        this._activeSyncCycle = null;
         this.menuTextRuntime = game?.menuTextRuntime instanceof MenuTextRuntime
             ? game.menuTextRuntime
             : new MenuTextRuntime({ overrideStore: this.settingsManager?.menuTextOverrideStore });
@@ -132,6 +164,59 @@ export class UIManager {
             const dispose = list.pop();
             try { dispose?.(); } catch { /* ignore teardown failures */ }
         }
+    }
+
+    _runSyncCycle(settings = this.settings, runSync = () => {}) {
+        const cycleSettings = settings || this.settings;
+        const menuUiContext = this._resolveMenuUiContext(cycleSettings);
+        const previousCycle = this._activeSyncCycle;
+        this._activeSyncCycle = {
+            settings: cycleSettings,
+            menuUiContext,
+            startSetupSynced: false,
+            startSetupSnapshot: null,
+        };
+        try {
+            return runSync(menuUiContext);
+        } finally {
+            this._activeSyncCycle = previousCycle;
+        }
+    }
+
+    _createStartSetupSyncSnapshot(settings = this.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
+        return {
+            settings,
+            menuUiContext,
+            surfacePolicy: menuUiContext?.surfacePolicy || null,
+            surfaceMenuState: menuUiContext?.surfaceMenuState || null,
+            multiplayerSessionState: this._readMenuMultiplayerSessionState(),
+        };
+    }
+
+    _syncStartSetupSnapshot(
+        settings = this.settings,
+        { menuUiContext = null, snapshot = null, force = false } = {}
+    ) {
+        if (!settings) return;
+        if (!force) {
+            const cycle = this._activeSyncCycle;
+            if (cycle && cycle.settings === settings) {
+                if (cycle.startSetupSynced) return;
+                const cycleSnapshot = snapshot || cycle.startSetupSnapshot || this._createStartSetupSyncSnapshot(
+                    settings,
+                    menuUiContext || cycle.menuUiContext
+                );
+                cycle.startSetupSnapshot = cycleSnapshot;
+                cycle.startSetupSynced = true;
+                this._startSync.syncStartSetupState(settings, cycleSnapshot);
+                return;
+            }
+        }
+        const explicitSnapshot = snapshot || this._createStartSetupSyncSnapshot(
+            settings,
+            menuUiContext || this._resolveMenuUiContext(settings)
+        );
+        this._startSync.syncStartSetupState(settings, explicitSnapshot);
     }
 
     // ------------------------------------------------------------------
@@ -205,18 +290,18 @@ export class UIManager {
 
     syncAll() {
         const settings = this.settings;
-        const menuUiContext = this._resolveMenuUiContext(settings);
-        this.syncSessionState(settings, menuUiContext);
-        this.syncModes(settings, menuUiContext);
-        this.syncMap(settings);
-        this.syncBots(settings);
-        this.syncRules(settings);
-        this.syncGameplay(settings);
-        this.syncVehicles(settings);
-        this.syncStartSetupState(settings);
-        this.syncPresetState(settings, menuUiContext);
-        this.syncMultiplayerState(settings, menuUiContext);
-        this.syncDeveloperState(settings, menuUiContext);
+        this._runSyncCycle(settings, (menuUiContext) => {
+            this.syncSessionState(settings, menuUiContext);
+            this.syncModes(settings, menuUiContext);
+            this.syncMap(settings);
+            this.syncBots(settings);
+            this.syncRules(settings);
+            this.syncGameplay(settings);
+            this.syncVehicles(settings);
+            this.syncPresetState(settings, menuUiContext);
+            this.syncMultiplayerState(settings, menuUiContext);
+            this.syncDeveloperState(settings, menuUiContext);
+        });
     }
 
     syncByChangeKeys(changedKeys) {
@@ -237,11 +322,13 @@ export class UIManager {
         const syncMethodNames = resolveSyncMethodNamesForChangeKeys(normalizedKeys);
         if (syncMethodNames.length === 0) { this.syncAll(); return; }
 
-        for (const methodName of syncMethodNames) {
-            const syncMethod = this[methodName];
-            if (typeof syncMethod !== 'function') { this.syncAll(); return; }
-            syncMethod.call(this);
-        }
+        this._runSyncCycle(this.settings, () => {
+            for (const methodName of syncMethodNames) {
+                const syncMethod = this[methodName];
+                if (typeof syncMethod !== 'function') { this.syncAll(); return; }
+                syncMethod.call(this);
+            }
+        });
     }
 
     // ------------------------------------------------------------------
@@ -265,7 +352,7 @@ export class UIManager {
         if (this.ui.mainMenu) {
             this.ui.mainMenu.setAttribute('data-menu-local-theme', themeMode);
         }
-        this.syncStartSetupState(settings);
+        this._syncStartSetupSnapshot(settings, { menuUiContext });
     }
 
     syncModes(settings = this.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
@@ -310,7 +397,7 @@ export class UIManager {
         if (this.ui.mapSelect) {
             this.ui.mapSelect.value = settings.mapKey;
         }
-        this.syncStartSetupState(settings);
+        this._syncStartSetupSnapshot(settings);
     }
 
     syncBots(settings = this.settings) {
@@ -405,11 +492,13 @@ export class UIManager {
         const ui = this.ui;
         if (ui.vehicleSelectP1) ui.vehicleSelectP1.value = settings.vehicles.PLAYER_1;
         if (ui.vehicleSelectP2) ui.vehicleSelectP2.value = settings.vehicles.PLAYER_2;
-        this.syncStartSetupState(settings);
+        this._syncStartSetupSnapshot(settings);
     }
 
     // Delegiert an UIStartSyncController
-    syncStartSetupState(settings = this.settings) { return this._startSync.syncStartSetupState(settings); }
+    syncStartSetupState(settings = this.settings, snapshot = null) {
+        return this._syncStartSetupSnapshot(settings, { snapshot, force: true });
+    }
 
     syncPresetState(settings = this.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
         syncMenuPresetState({
