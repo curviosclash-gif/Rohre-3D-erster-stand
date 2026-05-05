@@ -11,6 +11,9 @@ const DEFAULT_ARCADE_RUN_CONFIG = Object.freeze({
     maxMultiplier: 8,
     replayHooksEnabled: true,
     ghostDuelMode: 'off',
+    ghostLibraryMaxRoutes: 64,
+    ghostLibraryMaxFramesPerRoute: 0,
+    ghostLibraryMaxBytes: 0,
 });
 
 export const ARCADE_RUN_PHASES = Object.freeze({
@@ -81,6 +84,24 @@ export function createArcadeRunConfig(source = null) {
         maxMultiplier: clampInteger(input.maxMultiplier, 1, 25, DEFAULT_ARCADE_RUN_CONFIG.maxMultiplier),
         replayHooksEnabled: input.replayHooksEnabled !== false,
         ghostDuelMode: normalizeArcadeGhostDuelMode(input.ghostDuelMode, DEFAULT_ARCADE_RUN_CONFIG.ghostDuelMode),
+        ghostLibraryMaxRoutes: clampInteger(
+            input.ghostLibraryMaxRoutes,
+            1,
+            2048,
+            DEFAULT_ARCADE_RUN_CONFIG.ghostLibraryMaxRoutes
+        ),
+        ghostLibraryMaxFramesPerRoute: clampInteger(
+            input.ghostLibraryMaxFramesPerRoute,
+            0,
+            20000,
+            DEFAULT_ARCADE_RUN_CONFIG.ghostLibraryMaxFramesPerRoute
+        ),
+        ghostLibraryMaxBytes: clampInteger(
+            input.ghostLibraryMaxBytes,
+            0,
+            20_000_000,
+            DEFAULT_ARCADE_RUN_CONFIG.ghostLibraryMaxBytes
+        ),
     };
 }
 

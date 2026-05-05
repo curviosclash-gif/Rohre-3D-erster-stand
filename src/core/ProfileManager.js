@@ -14,6 +14,7 @@ import {
     setDefaultProfileByName,
     upsertProfileEntry,
 } from '../composition/core-ui/CoreProfilePorts.js';
+import { isPersistenceSuccess } from './settings/SettingsDomainUtils.js';
 
 export class ProfileManager {
     constructor(settingsStore) {
@@ -103,7 +104,7 @@ export class ProfileManager {
         this.activeProfileName = name;
 
         const persisted = this.store.saveProfiles(this.profiles);
-        if (!persisted) {
+        if (!isPersistenceSuccess(persisted)) {
             return { success: false, error: 'Profil konnte nicht gespeichert werden (Speicher voll?)' };
         }
 
@@ -145,7 +146,7 @@ export class ProfileManager {
         this.activeProfileName = duplicateName;
 
         const persisted = this.store.saveProfiles(this.profiles);
-        if (!persisted) {
+        if (!isPersistenceSuccess(persisted)) {
             return { success: false, error: 'Profil konnte nicht dupliziert werden' };
         }
 
@@ -222,7 +223,7 @@ export class ProfileManager {
         this.activeProfileName = entry.name;
 
         const persisted = this.store.saveProfiles(this.profiles);
-        if (!persisted) {
+        if (!isPersistenceSuccess(persisted)) {
             return { success: false, error: 'Profil konnte nicht importiert werden' };
         }
 
@@ -258,7 +259,7 @@ export class ProfileManager {
         this.activeProfileName = result.defaultProfile?.name || this.activeProfileName;
 
         const persisted = this.store.saveProfiles(this.profiles);
-        if (!persisted) {
+        if (!isPersistenceSuccess(persisted)) {
             return { success: false, error: 'Standardprofil konnte nicht gespeichert werden' };
         }
 
@@ -281,7 +282,7 @@ export class ProfileManager {
         this.activeProfileName = resolveActiveProfileName(this.profiles, this.activeProfileName, this.getProfileDataOps());
 
         const persisted = this.store.saveProfiles(this.profiles);
-        if (!persisted) {
+        if (!isPersistenceSuccess(persisted)) {
             return { success: false, error: 'Profil konnte nicht geloescht werden' };
         }
 

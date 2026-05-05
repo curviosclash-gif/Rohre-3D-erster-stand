@@ -298,7 +298,9 @@ function resolveBrowserDemoSurfacePolicyOverrideDraft(options = {}) {
         ? options.platformRuntimeSnapshot
         : null;
     const browserDemoPolicyContract = platformRuntimeSnapshot?.browserDemoSurfacePolicyContract;
-    const runtimeGlobal = resolveRuntimeGlobal(options.runtimeGlobal);
+    const runtimeGlobal = Object.prototype.hasOwnProperty.call(options, 'runtimeGlobal')
+        ? resolveRuntimeGlobal(options.runtimeGlobal)
+        : null;
     if (!browserDemoPolicyContract || typeof browserDemoPolicyContract.getOverrideSnapshot !== 'function') {
         return resolveBrowserDemoSurfacePolicyOverrideDraftFromBuildArtifact(runtimeGlobal);
     }

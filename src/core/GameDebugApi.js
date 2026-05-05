@@ -1,5 +1,6 @@
 import { BotValidationService } from '../state/validation/BotValidationService.js';
 import { DeveloperTrainingController } from './DeveloperTrainingController.js';
+import { createRuntimeAccess } from '../shared/runtime/RuntimeAccessFactory.js';
 import {
     TRAINING_AUTOMATION_CONTRACT_VERSION,
     TRAINING_GATE_CONTRACT_VERSION,
@@ -17,8 +18,14 @@ import {
 } from './debug/GameDebugTrainingFacade.js';
 
 export function createGameDebugRuntimeAccess(runtime) {
-    const game = runtime && typeof runtime === 'object' ? runtime : null;
-    return Object.freeze({
+    return createRuntimeAccess(runtime, (game) => {
+        const actionShowStatusToast = (message, durationMs, tone) => {
+            game?._showStatusToast?.(message, durationMs, tone);
+        };
+        const actionApplyValidationScenario = (validationService, idOrIndex = 0) => (
+            validationService?.applyScenario?.(game, idOrIndex) || null
+        );
+        return {
         getRecorder: () => game?.recorder || null,
         getRuntimePerfProfiler: () => game?.runtimePerfProfiler || null,
         getMediaRecorderSystem: () => game?.mediaRecorderSystem || null,
@@ -29,13 +36,13 @@ export function createGameDebugRuntimeAccess(runtime) {
                 game.recorder.setFrameCaptureEnabled(game._recorderFrameCaptureEnabled);
             }
         },
-        showStatusToast(message, durationMs, tone) {
-            game?._showStatusToast?.(message, durationMs, tone);
-        },
-        applyValidationScenario(validationService, idOrIndex = 0) {
-            return validationService?.applyScenario?.(game, idOrIndex) || null;
-        },
+        actionShowStatusToast,
+        actionApplyValidationScenario,
+        // Backward-compatible aliases for transitional call sites.
+        showStatusToast: actionShowStatusToast,
+        applyValidationScenario: actionApplyValidationScenario,
         getEntityManager: () => game?.entityManager || null,
+    };
     });
 }
 
@@ -95,7 +102,7 @@ export class GameDebugApi {
     captureBotBaseline(label = 'BASELINE') {
         const baseline = this.validationService.captureBaseline(label);
         const normalized = String(baseline?.label || label || 'BASELINE').toUpperCase();
-        this.runtimeAccess.showStatusToast?.(`Bot-Baseline gespeichert: ${normalized}`);
+        this.runtimeAccess.actionShowStatusToast?.(`Bot-Baseline gespeichert: ${normalized}`);
         console.log(`[Validation] Baseline gespeichert (${normalized}):`, baseline);
         return baseline;
     }
@@ -117,13 +124,13 @@ export class GameDebugApi {
     }
 
     applyBotValidationScenario(idOrIndex = 0) {
-        const scenario = this.runtimeAccess.applyValidationScenario?.(
+        const scenario = this.runtimeAccess.actionApplyValidationScenario?.(
             this.validationService,
             idOrIndex
         ) || null;
         if (!scenario) return null;
 
-        this.runtimeAccess.showStatusToast?.(`Szenario ${scenario.id} geladen`);
+        this.runtimeAccess.actionShowStatusToast?.(`Szenario ${scenario.id} geladen`);
         console.log('[Validation] scenario loaded:', scenario);
         return scenario;
     }

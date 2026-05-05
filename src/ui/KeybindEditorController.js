@@ -1,8 +1,30 @@
 import { GLOBAL_KEY_BIND_ACTIONS, KEY_BIND_ACTIONS } from './KeybindActionCatalog.js';
+import { createRuntimeAccess } from '../shared/runtime/RuntimeAccessFactory.js';
 
 export function createKeybindEditorRuntimeAccess(runtime) {
-    const game = runtime && typeof runtime === 'object' ? runtime : null;
-    return Object.freeze({
+    return createRuntimeAccess(runtime, (game) => {
+        const actionEnsurePlayerControls = (playerKey) => {
+            if (!game?.settings?.controls?.[playerKey]) {
+                if (!game?.settings?.controls) {
+                    if (!game?.settings) {
+                        return {};
+                    }
+                    game.settings.controls = {};
+                }
+                game.settings.controls[playerKey] = {};
+            }
+            return game?.settings?.controls?.[playerKey] || {};
+        };
+        const actionOnSettingsChanged = () => {
+            game?._onSettingsChanged?.();
+        };
+        const actionApplyPauseBindings = () => {
+            game?.input?.setBindings?.(game?.settings?.controls);
+        };
+        const actionShowStatusToast = (message, durationMs, tone) => {
+            game?._showStatusToast?.(message, durationMs, tone);
+        };
+        return {
         getUi: () => game?.ui || null,
         getState: () => game?.state || null,
         getKeyCapture: () => game?.keyCapture || null,
@@ -11,24 +33,16 @@ export function createKeybindEditorRuntimeAccess(runtime) {
             game.keyCapture = keyCapture;
         },
         getControls: () => game?.settings?.controls || {},
-        ensurePlayerControls(playerKey) {
-            if (!game?.settings?.controls?.[playerKey]) {
-                if (!game.settings.controls) {
-                    game.settings.controls = {};
-                }
-                game.settings.controls[playerKey] = {};
-            }
-            return game?.settings?.controls?.[playerKey] || {};
-        },
-        onSettingsChanged() {
-            game?._onSettingsChanged?.();
-        },
-        applyPauseBindings() {
-            game?.input?.setBindings?.(game?.settings?.controls);
-        },
-        showStatusToast(message, durationMs, tone) {
-            game?._showStatusToast?.(message, durationMs, tone);
-        },
+        actionEnsurePlayerControls,
+        actionOnSettingsChanged,
+        actionApplyPauseBindings,
+        actionShowStatusToast,
+        // Backward-compatible aliases for transitional call sites.
+        ensurePlayerControls: actionEnsurePlayerControls,
+        onSettingsChanged: actionOnSettingsChanged,
+        applyPauseBindings: actionApplyPauseBindings,
+        showStatusToast: actionShowStatusToast,
+    };
     });
 }
 
@@ -130,12 +144,12 @@ export class KeybindEditorController {
 
         this.setControlValue(keyCapture.playerKey, keyCapture.actionKey, event.code);
         this.runtimeAccess.setKeyCapture?.(null);
-        this.runtimeAccess.onSettingsChanged?.();
+        this.runtimeAccess.actionOnSettingsChanged?.();
         if (state === 'PAUSED') {
-            this.runtimeAccess.applyPauseBindings?.();
+            this.runtimeAccess.actionApplyPauseBindings?.();
             this.renderPauseEditor();
         }
-        this.runtimeAccess.showStatusToast?.('Taste gespeichert!');
+        this.runtimeAccess.actionShowStatusToast?.('Taste gespeichert!');
         return true;
     }
 
@@ -146,7 +160,7 @@ export class KeybindEditorController {
     }
 
     setControlValue(playerKey, actionKey, value) {
-        const playerControls = this.runtimeAccess.ensurePlayerControls?.(playerKey);
+        const playerControls = this.runtimeAccess.actionEnsurePlayerControls?.(playerKey);
         if (!playerControls) return;
         playerControls[actionKey] = value;
     }

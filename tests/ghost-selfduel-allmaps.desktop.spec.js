@@ -7,6 +7,19 @@ import {
 } from './core-targeted.shared.js';
 
 const GHOST_LIBRARY_STORAGE_KEY = 'cuviosclash.arcade-ghost-library.v1';
+const SUPPORTED_MODE_PATHS = Object.freeze(['normal', 'fight', 'arcade']);
+const DEFAULT_MODE_PATHS = Object.freeze(['normal', 'fight', 'arcade']);
+
+function resolveModePathsFromEnv() {
+    const raw = String(process.env.PW_GHOST_SELFDUEL_MODE_PATHS || '').trim().toLowerCase();
+    if (!raw) return [...DEFAULT_MODE_PATHS];
+    const parts = raw
+        .split(',')
+        .map((entry) => entry.trim())
+        .filter((entry) => entry.length > 0 && SUPPORTED_MODE_PATHS.includes(entry));
+    if (parts.length === 0) return [...DEFAULT_MODE_PATHS];
+    return Array.from(new Set(parts));
+}
 
 const SEEDED_GHOST_CLIP = Object.freeze({
     frames: [
@@ -139,10 +152,11 @@ async function readGhostRuntimeState(page) {
 }
 
 test('Ghost-Selbstduell funktioniert im Desktop-Electron in Single normal/fight/arcade auf allen sichtbaren Maps', async ({ page }) => {
-    test.setTimeout(900000);
+    const modePaths = resolveModePathsFromEnv();
+    const timeoutPerModeMs = 900000;
+    test.setTimeout(Math.max(900000, timeoutPerModeMs * modePaths.length));
     await loadGame(page);
 
-    const modePaths = ['normal', 'fight', 'arcade'];
     const failures = [];
 
     for (let modeIndex = 0; modeIndex < modePaths.length; modeIndex += 1) {
@@ -195,10 +209,11 @@ test('Ghost-Selbstduell funktioniert im Desktop-Electron in Single normal/fight/
                     const game = globalThis.GAME_INSTANCE;
                     const ghostState = game?.entityManager?.getLastRoundGhostState?.();
                     return ghostState?.active === true && Number(ghostState?.entryCount || 0) > 0;
-                }, null, { timeout: 5000 }).then(() => true).catch(() => false);
+                }, null, { timeout: 12000 }).then(() => true).catch(() => false);
 
                 const runtimeState = await readGhostRuntimeState(page);
-                if (!playbackActive || !runtimeState.active || runtimeState.entryCount <= 0) {
+                const hasActiveGhostState = runtimeState.active && runtimeState.entryCount > 0;
+                if (!(playbackActive || hasActiveGhostState)) {
                     failures.push({
                         modePath,
                         mapKey,

@@ -130,6 +130,7 @@ export function createMatchSession({
     baseConfig = null,
     requestedMapKey,
     currentSession = null,
+    isDesktopRuntime = null,
 }) {
     const portalsEnabled = runtimeConfig?.session?.portalsEnabled ?? !!settings?.portalsEnabled;
     const mapResolution = resolveMatchMap(runtimeConfig, requestedMapKey);
@@ -201,7 +202,9 @@ export function createMatchSession({
             createdSession.entityManager.setup(
                 numHumans,
                 numBots,
-                buildEntityManagerSetupOptions(settings, runtimeConfig, entityRuntimeConfig)
+                buildEntityManagerSetupOptions(settings, runtimeConfig, entityRuntimeConfig, {
+                    isDesktopRuntime,
+                })
             );
 
             return createdSession;
@@ -283,6 +286,7 @@ export function initializeMatchSession({
     baseConfig = null,
     requestedMapKey,
     currentSession = null,
+    isDesktopRuntime = null,
     onPlayerFeedback = null,
     onPlayerDied = null,
     onRoundEnd = null,
@@ -298,6 +302,7 @@ export function initializeMatchSession({
         baseConfig,
         requestedMapKey,
         currentSession,
+        isDesktopRuntime,
     });
     const finalizeInitializedMatch = (initializedMatch) => wireInitializedMatchRuntime({
         renderer,
@@ -323,6 +328,7 @@ export function prepareInitializedMatchSession({
     baseConfig = null,
     requestedMapKey,
     currentSession = null,
+    isDesktopRuntime = null,
 }) {
     const finalizePreparedMatch = (session) => {
         const feedbackPlan = deriveMapResolutionFeedbackPlan({
@@ -346,6 +352,7 @@ export function prepareInitializedMatchSession({
         baseConfig,
         requestedMapKey,
         currentSession,
+        isDesktopRuntime,
     });
     if (isPromiseLike(session)) {
         return Promise.resolve(session).then(finalizePreparedMatch);

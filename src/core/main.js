@@ -5,15 +5,13 @@
 import { RoundRecorder } from '../state/RoundRecorder.js';
 import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 import { ProfileUiController } from '../composition/core-ui/CoreUiAppPorts.js';
+import { createCoreRuntimeAccess } from '../composition/core-ui/CoreRuntimeAccessFactory.js';
 import { SettingsManager } from './SettingsManager.js';
 import { ProfileManager } from './ProfileManager.js';
 import { createRoundStateController } from '../state/RoundStateController.js';
-import {
-    createPlayingStateRuntimeAccess,
-    PlayingStateSystem,
-} from './PlayingStateSystem.js';
+import { PlayingStateSystem } from './PlayingStateSystem.js';
 import { RoundStateTickSystem } from '../state/RoundStateTickSystem.js';
-import { createGameDebugRuntimeAccess, GameDebugApi } from './GameDebugApi.js';
+import { GameDebugApi } from './GameDebugApi.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
@@ -24,6 +22,7 @@ import { isPlaytestLaunchRequested, readPlaytestLaunchBoolParam } from './Playte
 import { RECORDING_HUD_MODE } from '../shared/contracts/RecordingCaptureContract.js';
 import { ensureInteractiveMatchRuntime } from './InteractiveMatchRuntimeGuard.js';
 import { GameRuntimeCoordinator } from './runtime/GameRuntimeCoordinator.js';
+import { isPersistenceSuccess } from './settings/SettingsDomainUtils.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -51,7 +50,8 @@ export class Game {
         this.state = GAME_STATE_IDS.MENU;
         this.roundPause = 0;
         this.roundStateController = createRoundStateController({ defaultRoundPause: 3.0 });
-        this.playingStateSystem = new PlayingStateSystem(createPlayingStateRuntimeAccess(this));
+        const runtimeAccess = createCoreRuntimeAccess(this);
+        this.playingStateSystem = new PlayingStateSystem(runtimeAccess.playingState);
         this.roundStateTickSystem = new RoundStateTickSystem({
             game: this,
             getLifecyclePort: () => this.runtimeCoordinator?.getPorts?.()?.lifecyclePort || null,
@@ -76,7 +76,7 @@ export class Game {
             showStatusToast: (message, durationMs, tone) => this._showStatusToast(message, durationMs, tone),
             initialBindings: this.settings.controls,
         });
-        this.debugApi = new GameDebugApi(createGameDebugRuntimeAccess(this));
+        this.debugApi = new GameDebugApi(runtimeAccess.gameDebug);
 
         // Debug Recorder
         this.recorder = new RoundRecorder();
@@ -159,7 +159,7 @@ export class Game {
 
     _saveSettings() {
         const persisted = this.settingsManager.saveSettings(this.settings);
-        if (persisted) {
+        if (isPersistenceSuccess(persisted)) {
             this._markSettingsDirty(false);
         }
     }

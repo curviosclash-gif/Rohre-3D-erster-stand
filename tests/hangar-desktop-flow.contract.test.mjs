@@ -18,6 +18,7 @@ import {
     HANGAR_SELECTION_WRITEBACK_PATHS,
     readHangarMapSelection,
     readHangarVehicleSelection,
+    resolveHangarSelectionMode,
     writeHangarMapSelection,
     writeHangarVehicleSelection,
 } from '../src/ui/hangar/HangarSelectionWritebackContract.js';
@@ -83,6 +84,65 @@ test('V76.99.2 map/vehicle writeback persists mode-aware selections through one 
     assert.equal(fightMap.value, 'fight-map');
     assert.equal(arcadeVehicle.value, 'ship7');
     assert.equal(fightVehicle.value, 'ship9');
+    assert.equal(settings.mapKey, 'fight-map');
+    assert.equal(settings.vehicles.PLAYER_1, 'ship5');
+    assert.equal(settings.vehicles.PLAYER_2, 'ship9');
+});
+
+test('V76.99.2 unknown mode-path falls back consistently to fight mode', () => {
+    const settings = {
+        mapKey: 'standard',
+        vehicles: {
+            PLAYER_1: 'ship5',
+            PLAYER_2: 'ship5',
+        },
+        localSettings: {
+            modePath: 'normal',
+            startSetup: {},
+        },
+    };
+
+    assert.equal(resolveHangarSelectionMode('normal'), HANGAR_MODES.FIGHT);
+    assert.equal(resolveHangarSelectionMode('unknown-mode'), HANGAR_MODES.FIGHT);
+
+    const writeback = writeHangarMapSelection(settings, 'fight-map', 'standard', { modePath: 'normal' });
+    assert.equal(writeback.mode, HANGAR_MODES.FIGHT);
+    assert.equal(writeback.persistencePath, HANGAR_SELECTION_WRITEBACK_PATHS.MODE_FIGHT_MAP_KEY);
+    assert.equal(settings.localSettings.startSetup.modeSelections?.fight?.mapKey, 'fight-map');
+});
+
+test('V76.99.2 mode reads stay isolated from global map/vehicle fallbacks', () => {
+    const settings = {
+        mapKey: 'global-map',
+        vehicles: {
+            PLAYER_1: 'global-p1',
+            PLAYER_2: 'global-p2',
+        },
+        localSettings: {
+            modePath: HANGAR_MODES.FIGHT,
+            startSetup: {
+                modeSelections: {
+                    fight: {
+                        mapKey: 'fight-map',
+                        vehicles: {
+                            PLAYER_1: 'fight-p1',
+                            PLAYER_2: 'fight-p2',
+                        },
+                    },
+                },
+            },
+        },
+    };
+
+    const fightMap = readHangarMapSelection(settings, 'standard', { mode: HANGAR_MODES.FIGHT });
+    const fightP1 = readHangarVehicleSelection(settings, 'PLAYER_1', 'ship5', { mode: HANGAR_MODES.FIGHT });
+    const arcadeMap = readHangarMapSelection(settings, 'standard', { mode: HANGAR_MODES.ARCADE });
+    const arcadeP1 = readHangarVehicleSelection(settings, 'PLAYER_1', 'ship5', { mode: HANGAR_MODES.ARCADE });
+
+    assert.equal(fightMap.value, 'fight-map');
+    assert.equal(fightP1.value, 'fight-p1');
+    assert.equal(arcadeMap.value, 'standard');
+    assert.equal(arcadeP1.value, 'ship5');
 });
 
 test('V76.99.2 lifecycle keeps single contract return path to menu and match start for both modes', () => {
@@ -135,6 +195,18 @@ test('V76.99.2 workshop persistence facade saves via named desktop capabilities'
             HANGAR_CAPABILITY_IDS.DELETE_CUSTOM_BLUEPRINT,
         ]
     );
+});
+
+test('V76.99.2 workshop persistence facade propagates backend-level rejection', async () => {
+    const facade = createHangarWorkshopPersistenceFacade({
+        invokeCapability: async () => ({ ok: false, code: 'backend_rejected', message: 'refused by backend' }),
+    });
+
+    const result = await facade.saveCustomVehicle({ id: 'arcade-fighter' });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.code, 'backend_rejected');
+    assert.equal(result.message, 'refused by backend');
 });
 
 test('V104.4.4 legacy arcade manager stays wired to ArcadeMenuSurface while hangar shell contracts remain contract-only', () => {

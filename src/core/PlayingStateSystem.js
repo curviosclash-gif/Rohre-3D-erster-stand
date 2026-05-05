@@ -3,32 +3,50 @@
 // ============================================
 
 import { SimStateSnapshot } from './SimStateSnapshot.js';
+import { createRuntimeAccess } from '../shared/runtime/RuntimeAccessFactory.js';
 
 export function createPlayingStateRuntimeAccess(runtime) {
-    const game = runtime && typeof runtime === 'object' ? runtime : null;
-    return Object.freeze({
-        getRenderFrameId: () => game?.gameLoop?.renderFrameId || 0,
-        wasPausePressed: () => game?.input?.wasPressed?.('Escape') === true,
-        pauseMatch() {
+    return createRuntimeAccess(runtime, (game) => {
+        const actionPauseMatch = () => {
             game?.matchFlowUiController?.pause?.();
-        },
-        updatePlanarAimAssist(dt) {
+        };
+        const actionUpdatePlanarAimAssist = (dt) => {
             game?._updatePlanarAimAssist?.(dt);
-        },
+        };
+        const actionUpdateLastRoundGhostPlayback = (dt) => {
+            game?.entityManager?.updateLastRoundGhostPlayback?.(dt);
+        };
+        const actionTickSuddenDeath = (dt) => {
+            game?.runtimePorts?.arcadePort?.tickSuddenDeath?.(dt);
+        };
+        const actionUpdatePlayingHudTick = (dt) => {
+            game?.hudRuntimeSystem?.updatePlayingHudTick?.(dt);
+        };
+        const actionApplyPlayingTimeScaleFromEffects = () => {
+            game?._applyPlayingTimeScaleFromEffects?.();
+        };
+        return {
+        getRenderFrameId: () => game?.gameLoop?.renderFrameId || 0,
+        getPausePressed: () => game?.input?.wasPressed?.('Escape') === true,
+        actionPauseMatch,
+        actionUpdatePlanarAimAssist,
         getEntityManager: () => game?.entityManager || null,
         getInput: () => game?.input || null,
         getPowerupManager: () => game?.powerupManager || null,
         getParticles: () => game?.particles || null,
         getArena: () => game?.arena || null,
-        tickSuddenDeath(dt) {
-            game?.runtimePorts?.arcadePort?.tickSuddenDeath?.(dt);
-        },
-        updatePlayingHudTick(dt) {
-            game?.hudRuntimeSystem?.updatePlayingHudTick?.(dt);
-        },
-        applyPlayingTimeScaleFromEffects() {
-            game?._applyPlayingTimeScaleFromEffects?.();
-        },
+        actionUpdateLastRoundGhostPlayback,
+        actionTickSuddenDeath,
+        actionUpdatePlayingHudTick,
+        actionApplyPlayingTimeScaleFromEffects,
+        // Backward-compatible aliases for transitional call sites.
+        wasPausePressed: () => game?.input?.wasPressed?.('Escape') === true,
+        pauseMatch: actionPauseMatch,
+        updatePlanarAimAssist: actionUpdatePlanarAimAssist,
+        updateLastRoundGhostPlayback: actionUpdateLastRoundGhostPlayback,
+        tickSuddenDeath: actionTickSuddenDeath,
+        updatePlayingHudTick: actionUpdatePlayingHudTick,
+        applyPlayingTimeScaleFromEffects: actionApplyPlayingTimeScaleFromEffects,
         getElapsedTime: () => game?.gameLoop?.elapsedTime || 0,
         getHuntState: () => game?.huntState || null,
         getRenderer: () => game?.renderer || null,
@@ -37,6 +55,7 @@ export function createPlayingStateRuntimeAccess(runtime) {
         getRuntimeProjectionPort: () => game?.runtimeBundle?.ports?.runtimeProjectionPort || null,
         getRuntimePerfProfiler: () => game?.runtimePerfProfiler || null,
         getCrosshairSystem: () => game?.crosshairSystem || null,
+    };
     });
 }
 
@@ -99,12 +118,12 @@ export class PlayingStateSystem {
         const entityManager = this.runtimeAccess.getEntityManager?.() || null;
         const renderFrameId = this.runtimeAccess.getRenderFrameId?.() || 0;
 
-        if (this.runtimeAccess.wasPausePressed?.()) {
-            this.runtimeAccess.pauseMatch?.();
+        if (this.runtimeAccess.getPausePressed?.()) {
+            this.runtimeAccess.actionPauseMatch?.();
             return;
         }
 
-        this.runtimeAccess.updatePlanarAimAssist?.(dt);
+        this.runtimeAccess.actionUpdatePlanarAimAssist?.(dt);
 
         // V84: drive simulation through MatchKernel when an adapter is present;
         // fall back to direct calls for backwards compatibility during migration.
@@ -119,9 +138,10 @@ export class PlayingStateSystem {
             this.runtimeAccess.getArena?.()?.update?.(dt);
         }
 
-        this.runtimeAccess.tickSuddenDeath?.(dt);
-        this.runtimeAccess.updatePlayingHudTick?.(dt);
-        this.runtimeAccess.applyPlayingTimeScaleFromEffects?.();
+        this.runtimeAccess.actionTickSuddenDeath?.(dt);
+        this.runtimeAccess.actionUpdateLastRoundGhostPlayback?.(dt);
+        this.runtimeAccess.actionUpdatePlayingHudTick?.(dt);
+        this.runtimeAccess.actionApplyPlayingTimeScaleFromEffects?.();
 
         // N6: opt-in sim state snapshot capture (zero-alloc when enabled)
         if (this._simSnapshot?.enabled) {

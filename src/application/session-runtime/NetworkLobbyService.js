@@ -139,9 +139,23 @@ export class NetworkLobbyService {
             });
             this.onStateChanged?.(this.getSessionState());
         });
-        lobby.on('closed', () => {
+        lobby.on('error', (payload = null) => {
+            const message = normalizeString(
+                payload?.message,
+                'Lobby-Verbindung unterbrochen.'
+            );
+            this._setStatus(message);
+        });
+        lobby.on('closed', (payload = null) => {
             this._sessionState = createIdleSessionState('', this.transport);
             this.onStateChanged?.(this.getSessionState());
+            if (payload?.reason === 'signaling_unavailable') {
+                const reasonMessage = normalizeString(
+                    payload?.error?.message,
+                    'Lobby-Verbindung unterbrochen.'
+                );
+                this._setStatus(reasonMessage);
+            }
         });
         lobby.on('matchStart', ({ pendingMatchStart }) => {
             this.onMatchStart?.(deepClone(pendingMatchStart), this.getSessionState());
@@ -287,7 +301,8 @@ export class NetworkLobbyService {
                 maxPlayers: Number(options.maxPlayers || 10),
             });
         } catch (error) {
-            return this._fail(error instanceof Error ? error.message : 'Lobby konnte nicht erstellt werden.', 'lobby_create_failed');
+            const message = error instanceof Error ? error.message : 'Lobby konnte nicht erstellt werden.';
+            return this._fail(message, normalizeString(error?.code, 'lobby_create_failed'));
         }
 
         const sessionState = this.getSessionState();
@@ -332,7 +347,9 @@ export class NetworkLobbyService {
                 lobbyCode: requestedLobbyCode,
             }));
         } catch (error) {
-            return this._fail(error instanceof Error ? error.message : 'Lobby konnte nicht beigetreten werden.', 'join_failed');
+            const message = error instanceof Error ? error.message : 'Lobby konnte nicht beigetreten werden.';
+            const code = normalizeString(error?.code, 'join_failed');
+            return this._fail(message, code);
         }
 
         const sessionState = this.getSessionState();
@@ -364,7 +381,8 @@ export class NetworkLobbyService {
         try {
             await this._lobby.setReady(requestedReady);
         } catch (error) {
-            return this._fail(error instanceof Error ? error.message : 'Ready-Status konnte nicht gesetzt werden.', 'ready_failed');
+            const message = error instanceof Error ? error.message : 'Ready-Status konnte nicht gesetzt werden.';
+            return this._fail(message, normalizeString(error?.code, 'ready_failed'));
         }
 
         const event = this._emit(LOBBY_SERVICE_EVENT_TYPES.READY_TOGGLE, {
@@ -397,7 +415,10 @@ export class NetworkLobbyService {
                 sessionState: this.getSessionState(),
                 snapshot: this.getSnapshot(),
             };
-        }).catch(() => null);
+        }).catch((error) => this._fail(
+            error instanceof Error ? error.message : 'Ready-Invalidierung fehlgeschlagen.',
+            normalizeString(error?.code, 'ready_invalidation_failed')
+        ));
     }
 
     syncActorIdentity(actorId) {
@@ -457,7 +478,7 @@ export class NetworkLobbyService {
         }).catch((error) => (
             this._fail(
                 error instanceof Error ? error.message : 'Lobby-Start konnte nicht ausgeliefert werden.',
-                'match_start_failed'
+                normalizeString(error?.code, 'match_start_failed')
             )
         ));
     }

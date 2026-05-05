@@ -38,6 +38,7 @@ function createPlayer(index, { isBot = false } = {}) {
 }
 
 function createEntityManager(routeDefinition) {
+    let progressProvider = null;
     return {
         arena: {
             currentMapDefinition: {
@@ -45,9 +46,16 @@ function createEntityManager(routeDefinition) {
             },
             _portalGateSystem: {
                 checkpointRingRuntime: {
-                    setProgressProvider() {},
+                    setProgressProvider(provider) {
+                        progressProvider = typeof provider === 'function' ? provider : null;
+                    },
                     setParticleSystem() {},
                 },
+            },
+        },
+        renderer: {
+            viewportSystem: {
+                localPlayerIndex: 0,
             },
         },
         particles: null,
@@ -55,6 +63,9 @@ function createEntityManager(routeDefinition) {
             logEvent() {},
         },
         _notifyPlayerFeedback() {},
+        __getProgressProvider() {
+            return progressProvider;
+        },
     };
 }
 
@@ -134,7 +145,31 @@ test('ParcoursProgressSystem starts ghost recording only for human players', () 
         type: 'ghost_start',
         playerIndex: 0,
         routeId: 'unit_route',
+        source: 'parcours_checkpoint_start',
     }]);
+});
+
+test('ParcoursProgressSystem progress provider follows local viewport player index', () => {
+    const routeDefinition = createRouteDefinition();
+    const player0 = createPlayer(0, { isBot: false });
+    const player1 = createPlayer(1, { isBot: false });
+    const entityManager = createEntityManager(routeDefinition);
+    entityManager.renderer.viewportSystem.localPlayerIndex = 1;
+    entityManager.players = [player0, player1];
+    const system = new ParcoursProgressSystem(entityManager);
+    system.startRound([player0, player1]);
+
+    const provider = entityManager.__getProgressProvider();
+    assert.equal(typeof provider, 'function');
+
+    const routeSnapshot = system.getRouteSnapshot();
+    const firstCheckpoint = routeSnapshot?.checkpoints?.[0];
+    assert.ok(firstCheckpoint);
+    crossCheckpoint(system, player1, firstCheckpoint, 1000);
+
+    const snapshot = provider();
+    assert.equal(snapshot?.nextCheckpointIndex, 1);
+    assert.equal(snapshot?.lastCheckpointId, 'CP01');
 });
 
 test('ParcoursProgressSystem lets only the owning human finish the ghost recording', () => {

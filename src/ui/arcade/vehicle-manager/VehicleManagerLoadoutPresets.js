@@ -1,7 +1,23 @@
 import { resolveArtifactVersionState } from '../../../shared/contracts/ArtifactVersionMigrationContract.js';
+import { isArcadeVehicleUpgradeSlot } from '../../../shared/contracts/ArcadeVehicleProfileContract.js';
 
 const VEHICLE_LOADOUT_PRESET_STORAGE_KEY = 'cuviosclash.arcade-vehicle-loadouts.v1';
 const VEHICLE_LOADOUT_PRESET_SCHEMA = 'arcade-vehicle-loadouts.v1';
+
+function isPersistenceSuccess(result) {
+    return result === undefined || result === true || result?.success === true;
+}
+
+function warnPersistenceFailure(contextLabel, result) {
+    if (isPersistenceSuccess(result)) return;
+    if (typeof console === 'undefined' || typeof console.warn !== 'function') return;
+    console.warn(`[VehicleManagerLoadoutPresets] ${String(contextLabel || 'save')} failed`, {
+        reason: String(result?.reason || ''),
+        metadata: result?.metadata && typeof result.metadata === 'object'
+            ? { ...result.metadata }
+            : null,
+    });
+}
 
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
@@ -19,17 +35,35 @@ function toSafeTimestamp(value) {
 
 function toSafeUpgradeMap(source) {
     const result = {};
-    if (!source || typeof source !== 'object') return result;
+    const invalidEntries = [];
+    if (!source || typeof source !== 'object') {
+        return { upgrades: result, invalidEntries };
+    }
     const keys = Object.keys(source);
     for (let index = 0; index < keys.length; index += 1) {
         const key = normalizeString(keys[index]);
         if (!key) continue;
+        const normalizedKey = key.toLowerCase();
         const value = normalizeString(source[key], 'T1').toUpperCase();
-        if (value === 'T1' || value === 'T2' || value === 'T3') {
-            result[key] = value;
+        if (!isArcadeVehicleUpgradeSlot(normalizedKey)) {
+            invalidEntries.push({
+                slotName: normalizedKey,
+                targetTier: value,
+                code: 'invalid_slot',
+            });
+            continue;
         }
+        if (value !== 'T1' && value !== 'T2' && value !== 'T3') {
+            invalidEntries.push({
+                slotName: normalizedKey,
+                targetTier: value,
+                code: 'invalid_tier',
+            });
+            continue;
+        }
+        result[normalizedKey] = value;
     }
-    return result;
+    return { upgrades: result, invalidEntries };
 }
 
 function safeReadFromLocalStorage() {
@@ -54,11 +88,13 @@ function sanitizePresetRecord(source) {
     const normalized = source && typeof source === 'object' ? source : {};
     const normalizedVehicleId = normalizeVehicleId(normalized.vehicleId, 'ship5');
     const normalizedPresetId = normalizeString(normalized.presetId, `preset-${toSafeTimestamp(normalized.updatedAtMs)}`);
+    const sanitizedUpgrades = toSafeUpgradeMap(normalized.upgrades);
     return {
         presetId: normalizedPresetId,
         vehicleId: normalizedVehicleId,
         name: normalizeString(normalized.name, normalizedPresetId),
-        upgrades: toSafeUpgradeMap(normalized.upgrades),
+        upgrades: sanitizedUpgrades.upgrades,
+        invalidEntries: sanitizedUpgrades.invalidEntries,
         updatedAtMs: toSafeTimestamp(normalized.updatedAtMs),
     };
 }
@@ -113,7 +149,8 @@ function loadPayload(store) {
         const loaded = store.loadJsonRecord(VEHICLE_LOADOUT_PRESET_STORAGE_KEY, null);
         const resolved = resolvePersistedPayload(loaded);
         if (resolved.shouldPersist && typeof store.saveJsonRecord === 'function') {
-            store.saveJsonRecord(VEHICLE_LOADOUT_PRESET_STORAGE_KEY, resolved.payload);
+            const saveResult = store.saveJsonRecord(VEHICLE_LOADOUT_PRESET_STORAGE_KEY, resolved.payload);
+            warnPersistenceFailure('canonical write-back', saveResult);
         }
         return resolved.payload;
     }
@@ -136,7 +173,8 @@ function loadPayload(store) {
 function persistPayload(store, payload) {
     const normalized = sanitizeStorePayload(payload);
     if (store && typeof store.saveJsonRecord === 'function') {
-        store.saveJsonRecord(VEHICLE_LOADOUT_PRESET_STORAGE_KEY, normalized);
+        const saveResult = store.saveJsonRecord(VEHICLE_LOADOUT_PRESET_STORAGE_KEY, normalized);
+        warnPersistenceFailure('persistPayload', saveResult);
         return;
     }
     safeWriteToLocalStorage(JSON.stringify(normalized));
@@ -167,6 +205,7 @@ export function createVehicleManagerLoadoutPresetStore({ store } = {}) {
                 vehicleId: entry.vehicleId,
                 name: entry.name,
                 upgrades: { ...entry.upgrades },
+                invalidEntries: Array.isArray(entry.invalidEntries) ? entry.invalidEntries.map((item) => ({ ...item })) : [],
                 updatedAtMs: entry.updatedAtMs,
             }));
     }
@@ -217,6 +256,7 @@ export function createVehicleManagerLoadoutPresetStore({ store } = {}) {
             vehicleId: found.vehicleId,
             name: found.name,
             upgrades: { ...found.upgrades },
+            invalidEntries: Array.isArray(found.invalidEntries) ? found.invalidEntries.map((item) => ({ ...item })) : [],
             updatedAtMs: found.updatedAtMs,
         };
     }

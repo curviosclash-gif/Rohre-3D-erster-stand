@@ -32,7 +32,7 @@ export function buildHumanConfigs(settings, runtimeConfig = null) {
     ];
 }
 
-export function buildEntityManagerSetupOptions(settings, runtimeConfig = null, entityRuntimeConfig = null) {
+export function buildEntityManagerSetupOptions(settings, runtimeConfig = null, entityRuntimeConfig = null, setupOptions = null) {
     const runtimeBotConfig = runtimeConfig?.bot || null;
     const setupPlanarMode = runtimeConfig?.gameplay?.planarMode ?? settings?.gameplay?.planarMode;
     return {
@@ -43,6 +43,7 @@ export function buildEntityManagerSetupOptions(settings, runtimeConfig = null, e
         planarMode: typeof setupPlanarMode === 'boolean' ? setupPlanarMode : undefined,
         runtimeConfig,
         entityRuntimeConfig,
+        isDesktopRuntime: setupOptions?.isDesktopRuntime,
         humanConfigs: buildHumanConfigs(settings, runtimeConfig),
     };
 }

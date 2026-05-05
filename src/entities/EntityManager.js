@@ -11,6 +11,7 @@ import { createGameModeStrategy } from '../modes/GameModeRegistry.js';
 import { LastRoundGhostSystem } from './LastRoundGhostSystem.js';
 import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 import { applyLiveRuntimeConfig as _applyLiveRuntimeConfig } from './EntityManagerLiveConfigOps.js';
+import { createRuntimeRng } from '../shared/contracts/RuntimeRngContract.js';
 
 function clampInt(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -103,8 +104,10 @@ export class EntityManager {
         this.botBridgeEnabled = false;
         this.activeGameMode = String(this.entityRuntimeConfig.HUNT?.ACTIVE_MODE || 'CLASSIC').trim().toUpperCase();
         this.huntEnabled = this.entityRuntimeConfig.HUNT?.ENABLED !== false && this.activeGameMode === 'HUNT';
+        this.runtimeRng = createRuntimeRng();
         this.gameModeStrategy = createGameModeStrategy(this.activeGameMode, {
             entityRuntimeConfig: this.entityRuntimeConfig,
+            runtimeRng: this.runtimeRng,
         });
         if (this.powerupManager) {
             this.powerupManager.getStrategy = () => this.gameModeStrategy;
@@ -545,4 +548,3 @@ export class EntityManager {
         }
     }
 }
-

@@ -88,12 +88,6 @@ export class UIManager {
         this.menuTextRuntime = game?.menuTextRuntime instanceof MenuTextRuntime
             ? game.menuTextRuntime
             : new MenuTextRuntime({ overrideStore: this.settingsManager?.menuTextOverrideStore });
-        if (game) {
-            game.menuSchema = this.menuSchema;
-            game.menuPanelRegistry = this.menuPanelRegistry;
-            game.menuStateMachine = this.menuStateMachine;
-            game.menuTextRuntime = this.menuTextRuntime;
-        }
 
         const controllerPortDeps = { manager: this, game };
         this._startSync = new UIStartSyncController({ ui: this.ui, manager: this, port: createStartSetupControllerPortFromManager({ ...controllerPortDeps, settingsManager: this.settingsManager, getMapDefinitions: () => this._getGameplayConfig()?.MAPS || {} }) });

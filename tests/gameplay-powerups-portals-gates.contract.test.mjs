@@ -372,6 +372,62 @@ test('HuntBotPolicy erweitert Retreat-Fallback auf Portale und defensive Nicht-R
     assert.equal(action.yawLeft, false);
 });
 
+test('B04 F6 HuntBotPolicy Retreat-Fallback steuert vom Gegner weg statt frontal zu', () => {
+    const player = {
+        id: 'hunt-retreat-fallback',
+        index: 0,
+        alive: true,
+        hp: 20,
+        maxHp: 100,
+        shieldHP: 0,
+        maxShieldHp: 100,
+        inventory: [],
+        position: new THREE.Vector3(0, 0, 0),
+        getDirection(out) {
+            return out.set(0, 0, 1);
+        },
+    };
+    const enemy = {
+        id: 'enemy-front-right',
+        index: 1,
+        alive: true,
+        hp: 100,
+        maxHp: 100,
+        shieldHP: 0,
+        maxShieldHp: 100,
+        position: new THREE.Vector3(10, 0, 20),
+    };
+    const policy = new HuntBotPolicy();
+    policy._fallbackPolicy.update = () => ({
+        yawLeft: false,
+        yawRight: false,
+        pitchUp: false,
+        pitchDown: false,
+        boost: false,
+        shootMG: true,
+        shootItem: false,
+        shootItemIndex: -1,
+        useItem: -1,
+    });
+    policy._fallbackPolicy.getSensorSnapshot = () => null;
+
+    const action = policy.update(1 / 60, player, {
+        arena: {
+            portalsEnabled: false,
+            portals: [],
+            specialGates: [],
+        },
+        players: [player, enemy],
+        projectiles: [],
+        huntTarget: null,
+    });
+
+    assert.equal(action.boost, true);
+    assert.equal(action.shootMG, false);
+    assert.equal(action.yawRight, true);
+    assert.equal(action.yawLeft, false);
+});
+
 test('HuntBridgePolicy erweitert Retreat-Fallback auf Gates und defensive Nicht-Raketen-Items', () => {
     const player = {
         id: 'hunt-bridge-bot',

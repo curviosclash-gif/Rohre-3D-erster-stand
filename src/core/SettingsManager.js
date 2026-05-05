@@ -63,14 +63,14 @@ export class SettingsManager {
             telemetryHistoryStore: this.telemetryHistoryStore,
         });
 
-        this.profileStorePort = {
+        this.profileStorePort = Object.freeze({
             loadProfiles: () => this.settingsStore.loadProfiles(),
             saveProfiles: (profiles) => this.settingsStore.saveProfiles(profiles),
             sanitizeSettings: (settings) => this.sanitizeSettings(settings),
             normalizeProfileName: (rawName) => this.settingsStore.normalizeProfileName(rawName),
             findProfileIndexByName: (profiles, profileName) => this.settingsStore.findProfileIndexByName(profiles, profileName),
             findProfileByName: (profiles, profileName) => this.settingsStore.findProfileByName(profiles, profileName),
-        };
+        });
         this.settingsRecordStorePort = Object.freeze({
             loadJsonRecord: (storageKey, fallbackValue = null) => this.settingsStore.loadJsonRecord(storageKey, fallbackValue),
             saveJsonRecord: (storageKey, value) => this.settingsStore.saveJsonRecord(storageKey, value),
@@ -86,7 +86,11 @@ export class SettingsManager {
     }
 
     sanitizeSettings(saved) {
-        const sanitizedSettings = sanitizeSettingsSnapshot(saved, () => this.createDefaultSettings());
+        const sanitizedSettings = sanitizeSettingsSnapshot(
+            saved,
+            () => this.createDefaultSettings(),
+            this.runtimeGlobal
+        );
         return rebaseSettingsSnapshotWithRuntimeDefaults(sanitizedSettings, this.runtimeGlobal);
     }
 

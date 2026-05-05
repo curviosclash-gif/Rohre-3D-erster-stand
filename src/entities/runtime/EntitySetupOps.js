@@ -6,6 +6,7 @@ import {
 import { getVehicleIds, isValidVehicleId } from '../vehicle-registry.js';
 import { createGameModeStrategy } from '../../modes/GameModeRegistry.js';
 import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
+import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
 
 function normalizeActiveMode(mode) {
     return String(mode || '').trim().toLowerCase();
@@ -29,6 +30,22 @@ function resolveConfiguredBotPolicyType({ requestedPolicyType, runtimeConfig, ac
     const fallbackPolicyType = resolvePolicyFallbackByMode(activeGameMode, effectivePlanarMode);
     const resolvedPolicyType = normalizeBotPolicyType(requestedPolicyType || runtimePolicyType || fallbackPolicyType);
     return resolvedPolicyType;
+}
+
+function resolveDesktopRuntimeProbeOption(rawValue) {
+    if (rawValue === true) {
+        return () => true;
+    }
+    if (typeof rawValue === 'function') {
+        return () => {
+            try {
+                return rawValue() === true;
+            } catch {
+                return false;
+            }
+        };
+    }
+    return () => false;
 }
 
 export class EntitySetupOps {
@@ -66,14 +83,23 @@ export class EntitySetupOps {
         const setupBridgeEnabled = typeof options.bridgeEnabled === 'boolean'
             ? options.bridgeEnabled
             : (strategyForcesBridge || !!owner.runtimeConfig?.bot?.trainerBridgeEnabled);
+        const runtimeSeed = Number(owner.runtimeConfig?.arcade?.seed);
+        owner.runtimeRng = options.runtimeRng && typeof options.runtimeRng.next === 'function'
+            ? options.runtimeRng
+            : createRuntimeRng({
+                seed: Number.isFinite(runtimeSeed) ? runtimeSeed : 0,
+                random: typeof owner.runtimeRng?.next === 'function' ? owner.runtimeRng.next : Math.random,
+            });
         owner.huntEnabled = activeModeLower === 'hunt' && owner.entityRuntimeConfig?.HUNT?.ENABLED !== false;
         owner.gameModeStrategy = createGameModeStrategy(owner.activeGameMode, {
             entityRuntimeConfig: owner.entityRuntimeConfig,
+            runtimeRng: owner.runtimeRng,
         });
         owner.botDifficulty = options.botDifficulty
             || owner.entityRuntimeConfig?.BOT?.ACTIVE_DIFFICULTY
             || owner.botDifficulty;
         owner.botBridgeEnabled = setupBridgeEnabled;
+        owner.botIsDesktopRuntime = resolveDesktopRuntimeProbeOption(options.isDesktopRuntime);
         owner.botPolicyType = resolveConfiguredBotPolicyType({
             requestedPolicyType: options.botPolicyType,
             runtimeConfig: owner.runtimeConfig,
@@ -165,6 +191,7 @@ export class EntitySetupOps {
                 entityRuntimeConfig: owner.entityRuntimeConfig,
                 bridgeEnabled: owner.botBridgeEnabled,
                 activeGameMode: owner.activeGameMode,
+                isDesktopRuntime: owner.botIsDesktopRuntime,
             });
             const sensePhase = i % 4;
             if (typeof ai?.setSensePhase === 'function') {

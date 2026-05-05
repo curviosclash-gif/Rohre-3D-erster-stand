@@ -5,6 +5,7 @@
 
 import {
     HANGAR_MODES,
+    resolveHangarMode,
     resolveHangarUserFlow,
 } from '../../shared/contracts/HangarModeContract.js';
 import {
@@ -79,13 +80,13 @@ function ensureModeSelectionState(settings, mode) {
         startSetup.modeSelections[mode] = {};
     }
     const modeSelection = startSetup.modeSelections[mode];
-    const fallbackMapKey = normalizeString(settings?.mapKey, 'standard') || 'standard';
+    const fallbackMapKey = 'standard';
     if (typeof modeSelection.mapKey !== 'string') modeSelection.mapKey = fallbackMapKey;
     if (!modeSelection.vehicles || typeof modeSelection.vehicles !== 'object') {
         modeSelection.vehicles = {};
     }
-    const fallbackVehicleP1 = normalizeString(settings?.vehicles?.PLAYER_1, 'ship5').toLowerCase() || 'ship5';
-    const fallbackVehicleP2 = normalizeString(settings?.vehicles?.PLAYER_2, 'ship5').toLowerCase() || 'ship5';
+    const fallbackVehicleP1 = 'ship5';
+    const fallbackVehicleP2 = 'ship5';
     if (typeof modeSelection.vehicles.PLAYER_1 !== 'string') modeSelection.vehicles.PLAYER_1 = fallbackVehicleP1;
     if (typeof modeSelection.vehicles.PLAYER_2 !== 'string') modeSelection.vehicles.PLAYER_2 = fallbackVehicleP2;
     return modeSelection;
@@ -97,15 +98,18 @@ export function resolveHangarSelectionPlayerSlot(rawSlot) {
 }
 
 export function resolveHangarSelectionMode(rawModePath) {
-    const normalized = normalizeString(rawModePath).toLowerCase();
-    if (VALID_HANGAR_SELECTION_MODE_SET.has(normalized)) return normalized;
-    if (normalized === 'fight') return HANGAR_SELECTION_MODES.FIGHT;
-    return HANGAR_SELECTION_MODES.ARCADE;
+    const normalizedMode = resolveHangarMode(rawModePath);
+    if (VALID_HANGAR_SELECTION_MODE_SET.has(normalizedMode)) return normalizedMode;
+    return HANGAR_SELECTION_MODES.FIGHT;
 }
 
 function resolveSelectionModeFromSettings(settings, options = {}) {
     const optionMode = normalizeString(options.mode || options.modePath);
     if (optionMode) return resolveHangarSelectionMode(optionMode);
+    return resolveHangarSelectionMode(settings?.localSettings?.modePath);
+}
+
+function resolveActiveSelectionModeFromSettings(settings) {
     return resolveHangarSelectionMode(settings?.localSettings?.modePath);
 }
 
@@ -189,7 +193,7 @@ export function readHangarMapSelection(settings, fallbackMapKey = 'standard', op
     const mode = resolveSelectionModeFromSettings(settings, options);
     const modeSelection = ensureModeSelectionState(settings, mode);
     const modeInfo = resolveHangarSelectionDataSpace(mode);
-    const value = normalizeString(modeSelection?.mapKey, settings.mapKey || nextMapKey) || nextMapKey;
+    const value = normalizeString(modeSelection?.mapKey, nextMapKey) || nextMapKey;
     return {
         mode,
         dataSpace: modeInfo.dataSpace,
@@ -217,7 +221,7 @@ export function readHangarVehicleSelection(settings, rawPlayerSlot, fallbackVehi
     const modeInfo = resolveHangarSelectionDataSpace(mode);
     const value = normalizeString(
         modeSelection?.vehicles?.[playerSlot],
-        settings.vehicles?.[playerSlot] || nextVehicleId
+        nextVehicleId
     ).toLowerCase() || nextVehicleId;
     return {
         mode,
@@ -244,8 +248,10 @@ export function writeHangarMapSelection(settings, rawMapKey, fallbackMapKey = 's
     const mode = resolveSelectionModeFromSettings(settings, options);
     const modeSelection = ensureModeSelectionState(settings, mode);
     const modeInfo = resolveHangarSelectionDataSpace(mode);
-    const previousMapKey = normalizeString(modeSelection?.mapKey, settings.mapKey);
-    settings.mapKey = nextMapKey;
+    const previousMapKey = normalizeString(modeSelection?.mapKey, fallbackMapKey) || 'standard';
+    if (mode === resolveActiveSelectionModeFromSettings(settings)) {
+        settings.mapKey = nextMapKey;
+    }
     if (modeSelection) modeSelection.mapKey = nextMapKey;
     return {
         changed: previousMapKey !== nextMapKey,
@@ -275,11 +281,10 @@ export function writeHangarVehicleSelection(settings, rawPlayerSlot, rawVehicleI
     const modeSelection = ensureModeSelectionState(settings, mode);
     const modeInfo = resolveHangarSelectionDataSpace(mode);
     const nextVehicleId = normalizeString(rawVehicleId, fallbackVehicleId).toLowerCase() || 'ship5';
-    const previousVehicleId = normalizeString(
-        modeSelection?.vehicles?.[playerSlot],
-        settings.vehicles?.[playerSlot]
-    ).toLowerCase();
-    settings.vehicles[playerSlot] = nextVehicleId;
+    const previousVehicleId = normalizeString(modeSelection?.vehicles?.[playerSlot], fallbackVehicleId).toLowerCase() || 'ship5';
+    if (mode === resolveActiveSelectionModeFromSettings(settings)) {
+        settings.vehicles[playerSlot] = nextVehicleId;
+    }
     if (modeSelection?.vehicles) {
         modeSelection.vehicles[playerSlot] = nextVehicleId;
     }
@@ -293,12 +298,12 @@ export function writeHangarVehicleSelection(settings, rawPlayerSlot, rawVehicleI
     };
 }
 
-function createModeSelectionSnapshot(modeSelection = {}, fallbackMapKey, fallbackVehicles = {}) {
+function createModeSelectionSnapshot(modeSelection = {}, fallbackMapKey) {
     return Object.freeze({
         mapKey: normalizeString(modeSelection.mapKey, fallbackMapKey) || 'standard',
         vehicles: Object.freeze({
-            PLAYER_1: normalizeString(modeSelection?.vehicles?.PLAYER_1, fallbackVehicles.PLAYER_1).toLowerCase() || 'ship5',
-            PLAYER_2: normalizeString(modeSelection?.vehicles?.PLAYER_2, fallbackVehicles.PLAYER_2).toLowerCase() || 'ship5',
+            PLAYER_1: normalizeString(modeSelection?.vehicles?.PLAYER_1, 'ship5').toLowerCase() || 'ship5',
+            PLAYER_2: normalizeString(modeSelection?.vehicles?.PLAYER_2, 'ship5').toLowerCase() || 'ship5',
         }),
     });
 }
@@ -321,10 +326,6 @@ export function createHangarSelectionWritebackSnapshot(settings, options = {}) {
     );
     const arcadeModeSelection = ensureModeSelectionState(settings, HANGAR_SELECTION_MODES.ARCADE);
     const fightModeSelection = ensureModeSelectionState(settings, HANGAR_SELECTION_MODES.FIGHT);
-    const fallbackVehicles = {
-        PLAYER_1: normalizeString(settings?.vehicles?.PLAYER_1, 'ship5').toLowerCase() || 'ship5',
-        PLAYER_2: normalizeString(settings?.vehicles?.PLAYER_2, 'ship5').toLowerCase() || 'ship5',
-    };
     return Object.freeze({
         contractVersion: HANGAR_SELECTION_WRITEBACK_VERSION,
         mode: activeMode,
@@ -337,13 +338,11 @@ export function createHangarSelectionWritebackSnapshot(settings, options = {}) {
         modeSelections: Object.freeze({
             [HANGAR_SELECTION_MODES.ARCADE]: createModeSelectionSnapshot(
                 arcadeModeSelection || {},
-                settings?.mapKey,
-                fallbackVehicles
+                'standard'
             ),
             [HANGAR_SELECTION_MODES.FIGHT]: createModeSelectionSnapshot(
                 fightModeSelection || {},
-                settings?.mapKey,
-                fallbackVehicles
+                'standard'
             ),
         }),
         persistencePathMap: HANGAR_SELECTION_WRITEBACK_PATHS,

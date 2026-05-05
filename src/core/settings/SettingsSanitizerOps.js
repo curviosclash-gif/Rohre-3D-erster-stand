@@ -236,9 +236,9 @@ function migrateLegacySettingsSnapshot(src, defaults) {
     return migrated;
 }
 
-export function sanitizeSettingsSnapshot(saved, createDefaultSettings) {
+export function sanitizeSettingsSnapshot(saved, createDefaultSettings, runtimeGlobal = globalThis) {
     const defaults = createDefaultSettings();
-    const runtimeLimits = createRuntimeSettingsLimitsForRuntime();
+    const runtimeLimits = createRuntimeSettingsLimitsForRuntime(runtimeGlobal);
     const rawSource = saved && typeof saved === 'object' ? saved : {};
     const src = migrateLegacySettingsSnapshot(rawSource, defaults);
 

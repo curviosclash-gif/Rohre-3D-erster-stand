@@ -21,6 +21,8 @@ const JOIN_OFFER_MAX_BACKOFF_MS = 1_600;
 const ICE_POLL_MAX_RETRIES = 20;
 const ICE_QUIET_WINDOW_POLLS = 3;
 const ICE_POLL_DELAY_MS = 200;
+const HOST_STATUS_POLL_INTERVAL_MS = 1000;
+const HOST_STATUS_POLL_TIMEOUT_MS = 2500;
 
 function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -54,7 +56,10 @@ export class LANSessionAdapter extends SessionAdapterBase {
                 );
             },
         });
-        this._pollingInterval = null;
+        this._pollingTimer = null;
+        this._pollAbortController = null;
+        this._pollInFlight = false;
+        this._pollStopped = false;
 
         this._dataChannelManager.on('message', ({ peerId, channel, data }) => {
             this._handleMessage(peerId, channel, data);
@@ -234,25 +239,64 @@ export class LANSessionAdapter extends SessionAdapterBase {
 
     _startPolling() {
         if (!this.isHost || !this._signalingUrl) return;
+        this._stopStatusPolling();
         this._connectingPeers = new Set();
-        this._pollingInterval = setInterval(async () => {
-            try {
-                const res = await fetch(`${this._signalingUrl}/lobby/status`);
-                const data = await res.json();
-                if (Array.isArray(data.pendingPlayers)) {
-                    for (const pending of data.pendingPlayers) {
-                        const peerId = String(pending?.playerId || '').trim();
-                        if (!peerId || this._connectingPeers.has(peerId)) continue;
-                        this._connectingPeers.add(peerId);
-                        this._connectToPendingClient(pending).finally(() => {
-                            this._connectingPeers.delete(peerId);
-                        });
+        this._pollStopped = false;
+        const pollLoop = async () => {
+            if (this._pollStopped) return;
+            if (!this._pollInFlight) {
+                this._pollInFlight = true;
+                try {
+                    if (this._pollAbortController) {
+                        this._pollAbortController.abort();
                     }
+                    this._pollAbortController = new AbortController();
+                    const timeoutId = setTimeout(() => {
+                        this._pollAbortController?.abort();
+                    }, HOST_STATUS_POLL_TIMEOUT_MS);
+                    try {
+                        const res = await fetch(`${this._signalingUrl}/lobby/status`, {
+                            signal: this._pollAbortController.signal,
+                        });
+                        if (res?.ok === false) {
+                            throw new Error(`Lobby status failed (${res.status || 'unknown'})`);
+                        }
+                        const data = await res.json();
+                        if (Array.isArray(data.pendingPlayers)) {
+                            for (const pending of data.pendingPlayers) {
+                                const peerId = String(pending?.playerId || '').trim();
+                                if (!peerId || this._connectingPeers.has(peerId)) continue;
+                                this._connectingPeers.add(peerId);
+                                this._connectToPendingClient(pending).finally(() => {
+                                    this._connectingPeers.delete(peerId);
+                                });
+                            }
+                        }
+                    } finally {
+                        clearTimeout(timeoutId);
+                    }
+                } catch (err) {
+                    logger.debug('Polling lobby status failed:', err);
+                } finally {
+                    this._pollAbortController = null;
+                    this._pollInFlight = false;
                 }
-            } catch (err) {
-                logger.debug('Polling lobby status failed:', err);
             }
-        }, 1000);
+            this._pollingTimer = setTimeout(pollLoop, HOST_STATUS_POLL_INTERVAL_MS);
+        };
+        this._pollingTimer = setTimeout(pollLoop, HOST_STATUS_POLL_INTERVAL_MS);
+    }
+
+    _stopStatusPolling() {
+        this._pollStopped = true;
+        if (this._pollingTimer) {
+            clearTimeout(this._pollingTimer);
+            this._pollingTimer = null;
+        }
+        if (this._pollAbortController) {
+            this._pollAbortController.abort();
+            this._pollAbortController = null;
+        }
     }
 
     async _connectToPendingClient(pending) {
@@ -494,10 +538,7 @@ export class LANSessionAdapter extends SessionAdapterBase {
     disconnect() {
         this._sendLeaveMessage();
 
-        if (this._pollingInterval) {
-            clearInterval(this._pollingInterval);
-            this._pollingInterval = null;
-        }
+        this._stopStatusPolling();
 
         this._clearReconnectPeers();
         this._latencyMonitor.stop();

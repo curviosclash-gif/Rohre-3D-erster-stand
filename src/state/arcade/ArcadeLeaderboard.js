@@ -3,6 +3,21 @@
 export const LEADERBOARD_STORAGE_KEY = 'cuviosclash.parcours-leaderboard.v1';
 const MAX_ENTRIES_PER_ROUTE = 10;
 
+function isPersistenceSuccess(result) {
+    return result === undefined || result === true || result?.success === true;
+}
+
+function warnPersistenceFailure(contextLabel, result) {
+    if (isPersistenceSuccess(result)) return;
+    if (typeof console === 'undefined' || typeof console.warn !== 'function') return;
+    console.warn(`[ArcadeLeaderboard] ${String(contextLabel || 'save')} failed`, {
+        reason: String(result?.reason || ''),
+        metadata: result?.metadata && typeof result.metadata === 'object'
+            ? { ...result.metadata }
+            : null,
+    });
+}
+
 function toSafeMs(value) {
     const n = Math.round(Number(value) || 0);
     return Number.isFinite(n) && n >= 0 ? n : 0;
@@ -45,7 +60,8 @@ export function loadLeaderboard(store) {
 
 export function saveLeaderboard(store, lb) {
     if (!store || typeof store.saveJsonRecord !== 'function') return;
-    store.saveJsonRecord(LEADERBOARD_STORAGE_KEY, lb || {});
+    const saveResult = store.saveJsonRecord(LEADERBOARD_STORAGE_KEY, lb || {});
+    warnPersistenceFailure('saveLeaderboard', saveResult);
 }
 
 export function insertLeaderboardEntry(lb, routeId, entry) {

@@ -35,8 +35,20 @@ const WARNING_COOLDOWN_MAX_MS = 30000;
  * }} TrainerBridgeInitState
  */
 
-function isDesktopAppRuntime(runtimeGlobal = globalThis) {
-    return runtimeGlobal?.curviosApp?.isApp === true || runtimeGlobal?.__CURVIOS_APP__ === true;
+function resolveDesktopRuntimeProbe(options = {}) {
+    if (options.isDesktopRuntime === true) {
+        return () => true;
+    }
+    if (typeof options.isDesktopRuntime === 'function') {
+        return () => {
+            try {
+                return options.isDesktopRuntime() === true;
+            } catch {
+                return false;
+            }
+        };
+    }
+    return () => false;
 }
 
 export class ObservationBridgePolicy {
@@ -54,6 +66,7 @@ export class ObservationBridgePolicy {
             reason: null,
             updatedAt: 0,
         };
+        this._isDesktopRuntime = resolveDesktopRuntimeProbe(options);
         this._neutralAction = createNeutralBotAction({});
         this._localInference = null;
         this._localInferenceVocabulary = null;
@@ -254,7 +267,7 @@ export class ObservationBridgePolicy {
     }
 
     _autoLoadLatestCheckpoint() {
-        if (isDesktopAppRuntime()) {
+        if (this._isDesktopRuntime()) {
             return;
         }
         const CHECKPOINT_API_URL = '/api/bot/latest-checkpoint';

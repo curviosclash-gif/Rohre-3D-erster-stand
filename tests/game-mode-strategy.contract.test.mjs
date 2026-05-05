@@ -6,6 +6,7 @@ import { ClassicModeStrategy } from '../src/modes/ClassicModeStrategy.js';
 import { createGameModeStrategy, registerGameModeStrategy } from '../src/modes/GameModeRegistry.js';
 import { HuntModeStrategy } from '../src/modes/HuntModeStrategy.js';
 import { isRocketTierType, normalizeRocketPickupType, pickWeightedRocketTierType } from '../src/hunt/RocketPickupSystem.js';
+import { createRuntimeRng } from '../src/shared/contracts/RuntimeRngContract.js';
 
 test('GameModeRegistry resolves classic fallback and hunt mode deterministically', () => {
     assert.equal(createGameModeStrategy('UNKNOWN_MODE').modeType, 'CLASSIC');
@@ -174,6 +175,44 @@ test('HuntModeStrategy keeps spawn fallback and shield-hit regen delay robust', 
     assert.equal(hpAfterEarlyRegenTick, 80);
     assert.ok(player.hp > 80);
     assert.equal(player.lastDamageTimestamp, 10);
+});
+
+test('B04 F5 hunt pickup distribution stays deterministic for equal runtime RNG seed', () => {
+    const seed = 90210;
+    const strategyA = new HuntModeStrategy({
+        runtimeRng: createRuntimeRng({ seed }),
+    });
+    const strategyB = new HuntModeStrategy({
+        runtimeRng: createRuntimeRng({ seed }),
+    });
+    const config = {
+        HUNT: {
+            ROCKET_PICKUP_SPAWN_CHANCE: 0.48,
+            PICKUP_WEIGHTS: {
+                SHIELD: 2.4,
+                SPEED_UP: 0.6,
+                GHOST: 1.2,
+            },
+            ROCKET_TIERS: {
+                WEAK: { spawnChance: 0.42 },
+                MEDIUM: { spawnChance: 0.31 },
+                HEAVY: { spawnChance: 0.19 },
+                MEGA: { spawnChance: 0.08 },
+            },
+        },
+    };
+    const spawnableTypes = ['SHIELD', 'SPEED_UP', 'GHOST', 'ROCKET_WEAK', 'ROCKET_MEDIUM', 'ROCKET_HEAVY', 'ROCKET_MEGA'];
+    const picksA = [];
+    const picksB = [];
+
+    for (let index = 0; index < 64; index += 1) {
+        picksA.push(strategyA.resolveSpawnType(spawnableTypes, config));
+        picksB.push(strategyB.resolveSpawnType(spawnableTypes, config));
+    }
+
+    assert.deepEqual(picksA, picksB);
+    assert.equal(picksA.some((type) => String(type || '').startsWith('ROCKET_')), true);
+    assert.equal(picksA.some((type) => type === 'SHIELD' || type === 'SPEED_UP' || type === 'GHOST'), true);
 });
 
 test('registerGameModeStrategy supports targeted extensions without browser runtime', () => {

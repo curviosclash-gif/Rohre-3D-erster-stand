@@ -97,7 +97,7 @@ export class GameRuntimeArcadeSupport {
             );
         }
         if (parcoursSystem && typeof parcoursSystem.setGhostRecorder === 'function') {
-            parcoursSystem.setGhostRecorder(this.arcadeRunRuntime._ghostRecorder);
+            parcoursSystem.setGhostRecorder(this.arcadeRunRuntime.getGhostRecorder?.() || null);
         }
         if (typeof this.arcadeRunRuntime.setGhostPlaybackHandler === 'function') {
             const entityManager = runtimeState?.entityManager || null;

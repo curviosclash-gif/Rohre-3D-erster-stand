@@ -106,7 +106,7 @@ export const ARCADE_SECTOR_CATALOG = Object.freeze([
         objectivePool: ['parcours_run'],
         modifierPool: [],
         rewardPool: ['run_speed_t1', 'run_armor_t1', 'run_combo_t1'],
-        mapPool: ['parcours_rift'],
+        mapPool: ['parcours_rift', 'parcours_rift_sprint', 'parcours_rift_precision'],
     }),
 ]);
 

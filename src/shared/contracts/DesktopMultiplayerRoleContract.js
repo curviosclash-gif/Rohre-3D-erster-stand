@@ -20,6 +20,7 @@ import {
     PLATFORM_SURFACE_SESSION_TYPES,
 } from './PlatformCapabilityData.js';
 import {
+    normalizePlatformProductSurfaceId,
     resolveSurfaceCapabilityAccess,
     resolveSurfacePolicy,
 } from './PlatformCapabilityRegistry.js';
@@ -119,12 +120,10 @@ export const DESKTOP_MULTIPLAYER_COMPATIBILITY_MATRIX = Object.freeze({
  * }}
  */
 export function resolveDesktopMultiplayerRoleSurface(productSurfaceId) {
-    const normalizedSurfaceId = typeof productSurfaceId === 'string'
-        ? productSurfaceId.trim().toLowerCase()
-        : '';
-    const resolvedSurfaceId = Object.values(PLATFORM_PRODUCT_SURFACE_IDS).includes(normalizedSurfaceId)
-        ? normalizedSurfaceId
-        : PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO;
+    const resolvedSurfaceId = normalizePlatformProductSurfaceId(
+        productSurfaceId,
+        PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO
+    );
 
     const policy = resolveSurfacePolicy({ productSurfaceId: resolvedSurfaceId });
     const hostCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.HOST, {

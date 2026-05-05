@@ -16,6 +16,9 @@
 
 import { GAME_STATE_IDS } from '../../shared/contracts/GameStateIds.js';
 import { MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES } from '../../shared/contracts/MultiplayerSessionContract.js';
+import { createLogger } from '../../shared/logging/Logger.js';
+
+const logger = createLogger('MultiplayerMatchLifecycleKernel');
 
 /** Game states that indicate an active match (not yet in menu). */
 const MATCH_ACTIVE_GAME_STATES = new Set([
@@ -47,10 +50,23 @@ function isInActiveMatch(facade) {
  */
 function triggerReturnToMenu(facade, reason) {
     if (!isInActiveMatch(facade)) return;
+    if (facade?._pendingLifecycleReturnToMenu === true) return;
+    facade._pendingLifecycleReturnToMenu = true;
     try {
-        facade.returnToMenu({ reason });
-    } catch {
-        // Best-effort: lifecycle errors are handled internally by the facade.
+        Promise.resolve(facade.returnToMenu({ reason })).catch((error) => {
+            logger.warn('returnToMenu failed after multiplayer lifecycle signal', {
+                reason,
+                error: error instanceof Error ? error.message : String(error),
+            });
+        }).finally(() => {
+            facade._pendingLifecycleReturnToMenu = false;
+        });
+    } catch (error) {
+        facade._pendingLifecycleReturnToMenu = false;
+        logger.warn('returnToMenu threw synchronously after multiplayer lifecycle signal', {
+            reason,
+            error: error instanceof Error ? error.message : String(error),
+        });
     }
 }
 

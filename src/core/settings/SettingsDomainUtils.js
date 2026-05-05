@@ -25,3 +25,7 @@ export function normalizeModePath(value, fallback = 'normal') {
     }
     return fallback;
 }
+
+export function isPersistenceSuccess(result) {
+    return result === undefined || result === true || result?.success === true;
+}

@@ -212,7 +212,28 @@ export function applySteeringTowardPosition(policy, input, player, targetPositio
 }
 
 function applyRetreatSteeringFallback(policy, input, player, enemy) {
-    applySteeringTowardPosition(policy, input, player, enemy?.position || null);
+    if (!player?.position) return;
+    const retreatDistance = 24;
+    if (enemy?.position) {
+        policy._tmpGate.subVectors(player.position, enemy.position);
+        if (policy._tmpGate.lengthSq() > 0.000001) {
+            policy._tmpGate.normalize().multiplyScalar(retreatDistance).add(player.position);
+            applySteeringTowardPosition(policy, input, player, policy._tmpGate);
+            return;
+        }
+    }
+    if (typeof player.getDirection === 'function') {
+        player.getDirection(policy._tmpForward);
+    } else {
+        policy._tmpForward.set(0, 0, 1);
+    }
+    if (policy._tmpForward.lengthSq() <= 0.000001) {
+        policy._tmpForward.set(0, 0, 1);
+    } else {
+        policy._tmpForward.normalize();
+    }
+    policy._tmpGate.copy(player.position).addScaledVector(policy._tmpForward, retreatDistance);
+    applySteeringTowardPosition(policy, input, player, policy._tmpGate);
 }
 
 function applyRetreatSteeringFromSensors(input, snapshot, player) {

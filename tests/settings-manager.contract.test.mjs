@@ -3,11 +3,18 @@ import test from 'node:test';
 
 import { SETTINGS_CHANGE_KEYS } from '../src/composition/core-ui/CoreSettingsPorts.js';
 import { SettingsManager } from '../src/core/SettingsManager.js';
+import { SettingsStore } from '../src/ui/SettingsStore.js';
 import { STORAGE_KEYS } from '../src/ui/StorageKeys.js';
 import { MENU_TEXT_CATALOG } from '../src/ui/menu/MenuTextCatalog.js';
 
-function createMemoryStoragePlatform(initialRecords = {}) {
+function createMemoryStoragePlatform(initialRecords = {}, options = {}) {
     const records = new Map(Object.entries(initialRecords));
+    const writeJson = typeof options.writeJson === 'function'
+        ? options.writeJson
+        : (key, value) => {
+            records.set(key, value);
+            return { ok: true, reason: 'ok', quotaExceeded: false };
+        };
     return {
         driver: { storage: null },
         readJson(key, legacyKeys = [], fallback = null) {
@@ -19,8 +26,7 @@ function createMemoryStoragePlatform(initialRecords = {}) {
             return fallback;
         },
         writeJson(key, value) {
-            records.set(key, value);
-            return { ok: true, reason: 'ok', quotaExceeded: false };
+            return writeJson(key, value, records);
         },
         getRecord(key) {
             return records.get(key);
@@ -119,9 +125,38 @@ test('V103 SettingsManager saveSettings persists the same canonical snapshot ret
     const storedSettings = storagePlatform.getRecord(STORAGE_KEYS.settings);
     const canonicalSettings = manager.sanitizeSettings(rawSettings);
 
-    assert.equal(persisted, true);
+    assert.equal(persisted.success, true);
+    assert.equal(persisted.reason, 'ok');
+    assert.equal(persisted.metadata?.key, STORAGE_KEYS.settings);
     assert.deepEqual(storedSettings, canonicalSettings);
     assert.deepEqual(manager.loadSettings(), canonicalSettings);
+});
+
+test('V103 SettingsManager sanitizeSettings applies runtime-specific limit overrides from runtimeGlobal', () => {
+    const storagePlatform = createMemoryStoragePlatform();
+    const runtimeGlobal = {
+        settingsDefaultsContract: {
+            getOverrideSnapshot() {
+                return {
+                    draft: {
+                        schemaVersion: 'menu-defaults-override.v1',
+                        limitOverrides: {
+                            'baseSettings.gameplay.speed': { max: 12 },
+                        },
+                    },
+                };
+            },
+        },
+    };
+    const manager = new SettingsManager({ storagePlatform, runtimeGlobal });
+
+    const sanitized = manager.sanitizeSettings({
+        gameplay: {
+            speed: 20,
+        },
+    });
+
+    assert.equal(sanitized.gameplay.speed, 12);
 });
 
 test('V103 SettingsManager exposes a narrow record-store port for runtime consumers', () => {
@@ -134,8 +169,102 @@ test('V103 SettingsManager exposes a narrow record-store port for runtime consum
     assert.equal('loadSettings' in recordPort, false);
     assert.equal('saveSettings' in recordPort, false);
 
-    assert.equal(recordPort.saveJsonRecord('custom.record', { ok: true }), true);
+    assert.deepEqual(recordPort.saveJsonRecord('custom.record', { ok: true }), {
+        success: true,
+        reason: 'ok',
+        metadata: {
+            key: 'custom.record',
+        },
+    });
     assert.deepEqual(recordPort.loadJsonRecord('custom.record', null), { ok: true });
+});
+
+test('V103 SettingsManager persistence contract maps invalid_key, quota_exceeded and storage_failed reasons', () => {
+    const quotaStoragePlatform = createMemoryStoragePlatform({}, {
+        writeJson() {
+            return {
+                ok: false,
+                reason: 'QuotaExceededError',
+                quotaExceeded: true,
+            };
+        },
+    });
+    const quotaManager = new SettingsManager({ storagePlatform: quotaStoragePlatform });
+    const quotaResult = quotaManager.saveSettings(quotaManager.createDefaultSettings());
+    const quotaProfilesResult = quotaManager.getProfileStorePort().saveProfiles([]);
+
+    assert.equal(quotaResult.success, false);
+    assert.equal(quotaResult.reason, 'quota_exceeded');
+    assert.equal(quotaResult.metadata?.storageReason, 'QuotaExceededError');
+    assert.equal(quotaProfilesResult.success, false);
+    assert.equal(quotaProfilesResult.reason, 'quota_exceeded');
+    assert.equal(quotaProfilesResult.metadata?.key, STORAGE_KEYS.settingsProfiles);
+
+    const failedStoragePlatform = createMemoryStoragePlatform({}, {
+        writeJson() {
+            return {
+                ok: false,
+                reason: 'storage_unavailable',
+                quotaExceeded: false,
+            };
+        },
+    });
+    const failedManager = new SettingsManager({ storagePlatform: failedStoragePlatform });
+    const failedResult = failedManager.saveSettings(failedManager.createDefaultSettings());
+    const failedProfilesResult = failedManager.getProfileStorePort().saveProfiles([]);
+
+    assert.equal(failedResult.success, false);
+    assert.equal(failedResult.reason, 'storage_failed');
+    assert.equal(failedResult.metadata?.storageReason, 'storage_unavailable');
+    assert.equal(failedProfilesResult.success, false);
+    assert.equal(failedProfilesResult.reason, 'storage_failed');
+    assert.equal(failedProfilesResult.metadata?.key, STORAGE_KEYS.settingsProfiles);
+
+    const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+    const recordPort = manager.getSettingsRecordStorePort();
+    const invalidKeyResult = recordPort.saveJsonRecord('   ', { ok: true });
+
+    assert.equal(invalidKeyResult.success, false);
+    assert.equal(invalidKeyResult.reason, 'invalid_key');
+});
+
+test('V103 SettingsStore canonical rewrite check ignores property order for semantically identical data', () => {
+    const sourceSettings = {
+        gameplay: { speed: 1, planarMode: true },
+        localSettings: { sessionType: 'single', modePath: 'quick_action' },
+    };
+    const reorderedSettings = {
+        localSettings: { modePath: 'quick_action', sessionType: 'single' },
+        gameplay: { planarMode: true, speed: 1 },
+    };
+    let writeCount = 0;
+    const storagePlatform = createMemoryStoragePlatform(
+        { [STORAGE_KEYS.settings]: sourceSettings },
+        {
+            writeJson(key, value, records) {
+                writeCount += 1;
+                records.set(key, value);
+                return { ok: true, reason: 'ok', quotaExceeded: false };
+            },
+        }
+    );
+    const store = new SettingsStore({
+        storagePlatform,
+        sanitizeSettings: () => reorderedSettings,
+        createDefaultSettings: () => ({}),
+    });
+
+    const loaded = store.loadSettings();
+
+    assert.equal(writeCount, 0);
+    assert.deepEqual(loaded, reorderedSettings);
+});
+
+test('V103 SettingsManager profile store port is immutable', () => {
+    const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+    const profilePort = manager.getProfileStorePort();
+
+    assert.equal(Object.isFrozen(profilePort), true);
 });
 
 test('V103 SettingsManager mutation facades expose a shared result contract', () => {

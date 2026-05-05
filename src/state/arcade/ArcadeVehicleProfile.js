@@ -26,6 +26,22 @@ import { toSafeNumber, clampInteger as clampInt } from '../../shared/utils/Arcad
 const VEHICLE_PROFILE_SCHEMA_VERSION = ARCADE_VEHICLE_PROFILE_SCHEMA_VERSION;
 const STORAGE_KEY = ARCADE_VEHICLE_PROFILE_STORAGE_KEY;
 const MAX_UPGRADE_XP_BANK = 9_999_999;
+const MAX_LOADOUT_PRESET_UPGRADE_ENTRIES = 64;
+
+function isPersistenceSuccess(result) {
+    return result === undefined || result === true || result?.success === true;
+}
+
+function warnPersistenceFailure(contextLabel, result) {
+    if (isPersistenceSuccess(result)) return;
+    if (typeof console === 'undefined' || typeof console.warn !== 'function') return;
+    console.warn(`[ArcadeVehicleProfile] ${String(contextLabel || 'save')} failed`, {
+        reason: String(result?.reason || ''),
+        metadata: result?.metadata && typeof result.metadata === 'object'
+            ? { ...result.metadata }
+            : null,
+    });
+}
 
 export const XP_CONFIG = Object.freeze({
     BASE_XP: 100,
@@ -80,6 +96,10 @@ function normalizeSlotName(slotName) {
 function normalizeTier(tier) {
     const normalized = String(tier || '').trim().toUpperCase();
     return normalized || 'T1';
+}
+
+function isValidTier(tier) {
+    return tier === 'T1' || tier === 'T2' || tier === 'T3';
 }
 
 function resolveNextTier(tier) {
@@ -402,6 +422,116 @@ export function getSpendableUpgradeXp(profile) {
     return Math.max(0, toSafeNumber(normalized?.xpBank, 0));
 }
 
+export function sanitizeLoadoutPresetUpgrades(profile, upgrades) {
+    const normalizedProfile = ensureProfile(profile);
+    if (!normalizedProfile) {
+        return {
+            upgrades: {},
+            rejectedEntries: [{
+                slotName: '',
+                targetTier: 'T1',
+                code: UPGRADE_PURCHASE_CODES.INVALID_PROFILE,
+            }],
+            acceptedCount: 0,
+        };
+    }
+
+    const source = toObject(upgrades);
+    const entries = Object.entries(source).slice(0, MAX_LOADOUT_PRESET_UPGRADE_ENTRIES);
+    const rejectedEntries = [];
+    let simulatedProfile = normalizeVehicleProfile({
+        ...normalizedProfile,
+        upgrades: {},
+        xpBank: MAX_UPGRADE_XP_BANK,
+    });
+
+    for (let index = 0; index < entries.length; index += 1) {
+        const [rawSlotName, rawTargetTier] = entries[index];
+        const slotName = normalizeSlotName(rawSlotName);
+        const targetTier = normalizeTier(rawTargetTier);
+
+        if (!slotName || !resolveArcadeHangarPartFamily(slotName)) {
+            rejectedEntries.push({
+                slotName,
+                targetTier,
+                code: UPGRADE_PURCHASE_CODES.INVALID_SLOT,
+            });
+            continue;
+        }
+        if (!isValidTier(targetTier)) {
+            rejectedEntries.push({
+                slotName,
+                targetTier,
+                code: UPGRADE_PURCHASE_CODES.INVALID_TIER,
+            });
+            continue;
+        }
+        if (targetTier === 'T1') {
+            continue;
+        }
+
+        let currentTier = 'T1';
+        let blockedCode = '';
+        while (currentTier !== targetTier) {
+            const nextTier = resolveNextTier(currentTier);
+            if (!nextTier) {
+                blockedCode = UPGRADE_PURCHASE_CODES.INVALID_TIER_SEQUENCE;
+                break;
+            }
+            const upgradeResult = purchaseUpgrade(simulatedProfile, slotName, nextTier, 0);
+            if (!upgradeResult.ok) {
+                blockedCode = upgradeResult.code || UPGRADE_PURCHASE_CODES.INVALID_TIER_SEQUENCE;
+                break;
+            }
+            simulatedProfile = upgradeResult.profile;
+            currentTier = nextTier;
+        }
+
+        if (blockedCode) {
+            rejectedEntries.push({
+                slotName,
+                targetTier,
+                code: blockedCode,
+            });
+        }
+    }
+
+    return {
+        upgrades: { ...toObject(simulatedProfile.upgrades) },
+        rejectedEntries,
+        acceptedCount: Object.keys(toObject(simulatedProfile.upgrades)).length,
+    };
+}
+
+export function applyLoadoutPreset(profile, upgrades, nowMs = Date.now()) {
+    const normalizedProfile = ensureProfile(profile);
+    if (!normalizedProfile) {
+        return {
+            profile: profile || null,
+            upgrades: {},
+            rejectedEntries: [{
+                slotName: '',
+                targetTier: 'T1',
+                code: UPGRADE_PURCHASE_CODES.INVALID_PROFILE,
+            }],
+            acceptedCount: 0,
+        };
+    }
+
+    const sanitized = sanitizeLoadoutPresetUpgrades(normalizedProfile, upgrades);
+    const nextProfile = normalizeVehicleProfile({
+        ...normalizedProfile,
+        upgrades: { ...sanitized.upgrades },
+        updatedAt: toIsoString(nowMs),
+    });
+    return {
+        profile: nextProfile,
+        upgrades: { ...toObject(nextProfile.upgrades) },
+        rejectedEntries: sanitized.rejectedEntries.slice(),
+        acceptedCount: sanitized.acceptedCount,
+    };
+}
+
 // XP Reward Calculation
 
 export function calculateSectorXp(telemetry) {
@@ -442,7 +572,8 @@ export function loadVehicleProfiles(store) {
     });
 
     if (shouldRewrite && typeof store.saveJsonRecord === 'function') {
-        store.saveJsonRecord(STORAGE_KEY, normalizedProfiles);
+        const saveResult = store.saveJsonRecord(STORAGE_KEY, normalizedProfiles);
+        warnPersistenceFailure('canonical write-back', saveResult);
     }
     return normalizedProfiles;
 }
@@ -454,7 +585,8 @@ export function saveVehicleProfiles(store, profiles) {
     Object.entries(sourceProfiles).forEach(([vehicleId, profile]) => {
         normalizedProfiles[vehicleId] = normalizeVehicleProfile(profile);
     });
-    store.saveJsonRecord(STORAGE_KEY, normalizedProfiles);
+    const saveResult = store.saveJsonRecord(STORAGE_KEY, normalizedProfiles);
+    warnPersistenceFailure('saveVehicleProfiles', saveResult);
 }
 
 export function getOrCreateProfile(profiles, vehicleId, nowMs = Date.now()) {
@@ -479,6 +611,8 @@ export default {
     evaluateUpgradePurchase,
     purchaseUpgrade,
     getSpendableUpgradeXp,
+    sanitizeLoadoutPresetUpgrades,
+    applyLoadoutPreset,
     calculateSectorXp,
     loadVehicleProfiles,
     saveVehicleProfiles,

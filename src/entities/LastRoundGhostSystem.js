@@ -151,6 +151,9 @@ export class LastRoundGhostSystem {
         this._frames = [];
         this._lastPlaybackTime = 0;
         this._frameCursor = 1;
+        this._displayDuration = 0;
+        this._sourceDuration = 0;
+        this._playbackRate = 1;
         this.root.visible = false;
         this._routeId = '';
         this._clearEntries();

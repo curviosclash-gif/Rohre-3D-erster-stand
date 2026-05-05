@@ -18,7 +18,7 @@ import {
     loadCustomMapFromStorage,
     resolveCustomMapStorageCapability,
 } from '../src/entities/CustomMapLoader.js';
-import { loadVehicleProfiles } from '../src/state/arcade/ArcadeVehicleProfile.js';
+import { applyLoadoutPreset, loadVehicleProfiles } from '../src/state/arcade/ArcadeVehicleProfile.js';
 import {
     ARTIFACT_VERSION_DECISIONS,
     resolveArtifactVersionState,
@@ -307,6 +307,49 @@ test('V85.2 arcade persistence drops rejected future schemas and rewrites legacy
     const presets = loadoutPresetStore.listPresets('ship5');
     assert.equal(presets.length, 1);
     assert.equal(loadoutStore.saved?.schemaVersion, 'arcade-vehicle-loadouts.v1');
+});
+
+test('B04 F2 preset import blocks invalid upgrade slots and tiers before profile apply', () => {
+    const profile = {
+        schemaVersion: 'arcade-vehicle-profile.v1',
+        vehicleId: 'ship5',
+        xp: 0,
+        level: 1,
+        unlockedSlots: ['core', 'nose', 'wing_left', 'wing_right', 'engine_left', 'engine_right'],
+        upgrades: {},
+    };
+    const loadoutStore = {
+        data: {
+            schemaVersion: 'arcade-vehicle-loadouts.v1',
+            presets: [{
+                presetId: 'legacy-audit-import',
+                vehicleId: 'ship5',
+                name: 'Legacy import',
+                upgrades: {
+                    core: 'T3',
+                    wing_left: 'T2',
+                    hacker_slot: 'T2',
+                    nose: 'T9',
+                },
+                updatedAtMs: 1234,
+            }],
+        },
+        loadJsonRecord() {
+            return this.data;
+        },
+        saveJsonRecord(_key, value) {
+            this.data = value;
+        },
+    };
+    const presetStore = createVehicleManagerLoadoutPresetStore({ store: loadoutStore });
+    const importedPreset = presetStore.loadPreset('ship5', 'legacy-audit-import');
+    const applyResult = applyLoadoutPreset(profile, importedPreset?.upgrades || {});
+
+    assert.ok(importedPreset);
+    assert.equal(importedPreset.invalidEntries.some((entry) => entry.code === 'invalid_slot'), true);
+    assert.equal(importedPreset.invalidEntries.some((entry) => entry.code === 'invalid_tier'), true);
+    assert.equal(applyResult.rejectedEntries.some((entry) => entry.code === 'tier_locked'), true);
+    assert.deepEqual(applyResult.upgrades, {});
 });
 
 // ─── V97 Settings Override Migration ─────────────────

@@ -18,6 +18,7 @@ export class ParcoursProgressSystem {
         this._xpEventCallback = null;
         this._leaderboardCallback = null;
         this._ghostRecorder = null;
+        this._progressPlayerIndexResolver = null;
     }
     setXpEventCallback(callback) {
         this._xpEventCallback = typeof callback === 'function' ? callback : null;
@@ -27,6 +28,36 @@ export class ParcoursProgressSystem {
     }
     setGhostRecorder(recorder) {
         this._ghostRecorder = recorder && typeof recorder.sample === 'function' ? recorder : null;
+    }
+    setProgressPlayerIndexResolver(resolver) {
+        this._progressPlayerIndexResolver = typeof resolver === 'function' ? resolver : null;
+    }
+    _resolveProgressPlayerIndex(players = null) {
+        const playerList = Array.isArray(players) ? players : (this.entityManager?.players || []);
+        if (this._progressPlayerIndexResolver) {
+            try {
+                const resolved = this._progressPlayerIndexResolver({
+                    players: playerList,
+                    entityManager: this.entityManager,
+                    routeId: this._route?.routeId || '',
+                });
+                if (Number.isInteger(resolved) && resolved >= 0) return resolved;
+            } catch {
+                // no-op
+            }
+        }
+
+        const viewportLocalPlayerIndex = Number(this.entityManager?.renderer?.viewportSystem?.localPlayerIndex);
+        if (Number.isInteger(viewportLocalPlayerIndex) && viewportLocalPlayerIndex >= 0) {
+            return viewportLocalPlayerIndex;
+        }
+
+        for (const player of playerList) {
+            if (player && Number.isInteger(player.index) && player.isBot !== true) {
+                return player.index;
+            }
+        }
+        return 0;
     }
     _playerOwnsGhostRecording(player) {
         if (!this._ghostRecorder?.isRecording || !player || !Number.isInteger(player.index)) return false;
@@ -75,7 +106,10 @@ export class ParcoursProgressSystem {
         }
 
         const rt = this.entityManager?.arena?._portalGateSystem?.checkpointRingRuntime;
-        rt?.setProgressProvider?.(() => this.getPlayerProgressSnapshot(0));
+        rt?.setProgressProvider?.(() => {
+            const progressPlayerIndex = this._resolveProgressPlayerIndex(this.entityManager?.players || players);
+            return this.getPlayerProgressSnapshot(progressPlayerIndex);
+        });
         rt?.setParticleSystem?.(this.entityManager?.particles || null);
     }
     _ensurePlayerState(playerIndex) {
@@ -202,6 +236,7 @@ export class ParcoursProgressSystem {
                         type: 'ghost_start',
                         playerIndex: player.index,
                         routeId: this._route.routeId,
+                        source: 'parcours_checkpoint_start',
                     });
                 }
             }
@@ -347,6 +382,7 @@ export class ParcoursProgressSystem {
         const ghostClip = shouldFinalizeGhost && recorderOwnedByPlayer
             ? (this._ghostRecorder?.stopRecording?.(player.index) || null)
             : null;
+        const ghostDurationMsFromClip = Math.max(0, Math.round(Number(ghostClip?.sourceDuration) * 1000));
         this._leaderboardCallback?.({
             type: 'finish',
             playerIndex: player.index,
@@ -354,6 +390,7 @@ export class ParcoursProgressSystem {
             totalTimeMs: state.completionTimeMs,
             penaltyTimeMs,
             segmentSplitsMs: [...state.segmentSplitsMs],
+            ghostDurationMs: ghostDurationMsFromClip > 0 ? ghostDurationMsFromClip : baseTimeMs,
             ghostClip,
         });
     }

@@ -22,14 +22,16 @@ export function resolveRuntimeMenuFeatureFlags(sourceFlags = null, runtimeGlobal
     const featureFlags = createMenuFeatureFlags(sourceFlags);
     const appMode = typeof __APP_MODE__ !== 'undefined' ? String(__APP_MODE__).trim().toLowerCase() : 'web';
     const platformRuntimeSnapshot = resolveElectronRuntimeSnapshot(runtimeGlobal);
-    const surfacePolicy = resolveSurfacePolicy({
+    const capabilityResolverOptions = {
         appMode,
         platformRuntimeSnapshot,
-    });
-    const hostCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.HOST, {
-        appMode,
-        platformRuntimeSnapshot,
-    });
+        runtimeGlobal,
+    };
+    const surfacePolicy = resolveSurfacePolicy(capabilityResolverOptions);
+    const hostCapability = resolveSurfaceCapabilityAccess(
+        PLATFORM_CAPABILITY_IDS.HOST,
+        capabilityResolverOptions
+    );
     return {
         ...featureFlags,
         canHost: hostCapability.available,

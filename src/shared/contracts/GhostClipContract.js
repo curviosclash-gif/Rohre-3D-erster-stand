@@ -39,6 +39,21 @@ function normalizeGhostColor(value) {
     return numeric != null ? Math.max(0, Math.trunc(numeric)) : DEFAULT_GHOST_COLOR;
 }
 
+function normalizeMaxFrameBudget(value) {
+    const numeric = Number(value);
+    if (!Number.isInteger(numeric)) return 0;
+    return numeric >= MIN_GHOST_FRAME_COUNT ? numeric : 0;
+}
+
+function createGhostClipNormalizationStats(sourceFrameCount = 0) {
+    return {
+        sourceFrameCount: Math.max(0, Math.trunc(Number(sourceFrameCount) || 0)),
+        normalizedFrameCount: 0,
+        trimmedFrames: 0,
+        normalizeDurationMs: 0,
+    };
+}
+
 function normalizeGhostQuaternion(rawPose) {
     const qx = toFiniteNumber(rawPose?.qx ?? rawPose?.quaternion?.x);
     const qy = toFiniteNumber(rawPose?.qy ?? rawPose?.quaternion?.y);
@@ -193,6 +208,58 @@ function hasRenderablePose(frames) {
     return false;
 }
 
+function buildFrameIndexSelection(totalFrames, maxFrames) {
+    if (totalFrames <= maxFrames) {
+        const full = new Array(totalFrames);
+        for (let idx = 0; idx < totalFrames; idx += 1) {
+            full[idx] = idx;
+        }
+        return full;
+    }
+
+    const selected = new Array(maxFrames);
+    selected[0] = 0;
+    selected[maxFrames - 1] = totalFrames - 1;
+    let previousIndex = 0;
+
+    for (let slot = 1; slot < maxFrames - 1; slot += 1) {
+        const remainingSlots = (maxFrames - 1) - slot;
+        const idealIndex = Math.round((slot * (totalFrames - 1)) / (maxFrames - 1));
+        const minAllowed = previousIndex + 1;
+        const maxAllowed = (totalFrames - 1) - remainingSlots;
+        const clamped = Math.max(minAllowed, Math.min(maxAllowed, idealIndex));
+        selected[slot] = clamped;
+        previousIndex = clamped;
+    }
+
+    return selected;
+}
+
+function applyFrameBudget(frames, maxFrames) {
+    const safeMaxFrames = normalizeMaxFrameBudget(maxFrames);
+    if (safeMaxFrames <= 0 || frames.length <= safeMaxFrames) {
+        return {
+            frames,
+            trimmedFrames: 0,
+        };
+    }
+    const selectedIndices = buildFrameIndexSelection(frames.length, safeMaxFrames);
+    const cappedFrames = new Array(selectedIndices.length);
+    for (let i = 0; i < selectedIndices.length; i += 1) {
+        cappedFrames[i] = frames[selectedIndices[i]];
+    }
+    if (!hasRenderablePose(cappedFrames)) {
+        return {
+            frames,
+            trimmedFrames: 0,
+        };
+    }
+    return {
+        frames: cappedFrames,
+        trimmedFrames: Math.max(0, frames.length - cappedFrames.length),
+    };
+}
+
 function normalizeGhostPlayers(players, poseStats, options = {}) {
     const explicitPlayers = Array.isArray(players) ? players : [];
     const normalizedPlayersByIdx = new Map();
@@ -244,18 +311,24 @@ function alignGhostFrameTimes(frames, sourceDuration) {
 }
 
 function normalizeGhostClipResult(ghostClip, options = {}) {
+    const startedAtMs = Date.now();
+    const sourceFrameCount = Array.isArray(ghostClip?.frames) ? ghostClip.frames.length : 0;
+    const stats = createGhostClipNormalizationStats(sourceFrameCount);
     if (!isPlainObject(ghostClip)) {
-        return { clip: null, reason: 'invalid_clip' };
+        stats.normalizeDurationMs = Math.max(0, Date.now() - startedAtMs);
+        return { clip: null, reason: 'invalid_clip', stats };
     }
 
     const frameNormalization = normalizeGhostFrames(ghostClip.frames);
     if (frameNormalization.hasDuplicatePlayerPose) {
-        return { clip: null, reason: 'invalid_frames' };
+        stats.normalizeDurationMs = Math.max(0, Date.now() - startedAtMs);
+        return { clip: null, reason: 'invalid_frames', stats };
     }
 
     const frames = frameNormalization.frames;
     if (frames.length < MIN_GHOST_FRAME_COUNT) {
-        return { clip: null, reason: 'invalid_frames' };
+        stats.normalizeDurationMs = Math.max(0, Date.now() - startedAtMs);
+        return { clip: null, reason: 'invalid_frames', stats };
     }
 
     const lastFrameTime = Number(frames[frames.length - 1]?.time) || 0;
@@ -265,23 +338,27 @@ function normalizeGhostClipResult(ghostClip, options = {}) {
         Math.max(lastFrameTime, displayDurationFallback)
     );
     if (!(sourceDuration > 0)) {
-        return { clip: null, reason: 'invalid_duration' };
+        stats.normalizeDurationMs = Math.max(0, Date.now() - startedAtMs);
+        return { clip: null, reason: 'invalid_duration', stats };
     }
 
     alignGhostFrameTimes(frames, sourceDuration);
 
     const players = normalizeGhostPlayers(ghostClip.players, frameNormalization.poseStats, options);
     if (players.length === 0) {
-        return { clip: null, reason: 'invalid_players' };
+        stats.normalizeDurationMs = Math.max(0, Date.now() - startedAtMs);
+        return { clip: null, reason: 'invalid_players', stats };
     }
 
     const filteredFrames = filterGhostFramesToPlayers(frames, players);
     if (!hasRenderablePose(filteredFrames)) {
-        return { clip: null, reason: 'not_renderable' };
+        stats.normalizeDurationMs = Math.max(0, Date.now() - startedAtMs);
+        return { clip: null, reason: 'not_renderable', stats };
     }
+    const budgeted = applyFrameBudget(filteredFrames, options.maxFrames);
 
     const normalizedClip = {
-        frames: filteredFrames,
+        frames: budgeted.frames,
         players,
         sourceDuration,
         displayDuration: normalizePositiveSeconds(ghostClip?.displayDuration, sourceDuration),
@@ -291,10 +368,14 @@ function normalizeGhostClipResult(ghostClip, options = {}) {
     if (routeId) {
         normalizedClip.routeId = routeId;
     }
+    stats.normalizedFrameCount = normalizedClip.frames.length;
+    stats.trimmedFrames = budgeted.trimmedFrames;
+    stats.normalizeDurationMs = Math.max(0, Date.now() - startedAtMs);
 
     return {
         clip: normalizedClip,
         reason: 'ok',
+        stats,
     };
 }
 
@@ -323,5 +404,15 @@ export function validateGhostClip(ghostClip, options = {}) {
         valid: !!result.clip,
         reason: result.reason,
         clip: result.clip,
+        stats: result.stats,
+    };
+}
+
+export function normalizeGhostClipWithStats(ghostClip, options = {}) {
+    const result = normalizeGhostClipResult(ghostClip, options);
+    return {
+        clip: result.clip,
+        reason: result.reason,
+        stats: result.stats,
     };
 }

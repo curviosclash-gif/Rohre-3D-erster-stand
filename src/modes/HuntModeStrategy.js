@@ -6,6 +6,7 @@ import { isRocketTierType, pickWeightedRocketTierType, resolveRocketTierDamage }
 import { isPickupTypeAllowedForMode, normalizePickupType } from '../entities/PickupRegistry.js';
 import { GameModeContract } from './GameModeContract.js';
 import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
+import { createRuntimeRng } from '../shared/contracts/RuntimeRngContract.js';
 
 function toSafeNumber(value, fallback) {
     const parsed = Number(value);
@@ -50,7 +51,7 @@ function resolveConfig(config, fallbackConfig = null) {
     return resolveEntityRuntimeConfig(config || null, fallback);
 }
 
-function pickWeightedType(typeEntries = []) {
+function pickWeightedType(typeEntries = [], random = Math.random) {
     const weighted = [];
     for (const entry of typeEntries) {
         const type = String(entry?.type || '').trim().toUpperCase();
@@ -71,7 +72,8 @@ function pickWeightedType(typeEntries = []) {
         return weighted[0].type;
     }
 
-    let roll = Math.max(0, Math.min(0.999999, Number(Math.random()) || 0)) * totalWeight;
+    const randomValue = Number.isFinite(Number(random())) ? Number(random()) : 0;
+    let roll = Math.max(0, Math.min(0.999999, randomValue)) * totalWeight;
     for (const entry of weighted) {
         roll -= entry.weight;
         if (roll <= 0) return entry.type;
@@ -83,6 +85,14 @@ export class HuntModeStrategy extends GameModeContract {
     constructor(options = {}) {
         super();
         this.entityRuntimeConfig = resolveEntityRuntimeConfig(options?.entityRuntimeConfig || null);
+        const runtimeRng = options?.runtimeRng && typeof options.runtimeRng.next === 'function'
+            ? options.runtimeRng
+            : createRuntimeRng({
+                seed: Number(options?.seed),
+                random: typeof options?.random === 'function' ? options.random : Math.random,
+            });
+        this.runtimeRng = runtimeRng;
+        this._random = typeof runtimeRng.next === 'function' ? runtimeRng.next.bind(runtimeRng) : Math.random;
     }
 
     get modeType() { return 'HUNT'; }
@@ -351,10 +361,11 @@ export class HuntModeStrategy extends GameModeContract {
                     : 1,
             }));
 
-        if (Math.random() < rocketSpawnChance) {
+        if (this._random() < rocketSpawnChance) {
             const weightedRocketType = pickWeightedRocketTierType({
                 allowedTypes: normalizedSpawnableTypes,
                 tiersConfig: activeConfig?.HUNT?.ROCKET_TIERS || null,
+                random: this._random,
             });
             if (weightedRocketType && (normalizedSpawnableTypes.includes(weightedRocketType) || isRocketTierType(weightedRocketType))) {
                 return weightedRocketType;
@@ -362,7 +373,7 @@ export class HuntModeStrategy extends GameModeContract {
         }
 
         if (weightedNonRocketTypes.length > 0) {
-            return pickWeightedType(weightedNonRocketTypes) || nonRocketTypes[0];
+            return pickWeightedType(weightedNonRocketTypes, this._random) || nonRocketTypes[0];
         }
         if (nonRocketTypes.length > 0) {
             return nonRocketTypes[0];

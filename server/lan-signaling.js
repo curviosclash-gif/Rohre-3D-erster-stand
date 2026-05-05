@@ -11,6 +11,7 @@ import {
 const DEFAULT_MAX_PLAYERS = 10;
 const DEFAULT_GHOST_PLAYER_TIMEOUT_MS = 60_000;
 const DEFAULT_GHOST_CLEANUP_INTERVAL_MS = 5_000;
+const MAX_REQUEST_BODY_BYTES = 16 * 1024;
 
 function normalizeLobbyCode(value) {
     return String(value || '').trim().toUpperCase();
@@ -29,6 +30,10 @@ function generateLobbyCode() {
     return code;
 }
 
+function generateAccessToken(prefix = 'tok') {
+    return `${prefix}-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
+}
+
 function jsonResponse(res, data, status = 200) {
     res.writeHead(status, {
         'Content-Type': 'application/json',
@@ -45,16 +50,36 @@ function jsonResponse(res, data, status = 200) {
 function readBody(req) {
     return new Promise((resolve) => {
         let body = '';
+        let totalBytes = 0;
+        let settled = false;
+
+        const settle = (value) => {
+            if (settled) return;
+            settled = true;
+            resolve(value);
+        };
+
         req.on('data', (chunk) => {
+            if (settled) return;
+            const chunkBytes = Buffer.isBuffer(chunk)
+                ? chunk.length
+                : Buffer.byteLength(String(chunk), 'utf8');
+            totalBytes += chunkBytes;
+            if (totalBytes > MAX_REQUEST_BODY_BYTES) {
+                settle({ __tooLarge: true });
+                return;
+            }
             body += chunk;
         });
         req.on('end', () => {
+            if (settled) return;
             try {
-                resolve(JSON.parse(body));
+                settle(JSON.parse(body));
             } catch {
-                resolve({});
+                settle({});
             }
         });
+        req.on('error', () => settle({}));
     });
 }
 
@@ -84,6 +109,15 @@ function buildLobbyState(lobby) {
     };
 }
 
+function isHostPeerId(value) {
+    return toPlayerId(value) === 'host';
+}
+
+function countLobbyMembers(lobby) {
+    // Host is always represented as a virtual member in this signaling model.
+    return 1 + lobby.players.length;
+}
+
 export function createLANSignalingServer(port = 9090, options = {}) {
     const now = typeof options.now === 'function' ? options.now : () => Date.now();
     const resolveDiagnostics = typeof options.resolveDiagnostics === 'function'
@@ -98,6 +132,7 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
     const lobby = {
         code: generateLobbyCode(),
+        hostToken: generateAccessToken('host'),
         hostReady: false,
         maxPlayers: DEFAULT_MAX_PLAYERS,
         players: [],
@@ -181,8 +216,13 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_CREATE) {
             const body = await readBody(req);
+            if (body?.__tooLarge === true) {
+                jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
             const requestedMaxPlayers = Number(body.maxPlayers);
             lobby.code = generateLobbyCode();
+            lobby.hostToken = generateAccessToken('host');
             lobby.hostReady = false;
             lobby.maxPlayers = Number.isFinite(requestedMaxPlayers)
                 ? Math.max(2, Math.min(DEFAULT_MAX_PLAYERS, Math.floor(requestedMaxPlayers)))
@@ -196,6 +236,7 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             jsonResponse(res, {
                 ok: true,
                 lobbyCode: lobby.code,
+                hostToken: lobby.hostToken,
                 sessionState: buildLobbyState(lobby),
             });
             return;
@@ -204,17 +245,33 @@ export function createLANSignalingServer(port = 9090, options = {}) {
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_JOIN) {
             cleanupGhostPlayers();
             const body = await readBody(req);
+            if (body?.__tooLarge === true) {
+                jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
             const requestedLobbyCode = normalizeLobbyCode(body.lobbyCode);
             if (requestedLobbyCode && requestedLobbyCode !== normalizeLobbyCode(lobby.code)) {
                 jsonResponse(res, { ok: false, message: 'lobby_not_found' }, 404);
                 return;
             }
+            if (countLobbyMembers(lobby) >= Number(lobby.maxPlayers || DEFAULT_MAX_PLAYERS)) {
+                jsonResponse(res, { ok: false, message: 'lobby_full' }, 409);
+                return;
+            }
             const playerId = `player-${nextPlayerId++}`;
+            const playerToken = generateAccessToken('player');
             const timestamp = now();
-            lobby.players.push({ playerId, ready: false, joinedAt: timestamp, lastActivityAt: timestamp });
+            lobby.players.push({
+                playerId,
+                token: playerToken,
+                ready: false,
+                joinedAt: timestamp,
+                lastActivityAt: timestamp,
+            });
             lobby.pendingPlayers.push({ playerId, lastActivityAt: timestamp });
             jsonResponse(res, {
                 playerId,
+                playerToken,
                 lobbyCode: lobby.code,
                 sessionState: buildLobbyState(lobby),
             });
@@ -223,9 +280,17 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_READY) {
             const body = await readBody(req);
+            if (body?.__tooLarge === true) {
+                jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
             const playerId = toPlayerId(body.playerId);
             const ready = body.ready === true;
-            if (playerId === 'host') {
+            if (isHostPeerId(playerId)) {
+                if (String(body.hostToken || '') !== String(lobby.hostToken || '')) {
+                    jsonResponse(res, { ok: false, message: 'host_auth_failed' }, 403);
+                    return;
+                }
                 lobby.hostReady = ready;
                 jsonResponse(res, { ok: true, sessionState: buildLobbyState(lobby) });
                 return;
@@ -233,6 +298,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             const player = lobby.players.find((entry) => entry.playerId === playerId);
             if (!player) {
                 jsonResponse(res, { ok: false, message: 'player_not_found' }, 404);
+                return;
+            }
+            if (String(body.playerToken || '') !== String(player.token || '')) {
+                jsonResponse(res, { ok: false, message: 'player_auth_failed' }, 403);
                 return;
             }
             player.ready = ready;
@@ -243,13 +312,65 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_LEAVE) {
             const body = await readBody(req);
+            if (body?.__tooLarge === true) {
+                jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
             const playerId = toPlayerId(body.playerId);
+            if (!playerId) {
+                jsonResponse(res, { ok: false, message: 'player_id_missing' }, 400);
+                return;
+            }
+            if (isHostPeerId(playerId)) {
+                if (String(body.hostToken || '') !== String(lobby.hostToken || '')) {
+                    jsonResponse(res, { ok: false, message: 'host_auth_failed' }, 403);
+                    return;
+                }
+                lobby.code = generateLobbyCode();
+                lobby.hostToken = generateAccessToken('host');
+                lobby.hostReady = false;
+                lobby.players = [];
+                lobby.pendingPlayers = [];
+                lobby.offers.clear();
+                lobby.answers.clear();
+                lobby.ice.clear();
+                lobby.pendingMatchStart = null;
+                jsonResponse(res, {
+                    ok: true,
+                    lobbyCode: lobby.code,
+                    sessionState: buildLobbyState(lobby),
+                });
+                return;
+            }
+            const player = lobby.players.find((entry) => entry.playerId === playerId);
+            if (!player) {
+                jsonResponse(res, { ok: false, message: 'player_not_found' }, 404);
+                return;
+            }
+            if (String(body.playerToken || '') !== String(player.token || '')) {
+                jsonResponse(res, { ok: false, message: 'player_auth_failed' }, 403);
+                return;
+            }
             removePlayer(playerId);
             jsonResponse(res, { ok: true, sessionState: buildLobbyState(lobby) });
             return;
         }
 
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_INVALIDATE_READY) {
+            const body = await readBody(req);
+            if (body?.__tooLarge === true) {
+                jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
+            const hostPeerId = toPlayerId(body.hostPeerId || body.playerId);
+            if (!isHostPeerId(hostPeerId)) {
+                jsonResponse(res, { ok: false, message: 'host_required' }, 403);
+                return;
+            }
+            if (String(body.hostToken || '') !== String(lobby.hostToken || '')) {
+                jsonResponse(res, { ok: false, message: 'host_auth_failed' }, 403);
+                return;
+            }
             lobby.hostReady = false;
             lobby.players = lobby.players.map((entry) => ({
                 ...entry,
@@ -276,6 +397,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_ACK_PENDING) {
             const body = await readBody(req);
+            if (body?.__tooLarge === true) {
+                jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
             const playerId = toPlayerId(body.playerId);
             if (playerId) {
                 lobby.pendingPlayers = lobby.pendingPlayers.filter((entry) => entry.playerId !== playerId);
@@ -287,6 +412,27 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_MATCH_START) {
             const body = await readBody(req);
+            if (body?.__tooLarge === true) {
+                jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
+            const hostPeerId = toPlayerId(body.hostPeerId || body.playerId || 'host');
+            if (!isHostPeerId(hostPeerId)) {
+                jsonResponse(res, { ok: false, message: 'host_required' }, 403);
+                return;
+            }
+            if (String(body.hostToken || '') !== String(lobby.hostToken || '')) {
+                jsonResponse(res, { ok: false, message: 'host_auth_failed' }, 403);
+                return;
+            }
+            if (countLobbyMembers(lobby) < 2) {
+                jsonResponse(res, { ok: false, message: 'not_enough_members' }, 409);
+                return;
+            }
+            if (lobby.hostReady !== true || lobby.players.some((entry) => entry.ready !== true)) {
+                jsonResponse(res, { ok: false, message: 'members_not_ready' }, 409);
+                return;
+            }
             const timestamp = now();
             const requestedCommandId = String(body.commandId || '').trim();
             lobby.pendingMatchStart = {
@@ -306,6 +452,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.SIGNALING_OFFER) {
             const body = await readBody(req);
+            if (body?.__tooLarge === true) {
+                jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
             const targetPlayerId = toPlayerId(body.targetPlayerId);
             if (targetPlayerId) {
                 lobby.offers.set(targetPlayerId, body.offer);
@@ -326,6 +476,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.SIGNALING_ANSWER) {
             const body = await readBody(req);
+            if (body?.__tooLarge === true) {
+                jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
             const playerId = toPlayerId(body.playerId);
             if (playerId) {
                 lobby.answers.set(playerId, body.answer);
@@ -346,6 +500,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.SIGNALING_ICE) {
             const body = await readBody(req);
+            if (body?.__tooLarge === true) {
+                jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
             const fromPlayerId = toPlayerId(body.playerId);
             const targetPlayerId = toPlayerId(body.targetPlayerId) || fromPlayerId;
             if (!targetPlayerId) {
@@ -403,7 +561,7 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             jsonResponse(res, {
                 lobbyCode: lobby.code,
                 playerCount: lobby.players.length,
-                maxPlayers: DEFAULT_MAX_PLAYERS,
+                maxPlayers: Number(lobby.maxPlayers || DEFAULT_MAX_PLAYERS),
                 ip: hostIp || undefined,
                 hostIp: hostIp || undefined,
                 diagnostics,

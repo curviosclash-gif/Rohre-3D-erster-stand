@@ -1,5 +1,6 @@
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { isCinematicCaptureProfile } from '../shared/contracts/RecordingCaptureContract.js';
+import { createRuntimeAccess } from '../shared/runtime/RuntimeAccessFactory.js';
 
 const FPS_TRACKER_WINDOW = 60;
 
@@ -51,18 +52,23 @@ function resolveEffectiveQualityLabel(renderer, isLowQuality = false) {
 }
 
 export function createRuntimeDiagnosticsRuntimeAccess(runtime) {
-    const game = runtime && typeof runtime === 'object' ? runtime : null;
-    return Object.freeze({
-        isKeyCaptureActive: () => !!game?.keyCapture,
+    return createRuntimeAccess(runtime, (game) => {
+        const actionShowStatusToast = (message, durationMs, tone) => {
+            game?._showStatusToast?.(message, durationMs, tone);
+        };
+        return {
+        getKeyCaptureActive: () => !!game?.keyCapture,
         getRenderer: () => game?.renderer || null,
         getMediaRecorderSystem: () => game?.mediaRecorderSystem || null,
-        showStatusToast(message, durationMs, tone) {
-            game?._showStatusToast?.(message, durationMs, tone);
-        },
+        actionShowStatusToast,
+        // Backward-compatible aliases for transitional call sites.
+        isKeyCaptureActive: () => !!game?.keyCapture,
+        showStatusToast: actionShowStatusToast,
         getRenderDelta: () => Number(game?._renderDelta),
         getEntityManager: () => game?.entityManager || null,
         getRuntimePerfProfiler: () => game?.runtimePerfProfiler || null,
         getState: () => game?.state || null,
+    };
     });
 }
 
@@ -82,7 +88,7 @@ export class RuntimeDiagnosticsSystem {
     }
 
     _handleKeyDown(event) {
-        if (this.runtimeAccess.isKeyCaptureActive?.()) return;
+        if (this.runtimeAccess.getKeyCaptureActive?.()) return;
 
         const renderer = this.runtimeAccess.getRenderer?.() || null;
         const recorder = this.runtimeAccess.getMediaRecorderSystem?.() || null;
@@ -92,11 +98,11 @@ export class RuntimeDiagnosticsSystem {
             const quality = this._isLowQuality ? 'LOW' : 'HIGH';
             renderer?.setQuality?.(quality);
             if (quality === 'LOW' && isCinematicRecordingActive(recorder)) {
-                this.runtimeAccess.showStatusToast?.(
+                this.runtimeAccess.actionShowStatusToast?.(
                     'Grafik: Niedrig vorgemerkt (waehrend Cinematic-Aufnahme bleibt Hoch)'
                 );
             } else {
-                this.runtimeAccess.showStatusToast?.(
+                this.runtimeAccess.actionShowStatusToast?.(
                     `Grafik: ${quality === 'LOW' ? 'Niedrig (Schnell)' : 'Hoch (Schoen)'}`
                 );
             }
@@ -169,7 +175,7 @@ export class RuntimeDiagnosticsSystem {
             ) {
                 this._isLowQuality = true;
                 renderer?.setQuality?.('LOW');
-                this.runtimeAccess.showStatusToast?.('Grafik automatisch reduziert');
+                this.runtimeAccess.actionShowStatusToast?.('Grafik automatisch reduziert');
             }
         }
     }

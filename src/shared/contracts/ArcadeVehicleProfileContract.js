@@ -3,6 +3,15 @@ import { resolveArtifactVersionState } from './ArtifactVersionMigrationContract.
 export const ARCADE_VEHICLE_PROFILE_SCHEMA_VERSION = 'arcade-vehicle-profile.v1';
 export const ARCADE_VEHICLE_PROFILE_STORAGE_KEY = 'cuviosclash.arcade-vehicle-profile.v1';
 export const ARCADE_VEHICLE_PROFILE_MAX_LEVEL = 30;
+export const ARCADE_VEHICLE_PROFILE_UPGRADE_SLOTS = Object.freeze([
+    'core',
+    'nose',
+    'wing_left',
+    'wing_right',
+    'engine_left',
+    'engine_right',
+    'utility',
+]);
 
 const BASE_SLOTS = Object.freeze([
     'core', 'nose', 'wing_left', 'wing_right', 'engine_left', 'engine_right',
@@ -12,6 +21,11 @@ const ARCADE_VEHICLE_PROFILE_SUPPORTED_SCHEMAS = Object.freeze([ARCADE_VEHICLE_P
 
 function toIsoString(nowMs) {
     return new Date(Math.max(0, Number(nowMs) || Date.now())).toISOString();
+}
+
+export function isArcadeVehicleUpgradeSlot(slotName) {
+    const normalized = String(slotName || '').trim().toLowerCase();
+    return ARCADE_VEHICLE_PROFILE_UPGRADE_SLOTS.includes(normalized);
 }
 
 export function createArcadeVehicleProfileRecord(vehicleId, nowMs = Date.now()) {

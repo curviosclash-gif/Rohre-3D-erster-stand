@@ -25,6 +25,8 @@ const BASE_MAP_KEYS = [
     'upgrade_showcase',
     'showcase_nexus',
     'parcours_rift',
+    'parcours_rift_sprint',
+    'parcours_rift_precision',
     'neon_abyss',
     'crystal_ruins',
     'vulkan_odyssey',

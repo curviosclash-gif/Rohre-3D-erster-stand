@@ -3,15 +3,9 @@ import { GameLoop } from './GameLoop.js';
 import { InputManager } from './InputManager.js';
 import { ParticleSystem } from '../entities/Particles.js';
 import { AudioManager } from './Audio.js';
-import {
-    createRuntimeDiagnosticsRuntimeAccess,
-    RuntimeDiagnosticsSystem,
-} from './RuntimeDiagnosticsSystem.js';
+import { RuntimeDiagnosticsSystem } from './RuntimeDiagnosticsSystem.js';
 import { ScreenShake } from '../hunt/ScreenShake.js';
-import {
-    createPlanarAimAssistRuntimeAccess,
-    PlanarAimAssistSystem,
-} from './PlanarAimAssistSystem.js';
+import { PlanarAimAssistSystem } from './PlanarAimAssistSystem.js';
 import { MatchSessionRuntimeBridge } from './MatchSessionRuntimeBridge.js';
 import { BuildInfoController } from './BuildInfoController.js';
 import { MediaRecorderSystem } from './MediaRecorderSystem.js';
@@ -36,7 +30,6 @@ import {
 import {
     CrosshairSystem,
     createGameUiDomRefs,
-    createKeybindEditorRuntimeAccess,
     createHuntHudDomRefs,
     HUD,
     HudRuntimeSystem,
@@ -45,6 +38,7 @@ import {
     MatchFlowUiController,
     MenuExpertLoginRuntime,
 } from '../composition/core-ui/CoreUiBootstrapPorts.js';
+import { createCoreRuntimeAccess } from '../composition/core-ui/CoreRuntimeAccessFactory.js';
 
 function readBooleanQueryParam(paramName, fallback = false) {
     try {
@@ -149,6 +143,7 @@ export function bootstrapGameRuntime(game, options = {}) {
     attachGameRuntimeBundle(game, runtimeBundle);
     const runtimeState = getSessionRuntimeState(runtimeBundle) || runtimeBundle.state;
     const registerRuntimeHandle = (key, value) => setSessionRuntimeHandle(runtimeBundle, key, value);
+    const runtimeAccess = createCoreRuntimeAccess(game);
 
     const runtimePorts = createRuntimePorts(game);
     runtimeBundle.ports = runtimePorts;
@@ -179,15 +174,15 @@ export function bootstrapGameRuntime(game, options = {}) {
     }));
     registerRuntimeHandle(
         'runtimeDiagnosticsSystem',
-        new RuntimeDiagnosticsSystem(createRuntimeDiagnosticsRuntimeAccess(game))
+        new RuntimeDiagnosticsSystem(runtimeAccess.runtimeDiagnostics)
     );
     registerRuntimeHandle(
         'keybindEditorController',
-        new KeybindEditorController(createKeybindEditorRuntimeAccess(game))
+        new KeybindEditorController(runtimeAccess.keybindEditor)
     );
     registerRuntimeHandle(
         'planarAimAssistSystem',
-        new PlanarAimAssistSystem(createPlanarAimAssistRuntimeAccess(game))
+        new PlanarAimAssistSystem(runtimeAccess.planarAimAssist)
     );
     registerRuntimeHandle('matchSessionRuntimeBridge', new MatchSessionRuntimeBridge({
         game,

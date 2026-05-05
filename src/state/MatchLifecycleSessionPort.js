@@ -3,6 +3,7 @@ import {
     prepareInitializedMatchSession,
     wireInitializedMatchRuntime,
 } from './MatchSessionFactory.js';
+import { PLATFORM_PRODUCT_SURFACE_IDS } from '../shared/contracts/PlatformCapabilityData.js';
 import { recordSessionRuntimeEvent } from '../shared/runtime/SessionRuntimeObservability.js';
 
 function resolveSessionRuntimeState(runtime) {
@@ -21,6 +22,7 @@ export function createMatchSessionPort(runtime) {
     const getCurrentMatchKernelConsumers = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchKernelConsumers?.() || null;
     const getRecorder = () => runtimeHandles?.mediaRecorderSystem || runtime?.mediaRecorderSystem || runtime?.recorder || null;
     const applyPendingArcadeIntermissionEffects = (players) => runtimeHandles?.runtimePorts?.arcadePort?.applyPendingIntermissionEffects?.(players);
+    const isDesktopRuntime = () => runtime?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId === PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP;
     return {
         getSessionRuntimeState: () => sessionRuntime,
         getLifecycleState: () => ({
@@ -51,6 +53,7 @@ export function createMatchSessionPort(runtime) {
             baseConfig: runtime?.config || null,
             requestedMapKey: runtime?.settings?.mapKey || sessionSettings?.mapKey || runtime?.mapKey,
             currentSession: getCurrentMatchSessionRefs(),
+            isDesktopRuntime,
             ...handlers,
         }),
         wireInitializedMatchRuntime: (initializedMatch, handlers = {}) => wireInitializedMatchRuntime({
@@ -94,6 +97,7 @@ export function createMatchSessionPort(runtime) {
 
             runtime?.recorder?.startRound?.(entityManager.players);
             entityManager.spawnAll();
+            runtime?.recorder?.captureSnapshotNow?.(entityManager.players);
             applyPendingArcadeIntermissionEffects(entityManager.players);
             for (const player of entityManager.getHumanPlayers()) {
                 player.planarAimOffset = 0;

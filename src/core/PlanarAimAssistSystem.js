@@ -10,19 +10,22 @@
 
 import { CONFIG } from './Config.js';
 import { clamp } from '../utils/MathOps.js';
+import { createRuntimeAccess } from '../shared/runtime/RuntimeAccessFactory.js';
 
 export function createPlanarAimAssistRuntimeAccess(runtime) {
-    const game = runtime && typeof runtime === 'object' ? runtime : null;
-    return Object.freeze({
+    return createRuntimeAccess(runtime, (game) => {
+        const getInputDown = (code) => game?.input?.isDown?.(code) === true;
+        return {
         getControls: () => game?.settings?.controls || null,
         getNumHumans: () => Number(game?.numHumans) || 0,
-        isInputDown(code) {
-            return game?.input?.isDown?.(code) === true;
-        },
+        getInputDown,
+        // Backward-compatible alias for transitional call sites.
+        isInputDown: getInputDown,
         getEntityManager: () => game?.entityManager || null,
         getGameplayConfig: () => game?.runtimeConfig?.gameplay || null,
         getGameLoop: () => game?.gameLoop || null,
         getEntityRuntimeConfig: () => game?.entityRuntimeConfig || null,
+    };
     });
 }
 
@@ -43,14 +46,14 @@ export class PlanarAimAssistSystem {
         let down = false;
 
         if (this.runtimeAccess.getNumHumans?.() === 1 && playerIndex === 0) {
-            up = this.runtimeAccess.isInputDown?.(p1.UP) === true
-                || this.runtimeAccess.isInputDown?.(p2.UP) === true;
-            down = this.runtimeAccess.isInputDown?.(p1.DOWN) === true
-                || this.runtimeAccess.isInputDown?.(p2.DOWN) === true;
+            up = this.runtimeAccess.getInputDown?.(p1.UP) === true
+                || this.runtimeAccess.getInputDown?.(p2.UP) === true;
+            down = this.runtimeAccess.getInputDown?.(p1.DOWN) === true
+                || this.runtimeAccess.getInputDown?.(p2.DOWN) === true;
         } else {
             const map = playerIndex === 0 ? p1 : p2;
-            up = this.runtimeAccess.isInputDown?.(map.UP) === true;
-            down = this.runtimeAccess.isInputDown?.(map.DOWN) === true;
+            up = this.runtimeAccess.getInputDown?.(map.UP) === true;
+            down = this.runtimeAccess.getInputDown?.(map.DOWN) === true;
         }
 
         return (down ? 1 : 0) - (up ? 1 : 0);

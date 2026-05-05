@@ -25,6 +25,12 @@ function normalizeWorkshopRecord(value) {
     return value;
 }
 
+function normalizeCapabilityFailure(result, fallbackCode = 'capability_failed') {
+    const code = String(result?.code || fallbackCode).trim() || fallbackCode;
+    const message = String(result?.message || result?.error || code).trim() || code;
+    return { code, message };
+}
+
 function createUnavailableResult(operation, capabilityId) {
     return Object.freeze({
         ok: false,
@@ -42,19 +48,32 @@ async function invokeWorkshopCapability(invokeCapability, operation, payload = {
     }
     try {
         const result = await invokeCapability(validatedCapabilityId, payload);
+        const normalizedResult = normalizeWorkshopRecord(result);
+        if (normalizedResult?.ok === false) {
+            const failure = normalizeCapabilityFailure(normalizedResult, 'capability_rejected');
+            return Object.freeze({
+                ok: false,
+                operation,
+                capabilityId: validatedCapabilityId,
+                code: failure.code,
+                message: failure.message,
+                result: normalizedResult,
+            });
+        }
         return Object.freeze({
             ok: true,
             operation,
             capabilityId: validatedCapabilityId,
-            result: normalizeWorkshopRecord(result),
+            result: normalizedResult,
         });
     } catch (error) {
+        const failure = normalizeCapabilityFailure(error, 'capability_failed');
         return Object.freeze({
             ok: false,
             operation,
             capabilityId: validatedCapabilityId,
-            code: 'capability_failed',
-            message: String(error?.message || error || 'capability_failed'),
+            code: failure.code,
+            message: failure.message,
         });
     }
 }
@@ -100,4 +119,3 @@ export function createHangarWorkshopPersistenceFacade(options = {}) {
         ),
     });
 }
-

@@ -37,6 +37,7 @@ import {
 } from '../../state/arcade/ArcadeLeaderboard.js';
 import {
     bootstrapGhostLibraryFromLeaderboard,
+    getGhostLibraryDebugSnapshot,
     getLongestGhostByRoute,
     loadGhostLibrary,
     saveGhostLibrary,
@@ -62,12 +63,14 @@ import {
 } from '../../shared/contracts/ArcadeRewardContract.js';
 import {
     getRuntimeMapCatalog,
+    getRuntimeMapDefinition,
     listRuntimeMapPresetKeys,
     resolveRuntimeMapPresetLabel,
 } from '../../shared/contracts/RuntimeMapCatalogContract.js';
 import { isArcadeGhostDuelPlaybackEnabled } from '../../shared/contracts/ArcadeGhostDuelContract.js';
 
 const ARCADE_PROFILE_STORAGE_KEY = 'cuviosclash.arcade-run-profile.v1';
+const DEFAULT_GHOST_LIBRARY_SAVE_THROTTLE_MS = 250;
 
 import { toSafeNumber, computeDailySeed } from '../../shared/utils/ArcadeUtils.js';
 
@@ -90,6 +93,11 @@ function clampIndex(index, maxExclusive) {
     const parsed = Number(index);
     if (!Number.isFinite(parsed)) return 0;
     return Math.max(0, Math.min(maxExclusive - 1, Math.floor(parsed)));
+}
+
+function toSafeBudgetLimit(value, fallback = 0) {
+    const numeric = Math.trunc(Number(value));
+    return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
 }
 
 function normalizeRouteCandidates(routeId, routeAliases = null) {
@@ -162,6 +170,19 @@ export class ArcadeRunRuntime {
         this._ghostLibrary = {};
         this._ghostRecorder = new ArcadeGhostRecorder();
         this._onGhostPlayback = null;
+        this._lastGhostPlaybackRouteId = '';
+        this._ghostLibrarySaveThrottleMs = Math.max(
+            0,
+            toSafeInt(options.ghostLibrarySaveThrottleMs, DEFAULT_GHOST_LIBRARY_SAVE_THROTTLE_MS)
+        );
+        this._ghostLibrarySaveTimer = null;
+        this._pendingGhostLibrarySave = null;
+        this._ghostLibraryDebugCounters = {
+            evictedRoutes: 0,
+            trimmedFrames: 0,
+            migrationWrites: 0,
+            droppedByByteBudget: 0,
+        };
     }
 
     _nextRunId(nowMs = Date.now()) {
@@ -169,8 +190,14 @@ export class ArcadeRunRuntime {
         return `arcade-run-${Math.floor(Math.max(0, nowMs)).toString(36)}-${this._runSequence}`;
     }
 
+    _resolveSettingsRecordStore() {
+        return this.settingsManager?.getSettingsRecordStorePort?.()
+            || this.settingsManager?.store
+            || null;
+    }
+
     _readRecordsFromStorage() {
-        const store = this.settingsManager?.store;
+        const store = this._resolveSettingsRecordStore();
         if (!store || typeof store.loadJsonRecord !== 'function') {
             return createArcadeRunRecords(this._records);
         }
@@ -179,23 +206,89 @@ export class ArcadeRunRuntime {
     }
 
     _writeRecordsToStorage(records) {
-        const store = this.settingsManager?.store;
+        const store = this._resolveSettingsRecordStore();
         if (!store || typeof store.saveJsonRecord !== 'function') return false;
-        return store.saveJsonRecord(ARCADE_PROFILE_STORAGE_KEY, createArcadeRunRecords(records));
+        const saveResult = store.saveJsonRecord(ARCADE_PROFILE_STORAGE_KEY, createArcadeRunRecords(records));
+        const persisted = saveResult === undefined || saveResult === true || saveResult?.success === true;
+        if (!persisted) {
+            this.logger?.warn?.('[ArcadeRunRuntime] _writeRecordsToStorage failed', {
+                reason: String(saveResult?.reason || ''),
+                metadata: saveResult?.metadata && typeof saveResult.metadata === 'object'
+                    ? { ...saveResult.metadata }
+                    : null,
+            });
+        }
+        return persisted;
+    }
+
+    _mergeGhostLibraryTelemetryDelta(delta) {
+        if (!delta || typeof delta !== 'object') return;
+        this._ghostLibraryDebugCounters.evictedRoutes += Math.max(0, toSafeInt(delta.evictedRoutes, 0));
+        this._ghostLibraryDebugCounters.trimmedFrames += Math.max(0, toSafeInt(delta.trimmedFrames, 0));
+        this._ghostLibraryDebugCounters.migrationWrites += Math.max(0, toSafeInt(delta.migrationWrites, 0));
+        this._ghostLibraryDebugCounters.droppedByByteBudget += Math.max(0, toSafeInt(delta.droppedByByteBudget, 0));
+    }
+
+    _clearGhostLibrarySaveTimer() {
+        if (this._ghostLibrarySaveTimer != null) {
+            clearTimeout(this._ghostLibrarySaveTimer);
+            this._ghostLibrarySaveTimer = null;
+        }
+    }
+
+    _flushPendingGhostLibrarySave() {
+        this._clearGhostLibrarySaveTimer();
+        const pending = this._pendingGhostLibrarySave;
+        if (!pending) return false;
+        this._pendingGhostLibrarySave = null;
+        saveGhostLibrary(pending.store, pending.ghostLibrary, pending.budgetOptions);
+        return true;
+    }
+
+    flushGhostLibrarySaves() {
+        return this._flushPendingGhostLibrarySave();
+    }
+
+    _scheduleGhostLibrarySave(store, budgetOptions) {
+        if (!store || typeof store.saveJsonRecord !== 'function') return;
+        this._pendingGhostLibrarySave = {
+            store,
+            budgetOptions,
+            ghostLibrary: this._ghostLibrary,
+        };
+        if (this._ghostLibrarySaveThrottleMs <= 0) {
+            this._flushPendingGhostLibrarySave();
+            return;
+        }
+        if (this._ghostLibrarySaveTimer != null) {
+            return;
+        }
+        this._ghostLibrarySaveTimer = setTimeout(() => {
+            this._flushPendingGhostLibrarySave();
+        }, this._ghostLibrarySaveThrottleMs);
     }
 
     configure(runtimeConfig = null) {
+        this._flushPendingGhostLibrarySave();
         const nextConfig = createArcadeRunConfig(runtimeConfig?.arcade || null);
-        const store = this.settingsManager?.store;
+        const store = this._resolveSettingsRecordStore();
         this._config = nextConfig;
+        const ghostLibraryBudget = this._resolveGhostLibraryBudgetOptions(runtimeConfig?.arcade);
         this._enabled = nextConfig.enabled === true;
         this._records = this._readRecordsFromStorage();
         this._leaderboard = loadLeaderboard(store);
-        this._ghostLibrary = loadGhostLibrary(store);
-        const ghostLibraryBootstrap = bootstrapGhostLibraryFromLeaderboard(this._ghostLibrary, this._leaderboard);
+        this._ghostLibrary = loadGhostLibrary(store, ghostLibraryBudget, {
+            onMigrationWrite: ({ telemetryDelta }) => this._mergeGhostLibraryTelemetryDelta(telemetryDelta),
+        });
+        const ghostLibraryBootstrap = bootstrapGhostLibraryFromLeaderboard(
+            this._ghostLibrary,
+            this._leaderboard,
+            { budgetOptions: ghostLibraryBudget }
+        );
         this._ghostLibrary = ghostLibraryBootstrap.ghostLibrary;
+        this._mergeGhostLibraryTelemetryDelta(ghostLibraryBootstrap.telemetryDelta);
         if (ghostLibraryBootstrap.changed) {
-            saveGhostLibrary(store, this._ghostLibrary);
+            this._scheduleGhostLibrarySave(store, ghostLibraryBudget);
         }
         if (!this._enabled) {
             this.resetRunState({ preserveRecords: true });
@@ -217,7 +310,9 @@ export class ArcadeRunRuntime {
 
     _startReplayRecording({ entityManager = null, roundStateController = null, playerCount = 1 } = {}) {
         const recorder = this.replayRecorder;
-        if (!this._config.replayHooksEnabled || !recorder || typeof recorder.startRecording !== 'function') {
+        const replayEnabled = this._state?.config?.replayHooksEnabled === true
+            || (this._state == null && this._config.replayHooksEnabled === true);
+        if (!replayEnabled || !recorder || typeof recorder.startRecording !== 'function') {
             return;
         }
         try {
@@ -284,8 +379,32 @@ export class ArcadeRunRuntime {
         this._onGhostPlayback = typeof handler === 'function' ? handler : null;
     }
 
+    getGhostRecorder() {
+        return this._ghostRecorder;
+    }
+
+    _resolveGhostLibraryBudgetOptions(source = null) {
+        const budgetSource = source && typeof source === 'object'
+            ? source
+            : this._config;
+        return {
+            maxRoutes: toSafeBudgetLimit(budgetSource?.ghostLibraryMaxRoutes, 64),
+            maxFramesPerRoute: toSafeBudgetLimit(budgetSource?.ghostLibraryMaxFramesPerRoute, 0),
+            maxBytes: toSafeBudgetLimit(budgetSource?.ghostLibraryMaxBytes, 0),
+        };
+    }
+
     setStrategy(strategy) {
         this._strategy = strategy || null;
+    }
+
+    _resetStrategyRuntimeState() {
+        const strategy = this._strategy;
+        if (!strategy || typeof strategy !== 'object') return;
+        try { strategy.exitSuddenDeath?.(); } catch { /* no-op */ }
+        try { strategy.setActiveModifier?.(null); } catch { /* no-op */ }
+        try { strategy.setSectorType?.(null); } catch { /* no-op */ }
+        try { strategy.applyVehicleUpgrades?.(null); } catch { /* no-op */ }
     }
 
     setActiveVehicle(vehicleId) {
@@ -509,6 +628,21 @@ export class ArcadeRunRuntime {
             intermission: this.getIntermissionState(),
             postRunSummary: this.getPostRunSummary(),
             replay: this.getReplayState(),
+        };
+    }
+
+    getDebugSnapshot() {
+        return {
+            ghostRecorder: this._ghostRecorder?.getDebugSnapshot?.() || null,
+            ghostLibrary: {
+                ...getGhostLibraryDebugSnapshot(
+                    this._ghostLibrary,
+                    this._resolveGhostLibraryBudgetOptions()
+                ),
+                pendingSave: this._pendingGhostLibrarySave != null,
+                saveThrottleMs: this._ghostLibrarySaveThrottleMs,
+                counters: { ...this._ghostLibraryDebugCounters },
+            },
         };
     }
 
@@ -746,6 +880,7 @@ export class ArcadeRunRuntime {
         this._pendingIntermissionEffects = null;
         this._latestReplaySnapshot = null;
         this._strategy = options.strategy || this._strategy || null;
+        this._resetStrategyRuntimeState();
         // 61.10.1: Allow options.seed to override config seed (e.g., for daily challenge)
         const runConfig = options.seed != null
             ? { ...this._config, seed: toSafeNumber(options.seed, this._config.seed) }
@@ -767,12 +902,12 @@ export class ArcadeRunRuntime {
         this._state.suddenDeathStartedAtMs = 0;
         this._state.replay = {
             ...(this._state.replay && typeof this._state.replay === 'object' ? this._state.replay : {}),
-            playbackEnabled: this._config.replayHooksEnabled === true,
+            playbackEnabled: runConfig.replayHooksEnabled === true,
             payloadAvailable: false,
         };
 
         // Load vehicle profiles and notify slot bonuses
-        const store = this.settingsManager?.store;
+        const store = this._resolveSettingsRecordStore();
         this._vehicleProfiles = loadVehicleProfiles(store);
         const activeProfile = this.getVehicleProfile();
         this._notifyVehicleUpgradesChanged(getSlotStatBonuses(activeProfile?.upgrades));
@@ -780,7 +915,7 @@ export class ArcadeRunRuntime {
         // Resolve map sequence from encounter plan if available
         if (options.encounterPlan) {
             const runtimeMapCatalog = getRuntimeMapCatalog();
-            const mapSequence = resolveMapSequence(options.encounterPlan, this._config.seed, runtimeMapCatalog);
+            const mapSequence = resolveMapSequence(options.encounterPlan, runConfig.seed, runtimeMapCatalog);
             this._state.mapSequence = mapSequence;
             if (mapSequence.length > 0) {
                 this._state.currentMapKey = mapSequence[0];
@@ -902,12 +1037,20 @@ export class ArcadeRunRuntime {
     _assignMissionsForCurrentSector() {
         if (!this._state) return;
         const sectorIdx = Math.max(0, this._state.sectorIndex - 1);
-        const planEntry = this._state.mapSequence?.length > 0 ? { id: 'sector' } : null;
-        const mapKey = this._state.currentMapKey || 'standard';
+        const encounterEntry = this._getEncounterSectorEntry(this._state.sectorIndex);
+        const templateId = String(encounterEntry?.templateId || 'sector_intro').trim() || 'sector_intro';
+        const planEntry = { id: templateId };
+        const mapKey = String(this._state.currentMapKey || 'standard').trim() || 'standard';
+        const runtimeMapCatalog = getRuntimeMapCatalog();
+        const mapDefinition = getRuntimeMapDefinition(mapKey, runtimeMapCatalog);
+        const mapMissions = Array.isArray(mapDefinition?.missions) && mapDefinition.missions.length > 0
+            ? mapDefinition.missions
+            : null;
+        const seedSource = this._state?.config?.seed ?? this._config?.seed ?? 0;
         const missions = assignSectorMissions(
             planEntry,
-            null,
-            `${this._config.seed}-${this._state.runId}`,
+            mapMissions,
+            `${seedSource}-${this._state.runId}`,
             sectorIdx
         );
         this._missionState = createSectorMissionState(missions);
@@ -1120,7 +1263,7 @@ export class ArcadeRunRuntime {
         const baseXp = xpByEvent[String(eventType)] || 0;
         if (baseXp <= 0) return null;
 
-        const store = this.settingsManager?.store;
+        const store = this._resolveSettingsRecordStore();
         let profile = getOrCreateProfile(this._vehicleProfiles, this._activeVehicleId);
         const perks = getMasteryPerks(profile.level);
         const xpEarned = Math.max(1, Math.round(baseXp * (1 + perks.xpBonusPct / 100)));
@@ -1156,6 +1299,7 @@ export class ArcadeRunRuntime {
         const primaryRouteId = routeCandidates[0] || '';
         const runtimeEnabled = this._enabled === true;
         const persistLibraryOnly = data.persistLibraryOnly === true || !runtimeEnabled;
+        const ghostLibraryBudget = this._resolveGhostLibraryBudgetOptions();
 
         if (type === 'checkpoint') {
             if (!runtimeEnabled) return null;
@@ -1181,14 +1325,33 @@ export class ArcadeRunRuntime {
                 return null;
             }
             let clipToPlay = null;
+            let selectedRouteId = '';
             for (let i = 0; i < routeCandidates.length; i += 1) {
-                const longestGhost = getLongestGhostByRoute(this._ghostLibrary, routeCandidates[i]);
+                const longestGhost = getLongestGhostByRoute(
+                    this._ghostLibrary,
+                    routeCandidates[i],
+                    ghostLibraryBudget
+                );
                 if (!longestGhost?.longestGhostClip) continue;
                 clipToPlay = longestGhost.longestGhostClip;
+                selectedRouteId = routeCandidates[i];
                 break;
             }
+            const source = String(data?.source || '').trim().toLowerCase();
+            if (
+                source === 'parcours_checkpoint_start'
+                && selectedRouteId
+                && selectedRouteId === this._lastGhostPlaybackRouteId
+            ) {
+                return null;
+            }
             if (clipToPlay && this._onGhostPlayback) {
-                try { this._onGhostPlayback(clipToPlay); } catch { /* no-op */ }
+                try {
+                    this._onGhostPlayback(clipToPlay);
+                    this._lastGhostPlaybackRouteId = selectedRouteId;
+                } catch {
+                    /* no-op */
+                }
             }
             return null;
         }
@@ -1211,10 +1374,12 @@ export class ArcadeRunRuntime {
         }
 
         if (type === 'finish') {
-            const store = this.settingsManager?.store;
+            const store = this._resolveSettingsRecordStore();
             if (!primaryRouteId || !store) return null;
             const vehicleId = this._activeVehicleId || '';
             const recordedAtIso = new Date().toISOString();
+            const ghostDurationMs = Math.max(0, Math.trunc(Number(data?.ghostDurationMs) || 0));
+            const explicitLongestDurationMs = ghostDurationMs > 0 ? ghostDurationMs : 0;
             let isBestTime = false;
             let inserted = false;
             if (!persistLibraryOnly) {
@@ -1236,29 +1401,27 @@ export class ArcadeRunRuntime {
             let nextGhostLibrary = this._ghostLibrary;
             let longestGhostUpdated = false;
             let primaryLongestGhostReason = 'invalid_route';
-            let firstChangedReason = '';
-            for (let i = 0; i < routeCandidates.length; i += 1) {
-                const candidateRouteId = routeCandidates[i];
-                const ghostLibraryUpsert = upsertLongestGhostByRoute(
-                    nextGhostLibrary,
-                    candidateRouteId,
-                    ghostClip,
-                    totalTimeMs,
-                    { updatedAt: recordedAtIso }
-                );
-                nextGhostLibrary = ghostLibraryUpsert.ghostLibrary;
-                if (candidateRouteId === primaryRouteId) {
-                    primaryLongestGhostReason = ghostLibraryUpsert.reason;
+            const ghostLibraryUpsert = upsertLongestGhostByRoute(
+                nextGhostLibrary,
+                primaryRouteId,
+                ghostClip,
+                explicitLongestDurationMs,
+                {
+                    updatedAt: recordedAtIso,
+                    routeAliases: routeCandidates.slice(1),
+                    canonicalRouteId: primaryRouteId,
+                    budgetOptions: ghostLibraryBudget,
+                    assumeNormalizedLibrary: false,
                 }
-                if (!ghostLibraryUpsert.changed) continue;
-                longestGhostUpdated = true;
-                if (!firstChangedReason) {
-                    firstChangedReason = ghostLibraryUpsert.reason;
-                }
-            }
+            );
+            this._mergeGhostLibraryTelemetryDelta(ghostLibraryUpsert.telemetryDelta);
+            nextGhostLibrary = ghostLibraryUpsert.ghostLibrary;
+            primaryLongestGhostReason = ghostLibraryUpsert.reason;
+            longestGhostUpdated = ghostLibraryUpsert.changed;
             this._ghostLibrary = nextGhostLibrary;
+            this._lastGhostPlaybackRouteId = '';
             if (longestGhostUpdated) {
-                saveGhostLibrary(store, this._ghostLibrary);
+                this._scheduleGhostLibrarySave(store, ghostLibraryBudget);
             }
             if (!persistLibraryOnly && isBestTime) {
                 this.applyParcoursXpEvent('new_best_time', data.playerIndex || 0);
@@ -1269,7 +1432,7 @@ export class ArcadeRunRuntime {
                 persistLibraryOnly,
                 ghostRouteIds: routeCandidates,
                 longestGhostUpdated,
-                longestGhostReason: firstChangedReason || primaryLongestGhostReason,
+                longestGhostReason: primaryLongestGhostReason,
             };
         }
 
@@ -1278,7 +1441,7 @@ export class ArcadeRunRuntime {
 
     _applySectorXpReward(telemetryPayload) {
         if (!this._activeVehicleId || !this._vehicleProfiles) return;
-        const store = this.settingsManager?.store;
+        const store = this._resolveSettingsRecordStore();
 
         const missionsCompleted = this._missionState?.completedCount || 0;
         const totalMissions = this._missionState?.missions?.length || 0;
@@ -1388,6 +1551,7 @@ export class ArcadeRunRuntime {
 
     resetRunState(options = {}) {
         const preserveRecords = options?.preserveRecords === true;
+        this._flushPendingGhostLibrarySave();
         const replayRecorder = this.replayRecorder;
         if (replayRecorder?.isRecording && typeof replayRecorder.stopRecording === 'function') {
             try {
@@ -1402,7 +1566,9 @@ export class ArcadeRunRuntime {
         this._pendingIntermissionEffects = null;
         this._latestReplaySnapshot = null;
         this._activeModifierId = null;
+        this._lastGhostPlaybackRouteId = '';
         this._missionState = null;
+        this._resetStrategyRuntimeState();
         this._state = null;
         if (!preserveRecords) {
             this._records = this._readRecordsFromStorage();

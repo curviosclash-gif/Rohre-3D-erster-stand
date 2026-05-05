@@ -336,6 +336,25 @@ test('lifecyclePort no longer falls back to legacy runtimeFacade for migrated se
     assert.deepEqual(calls, []);
 });
 
+test('GameRuntimePorts keep transition fallback helpers removed from productive path (104.5.1)', () => {
+    const source = fs.readFileSync(new URL('../src/shared/runtime/GameRuntimePorts.js', import.meta.url), 'utf8');
+    assert.equal(source.includes('getLegacyRuntimeFacade'), false);
+    assert.equal(source.includes('getLegacyRuntimeCoordinator'), false);
+    assert.equal(source.includes('getRuntimeFeatureTransitionFacade'), false);
+    assert.equal(source.includes('getRuntimeFeatureTransitionCoordinator'), false);
+    assert.equal(source.includes('allowLegacyFallback = true'), false);
+});
+
+test('PlatformCapabilityRegistry and SettingsRuntimeLimitsContract avoid direct curvios globals (104.5.1)', () => {
+    const registrySource = fs.readFileSync(new URL('../src/shared/contracts/PlatformCapabilityRegistry.js', import.meta.url), 'utf8');
+    const settingsLimitsSource = fs.readFileSync(new URL('../src/shared/contracts/SettingsRuntimeLimitsContract.js', import.meta.url), 'utf8');
+
+    assert.equal(registrySource.includes('curviosApp'), false);
+    assert.equal(registrySource.includes('__CURVIOS_APP__'), false);
+    assert.equal(settingsLimitsSource.includes('curviosApp'), false);
+    assert.equal(settingsLimitsSource.includes('__CURVIOS_APP__'), false);
+});
+
 test('session runtime snapshot resolves session contract without legacy runtimeFacade fallback (92.3.1)', () => {
     const updatedAt = Date.now();
     const game = {

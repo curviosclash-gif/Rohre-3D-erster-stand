@@ -5,6 +5,7 @@
 import {
     resolveSurfaceMultiplayerGateAccess,
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import { resolveDesktopConnectivityProfile } from '../../shared/contracts/DesktopMultiplayerRoleContract.js';
 import { isMapEligibleForModePath } from '../../shared/contracts/MapModeContract.js';
 import { resolveRuntimeSessionContract } from '../../shared/contracts/RuntimeSessionContract.js';
 
@@ -53,9 +54,24 @@ export function resolveMatchStartValidationIssue({
         const sessionState = multiplayerSessionState && typeof multiplayerSessionState === 'object'
             ? multiplayerSessionState
             : null;
+        const connectivityProfile = resolveDesktopConnectivityProfile();
         const hostGate = resolveSurfaceMultiplayerGateAccess('host', { productSurfaceId });
         const legacyTransportActive = sessionContract.isLegacyTransport === true;
+        const requestedTransport = String(
+            sessionState?.transport || sessionContract.multiplayerTransport || 'lan'
+        ).trim().toLowerCase();
+        const onlineTransport = requestedTransport === 'online';
+        const transportOfflineHint = onlineTransport
+            ? connectivityProfile.onlineUnavailableHint
+            : connectivityProfile.lanOfflineHint;
         const lobbyCode = String(sessionState?.lobbyCode || ui?.multiplayerLobbyCodeInput?.value || '').trim();
+        if (sessionState?.joined === true && sessionState?.connected !== true) {
+            return {
+                message: `Start nicht moeglich: ${transportOfflineHint}`,
+                fieldKey: 'multiplayer',
+                fieldMessage: transportOfflineHint,
+            };
+        }
         if (!lobbyCode || sessionState?.joined !== true) {
             if (!hostGate.allowed) {
                 return {
@@ -75,7 +91,7 @@ export function resolveMatchStartValidationIssue({
             return {
                 message: `Start nicht moeglich: ${transportLabel}-Lobby verbinden (Host oder Join).`,
                 fieldKey: 'multiplayer',
-                fieldMessage: `${transportLabel}: Host oder Join ausfuehren, damit eine Lobby verbunden ist.`,
+                fieldMessage: `${transportLabel}: Host oder Join ausfuehren. ${transportOfflineHint}`,
             };
         }
         if (sessionState?.isHost !== true) {

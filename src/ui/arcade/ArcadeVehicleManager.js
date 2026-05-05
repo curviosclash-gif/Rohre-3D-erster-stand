@@ -6,6 +6,7 @@ import {
     getOrCreateProfile,
     evaluateUpgradePurchase,
     purchaseUpgrade,
+    applyLoadoutPreset,
     getSpendableUpgradeXp,
     xpToNextLevel,
 } from '../../state/arcade/ArcadeVehicleProfile.js';
@@ -248,6 +249,17 @@ export function setupArcadeVehicleManager(ctx = {}) {
     const toast = (message, tone = 'info') => {
         if (!emit || !eventTypes.SHOW_STATUS_TOAST) return;
         emit(eventTypes.SHOW_STATUS_TOAST, { message, tone, duration: 1200 });
+    };
+
+    const showPresetValidationFeedback = (rejectedEntries = []) => {
+        if (!Array.isArray(rejectedEntries) || rejectedEntries.length === 0) return;
+        const codes = new Set(rejectedEntries.map((entry) => String(entry?.code || '').trim()).filter(Boolean));
+        const blockedByGate = codes.has('slot_locked')
+            || codes.has('part_family_locked')
+            || codes.has('tier_locked')
+            || codes.has('level_locked');
+        const reasonLabel = blockedByGate ? 'Gate verletzt' : 'ungueltige Eintraege';
+        toast(`Preset bereinigt: ${rejectedEntries.length} ${reasonLabel}`, 'warning');
     };
 
     const syncVehicleContract = (vehicleId) => {
@@ -500,9 +512,16 @@ export function setupArcadeVehicleManager(ctx = {}) {
         const selectedVehicleId = selection.getSelectedVehicleId();
         const profile = profileFor(selectedVehicleId);
         const defaultName = `${entryFor(selectedVehicleId).label} Setup`;
-        const saved = presetStore.savePreset(selectedVehicleId, norm(presetName.value, defaultName), profile.upgrades || {});
+        const sanitizedPreset = applyLoadoutPreset(profile, profile.upgrades || {});
+        const saved = presetStore.savePreset(
+            selectedVehicleId,
+            norm(presetName.value, defaultName),
+            sanitizedPreset.upgrades || {}
+        );
         presetName.value = '';
         refreshPresets(saved.presetId);
+        showPresetValidationFeedback(saved.invalidEntries);
+        showPresetValidationFeedback(sanitizedPreset.rejectedEntries);
         toast(`Preset gespeichert: ${saved.name}`);
     });
 
@@ -511,12 +530,11 @@ export function setupArcadeVehicleManager(ctx = {}) {
         const preset = presetStore.loadPreset(selectedVehicleId, presetSelect.value);
         if (!preset) return;
         const profile = profileFor(selectedVehicleId);
-        profiles[selectedVehicleId] = {
-            ...profile,
-            upgrades: { ...(preset.upgrades || {}) },
-            updatedAt: new Date().toISOString(),
-        };
+        const loadedPreset = applyLoadoutPreset(profile, preset.upgrades || {});
+        profiles[selectedVehicleId] = loadedPreset.profile;
         persistProfiles();
+        showPresetValidationFeedback(preset.invalidEntries);
+        showPresetValidationFeedback(loadedPreset.rejectedEntries);
         toast(`Preset geladen: ${preset.name}`);
         syncDisplay();
     });

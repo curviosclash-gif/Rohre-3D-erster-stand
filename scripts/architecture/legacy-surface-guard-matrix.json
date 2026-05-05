@@ -1,6 +1,6 @@
 {
   "_comment": "Machine-readable Guard-Matrix fuer Legacy-Surfaces (V91 91.1.2, erweitert in V92 92.5.1). Beschreibt verbotene Globals, erlaubte Uebergangsadapter und Eigentuemer fuer den migrierten Scope.",
-  "updatedAt": "2026-04-20",
+  "updatedAt": "2026-05-04",
   "version": "1",
   "surfaces": [
     {
@@ -31,17 +31,10 @@
       "forbiddenForNewWork": true,
       "allowedAdapters": [
         "src/core/AppInitializer.js",
-        "src/core/main.js",
-        "src/core/runtime/GameRuntimeCoordinator.js",
-        "src/shared/runtime/GameRuntimePorts.js"
+        "src/core/main.js"
       ],
-      "allowedCallers": [
-        "src/core/PlayingStateSystem.js",
-        "src/state/RoundStateTickSystem.js",
-        "src/ui/HudRuntimeSystem.js",
-        "src/ui/UINavigationLifecycleController.js"
-      ],
-      "reason": "GameRuntimeCoordinator/AppInitializer duerfen den Debug-/Legacy-Handle noch publizieren; keine neuen Fachaufrufer mehr anbinden",
+      "allowedCallers": [],
+      "reason": "RuntimeFacade-/GAME_RUNTIME-Reads bleiben nur noch im dokumentierten Debug-Publish von AppInitializer/main erlaubt; neue Fachaufrufer sind nicht zulaessig",
       "migrationTarget": "Application-Commands plus read-only session_runtime_snapshot; globale Debug-Handles auf read-only Diagnostics reduzieren",
       "sunsetPhase": "91.3",
       "sunsetCriteria": "Sobald kein produktiver Code mehr game.runtimeFacade.* oder window.GAME_RUNTIME verwendet und die Fassade nur noch expliziter Legacy-Forwarder oder ganz entfernt ist"
@@ -92,12 +85,9 @@
         "electron/preload.cjs"
       ],
       "allowedCallers": [
-        "src/entities/ai/ObservationBridgePolicy.js",
-        "src/shared/contracts/PlatformCapabilityRegistry.js",
-        "src/core/settings/SettingsDefaultsFacade.js",
-        "src/shared/contracts/SettingsRuntimeLimitsContract.js"
+        "src/entities/ai/ObservationBridgePolicy.js"
       ],
-      "reason": "Nur der Plattformadapter (src/platform/electron/**) ist langfristig erlaubt; direkte Reads in ObservationBridgePolicy und PlatformCapabilityRegistry sind explizite Migrationsschuld bis 91.3; SettingsDefaultsFacade und SettingsRuntimeLimitsContract lesen curviosApp als V95/V97-Migrationspfad fuer Legacy-Override-Lese-Compat bis V97.4 den Pfad auf PlatformCapabilityContract umschreibt",
+      "reason": "Nur der Plattformadapter (src/platform/electron/**) ist langfristig erlaubt; ausserhalb davon bleibt ausschliesslich die explizit markierte ObservationBridge-Compat als Restschuld zugelassen",
       "migrationTarget": "PlatformCapabilityContract + dedizierte Adapter unter src/platform/**; Renderer bekommt nur Capability-Descriptoren ueber Application-/Platform-Layer",
       "sunsetPhase": "91.3",
       "sunsetCriteria": "Sobald curviosApp/__CURVIOS_APP__ ausserhalb der dedizierten Plattformadapter nicht mehr referenziert werden und Browser-/Desktop-Unterschiede nur noch ueber Capability-Snapshots sichtbar sind"
@@ -112,8 +102,7 @@
         "src/core/runtime/GameRuntimeBundle.js"
       ],
       "allowedCallers": [
-        "src/core/Config.js",
-        "src/core/settings/SettingsSanitizerOps.js"
+        "src/core/Config.js"
       ],
       "reason": "ActiveRuntimeConfigStore bleibt nur als dokumentierter Uebergangsadapter fuer Runtime-/Settings-Scope erlaubt; keine neuen Verbraucher ausserhalb Config/Settings",
       "migrationTarget": "SessionRuntime wird alleiniger Besitzer des Runtime-Config-Snapshots; Consumer erhalten explizite Projektionen per Injection oder Snapshot",

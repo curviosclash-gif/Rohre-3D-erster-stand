@@ -274,10 +274,13 @@ export function createMultiplayerPanel(ctx) {
             for (const host of hosts) {
                 const card = createElement('button', 'nav-btn mp-discovery-host');
                 card.type = 'button';
-                card.innerHTML = `<strong>${host.hostName || host.ip}</strong>`
-                    + `<span class="mp-discovery-meta">${host.ip}:${host.port}`
-                    + ` &middot; Code: ${host.lobbyCode}`
-                    + ` &middot; ${host.playerCount || 0} Spieler</span>`;
+                const title = createElement('strong', '', normalizeString(host.hostName || host.ip, 'Host'));
+                const metaText = `${normalizeString(host.ip, 'unknown')}:${normalizeString(host.port, '0')}`
+                    + ` - Code: ${normalizeString(host.lobbyCode, '?')}`
+                    + ` - ${Number(host.playerCount || 0)} Spieler`;
+                const meta = createElement('span', 'mp-discovery-meta', metaText);
+                card.appendChild(title);
+                card.appendChild(meta);
                 bind(card, 'click', () => handleDiscoveryJoin(host));
                 hostList.appendChild(card);
             }

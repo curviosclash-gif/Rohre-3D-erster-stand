@@ -20,10 +20,20 @@ import {
     buildSocketCloseDetails,
     createSocketLifecycleError,
     createServerSignalingError,
+    createInvalidSignalingPayloadError,
+    createNetworkUnavailableSignalingError,
     createResumeSignalingEnvelope,
     isRetryableSignalingError,
     toErrorPayload,
 } from './OnlineSignalingSupport.js';
+
+const MUTATION_ACK_TIMEOUT_MS = 3_500;
+
+function createLobbyUsageError(code, message) {
+    const error = new Error(message);
+    error.code = String(code || 'lobby_usage_error');
+    return error;
+}
 
 /**
  * Lobby for Internet play. Communicates with the self-hosted
@@ -36,6 +46,8 @@ export class OnlineMatchLobby extends MatchLobby {
         this._ws = null;
         this._playerId = null;
         this._lastHandledMatchCommandId = '';
+        this._pendingMutationAcks = new Map();
+        this._closedByClient = false;
         this.sessionState = createInitialLobbySessionState();
     }
 
@@ -61,6 +73,118 @@ export class OnlineMatchLobby extends MatchLobby {
             updatedAt: Date.now(),
             revision: Number(this.sessionState.revision || 0) + 1,
         });
+    }
+
+    _isSocketOpen() {
+        return !!(this._ws && this._ws.readyState === WebSocket.OPEN);
+    }
+
+    _createMutationAckId(prefix = 'ack') {
+        return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    _rejectAllPendingMutationAcks(error) {
+        const err = error || createNetworkUnavailableSignalingError({
+            signalingUrl: this._signalingUrl,
+            source: 'mutation_ack',
+            reason: 'socket_closed',
+        });
+        for (const [ackId, pending] of this._pendingMutationAcks.entries()) {
+            clearTimeout(pending.timerId);
+            try {
+                pending.reject(err);
+            } catch {
+                // Ignore downstream Promise observer failures.
+            }
+            this._pendingMutationAcks.delete(ackId);
+        }
+    }
+
+    _awaitMutationAck({ ackId, matcher, timeoutMs = MUTATION_ACK_TIMEOUT_MS } = {}) {
+        return new Promise((resolve, reject) => {
+            if (!ackId || typeof matcher !== 'function') {
+                reject(createInvalidSignalingPayloadError({
+                    reason: 'mutation_ack_invalid_registration',
+                    signalingUrl: this._signalingUrl,
+                }));
+                return;
+            }
+            const timerId = setTimeout(() => {
+                this._pendingMutationAcks.delete(ackId);
+                reject(createNetworkUnavailableSignalingError({
+                    signalingUrl: this._signalingUrl,
+                    source: 'mutation_ack_timeout',
+                    ackId,
+                    timeoutMs,
+                }));
+            }, timeoutMs);
+            this._pendingMutationAcks.set(ackId, {
+                matcher,
+                resolve,
+                reject,
+                timerId,
+            });
+        });
+    }
+
+    _resolveMatchingMutationAcks(message) {
+        for (const [ackId, pending] of this._pendingMutationAcks.entries()) {
+            let matches = false;
+            try {
+                matches = pending.matcher(message) === true;
+            } catch {
+                matches = false;
+            }
+            if (!matches) continue;
+            clearTimeout(pending.timerId);
+            this._pendingMutationAcks.delete(ackId);
+            pending.resolve(message);
+        }
+    }
+
+    _parseSocketMessage(rawData) {
+        let parsedMessage;
+        try {
+            parsedMessage = JSON.parse(rawData);
+        } catch (error) {
+            throw createInvalidSignalingPayloadError({
+                signalingUrl: this._signalingUrl,
+                rawData: typeof rawData === 'string' ? rawData.slice(0, 256) : String(rawData || ''),
+            }, error);
+        }
+        const normalizedType = typeof parsedMessage?.type === 'string'
+            ? parsedMessage.type.trim()
+            : '';
+        if (!normalizedType) {
+            throw createInvalidSignalingPayloadError({
+                signalingUrl: this._signalingUrl,
+                reason: 'missing_type',
+            });
+        }
+        return parsedMessage;
+    }
+
+    _handleSocketClosed(event = null) {
+        this._closeSocket();
+        if (this._closedByClient) {
+            this._closedByClient = false;
+            this._rejectAllPendingMutationAcks();
+            return;
+        }
+        const closeError = createSocketLifecycleError('close', buildSocketCloseDetails(event, this._signalingUrl));
+        this._rejectAllPendingMutationAcks(closeError);
+        this._emit('error', toErrorPayload(closeError));
+        this._applySessionState(createInitialLobbySessionState());
+        this._emit('closed', {
+            reason: 'signaling_socket_closed',
+            error: toErrorPayload(closeError),
+        });
+    }
+
+    _handleSocketError() {
+        const socketError = createSocketLifecycleError('error', { signalingUrl: this._signalingUrl });
+        this._rejectAllPendingMutationAcks(socketError);
+        this._emit('error', toErrorPayload(socketError));
     }
 
     async _makeConnectPromise(setupFn, options = {}) {
@@ -120,10 +244,18 @@ export class OnlineMatchLobby extends MatchLobby {
             setupFn(this._ws, connectResolve, connectReject, connectState);
 
             this._ws.onerror = () => {
-                connectReject(createSocketLifecycleError('error', { signalingUrl: this._signalingUrl }));
+                if (!connectState.settled) {
+                    connectReject(createSocketLifecycleError('error', { signalingUrl: this._signalingUrl }));
+                    return;
+                }
+                this._handleSocketError();
             };
             this._ws.onclose = (event) => {
-                connectReject(createSocketLifecycleError('close', buildSocketCloseDetails(event, this._signalingUrl)));
+                if (!connectState.settled) {
+                    connectReject(createSocketLifecycleError('close', buildSocketCloseDetails(event, this._signalingUrl)));
+                    return;
+                }
+                this._handleSocketClosed(event);
             };
         });
     }
@@ -143,6 +275,7 @@ export class OnlineMatchLobby extends MatchLobby {
         this.isHost = true;
         this.settings = { ...options };
         this._signalingUrl = resolveOnlineSignalingUrl(options.signalingUrl, this._signalingUrl);
+        this._closedByClient = false;
 
         return this._makeConnectPromise((ws, connectResolve, connectReject, connectState) => {
             ws.onopen = () => {
@@ -151,8 +284,16 @@ export class OnlineMatchLobby extends MatchLobby {
                 }));
             };
             ws.onmessage = (event) => {
-                const msg = JSON.parse(event.data);
-                this._handleMessage(msg, connectResolve, connectReject, connectState);
+                try {
+                    const msg = this._parseSocketMessage(event.data);
+                    this._handleMessage(msg, connectResolve, connectReject, connectState);
+                } catch (error) {
+                    const payload = toErrorPayload(error, 'Online-Signaling hat eine ungueltige Nachricht geliefert.');
+                    this._emit('error', payload);
+                    if (!connectState.settled) {
+                        connectReject(error);
+                    }
+                }
             };
         }, options);
     }
@@ -160,14 +301,23 @@ export class OnlineMatchLobby extends MatchLobby {
     async join(lobbyCode, options = {}) {
         this.isHost = false;
         this._signalingUrl = resolveOnlineSignalingUrl(options.signalingUrl, this._signalingUrl);
+        this._closedByClient = false;
 
         return this._makeConnectPromise((ws, connectResolve, connectReject, connectState) => {
             ws.onopen = () => {
                 this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.JOIN_LOBBY, { lobbyCode }));
             };
             ws.onmessage = (event) => {
-                const msg = JSON.parse(event.data);
-                this._handleMessage(msg, connectResolve, connectReject, connectState);
+                try {
+                    const msg = this._parseSocketMessage(event.data);
+                    this._handleMessage(msg, connectResolve, connectReject, connectState);
+                } catch (error) {
+                    const payload = toErrorPayload(error, 'Online-Signaling hat eine ungueltige Nachricht geliefert.');
+                    this._emit('error', payload);
+                    if (!connectState.settled) {
+                        connectReject(error);
+                    }
+                }
             };
         }, options);
     }
@@ -178,20 +328,42 @@ export class OnlineMatchLobby extends MatchLobby {
         }
         const lobbyCode = this.sessionState.lobbyCode || this.lobbyCode;
         const playerId = this._playerId;
+        this._closedByClient = false;
 
         return this._makeConnectPromise((ws, connectResolve, connectReject, connectState) => {
             ws.onopen = () => {
                 this._send(createResumeSignalingEnvelope({ lobbyCode, playerId }));
             };
             ws.onmessage = (event) => {
-                const msg = JSON.parse(event.data);
-                this._handleMessage(msg, connectResolve, connectReject, connectState);
+                try {
+                    const msg = this._parseSocketMessage(event.data);
+                    this._handleMessage(msg, connectResolve, connectReject, connectState);
+                } catch (error) {
+                    const payload = toErrorPayload(error, 'Online-Signaling hat eine ungueltige Nachricht geliefert.');
+                    this._emit('error', payload);
+                    if (!connectState.settled) {
+                        connectReject(error);
+                    }
+                }
             };
         }, options);
     }
 
     _handleMessage(msg, connectResolve, connectReject, connectState = null) {
-        switch (msg.type) {
+        const messageType = typeof msg?.type === 'string' ? msg.type.trim() : '';
+        if (!messageType) {
+            const payloadError = createInvalidSignalingPayloadError({
+                signalingUrl: this._signalingUrl,
+                reason: 'missing_type',
+            });
+            this._emit('error', toErrorPayload(payloadError));
+            if (connectReject && !connectState?.settled) {
+                connectReject(payloadError);
+            }
+            return;
+        }
+        this._resolveMatchingMutationAcks(msg);
+        switch (messageType) {
         case SIGNALING_EVENT_TYPES.LOBBY_CREATED: {
             this.lobbyCode = msg.lobbyCode;
             this._playerId = msg.playerId;
@@ -340,6 +512,7 @@ export class OnlineMatchLobby extends MatchLobby {
 
         case SIGNALING_EVENT_TYPES.ERROR: {
             const err = createServerSignalingError(msg.message);
+            this._rejectAllPendingMutationAcks(err);
             this._emit('error', toErrorPayload(err));
             if (connectReject) {
                 if (connectState?.rejected) break;
@@ -357,28 +530,110 @@ export class OnlineMatchLobby extends MatchLobby {
     _send(data) {
         if (!data) return;
         if (this._ws && this._ws.readyState === WebSocket.OPEN) {
-            this._ws.send(JSON.stringify(data));
+            try {
+                this._ws.send(JSON.stringify(data));
+                return true;
+            } catch {
+                return false;
+            }
         }
+        return false;
+    }
+
+    _sendMutationWithAck({
+        commandType,
+        payload = {},
+        timeoutMs = MUTATION_ACK_TIMEOUT_MS,
+        ackMatcher = null,
+    } = {}) {
+        if (!this._isSocketOpen()) {
+            return Promise.reject(createNetworkUnavailableSignalingError({
+                signalingUrl: this._signalingUrl,
+                source: 'mutation_send',
+                commandType,
+            }));
+        }
+        const ackId = this._createMutationAckId(commandType || 'mutation');
+        const matcher = typeof ackMatcher === 'function' ? ackMatcher : () => false;
+        const ackPromise = this._awaitMutationAck({ ackId, matcher, timeoutMs });
+        const sent = this._send(createSignalingEnvelope(commandType, payload));
+        if (!sent) {
+            const pending = this._pendingMutationAcks.get(ackId);
+            if (pending) {
+                clearTimeout(pending.timerId);
+                this._pendingMutationAcks.delete(ackId);
+                pending.reject(createNetworkUnavailableSignalingError({
+                    signalingUrl: this._signalingUrl,
+                    source: 'mutation_send_failed',
+                    commandType,
+                }));
+            }
+        }
+        return ackPromise;
     }
 
     leave() {
+        this._closedByClient = true;
         this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.LEAVE));
+        this._rejectAllPendingMutationAcks(createNetworkUnavailableSignalingError({
+            signalingUrl: this._signalingUrl,
+            source: 'manual_leave',
+        }));
         if (this._ws) {
             this._ws.close();
             this._ws = null;
         }
         this.players = [];
         this.sessionState = createInitialLobbySessionState();
+        this._playerId = null;
         this._lastHandledMatchCommandId = '';
         this._emit('closed', {});
     }
 
-    setReady(ready) {
-        this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.READY, { ready: ready === true }));
+    async setReady(ready) {
+        const expectedReady = ready === true;
+        const localPeerId = String(this._playerId || '').trim();
+        if (!localPeerId) {
+            throw createLobbyUsageError('not_in_lobby', 'Ready-Status kann ohne aktive Lobby nicht gesetzt werden.');
+        }
+        return this._sendMutationWithAck({
+            commandType: SIGNALING_COMMAND_TYPES.READY,
+            payload: { ready: expectedReady },
+            ackMatcher: (msg) => {
+                if (msg?.type !== SIGNALING_EVENT_TYPES.PLAYER_READY) return false;
+                const msgPeerId = String(msg.peerId || '').trim();
+                if (localPeerId && msgPeerId && msgPeerId === localPeerId) {
+                    return msg.ready === expectedReady;
+                }
+                const members = Array.isArray(msg?.sessionState?.members) ? msg.sessionState.members : [];
+                const localMember = members.find((member) => String(member?.peerId || '').trim() === localPeerId);
+                return localMember ? localMember.ready === expectedReady : false;
+            },
+        });
     }
 
-    invalidateReadyForAll() {
-        this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.INVALIDATE_READY));
+    async invalidateReadyForAll() {
+        if (this.isHost !== true) {
+            throw createLobbyUsageError('host_required', 'Nur der Host darf Ready fuer alle invalidieren.');
+        }
+        const hasAnyClientReady = this.sessionState.members.some((member) => (
+            member?.isHost !== true && member?.ready === true
+        ));
+        if (!hasAnyClientReady) {
+            return { ok: true, skipped: true };
+        }
+        return this._sendMutationWithAck({
+            commandType: SIGNALING_COMMAND_TYPES.INVALIDATE_READY,
+            payload: {},
+            ackMatcher: (msg) => {
+                if (msg?.type !== SIGNALING_EVENT_TYPES.PLAYER_READY) return false;
+                const members = Array.isArray(msg?.sessionState?.members) ? msg.sessionState.members : [];
+                if (members.length <= 0) return false;
+                return members.every((member) => (
+                    member?.isHost === true || member?.ready !== true
+                ));
+            },
+        });
     }
 
     updateSettings(settings) {
@@ -386,15 +641,27 @@ export class OnlineMatchLobby extends MatchLobby {
         this._emit('settingsChanged', { settings: this.settings, sessionState: this.sessionState });
     }
 
-    startMatch(options = {}) {
+    async startMatch(options = {}) {
+        if (this.isHost !== true) {
+            throw createLobbyUsageError('host_required', 'Nur der Host darf das Match starten.');
+        }
+        const commandId = this._createMutationAckId('match');
         const pendingMatchStart = {
-            commandId: `match-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+            commandId,
             lobbyCode: this.sessionState.lobbyCode || this.lobbyCode || '',
             hostPeerId: this.sessionState.hostPeerId || this._playerId || '',
             issuedAt: Date.now(),
             settingsSnapshot: options?.settingsSnapshot ?? this.settings ?? null,
         };
-        this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.START_MATCH, pendingMatchStart));
+        await this._sendMutationWithAck({
+            commandType: SIGNALING_COMMAND_TYPES.START_MATCH,
+            payload: pendingMatchStart,
+            ackMatcher: (msg) => (
+                msg?.type === SIGNALING_EVENT_TYPES.MATCH_START
+                && String(msg?.pendingMatchStart?.commandId || '').trim() === commandId
+            ),
+            timeoutMs: Math.max(MUTATION_ACK_TIMEOUT_MS, 5000),
+        });
         return { pendingMatchStart };
     }
 

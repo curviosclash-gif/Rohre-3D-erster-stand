@@ -25,6 +25,7 @@ import {
     buildSocketCloseDetails,
     createSocketLifecycleError,
     createServerSignalingError,
+    createInvalidSignalingPayloadError,
     isRetryableSignalingError,
     toErrorPayload,
 } from './OnlineSignalingSupport.js';
@@ -148,13 +149,50 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
             this._ws.onopen = onOpenFn;
             this._ws.onmessage = (event) => {
                 let msg;
-                try { msg = JSON.parse(event.data); } catch { return; }
-                this._handleSignalingMessage(msg, done, fail);
+                try {
+                    msg = JSON.parse(event.data);
+                } catch (error) {
+                    const payloadError = createInvalidSignalingPayloadError({
+                        signalingUrl: this._signalingUrl,
+                        rawData: typeof event?.data === 'string' ? event.data.slice(0, 256) : String(event?.data || ''),
+                    }, error);
+                    this._emit('error', toErrorPayload(payloadError));
+                    if (!settled) {
+                        fail(payloadError);
+                    }
+                    return;
+                }
+                Promise.resolve(this._handleSignalingMessage(msg, done, fail)).catch((error) => {
+                    const signalingError = error instanceof Error
+                        ? error
+                        : createServerSignalingError('unexpected_signaling_handler_failure');
+                    this._emit('error', toErrorPayload(signalingError));
+                    if (!settled) {
+                        fail(signalingError);
+                    }
+                });
             };
-            this._ws.onerror = () => fail(createSocketLifecycleError('error', { signalingUrl: this._signalingUrl }));
+            this._ws.onerror = () => {
+                const socketError = createSocketLifecycleError('error', { signalingUrl: this._signalingUrl });
+                this._emit('error', toErrorPayload(socketError));
+                if (!settled) {
+                    fail(socketError);
+                    return;
+                }
+                this._emit('signalingDisconnected', toErrorPayload(socketError));
+            };
             this._ws.onclose = (event) => {
-                fail(createSocketLifecycleError('close', buildSocketCloseDetails(event, this._signalingUrl)));
-                this._emit('signalingDisconnected', {});
+                const closeError = createSocketLifecycleError('close', buildSocketCloseDetails(event, this._signalingUrl));
+                if (!settled) {
+                    fail(closeError);
+                    return;
+                }
+                this.isConnected = false;
+                this._emit('signalingDisconnected', toErrorPayload(closeError));
+                this._emit('disconnected', {
+                    reason: 'signaling_socket_closed',
+                    error: toErrorPayload(closeError),
+                });
             };
         });
     }
@@ -185,7 +223,19 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
     }
 
     async _handleSignalingMessage(msg, connectResolve, connectReject) {
-        switch (msg.type) {
+        const messageType = typeof msg?.type === 'string' ? msg.type.trim() : '';
+        if (!messageType) {
+            const payloadError = createInvalidSignalingPayloadError({
+                signalingUrl: this._signalingUrl,
+                reason: 'missing_type',
+            });
+            this._emit('error', toErrorPayload(payloadError));
+            if (connectReject) {
+                connectReject(payloadError);
+            }
+            return;
+        }
+        switch (messageType) {
         case SIGNALING_EVENT_TYPES.LOBBY_CREATED:
             this._lobbyCode = msg.lobbyCode || msg?.sessionState?.lobbyCode || this._lobbyCode;
             this.localPlayerId = msg.playerId;
