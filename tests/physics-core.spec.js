@@ -69,6 +69,7 @@ function createParcoursDefinition(overrides = {}) {
         finish: overrides.finish || { id: 'FINISH', type: 'finish', pos: [30, 0, 0], radius: 1.3, forward: [1, 0, 0] },
         rules: {
             ordered: sourceRules.ordered !== false,
+            bidirectionalCheckpoints: sourceRules.bidirectionalCheckpoints !== false,
             resetOnDeath: sourceRules.resetOnDeath !== false,
             resetToLastValid: sourceRules.resetToLastValid === true,
             maxSegmentTimeMs: Number.isFinite(Number(sourceRules.maxSegmentTimeMs)) ? Number(sourceRules.maxSegmentTimeMs) : 4000,
@@ -974,6 +975,95 @@ test.describe('Physics Core (Tests 41-60)', () => {
 
         harness.nowRef.value = 1120;
         expect(crossCheckpoint(harness.system, harness.player, route.finish, harness.nowRef.value)?.type).toBe('finish');
+    });
+
+    test('T60e: Parcours zaehlt Checkpoints bidirektional (beide Anflugrichtungen)', () => {
+        const harness = createParcoursHarness(createParcoursDefinition({
+            rules: {
+                ordered: true,
+                bidirectionalCheckpoints: true,
+                cooldownMs: 0,
+            },
+        }));
+        const route = harness.system.getRouteSnapshot();
+        const cp01 = route.checkpoints.find((entry) => entry.routeIndex === 0);
+        expect(cp01).toBeTruthy();
+
+        const pos = Array.isArray(cp01?.pos) ? cp01.pos : [0, 0, 0];
+        const forward = Array.isArray(cp01?.forward) ? cp01.forward : [1, 0, 0];
+        const reversePrev = {
+            x: pos[0] + (forward[0] * 0.45),
+            y: pos[1] + (forward[1] * 0.45),
+            z: pos[2] + (forward[2] * 0.45),
+        };
+        harness.player.position.x = pos[0] - (forward[0] * 0.45);
+        harness.player.position.y = pos[1] - (forward[1] * 0.45);
+        harness.player.position.z = pos[2] - (forward[2] * 0.45);
+        harness.nowRef.value = 180;
+        const reverseHit = harness.system.updatePlayerProgress(harness.player, reversePrev, harness.nowRef.value);
+        expect(reverseHit?.type).toBe('checkpoint');
+
+        const snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.nextCheckpointIndex).toBe(1);
+    });
+
+    test('T60f: Parcours triggert pro Ring erst nach Verlassen erneut (Exit/Reentry-Schutz)', () => {
+        const harness = createParcoursHarness(createParcoursDefinition({
+            rules: {
+                ordered: true,
+                cooldownMs: 0,
+                wrongOrderCooldownMs: 0,
+                wrongOrderPenaltyMs: 0,
+            },
+        }));
+        const route = harness.system.getRouteSnapshot();
+        const cp02 = route.checkpoints.find((entry) => entry.routeIndex === 1);
+        expect(cp02).toBeTruthy();
+
+        const pos = Array.isArray(cp02?.pos) ? cp02.pos : [0, 0, 0];
+        harness.player.position.x = pos[0];
+        harness.player.position.y = pos[1];
+        harness.player.position.z = pos[2];
+
+        harness.nowRef.value = 100;
+        const firstWrongOrder = harness.system.updatePlayerProgress(
+            harness.player,
+            { x: pos[0], y: pos[1], z: pos[2] },
+            harness.nowRef.value
+        );
+        expect(firstWrongOrder?.type).toBe('wrong-order');
+
+        harness.nowRef.value = 150;
+        const hoverWrongOrder = harness.system.updatePlayerProgress(
+            harness.player,
+            { x: pos[0], y: pos[1], z: pos[2] },
+            harness.nowRef.value
+        );
+        expect(hoverWrongOrder || null).toBeNull();
+
+        harness.player.position.x = pos[0] + 100;
+        harness.player.position.y = pos[1];
+        harness.player.position.z = pos[2];
+        harness.nowRef.value = 190;
+        harness.system.updatePlayerProgress(
+            harness.player,
+            { x: pos[0] + 99, y: pos[1], z: pos[2] },
+            harness.nowRef.value
+        );
+
+        harness.player.position.x = pos[0];
+        harness.player.position.y = pos[1];
+        harness.player.position.z = pos[2];
+        harness.nowRef.value = 240;
+        const reenterWrongOrder = harness.system.updatePlayerProgress(
+            harness.player,
+            { x: pos[0] + 100, y: pos[1], z: pos[2] },
+            harness.nowRef.value
+        );
+        expect(reenterWrongOrder?.type).toBe('wrong-order');
+
+        const snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.wrongOrderCount).toBe(2);
     });
 
 });

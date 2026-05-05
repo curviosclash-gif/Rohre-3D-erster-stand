@@ -171,6 +171,7 @@ function sanitizeParcoursRules(raw) {
     const source = raw && typeof raw === 'object' ? raw : {};
     return {
         ordered: source.ordered !== false,
+        bidirectionalCheckpoints: source.bidirectionalCheckpoints !== false,
         resetOnDeath: source.resetOnDeath !== false,
         resetToLastValid: source.resetToLastValid === true,
         allowLaneAliases: source.allowLaneAliases !== false,

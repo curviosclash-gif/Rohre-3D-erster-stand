@@ -64,6 +64,7 @@ function mapParcoursToRuntime(parcours, invScale) {
         checkpoints,
         rules: {
             ordered: parcours.rules?.ordered !== false,
+            bidirectionalCheckpoints: parcours.rules?.bidirectionalCheckpoints !== false,
             resetOnDeath: parcours.rules?.resetOnDeath !== false,
             resetToLastValid: parcours.rules?.resetToLastValid === true,
             allowLaneAliases: parcours.rules?.allowLaneAliases !== false,

@@ -20,6 +20,7 @@ export function resetParcoursProgressState(state, {
     state.lastCheckpointId = '';
     state.lastWrongOrderAtMs = -Infinity;
     state.cooldownByCheckpointId.clear();
+    state.insideCheckpointById?.clear?.();
     state.lastError = '';
     state.errorUntilMs = 0;
     state.segmentSplitsMs = [];
@@ -63,6 +64,7 @@ export function rewindParcoursProgressState(state, route, {
     }
     state.lastWrongOrderAtMs = -Infinity;
     state.cooldownByCheckpointId.clear();
+    state.insideCheckpointById?.clear?.();
     state.lastError = '';
     state.errorUntilMs = 0;
     state.wrongOrderCount = previousWrongOrderCount;

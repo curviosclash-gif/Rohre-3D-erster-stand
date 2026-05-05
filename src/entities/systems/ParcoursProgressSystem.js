@@ -102,7 +102,6 @@ export class ParcoursProgressSystem {
     }
     _isCheckpointTriggered(entry, player, previousPosition, now, state) {
         if (!entry || !player?.position || !previousPosition) return false;
-        if (this._isCheckpointOnCooldown(state, entry.id, entry.cooldownMs, now)) return false;
         const px = Number(player.position.x) || 0;
         const py = Number(player.position.y) || 0;
         const pz = Number(player.position.z) || 0;
@@ -111,10 +110,26 @@ export class ParcoursProgressSystem {
         const dx = px - entry.pos[0];
         const dy = py - entry.pos[1];
         const dz = pz - entry.pos[2];
-        if ((dx * dx) + (dy * dy) + (dz * dz) > checkRadius * checkRadius) {
+        const insideRadius = ((dx * dx) + (dy * dy) + (dz * dz)) <= (checkRadius * checkRadius);
+        const insideMap = state?.insideCheckpointById;
+        const checkpointId = entry.id || '';
+        if (!insideRadius) {
+            if (checkpointId && insideMap instanceof Map) {
+                insideMap.set(checkpointId, false);
+            }
             return false;
         }
-        if (!entry.forward) return true;
+
+        const wasInside = checkpointId && insideMap instanceof Map
+            ? insideMap.get(checkpointId) === true
+            : false;
+        if (checkpointId && insideMap instanceof Map) {
+            insideMap.set(checkpointId, true);
+        }
+        if (wasInside) return false;
+        if (this._isCheckpointOnCooldown(state, entry.id, entry.cooldownMs, now)) return false;
+        if (this._route?.rules?.bidirectionalCheckpoints !== false || !entry.forward) return true;
+
         const prevDx = (Number(previousPosition.x) || 0) - entry.pos[0];
         const prevDy = (Number(previousPosition.y) || 0) - entry.pos[1];
         const prevDz = (Number(previousPosition.z) || 0) - entry.pos[2];

@@ -199,6 +199,7 @@ export function buildRouteFromParcours(parcoursRaw) {
     const rawRules = isObject(parcoursRaw.rules) ? parcoursRaw.rules : {};
     const rules = {
         ordered: rawRules.ordered !== false,
+        bidirectionalCheckpoints: rawRules.bidirectionalCheckpoints !== false,
         resetOnDeath: rawRules.resetOnDeath !== false,
         resetToLastValid: rawRules.resetToLastValid === true,
         maxSegmentTimeMs: Math.max(0, Math.trunc(toFiniteNumber(rawRules.maxSegmentTimeMs, 0))),
@@ -394,6 +395,7 @@ export function createPlayerProgressState(totalCheckpoints) {
         errorUntilMs: 0,
         lastWrongOrderAtMs: -Infinity,
         cooldownByCheckpointId: new Map(),
+        insideCheckpointById: new Map(),
         segmentSplitsMs: [],
     };
 }

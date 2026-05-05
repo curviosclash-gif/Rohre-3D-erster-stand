@@ -44,6 +44,7 @@
     "graph:build": "node scripts/build-knowledge-graph.mjs",
     "graph:check": "node scripts/check-knowledge-graph.mjs",
     "graph:query": "node scripts/query-knowledge-graph.mjs",
+    "parcours:check": "node scripts/check-parcours-routes.mjs",
     "scope:check": "node .agents/scripts/scope-validator.js",
     "phase:validate": "node .agents/scripts/phase-validator.js",
     "lock:status": "node .agents/scripts/lock-registry-merger.js --status",

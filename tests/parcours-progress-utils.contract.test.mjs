@@ -25,3 +25,14 @@ test('Parcours route defaults to ghost enabled unless explicitly disabled', () =
     const enabledRoute = buildRouteFromParcours(createParcoursFixture({ showGhost: true }));
     assert.equal(enabledRoute?.rules?.showGhost, true);
 });
+
+test('Parcours route defaults to bidirectional checkpoints unless explicitly disabled', () => {
+    const defaultRoute = buildRouteFromParcours(createParcoursFixture());
+    assert.equal(defaultRoute?.rules?.bidirectionalCheckpoints, true);
+
+    const disabledRoute = buildRouteFromParcours(createParcoursFixture({ bidirectionalCheckpoints: false }));
+    assert.equal(disabledRoute?.rules?.bidirectionalCheckpoints, false);
+
+    const enabledRoute = buildRouteFromParcours(createParcoursFixture({ bidirectionalCheckpoints: true }));
+    assert.equal(enabledRoute?.rules?.bidirectionalCheckpoints, true);
+});
