@@ -1,35 +1,42 @@
-# Lock-Status System
+﻿# Lock-Status System
 
 Dieses Verzeichnis verwaltet Locks fuer aktive Phasen im Distributed-Lock-File-System.
 Jede Person haelt eine eigene JSON-Datei (`alice.json`, `bob.json` usw.).
 
+## Operativer Wahrheitsraum
+
+- Operative Claims/Releases laufen ausschliesslich ueber `docs/lock-status/*.json`.
+- `docs/Umsetzungsplan.md` bleibt ein kompakter Index und ist nicht der Live-Lock-Kanal.
+- `_locks-registry.json` ist ein generierter Merge und wird nicht manuell editiert.
+
 ## Ziel
 
-Reduktion von Merge-Konflikten um 70%+ bei Paararbeit durch:
+Reduktion von Merge-Konflikten bei Teamarbeit durch:
 - Klare Zuweisung von Scope-Dateien pro Phase und Person
-- Automatische Konflikterkennung vor jedem Commit (pre-commit Hook)
-- Maschinenlesbare Lock-Registry fuer CI und Validatoren
+- Automatische Konflikterkennung vor Commits (`scope:validate`)
+- Maschinenlesbare Lock-Registry fuer Validatoren
 
 ## Dateistruktur
 
 ```
 docs/lock-status/
-  README.md                   <- Diese Datei
-  _locks-registry.json        <- Automatisch generierter Merge aller Lock-Files
-  alice.json                  <- Lock-File fuer Alice (per Person, git-tracked)
-  bob.json                    <- Lock-File fuer Bob (per Person, git-tracked)
+  README.md
+  _locks-registry.json
+  alice.json
+  bob.json
   examples/
-    lock-alice.example.json   <- Beispiel-Format fuer Alice
-    lock-bob.example.json     <- Beispiel-Format fuer Bob
+    lock-alice.example.json
+    lock-bob.example.json
 ```
 
 ## Lock setzen (Claim)
 
 ```bash
 npm run lock:claim V64 alice -- --phase=64.8.1 --target="2026-04-20"
+npm run lock:validate
 ```
 
-Oder manuell `docs/lock-status/alice.json` editieren und dann:
+Alternativ manuell `docs/lock-status/alice.json` editieren und danach:
 
 ```bash
 npm run lock:validate
@@ -41,18 +48,18 @@ Nach Abschluss einer Phase zur naechsten wechseln:
 
 ```bash
 npm run lock:advance V64.8.1 V64.8.2 alice
+npm run lock:validate
 ```
 
-Setzt 64.8.1 auf `completed` und fuegt 64.8.2 als neuen Lock hinzu.
-scope_files werden automatisch aus der VXX.md-Frontmatter extrahiert.
+Setzt `64.8.1` auf `completed` und fuegt `64.8.2` als neuen Lock hinzu.
+`scope_files` werden automatisch aus der `VXX.md`-Frontmatter extrahiert.
 
 ## Lock freigeben (Release)
 
 ```bash
 npm run lock:release V64 alice
+npm run lock:validate
 ```
-
-Entfernt alle aktiven Locks fuer alice in V64.
 
 ## Status anzeigen
 
@@ -68,13 +75,13 @@ Zeigt alle aktiven Locks aller Personen in tabellarischer Form.
 npm run lock:validate
 ```
 
-Prueft alle Lock-Files auf Ueberschneidungen (gleiche scope_files von verschiedenen Personen).
+Prueft alle Lock-Files auf Ueberschneidungen (gleiche `scope_files` von verschiedenen Personen).
 
 ```bash
 npm run scope:validate
 ```
 
-Prueft ob alle staged files im Scope der eigenen aktiven Phase liegen.
+Prueft staged files gegen aktive Scope-Locks.
 
 ## NPM-Commands Uebersicht
 
@@ -85,42 +92,20 @@ Prueft ob alle staged files im Scope der eigenen aktiven Phase liegen.
 | `npm run lock:release` | Lock freigeben |
 | `npm run lock:advance` | Lock auf naechste Phase weiterrollen |
 | `npm run lock:validate` | Prueft auf Lock-Konflikte |
-| `npm run scope:check` | Prueft staged files gegen scope_files |
-| `npm run scope:validate` | Kombiniert scope:check + lock:validate |
+| `npm run scope:check` | Prueft staged files gegen `scope_files` |
+| `npm run scope:validate` | Kombiniert `scope:check` + `lock:validate` |
 | `npm run phase:validate` | Prueft Phase-Sequenz und Dependencies |
 
-## Lock-File Format
+## Commit-Hinweis
 
-```json
-{
-  "person": "alice",
-  "timestamp": "2026-04-16T10:30:00Z",
-  "locks": [
-    {
-      "block_id": "V64",
-      "phase": "64.8.2",
-      "scope_files": [
-        "src/core/runtime/MenuRuntimeMultiplayerService.js"
-      ],
-      "start_date": "2026-04-16",
-      "target_completion": "2026-04-20",
-      "status": "in-progress",
-      "notes": "Menue-Lobby-Pfad auf echte Transporte"
-    }
-  ],
-  "current_phase_evidence": {
-    "phase_id": "64.8.2",
-    "completed_items": [],
-    "last_commit": ""
-  }
-}
-```
+- Lock-only Claim-/Release-Commits sind nicht verpflichtend.
+- Falls das Team explizite Synchronisierung braucht, duerfen Lock-Aenderungen separat committed werden.
+- Default: Lock-Aenderungen mit der naechsten fachlichen Lieferung bundlen.
 
 ## Regeln
 
 1. Jede Person hat genau eine Lock-File.
 2. Mehrere Locks (verschiedene Blocks) sind erlaubt.
-3. `scope_files` duerfen sich NICHT zwischen verschiedenen Personen mit `in-progress`-Status ueberschneiden.
-4. Lock-Files sind git-tracked und werden zusammen mit dem Lock-Commit gepusht.
-5. `_locks-registry.json` wird automatisch generiert - nie manuell editieren.
-6. Nach manuellem Edit immer `npm run lock:validate` ausfuehren.
+3. `scope_files` duerfen sich nicht zwischen verschiedenen Personen mit `in-progress`-Status ueberschneiden.
+4. Nach manuellem Edit immer `npm run lock:validate` ausfuehren.
+5. `scope:validate` vor Commit bleibt empfohlen.

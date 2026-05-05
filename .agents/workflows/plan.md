@@ -37,7 +37,7 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 - Goal, affected files.
 - Desktop-app-first scope and any demo-only exclusions.
 - A planned `plan_file` target under `docs/plaene/aktiv/VXX.md` when the draft is intended for active-master intake.
-- Phasen mit Pflicht-Unterphasen (jede Phase mindestens 2 Unterphasen).
+- Phasen mit klaren Unterphasen (standardmaessig 2+, bei kleinen eng umrissenen Schritten sind auch 1-2 Unterpunkte ok).
 - Abschluss-Gate als `X.99`.
 - Bei Legacy-/Dead-Code-Scope pro Kandidat: Klassifikation, geplanter Nachfolger, verbleibende Konsumenten und Delete-Kriterium.
 - Evidence format for completed items:
@@ -71,4 +71,3 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 ## Report
 
 Standardformat verwenden.
-

@@ -1,4 +1,4 @@
----
+﻿---
 description: Diagnose a reported issue and apply a targeted fix.
 ---
 
@@ -28,12 +28,14 @@ Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/p
 - Desktop-first bleibt Prioritaet (siehe `product_focus.md`).
 - Verdaechtige Altpfade nicht still mitloeschen; nur entfernen, wenn ein juengerer produktiver Ersatzpfad oder eine exakte Dublette belegt ist.
 - Wenn der Fix einen alten Pfad umgeht oder ersetzt, verbleibende Konsumenten und Delete-Kriterium im Scope dokumentieren.
-- Tests sind user-owned (siehe `planning_and_governance.md` -> Test Ownership). `npm run build` nur, wenn es das kleinste sinnvolle Signal ist.
+- Tests sind user-owned. Vor `*.99` sind kleine, risikoadjustierte Signale erlaubt (enger Contract-/Build-/Runtime-Check).
 
-## 4. Governance + Doc-Gates
+## 4. Governance + Gate-Strategie
 
 // turbo
-- Meta-Gate: `npm run gates:pre-commit` (ruft `plan:check` -> `docs:sync` -> `docs:check`).
+- Immer: `npm run plan:check`.
+- Wenn Docs/Governance/Graph-Dateien betroffen sind oder `*.99` geschlossen wird: `npm run gates:pre-commit`.
+- Bei reinem Code-Bugfix ohne Drift: nur kleinste sinnvolle Zusatzchecks.
 
 ## 5. Commit
 

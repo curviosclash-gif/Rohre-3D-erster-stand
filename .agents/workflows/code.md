@@ -1,4 +1,4 @@
----
+﻿---
 description: Implement a planned change from coding to verification and commit.
 ---
 
@@ -40,20 +40,21 @@ Optional (nur bei Bedarf):
 
 // turbo
 - `Grep` nach offenen Markern in geaenderten Pfaden: `(console\.log|TODO:|FIXME:|HACK:)`.
-- Keine offenen TODOs in geaendertem Code.
+- Keine offenen TODOs im geaenderten Code.
 - Bei Legacy-/Dead-Code-Aenderungen pruefen, dass keine neuen Konsumenten auf markierte Altpfade zeigen und dass Ersatz-/Behalteentscheidung im Scope dokumentiert ist.
-- Tests sind user-owned (siehe `planning_and_governance.md` -> Test Ownership). Fuer Subphasen unterhalb `*.99` Tests/Smokes vorbereiten, aber Ausfuehrung deferren.
+- Kleine risikoadjustierte Verifikation vor `*.99` ist erlaubt (enges Contract-/Build-/Runtime-Signal fuer den geaenderten Pfad).
 
-## 4. Governance + Doc-Gates
+## 4. Governance + Gate-Strategie
 
 // turbo
-- Meta-Gate: `npm run gates:pre-commit` (fuehrt `plan:check` -> `graph:check` -> `docs:sync` -> `docs:check`).
-- Einzeln, falls gezieltes Diagnose-Signal noetig: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`.
-- `npm run build`, wenn Build-Signal relevant.
+- Immer: `npm run plan:check`.
+- Wenn `docs/`, `.agents/`, `scripts/validate-umsetzungsplan.mjs`, Graph-Artefakte oder Master-/Blockplan-Struktur geaendert wurden: `npm run gates:pre-commit`.
+- Wenn `*.99` geschlossen wird: `npm run gates:pre-commit` verpflichtend.
+- Bei reinem Code-Scope ohne Doc-/Governance-Drift: nur kleinste sinnvolle Zusatzchecks (z. B. `npm run build` oder fokussierter Contract-Run).
 
 ## 5. Commit
 
-- Git-Policy: `.agents/rules/git_and_commits.md` (Scope, Commit-Granularitaet, Umsetzungsplan-Separat-Regel).
+- Git-Policy: `.agents/rules/git_and_commits.md` (Scope, Commit-Slice, Safety).
 - `npm run guard:main`.
 - Windows vor Staging: `npm run git:acl:heal`.
 - `git add [scoped-files]` -> `git commit -m "[type]: [name] - [short reason]"`.

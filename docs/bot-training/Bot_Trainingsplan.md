@@ -259,7 +259,7 @@ Mikro-Claim-Regel:
 | BT93N | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | hard | nein | DeathBefore60-Root-Cause, Stabilitaetsfix und 10k->50k->100k-Leiter nur nach Zwischen-Gates |
 | BT93O | BT93N.99 ohne `death-before60-still-blocking` | hard | nein | Action-/Objective-Qualitaet und Anti-Plateau; kein Candidate-Signal |
 | BT93P | BT93O.99 + gruenes Action-/Objective-/Anti-Plateau-Gate | hard | nein | 200k->500k->1M Trainingsleiter mit Statistik und frischem BT94A-Reentry-Gate |
-| BT94A | BT93P.4 (`BT94A-ready`) + `bt94a_gate_check.py` (`claimable=true`) | hard | nein | BT94A bleibt vor `94A.1` geschlossen, bis `BT93P` und das Gate `claimable=true` schreiben; Kandidatenlaeufe/Freeze bleiben vorher verboten |
+| BT94A | BT93P.4 (`reentry-ready`) + `bt94a_gate_check.py` (`claimable=true`) | hard | nein | BT94A bleibt vor `94A.1` geschlossen, bis `BT93P` und das Gate `claimable=true` schreiben; Kandidatenlaeufe/Freeze bleiben vorher verboten |
 | BT94B | BT94A.99 | hard | nein | Externe A/B-Evidence braucht einen eingefrorenen Kandidaten |
 | BT94B PPO-Validate | BT94A.99 + 94B.1/94B.2 feste Kandidatenmatrix | hard | nein | `94B.3` baut eine eigene PPO-Validate-Lane; BT80C `80.9.3` ersetzt diese Lane nicht |
 | BT94B `promote` | gruene PPO-Validate-Lane aus `94B.3` | hard | nein | harter Blocker fuer jedes Rollout-Signal und jeden echten BT95-Handoff |

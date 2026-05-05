@@ -33,6 +33,8 @@ Use this guide to choose the cheapest meaningful verification path for new featu
 
 - `V91 91.2` fuegt eine fuenfte Pruefklasse `architecture-guard` hinzu: `npm run check:architecture:boundaries`, `npm run check:architecture:touched-strict`, `npm run check:architecture:metrics` und `npm run check:architecture:ratchet`. Diese Gates blockieren neue Legacy-Surface-Reads (`game.runtimeBundle`, `game.runtimeFacade`, `window.GAME_RUNTIME`, `window.GAME_INSTANCE`, `curviosApp`/`__CURVIOS_APP__`, `getActiveRuntimeConfig` ausserhalb Config/Settings sowie explizite `GameRuntimePorts`-Fallback-Helfer wie `getLegacyRuntime*`, `getRuntimeFeatureTransition*`, `allowLegacyFallback=true`) und ueberwachen die Ratchet-Baselines. Fuer Folgeblocks V64/V81/V82/V86 gehoert `architecture-guard` vor `node-contract` in die Gate-Reihenfolge.
 - Seit `V92 92.5.1` ist die Budget-Baseline fuer Folgeblocks konkret eingefroren: `window.GAME_INSTANCE` darf nur in `src/core/AppInitializer.js` und `src/core/main.js` verbleiben; `GameRuntimePorts`-Fallbacks duerfen nur in `src/shared/runtime/GameRuntimePorts.js` vorkommen. Jede Ausweitung verlangt zuerst `architecture-guard`.
+- `V104 104.5.x` schaerft die Ratchets auf den aktuellen Restbestand nach: `constructor(game)`-Budget 5 Dateien, `ui -> core`-Budget 0 Kanten, `ui -> state`-Budget 4 Kanten, `game.runtimeBundle`-/`GameRuntimePorts`-Fallback-Budget jeweils 0 Dateien, `game.runtimeFacade`-Budget 2 Dateien, `curviosApp`-Budget 3 Dateien.
+- Fuer V76/V104-Abgleich gilt: Hangar-/Workshop-Vertraege (`HangarShellLayoutContract`, `HangarVerificationTargetContract`, `FightHangarBalanceContract`) bleiben explizit `contract-only`/`not-fully-productive`, waehrend der produktive Fahrzeugpfad ueber `ArcadeMenuSurface` + `ArcadeVehicleManagerLegacyContract` laeuft.
 
 ## Produktsignal und Gate-Reihenfolge
 
@@ -90,6 +92,7 @@ Use this guide to choose the cheapest meaningful verification path for new featu
 - `src/shared/vehicle-lab/**` -> `npm run test:browser:compat -- tests/editor-vehicle.spec.js`
 - `src/shared/contracts/**` -> `npm run test:contract`
 - `src/shared/contracts/PlatformCapabilityData.js` -> `npm run test:contract`
+- `src/shared/contracts/FightHangarBalanceContract.js` -> `node --test tests/hangar-desktop-flow.contract.test.mjs`
 - `src/shared/runtime/GameRuntimePorts.js` -> `npm run check:architecture:boundaries && npm run check:architecture:ratchet`
 - `scripts/architecture/legacy-surface-guard-matrix.json` -> `npm run check:architecture:boundaries && npm run check:architecture:ratchet`
 - `scripts/architecture/*.json` -> `npm run check:architecture:boundaries && npm run check:architecture:ratchet && npm run check:architecture:metrics`
@@ -104,6 +107,9 @@ Use this guide to choose the cheapest meaningful verification path for new featu
 - `src/core/recording/**` -> `npm run test:desktop:smoke` then `npm run test:browser:compat -- tests/recording.spec.js`
 - `src/core/Renderer.js` -> `npm run test:desktop:smoke` then `npm run test:heavy`
 - `src/ui/MatchFlowTransitionHotspots.js` -> `npm run check:architecture:boundaries && npm run check:architecture:ratchet`
+- `src/ui/hangar/HangarShellLayoutContract.js` -> `node --test tests/hangar-desktop-flow.contract.test.mjs`
+- `src/ui/hangar/HangarVerificationTargetContract.js` -> `node --test tests/hangar-desktop-flow.contract.test.mjs`
+- `src/ui/hangar/ArcadeVehicleManagerLegacyContract.js` -> `node --test tests/hangar-desktop-flow.contract.test.mjs`
 - `src/ui/**` -> `npm run test:desktop:smoke`
 - `editor/js/EditorAssetLoader.js` -> `npm run test:browser:compat -- tests/editor-vehicle.spec.js`
 - `editor/**` -> `npm run test:editor-ui`

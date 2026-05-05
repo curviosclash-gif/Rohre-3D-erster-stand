@@ -1,0 +1,122 @@
+﻿# Feature: Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz (V111)
+
+Stand: 2026-05-05
+Status: Entwurf
+Owner: Codex
+Risiko: mittel
+plan_file: `docs/plaene/aktiv/V111.md`
+
+## Ziel
+
+Aufbauend auf `V107` und `V110` soll der Wissensgraph um adaptive Query-Qualitaet, Ownership-/Stabilitaetsmodelle und entscheidungsnahe Analyse erweitert werden: negative Kanten, Causal-Weighting, Presets, Cross-Artifact-Linking, Safety-Filter, Scorecard, Counterfactuals, Unsicherheitsbudget, Auto-Minimization, Temporal-Anomaly-Detection, Test-Prioritization, Policy-as-Data und Feedback-Loop.
+
+- Fokus ist schnellerer Incident-, Review- und Refactor-Entscheid bei gleichbleibender Nachvollziehbarkeit.
+- Query-Ergebnisse sollen priorisiert, erklaerbar und fuer Alltagsszenarien robust nutzbar sein.
+- Sicherheits- und Governance-Leitplanken bleiben verpflichtend (Default-Schutz, auditierbare Overrides).
+
+## Desktop-first Scope
+
+- Prioritaet haben kritische Desktop-Pfade und deren Incident-/Review-Nutzung.
+- Viewer/Exports bleiben lokal und read-only.
+- Kein externer Online-Service als Pflichtkomponente.
+
+## Nicht-Ziel
+
+- Kein Ersatz der Basis-Integritaetsarbeit aus `V110`.
+- Kein Aufbau eines allgemeinen BI- oder Reporting-Systems ausserhalb der Graph-Fragestellungen.
+- Keine Aufweichung von Secret-/PII-Schutz durch Komfortfeatures.
+
+## Betroffene Dateien und Bereiche
+
+- `docs/plaene/neu/Feature_Wissensgraph_Adaptive_Intelligence_Ausbau_V111.md`
+- `docs/generated/knowledge-graph.json`
+- `docs/generated/knowledge-graph.schema.json`
+- `scripts/build-knowledge-graph.mjs`
+- `scripts/check-knowledge-graph.mjs`
+- `scripts/query-knowledge-graph.mjs`
+- `scripts/export-knowledge-graph-view.mjs`
+- `tools/graph-viewer/index.html`
+- `tools/graph-viewer/viewer.js`
+- `tools/graph-viewer/viewer.css`
+- `data/contracts/knowledge-graph/`
+- `tests/`
+- `docs/referenz/ai_architecture_context.md`
+- `.agents/rules/token_efficiency_and_tools.md`
+- `.agents/workflows/status.md`
+
+## Definition of Done
+
+- [ ] DoD.1 Negative-Edge-Model (`cannot`, `forbidden_by`, `blocked_by`) ist in Schema/Builder/`why-not` aktiv.
+- [ ] DoD.2 Causal-Weighting (`strength`, `directness`) steuert Ranking reproduzierbar in Impact-Queries.
+- [ ] DoD.3 Ownership-Layer und Stability-Index sind fuer kritische Subgraphen gepflegt und querybar.
+- [ ] DoD.4 Query-Intent-Presets (`incident`, `review`, `balance`, `onboarding`) liefern stabile Profile mit Golden-Tests.
+- [ ] DoD.5 Cross-Artifact-Linking (PR/Issue/ADR), Explainability und PII/Secret-Safety-Filter sind aktiv und dokumentiert.
+- [ ] DoD.6 Graph-Quality-Scorecard wird pro Build erzeugt, historisiert und als Gate-/Trend-Signal verwendet.
+- [ ] DoD.7 Counterfactual-Queries, Uncertainty-Budget und Incident-Auto-Minimization liefern reproduzierbare Referenzausgaben.
+- [ ] DoD.8 Temporal-Anomaly-Detection, Schema-Lint, Graph-Backed-Test-Prioritization, Policy-as-Data und Feedback-Loop sind wirksam und verifiziert.
+
+## Intake-Hinweis fuer den User
+
+- Ziel-Masterplan: `docs/Umsetzungsplan.md`
+- vorgeschlagene Block-ID: `V111`
+- vorgeschlagene kanonische Blockdatei: `docs/plaene/aktiv/V111.md`
+- hard dependencies: `V107.99`, `V110.99`
+- soft dependencies: `V104.99`, `V105.99`
+- Hinweis: `Manuelle Uebernahme erforderlich`
+
+## Evidence-Format
+
+Abgeschlossene Checkboxen im spaeteren aktiven Block immer mit:
+
+`(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
+
+## Phasenplan
+
+### 111.1 Semantische Diagnose-Tiefe
+status: open
+goal: Query-Antworten um Blocker- und Priorisierungswissen erweitern
+output: Negative-Kanten und gewichtete Pfadpriorisierung
+
+- [ ] 111.1.1 Negative-Edge-Model (`cannot`, `forbidden_by`, `blocked_by`) einziehen und `why-not` auf explizite Blocker priorisieren.
+- [ ] 111.1.2 Causal-Weighting (`strength`, `directness`) fuer zentrale Relationen aktivieren und Ranking in `impact-for-file`/`impact-diff` testbar fixieren.
+
+### 111.2 Ownership, Presets und Explainability
+status: open
+goal: Incident- und Review-Nutzung fuer Teams beschleunigen
+output: Nutzbare Betriebsprofile und kontextreiche Erklaerbarkeit
+
+- [ ] 111.2.1 Ownership-Layer und Stability-Index fuer kritische Pfade integrieren; Ausgabe in Incident-/Review-Queries sicherstellen.
+- [ ] 111.2.2 Query-Intent-Presets sowie Cross-Artifact-Linking (PR/Issue/ADR) und Explainability fuer Referenzfaelle stabilisieren.
+
+### 111.3 Safety, Scorecard und What-if-Analyse
+status: open
+goal: Sichere Exporte und bessere Entscheidungsunterstuetzung bereitstellen
+output: Safety-Defaults, Trendsignal und counterfactual Analyse
+
+- [ ] 111.3.1 PII/Secret-Safety-Filter als Default fuer Export/Viewer verankern; auditierbaren Override-Pfad dokumentieren.
+- [ ] 111.3.2 Graph-Quality-Scorecard historisieren sowie Counterfactual-Queries (`what-if-remove`, `what-if-replace`) und Uncertainty-Budget reproduzierbar machen.
+
+### 111.4 Adaptive Qualitaetssteuerung
+status: open
+goal: Drift frueh erkennen und Test-/Gate-Fokus dynamisch verbessern
+output: Anomaly-, Priorisierungs- und Policy-Mechanismen mit Feedback-Loop
+
+- [ ] 111.4.1 Incident-Auto-Minimization, Temporal-Anomaly-Detection und Schema-Lint als dokumentierte Diagnose-/Gate-Pfade aktivieren.
+- [ ] 111.4.2 Graph-Backed-Test-Prioritization, Policy-as-Data und Human-Feedback-Loop implementieren und mit Referenzfaellen evaluieren.
+
+### 111.99 Abschluss-Gate
+status: open
+goal: Adaptive Query-Intelligenz gruensicher und produktionsnah abschliessen
+output: Reproduzierbare Diagnose- und Entscheidungswerkzeuge auf dem Wissensgraphen
+
+- [ ] 111.99.1 `npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen.
+- [ ] 111.99.2 Negative-Edges, Causal-Weighting, Presets und Explainability sind mit Golden-/Fixture-Evidence stabil belegt.
+- [ ] 111.99.3 Safety-Filter, Scorecard, Counterfactuals, Uncertainty-Budget und Auto-Minimization sind reproduzierbar dokumentiert.
+- [ ] 111.99.4 Anomaly-Detection, Test-Prioritization, Policy-as-Data und Feedback-Loop sind im Workflow verankert und mit Referenzartefakten verifiziert.
+
+## Risiken
+
+- R1 | mittel | Komplexe Ranking-/Preset-Logik kann ohne strenge Golden-Tests zu semantischer Drift fuehren.
+- R2 | mittel | Safety-Filter koennen bei unklaren Mustern false positives/negatives erzeugen.
+- R3 | mittel | Feedback-Loop kann ohne Guardrails verrauschte Signale in Presets einspeisen.
+- R4 | niedrig | Zu viele Zusatzmetriken koennen Query-Outputs ueberfrachten, wenn keine klaren Default-Profile gelten.

@@ -291,3 +291,26 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `src/core/runtime/GameRuntimeBundle.js` hat die Legacy-Alias-Inventarliste sichtbar verkleinert: nicht mehr als Game-Alias benoetigte Menu-State-Felder (`menuController`, `menuMultiplayerBridge`, `_navButtons`, `_menuButtonByPanel`, `_activeSubmenu`, `_lastMenuTrigger`, `_buildInfoClipboardText`) sind aus `GAME_RUNTIME_LEGACY_ALIAS_SPECS` entfernt.
 - Wissensgraph wurde fuer den neuen Sunset-Stand aktualisiert und validiert (`npm run graph:build`, `npm run graph:check`).
 - Naechste offene V104-Subphase ist `104.3.1`.
+
+## Stand-Snapshot 2026-05-04 (Start `V109`, Subphasen `109.1` bis `109.5`)
+
+- `V109` wurde von `planned` auf `active` gesetzt; `109.1` bis `109.5` sind umgesetzt und im Block mit Evidence markiert.
+- Rule-Entschlackung: Commit-Policy wurde auf fachliche Delivery-Slices umgestellt; Blocker-/Evidence-Regeln sind kompakter, ohne Dead-Code- oder Scope-Safety aufzuweichen.
+- Workflow-Entschlackung: `code`, `bugfix` und `quick` fahren konditionale Gate-Strategie (`plan:check` default, `gates:pre-commit` nur bei `*.99` oder Docs-/Governance-/Graph-Scope) und erlauben kleine risikoadjustierte Vorab-Signale.
+- Lock-Modell wurde vereinheitlicht: `docs/lock-status/*.json` ist der operative Wahrheitsraum; Lock-only Claim-/Release-Commits sind nicht mehr Default.
+- `docs/Umsetzungsplan.md` wurde auf kompakten Index reduziert; offene Findings wurden nach `docs/prozess/Open_Findings.md` ausgelagert und von dort kanonisch referenziert.
+
+## Stand-Snapshot 2026-05-04 (Abschluss `V109 109.99`)
+
+- `V109` ist abgeschlossen (`status: done`, `109.99` geschlossen) und in den abgeschlossenen Referenzblock des Master-Index verschoben.
+- `docs/Umsetzungsplan.md` bleibt als kompakter Steuerindex; offene Findings liegen kanonisch in `docs/prozess/Open_Findings.md`.
+- Lock- und Workflow-Governance sind konsistent auf den operativen Wahrheitsraum `docs/lock-status/*.json` ausgerichtet.
+- Abschluss-Gates sind gruen: `npm run gates:pre-commit` (inkl. `plan:check`, `graph:check`, `docs:sync`, `docs:check`).
+- Naechste offene Subphase im Master ist `104.1`.
+
+## Stand-Snapshot 2026-05-05 (Abschluss `V104 104.99`)
+
+- `V104` ist abgeschlossen (`status: done`, `104.99` geschlossen); DoD, Phasenstatus und Abschluss-Gate sind im Blockfile konsistent nachgezogen.
+- Der verbleibende Abschluss-Blocker wurde behoben: `npm run typecheck:architecture` ist wieder gruen (Fix in `src/shared/contracts/DesktopMultiplayerRoleContract.js` via kanonischem `normalizePlatformProductSurfaceId()`).
+- Abschluss-Gates fuer `V104` sind gruensicher: `architecture:report`, `check:architecture:{boundaries,metrics,ratchet}`, `typecheck:architecture`, `graph:check`, `plan:check`, `docs:sync`, `docs:check` sowie die gezielten Contract-Checks (`104.5.1`, `V104.4.4`) laufen ohne Fehler.
+- Der Master-Index fuehrt `V104` jetzt als done-Block mit `current_phase 104.99`; der Lock-Index ist auf `closed` aktualisiert.

@@ -1,4 +1,4 @@
----
+﻿---
 description: Fast path for small, scoped changes (1-2 Dateien, keine Subphase).
 ---
 // turbo-all
@@ -19,8 +19,10 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 
 ## 2. Verify
 
-- Tests sind user-owned (siehe `planning_and_governance.md` -> Test Ownership). Ohne Test-Request nichts ausfuehren.
+- Tests sind user-owned; keine Voll-Suite ohne User-Anfrage.
+- Kleine risikoadjustierte Checks sind erlaubt (enger Build-/Contract-/Runtime-Signalpfad).
 - Wenn Plan-/Workflow-/Rule-Dateien geaendert wurden: `npm run gates:pre-commit`.
+- Sonst mindestens `npm run plan:check`.
 - Keine Totcode-Loeschung ohne nachgewiesenen Nachfolgerpfad und dokumentierte Konsumentenlage.
 
 ## 3. Commit

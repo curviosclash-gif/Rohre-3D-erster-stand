@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-05-02
+Stand: 2026-05-05
 
 ## 1. Architekturparadigma
 
@@ -772,13 +772,14 @@ Architekturprinzip: Alle Surface-Entscheide laufen ueber die obigen Resolver aus
 - Wenn eine bestehende Public-Methode nur Leaf-Charakter hat, bleibt sie Legacy-kompatibel, ist aber kein Ziel fuer neue Features. Konkret sollen neue Session-bezogene Features an `switchSessionType()` oder einen neuen intentartigen Einstieg andocken, nicht direkt an `saveSessionDraft()` oder `applySessionDraft()`.
 - Tests fuer neue Settings-Erweiterungen verankern den Vertrag am schmalsten sinnvollen Punkt: Runtime-/Apply-Pfade in `tests/runtime-settings-live-apply.contract.test.mjs`, Manager-/Facade-Vertraege in einer dedizierten Settings-Contract-Datei. Der in `V103` reservierte Pfad `tests/settings-manager.contract.test.mjs` bleibt dafuer der bevorzugte Zielort, falls neue Manager-spezifische Contract-Coverage noetig wird.
 
-### 4.6.7 V104 Inventar- und Sunset-Snapshot (Stand 2026-04-29)
+### 4.6.7 V104 Inventar- und Sunset-Snapshot (Stand 2026-05-04)
 
-- Zielbild bleibt `Contract -> Snapshot -> Intent-Port -> Feature-Adapter`; `V104.1` hat den Ist-Konsumentenabgleich fuer Runtime-/UI-God-Objects gegen Produktpfade, Harness-Pfade und Legacy-Reste aktualisiert.
+- Zielbild bleibt `Contract -> Snapshot -> Intent-Port -> Feature-Adapter`; `V104.5` haertet diesen Pfad jetzt auch ueber Guard-Matrix, Ratchet-Budgets und Contract-Checks.
 - `GameRuntimeBundle` bleibt produktiv nur als Runtime-Assembly-/Legacy-Container in `GameBootstrap`, `GameRuntimeFacade`, `GameRuntimeCoordinator` und `MatchSessionRuntimeBridge` akzeptiert; neue Featurearbeit darf dort keine neuen Alias-/Wrapper-Aufrufer platzieren.
-- `GameRuntimePorts` fuehrt weiterhin explizite Transition-Fallbacks (`legacy-game-slot:runtimeCoordinator`/`legacy-game-slot:runtimeFacade`); der Pfad bleibt Migrationsadapter, nicht Default-Entry fuer neue Runtime-Intents.
-- `MatchFlowUiController` ist weiter oeffentliche UI-Fassade, traegt aber noch `this.game`-basierte Runtime-Weitergabe in Subcontroller; Folgearbeit in `V104.3`/`V104.4` reduziert diese Restbreite auf Snapshot-/Port-Inputs.
-- `PlatformCapabilityRegistry` bleibt zentraler Resolver; direkter `curviosApp`-/`__CURVIOS_APP__`-Read ist ausschliesslich in `resolvePlatformRuntimeKind()` als guard-markierte Migrationsschuld erlaubt und wird langfristig in dedizierte Plattformadapter verschoben.
+- `GameRuntimePorts` fuehrt im produktiven Pfad keine `getLegacyRuntime*`-/`getRuntimeFeatureTransition*`-Fallback-Helfer mehr; der Erweiterungspfad laeuft ueber Runtime-Snapshots, Intent-Ports und dedizierte Feature-Adapter.
+- `MatchFlowUiController` und angrenzende Lifecycle-/Telemetry-Pfade konsumieren Runtime-Projektionen und Ports; der `constructor(game)`-/`this.game = game`-Restbestand liegt im Scope nur noch auf den expliziten Legacy-Ausnahmen (`GameDebugApi`, `PlayingStateSystem`, `PlanarAimAssistSystem`, `RuntimeDiagnosticsSystem`, `KeybindEditorController`).
+- `PlatformCapabilityRegistry` und `SettingsRuntimeLimitsContract` sind curvios-global-frei; direkte `curviosApp`-/`__CURVIOS_APP__`-Reads bleiben auf dedizierte Electron-Adapter plus die explizit markierte Observation-Bridge-Compat begrenzt.
+- V76/V104-Abgleich: Hangar-/Workshop-Vertraege (`HangarShellLayoutContract`, `HangarVerificationTargetContract`, `FightHangarBalanceContract`) bleiben bewusst `contract-only`/`not-fully-productive`, waehrend der produktive Fahrzeugpfad ueber `ArcadeMenuSurface` + `ArcadeVehicleManagerLegacyContract` laeuft.
 
 Dead-Code-/Legacy-Einordnung (V104.1.3/1.4):
 
@@ -802,6 +803,25 @@ Dead-Code-/Legacy-Einordnung (V104.1.3/1.4):
   - Sync ueber bestehende `UISettingsSyncMap`/`syncSessionState`-Pfade
 - UI-Gating in `UIStartSyncController`: Option aktiv in allen Single-Mode-Pfaden (`normal`, `fight`, `arcade`), ausserhalb davon deaktiviert bei erhaltenem Stored-Value.
 - V104-Ueberlappung bleibt kontrolliert: Aenderungen in `UIStartSyncController` und `UIManager` erfolgen ohne neue produktive `this.game`-Kurzschluesse und ohne neue God-Object-Reachthrough-Ketten.
+
+### 4.6.9 V99 Multiplayer Signaling-/Connectivity-Hardening (Stand 2026-05-04)
+
+- Failure-Taxonomie im produktiven Pfad:
+  - `signaling_endpoint_invalid_*`, `signaling_connect_timeout`, `signaling_socket_closed`, `signaling_payload_invalid`, `signaling_network_unavailable` bleiben als kanonische Fehlercodes aus `OnlineSignalingSupport` sichtbar.
+  - `OnlineMatchLobby` und `OnlineSessionAdapter` melden Payload-Parse-Fehler explizit als `signaling_payload_invalid` statt sie still zu ignorieren.
+- Online-Lobby-Truthfulness:
+  - Mutationen (`ready`, `invalidate_ready`, `start_match`) liefern im `OnlineMatchLobby` nur noch nach verifizierbarem ACK Erfolg; verlorene/geschlossene Sockets fallen explizit als Fehlerpfad aus.
+  - Etablierte Socket-Close-/Error-Zustaende propagieren ueber `error`/`closed` in den `NetworkLobbyService`; Menu-Session-State bleibt dadurch nicht stale auf `joined`.
+- LAN-Hardening:
+  - `server/lan-signaling.js` erzwingt `maxPlayers` beim Join und haertet mutierende Routen ueber Host-/Player-Tokens (`hostToken`, `playerToken`) statt ungebundener Fremd-POSTs.
+  - `LANMatchLobby` bildet Ready-State strikt aus dem Serverstatus ab (kein sticky Merge), propagiert Polling-Ausfaelle als `closed`/`signaling_unavailable` und nutzt fuer Host-Leave den expliziten `LOBBY_LEAVE`-Pfad statt semantischem Reset ueber `LOBBY_CREATE`.
+  - `LANSessionAdapter` nutzt overlap-sicheres Host-Status-Polling mit Timeout/Abort statt ungebremstem `setInterval(async ...)`.
+- Connectivity-Vertrag produktiv genutzt:
+  - `MatchStartValidationService` liest `resolveDesktopConnectivityProfile()` direkt fuer LAN-/Online-Hinweise (offline/kein Internet), nicht nur in Contract-Tests.
+- Lifecycle-Ownership:
+  - `MultiplayerMatchLifecycleKernel` beobachtet `returnToMenu()` asynchron, loggt Fehler sichtbar und unterdrueckt doppelte Trigger waehrend ein Return bereits in-flight ist.
+- UI-XSS-Pfad geschlossen:
+  - `MenuMultiplayerPanel` rendert Discovery-Hostkarten ohne untrusted `innerHTML` (DOM-Node-Aufbau mit `textContent`).
 
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 

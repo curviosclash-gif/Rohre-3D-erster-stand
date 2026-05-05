@@ -5,13 +5,13 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 ## 0. Read status
 
 // turbo
-- `git pull --rebase`
-- `npm run guard:main`
+- Optional: `git pull --rebase`.
+- `npm run guard:main`.
 - Read `docs/Umsetzungsplan.md`.
 - Read the linked `docs/plaene/aktiv/VXX.md` for the claimed block before execution.
 - For bot-training scope also read `docs/bot-training/Bot_Trainingsplan.md` and treat it as selected master plan.
 - `git log -n 5 --oneline`.
-- `npm run plan:check`
+- `npm run plan:check`.
 
 ## 1. Claim phase (parallel-safe)
 
@@ -21,20 +21,12 @@ description: Execute the next open phase from master plan with dynamic N-bot par
   - Bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs): `docs/bot-training/Bot_Trainingsplan.md`
 - Execute only blocks already manually integrated by the user.
 - Do not create new blocks or planning scopes directly in master plans.
-- Find first block whose row in `## Lock-Status` is `frei` and whose hard dependencies are fulfilled.
-- If a shared or sub-lock model is needed, document it in the linked block file and lock row before work starts.
-- Atomic claim commit:
-
-```bash
-git pull --rebase
-npm run guard:main
-# Lock-Status-Zeile im ausgewaehlten Masterplan aktualisieren
-git add [masterplan-datei]
-git commit -m "chore: Bot-X claims Block VXX"
-git push
-# bei Push-Fehler: git pull --rebase und retry
-```
-
+- Find first block whose lock status is `frei` and whose hard dependencies are fulfilled.
+- Operativer Lock-Wahrheitsraum ist `docs/lock-status/*.json`.
+- Claim ueber Lock-Tooling statt Masterplan-Edit:
+  - `npm run lock:claim VXX <person> -- --phase=<VXX.Y.Z> --target="YYYY-MM-DD"`
+  - danach `npm run lock:validate`
+- Lock-only Claim-Commits sind nicht mehr Default; Lock-Aenderungen werden mit der ersten fachlichen Lieferung oder einem gezielten Sync-Commit gebuendelt.
 - If no free block exists: report `Kein freier Block` and stop.
 - Treat `scope_files` in `docs/plaene/aktiv/VXX.md` as canonical ownership for claimed scope.
 
@@ -50,7 +42,8 @@ git push
 
 - Run `/code` workflow with `fix:` or `refactor:` prefix as fitting.
 - `/code` remains source of truth for implementation verification.
-- For non-`*.99` phases, adapt tests or smokes as needed but defer their execution to the block Abschluss-Gate unless the user explicitly asks otherwise.
+- For non-`*.99` phases, adapt tests or smokes as needed but defer broad suite execution unless user explicitly asks.
+- Kleine risikoadjustierte Checks vor `*.99` sind erlaubt.
 - Remove old code in phase work only when a newer productive path or exact duplicate-/shim-replacement is evidenced; otherwise keep and mark the path explicitly.
 - If the user explicitly requests Playwright validation, parallel runs require unique `TEST_PORT`, `PW_RUN_TAG`, `PW_OUTPUT_DIR` per bot.
 
@@ -60,18 +53,17 @@ git push
 - Every `[x]` entry must include evidence format:
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
 - Keep gate invariant intact (`*.99` only when prior phases are `[x]`).
-- For non-`*.99` phases, record the pending block-end verification scope instead of running mapped tests or smokes.
+- For non-`*.99` phases, record pending block-end verification scope when full suite execution is deferred.
 - If the phase handled dead code or legacy paths, record replacement proof or explicit retention reason in the block evidence before closing.
-- Meta-Gate: `npm run gates:pre-commit` (ruft `plan:check` -> `docs:sync` -> `docs:check`).
-- Commit scoped updates (Git-Policy: `.agents/rules/git_and_commits.md`).
-- Before push on `main`: `npm run snapshot:tag`
+- Gate-Strategie:
+  - `*.99` oder Docs-/Governance-/Graph-Scope: `npm run gates:pre-commit`
+  - sonst mindestens `npm run plan:check` plus kleinste sinnvolle Zusatzchecks.
 
 ## 5. Release block
 
-- Reset the matching row in `## Lock-Status` to `frei`.
-- `npm run plan:check`
-- Commit: `chore: Bot-X releases Block VXX` (update selected master plan file)
-- Before push on `main`: `npm run snapshot:tag`
+- Lock ueber `npm run lock:release VXX <person>` freigeben und `npm run lock:validate` laufen lassen.
+- Master-Lock-Tabelle ist ein synchronisierter Index, nicht der operative Claim-/Release-Mechanismus.
+- Lock-only Release-Commits sind nicht verpflichtend.
 
 ## Report
 

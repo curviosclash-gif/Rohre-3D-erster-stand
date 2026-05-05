@@ -1,6 +1,6 @@
 # Dokumentationsstatus
 
-Stand: 2026-05-02
+Stand: 2026-05-05
 Modus: sync
 Gate: PASS
 
@@ -17,7 +17,7 @@ Gate: PASS
 - Keine Legacy-Pfade gefunden.
 
 ## Encoding-Warnungen (Mojibake)
-- docs/Fehlerberichte/2026-04-29_v104-v107-graph-check-orphan-dependency.md: Zeilen 5, 24
+- Keine Mojibake-Muster gefunden.
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-05-02).
+- Dokumentation aktuell (geprueft am 2026-05-05).

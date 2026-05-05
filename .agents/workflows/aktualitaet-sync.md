@@ -5,7 +5,7 @@ description: Check and auto-update docs/workflows/rules to current repository re
 ## 0. Context
 
 // turbo
-- Read `docs/Umsetzungsplan.md`, `docs/bot-training/Bot_Trainingsplan.md`, `docs/Analysebericht.md`, latest `docs/tests/Testergebnisse_*.md`.
+- Read `docs/Umsetzungsplan.md`, `docs/bot-training/Bot_Trainingsplan.md`, `docs/Analysebericht.md`, latest `docs/tests/Testergebnisse_*.md` where relevant.
 - Sample linked files in `docs/plaene/aktiv/` when syncing active-block wording or ownership.
 - `git log -n 5 --oneline`.
 - `npm run guard:main`.
@@ -18,8 +18,9 @@ description: Check and auto-update docs/workflows/rules to current repository re
 
 ## 2. Resolve remaining drift
 
-- Update affected files for legacy-path findings, missing required files, and stale wording that treats online/browser as equal to the desktop app.
-- Re-run `npm run docs:sync` after each fix.
+- Nur reale Drift korrigieren (Legacy-Pfad-Funde, fehlende Pflichtdateien, veraltete Aussagen).
+- Keine kosmetische Meta-Produktion ohne Produkt- oder Governance-Nutzen.
+- Nach inhaltlichen Korrekturen `npm run docs:sync` erneut laufen lassen.
 
 ## 3. Validate governance + docs
 
@@ -30,14 +31,14 @@ description: Check and auto-update docs/workflows/rules to current repository re
 ## 4. Commit
 
 - `npm run guard:main`
-- `git add docs/ .agents/ scripts/validate-umsetzungsplan.mjs package.json` (only what changed)
+- Nur geaenderte Scope-Dateien stagen (kein pauschales `docs/`-Bulk-Add).
 - `git commit -m "docs: sync documentation and plan governance"`
 - Before push on `main`: `npm run snapshot:tag`
 
 ## 5. Optional reality checks
 
 // turbo
-- `npm run smoke:roundstate` and `npm run smoke:selftrail` (if docs claim stability).
+- `npm run smoke:roundstate` und `npm run smoke:selftrail` nur wenn Claims explizit auf diese Runtime-Signale referenzieren.
 
 ## Gate
 
@@ -48,4 +49,3 @@ description: Check and auto-update docs/workflows/rules to current repository re
 ## Report
 
 Standardformat verwenden.
-
