@@ -1,7 +1,4 @@
-// ============================================
-// OnlineMatchLobby.js - Internet lobby via WebSocket signaling
-// ============================================
-
+// OnlineMatchLobby: Internet lobby via WebSocket signaling.
 import { MatchLobby } from '../core/lobby/MatchLobby.js';
 import {
     createInitialLobbySessionState,
@@ -19,13 +16,13 @@ import {
     resolveOnlineSignalingUrl,
     buildSocketCloseDetails,
     createSocketLifecycleError,
-    createServerSignalingError,
     createInvalidSignalingPayloadError,
     createNetworkUnavailableSignalingError,
     createResumeSignalingEnvelope,
     isRetryableSignalingError,
     toErrorPayload,
 } from './OnlineSignalingSupport.js';
+import { routeOnlineLobbyMessage } from './OnlineMatchLobbyMessageRouter.js';
 
 const MUTATION_ACK_TIMEOUT_MS = 3_500;
 
@@ -350,181 +347,7 @@ export class OnlineMatchLobby extends MatchLobby {
     }
 
     _handleMessage(msg, connectResolve, connectReject, connectState = null) {
-        const messageType = typeof msg?.type === 'string' ? msg.type.trim() : '';
-        if (!messageType) {
-            const payloadError = createInvalidSignalingPayloadError({
-                signalingUrl: this._signalingUrl,
-                reason: 'missing_type',
-            });
-            this._emit('error', toErrorPayload(payloadError));
-            if (connectReject && !connectState?.settled) {
-                connectReject(payloadError);
-            }
-            return;
-        }
-        this._resolveMatchingMutationAcks(msg);
-        switch (messageType) {
-        case SIGNALING_EVENT_TYPES.LOBBY_CREATED: {
-            this.lobbyCode = msg.lobbyCode;
-            this._playerId = msg.playerId;
-            const serverState = msg?.sessionState && typeof msg.sessionState === 'object'
-                ? msg.sessionState
-                : {
-                    lobbyCode: this.lobbyCode,
-                    hostPeerId: this._playerId,
-                    maxPlayers: Number(msg.maxPlayers || 10),
-                    members: [{
-                        peerId: this._playerId,
-                        actorId: 'Host',
-                        name: 'Host',
-                        role: 'host',
-                        ready: true,
-                        joinedAt: Date.now(),
-                        lastSeenAt: Date.now(),
-                    }],
-                    updatedAt: Date.now(),
-                    revision: Number(this.sessionState.revision || 0) + 1,
-                };
-            this._applySessionState(serverState);
-            if (connectResolve) connectResolve();
-            break;
-        }
-
-        case SIGNALING_EVENT_TYPES.LOBBY_JOINED: {
-            this._playerId = msg.playerId;
-            const serverState = msg?.sessionState && typeof msg.sessionState === 'object'
-                ? msg.sessionState
-                : {
-                    ...this.sessionState,
-                    lobbyCode: msg.lobbyCode || this.sessionState.lobbyCode,
-                    updatedAt: Date.now(),
-                    revision: Number(this.sessionState.revision || 0) + 1,
-                };
-            this._applySessionState(serverState);
-            if (connectResolve) connectResolve();
-            break;
-        }
-
-        case SIGNALING_EVENT_TYPES.CONNECTION_RESUMED: {
-            this._playerId = msg.playerId || this._playerId;
-            if (msg?.sessionState && typeof msg.sessionState === 'object') {
-                this._applySessionState(msg.sessionState);
-            }
-            const now = Date.now();
-            if (!msg?.sessionState || typeof msg.sessionState !== 'object') {
-                this._applySessionState({
-                    ...this.sessionState,
-                    lobbyCode: msg.lobbyCode || this.sessionState.lobbyCode,
-                    updatedAt: now,
-                    revision: Number(this.sessionState.revision || 0) + 1,
-                });
-            }
-            this._emit('connectionResumed', { sessionState: this.sessionState });
-            if (connectResolve) connectResolve();
-            break;
-        }
-
-        case SIGNALING_EVENT_TYPES.PLAYER_JOINED: {
-            if (msg?.sessionState && typeof msg.sessionState === 'object') {
-                this._applySessionState(msg.sessionState);
-                break;
-            }
-            const now = Date.now();
-            const peerId = String(msg.peerId || '').trim();
-            if (!peerId) break;
-            const exists = this.sessionState.members.some((member) => member.peerId === peerId);
-            if (!exists) {
-                this._applySessionState({
-                    ...this.sessionState,
-                    members: [
-                        ...this.sessionState.members,
-                        {
-                            peerId,
-                            actorId: String(msg.name || peerId).trim(),
-                            name: String(msg.name || peerId).trim(),
-                            role: peerId === this.sessionState.hostPeerId ? 'host' : 'client',
-                            ready: false,
-                            joinedAt: now,
-                            lastSeenAt: now,
-                        },
-                    ],
-                    updatedAt: now,
-                    revision: Number(this.sessionState.revision || 0) + 1,
-                });
-            }
-            break;
-        }
-
-        case SIGNALING_EVENT_TYPES.PLAYER_LEFT:
-            if (msg?.sessionState && typeof msg.sessionState === 'object') {
-                this._applySessionState(msg.sessionState);
-                break;
-            }
-            this._applySessionState({
-                ...this.sessionState,
-                members: this.sessionState.members.filter((member) => member.peerId !== msg.peerId),
-                updatedAt: Date.now(),
-                revision: Number(this.sessionState.revision || 0) + 1,
-            });
-            break;
-
-        case SIGNALING_EVENT_TYPES.PLAYER_READY:
-            if (msg?.sessionState && typeof msg.sessionState === 'object') {
-                this._applySessionState(msg.sessionState);
-                break;
-            }
-            this._setReadyStateFor(msg.peerId, msg.ready === true);
-            break;
-
-        case SIGNALING_EVENT_TYPES.MATCH_START: {
-            if (msg?.sessionState && typeof msg.sessionState === 'object') {
-                this._applySessionState(msg.sessionState);
-            }
-            const pendingMatchStart = msg?.pendingMatchStart && typeof msg.pendingMatchStart === 'object'
-                ? {
-                    ...msg.pendingMatchStart,
-                    settingsSnapshot: msg.pendingMatchStart.settingsSnapshot ?? null,
-                }
-                : null;
-            const commandId = String(pendingMatchStart?.commandId || '').trim();
-            if (!commandId || commandId === this._lastHandledMatchCommandId) {
-                break;
-            }
-            this._lastHandledMatchCommandId = commandId;
-            this._emit('matchStart', {
-                pendingMatchStart,
-                players: this.players,
-                settings: pendingMatchStart.settingsSnapshot ?? this.settings,
-                sessionState: this.sessionState,
-            });
-            break;
-        }
-
-        case SIGNALING_EVENT_TYPES.PLAYER_RECONNECTED: {
-            const peerId = String(msg.peerId || '').trim();
-            if (msg?.sessionState && typeof msg.sessionState === 'object') {
-                this._applySessionState(msg.sessionState);
-            }
-            if (!peerId) break;
-            this._emit('playerReconnected', { peerId, sessionState: this.sessionState });
-            break;
-        }
-
-        case SIGNALING_EVENT_TYPES.ERROR: {
-            const err = createServerSignalingError(msg.message);
-            this._rejectAllPendingMutationAcks(err);
-            this._emit('error', toErrorPayload(err));
-            if (connectReject) {
-                if (connectState?.rejected) break;
-                if (connectState) connectState.rejected = true;
-                connectReject(err);
-            }
-            break;
-        }
-
-        default:
-            break;
-        }
+        routeOnlineLobbyMessage(this, msg, { connectResolve, connectReject, connectState });
     }
 
     _send(data) {

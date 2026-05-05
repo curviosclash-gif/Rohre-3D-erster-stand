@@ -2,11 +2,17 @@ import {
     buildRouteFromParcours,
     createPlayerProgressState,
     formatDurationMs,
-    isObject,
     normalizeString,
     nowMs,
 } from './ParcoursProgressUtils.js';
 import { resetParcoursProgressState, rewindParcoursProgressState } from './ParcoursProgressStateOps.js';
+import {
+    buildRouteSnapshot,
+    cancelGhostRecordingForPlayer,
+    clearGhostRecording,
+    playerOwnsGhostRecording,
+    resolveProgressPlayerIndex,
+} from './ParcoursProgressRuntime.js';
 
 export class ParcoursProgressSystem {
     constructor(entityManager, options = {}) {
@@ -33,54 +39,21 @@ export class ParcoursProgressSystem {
         this._progressPlayerIndexResolver = typeof resolver === 'function' ? resolver : null;
     }
     _resolveProgressPlayerIndex(players = null) {
-        const playerList = Array.isArray(players) ? players : (this.entityManager?.players || []);
-        if (this._progressPlayerIndexResolver) {
-            try {
-                const resolved = this._progressPlayerIndexResolver({
-                    players: playerList,
-                    entityManager: this.entityManager,
-                    routeId: this._route?.routeId || '',
-                });
-                if (Number.isInteger(resolved) && resolved >= 0) return resolved;
-            } catch {
-                // no-op
-            }
-        }
-
-        const viewportLocalPlayerIndex = Number(this.entityManager?.renderer?.viewportSystem?.localPlayerIndex);
-        if (Number.isInteger(viewportLocalPlayerIndex) && viewportLocalPlayerIndex >= 0) {
-            return viewportLocalPlayerIndex;
-        }
-
-        for (const player of playerList) {
-            if (player && Number.isInteger(player.index) && player.isBot !== true) {
-                return player.index;
-            }
-        }
-        return 0;
+        return resolveProgressPlayerIndex(
+            this.entityManager,
+            this._route,
+            this._progressPlayerIndexResolver,
+            players
+        );
     }
     _playerOwnsGhostRecording(player) {
-        if (!this._ghostRecorder?.isRecording || !player || !Number.isInteger(player.index)) return false;
-        return typeof this._ghostRecorder.isOwnedBy === 'function'
-            ? this._ghostRecorder.isOwnedBy(player.index)
-            : player?.isBot !== true;
+        return playerOwnsGhostRecording(this._ghostRecorder, player);
     }
     _clearGhostRecording(reason = 'reset') {
-        if (!this._ghostRecorder) return;
-        if (typeof this._ghostRecorder.cancelRecording === 'function' && this._ghostRecorder.isRecording === true) {
-            this._ghostRecorder.cancelRecording(reason);
-            return;
-        }
-        this._ghostRecorder.reset?.();
+        clearGhostRecording(this._ghostRecorder, reason);
     }
     _cancelGhostRecordingForPlayer(player, reason = 'cancelled') {
-        if (!this._ghostRecorder || player?.isBot === true || !Number.isInteger(player?.index)) return false;
-        if (!this._playerOwnsGhostRecording(player)) return false;
-        if (typeof this._ghostRecorder.cancelRecording === 'function') {
-            return this._ghostRecorder.cancelRecording(reason, player.index) === true;
-        }
-        this._ghostRecorder.reset?.();
-        return true;
+        return cancelGhostRecordingForPlayer(this._ghostRecorder, player, reason);
     }
     isEnabled() {
         return !!this._route;
@@ -98,13 +71,11 @@ export class ParcoursProgressSystem {
         this._playerStates.clear();
         this._completionOrder.length = 0;
         if (!this._route) return;
-
         if (!Array.isArray(players)) return;
         for (const player of players) {
             if (!player || !Number.isInteger(player.index)) continue;
             this._playerStates.set(player.index, createPlayerProgressState(this._route.totalCheckpoints));
         }
-
         const rt = this.entityManager?.arena?._portalGateSystem?.checkpointRingRuntime;
         rt?.setProgressProvider?.(() => {
             const progressPlayerIndex = this._resolveProgressPlayerIndex(this.entityManager?.players || players);
@@ -132,7 +103,6 @@ export class ParcoursProgressSystem {
     _isCheckpointTriggered(entry, player, previousPosition, now, state) {
         if (!entry || !player?.position || !previousPosition) return false;
         if (this._isCheckpointOnCooldown(state, entry.id, entry.cooldownMs, now)) return false;
-
         const px = Number(player.position.x) || 0;
         const py = Number(player.position.y) || 0;
         const pz = Number(player.position.z) || 0;
@@ -144,9 +114,7 @@ export class ParcoursProgressSystem {
         if ((dx * dx) + (dy * dy) + (dz * dz) > checkRadius * checkRadius) {
             return false;
         }
-
         if (!entry.forward) return true;
-
         const prevDx = (Number(previousPosition.x) || 0) - entry.pos[0];
         const prevDy = (Number(previousPosition.y) || 0) - entry.pos[1];
         const prevDz = (Number(previousPosition.z) || 0) - entry.pos[2];
@@ -167,12 +135,10 @@ export class ParcoursProgressSystem {
         state.lastError = normalizeString(message, '');
         state.errorUntilMs = Math.max(0, now + this._route.rules.errorIndicatorMs);
     }
-
     onPlayerSpawn(player, options = {}) {
         if (!this._route || !player || !Number.isInteger(player.index)) return;
         const state = this._ensurePlayerState(player.index);
         if (!state) return;
-
         const reason = normalizeString(options.reason, 'spawn');
         if (reason === 'round_start' || reason === 'match_start' || reason === 'spawn_all') {
             resetParcoursProgressState(state, {
@@ -528,42 +494,6 @@ export class ParcoursProgressSystem {
     }
 
     getRouteSnapshot() {
-        if (!this._route) return null;
-        return {
-            enabled: true,
-            routeId: this._route.routeId,
-            totalCheckpoints: this._route.totalCheckpoints,
-            sequence: [...this._route.sequence],
-            checkpoints: this._route.checkpoints.map((entry) => ({
-                id: entry.id,
-                type: entry.type,
-                aliasOf: entry.aliasOf,
-                routeIndex: entry.routeIndex,
-                nextCheckpointIds: [...(entry.nextCheckpointIds || [])],
-                isBranchOption: entry.isBranchOption === true,
-                branchParentId: entry.branchParentId || null,
-                mergeCheckpointId: entry.mergeCheckpointId || null,
-                pos: [...entry.pos],
-                radius: entry.radius,
-                forward: entry.forward ? [...entry.forward] : null,
-            })),
-            branches: Array.isArray(this._route.branches)
-                ? this._route.branches.map((entry) => ({
-                    checkpointId: entry.checkpointId,
-                    routeIndex: entry.routeIndex,
-                    nextCheckpointIds: [...(entry.nextCheckpointIds || [])],
-                    mergeCheckpointId: entry.mergeCheckpointId || null,
-                    validMerge: entry.validMerge === true,
-                }))
-                : [],
-            finish: this._route.finish ? {
-                id: this._route.finish.id,
-                type: this._route.finish.type,
-                pos: [...this._route.finish.pos],
-                radius: this._route.finish.radius,
-                forward: this._route.finish.forward ? [...this._route.finish.forward] : null,
-            } : null,
-            rules: { ...this._route.rules },
-        };
+        return buildRouteSnapshot(this._route);
     }
 }

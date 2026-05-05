@@ -10,38 +10,31 @@ import {
 } from '../../shared/contracts/ArcadeVehicleProfileContract.js';
 import {
     ARCADE_HANGAR_SLOT_UNLOCK_GATES,
-    ARCADE_HANGAR_TIER_UNLOCK_GATES,
-    resolveArcadeHangarAllowedPartFamilies,
-    resolveArcadeHangarAllowedTiers,
-    resolveArcadeHangarPartFamily,
     resolveArcadeHangarProgressionSnapshot,
     resolveArcadeHangarUnlockedSlots,
 } from '../../shared/contracts/ArcadeHangarRulesContract.js';
-import {
-    canUpgrade,
-    getUpgradeCost,
-} from '../../entities/arcade/ArcadeBlueprintSchema.js';
 import { toSafeNumber, clampInteger as clampInt } from '../../shared/utils/ArcadeUtils.js';
+import {
+    buildUpgradeState,
+    computeLevel,
+    ensureProfile,
+    isValidTier,
+    normalizeSlotName,
+    normalizeTier,
+    normalizeVehicleProfile,
+    profileEquals,
+    resolveNextTier,
+    resolveArcadeHangarPartFamily,
+    toIsoString,
+    toObject,
+    warnPersistenceFailure,
+    xpForLevel as xpForLevelInternal,
+} from './ArcadeVehicleProfileInternals.js';
 
 const VEHICLE_PROFILE_SCHEMA_VERSION = ARCADE_VEHICLE_PROFILE_SCHEMA_VERSION;
 const STORAGE_KEY = ARCADE_VEHICLE_PROFILE_STORAGE_KEY;
 const MAX_UPGRADE_XP_BANK = 9_999_999;
 const MAX_LOADOUT_PRESET_UPGRADE_ENTRIES = 64;
-
-function isPersistenceSuccess(result) {
-    return result === undefined || result === true || result?.success === true;
-}
-
-function warnPersistenceFailure(contextLabel, result) {
-    if (isPersistenceSuccess(result)) return;
-    if (typeof console === 'undefined' || typeof console.warn !== 'function') return;
-    console.warn(`[ArcadeVehicleProfile] ${String(contextLabel || 'save')} failed`, {
-        reason: String(result?.reason || ''),
-        metadata: result?.metadata && typeof result.metadata === 'object'
-            ? { ...result.metadata }
-            : null,
-    });
-}
 
 export const XP_CONFIG = Object.freeze({
     BASE_XP: 100,
@@ -77,164 +70,38 @@ export const UPGRADE_PURCHASE_CODES = Object.freeze({
     COST_INVALID: 'cost_invalid',
 });
 
-function toIsoString(nowMs) {
-    return new Date(Math.max(0, toSafeNumber(nowMs, Date.now()))).toISOString();
+function normalizeVehicleProfileSafe(profile) {
+    return normalizeVehicleProfile(profile, {
+        xpConfig: XP_CONFIG,
+        maxUpgradeXpBank: MAX_UPGRADE_XP_BANK,
+    });
 }
 
-function toObject(value) {
-    return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+function ensureProfileSafe(profile) {
+    return ensureProfile(profile, {
+        xpConfig: XP_CONFIG,
+        maxUpgradeXpBank: MAX_UPGRADE_XP_BANK,
+    });
 }
 
-function uniqueList(values) {
-    return [...new Set((Array.isArray(values) ? values : []).map((entry) => String(entry || '').trim()).filter(Boolean))];
+function buildUpgradeStateSafe(profile, slotName, targetTier) {
+    return buildUpgradeState(profile, slotName, targetTier, {
+        xpConfig: XP_CONFIG,
+        maxUpgradeXpBank: MAX_UPGRADE_XP_BANK,
+        upgradePurchaseCodes: UPGRADE_PURCHASE_CODES,
+    });
 }
 
-function normalizeSlotName(slotName) {
-    return String(slotName || '').trim().toLowerCase();
-}
-
-function normalizeTier(tier) {
-    const normalized = String(tier || '').trim().toUpperCase();
-    return normalized || 'T1';
-}
-
-function isValidTier(tier) {
-    return tier === 'T1' || tier === 'T2' || tier === 'T3';
-}
-
-function resolveNextTier(tier) {
-    const normalized = normalizeTier(tier);
-    if (normalized === 'T1') return 'T2';
-    if (normalized === 'T2') return 'T3';
-    return null;
-}
-
-function profileEquals(left, right) {
-    return JSON.stringify(left) === JSON.stringify(right);
-}
-
-function normalizeVehicleProfile(profile) {
-    const source = toObject(profile);
-    const level = clampInt(source.level, 1, XP_CONFIG.MAX_LEVEL, 1);
-    const xp = Math.max(0, toSafeNumber(source.xp, 0));
-    const progression = resolveArcadeHangarProgressionSnapshot(level);
-    const upgrades = toObject(source.upgrades);
-    const spentUpgradeXp = Math.max(0, toSafeNumber(source.spentUpgradeXp, 0));
-    const fallbackBank = Math.max(0, xp - spentUpgradeXp);
-    const xpBank = clampInt(source.xpBank, 0, MAX_UPGRADE_XP_BANK, fallbackBank);
-    const totalXpEarned = Math.max(xp, toSafeNumber(source.totalXpEarned, xp));
-    const upgradesApplied = Math.max(0, clampInt(source.upgradesApplied, 0, 100_000, Object.keys(upgrades).length));
-    const masteryMilestones = uniqueList(source.masteryMilestones).length
-        ? uniqueList(source.masteryMilestones)
-        : progression.masteryMilestones;
-    const normalized = {
-        ...source,
-        xp,
-        level,
-        unlockedSlots: progression.unlockedSlots.slice(),
-        upgrades: { ...upgrades },
-        xpBank,
-        spentUpgradeXp,
-        totalXpEarned,
-        upgradesApplied,
-        unlockedPartFamilies: progression.allowedPartFamilies.slice(),
-        unlockedUpgradeTiers: progression.allowedTiers.slice(),
-        masteryMilestones: masteryMilestones.slice(),
-    };
-    return normalized;
-}
-
-function ensureProfile(profile) {
-    if (!profile || typeof profile !== 'object') return null;
-    return normalizeVehicleProfile(profile);
-}
-
-function finalizeUpgradeState(baseState, code, ok = false) {
-    return { ...baseState, ok, code };
-}
-
-function buildUpgradeState(profile, slotName, targetTier) {
-    const normalizedProfile = ensureProfile(profile);
-    if (!normalizedProfile) {
-        return finalizeUpgradeState({
-            profile,
-            slotName: normalizeSlotName(slotName),
-            targetTier: normalizeTier(targetTier),
-            currentTier: 'T1',
-            nextTier: 'T2',
-            cost: Infinity,
-            spendableXp: 0,
-            remainingXp: 0,
-            partFamily: null,
-            requiredLevel: 1,
-        }, UPGRADE_PURCHASE_CODES.INVALID_PROFILE);
-    }
-
-    const normalizedSlot = normalizeSlotName(slotName);
-    const normalizedTargetTier = normalizeTier(targetTier);
-    const currentTier = normalizeTier(normalizedProfile.upgrades?.[normalizedSlot] || 'T1');
-    const nextTier = resolveNextTier(currentTier);
-    const partFamily = resolveArcadeHangarPartFamily(normalizedSlot);
-    const allowedPartFamilies = new Set(resolveArcadeHangarAllowedPartFamilies(normalizedProfile.level));
-    const allowedTiers = new Set(resolveArcadeHangarAllowedTiers(normalizedProfile.level));
-    const unlockedSlots = new Set(resolveArcadeHangarUnlockedSlots(normalizedProfile.level));
-    const tierUnlockKey = `${normalizedSlot}_${normalizedTargetTier.toLowerCase()}`;
-    const requiredLevelByTier = Number(ARCADE_HANGAR_TIER_UNLOCK_GATES[normalizedTargetTier]) || 1;
-    const cost = Number(getUpgradeCost(normalizedSlot, normalizedTargetTier));
-    const spendableXp = Math.max(0, toSafeNumber(normalizedProfile.xpBank, 0));
-    const remainingXp = spendableXp - (Number.isFinite(cost) ? cost : 0);
-    const baseState = {
-        profile: normalizedProfile,
-        slotName: normalizedSlot,
-        targetTier: normalizedTargetTier,
-        currentTier,
-        nextTier,
-        cost,
-        spendableXp,
-        remainingXp,
-        partFamily,
-        requiredLevel: requiredLevelByTier,
-    };
-
-    if (!normalizedSlot) return finalizeUpgradeState(baseState, UPGRADE_PURCHASE_CODES.INVALID_SLOT);
-    if (normalizedTargetTier !== 'T2' && normalizedTargetTier !== 'T3') {
-        return finalizeUpgradeState(baseState, UPGRADE_PURCHASE_CODES.INVALID_TIER);
-    }
-    if (!nextTier || normalizedTargetTier !== nextTier) {
-        return finalizeUpgradeState(baseState, UPGRADE_PURCHASE_CODES.INVALID_TIER_SEQUENCE);
-    }
-    if (!unlockedSlots.has(normalizedSlot) && !unlockedSlots.has(tierUnlockKey)) {
-        return finalizeUpgradeState(baseState, UPGRADE_PURCHASE_CODES.SLOT_LOCKED);
-    }
-    if (partFamily && !allowedPartFamilies.has(partFamily)) {
-        return finalizeUpgradeState(baseState, UPGRADE_PURCHASE_CODES.PART_FAMILY_LOCKED);
-    }
-    if (!allowedTiers.has(normalizedTargetTier)) {
-        return finalizeUpgradeState(baseState, UPGRADE_PURCHASE_CODES.TIER_LOCKED);
-    }
-    if (!canUpgrade(normalizedSlot, normalizedTargetTier, normalizedProfile.level)) {
-        return finalizeUpgradeState(baseState, UPGRADE_PURCHASE_CODES.LEVEL_LOCKED);
-    }
-    if (!Number.isFinite(cost) || cost < 0) {
-        return finalizeUpgradeState(baseState, UPGRADE_PURCHASE_CODES.COST_INVALID);
-    }
-    if (spendableXp < cost) {
-        return finalizeUpgradeState(baseState, UPGRADE_PURCHASE_CODES.INSUFFICIENT_XP);
-    }
-    return finalizeUpgradeState(baseState, UPGRADE_PURCHASE_CODES.APPLIED, true);
-}
 
 // XP Curve
 
 export function xpForLevel(level) {
-    const n = Math.max(1, Math.min(XP_CONFIG.MAX_LEVEL, Math.floor(level)));
-    if (n <= 1) return 0;
-    return Math.floor(XP_CONFIG.BASE_XP * Math.pow(n, XP_CONFIG.EXPONENT));
+    return xpForLevelInternal(level, XP_CONFIG);
 }
 
 export function xpToNextLevel(profile) {
     if (!profile || typeof profile !== 'object') return { current: 0, required: 100, progress: 0 };
-    const normalized = normalizeVehicleProfile(profile);
+    const normalized = normalizeVehicleProfileSafe(profile);
     const level = clampInt(normalized.level, 1, XP_CONFIG.MAX_LEVEL, 1);
     if (level >= XP_CONFIG.MAX_LEVEL) return { current: 0, required: 0, progress: 1 };
     const currentLevelXp = xpForLevel(level);
@@ -248,13 +115,6 @@ export function xpToNextLevel(profile) {
     };
 }
 
-function computeLevel(totalXp) {
-    let level = 1;
-    while (level < XP_CONFIG.MAX_LEVEL && totalXp >= xpForLevel(level + 1)) {
-        level += 1;
-    }
-    return level;
-}
 
 // Slot stat bonuses
 
@@ -295,7 +155,7 @@ export function getUnlockedSlots(level) {
 
 export function createArcadeVehicleProfile(vehicleId, nowMs = Date.now()) {
     const base = createArcadeVehicleProfileRecord(vehicleId, nowMs);
-    return normalizeVehicleProfile(base);
+    return normalizeVehicleProfileSafe(base);
 }
 
 export function addXp(profile, amount, nowMs = Date.now()) {
@@ -311,11 +171,11 @@ export function addXp(profile, amount, nowMs = Date.now()) {
             xpBank: 0,
         };
     }
-    const normalized = normalizeVehicleProfile(profile);
+    const normalized = normalizeVehicleProfileSafe(profile);
     const prevLevel = clampInt(normalized.level, 1, XP_CONFIG.MAX_LEVEL, 1);
     const gain = Math.max(0, toSafeNumber(amount, 0));
     const totalXp = Math.max(0, toSafeNumber(normalized.xp, 0) + gain);
-    const newLevel = computeLevel(totalXp);
+    const newLevel = computeLevel(totalXp, XP_CONFIG);
     const leveledUp = newLevel > prevLevel;
 
     const prevSnapshot = resolveArcadeHangarProgressionSnapshot(prevLevel);
@@ -364,12 +224,12 @@ export function addXp(profile, amount, nowMs = Date.now()) {
 
 export function applyUpgrade(profile, slotName, tier, nowMs = Date.now()) {
     if (!profile || typeof profile !== 'object') return profile;
-    const normalized = normalizeVehicleProfile(profile);
+    const normalized = normalizeVehicleProfileSafe(profile);
     const slotKey = normalizeSlotName(slotName);
     if (!slotKey) return normalized;
     const upgrades = { ...normalized.upgrades };
     upgrades[slotKey] = normalizeTier(tier);
-    return normalizeVehicleProfile({
+    return normalizeVehicleProfileSafe({
         ...normalized,
         upgrades,
         upgradesApplied: Math.max(0, toSafeNumber(normalized.upgradesApplied, 0)),
@@ -378,11 +238,11 @@ export function applyUpgrade(profile, slotName, tier, nowMs = Date.now()) {
 }
 
 export function evaluateUpgradePurchase(profile, slotName, targetTier) {
-    return buildUpgradeState(profile, slotName, targetTier);
+    return buildUpgradeStateSafe(profile, slotName, targetTier);
 }
 
 export function purchaseUpgrade(profile, slotName, targetTier, nowMs = Date.now()) {
-    const upgradeState = buildUpgradeState(profile, slotName, targetTier);
+    const upgradeState = buildUpgradeStateSafe(profile, slotName, targetTier);
     if (!upgradeState.ok) {
         return {
             ...upgradeState,
@@ -393,7 +253,7 @@ export function purchaseUpgrade(profile, slotName, targetTier, nowMs = Date.now(
     const normalized = upgradeState.profile;
     const upgrades = { ...toObject(normalized.upgrades) };
     upgrades[upgradeState.slotName] = upgradeState.targetTier;
-    const nextProfile = normalizeVehicleProfile({
+    const nextProfile = normalizeVehicleProfileSafe({
         ...normalized,
         upgrades,
         xpBank: Math.max(0, upgradeState.spendableXp - upgradeState.cost),
@@ -418,12 +278,12 @@ export function purchaseUpgrade(profile, slotName, targetTier, nowMs = Date.now(
 }
 
 export function getSpendableUpgradeXp(profile) {
-    const normalized = ensureProfile(profile);
+    const normalized = ensureProfileSafe(profile);
     return Math.max(0, toSafeNumber(normalized?.xpBank, 0));
 }
 
 export function sanitizeLoadoutPresetUpgrades(profile, upgrades) {
-    const normalizedProfile = ensureProfile(profile);
+    const normalizedProfile = ensureProfileSafe(profile);
     if (!normalizedProfile) {
         return {
             upgrades: {},
@@ -439,7 +299,7 @@ export function sanitizeLoadoutPresetUpgrades(profile, upgrades) {
     const source = toObject(upgrades);
     const entries = Object.entries(source).slice(0, MAX_LOADOUT_PRESET_UPGRADE_ENTRIES);
     const rejectedEntries = [];
-    let simulatedProfile = normalizeVehicleProfile({
+    let simulatedProfile = normalizeVehicleProfileSafe({
         ...normalizedProfile,
         upgrades: {},
         xpBank: MAX_UPGRADE_XP_BANK,
@@ -504,7 +364,7 @@ export function sanitizeLoadoutPresetUpgrades(profile, upgrades) {
 }
 
 export function applyLoadoutPreset(profile, upgrades, nowMs = Date.now()) {
-    const normalizedProfile = ensureProfile(profile);
+    const normalizedProfile = ensureProfileSafe(profile);
     if (!normalizedProfile) {
         return {
             profile: profile || null,
@@ -519,7 +379,7 @@ export function applyLoadoutPreset(profile, upgrades, nowMs = Date.now()) {
     }
 
     const sanitized = sanitizeLoadoutPresetUpgrades(normalizedProfile, upgrades);
-    const nextProfile = normalizeVehicleProfile({
+    const nextProfile = normalizeVehicleProfileSafe({
         ...normalizedProfile,
         upgrades: { ...sanitized.upgrades },
         updatedAt: toIsoString(nowMs),
@@ -566,7 +426,7 @@ export function loadVehicleProfiles(store) {
     let shouldRewrite = shouldPersist;
 
     Object.entries(contractProfiles).forEach(([vehicleId, profile]) => {
-        const normalized = normalizeVehicleProfile(profile);
+        const normalized = normalizeVehicleProfileSafe(profile);
         normalizedProfiles[vehicleId] = normalized;
         if (!profileEquals(profile, normalized)) shouldRewrite = true;
     });
@@ -583,7 +443,7 @@ export function saveVehicleProfiles(store, profiles) {
     const sourceProfiles = profiles && typeof profiles === 'object' ? profiles : {};
     const normalizedProfiles = {};
     Object.entries(sourceProfiles).forEach(([vehicleId, profile]) => {
-        normalizedProfiles[vehicleId] = normalizeVehicleProfile(profile);
+        normalizedProfiles[vehicleId] = normalizeVehicleProfileSafe(profile);
     });
     const saveResult = store.saveJsonRecord(STORAGE_KEY, normalizedProfiles);
     warnPersistenceFailure('saveVehicleProfiles', saveResult);
@@ -591,7 +451,7 @@ export function saveVehicleProfiles(store, profiles) {
 
 export function getOrCreateProfile(profiles, vehicleId, nowMs = Date.now()) {
     const record = getArcadeVehicleProfileRecord(profiles, vehicleId, nowMs);
-    return normalizeVehicleProfile(record);
+    return normalizeVehicleProfileSafe(record);
 }
 
 export default {

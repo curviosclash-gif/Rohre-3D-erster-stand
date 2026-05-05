@@ -28,6 +28,10 @@ import {
     collectMatchingDiscoveryHosts,
     selectJoinSignalingUrlFromDiscoveredHosts,
 } from './NetworkLobbyDiscoveryResolver.js';
+import {
+    resolveDefaultHostSignalingUrl,
+    resolveDefaultJoinSignalingUrl,
+} from './NetworkLobbyServiceDiscovery.js';
 
 const DISCOVERY_POLL_INTERVAL_MS = 250;
 const DISCOVERY_MAX_WAIT_MS = 3_000;
@@ -176,24 +180,11 @@ export class NetworkLobbyService {
     }
 
     async _resolveDefaultHostSignalingUrl() {
-        const hostCapabilities = this._platformCapabilities?.host || null;
-        const hostBridge = this._hostIntentBridge;
-        const getLanServerStatus = toCallable(hostBridge?.getLanServerStatus || hostBridge?.getStatus, null);
-        const startLanServer = toCallable(hostBridge?.startLanServer || hostBridge?.start, null);
-        const status = getLanServerStatus ? await getLanServerStatus.call(hostBridge) : null;
-        if (status?.running && status?.port) {
-            return `http://localhost:${status.port}`;
-        }
-        if (startLanServer) {
-            const started = await startLanServer.call(hostBridge);
-            if (started?.running && started?.port) {
-                return `http://localhost:${started.port}`;
-            }
-        }
-        if (hostCapabilities?.available !== true) {
-            return 'http://localhost:9090';
-        }
-        return 'http://localhost:9090';
+        return resolveDefaultHostSignalingUrl({
+            platformCapabilities: this._platformCapabilities,
+            hostIntentBridge: this._hostIntentBridge,
+            toCallable,
+        });
     }
 
     async _resolveHostSignalingUrl() {
@@ -210,65 +201,23 @@ export class NetworkLobbyService {
     }
 
     async _resolveDefaultJoinSignalingUrl(lobbyCode, explicitSignalingUrl = '') {
-        const normalizedExplicitUrl = normalizeSignalingUrl(explicitSignalingUrl);
-        if (normalizedExplicitUrl) {
-            this._clearJoinDiscoveryIssue();
-            return normalizedExplicitUrl;
-        }
-
-        const manualAddress = tryParseManualSignalingUrl(lobbyCode);
-        if (manualAddress) {
-            this._clearJoinDiscoveryIssue();
-            return manualAddress;
-        }
-
-        if (!this._discoveryPort?.isAvailable?.()) {
-            this._setJoinDiscoveryIssue(
-                'discovery_unavailable',
-                `Lobby nicht gefunden: ${normalizeLobbyCode(lobbyCode, '') || 'unbekannt'}`
-            );
-            return '';
-        }
-
-        const normalizedLobbyCode = normalizeLobbyCode(lobbyCode, '');
-        this._clearJoinDiscoveryIssue();
-        this._discoveryPort.start?.();
-        try {
-            const deadline = Date.now() + DISCOVERY_MAX_WAIT_MS;
-            let lastIssue = null;
-            while (Date.now() <= deadline) {
-                const hosts = await Promise.resolve(this._discoveryPort.getHosts?.());
-                const matches = collectMatchingDiscoveryHosts(hosts, normalizedLobbyCode, DISCOVERY_MAX_MATCHING_HOSTS);
-                if (matches.length > 0) {
-                    const resolved = await selectJoinSignalingUrlFromDiscoveredHosts({
-                        hosts: matches,
-                        lobbyCode: normalizedLobbyCode,
-                        runtimeGlobal: this._runtimeGlobal,
-                    });
-                    if (resolved?.signalingUrl) {
-                        this._clearJoinDiscoveryIssue();
-                        return resolved.signalingUrl;
-                    }
-                    if (resolved?.issue) {
-                        lastIssue = this._setJoinDiscoveryIssue(
-                            resolved.issue.code,
-                            resolved.issue.message,
-                            resolved.issue.details
-                        );
-                    }
-                }
-                await delay(DISCOVERY_POLL_INTERVAL_MS);
-            }
-            if (lastIssue) {
-                this._lastJoinDiscoveryIssue = lastIssue;
-            } else {
-                this._setJoinDiscoveryIssue('lobby_not_found', `Lobby nicht gefunden: ${normalizedLobbyCode}`);
-            }
-        } finally {
-            this._discoveryPort.stop?.();
-        }
-
-        return '';
+        return resolveDefaultJoinSignalingUrl({
+            lobbyCode,
+            explicitSignalingUrl,
+            normalizeSignalingUrl,
+            normalizeLobbyCode,
+            tryParseManualSignalingUrl,
+            discoveryPort: this._discoveryPort,
+            clearJoinDiscoveryIssue: this._clearJoinDiscoveryIssue.bind(this),
+            setJoinDiscoveryIssue: this._setJoinDiscoveryIssue.bind(this),
+            delay,
+            collectMatchingDiscoveryHosts,
+            selectJoinSignalingUrlFromDiscoveredHosts,
+            runtimeGlobal: this._runtimeGlobal,
+            discoveryPollIntervalMs: DISCOVERY_POLL_INTERVAL_MS,
+            discoveryMaxWaitMs: DISCOVERY_MAX_WAIT_MS,
+            discoveryMaxMatchingHosts: DISCOVERY_MAX_MATCHING_HOSTS,
+        });
     }
 
     async _resolveJoinSignalingUrl(lobbyCode, explicitSignalingUrl = '') {
