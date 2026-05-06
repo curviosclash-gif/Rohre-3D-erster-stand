@@ -15,6 +15,7 @@ import { createStartMatchCommand } from '../src/shared/contracts/SessionRuntimeC
 import { SESSION_RUNTIME_EVENT_TYPES } from '../src/shared/contracts/SessionRuntimeEventContract.js';
 import { createArcadePort } from '../src/shared/runtime/GameRuntimeFeaturePorts.js';
 import {
+    createUiFeedbackPort,
     createLifecyclePort,
     createRuntimeIntentPort,
     createRuntimeProjectionPort,
@@ -226,6 +227,76 @@ test('MatchFlowLifecycleController delegates returnToMenu to the injected runtim
 
     assert.equal(result, 'runtime-port-return');
     assert.deepEqual(calls, [{ reason: 'contract-test' }]);
+});
+
+test('MatchFlowLifecycleController applyReturnToMenuUi uses runtime-handle-backed UI feedback ports', () => {
+    const uiCalls = [];
+    const transition = {
+        transitionId: 'return_to_menu',
+        uiState: { screen: 'menu' },
+    };
+    const uiManager = {
+        syncAll() {
+            uiCalls.push(['syncAll']);
+        },
+        menuNavigationRuntime: {
+            showPanel(panelId, options = undefined) {
+                uiCalls.push(['showPanel', panelId, options]);
+            },
+        },
+    };
+    const game = {
+        _showMainNav() {
+            uiCalls.push(['legacyShowMainNav']);
+        },
+        runtimeBundle: {
+            sessionRuntime: {
+                handles: {
+                    uiManager,
+                },
+            },
+        },
+    };
+    const lifecycleCalls = [];
+    const runtimePort = createMatchFlowUiControllerPort({
+        uiFeedbackPort: createUiFeedbackPort(game),
+    });
+    const lifecycleController = new MatchFlowLifecycleController({
+        game,
+        runtimePort,
+        deriveReturnToMenuTransition: () => transition,
+        matchFlowUiController: {
+            _clearArcadeOverlayPanel() {
+                lifecycleCalls.push('clearArcadeOverlayPanel');
+            },
+            applyLifecycleTransition(nextTransition) {
+                lifecycleCalls.push(['applyLifecycleTransition', nextTransition]);
+            },
+            applyMatchUiState(nextUiState) {
+                lifecycleCalls.push(['applyMatchUiState', nextUiState]);
+            },
+            resetCrosshairUi() {
+                lifecycleCalls.push('resetCrosshairUi');
+            },
+        },
+    });
+
+    const result = lifecycleController.applyReturnToMenuUi({
+        panelId: 'submenu-settings',
+        trigger: 'contract-test',
+    });
+
+    assert.equal(result, transition);
+    assert.deepEqual(lifecycleCalls, [
+        'clearArcadeOverlayPanel',
+        ['applyLifecycleTransition', transition],
+        ['applyMatchUiState', transition.uiState],
+        'resetCrosshairUi',
+    ]);
+    assert.deepEqual(uiCalls, [
+        ['showPanel', 'submenu-settings', { trigger: 'contract-test' }],
+        ['syncAll'],
+    ]);
 });
 
 test('requestArcadeReplayPlayback falls back to current-route ghost playback when replay player is unavailable', () => {

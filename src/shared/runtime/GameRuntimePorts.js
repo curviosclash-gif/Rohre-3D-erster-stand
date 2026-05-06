@@ -223,10 +223,10 @@ export function createUiFeedbackPort(game) {
             return game?._getDeathMessage?.(cause) || '';
         },
         syncAll() {
-            game?.uiManager?.syncAll?.();
+            getUiManager(game)?.syncAll?.();
         },
         showMenuPanel(panelId, options = undefined) {
-            game?.uiManager?.menuNavigationRuntime?.showPanel?.(panelId, options);
+            getUiManager(game)?.menuNavigationRuntime?.showPanel?.(panelId, options);
         },
         toggleP2Hud(isVisible) {
             getRuntimeComponents(game)?.hudP2?.setVisibility?.(!!isVisible);
