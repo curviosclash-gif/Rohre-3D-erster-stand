@@ -123,6 +123,8 @@ export function createGameUiRefs(doc = document) {
         fireRateLabel: doc.getElementById('fire-rate-label'),
         lockOnSlider: doc.getElementById('lockon-slider'),
         lockOnLabel: doc.getElementById('lockon-label'),
+        nextCheckpointGlowSlider: doc.getElementById('next-checkpoint-glow-slider'),
+        nextCheckpointGlowLabel: doc.getElementById('next-checkpoint-glow-label'),
         mgTrailAimSlider: doc.getElementById('mg-trail-aim-slider'),
         mgTrailAimLabel: doc.getElementById('mg-trail-aim-label'),
         fightPlayerHpSlider: doc.getElementById('fight-player-hp-slider'),

@@ -35,6 +35,8 @@ function deepClone(value) {
     return cloneJsonValue(value);
 }
 
+const DEFAULT_NEXT_CHECKPOINT_GLOW_INTENSITY = 1.35;
+
 function clampInteger(value, min, max, fallback) {
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) return fallback;
@@ -225,6 +227,11 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
             planarMode,
             portalCount: clampSettingValue(gameplaySource.portalCount, runtimeLimits.gameplay.portalCount, gameplayDefaults.PORTAL_COUNT || 0),
             planarLevelCount: clampSettingValue(gameplaySource.planarLevelCount, runtimeLimits.gameplay.planarLevelCount, gameplayDefaults.PLANAR_LEVEL_COUNT || 5),
+            nextCheckpointGlowIntensity: clampSettingValue(
+                gameplaySource.nextCheckpointGlowIntensity,
+                runtimeLimits.gameplay.nextCheckpointGlowIntensity,
+                DEFAULT_NEXT_CHECKPOINT_GLOW_INTENSITY
+            ),
             portalBeams: false,
             planarAimInputSpeed: toNumber(gameplayDefaults.PLANAR_AIM_INPUT_SPEED, 1.5),
             planarAimReturnSpeed: toNumber(gameplayDefaults.PLANAR_AIM_RETURN_SPEED, 0.6),
@@ -326,6 +333,7 @@ export function applyRuntimeConfigCompatibility(runtimeConfig, targetConfig = CO
     nextConfig.GAMEPLAY.PLANAR_MODE = runtimeConfig.gameplay.planarMode;
     nextConfig.GAMEPLAY.PORTAL_COUNT = runtimeConfig.gameplay.portalCount;
     nextConfig.GAMEPLAY.PLANAR_LEVEL_COUNT = runtimeConfig.gameplay.planarLevelCount;
+    nextConfig.GAMEPLAY.NEXT_CHECKPOINT_GLOW_INTENSITY = runtimeConfig.gameplay.nextCheckpointGlowIntensity;
     nextConfig.GAMEPLAY.PORTAL_BEAMS = runtimeConfig.gameplay.portalBeams;
 
     nextConfig.TRAIL.WIDTH = runtimeConfig.trail.width;

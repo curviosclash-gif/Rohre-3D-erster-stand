@@ -164,6 +164,41 @@ test('AudioManager respects cooldown throttling', async () => {
     });
 });
 
+test('AudioManager supports dedicated parcours sound families with distinct cooldowns', async () => {
+    await withMockWindow(async () => {
+        const audio = new AudioManager();
+        try {
+            const played = [];
+            audio.ctx = {
+                state: 'running',
+                resume() {},
+                close() {
+                    return Promise.resolve();
+                },
+            };
+            audio._resolveTime = () => 1_000;
+            audio._playParcoursCheckpoint = () => played.push('PARCOURS_CP');
+            audio._playParcoursBranch = () => played.push('PARCOURS_BRANCH');
+            audio._playParcoursFinish = () => played.push('PARCOURS_FINISH');
+
+            audio.play('PARCOURS_CP');
+            audio.play('PARCOURS_BRANCH');
+            audio.play('PARCOURS_FINISH');
+
+            assert.equal(audio.cooldowns.PARCOURS_CP, 80);
+            assert.equal(audio.cooldowns.PARCOURS_BRANCH, 140);
+            assert.equal(audio.cooldowns.PARCOURS_FINISH, 650);
+            assert.deepEqual(played, ['PARCOURS_CP', 'PARCOURS_BRANCH', 'PARCOURS_FINISH']);
+            assert.deepEqual(
+                audio.getRecentEvents(5).map((entry) => entry.type),
+                ['PARCOURS_CP', 'PARCOURS_BRANCH', 'PARCOURS_FINISH']
+            );
+        } finally {
+            audio.dispose();
+        }
+    });
+});
+
 test('AudioManager initializes once on first interaction and removes init listeners', async () => {
     await withMockWindow(async (mockWindow) => {
         let constructorCalls = 0;

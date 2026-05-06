@@ -445,5 +445,14 @@ export class GameRuntimeFacade {
     hostLobby(options = {}) { return this.executeSessionRuntimeCommand(createHostLobbyCommand(options)); }
     joinLobby(options = {}) { return this.executeSessionRuntimeCommand(createJoinLobbyCommand(options)); }
     syncP2HudVisibility() { return this.sessionHandler.syncP2HudVisibility(); }
-    dispose() { return this.sessionHandler.dispose(); }
+    dispose() {
+        const runtimeState = this.getRuntimeState();
+        runtimeState?.menuController?.dispose?.();
+        if (runtimeState && runtimeState.menuController) {
+            runtimeState.menuController = null;
+        }
+        this.menuMultiplayerBridge = null;
+        this._lastObservedMultiplayerSessionState = null;
+        return this.sessionHandler.dispose();
+    }
 }

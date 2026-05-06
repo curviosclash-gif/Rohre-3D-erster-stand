@@ -443,6 +443,16 @@ export class UIManager {
         syncRangeInput(ui.fireRateSlider, gp.fireRate, runtimeLimits.gameplay.fireRate, gp.fireRate);
         ui.fireRateLabel.textContent = gp.fireRate.toFixed(2) + 's';
         syncRangeInput(ui.lockOnSlider, gp.lockOnAngle, runtimeLimits.gameplay.lockOnAngle, gp.lockOnAngle);
+        const nextCheckpointGlowIntensity = Number.isFinite(Number(gp.nextCheckpointGlowIntensity))
+            ? Number(gp.nextCheckpointGlowIntensity)
+            : 1.35;
+        syncRangeInput(
+            ui.nextCheckpointGlowSlider,
+            nextCheckpointGlowIntensity,
+            runtimeLimits.gameplay.nextCheckpointGlowIntensity,
+            nextCheckpointGlowIntensity
+        );
+        if (ui.nextCheckpointGlowLabel) ui.nextCheckpointGlowLabel.textContent = nextCheckpointGlowIntensity.toFixed(2);
         const mgTrailAimRadius = Number.isFinite(Number(gp.mgTrailAimRadius))
             ? Number(gp.mgTrailAimRadius)
             : Math.max(runtimeLimits.gameplay.mgTrailAimRadius.min, Number(runtimeConfig?.HUNT?.MG?.TRAIL_HIT_RADIUS) || 0.78);

@@ -8,6 +8,7 @@ export const MENU_DEFAULT_EVENT_PLAYLIST_ID = 'fun_rotation';
 export const MENU_FIXED_PRESET_CREATED_AT = '2026-03-05T00:00:00.000Z';
 const DEFAULT_MG_TRAIL_AIM_RADIUS = Number(HUNT_CONFIG?.MG?.TRAIL_HIT_RADIUS) || 0.78;
 const DEFAULT_FIGHT_MG_DAMAGE = Number(HUNT_CONFIG?.MG?.DAMAGE) || 7.75;
+const DEFAULT_NEXT_CHECKPOINT_GLOW_INTENSITY = 1.35;
 
 function deepFreeze(value) {
     if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
@@ -60,6 +61,7 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             itemAmount: 8,
             fireRate: 0.45,
             lockOnAngle: 11,
+            nextCheckpointGlowIntensity: DEFAULT_NEXT_CHECKPOINT_GLOW_INTENSITY,
             mgTrailAimRadius: DEFAULT_MG_TRAIL_AIM_RADIUS,
             fightPlayerHp: HUNT_CONFIG.PLAYER_MAX_HP,
             fightMgDamage: DEFAULT_FIGHT_MG_DAMAGE,

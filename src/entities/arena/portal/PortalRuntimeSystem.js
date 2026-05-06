@@ -87,6 +87,10 @@ export class PortalRuntimeSystem {
         });
     }
 
+    resetRuntimeState() {
+        this._postPortalSignalByEntity.clear();
+    }
+
     checkPortal(position, radius, entityId) {
         if (!this.arena.portalsEnabled) {
             return buildPortalInteractionResult({

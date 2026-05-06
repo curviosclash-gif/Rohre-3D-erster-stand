@@ -36,3 +36,12 @@ test('Parcours route defaults to bidirectional checkpoints unless explicitly dis
     const enabledRoute = buildRouteFromParcours(createParcoursFixture({ bidirectionalCheckpoints: true }));
     assert.equal(enabledRoute?.rules?.bidirectionalCheckpoints, true);
 });
+
+test('Parcours route can scale checkpoint world positions and trigger radii', () => {
+    const scaledRoute = buildRouteFromParcours(createParcoursFixture(), { positionScale: 3 });
+    assert.deepEqual(scaledRoute?.checkpoints?.[0]?.pos, [0, 0, 0]);
+    assert.deepEqual(scaledRoute?.checkpoints?.[1]?.pos, [30, 0, 0]);
+    assert.ok(Math.abs((scaledRoute?.checkpoints?.[0]?.radius ?? 0) - 3.6) < 1e-9);
+    assert.deepEqual(scaledRoute?.finish?.pos, [60, 0, 0]);
+    assert.ok(Math.abs((scaledRoute?.finish?.radius ?? 0) - 3.6) < 1e-9);
+});

@@ -593,26 +593,29 @@ test('Arcade ghost_start replays only in self_longest_ghost mode and uses longes
         playedClips.push(clip);
     });
 
-    runtime.applyParcoursLeaderboardEvent({
+    const firstStart = runtime.applyParcoursLeaderboardEvent({
         type: 'ghost_start',
         routeId: 'route_alpha',
     });
+    assert.equal(firstStart?.started, true);
     assert.equal(playedClips.length, 1);
     assert.equal(playedClips[0]?.frames?.length, 2);
 
-    runtime.applyParcoursLeaderboardEvent({
+    const aliasStart = runtime.applyParcoursLeaderboardEvent({
         type: 'ghost_start',
         routeId: 'route_unknown',
         routeAliases: ['map_unknown', 'route_alpha'],
     });
+    assert.equal(aliasStart?.started, true);
     assert.equal(playedClips.length, 2);
     assert.equal(playedClips[1]?.frames?.length, 2);
 
     runtime._config.ghostDuelMode = 'off';
-    runtime.applyParcoursLeaderboardEvent({
+    const disabledStart = runtime.applyParcoursLeaderboardEvent({
         type: 'ghost_start',
         routeId: 'route_alpha',
     });
+    assert.equal(disabledStart?.reason, 'ghost_mode_disabled');
     assert.equal(playedClips.length, 2);
 });
 
@@ -643,11 +646,12 @@ test('Arcade ghost_start ignores duplicate checkpoint-trigger playback for same 
     });
     assert.equal(playedClips.length, 1);
 
-    runtime.applyParcoursLeaderboardEvent({
+    const duplicateStart = runtime.applyParcoursLeaderboardEvent({
         type: 'ghost_start',
         routeId: 'route_alpha',
         source: 'parcours_checkpoint_start',
     });
+    assert.equal(duplicateStart?.reason, 'duplicate_checkpoint_start');
     assert.equal(playedClips.length, 1);
 
     runtime.applyParcoursLeaderboardEvent({
@@ -1010,6 +1014,48 @@ test('Ghost library save throttle flushes pending write on resetRunState shutdow
     runtime.resetRunState({ preserveRecords: true });
     assert.equal(writes.length, 1);
     assert.equal(writes[0]?.key, ARCADE_GHOST_LIBRARY_STORAGE_KEY);
+});
+
+test('Arcade resetRunState clears active ghost recorder state', () => {
+    const runtime = new ArcadeRunRuntime({ ghostLibrarySaveThrottleMs: 0 });
+    const recorder = runtime.getGhostRecorder();
+
+    assert.equal(recorder.startRecording(0, 1000, {
+        routeId: 'route_reset',
+        color: 0xffffff,
+        modelScale: 1,
+        isBot: false,
+    }), true);
+    recorder.sample({
+        index: 0,
+        isBot: false,
+        alive: true,
+        position: { x: 0, y: 0, z: 0 },
+        quaternion: { x: 0, y: 0, z: 0, w: 1 },
+        color: 0xffffff,
+        modelScale: 1,
+    }, 1000);
+    recorder.sample({
+        index: 0,
+        isBot: false,
+        alive: true,
+        position: { x: 1, y: 0, z: 0 },
+        quaternion: { x: 0, y: 0, z: 0, w: 1 },
+        color: 0xffffff,
+        modelScale: 1,
+    }, 1050);
+
+    runtime.resetRunState({ preserveRecords: true });
+
+    assert.equal(recorder.isRecording, false);
+    assert.deepEqual(recorder.getDebugSnapshot(), {
+        routeId: '',
+        ownerIdx: null,
+        frameCount: 0,
+        sourceDuration: 0,
+        sampleIntervalMs: 50,
+        active: false,
+    });
 });
 
 test('Runtime debug snapshot exposes ghost library telemetry counters', () => {

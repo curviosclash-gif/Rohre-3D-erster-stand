@@ -19,6 +19,7 @@ export const SETTINGS_LIMITS = Object.freeze({
         itemAmount: Object.freeze({ min: 1, max: 20, integer: true }),
         fireRate: Object.freeze({ min: 0.1, max: 2 }),
         lockOnAngle: Object.freeze({ min: 5, max: 45, integer: true }),
+        nextCheckpointGlowIntensity: Object.freeze({ min: 0, max: 3 }),
         mgTrailAimRadius: MG_TRAIL_AIM_RADIUS_LIMITS,
         fightPlayerHp: Object.freeze({ min: 80, max: 250, integer: true }),
         fightMgDamage: FIGHT_MG_DAMAGE_LIMITS,

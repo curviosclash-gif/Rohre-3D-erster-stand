@@ -181,6 +181,8 @@ function sanitizeParcoursRules(raw) {
         wrongOrderCooldownMs: Math.max(0, Math.trunc(asFiniteNumber(source.wrongOrderCooldownMs, 650))),
         wrongOrderPenaltyMs: Math.max(0, Math.trunc(asFiniteNumber(source.wrongOrderPenaltyMs, 2000))),
         errorIndicatorMs: Math.max(0, Math.trunc(asFiniteNumber(source.errorIndicatorMs, 1400))),
+        animateCheckpoints: source.animateCheckpoints !== false,
+        showGhost: source.showGhost !== false,
     };
 }
 

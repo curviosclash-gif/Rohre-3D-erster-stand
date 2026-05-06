@@ -5,6 +5,7 @@ import {
     normalizeString,
     nowMs,
 } from './ParcoursProgressUtils.js';
+import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
 import { resetParcoursProgressState, rewindParcoursProgressState } from './ParcoursProgressStateOps.js';
 import {
     buildRouteSnapshot,
@@ -67,7 +68,11 @@ export class ParcoursProgressSystem {
     }
     startRound(players = []) {
         this._clearGhostRecording('round-start');
-        this._route = buildRouteFromParcours(this.entityManager?.arena?.currentMapDefinition?.parcours);
+        const entityRuntimeConfig = resolveEntityRuntimeConfig(this.entityManager);
+        const mapScale = Number(entityRuntimeConfig?.ARENA?.MAP_SCALE);
+        this._route = buildRouteFromParcours(this.entityManager?.arena?.currentMapDefinition?.parcours, {
+            positionScale: Number.isFinite(mapScale) && mapScale > 0 ? mapScale : 1,
+        });
         this._playerStates.clear();
         this._completionOrder.length = 0;
         if (!this._route) return;
@@ -144,6 +149,10 @@ export class ParcoursProgressSystem {
     _logRecorderEvent(type, player, details = '') {
         if (!player) return;
         this.entityManager?.recorder?.logEvent?.(type, player.index, details);
+    }
+    _playProgressAudio(type, player, options = {}) {
+        if (!type || !player || player.isBot === true) return;
+        this.entityManager?.audio?.play?.(type, options);
     }
     _setErrorState(state, message, now) {
         if (!this._route || !state) return;
@@ -251,6 +260,11 @@ export class ParcoursProgressSystem {
             player,
             `id=${entry.id} index=${entry.routeIndex + 1}/${this._route.totalCheckpoints}`
         );
+        this._playProgressAudio(
+            entry.isBranchOption === true ? 'PARCOURS_BRANCH' : 'PARCOURS_CP',
+            player,
+            { intensity: entry.isBranchOption === true ? 1.05 : 0.9 }
+        );
         const splitMs = state.startedAtMs > 0 ? Math.max(0, now - state.startedAtMs) : 0;
         state.segmentSplitsMs.push(splitMs);
         const checkpointIndex = state.segmentSplitsMs.length - 1;
@@ -354,6 +368,7 @@ export class ParcoursProgressSystem {
             player,
             `route=${this._route.routeId} timeMs=${Math.round(state.completionTimeMs)} penaltyMs=${penaltyTimeMs}`
         );
+        this._playProgressAudio('PARCOURS_FINISH', player, { intensity: 1.15 });
         const finishXpResult = this._xpEventCallback?.('finish', player.index);
         if (finishXpResult?.earned > 0) {
             this._notifyPlayer(player, `+${finishXpResult.earned} XP (Parcours)`);
@@ -465,11 +480,15 @@ export class ParcoursProgressSystem {
                 Math.max(0, Math.min(this._route.totalCheckpoints - 1, state.nextCheckpointIndex))
             ] || [])
             : [];
+        const passedCheckpointIds = state.stageCheckpointIds.filter((checkpointId) => (
+            typeof checkpointId === 'string' && checkpointId.trim().length > 0
+        ));
         return {
             routeId: this._route.routeId,
             totalCheckpoints: this._route.totalCheckpoints,
             nextCheckpointIndex: state.nextCheckpointIndex,
             passedMask: Array.from(state.passedMask),
+            passedCheckpointIds,
             expectedCheckpointIds: expectedEntries.map((entry) => entry.id),
             startedAtMs: state.startedAtMs,
             lastCheckpointAtMs: state.lastCheckpointAtMs,
@@ -501,6 +520,7 @@ export class ParcoursProgressSystem {
             completionTimeMs: snapshot.completionTimeMs,
             penaltyTimeMs: snapshot.penaltyTimeMs,
             segmentElapsedMs: snapshot.segmentElapsedMs,
+            passedCheckpointIds: [...snapshot.passedCheckpointIds],
             hasError: snapshot.hasError,
             errorMessage: snapshot.errorMessage,
             wrongOrderCount: snapshot.wrongOrderCount,

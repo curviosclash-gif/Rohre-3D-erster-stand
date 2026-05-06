@@ -438,6 +438,10 @@ export function setupArcadeMenuSurface(ctx = {}) {
     bind(refs.replayButton, 'click', () => {
         const result = runtimeAccess?.requestArcadeReplayPlayback?.();
         const code = String(result?.code || 'replay_unavailable');
+        if (code === 'ghost_fallback_started') {
+            showToast(runtimeAccess, t('menu.arcade.postrun.replay.toast.started', 'Ghost-Fallback wird abgespielt.'), 'info', 1300);
+            return;
+        }
         if (code === 'replay_player_unavailable') {
             showToast(runtimeAccess, t('menu.arcade.postrun.replay.toast.ready', 'Replay-Fallback bereit.'), 'warning', 1300);
             return;

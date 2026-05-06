@@ -43,3 +43,11 @@ test('MapSchema runtime preserves explicit bidirectional checkpoint override', (
     assert.equal(runtime?.map?.parcours?.rules?.bidirectionalCheckpoints, false);
 });
 
+test('MapSchema runtime preserves custom parcours ghost and animation flags', () => {
+    const runtime = toArenaMapDefinition(
+        createMapDocument({ showGhost: false, animateCheckpoints: false }),
+        { mapScale: 1, name: 'Schema Route' }
+    );
+    assert.equal(runtime?.map?.parcours?.rules?.showGhost, false);
+    assert.equal(runtime?.map?.parcours?.rules?.animateCheckpoints, false);
+});

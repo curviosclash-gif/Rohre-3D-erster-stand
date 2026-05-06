@@ -1320,9 +1320,19 @@ export class ArcadeRunRuntime {
         }
 
         if (type === 'ghost_start') {
-            if (routeCandidates.length === 0) return null;
+            if (routeCandidates.length === 0) {
+                return {
+                    started: false,
+                    reason: 'invalid_route',
+                    routeCandidates,
+                };
+            }
             if (!isArcadeGhostDuelPlaybackEnabled(this._config?.ghostDuelMode)) {
-                return null;
+                return {
+                    started: false,
+                    reason: 'ghost_mode_disabled',
+                    routeCandidates,
+                };
             }
             let clipToPlay = null;
             let selectedRouteId = '';
@@ -1334,8 +1344,15 @@ export class ArcadeRunRuntime {
                 );
                 if (!longestGhost?.longestGhostClip) continue;
                 clipToPlay = longestGhost.longestGhostClip;
-                selectedRouteId = routeCandidates[i];
+                selectedRouteId = String(longestGhost.routeId || routeCandidates[i] || '').trim();
                 break;
+            }
+            if (!clipToPlay) {
+                return {
+                    started: false,
+                    reason: 'ghost_not_found',
+                    routeCandidates,
+                };
             }
             const source = String(data?.source || '').trim().toLowerCase();
             if (
@@ -1343,17 +1360,38 @@ export class ArcadeRunRuntime {
                 && selectedRouteId
                 && selectedRouteId === this._lastGhostPlaybackRouteId
             ) {
-                return null;
+                return {
+                    started: false,
+                    reason: 'duplicate_checkpoint_start',
+                    routeId: selectedRouteId,
+                    routeCandidates,
+                };
             }
-            if (clipToPlay && this._onGhostPlayback) {
+            if (this._onGhostPlayback) {
                 try {
                     this._onGhostPlayback(clipToPlay);
                     this._lastGhostPlaybackRouteId = selectedRouteId;
+                    return {
+                        started: true,
+                        reason: 'ok',
+                        routeId: selectedRouteId,
+                        routeCandidates,
+                    };
                 } catch {
-                    /* no-op */
+                    return {
+                        started: false,
+                        reason: 'playback_handler_error',
+                        routeId: selectedRouteId,
+                        routeCandidates,
+                    };
                 }
             }
-            return null;
+            return {
+                started: false,
+                reason: 'playback_handler_missing',
+                routeId: selectedRouteId,
+                routeCandidates,
+            };
         }
 
         if (type === 'wrong_order') {
@@ -1552,6 +1590,7 @@ export class ArcadeRunRuntime {
     resetRunState(options = {}) {
         const preserveRecords = options?.preserveRecords === true;
         this._flushPendingGhostLibrarySave();
+        this._ghostRecorder?.reset?.();
         const replayRecorder = this.replayRecorder;
         if (replayRecorder?.isRecording && typeof replayRecorder.stopRecording === 'function') {
             try {

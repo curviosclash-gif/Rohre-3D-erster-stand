@@ -74,6 +74,8 @@ function mapParcoursToRuntime(parcours, invScale) {
             wrongOrderCooldownMs: Math.max(0, Math.trunc(Number(parcours.rules?.wrongOrderCooldownMs) || 650)),
             wrongOrderPenaltyMs: Math.max(0, Math.trunc(Number(parcours.rules?.wrongOrderPenaltyMs) || 2000)),
             errorIndicatorMs: Math.max(0, Math.trunc(Number(parcours.rules?.errorIndicatorMs) || 1400)),
+            animateCheckpoints: parcours.rules?.animateCheckpoints !== false,
+            showGhost: parcours.rules?.showGhost !== false,
         },
         finish,
     };

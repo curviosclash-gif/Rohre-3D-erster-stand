@@ -147,8 +147,9 @@ test('ArcadeGhostLibrary bootstraps from leaderboard best ghost clips per route'
     const leaderboard = {
         route_alpha: [
             {
-                totalTimeMs: 5400,
-                ghostClip: createGhostClip(5.4),
+                totalTimeMs: 6200,
+                penaltyTimeMs: 2000,
+                ghostClip: createGhostClip(4.2),
                 date: '2026-05-01T10:00:00.000Z',
             },
         ],
@@ -163,14 +164,14 @@ test('ArcadeGhostLibrary bootstraps from leaderboard best ghost clips per route'
 
     const result = bootstrapGhostLibraryFromLeaderboard({}, leaderboard);
     assert.equal(result.changed, true);
-    assert.equal(result.ghostLibrary.route_alpha.durationMs, 5400);
+    assert.equal(result.ghostLibrary.route_alpha.durationMs, 4200);
     assert.equal(result.ghostLibrary.route_beta, undefined);
 
     const noOverwrite = bootstrapGhostLibraryFromLeaderboard(result.ghostLibrary, {
         route_alpha: [{ totalTimeMs: 9000, ghostClip: createGhostClip(9) }],
     });
     assert.equal(noOverwrite.changed, false);
-    assert.equal(noOverwrite.ghostLibrary.route_alpha.durationMs, 5400);
+    assert.equal(noOverwrite.ghostLibrary.route_alpha.durationMs, 4200);
 });
 
 test('ArcadeGhostLibrary load/save normalizes persisted records', () => {

@@ -20,6 +20,27 @@ import {
 } from '../PortalPlacementOps.js';
 import { resolveEntityRuntimeConfig } from '../../../shared/contracts/EntityRuntimeConfig.js';
 
+function disposeMeshTreeResources(root) {
+    if (!root || typeof root.traverse !== 'function') return;
+    const seenGeometries = new Set();
+    const seenMaterials = new Set();
+    root.traverse((node) => {
+        const geometry = node?.geometry;
+        if (geometry && !geometry?.userData?.__sharedNoDispose && typeof geometry.dispose === 'function' && !seenGeometries.has(geometry)) {
+            seenGeometries.add(geometry);
+            geometry.dispose();
+        }
+        const material = node?.material;
+        if (!material) return;
+        const materialList = Array.isArray(material) ? material : [material];
+        for (const entry of materialList) {
+            if (!entry || entry?.userData?.__sharedNoDispose || seenMaterials.has(entry) || typeof entry.dispose !== 'function') continue;
+            seenMaterials.add(entry);
+            entry.dispose();
+        }
+    });
+}
+
 function asFiniteNumber(value, defaultValue = 0) {
     const num = Number(value);
     return Number.isFinite(num) ? num : defaultValue;
@@ -40,6 +61,7 @@ export class PortalLayoutBuilder {
     }
 
     build(map, scale) {
+        this._resetExistingPortalGateVisuals();
         this._mapDefinition = map || null;
         this._visualRegistry = createPortalGateVisualRegistry(this.arena.renderer);
         this._checkpointRingSpinEnabled = true;
@@ -47,6 +69,36 @@ export class PortalLayoutBuilder {
         this._buildSpecialGates(map, scale);
         this._buildExitPortals(map, scale);
         this._buildCheckpointRings(map, scale);
+    }
+
+    _resetExistingPortalGateVisuals() {
+        this._disposeVisualRegistry();
+        this._disposeCheckpointMeshes();
+        this.arena.portals = [];
+        this.arena.specialGates = [];
+        this.arena.exitPortals = [];
+        this.arena.checkpointRings = [];
+    }
+
+    _disposeVisualRegistry() {
+        if (!this._visualRegistry || typeof this._visualRegistry.dispose !== 'function') {
+            this._visualRegistry = null;
+            return;
+        }
+        this._visualRegistry.dispose();
+        this._visualRegistry = null;
+    }
+
+    _disposeCheckpointMeshes() {
+        const checkpointRings = Array.isArray(this.arena.checkpointRings)
+            ? this.arena.checkpointRings
+            : [];
+        for (const checkpointRing of checkpointRings) {
+            const mesh = checkpointRing?.mesh;
+            if (!mesh) continue;
+            this.arena.renderer?.removeFromScene?.(mesh);
+            disposeMeshTreeResources(mesh);
+        }
     }
 
     get checkpointRingSpinEnabled() {

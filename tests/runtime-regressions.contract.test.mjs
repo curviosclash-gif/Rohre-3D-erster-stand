@@ -25,6 +25,10 @@ import { MatchKernel } from '../src/state/MatchKernel.js';
 import { MATCH_KERNEL_CONSUMER_IDS, createMatchKernelConsumerRegistry } from '../src/state/MatchKernelConsumerAdapters.js';
 import { MatchFlowLifecycleController } from '../src/ui/MatchFlowLifecycleController.js';
 import { MatchFlowTelemetryController } from '../src/ui/MatchFlowTelemetryController.js';
+import { requestArcadeReplayPlayback } from '../src/ui/MatchFlowTransitionHotspots.js';
+import { SETTINGS_CHANGE_KEYS } from '../src/ui/SettingsChangeKeys.js';
+import { UIManager } from '../src/ui/UIManager.js';
+import { UIStartSyncController } from '../src/ui/UIStartSyncController.js';
 import { resolveDeveloperReleaseState, resolveMenuUiSyncContext } from '../src/ui/menu/MenuUiSyncContext.js';
 
 function withMockRuntimeGlobals(run, options = {}) {
@@ -65,6 +69,7 @@ function withMockRuntimeGlobals(run, options = {}) {
             }
         });
 }
+
 test('MatchFlow UI controller port forwards runtime projections when provided', () => {
     const runtimeSnapshot = { tickIndex: 12 };
     const runtimeProjection = { lifecycle: 'running' };
@@ -221,6 +226,53 @@ test('MatchFlowLifecycleController delegates returnToMenu to the injected runtim
 
     assert.equal(result, 'runtime-port-return');
     assert.deepEqual(calls, [{ reason: 'contract-test' }]);
+});
+
+test('requestArcadeReplayPlayback falls back to current-route ghost playback when replay player is unavailable', () => {
+    const calls = [];
+    const game = {
+        arena: {
+            currentMapDefinition: {
+                parcours: {
+                    routeId: 'route_sigma',
+                },
+            },
+            currentMapKey: 'trench',
+        },
+        settings: {
+            mapKey: 'trench',
+        },
+        runtimeConfig: {
+            session: {
+                mapKey: 'trench',
+            },
+        },
+    };
+    const runtimePort = {
+        requestArcadeReplayPlayback() {
+            calls.push(['replay']);
+            return { ok: false, code: 'replay_player_unavailable' };
+        },
+        applyArcadeParcoursEvent(payload) {
+            calls.push(['ghost', payload]);
+            return { started: true, routeId: 'route_sigma' };
+        },
+    };
+
+    const result = requestArcadeReplayPlayback(runtimePort, game);
+
+    assert.equal(result?.ok, true);
+    assert.equal(result?.code, 'ghost_fallback_started');
+    assert.equal(result?.routeId, 'route_sigma');
+    assert.deepEqual(calls, [
+        ['replay'],
+        ['ghost', {
+            type: 'ghost_start',
+            routeId: 'route_sigma',
+            routeAliases: ['route_sigma', 'trench'],
+            source: 'menu_replay_fallback',
+        }],
+    ]);
 });
 
 test('MatchFlowLifecycleController startRound requests ghost playback by active route/map key', () => {
@@ -504,9 +556,6 @@ test('session runtime snapshot resolves session contract without legacy runtimeF
                 multiplayerTransport: 'lan',
             },
         },
-        session: {
-            isHost: false,
-        },
         runtimeBundle: {
             sessionRuntime: {
                 session: {
@@ -524,11 +573,16 @@ test('session runtime snapshot resolves session contract without legacy runtimeF
                     errorMessage: null,
                     updatedAt,
                 },
-            },
-        },
-        runtimeFacade: {
-            isNetworkSession() {
-                throw new Error('legacy runtimeFacade should not be read');
+                handles: {
+                    runtimeFacade: {
+                        session: {
+                            isHost: false,
+                        },
+                        isNetworkSession() {
+                            throw new Error('legacy runtimeFacade should not be read');
+                        },
+                    },
+                },
             },
         },
     };
@@ -874,6 +928,267 @@ test('Menu UI sync context resolves access, release, and surface state via one s
     assert.equal(menuUiContext.accessContext?.isOwner, true);
     assert.equal(menuUiContext.releaseState?.featureEnabled, false);
     assert.equal(menuUiContext.releaseState?.releaseCutEnabled, true);
+});
+
+test('UIManager syncByChangeKeys coalesces Start-Setup sync into one snapshot per change cycle (100.5.1)', () => {
+    const syncCalls = [];
+    const settings = {
+        mapKey: 'standard',
+        vehicles: {
+            PLAYER_1: 'ship5',
+            PLAYER_2: 'ship6',
+        },
+        localSettings: {
+            sessionType: 'single',
+            modePath: 'normal',
+            startSetup: {},
+        },
+    };
+    const manager = Object.create(UIManager.prototype);
+    manager.settings = settings;
+    manager.ui = {};
+    manager._activeSyncCycle = null;
+    manager._readMenuMultiplayerSessionState = () => ({ joined: false, connected: false });
+    manager._resolveMenuUiContext = () => ({
+        surfacePolicy: { productSurfaceId: 'desktop-app' },
+        surfaceMenuState: {
+            sessionType: 'single',
+            modePath: 'normal',
+            mapKey: 'standard',
+        },
+    });
+    manager._startSync = {
+        syncStartSetupState(_settings, snapshot = null) {
+            syncCalls.push(snapshot);
+        },
+    };
+    manager.syncAll = () => {
+        throw new Error('syncAll fallback should not execute for known keys');
+    };
+    manager.syncModes = () => {};
+    manager.syncMultiplayerState = () => {};
+    manager.syncSessionState = function syncSessionStateStub(nextSettings = this.settings) {
+        this._syncStartSetupSnapshot(nextSettings, { menuUiContext: this._resolveMenuUiContext(nextSettings) });
+    };
+    manager.syncMap = function syncMapStub(nextSettings = this.settings) {
+        this._syncStartSetupSnapshot(nextSettings);
+    };
+    manager.syncVehicles = function syncVehiclesStub(nextSettings = this.settings) {
+        this._syncStartSetupSnapshot(nextSettings);
+    };
+
+    UIManager.prototype.syncByChangeKeys.call(manager, [
+        SETTINGS_CHANGE_KEYS.SESSION_TYPE,
+        SETTINGS_CHANGE_KEYS.MAP_KEY,
+        SETTINGS_CHANGE_KEYS.VEHICLES_PLAYER_1,
+    ]);
+
+    assert.equal(syncCalls.length, 1);
+    assert.equal(syncCalls[0]?.settings, settings);
+    assert.equal(syncCalls[0]?.surfaceMenuState?.modePath, 'normal');
+});
+
+test('UIManager syncStartSetupState forced call still emits a snapshot contract (100.5.1)', () => {
+    const syncCalls = [];
+    const settings = {
+        mapKey: 'standard',
+        vehicles: { PLAYER_1: 'ship5', PLAYER_2: 'ship6' },
+        localSettings: { sessionType: 'single', modePath: 'normal', startSetup: {} },
+    };
+    const manager = Object.create(UIManager.prototype);
+    manager.settings = settings;
+    manager.ui = {};
+    manager._activeSyncCycle = null;
+    manager._readMenuMultiplayerSessionState = () => ({ joined: false });
+    manager._resolveMenuUiContext = () => ({
+        surfacePolicy: { productSurfaceId: 'desktop-app' },
+        surfaceMenuState: { sessionType: 'single', modePath: 'normal', mapKey: 'standard' },
+    });
+    manager._startSync = {
+        syncStartSetupState(_settings, snapshot = null) {
+            syncCalls.push(snapshot);
+        },
+    };
+
+    UIManager.prototype.syncStartSetupState.call(manager, settings);
+
+    assert.equal(syncCalls.length, 1);
+    assert.equal(syncCalls[0]?.surfacePolicy?.productSurfaceId, 'desktop-app');
+    assert.equal(syncCalls[0]?.surfaceMenuState?.sessionType, 'single');
+});
+
+test('UIStartSyncController keeps the mode-specific map selection ahead of stale settings.mapKey during mode sync', () => {
+    class FakeOption {
+        constructor() {
+            this.value = '';
+            this.textContent = '';
+        }
+    }
+
+    class FakeSelect {
+        constructor() {
+            this._options = [];
+            this._value = '';
+        }
+
+        get options() {
+            return this._options;
+        }
+
+        appendChild(option) {
+            this._options.push(option);
+            if (!this._value) {
+                this._value = option.value;
+            }
+            return option;
+        }
+
+        set innerHTML(_value) {
+            this._options = [];
+            this._value = '';
+        }
+
+        get innerHTML() {
+            return '';
+        }
+
+        set value(nextValue) {
+            this._value = String(nextValue || '');
+        }
+
+        get value() {
+            return this._value;
+        }
+    }
+
+    const originalDocument = globalThis.document;
+    const originalHtmlSelectElement = globalThis.HTMLSelectElement;
+    globalThis.document = {
+        createElement(tagName) {
+            if (String(tagName).toLowerCase() === 'option') {
+                return new FakeOption();
+            }
+            throw new Error(`unexpected tag: ${tagName}`);
+        },
+    };
+    globalThis.HTMLSelectElement = FakeSelect;
+
+    try {
+        const settings = {
+            mapKey: 'arcade-map',
+            vehicles: {
+                PLAYER_1: 'ship5',
+                PLAYER_2: 'ship6',
+            },
+            localSettings: {
+                sessionType: 'single',
+                modePath: 'fight',
+                multiplayerTransport: 'lan',
+                startSetup: {
+                    mapSearch: '',
+                    mapFilter: 'all',
+                    vehicleSearch: '',
+                    vehicleFilter: 'all',
+                    favoriteMaps: [],
+                    recentMaps: [],
+                    favoriteVehicles: [],
+                    recentVehicles: [],
+                    arcadeGhostDuelMode: 'off',
+                    modeSelections: {
+                        arcade: {
+                            mapKey: 'arcade-map',
+                            vehicles: {
+                                PLAYER_1: 'ship5',
+                                PLAYER_2: 'ship6',
+                            },
+                        },
+                        fight: {
+                            mapKey: 'fight-map',
+                            vehicles: {
+                                PLAYER_1: 'ship5',
+                                PLAYER_2: 'ship6',
+                            },
+                        },
+                    },
+                },
+                toolsState: {
+                    level4Open: false,
+                },
+            },
+        };
+        const mapSelect = new FakeSelect();
+        const controller = new UIStartSyncController({
+            ui: {
+                mapSelect,
+            },
+            manager: {
+                settings,
+                setLevel4Open() {},
+                _disposeDisposerList() {},
+                _listen() {},
+                _setStartSectionOpen() {},
+                resolveSurfacePolicy() {
+                    return { productSurfaceId: 'desktop-app' };
+                },
+            },
+            port: {
+                getSettings() {
+                    return settings;
+                },
+                getMultiplayerSessionState() {
+                    return {
+                        joined: false,
+                        connected: false,
+                        readyCount: 0,
+                        memberCount: 0,
+                    };
+                },
+                resolveSurfacePolicy() {
+                    return { productSurfaceId: 'desktop-app' };
+                },
+            },
+        });
+        controller._getRuntimeMaps = () => ({
+            'arcade-map': { name: 'Arcade Map', size: [80, 30, 80] },
+            'fight-map': { name: 'Fight Map', size: [80, 30, 80] },
+        });
+        controller._mapPreviewEntries = [
+            { key: 'arcade-map', name: 'Arcade Map', category: 'medium' },
+            { key: 'fight-map', name: 'Fight Map', category: 'medium' },
+        ];
+        controller._renderStartFieldHints = () => {};
+
+        controller.syncStartSetupState(settings, {
+            surfacePolicy: { productSurfaceId: 'desktop-app' },
+            surfaceMenuState: {
+                sessionType: 'single',
+                modePath: 'fight',
+                mapKey: 'arcade-map',
+            },
+            multiplayerSessionState: {
+                joined: false,
+                connected: false,
+                readyCount: 0,
+                memberCount: 0,
+            },
+        });
+
+        assert.equal(mapSelect.value, 'fight-map');
+        assert.equal(settings.mapKey, 'fight-map');
+        assert.equal(settings.localSettings.startSetup.modeSelections.fight.mapKey, 'fight-map');
+        assert.equal(settings.localSettings.startSetup.modeSelections.arcade.mapKey, 'arcade-map');
+    } finally {
+        if (typeof originalDocument === 'undefined') {
+            delete globalThis.document;
+        } else {
+            globalThis.document = originalDocument;
+        }
+        if (typeof originalHtmlSelectElement === 'undefined') {
+            delete globalThis.HTMLSelectElement;
+        } else {
+            globalThis.HTMLSelectElement = originalHtmlSelectElement;
+        }
+    }
 });
 
 test('Developer release state helper keeps release-cut contract stable (91.3.4)', () => {

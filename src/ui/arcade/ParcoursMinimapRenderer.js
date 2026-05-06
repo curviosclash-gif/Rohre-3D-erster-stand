@@ -31,7 +31,7 @@ export class ParcoursMinimapRenderer {
         if (this._canvas) this._canvas.style.display = 'none';
     }
 
-    update(routeSnapshot, nextCheckpointIndex, playerPos, playerQuat) {
+    update(routeSnapshot, nextCheckpointIndex, passedCheckpointIds = [], playerPos, playerQuat) {
         if (!routeSnapshot?.enabled) {
             this._hide();
             return;
@@ -103,6 +103,11 @@ export class ParcoursMinimapRenderer {
         ctx.fill();
 
         const nextIdx = Math.max(0, nextCheckpointIndex || 0);
+        const passedCheckpointIdSet = new Set(
+            Array.isArray(passedCheckpointIds)
+                ? passedCheckpointIds.map((checkpointId) => String(checkpointId || '').trim()).filter(Boolean)
+                : []
+        );
 
         // Connection lines between checkpoints
         for (const cp of routeSnapshot.checkpoints) {
@@ -137,7 +142,7 @@ export class ParcoursMinimapRenderer {
         // Checkpoint dots
         for (const cp of routeSnapshot.checkpoints) {
             const [cx, cz] = toCanvas(cp.pos[0], cp.pos[2]);
-            const isPassed = cp.routeIndex < nextIdx;
+            const isPassed = passedCheckpointIdSet.has(cp.id);
             const isNext = cp.routeIndex === nextIdx;
             const isBranch = cp.isBranchOption === true;
 

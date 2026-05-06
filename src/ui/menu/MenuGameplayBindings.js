@@ -361,6 +361,17 @@ export function setupMenuGameplayBindings(ctx) {
         queueInputSettingsChanged([keys.GAMEPLAY_LOCK_ON_ANGLE]);
     });
 
+    if (ui.nextCheckpointGlowSlider) {
+        bind(ui.nextCheckpointGlowSlider, 'input', () => {
+            settings.gameplay.nextCheckpointGlowIntensity = clamp(
+                parseFloat(ui.nextCheckpointGlowSlider.value),
+                gameplayLimits.nextCheckpointGlowIntensity.min,
+                gameplayLimits.nextCheckpointGlowIntensity.max
+            );
+            queueInputSettingsChanged([keys.GAMEPLAY_NEXT_CHECKPOINT_GLOW_INTENSITY]);
+        });
+    }
+
     if (ui.mgTrailAimSlider) {
         bind(ui.mgTrailAimSlider, 'input', () => {
             settings.gameplay.mgTrailAimRadius = clamp(

@@ -123,6 +123,11 @@ function applyGameplaySanitization({ merged, src, defaults, runtimeLimits }) {
         runtimeLimits.gameplay.lockOnAngle,
         defaults.gameplay.lockOnAngle
     );
+    merged.gameplay.nextCheckpointGlowIntensity = clampSettingValue(
+        src?.gameplay?.nextCheckpointGlowIntensity ?? defaults.gameplay.nextCheckpointGlowIntensity,
+        runtimeLimits.gameplay.nextCheckpointGlowIntensity,
+        defaults.gameplay.nextCheckpointGlowIntensity
+    );
     merged.gameplay.mgTrailAimRadius = clampSettingValue(
         src?.gameplay?.mgTrailAimRadius ?? defaults.gameplay.mgTrailAimRadius,
         runtimeLimits.gameplay.mgTrailAimRadius,

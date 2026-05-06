@@ -944,6 +944,122 @@ test.describe('T1-20: Core & Infrastruktur - Shell & Setup', () => {
         expect(probe.telemetryRecentRound?.parcoursRouteId).toBe('rift_gauntlet_v1');
     });
 
+    test('T14h: Parcours-CP01 und Finish feuern eigene Audio-Debug-Events', async ({ page }) => {
+        await loadGame(page);
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="arcade"]');
+        await page.waitForFunction(() => String(window.GAME_INSTANCE?.settings?.localSettings?.modePath || '') === 'arcade', null, { timeout: 5000 });
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await page.selectOption('#map-select', 'parcours_rift');
+        await page.waitForFunction(() => window.GAME_INSTANCE?.settings?.mapKey === 'parcours_rift', null, { timeout: 5000 });
+        await page.click('#btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            return !!(hud && !hud.classList.contains('hidden'));
+        }, null, { timeout: 20000 });
+
+        const probe = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const system = entityManager?._parcoursProgressSystem;
+            const route = system?.getRouteSnapshot?.();
+            const player = entityManager?.players?.find((entry) => !entry?.isBot) || entityManager?.players?.[0] || null;
+            if (!route || !player) return { error: 'missing-route-or-player' };
+            if (
+                typeof game?.audio?.clearDebugEvents !== 'function'
+                || typeof game?.audio?.getRecentEvents !== 'function'
+            ) {
+                return { error: 'missing-audio-debug-hooks' };
+            }
+
+            game.audio.enabled = true;
+            game.audio.ctx = game.audio.ctx || {
+                state: 'running',
+                destination: {},
+                resume() {},
+                close() { return Promise.resolve(); },
+            };
+            game.audio._playParcoursCheckpoint = () => {};
+            game.audio._playParcoursBranch = () => {};
+            game.audio._playParcoursFinish = () => {};
+
+            const setPlayerPosition = (x, y, z) => {
+                if (player.position?.set) {
+                    player.position.set(x, y, z);
+                    return;
+                }
+                player.position.x = x;
+                player.position.y = y;
+                player.position.z = z;
+            };
+
+            const cross = (entry, nowMs) => {
+                const pos = Array.isArray(entry?.pos) ? entry.pos : [0, 0, 0];
+                const forward = Array.isArray(entry?.forward) ? entry.forward : [1, 0, 0];
+                const previousPosition = {
+                    x: pos[0] - (forward[0] * 0.65),
+                    y: pos[1] - (forward[1] * 0.65),
+                    z: pos[2] - (forward[2] * 0.65),
+                };
+                setPlayerPosition(
+                    pos[0] + (forward[0] * 0.35),
+                    pos[1] + (forward[1] * 0.35),
+                    pos[2] + (forward[2] * 0.35)
+                );
+                return system.updatePlayerProgress(player, previousPosition, nowMs);
+            };
+
+            const cp01 = route.checkpoints.find((entry) => entry.routeIndex === 0);
+            if (!cp01) return { error: 'missing-cp01' };
+
+            let nowMs = 800;
+            game.audio.clearDebugEvents();
+            const cp01Hit = cross(cp01, nowMs);
+            const afterCp01 = system.getPlayerProgressSnapshot(player.index, nowMs);
+            const cp01Audio = game.audio.getRecentEvents(6).map((entry) => entry.type);
+
+            game.audio.clearDebugEvents();
+            for (let checkpointIndex = 1; checkpointIndex < route.totalCheckpoints; checkpointIndex += 1) {
+                nowMs += 450;
+                const entry = route.checkpoints.find((candidate) => candidate.routeIndex === checkpointIndex);
+                if (!entry) return { error: `missing-checkpoint-${checkpointIndex}` };
+                cross(entry, nowMs);
+            }
+            nowMs += 500;
+            const finishHit = cross(route.finish, nowMs);
+            const afterFinish = system.getPlayerProgressSnapshot(player.index, nowMs);
+            const finishAudio = game.audio.getRecentEvents(6).map((entry) => entry.type);
+
+            return {
+                error: '',
+                cp01Hit: cp01Hit?.type || '',
+                cp01Audio,
+                afterCp01: {
+                    nextCheckpointIndex: afterCp01?.nextCheckpointIndex ?? -1,
+                    startedAtMs: afterCp01?.startedAtMs ?? 0,
+                    passedCheckpointIds: afterCp01?.passedCheckpointIds || [],
+                },
+                finishHit: finishHit?.type || '',
+                finishAudio,
+                afterFinish: {
+                    completed: afterFinish?.completed === true,
+                    completionTimeMs: afterFinish?.completionTimeMs ?? 0,
+                },
+            };
+        });
+
+        expect(probe.error || '').toBe('');
+        expect(probe.cp01Hit).toBe('checkpoint');
+        expect(probe.cp01Audio).toContain('PARCOURS_CP');
+        expect(probe.afterCp01.nextCheckpointIndex).toBe(1);
+        expect(probe.afterCp01.startedAtMs).toBeGreaterThan(0);
+        expect(probe.afterCp01.passedCheckpointIds).toEqual(['CP01']);
+        expect(probe.finishHit).toBe('finish');
+        expect(probe.finishAudio).toContain('PARCOURS_FINISH');
+        expect(probe.afterFinish.completed).toBeTruthy();
+        expect(probe.afterFinish.completionTimeMs).toBeGreaterThan(0);
+    });
+
     test('T14g: Editor-Import/Export behaelt Parcours-Definitionen im Roundtrip', async () => {
         const manager = createMockEditorManager();
         const sourceDocument = {

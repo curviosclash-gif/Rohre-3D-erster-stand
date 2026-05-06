@@ -26,6 +26,34 @@ function getLegacyRoundRecorder(game) {
     return game?.recorder || null;
 }
 
+function resolveGhostRouteContext(game) {
+    const explicitRouteId = String(game?.arena?.currentMapDefinition?.parcours?.routeId || '').trim();
+    const runtimeRouteId = String(game?.arena?.runtimeMapDefinition?.parcours?.routeId || '').trim();
+    const fallbackMapKeys = [
+        game?.arena?.currentMapKey,
+        game?.runtimeConfig?.session?.mapKey,
+        game?.settings?.mapKey,
+        game?.mapKey,
+    ];
+    const routeAliases = [];
+    const seen = new Set();
+    const pushCandidate = (value) => {
+        const candidate = String(value || '').trim();
+        if (!candidate || seen.has(candidate)) return;
+        seen.add(candidate);
+        routeAliases.push(candidate);
+    };
+    pushCandidate(explicitRouteId);
+    pushCandidate(runtimeRouteId);
+    for (let i = 0; i < fallbackMapKeys.length; i += 1) {
+        pushCandidate(fallbackMapKeys[i]);
+    }
+    return {
+        routeId: routeAliases[0] || '',
+        routeAliases,
+    };
+}
+
 function resolveTransitionSessionSnapshot(game) {
     const runtimeProjectionPort = getTransitionRuntimeProjectionPort(game);
     const snapshot = runtimeProjectionPort?.getSessionRuntimeSnapshot?.();
@@ -143,8 +171,44 @@ export function selectArcadeReward(runtimePort, game, rewardId) {
 }
 
 export function requestArcadeReplayPlayback(runtimePort, game) {
-    return runtimePort?.requestArcadeReplayPlayback?.()
+    const replayResult = runtimePort?.requestArcadeReplayPlayback?.()
         ?? createTransitionArcadeAdapter(game).requestReplayPlayback();
+    const replayCode = String(replayResult?.code || '').trim();
+    if (
+        replayResult?.ok === true
+        || (replayCode !== 'replay_player_unavailable' && replayCode !== 'replay_unavailable')
+    ) {
+        return replayResult;
+    }
+    if (typeof runtimePort?.applyArcadeParcoursEvent !== 'function') {
+        return replayResult;
+    }
+    const routeContext = resolveGhostRouteContext(game);
+    if (!routeContext.routeId) {
+        return replayResult;
+    }
+    const ghostResult = runtimePort.applyArcadeParcoursEvent({
+        type: 'ghost_start',
+        routeId: routeContext.routeId,
+        routeAliases: routeContext.routeAliases,
+        source: 'menu_replay_fallback',
+    });
+    if (ghostResult?.started === true) {
+        return {
+            ok: true,
+            code: 'ghost_fallback_started',
+            replayResult,
+            ghostResult,
+            routeId: String(ghostResult.routeId || routeContext.routeId || ''),
+        };
+    }
+    return {
+        ...(replayResult && typeof replayResult === 'object' ? replayResult : {}),
+        ok: false,
+        code: String(ghostResult?.reason || replayCode || 'replay_unavailable'),
+        replayResult,
+        ghostResult,
+    };
 }
 
 export function getLastRoundRecordingMetrics(runtimePort, game, roundEndPlan) {

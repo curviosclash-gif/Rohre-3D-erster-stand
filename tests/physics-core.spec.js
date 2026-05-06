@@ -179,8 +179,12 @@ test.describe('Physics Core (Tests 41-60)', () => {
             slider.value = '3';
             slider.dispatchEvent(new Event('input', { bubbles: true }));
             const game = window.GAME_INSTANCE;
-            game.settings.mapKey = 'custom';
-            game.runtimeFacade?.onSettingsChanged?.({ changedKeys: ['mapKey'] });
+            const mapSelect = game?.ui?.mapSelect;
+            if (!mapSelect) {
+                throw new Error('mapSelect missing');
+            }
+            mapSelect.value = 'custom';
+            mapSelect.dispatchEvent(new Event('change', { bubbles: true }));
         }, {
             storageKey: CUSTOM_MAP_STORAGE_KEY,
             runtimeMapJson: mapJson,
@@ -811,9 +815,20 @@ test.describe('Physics Core (Tests 41-60)', () => {
 
         harness.nowRef.value = 300;
         const wrongOrderSpam = crossCheckpoint(harness.system, harness.player, cp02, harness.nowRef.value);
-        expect(wrongOrderSpam?.type).toBe('wrong-order');
+        expect(wrongOrderSpam || null).toBeNull();
         snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
         expect(snapshot?.wrongOrderCount).toBe(1);
+
+        const cp02Pos = Array.isArray(cp02?.pos) ? cp02.pos : [10, 0, 0];
+        harness.player.position.x = cp02Pos[0] + 100;
+        harness.player.position.y = cp02Pos[1];
+        harness.player.position.z = cp02Pos[2];
+        harness.nowRef.value = 600;
+        harness.system.updatePlayerProgress(
+            harness.player,
+            { x: cp02Pos[0] + 99, y: cp02Pos[1], z: cp02Pos[2] },
+            harness.nowRef.value
+        );
 
         harness.nowRef.value = 1800;
         const cp01Hit = crossCheckpoint(harness.system, harness.player, cp01, harness.nowRef.value);
@@ -966,6 +981,10 @@ test.describe('Physics Core (Tests 41-60)', () => {
         snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
         expect(snapshot?.nextCheckpointIndex).toBe(3);
         expect(snapshot?.expectedCheckpointIds).toEqual(['CP04']);
+        expect(snapshot?.passedCheckpointIds).toEqual(['CP01', 'CP02', 'CP03_BOOST']);
+
+        const hudState = harness.system.getPlayerHudState(harness.player.index, harness.nowRef.value);
+        expect(hudState?.passedCheckpointIds).toEqual(['CP01', 'CP02', 'CP03_BOOST']);
 
         harness.nowRef.value = 650;
         expect(crossCheckpoint(harness.system, harness.player, branchTunnel, harness.nowRef.value)?.type).toBe('wrong-order');

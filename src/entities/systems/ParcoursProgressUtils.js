@@ -32,6 +32,15 @@ export function normalizeForward(raw) {
     return [vec[0] * invLength, vec[1] * invLength, vec[2] * invLength];
 }
 
+function scaleVec3(vec, scale = 1) {
+    const normalizedScale = toPositiveNumber(scale, 1, 0.0001);
+    return [
+        vec[0] * normalizedScale,
+        vec[1] * normalizedScale,
+        vec[2] * normalizedScale,
+    ];
+}
+
 export function nowMs() {
     if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
         return performance.now();
@@ -191,10 +200,11 @@ function buildCanonicalRouteStages(canonicalIds, nextCanonicalIdsById) {
     };
 }
 
-export function buildRouteFromParcours(parcoursRaw) {
+export function buildRouteFromParcours(parcoursRaw, options = {}) {
     if (!isObject(parcoursRaw) || parcoursRaw.enabled !== true) {
         return null;
     }
+    const positionScale = toPositiveNumber(options?.positionScale, 1, 0.0001);
 
     const rawRules = isObject(parcoursRaw.rules) ? parcoursRaw.rules : {};
     const rules = {
@@ -330,8 +340,8 @@ export function buildRouteFromParcours(parcoursRaw) {
             isBranchOption: !!branchMeta,
             branchParentId: branchMeta?.branchParentId || null,
             mergeCheckpointId: branchMeta?.mergeCheckpointId || null,
-            pos: normalizeVec3(rawEntry.pos, [0, 0, 0]),
-            radius: toPositiveNumber(rawEntry.radius, 3.5, 0.1),
+            pos: scaleVec3(normalizeVec3(rawEntry.pos, [0, 0, 0]), positionScale),
+            radius: toPositiveNumber(rawEntry.radius, 3.5, 0.1) * positionScale,
             forward: normalizeForward(rawEntry.forward),
             cooldownMs: Math.max(
                 0,
@@ -355,8 +365,8 @@ export function buildRouteFromParcours(parcoursRaw) {
     const finish = finishRaw ? {
         id: toCheckpointId(finishRaw.id, 'FINISH'),
         type: 'finish',
-        pos: normalizeVec3(finishRaw.pos, [0, 0, 0]),
-        radius: toPositiveNumber(finishRaw.radius, 4.2, 0.1),
+        pos: scaleVec3(normalizeVec3(finishRaw.pos, [0, 0, 0]), positionScale),
+        radius: toPositiveNumber(finishRaw.radius, 4.2, 0.1) * positionScale,
         forward: normalizeForward(finishRaw.forward),
         cooldownMs: Math.max(
             0,

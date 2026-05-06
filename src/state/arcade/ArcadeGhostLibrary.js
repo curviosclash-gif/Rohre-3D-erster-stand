@@ -409,7 +409,7 @@ export function bootstrapGhostLibraryFromLeaderboard(
             nextLibrary,
             routeId,
             bestEntry.ghostClip,
-            bestEntry.totalTimeMs,
+            bestEntry.ghostDurationMs,
             {
                 updatedAt: bestEntry.date,
                 budgetOptions: resolvedBudget,

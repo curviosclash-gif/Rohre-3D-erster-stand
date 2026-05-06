@@ -2347,7 +2347,60 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         expect(secondProbe.floorParent).toBe('matchRoot');
     });
 
-    test.skip('T10f: Editor-Disk-Maps erscheinen im Runtime-Menue und laden im Match', async ({ page }) => {
+    test('T10f: UIManager coalesct Start-Setup-Sync bei kombinierten Change-Keys auf einen Snapshot pro Runde', async ({ page }) => {
+        await loadGame(page);
+
+        const probe = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const uiManager = game?.uiManager;
+            const startSync = uiManager?._startSync;
+            if (!game || !uiManager || !startSync || typeof uiManager.syncByChangeKeys !== 'function') {
+                return { ok: false, reason: 'missing_runtime' };
+            }
+
+            const originalSyncStartSetupState = startSync.syncStartSetupState.bind(startSync);
+            const snapshots = [];
+            let syncCalls = 0;
+            startSync.syncStartSetupState = (settings, snapshot = null) => {
+                syncCalls += 1;
+                snapshots.push({
+                    sessionType: String(snapshot?.surfaceMenuState?.sessionType || ''),
+                    modePath: String(snapshot?.surfaceMenuState?.modePath || ''),
+                    hasMultiplayerSessionState: !!snapshot?.multiplayerSessionState,
+                });
+                return originalSyncStartSetupState(settings, snapshot);
+            };
+
+            try {
+                if (!game.settings?.localSettings || typeof game.settings.localSettings !== 'object') {
+                    game.settings.localSettings = {};
+                }
+                game.settings.localSettings.sessionType = 'single';
+                game.settings.localSettings.modePath = 'normal';
+                game.uiManager.syncByChangeKeys([
+                    'session.type',
+                    'mapKey',
+                    'vehicles.player1',
+                ]);
+                return {
+                    ok: true,
+                    syncCalls,
+                    snapshots,
+                };
+            } finally {
+                startSync.syncStartSetupState = originalSyncStartSetupState;
+            }
+        });
+
+        expect(probe.ok).toBeTruthy();
+        expect(probe.syncCalls).toBe(1);
+        expect(probe.snapshots.length).toBe(1);
+        expect(probe.snapshots[0].sessionType).toBe('single');
+        expect(probe.snapshots[0].modePath).toBe('normal');
+        expect(probe.snapshots[0].hasMultiplayerSessionState).toBeTruthy();
+    });
+
+    test.skip('T10g: Editor-Disk-Maps erscheinen im Runtime-Menue und laden im Match', async ({ page }) => {
         await loadGameWithRetry(page);
         await openGameSubmenu(page);
 

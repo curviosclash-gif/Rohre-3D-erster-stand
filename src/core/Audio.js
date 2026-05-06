@@ -18,6 +18,9 @@ const SOUND_COOLDOWNS_MS = Object.freeze({
     SHIELD_HIT: 70,
     POWERUP: 500,
     BOOST: 200,
+    PARCOURS_CP: 80,
+    PARCOURS_BRANCH: 140,
+    PARCOURS_FINISH: 650,
 });
 
 const AUDIO_INIT_EVENT_TYPES = ['click', 'keydown', 'touchstart'];
@@ -190,6 +193,9 @@ export class AudioManager {
             case 'SHIELD_HIT': this._playShieldHit(options); break;
             case 'POWERUP': this._playPowerup(); break;
             case 'BOOST': this._playBoost(); break;
+            case 'PARCOURS_CP': this._playParcoursCheckpoint(options); break;
+            case 'PARCOURS_BRANCH': this._playParcoursBranch(options); break;
+            case 'PARCOURS_FINISH': this._playParcoursFinish(options); break;
         }
     }
 
@@ -390,6 +396,96 @@ export class AudioManager {
 
         osc.start();
         osc.stop(this.ctx.currentTime + 0.3);
+    }
+
+    _playParcoursCheckpoint(options = {}) {
+        const primary = this.ctx.createOscillator();
+        const overtone = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const intensity = this._clamp(Number(options.intensity) || 0.9, 0.25, 1.3);
+
+        primary.type = 'sine';
+        primary.frequency.setValueAtTime(1420, this.ctx.currentTime);
+        primary.frequency.exponentialRampToValueAtTime(980, this.ctx.currentTime + 0.12);
+
+        overtone.type = 'triangle';
+        overtone.frequency.setValueAtTime(2120, this.ctx.currentTime);
+        overtone.frequency.exponentialRampToValueAtTime(1560, this.ctx.currentTime + 0.09);
+
+        gain.gain.setValueAtTime(this.volume * 0.2 * intensity, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.14);
+
+        primary.connect(gain);
+        overtone.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        primary.start();
+        overtone.start();
+        primary.stop(this.ctx.currentTime + 0.14);
+        overtone.stop(this.ctx.currentTime + 0.1);
+    }
+
+    _playParcoursBranch(options = {}) {
+        const primary = this.ctx.createOscillator();
+        const accent = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const intensity = this._clamp(Number(options.intensity) || 1.0, 0.3, 1.4);
+
+        primary.type = 'triangle';
+        primary.frequency.setValueAtTime(960, this.ctx.currentTime);
+        primary.frequency.exponentialRampToValueAtTime(720, this.ctx.currentTime + 0.2);
+
+        accent.type = 'square';
+        accent.frequency.setValueAtTime(1480, this.ctx.currentTime);
+        accent.frequency.exponentialRampToValueAtTime(1180, this.ctx.currentTime + 0.16);
+
+        gain.gain.setValueAtTime(this.volume * 0.28 * intensity, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.22);
+
+        primary.connect(gain);
+        accent.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        primary.start();
+        accent.start();
+        primary.stop(this.ctx.currentTime + 0.22);
+        accent.stop(this.ctx.currentTime + 0.17);
+    }
+
+    _playParcoursFinish(options = {}) {
+        const low = this.ctx.createOscillator();
+        const mid = this.ctx.createOscillator();
+        const high = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const intensity = this._clamp(Number(options.intensity) || 1.05, 0.35, 1.6);
+
+        low.type = 'triangle';
+        low.frequency.setValueAtTime(240, this.ctx.currentTime);
+        low.frequency.linearRampToValueAtTime(360, this.ctx.currentTime + 0.34);
+
+        mid.type = 'sine';
+        mid.frequency.setValueAtTime(480, this.ctx.currentTime);
+        mid.frequency.linearRampToValueAtTime(720, this.ctx.currentTime + 0.34);
+
+        high.type = 'triangle';
+        high.frequency.setValueAtTime(720, this.ctx.currentTime);
+        high.frequency.linearRampToValueAtTime(1080, this.ctx.currentTime + 0.28);
+
+        gain.gain.setValueAtTime(this.volume * 0.34 * intensity, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(this.volume * 0.12 * intensity, this.ctx.currentTime + 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.58);
+
+        low.connect(gain);
+        mid.connect(gain);
+        high.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        low.start();
+        mid.start();
+        high.start();
+        low.stop(this.ctx.currentTime + 0.58);
+        mid.stop(this.ctx.currentTime + 0.5);
+        high.stop(this.ctx.currentTime + 0.36);
     }
 
     dispose() {

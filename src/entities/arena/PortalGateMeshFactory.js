@@ -141,6 +141,16 @@ class InstancedComponentBatch {
             this.mesh.instanceColor.needsUpdate = true;
         }
     }
+
+    dispose() {
+        if (this.mesh) {
+            this.renderer.removeFromScene(this.mesh);
+            this.mesh.dispose();
+        }
+        this.mesh = null;
+        this.instances = [];
+        this.capacity = 0;
+    }
 }
 
 class PortalGateVisualRegistry {
@@ -193,6 +203,13 @@ class PortalGateVisualRegistry {
         // Match Object3D.lookAt() for non-camera objects.
         this._tmpLookAt.lookAt(target, handle.position, handle.up);
         outQuaternion.setFromRotationMatrix(this._tmpLookAt);
+    }
+
+    dispose() {
+        for (const batch of this._batches.values()) {
+            batch?.dispose?.();
+        }
+        this._batches.clear();
     }
 }
 

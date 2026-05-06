@@ -13,6 +13,8 @@ export class PortalGateSystem {
     }
 
     build(map, scale) {
+        this.portalRuntime.resetRuntimeState();
+        this.checkpointRingRuntime.resetRuntimeState();
         this.layoutBuilder.build(map, scale);
         this.checkpointRingSpinEnabled = this.layoutBuilder.checkpointRingSpinEnabled;
     }

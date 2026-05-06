@@ -230,13 +230,15 @@ export class MatchFlowArcadeOverlayController {
                 const result = requestArcadeReplayPlayback(this.runtimePort, this.game);
                 const code = String(result?.code || 'replay_unknown');
                 const tone = code === 'replay_player_unavailable' ? 'warning' : 'info';
-                const message = code === 'replay_player_unavailable'
+                const message = code === 'ghost_fallback_started'
+                    ? 'Ghost-Fallback wird abgespielt.'
+                    : (code === 'replay_player_unavailable'
                     ? 'Replay-Player fehlt, Export-Fallback bereit.'
                     : (code === 'replay_disabled'
                         ? 'Replay ist in den Runtime-Einstellungen deaktiviert.'
                         : (code === 'replay_unavailable'
                             ? 'Kein Replay fuer diesen Run verfuegbar.'
-                            : 'Replay-Status aktualisiert.'));
+                            : 'Replay-Status aktualisiert.')));
                 this.game?._showStatusToast?.(message, 1800, tone);
             });
         }

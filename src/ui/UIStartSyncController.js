@@ -75,6 +75,7 @@ export class UIStartSyncController {
         this._vehiclePreviewEntries = listVehiclePreviewEntries();
         this._startSetupDisposers = [];
         this._startValidationIssue = null;
+        this._activeSyncSnapshot = null;
     }
 
     _getSettings() {
@@ -89,7 +90,14 @@ export class UIStartSyncController {
         return this.port?.getMapDefinitions?.() || {};
     }
 
+    _getRuntimeMaps() {
+        return getRuntimeMapCatalog();
+    }
+
     _getMultiplayerSessionState() {
+        if (this._activeSyncSnapshot?.multiplayerSessionState) {
+            return this._activeSyncSnapshot.multiplayerSessionState;
+        }
         return this.port?.getMultiplayerSessionState?.() || null;
     }
 
@@ -243,9 +251,11 @@ export class UIStartSyncController {
     }
 
     _resolveSurfacePolicy(settings = this._getSettings()) {
+        if (this._activeSyncSnapshot?.surfacePolicy) {
+            return this._activeSyncSnapshot.surfacePolicy;
+        }
         return this.port?.resolveSurfacePolicy?.(settings)
             || this.manager?.resolveSurfacePolicy?.(settings)
-            || this.manager?._runtimeFeatureFlags?.surfacePolicy
             || null;
     }
 
@@ -344,39 +354,56 @@ export class UIStartSyncController {
     // Sync-Methoden
     // ------------------------------------------------------------------
 
-    syncStartSetupState(settings = this._getSettings()) {
+    syncStartSetupState(settings = this._getSettings(), syncSnapshot = null) {
         if (!settings) return;
-        const startSetup = ensureStartSetupLocalState(settings);
-        const multiplayerSessionState = this._getMultiplayerSessionState();
-        const mapSearch = String(startSetup.mapSearch || '').trim().toLowerCase();
-        const mapFilter = String(startSetup.mapFilter || 'all').toLowerCase();
-        const vehicleSearch = String(startSetup.vehicleSearch || '').trim().toLowerCase();
-        const vehicleFilter = String(startSetup.vehicleFilter || 'all').toLowerCase();
-        const runtimeMaps = getRuntimeMapCatalog();
-        const surfacePolicy = this._resolveSurfacePolicy();
-        const surfaceMenuState = resolveSurfaceMenuState(settings, {
-            productSurfaceId: surfacePolicy?.productSurfaceId,
-            maps: runtimeMaps,
-        });
-        const modePath = surfaceMenuState.modePath;
-        const hangarSelectionModePath = this._resolveHangarSelectionModePath(settings);
-        const sessionType = surfaceMenuState.sessionType;
-        const multiplayerTransportUiState = this._resolveMultiplayerTransportUiState(settings);
-        const sessionContract = resolveRuntimeSessionContract({
-            sessionType,
-            multiplayerTransport: settings?.localSettings?.multiplayerTransport,
-        });
-        const isMultiplayerSession = sessionType === MENU_SESSION_TYPES.MULTIPLAYER;
-        const configuredArcadeGhostDuelMode = normalizeArcadeGhostDuelMode(
-            startSetup.arcadeGhostDuelMode,
-            ARCADE_GHOST_DUEL_MODES.OFF
-        );
-        startSetup.arcadeGhostDuelMode = configuredArcadeGhostDuelMode;
-        const ghostDuelSelectable = sessionType === MENU_SESSION_TYPES.SINGLE;
-        const effectiveArcadeGhostDuelMode = ghostDuelSelectable
-            ? configuredArcadeGhostDuelMode
-            : ARCADE_GHOST_DUEL_MODES.OFF;
-        const hasActiveLobbySession = isMultiplayerSession && multiplayerSessionState?.joined === true;
+        const normalizedSnapshot = syncSnapshot && typeof syncSnapshot === 'object'
+            ? syncSnapshot
+            : null;
+        const previousSyncSnapshot = this._activeSyncSnapshot;
+        const runtimeMaps = this._getRuntimeMaps();
+        const surfacePolicy = normalizedSnapshot?.surfacePolicy
+            || normalizedSnapshot?.menuUiContext?.surfacePolicy
+            || this._resolveSurfacePolicy(settings);
+        const surfaceMenuState = normalizedSnapshot?.surfaceMenuState
+            || normalizedSnapshot?.menuUiContext?.surfaceMenuState
+            || resolveSurfaceMenuState(settings, {
+                productSurfaceId: surfacePolicy?.productSurfaceId,
+                maps: runtimeMaps,
+            });
+        const multiplayerSessionState = normalizedSnapshot?.multiplayerSessionState
+            || this.port?.getMultiplayerSessionState?.()
+            || null;
+        this._activeSyncSnapshot = {
+            surfacePolicy,
+            surfaceMenuState,
+            multiplayerSessionState,
+        };
+        try {
+            const startSetup = ensureStartSetupLocalState(settings);
+            const resolvedMultiplayerSessionState = this._getMultiplayerSessionState();
+            const mapSearch = String(startSetup.mapSearch || '').trim().toLowerCase();
+            const mapFilter = String(startSetup.mapFilter || 'all').toLowerCase();
+            const vehicleSearch = String(startSetup.vehicleSearch || '').trim().toLowerCase();
+            const vehicleFilter = String(startSetup.vehicleFilter || 'all').toLowerCase();
+            const modePath = surfaceMenuState.modePath;
+            const hangarSelectionModePath = this._resolveHangarSelectionModePath(settings);
+            const sessionType = surfaceMenuState.sessionType;
+            const multiplayerTransportUiState = this._resolveMultiplayerTransportUiState(settings);
+            const sessionContract = resolveRuntimeSessionContract({
+                sessionType,
+                multiplayerTransport: settings?.localSettings?.multiplayerTransport,
+            });
+            const isMultiplayerSession = sessionType === MENU_SESSION_TYPES.MULTIPLAYER;
+            const configuredArcadeGhostDuelMode = normalizeArcadeGhostDuelMode(
+                startSetup.arcadeGhostDuelMode,
+                ARCADE_GHOST_DUEL_MODES.OFF
+            );
+            startSetup.arcadeGhostDuelMode = configuredArcadeGhostDuelMode;
+            const ghostDuelSelectable = sessionType === MENU_SESSION_TYPES.SINGLE;
+            const effectiveArcadeGhostDuelMode = ghostDuelSelectable
+                ? configuredArcadeGhostDuelMode
+                : ARCADE_GHOST_DUEL_MODES.OFF;
+            const hasActiveLobbySession = isMultiplayerSession && resolvedMultiplayerSessionState?.joined === true;
         const knownVehicleIds = new Set(this._vehiclePreviewEntries.map((entry) => entry.id));
         const appendVehicleOption = (select, vehicleId) => {
             const normalizedVehicleId = String(vehicleId || '').trim();
@@ -579,17 +606,17 @@ export class UIStartSyncController {
                 summaryBlocks.push({ label: 'P2', value: vehiclePreviewP2.label });
             }
             if (sessionType === MENU_SESSION_TYPES.MULTIPLAYER) {
-                const hasCode = String(multiplayerSessionState?.lobbyCode || this.ui.multiplayerLobbyCodeInput?.value || '').trim();
+                const hasCode = String(resolvedMultiplayerSessionState?.lobbyCode || this.ui.multiplayerLobbyCodeInput?.value || '').trim();
                 const readySummary = hasActiveLobbySession
-                    ? ` | ${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready`
+                    ? ` | ${resolvedMultiplayerSessionState.readyCount}/${resolvedMultiplayerSessionState.memberCount} ready`
                     : '';
                 const roleSummary = hasActiveLobbySession
-                    ? (multiplayerSessionState.isHost ? 'Host' : surfaceEntryCopy.multiplayerClientRoleLabel)
+                    ? (resolvedMultiplayerSessionState.isHost ? 'Host' : surfaceEntryCopy.multiplayerClientRoleLabel)
                     : '';
                 const connectionSummary = hasActiveLobbySession
-                    ? (multiplayerSessionState.pendingMatchCommandId
+                    ? (resolvedMultiplayerSessionState.pendingMatchCommandId
                         ? 'Startsignal gesendet'
-                        : (multiplayerSessionState.connected ? 'verbunden' : 'Warte auf Host'))
+                        : (resolvedMultiplayerSessionState.connected ? 'verbunden' : 'Warte auf Host'))
                     : '';
                 summaryBlocks.push({
                     label: 'Lobby',
@@ -685,7 +712,7 @@ export class UIStartSyncController {
         }
         if (this.ui.multiplayerLobbyCodeInput) {
             if (hasActiveLobbySession) {
-                this.ui.multiplayerLobbyCodeInput.value = String(multiplayerSessionState.lobbyCode || '');
+                this.ui.multiplayerLobbyCodeInput.value = String(resolvedMultiplayerSessionState.lobbyCode || '');
             }
             this.ui.multiplayerLobbyCodeInput.readOnly = hasActiveLobbySession;
             this.ui.multiplayerLobbyCodeInput.title = hasActiveLobbySession
@@ -709,26 +736,26 @@ export class UIStartSyncController {
         if (this.ui.multiplayerReadyToggle) {
             this.ui.multiplayerReadyToggle.disabled = !hasActiveLobbySession;
             this.ui.multiplayerReadyToggle.checked = isMultiplayerSession
-                ? multiplayerSessionState?.localReady === true
+                ? resolvedMultiplayerSessionState?.localReady === true
                 : false;
         }
         if (this.ui.multiplayerLobbyState) {
-            const lobbyCode = String(multiplayerSessionState?.lobbyCode || this.ui.multiplayerLobbyCodeInput?.value || '').trim();
+            const lobbyCode = String(resolvedMultiplayerSessionState?.lobbyCode || this.ui.multiplayerLobbyCodeInput?.value || '').trim();
             if (!isMultiplayerSession) {
                 this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: inaktiv';
             } else if (hasActiveLobbySession) {
-                const roleLabel = multiplayerSessionState.isHost
+                const roleLabel = resolvedMultiplayerSessionState.isHost
                     ? 'Host'
                     : surfaceEntryCopy.multiplayerClientRoleLabel;
-                const connectionLabel = multiplayerSessionState.pendingMatchCommandId
+                const connectionLabel = resolvedMultiplayerSessionState.pendingMatchCommandId
                     ? 'Startsignal gesendet'
-                    : (multiplayerSessionState.connected
+                    : (resolvedMultiplayerSessionState.connected
                         ? 'verbunden'
-                        : (multiplayerSessionState.isHost ? 'Host aktiv' : 'Warte auf Host'));
+                        : (resolvedMultiplayerSessionState.isHost ? 'Host aktiv' : 'Warte auf Host'));
                 const transportSuffix = sessionContract.isLegacyTransport === true
                     ? ` | ${sessionContract.transportAudienceLabel}`
                     : '';
-                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${roleLabel} | ${connectionLabel} | ${multiplayerSessionState.memberCount} Spieler | ${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready${transportSuffix}`;
+                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${roleLabel} | ${connectionLabel} | ${resolvedMultiplayerSessionState.memberCount} Spieler | ${resolvedMultiplayerSessionState.readyCount}/${resolvedMultiplayerSessionState.memberCount} ready${transportSuffix}`;
             } else if (sessionContract.isLegacyTransport === true) {
                 this.ui.multiplayerLobbyState.textContent = lobbyCode
                     ? `Lobbystatus: ${lobbyCode} | ${sessionContract.transportAudienceLabel}`
@@ -769,6 +796,9 @@ export class UIStartSyncController {
         const level4Open = !!settings?.localSettings?.toolsState?.level4Open;
         this.manager.setLevel4Open(level4Open);
         this._renderStartFieldHints(settings);
+        } finally {
+            this._activeSyncSnapshot = previousSyncSnapshot;
+        }
     }
 
     // ------------------------------------------------------------------

@@ -117,10 +117,19 @@ export class ParcoursOverlayController {
         if (!this._minimap) this._minimap = new ParcoursMinimapRenderer();
         const routeSnapshot = entityManager?.getParcoursRouteSnapshot?.() || null;
         const nextCheckpointIndex = Math.max(0, Number(projection.parcours.currentCheckpoint) || 0);
+        const passedCheckpointIds = Array.isArray(projection?.parcours?.passedCheckpointIds)
+            ? projection.parcours.passedCheckpointIds
+            : (entityManager?.getParcoursHudState?.(localIdx)?.passedCheckpointIds || []);
         const localPlayer = Array.isArray(projection?.players)
             ? projection.players.find((p) => p?.playerIndex === localIdx) || null
             : null;
-        this._minimap.update(routeSnapshot, nextCheckpointIndex, localPlayer?.position || null, localPlayer?.quaternion || null);
+        this._minimap.update(
+            routeSnapshot,
+            nextCheckpointIndex,
+            passedCheckpointIds,
+            localPlayer?.position || null,
+            localPlayer?.quaternion || null
+        );
     }
 
     dispose() {

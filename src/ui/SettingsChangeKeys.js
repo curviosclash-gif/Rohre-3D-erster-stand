@@ -29,6 +29,7 @@ export const SETTINGS_CHANGE_KEYS = Object.freeze({
     GAMEPLAY_ITEM_AMOUNT: 'gameplay.itemAmount',
     GAMEPLAY_FIRE_RATE: 'gameplay.fireRate',
     GAMEPLAY_LOCK_ON_ANGLE: 'gameplay.lockOnAngle',
+    GAMEPLAY_NEXT_CHECKPOINT_GLOW_INTENSITY: 'gameplay.nextCheckpointGlowIntensity',
     GAMEPLAY_MG_TRAIL_AIM_RADIUS: 'gameplay.mgTrailAimRadius',
     GAMEPLAY_FIGHT_PLAYER_HP: 'gameplay.fightPlayerHp',
     GAMEPLAY_FIGHT_MG_DAMAGE: 'gameplay.fightMgDamage',
