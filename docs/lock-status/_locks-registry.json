@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T19:09:08.593Z",
+  "generated_at": "2026-05-06T20:10:19.285Z",
   "locks": [
     {
       "person": "codex",
@@ -76,7 +76,7 @@
     {
       "person": "codex",
       "block_id": "V107",
-      "phase": "107.1.1",
+      "phase": "107.2.1",
       "scope_files": [
         "docs/generated/knowledge-graph.json",
         "docs/generated/knowledge-graph.coverage.json",
@@ -99,7 +99,7 @@
       "start_date": "2026-05-06",
       "target_completion": "2026-05-06",
       "status": "in-progress",
-      "notes": "Schema and mapping foundation"
+      "notes": "Critical-path mappings enforced; next builder/runtime relation slice"
     }
   ],
   "metadata": {

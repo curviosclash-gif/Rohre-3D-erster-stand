@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-06T19:07:18.749Z",
+  "timestamp": "2026-05-06T20:10:00.000Z",
   "locks": [
     {
       "block_id": "V103",
@@ -73,7 +73,7 @@
     },
     {
       "block_id": "V107",
-      "phase": "107.1.1",
+      "phase": "107.2.1",
       "scope_files": [
         "docs/generated/knowledge-graph.json",
         "docs/generated/knowledge-graph.coverage.json",
@@ -96,12 +96,15 @@
       "start_date": "2026-05-06",
       "target_completion": "2026-05-06",
       "status": "in-progress",
-      "notes": "Schema and mapping foundation"
+      "notes": "Critical-path mappings enforced; next builder/runtime relation slice"
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "107.1.1",
-    "completed_items": [],
+    "phase_id": "107.1.2",
+    "completed_items": [
+      "Critical desktop-path mappings are now enforced via graph:check requirements",
+      "knowledge-graph contract test asserts spawn/combat-hit/round-end/settings coverage"
+    ],
     "last_commit": ""
   }
 }

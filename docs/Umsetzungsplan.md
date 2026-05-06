@@ -1,6 +1,6 @@
 ﻿# Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-06. Aktuelle offene Subphase: `V107 107.1.2`.
+Stand: 2026-05-06. Aktuelle offene Subphase: `V107 107.2.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -46,7 +46,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V112 | Spielaudit- und Playtest-Improvement-Paket | blocked | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
-| V107 | Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer | active | P2 | codex | V94.99 | 107.1 | `docs/plaene/aktiv/V107.md` |
+| V107 | Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer | active | P2 | codex | V94.99 | 107.2 | `docs/plaene/aktiv/V107.md` |
 | V110 | Wissensgraph Ops-, Guard- und Integritaets-Haertung | planned | P2 | frei | V107.99 | 110.1 | `docs/plaene/aktiv/V110.md` |
 | V111 | Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz | planned | P2 | frei | V107.99,V110.99 | 111.1 | `docs/plaene/aktiv/V111.md` |
 
@@ -81,7 +81,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V104 | 2026-05-05 | closed | Abgeschlossen 2026-05-05 |
 | - | V109 | 2026-05-04 | closed | Abgeschlossen 2026-05-04 |
 | - | V100 | 2026-05-05 | closed | Abgeschlossen 2026-05-06 |
-| codex | V107 | 2026-05-06 | active | 107.1.2 Kritische Desktop-Mappings |
+| codex | V107 | 2026-05-06 | active | 107.2.1 Builder-Runtime-Relationen |
 | - | V110 | - | frei | Geplant |
 | - | V111 | - | frei | Geplant |
 | - | V112 | - | blockiert | Wartet auf V102.99 und V105.99 |

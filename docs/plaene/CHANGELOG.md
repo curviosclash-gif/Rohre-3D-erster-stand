@@ -344,6 +344,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Abschluss-Gates sind gruen: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, `npm run graph:build`, `npm run gates:pre-commit` und `npm run lock:validate`.
 - Die V92-Ratchets bleiben unverletzt: `npm run check:architecture:boundaries` und `npm run check:architecture:ratchet` bleiben gruen; `window.GAME_INSTANCE` und `window.GAME_RUNTIME` verbleiben nur im Bootstrap-/Diagnostics-Scope.
 
+## Stand-Snapshot 2026-05-06 (Subphase `V107 107.1.2`)
+
+- `107.1.2` ist geschlossen: `scripts/check-knowledge-graph.mjs` validiert jetzt die Pflicht-Mapping-IDs `runtime-taxonomy` und `desktop-critical-paths` sowie verbindliche Spawn-, Combat/Hit-, Round-End- und Settings-Knoten/-Kanten direkt im Graph-Artefakt.
+- `tests/knowledge-graph-build.contract.test.mjs` baut den Graphen jetzt explizit gegen dieselben Critical-Path-Anforderungen und haertet dabei insbesondere die `SettingsManager`-Pflichtreferenz, Mehrfachpfade wie `GameplayConfigContract` und die `validated_by`-/`reads_config`-Verknuepfungen gegen Drift.
+- Der aktive Planstand springt damit von `107.1` auf `107.2`; naechste offene Subphase ist `107.2.1` fuer Builder-Runtime-/State-/Test-Relationen.
+
 ## Commit-Notizen 2026-05-06
 
 - `43a510fe` `fix: harden parcours runtime feedback and sync flows`: Parcours-Feedback, Ring-/Minimap-Zustand und Start-Setup-Sync wurden gemeinsam gehoben, damit Branch-/Checkpoint-Fortschritt im Runtime-, UI- und Testpfad denselben Zustand lesen und der Nutzer keine widerspruechlichen Signale zwischen Overlay, Audio und Replay-Fallback bekommt.

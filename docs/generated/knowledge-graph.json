@@ -1934,7 +1934,7 @@
         ],
         "priority": "P2",
         "owner": "codex",
-        "currentPhase": "107.1",
+        "currentPhase": "107.2",
         "planFile": "docs/plaene/aktiv/V107.md",
         "scopeDeclarations": [
           ".agents/rules/token_efficiency_and_tools.md",
@@ -5442,7 +5442,7 @@
       "id": "V107.1",
       "type": "phase",
       "title": "Schema- und Mapping-Fundament",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.1"
@@ -15327,8 +15327,8 @@
     {
       "id": "V107.1.2",
       "type": "subphase",
-      "title": "Mapping-Dateien unter `data/contracts/knowledge-graph/` fuer kritische Desktop-Pfade verbindlich festziehen.",
-      "status": "open",
+      "title": "Mapping-Dateien unter `data/contracts/knowledge-graph/` fuer kritische Desktop-Pfade verbindlich festziehen. (abgeschlossen: 2026-05-06; evidence: `npm run graph:check` + `node --test tests/knowledge-graph-build.contract.test.mjs` -> `scripts/check-knowledge-graph.mjs` validiert Pflicht-Mapping-IDs sowie verbindliche Spawn-/Combat-/Round-End-/Settings-Knoten und -Kanten; Contract-Test haertet dieselben Pfade gegen Drift)",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.1",
