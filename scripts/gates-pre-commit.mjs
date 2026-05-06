@@ -9,6 +9,7 @@ import { spawnSync } from 'node:child_process';
 const steps = [
   ['plan:check', 'scripts/validate-umsetzungsplan.mjs', []],
   ['graph:check', 'scripts/check-knowledge-graph.mjs', []],
+  ['parcours:check/strict', 'scripts/check-parcours-routes.mjs', ['--strict']],
   ['docs:sync', 'scripts/docs-freshness.mjs', ['--write']],
   ['docs:check', 'scripts/docs-freshness.mjs', ['--check']],
   ['docs:check/plan:check', 'scripts/validate-umsetzungsplan.mjs', []],
