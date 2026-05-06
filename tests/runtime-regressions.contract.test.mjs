@@ -2,6 +2,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 
+import {
+    mountGameInstanceForTests,
+    resetAppInitializerForTests,
+} from '../src/core/AppInitializerTestHooks.js';
 import { SessionRuntimeCommandExecutor } from '../src/application/session-runtime/SessionRuntimeCommandExecutor.js';
 import { GameRuntimeFacade } from '../src/core/GameRuntimeFacade.js';
 import { GameRuntimeCoordinator } from '../src/core/runtime/GameRuntimeCoordinator.js';
@@ -23,6 +27,44 @@ import { MatchFlowLifecycleController } from '../src/ui/MatchFlowLifecycleContro
 import { MatchFlowTelemetryController } from '../src/ui/MatchFlowTelemetryController.js';
 import { resolveDeveloperReleaseState, resolveMenuUiSyncContext } from '../src/ui/menu/MenuUiSyncContext.js';
 
+function withMockRuntimeGlobals(run, options = {}) {
+    const originalWindow = globalThis.window;
+    const originalDocument = globalThis.document;
+    const originalCurviosApp = globalThis.curviosApp;
+    const lifecycle = options.lifecycle || null;
+    const window = {
+        __CURVIOS_E2E__: false,
+    };
+    if (lifecycle) {
+        window.curviosApp = {
+            contracts: {
+                lifecycle,
+            },
+        };
+        globalThis.curviosApp = window.curviosApp;
+    }
+    globalThis.window = window;
+    globalThis.document = {};
+    return Promise.resolve()
+        .then(() => run({ window }))
+        .finally(() => {
+            if (typeof originalWindow === 'undefined') {
+                delete globalThis.window;
+            } else {
+                globalThis.window = originalWindow;
+            }
+            if (typeof originalDocument === 'undefined') {
+                delete globalThis.document;
+            } else {
+                globalThis.document = originalDocument;
+            }
+            if (typeof originalCurviosApp === 'undefined') {
+                delete globalThis.curviosApp;
+            } else {
+                globalThis.curviosApp = originalCurviosApp;
+            }
+        });
+}
 test('MatchFlow UI controller port forwards runtime projections when provided', () => {
     const runtimeSnapshot = { tickIndex: 12 };
     const runtimeProjection = { lifecycle: 'running' };
@@ -35,6 +77,104 @@ test('MatchFlow UI controller port forwards runtime projections when provided', 
 
     assert.equal(port.getSessionRuntimeSnapshot(), runtimeSnapshot);
     assert.equal(port.getMatchRuntimeProjection(), runtimeProjection);
+});
+
+test('AppInitializer aborts remount when previous dispose fails before publishing a new runtime (V100)', async () => {
+    await withMockRuntimeGlobals(async ({ window }) => {
+        resetAppInitializerForTests();
+        try {
+            let createCalls = 0;
+            const previousRuntimeFacade = { id: 'previous-runtime' };
+            const previousDebugApi = { id: 'previous-debug' };
+            window.GAME_INSTANCE = {
+                runtimeFacade: previousRuntimeFacade,
+                debugApi: previousDebugApi,
+                dispose() {
+                    throw new Error('dispose failed hard');
+                },
+            };
+            window.GAME_RUNTIME = previousRuntimeFacade;
+            window.GAME_DEBUG = previousDebugApi;
+
+            await assert.rejects(
+                () => mountGameInstanceForTests(() => {
+                    createCalls += 1;
+                    return {
+                        runtimeFacade: { id: 'next-runtime' },
+                        debugApi: { id: 'next-debug' },
+                    };
+                }),
+                /remount aborted/i
+            );
+
+            assert.equal(createCalls, 0);
+            assert.equal(window.GAME_INSTANCE, null);
+            assert.equal(window.GAME_RUNTIME, null);
+            assert.equal(window.GAME_DEBUG, null);
+        } finally {
+            resetAppInitializerForTests();
+        }
+    });
+});
+
+test('AppInitializer detaches stale graceful-close handlers before remounting (V100)', async () => {
+    const callbacks = [];
+    let unsubscribeCalls = 0;
+    let confirmCalls = 0;
+    const lifecycle = {
+        contractVersion: 'test.lifecycle.v1',
+        onGracefulClose(callback) {
+            callbacks.push(callback);
+            return () => {
+                unsubscribeCalls += 1;
+                const index = callbacks.indexOf(callback);
+                if (index >= 0) {
+                    callbacks.splice(index, 1);
+                }
+            };
+        },
+        confirmGracefulClose() {
+            confirmCalls += 1;
+        },
+    };
+
+    await withMockRuntimeGlobals(async ({ window }) => {
+        resetAppInitializerForTests();
+        try {
+            let firstDisposeCalls = 0;
+            let secondDisposeCalls = 0;
+
+            await mountGameInstanceForTests(() => ({
+                runtimeFacade: { id: 'first-runtime' },
+                debugApi: { id: 'first-debug' },
+                dispose() {
+                    firstDisposeCalls += 1;
+                },
+            }));
+
+            await mountGameInstanceForTests(() => ({
+                runtimeFacade: { id: 'second-runtime' },
+                debugApi: { id: 'second-debug' },
+                dispose() {
+                    secondDisposeCalls += 1;
+                },
+            }));
+
+            assert.equal(unsubscribeCalls, 1);
+            assert.equal(callbacks.length, 1);
+            assert.equal(window.GAME_RUNTIME?.id, 'second-runtime');
+            assert.equal(firstDisposeCalls, 1);
+            assert.equal(secondDisposeCalls, 0);
+
+            await callbacks[0]();
+
+            assert.equal(firstDisposeCalls, 1);
+            assert.equal(secondDisposeCalls, 1);
+            assert.equal(confirmCalls, 1);
+        } finally {
+            resetAppInitializerForTests();
+        }
+    }, { lifecycle });
 });
 
 test('MatchFlow UI controller port forwards arcade parcours events when provided', () => {

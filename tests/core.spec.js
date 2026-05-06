@@ -76,4 +76,95 @@ test.describe('Desktop Smoke', () => {
         await expect(page.locator('#submenu-game:not(.hidden)')).toHaveCount(1);
         expect(errors).toHaveLength(0);
     });
+
+    test('graceful-close IPC reaches only the current runtime after an AppInitializer remount', async ({ page, electronApp }) => {
+        const errors = collectErrors(page);
+        await waitForLoadedGame(page);
+        await page.evaluate(() => {
+            globalThis.__curviosImport = async (moduleSpecifier) => {
+                const normalizedSpecifier = String(moduleSpecifier || '').trim();
+                const api = globalThis?.CURVIOS_TEST_API;
+                if (typeof api?.importCurviosTestModule === 'function') {
+                    return api.importCurviosTestModule(normalizedSpecifier);
+                }
+                return import(normalizedSpecifier);
+            };
+        });
+
+        const setupResult = await page.evaluate(async () => {
+            const first = window.GAME_INSTANCE;
+            if (!first?.constructor || !window.curviosApp?.contracts?.lifecycle) {
+                return { error: 'missing-runtime-lifecycle' };
+            }
+
+            const hooks = await window.__curviosImport('/src/core/AppInitializerTestHooks.js');
+            const probe = {
+                firstDisposeCalls: 0,
+                secondDisposeCalls: 0,
+            };
+            const lifecycle = window.curviosApp.contracts.lifecycle;
+            const originalFirstDispose = typeof first.dispose === 'function'
+                ? first.dispose.bind(first)
+                : null;
+
+            first.dispose = async () => {
+                probe.firstDisposeCalls += 1;
+            };
+
+            await hooks.mountGameInstanceForTests(() => {
+                const second = new first.constructor();
+                const originalSecondDispose = typeof second.dispose === 'function'
+                    ? second.dispose.bind(second)
+                    : null;
+                second.dispose = async () => {
+                    probe.secondDisposeCalls += 1;
+                };
+                window.__gracefulCloseProbe = probe;
+                window.__gracefulCloseProbe.restore = () => {
+                    first.dispose = originalFirstDispose;
+                    second.dispose = originalSecondDispose;
+                };
+                return second;
+            });
+
+            return {
+                error: null,
+                remounted: window.GAME_INSTANCE !== first,
+                firstDisposeCallsAfterRemount: probe.firstDisposeCalls,
+            };
+        });
+
+        expect(setupResult.error).toBeNull();
+        expect(setupResult.remounted).toBeTruthy();
+        expect(setupResult.firstDisposeCallsAfterRemount).toBe(1);
+
+        await electronApp.evaluate(({ BrowserWindow }) => {
+            const browserWindow = BrowserWindow.getAllWindows()[0];
+            browserWindow?.webContents?.send?.('request-graceful-close');
+            return !!browserWindow;
+        });
+
+        await page.waitForTimeout(750);
+
+        const probeResult = await page.evaluate(() => {
+            const probe = window.__gracefulCloseProbe || null;
+            try {
+                probe?.restore?.();
+            } finally {
+                delete window.__gracefulCloseProbe;
+            }
+            return probe
+                ? {
+                    firstDisposeCalls: probe.firstDisposeCalls,
+                    secondDisposeCalls: probe.secondDisposeCalls,
+                }
+                : null;
+        });
+
+        expect(probeResult).toEqual({
+            firstDisposeCalls: 1,
+            secondDisposeCalls: 1,
+        });
+        expect(errors).toHaveLength(0);
+    });
 });

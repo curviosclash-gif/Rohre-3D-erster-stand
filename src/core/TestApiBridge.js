@@ -16,6 +16,7 @@ import { HuntBotPolicy } from '../hunt/HuntBotPolicy.js';
 import { applyTrailDamageFromProjectile } from '../hunt/DestructibleTrail.js';
 import { updatePlayerHealthRegen } from '../hunt/HealthSystem.js';
 import { createRuntimeConfigSnapshot } from './RuntimeConfig.js';
+import * as AppInitializerTestHooksModule from './AppInitializerTestHooks.js';
 import * as GameLoopModule from './GameLoop.js';
 import * as RuntimePerfProfilerModule from './perf/RuntimePerfProfiler.js';
 import * as MediaRecorderSystemModule from './MediaRecorderSystem.js';
@@ -33,6 +34,7 @@ import * as TelemetryHistoryStoreModule from '../state/TelemetryHistoryStore.js'
  */
 
 const TEST_MODULE_EXPORTS = Object.freeze({
+    '/src/core/AppInitializerTestHooks.js': Object.freeze({ ...AppInitializerTestHooksModule }),
     '/src/core/GameLoop.js': Object.freeze({ ...GameLoopModule }),
     '/src/core/perf/RuntimePerfProfiler.js': Object.freeze({ ...RuntimePerfProfilerModule }),
     '/src/core/MediaRecorderSystem.js': Object.freeze({ ...MediaRecorderSystemModule }),

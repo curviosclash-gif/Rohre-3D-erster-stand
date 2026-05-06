@@ -45,6 +45,7 @@ export const LEGACY_CONSTRUCTOR_GAME_ALLOWLIST = new Map([]);
 
 export const LEGACY_DOM_ACCESS_ALLOWLIST = new Map([
     ['src/core/AppInitializer.js', 'Bootstrap readiness check is infrastructure and still touches document directly.'],
+    ['src/core/AppInitializerLifecycle.js', 'Bootstrap readiness check remains infrastructure after the AppInitializer lifecycle split.'],
     ['src/core/BuildInfoController.js', 'Clipboard fallback still needs temporary DOM helpers.'],
     ['src/core/GameBootstrap.js', 'Canvas bootstrap is allowed infrastructure DOM access.'],
     ['src/core/GameLoop.js', 'Loop visibility handling and emergency overlay remain infrastructure concerns.'],

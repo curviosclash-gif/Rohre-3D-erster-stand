@@ -1,6 +1,6 @@
 {
   "_comment": "Machine-readable Guard-Matrix fuer Legacy-Surfaces (V91 91.1.2, erweitert in V92 92.5.1). Beschreibt verbotene Globals, erlaubte Uebergangsadapter und Eigentuemer fuer den migrierten Scope.",
-  "updatedAt": "2026-05-04",
+  "updatedAt": "2026-05-06",
   "version": "1",
   "surfaces": [
     {
@@ -31,6 +31,7 @@
       "forbiddenForNewWork": true,
       "allowedAdapters": [
         "src/core/AppInitializer.js",
+        "src/core/AppInitializerLifecycle.js",
         "src/core/main.js"
       ],
       "allowedCallers": [],
@@ -46,6 +47,7 @@
       "forbiddenForNewWork": true,
       "allowedAdapters": [
         "src/core/AppInitializer.js",
+        "src/core/AppInitializerLifecycle.js",
         "src/core/main.js"
       ],
       "allowedCallers": [],
