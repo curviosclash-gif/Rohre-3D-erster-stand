@@ -45,4 +45,5 @@ Policy-Details werden nicht in AGENTS.md wiederholt. Bei Konflikt gewinnt die Ru
 - Antworten kurz, ohne abschliessende Summaries (der User sieht Diff und Tool-Output).
 - Ergebnisse parallel holen, wenn unabhaengig.
 - Abgeschlossene Aufgaben mit verifizierten Repo-Aenderungen standardmaessig im selben Turn sinnvoll committen; nur offen lassen, wenn der User explizit keinen Commit will oder ein echter Blocker besteht.
+- Zu eigenen Abschluss-Commits immer auch kurze erklaerende Notizen hinterlassen: planbezogen im Block/`docs/plaene/CHANGELOG.md`, sonst mindestens im passenden Governance-/Status-Kontext.
 - Kein Plan-Mode fuer kleine Tasks.

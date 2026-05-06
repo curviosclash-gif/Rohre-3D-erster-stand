@@ -55,6 +55,7 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 - For non-`*.99` phases, record pending block-end verification scope when full suite execution is deferred.
 - If the phase handled dead code or legacy paths, record replacement proof or explicit retention reason in the block evidence before closing.
 - Abgeschlossene Phasenarbeit mit Repo-Aenderungen nicht uncommitted lassen: nach Gate/Evidence folgt ein scoped Commit im selben Turn.
+- Erklaerende Commit-Notizen sind Pflicht: kurz festhalten, warum der Slice noetig war und welcher beobachtbare Effekt erreicht wurde.
 - Gate-Strategie:
   - `*.99` oder Docs-/Governance-/Graph-Scope: `npm run gates:pre-commit`
   - sonst mindestens `npm run plan:check` plus kleinste sinnvolle Zusatzchecks.

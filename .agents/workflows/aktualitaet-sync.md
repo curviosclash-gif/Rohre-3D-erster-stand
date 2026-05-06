@@ -33,6 +33,7 @@ description: Check and auto-update docs/workflows/rules to current repository re
 - `npm run guard:main`
 - Nur geaenderte Scope-Dateien stagen (kein pauschales `docs/`-Bulk-Add).
 - Wenn der Sync-Lauf abgeschlossen ist und Drift behoben wurde, den scoped Commit direkt im selben Turn erstellen.
+- Ergaenze eine kurze Sync-Notiz im passenden Doku-Kontext, die die relevante Drift und den Grund fuer den Commit benennt.
 - `git commit -m "docs: sync documentation and plan governance"`
 - Before push on `main`: `npm run snapshot:tag`
 

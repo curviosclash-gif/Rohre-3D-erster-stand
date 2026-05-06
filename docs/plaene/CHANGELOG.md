@@ -338,3 +338,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Relevante Runtime-Gates sind gruen: `node --test tests/runtime-regressions.contract.test.mjs` (31/31 PASS), `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-runtime.spec.js --grep "T20ae:" --timeout=240000` (`test-results/v100-runtime-dispose`) und `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-runtime.spec.js --grep "T10e:|T10f:" --timeout=240000` (`test-results/v100-runtime-t10ef`).
 - Abschluss-Gates sind gruen: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, `npm run graph:build`, `npm run gates:pre-commit` und `npm run lock:validate`.
 - Die V92-Ratchets bleiben unverletzt: `npm run check:architecture:boundaries` und `npm run check:architecture:ratchet` bleiben gruen; `window.GAME_INSTANCE` und `window.GAME_RUNTIME` verbleiben nur im Bootstrap-/Diagnostics-Scope.
+
+## Commit-Notizen 2026-05-06
+
+- `43a510fe` `fix: harden parcours runtime feedback and sync flows`: Parcours-Feedback, Ring-/Minimap-Zustand und Start-Setup-Sync wurden gemeinsam gehoben, damit Branch-/Checkpoint-Fortschritt im Runtime-, UI- und Testpfad denselben Zustand lesen und der Nutzer keine widerspruechlichen Signale zwischen Overlay, Audio und Replay-Fallback bekommt.
+- `b456c7bf` `docs: sync governance plans and enforce task-closure commits`: Governance und Planstand wurden nachgezogen, damit abgeschlossene Arbeit nicht mehr als offener Worktree endet und der aktuelle Block-/Lock-/Graph-Stand wieder denselben Repo-Zustand beschreibt wie die Commits.
+- `ff0b37eb` `chore: tighten pre-commit parcours validation`: Das Meta-Gate prueft Parcours-Routen jetzt auch strikt vor dem Commit, um fehlerhafte Stage-Spruenge oder Branch-Drift frueh abzufangen, bevor UI-/Runtime-Fixes mit inkonsistenten Streckendaten eingecheckt werden.

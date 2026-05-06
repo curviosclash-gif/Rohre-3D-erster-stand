@@ -29,5 +29,6 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 ## 3. Commit
 
 - Wenn die kleine Aufgabe abgeschlossen ist und scoped Aenderungen erzeugt hat, Commit direkt im selben Turn erstellen.
+- Eine kurze Notiz zum Commit-Zweck im passenden Kontext hinterlassen; bei fehlendem Block mindestens in `docs/plaene/CHANGELOG.md`, wenn Repo-Governance oder Statuswissen betroffen ist.
 - `git add [scoped-files]` -> `[type]: [short reason]`.
 - Scope pruefen: `git diff --name-only`.

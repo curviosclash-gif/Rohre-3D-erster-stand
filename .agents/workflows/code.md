@@ -56,6 +56,7 @@ Optional (nur bei Bedarf):
 
 - Git-Policy: `.agents/rules/git_and_commits.md` (Scope, Commit-Slice, Safety).
 - Wenn die angeforderte Aufgabe nach Self-check/Gates abgeschlossen ist und scoped Repo-Aenderungen vorliegen, den Commit im selben Turn erstellen; keinen eigenen offenen Worktree zuruecklassen.
+- Vor oder zusammen mit dem Commit kurze Notizen hinterlassen, die Zweck und Effekt des Delivery-Slices erklaeren (Block-Evidence und/oder `docs/plaene/CHANGELOG.md`).
 - `npm run guard:main`.
 - Windows vor Staging: `npm run git:acl:heal`.
 - `git add [scoped-files]` -> `git commit -m "[type]: [name] - [short reason]"`.

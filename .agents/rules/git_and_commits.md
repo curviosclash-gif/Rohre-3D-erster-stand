@@ -32,6 +32,8 @@ description: Git safety, branch enforcement, and commit policy (consolidated)
 - Umsetzungsplan-/Lock-Aenderungen sind kein eigener Pflicht-Commit mehr; separat nur bei reiner Governance-/Planpflege ohne Codewirkung.
 - Commit-Preflight bleibt: eigene offenen Aenderungen vor neuem, unverbundenem Task sauber sichern oder bewusst im selben Delivery-Slice halten.
 - Concise messages explaining *why*, not *what*. Types: `feat`, `fix`, `refactor`, `perf`, `chore`, `release`, `docs`.
+- Jeder eigene Abschluss-Commit braucht zusaetzlich kurze erklaerende Notizen zum Zweck, Risiko oder Nutzer-/Workflow-Effekt.
+- Plangebundene Arbeit dokumentiert diese Notizen im aktiven Block und/oder in `docs/plaene/CHANGELOG.md`; nicht plangebundene Repo-Arbeit hinterlaesst sie im naechstliegenden Governance-/Status-Kontext.
 - For immediate small corrections in the same delivery slice, use `git commit --amend`.
 - Never use destructive history changes as default. Use `revert`/scoped restore first.
 

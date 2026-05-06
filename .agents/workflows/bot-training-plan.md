@@ -56,6 +56,7 @@ git push
 - For completed phase items (`[x]`), append evidence metadata:
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
 - Keep artifact paths and KPI deltas documented in `docs/bot-training/Bot_Trainingsplan.md`.
+- Zu jedem Abschluss-Commit kurze Trainings-Notiz mit Ziel, KPI-/Artefakt-Effekt oder Guardrail-Hintergrund festhalten.
 
 ## 5. Close and release
 
