@@ -18,6 +18,106 @@ const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
 const BOT_TRAINING_MASTER_PATH = 'docs/bot-training/Bot_Trainingsplan.md';
 const ACTIVE_PLANS_DIR = 'docs/plaene/aktiv';
+const REQUIRED_KNOWLEDGE_GRAPH_MAPPING_IDS = Object.freeze([
+    'runtime-taxonomy',
+    'desktop-critical-paths',
+]);
+const CRITICAL_DESKTOP_GRAPH_REQUIREMENTS = Object.freeze([
+    {
+        criticalPath: 'spawn',
+        requiredNodes: [
+            { id: 'event:spawn', type: 'event', mappingId: 'runtime-taxonomy' },
+            { id: 'state:spawn-context', type: 'state', mappingId: 'runtime-taxonomy' },
+            { id: 'runtime:entity-spawn-ops', type: 'runtime', mappingId: 'desktop-critical-paths' },
+            { id: 'runtime:spawn-placement-system', type: 'runtime', mappingId: 'desktop-critical-paths' },
+            { id: 'test:physics-core-spawn', type: 'test', mappingId: 'desktop-critical-paths' },
+        ],
+        requiredEdges: [
+            { from: 'runtime:entity-spawn-ops', to: 'config:gameplay-config-contract', type: 'reads_config', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:entity-spawn-ops', to: 'state:spawn-context', type: 'writes_state', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:entity-spawn-ops', to: 'event:spawn', type: 'emits', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:entity-spawn-ops', to: 'test:physics-core-spawn', type: 'validated_by', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:spawn-placement-system', to: 'state:spawn-context', type: 'reads_state', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:spawn-placement-system', to: 'test:physics-core-spawn', type: 'validated_by', mappingId: 'desktop-critical-paths' },
+        ],
+    },
+    {
+        criticalPath: 'combat-hit',
+        requiredNodes: [
+            { id: 'event:hunt-damage', type: 'event', mappingId: 'runtime-taxonomy' },
+            { id: 'state:hunt-combat-lock-on', type: 'state', mappingId: 'runtime-taxonomy' },
+            { id: 'config:entity-runtime-config', type: 'config', mappingId: 'runtime-taxonomy' },
+            { id: 'config:gameplay-config-contract', type: 'config', mappingId: 'runtime-taxonomy' },
+            { id: 'runtime:hunt-combat-system', type: 'runtime', mappingId: 'desktop-critical-paths' },
+            { id: 'runtime:projectile-hit-resolver', type: 'runtime', mappingId: 'desktop-critical-paths' },
+            { id: 'runtime:mg-hit-resolver', type: 'runtime', mappingId: 'desktop-critical-paths' },
+            { id: 'test:physics-hunt-combat', type: 'test', mappingId: 'desktop-critical-paths' },
+        ],
+        requiredEdges: [
+            { from: 'runtime:hunt-combat-system', to: 'config:entity-runtime-config', type: 'reads_config', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:hunt-combat-system', to: 'state:hunt-combat-lock-on', type: 'writes_state', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:hunt-combat-system', to: 'test:physics-hunt-combat', type: 'validated_by', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:projectile-hit-resolver', to: 'config:entity-runtime-config', type: 'reads_config', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:projectile-hit-resolver', to: 'event:hunt-damage', type: 'emits', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:projectile-hit-resolver', to: 'test:physics-hunt-combat', type: 'validated_by', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:mg-hit-resolver', to: 'config:gameplay-config-contract', type: 'reads_config', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:mg-hit-resolver', to: 'event:hunt-damage', type: 'emits', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:mg-hit-resolver', to: 'test:physics-hunt-combat', type: 'validated_by', mappingId: 'desktop-critical-paths' },
+        ],
+    },
+    {
+        criticalPath: 'round-end',
+        requiredNodes: [
+            { id: 'event:round-end', type: 'event', mappingId: 'runtime-taxonomy' },
+            { id: 'state:round-outcome', type: 'state', mappingId: 'runtime-taxonomy' },
+            { id: 'state:round-end-overlay', type: 'state', mappingId: 'runtime-taxonomy' },
+            { id: 'runtime:round-outcome-system', type: 'runtime', mappingId: 'desktop-critical-paths' },
+            { id: 'runtime:round-end-coordinator', type: 'runtime', mappingId: 'desktop-critical-paths' },
+            { id: 'test:runtime-regressions-round-end', type: 'test', mappingId: 'desktop-critical-paths' },
+        ],
+        requiredEdges: [
+            { from: 'runtime:round-outcome-system', to: 'state:round-outcome', type: 'writes_state', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:round-outcome-system', to: 'event:round-end', type: 'emits', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:round-outcome-system', to: 'test:runtime-regressions-round-end', type: 'validated_by', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:round-end-coordinator', to: 'event:round-end', type: 'consumes', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:round-end-coordinator', to: 'state:round-end-overlay', type: 'writes_state', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:round-end-coordinator', to: 'test:runtime-regressions-round-end', type: 'validated_by', mappingId: 'desktop-critical-paths' },
+        ],
+    },
+    {
+        criticalPath: 'settings',
+        requiredNodes: [
+            { id: 'state:settings-snapshot', type: 'state', mappingId: 'runtime-taxonomy' },
+            { id: 'state:runtime-config-snapshot', type: 'state', mappingId: 'runtime-taxonomy' },
+            { id: 'config:runtime-config-builder', type: 'config', mappingId: 'runtime-taxonomy' },
+            { id: 'config:base-game-config', type: 'config', mappingId: 'runtime-taxonomy' },
+            { id: 'config:settings-runtime-contract', type: 'config', mappingId: 'runtime-taxonomy' },
+            { id: 'config:runtime-session-contract', type: 'config', mappingId: 'runtime-taxonomy' },
+            { id: 'config:settings-runtime-limits', type: 'config', mappingId: 'runtime-taxonomy' },
+            {
+                id: 'runtime:settings-manager',
+                type: 'runtime',
+                mappingId: 'desktop-critical-paths',
+                attributes: {
+                    requiredReference: true,
+                },
+            },
+            { id: 'test:runtime-settings-live-apply', type: 'test', mappingId: 'desktop-critical-paths' },
+            { id: 'test:settings-manager-contract', type: 'test', mappingId: 'desktop-critical-paths' },
+        ],
+        requiredEdges: [
+            { from: 'runtime:settings-manager', to: 'config:runtime-config-builder', type: 'reads_config', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:settings-manager', to: 'state:settings-snapshot', type: 'writes_state', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:settings-manager', to: 'state:runtime-config-snapshot', type: 'writes_state', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:settings-manager', to: 'test:runtime-settings-live-apply', type: 'validated_by', mappingId: 'desktop-critical-paths' },
+            { from: 'runtime:settings-manager', to: 'test:settings-manager-contract', type: 'validated_by', mappingId: 'desktop-critical-paths' },
+            { from: 'config:runtime-config-builder', to: 'config:base-game-config', type: 'reads_config', mappingId: 'desktop-critical-paths' },
+            { from: 'config:runtime-config-builder', to: 'config:settings-runtime-contract', type: 'reads_config', mappingId: 'desktop-critical-paths' },
+            { from: 'config:runtime-config-builder', to: 'config:runtime-session-contract', type: 'reads_config', mappingId: 'desktop-critical-paths' },
+            { from: 'config:runtime-config-builder', to: 'config:settings-runtime-limits', type: 'reads_config', mappingId: 'desktop-critical-paths' },
+        ],
+    },
+]);
 
 function artifactToString(payload) {
     return `${JSON.stringify(payload, null, 2)}\n`;
@@ -25,6 +125,14 @@ function artifactToString(payload) {
 
 function addViolation(violations, code, message) {
     violations.push({ code, message });
+}
+
+function nodeHasMappingId(node, mappingId) {
+    return String(node?.attributes?.mappingId || '').trim() === mappingId;
+}
+
+function edgeHasMappingId(edge, mappingId) {
+    return String(edge?.attributes?.mappingId || '').trim() === mappingId;
 }
 
 async function readExistingArtifact(relativePath) {
@@ -116,6 +224,83 @@ function ensureAllEdgeEndpointsExist(graph, violations) {
         }
         if (!nodeById.has(edge.to)) {
             addViolation(violations, 'EDGE_TO_MISSING', `edge target fehlt: ${edge.type} ${edge.from} -> ${edge.to}`);
+        }
+    }
+}
+
+function validateCriticalDesktopMappings(graph, violations) {
+    const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
+    const edges = Array.isArray(graph.edges) ? graph.edges : [];
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const edgeKeySet = new Set(
+        edges.map((edge) => [
+            String(edge.from || '').trim(),
+            String(edge.to || '').trim(),
+            String(edge.type || '').trim(),
+            String(edge.attributes?.mappingId || '').trim(),
+        ].join('::'))
+    );
+
+    for (const mappingId of REQUIRED_KNOWLEDGE_GRAPH_MAPPING_IDS) {
+        const hasAnyNode = nodes.some((node) => nodeHasMappingId(node, mappingId));
+        const hasAnyEdge = edges.some((edge) => edgeHasMappingId(edge, mappingId));
+        if (!hasAnyNode && !hasAnyEdge) {
+            addViolation(violations, 'KG_MAPPING_MISSING', `Pflicht-Mapping ${mappingId} fehlt komplett im Graph`);
+        }
+    }
+
+    for (const requirement of CRITICAL_DESKTOP_GRAPH_REQUIREMENTS) {
+        for (const nodeRequirement of requirement.requiredNodes) {
+            const node = nodeById.get(nodeRequirement.id) || null;
+            if (!node) {
+                addViolation(
+                    violations,
+                    'KG_CRITICAL_NODE_MISSING',
+                    `Critical-Path ${requirement.criticalPath} fehlt Pflichtknoten ${nodeRequirement.id}`
+                );
+                continue;
+            }
+            if (node.type !== nodeRequirement.type) {
+                addViolation(
+                    violations,
+                    'KG_CRITICAL_NODE_TYPE',
+                    `Critical-Path ${requirement.criticalPath} erwartet ${nodeRequirement.id} als ${nodeRequirement.type}, gefunden ${node.type}`
+                );
+            }
+            if (!nodeHasMappingId(node, nodeRequirement.mappingId)) {
+                addViolation(
+                    violations,
+                    'KG_CRITICAL_NODE_MAPPING',
+                    `Critical-Path ${requirement.criticalPath} erwartet ${nodeRequirement.id} aus Mapping ${nodeRequirement.mappingId}`
+                );
+            }
+
+            const requiredAttributes = nodeRequirement.attributes || {};
+            for (const [attributeKey, attributeValue] of Object.entries(requiredAttributes)) {
+                if (node.attributes?.[attributeKey] !== attributeValue) {
+                    addViolation(
+                        violations,
+                        'KG_CRITICAL_NODE_ATTRIBUTE',
+                        `Critical-Path ${requirement.criticalPath} erwartet ${nodeRequirement.id}.${attributeKey}=${attributeValue}`
+                    );
+                }
+            }
+        }
+
+        for (const edgeRequirement of requirement.requiredEdges) {
+            const edgeKey = [
+                edgeRequirement.from,
+                edgeRequirement.to,
+                edgeRequirement.type,
+                edgeRequirement.mappingId,
+            ].join('::');
+            if (!edgeKeySet.has(edgeKey)) {
+                addViolation(
+                    violations,
+                    'KG_CRITICAL_EDGE_MISSING',
+                    `Critical-Path ${requirement.criticalPath} fehlt Pflichtkante ${edgeRequirement.from} -> ${edgeRequirement.to} (${edgeRequirement.type})`
+                );
+            }
         }
     }
 }
@@ -442,6 +627,7 @@ async function runChecks() {
 
     validateNodeIdAndOrphans(existingGraph.parsed, violations);
     ensureAllEdgeEndpointsExist(existingGraph.parsed, violations);
+    validateCriticalDesktopMappings(existingGraph.parsed, violations);
     ensureDependsTargetsExist(existingGraph.parsed, violations);
     detectHardDependsCycles(existingGraph.parsed, violations);
     validateScopeEdgesAndFiles(existingGraph.parsed, violations);
@@ -471,3 +657,7 @@ if (isDirectRun) {
 }
 
 export { runChecks };
+export {
+    CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
+    validateCriticalDesktopMappings,
+};

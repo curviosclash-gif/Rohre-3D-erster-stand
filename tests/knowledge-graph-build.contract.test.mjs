@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+    buildKnowledgeGraph,
     classifyCoveragePath,
     normalizeKnowledgeGraphMappingContract,
     parseAuditFindingsMetadata,
@@ -14,6 +15,10 @@ import {
     parseMasterRows,
     resolveScopeEntries,
 } from '../scripts/build-knowledge-graph.mjs';
+import {
+    CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
+    validateCriticalDesktopMappings,
+} from '../scripts/check-knowledge-graph.mjs';
 
 test('parseFrontmatter tolerates missing status and variant field order', () => {
     const content = [
@@ -278,6 +283,29 @@ test('normalizeKnowledgeGraphMappingContract validates mapping payloads and norm
     assert.equal(mapping.nodes[2].file, 'src/core/RuntimeConfig.js');
     assert.equal(mapping.edges[0].type, 'validated_by');
     assert.equal(mapping.edges[1].type, 'reads_config');
+});
+
+test('buildKnowledgeGraph keeps required desktop critical-path mappings intact', async () => {
+    const graph = await buildKnowledgeGraph();
+    const violations = [];
+    validateCriticalDesktopMappings(graph, violations);
+
+    assert.deepEqual(violations, []);
+
+    const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
+    for (const requirement of CRITICAL_DESKTOP_GRAPH_REQUIREMENTS) {
+        for (const nodeRequirement of requirement.requiredNodes) {
+            const node = nodeById.get(nodeRequirement.id);
+            assert.ok(node, `${requirement.criticalPath} node ${nodeRequirement.id} missing`);
+            const criticalPaths = Array.isArray(node.attributes?.criticalPaths)
+                ? node.attributes.criticalPaths
+                : [node.attributes?.criticalPath].filter(Boolean);
+            assert.ok(
+                criticalPaths.includes(requirement.criticalPath),
+                `${nodeRequirement.id} should stay tagged with ${requirement.criticalPath}`
+            );
+        }
+    }
 });
 
 test('parseAuditMasterRows extracts audit blocks, findings paths and core scope references', () => {
