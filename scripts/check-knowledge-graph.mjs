@@ -95,6 +95,30 @@ function ensureDependsTargetsExist(graph, violations) {
     }
 }
 
+function ensureAllEdgeEndpointsExist(graph, violations) {
+    const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
+    const edges = Array.isArray(graph.edges) ? graph.edges : [];
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const mappingEdgeTypes = new Set([
+        'implements',
+        'emits',
+        'consumes',
+        'reads_state',
+        'writes_state',
+        'validated_by',
+    ]);
+
+    for (const edge of edges) {
+        if (!mappingEdgeTypes.has(edge.type)) continue;
+        if (!nodeById.has(edge.from)) {
+            addViolation(violations, 'EDGE_FROM_MISSING', `edge source fehlt: ${edge.type} ${edge.from} -> ${edge.to}`);
+        }
+        if (!nodeById.has(edge.to)) {
+            addViolation(violations, 'EDGE_TO_MISSING', `edge target fehlt: ${edge.type} ${edge.from} -> ${edge.to}`);
+        }
+    }
+}
+
 function detectHardDependsCycles(graph, violations) {
     const edges = Array.isArray(graph.edges) ? graph.edges : [];
     const hardEdges = edges.filter((edge) => edge.type === 'depends_on' && edge.hard === true);
@@ -416,6 +440,7 @@ async function runChecks() {
     }
 
     validateNodeIdAndOrphans(existingGraph.parsed, violations);
+    ensureAllEdgeEndpointsExist(existingGraph.parsed, violations);
     ensureDependsTargetsExist(existingGraph.parsed, violations);
     detectHardDependsCycles(existingGraph.parsed, violations);
     validateScopeEdgesAndFiles(existingGraph.parsed, violations);

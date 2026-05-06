@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
     classifyCoveragePath,
+    normalizeKnowledgeGraphMappingContract,
     parseAuditFindingsMetadata,
     parseAuditMasterRows,
     parseBotTrainingBlocks,
@@ -229,6 +230,44 @@ test('classifyCoveragePath marks excluded and active buckets', () => {
     });
 });
 
+test('normalizeKnowledgeGraphMappingContract validates mapping payloads and normalizes repo paths', () => {
+    const mapping = normalizeKnowledgeGraphMappingContract({
+        contract: 'knowledge-graph.mapping.v1',
+        schema_version: 1,
+        mapping_id: 'desktop-critical-paths',
+        description: 'fixture',
+        nodes: [
+            {
+                id: 'runtime:settings-manager',
+                type: 'runtime',
+                title: 'SettingsManager',
+                file: 'src\\core\\SettingsManager.js',
+                attributes: {
+                    criticalPath: 'settings',
+                },
+            },
+            {
+                id: 'test:settings-manager-contract',
+                type: 'test',
+                file: './tests/settings-manager.contract.test.mjs',
+            },
+        ],
+        edges: [
+            {
+                from: 'runtime:settings-manager',
+                to: 'test:settings-manager-contract',
+                type: 'validated_by',
+            },
+        ],
+    });
+
+    assert.equal(mapping.mapping_id, 'desktop-critical-paths');
+    assert.equal(mapping.nodes[0].file, 'src/core/SettingsManager.js');
+    assert.equal(mapping.nodes[1].file, 'tests/settings-manager.contract.test.mjs');
+    assert.equal(mapping.nodes[1].status, 'unknown');
+    assert.equal(mapping.edges[0].type, 'validated_by');
+});
+
 test('parseAuditMasterRows extracts audit blocks, findings paths and core scope references', () => {
     const content = [
         '# Spielaudit',
@@ -245,7 +284,7 @@ test('parseAuditMasterRows extracts audit blocks, findings paths and core scope 
     assert.equal(rows[0].id, 'B05');
     assert.equal(rows[0].title, 'Menue, Start-Setup und UI-Orchestrierung');
     assert.equal(rows[0].findingsPath, 'docs/qa/Spielaudit_2026-04-28/B05_Findings.md');
-    assert.deepEqual(rows[0].scopeEntries, ['src/ui/UIManager.js', 'src/ui/start-setup/**']);
+    assert.deepEqual(rows[0].scopeEntries, ['src/ui/start-setup/**', 'src/ui/UIManager.js']);
 });
 
 test('parseAuditFindingsMetadata reads status and scope references from findings documents', () => {
@@ -266,7 +305,7 @@ test('parseAuditFindingsMetadata reads status and scope references from findings
 
     assert.equal(metadata.status, 'open');
     assert.deepEqual(metadata.scopeEntries, [
-        'src/ui/UIStartSyncController.js',
         'src/ui/start-setup/StartSetupUiOps.js',
+        'src/ui/UIStartSyncController.js',
     ]);
 });

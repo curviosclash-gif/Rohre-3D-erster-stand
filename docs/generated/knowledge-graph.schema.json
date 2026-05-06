@@ -53,6 +53,10 @@
         "block",
         "phase",
         "subphase",
+        "runtime",
+        "event",
+        "state",
+        "test",
         "file",
         "surface"
       ]
@@ -64,7 +68,13 @@
         "scope",
         "touches",
         "contains_phase",
-        "contains_subphase"
+        "contains_subphase",
+        "implements",
+        "emits",
+        "consumes",
+        "reads_state",
+        "writes_state",
+        "validated_by"
       ]
     },
     "dependsSourceType": {

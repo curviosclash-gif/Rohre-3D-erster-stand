@@ -1,0 +1,90 @@
+{
+  "contract": "knowledge-graph.mapping.v1",
+  "schema_version": 1,
+  "mapping_id": "runtime-taxonomy",
+  "description": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+  "nodes": [
+    {
+      "id": "event:spawn",
+      "type": "event",
+      "title": "Player spawn lifecycle",
+      "attributes": {
+        "criticalPath": "spawn",
+        "domain": "entity-lifecycle"
+      }
+    },
+    {
+      "id": "event:hunt-damage",
+      "type": "event",
+      "title": "Hunt damage and hit feedback",
+      "attributes": {
+        "criticalPath": "combat-hit",
+        "domain": "combat"
+      }
+    },
+    {
+      "id": "event:round-end",
+      "type": "event",
+      "title": "Round end resolution",
+      "attributes": {
+        "criticalPath": "round-end",
+        "domain": "match-flow"
+      }
+    },
+    {
+      "id": "state:spawn-context",
+      "type": "state",
+      "title": "Spawn context and authored placement state",
+      "attributes": {
+        "criticalPath": "spawn",
+        "domain": "entity-lifecycle"
+      }
+    },
+    {
+      "id": "state:hunt-combat-lock-on",
+      "type": "state",
+      "title": "Hunt combat targeting and lock-on cache",
+      "attributes": {
+        "criticalPath": "combat-hit",
+        "domain": "combat"
+      }
+    },
+    {
+      "id": "state:round-outcome",
+      "type": "state",
+      "title": "Round outcome decision state",
+      "attributes": {
+        "criticalPath": "round-end",
+        "domain": "match-flow"
+      }
+    },
+    {
+      "id": "state:round-end-overlay",
+      "type": "state",
+      "title": "Round end UI overlay state",
+      "attributes": {
+        "criticalPath": "round-end",
+        "domain": "match-flow"
+      }
+    },
+    {
+      "id": "state:settings-snapshot",
+      "type": "state",
+      "title": "Sanitized settings snapshot",
+      "attributes": {
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "state:runtime-config-snapshot",
+      "type": "state",
+      "title": "Runtime config snapshot",
+      "attributes": {
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    }
+  ],
+  "edges": []
+}

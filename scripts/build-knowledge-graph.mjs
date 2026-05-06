@@ -17,6 +17,7 @@ const ARCHIVED_COMPLETED_BLOCKS_PATH = 'docs/plaene/archiv/abgeschlossene-bloeck
 const GUARD_MATRIX_PATH = 'scripts/architecture/legacy-surface-guard-matrix.json';
 const OUTPUT_PATH = 'docs/generated/knowledge-graph.json';
 const COVERAGE_OUTPUT_PATH = 'docs/generated/knowledge-graph.coverage.json';
+const KNOWLEDGE_GRAPH_MAPPING_DIR = 'data/contracts/knowledge-graph';
 const GIT_HOTSPOT_OVERLAY_ID = 'GIT-HISTORY-HOTSPOTS';
 const GIT_HOTSPOT_MAX_FILES = 96;
 const GIT_HOTSPOT_MIN_CHANGES = 5;
@@ -43,6 +44,8 @@ const GIT_HOTSPOT_ROOT_FILES = new Set([
 
 const GRAPH_CONTRACT = 'knowledge-graph.v1';
 const GRAPH_SCHEMA_VERSION = 1;
+const GRAPH_MAPPING_CONTRACT = 'knowledge-graph.mapping.v1';
+const GRAPH_MAPPING_SCHEMA_VERSION = 1;
 const COVERAGE_CONTRACT = 'knowledge-graph.coverage.v1';
 const COVERAGE_SCHEMA_VERSION = 1;
 const execFile = promisify(execFileCallback);
@@ -113,9 +116,28 @@ const NODE_TYPE_ORDER = Object.freeze({
     block: 0,
     phase: 1,
     subphase: 2,
-    file: 3,
-    surface: 4,
+    runtime: 3,
+    event: 4,
+    state: 5,
+    test: 6,
+    file: 7,
+    surface: 8,
 });
+
+const KNOWLEDGE_GRAPH_MAPPING_NODE_TYPES = new Set([
+    'runtime',
+    'event',
+    'state',
+    'test',
+]);
+const KNOWLEDGE_GRAPH_MAPPING_EDGE_TYPES = new Set([
+    'implements',
+    'emits',
+    'consumes',
+    'reads_state',
+    'writes_state',
+    'validated_by',
+]);
 
 const KNOWN_FRONTMATTER_FIELDS = new Set([
     'id',
@@ -142,6 +164,14 @@ function normalizeRepoPath(value) {
         .replace(/\\/g, '/')
         .replace(/^\.\/+/, '')
         .replace(/\/{2,}/g, '/');
+}
+
+function isMappingNodeType(value) {
+    return KNOWLEDGE_GRAPH_MAPPING_NODE_TYPES.has(String(value || '').trim());
+}
+
+function isMappingEdgeType(value) {
+    return KNOWLEDGE_GRAPH_MAPPING_EDGE_TYPES.has(String(value || '').trim());
 }
 
 function splitBlockId(blockId) {
@@ -562,6 +592,109 @@ async function readAuditPlans(trackedFiles, trackedFileSet) {
     }
 
     return plans.sort((left, right) => left.id.localeCompare(right.id));
+}
+
+function normalizeKnowledgeGraphMappingContract(rawMapping) {
+    const mapping = rawMapping && typeof rawMapping === 'object' ? rawMapping : {};
+    const contract = String(mapping.contract || '').trim();
+    if (contract !== GRAPH_MAPPING_CONTRACT) {
+        throw new Error(`Unsupported knowledge-graph mapping contract: ${contract || '<empty>'}`);
+    }
+
+    const schemaVersion = Number(mapping.schema_version);
+    if (schemaVersion !== GRAPH_MAPPING_SCHEMA_VERSION) {
+        throw new Error(`Unsupported knowledge-graph mapping schema_version: ${mapping.schema_version}`);
+    }
+
+    const mappingId = String(mapping.mapping_id || '').trim();
+    if (!mappingId) {
+        throw new Error('knowledge-graph mapping requires mapping_id');
+    }
+
+    const description = String(mapping.description || '').trim() || null;
+    const nodes = Array.isArray(mapping.nodes) ? mapping.nodes : [];
+    const edges = Array.isArray(mapping.edges) ? mapping.edges : [];
+    const normalizedNodes = nodes.map((entry, index) => {
+        const node = entry && typeof entry === 'object' ? entry : {};
+        const id = String(node.id || '').trim();
+        const type = String(node.type || '').trim();
+        if (!id) {
+            throw new Error(`knowledge-graph mapping ${mappingId} node[${index}] requires id`);
+        }
+        if (!isMappingNodeType(type)) {
+            throw new Error(`knowledge-graph mapping ${mappingId} node[${index}] uses unsupported type ${type || '<empty>'}`);
+        }
+
+        const filePath = node.file ? normalizeRepoPath(node.file) : null;
+        return {
+            id,
+            type,
+            title: typeof node.title === 'string' && node.title.trim() ? node.title.trim() : null,
+            status: typeof node.status === 'string' && node.status.trim() ? node.status.trim() : 'unknown',
+            file: filePath || null,
+            attributes: node.attributes && typeof node.attributes === 'object' && !Array.isArray(node.attributes)
+                ? { ...node.attributes }
+                : {},
+        };
+    });
+
+    const normalizedEdges = edges.map((entry, index) => {
+        const edge = entry && typeof entry === 'object' ? entry : {};
+        const from = String(edge.from || '').trim();
+        const to = String(edge.to || '').trim();
+        const type = String(edge.type || '').trim();
+        if (!from || !to) {
+            throw new Error(`knowledge-graph mapping ${mappingId} edge[${index}] requires from/to`);
+        }
+        if (!isMappingEdgeType(type)) {
+            throw new Error(`knowledge-graph mapping ${mappingId} edge[${index}] uses unsupported type ${type || '<empty>'}`);
+        }
+        return {
+            from,
+            to,
+            type,
+            attributes: edge.attributes && typeof edge.attributes === 'object' && !Array.isArray(edge.attributes)
+                ? { ...edge.attributes }
+                : {},
+        };
+    });
+
+    return {
+        contract,
+        schema_version: schemaVersion,
+        mapping_id: mappingId,
+        description,
+        nodes: normalizedNodes,
+        edges: normalizedEdges,
+    };
+}
+
+async function readKnowledgeGraphMappings() {
+    const absoluteDirectory = path.join(ROOT, KNOWLEDGE_GRAPH_MAPPING_DIR);
+    let entries = [];
+    try {
+        entries = await fs.readdir(absoluteDirectory, { withFileTypes: true });
+    } catch {
+        return [];
+    }
+
+    const mappingFiles = entries
+        .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
+        .map((entry) => entry.name)
+        .sort((left, right) => left.localeCompare(right));
+
+    const mappings = [];
+    for (const fileName of mappingFiles) {
+        const relativePath = normalizeRepoPath(path.join(KNOWLEDGE_GRAPH_MAPPING_DIR, fileName));
+        const raw = JSON.parse(await fs.readFile(path.join(ROOT, relativePath), 'utf8'));
+        const normalized = normalizeKnowledgeGraphMappingContract(raw);
+        mappings.push({
+            ...normalized,
+            filePath: relativePath,
+        });
+    }
+
+    return mappings;
 }
 
 async function buildGitHotspotOverlay(coveredFileIds, trackedFiles) {
@@ -1899,12 +2032,71 @@ function emitBlockPlan(nodes, edges, plan, declaredBy) {
     }
 }
 
+function emitKnowledgeGraphMappings(nodes, edges, mappings) {
+    for (const mapping of mappings || []) {
+        for (const node of mapping.nodes || []) {
+            nodes.upsert({
+                id: node.id,
+                type: node.type,
+                title: node.title,
+                status: node.status || 'unknown',
+                attributes: {
+                    source: ['knowledge-graph-mapping'],
+                    mappingId: mapping.mapping_id,
+                    mappingFile: mapping.filePath,
+                    ...(mapping.description ? { mappingDescription: mapping.description } : {}),
+                    ...(node.file ? { file: node.file } : {}),
+                    ...(node.attributes || {}),
+                },
+            });
+
+            if (node.file) {
+                nodes.upsert({
+                    id: node.file,
+                    type: 'file',
+                    title: null,
+                    status: 'unknown',
+                    attributes: {
+                        source: ['knowledge-graph-mapping'],
+                        mappedNodes: [node.id],
+                    },
+                });
+                edges.upsert({
+                    from: node.file,
+                    to: node.id,
+                    type: 'implements',
+                    attributes: {
+                        mappingId: mapping.mapping_id,
+                        mappingFile: mapping.filePath,
+                    },
+                });
+            }
+        }
+    }
+
+    for (const mapping of mappings || []) {
+        for (const edge of mapping.edges || []) {
+            edges.upsert({
+                from: edge.from,
+                to: edge.to,
+                type: edge.type,
+                attributes: {
+                    mappingId: mapping.mapping_id,
+                    mappingFile: mapping.filePath,
+                    ...(edge.attributes || {}),
+                },
+            });
+        }
+    }
+}
+
 async function buildKnowledgeGraphModel() {
-    const [masterContent, guardMatrixContent, canonicalPlans, fallbackBlockMetadata] = await Promise.all([
+    const [masterContent, guardMatrixContent, canonicalPlans, fallbackBlockMetadata, knowledgeGraphMappings] = await Promise.all([
         fs.readFile(path.join(ROOT, MASTER_PLAN_PATH), 'utf8'),
         fs.readFile(path.join(ROOT, GUARD_MATRIX_PATH), 'utf8'),
         readCanonicalBlockPlans(),
         readFallbackBlockMetadata(),
+        readKnowledgeGraphMappings(),
     ]);
     const trackedFiles = await readTrackedFiles();
     const trackedFileSet = new Set(trackedFiles);
@@ -1975,6 +2167,8 @@ async function buildKnowledgeGraphModel() {
     for (const auditPlan of auditPlans) {
         emitBlockPlan(nodes, edges, auditPlan, 'audit-scope');
     }
+
+    emitKnowledgeGraphMappings(nodes, edges, knowledgeGraphMappings);
 
     const dependsMap = new Map();
     function addDepends(blockId, token, sourceType) {
@@ -2214,6 +2408,7 @@ export {
     buildCoverageArtifact,
     buildGitHotspotOverlay,
     classifyCoveragePath,
+    normalizeKnowledgeGraphMappingContract,
     parseFrontmatter,
     parseMasterRows,
     parseDependencyTable,

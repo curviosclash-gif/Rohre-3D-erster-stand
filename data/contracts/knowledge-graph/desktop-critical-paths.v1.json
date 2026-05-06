@@ -1,0 +1,246 @@
+{
+  "contract": "knowledge-graph.mapping.v1",
+  "schema_version": 1,
+  "mapping_id": "desktop-critical-paths",
+  "description": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+  "nodes": [
+    {
+      "id": "runtime:entity-spawn-ops",
+      "type": "runtime",
+      "title": "EntitySpawnOps",
+      "file": "src/entities/runtime/EntitySpawnOps.js",
+      "attributes": {
+        "criticalPath": "spawn",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:spawn-placement-system",
+      "type": "runtime",
+      "title": "SpawnPlacementSystem",
+      "file": "src/entities/systems/SpawnPlacementSystem.js",
+      "attributes": {
+        "criticalPath": "spawn",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:hunt-combat-system",
+      "type": "runtime",
+      "title": "HuntCombatSystem",
+      "file": "src/entities/systems/HuntCombatSystem.js",
+      "attributes": {
+        "criticalPath": "combat-hit",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:projectile-hit-resolver",
+      "type": "runtime",
+      "title": "ProjectileHitResolver",
+      "file": "src/entities/systems/projectile/ProjectileHitResolver.js",
+      "attributes": {
+        "criticalPath": "combat-hit",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:mg-hit-resolver",
+      "type": "runtime",
+      "title": "MGHitResolver",
+      "file": "src/hunt/mg/MGHitResolver.js",
+      "attributes": {
+        "criticalPath": "combat-hit",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:round-outcome-system",
+      "type": "runtime",
+      "title": "RoundOutcomeSystem",
+      "file": "src/entities/systems/RoundOutcomeSystem.js",
+      "attributes": {
+        "criticalPath": "round-end",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:round-end-coordinator",
+      "type": "runtime",
+      "title": "RoundEndCoordinator",
+      "file": "src/state/RoundEndCoordinator.js",
+      "attributes": {
+        "criticalPath": "round-end",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:settings-manager",
+      "type": "runtime",
+      "title": "SettingsManager",
+      "file": "src/core/SettingsManager.js",
+      "attributes": {
+        "criticalPath": "settings",
+        "layer": "runtime",
+        "requiredReference": true
+      }
+    },
+    {
+      "id": "test:physics-core-spawn",
+      "type": "test",
+      "title": "Physics core authored spawn coverage",
+      "file": "tests/physics-core.spec.js",
+      "attributes": {
+        "criticalPath": "spawn",
+        "testLayer": "desktop-e2e"
+      }
+    },
+    {
+      "id": "test:physics-hunt-combat",
+      "type": "test",
+      "title": "Physics hunt combat coverage",
+      "file": "tests/physics-hunt.spec.js",
+      "attributes": {
+        "criticalPath": "combat-hit",
+        "testLayer": "desktop-e2e"
+      }
+    },
+    {
+      "id": "test:runtime-regressions-round-end",
+      "type": "test",
+      "title": "Runtime regressions round-end coverage",
+      "file": "tests/runtime-regressions.contract.test.mjs",
+      "attributes": {
+        "criticalPath": "round-end",
+        "testLayer": "node-contract"
+      }
+    },
+    {
+      "id": "test:runtime-settings-live-apply",
+      "type": "test",
+      "title": "Runtime settings live apply coverage",
+      "file": "tests/runtime-settings-live-apply.contract.test.mjs",
+      "attributes": {
+        "criticalPath": "settings",
+        "testLayer": "node-contract"
+      }
+    },
+    {
+      "id": "test:settings-manager-contract",
+      "type": "test",
+      "title": "SettingsManager contract coverage",
+      "file": "tests/settings-manager.contract.test.mjs",
+      "attributes": {
+        "criticalPath": "settings",
+        "testLayer": "node-contract"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "runtime:entity-spawn-ops",
+      "to": "state:spawn-context",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:spawn-placement-system",
+      "to": "state:spawn-context",
+      "type": "reads_state"
+    },
+    {
+      "from": "runtime:entity-spawn-ops",
+      "to": "event:spawn",
+      "type": "emits"
+    },
+    {
+      "from": "runtime:entity-spawn-ops",
+      "to": "test:physics-core-spawn",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:spawn-placement-system",
+      "to": "test:physics-core-spawn",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:hunt-combat-system",
+      "to": "state:hunt-combat-lock-on",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:projectile-hit-resolver",
+      "to": "event:hunt-damage",
+      "type": "emits"
+    },
+    {
+      "from": "runtime:mg-hit-resolver",
+      "to": "event:hunt-damage",
+      "type": "emits"
+    },
+    {
+      "from": "runtime:hunt-combat-system",
+      "to": "test:physics-hunt-combat",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:projectile-hit-resolver",
+      "to": "test:physics-hunt-combat",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:mg-hit-resolver",
+      "to": "test:physics-hunt-combat",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:round-outcome-system",
+      "to": "state:round-outcome",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:round-outcome-system",
+      "to": "event:round-end",
+      "type": "emits"
+    },
+    {
+      "from": "runtime:round-end-coordinator",
+      "to": "event:round-end",
+      "type": "consumes"
+    },
+    {
+      "from": "runtime:round-end-coordinator",
+      "to": "state:round-end-overlay",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:round-outcome-system",
+      "to": "test:runtime-regressions-round-end",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:round-end-coordinator",
+      "to": "test:runtime-regressions-round-end",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "state:settings-snapshot",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "state:runtime-config-snapshot",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "test:runtime-settings-live-apply",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "test:settings-manager-contract",
+      "type": "validated_by"
+    }
+  ]
+}

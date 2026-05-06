@@ -140,11 +140,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2428,
-    "rawCoveredFileCount": 1951,
+    "trackedFileCount": 2430,
+    "rawCoveredFileCount": 1953,
     "rawCoveragePercent": 80.4,
-    "adjustedTrackedFileCount": 1525,
-    "adjustedCoveredFileCount": 1290,
+    "adjustedTrackedFileCount": 1527,
+    "adjustedCoveredFileCount": 1292,
     "adjustedCoveragePercent": 84.6,
     "uncoveredFileCount": 477,
     "uncoveredActiveFileCount": 235,
@@ -188,8 +188,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 903,
-        "coveredCount": 887
+        "count": 905,
+        "coveredCount": 889
       },
       {
         "classification": "product-docs",
@@ -3633,6 +3633,44 @@
       "covered": false,
       "coverageSources": [],
       "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111"
+      ],
       "surfaces": [],
       "classification": "product-code",
       "excludedFromCoverage": false,
@@ -11999,6 +12037,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V107",
         "V109",
         "V77",
         "V93"
@@ -22324,6 +22363,7 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -24323,6 +24363,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -24418,6 +24459,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -24618,6 +24660,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -24697,6 +24740,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -24717,6 +24761,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -25052,6 +25097,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -27837,6 +27883,7 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -31468,6 +31515,7 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V107",
         "V110",
         "V111",
         "V94"
@@ -32002,6 +32050,7 @@
       "coverageSources": [
         "audit-scope",
         "bot-training-plan",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -32027,6 +32076,7 @@
       "coverageSources": [
         "audit-scope",
         "bot-training-plan",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -32334,6 +32384,7 @@
       "coverageSources": [
         "audit-scope",
         "bot-training-plan",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -32360,6 +32411,7 @@
       "coverageSources": [
         "audit-scope",
         "bot-training-plan",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -32385,6 +32437,7 @@
       "coverageSources": [
         "audit-scope",
         "bot-training-plan",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [

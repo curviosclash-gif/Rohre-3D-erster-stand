@@ -334,6 +334,10 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 
 ## Stand-Snapshot 2026-05-06 (Abschluss `V100 100.99`)
 
+- Start `V107 107.1.1`: Wissensgraph-Block ist als aktiver Produktblock im Master/Lock-System aufgenommen (`docs/Umsetzungsplan.md`, `docs/lock-status/codex.json`).
+- Neuer versionierter Mapping-Slice unter `data/contracts/knowledge-graph/`: `runtime-taxonomy.v1.json` fixiert Event-/State-Taxonomie fuer Spawn, Combat/Hit, Round-Ende und Settings; `desktop-critical-paths.v1.json` verknuepft dieselben Pfade mit Runtime- und Testknoten inkl. `SettingManager`-Pflichtreferenz.
+- `scripts/build-knowledge-graph.mjs`, `scripts/check-knowledge-graph.mjs` und `docs/generated/knowledge-graph.schema.json` tragen jetzt die neuen Knotentypen (`runtime`, `event`, `state`, `test`) und Kernkanten (`implements`, `emits`, `consumes`, `reads_state`, `writes_state`, `validated_by`), sodass `graph:build`/`graph:check` dieselbe Mapping-Schicht deterministisch erzeugen und pruefen.
+
 - `V100` ist abgeschlossen: der Runtime-Dispose-Pfad entfernt den alten `MenuController` jetzt deterministisch vor Reinit, und der Start-Setup-Sync priorisiert den autoritativen `settings.mapKey` vor der persistierten Hangar-Auswahl, sodass Custom-Map-Rebuilds mit gleichem Key keinen Standard-Layout-Drift mehr verursachen.
 - Relevante Runtime-Gates sind gruen: `node --test tests/runtime-regressions.contract.test.mjs` (31/31 PASS), `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-runtime.spec.js --grep "T20ae:" --timeout=240000` (`test-results/v100-runtime-dispose`) und `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-runtime.spec.js --grep "T10e:|T10f:" --timeout=240000` (`test-results/v100-runtime-t10ef`).
 - Abschluss-Gates sind gruen: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, `npm run graph:build`, `npm run gates:pre-commit` und `npm run lock:validate`.

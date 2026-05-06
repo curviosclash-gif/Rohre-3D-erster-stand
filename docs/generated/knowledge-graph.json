@@ -1925,7 +1925,7 @@
       "id": "V107",
       "type": "block",
       "title": "Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer",
-      "status": "planned",
+      "status": "active",
       "attributes": {
         "source": [
           "block-plan",
@@ -1933,28 +1933,30 @@
           "master-index"
         ],
         "priority": "P2",
-        "owner": "frei",
+        "owner": "codex",
         "currentPhase": "107.1",
         "planFile": "docs/plaene/aktiv/V107.md",
         "scopeDeclarations": [
           ".agents/rules/token_efficiency_and_tools.md",
           ".agents/workflows/status.md",
-          "data/contracts/knowledge-graph/",
+          "data/contracts/knowledge-graph/**",
           "docs/generated/knowledge-graph.coverage.json",
           "docs/generated/knowledge-graph.json",
           "docs/generated/knowledge-graph.schema.json",
           "docs/plaene/aktiv/V107.md",
+          "docs/plaene/CHANGELOG.md",
           "docs/referenz/ai_architecture_context.md",
           "scripts/build-knowledge-graph.mjs",
           "scripts/check-knowledge-graph.mjs",
           "scripts/export-knowledge-graph-view.mjs",
           "scripts/query-knowledge-graph.mjs",
+          "tests/knowledge-graph-build.contract.test.mjs",
           "tools/graph-viewer/index.html",
           "tools/graph-viewer/viewer.css",
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 10,
+          "concreteCount": 14,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -2078,7 +2080,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 106,
+          "concreteCount": 108,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2122,7 +2124,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 107,
+          "concreteCount": 109,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -23793,6 +23795,372 @@
       }
     },
     {
+      "id": "runtime:entity-spawn-ops",
+      "type": "runtime",
+      "title": "EntitySpawnOps",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "src/entities/runtime/EntitySpawnOps.js",
+        "criticalPath": "spawn",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:hunt-combat-system",
+      "type": "runtime",
+      "title": "HuntCombatSystem",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "src/entities/systems/HuntCombatSystem.js",
+        "criticalPath": "combat-hit",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:mg-hit-resolver",
+      "type": "runtime",
+      "title": "MGHitResolver",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "src/hunt/mg/MGHitResolver.js",
+        "criticalPath": "combat-hit",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:projectile-hit-resolver",
+      "type": "runtime",
+      "title": "ProjectileHitResolver",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "src/entities/systems/projectile/ProjectileHitResolver.js",
+        "criticalPath": "combat-hit",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:round-end-coordinator",
+      "type": "runtime",
+      "title": "RoundEndCoordinator",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "src/state/RoundEndCoordinator.js",
+        "criticalPath": "round-end",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:round-outcome-system",
+      "type": "runtime",
+      "title": "RoundOutcomeSystem",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "src/entities/systems/RoundOutcomeSystem.js",
+        "criticalPath": "round-end",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "runtime:settings-manager",
+      "type": "runtime",
+      "title": "SettingsManager",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "src/core/SettingsManager.js",
+        "criticalPath": "settings",
+        "layer": "runtime",
+        "requiredReference": true
+      }
+    },
+    {
+      "id": "runtime:spawn-placement-system",
+      "type": "runtime",
+      "title": "SpawnPlacementSystem",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "src/entities/systems/SpawnPlacementSystem.js",
+        "criticalPath": "spawn",
+        "layer": "runtime"
+      }
+    },
+    {
+      "id": "event:hunt-damage",
+      "type": "event",
+      "title": "Hunt damage and hit feedback",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "criticalPath": "combat-hit",
+        "domain": "combat"
+      }
+    },
+    {
+      "id": "event:round-end",
+      "type": "event",
+      "title": "Round end resolution",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "criticalPath": "round-end",
+        "domain": "match-flow"
+      }
+    },
+    {
+      "id": "event:spawn",
+      "type": "event",
+      "title": "Player spawn lifecycle",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "criticalPath": "spawn",
+        "domain": "entity-lifecycle"
+      }
+    },
+    {
+      "id": "state:hunt-combat-lock-on",
+      "type": "state",
+      "title": "Hunt combat targeting and lock-on cache",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "criticalPath": "combat-hit",
+        "domain": "combat"
+      }
+    },
+    {
+      "id": "state:round-end-overlay",
+      "type": "state",
+      "title": "Round end UI overlay state",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "criticalPath": "round-end",
+        "domain": "match-flow"
+      }
+    },
+    {
+      "id": "state:round-outcome",
+      "type": "state",
+      "title": "Round outcome decision state",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "criticalPath": "round-end",
+        "domain": "match-flow"
+      }
+    },
+    {
+      "id": "state:runtime-config-snapshot",
+      "type": "state",
+      "title": "Runtime config snapshot",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "state:settings-snapshot",
+      "type": "state",
+      "title": "Sanitized settings snapshot",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "state:spawn-context",
+      "type": "state",
+      "title": "Spawn context and authored placement state",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "criticalPath": "spawn",
+        "domain": "entity-lifecycle"
+      }
+    },
+    {
+      "id": "test:physics-core-spawn",
+      "type": "test",
+      "title": "Physics core authored spawn coverage",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "tests/physics-core.spec.js",
+        "criticalPath": "spawn",
+        "testLayer": "desktop-e2e"
+      }
+    },
+    {
+      "id": "test:physics-hunt-combat",
+      "type": "test",
+      "title": "Physics hunt combat coverage",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "tests/physics-hunt.spec.js",
+        "criticalPath": "combat-hit",
+        "testLayer": "desktop-e2e"
+      }
+    },
+    {
+      "id": "test:runtime-regressions-round-end",
+      "type": "test",
+      "title": "Runtime regressions round-end coverage",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "tests/runtime-regressions.contract.test.mjs",
+        "criticalPath": "round-end",
+        "testLayer": "node-contract"
+      }
+    },
+    {
+      "id": "test:runtime-settings-live-apply",
+      "type": "test",
+      "title": "Runtime settings live apply coverage",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "tests/runtime-settings-live-apply.contract.test.mjs",
+        "criticalPath": "settings",
+        "testLayer": "node-contract"
+      }
+    },
+    {
+      "id": "test:settings-manager-contract",
+      "type": "test",
+      "title": "SettingsManager contract coverage",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
+        "file": "tests/settings-manager.contract.test.mjs",
+        "criticalPath": "settings",
+        "testLayer": "node-contract"
+      }
+    },
+    {
       "id": ".agents/rules/code_quality_and_debugging.md",
       "type": "file",
       "title": null,
@@ -24148,6 +24516,40 @@
           "BT93E",
           "BT93F",
           "BT93M"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -30371,6 +30773,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
           "V109",
           "V77",
           "V93"
@@ -39084,11 +39487,15 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V103",
           "V53"
+        ],
+        "mappedNodes": [
+          "runtime:settings-manager"
         ],
         "exists": true
       }
@@ -40851,11 +41258,15 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B03",
           "V84"
+        ],
+        "mappedNodes": [
+          "runtime:entity-spawn-ops"
         ],
         "exists": true
       }
@@ -40936,12 +41347,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B03",
           "V63",
           "V84"
+        ],
+        "mappedNodes": [
+          "runtime:hunt-combat-system"
         ],
         "exists": true
       }
@@ -41116,12 +41531,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B03",
           "V63",
           "V84"
+        ],
+        "mappedNodes": [
+          "runtime:projectile-hit-resolver"
         ],
         "exists": true
       }
@@ -41187,12 +41606,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B03",
           "V51",
           "V84"
+        ],
+        "mappedNodes": [
+          "runtime:round-outcome-system"
         ],
         "exists": true
       }
@@ -41205,11 +41628,15 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B03",
           "V84"
+        ],
+        "mappedNodes": [
+          "runtime:spawn-placement-system"
         ],
         "exists": true
       }
@@ -41521,12 +41948,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B04",
           "V72",
           "V74"
+        ],
+        "mappedNodes": [
+          "runtime:mg-hit-resolver"
         ],
         "exists": true
       }
@@ -44091,11 +44522,15 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V84",
           "V91"
+        ],
+        "mappedNodes": [
+          "runtime:round-end-coordinator"
         ],
         "exists": true
       }
@@ -47298,6 +47733,7 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V107",
           "V110",
           "V111",
           "V94"
@@ -47784,6 +48220,7 @@
         "source": [
           "audit-scope",
           "bot-training-plan",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -47794,6 +48231,9 @@
           "V51",
           "V88",
           "V89"
+        ],
+        "mappedNodes": [
+          "test:physics-core-spawn"
         ],
         "exists": true
       }
@@ -47807,6 +48247,7 @@
         "source": [
           "audit-scope",
           "bot-training-plan",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -47818,6 +48259,9 @@
           "V69",
           "V88",
           "V89"
+        ],
+        "mappedNodes": [
+          "test:physics-hunt-combat"
         ],
         "exists": true
       }
@@ -48088,6 +48532,7 @@
         "source": [
           "audit-scope",
           "bot-training-plan",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -48099,6 +48544,9 @@
           "V111",
           "V91",
           "V92"
+        ],
+        "mappedNodes": [
+          "test:runtime-regressions-round-end"
         ],
         "exists": true
       }
@@ -48112,6 +48560,7 @@
         "source": [
           "audit-scope",
           "bot-training-plan",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -48122,6 +48571,9 @@
           "V110",
           "V111",
           "V97"
+        ],
+        "mappedNodes": [
+          "test:runtime-settings-live-apply"
         ],
         "exists": true
       }
@@ -48135,6 +48587,7 @@
         "source": [
           "audit-scope",
           "bot-training-plan",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -48143,6 +48596,9 @@
           "V103",
           "V110",
           "V111"
+        ],
+        "mappedNodes": [
+          "test:settings-manager-contract"
         ],
         "exists": true
       }
@@ -139258,6 +139714,216 @@
       }
     },
     {
+      "from": "runtime:entity-spawn-ops",
+      "to": "event:spawn",
+      "type": "emits",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:entity-spawn-ops",
+      "to": "state:spawn-context",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:entity-spawn-ops",
+      "to": "test:physics-core-spawn",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:hunt-combat-system",
+      "to": "state:hunt-combat-lock-on",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:hunt-combat-system",
+      "to": "test:physics-hunt-combat",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:mg-hit-resolver",
+      "to": "event:hunt-damage",
+      "type": "emits",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:mg-hit-resolver",
+      "to": "test:physics-hunt-combat",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:projectile-hit-resolver",
+      "to": "event:hunt-damage",
+      "type": "emits",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:projectile-hit-resolver",
+      "to": "test:physics-hunt-combat",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:round-end-coordinator",
+      "to": "event:round-end",
+      "type": "consumes",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:round-end-coordinator",
+      "to": "state:round-end-overlay",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:round-end-coordinator",
+      "to": "test:runtime-regressions-round-end",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:round-outcome-system",
+      "to": "event:round-end",
+      "type": "emits",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:round-outcome-system",
+      "to": "state:round-outcome",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:round-outcome-system",
+      "to": "test:runtime-regressions-round-end",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "state:runtime-config-snapshot",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "state:settings-snapshot",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "test:runtime-settings-live-apply",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "test:settings-manager-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:spawn-placement-system",
+      "to": "state:spawn-context",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:spawn-placement-system",
+      "to": "test:physics-core-spawn",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
       "from": "src/core/AppInitializer.js",
       "to": "game.runtimeFacade",
       "type": "touches",
@@ -139390,6 +140056,16 @@
       }
     },
     {
+      "from": "src/core/SettingsManager.js",
+      "to": "runtime:settings-manager",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
       "from": "src/entities/ai/ObservationBridgePolicy.js",
       "to": "curviosApp",
       "type": "touches",
@@ -139398,6 +140074,66 @@
         "roles": [
           "allowedCaller"
         ]
+      }
+    },
+    {
+      "from": "src/entities/runtime/EntitySpawnOps.js",
+      "to": "runtime:entity-spawn-ops",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "src/entities/systems/HuntCombatSystem.js",
+      "to": "runtime:hunt-combat-system",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "src/entities/systems/projectile/ProjectileHitResolver.js",
+      "to": "runtime:projectile-hit-resolver",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "src/entities/systems/RoundOutcomeSystem.js",
+      "to": "runtime:round-outcome-system",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "src/entities/systems/SpawnPlacementSystem.js",
+      "to": "runtime:spawn-placement-system",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "src/hunt/mg/MGHitResolver.js",
+      "to": "runtime:mg-hit-resolver",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
       }
     },
     {
@@ -139434,6 +140170,16 @@
       }
     },
     {
+      "from": "src/state/RoundEndCoordinator.js",
+      "to": "runtime:round-end-coordinator",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
       "from": "src/state/RoundStateTickSystem.js",
       "to": "game.runtimeBundle",
       "type": "touches",
@@ -139442,6 +140188,56 @@
         "roles": [
           "allowedCaller"
         ]
+      }
+    },
+    {
+      "from": "tests/physics-core.spec.js",
+      "to": "test:physics-core-spawn",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "tests/physics-hunt.spec.js",
+      "to": "test:physics-hunt-combat",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "tests/runtime-regressions.contract.test.mjs",
+      "to": "test:runtime-regressions-round-end",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "tests/runtime-settings-live-apply.contract.test.mjs",
+      "to": "test:runtime-settings-live-apply",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "tests/settings-manager.contract.test.mjs",
+      "to": "test:settings-manager-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
       }
     },
     {
@@ -141264,6 +142060,24 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "docs/generated/knowledge-graph.coverage.json",
       "type": "scope",
       "hint": null,
@@ -141292,6 +142106,15 @@
     {
       "from": "V107",
       "to": "docs/plaene/aktiv/V107.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "docs/plaene/CHANGELOG.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -141337,6 +142160,15 @@
     {
       "from": "V107",
       "to": "scripts/query-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "tests/knowledge-graph-build.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -142462,6 +143294,24 @@
     {
       "from": "V110",
       "to": ".agents/workflows/status.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -143625,6 +144475,24 @@
     {
       "from": "V111",
       "to": ".agents/workflows/status.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {
