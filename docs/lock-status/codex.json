@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-06T13:18:03.794Z",
+  "timestamp": "2026-05-06T19:07:18.749Z",
   "locks": [
     {
       "block_id": "V103",
@@ -70,10 +70,37 @@
       "target_completion": "2026-05-06",
       "status": "completed",
       "notes": ""
+    },
+    {
+      "block_id": "V107",
+      "phase": "107.1.1",
+      "scope_files": [
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.schema.json",
+        "scripts/build-knowledge-graph.mjs",
+        "scripts/check-knowledge-graph.mjs",
+        "scripts/query-knowledge-graph.mjs",
+        "scripts/export-knowledge-graph-view.mjs",
+        "tools/graph-viewer/index.html",
+        "tools/graph-viewer/viewer.js",
+        "tools/graph-viewer/viewer.css",
+        "data/contracts/knowledge-graph/**",
+        "docs/referenz/ai_architecture_context.md",
+        ".agents/rules/token_efficiency_and_tools.md",
+        ".agents/workflows/status.md",
+        "tests/knowledge-graph-build.contract.test.mjs",
+        "docs/plaene/aktiv/V107.md",
+        "docs/plaene/CHANGELOG.md"
+      ],
+      "start_date": "2026-05-06",
+      "target_completion": "2026-05-06",
+      "status": "in-progress",
+      "notes": "Schema and mapping foundation"
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "100.4.1",
+    "phase_id": "107.1.1",
     "completed_items": [],
     "last_commit": ""
   }
