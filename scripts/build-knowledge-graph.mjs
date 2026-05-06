@@ -119,21 +119,24 @@ const NODE_TYPE_ORDER = Object.freeze({
     runtime: 3,
     event: 4,
     state: 5,
-    test: 6,
-    file: 7,
-    surface: 8,
+    config: 6,
+    test: 7,
+    file: 8,
+    surface: 9,
 });
 
 const KNOWLEDGE_GRAPH_MAPPING_NODE_TYPES = new Set([
     'runtime',
     'event',
     'state',
+    'config',
     'test',
 ]);
 const KNOWLEDGE_GRAPH_MAPPING_EDGE_TYPES = new Set([
     'implements',
     'emits',
     'consumes',
+    'reads_config',
     'reads_state',
     'writes_state',
     'validated_by',

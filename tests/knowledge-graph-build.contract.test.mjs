@@ -251,12 +251,22 @@ test('normalizeKnowledgeGraphMappingContract validates mapping payloads and norm
                 type: 'test',
                 file: './tests/settings-manager.contract.test.mjs',
             },
+            {
+                id: 'config:runtime-config-builder',
+                type: 'config',
+                file: './src/core/RuntimeConfig.js',
+            },
         ],
         edges: [
             {
                 from: 'runtime:settings-manager',
                 to: 'test:settings-manager-contract',
                 type: 'validated_by',
+            },
+            {
+                from: 'runtime:settings-manager',
+                to: 'config:runtime-config-builder',
+                type: 'reads_config',
             },
         ],
     });
@@ -265,7 +275,9 @@ test('normalizeKnowledgeGraphMappingContract validates mapping payloads and norm
     assert.equal(mapping.nodes[0].file, 'src/core/SettingsManager.js');
     assert.equal(mapping.nodes[1].file, 'tests/settings-manager.contract.test.mjs');
     assert.equal(mapping.nodes[1].status, 'unknown');
+    assert.equal(mapping.nodes[2].file, 'src/core/RuntimeConfig.js');
     assert.equal(mapping.edges[0].type, 'validated_by');
+    assert.equal(mapping.edges[1].type, 'reads_config');
 });
 
 test('parseAuditMasterRows extracts audit blocks, findings paths and core scope references', () => {

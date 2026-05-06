@@ -84,6 +84,81 @@
         "criticalPath": "settings",
         "domain": "settings"
       }
+    },
+    {
+      "id": "config:gameplay-config-contract",
+      "type": "config",
+      "title": "Gameplay config contract",
+      "file": "src/shared/contracts/GameplayConfigContract.js",
+      "attributes": {
+        "criticalPaths": [
+          "spawn",
+          "combat-hit"
+        ],
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:entity-runtime-config",
+      "type": "config",
+      "title": "Entity runtime config contract",
+      "file": "src/shared/contracts/EntityRuntimeConfig.js",
+      "attributes": {
+        "criticalPaths": [
+          "combat-hit"
+        ],
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:runtime-config-builder",
+      "type": "config",
+      "title": "Runtime config snapshot builder",
+      "file": "src/core/RuntimeConfig.js",
+      "attributes": {
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:base-game-config",
+      "type": "config",
+      "title": "Base game config proxy",
+      "file": "src/core/Config.js",
+      "attributes": {
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:settings-runtime-contract",
+      "type": "config",
+      "title": "Settings runtime contract export",
+      "file": "src/core/config/SettingsRuntimeContract.js",
+      "attributes": {
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:runtime-session-contract",
+      "type": "config",
+      "title": "Runtime session contract",
+      "file": "src/shared/contracts/RuntimeSessionContract.js",
+      "attributes": {
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:settings-runtime-limits",
+      "type": "config",
+      "title": "Settings runtime limits",
+      "file": "src/core/settings/SettingsRuntimeLimits.js",
+      "attributes": {
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
     }
   ],
   "edges": []

@@ -15316,8 +15316,8 @@
     {
       "id": "V107.1.1",
       "type": "subphase",
-      "title": "Node-/Edge-Taxonomie fuer Runtime-, Event-, State-, Config- und Test-Layer finalisieren und versionieren.",
-      "status": "open",
+      "title": "Node-/Edge-Taxonomie fuer Runtime-, Event-, State-, Config- und Test-Layer finalisieren und versionieren. (abgeschlossen: 2026-05-06; evidence: `npm run graph:build` + `npm run graph:check` + `node --test tests/knowledge-graph-build.contract.test.mjs` -> `config`-Knotentyp und `reads_config`-Kanten fuer versionierte Runtime-/Settings-Vertraege im Graph gruen)",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.1",
@@ -24073,6 +24073,130 @@
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "criticalPath": "spawn",
         "domain": "entity-lifecycle"
+      }
+    },
+    {
+      "id": "config:base-game-config",
+      "type": "config",
+      "title": "Base game config proxy",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "file": "src/core/Config.js",
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:entity-runtime-config",
+      "type": "config",
+      "title": "Entity runtime config contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "file": "src/shared/contracts/EntityRuntimeConfig.js",
+        "criticalPaths": [
+          "combat-hit"
+        ],
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:gameplay-config-contract",
+      "type": "config",
+      "title": "Gameplay config contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "file": "src/shared/contracts/GameplayConfigContract.js",
+        "criticalPaths": [
+          "spawn",
+          "combat-hit"
+        ],
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:runtime-config-builder",
+      "type": "config",
+      "title": "Runtime config snapshot builder",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "file": "src/core/RuntimeConfig.js",
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:runtime-session-contract",
+      "type": "config",
+      "title": "Runtime session contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "file": "src/shared/contracts/RuntimeSessionContract.js",
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:settings-runtime-contract",
+      "type": "config",
+      "title": "Settings runtime contract export",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "file": "src/core/config/SettingsRuntimeContract.js",
+        "criticalPath": "settings",
+        "domain": "settings"
+      }
+    },
+    {
+      "id": "config:settings-runtime-limits",
+      "type": "config",
+      "title": "Settings runtime limits",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
+        "file": "src/core/settings/SettingsRuntimeLimits.js",
+        "criticalPath": "settings",
+        "domain": "settings"
       }
     },
     {
@@ -37559,12 +37683,16 @@
       "attributes": {
         "source": [
           "guard-matrix",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V81",
           "V85",
           "V91"
+        ],
+        "mappedNodes": [
+          "config:base-game-config"
         ],
         "exists": true
       }
@@ -37952,6 +38080,21 @@
         "scopeBlocks": [
           "V85",
           "V86"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/core/config/SettingsRuntimeContract.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:settings-runtime-contract"
         ],
         "exists": true
       }
@@ -39236,12 +39379,16 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V101",
           "V108",
           "V69"
+        ],
+        "mappedNodes": [
+          "config:runtime-config-builder"
         ],
         "exists": true
       }
@@ -39390,12 +39537,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B07",
           "V85",
           "V91"
+        ],
+        "mappedNodes": [
+          "config:settings-runtime-limits"
         ],
         "exists": true
       }
@@ -42866,6 +43017,7 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -42875,6 +43027,9 @@
           "V84",
           "V85",
           "V91"
+        ],
+        "mappedNodes": [
+          "config:entity-runtime-config"
         ],
         "exists": true
       }
@@ -42953,6 +43108,7 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -42962,6 +43118,9 @@
           "V84",
           "V85",
           "V91"
+        ],
+        "mappedNodes": [
+          "config:gameplay-config-contract"
         ],
         "exists": true
       }
@@ -43533,6 +43692,7 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -43544,6 +43704,9 @@
           "V85",
           "V91",
           "V99"
+        ],
+        "mappedNodes": [
+          "config:runtime-session-contract"
         ],
         "exists": true
       }
@@ -139703,6 +139866,46 @@
       }
     },
     {
+      "from": "config:runtime-config-builder",
+      "to": "config:base-game-config",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "config:runtime-config-builder",
+      "to": "config:runtime-session-contract",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "config:runtime-config-builder",
+      "to": "config:settings-runtime-contract",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "config:runtime-config-builder",
+      "to": "config:settings-runtime-limits",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
       "from": "electron/preload.cjs",
       "to": "curviosApp",
       "type": "touches",
@@ -139711,6 +139914,16 @@
         "roles": [
           "allowedAdapter"
         ]
+      }
+    },
+    {
+      "from": "runtime:entity-spawn-ops",
+      "to": "config:gameplay-config-contract",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
       }
     },
     {
@@ -139745,6 +139958,16 @@
     },
     {
       "from": "runtime:hunt-combat-system",
+      "to": "config:entity-runtime-config",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:hunt-combat-system",
       "to": "state:hunt-combat-lock-on",
       "type": "writes_state",
       "hint": null,
@@ -139765,6 +139988,16 @@
     },
     {
       "from": "runtime:mg-hit-resolver",
+      "to": "config:gameplay-config-contract",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:mg-hit-resolver",
       "to": "event:hunt-damage",
       "type": "emits",
       "hint": null,
@@ -139777,6 +140010,16 @@
       "from": "runtime:mg-hit-resolver",
       "to": "test:physics-hunt-combat",
       "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:projectile-hit-resolver",
+      "to": "config:entity-runtime-config",
+      "type": "reads_config",
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
@@ -139857,6 +140100,16 @@
       "from": "runtime:round-outcome-system",
       "to": "test:runtime-regressions-round-end",
       "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+      }
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "config:runtime-config-builder",
+      "type": "reads_config",
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
@@ -139979,6 +140232,26 @@
       }
     },
     {
+      "from": "src/core/Config.js",
+      "to": "config:base-game-config",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+      }
+    },
+    {
+      "from": "src/core/config/SettingsRuntimeContract.js",
+      "to": "config:settings-runtime-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+      }
+    },
+    {
       "from": "src/core/GameBootstrap.js",
       "to": "game.runtimeBundle",
       "type": "touches",
@@ -140053,6 +140326,26 @@
         "roles": [
           "allowedAdapter"
         ]
+      }
+    },
+    {
+      "from": "src/core/RuntimeConfig.js",
+      "to": "config:runtime-config-builder",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+      }
+    },
+    {
+      "from": "src/core/settings/SettingsRuntimeLimits.js",
+      "to": "config:settings-runtime-limits",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
       }
     },
     {
@@ -140156,6 +140449,36 @@
         "roles": [
           "allowedAdapter"
         ]
+      }
+    },
+    {
+      "from": "src/shared/contracts/EntityRuntimeConfig.js",
+      "to": "config:entity-runtime-config",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+      }
+    },
+    {
+      "from": "src/shared/contracts/GameplayConfigContract.js",
+      "to": "config:gameplay-config-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+      }
+    },
+    {
+      "from": "src/shared/contracts/RuntimeSessionContract.js",
+      "to": "config:runtime-session-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "runtime-taxonomy",
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
       }
     },
     {

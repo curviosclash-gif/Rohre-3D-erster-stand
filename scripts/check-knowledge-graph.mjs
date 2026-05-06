@@ -103,6 +103,7 @@ function ensureAllEdgeEndpointsExist(graph, violations) {
         'implements',
         'emits',
         'consumes',
+        'reads_config',
         'reads_state',
         'writes_state',
         'validated_by',

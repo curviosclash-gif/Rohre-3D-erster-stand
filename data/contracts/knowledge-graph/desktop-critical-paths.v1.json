@@ -143,6 +143,11 @@
       "type": "writes_state"
     },
     {
+      "from": "runtime:entity-spawn-ops",
+      "to": "config:gameplay-config-contract",
+      "type": "reads_config"
+    },
+    {
       "from": "runtime:spawn-placement-system",
       "to": "state:spawn-context",
       "type": "reads_state"
@@ -168,14 +173,29 @@
       "type": "writes_state"
     },
     {
+      "from": "runtime:hunt-combat-system",
+      "to": "config:entity-runtime-config",
+      "type": "reads_config"
+    },
+    {
       "from": "runtime:projectile-hit-resolver",
       "to": "event:hunt-damage",
       "type": "emits"
     },
     {
+      "from": "runtime:projectile-hit-resolver",
+      "to": "config:entity-runtime-config",
+      "type": "reads_config"
+    },
+    {
       "from": "runtime:mg-hit-resolver",
       "to": "event:hunt-damage",
       "type": "emits"
+    },
+    {
+      "from": "runtime:mg-hit-resolver",
+      "to": "config:gameplay-config-contract",
+      "type": "reads_config"
     },
     {
       "from": "runtime:hunt-combat-system",
@@ -229,8 +249,33 @@
     },
     {
       "from": "runtime:settings-manager",
+      "to": "config:runtime-config-builder",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:settings-manager",
       "to": "state:runtime-config-snapshot",
       "type": "writes_state"
+    },
+    {
+      "from": "config:runtime-config-builder",
+      "to": "config:base-game-config",
+      "type": "reads_config"
+    },
+    {
+      "from": "config:runtime-config-builder",
+      "to": "config:settings-runtime-contract",
+      "type": "reads_config"
+    },
+    {
+      "from": "config:runtime-config-builder",
+      "to": "config:runtime-session-contract",
+      "type": "reads_config"
+    },
+    {
+      "from": "config:runtime-config-builder",
+      "to": "config:settings-runtime-limits",
+      "type": "reads_config"
     },
     {
       "from": "runtime:settings-manager",

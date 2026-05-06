@@ -8,16 +8,11 @@
       "id": "GIT-HISTORY-HOTSPOTS",
       "title": "Git-History Hotspots ausserhalb des Core-Graphen",
       "coverageSource": "git-history",
-      "fileCount": 6,
+      "fileCount": 5,
       "files": [
         {
           "path": "README.md",
           "changeCount": 10,
-          "dirty": false
-        },
-        {
-          "path": "src/core/config/SettingsRuntimeContract.js",
-          "changeCount": 9,
           "dirty": false
         },
         {
@@ -20036,6 +20031,7 @@
       "covered": true,
       "coverageSources": [
         "guard-matrix",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -20493,25 +20489,17 @@
     {
       "path": "src/core/config/SettingsRuntimeContract.js",
       "tracked": true,
-      "coveredInCore": false,
-      "coveredByOverlay": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "git-history"
+        "knowledge-graph-mapping"
       ],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "product-code",
       "excludedFromCoverage": false,
-      "excludeReason": null,
-      "overlays": [
-        {
-          "blockId": "GIT-HISTORY-HOTSPOTS",
-          "coverageSource": "git-history",
-          "changeCount": 9,
-          "dirty": false
-        }
-      ]
+      "excludeReason": null
     },
     {
       "path": "src/core/debug/GameDebugTrainingFacade.js",
@@ -22047,6 +22035,7 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -22256,6 +22245,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -26069,6 +26059,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -26164,6 +26155,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -26798,6 +26790,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
