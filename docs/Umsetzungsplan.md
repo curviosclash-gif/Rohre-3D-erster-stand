@@ -1,6 +1,6 @@
 ﻿# Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-05. Aktuell keine offene Subphase im Master-Index.
+Stand: 2026-05-06. Aktuelle offene Subphase: `keine aktive Produkt-Subphase`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -33,6 +33,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V99 | Desktop Multiplayer Signaling-, LAN- und Connectivity-Hardening | done | P1 | frei | V64.99,V92.99 | 99.99 | `docs/plaene/aktiv/V99.md` |
 | V109 | Governance-, Workflow- und Masterplan-Entschlackung fuer AI-gestuetzte Repo-Arbeit | done | P1 | frei | V99.99 | 109.99 | `docs/plaene/aktiv/V109.md` |
 | V104 | Runtime- und UI-God-Object-Sunset mit Port-Zuschnitt | done | P2 | frei | V92.99,V103.99 | 104.99 | `docs/plaene/aktiv/V104.md` |
+| V100 | Runtime Rebuild-, Remount- und StartSync-Stabilisierung | done | P1 | frei | V92.99 | 100.99 | `docs/plaene/aktiv/V100.md` |
 
 ### Abgeschlossene Bloecke (offener Abgleich vor Archivierung)
 
@@ -44,7 +45,8 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| V112 | Spielaudit- und Playtest-Improvement-Paket | planned | P1 | frei | - | 112.1 | `docs/plaene/aktiv/V112.md` |
+| V112 | Spielaudit- und Playtest-Improvement-Paket | blocked | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
+| V107 | Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer | planned | P2 | frei | V94.99 | 107.1 | `docs/plaene/aktiv/V107.md` |
 | V110 | Wissensgraph Ops-, Guard- und Integritaets-Haertung | planned | P2 | frei | V107.99 | 110.1 | `docs/plaene/aktiv/V110.md` |
 | V111 | Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz | planned | P2 | frei | V107.99,V110.99 | 111.1 | `docs/plaene/aktiv/V111.md` |
 
@@ -55,13 +57,15 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V104 | V92.99 | hard | ja | Ownership-, Snapshot- und Legacy-Surface-Ratchet als Baseline fuer weiteren Port-/Alias-Abbau |
 | V104 | V103.99 | hard | ja | Schmaler Settings-Persistenzpfad verhindert neue Store-Bypaesse bei UI-Splits |
 | V109 | V99.99 | hard | ja | V99 ist am 2026-05-04 mit `99.99` abgeschlossen |
+| V100 | V92.99 | hard | ja | V92 ist abgeschlossen; V100 kann als Runtime-Stabilisierung direkt starten |
 | V76 | V64.99 | hard | ja | Abschluss vorhanden; verbleibt nur im offenen Abgleich vor Archivierung |
 | V76 | V77.99 | hard | ja | Surface-Policy-Baseline weiterhin erfuellt |
+| V107 | V94.99 | hard | ja | V94 ist abgeschlossen; V107 kann als Core-Graph-Block gestartet werden |
 | V110 | V107.99 | hard | nein | V110 haertet den Wissensgraphen erst nach Core-Claim aus V107 |
 | V111 | V107.99 | hard | nein | V111 baut auf dem mehrschichtigen Graph-Core aus V107 auf |
 | V111 | V110.99 | hard | nein | V111 setzt die Ops-/Guard-Haertung aus V110 voraus |
-| V112 | V102.99 | soft | nein | Security-/Runtime-Hardening reduziert Rework bei UI- und Surface-Haertung aus V112 |
-| V112 | V105.99 | soft | nein | Guard-/Typecheck-Recovery stabilisiert die nachgelagerten targeted Verifikationspfade fuer V112 |
+| V112 | V102.99 | hard | nein | V112 startet erst nach Security-/Runtime-Hardening aus V102 |
+| V112 | V105.99 | hard | nein | V112 startet erst nach Guard-/Typecheck-Recovery aus V105 |
 
 ## Lock-Status
 
@@ -76,19 +80,20 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V76 | 2026-04-27 | closed | Abgeschlossen 2026-04-27 |
 | - | V104 | 2026-05-05 | closed | Abgeschlossen 2026-05-05 |
 | - | V109 | 2026-05-04 | closed | Abgeschlossen 2026-05-04 |
+| - | V100 | 2026-05-05 | closed | Abgeschlossen 2026-05-06 |
+| - | V107 | - | frei | Geplant |
 | - | V110 | - | frei | Geplant |
 | - | V111 | - | frei | Geplant |
-| - | V112 | - | frei | Geplant |
+| - | V112 | - | blockiert | Wartet auf V102.99 und V105.99 |
 
 ## Empfohlene Reihenfolge
 
-1. `V100` als naechste Intake-Uebernahme aus `docs/plaene/neu/`.
-2. Danach `V102` (Security-/Runtime-/Contract-Hardening).
-3. Danach `V105` (Guard-/Typecheck-Recovery).
-4. Danach `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster vor Wissensgraph-Ausbau.
-5. Danach `V107` (Wissensgraph-Ausbaustufe).
-6. Danach `V110` (Wissensgraph Ops-/Guard-Haertung).
-7. Danach `V111` (Wissensgraph adaptive Diagnose- und Entscheidungsintelligenz).
+1. `V102` (Security-/Runtime-/Contract-Hardening).
+2. Danach `V105` (Guard-/Typecheck-Recovery).
+3. Danach `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster vor Wissensgraph-Ausbau.
+4. Danach `V107` (Wissensgraph-Ausbaustufe).
+5. Danach `V110` (Wissensgraph Ops-/Guard-Haertung).
+6. Danach `V111` (Wissensgraph adaptive Diagnose- und Entscheidungsintelligenz).
 
 ## Conflict-Log
 

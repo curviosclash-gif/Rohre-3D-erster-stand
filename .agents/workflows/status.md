@@ -7,7 +7,9 @@ description: Quick project status snapshot.
 
 - Read `docs/Umsetzungsplan.md` and bei Bot-Training-Scope `docs/bot-training/Bot_Trainingsplan.md`.
 - If available, read `docs/generated/knowledge-graph.json` first for dependency/scope/surface questions.
-- Run graph queries for compact status reads: `node scripts/query-knowledge-graph.mjs open-deps V81 --json` and `node scripts/query-knowledge-graph.mjs scope-collisions --json`.
+- Determine the actually relevant active block ID from `docs/Umsetzungsplan.md` first, then run graph queries for that block:
+  - `node scripts/query-knowledge-graph.mjs open-deps <active-block-id> --json`
+  - `node scripts/query-knowledge-graph.mjs scope-collisions --json`
 - Identify next open phase and dependency blockers.
 - Check pending external intake plans in `docs/plaene/neu/`.
 - Run `npm run plan:check`.

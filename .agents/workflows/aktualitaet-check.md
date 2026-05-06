@@ -1,11 +1,11 @@
-﻿---
+---
 description: Verify docs/workflows/rules are current with an automated gate.
 ---
 
 ## 0. Context
 
 // turbo
-- Read `docs/Umsetzungsplan.md`, `docs/bot-training/Bot_Trainingsplan.md`, `docs/Analysebericht.md`, latest `docs/tests/Testergebnisse_*.md`.
+- Read `docs/Umsetzungsplan.md`, `docs/bot-training/Bot_Trainingsplan.md`, optional historical baseline `docs/archive/Analysebericht.md`, latest `docs/tests/Testergebnisse_*.md`.
 - Sample linked files in `docs/plaene/aktiv/` when checking planning drift for active blocks.
 - `git log -n 5 --oneline`.
 - `npm run guard:main`.
@@ -40,4 +40,3 @@ description: Verify docs/workflows/rules are current with an automated gate.
 ## Report
 
 Standardformat verwenden.
-

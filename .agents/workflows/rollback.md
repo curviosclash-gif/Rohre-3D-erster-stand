@@ -9,7 +9,7 @@ description: Roll back safely to an earlier state with plan sync.
 
 ## 1. Protect local work
 
-- If needed: `git stash push -m "rollback backup"`.
+- If needed: create a scoped safety commit or patch backup first; never use `git stash`.
 
 ## 2. Safe default rollback
 
@@ -26,8 +26,9 @@ git reset --hard <COMMIT>
 
 ## 4. Sync plan
 
-- Update `docs/Umsetzungsplan.md` phases that are no longer done.
-- `git add docs/Umsetzungsplan.md` → `chore: sync plan after rollback`
+- Update the affected `docs/plaene/aktiv/VXX.md` phase checklist and evidence so runtime, plan, and tests stay aligned.
+- Sync the compact index in `docs/Umsetzungsplan.md` only when block status, dependency state, owner, or `current_phase` changed.
+- `git add [scoped-plan-files]` -> `chore: sync plan state after rollback`
 
 ## Report
 

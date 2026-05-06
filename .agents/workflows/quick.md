@@ -3,13 +3,14 @@ description: Fast path for small, scoped changes (1-2 Dateien, keine Subphase).
 ---
 // turbo-all
 
-Eintrittskriterium: 1-2 Dateien, kein `*.99`-Gate, keine aktive Subphase aus `docs/Umsetzungsplan.md`. Groesserer Scope -> `.agents/workflows/code.md`.
+Eintrittskriterium: 1-2 Dateien, kein `*.99`-Gate, und die betroffenen Dateien gehoeren zu keinem aktiven Block-/Lock-Scope. Groesserer Scope -> `.agents/workflows/code.md`.
 
 Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_and_commits.md`, `.agents/rules/token_efficiency_and_tools.md`.
 
 ## 0. Context
 
-- Kein Pflicht-Read des Master-Index. Nur die betroffenen Dateien und ggf. deren direkte Nachbarn laden.
+- Kein Pflicht-Read des kompletten Master-Index. Vor Einstieg aber einen kompakten Governance-Check machen: betroffene Dateien gegen `docs/Umsetzungsplan.md`, `docs/plaene/aktiv/VXX.md` oder `docs/lock-status/*.json` abgleichen.
+- Nur wenn kein aktiver Block, kein Lock und keine laufende Subphase betroffen sind, im Quick-Path bleiben.
 - `git log -n 3 --oneline` fuer aktuellen Stand.
 
 ## 1. Implement
@@ -27,5 +28,6 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 
 ## 3. Commit
 
+- Wenn die kleine Aufgabe abgeschlossen ist und scoped Aenderungen erzeugt hat, Commit direkt im selben Turn erstellen.
 - `git add [scoped-files]` -> `[type]: [short reason]`.
 - Scope pruefen: `git diff --name-only`.

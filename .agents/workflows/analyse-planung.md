@@ -1,4 +1,4 @@
-﻿---
+---
 description: Run full test analysis, persist results, and update prioritized action plan.
 ---
 
@@ -6,7 +6,7 @@ description: Run full test analysis, persist results, and update prioritized act
 
 // turbo
 - Use this workflow only after explicit user request for test execution/analysis or when the user provides fresh test results.
-- Read `docs/Umsetzungsplan.md` and latest `docs/Analysebericht.md`.
+- Read `docs/Umsetzungsplan.md` and, when useful for historical comparison, `docs/archive/Analysebericht.md`.
 
 ## 1. Execute and persist
 
@@ -17,7 +17,7 @@ description: Run full test analysis, persist results, and update prioritized act
 
 ## 2. Analyze deltas
 
-- Compare against previous `docs/Analysebericht.md`.
+- Compare against the previous analysis artifact (default historical baseline: `docs/archive/Analysebericht.md`).
 - Document only: new issues, regressions, resolved items, and whether findings block the desktop app or only the online demo.
 
 ## 3. Update follow-up plan (external)
@@ -34,4 +34,3 @@ description: Run full test analysis, persist results, and update prioritized act
 ## Report
 
 Standardformat verwenden.
-

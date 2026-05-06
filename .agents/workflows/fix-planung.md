@@ -9,16 +9,14 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 - `npm run guard:main`.
 - Read `docs/Umsetzungsplan.md`.
 - Read the linked `docs/plaene/aktiv/VXX.md` for the claimed block before execution.
-- For bot-training scope also read `docs/bot-training/Bot_Trainingsplan.md` and treat it as selected master plan.
+- If the requested scope is bot-training, stop here and switch to `/bot-training-plan`; `/fix-planung` is only for `VXX` blocks backed by `docs/plaene/aktiv/`.
 - `git log -n 5 --oneline`.
 - `npm run plan:check`.
 
 ## 1. Claim phase (parallel-safe)
 
 - Identify your Bot-ID from the kickoff command (for example `/fix-planung Bot-1`).
-- Select master plan file by scope:
-  - Default: `docs/Umsetzungsplan.md`
-  - Bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs): `docs/bot-training/Bot_Trainingsplan.md`
+- Select the claimed `VXX` block from `docs/Umsetzungsplan.md`.
 - Execute only blocks already manually integrated by the user.
 - Do not create new blocks or planning scopes directly in master plans.
 - Find first block whose lock status is `frei` and whose hard dependencies are fulfilled.
@@ -26,6 +24,7 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 - Claim ueber Lock-Tooling statt Masterplan-Edit:
   - `npm run lock:claim VXX <person> -- --phase=<VXX.Y.Z> --target="YYYY-MM-DD"`
   - danach `npm run lock:validate`
+- Bot-training-Claims laufen nicht ueber diesen Pfad; dafuer `/bot-training-plan` verwenden.
 - Lock-only Claim-Commits sind nicht mehr Default; Lock-Aenderungen werden mit der ersten fachlichen Lieferung oder einem gezielten Sync-Commit gebuendelt.
 - If no free block exists: report `Kein freier Block` and stop.
 - Treat `scope_files` in `docs/plaene/aktiv/VXX.md` as canonical ownership for claimed scope.
@@ -55,12 +54,14 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 - Keep gate invariant intact (`*.99` only when prior phases are `[x]`).
 - For non-`*.99` phases, record pending block-end verification scope when full suite execution is deferred.
 - If the phase handled dead code or legacy paths, record replacement proof or explicit retention reason in the block evidence before closing.
+- Abgeschlossene Phasenarbeit mit Repo-Aenderungen nicht uncommitted lassen: nach Gate/Evidence folgt ein scoped Commit im selben Turn.
 - Gate-Strategie:
   - `*.99` oder Docs-/Governance-/Graph-Scope: `npm run gates:pre-commit`
   - sonst mindestens `npm run plan:check` plus kleinste sinnvolle Zusatzchecks.
 
 ## 5. Release block
 
+- Lock erst releasen, nachdem der zugehoerige Delivery-Slice commitet oder ein expliziter Abschluss-Blocker dokumentiert wurde.
 - Lock ueber `npm run lock:release VXX <person>` freigeben und `npm run lock:validate` laufen lassen.
 - Master-Lock-Tabelle ist ein synchronisierter Index, nicht der operative Claim-/Release-Mechanismus.
 - Lock-only Release-Commits sind nicht verpflichtend.

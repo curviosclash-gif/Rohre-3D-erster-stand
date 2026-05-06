@@ -107,6 +107,8 @@ Use this guide to choose the cheapest meaningful verification path for new featu
 - `src/core/recording/**` -> `npm run test:desktop:smoke` then `npm run test:browser:compat -- tests/recording.spec.js`
 - `src/core/Renderer.js` -> `npm run test:desktop:smoke` then `npm run test:heavy`
 - `src/ui/MatchFlowTransitionHotspots.js` -> `npm run check:architecture:boundaries && npm run check:architecture:ratchet`
+- `src/ui/UIManager.js` -> `npm run test:contract` then `npm run test:desktop:e2e -- core-runtime`
+- `src/ui/UIStartSyncController.js` -> `npm run test:contract` then `npm run test:desktop:e2e -- core-runtime`
 - `src/ui/hangar/HangarShellLayoutContract.js` -> `node --test tests/hangar-desktop-flow.contract.test.mjs`
 - `src/ui/hangar/HangarVerificationTargetContract.js` -> `node --test tests/hangar-desktop-flow.contract.test.mjs`
 - `src/ui/hangar/ArcadeVehicleManagerLegacyContract.js` -> `node --test tests/hangar-desktop-flow.contract.test.mjs`

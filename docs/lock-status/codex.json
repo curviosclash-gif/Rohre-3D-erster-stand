@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-04T10:47:08.040Z",
+  "timestamp": "2026-05-06T13:18:03.794Z",
   "locks": [
     {
       "block_id": "V103",
@@ -51,32 +51,29 @@
       "notes": ""
     },
     {
-      "block_id": "V103",
-      "phase": "103.2.1",
+      "block_id": "V100",
+      "phase": "100.1.1",
       "scope_files": [
-        "src/core/SettingsManager.js",
-        "src/ui/SettingsStore.js",
+        "src/entities/Arena.js",
+        "src/entities/arena/portal/PortalLayoutBuilder.js",
+        "src/entities/arena/portal/**",
+        "src/core/AppInitializer.js",
         "src/core/main.js",
-        "src/core/settings/SettingsDeveloperFacade.js",
-        "src/core/settings/SettingsPresetFacade.js",
-        "src/core/settings/SettingsSessionDraftFacade.js",
-        "src/core/settings/SettingsTextOverrideFacade.js",
-        "src/core/runtime/MenuRuntimeDeveloperModeService.js",
-        "src/core/runtime/MenuRuntimePresetConfigService.js",
-        "src/core/runtime/MenuRuntimeSessionService.js",
-        "src/ui/KeybindEditorController.js",
-        "tests/runtime-settings-live-apply.contract.test.mjs",
-        "tests/settings-manager.contract.test.mjs",
+        "src/ui/UIManager.js",
+        "src/ui/UIStartSyncController.js",
+        "tests/core-targeted-runtime.spec.js",
+        "tests/core-targeted-regressions.spec.js",
+        "tests/runtime-regressions.contract.test.mjs",
         "docs/referenz/ai_architecture_context.md"
       ],
-      "start_date": "2026-04-26",
-      "target_completion": "2026-04-26",
-      "status": "in-progress",
+      "start_date": "2026-05-05",
+      "target_completion": "2026-05-06",
+      "status": "completed",
       "notes": ""
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "104.5.1",
+    "phase_id": "100.4.1",
     "completed_items": [],
     "last_commit": ""
   }

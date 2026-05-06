@@ -40,6 +40,7 @@ Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/p
 ## 5. Commit
 
 - Git-Policy: `.agents/rules/git_and_commits.md`.
+- Nach erfolgreicher Root-Cause-Behebung und Verifikation den scoped Commit im selben Turn erstellen, statt die Fix-Aenderungen offen liegen zu lassen.
 - `git add [scoped-files]` -> `fix: [short reason]`.
 - Scope pruefen: `git diff --name-only`.
 

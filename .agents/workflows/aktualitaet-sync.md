@@ -1,11 +1,11 @@
-﻿---
+---
 description: Check and auto-update docs/workflows/rules to current repository reality.
 ---
 
 ## 0. Context
 
 // turbo
-- Read `docs/Umsetzungsplan.md`, `docs/bot-training/Bot_Trainingsplan.md`, `docs/Analysebericht.md`, latest `docs/tests/Testergebnisse_*.md` where relevant.
+- Read `docs/Umsetzungsplan.md`, `docs/bot-training/Bot_Trainingsplan.md`, optional historical baseline `docs/archive/Analysebericht.md`, latest `docs/tests/Testergebnisse_*.md` where relevant.
 - Sample linked files in `docs/plaene/aktiv/` when syncing active-block wording or ownership.
 - `git log -n 5 --oneline`.
 - `npm run guard:main`.
@@ -32,6 +32,7 @@ description: Check and auto-update docs/workflows/rules to current repository re
 
 - `npm run guard:main`
 - Nur geaenderte Scope-Dateien stagen (kein pauschales `docs/`-Bulk-Add).
+- Wenn der Sync-Lauf abgeschlossen ist und Drift behoben wurde, den scoped Commit direkt im selben Turn erstellen.
 - `git commit -m "docs: sync documentation and plan governance"`
 - Before push on `main`: `npm run snapshot:tag`
 

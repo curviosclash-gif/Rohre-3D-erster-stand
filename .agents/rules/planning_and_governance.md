@@ -43,6 +43,8 @@ description: Plan governance, bot-training governance, and blocker reporting (co
 - Normaler Codepfad: kleinste sinnvolle Verifikation waehlen (z. B. gezielter Contract-Run, Build-Signal oder Architekturcheck).
 - Meta-Gate `npm run gates:pre-commit` ist Pflicht bei `*.99` oder bei Docs-/Governance-/Planstruktur-Aenderungen.
 - Einzeln falls noetig: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`.
+- Abschluss eines Tasks oder einer Subphase mit Repo-Aenderungen ist erst uebergabefaehig, wenn Evidence und passender scoped Commit vorliegen.
+- Offene eigene Scope-Aenderungen nach bestandenem Gate gelten als Closure-Luecke; vor Abschluss committen oder den fehlenden Abschlussgrund explizit dokumentieren.
 - If scope includes dead-code or legacy cleanup, closure evidence must also name the replacement proof or the explicit retention reason.
 
 ## Test Ownership

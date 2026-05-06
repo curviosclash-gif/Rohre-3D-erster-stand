@@ -12,6 +12,7 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - `V104` trennt den nachhaltigen God-Object-Sunset bewusst von `V100`: Remount-/Rebuild-/StartSync-Stabilisierung bleibt dort, waehrend `V104` den Ownership-, Port- und Alias-Zuschnitt fuer `UIManager`, `UIStartSyncController`, `UINavigationLifecycleController`, `GameRuntimeBundle`, `GameRuntimePorts`, `ArcadeVehicleManager`, `MatchFlowUiController` und `PlatformCapabilityRegistry` plant.
 - Die empfohlene Intake-Reihenfolge lautet damit `V99 -> V100 -> V104 -> V102`.
 
+
 ## Stand-Snapshot 2026-04-17
 
 - Nachpflege zum V92-Architekturscope: `src/ui/MatchFlowTransitionHotspots.js` nutzt fuer Arcade-/Recording-/Session-Transitions nur noch Runtime-Port-Fallbacks und keinen direkten `game.runtimeFacade`-Reach-through mehr.
@@ -278,6 +279,15 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `V81` ist damit vollstaendig abgeschlossen (`81.99` done). Der Fehlerbericht `docs/Fehlerberichte/2026-04-27_v81-81.99.2-build-touched-strict-mediarecorder.md` ist auf geloest aktualisiert.
 - Naechste offene Subphase im aktiven Master ist `V76 76.99.2` (weiter im Lock), waehrend die naechste freie Intake-Reihenfolge bei `V99 -> V100 -> V102` liegt.
 
+## Stand-Snapshot 2026-05-05 (Start `V100`, Subphasen `100.1` bis `100.3`)
+
+- `V100` wurde aus `docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md` als aktiver Block nach `docs/plaene/aktiv/V100.md` uebernommen und im Master auf `status: active` gespiegelt.
+- `100.1` ist abgeschlossen: der Iststand zeigte Rebuild-Lecks bei Portal-/Gate-/Checkpoint-Visuals (Array-Reset ohne Registry-/Mesh-Dispose) sowie Remount ohne await auf vorherigem `dispose`.
+- `100.2` ist abgeschlossen: `PortalLayoutBuilder` fuehrt vor jedem Rebuild einen kanonischen Visual-Reset aus; `PortalGateVisualRegistry` besitzt ein explizites `dispose()`, und `PortalGateSystem` resettet Portal-/Checkpoint-Runtime-Zwischenstaende vor dem Neuaufbau.
+- `100.3` ist abgeschlossen: `AppInitializer` serialisiert Mounts ueber eine Queue und wartet den vorherigen `dispose`-Pfad (inkl. asynchronem Runtime-Finalize) vor neuem `createGame()` ab.
+- Kleiner StartSync-Dedupe wurde mitgezogen: `UIManager.syncAll()` vermeidet den doppelten `syncStartSetupState`-Aufruf.
+- `npm run plan:check` und `npm run check:architecture:boundaries` sind gruensicher; naechste offene V100-Subphase ist `100.4.1`.
+
 ## Stand-Snapshot 2026-04-27 (Abschluss `V76 76.99.2`)
 
 - `V76` ist abgeschlossen (`76.99` done): `docs/plaene/aktiv/V76.md` steht jetzt auf `status: done`, `76.99` ist geschlossen und `76.99.2` dokumentiert den produktnahen Verifikationslauf.
@@ -314,3 +324,17 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Der verbleibende Abschluss-Blocker wurde behoben: `npm run typecheck:architecture` ist wieder gruen (Fix in `src/shared/contracts/DesktopMultiplayerRoleContract.js` via kanonischem `normalizePlatformProductSurfaceId()`).
 - Abschluss-Gates fuer `V104` sind gruensicher: `architecture:report`, `check:architecture:{boundaries,metrics,ratchet}`, `typecheck:architecture`, `graph:check`, `plan:check`, `docs:sync`, `docs:check` sowie die gezielten Contract-Checks (`104.5.1`, `V104.4.4`) laufen ohne Fehler.
 - Der Master-Index fuehrt `V104` jetzt als done-Block mit `current_phase 104.99`; der Lock-Index ist auf `closed` aktualisiert.
+
+## Stand-Snapshot 2026-05-05 (Plan-Update `V112` Test-Hardening)
+
+- `V112` wurde um den dedizierten Test-Hardening-Slice `112.6` erweitert, um die im Test-Review sichtbar gewordenen Gate- und Harness-Risiken strukturiert abzuarbeiten.
+- Der Scope deckt jetzt explizit `package.json`, `.agents/test_mapping.md`, `tests/helpers.js` sowie `core-targeted`-Testpfade ab.
+- Neue DoD-Ergaenzungen sichern (1) vollstaendige `test:contract`-Abdeckung fuer `*.contract.test.mjs`, (2) UI-first-E2E-Verhalten ohne verdeckende Runtime-Mutationspfade im Standardpfad und (3) nachvollziehbare Reduktion bzw. Sunset-Dokumentation von `skip`-/Sleep-Hotspots.
+- Naechste offene Subphase im Block bleibt `112.1`; `112.6` ist als geplanter Folge-Slice fuer die Testqualitaets-Haertung aufgenommen.
+
+## Stand-Snapshot 2026-05-06 (Abschluss `V100 100.99`)
+
+- `V100` ist abgeschlossen: der Runtime-Dispose-Pfad entfernt den alten `MenuController` jetzt deterministisch vor Reinit, und der Start-Setup-Sync priorisiert den autoritativen `settings.mapKey` vor der persistierten Hangar-Auswahl, sodass Custom-Map-Rebuilds mit gleichem Key keinen Standard-Layout-Drift mehr verursachen.
+- Relevante Runtime-Gates sind gruen: `node --test tests/runtime-regressions.contract.test.mjs` (31/31 PASS), `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-runtime.spec.js --grep "T20ae:" --timeout=240000` (`test-results/v100-runtime-dispose`) und `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-runtime.spec.js --grep "T10e:|T10f:" --timeout=240000` (`test-results/v100-runtime-t10ef`).
+- Abschluss-Gates sind gruen: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, `npm run graph:build`, `npm run gates:pre-commit` und `npm run lock:validate`.
+- Die V92-Ratchets bleiben unverletzt: `npm run check:architecture:boundaries` und `npm run check:architecture:ratchet` bleiben gruen; `window.GAME_INSTANCE` und `window.GAME_RUNTIME` verbleiben nur im Bootstrap-/Diagnostics-Scope.

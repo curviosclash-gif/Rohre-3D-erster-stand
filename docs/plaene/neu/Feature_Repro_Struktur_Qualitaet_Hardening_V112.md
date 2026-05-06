@@ -1,10 +1,12 @@
-# Feature: Repro Struktur-, Arbeits- und Qualitaets-Hardening (V112)
+# Feature: Repro Struktur-, Arbeits- und Qualitaets-Hardening (Ablage-Entwurf, kein Blockclaim)
 
 Stand: 2026-05-05
-Status: Entwurf
+Status: Abgeloester Alternativentwurf
 Owner: Codex
 Risiko: mittel-hoch
-plan_file: `docs/plaene/aktiv/V112.md`
+plan_file: `n/a`
+
+Hinweis: Dieser Entwurf ist als Alternativvorschlag abgelegt und beansprucht keine eigene Block-ID mehr. Der kanonische aktive V112-Block ist `docs/plaene/aktiv/V112.md` und basiert auf `Feature_Spielaudit_Playtest_Improvement_Paket_V112.md`.
 
 ## Ziel
 
@@ -77,11 +79,11 @@ Leitziele:
 ## Intake-Hinweis fuer den User
 
 - Ziel-Masterplan: `docs/Umsetzungsplan.md`
-- vorgeschlagene Block-ID: `V112`
-- vorgeschlagene kanonische Blockdatei: `docs/plaene/aktiv/V112.md`
+- vorgeschlagene Block-ID: `n/a (abgeloester Alternativentwurf)`
+- vorgeschlagene kanonische Blockdatei: `n/a`
 - hard dependencies: `V109.99`
 - soft dependencies: `V104.99`, `V105.99`, `V110.99`, `V111.99`
-- Hinweis: `Manuelle Uebernahme erforderlich`
+- Hinweis: `Nicht zur Uebernahme vorgesehen; nur als Ideenspeicher`
 
 ## Evidence-Format
 

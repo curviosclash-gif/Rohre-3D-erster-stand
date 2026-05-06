@@ -12,7 +12,7 @@ description: Detect and retire dead code/files with replacement-proof and safe d
 ## 1. Inventory
 
 // turbo
-- `git ls-files "src/**/*.js" "editor/js/**/*.js" "tests/**/*.js"`
+- `git ls-files "src/**/*.js" "editor/js/**/*.js" "tests/**/*.js" "tests/**/*.mjs"`
 - Cross-check with actual imports/references.
 - Classify each candidate as `duplicate-backed`, `legacy-with-replacement`, `contract-first/plan-drift`, or `unverified-altpath`.
 - Record per candidate: newer path, real consumers, test-/harness-only consumers, and delete criterion.
@@ -34,9 +34,10 @@ description: Detect and retire dead code/files with replacement-proof and safe d
 - Delete only `duplicate-backed` items or paths with proven productive replacement; keep or mark everything else as `legacy`, `compatibility path`, `shim`, or `plan-drift`.
 - Re-run relevant tests only after explicit user request; otherwise list the recommended manual test command for the user.
 
-## 5. Commit (see AGENTS.md §Commit Convention)
+## 5. Commit (see AGENTS.md section Commit Convention)
 
-- `git add [approved-files]` → `chore: cleanup - remove dead code/files`
+- Wenn die freigegebenen Cleanup-Aenderungen umgesetzt und nachvollziehbar eingegrenzt sind, Commit im selben Turn erstellen.
+- `git add [approved-files]` -> `chore: cleanup - remove dead code/files`
 - Verify scope: `git diff --name-only`.
 
 ## Report

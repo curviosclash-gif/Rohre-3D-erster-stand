@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-05-05
+Stand: 2026-05-06
 
 ## 1. Architekturparadigma
 
@@ -57,11 +57,12 @@ Stand: 2026-05-05
 
 ### 2.4 UI (`src/ui`)
 
-- `UIManager.js`: Menues, selektive Settings-Sync (`syncByChangeKeys`), Menu-Context und Status-Toast
+- `UIManager.js`: Menues, selektive Settings-Sync (`syncByChangeKeys`), Menu-Context, Status-Toast und koaleszierter Start-Setup-Snapshot-Dispatch (pro Sync-Zyklus genau ein `syncStartSetupState`-Call)
 - `HUD.js`, `HuntHUD.js`: Ingame-Overlay
 - `MatchFlowUiController.js`, `PauseOverlayController.js`, `KeybindEditorController.js`: UI-Flow/Settings-Controller-Splits; Match-/Pause-Exit nur ueber `lifecyclePort`/`matchUiPort`
 - `UISettingsSyncMap.js`: Zuordnung `changedKey -> UI-Sync-Teilfunktion`
 - `SettingsChangeKeys.js`, `SettingsChangeSetOps.js`: stabiler Key-Vertrag und Set-Operationen fuer Event-Coalescing
+- `UIStartSyncController.js`: konsumiert denselben Start-Setup-Snapshot-Vertrag fuer Surface-, Multiplayer- und Setup-Darstellung statt mehrfacher Einzel-Reads
 - `MenuController.js`: emittiert typisierte `SETTINGS_CHANGED`-Payloads und coalesct `input`-Storms pro Frame
 - `menu/MenuDefaultsEditorConfig.js`: zentrale Datenquelle fuer Menue-Basisdefaults, Local-UI-Defaults, Level-3-Reset und Fixed-Preset-Seeds
 - `SettingsStore.js`, `Profile*Ops.js`, `MatchUiStateOps.js`

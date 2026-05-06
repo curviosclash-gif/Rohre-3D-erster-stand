@@ -27,7 +27,7 @@
           "src/state/Match*"
         ],
         "scopeResolution": {
-          "concreteCount": 58,
+          "concreteCount": 59,
           "plannedCount": 0
         }
       }
@@ -96,7 +96,7 @@
           "src/entities/systems/PlayerLifecycleSystem.js"
         ],
         "scopeResolution": {
-          "concreteCount": 55,
+          "concreteCount": 56,
           "plannedCount": 0
         }
       }
@@ -141,7 +141,7 @@
           "src/ui/hangar/HangarWorkshopPersistenceFacade.js"
         ],
         "scopeResolution": {
-          "concreteCount": 57,
+          "concreteCount": 59,
           "plannedCount": 0
         }
       }
@@ -284,7 +284,7 @@
           "src/ui/menu/testing/MenuMultiplayerPanel.js"
         ],
         "scopeResolution": {
-          "concreteCount": 20,
+          "concreteCount": 22,
           "plannedCount": 0
         }
       }
@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 175,
+          "concreteCount": 182,
           "plannedCount": 0
         }
       }
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 438,
+          "concreteCount": 445,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -1703,6 +1703,46 @@
       }
     },
     {
+      "id": "V100",
+      "type": "block",
+      "title": "Runtime Rebuild-, Remount- und StartSync-Stabilisierung",
+      "status": "done",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "currentPhase": "100.99",
+        "planFile": "docs/plaene/aktiv/V100.md",
+        "scopeDeclarations": [
+          "docs/referenz/ai_architecture_context.md",
+          "src/core/AppInitializer.js",
+          "src/core/main.js",
+          "src/entities/Arena.js",
+          "src/entities/arena/portal/**",
+          "src/entities/arena/portal/PortalLayoutBuilder.js",
+          "src/ui/UIManager.js",
+          "src/ui/UIStartSyncController.js",
+          "tests/core-targeted-regressions.spec.js",
+          "tests/core-targeted-runtime.spec.js",
+          "tests/runtime-regressions.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 14,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [
+          "V107",
+          "V110",
+          "V111",
+          "V112"
+        ],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
       "id": "V101",
       "type": "block",
       "title": "Architecture Type-Safety und Contract-Hardening",
@@ -1744,6 +1784,21 @@
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V102",
+      "type": "block",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "dependency-target"
+        ],
+        "priority": null,
+        "owner": null,
+        "currentPhase": null,
+        "planFile": null
       }
     },
     {
@@ -1852,6 +1907,65 @@
       }
     },
     {
+      "id": "V105",
+      "type": "block",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "dependency-target"
+        ],
+        "priority": null,
+        "owner": null,
+        "currentPhase": null,
+        "planFile": null
+      }
+    },
+    {
+      "id": "V107",
+      "type": "block",
+      "title": "Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "dependency-target",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "107.1",
+        "planFile": "docs/plaene/aktiv/V107.md",
+        "scopeDeclarations": [
+          ".agents/rules/token_efficiency_and_tools.md",
+          ".agents/workflows/status.md",
+          "data/contracts/knowledge-graph/",
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.schema.json",
+          "docs/plaene/aktiv/V107.md",
+          "docs/referenz/ai_architecture_context.md",
+          "scripts/build-knowledge-graph.mjs",
+          "scripts/check-knowledge-graph.mjs",
+          "scripts/export-knowledge-graph-view.mjs",
+          "scripts/query-knowledge-graph.mjs",
+          "tools/graph-viewer/index.html",
+          "tools/graph-viewer/viewer.css",
+          "tools/graph-viewer/viewer.js"
+        ],
+        "scopeResolution": {
+          "concreteCount": 10,
+          "plannedCount": 4
+        },
+        "scopeOverlapAllowedWith": [
+          "V100",
+          "V110",
+          "V111"
+        ],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
       "id": "V108",
       "type": "block",
       "title": "Arcade-Ghost Selbstduell (laengste Spur pro Route)",
@@ -1933,6 +2047,134 @@
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V110",
+      "type": "block",
+      "title": "Wissensgraph Ops-, Guard- und Integritaets-Haertung",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "dependency-target",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "110.1",
+        "planFile": "docs/plaene/aktiv/V110.md",
+        "scopeDeclarations": [
+          ".agents/workflows/status.md",
+          "data/contracts/knowledge-graph/",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.schema.json",
+          "docs/plaene/aktiv/V110.md",
+          "docs/referenz/ai_architecture_context.md",
+          "scripts/build-knowledge-graph.mjs",
+          "scripts/check-knowledge-graph.mjs",
+          "scripts/query-knowledge-graph.mjs",
+          "tests/"
+        ],
+        "scopeResolution": {
+          "concreteCount": 106,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [
+          "V100",
+          "V107",
+          "V111",
+          "V112"
+        ],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V111",
+      "type": "block",
+      "title": "Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "111.1",
+        "planFile": "docs/plaene/aktiv/V111.md",
+        "scopeDeclarations": [
+          ".agents/rules/token_efficiency_and_tools.md",
+          ".agents/workflows/status.md",
+          "data/contracts/knowledge-graph/",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.schema.json",
+          "docs/plaene/aktiv/V111.md",
+          "docs/referenz/ai_architecture_context.md",
+          "scripts/build-knowledge-graph.mjs",
+          "scripts/check-knowledge-graph.mjs",
+          "scripts/export-knowledge-graph-view.mjs",
+          "scripts/query-knowledge-graph.mjs",
+          "tests/",
+          "tools/graph-viewer/index.html",
+          "tools/graph-viewer/viewer.css",
+          "tools/graph-viewer/viewer.js"
+        ],
+        "scopeResolution": {
+          "concreteCount": 107,
+          "plannedCount": 4
+        },
+        "scopeOverlapAllowedWith": [
+          "V100",
+          "V107",
+          "V110",
+          "V112"
+        ],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V112",
+      "type": "block",
+      "title": "Spielaudit- und Playtest-Improvement-Paket",
+      "status": "blocked",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "currentPhase": "112.1",
+        "planFile": "docs/plaene/aktiv/V112.md",
+        "scopeDeclarations": [
+          ".agents/test_mapping.md",
+          "electron/static-server.cjs",
+          "package.json",
+          "src/core/arcade/ArcadeRunRuntime.js",
+          "src/core/InputManager.js",
+          "src/entities/systems/CollisionResponseSystem.js",
+          "src/entities/systems/lifecycle/PlayerCollisionPhase.js",
+          "src/modes/ArcadeModeStrategy.js",
+          "src/ui/MatchFlowArcadeOverlayController.js",
+          "src/ui/start-setup/StartSetupUiOps.js",
+          "style.css",
+          "tests/core-targeted-platform.spec.js",
+          "tests/core-targeted-runtime.spec.js",
+          "tests/core-targeted-surface.spec.js",
+          "tests/core.spec.js",
+          "tests/helpers.js"
+        ],
+        "scopeResolution": {
+          "concreteCount": 16,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [
+          "V100",
+          "V110",
+          "V111"
+        ],
         "unknownFrontmatterFields": []
       }
     },
@@ -2221,7 +2463,7 @@
           "src/ui/UIStartSyncController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 77,
+          "concreteCount": 78,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2647,7 +2889,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 282,
+          "concreteCount": 292,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2774,7 +3016,7 @@
           "src/ui/PauseOverlayController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 85,
+          "concreteCount": 86,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2808,7 +3050,7 @@
           "src/state/**"
         ],
         "scopeResolution": {
-          "concreteCount": 255,
+          "concreteCount": 259,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2848,7 +3090,7 @@
           "tests/persistence-version-migration.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 175,
+          "concreteCount": 177,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3094,7 +3336,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 253,
+          "concreteCount": 255,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3201,7 +3443,9 @@
       "status": "done",
       "attributes": {
         "source": [
-          "block-plan"
+          "archive-index",
+          "block-plan",
+          "dependency-target"
         ],
         "priority": "P3",
         "owner": "frei",
@@ -3235,7 +3479,8 @@
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
-        "unknownFrontmatterFields": []
+        "unknownFrontmatterFields": [],
+        "currentPhase": "94.99"
       }
     },
     {
@@ -4952,6 +5197,66 @@
       }
     },
     {
+      "id": "V100.1",
+      "type": "phase",
+      "title": "Rebuild- und Remount-Iststand inventarisieren",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.1"
+      }
+    },
+    {
+      "id": "V100.2",
+      "type": "phase",
+      "title": "Arena-Rebuild teardown-sicher machen",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.2"
+      }
+    },
+    {
+      "id": "V100.3",
+      "type": "phase",
+      "title": "Runtime-Remount serialisieren",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.3"
+      }
+    },
+    {
+      "id": "V100.4",
+      "type": "phase",
+      "title": "Start-Setup-Sync deduplizieren",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.4"
+      }
+    },
+    {
+      "id": "V100.5",
+      "type": "phase",
+      "title": "Guard-Tests und Referenzspiegelung",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.5"
+      }
+    },
+    {
+      "id": "V100.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.99"
+      }
+    },
+    {
       "id": "V101.1",
       "type": "phase",
       "title": "Fehler-Taxonomie und Scope-Schnitt",
@@ -5132,6 +5437,66 @@
       }
     },
     {
+      "id": "V107.1",
+      "type": "phase",
+      "title": "Schema- und Mapping-Fundament",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.1"
+      }
+    },
+    {
+      "id": "V107.2",
+      "type": "phase",
+      "title": "Builder- und Query-Ausbau",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.2"
+      }
+    },
+    {
+      "id": "V107.3",
+      "type": "phase",
+      "title": "Integritaets- und Coverage-Gates",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.3"
+      }
+    },
+    {
+      "id": "V107.4",
+      "type": "phase",
+      "title": "Kritische Pfade und SettingManager-Referenz",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.4"
+      }
+    },
+    {
+      "id": "V107.5",
+      "type": "phase",
+      "title": "Doku- und Workflow-Spiegelung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.5"
+      }
+    },
+    {
+      "id": "V107.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.99"
+      }
+    },
+    {
       "id": "V108.1",
       "type": "phase",
       "title": "Fachregel und Contracts fuer Selbstduell festziehen",
@@ -5259,6 +5624,176 @@
       "attributes": {
         "blockId": "V109",
         "phaseCode": "109.99"
+      }
+    },
+    {
+      "id": "V110.1",
+      "type": "phase",
+      "title": "Constraints- und Provenance-Fundament",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.1"
+      }
+    },
+    {
+      "id": "V110.2",
+      "type": "phase",
+      "title": "Integritaet und Laufzeitabgleich",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.2"
+      }
+    },
+    {
+      "id": "V110.3",
+      "type": "phase",
+      "title": "Delta-Validation und Migration",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.3"
+      }
+    },
+    {
+      "id": "V110.4",
+      "type": "phase",
+      "title": "SLOs und Operator-Pfade",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.4"
+      }
+    },
+    {
+      "id": "V110.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.99"
+      }
+    },
+    {
+      "id": "V111.1",
+      "type": "phase",
+      "title": "Semantische Diagnose-Tiefe",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.1"
+      }
+    },
+    {
+      "id": "V111.2",
+      "type": "phase",
+      "title": "Ownership, Presets und Explainability",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.2"
+      }
+    },
+    {
+      "id": "V111.3",
+      "type": "phase",
+      "title": "Safety, Scorecard und What-if-Analyse",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.3"
+      }
+    },
+    {
+      "id": "V111.4",
+      "type": "phase",
+      "title": "Adaptive Qualitaetssteuerung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.4"
+      }
+    },
+    {
+      "id": "V111.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.99"
+      }
+    },
+    {
+      "id": "V112.1",
+      "type": "phase",
+      "title": "Input- und Lifecycle-Stabilisierung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.1"
+      }
+    },
+    {
+      "id": "V112.2",
+      "type": "phase",
+      "title": "Determinismus und Arcade-Run-Konsistenz",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.2"
+      }
+    },
+    {
+      "id": "V112.3",
+      "type": "phase",
+      "title": "UI-Sicherheits- und Overlay-Hardening",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.3"
+      }
+    },
+    {
+      "id": "V112.4",
+      "type": "phase",
+      "title": "Desktop-Surface- und CSP-Bereinigung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.4"
+      }
+    },
+    {
+      "id": "V112.5",
+      "type": "phase",
+      "title": "Gezielte Verifikation und Befund-Abgleich",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.5"
+      }
+    },
+    {
+      "id": "V112.6",
+      "type": "phase",
+      "title": "Test-Gate- und Harness-Logik-Hardening",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.6"
+      }
+    },
+    {
+      "id": "V112.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.99"
       }
     },
     {
@@ -14161,6 +14696,149 @@
       }
     },
     {
+      "id": "V100.1.1",
+      "type": "subphase",
+      "title": "Portal-, Gate- und Checkpoint-Visual-Lifecycle in `Arena.js` und `PortalLayoutBuilder.js` inventarisieren: Aufbau, Registry, Batch, Dispose, Rebuild-Reihenfolge. (abgeschlossen: 2026-05-05; evidence: `Get-Content src/entities/Arena.js` + `Get-Content src/entities/arena/portal/PortalLayoutBuilder.js` -> alter Rebuild setzte Arrays ohne registry-/mesh-dispose zurueck)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.1",
+        "subphaseCode": "100.1.1"
+      }
+    },
+    {
+      "id": "V100.1.2",
+      "type": "subphase",
+      "title": "Bootstrap-/Dispose-Reihenfolge in `AppInitializer.js` und `main.js` sowie Triggerkette `UIManager` -> `UIStartSyncController` pro Runde als Ist-Snapshot festhalten. (abgeschlossen: 2026-05-05; evidence: `Get-Content src/core/AppInitializer.js` + `Get-Content src/core/main.js` + `Get-Content src/ui/UIManager.js` + `Get-Content src/ui/UIStartSyncController.js` -> Remount ohne await auf vorherigem dispose, Full-sync mit doppeltem StartSetup-Call sichtbar)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.1",
+        "subphaseCode": "100.1.2"
+      }
+    },
+    {
+      "id": "V100.2.1",
+      "type": "subphase",
+      "title": "Vor jedem Arena-Neuaufbau einen kanonischen Reset fuer Portal-, Gate- und Checkpoint-Visuals einfuehren; alte Scene-Objekte, Registries und Batches werden deterministisch entsorgt. (abgeschlossen: 2026-05-05; evidence: `Get-Content src/entities/arena/portal/PortalLayoutBuilder.js` + `Get-Content src/entities/arena/PortalGateMeshFactory.js` -> `_resetExistingPortalGateVisuals()` und `PortalGateVisualRegistry.dispose()` vor Rebuild verdrahtet)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.2",
+        "subphaseCode": "100.2.1"
+      }
+    },
+    {
+      "id": "V100.2.2",
+      "type": "subphase",
+      "title": "Rebuild-Pfade gegen mehrfache Aufrufe und teils initialisierte Layouts absichern, ohne neue Visual-Dopplungen oder Dispose-Fehler zu erzeugen. (abgeschlossen: 2026-05-05; evidence: `Get-Content src/entities/arena/PortalGateSystem.js` + `Get-Content src/entities/arena/portal/{PortalRuntimeSystem.js,CheckpointRingRuntime.js}` -> runtime-reset vor jedem build; `npm run check:architecture:boundaries` -> passed)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.2",
+        "subphaseCode": "100.2.2"
+      }
+    },
+    {
+      "id": "V100.3.1",
+      "type": "subphase",
+      "title": "`AppInitializer` so nachschaerfen, dass altes Dispose/Teardown awaitbar oder explizit serialisiert ist, bevor neuer Runtime-State publiziert oder abonniert wird. (abgeschlossen: 2026-05-05; evidence: `Get-Content src/core/AppInitializer.js` -> `mountQueue` + `await disposeRuntimeGameInstance(previousGame)` vor neuem `createGame()`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.3",
+        "subphaseCode": "100.3.1"
+      }
+    },
+    {
+      "id": "V100.3.2",
+      "type": "subphase",
+      "title": "Remount-Guard gegen doppelte Starts, ueberschneidende Disposes und halb entsorgte Globals ergaenzen; `V92`-Ratchet bleibt unverletzt. (abgeschlossen: 2026-05-05; evidence: `Get-Content src/core/AppInitializer.js` -> globale Runtime-Slots werden vor dispose geleert; Mounts laufen sequentiell ueber Queue)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.3",
+        "subphaseCode": "100.3.2"
+      }
+    },
+    {
+      "id": "V100.4.1",
+      "type": "subphase",
+      "title": "Triggerpfade zwischen `UIManager` und `UIStartSyncController` auf einen koordinierten Sync pro State-Aenderung zusammenschneiden; Mehrfach-Trigger derselben Runde werden entfernt oder zentral gedrosselt. (abgeschlossen: 2026-05-05; evidence: `Get-Content src/ui/UIManager.js` + `node --check src/ui/UIManager.js` -> `_runSyncCycle` + `_syncStartSetupSnapshot` coalescen `syncStartSetupState` auf einen Call pro Sync-Runde)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.4",
+        "subphaseCode": "100.4.1"
+      }
+    },
+    {
+      "id": "V100.4.2",
+      "type": "subphase",
+      "title": "Sync-Vertrag so spiegeln, dass Surface-, Multiplayer- und Setup-Darstellung denselben Snapshot nutzen und keine privaten Manager-Interna mehrfach lesen. (abgeschlossen: 2026-05-05; evidence: `Get-Content src/ui/UIStartSyncController.js` + `node --check src/ui/UIStartSyncController.js` -> gemeinsamer Snapshot (`surfacePolicy`, `surfaceMenuState`, `multiplayerSessionState`) und Entfernen des privaten `_runtimeFeatureFlags`-Fallbacks)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.4",
+        "subphaseCode": "100.4.2"
+      }
+    },
+    {
+      "id": "V100.5.1",
+      "type": "subphase",
+      "title": "Relevante targeted- oder contract-Tests fuer Arena-Rebuild, Runtime-Remount und deduplizierten StartSync ergaenzen. (abgeschlossen: 2026-05-05; evidence: `Get-Content tests/core-targeted-runtime.spec.js` + `Get-Content tests/runtime-regressions.contract.test.mjs` + `node --check tests/core-targeted-runtime.spec.js` + `node --check tests/runtime-regressions.contract.test.mjs` -> neuer Playwright-Guard `T10f` und zwei Contract-Tests fuer Start-Setup-Sync-Coalescing/Snapshot)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.5",
+        "subphaseCode": "100.5.1"
+      }
+    },
+    {
+      "id": "V100.5.2",
+      "type": "subphase",
+      "title": "Referenzdoku und Test-Mapping auf denselben Dispose-, Remount- und Sync-Vertrag heben. (abgeschlossen: 2026-05-05; evidence: `Get-Content docs/referenz/ai_architecture_context.md` + `Get-Content .agents/test_mapping.md` -> Start-Setup-Snapshot-Vertrag in Architekturkontext und V100-spezifische UI-Testzuordnung gespiegelt)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.5",
+        "subphaseCode": "100.5.2"
+      }
+    },
+    {
+      "id": "V100.99.1",
+      "type": "subphase",
+      "title": "Relevante targeted-/contract-Tests fuer den geaenderten Scope sind gruensicher oder blockerfest dokumentiert. (abgeschlossen: 2026-05-06; evidence: `node --test tests/runtime-regressions.contract.test.mjs` + `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-runtime.spec.js --grep \"T20ae:\" --timeout=240000` + `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-runtime.spec.js --grep \"T10e:|T10f:\" --timeout=240000` -> `31/31 PASS`, `test-results/v100-runtime-dispose`, `test-results/v100-runtime-t10ef`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.99",
+        "subphaseCode": "100.99.1"
+      }
+    },
+    {
+      "id": "V100.99.2",
+      "type": "subphase",
+      "title": "`npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-06; evidence: `npm run plan:check` + `npm run docs:sync` + `npm run docs:check` + `npm run gates:pre-commit` -> alle gruen)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.99",
+        "subphaseCode": "100.99.2"
+      }
+    },
+    {
+      "id": "V100.99.3",
+      "type": "subphase",
+      "title": "Keine neuen Runtime-Globals, Restadapter oder UI-Reach-throughs im migrierten Scope. (abgeschlossen: 2026-05-06; evidence: `npm run check:architecture:boundaries` + `npm run check:architecture:ratchet` -> beide gruen; Legacy-Surface-Budgets unverletzt)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.99",
+        "subphaseCode": "100.99.3"
+      }
+    },
+    {
       "id": "V101.1.1",
       "type": "subphase",
       "title": "`typecheck:architecture`-Cluster fuer `globals`, `literal-unions`, `object-shapes` und `readonly/mutable` auf den V101-Scope geschnitten. (abgeschlossen: 2026-04-24; evidence: `npm run typecheck:architecture` -> gruen; keine verbleibenden Clusterfehler)",
@@ -14634,6 +15312,138 @@
       }
     },
     {
+      "id": "V107.1.1",
+      "type": "subphase",
+      "title": "Node-/Edge-Taxonomie fuer Runtime-, Event-, State-, Config- und Test-Layer finalisieren und versionieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.1",
+        "subphaseCode": "107.1.1"
+      }
+    },
+    {
+      "id": "V107.1.2",
+      "type": "subphase",
+      "title": "Mapping-Dateien unter `data/contracts/knowledge-graph/` fuer kritische Desktop-Pfade verbindlich festziehen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.1",
+        "subphaseCode": "107.1.2"
+      }
+    },
+    {
+      "id": "V107.2.1",
+      "type": "subphase",
+      "title": "Builder um Runtime-/State-/Test-Relationen erweitern und deterministisch serialisieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.2",
+        "subphaseCode": "107.2.1"
+      }
+    },
+    {
+      "id": "V107.2.2",
+      "type": "subphase",
+      "title": "Kernqueries (`impact-for-file`, `event-flow`, `untested-systems`, `critical-path-health`) inkl. JSON-Ausgabe stabilisieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.2",
+        "subphaseCode": "107.2.2"
+      }
+    },
+    {
+      "id": "V107.3.1",
+      "type": "subphase",
+      "title": "`graph:check` um Runtime-Orphans, Missing-Validation und Unknown-Reference-Checks erweitern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.3",
+        "subphaseCode": "107.3.1"
+      }
+    },
+    {
+      "id": "V107.3.2",
+      "type": "subphase",
+      "title": "Coverage-Report (`knowledge-graph.coverage.json`) mit Gate-Regeln fuer neue Uncovered-Dateien verankern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.3",
+        "subphaseCode": "107.3.2"
+      }
+    },
+    {
+      "id": "V107.4.1",
+      "type": "subphase",
+      "title": "Spawn-, Combat/Hit- und Round-Ende-Flows mit Runtime-Systemen, States und Tests verknuepfen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.4",
+        "subphaseCode": "107.4.1"
+      }
+    },
+    {
+      "id": "V107.4.2",
+      "type": "subphase",
+      "title": "`SettingManager` als Pflichtreferenzknoten mit Query-Evidence und Test-Link absichern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.4",
+        "subphaseCode": "107.4.2"
+      }
+    },
+    {
+      "id": "V107.5.1",
+      "type": "subphase",
+      "title": "`docs/referenz/ai_architecture_context.md` um den Runtime-Graph-Leseweg und Kernquery-Beispiele erweitern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.5",
+        "subphaseCode": "107.5.1"
+      }
+    },
+    {
+      "id": "V107.5.2",
+      "type": "subphase",
+      "title": "`.agents/rules/token_efficiency_and_tools.md` und `.agents/workflows/status.md` auf die neuen Query-Pfade spiegeln.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.5",
+        "subphaseCode": "107.5.2"
+      }
+    },
+    {
+      "id": "V107.99.1",
+      "type": "subphase",
+      "title": "`npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.99",
+        "subphaseCode": "107.99.1"
+      }
+    },
+    {
+      "id": "V107.99.2",
+      "type": "subphase",
+      "title": "Kernqueries, kritische Pfade, Coverage-Evidence und `SettingManager`-Referenz sind dokumentiert und reproduzierbar.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.99",
+        "subphaseCode": "107.99.2"
+      }
+    },
+    {
       "id": "V108.1.1",
       "type": "subphase",
       "title": "Ghost-Duell-Enum und Defaults (`off`, `self_longest_ghost`) im Menue-Settingspfad definiert. (abgeschlossen: 2026-05-01; evidence: `git diff -- src/shared/contracts/ArcadeGhostDuelContract.js src/ui/menu/MenuDefaultsEditorConfig.js src/ui/menu/MenuStateContracts.js` -> Enum + Defaults + Normalisierung aktiv)",
@@ -14994,6 +15804,479 @@
         "blockId": "V109",
         "phaseCode": "109.99",
         "subphaseCode": "109.99.3"
+      }
+    },
+    {
+      "id": "V110.1.1",
+      "type": "subphase",
+      "title": "Predicate-Constraints fuer produktiv genutzte Relationen versionieren und in `graph:check` fail-fast validieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.1",
+        "subphaseCode": "110.1.1"
+      }
+    },
+    {
+      "id": "V110.1.2",
+      "type": "subphase",
+      "title": "Evidence-Provenance (`file`, `line`, `commit`) fuer kritische Knoten/Kanten in Builder und Query-Ausgaben vollstaendig einziehen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.1",
+        "subphaseCode": "110.1.2"
+      }
+    },
+    {
+      "id": "V110.2.1",
+      "type": "subphase",
+      "title": "Contradiction-Detection mit kritischem Fail-Pfad und nicht-kritischer Warnklassifikation implementieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.2",
+        "subphaseCode": "110.2.1"
+      }
+    },
+    {
+      "id": "V110.2.2",
+      "type": "subphase",
+      "title": "Telemetrie-Replay-Fixtures fuer Spawn, Combat/Hit, Round-Ende anbinden und Abweichungsreport in `graph:check` integrieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.2",
+        "subphaseCode": "110.2.2"
+      }
+    },
+    {
+      "id": "V110.3.1",
+      "type": "subphase",
+      "title": "`impact-diff`-basierte Delta-Gates fuer geaenderte Subgraphen als Standardpfad dokumentieren und mit Referenzdiffs belegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.3",
+        "subphaseCode": "110.3.1"
+      }
+    },
+    {
+      "id": "V110.3.2",
+      "type": "subphase",
+      "title": "Ontology-Migrationen (`schema`/`id`) als versionierte Skripte inkl. Backfill-/Regressionstest absichern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.3",
+        "subphaseCode": "110.3.2"
+      }
+    },
+    {
+      "id": "V110.4.1",
+      "type": "subphase",
+      "title": "Query-SLO-Messung fuer Kernqueries in `desktop-local` und `ci-linux` etablieren; Regression-Gate mit Toleranzfenstern verankern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.4",
+        "subphaseCode": "110.4.1"
+      }
+    },
+    {
+      "id": "V110.4.2",
+      "type": "subphase",
+      "title": "Failure-Playbooks fuer `critical-path-health` und `change-risk` schreiben, verlinken und mit Referenz-Incident testen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.4",
+        "subphaseCode": "110.4.2"
+      }
+    },
+    {
+      "id": "V110.99.1",
+      "type": "subphase",
+      "title": "`npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.99",
+        "subphaseCode": "110.99.1"
+      }
+    },
+    {
+      "id": "V110.99.2",
+      "type": "subphase",
+      "title": "Constraints, Provenance, Contradiction-Detection und Replay sind mit Referenzartefakten nachweisbar aktiv.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.99",
+        "subphaseCode": "110.99.2"
+      }
+    },
+    {
+      "id": "V110.99.3",
+      "type": "subphase",
+      "title": "Delta-Gates und Migrationspfad sind dokumentiert, reproduzierbar und mit mindestens einem Referenzfall belegt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.99",
+        "subphaseCode": "110.99.3"
+      }
+    },
+    {
+      "id": "V110.99.4",
+      "type": "subphase",
+      "title": "SLO-Messungen (`desktop-local`, `ci-linux`) und Playbooks sind versioniert und im Workflow verankert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.99",
+        "subphaseCode": "110.99.4"
+      }
+    },
+    {
+      "id": "V111.1.1",
+      "type": "subphase",
+      "title": "Negative-Edge-Model (`cannot`, `forbidden_by`, `blocked_by`) einziehen und `why-not` auf explizite Blocker priorisieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.1",
+        "subphaseCode": "111.1.1"
+      }
+    },
+    {
+      "id": "V111.1.2",
+      "type": "subphase",
+      "title": "Causal-Weighting (`strength`, `directness`) fuer zentrale Relationen aktivieren und Ranking in `impact-for-file`/`impact-diff` testbar fixieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.1",
+        "subphaseCode": "111.1.2"
+      }
+    },
+    {
+      "id": "V111.2.1",
+      "type": "subphase",
+      "title": "Ownership-Layer und Stability-Index fuer kritische Pfade integrieren; Ausgabe in Incident-/Review-Queries sicherstellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.2",
+        "subphaseCode": "111.2.1"
+      }
+    },
+    {
+      "id": "V111.2.2",
+      "type": "subphase",
+      "title": "Query-Intent-Presets sowie Cross-Artifact-Linking (PR/Issue/ADR) und Explainability fuer Referenzfaelle stabilisieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.2",
+        "subphaseCode": "111.2.2"
+      }
+    },
+    {
+      "id": "V111.3.1",
+      "type": "subphase",
+      "title": "PII/Secret-Safety-Filter als Default fuer Export/Viewer verankern; auditierbaren Override-Pfad dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.3",
+        "subphaseCode": "111.3.1"
+      }
+    },
+    {
+      "id": "V111.3.2",
+      "type": "subphase",
+      "title": "Graph-Quality-Scorecard historisieren sowie Counterfactual-Queries (`what-if-remove`, `what-if-replace`) und Uncertainty-Budget reproduzierbar machen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.3",
+        "subphaseCode": "111.3.2"
+      }
+    },
+    {
+      "id": "V111.4.1",
+      "type": "subphase",
+      "title": "Incident-Auto-Minimization, Temporal-Anomaly-Detection und Schema-Lint als dokumentierte Diagnose-/Gate-Pfade aktivieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.4",
+        "subphaseCode": "111.4.1"
+      }
+    },
+    {
+      "id": "V111.4.2",
+      "type": "subphase",
+      "title": "Graph-Backed-Test-Prioritization, Policy-as-Data und Human-Feedback-Loop implementieren und mit Referenzfaellen evaluieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.4",
+        "subphaseCode": "111.4.2"
+      }
+    },
+    {
+      "id": "V111.99.1",
+      "type": "subphase",
+      "title": "`npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.99",
+        "subphaseCode": "111.99.1"
+      }
+    },
+    {
+      "id": "V111.99.2",
+      "type": "subphase",
+      "title": "Negative-Edges, Causal-Weighting, Presets und Explainability sind mit Golden-/Fixture-Evidence stabil belegt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.99",
+        "subphaseCode": "111.99.2"
+      }
+    },
+    {
+      "id": "V111.99.3",
+      "type": "subphase",
+      "title": "Safety-Filter, Scorecard, Counterfactuals, Uncertainty-Budget und Auto-Minimization sind reproduzierbar dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.99",
+        "subphaseCode": "111.99.3"
+      }
+    },
+    {
+      "id": "V111.99.4",
+      "type": "subphase",
+      "title": "Anomaly-Detection, Test-Prioritization, Policy-as-Data und Feedback-Loop sind im Workflow verankert und mit Referenzartefakten verifiziert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.99",
+        "subphaseCode": "111.99.4"
+      }
+    },
+    {
+      "id": "V112.1.1",
+      "type": "subphase",
+      "title": "`InputManager` fuer `keyup`/Reset bei Fokuswechseln und Textinputs haerten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.1",
+        "subphaseCode": "112.1.1"
+      }
+    },
+    {
+      "id": "V112.1.2",
+      "type": "subphase",
+      "title": "Match-/Menu-Lifecycle auf Sticky-Input-Randfaelle absichern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.1",
+        "subphaseCode": "112.1.2"
+      }
+    },
+    {
+      "id": "V112.2.1",
+      "type": "subphase",
+      "title": "Kollisions-Bounce von unseeded Zufall auf deterministischen/replay-vertraeglichen Pfad umstellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.2",
+        "subphaseCode": "112.2.1"
+      }
+    },
+    {
+      "id": "V112.2.2",
+      "type": "subphase",
+      "title": "Arcade-Seed-Ableitung (Map/Mission) auf aktive Run-Seed-Quelle vereinheitlichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.2",
+        "subphaseCode": "112.2.2"
+      }
+    },
+    {
+      "id": "V112.2.3",
+      "type": "subphase",
+      "title": "Sudden-Death-Status pro Run korrekt resetten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.2",
+        "subphaseCode": "112.2.3"
+      }
+    },
+    {
+      "id": "V112.3.1",
+      "type": "subphase",
+      "title": "`StartSetupUiOps` auf sichere DOM-Erzeugung oder gleichwertiges Escaping umstellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.3",
+        "subphaseCode": "112.3.1"
+      }
+    },
+    {
+      "id": "V112.3.2",
+      "type": "subphase",
+      "title": "`MatchFlowArcadeOverlayController` analog haerten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.3",
+        "subphaseCode": "112.3.2"
+      }
+    },
+    {
+      "id": "V112.3.3",
+      "type": "subphase",
+      "title": "Negativfall-Test fuer Escape/Injection im Surface-Pfad ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.3",
+        "subphaseCode": "112.3.3"
+      }
+    },
+    {
+      "id": "V112.4.1",
+      "type": "subphase",
+      "title": "Externe Font-Imports gegen Desktop-CSP harmonisieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.4",
+        "subphaseCode": "112.4.1"
+      }
+    },
+    {
+      "id": "V112.4.2",
+      "type": "subphase",
+      "title": "Surface-Policy-/Contract-Nebenpfad im Boot-Kontext auf fehlertraechtige Zugriffe minimieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.4",
+        "subphaseCode": "112.4.2"
+      }
+    },
+    {
+      "id": "V112.5.1",
+      "type": "subphase",
+      "title": "Targeted Desktop-Smoke plus relevante Surface/Runtime-Tests fuer geaenderte Komponenten fahren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.5",
+        "subphaseCode": "112.5.1"
+      }
+    },
+    {
+      "id": "V112.5.2",
+      "type": "subphase",
+      "title": "B02/B03/B04/B05/B06-Status und `docs/prozess/Open_Findings.md` abgleichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.5",
+        "subphaseCode": "112.5.2"
+      }
+    },
+    {
+      "id": "V112.6.1",
+      "type": "subphase",
+      "title": "`test:contract` auf vollstaendige `*.contract.test.mjs`-Abdeckung ausrichten (inkl. Abgleich zu `.agents/test_mapping.md`).",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.6",
+        "subphaseCode": "112.6.1"
+      }
+    },
+    {
+      "id": "V112.6.2",
+      "type": "subphase",
+      "title": "`tests/helpers.js` fuer Match-/Mode-Start auf UI-first-Verhalten haerten; Runtime-Fallback nur explizit zuschaltbar und als Recovery klassifiziert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.6",
+        "subphaseCode": "112.6.2"
+      }
+    },
+    {
+      "id": "V112.6.3",
+      "type": "subphase",
+      "title": "`core-targeted-{runtime,surface,platform}` auf harte `skip`-/Sleep-Hotspots pruefen und priorisierte Ersatzpfade mit zustandsbasierten Waits planen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.6",
+        "subphaseCode": "112.6.3"
+      }
+    },
+    {
+      "id": "V112.6.4",
+      "type": "subphase",
+      "title": "Verbleibende Ausnahmen (z. B. env- oder runtime-abhaengige Skips) mit Sunset-Kriterium und Nachweispfad dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.6",
+        "subphaseCode": "112.6.4"
+      }
+    },
+    {
+      "id": "V112.99.1",
+      "type": "subphase",
+      "title": "Relevante targeted Verifikationssignale sind gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.99",
+        "subphaseCode": "112.99.1"
+      }
+    },
+    {
+      "id": "V112.99.2",
+      "type": "subphase",
+      "title": "`npm run plan:check` ist gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.99",
+        "subphaseCode": "112.99.2"
+      }
+    },
+    {
+      "id": "V112.99.3",
+      "type": "subphase",
+      "title": "Falls Docs-/Governance-Scope geaendert wurde: `npm run docs:sync` und `npm run docs:check` sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.99",
+        "subphaseCode": "112.99.3"
       }
     },
     {
@@ -22582,7 +23865,9 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
           "V109",
+          "V111",
           "V93",
           "V94"
         ],
@@ -22600,6 +23885,7 @@
         ],
         "scopeBlocks": [
           "V104",
+          "V112",
           "V88",
           "V89",
           "V91",
@@ -22716,7 +24002,10 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
           "V109",
+          "V110",
+          "V111",
           "V93",
           "V94"
         ],
@@ -27674,6 +28963,21 @@
       }
     },
     {
+      "id": "docs/generated/knowledge-graph.coverage.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/generated/knowledge-graph.json",
       "type": "file",
       "title": null,
@@ -27683,6 +28987,9 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
           "V94"
         ],
         "exists": true
@@ -27698,6 +29005,9 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
           "V94"
         ],
         "exists": true
@@ -27720,6 +29030,21 @@
     },
     {
       "id": "docs/plaene/aktiv/README.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V100.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -27779,6 +29104,22 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V107.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V108.md",
       "type": "file",
       "title": null,
@@ -27805,6 +29146,53 @@
         ],
         "scopeBlocks": [
           "V109",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V110.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V110",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V111.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V111",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V112.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
           "V77"
         ],
         "exists": true
@@ -29796,6 +31184,21 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md",
       "type": "file",
       "title": null,
@@ -29841,7 +31244,52 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_Spielaudit_Playtest_Improvement_Paket_V112.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Wissensgraph_Adaptive_Intelligence_Ausbau_V111.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Wissensgraph_Ops_Guards_Haertung_V110.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -30181,10 +31629,14 @@
           "BT73",
           "BT90",
           "BT93K",
+          "V100",
           "V101",
           "V103",
           "V104",
+          "V107",
           "V108",
+          "V110",
+          "V111",
           "V74",
           "V77",
           "V83",
@@ -31214,6 +32666,7 @@
         ],
         "scopeBlocks": [
           "B09",
+          "V112",
           "V60",
           "V64",
           "V89"
@@ -31427,6 +32880,7 @@
           "BT93K",
           "BT93L",
           "BT93M",
+          "V112",
           "V75",
           "V87",
           "V88",
@@ -34241,6 +35695,9 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V107",
+          "V110",
+          "V111",
           "V94"
         ],
         "exists": true
@@ -34375,7 +35832,27 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V107",
+          "V110",
+          "V111",
           "V94"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/check-parcours-routes.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
         ],
         "exists": true
       }
@@ -34572,6 +36049,22 @@
       }
     },
     {
+      "id": "scripts/export-knowledge-graph-view.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V111"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "scripts/find-unused-files.mjs",
       "type": "file",
       "title": null,
@@ -34763,6 +36256,9 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V107",
+          "V110",
+          "V111",
           "V94"
         ],
         "exists": true
@@ -35342,6 +36838,25 @@
       }
     },
     {
+      "id": "src/application/session-runtime/NetworkLobbyServiceDiscovery.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B01",
+          "B08",
+          "V83",
+          "V84"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/application/session-runtime/NetworkLobbyServiceSupport.js",
       "type": "file",
       "title": null,
@@ -35580,9 +37095,22 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V100",
           "V101",
           "V89",
           "V92"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/core/AppInitializerLifecycle.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "guard-matrix"
         ],
         "exists": true
       }
@@ -35599,7 +37127,8 @@
         ],
         "scopeBlocks": [
           "B04",
-          "V108"
+          "V108",
+          "V112"
         ],
         "exists": true
       }
@@ -36139,10 +37668,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B02"
+          "B02",
+          "V112"
         ],
         "exists": true
       }
@@ -36191,6 +37722,7 @@
         ],
         "scopeBlocks": [
           "B01",
+          "V100",
           "V103",
           "V60",
           "V74",
@@ -38355,6 +39887,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V100",
           "V51",
           "V84"
         ],
@@ -38478,6 +40011,7 @@
         ],
         "scopeBlocks": [
           "B03",
+          "V100",
           "V72",
           "V74",
           "V82",
@@ -38498,6 +40032,7 @@
         ],
         "scopeBlocks": [
           "B03",
+          "V100",
           "V51",
           "V72",
           "V74",
@@ -38519,6 +40054,7 @@
         ],
         "scopeBlocks": [
           "B03",
+          "V100",
           "V72",
           "V74",
           "V84"
@@ -38538,6 +40074,7 @@
         ],
         "scopeBlocks": [
           "B03",
+          "V100",
           "V72",
           "V74",
           "V84"
@@ -38557,6 +40094,7 @@
         ],
         "scopeBlocks": [
           "B03",
+          "V100",
           "V72",
           "V74",
           "V84"
@@ -39384,6 +40922,7 @@
         ],
         "scopeBlocks": [
           "B03",
+          "V112",
           "V84"
         ],
         "exists": true
@@ -39438,6 +40977,7 @@
         ],
         "scopeBlocks": [
           "B03",
+          "V112",
           "V72",
           "V84"
         ],
@@ -39458,6 +40998,23 @@
           "B03",
           "V51",
           "V72",
+          "V84"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/entities/systems/ParcoursProgressRuntime.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B03",
           "V84"
         ],
         "exists": true
@@ -40095,6 +41652,7 @@
         ],
         "scopeBlocks": [
           "B04",
+          "V112",
           "V72",
           "V82",
           "V84"
@@ -40294,6 +41852,24 @@
           "V64",
           "V77",
           "V99"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/network/OnlineMatchLobbyMessageRouter.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B08",
+          "V64",
+          "V77"
         ],
         "exists": true
       }
@@ -41993,6 +43569,25 @@
       }
     },
     {
+      "id": "src/state/arcade/ArcadeGhostLibraryInternals.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B04",
+          "V84",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/state/arcade/ArcadeGhostRecorder.js",
       "type": "file",
       "title": null,
@@ -42144,6 +43739,25 @@
           "V66",
           "V76",
           "V82",
+          "V84",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/state/arcade/ArcadeVehicleProfileInternals.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B04",
           "V84",
           "V85",
           "V91"
@@ -43462,6 +45076,7 @@
         ],
         "scopeBlocks": [
           "B06",
+          "V112",
           "V91"
         ],
         "exists": true
@@ -44915,6 +46530,7 @@
         "scopeBlocks": [
           "B05",
           "V108",
+          "V112",
           "V76",
           "V77",
           "V91"
@@ -44986,6 +46602,7 @@
         ],
         "scopeBlocks": [
           "B05",
+          "V100",
           "V104",
           "V64",
           "V91"
@@ -45041,6 +46658,7 @@
         ],
         "scopeBlocks": [
           "B05",
+          "V100",
           "V104",
           "V108",
           "V64",
@@ -45075,6 +46693,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V112",
           "V74"
         ],
         "exists": true
@@ -45094,6 +46713,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V88"
         ],
         "exists": true
@@ -45113,7 +46734,9 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V108"
+          "V108",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45126,11 +46749,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45143,11 +46769,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45166,6 +46795,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V88"
         ],
         "exists": true
@@ -45179,11 +46810,34 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/checkpoint-ring-runtime.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45196,11 +46850,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45219,6 +46876,9 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
+          "V112",
           "V88",
           "V89"
         ],
@@ -45239,6 +46899,9 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V100",
+          "V110",
+          "V111",
           "V88",
           "V89"
         ],
@@ -45260,6 +46923,10 @@
           "B06",
           "B13",
           "BT91",
+          "V100",
+          "V110",
+          "V111",
+          "V112",
           "V88",
           "V89"
         ],
@@ -45284,6 +46951,9 @@
           "BT91",
           "V104",
           "V108",
+          "V110",
+          "V111",
+          "V112",
           "V88",
           "V89"
         ],
@@ -45304,6 +46974,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V88"
         ],
         "exists": true
@@ -45323,6 +46995,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V87",
           "V88",
           "V89"
@@ -45344,6 +47018,9 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
+          "V112",
           "V51",
           "V53",
           "V63",
@@ -45371,6 +47048,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V99"
         ],
         "exists": true
@@ -45384,11 +47063,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45407,6 +47089,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V65"
         ],
         "exists": true
@@ -45426,6 +47110,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V88",
           "V89"
         ],
@@ -45440,11 +47126,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45463,6 +47152,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V72"
         ],
         "exists": true
@@ -45476,11 +47167,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45493,11 +47187,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45510,11 +47207,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45533,7 +47233,9 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V104"
+          "V104",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45546,11 +47248,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45569,6 +47274,9 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
+          "V112",
           "V87",
           "V88",
           "V89"
@@ -45590,6 +47298,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V94"
         ],
         "exists": true
@@ -45603,11 +47313,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45626,6 +47339,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V99"
         ],
         "exists": true
@@ -45639,11 +47354,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45662,6 +47380,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V92"
         ],
         "exists": true
@@ -45675,11 +47395,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45698,6 +47421,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V99"
         ],
         "exists": true
@@ -45711,11 +47436,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45728,11 +47456,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45751,6 +47482,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V88"
         ],
         "exists": true
@@ -45764,11 +47497,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45787,6 +47523,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V99"
         ],
         "exists": true
@@ -45806,6 +47544,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V88",
           "V89"
         ],
@@ -45820,11 +47560,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45837,11 +47580,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45854,11 +47600,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45871,11 +47620,74 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/parcours-map-schema.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/parcours-minimap.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/parcours-progress-audio.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45888,11 +47700,54 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/parcours-ring-glow-settings.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/parcours-start.spec.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -45912,6 +47767,8 @@
           "B07",
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V85",
           "V97"
         ],
@@ -45932,6 +47789,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V51",
           "V88",
           "V89"
@@ -45953,6 +47812,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V63",
           "V69",
           "V88",
@@ -45975,6 +47836,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V69",
           "V88",
           "V89"
@@ -45998,6 +47861,8 @@
           "BT91",
           "V101",
           "V104",
+          "V110",
+          "V111",
           "V77",
           "V88",
           "V91",
@@ -46015,11 +47880,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46038,6 +47906,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V88",
           "V89"
         ],
@@ -46058,6 +47928,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V87",
           "V88",
           "V89"
@@ -46073,11 +47945,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46090,11 +47965,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46107,11 +47985,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46130,6 +48011,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V88",
           "V89"
         ],
@@ -46144,11 +48027,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46161,11 +48047,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46178,11 +48067,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46201,7 +48093,10 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V100",
           "V104",
+          "V110",
+          "V111",
           "V91",
           "V92"
         ],
@@ -46224,6 +48119,8 @@
           "BT91",
           "V103",
           "V108",
+          "V110",
+          "V111",
           "V97"
         ],
         "exists": true
@@ -46243,7 +48140,9 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V103"
+          "V103",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46263,6 +48162,8 @@
           "B13",
           "BT91",
           "V101",
+          "V110",
+          "V111",
           "V97",
           "V98"
         ],
@@ -46298,6 +48199,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V51",
           "V63"
         ],
@@ -46312,11 +48215,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46329,11 +48235,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46346,11 +48255,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46363,11 +48275,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46380,11 +48295,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46397,11 +48315,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46414,11 +48335,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46431,11 +48355,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46448,11 +48375,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46465,11 +48395,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46482,11 +48415,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46499,11 +48435,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46516,12 +48455,15 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "BT20",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46534,12 +48476,15 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "BT80C",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46552,12 +48497,15 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "BT91",
-          "BT93E"
+          "BT93E",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46586,13 +48534,16 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "BT80C",
           "BT91",
-          "BT93E"
+          "BT93E",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46605,13 +48556,16 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "BT80C",
           "BT91",
-          "BT93E"
+          "BT93E",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46624,7 +48578,8 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
@@ -46632,7 +48587,9 @@
           "BT91",
           "BT93E",
           "BT93G",
-          "BT93N"
+          "BT93N",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46645,13 +48602,16 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "BT80C",
           "BT91",
-          "BT93E"
+          "BT93E",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46664,14 +48624,17 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "BT20",
           "BT91",
           "BT93E",
-          "BT93N"
+          "BT93N",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46684,12 +48647,15 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "BT91",
-          "BT93E"
+          "BT93E",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46708,6 +48674,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
+          "V110",
+          "V111",
           "V99"
         ],
         "exists": true
@@ -46721,11 +48689,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46738,11 +48709,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46755,11 +48729,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46772,11 +48749,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46789,11 +48769,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -46806,11 +48789,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -61608,6 +63594,54 @@
       }
     },
     {
+      "id": "tools/graph-viewer/index.html",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V111"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tools/graph-viewer/viewer.css",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V111"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tools/graph-viewer/viewer.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V111"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "trainer/artifacts/TrainerArtifactStore.mjs",
       "type": "file",
       "title": null,
@@ -61980,6 +64014,15 @@
     {
       "from": "B01",
       "to": "src/application/session-runtime/NetworkLobbyService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B01",
+      "to": "src/application/session-runtime/NetworkLobbyServiceDiscovery.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -63014,6 +65057,15 @@
     },
     {
       "from": "B03",
+      "to": "src/entities/systems/ParcoursProgressRuntime.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B03",
       "to": "src/entities/systems/ParcoursProgressStateOps.js",
       "type": "scope",
       "hint": null,
@@ -63419,6 +65471,15 @@
     },
     {
       "from": "B04",
+      "to": "src/state/arcade/ArcadeGhostLibraryInternals.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B04",
       "to": "src/state/arcade/ArcadeGhostRecorder.js",
       "type": "scope",
       "hint": null,
@@ -63483,6 +65544,15 @@
     {
       "from": "B04",
       "to": "src/state/arcade/ArcadeVehicleProfile.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B04",
+      "to": "src/state/arcade/ArcadeVehicleProfileInternals.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -64724,6 +66794,15 @@
     },
     {
       "from": "B08",
+      "to": "src/application/session-runtime/NetworkLobbyServiceDiscovery.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B08",
       "to": "src/application/session-runtime/NetworkLobbyServiceSupport.js",
       "type": "scope",
       "hint": null,
@@ -64797,6 +66876,15 @@
     {
       "from": "B08",
       "to": "src/network/OnlineMatchLobby.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B08",
+      "to": "src/network/OnlineMatchLobbyMessageRouter.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -66452,6 +68540,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/check-parcours-routes.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/check-root-runtime-invariants.mjs",
       "type": "scope",
       "hint": null,
@@ -66920,6 +69017,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/checkpoint-ring-runtime.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/content-descriptor-registries.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -67253,7 +69359,52 @@
     },
     {
       "from": "B13",
+      "to": "tests/parcours-map-schema.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/parcours-minimap.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/parcours-progress-audio.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/parcours-progress-utils.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/parcours-ring-glow-settings.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/parcours-start.spec.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -74823,6 +76974,15 @@
     },
     {
       "from": "BT91",
+      "to": "scripts/check-parcours-routes.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "scripts/check-root-runtime-invariants.mjs",
       "type": "scope",
       "hint": null,
@@ -75291,6 +77451,15 @@
     },
     {
       "from": "BT91",
+      "to": "tests/checkpoint-ring-runtime.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "tests/content-descriptor-registries.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -75624,7 +77793,52 @@
     },
     {
       "from": "BT91",
+      "to": "tests/parcours-map-schema.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "tests/parcours-minimap.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "tests/parcours-progress-audio.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "tests/parcours-progress-utils.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "tests/parcours-ring-glow-settings.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "tests/parcours-start.spec.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -137066,6 +139280,28 @@
       }
     },
     {
+      "from": "src/core/AppInitializerLifecycle.js",
+      "to": "game.runtimeFacade",
+      "type": "touches",
+      "hint": null,
+      "attributes": {
+        "roles": [
+          "allowedAdapter"
+        ]
+      }
+    },
+    {
+      "from": "src/core/AppInitializerLifecycle.js",
+      "to": "window.GAME_INSTANCE",
+      "type": "touches",
+      "hint": null,
+      "attributes": {
+        "roles": [
+          "allowedAdapter"
+        ]
+      }
+    },
+    {
       "from": "src/core/Config.js",
       "to": "ActiveRuntimeConfigStore",
       "type": "touches",
@@ -137206,6 +139442,353 @@
         "roles": [
           "allowedCaller"
         ]
+      }
+    },
+    {
+      "from": "V100",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "src/core/AppInitializer.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "src/core/main.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "src/entities/Arena.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "src/entities/arena/portal/CheckpointRingRuntime.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "src/entities/arena/portal/PortalLayoutBuilder.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "src/entities/arena/portal/PortalRuntimeSystem.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "src/entities/arena/portal/SpecialGateRuntime.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "src/entities/arena/portal/TraversalCooldownOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "src/ui/UIManager.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "src/ui/UIStartSyncController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "tests/core-targeted-regressions.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "tests/core-targeted-runtime.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "tests/runtime-regressions.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "V100.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.1"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "V100.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.2"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "V100.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.3"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "V100.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.4"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "V100.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.5"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "V100.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.99"
+      }
+    },
+    {
+      "from": "V100",
+      "to": "V92",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "V92 ist abgeschlossen; V100 kann als Runtime-Stabilisierung direkt starten",
+      "attributes": {
+        "dependsPhase": "92.99",
+        "rawToken": "V92.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V100.1",
+      "to": "V100.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.1",
+        "subphaseCode": "100.1.1"
+      }
+    },
+    {
+      "from": "V100.1",
+      "to": "V100.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.1",
+        "subphaseCode": "100.1.2"
+      }
+    },
+    {
+      "from": "V100.2",
+      "to": "V100.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.2",
+        "subphaseCode": "100.2.1"
+      }
+    },
+    {
+      "from": "V100.2",
+      "to": "V100.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.2",
+        "subphaseCode": "100.2.2"
+      }
+    },
+    {
+      "from": "V100.3",
+      "to": "V100.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.3",
+        "subphaseCode": "100.3.1"
+      }
+    },
+    {
+      "from": "V100.3",
+      "to": "V100.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.3",
+        "subphaseCode": "100.3.2"
+      }
+    },
+    {
+      "from": "V100.4",
+      "to": "V100.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.4",
+        "subphaseCode": "100.4.1"
+      }
+    },
+    {
+      "from": "V100.4",
+      "to": "V100.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.4",
+        "subphaseCode": "100.4.2"
+      }
+    },
+    {
+      "from": "V100.5",
+      "to": "V100.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.5",
+        "subphaseCode": "100.5.1"
+      }
+    },
+    {
+      "from": "V100.5",
+      "to": "V100.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.5",
+        "subphaseCode": "100.5.2"
+      }
+    },
+    {
+      "from": "V100.99",
+      "to": "V100.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.99",
+        "subphaseCode": "100.99.1"
+      }
+    },
+    {
+      "from": "V100.99",
+      "to": "V100.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.99",
+        "subphaseCode": "100.99.2"
+      }
+    },
+    {
+      "from": "V100.99",
+      "to": "V100.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V100",
+        "phaseCode": "100.99",
+        "subphaseCode": "100.99.3"
       }
     },
     {
@@ -138662,6 +141245,342 @@
       }
     },
     {
+      "from": "V107",
+      "to": ".agents/rules/token_efficiency_and_tools.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": ".agents/workflows/status.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "docs/generated/knowledge-graph.schema.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "docs/plaene/aktiv/V107.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "scripts/build-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "scripts/check-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "scripts/export-knowledge-graph-view.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "scripts/query-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "tools/graph-viewer/index.html",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "tools/graph-viewer/viewer.css",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "tools/graph-viewer/viewer.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "V107.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.1"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "V107.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.2"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "V107.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.3"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "V107.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.4"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "V107.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.5"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "V107.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.99"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "V94",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "V94 ist abgeschlossen; V107 kann als Core-Graph-Block gestartet werden",
+      "attributes": {
+        "dependsPhase": "94.99",
+        "rawToken": "V94.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V107.1",
+      "to": "V107.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.1",
+        "subphaseCode": "107.1.1"
+      }
+    },
+    {
+      "from": "V107.1",
+      "to": "V107.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.1",
+        "subphaseCode": "107.1.2"
+      }
+    },
+    {
+      "from": "V107.2",
+      "to": "V107.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.2",
+        "subphaseCode": "107.2.1"
+      }
+    },
+    {
+      "from": "V107.2",
+      "to": "V107.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.2",
+        "subphaseCode": "107.2.2"
+      }
+    },
+    {
+      "from": "V107.3",
+      "to": "V107.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.3",
+        "subphaseCode": "107.3.1"
+      }
+    },
+    {
+      "from": "V107.3",
+      "to": "V107.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.3",
+        "subphaseCode": "107.3.2"
+      }
+    },
+    {
+      "from": "V107.4",
+      "to": "V107.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.4",
+        "subphaseCode": "107.4.1"
+      }
+    },
+    {
+      "from": "V107.4",
+      "to": "V107.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.4",
+        "subphaseCode": "107.4.2"
+      }
+    },
+    {
+      "from": "V107.5",
+      "to": "V107.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.5",
+        "subphaseCode": "107.5.1"
+      }
+    },
+    {
+      "from": "V107.5",
+      "to": "V107.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.5",
+        "subphaseCode": "107.5.2"
+      }
+    },
+    {
+      "from": "V107.99",
+      "to": "V107.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.99",
+        "subphaseCode": "107.99.1"
+      }
+    },
+    {
+      "from": "V107.99",
+      "to": "V107.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V107",
+        "phaseCode": "107.99",
+        "subphaseCode": "107.99.2"
+      }
+    },
+    {
       "from": "V108",
       "to": "docs/plaene/aktiv/V108.md",
       "type": "scope",
@@ -139538,6 +142457,2836 @@
         "blockId": "V109",
         "phaseCode": "109.99",
         "subphaseCode": "109.99.3"
+      }
+    },
+    {
+      "from": "V110",
+      "to": ".agents/workflows/status.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/generated/knowledge-graph.schema.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/plaene/aktiv/V110.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "scripts/build-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "scripts/check-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "scripts/query-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/arcade-blueprint.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/arcade-ghost-library.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/arcade-hangar-rules.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/audio.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/bot-targeting.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/browser-demo-surface-policy-override.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/checkpoint-ring-runtime.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/content-descriptor-registries.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/core-targeted-platform.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/core-targeted-regressions.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/core-targeted-runtime.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/core-targeted-surface.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/core-targeted.shared.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/core-targeted.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/core.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/desktop-multiinstance-smoke.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/editor-authoring-contract.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/editor-map-ui.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/editor-vehicle.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/game-mode-strategy.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/gameplay-powerups-portals-gates.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/ghost-selfduel-allmaps.desktop.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/ghost-selfduel-roundtrip.desktop.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/gpu.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/hangar-desktop-flow.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/helpers.desktop.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/helpers.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/knowledge-graph-build.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/knowledge-graph-query.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/lan-signaling-hardening.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/last-round-ghost-system.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/lifecycle-capability.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/map-mode-eligibility.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/match-start-validation-connectivity.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/media-recorder-engine.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/media-recorder-lifecycle.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/menu-multiplayer-bridge.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/menu-runtime-session-service.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/multiplayer-lifecycle-and-signaling.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/network-adapter.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/observation-bridge-policy-runtime.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/offline-session-compatibility.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/online-signaling-config.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/parcours-ghost.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/parcours-map-schema.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/parcours-minimap.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/parcours-progress-audio.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/parcours-progress-utils.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/parcours-ring-glow-settings.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/parcours-start.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/persistence-version-migration.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/physics-core.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/physics-hunt.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/physics-policy.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/platform-capabilities.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/playing-state-ghost-playback.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/playwright-readiness.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/playwright.global-setup.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/playwright.global-teardown.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/recording-video-export-job.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/recording-video-export.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/recording.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/round-recorder-ghost-fallback.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/runtime-access-seams.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/runtime-facade.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/runtime-regressions.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/runtime-settings-live-apply.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/settings-manager.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/settings-studio-override.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/stress.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/tmp-shorts-diagnostic.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v34-bridge.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v34-checkpoint.integration.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v34-deterministic-smoke.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v34-loop.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v34-match-resume.integration.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v34-model.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v34-replay.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v34-resume-latest.integration.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v34-run-fallback.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v34-server.integration.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v35-model.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v36-action-safety.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/trainer-v36-algorithm-profile.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/training-automation-core.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/training-benchmark-artifacts.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/training-e2e.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/training-environment.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/training-gate.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/training-reward-survival.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/training-runtime-near-architecture.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/transport-verification-matrix.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/tuning-ipc.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/tuning-preset-manager.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/tuning-runtime-bridge.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/tuning-window.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/v28-regression.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/validate-umsetzungsplan.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "V107",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "V110 haertet den Wissensgraphen erst nach Core-Claim aus V107",
+      "attributes": {
+        "dependsPhase": "107.99",
+        "rawToken": "V107.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V110",
+      "to": "V110.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.1"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "V110.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.2"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "V110.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.3"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "V110.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.4"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "V110.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.99"
+      }
+    },
+    {
+      "from": "V110.1",
+      "to": "V110.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.1",
+        "subphaseCode": "110.1.1"
+      }
+    },
+    {
+      "from": "V110.1",
+      "to": "V110.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.1",
+        "subphaseCode": "110.1.2"
+      }
+    },
+    {
+      "from": "V110.2",
+      "to": "V110.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.2",
+        "subphaseCode": "110.2.1"
+      }
+    },
+    {
+      "from": "V110.2",
+      "to": "V110.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.2",
+        "subphaseCode": "110.2.2"
+      }
+    },
+    {
+      "from": "V110.3",
+      "to": "V110.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.3",
+        "subphaseCode": "110.3.1"
+      }
+    },
+    {
+      "from": "V110.3",
+      "to": "V110.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.3",
+        "subphaseCode": "110.3.2"
+      }
+    },
+    {
+      "from": "V110.4",
+      "to": "V110.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.4",
+        "subphaseCode": "110.4.1"
+      }
+    },
+    {
+      "from": "V110.4",
+      "to": "V110.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.4",
+        "subphaseCode": "110.4.2"
+      }
+    },
+    {
+      "from": "V110.99",
+      "to": "V110.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.99",
+        "subphaseCode": "110.99.1"
+      }
+    },
+    {
+      "from": "V110.99",
+      "to": "V110.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.99",
+        "subphaseCode": "110.99.2"
+      }
+    },
+    {
+      "from": "V110.99",
+      "to": "V110.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.99",
+        "subphaseCode": "110.99.3"
+      }
+    },
+    {
+      "from": "V110.99",
+      "to": "V110.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V110",
+        "phaseCode": "110.99",
+        "subphaseCode": "110.99.4"
+      }
+    },
+    {
+      "from": "V111",
+      "to": ".agents/rules/token_efficiency_and_tools.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": ".agents/workflows/status.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "docs/generated/knowledge-graph.schema.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "docs/plaene/aktiv/V111.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "scripts/build-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "scripts/check-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "scripts/export-knowledge-graph-view.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "scripts/query-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/arcade-blueprint.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/arcade-ghost-library.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/arcade-hangar-rules.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/audio.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/bot-targeting.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/browser-demo-surface-policy-override.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/checkpoint-ring-runtime.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/content-descriptor-registries.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/core-targeted-platform.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/core-targeted-regressions.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/core-targeted-runtime.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/core-targeted-surface.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/core-targeted.shared.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/core-targeted.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/core.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/desktop-multiinstance-smoke.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/editor-authoring-contract.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/editor-map-ui.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/editor-vehicle.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/game-mode-strategy.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/gameplay-powerups-portals-gates.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/ghost-selfduel-allmaps.desktop.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/ghost-selfduel-roundtrip.desktop.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/gpu.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/hangar-desktop-flow.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/helpers.desktop.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/helpers.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/knowledge-graph-build.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/knowledge-graph-query.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/lan-signaling-hardening.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/last-round-ghost-system.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/lifecycle-capability.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/map-mode-eligibility.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/match-start-validation-connectivity.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/media-recorder-engine.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/media-recorder-lifecycle.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/menu-multiplayer-bridge.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/menu-runtime-session-service.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/multiplayer-lifecycle-and-signaling.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/network-adapter.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/observation-bridge-policy-runtime.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/offline-session-compatibility.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/online-signaling-config.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/parcours-ghost.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/parcours-map-schema.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/parcours-minimap.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/parcours-progress-audio.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/parcours-progress-utils.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/parcours-ring-glow-settings.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/parcours-start.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/persistence-version-migration.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/physics-core.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/physics-hunt.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/physics-policy.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/platform-capabilities.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/playing-state-ghost-playback.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/playwright-readiness.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/playwright.global-setup.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/playwright.global-teardown.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/recording-video-export-job.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/recording-video-export.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/recording.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/round-recorder-ghost-fallback.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/runtime-access-seams.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/runtime-facade.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/runtime-regressions.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/runtime-settings-live-apply.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/settings-manager.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/settings-studio-override.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/stress.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/tmp-shorts-diagnostic.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v34-bridge.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v34-checkpoint.integration.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v34-deterministic-smoke.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v34-loop.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v34-match-resume.integration.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v34-model.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v34-replay.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v34-resume-latest.integration.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v34-run-fallback.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v34-server.integration.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v35-model.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v36-action-safety.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/trainer-v36-algorithm-profile.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/training-automation-core.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/training-benchmark-artifacts.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/training-e2e.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/training-environment.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/training-gate.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/training-reward-survival.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/training-runtime-near-architecture.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/transport-verification-matrix.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/tuning-ipc.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/tuning-preset-manager.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/tuning-runtime-bridge.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/tuning-window.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/v28-regression.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/validate-umsetzungsplan.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tools/graph-viewer/index.html",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tools/graph-viewer/viewer.css",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tools/graph-viewer/viewer.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "V107",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "V111 baut auf dem mehrschichtigen Graph-Core aus V107 auf",
+      "attributes": {
+        "dependsPhase": "107.99",
+        "rawToken": "V107.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V111",
+      "to": "V110",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "V111 setzt die Ops-/Guard-Haertung aus V110 voraus",
+      "attributes": {
+        "dependsPhase": "110.99",
+        "rawToken": "V110.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V111",
+      "to": "V111.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.1"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "V111.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.2"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "V111.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.3"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "V111.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.4"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "V111.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.99"
+      }
+    },
+    {
+      "from": "V111.1",
+      "to": "V111.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.1",
+        "subphaseCode": "111.1.1"
+      }
+    },
+    {
+      "from": "V111.1",
+      "to": "V111.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.1",
+        "subphaseCode": "111.1.2"
+      }
+    },
+    {
+      "from": "V111.2",
+      "to": "V111.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.2",
+        "subphaseCode": "111.2.1"
+      }
+    },
+    {
+      "from": "V111.2",
+      "to": "V111.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.2",
+        "subphaseCode": "111.2.2"
+      }
+    },
+    {
+      "from": "V111.3",
+      "to": "V111.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.3",
+        "subphaseCode": "111.3.1"
+      }
+    },
+    {
+      "from": "V111.3",
+      "to": "V111.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.3",
+        "subphaseCode": "111.3.2"
+      }
+    },
+    {
+      "from": "V111.4",
+      "to": "V111.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.4",
+        "subphaseCode": "111.4.1"
+      }
+    },
+    {
+      "from": "V111.4",
+      "to": "V111.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.4",
+        "subphaseCode": "111.4.2"
+      }
+    },
+    {
+      "from": "V111.99",
+      "to": "V111.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.99",
+        "subphaseCode": "111.99.1"
+      }
+    },
+    {
+      "from": "V111.99",
+      "to": "V111.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.99",
+        "subphaseCode": "111.99.2"
+      }
+    },
+    {
+      "from": "V111.99",
+      "to": "V111.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.99",
+        "subphaseCode": "111.99.3"
+      }
+    },
+    {
+      "from": "V111.99",
+      "to": "V111.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V111",
+        "phaseCode": "111.99",
+        "subphaseCode": "111.99.4"
+      }
+    },
+    {
+      "from": "V112",
+      "to": ".agents/test_mapping.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "electron/static-server.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "src/core/arcade/ArcadeRunRuntime.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "src/core/InputManager.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "src/entities/systems/CollisionResponseSystem.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "src/entities/systems/lifecycle/PlayerCollisionPhase.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "src/modes/ArcadeModeStrategy.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "src/ui/MatchFlowArcadeOverlayController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "src/ui/start-setup/StartSetupUiOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "style.css",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "tests/core-targeted-platform.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "tests/core-targeted-runtime.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "tests/core-targeted-surface.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "tests/core.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "tests/helpers.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "V102",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "V112 startet erst nach Security-/Runtime-Hardening aus V102",
+      "attributes": {
+        "dependsPhase": "102.99",
+        "rawToken": "V102.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V112",
+      "to": "V105",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "V112 startet erst nach Guard-/Typecheck-Recovery aus V105",
+      "attributes": {
+        "dependsPhase": "105.99",
+        "rawToken": "V105.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V112",
+      "to": "V112.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.1"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "V112.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.2"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "V112.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.3"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "V112.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.4"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "V112.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.5"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "V112.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.6"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "V112.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.99"
+      }
+    },
+    {
+      "from": "V112.1",
+      "to": "V112.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.1",
+        "subphaseCode": "112.1.1"
+      }
+    },
+    {
+      "from": "V112.1",
+      "to": "V112.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.1",
+        "subphaseCode": "112.1.2"
+      }
+    },
+    {
+      "from": "V112.2",
+      "to": "V112.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.2",
+        "subphaseCode": "112.2.1"
+      }
+    },
+    {
+      "from": "V112.2",
+      "to": "V112.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.2",
+        "subphaseCode": "112.2.2"
+      }
+    },
+    {
+      "from": "V112.2",
+      "to": "V112.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.2",
+        "subphaseCode": "112.2.3"
+      }
+    },
+    {
+      "from": "V112.3",
+      "to": "V112.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.3",
+        "subphaseCode": "112.3.1"
+      }
+    },
+    {
+      "from": "V112.3",
+      "to": "V112.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.3",
+        "subphaseCode": "112.3.2"
+      }
+    },
+    {
+      "from": "V112.3",
+      "to": "V112.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.3",
+        "subphaseCode": "112.3.3"
+      }
+    },
+    {
+      "from": "V112.4",
+      "to": "V112.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.4",
+        "subphaseCode": "112.4.1"
+      }
+    },
+    {
+      "from": "V112.4",
+      "to": "V112.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.4",
+        "subphaseCode": "112.4.2"
+      }
+    },
+    {
+      "from": "V112.5",
+      "to": "V112.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.5",
+        "subphaseCode": "112.5.1"
+      }
+    },
+    {
+      "from": "V112.5",
+      "to": "V112.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.5",
+        "subphaseCode": "112.5.2"
+      }
+    },
+    {
+      "from": "V112.6",
+      "to": "V112.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.6",
+        "subphaseCode": "112.6.1"
+      }
+    },
+    {
+      "from": "V112.6",
+      "to": "V112.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.6",
+        "subphaseCode": "112.6.2"
+      }
+    },
+    {
+      "from": "V112.6",
+      "to": "V112.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.6",
+        "subphaseCode": "112.6.3"
+      }
+    },
+    {
+      "from": "V112.6",
+      "to": "V112.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.6",
+        "subphaseCode": "112.6.4"
+      }
+    },
+    {
+      "from": "V112.99",
+      "to": "V112.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.99",
+        "subphaseCode": "112.99.1"
+      }
+    },
+    {
+      "from": "V112.99",
+      "to": "V112.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.99",
+        "subphaseCode": "112.99.2"
+      }
+    },
+    {
+      "from": "V112.99",
+      "to": "V112.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V112",
+        "phaseCode": "112.99",
+        "subphaseCode": "112.99.3"
       }
     },
     {
@@ -142923,6 +148672,15 @@
     {
       "from": "V64",
       "to": "src/network/OnlineMatchLobby.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V64",
+      "to": "src/network/OnlineMatchLobbyMessageRouter.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -155222,6 +160980,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V100.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V101.md",
       "type": "scope",
       "hint": null,
@@ -155249,6 +161016,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V107.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V108.md",
       "type": "scope",
       "hint": null,
@@ -155259,6 +161035,33 @@
     {
       "from": "V77",
       "to": "docs/plaene/aktiv/V109.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V110.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V111.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V112.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -156437,6 +162240,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/neu/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md",
       "type": "scope",
       "hint": null,
@@ -156464,7 +162276,34 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/neu/Feature_Spielaudit_Playtest_Improvement_Paket_V112.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Wissensgraph_Adaptive_Intelligence_Ausbau_V111.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Wissensgraph_Ops_Guards_Haertung_V110.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -157149,6 +162988,15 @@
     {
       "from": "V77",
       "to": "src/network/OnlineMatchLobby.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "src/network/OnlineMatchLobbyMessageRouter.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -159437,6 +165285,15 @@
     },
     {
       "from": "V83",
+      "to": "src/application/session-runtime/NetworkLobbyServiceDiscovery.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
       "to": "src/application/session-runtime/NetworkLobbyServiceSupport.js",
       "type": "scope",
       "hint": null,
@@ -160440,6 +166297,15 @@
     {
       "from": "V84",
       "to": "src/application/session-runtime/NetworkLobbyService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/application/session-runtime/NetworkLobbyServiceDiscovery.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -161546,6 +167412,15 @@
     },
     {
       "from": "V84",
+      "to": "src/entities/systems/ParcoursProgressRuntime.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
       "to": "src/entities/systems/ParcoursProgressStateOps.js",
       "type": "scope",
       "hint": null,
@@ -162284,6 +168159,15 @@
     },
     {
       "from": "V84",
+      "to": "src/state/arcade/ArcadeGhostLibraryInternals.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
       "to": "src/state/arcade/ArcadeGhostRecorder.js",
       "type": "scope",
       "hint": null,
@@ -162348,6 +168232,15 @@
     {
       "from": "V84",
       "to": "src/state/arcade/ArcadeVehicleProfile.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/state/arcade/ArcadeVehicleProfileInternals.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -163888,6 +169781,15 @@
     },
     {
       "from": "V85",
+      "to": "src/state/arcade/ArcadeGhostLibraryInternals.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
       "to": "src/state/arcade/ArcadeGhostRecorder.js",
       "type": "scope",
       "hint": null,
@@ -163952,6 +169854,15 @@
     {
       "from": "V85",
       "to": "src/state/arcade/ArcadeVehicleProfile.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/state/arcade/ArcadeVehicleProfileInternals.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -168012,6 +173923,15 @@
     },
     {
       "from": "V91",
+      "to": "src/state/arcade/ArcadeGhostLibraryInternals.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
       "to": "src/state/arcade/ArcadeGhostRecorder.js",
       "type": "scope",
       "hint": null,
@@ -168076,6 +173996,15 @@
     {
       "from": "V91",
       "to": "src/state/arcade/ArcadeVehicleProfile.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/state/arcade/ArcadeVehicleProfileInternals.js",
       "type": "scope",
       "hint": null,
       "attributes": {

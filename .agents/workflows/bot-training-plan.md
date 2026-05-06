@@ -1,4 +1,4 @@
-﻿---
+---
 description: Plan and execute bot-training work outside the general Umsetzungsplan.
 ---
 
@@ -26,20 +26,22 @@ description: Plan and execute bot-training work outside the general Umsetzungspl
 
 ## 2. Claim block
 
-- Find first free lock in `docs/bot-training/Bot_Trainingsplan.md`.
+- Find first free or explicitly claimable block/phase in `docs/bot-training/Bot_Trainingsplan.md`.
 - Verify hard dependencies are completed.
-- Atomically claim:
+- Operativer Lock-Wahrheitsraum bleibt `docs/lock-status/*.json`, nicht der reine Plantext.
+- BT-Locks deshalb ueber `docs/lock-status/<person>.json` festhalten und danach `npm run lock:validate` ausfuehren.
+- Lock-only Claim-Commits sind nicht Default; wenn moeglich Lock-Aenderung mit der ersten fachlichen Lieferung oder einem gezielten Sync-Commit buendeln.
+- Falls der Team-Flow einen sofort publizierten Claim auf `main` braucht:
 
 ```bash
-git pull --rebase
 npm run guard:main
-# lock setzen im Bot-Trainingsplan
-git add docs/bot-training/Bot_Trainingsplan.md
-git commit -m "chore: Bot-X claims BT block"
+git add docs/lock-status/<person>.json
+git commit -m "chore: claim BT block <BTXX phase>"
+npm run snapshot:tag
 git push
 ```
 
-- On push failure: `git pull --rebase` and retry.
+- Plantext in `docs/bot-training/Bot_Trainingsplan.md` nur anpassen, wenn sich Status, Evidence, Risiken oder Freigabe wirklich geaendert haben; kein Claim nur per Plan-Edit.
 
 ## 3. Plan execution
 
@@ -60,9 +62,9 @@ git push
 - Mark sub-phases and phase done with date + evidence.
 - Keep gate invariant valid (`*.99` only after all earlier phases are done).
 - Remove `implementation_plan.md`.
-- Commit scoped changes.
+- Commit scoped changes im selben Turn, sobald der bearbeitete Trainings-Slice verifiziert abgeschlossen ist.
 - Before push on `main`: `npm run snapshot:tag`.
-- When block is complete, release lock back to `frei`.
+- When block is complete, release the operational BT lock in `docs/lock-status/*.json` and keep the bot-training plan status/evidence aligned.
 
 ## 6. Mandatory closure checks
 
@@ -74,4 +76,3 @@ git push
 ## Report
 
 Standardformat verwenden. For next bot-training phase set `Next Step` to `/bot-training-plan` or `/fix-planung` with bot-training scope.
-

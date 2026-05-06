@@ -11,16 +11,6 @@
       "fileCount": 6,
       "files": [
         {
-          "path": "src/core/GameDebugApi.js",
-          "changeCount": 7,
-          "dirty": true
-        },
-        {
-          "path": "src/core/PlanarAimAssistSystem.js",
-          "changeCount": 5,
-          "dirty": true
-        },
-        {
           "path": "README.md",
           "changeCount": 10,
           "dirty": false
@@ -33,6 +23,16 @@
         {
           "path": "package-lock.json",
           "changeCount": 8,
+          "dirty": false
+        },
+        {
+          "path": "src/core/GameDebugApi.js",
+          "changeCount": 8,
+          "dirty": false
+        },
+        {
+          "path": "src/core/PlanarAimAssistSystem.js",
+          "changeCount": 6,
           "dirty": false
         },
         {
@@ -140,12 +140,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2405,
-    "rawCoveredFileCount": 1928,
-    "rawCoveragePercent": 80.2,
-    "adjustedTrackedFileCount": 1502,
-    "adjustedCoveredFileCount": 1267,
-    "adjustedCoveragePercent": 84.4,
+    "trackedFileCount": 2428,
+    "rawCoveredFileCount": 1951,
+    "rawCoveragePercent": 80.4,
+    "adjustedTrackedFileCount": 1525,
+    "adjustedCoveredFileCount": 1290,
+    "adjustedCoveragePercent": 84.6,
     "uncoveredFileCount": 477,
     "uncoveredActiveFileCount": 235,
     "classifications": [
@@ -188,14 +188,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 889,
-        "coveredCount": 874
+        "count": 903,
+        "coveredCount": 887
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 375,
-        "coveredCount": 189
+        "count": 384,
+        "coveredCount": 199
       },
       {
         "classification": "prototype",
@@ -299,7 +299,9 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V107",
         "V109",
+        "V111",
         "V93",
         "V94"
       ],
@@ -397,6 +399,7 @@
       ],
       "scopeBlocks": [
         "V104",
+        "V112",
         "V88",
         "V89",
         "V91",
@@ -657,7 +660,10 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V107",
         "V109",
+        "V110",
+        "V111",
         "V93",
         "V94"
       ],
@@ -10299,11 +10305,15 @@
     {
       "path": "docs/generated/knowledge-graph.coverage.json",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107"
+      ],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
@@ -10319,6 +10329,9 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
         "V94"
       ],
       "surfaces": [],
@@ -10336,6 +10349,9 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
         "V94"
       ],
       "surfaces": [],
@@ -10482,6 +10498,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V100.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V101.md",
       "tracked": true,
       "coveredInCore": true,
@@ -10533,6 +10566,24 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V107.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V108.md",
       "tracked": true,
       "coveredInCore": true,
@@ -10561,6 +10612,59 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V110.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V110",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V111.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V111",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V112.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
         "V77"
       ],
       "surfaces": [],
@@ -12814,6 +12918,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md",
       "tracked": true,
       "coveredInCore": true,
@@ -12865,7 +12986,58 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/Feature_Spielaudit_Playtest_Improvement_Paket_V112.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Wissensgraph_Adaptive_Intelligence_Ausbau_V111.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Wissensgraph_Ops_Guards_Haertung_V110.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -13364,10 +13536,14 @@
         "BT73",
         "BT90",
         "BT93K",
+        "V100",
         "V101",
         "V103",
         "V104",
+        "V107",
         "V108",
+        "V110",
+        "V111",
         "V74",
         "V77",
         "V83",
@@ -14553,6 +14729,7 @@
       ],
       "scopeBlocks": [
         "B09",
+        "V112",
         "V60",
         "V64",
         "V89"
@@ -14826,6 +15003,7 @@
         "BT93K",
         "BT93L",
         "BT93M",
+        "V112",
         "V75",
         "V87",
         "V88",
@@ -18136,6 +18314,9 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V107",
+        "V110",
+        "V111",
         "V94"
       ],
       "surfaces": [],
@@ -18284,7 +18465,29 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V107",
+        "V110",
+        "V111",
         "V94"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/check-parcours-routes.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -18716,6 +18919,9 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V107",
+        "V110",
+        "V111",
         "V94"
       ],
       "surfaces": [],
@@ -19384,6 +19590,27 @@
       "excludeReason": null
     },
     {
+      "path": "src/application/session-runtime/NetworkLobbyServiceDiscovery.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B01",
+        "B08",
+        "V83",
+        "V84"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/application/session-runtime/NetworkLobbyServiceSupport.js",
       "tracked": true,
       "coveredInCore": true,
@@ -19648,6 +19875,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V100",
         "V101",
         "V89",
         "V92"
@@ -19671,6 +19899,47 @@
       "excludeReason": null
     },
     {
+      "path": "src/core/AppInitializerLifecycle.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "guard-matrix"
+      ],
+      "scopeBlocks": [],
+      "surfaces": [
+        {
+          "surface": "game.runtimeFacade",
+          "roles": [
+            "allowedAdapter"
+          ]
+        },
+        {
+          "surface": "window.GAME_INSTANCE",
+          "roles": [
+            "allowedAdapter"
+          ]
+        }
+      ],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/core/AppInitializerTestHooks.js",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/core/arcade/ArcadeRunRuntime.js",
       "tracked": true,
       "coveredInCore": true,
@@ -19682,7 +19951,8 @@
       ],
       "scopeBlocks": [
         "B04",
-        "V108"
+        "V108",
+        "V112"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -20278,8 +20548,8 @@
         {
           "blockId": "GIT-HISTORY-HOTSPOTS",
           "coverageSource": "git-history",
-          "changeCount": 7,
-          "dirty": true
+          "changeCount": 8,
+          "dirty": false
         }
       ]
     },
@@ -20366,10 +20636,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B02"
+        "B02",
+        "V112"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -20437,6 +20709,7 @@
       ],
       "scopeBlocks": [
         "B01",
+        "V100",
         "V103",
         "V60",
         "V74",
@@ -20587,8 +20860,8 @@
         {
           "blockId": "GIT-HISTORY-HOTSPOTS",
           "coverageSource": "git-history",
-          "changeCount": 5,
-          "dirty": true
+          "changeCount": 6,
+          "dirty": false
         }
       ]
     },
@@ -22991,6 +23264,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V100",
         "V51",
         "V84"
       ],
@@ -23111,6 +23385,7 @@
       ],
       "scopeBlocks": [
         "B03",
+        "V100",
         "V72",
         "V74",
         "V82",
@@ -23133,6 +23408,7 @@
       ],
       "scopeBlocks": [
         "B03",
+        "V100",
         "V51",
         "V72",
         "V74",
@@ -23156,6 +23432,7 @@
       ],
       "scopeBlocks": [
         "B03",
+        "V100",
         "V72",
         "V74",
         "V84"
@@ -23177,6 +23454,7 @@
       ],
       "scopeBlocks": [
         "B03",
+        "V100",
         "V72",
         "V74",
         "V84"
@@ -23198,6 +23476,7 @@
       ],
       "scopeBlocks": [
         "B03",
+        "V100",
         "V72",
         "V74",
         "V84"
@@ -24123,6 +24402,7 @@
       ],
       "scopeBlocks": [
         "B03",
+        "V112",
         "V84"
       ],
       "surfaces": [],
@@ -24183,6 +24463,7 @@
       ],
       "scopeBlocks": [
         "B03",
+        "V112",
         "V72",
         "V84"
       ],
@@ -24205,6 +24486,25 @@
         "B03",
         "V51",
         "V72",
+        "V84"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/entities/systems/ParcoursProgressRuntime.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B03",
         "V84"
       ],
       "surfaces": [],
@@ -24897,6 +25197,7 @@
       ],
       "scopeBlocks": [
         "B04",
+        "V112",
         "V72",
         "V82",
         "V84"
@@ -25101,6 +25402,26 @@
         "V64",
         "V77",
         "V99"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/network/OnlineMatchLobbyMessageRouter.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B08",
+        "V64",
+        "V77"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -26955,6 +27276,27 @@
       "excludeReason": null
     },
     {
+      "path": "src/state/arcade/ArcadeGhostLibraryInternals.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B04",
+        "V84",
+        "V85",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/state/arcade/ArcadeGhostRecorder.js",
       "tracked": true,
       "coveredInCore": true,
@@ -27120,6 +27462,27 @@
         "V66",
         "V76",
         "V82",
+        "V84",
+        "V85",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/state/arcade/ArcadeVehicleProfileInternals.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B04",
         "V84",
         "V85",
         "V91"
@@ -28544,6 +28907,7 @@
       ],
       "scopeBlocks": [
         "B06",
+        "V112",
         "V91"
       ],
       "surfaces": [],
@@ -30145,6 +30509,7 @@
       "scopeBlocks": [
         "B05",
         "V108",
+        "V112",
         "V76",
         "V77",
         "V91"
@@ -30224,6 +30589,7 @@
       ],
       "scopeBlocks": [
         "B05",
+        "V100",
         "V104",
         "V64",
         "V91"
@@ -30285,6 +30651,7 @@
       ],
       "scopeBlocks": [
         "B05",
+        "V100",
         "V104",
         "V108",
         "V64",
@@ -30440,6 +30807,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V112",
         "V74"
       ],
       "surfaces": [],
@@ -30461,6 +30829,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V88"
       ],
       "surfaces": [],
@@ -30482,7 +30852,9 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V108"
+        "V108",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30497,11 +30869,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30516,11 +30891,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30541,6 +30919,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V88"
       ],
       "surfaces": [],
@@ -30556,11 +30936,36 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/checkpoint-ring-runtime.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30575,11 +30980,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30600,6 +31008,9 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
+        "V112",
         "V88",
         "V89"
       ],
@@ -30622,6 +31033,9 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V100",
+        "V110",
+        "V111",
         "V88",
         "V89"
       ],
@@ -30645,6 +31059,10 @@
         "B06",
         "B13",
         "BT91",
+        "V100",
+        "V110",
+        "V111",
+        "V112",
         "V88",
         "V89"
       ],
@@ -30671,6 +31089,9 @@
         "BT91",
         "V104",
         "V108",
+        "V110",
+        "V111",
+        "V112",
         "V88",
         "V89"
       ],
@@ -30693,6 +31114,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V88"
       ],
       "surfaces": [],
@@ -30714,6 +31137,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V87",
         "V88",
         "V89"
@@ -30737,6 +31162,9 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
+        "V112",
         "V51",
         "V53",
         "V63",
@@ -30766,6 +31194,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V99"
       ],
       "surfaces": [],
@@ -30781,11 +31211,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30806,6 +31239,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V65"
       ],
       "surfaces": [],
@@ -30827,6 +31262,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V88",
         "V89"
       ],
@@ -30843,11 +31280,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30868,6 +31308,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V72"
       ],
       "surfaces": [],
@@ -30883,11 +31325,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30902,11 +31347,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30921,11 +31369,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30946,7 +31397,9 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V104"
+        "V104",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30961,11 +31414,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30986,6 +31442,9 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
+        "V112",
         "V87",
         "V88",
         "V89"
@@ -31009,6 +31468,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V94"
       ],
       "surfaces": [],
@@ -31024,11 +31485,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31049,6 +31513,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V99"
       ],
       "surfaces": [],
@@ -31064,11 +31530,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31089,6 +31558,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V92"
       ],
       "surfaces": [],
@@ -31104,11 +31575,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31129,6 +31603,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V99"
       ],
       "surfaces": [],
@@ -31144,11 +31620,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31163,11 +31642,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31188,6 +31670,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V88"
       ],
       "surfaces": [],
@@ -31203,11 +31687,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31228,6 +31715,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V99"
       ],
       "surfaces": [],
@@ -31249,6 +31738,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V88",
         "V89"
       ],
@@ -31265,11 +31756,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31284,11 +31778,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31303,11 +31800,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31322,11 +31822,80 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/parcours-map-schema.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/parcours-minimap.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/parcours-progress-audio.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31341,11 +31910,58 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/parcours-ring-glow-settings.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/parcours-start.spec.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31367,6 +31983,8 @@
         "B07",
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V85",
         "V97"
       ],
@@ -31389,6 +32007,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V51",
         "V88",
         "V89"
@@ -31412,6 +32032,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V63",
         "V69",
         "V88",
@@ -31436,6 +32058,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V69",
         "V88",
         "V89"
@@ -31461,6 +32085,8 @@
         "BT91",
         "V101",
         "V104",
+        "V110",
+        "V111",
         "V77",
         "V88",
         "V91",
@@ -31480,11 +32106,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31505,6 +32134,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V88",
         "V89"
       ],
@@ -31527,6 +32158,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V87",
         "V88",
         "V89"
@@ -31544,11 +32177,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31563,11 +32199,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31582,11 +32221,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31607,6 +32249,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V88",
         "V89"
       ],
@@ -31623,11 +32267,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31642,11 +32289,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31661,11 +32311,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31686,7 +32339,10 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V100",
         "V104",
+        "V110",
+        "V111",
         "V91",
         "V92"
       ],
@@ -31711,6 +32367,8 @@
         "BT91",
         "V103",
         "V108",
+        "V110",
+        "V111",
         "V97"
       ],
       "surfaces": [],
@@ -31732,7 +32390,9 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V103"
+        "V103",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31754,6 +32414,8 @@
         "B13",
         "BT91",
         "V101",
+        "V110",
+        "V111",
         "V97",
         "V98"
       ],
@@ -31776,6 +32438,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V51",
         "V63"
       ],
@@ -31792,11 +32456,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31811,11 +32478,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31830,11 +32500,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31849,11 +32522,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31868,11 +32544,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31887,11 +32566,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31906,11 +32588,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31925,11 +32610,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31944,11 +32632,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31963,11 +32654,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -31982,11 +32676,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32001,11 +32698,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32020,12 +32720,15 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
         "BT20",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32040,12 +32743,15 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
         "BT80C",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32060,12 +32766,15 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
         "BT91",
-        "BT93E"
+        "BT93E",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32080,13 +32789,16 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
         "BT80C",
         "BT91",
-        "BT93E"
+        "BT93E",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32101,13 +32813,16 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
         "BT80C",
         "BT91",
-        "BT93E"
+        "BT93E",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32122,7 +32837,8 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
@@ -32130,7 +32846,9 @@
         "BT91",
         "BT93E",
         "BT93G",
-        "BT93N"
+        "BT93N",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32145,13 +32863,16 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
         "BT80C",
         "BT91",
-        "BT93E"
+        "BT93E",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32166,14 +32887,17 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
         "BT20",
         "BT91",
         "BT93E",
-        "BT93N"
+        "BT93N",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32188,12 +32912,15 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
         "BT91",
-        "BT93E"
+        "BT93E",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32214,6 +32941,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
+        "V110",
+        "V111",
         "V99"
       ],
       "surfaces": [],
@@ -32229,11 +32958,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32248,11 +32980,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32267,11 +33002,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32286,11 +33024,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32305,11 +33046,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32324,11 +33068,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
