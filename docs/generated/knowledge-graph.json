@@ -1934,7 +1934,7 @@
         ],
         "priority": "P2",
         "owner": "codex",
-        "currentPhase": "107.3",
+        "currentPhase": "107.4",
         "planFile": "docs/plaene/aktiv/V107.md",
         "scopeDeclarations": [
           ".agents/rules/token_efficiency_and_tools.md",
@@ -5462,7 +5462,7 @@
       "id": "V107.3",
       "type": "phase",
       "title": "Integritaets- und Coverage-Gates",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.3"
@@ -15371,8 +15371,8 @@
     {
       "id": "V107.3.2",
       "type": "subphase",
-      "title": "Coverage-Report (`knowledge-graph.coverage.json`) mit Gate-Regeln fuer neue Uncovered-Dateien verankern.",
-      "status": "open",
+      "title": "Coverage-Report (`knowledge-graph.coverage.json`) mit Gate-Regeln fuer neue Uncovered-Dateien verankern. (abgeschlossen: 2026-05-07; evidence: `node --test tests/knowledge-graph-build.contract.test.mjs tests/knowledge-graph-query.contract.test.mjs` -> 20/20 PASS; `npm run graph:build` -> Coverage-Gate im Artefakt geschrieben; `node scripts/query-knowledge-graph.mjs coverage-report` -> `gate: pass (new uncovered active: 0)`; `npm run graph:check` + `npm run plan:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.3",
