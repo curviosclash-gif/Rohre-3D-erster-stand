@@ -639,6 +639,10 @@ function normalizeKnowledgeGraphMappingContract(rawMapping) {
                 ? { ...node.attributes }
                 : {},
         };
+    }).sort((left, right) => {
+        const rank = toNodeSortRank(left.type) - toNodeSortRank(right.type);
+        if (rank !== 0) return rank;
+        return left.id.localeCompare(right.id);
     });
 
     const normalizedEdges = edges.map((entry, index) => {
@@ -660,7 +664,30 @@ function normalizeKnowledgeGraphMappingContract(rawMapping) {
                 ? { ...edge.attributes }
                 : {},
         };
+    }).sort((left, right) => {
+        const fromCompare = left.from.localeCompare(right.from);
+        if (fromCompare !== 0) return fromCompare;
+        const toCompare = left.to.localeCompare(right.to);
+        if (toCompare !== 0) return toCompare;
+        return left.type.localeCompare(right.type);
     });
+
+    const seenNodeIds = new Set();
+    for (const node of normalizedNodes) {
+        if (seenNodeIds.has(node.id)) {
+            throw new Error(`knowledge-graph mapping ${mappingId} declares duplicate node ${node.id}`);
+        }
+        seenNodeIds.add(node.id);
+    }
+
+    const seenEdgeKeys = new Set();
+    for (const edge of normalizedEdges) {
+        const edgeKey = `${edge.from}::${edge.to}::${edge.type}`;
+        if (seenEdgeKeys.has(edgeKey)) {
+            throw new Error(`knowledge-graph mapping ${mappingId} declares duplicate edge ${edge.from} -> ${edge.to} (${edge.type})`);
+        }
+        seenEdgeKeys.add(edgeKey);
+    }
 
     return {
         contract,
@@ -670,6 +697,15 @@ function normalizeKnowledgeGraphMappingContract(rawMapping) {
         nodes: normalizedNodes,
         edges: normalizedEdges,
     };
+}
+
+function classifyMappingRelationLayer(edgeType) {
+    if (edgeType === 'validated_by') return 'test';
+    if (edgeType === 'reads_state' || edgeType === 'writes_state') return 'state';
+    if (edgeType === 'reads_config') return 'config';
+    if (edgeType === 'emits' || edgeType === 'consumes') return 'event';
+    if (edgeType === 'implements') return 'runtime';
+    return 'runtime';
 }
 
 async function readKnowledgeGraphMappings() {
@@ -2086,6 +2122,7 @@ function emitKnowledgeGraphMappings(nodes, edges, mappings) {
                 attributes: {
                     mappingId: mapping.mapping_id,
                     mappingFile: mapping.filePath,
+                    relationLayer: classifyMappingRelationLayer(edge.type),
                     ...(edge.attributes || {}),
                 },
             });

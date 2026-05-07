@@ -277,12 +277,62 @@ test('normalizeKnowledgeGraphMappingContract validates mapping payloads and norm
     });
 
     assert.equal(mapping.mapping_id, 'desktop-critical-paths');
-    assert.equal(mapping.nodes[0].file, 'src/core/SettingsManager.js');
-    assert.equal(mapping.nodes[1].file, 'tests/settings-manager.contract.test.mjs');
-    assert.equal(mapping.nodes[1].status, 'unknown');
-    assert.equal(mapping.nodes[2].file, 'src/core/RuntimeConfig.js');
-    assert.equal(mapping.edges[0].type, 'validated_by');
-    assert.equal(mapping.edges[1].type, 'reads_config');
+    const nodeById = new Map(mapping.nodes.map((node) => [node.id, node]));
+    assert.equal(nodeById.get('runtime:settings-manager').file, 'src/core/SettingsManager.js');
+    assert.equal(nodeById.get('test:settings-manager-contract').file, 'tests/settings-manager.contract.test.mjs');
+    assert.equal(nodeById.get('test:settings-manager-contract').status, 'unknown');
+    assert.equal(nodeById.get('config:runtime-config-builder').file, 'src/core/RuntimeConfig.js');
+    assert.deepEqual(mapping.edges.map((edge) => edge.type), [
+        'reads_config',
+        'validated_by',
+    ]);
+});
+
+test('normalizeKnowledgeGraphMappingContract rejects duplicate runtime relations', () => {
+    assert.throws(() => normalizeKnowledgeGraphMappingContract({
+        contract: 'knowledge-graph.mapping.v1',
+        schema_version: 1,
+        mapping_id: 'duplicate-fixture',
+        nodes: [
+            {
+                id: 'runtime:fixture',
+                type: 'runtime',
+            },
+            {
+                id: 'runtime:fixture',
+                type: 'runtime',
+            },
+        ],
+        edges: [],
+    }), /duplicate node runtime:fixture/);
+
+    assert.throws(() => normalizeKnowledgeGraphMappingContract({
+        contract: 'knowledge-graph.mapping.v1',
+        schema_version: 1,
+        mapping_id: 'duplicate-fixture',
+        nodes: [
+            {
+                id: 'runtime:fixture',
+                type: 'runtime',
+            },
+            {
+                id: 'state:fixture',
+                type: 'state',
+            },
+        ],
+        edges: [
+            {
+                from: 'runtime:fixture',
+                to: 'state:fixture',
+                type: 'writes_state',
+            },
+            {
+                from: 'runtime:fixture',
+                to: 'state:fixture',
+                type: 'writes_state',
+            },
+        ],
+    }), /duplicate edge runtime:fixture -> state:fixture \(writes_state\)/);
 });
 
 test('buildKnowledgeGraph keeps required desktop critical-path mappings intact', async () => {
@@ -306,6 +356,24 @@ test('buildKnowledgeGraph keeps required desktop critical-path mappings intact',
             );
         }
     }
+
+    const relationLayerByEdge = new Map(
+        graph.edges
+            .filter((edge) => edge.attributes?.mappingId === 'desktop-critical-paths')
+            .map((edge) => [`${edge.from}::${edge.to}::${edge.type}`, edge.attributes?.relationLayer])
+    );
+    assert.equal(
+        relationLayerByEdge.get('runtime:entity-spawn-ops::state:spawn-context::writes_state'),
+        'state'
+    );
+    assert.equal(
+        relationLayerByEdge.get('runtime:entity-spawn-ops::test:physics-core-spawn::validated_by'),
+        'test'
+    );
+    assert.equal(
+        relationLayerByEdge.get('runtime:entity-spawn-ops::event:spawn::emits'),
+        'event'
+    );
 });
 
 test('parseAuditMasterRows extracts audit blocks, findings paths and core scope references', () => {
