@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T20:10:41.119Z",
+  "generated_at": "2026-05-07T09:34:35.439Z",
   "locks": [
     {
       "person": "codex",
@@ -98,8 +98,36 @@
       ],
       "start_date": "2026-05-06",
       "target_completion": "2026-05-06",
-      "status": "in-progress",
+      "status": "completed",
       "notes": "Critical-path mappings enforced; next builder/runtime relation slice"
+    },
+    {
+      "person": "codex",
+      "block_id": "V107",
+      "phase": "107.2.2",
+      "scope_files": [
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.schema.json",
+        "scripts/build-knowledge-graph.mjs",
+        "scripts/check-knowledge-graph.mjs",
+        "scripts/query-knowledge-graph.mjs",
+        "scripts/export-knowledge-graph-view.mjs",
+        "tools/graph-viewer/index.html",
+        "tools/graph-viewer/viewer.js",
+        "tools/graph-viewer/viewer.css",
+        "data/contracts/knowledge-graph/**",
+        "docs/referenz/ai_architecture_context.md",
+        ".agents/rules/token_efficiency_and_tools.md",
+        ".agents/workflows/status.md",
+        "tests/knowledge-graph-build.contract.test.mjs",
+        "docs/plaene/aktiv/V107.md",
+        "docs/plaene/CHANGELOG.md"
+      ],
+      "start_date": "2026-05-07",
+      "target_completion": "2026-05-06",
+      "status": "in-progress",
+      "notes": ""
     }
   ],
   "metadata": {

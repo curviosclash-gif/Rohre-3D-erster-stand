@@ -1,6 +1,6 @@
 ﻿# Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-06. Aktuelle offene Subphase: `V107 107.2.1`.
+Stand: 2026-05-07. Aktuelle offene Subphase: `V107 107.2.2`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -81,7 +81,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V104 | 2026-05-05 | closed | Abgeschlossen 2026-05-05 |
 | - | V109 | 2026-05-04 | closed | Abgeschlossen 2026-05-04 |
 | - | V100 | 2026-05-05 | closed | Abgeschlossen 2026-05-06 |
-| codex | V107 | 2026-05-06 | active | 107.2.1 Builder-Runtime-Relationen |
+| codex | V107 | 2026-05-06 | active | 107.2.2 Kernqueries stabilisieren |
 | - | V110 | - | frei | Geplant |
 | - | V111 | - | frei | Geplant |
 | - | V112 | - | blockiert | Wartet auf V102.99 und V105.99 |
