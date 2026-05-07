@@ -1,13 +1,8 @@
 import * as THREE from 'three';
 import { validateGhostClip } from '../shared/contracts/GhostClipContract.js';
+import { Trail } from './Trail.js';
 
 const SHARED_GHOST_GEOMETRIES = {};
-const GHOST_TRAIL_RADIUS = 0.16;
-const GHOST_TRAIL_Y_OFFSET = 0.24;
-const GHOST_TRAIL_MIN_SEGMENT_LENGTH = 0.05;
-const TRAIL_UP_AXIS = new THREE.Vector3(0, 1, 0);
-const TRAIL_DUMMY = new THREE.Object3D();
-const TRAIL_DIRECTION = new THREE.Vector3();
 
 function markSharedGeometry(geometry) {
     if (!geometry) return;
@@ -24,112 +19,32 @@ function ensureSharedGhostGeometries() {
     SHARED_GHOST_GEOMETRIES.tail = new THREE.BoxGeometry(0.08, 0.5, 0.42);
     SHARED_GHOST_GEOMETRIES.halo = new THREE.BoxGeometry(1.18, 0.64, 2.24);
     SHARED_GHOST_GEOMETRIES.glow = new THREE.SphereGeometry(0.38, 12, 12);
-    SHARED_GHOST_GEOMETRIES.trailSegment = new THREE.CylinderGeometry(1, 1, 1, 6);
 
     for (const geometry of Object.values(SHARED_GHOST_GEOMETRIES)) {
         markSharedGeometry(geometry);
     }
 }
 
-function toFiniteCoordinate(value) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : 0;
-}
-
-function buildGhostTrail(playerMeta = {}, frames = []) {
+function createGhostTrail(renderer, playerMeta = {}) {
     const playerIdx = Number(playerMeta?.idx);
     if (!Number.isInteger(playerIdx) || playerIdx < 0) return null;
+    if (!renderer?.addToScene || !renderer?.removeFromScene) return null;
 
-    const points = [];
-    const safeFrames = Array.isArray(frames) ? frames : [];
-    for (let frameIndex = 0; frameIndex < safeFrames.length; frameIndex += 1) {
-        const players = Array.isArray(safeFrames[frameIndex]?.players) ? safeFrames[frameIndex].players : [];
-        for (let poseIndex = 0; poseIndex < players.length; poseIndex += 1) {
-            const pose = players[poseIndex];
-            if (pose?.idx !== playerIdx || pose?.alive === false) continue;
-            points.push(
-                toFiniteCoordinate(pose.x),
-                toFiniteCoordinate(pose.y) + GHOST_TRAIL_Y_OFFSET,
-                toFiniteCoordinate(pose.z)
-            );
-            break;
-        }
+    const trail = new Trail(renderer, Number(playerMeta?.color) || 0xffffff, playerIdx, null);
+    trail.clear();
+    if (trail.mesh) {
+        trail.mesh.name = `lastRoundGhostTrail-${playerIdx}`;
+        trail.mesh.renderOrder = 3;
+        trail.mesh.userData = {
+            ...(trail.mesh.userData || {}),
+            entityViewType: 'last-round-ghost-trail',
+            playerIdx,
+        };
     }
-
-    if (points.length < 6) return null;
-
-    let segmentCount = 0;
-    for (let pointIndex = 3; pointIndex < points.length; pointIndex += 3) {
-        const dx = points[pointIndex] - points[pointIndex - 3];
-        const dy = points[pointIndex + 1] - points[pointIndex - 2];
-        const dz = points[pointIndex + 2] - points[pointIndex - 1];
-        const length = Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
-        if (length >= GHOST_TRAIL_MIN_SEGMENT_LENGTH) {
-            segmentCount += 1;
-        }
-    }
-
-    if (segmentCount < 1) return null;
-
-    const color = new THREE.Color(Number(playerMeta?.color) || 0xffffff);
-    color.lerp(new THREE.Color(0xffffff), 0.35);
-    const material = new THREE.MeshBasicMaterial({
-        color,
-        transparent: true,
-        opacity: 0.44,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        toneMapped: false,
-    });
-    const mesh = new THREE.InstancedMesh(SHARED_GHOST_GEOMETRIES.trailSegment, material, segmentCount);
-    mesh.name = `lastRoundGhostTrail-${playerIdx}`;
-    mesh.renderOrder = 3;
-    mesh.frustumCulled = false;
-    mesh.castShadow = false;
-    mesh.receiveShadow = false;
-    mesh.userData = {
-        entityViewType: 'last-round-ghost-trail',
-        playerIdx,
-    };
-
-    let writeIndex = 0;
-    for (let pointIndex = 3; pointIndex < points.length; pointIndex += 3) {
-        const fromX = points[pointIndex - 3];
-        const fromY = points[pointIndex - 2];
-        const fromZ = points[pointIndex - 1];
-        const toX = points[pointIndex];
-        const toY = points[pointIndex + 1];
-        const toZ = points[pointIndex + 2];
-        const dx = toX - fromX;
-        const dy = toY - fromY;
-        const dz = toZ - fromZ;
-        const length = Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
-        if (length < GHOST_TRAIL_MIN_SEGMENT_LENGTH) continue;
-
-        TRAIL_DUMMY.position.set(
-            (fromX + toX) * 0.5,
-            (fromY + toY) * 0.5,
-            (fromZ + toZ) * 0.5
-        );
-        TRAIL_DIRECTION.set(dx / length, dy / length, dz / length);
-        TRAIL_DUMMY.quaternion.setFromUnitVectors(TRAIL_UP_AXIS, TRAIL_DIRECTION);
-        TRAIL_DUMMY.scale.set(GHOST_TRAIL_RADIUS, length, GHOST_TRAIL_RADIUS);
-        TRAIL_DUMMY.updateMatrix();
-        mesh.setMatrixAt(writeIndex, TRAIL_DUMMY.matrix);
-        writeIndex += 1;
-    }
-    mesh.count = writeIndex;
-    mesh.instanceMatrix.needsUpdate = true;
-
-    return {
-        mesh,
-        material,
-        pointCount: points.length / 3,
-        segmentCount: writeIndex,
-    };
+    return trail;
 }
 
-function buildGhostEntry(playerMeta = {}, frames = []) {
+function buildGhostEntry(renderer, playerMeta = {}) {
     ensureSharedGhostGeometries();
 
     const color = new THREE.Color(Number(playerMeta?.color) || 0xffffff);
@@ -176,17 +91,13 @@ function buildGhostEntry(playerMeta = {}, frames = []) {
     group.add(halo);
     group.add(glow);
     group.scale.setScalar(Math.max(0.6, Number(playerMeta?.modelScale) || 1));
-    const trail = buildGhostTrail(playerMeta, frames);
+    const trail = createGhostTrail(renderer, playerMeta);
 
     return {
         idx: Number(playerMeta?.idx),
         group,
-        materials: trail?.material
-            ? [coreMaterial, frameMaterial, glowMaterial, trail.material]
-            : [coreMaterial, frameMaterial, glowMaterial],
-        trail: trail?.mesh || null,
-        trailPointCount: Math.max(0, Number(trail?.pointCount) || 0),
-        trailSegmentCount: Math.max(0, Number(trail?.segmentCount) || 0),
+        materials: [coreMaterial, frameMaterial, glowMaterial],
+        trail,
     };
 }
 
@@ -239,6 +150,8 @@ export class LastRoundGhostSystem {
         this._routeId = '';
         this._tmpQuatA = new THREE.Quaternion();
         this._tmpQuatB = new THREE.Quaternion();
+        this._tmpTrailPosition = new THREE.Vector3();
+        this._tmpTrailDirection = new THREE.Vector3();
     }
 
     _ensureAttached() {
@@ -284,11 +197,8 @@ export class LastRoundGhostSystem {
 
         const playerMeta = Array.isArray(safeClip.players) ? safeClip.players : [];
         for (let i = 0; i < playerMeta.length; i++) {
-            const entry = buildGhostEntry(playerMeta[i], safeClip.frames);
+            const entry = buildGhostEntry(this.renderer, playerMeta[i]);
             this._entries.push(entry);
-            if (entry.trail) {
-                this.root.add(entry.trail);
-            }
             this.root.add(entry.group);
         }
 
@@ -321,8 +231,12 @@ export class LastRoundGhostSystem {
             ? (this._elapsed % this._displayDuration)
             : this._elapsed;
         const playbackTime = Math.min(this._sourceDuration, cycleTime * this._playbackRate);
-        if (playbackTime < this._lastPlaybackTime) {
+        const loopedPlayback = playbackTime < this._lastPlaybackTime;
+        if (loopedPlayback) {
             this._frameCursor = Math.min(1, Math.max(0, this._frames.length - 1));
+            for (let entryIndex = 0; entryIndex < this._entries.length; entryIndex += 1) {
+                this._entries[entryIndex]?.trail?.clear?.();
+            }
         }
         while (
             this._frameCursor < this._frames.length - 1
@@ -352,13 +266,18 @@ export class LastRoundGhostSystem {
                 continue;
             }
 
+            const currentPosition = this._tmpTrailPosition.set(
+                THREE.MathUtils.lerp(Number(poseA.x) || 0, Number(poseB.x) || 0, alpha),
+                THREE.MathUtils.lerp(Number(poseA.y) || 0, Number(poseB.y) || 0, alpha),
+                THREE.MathUtils.lerp(Number(poseA.z) || 0, Number(poseB.z) || 0, alpha)
+            );
             entry.group.visible = true;
             entry.group.position.set(
-                THREE.MathUtils.lerp(Number(poseA.x) || 0, Number(poseB.x) || 0, alpha),
-                THREE.MathUtils.lerp(Number(poseA.y) || 0, Number(poseB.y) || 0, alpha)
+                currentPosition.x,
+                currentPosition.y
                     + 0.55
                     + Math.sin(bobPhase + entry.idx) * 0.08,
-                THREE.MathUtils.lerp(Number(poseA.z) || 0, Number(poseB.z) || 0, alpha)
+                currentPosition.z
             );
 
             this._tmpQuatA.set(
@@ -374,6 +293,8 @@ export class LastRoundGhostSystem {
                 Number(poseB.qw) || 1
             );
             entry.group.quaternion.copy(this._tmpQuatA).slerp(this._tmpQuatB, alpha);
+            this._tmpTrailDirection.set(0, 0, -1).applyQuaternion(entry.group.quaternion).normalize();
+            entry.trail?.update?.(Math.max(0, Number(dt) || 0), currentPosition, this._tmpTrailDirection);
         }
     }
 
@@ -384,16 +305,18 @@ export class LastRoundGhostSystem {
         let trailSegmentCount = 0;
         for (let i = 0; i < this._entries.length; i++) {
             const entry = this._entries[i];
+            const entryTrailSegments = Math.max(0, Number(entry?.trail?.segmentCount) || 0);
+            const entryTrailPoints = entryTrailSegments > 0 ? entryTrailSegments + 1 : 0;
             if (entry?.trail) {
                 trailCount += 1;
-                trailPointCount += Math.max(0, Number(entry.trailPointCount) || 0);
-                trailSegmentCount += Math.max(0, Number(entry.trailSegmentCount) || 0);
+                trailPointCount += entryTrailPoints;
+                trailSegmentCount += entryTrailSegments;
             }
             ghosts.push({
                 idx: entry.idx,
                 visible: !!entry?.group?.visible,
-                trailPoints: Math.max(0, Number(entry.trailPointCount) || 0),
-                trailSegments: Math.max(0, Number(entry.trailSegmentCount) || 0),
+                trailPoints: entryTrailPoints,
+                trailSegments: entryTrailSegments,
                 x: Number(entry?.group?.position?.x?.toFixed?.(2) || 0),
                 y: Number(entry?.group?.position?.y?.toFixed?.(2) || 0),
                 z: Number(entry?.group?.position?.z?.toFixed?.(2) || 0),

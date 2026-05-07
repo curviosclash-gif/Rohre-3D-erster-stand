@@ -6,6 +6,7 @@ import { LastRoundGhostSystem } from '../src/entities/LastRoundGhostSystem.js';
 function createRendererStub() {
     return {
         addToScene() {},
+        removeFromScene() {},
     };
 }
 
@@ -24,6 +25,11 @@ test('LastRoundGhostSystem normalizes broken time and pose data without destabil
     });
 
     assert.equal(playable, true);
+    const initialState = system.getState();
+    assert.equal(initialState.trailCount, 1);
+    assert.equal(initialState.trailPointCount, 0);
+    assert.equal(initialState.trailSegmentCount, 0);
+    assert.equal(initialState.ghosts[0]?.trailSegments, 0);
     assert.doesNotThrow(() => system.update(0.25));
     assert.doesNotThrow(() => system.update(0.5));
 
@@ -39,9 +45,14 @@ test('LastRoundGhostSystem normalizes broken time and pose data without destabil
     assert.equal(Number.isFinite(state.ghosts[0]?.x), true);
     assert.equal(Number.isFinite(state.ghosts[0]?.y), true);
     assert.equal(Number.isFinite(state.ghosts[0]?.z), true);
-    assert.equal(system._entries[0]?.trail?.isInstancedMesh, true);
+    assert.equal(system._entries[0]?.trail?.mesh?.isInstancedMesh, true);
     assert.equal(Number.isFinite(system._entries[0]?.group?.quaternion?.x), true);
     assert.equal(Number.isFinite(system._entries[0]?.group?.quaternion?.w), true);
+
+    system.update(0.3);
+    const loopedState = system.getState();
+    assert.equal(loopedState.trailSegmentCount, 0);
+    assert.equal(loopedState.ghosts[0]?.trailSegments, 0);
 
     system.dispose();
 });
