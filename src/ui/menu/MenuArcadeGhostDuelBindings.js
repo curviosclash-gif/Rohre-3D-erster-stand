@@ -1,6 +1,7 @@
 import {
     ARCADE_GHOST_DUEL_MODES,
     normalizeArcadeGhostDuelMode,
+    normalizeArcadeGhostTrailCollisionEnabled,
 } from '../../shared/contracts/ArcadeGhostDuelContract.js';
 
 function ensureStartSetupSettings(settings) {
@@ -14,6 +15,10 @@ function ensureStartSetupSettings(settings) {
         settings.localSettings.startSetup.arcadeGhostDuelMode,
         ARCADE_GHOST_DUEL_MODES.OFF
     );
+    settings.localSettings.startSetup.arcadeGhostTrailCollisionEnabled = normalizeArcadeGhostTrailCollisionEnabled(
+        settings.localSettings.startSetup.arcadeGhostTrailCollisionEnabled,
+        false
+    );
     return settings.localSettings.startSetup;
 }
 
@@ -24,15 +29,26 @@ export function bindArcadeGhostDuelModeSelect({
     emitSettingsChangedImmediate,
     keys,
 }) {
-    if (!ui?.arcadeGhostDuelModeSelect) return;
-    ui.arcadeGhostDuelModeSelect.value = ensureStartSetupSettings(settings).arcadeGhostDuelMode;
-    bind(ui.arcadeGhostDuelModeSelect, 'change', () => {
-        const startSetupSettings = ensureStartSetupSettings(settings);
-        startSetupSettings.arcadeGhostDuelMode = normalizeArcadeGhostDuelMode(
-            ui.arcadeGhostDuelModeSelect.value,
-            ARCADE_GHOST_DUEL_MODES.OFF
-        );
+    const startSetupSettings = ensureStartSetupSettings(settings);
+    if (ui?.arcadeGhostDuelModeSelect) {
         ui.arcadeGhostDuelModeSelect.value = startSetupSettings.arcadeGhostDuelMode;
-        emitSettingsChangedImmediate([keys.ARCADE_GHOST_DUEL_MODE]);
-    });
+        bind(ui.arcadeGhostDuelModeSelect, 'change', () => {
+            const nextStartSetupSettings = ensureStartSetupSettings(settings);
+            nextStartSetupSettings.arcadeGhostDuelMode = normalizeArcadeGhostDuelMode(
+                ui.arcadeGhostDuelModeSelect.value,
+                ARCADE_GHOST_DUEL_MODES.OFF
+            );
+            ui.arcadeGhostDuelModeSelect.value = nextStartSetupSettings.arcadeGhostDuelMode;
+            emitSettingsChangedImmediate([keys.ARCADE_GHOST_DUEL_MODE]);
+        });
+    }
+
+    if (ui?.arcadeGhostTrailCollisionToggle) {
+        ui.arcadeGhostTrailCollisionToggle.checked = startSetupSettings.arcadeGhostTrailCollisionEnabled === true;
+        bind(ui.arcadeGhostTrailCollisionToggle, 'change', () => {
+            const nextStartSetupSettings = ensureStartSetupSettings(settings);
+            nextStartSetupSettings.arcadeGhostTrailCollisionEnabled = ui.arcadeGhostTrailCollisionToggle.checked === true;
+            emitSettingsChangedImmediate([keys.ARCADE_GHOST_TRAIL_COLLISION_ENABLED]);
+        });
+    }
 }

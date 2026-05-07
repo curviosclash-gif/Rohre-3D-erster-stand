@@ -97,7 +97,10 @@ export class EntityManager {
             || 'NORMAL';
         this.runtime = assembleEntityRuntime(this);
         bindRuntimePorts(this, this.runtime);
-        this._lastRoundGhostSystem = new LastRoundGhostSystem(renderer);
+        this._lastRoundGhostSystem = new LastRoundGhostSystem(renderer, {
+            entityManager: this,
+            ghostTrailCollisionEnabled: this.entityRuntimeConfig?.TRAIL?.GHOST_COLLISION_ENABLED === true,
+        });
         this.projectiles = this.runtime.systems.projectileSystem.projectiles;
         this.botPolicyRegistry = new BotPolicyRegistry();
         this.botPolicyType = DEFAULT_BOT_POLICY_TYPE;

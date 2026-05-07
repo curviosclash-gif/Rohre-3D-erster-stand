@@ -43,6 +43,7 @@ export const DEFAULT_ENTITY_RUNTIME_CONFIG = Object.freeze({
         GAP_CHANCE: 0,
         GAP_DURATION: 0.5,
         MAX_SEGMENTS: 1400,
+        GHOST_COLLISION_ENABLED: false,
     }),
     POWERUP: Object.freeze({
         SIZE: 1,
@@ -155,6 +156,10 @@ export function createEntityRuntimeConfig(runtimeConfig = null, baseConfig = nul
         contract.TRAIL.MAX_SEGMENTS = toFiniteNumber(runtimeConfig.trail.maxSegments, contract.TRAIL.MAX_SEGMENTS);
         contract.TRAIL.GAP_CHANCE = toFiniteNumber(runtimeConfig.trail.gapChance, contract.TRAIL.GAP_CHANCE);
         contract.TRAIL.GAP_DURATION = toFiniteNumber(runtimeConfig.trail.gapDuration, contract.TRAIL.GAP_DURATION);
+    }
+
+    if (runtimeConfig?.arcade) {
+        contract.TRAIL.GHOST_COLLISION_ENABLED = runtimeConfig.arcade.ghostTrailCollisionEnabled === true;
     }
 
     if (runtimeConfig?.powerup) {

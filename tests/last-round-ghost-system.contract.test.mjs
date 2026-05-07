@@ -10,6 +10,59 @@ function createRendererStub() {
     };
 }
 
+function createTrailCollisionEntityManagerStub() {
+    const registrations = [];
+    const unregistrations = [];
+    const trailSpatialIndex = {
+        registerTrailSegment(playerIndex, segmentIdx, data, reusableRef = null) {
+            const entry = { playerIndex, segmentIdx, ...data };
+            const ref = reusableRef || { key: `${playerIndex}:${segmentIdx}`, entry };
+            ref.entry = entry;
+            registrations.push({ playerIndex, segmentIdx, data, ref });
+            return ref;
+        },
+        unregisterTrailSegment(key, entry) {
+            unregistrations.push({ key, entry });
+        },
+    };
+
+    return {
+        registrations,
+        unregistrations,
+        entityManager: {
+            entityRuntimeConfig: {
+                TRAIL: {
+                    WIDTH: 0.6,
+                    UPDATE_INTERVAL: 0.07,
+                    GAP_CHANCE: 0,
+                    GAP_DURATION: 0.5,
+                    MAX_SEGMENTS: 1400,
+                    GHOST_COLLISION_ENABLED: true,
+                },
+                HUNT: {
+                    TRAIL_SEGMENT_HP: 3,
+                },
+            },
+            getTrailSpatialIndex() {
+                return trailSpatialIndex;
+            },
+        },
+    };
+}
+
+function createPlayableClip() {
+    return {
+        routeId: 'route_collision',
+        sourceDuration: 1,
+        displayDuration: 1,
+        players: [{ idx: 0, color: 0xffffff }],
+        frames: [
+            { time: 0, players: [{ idx: 0, x: 0, y: 0, z: 0, qx: 0, qy: 0, qz: 0, qw: 1 }] },
+            { time: 1, players: [{ idx: 0, x: 4, y: 0, z: 0, qx: 0, qy: 0, qz: 0, qw: 1 }] },
+        ],
+    };
+}
+
 test('LastRoundGhostSystem normalizes broken time and pose data without destabilizing playback', () => {
     const system = new LastRoundGhostSystem(createRendererStub());
     const playable = system.playClip({
@@ -53,6 +106,70 @@ test('LastRoundGhostSystem normalizes broken time and pose data without destabil
     const loopedState = system.getState();
     assert.equal(loopedState.trailSegmentCount, 0);
     assert.equal(loopedState.ghosts[0]?.trailSegments, 0);
+
+    system.dispose();
+});
+
+test('LastRoundGhostSystem keeps ghost trail visual-only by default', () => {
+    const collision = createTrailCollisionEntityManagerStub();
+    const system = new LastRoundGhostSystem(createRendererStub(), {
+        entityManager: collision.entityManager,
+    });
+
+    assert.equal(system.playClip(createPlayableClip()), true);
+    system.update(0.25);
+    system.update(0.25);
+
+    const state = system.getState();
+    assert.equal(collision.registrations.length, 0);
+    assert.equal(state.configuredTrailCollisionEnabled, false);
+    assert.equal(state.trailCollisionEnabled, false);
+    assert.equal(state.ghosts[0]?.trailCollisionEnabled, false);
+
+    system.dispose();
+});
+
+test('LastRoundGhostSystem registers ghost trail as collidable with a non-player owner id when enabled', () => {
+    const collision = createTrailCollisionEntityManagerStub();
+    const system = new LastRoundGhostSystem(createRendererStub(), {
+        entityManager: collision.entityManager,
+        ghostTrailCollisionEnabled: true,
+    });
+
+    assert.equal(system.playClip(createPlayableClip()), true);
+    system.update(0.25);
+    system.update(0.25);
+
+    const firstRegistration = collision.registrations[0];
+    const state = system.getState();
+    assert.ok(firstRegistration);
+    assert.equal(firstRegistration.playerIndex >= 10000, true);
+    assert.notEqual(firstRegistration.playerIndex, 0);
+    assert.equal(state.configuredTrailCollisionEnabled, true);
+    assert.equal(state.trailCollisionEnabled, true);
+    assert.equal(state.ghosts[0]?.trailCollisionEnabled, true);
+
+    system.dispose();
+});
+
+test('LastRoundGhostSystem unregisters collidable ghost trail segments when cleared', () => {
+    const collision = createTrailCollisionEntityManagerStub();
+    const system = new LastRoundGhostSystem(createRendererStub(), {
+        entityManager: collision.entityManager,
+        ghostTrailCollisionEnabled: true,
+    });
+
+    assert.equal(system.playClip(createPlayableClip()), true);
+    system.update(0.25);
+    system.update(0.25);
+
+    const registrationCount = collision.registrations.length;
+    assert.equal(registrationCount > 0, true);
+
+    system.clear();
+
+    assert.equal(collision.unregistrations.length, registrationCount);
+    assert.equal(system.getState().active, false);
 
     system.dispose();
 });

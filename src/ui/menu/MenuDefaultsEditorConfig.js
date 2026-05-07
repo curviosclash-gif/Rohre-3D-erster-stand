@@ -101,6 +101,7 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             vehicleSearch: '',
             vehicleFilter: 'all',
             arcadeGhostDuelMode: 'off',
+            arcadeGhostTrailCollisionEnabled: false,
         },
         toolsState: {
             level4Open: false,

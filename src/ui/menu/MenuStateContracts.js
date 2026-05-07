@@ -4,6 +4,7 @@ import { MULTIPLAYER_TRANSPORTS } from '../../shared/contracts/RuntimeSessionCon
 import {
     ARCADE_GHOST_DUEL_MODES,
     normalizeArcadeGhostDuelMode,
+    normalizeArcadeGhostTrailCollisionEnabled,
 } from '../../shared/contracts/ArcadeGhostDuelContract.js';
 import {
     createMenuEventPlaylistStateDefaults,
@@ -129,6 +130,10 @@ function normalizeStartSetupState(startSetup = null) {
     nextState.arcadeGhostDuelMode = normalizeArcadeGhostDuelMode(
         nextState.arcadeGhostDuelMode,
         defaults.arcadeGhostDuelMode || ARCADE_GHOST_DUEL_MODES.OFF
+    );
+    nextState.arcadeGhostTrailCollisionEnabled = normalizeArcadeGhostTrailCollisionEnabled(
+        nextState.arcadeGhostTrailCollisionEnabled,
+        defaults.arcadeGhostTrailCollisionEnabled === true
     );
     return nextState;
 }

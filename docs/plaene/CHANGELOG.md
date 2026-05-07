@@ -381,3 +381,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Nutzerfeedback: Der Ghost war sichtbar, aber seine Spur lag sofort komplett im Raum statt waehrend des Ghost-Flugs zu entstehen.
 - Fixpfad: `LastRoundGhostSystem` benutzt fuer Ghosts jetzt die normale `Trail`-Klasse und fuettert sie pro Playback-Tick mit der interpolierten Ghost-Position; beim Playback-Loop wird die Ghost-Spur geloescht und waechst neu an.
 - Evidence: `node --test tests/last-round-ghost-system.contract.test.mjs tests/playing-state-ghost-playback.contract.test.mjs`, `node --test tests/parcours-ghost.contract.test.mjs tests/last-round-ghost-system.contract.test.mjs tests/playing-state-ghost-playback.contract.test.mjs`, Desktop-Roundtrip `tests/ghost-selfduel-roundtrip.desktop.spec.js` und `npm run plan:check` sind gruen.
+
+## Bugfix-Follow-up 2026-05-07 (Arcade-Ghost Trail-Kollision)
+
+- Nutzerfeedback: Die Ghost-Spur soll wie im normalen Spiel entstehen, aber ihre Trail-Kollision soll im Menue ein- und ausschaltbar bleiben.
+- Fixpfad: Das Start-Menue speichert `arcadeGhostTrailCollisionEnabled`; `RuntimeConfig` und `EntityRuntimeConfig` reichen die Option bis zum `LastRoundGhostSystem` durch. Bei aktivem Toggle registriert die Ghost-Spur ihre Segmente im normalen Trail-Spatial-Index mit eigener Ghost-Owner-ID, damit P1 nicht als eigener frischer Trail uebersprungen wird.
+- Evidence: `node --test tests/last-round-ghost-system.contract.test.mjs tests/runtime-settings-live-apply.contract.test.mjs` und `git diff --check` sind gruen.

@@ -12,6 +12,7 @@ import {
 } from '../src/shared/contracts/RuntimeMapCatalogContract.js';
 import { registerSessionMenuEventHandlers } from '../src/core/runtime/menu-handlers/SessionMenuEventHandlers.js';
 import { createRuntimeConfigSnapshot } from '../src/core/RuntimeConfig.js';
+import { createEntityRuntimeConfig } from '../src/shared/contracts/EntityRuntimeConfig.js';
 import { createDefaultSettingsSnapshotForRuntime } from '../src/core/settings/SettingsDefaultsFacade.js';
 import {
     createSettingsOverrideDraft,
@@ -109,7 +110,10 @@ test('EntityManager live runtime apply propagates updated config to runtime cach
         },
         HUNT: { PLAYER_MAX_HP: 100 },
     });
-    const runtimeConfig = { gameplay: { fireRate: 0.7 } };
+    const runtimeConfig = {
+        gameplay: { fireRate: 0.7 },
+        arcade: { ghostTrailCollisionEnabled: true },
+    };
 
     const directRuntimeContext = {
         services: {
@@ -164,12 +168,20 @@ test('EntityManager live runtime apply propagates updated config to runtime cach
         arena,
         runtimeConfig: null,
         players,
+        _lastRoundGhostSystem: {
+            configured: null,
+            configure(options) {
+                this.configured = options;
+            },
+        },
     };
 
     EntityManager.prototype.applyLiveRuntimeConfig.call(managerLike, nextErc, runtimeConfig);
 
     assert.equal(managerLike.entityRuntimeConfig, nextErc);
     assert.equal(managerLike.runtimeConfig, runtimeConfig);
+    assert.equal(managerLike._lastRoundGhostSystem.configured.entityManager, managerLike);
+    assert.equal(managerLike._lastRoundGhostSystem.configured.ghostTrailCollisionEnabled, true);
     assert.equal(arena.entityRuntimeConfig, nextErc);
     assert.equal(arena.runtimeConfig, runtimeConfig);
 
@@ -285,28 +297,55 @@ test('Arcade ghost duel mode stays enabled for all single mode paths', () => {
         localSettings: {
             sessionType: 'single',
             modePath: 'normal',
-            startSetup: { arcadeGhostDuelMode: 'self_longest_ghost' },
+            startSetup: {
+                arcadeGhostDuelMode: 'self_longest_ghost',
+                arcadeGhostTrailCollisionEnabled: true,
+            },
         },
     });
     assert.equal(normalSnapshot.arcade.ghostDuelMode, 'self_longest_ghost');
+    assert.equal(normalSnapshot.arcade.ghostTrailCollisionEnabled, true);
 
     const fightSnapshot = createRuntimeConfigSnapshot({
         localSettings: {
             sessionType: 'single',
             modePath: 'fight',
-            startSetup: { arcadeGhostDuelMode: 'self_longest_ghost' },
+            startSetup: {
+                arcadeGhostDuelMode: 'self_longest_ghost',
+                arcadeGhostTrailCollisionEnabled: true,
+            },
         },
     });
     assert.equal(fightSnapshot.arcade.ghostDuelMode, 'self_longest_ghost');
+    assert.equal(fightSnapshot.arcade.ghostTrailCollisionEnabled, true);
 
     const multiplayerSnapshot = createRuntimeConfigSnapshot({
         localSettings: {
             sessionType: 'multiplayer',
             modePath: 'arcade',
-            startSetup: { arcadeGhostDuelMode: 'self_longest_ghost' },
+            startSetup: {
+                arcadeGhostDuelMode: 'self_longest_ghost',
+                arcadeGhostTrailCollisionEnabled: true,
+            },
         },
     });
     assert.equal(multiplayerSnapshot.arcade.ghostDuelMode, 'off');
+    assert.equal(multiplayerSnapshot.arcade.ghostTrailCollisionEnabled, false);
+
+    const modeOffSnapshot = createRuntimeConfigSnapshot({
+        localSettings: {
+            sessionType: 'single',
+            modePath: 'normal',
+            startSetup: {
+                arcadeGhostDuelMode: 'off',
+                arcadeGhostTrailCollisionEnabled: true,
+            },
+        },
+    });
+    assert.equal(modeOffSnapshot.arcade.ghostTrailCollisionEnabled, false);
+
+    const entityRuntimeConfig = createEntityRuntimeConfig(normalSnapshot);
+    assert.equal(entityRuntimeConfig.TRAIL.GHOST_COLLISION_ENABLED, true);
 });
 
 test('Arcade mission assignment uses active sector template id from encounter sequence', () => {

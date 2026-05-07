@@ -8,7 +8,9 @@ import {
 import { normalizeSessionType } from '../composition/core-ui/CoreSettingsPorts.js';
 import {
     ARCADE_GHOST_DUEL_MODES,
+    isArcadeGhostDuelPlaybackEnabled,
     normalizeArcadeGhostDuelMode,
+    normalizeArcadeGhostTrailCollisionEnabled,
 } from '../shared/contracts/ArcadeGhostDuelContract.js';
 import {
     createDefaultRecordingCaptureSettings,
@@ -79,6 +81,16 @@ function resolveArcadeGhostDuelMode(settings = null, { sessionType = '' } = {}) 
     return normalizeArcadeGhostDuelMode(
         settings?.localSettings?.startSetup?.arcadeGhostDuelMode,
         ARCADE_GHOST_DUEL_MODES.OFF
+    );
+}
+
+function resolveArcadeGhostTrailCollisionEnabled(settings = null, { sessionType = '', ghostDuelMode = ARCADE_GHOST_DUEL_MODES.OFF } = {}) {
+    if (sessionType !== 'single' || !isArcadeGhostDuelPlaybackEnabled(ghostDuelMode)) {
+        return false;
+    }
+    return normalizeArcadeGhostTrailCollisionEnabled(
+        settings?.localSettings?.startSetup?.arcadeGhostTrailCollisionEnabled,
+        false
     );
 }
 
@@ -197,6 +209,11 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
         planarMode,
         trainerBridgeEnabled,
     });
+    const arcadeGhostDuelMode = resolveArcadeGhostDuelMode(source, { sessionType });
+    const arcadeGhostTrailCollisionEnabled = resolveArcadeGhostTrailCollisionEnabled(source, {
+        sessionType,
+        ghostDuelMode: arcadeGhostDuelMode,
+    });
 
     const runtimeConfig = {
         session: {
@@ -302,7 +319,8 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
             comboDecayPerSecond: clampSettingValue(arcadeSource.comboDecayPerSecond, { min: 0, max: 10 }, 1),
             maxMultiplier: clampInteger(arcadeSource.maxMultiplier, 1, 25, 8),
             replayHooksEnabled: arcadeSource.replayHooksEnabled !== false,
-            ghostDuelMode: resolveArcadeGhostDuelMode(source, { sessionType }),
+            ghostDuelMode: arcadeGhostDuelMode,
+            ghostTrailCollisionEnabled: arcadeGhostTrailCollisionEnabled,
         },
         recording: normalizeRecordingCaptureSettings(recordingSource, createDefaultRecordingCaptureSettings()),
         cameraPerspective: normalizeCameraPerspectiveSettings(

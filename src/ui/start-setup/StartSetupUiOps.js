@@ -17,6 +17,7 @@ export function ensureStartSetupLocalState(settings) {
         vehicleSearch: '',
         vehicleFilter: 'all',
         arcadeGhostDuelMode: 'off',
+        arcadeGhostTrailCollisionEnabled: false,
     };
 }
 

@@ -11,6 +11,7 @@ import {
 import {
     ARCADE_GHOST_DUEL_MODES,
     normalizeArcadeGhostDuelMode,
+    normalizeArcadeGhostTrailCollisionEnabled,
 } from '../../shared/contracts/ArcadeGhostDuelContract.js';
 
 export const HANGAR_SELECTION_WRITEBACK_VERSION = 'hangar-selection-writeback.v1';
@@ -40,6 +41,7 @@ export const HANGAR_SELECTION_WRITEBACK_PATHS = Object.freeze({
     MODE_FIGHT_VEHICLE_PLAYER_1: 'settings.localSettings.startSetup.modeSelections.fight.vehicles.PLAYER_1',
     MODE_FIGHT_VEHICLE_PLAYER_2: 'settings.localSettings.startSetup.modeSelections.fight.vehicles.PLAYER_2',
     START_SETUP_ARCADE_GHOST_DUEL_MODE: 'settings.localSettings.startSetup.arcadeGhostDuelMode',
+    START_SETUP_ARCADE_GHOST_TRAIL_COLLISION_ENABLED: 'settings.localSettings.startSetup.arcadeGhostTrailCollisionEnabled',
 });
 
 export const HANGAR_START_SETUP_PERSISTED_FIELDS = Object.freeze({
@@ -52,6 +54,7 @@ export const HANGAR_START_SETUP_PERSISTED_FIELDS = Object.freeze({
     VEHICLE_SEARCH: 'vehicleSearch',
     VEHICLE_FILTER: 'vehicleFilter',
     ARCADE_GHOST_DUEL_MODE: 'arcadeGhostDuelMode',
+    ARCADE_GHOST_TRAIL_COLLISION_ENABLED: 'arcadeGhostTrailCollisionEnabled',
 });
 
 const VALID_HANGAR_SELECTION_MODE_SET = new Set(Object.values(HANGAR_SELECTION_MODES));
@@ -136,6 +139,10 @@ export function ensureHangarSelectionWritebackState(settings) {
     startSetup.arcadeGhostDuelMode = normalizeArcadeGhostDuelMode(
         startSetup.arcadeGhostDuelMode,
         ARCADE_GHOST_DUEL_MODES.OFF
+    );
+    startSetup.arcadeGhostTrailCollisionEnabled = normalizeArcadeGhostTrailCollisionEnabled(
+        startSetup.arcadeGhostTrailCollisionEnabled,
+        false
     );
     return startSetup;
 }

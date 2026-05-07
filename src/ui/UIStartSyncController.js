@@ -54,7 +54,9 @@ import {
 import { hasConfiguredOnlineSignalingUrl } from '../shared/contracts/OnlineSignalingConfig.js';
 import {
     ARCADE_GHOST_DUEL_MODES,
+    isArcadeGhostDuelPlaybackEnabled,
     normalizeArcadeGhostDuelMode,
+    normalizeArcadeGhostTrailCollisionEnabled,
 } from '../shared/contracts/ArcadeGhostDuelContract.js';
 
 function resolveArcadeGhostDuelModeLabel(mode) {
@@ -399,10 +401,19 @@ export class UIStartSyncController {
                 ARCADE_GHOST_DUEL_MODES.OFF
             );
             startSetup.arcadeGhostDuelMode = configuredArcadeGhostDuelMode;
+            const configuredArcadeGhostTrailCollisionEnabled = normalizeArcadeGhostTrailCollisionEnabled(
+                startSetup.arcadeGhostTrailCollisionEnabled,
+                false
+            );
+            startSetup.arcadeGhostTrailCollisionEnabled = configuredArcadeGhostTrailCollisionEnabled;
             const ghostDuelSelectable = sessionType === MENU_SESSION_TYPES.SINGLE;
             const effectiveArcadeGhostDuelMode = ghostDuelSelectable
                 ? configuredArcadeGhostDuelMode
                 : ARCADE_GHOST_DUEL_MODES.OFF;
+            const ghostTrailCollisionSelectable = ghostDuelSelectable
+                && isArcadeGhostDuelPlaybackEnabled(effectiveArcadeGhostDuelMode);
+            const effectiveArcadeGhostTrailCollisionEnabled = ghostTrailCollisionSelectable
+                && configuredArcadeGhostTrailCollisionEnabled;
             const hasActiveLobbySession = isMultiplayerSession && resolvedMultiplayerSessionState?.joined === true;
         const knownVehicleIds = new Set(this._vehiclePreviewEntries.map((entry) => entry.id));
         const appendVehicleOption = (select, vehicleId) => {
@@ -452,6 +463,13 @@ export class UIStartSyncController {
             } else {
                 this.ui.arcadeGhostDuelModeHint.textContent = 'Nur im Einzelspieler aktiv.';
             }
+        }
+        if (this.ui.arcadeGhostTrailCollisionToggle) {
+            this.ui.arcadeGhostTrailCollisionToggle.checked = configuredArcadeGhostTrailCollisionEnabled;
+            this.ui.arcadeGhostTrailCollisionToggle.disabled = !ghostTrailCollisionSelectable;
+            this.ui.arcadeGhostTrailCollisionToggle.title = ghostTrailCollisionSelectable
+                ? 'Ghost-Spur nimmt an der normalen Trail-Kollision teil.'
+                : 'Aktiv, sobald Ghost-Wiedergabe im Einzelspieler laeuft.';
         }
 
         if (this.ui.mapSelect) {
@@ -599,6 +617,11 @@ export class UIStartSyncController {
                     label: 'Ghost',
                     value: resolveArcadeGhostDuelModeLabel(effectiveArcadeGhostDuelMode),
                     muted: !ghostDuelSelectable,
+                },
+                {
+                    label: 'Ghost-Kollision',
+                    value: effectiveArcadeGhostTrailCollisionEnabled ? 'An' : 'Aus',
+                    muted: !ghostTrailCollisionSelectable,
                 },
                 { label: 'Ansicht', value: themeLabel },
             ];

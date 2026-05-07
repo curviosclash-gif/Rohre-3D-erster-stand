@@ -27,3 +27,17 @@ export function normalizeArcadeGhostDuelMode(value, fallback = ARCADE_GHOST_DUEL
 export function isArcadeGhostDuelPlaybackEnabled(mode) {
     return normalizeArcadeGhostDuelMode(mode) === ARCADE_GHOST_DUEL_MODES.SELF_LONGEST_GHOST;
 }
+
+export function normalizeArcadeGhostTrailCollisionEnabled(value, fallback = false) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+        const normalized = value.trim().toLowerCase();
+        if (normalized === 'true' || normalized === '1' || normalized === 'on' || normalized === 'yes') {
+            return true;
+        }
+        if (normalized === 'false' || normalized === '0' || normalized === 'off' || normalized === 'no') {
+            return false;
+        }
+    }
+    return fallback === true;
+}

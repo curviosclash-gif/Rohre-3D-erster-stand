@@ -3,6 +3,7 @@ import { validateGhostClip } from '../shared/contracts/GhostClipContract.js';
 import { Trail } from './Trail.js';
 
 const SHARED_GHOST_GEOMETRIES = {};
+const GHOST_TRAIL_PLAYER_INDEX_OFFSET = 10000;
 
 function markSharedGeometry(geometry) {
     if (!geometry) return;
@@ -25,12 +26,32 @@ function ensureSharedGhostGeometries() {
     }
 }
 
-function createGhostTrail(renderer, playerMeta = {}) {
+function createGhostTrailCollisionSource(entityManager) {
+    const trailSpatialIndex = entityManager?.getTrailSpatialIndex?.() || null;
+    if (!trailSpatialIndex?.registerTrailSegment) return null;
+    return {
+        entityRuntimeConfig: entityManager.entityRuntimeConfig || null,
+        getTrailSpatialIndex() {
+            return entityManager?.getTrailSpatialIndex?.() || trailSpatialIndex;
+        },
+    };
+}
+
+function resolveGhostTrailPlayerIndex(playerIdx, collisionEnabled) {
+    return collisionEnabled ? GHOST_TRAIL_PLAYER_INDEX_OFFSET + playerIdx : playerIdx;
+}
+
+function createGhostTrail(renderer, playerMeta = {}, options = {}) {
     const playerIdx = Number(playerMeta?.idx);
     if (!Number.isInteger(playerIdx) || playerIdx < 0) return null;
     if (!renderer?.addToScene || !renderer?.removeFromScene) return null;
 
-    const trail = new Trail(renderer, Number(playerMeta?.color) || 0xffffff, playerIdx, null);
+    const collisionSource = options.trailCollisionEnabled === true
+        ? createGhostTrailCollisionSource(options.entityManager || null)
+        : null;
+    const trailCollisionEnabled = !!collisionSource;
+    const trailPlayerIndex = resolveGhostTrailPlayerIndex(playerIdx, trailCollisionEnabled);
+    const trail = new Trail(renderer, Number(playerMeta?.color) || 0xffffff, trailPlayerIndex, collisionSource);
     trail.clear();
     if (trail.mesh) {
         trail.mesh.name = `lastRoundGhostTrail-${playerIdx}`;
@@ -39,12 +60,14 @@ function createGhostTrail(renderer, playerMeta = {}) {
             ...(trail.mesh.userData || {}),
             entityViewType: 'last-round-ghost-trail',
             playerIdx,
+            trailPlayerIndex,
+            trailCollisionEnabled,
         };
     }
     return trail;
 }
 
-function buildGhostEntry(renderer, playerMeta = {}) {
+function buildGhostEntry(renderer, playerMeta = {}, options = {}) {
     ensureSharedGhostGeometries();
 
     const color = new THREE.Color(Number(playerMeta?.color) || 0xffffff);
@@ -91,13 +114,14 @@ function buildGhostEntry(renderer, playerMeta = {}) {
     group.add(halo);
     group.add(glow);
     group.scale.setScalar(Math.max(0.6, Number(playerMeta?.modelScale) || 1));
-    const trail = createGhostTrail(renderer, playerMeta);
+    const trail = createGhostTrail(renderer, playerMeta, options);
 
     return {
         idx: Number(playerMeta?.idx),
         group,
         materials: [coreMaterial, frameMaterial, glowMaterial],
         trail,
+        trailCollisionEnabled: trail?.mesh?.userData?.trailCollisionEnabled === true,
     };
 }
 
@@ -106,6 +130,7 @@ function disposeEntry(entry) {
     for (let i = 0; i < materials.length; i++) {
         materials[i]?.dispose?.();
     }
+    entry?.trail?.clear?.();
     entry?.trail?.dispose?.();
 }
 
@@ -130,8 +155,10 @@ function buildPlaybackFrames(frames) {
 }
 
 export class LastRoundGhostSystem {
-    constructor(renderer) {
+    constructor(renderer, options = {}) {
         this.renderer = renderer || null;
+        this.entityManager = options?.entityManager || null;
+        this._ghostTrailCollisionEnabled = options?.ghostTrailCollisionEnabled === true;
         this.root = new THREE.Group();
         this.root.name = 'lastRoundGhostRoot';
         this.root.visible = false;
@@ -152,6 +179,15 @@ export class LastRoundGhostSystem {
         this._tmpQuatB = new THREE.Quaternion();
         this._tmpTrailPosition = new THREE.Vector3();
         this._tmpTrailDirection = new THREE.Vector3();
+    }
+
+    configure(options = {}) {
+        if (Object.prototype.hasOwnProperty.call(options, 'entityManager')) {
+            this.entityManager = options.entityManager || null;
+        }
+        if (Object.prototype.hasOwnProperty.call(options, 'ghostTrailCollisionEnabled')) {
+            this._ghostTrailCollisionEnabled = options.ghostTrailCollisionEnabled === true;
+        }
     }
 
     _ensureAttached() {
@@ -197,7 +233,10 @@ export class LastRoundGhostSystem {
 
         const playerMeta = Array.isArray(safeClip.players) ? safeClip.players : [];
         for (let i = 0; i < playerMeta.length; i++) {
-            const entry = buildGhostEntry(this.renderer, playerMeta[i]);
+            const entry = buildGhostEntry(this.renderer, playerMeta[i], {
+                entityManager: this.entityManager,
+                trailCollisionEnabled: this._ghostTrailCollisionEnabled,
+            });
             this._entries.push(entry);
             this.root.add(entry.group);
         }
@@ -315,6 +354,7 @@ export class LastRoundGhostSystem {
             ghosts.push({
                 idx: entry.idx,
                 visible: !!entry?.group?.visible,
+                trailCollisionEnabled: entry?.trailCollisionEnabled === true,
                 trailPoints: entryTrailPoints,
                 trailSegments: entryTrailSegments,
                 x: Number(entry?.group?.position?.x?.toFixed?.(2) || 0),
@@ -328,6 +368,8 @@ export class LastRoundGhostSystem {
             routeId: this._routeId,
             frameCount: this._frames.length,
             entryCount: this._entries.length,
+            trailCollisionEnabled: this._entries.some((entry) => entry?.trailCollisionEnabled === true),
+            configuredTrailCollisionEnabled: this._ghostTrailCollisionEnabled,
             trailCount,
             trailPointCount,
             trailSegmentCount,

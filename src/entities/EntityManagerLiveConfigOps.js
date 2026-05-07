@@ -45,6 +45,16 @@ export function applyLiveRuntimeConfig(em, entityRuntimeConfig, runtimeConfig) {
             em.arena.runtimeConfig = runtimeConfig;
         }
     }
+    if (em._lastRoundGhostSystem && typeof em._lastRoundGhostSystem.configure === 'function') {
+        const hasRuntimeGhostCollisionSetting = runtimeConfig?.arcade
+            && Object.prototype.hasOwnProperty.call(runtimeConfig.arcade, 'ghostTrailCollisionEnabled');
+        em._lastRoundGhostSystem.configure({
+            entityManager: em,
+            ghostTrailCollisionEnabled: hasRuntimeGhostCollisionSetting
+                ? runtimeConfig.arcade.ghostTrailCollisionEnabled === true
+                : nextErc.TRAIL?.GHOST_COLLISION_ENABLED === true,
+        });
+    }
     if (runtimeConfig !== undefined) {
         em.runtimeConfig = runtimeConfig;
     }
