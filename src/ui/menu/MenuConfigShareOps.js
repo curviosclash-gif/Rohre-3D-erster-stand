@@ -60,6 +60,7 @@ function createSharePayload(settings) {
         mapKey: sanitizeString(source.mapKey, defaults.mapKey),
         numBots: Number.isFinite(Number(source.numBots)) ? Number(source.numBots) : defaults.numBots,
         botDifficulty: sanitizeString(source.botDifficulty, defaults.botDifficulty).toUpperCase(),
+        botPolicyStrategy: sanitizeString(source.botPolicyStrategy, defaults.botPolicyStrategy).toLowerCase(),
         winsNeeded: Number.isFinite(Number(source.winsNeeded)) ? Number(source.winsNeeded) : defaults.winsNeeded,
         autoRoll: typeof source.autoRoll === 'boolean' ? source.autoRoll : defaults.autoRoll,
         portalsEnabled: typeof source.portalsEnabled === 'boolean' ? source.portalsEnabled : defaults.portalsEnabled,
@@ -82,6 +83,7 @@ export function applyMenuConfigPayload(settings, payload) {
     settings.mapKey = sanitizeString(payload.mapKey, settings.mapKey || defaults.mapKey);
     settings.numBots = Number.isFinite(Number(payload.numBots)) ? Number(payload.numBots) : settings.numBots;
     settings.botDifficulty = sanitizeString(payload.botDifficulty, settings.botDifficulty || defaults.botDifficulty).toUpperCase();
+    settings.botPolicyStrategy = sanitizeString(payload.botPolicyStrategy, settings.botPolicyStrategy || defaults.botPolicyStrategy).toLowerCase();
     settings.winsNeeded = Number.isFinite(Number(payload.winsNeeded)) ? Number(payload.winsNeeded) : settings.winsNeeded;
     settings.autoRoll = typeof payload.autoRoll === 'boolean' ? payload.autoRoll : defaults.autoRoll;
     settings.portalsEnabled = typeof payload.portalsEnabled === 'boolean' ? payload.portalsEnabled : defaults.portalsEnabled;

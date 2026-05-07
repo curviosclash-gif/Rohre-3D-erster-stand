@@ -250,6 +250,7 @@ export function createSettingsDomainSnapshot(settings) {
             mapKey: source.mapKey,
             numBots: source.numBots,
             botDifficulty: source.botDifficulty,
+            botPolicyStrategy: source.botPolicyStrategy,
             winsNeeded: source.winsNeeded,
             autoRoll: source.autoRoll,
             portalsEnabled: source.portalsEnabled,

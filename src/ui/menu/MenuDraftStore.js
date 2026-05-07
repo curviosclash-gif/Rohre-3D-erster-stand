@@ -53,6 +53,7 @@ function createSessionDraftSnapshot(settings, sessionType) {
         gameMode: String(source.gameMode || defaults.gameMode),
         numBots: Number.isFinite(Number(source.numBots)) ? Number(source.numBots) : defaults.numBots,
         botDifficulty: String(source.botDifficulty || defaults.botDifficulty).toUpperCase(),
+        botPolicyStrategy: normalizeString(source.botPolicyStrategy, defaults.botPolicyStrategy || 'auto'),
         winsNeeded: Number.isFinite(Number(source.winsNeeded)) ? Number(source.winsNeeded) : defaults.winsNeeded,
         autoRoll: typeof source.autoRoll === 'boolean' ? source.autoRoll : defaults.autoRoll,
         portalsEnabled: typeof source.portalsEnabled === 'boolean' ? source.portalsEnabled : defaults.portalsEnabled,
@@ -73,6 +74,7 @@ function applySnapshotToSettings(settings, snapshot) {
     settings.gameMode = String(snapshot.gameMode || settings.gameMode || defaults.gameMode);
     settings.numBots = Number.isFinite(Number(snapshot.numBots)) ? Number(snapshot.numBots) : settings.numBots;
     settings.botDifficulty = String(snapshot.botDifficulty || settings.botDifficulty || defaults.botDifficulty).toUpperCase();
+    settings.botPolicyStrategy = normalizeString(snapshot.botPolicyStrategy, settings.botPolicyStrategy || defaults.botPolicyStrategy || 'auto');
     settings.winsNeeded = Number.isFinite(Number(snapshot.winsNeeded)) ? Number(snapshot.winsNeeded) : settings.winsNeeded;
     settings.autoRoll = typeof snapshot.autoRoll === 'boolean' ? snapshot.autoRoll : defaults.autoRoll;
     settings.portalsEnabled = typeof snapshot.portalsEnabled === 'boolean' ? snapshot.portalsEnabled : defaults.portalsEnabled;

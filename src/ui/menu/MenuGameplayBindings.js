@@ -241,6 +241,26 @@ export function setupMenuGameplayBindings(ctx) {
         });
     }
 
+    if (ui.botPolicyStrategySelect) {
+        bind(ui.botPolicyStrategySelect, 'change', () => {
+            const value = String(ui.botPolicyStrategySelect.value || '').trim().toLowerCase();
+            const settingsManager = ctx.game?.settingsManager || null;
+            const result = typeof settingsManager?.setBotPolicyStrategy === 'function'
+                ? settingsManager.setBotPolicyStrategy(settings, value)
+                : null;
+            if (result && result.success) {
+                emitSettingsChangedImmediate(result.changedKeys.length > 0
+                    ? result.changedKeys
+                    : [keys.BOTS_POLICY_STRATEGY]);
+                return;
+            }
+            settings.botPolicyStrategy = ['auto', 'heuristic', 'rule-based', 'bridge'].includes(value)
+                ? value
+                : 'auto';
+            emitSettingsChangedImmediate([keys.BOTS_POLICY_STRATEGY]);
+        });
+    }
+
     bind(ui.winSlider, 'input', () => {
         settings.winsNeeded = clamp(parseInt(ui.winSlider.value, 10), sessionLimits.winsNeeded.min, sessionLimits.winsNeeded.max);
         queueInputSettingsChanged([keys.RULES_WINS_NEEDED]);

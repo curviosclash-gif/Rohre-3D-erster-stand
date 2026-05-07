@@ -138,6 +138,7 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
         mapKey: 'standard',
         numBots: 1,
         botDifficulty: 'NORMAL',
+        botPolicyStrategy: 'auto',
         winsNeeded: 5,
         autoRoll: true,
         portalsEnabled: true,

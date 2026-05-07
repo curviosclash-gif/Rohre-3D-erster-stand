@@ -97,6 +97,7 @@ export function createGameUiRefs(doc = document) {
         botSlider: doc.getElementById('bot-count'),
         botLabel: doc.getElementById('bot-count-label'),
         botDifficultySelect: doc.getElementById('bot-difficulty'),
+        botPolicyStrategySelect: doc.getElementById('bot-policy-strategy'),
         winSlider: doc.getElementById('win-count'),
         winLabel: doc.getElementById('win-count-label'),
         autoRollToggle: doc.getElementById('auto-roll-toggle'),

@@ -405,6 +405,7 @@ export class UIManager {
         syncRangeInput(ui.botSlider, settings.numBots, this._runtimeSettingLimits.session.numBots, settings.numBots);
         ui.botLabel.textContent = settings.numBots;
         if (ui.botDifficultySelect) ui.botDifficultySelect.value = settings.botDifficulty;
+        if (ui.botPolicyStrategySelect) ui.botPolicyStrategySelect.value = settings.botPolicyStrategy || 'auto';
     }
 
     syncRules(settings = this.settings) {
