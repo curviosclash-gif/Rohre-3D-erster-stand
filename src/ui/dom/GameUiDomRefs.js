@@ -19,7 +19,7 @@ function defineLazyUiRef(target, key, resolver) {
 }
 
 export function createGameUiRefs(doc = document) {
-    const level4CloseButton = doc.getElementById('btn-close-level4') || doc.getElementById('btn-level4-close');
+    const level4CloseButton = doc.getElementById('btn-close-level4');
     const ui = {
         mainMenu: doc.getElementById('main-menu'),
         hud: doc.getElementById('hud'),
@@ -241,8 +241,6 @@ export function createGameUiRefs(doc = document) {
         level4ResetButton: doc.getElementById('btn-level4-reset'),
         level4SectionTabs: null,
         level4SectionPanels: null,
-        level4Status: doc.getElementById('level4-status'),
-        startSetupRoot: doc.getElementById('start-setup'),
         menuSelectionSummary: doc.getElementById('menu-selection-summary'),
         startRail: doc.querySelector('.start-rail'),
         vehicleSelectP1: doc.getElementById('vehicle-select-p1'),
@@ -276,7 +274,6 @@ export function createGameUiRefs(doc = document) {
         developerTrainingAutoStepsInput: doc.getElementById('developer-training-auto-steps-input'),
         developerTrainingBridgeModeSelect: doc.getElementById('developer-training-bridge-mode-select'),
         developerTrainingTimeoutMsInput: doc.getElementById('developer-training-timeout-ms-input'),
-        vehicleEditorStatus: doc.getElementById('vehicle-editor-status'),
         openVehicleEditorButton: doc.getElementById('btn-open-vehicle-editor'),
     };
 

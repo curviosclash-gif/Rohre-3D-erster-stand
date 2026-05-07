@@ -1,4 +1,7 @@
-import { createMenuConfigSharePayloadDefaults } from './MenuDefaultsEditorConfig.js';
+import {
+    createMenuConfigSharePayloadDefaults,
+    createMenuLocalSettingsDefaults,
+} from './MenuDefaultsEditorConfig.js';
 import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
 
 export const MENU_CONFIG_SHARE_CONTRACT_VERSION = 'menu-config-share.v1';
@@ -51,10 +54,21 @@ function createLegacyImportWarning() {
 function createSharePayload(settings) {
     const source = settings && typeof settings === 'object' ? settings : {};
     const defaults = createMenuConfigSharePayloadDefaults();
+    const localDefaults = createMenuLocalSettingsDefaults();
     return {
         sessionType: sanitizeString(source?.localSettings?.sessionType, defaults.sessionType),
         modePath: sanitizeString(source?.localSettings?.modePath, defaults.modePath),
         themeMode: sanitizeString(source?.localSettings?.themeMode, defaults.themeMode),
+        shadowQuality: source?.localSettings?.shadowQuality ?? localDefaults.shadowQuality,
+        startSetup: {
+            arcadeGhostDuelMode: sanitizeString(
+                source?.localSettings?.startSetup?.arcadeGhostDuelMode,
+                localDefaults.startSetup.arcadeGhostDuelMode
+            ),
+            arcadeGhostTrailCollisionEnabled: typeof source?.localSettings?.startSetup?.arcadeGhostTrailCollisionEnabled === 'boolean'
+                ? source.localSettings.startSetup.arcadeGhostTrailCollisionEnabled
+                : localDefaults.startSetup.arcadeGhostTrailCollisionEnabled,
+        },
         mode: source.mode === '2p' ? '2p' : defaults.mode,
         gameMode: sanitizeString(source.gameMode, defaults.gameMode),
         mapKey: sanitizeString(source.mapKey, defaults.mapKey),
@@ -113,6 +127,14 @@ export function applyMenuConfigPayload(settings, payload) {
     settings.localSettings.sessionType = sanitizeString(payload.sessionType, settings.localSettings.sessionType || defaults.sessionType);
     settings.localSettings.modePath = sanitizeString(payload.modePath, settings.localSettings.modePath || defaults.modePath);
     settings.localSettings.themeMode = sanitizeString(payload.themeMode, settings.localSettings.themeMode || defaults.themeMode);
+    const localDefaults = createMenuLocalSettingsDefaults();
+    settings.localSettings.shadowQuality = payload.shadowQuality ?? settings.localSettings.shadowQuality ?? localDefaults.shadowQuality;
+    settings.localSettings.startSetup = {
+        ...(settings.localSettings.startSetup && typeof settings.localSettings.startSetup === 'object'
+            ? settings.localSettings.startSetup
+            : deepClone(localDefaults.startSetup)),
+        ...(payload.startSetup && typeof payload.startSetup === 'object' ? payload.startSetup : {}),
+    };
     return true;
 }
 

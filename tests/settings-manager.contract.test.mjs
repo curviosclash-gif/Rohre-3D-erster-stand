@@ -9,9 +9,11 @@ import { SettingsStore } from '../src/ui/SettingsStore.js';
 import { STORAGE_KEYS } from '../src/ui/StorageKeys.js';
 import {
     applyMenuConfigPayload,
+    exportMenuConfigAsJson,
     parseMenuConfigImportInput,
 } from '../src/ui/menu/MenuConfigShareOps.js';
 import { diffSettingsSnapshots } from '../src/core/settings/SettingsDiffOps.js';
+import { MenuDraftStore } from '../src/ui/menu/MenuDraftStore.js';
 import { MENU_TEXT_CATALOG } from '../src/ui/menu/MenuTextCatalog.js';
 
 function createMemoryStoragePlatform(initialRecords = {}, options = {}) {
@@ -296,6 +298,40 @@ test('V103 menu config import parsing is pure and apply owns mutation', () => {
     assert.equal(applyMenuConfigPayload(settings, parsed.payload), true);
     assert.equal(settings.mapKey, 'arena_simple');
     assert.equal(settings.localSettings.sessionType, 'splitscreen');
+});
+
+test('Menu config share preserves local and media runtime fields', () => {
+    const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+    const source = manager.createDefaultSettings();
+    source.localSettings.shadowQuality = 1;
+    source.localSettings.startSetup.arcadeGhostDuelMode = 'self_longest_ghost';
+    source.localSettings.startSetup.arcadeGhostTrailCollisionEnabled = true;
+    source.recording.profile = 'youtube_short';
+    source.recording.hudMode = 'with_hud';
+    source.cameraPerspective.normal = 'cinematic_action';
+    source.cameraPerspective.reduceMotion = false;
+    source.cameraPerspective.speedFovIntensity = 0.4;
+
+    const exported = JSON.parse(exportMenuConfigAsJson(source));
+    const target = manager.createDefaultSettings();
+    target.localSettings.shadowQuality = 3;
+    target.localSettings.startSetup.arcadeGhostDuelMode = 'off';
+    target.localSettings.startSetup.arcadeGhostTrailCollisionEnabled = false;
+    target.recording.profile = 'standard';
+    target.recording.hudMode = 'clean';
+    target.cameraPerspective.normal = 'classic';
+    target.cameraPerspective.reduceMotion = true;
+    target.cameraPerspective.speedFovIntensity = 1;
+
+    assert.equal(applyMenuConfigPayload(target, exported.payload), true);
+    assert.equal(target.localSettings.shadowQuality, 1);
+    assert.equal(target.localSettings.startSetup.arcadeGhostDuelMode, 'self_longest_ghost');
+    assert.equal(target.localSettings.startSetup.arcadeGhostTrailCollisionEnabled, true);
+    assert.equal(target.recording.profile, 'youtube_short');
+    assert.equal(target.recording.hudMode, 'with_hud');
+    assert.equal(target.cameraPerspective.normal, 'cinematic_action');
+    assert.equal(target.cameraPerspective.reduceMotion, false);
+    assert.equal(target.cameraPerspective.speedFovIntensity, 0.4);
 });
 
 test('V103 SettingsManager previewMenuConfigImport does not mutate source settings and returns changes', () => {
@@ -611,6 +647,100 @@ test('V103 Settings session draft facade preserves store failure reasons', () =>
     assert.equal(result.reason, 'quota_exceeded');
     assert.deepEqual(result.changedKeys, []);
     assert.equal(result.metadata.persistedDraftState, false);
+});
+
+test('Menu session drafts preserve local, recording and camera runtime fields', () => {
+    const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+    const settings = manager.createDefaultSettings();
+    settings.localSettings.sessionType = 'single';
+    settings.localSettings.shadowQuality = 1;
+    settings.localSettings.startSetup.arcadeGhostDuelMode = 'self_longest_ghost';
+    settings.localSettings.startSetup.arcadeGhostTrailCollisionEnabled = true;
+    settings.gameplay.nextCheckpointGlowIntensity = 1.2;
+    settings.recording.profile = 'youtube_short';
+    settings.recording.hudMode = 'with_hud';
+    settings.cameraPerspective.normal = 'cinematic_action';
+    settings.cameraPerspective.reduceMotion = false;
+    settings.cameraPerspective.speedFovIntensity = 0.35;
+
+    const store = new MenuDraftStore({ storagePlatform: createMemoryStoragePlatform() });
+    assert.equal(store.saveDraft('single', settings).success, true);
+
+    settings.localSettings.shadowQuality = 3;
+    settings.localSettings.startSetup.arcadeGhostDuelMode = 'off';
+    settings.localSettings.startSetup.arcadeGhostTrailCollisionEnabled = false;
+    settings.gameplay.nextCheckpointGlowIntensity = 0.5;
+    settings.recording.profile = 'standard';
+    settings.recording.hudMode = 'clean';
+    settings.cameraPerspective.normal = 'classic';
+    settings.cameraPerspective.reduceMotion = true;
+    settings.cameraPerspective.speedFovIntensity = 1;
+
+    const applyResult = store.applyDraft(settings, 'single');
+
+    assert.equal(applyResult.success, true);
+    assert.equal(settings.localSettings.shadowQuality, 1);
+    assert.equal(settings.localSettings.startSetup.arcadeGhostDuelMode, 'self_longest_ghost');
+    assert.equal(settings.localSettings.startSetup.arcadeGhostTrailCollisionEnabled, true);
+    assert.equal(settings.gameplay.nextCheckpointGlowIntensity, 1.2);
+    assert.equal(settings.recording.profile, 'youtube_short');
+    assert.equal(settings.recording.hudMode, 'with_hud');
+    assert.equal(settings.cameraPerspective.normal, 'cinematic_action');
+    assert.equal(settings.cameraPerspective.reduceMotion, false);
+    assert.equal(settings.cameraPerspective.speedFovIntensity, 0.35);
+});
+
+test('Menu presets capture and apply local, recording and camera runtime fields', () => {
+    withMockLocalStorage(() => {
+        const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+        const settings = manager.createDefaultSettings();
+        const accessContext = createOwnerAccessContext();
+        settings.localSettings.shadowQuality = 1;
+        settings.localSettings.startSetup.arcadeGhostDuelMode = 'self_longest_ghost';
+        settings.localSettings.startSetup.arcadeGhostTrailCollisionEnabled = true;
+        settings.gameplay.nextCheckpointGlowIntensity = 1.25;
+        settings.recording.profile = 'youtube_short';
+        settings.recording.hudMode = 'with_hud';
+        settings.cameraPerspective.normal = 'cinematic_action';
+        settings.cameraPerspective.reduceMotion = false;
+        settings.cameraPerspective.speedFovIntensity = 0.45;
+
+        const saveResult = manager.saveMenuPreset(settings, {
+            kind: 'open',
+            id: 'media-runtime-preset',
+            name: 'Media Runtime Preset',
+            timestamp: '2026-05-07T00:00:00.000Z',
+        }, accessContext);
+        assert.equal(saveResult.success, true);
+
+        settings.localSettings.shadowQuality = 3;
+        settings.localSettings.startSetup.arcadeGhostDuelMode = 'off';
+        settings.localSettings.startSetup.arcadeGhostTrailCollisionEnabled = false;
+        settings.gameplay.nextCheckpointGlowIntensity = 0.75;
+        settings.recording.profile = 'standard';
+        settings.recording.hudMode = 'clean';
+        settings.cameraPerspective.normal = 'classic';
+        settings.cameraPerspective.reduceMotion = true;
+        settings.cameraPerspective.speedFovIntensity = 1;
+
+        const applyResult = manager.applyMenuPreset(settings, 'media-runtime-preset', accessContext);
+
+        assert.equal(applyResult.success, true);
+        assert.ok(applyResult.changedKeys.includes(SETTINGS_CHANGE_KEYS.LOCAL_SHADOW_QUALITY));
+        assert.ok(applyResult.changedKeys.includes(SETTINGS_CHANGE_KEYS.ARCADE_GHOST_DUEL_MODE));
+        assert.ok(applyResult.changedKeys.includes(SETTINGS_CHANGE_KEYS.GAMEPLAY_NEXT_CHECKPOINT_GLOW_INTENSITY));
+        assert.ok(applyResult.changedKeys.includes(SETTINGS_CHANGE_KEYS.RECORDING_PROFILE));
+        assert.ok(applyResult.changedKeys.includes(SETTINGS_CHANGE_KEYS.CAMERA_PERSPECTIVE_NORMAL));
+        assert.equal(settings.localSettings.shadowQuality, 1);
+        assert.equal(settings.localSettings.startSetup.arcadeGhostDuelMode, 'self_longest_ghost');
+        assert.equal(settings.localSettings.startSetup.arcadeGhostTrailCollisionEnabled, true);
+        assert.equal(settings.gameplay.nextCheckpointGlowIntensity, 1.25);
+        assert.equal(settings.recording.profile, 'youtube_short');
+        assert.equal(settings.recording.hudMode, 'with_hud');
+        assert.equal(settings.cameraPerspective.normal, 'cinematic_action');
+        assert.equal(settings.cameraPerspective.reduceMotion, false);
+        assert.equal(settings.cameraPerspective.speedFovIntensity, 0.45);
+    });
 });
 
 test('Settings diff maps uppercase player slot paths to UI change keys', () => {

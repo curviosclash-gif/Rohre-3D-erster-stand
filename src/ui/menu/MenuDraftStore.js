@@ -1,5 +1,8 @@
 import { MENU_SESSION_TYPES } from './MenuStateContracts.js';
-import { createMenuConfigSharePayloadDefaults } from './MenuDefaultsEditorConfig.js';
+import {
+    createMenuConfigSharePayloadDefaults,
+    createMenuLocalSettingsDefaults,
+} from './MenuDefaultsEditorConfig.js';
 import {
     LEGACY_STORAGE_KEYS,
     STORAGE_KEYS,
@@ -42,6 +45,7 @@ function createSessionDraftSnapshot(settings, sessionType) {
         ? source.localSettings
         : {};
     const defaults = createMenuConfigSharePayloadDefaults();
+    const localDefaults = createMenuLocalSettingsDefaults();
 
     return {
         sessionType: normalizeSessionType(sessionType, localSettings.sessionType || defaults.sessionType || MENU_SESSION_TYPES.SINGLE),
@@ -49,6 +53,8 @@ function createSessionDraftSnapshot(settings, sessionType) {
         mode: resolveModeFromSessionType(sessionType),
         modePath: normalizeString(localSettings.modePath, defaults.modePath),
         themeMode: normalizeString(localSettings.themeMode, defaults.themeMode),
+        shadowQuality: localSettings.shadowQuality ?? localDefaults.shadowQuality,
+        startSetup: cloneObject(localSettings.startSetup, localDefaults.startSetup),
         mapKey: String(source.mapKey || defaults.mapKey),
         gameMode: String(source.gameMode || defaults.gameMode),
         numBots: Number.isFinite(Number(source.numBots)) ? Number(source.numBots) : defaults.numBots,
@@ -62,6 +68,8 @@ function createSessionDraftSnapshot(settings, sessionType) {
             respawnEnabled: !!(source?.hunt?.respawnEnabled ?? defaults?.hunt?.respawnEnabled),
         },
         gameplay: cloneObject(source.gameplay, defaults.gameplay),
+        recording: cloneObject(source.recording, defaults.recording),
+        cameraPerspective: cloneObject(source.cameraPerspective, defaults.cameraPerspective),
     };
 }
 
@@ -94,6 +102,14 @@ function applySnapshotToSettings(settings, snapshot) {
         ...(settings.gameplay && typeof settings.gameplay === 'object' ? settings.gameplay : cloneObject(defaults.gameplay, {})),
         ...cloneObject(snapshot.gameplay, defaults.gameplay),
     };
+    settings.recording = {
+        ...(settings.recording && typeof settings.recording === 'object' ? settings.recording : cloneObject(defaults.recording, {})),
+        ...cloneObject(snapshot.recording, defaults.recording),
+    };
+    settings.cameraPerspective = {
+        ...(settings.cameraPerspective && typeof settings.cameraPerspective === 'object' ? settings.cameraPerspective : cloneObject(defaults.cameraPerspective, {})),
+        ...cloneObject(snapshot.cameraPerspective, defaults.cameraPerspective),
+    };
 
     if (!settings.localSettings || typeof settings.localSettings !== 'object') {
         settings.localSettings = {};
@@ -109,6 +125,14 @@ function applySnapshotToSettings(settings, snapshot) {
     }
     settings.localSettings.modePath = normalizeString(snapshot.modePath, settings.localSettings.modePath || defaults.modePath);
     settings.localSettings.themeMode = normalizeString(snapshot.themeMode, settings.localSettings.themeMode || defaults.themeMode);
+    const localDefaults = createMenuLocalSettingsDefaults();
+    settings.localSettings.shadowQuality = snapshot.shadowQuality ?? settings.localSettings.shadowQuality ?? localDefaults.shadowQuality;
+    settings.localSettings.startSetup = {
+        ...(settings.localSettings.startSetup && typeof settings.localSettings.startSetup === 'object'
+            ? settings.localSettings.startSetup
+            : cloneObject(localDefaults.startSetup, {})),
+        ...cloneObject(snapshot.startSetup, localDefaults.startSetup),
+    };
     return true;
 }
 
