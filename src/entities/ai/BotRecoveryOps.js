@@ -228,8 +228,8 @@ export function updateRecovery(bot, dt, player, arena, allPlayers) {
 
     bot._resetInput(bot.currentInput);
     bot.currentInput.boost = shouldBoostRecovery(bot, player, arena, allPlayers);
-    if (bot.state.recoveryYaw > 0) bot.currentInput.yawRight = true;
-    else if (bot.state.recoveryYaw < 0) bot.currentInput.yawLeft = true;
+    if (bot.state.recoveryYaw > 0) bot.currentInput.yawLeft = true;
+    else if (bot.state.recoveryYaw < 0) bot.currentInput.yawRight = true;
 
     if (!planarMode) {
         if (bot.state.recoveryPitch > 0) bot.currentInput.pitchUp = true;

@@ -194,7 +194,7 @@ function sampleWallRatios(player, runtimeContext, radius) {
     ratios[WALL_INDEX_LEFT] = sampleWallDistanceRatio(
         arena,
         player.position,
-        TMP_LEFT.copy(TMP_RIGHT).multiplyScalar(-1),
+        TMP_RIGHT,
         radius,
         wallProbeDistance,
         resolveWallProbeSteps(runtimeContext, previousLeft)
@@ -202,7 +202,7 @@ function sampleWallRatios(player, runtimeContext, radius) {
     ratios[WALL_INDEX_RIGHT] = sampleWallDistanceRatio(
         arena,
         player.position,
-        TMP_RIGHT,
+        TMP_LEFT.copy(TMP_RIGHT).multiplyScalar(-1),
         radius,
         wallProbeDistance,
         resolveWallProbeSteps(runtimeContext, previousRight)

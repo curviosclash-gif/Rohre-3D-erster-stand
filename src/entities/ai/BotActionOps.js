@@ -6,8 +6,8 @@ export function applyDecisionToInput(bot) {
     const input = bot.currentInput;
     bot._resetInput(input);
 
-    if (bot._decision.yaw > 0) input.yawRight = true;
-    else if (bot._decision.yaw < 0) input.yawLeft = true;
+    if (bot._decision.yaw > 0) input.yawLeft = true;
+    else if (bot._decision.yaw < 0) input.yawRight = true;
 
     if (bot._decision.pitch > 0) input.pitchUp = true;
     else if (bot._decision.pitch < 0) input.pitchDown = true;
