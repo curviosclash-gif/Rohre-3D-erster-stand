@@ -354,6 +354,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `tests/knowledge-graph-build.contract.test.mjs` baut den Graphen jetzt explizit gegen dieselben Critical-Path-Anforderungen und haertet dabei insbesondere die `SettingsManager`-Pflichtreferenz, Mehrfachpfade wie `GameplayConfigContract` und die `validated_by`-/`reads_config`-Verknuepfungen gegen Drift.
 - Der aktive Planstand springt damit von `107.1` auf `107.2`; naechste offene Subphase ist `107.2.1` fuer Builder-Runtime-/State-/Test-Relationen.
 
+## Stand-Snapshot 2026-05-07 (Subphase `V107 107.3.1`)
+
+- `107.3.1` ist geschlossen: `scripts/check-knowledge-graph.mjs` prueft Mapping-Runtime-Knoten jetzt gezielt auf produktive Runtime-/State-/Config-/Event-/Test-Relationen, kritische Runtime-Knoten ohne `validated_by`-Testkante und unbekannte Mapping-/Dateireferenzen.
+- Der fokussierte Contract-Test haertet die neuen Fehlercodes `KG_RUNTIME_ORPHAN`, `KG_RUNTIME_VALIDATION_MISSING`, `KG_UNKNOWN_REFERENCE` und `KG_UNKNOWN_FILE_REFERENCE`; `node --test tests/knowledge-graph-build.contract.test.mjs` lief mit 15/15 PASS.
+- `npm run graph:check` erreicht die neuen V107-Regeln, bleibt im aktuellen Dirty-Workspace aber an fremden Intake-/Scope-Drifts blockiert (`GRAPH_DIFF`, `COVERAGE_DIFF`, V113-Scope-Kollisionen). Naechste V107-Subphase ist `107.3.2` fuer Coverage-Gate-Regeln.
+
 ## Commit-Notizen 2026-05-06
 
 - `43a510fe` `fix: harden parcours runtime feedback and sync flows`: Parcours-Feedback, Ring-/Minimap-Zustand und Start-Setup-Sync wurden gemeinsam gehoben, damit Branch-/Checkpoint-Fortschritt im Runtime-, UI- und Testpfad denselben Zustand lesen und der Nutzer keine widerspruechlichen Signale zwischen Overlay, Audio und Replay-Fallback bekommt.
