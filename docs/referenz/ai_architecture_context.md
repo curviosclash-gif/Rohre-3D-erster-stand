@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-05-07
+Stand: 2026-05-08
 
 ## 1. Architekturparadigma
 
@@ -851,6 +851,8 @@ Dead-Code-/Legacy-Einordnung (V104.1.3/1.4):
 - Testauswahl ueber `.agents/test_mapping.md`
 - Plan-/Governance-Leseweg bleibt: zuerst `docs/Umsetzungsplan.md` (Master-Index), danach blockbezogene Details in `docs/plaene/aktiv/VXX.md`.
 - Fuer Abhaengigkeits-, Scope- und Surface-Fragen dient `docs/generated/knowledge-graph.json` als sekundaere Query-Schicht; bevorzugte Abfragen laufen ueber `node scripts/query-knowledge-graph.mjs open-deps <BLOCK_ID> --json`, `scope-collisions` und `surfaces-for-file <PATH> --json`.
+- Fuer Runtime-Diagnosen dient derselbe Wissensgraph als erster Leseweg vor Volltextsuche: `node scripts/query-knowledge-graph.mjs impact-for-file <PATH> --json` zeigt Datei-, Runtime-, State-, Config- und Test-Kontext; `node scripts/query-knowledge-graph.mjs event-flow spawn|combat-hit|round-end|settings` zeigt kritische Desktop-Flows mit Systemen, States, Configs, Tests und Kontextkanten.
+- Fuer Graph-Gesundheit und Testabdeckung sind die Standardfragen `node scripts/query-knowledge-graph.mjs critical-path-health`, `node scripts/query-knowledge-graph.mjs untested-systems [CRITICAL_PATH] --json` und `node scripts/query-knowledge-graph.mjs coverage-report`; `graph:check` validiert den generierten Coverage-Report.
 - Neue Feature-Arbeit waehlt immer den leichtesten passenden Layer: `node-contract` vor `desktop-smoke`, `desktop-e2e` nur fuer produktnahe Integrationen ueber den Smoke-Kern hinaus, `browser-compat` nur fuer Browser-Demo/Web-API-/Fallback-Scope und `heavy-diagnostic` nur fuer bestehende schwere Cluster oder Diagnosebedarf.
 - `desktop-smoke` ist das primaere Produktsignal fuer die Desktop-App; es deckt App-Boot, Menu, Matchstart, Input-Ankunft und Return-to-Menu ueber die echte Electron-Shell ab.
 - `desktop-e2e`-Reruns laufen bevorzugt ueber `node scripts/run-playwright-targeted-clusters.mjs <cluster-id...>`; standardmaessig bleiben nur `core-shell`, `core-platform`, `core-surface` und `core-runtime` im produktnahen Hauptpfad, waehrend `core-regressions` und `physics-*` bewusst `heavy-diagnostic` bleiben.

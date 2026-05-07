@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T11:22:47.492Z",
+  "generated_at": "2026-05-07T22:53:21.227Z",
   "locks": [
     {
       "person": "codex",
@@ -90,6 +90,9 @@
         "tools/graph-viewer/viewer.css",
         "data/contracts/knowledge-graph/**",
         "docs/referenz/ai_architecture_context.md",
+        "docs/referenz/ai_project_onboarding.md",
+        "docs/referenz/architektur_ausfuehrlich.md",
+        "docs/prozess/Dokumentationsstatus.md",
         ".agents/rules/token_efficiency_and_tools.md",
         ".agents/workflows/status.md",
         "tests/knowledge-graph-build.contract.test.mjs",
@@ -188,7 +191,7 @@
     {
       "person": "codex",
       "block_id": "V107",
-      "phase": "107.5.1",
+      "phase": "107.99",
       "scope_files": [
         "docs/generated/knowledge-graph.json",
         "docs/generated/knowledge-graph.coverage.json",
@@ -210,8 +213,8 @@
       ],
       "start_date": "2026-05-07",
       "target_completion": "2026-05-07",
-      "status": "in-progress",
-      "notes": ""
+      "status": "completed",
+      "notes": "V107 core graph, runtime query layer, coverage gate and workflow documentation closed"
     }
   ],
   "metadata": {

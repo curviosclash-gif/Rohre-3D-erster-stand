@@ -15,7 +15,7 @@ description: Token efficiency, file access, and tool usage (consolidated)
 - Antworten kurz halten - der User sieht den Diff.
 - Kein Plan-Mode fuer kleine Tasks - nur bei grossen Multi-Datei-Vorhaben.
 - Agent-Explore sparsam: Default `quick`/`medium`. `very thorough` nur auf User-Anfrage.
-- Graph-First fuer Planfragen: bei Abhaengigkeits-/Scope-/Surface-Fragen zuerst `docs/generated/knowledge-graph.json` oder `npm run graph:query` nutzen.
+- Graph-First fuer Plan- und Runtimefragen: bei Abhaengigkeits-/Scope-/Surface-Fragen zuerst `docs/generated/knowledge-graph.json` oder `npm run graph:query` nutzen; bei Runtime-Diagnosen zuerst `impact-for-file`, `event-flow`, `critical-path-health`, `untested-systems` oder `coverage-report` ueber `node scripts/query-knowledge-graph.mjs` pruefen.
 
 ## AI-Arbeitsleitplanken
 
@@ -31,7 +31,7 @@ description: Token efficiency, file access, and tool usage (consolidated)
 - Lesen: `Read` mit `offset`/`limit` fuer grosse Dateien statt `cat`/`head`/`tail`.
 - Bearbeiten: `Edit`/`Write` statt `sed`/`awk`.
 - Nur gezielte Abschnitte grosser Dateien laden; fuer `docs/plaene/aktiv/VXX.md` nur aktuelle + naechste Subphase lesen.
-- Query-Shortcuts fuer den Graph: `node scripts/query-knowledge-graph.mjs open-deps V81 --json`, `node scripts/query-knowledge-graph.mjs scope-collisions --json`, `node scripts/query-knowledge-graph.mjs surfaces-for-file src/core/main.js --json`.
+- Query-Shortcuts fuer den Graph: `node scripts/query-knowledge-graph.mjs open-deps V81 --json`, `node scripts/query-knowledge-graph.mjs scope-collisions --json`, `node scripts/query-knowledge-graph.mjs surfaces-for-file src/core/main.js --json`, `node scripts/query-knowledge-graph.mjs impact-for-file src/core/SettingsManager.js --json`, `node scripts/query-knowledge-graph.mjs event-flow spawn`, `node scripts/query-knowledge-graph.mjs critical-path-health`, `node scripts/query-knowledge-graph.mjs coverage-report`.
 
 ## Lese-Budget fuer `VXX.md`
 

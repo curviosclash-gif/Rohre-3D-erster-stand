@@ -130,12 +130,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1802,
-    "rawCoveredFileCount": 1446,
-    "rawCoveragePercent": 80.2,
-    "adjustedTrackedFileCount": 1540,
-    "adjustedCoveredFileCount": 1306,
-    "adjustedCoveragePercent": 84.8,
+    "trackedFileCount": 1807,
+    "rawCoveredFileCount": 1451,
+    "rawCoveragePercent": 80.3,
+    "adjustedTrackedFileCount": 1545,
+    "adjustedCoveredFileCount": 1311,
+    "adjustedCoveragePercent": 84.9,
     "uncoveredFileCount": 356,
     "uncoveredActiveFileCount": 234,
     "classifications": [
@@ -178,8 +178,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 911,
-        "coveredCount": 896
+        "count": 916,
+        "coveredCount": 901
       },
       {
         "classification": "product-docs",
@@ -13770,6 +13770,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V107",
         "V109",
         "V90"
       ],
@@ -14240,6 +14241,7 @@
       ],
       "scopeBlocks": [
         "BT93K",
+        "V107",
         "V89",
         "V91"
       ],
@@ -14255,10 +14257,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "BT93K"
+        "BT93K",
+        "V107"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -18958,6 +18962,25 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/bot-play-analysis.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/bot-validation-runner.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -22867,6 +22890,26 @@
       "excludeReason": null
     },
     {
+      "path": "src/core/settings/SettingsBotPolicyFacade.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B07",
+        "V85",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/core/settings/SettingsDefaultsFacade.js",
       "tracked": true,
       "coveredInCore": true,
@@ -23584,6 +23627,23 @@
     },
     {
       "path": "src/entities/ai/ClassicBridgePolicy.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V84"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/entities/ai/HeuristicBotPolicy.js",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -32536,6 +32596,28 @@
       "excludeReason": null
     },
     {
+      "path": "tests/electron-renderer-dist-drift.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "tests/game-mode-strategy.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -32712,6 +32794,28 @@
         "V87",
         "V88",
         "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/heuristic-bot-survival-regression.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",

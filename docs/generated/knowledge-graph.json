@@ -246,7 +246,7 @@
           "tests/persistence-version-migration.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 40,
+          "concreteCount": 41,
           "plannedCount": 0
         }
       }
@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 182,
+          "concreteCount": 185,
           "plannedCount": 0
         }
       }
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 445,
+          "concreteCount": 448,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2066,7 +2066,10 @@
           "docs/generated/knowledge-graph.schema.json",
           "docs/plaene/aktiv/V107.md",
           "docs/plaene/CHANGELOG.md",
+          "docs/prozess/Dokumentationsstatus.md",
           "docs/referenz/ai_architecture_context.md",
+          "docs/referenz/ai_project_onboarding.md",
+          "docs/referenz/architektur_ausfuehrlich.md",
           "scripts/build-knowledge-graph.mjs",
           "scripts/check-knowledge-graph.mjs",
           "scripts/export-knowledge-graph-view.mjs",
@@ -2077,7 +2080,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 14,
+          "concreteCount": 17,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -2209,7 +2212,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 108,
+          "concreteCount": 110,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2258,7 +2261,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 109,
+          "concreteCount": 111,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -3246,7 +3249,7 @@
           "src/state/**"
         ],
         "scopeResolution": {
-          "concreteCount": 260,
+          "concreteCount": 261,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3286,7 +3289,7 @@
           "tests/persistence-version-migration.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 182,
+          "concreteCount": 183,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3579,7 +3582,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 260,
+          "concreteCount": 261,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5939,7 +5942,7 @@
       "id": "V107.5",
       "type": "phase",
       "title": "Doku- und Workflow-Spiegelung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.5"
@@ -5949,7 +5952,7 @@
       "id": "V107.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.99"
@@ -16456,8 +16459,8 @@
     {
       "id": "V107.5.1",
       "type": "subphase",
-      "title": "`docs/referenz/ai_architecture_context.md` um den Runtime-Graph-Leseweg und Kernquery-Beispiele erweitern.",
-      "status": "open",
+      "title": "`docs/referenz/ai_architecture_context.md` um den Runtime-Graph-Leseweg und Kernquery-Beispiele erweitern. (abgeschlossen: 2026-05-08; evidence: Verifikationsabschnitt nennt jetzt `impact-for-file`, `event-flow`, `critical-path-health`, `untested-systems` und `coverage-report` als Runtime-Graph-Leseweg vor Volltextsuche)",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.5",
@@ -16467,8 +16470,8 @@
     {
       "id": "V107.5.2",
       "type": "subphase",
-      "title": "`.agents/rules/token_efficiency_and_tools.md` und `.agents/workflows/status.md` auf die neuen Query-Pfade spiegeln.",
-      "status": "open",
+      "title": "`.agents/rules/token_efficiency_and_tools.md` und `.agents/workflows/status.md` auf die neuen Query-Pfade spiegeln. (abgeschlossen: 2026-05-08; evidence: Token-Regel und Status-Workflow fuehren die V107-Kernqueries fuer Runtime-Diagnose, Health, Coverage und Event-Flows als Standardpfad)",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.5",
@@ -16478,8 +16481,8 @@
     {
       "id": "V107.99.1",
       "type": "subphase",
-      "title": "`npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen.",
-      "status": "open",
+      "title": "`npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-08; evidence: alle fuenf Kommandos PASS, `docs:sync` aktualisierte Freshness-Stempel und `docs:check` bestaetigte danach `updated=0`; `npm run gates:pre-commit` PASS inklusive Plan, Graph, Parcours und Docs)",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.99",
@@ -16489,8 +16492,8 @@
     {
       "id": "V107.99.2",
       "type": "subphase",
-      "title": "Kernqueries, kritische Pfade, Coverage-Evidence und `SettingManager`-Referenz sind dokumentiert und reproduzierbar.",
-      "status": "open",
+      "title": "Kernqueries, kritische Pfade, Coverage-Evidence und `SettingManager`-Referenz sind dokumentiert und reproduzierbar. (abgeschlossen: 2026-05-08; evidence: `node scripts/query-knowledge-graph.mjs critical-path-health` meldet Spawn, Combat/Hit, Round-End und Settings `ok`; `coverage-report` meldet `gate: pass`; `event-flow settings` zeigt `runtime:settings-manager` mit Config-/State-/Test-Kanten)",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.99",
@@ -35610,6 +35613,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
           "V109",
           "V90"
         ],
@@ -35938,6 +35942,7 @@
         ],
         "scopeBlocks": [
           "BT93K",
+          "V107",
           "V89",
           "V91"
         ],
@@ -35951,10 +35956,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "BT93K"
+          "BT93K",
+          "V107"
         ],
         "exists": true
       }
@@ -39969,6 +39976,23 @@
       }
     },
     {
+      "id": "scripts/bot-play-analysis.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "scripts/bot-validation-runner.mjs",
       "type": "file",
       "title": null,
@@ -43306,6 +43330,24 @@
       }
     },
     {
+      "id": "src/core/settings/SettingsBotPolicyFacade.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B07",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/core/settings/SettingsDefaultsFacade.js",
       "type": "file",
       "title": null,
@@ -43942,6 +43984,21 @@
     },
     {
       "id": "src/entities/ai/ClassicBridgePolicy.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V84"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/entities/ai/HeuristicBotPolicy.js",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -52074,6 +52131,26 @@
       }
     },
     {
+      "id": "tests/electron-renderer-dist-drift.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/game-mode-strategy.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -52236,6 +52313,26 @@
           "V87",
           "V88",
           "V89"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/heuristic-bot-survival-regression.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -56722,6 +56819,15 @@
     },
     {
       "from": "B07",
+      "to": "src/core/settings/SettingsBotPolicyFacade.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B07",
       "to": "src/core/settings/SettingsDefaultsFacade.js",
       "type": "scope",
       "hint": null,
@@ -58756,6 +58862,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/bot-play-analysis.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/bot-validation-runner.mjs",
       "type": "scope",
       "hint": null,
@@ -59431,6 +59546,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/electron-renderer-dist-drift.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/game-mode-strategy.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -59495,6 +59619,15 @@
     {
       "from": "B13",
       "to": "tests/helpers.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/heuristic-bot-survival-regression.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -67190,6 +67323,15 @@
     },
     {
       "from": "BT91",
+      "to": "scripts/bot-play-analysis.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "scripts/bot-validation-runner.mjs",
       "type": "scope",
       "hint": null,
@@ -67865,6 +68007,15 @@
     },
     {
       "from": "BT91",
+      "to": "tests/electron-renderer-dist-drift.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "tests/game-mode-strategy.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -67929,6 +68080,15 @@
     {
       "from": "BT91",
       "to": "tests/helpers.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "tests/heuristic-bot-survival-regression.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -96124,7 +96284,34 @@
     },
     {
       "from": "V107",
+      "to": "docs/prozess/Dokumentationsstatus.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "docs/referenz/ai_project_onboarding.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "docs/referenz/architektur_ausfuehrlich.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97556,6 +97743,15 @@
     },
     {
       "from": "V110",
+      "to": "tests/electron-renderer-dist-drift.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "tests/game-mode-strategy.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -97620,6 +97816,15 @@
     {
       "from": "V110",
       "to": "tests/helpers.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "tests/heuristic-bot-survival-regression.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98746,6 +98951,15 @@
     },
     {
       "from": "V111",
+      "to": "tests/electron-renderer-dist-drift.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
       "to": "tests/game-mode-strategy.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -98810,6 +99024,15 @@
     {
       "from": "V111",
       "to": "tests/helpers.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/heuristic-bot-survival-regression.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -116934,6 +117157,15 @@
     },
     {
       "from": "V84",
+      "to": "src/entities/ai/HeuristicBotPolicy.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
       "to": "src/entities/ai/HuntBridgePolicy.js",
       "type": "scope",
       "hint": null,
@@ -119493,6 +119725,15 @@
     {
       "from": "V85",
       "to": "src/core/replay/ReplayRecorder.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/core/settings/SettingsBotPolicyFacade.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -123909,6 +124150,15 @@
     {
       "from": "V91",
       "to": "src/core/runtime/GameRuntimeCoordinator.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/core/settings/SettingsBotPolicyFacade.js",
       "type": "scope",
       "hint": null,
       "attributes": {
