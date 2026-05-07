@@ -11,6 +11,7 @@ import {
     applyMenuConfigPayload,
     parseMenuConfigImportInput,
 } from '../src/ui/menu/MenuConfigShareOps.js';
+import { diffSettingsSnapshots } from '../src/core/settings/SettingsDiffOps.js';
 import { MENU_TEXT_CATALOG } from '../src/ui/menu/MenuTextCatalog.js';
 
 function createMemoryStoragePlatform(initialRecords = {}, options = {}) {
@@ -610,4 +611,26 @@ test('V103 Settings session draft facade preserves store failure reasons', () =>
     assert.equal(result.reason, 'quota_exceeded');
     assert.deepEqual(result.changedKeys, []);
     assert.equal(result.metadata.persistedDraftState, false);
+});
+
+test('Settings diff maps uppercase player slot paths to UI change keys', () => {
+    const before = {
+        invertPitch: { PLAYER_1: true, PLAYER_2: true },
+        cockpitCamera: { PLAYER_1: true, PLAYER_2: true },
+        vehicles: { PLAYER_1: 'ship5', PLAYER_2: 'ship8' },
+    };
+    const after = {
+        invertPitch: { PLAYER_1: false, PLAYER_2: true },
+        cockpitCamera: { PLAYER_1: true, PLAYER_2: false },
+        vehicles: { PLAYER_1: 'ship7', PLAYER_2: 'ship9' },
+    };
+
+    const diff = diffSettingsSnapshots(before, after);
+
+    assert.deepEqual(diff.changedKeys.sort(), [
+        SETTINGS_CHANGE_KEYS.RULES_COCKPIT_P2,
+        SETTINGS_CHANGE_KEYS.RULES_INVERT_P1,
+        SETTINGS_CHANGE_KEYS.VEHICLES_PLAYER_1,
+        SETTINGS_CHANGE_KEYS.VEHICLES_PLAYER_2,
+    ].sort());
 });
