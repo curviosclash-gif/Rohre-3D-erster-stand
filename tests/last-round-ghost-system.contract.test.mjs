@@ -63,6 +63,22 @@ function createPlayableClip() {
     };
 }
 
+test('LastRoundGhostSystem renders ghost trails in white independent of player color', () => {
+    const system = new LastRoundGhostSystem(createRendererStub());
+
+    assert.equal(system.playClip({
+        ...createPlayableClip(),
+        players: [{ idx: 0, color: 0x00aaff }],
+    }), true);
+
+    const trail = system._entries[0]?.trail;
+    assert.equal(trail?.color, 0xffffff);
+    assert.equal(trail?.material?.color?.getHex(), 0xffffff);
+    assert.equal(trail?.material?.emissive?.getHex(), 0xffffff);
+
+    system.dispose();
+});
+
 test('LastRoundGhostSystem normalizes broken time and pose data without destabilizing playback', () => {
     const system = new LastRoundGhostSystem(createRendererStub());
     const playable = system.playClip({

@@ -4,6 +4,7 @@ import { Trail } from './Trail.js';
 
 const SHARED_GHOST_GEOMETRIES = {};
 const GHOST_TRAIL_PLAYER_INDEX_OFFSET = 10000;
+const GHOST_TRAIL_COLOR = 0xffffff;
 
 function markSharedGeometry(geometry) {
     if (!geometry) return;
@@ -51,7 +52,7 @@ function createGhostTrail(renderer, playerMeta = {}, options = {}) {
         : null;
     const trailCollisionEnabled = !!collisionSource;
     const trailPlayerIndex = resolveGhostTrailPlayerIndex(playerIdx, trailCollisionEnabled);
-    const trail = new Trail(renderer, Number(playerMeta?.color) || 0xffffff, trailPlayerIndex, collisionSource);
+    const trail = new Trail(renderer, GHOST_TRAIL_COLOR, trailPlayerIndex, collisionSource);
     trail.clear();
     if (trail.mesh) {
         trail.mesh.name = `lastRoundGhostTrail-${playerIdx}`;
