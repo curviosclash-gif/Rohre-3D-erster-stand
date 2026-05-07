@@ -533,6 +533,28 @@ test('knowledge graph core runtime queries return stable JSON shapes', async () 
     assert.deepEqual(eventFlow.events.map((event) => event.id), ['event:round-end']);
     assert.ok(eventFlow.edges.some((edge) => edge.type === 'emits' && edge.from === 'runtime:round-outcome-system'));
     assert.ok(eventFlow.edges.some((edge) => edge.type === 'consumes' && edge.from === 'runtime:round-end-coordinator'));
+    assert.deepEqual(eventFlow.systems.map((node) => node.id), [
+        'runtime:round-end-coordinator',
+        'runtime:round-outcome-system',
+    ]);
+    assert.ok(eventFlow.states.some((node) => node.id === 'state:round-outcome'));
+    assert.ok(eventFlow.states.some((node) => node.id === 'state:round-end-overlay'));
+    assert.ok(eventFlow.tests.some((node) => node.id === 'test:runtime-regressions-round-end'));
+    assert.ok(eventFlow.contextEdges.some((edge) => edge.type === 'writes_state' && edge.to === 'state:round-outcome'));
+    assert.ok(eventFlow.contextEdges.some((edge) => edge.type === 'validated_by' && edge.to === 'test:runtime-regressions-round-end'));
+
+    const combatFlow = queryEventFlow(graph, 'combat-hit');
+    assert.ok(combatFlow.systems.some((node) => node.id === 'runtime:hunt-combat-system'));
+    assert.ok(combatFlow.states.some((node) => node.id === 'state:hunt-combat-lock-on'));
+    assert.ok(combatFlow.configs.some((node) => node.id === 'config:entity-runtime-config'));
+    assert.ok(combatFlow.tests.some((node) => node.id === 'test:physics-hunt-combat'));
+
+    const settingsFlow = queryEventFlow(graph, 'settings');
+    assert.equal(settingsFlow.events.length, 0);
+    assert.ok(settingsFlow.systems.some((node) => node.id === 'runtime:settings-manager'));
+    assert.ok(settingsFlow.configs.some((node) => node.id === 'config:runtime-config-builder'));
+    assert.ok(settingsFlow.tests.some((node) => node.id === 'test:settings-manager-contract'));
+    assert.ok(settingsFlow.contextEdges.some((edge) => edge.type === 'validated_by' && edge.to === 'test:settings-manager-contract'));
 
     const untestedSystems = queryUntestedSystems(graph, 'spawn');
     assert.equal(untestedSystems.query, 'untested-systems');

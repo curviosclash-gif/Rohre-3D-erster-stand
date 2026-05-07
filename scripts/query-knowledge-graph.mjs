@@ -17,6 +17,14 @@ const RUNTIME_QUERY_EDGE_TYPES = new Set([
     'writes_state',
     'validated_by',
 ]);
+const EVENT_FLOW_CONTEXT_EDGE_TYPES = new Set([
+    'emits',
+    'consumes',
+    'reads_config',
+    'reads_state',
+    'writes_state',
+    'validated_by',
+]);
 
 function normalizePath(value) {
     return String(value || '')
@@ -368,21 +376,46 @@ function queryEventFlow(graph, selector) {
         .map(nodeSummary)
         .filter(Boolean);
     const eventIds = new Set(eventNodes.map((node) => node.id));
+    const selectedCriticalPaths = criticalPathFilter
+        ? [criticalPathFilter]
+        : Array.from(new Set(eventNodes.flatMap((node) => node.criticalPaths))).sort((left, right) => left.localeCompare(right));
+    const selectedPathNodeIds = new Set(
+        nodes
+            .filter((node) => selectedCriticalPaths.some((criticalPath) => nodeMatchesCriticalPath(node, criticalPath)))
+            .filter((node) => RUNTIME_QUERY_NODE_TYPES.has(node.type))
+            .map((node) => node.id)
+    );
     const flowEdges = edges
         .filter((edge) => (edge.type === 'emits' || edge.type === 'consumes') && eventIds.has(edge.to))
         .map((edge) => edgeSummary(edge, nodeById));
+    for (const edge of flowEdges) {
+        selectedPathNodeIds.add(edge.from);
+        selectedPathNodeIds.add(edge.to);
+    }
+    const selectedPathNodes = Array.from(selectedPathNodeIds)
+        .map((nodeId) => nodeById.get(nodeId))
+        .filter((node) => node && RUNTIME_QUERY_NODE_TYPES.has(node.type));
+    const contextEdges = edges
+        .filter((edge) => EVENT_FLOW_CONTEXT_EDGE_TYPES.has(edge.type))
+        .filter((edge) => selectedPathNodeIds.has(edge.from) && selectedPathNodeIds.has(edge.to))
+        .map((edge) => edgeSummary(edge, nodeById));
 
-    const systems = Array.from(new Set(flowEdges.map((edge) => edge.from)))
-        .map((nodeId) => nodeSummary(nodeById.get(nodeId)))
-        .filter(Boolean);
+    const systems = selectedPathNodes.filter((node) => node.type === 'runtime').map(nodeSummary).filter(Boolean);
+    const states = selectedPathNodes.filter((node) => node.type === 'state').map(nodeSummary).filter(Boolean);
+    const configs = selectedPathNodes.filter((node) => node.type === 'config').map(nodeSummary).filter(Boolean);
+    const tests = selectedPathNodes.filter((node) => node.type === 'test').map(nodeSummary).filter(Boolean);
 
     return {
         query: 'event-flow',
         selector: normalizedSelector,
-        criticalPath: criticalPathFilter || null,
+        criticalPath: criticalPathFilter || selectedCriticalPaths[0] || null,
         events: sortNodeSummaries(eventNodes),
         systems: sortNodeSummaries(systems),
+        states: sortNodeSummaries(states),
+        configs: sortNodeSummaries(configs),
+        tests: sortNodeSummaries(tests),
         edges: sortEdgeSummaries(flowEdges),
+        contextEdges: sortEdgeSummaries(contextEdges),
     };
 }
 
@@ -674,7 +707,9 @@ function printText(result) {
 
     if (result.query === 'event-flow') {
         process.stdout.write(`event-flow ${result.selector}\n`);
-        if (result.events.length === 0) {
+        const contextEdges = (result.contextEdges || [])
+            .filter((edge) => edge.type !== 'emits' && edge.type !== 'consumes');
+        if (result.events.length === 0 && contextEdges.length === 0) {
             process.stdout.write('- none\n');
             return;
         }
@@ -683,6 +718,12 @@ function printText(result) {
             const eventEdges = result.edges.filter((edge) => edge.to === event.id);
             for (const edge of eventEdges) {
                 process.stdout.write(`  - ${edge.type}: ${edge.from}\n`);
+            }
+        }
+        if (contextEdges.length > 0) {
+            process.stdout.write('context\n');
+            for (const edge of contextEdges) {
+                process.stdout.write(`- ${edge.type}: ${edge.from} -> ${edge.to}\n`);
             }
         }
         return;
