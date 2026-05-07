@@ -9,6 +9,7 @@ import {
     normalizeBotPolicyType,
 } from './BotPolicyTypes.js';
 import { RuleBasedBotPolicy } from './RuleBasedBotPolicy.js';
+import { HeuristicBotPolicy } from './HeuristicBotPolicy.js';
 import { HuntBotPolicy } from '../../hunt/HuntBotPolicy.js';
 import { ClassicBridgePolicy } from './ClassicBridgePolicy.js';
 import { HuntBridgePolicy } from './HuntBridgePolicy.js';
@@ -37,6 +38,7 @@ export class BotPolicyRegistry {
         this._factories = new Map();
         this._creationLogCache = new Set();
         this.register(BOT_POLICY_TYPES.RULE_BASED, (options) => new RuleBasedBotPolicy(options));
+        this.register(BOT_POLICY_TYPES.HEURISTIC, (options) => new HeuristicBotPolicy(options));
         this.register(BOT_POLICY_TYPES.HUNT, (options) => new HuntBotPolicy(options));
         this.register(BOT_POLICY_TYPES.CLASSIC_BRIDGE, createClassicBridgeFactory(BOT_POLICY_TYPES.CLASSIC_BRIDGE));
         this.register(BOT_POLICY_TYPES.HUNT_BRIDGE, createHuntBridgeFactory(BOT_POLICY_TYPES.HUNT_BRIDGE));

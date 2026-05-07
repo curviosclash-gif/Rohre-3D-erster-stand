@@ -513,6 +513,7 @@ test('V103 SettingsManager mutation facades expose a shared result contract', ()
         const presetResult = manager.saveMenuPreset(settings, { kind: 'open', name: 'Contract Preset' }, accessContext);
         const sessionResult = manager.switchSessionType(settings, 'splitscreen');
         const textResult = manager.setMenuTextOverride(textId, 'Contract override');
+        const botPolicyResult = manager.setBotPolicyStrategy(settings, 'heuristic');
 
         assert.equal(developerResult.success, true);
         assert.equal(developerResult.reason, 'updated');
@@ -534,7 +535,35 @@ test('V103 SettingsManager mutation facades expose a shared result contract', ()
         assert.equal(textResult.reason, 'updated');
         assert.deepEqual(textResult.changedKeys, [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES]);
         assert.equal(textResult.metadata?.textId, textId);
+
+        assert.equal(botPolicyResult.success, true);
+        assert.equal(botPolicyResult.reason, 'updated');
+        assert.deepEqual(botPolicyResult.changedKeys, [SETTINGS_CHANGE_KEYS.BOTS_POLICY_STRATEGY]);
+        assert.equal(botPolicyResult.metadata?.botPolicyStrategy, 'heuristic');
     });
+});
+
+test('V103 SettingsManager controls bot policy strategy with normalization', () => {
+    const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+    const settings = manager.createDefaultSettings();
+
+    const heuristicResult = manager.setBotPolicyStrategy(settings, 'pure-heuristic');
+    const invalidResult = manager.setBotPolicyStrategy(settings, 'not-a-policy');
+    const unchangedResult = manager.setBotPolicyStrategy(settings, 'heuristic');
+
+    assert.equal(heuristicResult.success, true);
+    assert.equal(heuristicResult.reason, 'updated');
+    assert.equal(settings.botPolicyStrategy, 'heuristic');
+    assert.deepEqual(heuristicResult.changedKeys, [SETTINGS_CHANGE_KEYS.BOTS_POLICY_STRATEGY]);
+
+    assert.equal(invalidResult.success, true);
+    assert.equal(invalidResult.reason, 'unchanged');
+    assert.equal(settings.botPolicyStrategy, 'heuristic');
+    assert.deepEqual(invalidResult.changedKeys, []);
+
+    assert.equal(unchangedResult.success, true);
+    assert.equal(unchangedResult.reason, 'unchanged');
+    assert.deepEqual(unchangedResult.changedKeys, []);
 });
 
 test('V103 SettingsManager mutation contracts preserve ownership and failure reasons', () => {

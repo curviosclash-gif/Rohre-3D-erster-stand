@@ -105,11 +105,16 @@ function resolveBotDifficulty(requestedDifficulty, botConfig) {
 
 export const BOT_POLICY_STRATEGIES = Object.freeze({
     RULE_BASED: 'rule-based',
+    HEURISTIC: 'heuristic',
     BRIDGE: 'bridge',
     AUTO: 'auto',
 });
 /** @type {Set<string>} */
 const BOT_POLICY_STRATEGY_SET = new Set(Object.values(BOT_POLICY_STRATEGIES));
+const BOT_POLICY_STRATEGY_ALIASES = Object.freeze({
+    heuristics: BOT_POLICY_STRATEGIES.HEURISTIC,
+    'pure-heuristic': BOT_POLICY_STRATEGIES.HEURISTIC,
+});
 
 /**
  * @param {unknown} strategy
@@ -121,7 +126,8 @@ export function normalizeBotPolicyStrategy(strategy, fallback = BOT_POLICY_STRAT
         ? String(fallback).trim().toLowerCase()
         : BOT_POLICY_STRATEGIES.AUTO;
     const candidate = typeof strategy === 'string' ? strategy.trim().toLowerCase() : '';
-    return BOT_POLICY_STRATEGY_SET.has(candidate) ? candidate : normalizedFallback;
+    const aliasedCandidate = BOT_POLICY_STRATEGY_ALIASES[candidate] || candidate;
+    return BOT_POLICY_STRATEGY_SET.has(aliasedCandidate) ? aliasedCandidate : normalizedFallback;
 }
 
 function resolveLocalBotPolicyType(huntModeActive) {
@@ -145,6 +151,9 @@ export function resolveBotPolicyType(
     }
     if (normalizedStrategy === BOT_POLICY_STRATEGIES.RULE_BASED) {
         return BOT_POLICY_TYPES.RULE_BASED;
+    }
+    if (normalizedStrategy === BOT_POLICY_STRATEGIES.HEURISTIC) {
+        return BOT_POLICY_TYPES.HEURISTIC;
     }
     // AUTO strategy: always use bridge policy types so that local checkpoint
     // auto-loading works. The bridge policy gracefully falls back to rule-based

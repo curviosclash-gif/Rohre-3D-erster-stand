@@ -4,6 +4,7 @@
 
 export const BOT_POLICY_TYPES = Object.freeze({
     RULE_BASED: 'rule-based',
+    HEURISTIC: 'heuristic',
     HUNT: 'hunt',
     CLASSIC_BRIDGE: 'classic-bridge',
     HUNT_BRIDGE: 'hunt-bridge',
@@ -31,6 +32,8 @@ const BRIDGE_POLICY_TYPE_SET = new Set([
 ]);
 const BOT_POLICY_TYPE_ALIASES = Object.freeze({
     bridge: BOT_POLICY_TYPES.CLASSIC_BRIDGE,
+    heuristics: BOT_POLICY_TYPES.HEURISTIC,
+    'pure-heuristic': BOT_POLICY_TYPES.HEURISTIC,
     normal: BOT_POLICY_TYPES.CLASSIC_3D,
     classic: BOT_POLICY_TYPES.CLASSIC_3D,
     fight: BOT_POLICY_TYPES.HUNT_3D,

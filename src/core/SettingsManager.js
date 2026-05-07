@@ -26,6 +26,7 @@ import { createSettingsPresetFacade } from './settings/SettingsPresetFacade.js';
 import { createSettingsDeveloperFacade } from './settings/SettingsDeveloperFacade.js';
 import { createSettingsTextOverrideFacade } from './settings/SettingsTextOverrideFacade.js';
 import { createSettingsTelemetryFacade } from './settings/SettingsTelemetryFacade.js';
+import { createSettingsBotPolicyFacade } from './settings/SettingsBotPolicyFacade.js';
 import { attachSettingsDiagnosticsFacade } from './settings/SettingsDiagnosticsFacade.js';
 
 export class SettingsManager {
@@ -61,6 +62,7 @@ export class SettingsManager {
             menuTelemetryStore: this.menuTelemetryStore,
             telemetryHistoryStore: this.telemetryHistoryStore,
         });
+        this.botPolicyFacade = createSettingsBotPolicyFacade();
 
         this.profileStorePort = Object.freeze({
             loadProfiles: () => this.settingsStore.loadProfiles(),
@@ -181,6 +183,10 @@ export class SettingsManager {
 
     recordMenuTelemetry(settings, eventType, payload = null) {
         return this.telemetryFacade.recordMenuTelemetry(settings, eventType, payload);
+    }
+
+    setBotPolicyStrategy(settings, strategy) {
+        return this.botPolicyFacade.setBotPolicyStrategy(settings, strategy);
     }
 
     getTelemetryHistorySummary() {

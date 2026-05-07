@@ -1,7 +1,8 @@
 import { getTrainingBenchmarkBotValidationMatrix } from '../training/TrainingBenchmarkContract.js';
 
 function cloneScenario(entry) {
-    const normalizedMode = String(entry.gameMode || '').trim().toUpperCase() === 'HUNT' ? 'HUNT' : 'CLASSIC';
+    const requestedMode = String(entry.gameMode || '').trim().toUpperCase();
+    const normalizedMode = requestedMode === 'HUNT' || requestedMode === 'ARCADE' ? requestedMode : 'CLASSIC';
     const rawStrategy = String(entry.botPolicyStrategy || '').trim().toLowerCase();
     const strategy = rawStrategy || 'auto';
     return {
@@ -19,7 +20,48 @@ function cloneScenario(entry) {
 }
 
 export function getBotValidationMatrix() {
-    return getTrainingBenchmarkBotValidationMatrix().map((entry) => cloneScenario(entry));
+    const heuristicScenarios = [
+        {
+            id: 'H-CLASSIC',
+            mode: '1p',
+            bots: 2,
+            mapKey: 'standard',
+            gameMode: 'CLASSIC',
+            botPolicyStrategy: 'heuristic',
+            planarMode: false,
+            portalCount: 0,
+            rounds: 4,
+            expectedPolicyType: 'heuristic',
+        },
+        {
+            id: 'H-FIGHT',
+            mode: '1p',
+            bots: 2,
+            mapKey: 'standard',
+            gameMode: 'HUNT',
+            botPolicyStrategy: 'heuristic',
+            planarMode: false,
+            portalCount: 4,
+            rounds: 4,
+            expectedPolicyType: 'heuristic',
+        },
+        {
+            id: 'H-ARCADE',
+            mode: '1p',
+            bots: 1,
+            mapKey: 'arcade-default',
+            gameMode: 'ARCADE',
+            botPolicyStrategy: 'heuristic',
+            planarMode: false,
+            portalCount: 0,
+            rounds: 4,
+            expectedPolicyType: 'heuristic',
+        },
+    ];
+    return [
+        ...getTrainingBenchmarkBotValidationMatrix(),
+        ...heuristicScenarios,
+    ].map((entry) => cloneScenario(entry));
 }
 
 export function resolveBotValidationScenario(idOrIndex = 0, matrix = null) {
