@@ -36,6 +36,27 @@ import {
     writeAliasMappings,
 } from './ArcadeGhostLibraryInternals.js';
 
+const ROOT_SCHEMA_V2_RESERVED_KEYS = new Set([
+    'schemaVersion',
+    'lastTouchSeq',
+    'aliasIndex',
+    'routes',
+]);
+
+function collectLegacyRouteEntriesFromSchemaV2Root(rawLibrary) {
+    if (!isPlainObject(rawLibrary)) return [];
+    const routeEntries = [];
+    const keys = Object.keys(rawLibrary);
+    for (let i = 0; i < keys.length; i += 1) {
+        const routeId = normalizeString(keys[i]);
+        if (!routeId || ROOT_SCHEMA_V2_RESERVED_KEYS.has(routeId)) continue;
+        const routeEntry = rawLibrary[routeId];
+        if (!isPlainObject(routeEntry)) continue;
+        routeEntries.push([routeId, routeEntry]);
+    }
+    return routeEntries;
+}
+
 function normalizeGhostLibrary(
     rawLibrary,
     budgetOptions = DEFAULT_GHOST_LIBRARY_BUDGET,
@@ -47,11 +68,16 @@ function normalizeGhostLibrary(
 
     if (isRootSchemaV2(rawLibrary)) {
         const aliasSeedByCanonical = buildAliasSeedFromRoot(rawLibrary);
-        const routeIds = Object.keys(rawLibrary.routes);
-        for (let i = 0; i < routeIds.length; i += 1) {
-            const canonicalRouteId = normalizeString(routeIds[i]);
+        // Some persisted desktops already carry a v2 root plus pre-migration top-level route entries.
+        // We ingest both shapes here so ghost playback survives mixed-format localStorage until write-back.
+        const routeEntries = [
+            ...Object.entries(rawLibrary.routes || {}),
+            ...collectLegacyRouteEntriesFromSchemaV2Root(rawLibrary),
+        ];
+        for (let i = 0; i < routeEntries.length; i += 1) {
+            const [rawRouteId, routeEntry] = routeEntries[i];
+            const canonicalRouteId = normalizeString(rawRouteId);
             if (!canonicalRouteId) continue;
-            const routeEntry = rawLibrary.routes[canonicalRouteId];
             const mergedAliases = [
                 ...normalizeRouteAliases(routeEntry?.routeAliases, canonicalRouteId),
                 ...(aliasSeedByCanonical.get(canonicalRouteId) || []),

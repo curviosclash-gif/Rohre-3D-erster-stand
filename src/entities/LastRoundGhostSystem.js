@@ -2,6 +2,12 @@ import * as THREE from 'three';
 import { validateGhostClip } from '../shared/contracts/GhostClipContract.js';
 
 const SHARED_GHOST_GEOMETRIES = {};
+const GHOST_TRAIL_RADIUS = 0.16;
+const GHOST_TRAIL_Y_OFFSET = 0.24;
+const GHOST_TRAIL_MIN_SEGMENT_LENGTH = 0.05;
+const TRAIL_UP_AXIS = new THREE.Vector3(0, 1, 0);
+const TRAIL_DUMMY = new THREE.Object3D();
+const TRAIL_DIRECTION = new THREE.Vector3();
 
 function markSharedGeometry(geometry) {
     if (!geometry) return;
@@ -18,13 +24,112 @@ function ensureSharedGhostGeometries() {
     SHARED_GHOST_GEOMETRIES.tail = new THREE.BoxGeometry(0.08, 0.5, 0.42);
     SHARED_GHOST_GEOMETRIES.halo = new THREE.BoxGeometry(1.18, 0.64, 2.24);
     SHARED_GHOST_GEOMETRIES.glow = new THREE.SphereGeometry(0.38, 12, 12);
+    SHARED_GHOST_GEOMETRIES.trailSegment = new THREE.CylinderGeometry(1, 1, 1, 6);
 
     for (const geometry of Object.values(SHARED_GHOST_GEOMETRIES)) {
         markSharedGeometry(geometry);
     }
 }
 
-function buildGhostEntry(playerMeta = {}) {
+function toFiniteCoordinate(value) {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function buildGhostTrail(playerMeta = {}, frames = []) {
+    const playerIdx = Number(playerMeta?.idx);
+    if (!Number.isInteger(playerIdx) || playerIdx < 0) return null;
+
+    const points = [];
+    const safeFrames = Array.isArray(frames) ? frames : [];
+    for (let frameIndex = 0; frameIndex < safeFrames.length; frameIndex += 1) {
+        const players = Array.isArray(safeFrames[frameIndex]?.players) ? safeFrames[frameIndex].players : [];
+        for (let poseIndex = 0; poseIndex < players.length; poseIndex += 1) {
+            const pose = players[poseIndex];
+            if (pose?.idx !== playerIdx || pose?.alive === false) continue;
+            points.push(
+                toFiniteCoordinate(pose.x),
+                toFiniteCoordinate(pose.y) + GHOST_TRAIL_Y_OFFSET,
+                toFiniteCoordinate(pose.z)
+            );
+            break;
+        }
+    }
+
+    if (points.length < 6) return null;
+
+    let segmentCount = 0;
+    for (let pointIndex = 3; pointIndex < points.length; pointIndex += 3) {
+        const dx = points[pointIndex] - points[pointIndex - 3];
+        const dy = points[pointIndex + 1] - points[pointIndex - 2];
+        const dz = points[pointIndex + 2] - points[pointIndex - 1];
+        const length = Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
+        if (length >= GHOST_TRAIL_MIN_SEGMENT_LENGTH) {
+            segmentCount += 1;
+        }
+    }
+
+    if (segmentCount < 1) return null;
+
+    const color = new THREE.Color(Number(playerMeta?.color) || 0xffffff);
+    color.lerp(new THREE.Color(0xffffff), 0.35);
+    const material = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.44,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        toneMapped: false,
+    });
+    const mesh = new THREE.InstancedMesh(SHARED_GHOST_GEOMETRIES.trailSegment, material, segmentCount);
+    mesh.name = `lastRoundGhostTrail-${playerIdx}`;
+    mesh.renderOrder = 3;
+    mesh.frustumCulled = false;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    mesh.userData = {
+        entityViewType: 'last-round-ghost-trail',
+        playerIdx,
+    };
+
+    let writeIndex = 0;
+    for (let pointIndex = 3; pointIndex < points.length; pointIndex += 3) {
+        const fromX = points[pointIndex - 3];
+        const fromY = points[pointIndex - 2];
+        const fromZ = points[pointIndex - 1];
+        const toX = points[pointIndex];
+        const toY = points[pointIndex + 1];
+        const toZ = points[pointIndex + 2];
+        const dx = toX - fromX;
+        const dy = toY - fromY;
+        const dz = toZ - fromZ;
+        const length = Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
+        if (length < GHOST_TRAIL_MIN_SEGMENT_LENGTH) continue;
+
+        TRAIL_DUMMY.position.set(
+            (fromX + toX) * 0.5,
+            (fromY + toY) * 0.5,
+            (fromZ + toZ) * 0.5
+        );
+        TRAIL_DIRECTION.set(dx / length, dy / length, dz / length);
+        TRAIL_DUMMY.quaternion.setFromUnitVectors(TRAIL_UP_AXIS, TRAIL_DIRECTION);
+        TRAIL_DUMMY.scale.set(GHOST_TRAIL_RADIUS, length, GHOST_TRAIL_RADIUS);
+        TRAIL_DUMMY.updateMatrix();
+        mesh.setMatrixAt(writeIndex, TRAIL_DUMMY.matrix);
+        writeIndex += 1;
+    }
+    mesh.count = writeIndex;
+    mesh.instanceMatrix.needsUpdate = true;
+
+    return {
+        mesh,
+        material,
+        pointCount: points.length / 3,
+        segmentCount: writeIndex,
+    };
+}
+
+function buildGhostEntry(playerMeta = {}, frames = []) {
     ensureSharedGhostGeometries();
 
     const color = new THREE.Color(Number(playerMeta?.color) || 0xffffff);
@@ -71,11 +176,17 @@ function buildGhostEntry(playerMeta = {}) {
     group.add(halo);
     group.add(glow);
     group.scale.setScalar(Math.max(0.6, Number(playerMeta?.modelScale) || 1));
+    const trail = buildGhostTrail(playerMeta, frames);
 
     return {
         idx: Number(playerMeta?.idx),
         group,
-        materials: [coreMaterial, frameMaterial, glowMaterial],
+        materials: trail?.material
+            ? [coreMaterial, frameMaterial, glowMaterial, trail.material]
+            : [coreMaterial, frameMaterial, glowMaterial],
+        trail: trail?.mesh || null,
+        trailPointCount: Math.max(0, Number(trail?.pointCount) || 0),
+        trailSegmentCount: Math.max(0, Number(trail?.segmentCount) || 0),
     };
 }
 
@@ -84,6 +195,7 @@ function disposeEntry(entry) {
     for (let i = 0; i < materials.length; i++) {
         materials[i]?.dispose?.();
     }
+    entry?.trail?.dispose?.();
 }
 
 function buildPlaybackFrames(frames) {
@@ -137,6 +249,9 @@ export class LastRoundGhostSystem {
     _clearEntries() {
         for (let i = 0; i < this._entries.length; i++) {
             const entry = this._entries[i];
+            if (entry?.trail?.parent === this.root) {
+                this.root.remove(entry.trail);
+            }
             if (entry?.group?.parent === this.root) {
                 this.root.remove(entry.group);
             }
@@ -169,8 +284,11 @@ export class LastRoundGhostSystem {
 
         const playerMeta = Array.isArray(safeClip.players) ? safeClip.players : [];
         for (let i = 0; i < playerMeta.length; i++) {
-            const entry = buildGhostEntry(playerMeta[i]);
+            const entry = buildGhostEntry(playerMeta[i], safeClip.frames);
             this._entries.push(entry);
+            if (entry.trail) {
+                this.root.add(entry.trail);
+            }
             this.root.add(entry.group);
         }
 
@@ -261,11 +379,21 @@ export class LastRoundGhostSystem {
 
     getState() {
         const ghosts = [];
+        let trailCount = 0;
+        let trailPointCount = 0;
+        let trailSegmentCount = 0;
         for (let i = 0; i < this._entries.length; i++) {
             const entry = this._entries[i];
+            if (entry?.trail) {
+                trailCount += 1;
+                trailPointCount += Math.max(0, Number(entry.trailPointCount) || 0);
+                trailSegmentCount += Math.max(0, Number(entry.trailSegmentCount) || 0);
+            }
             ghosts.push({
                 idx: entry.idx,
                 visible: !!entry?.group?.visible,
+                trailPoints: Math.max(0, Number(entry.trailPointCount) || 0),
+                trailSegments: Math.max(0, Number(entry.trailSegmentCount) || 0),
                 x: Number(entry?.group?.position?.x?.toFixed?.(2) || 0),
                 y: Number(entry?.group?.position?.y?.toFixed?.(2) || 0),
                 z: Number(entry?.group?.position?.z?.toFixed?.(2) || 0),
@@ -277,6 +405,9 @@ export class LastRoundGhostSystem {
             routeId: this._routeId,
             frameCount: this._frames.length,
             entryCount: this._entries.length,
+            trailCount,
+            trailPointCount,
+            trailSegmentCount,
             frameCursor: this._frameCursor,
             elapsed: Number(this._elapsed.toFixed(3)),
             displayDuration: Number(this._displayDuration.toFixed(3)),

@@ -31,9 +31,15 @@ test('LastRoundGhostSystem normalizes broken time and pose data without destabil
     assert.equal(state.active, true);
     assert.equal(state.routeId, 'route_alpha');
     assert.equal(state.frameCount, 4);
+    assert.equal(state.trailCount, 1);
+    assert.equal(state.trailPointCount > 1, true);
+    assert.equal(state.trailSegmentCount > 0, true);
+    assert.equal(state.ghosts[0]?.trailPoints > 1, true);
+    assert.equal(state.ghosts[0]?.trailSegments > 0, true);
     assert.equal(Number.isFinite(state.ghosts[0]?.x), true);
     assert.equal(Number.isFinite(state.ghosts[0]?.y), true);
     assert.equal(Number.isFinite(state.ghosts[0]?.z), true);
+    assert.equal(system._entries[0]?.trail?.isInstancedMesh, true);
     assert.equal(Number.isFinite(system._entries[0]?.group?.quaternion?.x), true);
     assert.equal(Number.isFinite(system._entries[0]?.group?.quaternion?.w), true);
 

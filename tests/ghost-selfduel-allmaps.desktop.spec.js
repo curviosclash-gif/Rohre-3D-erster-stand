@@ -7,6 +7,7 @@ import {
 } from './core-targeted.shared.js';
 
 const GHOST_LIBRARY_STORAGE_KEY = 'cuviosclash.arcade-ghost-library.v1';
+const GHOST_LIBRARY_SCHEMA_VERSION = 'arcade-ghost-library.v2';
 const SUPPORTED_MODE_PATHS = Object.freeze(['normal', 'fight', 'arcade']);
 const DEFAULT_MODE_PATHS = Object.freeze(['normal', 'fight', 'arcade']);
 
@@ -75,7 +76,7 @@ async function listVisibleMapKeys(page) {
 }
 
 async function seedGhostForMapAndEnableSelfDuel(page, { modePath, mapKey }) {
-    return page.evaluate(({ modePath, mapKey, ghostLibraryStorageKey, seededGhostClip }) => {
+    return page.evaluate(({ modePath, mapKey, ghostLibraryStorageKey, ghostLibrarySchemaVersion, seededGhostClip }) => {
         const game = globalThis.GAME_INSTANCE;
         if (!game?.settings) {
             return { ok: false, reason: 'missing_game' };
@@ -116,12 +117,26 @@ async function seedGhostForMapAndEnableSelfDuel(page, { modePath, mapKey }) {
         }
 
         const existingLibrary = JSON.parse(localStorage.getItem(ghostLibraryStorageKey) || '{}');
-        existingLibrary[routeId] = {
+        const nextEntry = {
             routeId,
+            canonicalRouteId: routeId,
+            routeAliases: routeId === mapKey ? [] : [mapKey],
             longestGhostClip: seededGhostClip,
             durationMs: 3800,
             updatedAt: new Date().toISOString(),
         };
+        if (existingLibrary?.schemaVersion === ghostLibrarySchemaVersion && existingLibrary?.routes) {
+            if (!existingLibrary.aliasIndex || typeof existingLibrary.aliasIndex !== 'object') {
+                existingLibrary.aliasIndex = {};
+            }
+            existingLibrary.routes[routeId] = nextEntry;
+            existingLibrary.aliasIndex[routeId] = routeId;
+            if (routeId !== mapKey) {
+                existingLibrary.aliasIndex[mapKey] = routeId;
+            }
+        } else {
+            existingLibrary[routeId] = nextEntry;
+        }
         localStorage.setItem(ghostLibraryStorageKey, JSON.stringify(existingLibrary));
 
         return { ok: true, routeId };
@@ -129,6 +144,7 @@ async function seedGhostForMapAndEnableSelfDuel(page, { modePath, mapKey }) {
         modePath,
         mapKey,
         ghostLibraryStorageKey: GHOST_LIBRARY_STORAGE_KEY,
+        ghostLibrarySchemaVersion: GHOST_LIBRARY_SCHEMA_VERSION,
         seededGhostClip: SEEDED_GHOST_CLIP,
     });
 }
@@ -141,6 +157,9 @@ async function readGhostRuntimeState(page) {
             active: ghostState?.active === true,
             entryCount: Number(ghostState?.entryCount || 0),
             frameCount: Number(ghostState?.frameCount || 0),
+            trailCount: Number(ghostState?.trailCount || 0),
+            trailPointCount: Number(ghostState?.trailPointCount || 0),
+            trailSegmentCount: Number(ghostState?.trailSegmentCount || 0),
             configuredMode: String(game?.settings?.localSettings?.startSetup?.arcadeGhostDuelMode || ''),
             runtimeMode: String(game?.runtimeConfig?.arcade?.ghostDuelMode || ''),
             sessionType: String(game?.settings?.localSettings?.sessionType || ''),
@@ -208,16 +227,23 @@ test('Ghost-Selbstduell funktioniert im Desktop-Electron in Single normal/fight/
                 const playbackActive = await page.waitForFunction(() => {
                     const game = globalThis.GAME_INSTANCE;
                     const ghostState = game?.entityManager?.getLastRoundGhostState?.();
-                    return ghostState?.active === true && Number(ghostState?.entryCount || 0) > 0;
+                    return ghostState?.active === true
+                        && Number(ghostState?.entryCount || 0) > 0
+                        && Number(ghostState?.trailCount || 0) > 0
+                        && Number(ghostState?.trailSegmentCount || 0) > 0;
                 }, null, { timeout: 12000 }).then(() => true).catch(() => false);
 
                 const runtimeState = await readGhostRuntimeState(page);
-                const hasActiveGhostState = runtimeState.active && runtimeState.entryCount > 0;
+                const hasActiveGhostState = runtimeState.active
+                    && runtimeState.entryCount > 0
+                    && runtimeState.trailCount > 0
+                    && runtimeState.trailSegmentCount > 0;
                 if (!(playbackActive || hasActiveGhostState)) {
                     failures.push({
                         modePath,
                         mapKey,
                         routeId: seedResult.routeId || '',
+                        reason: 'playback_or_trail_inactive',
                         playbackActive,
                         runtimeState,
                     });

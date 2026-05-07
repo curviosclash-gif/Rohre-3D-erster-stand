@@ -212,6 +212,39 @@ test('ArcadeGhostLibrary load/save normalizes persisted records', () => {
     assert.equal(writes[1].value.routes.route_beta, undefined);
 });
 
+test('ArcadeGhostLibrary loads mixed legacy route entries from a v2 root container', () => {
+    const store = {
+        loadJsonRecord(key) {
+            assert.equal(key, ARCADE_GHOST_LIBRARY_STORAGE_KEY);
+            return {
+                schemaVersion: ARCADE_GHOST_LIBRARY_SCHEMA_VERSION,
+                lastTouchSeq: 4,
+                aliasIndex: {
+                    route_alpha_alias: 'route_alpha',
+                },
+                routes: {
+                    route_alpha: {
+                        durationMs: 4000,
+                        longestGhostClip: createGhostClip(4),
+                        updatedAt: '2026-05-01T10:02:00.000Z',
+                    },
+                },
+                route_beta: {
+                    durationMs: 5000,
+                    longestGhostClip: createGhostClip(5),
+                    updatedAt: '2026-05-01T10:03:00.000Z',
+                },
+            };
+        },
+    };
+
+    const loaded = loadGhostLibrary(store);
+    assert.equal(loaded.route_alpha.durationMs, 4000);
+    assert.equal(loaded.route_beta.durationMs, 5000);
+    assert.equal(getLongestGhostByRoute(loaded, 'route_alpha_alias')?.durationMs, 4000);
+    assert.equal(getLongestGhostByRoute(loaded, 'route_beta')?.durationMs, 5000);
+});
+
 test('ArcadeGhostLibrary derives renderable players from persisted frame data', () => {
     const store = {
         loadJsonRecord(key) {

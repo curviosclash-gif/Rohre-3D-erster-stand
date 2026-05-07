@@ -1412,7 +1412,8 @@ export class ArcadeRunRuntime {
 
         if (type === 'finish') {
             const store = this._resolveSettingsRecordStore();
-            if (!primaryRouteId || !store) return null;
+            // Ghost self-duel should keep working in-session even when persistence is unavailable.
+            if (!primaryRouteId) return null;
             const vehicleId = this._activeVehicleId || '';
             const recordedAtIso = new Date().toISOString();
             const ghostDurationMs = Math.max(0, Math.trunc(Number(data?.ghostDurationMs) || 0));

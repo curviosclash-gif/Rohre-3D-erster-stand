@@ -139,7 +139,10 @@ export class PlayingStateSystem {
         }
 
         this.runtimeAccess.actionTickSuddenDeath?.(dt);
-        this.runtimeAccess.actionUpdateLastRoundGhostPlayback?.(dt);
+        // Legacy runtime-access callers still expose the shorter alias during kernel migration.
+        const updateLastRoundGhostPlayback = this.runtimeAccess.actionUpdateLastRoundGhostPlayback
+            || this.runtimeAccess.updateLastRoundGhostPlayback;
+        updateLastRoundGhostPlayback?.(dt);
         this.runtimeAccess.actionUpdatePlayingHudTick?.(dt);
         this.runtimeAccess.actionApplyPlayingTimeScaleFromEffects?.();
 

@@ -56,6 +56,14 @@ function createGhostClip(durationSeconds) {
     };
 }
 
+function createRecordStoreSettingsManager(recordStore) {
+    return {
+        getSettingsRecordStorePort() {
+            return recordStore;
+        },
+    };
+}
+
 test('Session menu handler forwards LEVEL4_OPEN payload to facade', () => {
     const calls = [];
     const facade = {
@@ -548,13 +556,11 @@ test('Arcade parcours leaderboard persists penaltyTimeMs separately from totalTi
     runtime._enabled = true;
     runtime._state = {};
     runtime._leaderboard = {};
-    runtime.settingsManager = {
-        store: {
-            saveJsonRecord(key, value) {
-                writes.push({ key, value });
-            },
+    runtime.settingsManager = createRecordStoreSettingsManager({
+        saveJsonRecord(key, value) {
+            writes.push({ key, value });
         },
-    };
+    });
 
     const result = runtime.applyParcoursLeaderboardEvent({
         type: 'finish',
@@ -697,11 +703,9 @@ test('Ghost duel route aliases resolve playback across all runtime maps', () => 
     runtime._state = null;
     runtime._leaderboard = {};
     runtime._ghostLibrary = {};
-    runtime.settingsManager = {
-        store: {
-            saveJsonRecord() {},
-        },
-    };
+    runtime.settingsManager = createRecordStoreSettingsManager({
+        saveJsonRecord() {},
+    });
     const maps = getRuntimeMapCatalog();
     const mapEntries = Object.entries(maps || {});
     const clip = createGhostClip(4.2);
@@ -747,13 +751,11 @@ test('Ghost library can persist finish clips in non-arcade library-only mode', (
     runtime._state = null;
     runtime._leaderboard = {};
     runtime._ghostLibrary = {};
-    runtime.settingsManager = {
-        store: {
-            saveJsonRecord(key, value) {
-                writes.push({ key, value });
-            },
+    runtime.settingsManager = createRecordStoreSettingsManager({
+        saveJsonRecord(key, value) {
+            writes.push({ key, value });
         },
-    };
+    });
 
     const result = runtime.applyParcoursLeaderboardEvent({
         type: 'finish',
@@ -782,6 +784,29 @@ test('Ghost library can persist finish clips in non-arcade library-only mode', (
     assert.equal(ghostLibraryWrites[0]?.value?.aliasIndex?.downtown_alias, 'map_downtown');
 });
 
+test('Ghost library keeps finish clips in memory when record store is unavailable', () => {
+    const runtime = new ArcadeRunRuntime({ ghostLibrarySaveThrottleMs: 0 });
+    runtime._enabled = false;
+    runtime._config = { ghostDuelMode: 'self_longest_ghost' };
+    runtime._state = null;
+    runtime._leaderboard = {};
+    runtime._ghostLibrary = {};
+    runtime.settingsManager = null;
+
+    const result = runtime.applyParcoursLeaderboardEvent({
+        type: 'finish',
+        routeId: 'route_memory',
+        totalTimeMs: 5400,
+        penaltyTimeMs: 0,
+        segmentSplitsMs: [],
+        ghostClip: createGhostClip(5.4),
+        persistLibraryOnly: true,
+    });
+
+    assert.equal(result?.longestGhostUpdated, true);
+    assert.equal(runtime._ghostLibrary.route_memory.durationMs, 5400);
+});
+
 test('Ghost library budget in runtime evicts oldest routes by updatedAt during finish upsert', () => {
     const writes = [];
     const runtime = new ArcadeRunRuntime({ ghostLibrarySaveThrottleMs: 0 });
@@ -806,13 +831,11 @@ test('Ghost library budget in runtime evicts oldest routes by updatedAt during f
             updatedAt: '2026-05-01T10:01:00.000Z',
         },
     };
-    runtime.settingsManager = {
-        store: {
-            saveJsonRecord(key, value) {
-                writes.push({ key, value });
-            },
+    runtime.settingsManager = createRecordStoreSettingsManager({
+        saveJsonRecord(key, value) {
+            writes.push({ key, value });
         },
-    };
+    });
 
     const result = runtime.applyParcoursLeaderboardEvent({
         type: 'finish',
@@ -867,13 +890,11 @@ test('Ghost library runtime budget respects maxBytes and evicts oldest first', (
         routes: runtime._ghostLibrary,
     }).length;
     runtime._config.ghostLibraryMaxBytes = baseSize;
-    runtime.settingsManager = {
-        store: {
-            saveJsonRecord(key, value) {
-                writes.push({ key, value });
-            },
+    runtime.settingsManager = createRecordStoreSettingsManager({
+        saveJsonRecord(key, value) {
+            writes.push({ key, value });
         },
-    };
+    });
 
     const result = runtime.applyParcoursLeaderboardEvent({
         type: 'finish',
@@ -902,11 +923,9 @@ test('Arcade finish keeps longest ghost duration independent from penalty-inflat
     runtime._state = {};
     runtime._leaderboard = {};
     runtime._ghostLibrary = {};
-    runtime.settingsManager = {
-        store: {
-            saveJsonRecord() {},
-        },
-    };
+    runtime.settingsManager = createRecordStoreSettingsManager({
+        saveJsonRecord() {},
+    });
 
     const clip = createGhostClip(4.2);
 
@@ -933,13 +952,11 @@ test('Arcade finish updates longest ghost library by durationMs and keeps shorte
     runtime._leaderboard = {};
     runtime._ghostLibrary = {};
     runtime._activeVehicleId = 'ship5';
-    runtime.settingsManager = {
-        store: {
-            saveJsonRecord(key, value) {
-                writes.push({ key, value });
-            },
+    runtime.settingsManager = createRecordStoreSettingsManager({
+        saveJsonRecord(key, value) {
+            writes.push({ key, value });
         },
-    };
+    });
 
     const clipLong = createGhostClip(4.8);
     const clipShort = createGhostClip(2.9);
@@ -992,13 +1009,11 @@ test('Ghost library save throttle flushes pending write on resetRunState shutdow
     runtime._state = null;
     runtime._leaderboard = {};
     runtime._ghostLibrary = {};
-    runtime.settingsManager = {
-        store: {
-            saveJsonRecord(key, value) {
-                writes.push({ key, value });
-            },
+    runtime.settingsManager = createRecordStoreSettingsManager({
+        saveJsonRecord(key, value) {
+            writes.push({ key, value });
         },
-    };
+    });
 
     runtime.applyParcoursLeaderboardEvent({
         type: 'finish',
@@ -1061,24 +1076,22 @@ test('Arcade resetRunState clears active ghost recorder state', () => {
 test('Runtime debug snapshot exposes ghost library telemetry counters', () => {
     const writes = [];
     const runtime = new ArcadeRunRuntime({ ghostLibrarySaveThrottleMs: 0 });
-    runtime.settingsManager = {
-        store: {
-            loadJsonRecord(key, fallbackValue = null) {
-                if (key === ARCADE_GHOST_LIBRARY_STORAGE_KEY) {
-                    return {
-                        route_old: {
-                            durationMs: 4200,
-                            longestGhostClip: createGhostClip(4.2),
-                        },
-                    };
-                }
-                return fallbackValue;
-            },
-            saveJsonRecord(key, value) {
-                writes.push({ key, value });
-            },
+    runtime.settingsManager = createRecordStoreSettingsManager({
+        loadJsonRecord(key, fallbackValue = null) {
+            if (key === ARCADE_GHOST_LIBRARY_STORAGE_KEY) {
+                return {
+                    route_old: {
+                        durationMs: 4200,
+                        longestGhostClip: createGhostClip(4.2),
+                    },
+                };
+            }
+            return fallbackValue;
         },
-    };
+        saveJsonRecord(key, value) {
+            writes.push({ key, value });
+        },
+    });
 
     runtime.configure({
         arcade: {
