@@ -18,6 +18,7 @@ import {
 import {
     CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
     validateCriticalDesktopMappings,
+    validateRuntimeMappingIntegrity,
 } from '../scripts/check-knowledge-graph.mjs';
 import {
     queryCriticalPathHealth,
@@ -345,6 +346,7 @@ test('buildKnowledgeGraph keeps required desktop critical-path mappings intact',
     const graph = await buildKnowledgeGraph();
     const violations = [];
     validateCriticalDesktopMappings(graph, violations);
+    validateRuntimeMappingIntegrity(graph, violations);
 
     assert.deepEqual(violations, []);
 
@@ -380,6 +382,72 @@ test('buildKnowledgeGraph keeps required desktop critical-path mappings intact',
         relationLayerByEdge.get('runtime:entity-spawn-ops::event:spawn::emits'),
         'event'
     );
+});
+
+test('runtime mapping integrity reports orphan, missing validation and unknown references', () => {
+    const graph = {
+        nodes: [
+            {
+                id: 'runtime:critical-orphan',
+                type: 'runtime',
+                attributes: {
+                    mappingId: 'fixture',
+                    file: 'src/runtime/CriticalOrphan.js',
+                    criticalPath: 'fixture-path',
+                },
+            },
+            {
+                id: 'runtime:critical-unvalidated',
+                type: 'runtime',
+                attributes: {
+                    mappingId: 'fixture',
+                    file: 'src/runtime/CriticalUnvalidated.js',
+                    criticalPath: 'fixture-path',
+                },
+            },
+            {
+                id: 'state:fixture',
+                type: 'state',
+                attributes: {
+                    mappingId: 'fixture',
+                },
+            },
+            {
+                id: 'src/runtime/CriticalUnvalidated.js',
+                type: 'file',
+                attributes: {
+                    exists: true,
+                },
+            },
+        ],
+        edges: [
+            {
+                from: 'runtime:critical-unvalidated',
+                to: 'state:fixture',
+                type: 'writes_state',
+                attributes: {
+                    mappingId: 'fixture',
+                },
+            },
+            {
+                from: 'runtime:critical-unvalidated',
+                to: 'test:missing-fixture',
+                type: 'validated_by',
+                attributes: {
+                    mappingId: 'fixture',
+                },
+            },
+        ],
+    };
+
+    const violations = [];
+    validateRuntimeMappingIntegrity(graph, violations);
+    const codes = violations.map((violation) => violation.code);
+
+    assert.ok(codes.includes('KG_RUNTIME_ORPHAN'));
+    assert.ok(codes.includes('KG_RUNTIME_VALIDATION_MISSING'));
+    assert.ok(codes.includes('KG_UNKNOWN_REFERENCE'));
+    assert.ok(codes.includes('KG_UNKNOWN_FILE_REFERENCE'));
 });
 
 test('knowledge graph core runtime queries return stable JSON shapes', async () => {

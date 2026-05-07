@@ -135,6 +135,15 @@ function edgeHasMappingId(edge, mappingId) {
     return String(edge?.attributes?.mappingId || '').trim() === mappingId;
 }
 
+function getCriticalPaths(node) {
+    const criticalPaths = Array.isArray(node?.attributes?.criticalPaths)
+        ? node.attributes.criticalPaths
+        : [node?.attributes?.criticalPath].filter(Boolean);
+    return criticalPaths
+        .map((entry) => String(entry || '').trim())
+        .filter(Boolean);
+}
+
 async function readExistingArtifact(relativePath) {
     const absolutePath = path.join(ROOT, relativePath);
     const raw = await fs.readFile(absolutePath, 'utf8');
@@ -224,6 +233,54 @@ function ensureAllEdgeEndpointsExist(graph, violations) {
         }
         if (!nodeById.has(edge.to)) {
             addViolation(violations, 'EDGE_TO_MISSING', `edge target fehlt: ${edge.type} ${edge.from} -> ${edge.to}`);
+        }
+    }
+}
+
+function validateRuntimeMappingIntegrity(graph, violations) {
+    const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
+    const edges = Array.isArray(graph.edges) ? graph.edges : [];
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const fileNodeByPath = new Map(nodes.filter((node) => node.type === 'file').map((node) => [node.id, node]));
+    const mappingNodes = nodes.filter((node) => String(node?.attributes?.mappingId || '').trim());
+    const runtimeNodes = mappingNodes.filter((node) => node.type === 'runtime');
+    const mappingEdges = edges.filter((edge) => String(edge?.attributes?.mappingId || '').trim());
+
+    for (const edge of mappingEdges) {
+        if (!nodeById.has(edge.from)) {
+            addViolation(violations, 'KG_UNKNOWN_REFERENCE', `Mapping-Kante referenziert unbekannte Quelle: ${edge.type} ${edge.from} -> ${edge.to}`);
+        }
+        if (!nodeById.has(edge.to)) {
+            addViolation(violations, 'KG_UNKNOWN_REFERENCE', `Mapping-Kante referenziert unbekanntes Ziel: ${edge.type} ${edge.from} -> ${edge.to}`);
+        }
+    }
+
+    for (const node of mappingNodes) {
+        const filePath = String(node?.attributes?.file || '').trim();
+        if (!filePath) continue;
+        const fileNode = fileNodeByPath.get(filePath) || null;
+        if (!fileNode) {
+            addViolation(violations, 'KG_UNKNOWN_FILE_REFERENCE', `Mapping-Knoten ${node.id} referenziert unbekannte Datei: ${filePath}`);
+            continue;
+        }
+        if (fileNode.attributes?.exists !== true) {
+            addViolation(violations, 'KG_MAPPING_FILE_MISSING', `Mapping-Knoten ${node.id} referenziert fehlende Datei: ${filePath}`);
+        }
+    }
+
+    for (const runtimeNode of runtimeNodes) {
+        const runtimeEdges = mappingEdges.filter((edge) => edge.type !== 'implements' && (edge.from === runtimeNode.id || edge.to === runtimeNode.id));
+        if (runtimeEdges.length === 0) {
+            addViolation(violations, 'KG_RUNTIME_ORPHAN', `Runtime-Knoten ohne Runtime-/State-/Config-/Event-/Test-Relation: ${runtimeNode.id}`);
+        }
+
+        const criticalPaths = getCriticalPaths(runtimeNode);
+        if (criticalPaths.length === 0) continue;
+
+        const validationEdges = mappingEdges.filter((edge) => edge.from === runtimeNode.id && edge.type === 'validated_by');
+        const hasTestValidation = validationEdges.some((edge) => nodeById.get(edge.to)?.type === 'test');
+        if (!hasTestValidation) {
+            addViolation(violations, 'KG_RUNTIME_VALIDATION_MISSING', `Kritischer Runtime-Knoten ohne validated_by-Testkante: ${runtimeNode.id} (${criticalPaths.join(', ')})`);
         }
     }
 }
@@ -627,6 +684,7 @@ async function runChecks() {
 
     validateNodeIdAndOrphans(existingGraph.parsed, violations);
     ensureAllEdgeEndpointsExist(existingGraph.parsed, violations);
+    validateRuntimeMappingIntegrity(existingGraph.parsed, violations);
     validateCriticalDesktopMappings(existingGraph.parsed, violations);
     ensureDependsTargetsExist(existingGraph.parsed, violations);
     detectHardDependsCycles(existingGraph.parsed, violations);
@@ -660,4 +718,5 @@ export { runChecks };
 export {
     CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
     validateCriticalDesktopMappings,
+    validateRuntimeMappingIntegrity,
 };
