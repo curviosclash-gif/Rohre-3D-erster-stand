@@ -7,6 +7,16 @@ const ROOT = process.cwd();
 const GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
 const GIT_HOTSPOT_OVERLAY_ID = 'GIT-HISTORY-HOTSPOTS';
+const RUNTIME_QUERY_NODE_TYPES = new Set(['runtime', 'event', 'state', 'config', 'test']);
+const RUNTIME_QUERY_EDGE_TYPES = new Set([
+    'implements',
+    'emits',
+    'consumes',
+    'reads_config',
+    'reads_state',
+    'writes_state',
+    'validated_by',
+]);
 
 function normalizePath(value) {
     return String(value || '')
@@ -43,6 +53,81 @@ function buildCoverageFileIndex(coverage) {
         (Array.isArray(coverage.files) ? coverage.files : [])
             .map((entry) => [normalizePath(entry.path), entry])
     );
+}
+
+function buildGraphIndexes(graph) {
+    const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
+    const edges = Array.isArray(graph.edges) ? graph.edges : [];
+    return {
+        nodes,
+        edges,
+        nodeById: new Map(nodes.map((node) => [node.id, node])),
+    };
+}
+
+function getCriticalPaths(node) {
+    const attributes = node?.attributes || {};
+    const values = Array.isArray(attributes.criticalPaths)
+        ? attributes.criticalPaths
+        : [attributes.criticalPath];
+    return values
+        .map((value) => String(value || '').trim())
+        .filter(Boolean)
+        .sort((left, right) => left.localeCompare(right));
+}
+
+function nodeSummary(node) {
+    if (!node) return null;
+    return {
+        id: node.id,
+        type: node.type,
+        title: node.title || null,
+        file: node.attributes?.file || null,
+        criticalPaths: getCriticalPaths(node),
+        mappingId: node.attributes?.mappingId || null,
+    };
+}
+
+function edgeSummary(edge, nodeById) {
+    return {
+        from: edge.from,
+        fromType: nodeById.get(edge.from)?.type || null,
+        to: edge.to,
+        toType: nodeById.get(edge.to)?.type || null,
+        type: edge.type,
+        relationLayer: edge.attributes?.relationLayer || null,
+        mappingId: edge.attributes?.mappingId || null,
+    };
+}
+
+function sortNodeSummaries(entries) {
+    return entries.sort((left, right) => {
+        const typeCompare = String(left.type || '').localeCompare(String(right.type || ''));
+        if (typeCompare !== 0) return typeCompare;
+        return String(left.id || '').localeCompare(String(right.id || ''));
+    });
+}
+
+function sortEdgeSummaries(entries) {
+    return entries.sort((left, right) => {
+        const fromCompare = String(left.from || '').localeCompare(String(right.from || ''));
+        if (fromCompare !== 0) return fromCompare;
+        const toCompare = String(left.to || '').localeCompare(String(right.to || ''));
+        if (toCompare !== 0) return toCompare;
+        return String(left.type || '').localeCompare(String(right.type || ''));
+    });
+}
+
+function normalizeCriticalPathFilter(value) {
+    const normalized = String(value || '').trim();
+    if (!normalized) return '';
+    return normalized.startsWith('event:') ? normalized.slice('event:'.length) : normalized;
+}
+
+function nodeMatchesCriticalPath(node, criticalPath) {
+    const normalizedCriticalPath = normalizeCriticalPathFilter(criticalPath);
+    if (!normalizedCriticalPath) return true;
+    return getCriticalPaths(node).includes(normalizedCriticalPath);
 }
 
 function queryOpenDeps(graph, blockId) {
@@ -213,6 +298,160 @@ function queryFilesForBlock(graph, coverage, blockId) {
         query: 'files-for-block',
         blockId: normalizedBlockId,
         files,
+    };
+}
+
+function queryImpactForFile(graph, coverage, filePath) {
+    const normalizedFilePath = normalizePath(filePath);
+    const coverageFile = buildCoverageFileIndex(coverage).get(normalizedFilePath) || null;
+    const { nodes, edges, nodeById } = buildGraphIndexes(graph);
+    const directNodes = nodes
+        .filter((node) => node.attributes?.file && normalizePath(node.attributes.file) === normalizedFilePath)
+        .map(nodeSummary)
+        .filter(Boolean);
+    const implementedNodeIds = new Set(
+        edges
+            .filter((edge) => edge.type === 'implements' && normalizePath(edge.from) === normalizedFilePath)
+            .map((edge) => edge.to)
+    );
+    for (const entry of directNodes) {
+        implementedNodeIds.add(entry.id);
+    }
+
+    const relationEdges = edges
+        .filter((edge) => RUNTIME_QUERY_EDGE_TYPES.has(edge.type))
+        .filter((edge) => implementedNodeIds.has(edge.from) || implementedNodeIds.has(edge.to))
+        .map((edge) => edgeSummary(edge, nodeById));
+    const neighborIds = new Set();
+    for (const edge of relationEdges) {
+        if (!implementedNodeIds.has(edge.from)) neighborIds.add(edge.from);
+        if (!implementedNodeIds.has(edge.to)) neighborIds.add(edge.to);
+    }
+
+    const relatedNodes = Array.from(neighborIds)
+        .map((nodeId) => nodeSummary(nodeById.get(nodeId)))
+        .filter((node) => node && RUNTIME_QUERY_NODE_TYPES.has(node.type));
+    const criticalPaths = Array.from(new Set([
+        ...directNodes.flatMap((node) => node.criticalPaths),
+        ...relatedNodes.flatMap((node) => node.criticalPaths),
+    ])).sort((left, right) => left.localeCompare(right));
+
+    return {
+        query: 'impact-for-file',
+        file: normalizedFilePath,
+        existsInCoreGraph: directNodes.length > 0 || implementedNodeIds.size > 0,
+        coverage: coverageFile ? {
+            covered: coverageFile.covered === true,
+            coveredInCore: coverageFile.coveredInCore === true,
+            coveredByOverlay: coverageFile.coveredByOverlay === true,
+            classification: coverageFile.classification || null,
+            scopeBlocks: Array.isArray(coverageFile.scopeBlocks) ? coverageFile.scopeBlocks : [],
+            surfaces: Array.isArray(coverageFile.surfaces) ? coverageFile.surfaces : [],
+        } : null,
+        implementedNodes: sortNodeSummaries(directNodes),
+        relatedNodes: sortNodeSummaries(relatedNodes),
+        relationEdges: sortEdgeSummaries(relationEdges),
+        criticalPaths,
+    };
+}
+
+function queryEventFlow(graph, selector) {
+    const normalizedSelector = String(selector || '').trim();
+    const criticalPathFilter = normalizedSelector.startsWith('event:') ? '' : normalizeCriticalPathFilter(normalizedSelector);
+    const explicitEventId = normalizedSelector.startsWith('event:') ? normalizedSelector : '';
+    const { nodes, edges, nodeById } = buildGraphIndexes(graph);
+    const eventNodes = nodes
+        .filter((node) => node.type === 'event')
+        .filter((node) => !explicitEventId || node.id === explicitEventId)
+        .filter((node) => !criticalPathFilter || nodeMatchesCriticalPath(node, criticalPathFilter))
+        .map(nodeSummary)
+        .filter(Boolean);
+    const eventIds = new Set(eventNodes.map((node) => node.id));
+    const flowEdges = edges
+        .filter((edge) => (edge.type === 'emits' || edge.type === 'consumes') && eventIds.has(edge.to))
+        .map((edge) => edgeSummary(edge, nodeById));
+
+    const systems = Array.from(new Set(flowEdges.map((edge) => edge.from)))
+        .map((nodeId) => nodeSummary(nodeById.get(nodeId)))
+        .filter(Boolean);
+
+    return {
+        query: 'event-flow',
+        selector: normalizedSelector,
+        criticalPath: criticalPathFilter || null,
+        events: sortNodeSummaries(eventNodes),
+        systems: sortNodeSummaries(systems),
+        edges: sortEdgeSummaries(flowEdges),
+    };
+}
+
+function queryUntestedSystems(graph, criticalPath = '') {
+    const criticalPathFilter = normalizeCriticalPathFilter(criticalPath);
+    const { nodes, edges } = buildGraphIndexes(graph);
+    const validatedRuntimeIds = new Set(
+        edges
+            .filter((edge) => edge.type === 'validated_by')
+            .map((edge) => edge.from)
+    );
+    const systems = nodes
+        .filter((node) => node.type === 'runtime')
+        .filter((node) => nodeMatchesCriticalPath(node, criticalPathFilter))
+        .filter((node) => !validatedRuntimeIds.has(node.id))
+        .map(nodeSummary)
+        .filter(Boolean);
+
+    return {
+        query: 'untested-systems',
+        criticalPath: criticalPathFilter || null,
+        systems: sortNodeSummaries(systems),
+    };
+}
+
+function queryCriticalPathHealth(graph) {
+    const { nodes, edges, nodeById } = buildGraphIndexes(graph);
+    const criticalPaths = Array.from(new Set(
+        nodes
+            .filter((node) => RUNTIME_QUERY_NODE_TYPES.has(node.type))
+            .flatMap((node) => getCriticalPaths(node))
+    )).sort((left, right) => left.localeCompare(right));
+    const validatedRuntimeIds = new Set(
+        edges
+            .filter((edge) => edge.type === 'validated_by')
+            .map((edge) => edge.from)
+    );
+    const rows = criticalPaths.map((criticalPath) => {
+        const pathNodes = nodes.filter((node) => nodeMatchesCriticalPath(node, criticalPath));
+        const counts = {
+            runtime: pathNodes.filter((node) => node.type === 'runtime').length,
+            event: pathNodes.filter((node) => node.type === 'event').length,
+            state: pathNodes.filter((node) => node.type === 'state').length,
+            config: pathNodes.filter((node) => node.type === 'config').length,
+            test: pathNodes.filter((node) => node.type === 'test').length,
+        };
+        const missingValidation = pathNodes
+            .filter((node) => node.type === 'runtime' && !validatedRuntimeIds.has(node.id))
+            .map(nodeSummary)
+            .filter(Boolean);
+        const eventIds = new Set(pathNodes.filter((node) => node.type === 'event').map((node) => node.id));
+        const eventEdges = edges
+            .filter((edge) => (edge.type === 'emits' || edge.type === 'consumes') && eventIds.has(edge.to))
+            .map((edge) => edgeSummary(edge, nodeById));
+        const status = counts.runtime > 0 && counts.test > 0 && missingValidation.length === 0
+            ? 'ok'
+            : 'needs-attention';
+
+        return {
+            criticalPath,
+            status,
+            counts,
+            missingValidation: sortNodeSummaries(missingValidation),
+            eventEdges: sortEdgeSummaries(eventEdges),
+        };
+    });
+
+    return {
+        query: 'critical-path-health',
+        criticalPaths: rows,
     };
 }
 
@@ -412,6 +651,56 @@ function printText(result) {
             process.stdout.write(`- ${block.id} status=${block.status} currentPhase=${block.currentPhase || 'none'} openDeps=${block.openDependencyCount} scopeFiles=${block.scopeFileCount}\n`);
         }
     }
+
+    if (result.query === 'impact-for-file') {
+        process.stdout.write(`impact-for-file ${result.file}\n`);
+        const coverage = result.coverage;
+        if (coverage) {
+            process.stdout.write(`- coverage covered=${coverage.covered} core=${coverage.coveredInCore} overlay=${coverage.coveredByOverlay} classification=${coverage.classification}\n`);
+        } else {
+            process.stdout.write('- coverage not tracked\n');
+        }
+        process.stdout.write(`- critical paths=${result.criticalPaths.join(', ') || 'none'}\n`);
+        process.stdout.write(`- implemented nodes=${result.implementedNodes.map((node) => node.id).join(', ') || 'none'}\n`);
+        process.stdout.write(`- relation edges=${result.relationEdges.length}\n`);
+        return;
+    }
+
+    if (result.query === 'event-flow') {
+        process.stdout.write(`event-flow ${result.selector}\n`);
+        if (result.events.length === 0) {
+            process.stdout.write('- none\n');
+            return;
+        }
+        for (const event of result.events) {
+            process.stdout.write(`- ${event.id} (${event.title || 'untitled'})\n`);
+            const eventEdges = result.edges.filter((edge) => edge.to === event.id);
+            for (const edge of eventEdges) {
+                process.stdout.write(`  - ${edge.type}: ${edge.from}\n`);
+            }
+        }
+        return;
+    }
+
+    if (result.query === 'untested-systems') {
+        process.stdout.write(`untested-systems${result.criticalPath ? ` ${result.criticalPath}` : ''}\n`);
+        if (result.systems.length === 0) {
+            process.stdout.write('- none\n');
+            return;
+        }
+        for (const system of result.systems) {
+            process.stdout.write(`- ${system.id} (${system.file || 'no-file'})\n`);
+        }
+        return;
+    }
+
+    if (result.query === 'critical-path-health') {
+        process.stdout.write('critical-path-health\n');
+        for (const entry of result.criticalPaths) {
+            const counts = entry.counts;
+            process.stdout.write(`- ${entry.criticalPath}: ${entry.status} runtime=${counts.runtime} event=${counts.event} state=${counts.state} config=${counts.config} test=${counts.test} missingValidation=${entry.missingValidation.length}\n`);
+        }
+    }
 }
 
 function usage() {
@@ -425,16 +714,24 @@ function usage() {
         + '  node scripts/query-knowledge-graph.mjs why-file <FILE_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs files-for-block <BLOCK_ID> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs bt-status [BLOCK_ID] [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs impact-for-file <FILE_PATH> [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs event-flow <EVENT_ID|CRITICAL_PATH> [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs untested-systems [CRITICAL_PATH] [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs critical-path-health [--json]\n'
     );
 }
 
 export {
     queryBtStatus,
     queryCoverageReport,
+    queryCriticalPathHealth,
+    queryEventFlow,
     queryFilesForBlock,
+    queryImpactForFile,
     queryOpenDeps,
     queryScopeCollisions,
     querySurfacesForFile,
+    queryUntestedSystems,
     queryUncoveredFiles,
     queryWhyFile,
 };
@@ -493,6 +790,24 @@ if (isDirectRun) {
             result = queryFilesForBlock(graph, coverage, blockId);
         } else if (command === 'bt-status') {
             result = queryBtStatus(graph, positional[1] || null);
+        } else if (command === 'impact-for-file') {
+            const filePath = positional[1];
+            if (!filePath) {
+                usage();
+                process.exit(1);
+            }
+            result = queryImpactForFile(graph, coverage, filePath);
+        } else if (command === 'event-flow') {
+            const selector = positional[1];
+            if (!selector) {
+                usage();
+                process.exit(1);
+            }
+            result = queryEventFlow(graph, selector);
+        } else if (command === 'untested-systems') {
+            result = queryUntestedSystems(graph, positional[1] || '');
+        } else if (command === 'critical-path-health') {
+            result = queryCriticalPathHealth(graph);
         } else {
             usage();
             process.exit(1);

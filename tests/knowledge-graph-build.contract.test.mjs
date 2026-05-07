@@ -19,6 +19,12 @@ import {
     CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
     validateCriticalDesktopMappings,
 } from '../scripts/check-knowledge-graph.mjs';
+import {
+    queryCriticalPathHealth,
+    queryEventFlow,
+    queryImpactForFile,
+    queryUntestedSystems,
+} from '../scripts/query-knowledge-graph.mjs';
 
 test('parseFrontmatter tolerates missing status and variant field order', () => {
     const content = [
@@ -374,6 +380,48 @@ test('buildKnowledgeGraph keeps required desktop critical-path mappings intact',
         relationLayerByEdge.get('runtime:entity-spawn-ops::event:spawn::emits'),
         'event'
     );
+});
+
+test('knowledge graph core runtime queries return stable JSON shapes', async () => {
+    const graph = await buildKnowledgeGraph();
+    const coverage = {
+        files: [
+            {
+                path: 'src/core/SettingsManager.js',
+                covered: true,
+                coveredInCore: true,
+                coveredByOverlay: false,
+                classification: 'product-code',
+                scopeBlocks: ['V107'],
+                surfaces: [],
+            },
+        ],
+    };
+
+    const impact = queryImpactForFile(graph, coverage, 'src\\core\\SettingsManager.js');
+    assert.equal(impact.query, 'impact-for-file');
+    assert.equal(impact.file, 'src/core/SettingsManager.js');
+    assert.deepEqual(impact.criticalPaths, ['settings']);
+    assert.ok(impact.implementedNodes.some((node) => node.id === 'runtime:settings-manager'));
+    assert.ok(impact.relationEdges.some((edge) => edge.type === 'validated_by' && edge.to === 'test:settings-manager-contract'));
+
+    const eventFlow = queryEventFlow(graph, 'round-end');
+    assert.equal(eventFlow.query, 'event-flow');
+    assert.deepEqual(eventFlow.events.map((event) => event.id), ['event:round-end']);
+    assert.ok(eventFlow.edges.some((edge) => edge.type === 'emits' && edge.from === 'runtime:round-outcome-system'));
+    assert.ok(eventFlow.edges.some((edge) => edge.type === 'consumes' && edge.from === 'runtime:round-end-coordinator'));
+
+    const untestedSystems = queryUntestedSystems(graph, 'spawn');
+    assert.equal(untestedSystems.query, 'untested-systems');
+    assert.deepEqual(untestedSystems.systems, []);
+
+    const health = queryCriticalPathHealth(graph);
+    assert.equal(health.query, 'critical-path-health');
+    const healthByPath = new Map(health.criticalPaths.map((entry) => [entry.criticalPath, entry]));
+    assert.equal(healthByPath.get('spawn').status, 'ok');
+    assert.equal(healthByPath.get('combat-hit').status, 'ok');
+    assert.equal(healthByPath.get('round-end').status, 'ok');
+    assert.equal(healthByPath.get('settings').status, 'ok');
 });
 
 test('parseAuditMasterRows extracts audit blocks, findings paths and core scope references', () => {
