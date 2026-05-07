@@ -50,6 +50,30 @@ const BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL = new URL(
 const BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT = 'build-artifact';
 const BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE = new WeakMap();
 
+function decodeBase64DataUrlPayload(payload, runtimeGlobal) {
+    const atobFn = typeof runtimeGlobal?.atob === 'function'
+        ? runtimeGlobal.atob.bind(runtimeGlobal)
+        : (typeof globalThis.atob === 'function' ? globalThis.atob.bind(globalThis) : null);
+    if (!atobFn) return '';
+    const binary = atobFn(payload);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    const TextDecoderCtor = typeof runtimeGlobal?.TextDecoder === 'function'
+        ? runtimeGlobal.TextDecoder
+        : (typeof globalThis.TextDecoder === 'function' ? globalThis.TextDecoder : null);
+    return TextDecoderCtor ? new TextDecoderCtor('utf-8').decode(bytes) : binary;
+}
+
+function readBrowserDemoPolicyExportDataUrl(runtimeGlobal) {
+    if (!BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL.startsWith('data:')) return null;
+    const separatorIndex = BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL.indexOf(',');
+    if (separatorIndex < 0) return '';
+    const metadata = BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL.slice(5, separatorIndex).toLowerCase();
+    const payload = BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL.slice(separatorIndex + 1);
+    return metadata.split(';').includes('base64')
+        ? decodeBase64DataUrlPayload(payload, runtimeGlobal)
+        : decodeURIComponent(payload);
+}
+
 function sanitizeDiagnosticsCodeArray(values) {
     return sanitizeUniqueStringArray(values, normalizeString);
 }
@@ -163,26 +187,31 @@ function resolveBrowserDemoSurfacePolicyOverrideDraftFromBuildArtifact(runtimeGl
         return cached;
     }
 
-    const XMLHttpRequestCtor = runtimeGlobal.XMLHttpRequest;
-    if (typeof XMLHttpRequestCtor !== 'function') {
-        const unavailable = createBrowserDemoOverrideDraftResolution({
-            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
-            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SOURCE_UNAVAILABLE,
-            reason: 'XMLHttpRequest ist fuer den Build-Artefakt-Lesepfad nicht verfuegbar.',
-            source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
-        });
-        BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, unavailable);
-        return unavailable;
-    }
-
     let responseText = '';
     let responseStatus = 0;
     try {
-        const request = new XMLHttpRequestCtor();
-        request.open('GET', BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL, false);
-        request.send(null);
-        responseStatus = Number(request.status || 0);
-        responseText = String(request.responseText || '');
+        const dataUrlResponseText = readBrowserDemoPolicyExportDataUrl(runtimeGlobal);
+        if (dataUrlResponseText !== null) {
+            responseStatus = 200;
+            responseText = dataUrlResponseText;
+        } else {
+            const XMLHttpRequestCtor = runtimeGlobal.XMLHttpRequest;
+            if (typeof XMLHttpRequestCtor !== 'function') {
+                const unavailable = createBrowserDemoOverrideDraftResolution({
+                    status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
+                    reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SOURCE_UNAVAILABLE,
+                    reason: 'XMLHttpRequest ist fuer den Build-Artefakt-Lesepfad nicht verfuegbar.',
+                    source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+                });
+                BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, unavailable);
+                return unavailable;
+            }
+            const request = new XMLHttpRequestCtor();
+            request.open('GET', BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL, false);
+            request.send(null);
+            responseStatus = Number(request.status || 0);
+            responseText = String(request.responseText || '');
+        }
     } catch (error) {
         const readFailed = createBrowserDemoOverrideDraftResolution({
             status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,

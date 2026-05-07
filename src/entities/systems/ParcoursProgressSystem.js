@@ -14,6 +14,10 @@ import {
     playerOwnsGhostRecording,
     resolveProgressPlayerIndex,
 } from './ParcoursProgressRuntime.js';
+import {
+    createPlayerHudState,
+    createPlayerProgressSnapshot,
+} from './ParcoursProgressSnapshot.js';
 
 export class ParcoursProgressSystem {
     constructor(entityManager, options = {}) {
@@ -470,62 +474,14 @@ export class ParcoursProgressSystem {
         if (!this._route) return null;
         const state = this._ensurePlayerState(playerIndex);
         if (!state) return null;
-        const hasError = state.errorUntilMs > now && !!state.lastError;
-        const segmentAnchor = state.lastCheckpointAtMs || state.startedAtMs || 0;
-        const segmentElapsedMs = state.completed || segmentAnchor <= 0
-            ? 0
-            : Math.max(0, now - segmentAnchor);
-        const expectedEntries = !state.completed && this._route.totalCheckpoints > 0
-            ? (this._route.entriesByCheckpointIndex[
-                Math.max(0, Math.min(this._route.totalCheckpoints - 1, state.nextCheckpointIndex))
-            ] || [])
-            : [];
-        const passedCheckpointIds = state.stageCheckpointIds.filter((checkpointId) => (
-            typeof checkpointId === 'string' && checkpointId.trim().length > 0
-        ));
-        return {
-            routeId: this._route.routeId,
-            totalCheckpoints: this._route.totalCheckpoints,
-            nextCheckpointIndex: state.nextCheckpointIndex,
-            passedMask: Array.from(state.passedMask),
-            passedCheckpointIds,
-            expectedCheckpointIds: expectedEntries.map((entry) => entry.id),
-            startedAtMs: state.startedAtMs,
-            lastCheckpointAtMs: state.lastCheckpointAtMs,
-            wrongOrderCount: state.wrongOrderCount,
-            penaltyTimeMs: Math.max(0, Math.trunc(Number(state.penaltyTimeMs) || 0)),
-            resetCount: state.resetCount,
-            completed: state.completed,
-            completedAtMs: state.completedAtMs,
-            completionTimeMs: state.completionTimeMs,
-            lastCheckpointId: state.lastCheckpointId,
-            hasError,
-            errorMessage: hasError ? state.lastError : '',
-            segmentElapsedMs,
-        };
+        return createPlayerProgressSnapshot(this._route, state, now);
     }
 
     getPlayerHudState(playerIndex, now = this.nowProvider()) {
         if (!this._route) return null;
         const snapshot = this.getPlayerProgressSnapshot(playerIndex, now);
         if (!snapshot) return null;
-        return {
-            enabled: true,
-            routeId: snapshot.routeId,
-            totalCheckpoints: snapshot.totalCheckpoints,
-            currentCheckpoint: snapshot.completed
-                ? snapshot.totalCheckpoints
-                : Math.max(0, Math.min(snapshot.totalCheckpoints, snapshot.nextCheckpointIndex)),
-            completed: snapshot.completed,
-            completionTimeMs: snapshot.completionTimeMs,
-            penaltyTimeMs: snapshot.penaltyTimeMs,
-            segmentElapsedMs: snapshot.segmentElapsedMs,
-            passedCheckpointIds: [...snapshot.passedCheckpointIds],
-            hasError: snapshot.hasError,
-            errorMessage: snapshot.errorMessage,
-            wrongOrderCount: snapshot.wrongOrderCount,
-            resetCount: snapshot.resetCount,
-        };
+        return createPlayerHudState(snapshot);
     }
 
     getRouteSnapshot() {

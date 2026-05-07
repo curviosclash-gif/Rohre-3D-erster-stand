@@ -6,6 +6,10 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-07
+
+- Build-/Desktop-Bugfix ausserhalb eines aktiven Blocks: `ParcoursProgressSystem` unterschreitet den Architektur-`max-lines`-Guard durch Auslagerung der Progress-Snapshot-/HUD-DTO-Erzeugung; die Desktop-CSP bleibt self-contained, weil der Google-Fonts-Import entfernt wurde und Vite-`data:`-Buildartefakte fuer `browser-demo-surface-policy.export.v1.json` ohne XHR gelesen werden. `tmp/` ist aus dem Git-Index entfernt, lokale transiente Artefakte bleiben durch `.gitignore` unversioniert.
+
 ## Stand-Snapshot 2026-04-28
 
 - Neuer geplanter Architekturblock `V104` ist im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V104.md`.
