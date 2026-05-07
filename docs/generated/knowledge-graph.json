@@ -246,7 +246,7 @@
           "tests/persistence-version-migration.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 35,
+          "concreteCount": 40,
           "plannedCount": 0
         }
       }
@@ -1934,7 +1934,7 @@
         ],
         "priority": "P2",
         "owner": "codex",
-        "currentPhase": "107.2",
+        "currentPhase": "107.3",
         "planFile": "docs/plaene/aktiv/V107.md",
         "scopeDeclarations": [
           ".agents/rules/token_efficiency_and_tools.md",
@@ -3092,7 +3092,7 @@
           "tests/persistence-version-migration.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 177,
+          "concreteCount": 182,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3338,7 +3338,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 255,
+          "concreteCount": 260,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5452,7 +5452,7 @@
       "id": "V107.2",
       "type": "phase",
       "title": "Builder- und Query-Ausbau",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.2"
@@ -15349,8 +15349,8 @@
     {
       "id": "V107.2.2",
       "type": "subphase",
-      "title": "Kernqueries (`impact-for-file`, `event-flow`, `untested-systems`, `critical-path-health`) inkl. JSON-Ausgabe stabilisieren.",
-      "status": "open",
+      "title": "Kernqueries (`impact-for-file`, `event-flow`, `untested-systems`, `critical-path-health`) inkl. JSON-Ausgabe stabilisieren. (abgeschlossen: 2026-05-07; evidence: `node --test tests/knowledge-graph-build.contract.test.mjs` + `node scripts/query-knowledge-graph.mjs critical-path-health` + `node scripts/query-knowledge-graph.mjs impact-for-file src\\core\\SettingsManager.js --json` + `node scripts/query-knowledge-graph.mjs event-flow round-end` + `node scripts/query-knowledge-graph.mjs untested-systems spawn --json` -> Text- und JSON-Ausgabe fuer Kernqueries stabil; `SettingManager`-Impact zeigt Runtime-/Config-/State-/Test-Kanten, Critical-Path-Health meldet Spawn, Combat/Hit, Round-End und Settings als `ok`)",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.2",
@@ -15360,8 +15360,8 @@
     {
       "id": "V107.3.1",
       "type": "subphase",
-      "title": "`graph:check` um Runtime-Orphans, Missing-Validation und Unknown-Reference-Checks erweitern.",
-      "status": "open",
+      "title": "`graph:check` um Runtime-Orphans, Missing-Validation und Unknown-Reference-Checks erweitern. (abgeschlossen: 2026-05-07; evidence: `node --test tests/knowledge-graph-build.contract.test.mjs` -> 15/15 PASS inkl. `KG_RUNTIME_ORPHAN`, `KG_RUNTIME_VALIDATION_MISSING`, `KG_UNKNOWN_REFERENCE` und `KG_UNKNOWN_FILE_REFERENCE`; `npm run plan:check` -> PASS; `npm run graph:check` prueft die neuen Regeln mit, ist im aktuellen Dirty-Workspace aber durch fremde Intake-/Scope-Drifts (`GRAPH_DIFF`, `COVERAGE_DIFF`, V113-Scope-Kollisionen) blockiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V107",
         "phaseCode": "107.3",
@@ -29032,7 +29032,7 @@
         "scopeBlocks": [
           "BT11"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -39450,6 +39450,42 @@
       }
     },
     {
+      "id": "src/core/settings/SettingsDiagnosticsFacade.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B07",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/core/settings/SettingsDiffOps.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B07",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/core/settings/SettingsDomainUtils.js",
       "type": "file",
       "title": null,
@@ -39465,6 +39501,60 @@
           "V85",
           "V91",
           "V95"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/core/settings/SettingsHealthSnapshot.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B07",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/core/settings/SettingsImportPreviewOps.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B07",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/core/settings/SettingsMutationResult.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B07",
+          "V85",
+          "V91"
         ],
         "exists": true
       }
@@ -49464,7 +49554,7 @@
         "scopeBlocks": [
           "BT12"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -52390,7 +52480,52 @@
     },
     {
       "from": "B07",
+      "to": "src/core/settings/SettingsDiagnosticsFacade.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B07",
+      "to": "src/core/settings/SettingsDiffOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B07",
       "to": "src/core/settings/SettingsDomainUtils.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B07",
+      "to": "src/core/settings/SettingsHealthSnapshot.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B07",
+      "to": "src/core/settings/SettingsImportPreviewOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B07",
+      "to": "src/core/settings/SettingsMutationResult.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -109494,7 +109629,52 @@
     },
     {
       "from": "V85",
+      "to": "src/core/settings/SettingsDiagnosticsFacade.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/core/settings/SettingsDiffOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
       "to": "src/core/settings/SettingsDomainUtils.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/core/settings/SettingsHealthSnapshot.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/core/settings/SettingsImportPreviewOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/core/settings/SettingsMutationResult.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -113627,7 +113807,52 @@
     },
     {
       "from": "V91",
+      "to": "src/core/settings/SettingsDiagnosticsFacade.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/core/settings/SettingsDiffOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
       "to": "src/core/settings/SettingsDomainUtils.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/core/settings/SettingsHealthSnapshot.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/core/settings/SettingsImportPreviewOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/core/settings/SettingsMutationResult.js",
       "type": "scope",
       "hint": null,
       "attributes": {

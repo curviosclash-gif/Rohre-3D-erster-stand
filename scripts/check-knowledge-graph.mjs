@@ -557,6 +557,7 @@ function validateCoverageArtifact(coverage, graph, violations) {
     const files = Array.isArray(coverage.files) ? coverage.files : [];
     const overlayBlocks = Array.isArray(coverage.overlayBlocks) ? coverage.overlayBlocks : [];
     const summary = coverage.summary || {};
+    const gate = coverage.gate || null;
     const overlayIds = new Set(overlayBlocks.map((entry) => entry.id));
     const seenPaths = new Set();
     const rawCoveredCount = files.filter((entry) => entry.covered === true).length;
@@ -577,6 +578,21 @@ function validateCoverageArtifact(coverage, graph, violations) {
     }
     if (summary.adjustedTrackedFileCount !== activeFiles.length) {
         addViolation(violations, 'COVERAGE_ADJUSTED_TRACKED_COUNT_MISMATCH', `summary.adjustedTrackedFileCount=${summary.adjustedTrackedFileCount} passt nicht zur Dateiaggregation=${activeFiles.length}`);
+    }
+    if (!gate || typeof gate !== 'object') {
+        addViolation(violations, 'COVERAGE_GATE_MISSING', 'Coverage-Artefakt enthaelt keinen Gate-Abschnitt');
+    } else {
+        const rules = Array.isArray(gate.rules) ? gate.rules : [];
+        const failingRules = rules.filter((rule) => rule.status === 'fail' || Number(rule.violationCount || 0) > 0);
+        if (gate.status !== 'pass') {
+            addViolation(violations, 'COVERAGE_GATE_FAILED', `Coverage-Gate status=${gate.status}; neue uncovered Dateien: ${failingRules.map((rule) => `${rule.id}:${rule.violationCount || 0}`).join(', ') || 'unbekannt'}`);
+        }
+        for (const rule of rules) {
+            const filesForRule = Array.isArray(rule.files) ? rule.files : [];
+            if (rule.violationCount !== filesForRule.length) {
+                addViolation(violations, 'COVERAGE_GATE_COUNT_MISMATCH', `Coverage-Gate ${rule.id} meldet violationCount=${rule.violationCount}, aber files.length=${filesForRule.length}`);
+            }
+        }
     }
 
     for (const entry of files) {
@@ -718,5 +734,6 @@ export { runChecks };
 export {
     CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
     validateCriticalDesktopMappings,
+    validateCoverageArtifact,
     validateRuntimeMappingIntegrity,
 };

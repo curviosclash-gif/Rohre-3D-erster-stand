@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
     buildKnowledgeGraph,
+    buildCoverageArtifact,
     classifyCoveragePath,
     normalizeKnowledgeGraphMappingContract,
     parseAuditFindingsMetadata,
@@ -18,6 +19,7 @@ import {
 import {
     CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
     validateCriticalDesktopMappings,
+    validateCoverageArtifact,
     validateRuntimeMappingIntegrity,
 } from '../scripts/check-knowledge-graph.mjs';
 import {
@@ -240,6 +242,59 @@ test('classifyCoveragePath marks excluded and active buckets', () => {
         excludedFromCoverage: false,
         excludeReason: null,
     });
+});
+
+test('buildCoverageArtifact gates newly uncovered active files against baseline', () => {
+    const graph = {
+        contract: 'knowledge-graph.v1',
+        nodes: [
+            {
+                id: 'src/core/CoveredRuntime.js',
+                type: 'file',
+                attributes: {
+                    exists: true,
+                    source: ['fixture'],
+                },
+            },
+        ],
+        edges: [],
+    };
+    const baselineCoverage = {
+        files: [
+            {
+                path: 'src/core/ExistingGap.js',
+                covered: false,
+                excludedFromCoverage: false,
+            },
+            {
+                path: 'src/core/NewGap.js',
+                covered: true,
+                excludedFromCoverage: false,
+            },
+        ],
+    };
+
+    const coverage = buildCoverageArtifact(
+        graph,
+        [
+            'assets/ui/logo.png',
+            'src/core/CoveredRuntime.js',
+            'src/core/ExistingGap.js',
+            'src/core/NewGap.js',
+        ],
+        null,
+        baselineCoverage
+    );
+    const gateRule = coverage.gate.rules.find((rule) => rule.id === 'no-new-active-uncovered-files');
+    const violations = [];
+
+    validateCoverageArtifact(coverage, graph, violations);
+
+    assert.equal(coverage.gate.status, 'fail');
+    assert.equal(gateRule.violationCount, 1);
+    assert.equal(gateRule.files[0].path, 'src/core/NewGap.js');
+    assert.equal(gateRule.files[0].baselineState, 'covered');
+    assert.ok(violations.some((violation) => violation.code === 'COVERAGE_GATE_FAILED'));
 });
 
 test('normalizeKnowledgeGraphMappingContract validates mapping payloads and normalizes repo paths', () => {

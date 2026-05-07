@@ -221,6 +221,7 @@ function queryCoverageReport(coverage) {
         query: 'coverage-report',
         summary: coverage.summary || {},
         overlayBlocks: Array.isArray(coverage.overlayBlocks) ? coverage.overlayBlocks : [],
+        gate: coverage.gate || null,
     };
 }
 
@@ -572,10 +573,15 @@ function printText(result) {
 
     if (result.query === 'coverage-report') {
         const summary = result.summary || {};
+        const gate = result.gate || null;
         process.stdout.write('coverage-report\n');
         process.stdout.write(`- raw: ${summary.rawCoveredFileCount}/${summary.trackedFileCount} (${summary.rawCoveragePercent}%)\n`);
         process.stdout.write(`- adjusted: ${summary.adjustedCoveredFileCount}/${summary.adjustedTrackedFileCount} (${summary.adjustedCoveragePercent}%)\n`);
         process.stdout.write(`- uncovered active: ${summary.uncoveredActiveFileCount}\n`);
+        if (gate) {
+            const newUncoveredRule = (gate.rules || []).find((rule) => rule.id === 'no-new-active-uncovered-files');
+            process.stdout.write(`- gate: ${gate.status} (new uncovered active: ${newUncoveredRule?.violationCount ?? 0})\n`);
+        }
         process.stdout.write(`- overlay blocks: ${(result.overlayBlocks || []).length}\n`);
         return;
     }

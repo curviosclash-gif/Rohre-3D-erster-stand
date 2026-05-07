@@ -48,6 +48,8 @@ const GRAPH_MAPPING_CONTRACT = 'knowledge-graph.mapping.v1';
 const GRAPH_MAPPING_SCHEMA_VERSION = 1;
 const COVERAGE_CONTRACT = 'knowledge-graph.coverage.v1';
 const COVERAGE_SCHEMA_VERSION = 1;
+const COVERAGE_GATE_CONTRACT = 'knowledge-graph.coverage.gate.v1';
+const COVERAGE_NO_NEW_UNCOVERED_RULE = 'no-new-active-uncovered-files';
 const execFile = promisify(execFileCallback);
 const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
     {
@@ -393,6 +395,18 @@ async function readDirtyTrackedFiles() {
     }
 
     return dirtyFiles;
+}
+
+async function readCoverageBaseline() {
+    const raw = await runGitCommand(['show', `HEAD:${COVERAGE_OUTPUT_PATH}`]);
+    if (!raw.trim()) {
+        return null;
+    }
+    try {
+        return JSON.parse(raw);
+    } catch {
+        return null;
+    }
 }
 
 function isHotspotEligible(filePath) {
@@ -1758,7 +1772,73 @@ function buildGraphFileCoverageIndex(graph) {
     };
 }
 
-function buildCoverageArtifact(coreGraph, trackedFiles, hotspotOverlay) {
+function isActiveUncoveredCoverageFile(entry) {
+    return entry?.covered !== true && entry?.excludedFromCoverage !== true;
+}
+
+function summarizeCoverageBaselineState(entry) {
+    if (!entry) {
+        return 'absent';
+    }
+    if (entry.excludedFromCoverage === true) {
+        return 'excluded';
+    }
+    if (entry.covered === true) {
+        return 'covered';
+    }
+    return 'uncovered';
+}
+
+function buildCoverageGate(files, baselineCoverage) {
+    const baselineByPath = new Map(
+        (Array.isArray(baselineCoverage?.files) ? baselineCoverage.files : [])
+            .map((entry) => [normalizeRepoPath(entry.path), entry])
+    );
+    const baselineAvailable = baselineByPath.size > 0;
+    const newUncoveredActiveFiles = baselineAvailable
+        ? files
+            .filter(isActiveUncoveredCoverageFile)
+            .filter((entry) => {
+                const previous = baselineByPath.get(entry.path);
+                return !previous || previous.covered === true || previous.excludedFromCoverage === true;
+            })
+            .map((entry) => {
+                const previous = baselineByPath.get(entry.path);
+                return {
+                    path: entry.path,
+                    classification: entry.classification,
+                    baselineState: summarizeCoverageBaselineState(previous),
+                    coveredInCore: entry.coveredInCore === true,
+                    coveredByOverlay: entry.coveredByOverlay === true,
+                    scopeBlocks: Array.isArray(entry.scopeBlocks) ? entry.scopeBlocks : [],
+                };
+            })
+            .sort((left, right) => left.path.localeCompare(right.path))
+        : [];
+    const status = newUncoveredActiveFiles.length === 0 ? 'pass' : 'fail';
+
+    return {
+        contract: COVERAGE_GATE_CONTRACT,
+        status,
+        baseline: {
+            ref: 'HEAD',
+            path: COVERAGE_OUTPUT_PATH,
+            available: baselineAvailable,
+        },
+        rules: [
+            {
+                id: COVERAGE_NO_NEW_UNCOVERED_RULE,
+                severity: 'error',
+                status,
+                description: 'Active repo files may not become newly uncovered; add them to a graph scope/mapping or classify them as excluded.',
+                violationCount: newUncoveredActiveFiles.length,
+                files: newUncoveredActiveFiles,
+            },
+        ],
+    };
+}
+
+function buildCoverageArtifact(coreGraph, trackedFiles, hotspotOverlay, baselineCoverage = null) {
     const index = buildGraphFileCoverageIndex(coreGraph);
     const hotspotByPath = new Map((hotspotOverlay?.files || []).map((entry) => [entry.path, entry]));
     const files = trackedFiles.map((filePath) => {
@@ -1851,6 +1931,7 @@ function buildCoverageArtifact(coreGraph, trackedFiles, hotspotOverlay) {
             classifications: Array.from(classificationSummary.values())
                 .sort((left, right) => left.classification.localeCompare(right.classification)),
         },
+        gate: buildCoverageGate(files, baselineCoverage),
         files,
     };
 }
@@ -2418,8 +2499,11 @@ export async function buildKnowledgeGraphArtifacts() {
             .filter((node) => node.type === 'file' && node.attributes?.exists === true)
             .map((node) => node.id)
     );
-    const hotspotOverlay = await buildGitHotspotOverlay(coveredFileIds, trackedFiles);
-    const coverage = buildCoverageArtifact(graph, trackedFiles, hotspotOverlay);
+    const [hotspotOverlay, baselineCoverage] = await Promise.all([
+        buildGitHotspotOverlay(coveredFileIds, trackedFiles),
+        readCoverageBaseline(),
+    ]);
+    const coverage = buildCoverageArtifact(graph, trackedFiles, hotspotOverlay, baselineCoverage);
     return {
         graph,
         coverage,
@@ -2448,6 +2532,7 @@ export {
     buildCoverageArtifact,
     buildGitHotspotOverlay,
     classifyCoveragePath,
+    isActiveUncoveredCoverageFile,
     normalizeKnowledgeGraphMappingContract,
     parseFrontmatter,
     parseMasterRows,

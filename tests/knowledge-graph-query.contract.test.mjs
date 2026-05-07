@@ -138,6 +138,25 @@ const coverageFixture = {
             ],
         },
     ],
+    gate: {
+        contract: 'knowledge-graph.coverage.gate.v1',
+        status: 'pass',
+        baseline: {
+            ref: 'HEAD',
+            path: 'docs/generated/knowledge-graph.coverage.json',
+            available: true,
+        },
+        rules: [
+            {
+                id: 'no-new-active-uncovered-files',
+                severity: 'error',
+                status: 'pass',
+                description: 'fixture',
+                violationCount: 0,
+                files: [],
+            },
+        ],
+    },
     files: [
         {
             path: 'python/train.py',
@@ -199,6 +218,7 @@ test('queryCoverageReport and queryUncoveredFiles expose coverage summary and ga
     const uncovered = queryUncoveredFiles(coverageFixture, 'assets/');
 
     assert.equal(report.summary.adjustedCoveragePercent, 100);
+    assert.equal(report.gate.status, 'pass');
     assert.deepEqual(uncovered.files, [
         {
             path: 'assets/ui/logo.png',
