@@ -11,8 +11,9 @@ export class MenuTextRuntime {
         this.catalog = options.catalog && typeof options.catalog === 'object'
             ? options.catalog
             : MENU_TEXT_CATALOG;
-        this.overrideStore = options.overrideStore instanceof MenuTextOverrideStore
-            ? options.overrideStore
+        const overridePort = options.overridePort || options.overrideStore;
+        this.overridePort = overridePort && typeof overridePort.getOverride === 'function'
+            ? overridePort
             : new MenuTextOverrideStore();
     }
 
@@ -30,7 +31,7 @@ export class MenuTextRuntime {
         if (!overridesEnabled) {
             return defaultText;
         }
-        const overrideText = this.overrideStore.getOverride(normalizedTextId);
+        const overrideText = this.overridePort.getOverride(normalizedTextId);
         return overrideText || defaultText;
     }
 

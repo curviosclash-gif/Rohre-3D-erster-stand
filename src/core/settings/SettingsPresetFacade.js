@@ -7,6 +7,7 @@ import {
     SETTINGS_CHANGE_KEYS,
 } from '../../composition/core-ui/CoreSettingsPorts.js';
 import { normalizePresetId } from './SettingsDomainUtils.js';
+import { createSettingsMutationFailure } from './SettingsMutationResult.js';
 
 function mergeChangedKeys(...groups) {
     return Array.from(new Set(groups.flatMap((group) => (
@@ -27,11 +28,11 @@ export function createSettingsPresetFacade(options = {}) {
     function applyMenuPreset(settings, presetId, accessContext = null) {
         const normalizedPresetId = String(presetId || '').trim();
         if (!normalizedPresetId) {
-            return { success: false, reason: 'invalid_preset_id', changedKeys: [], metadata: null };
+            return createSettingsMutationFailure('invalid_preset_id');
         }
         const preset = menuPresetStore.getPresetById(normalizedPresetId);
         if (!preset) {
-            return { success: false, reason: 'preset_not_found', changedKeys: [], metadata: null };
+            return createSettingsMutationFailure('preset_not_found');
         }
 
         ensureMenuContractState(settings);
@@ -84,14 +85,14 @@ export function createSettingsPresetFacade(options = {}) {
             : resolveMenuAccessContext(settings);
         const kind = optionsPayload.kind === 'fixed' ? 'fixed' : 'open';
         if (kind === 'fixed' && !resolvedContext.isOwner) {
-            return { success: false, reason: 'owner_required', changedKeys: [], metadata: null };
+            return createSettingsMutationFailure('owner_required');
         }
 
         const requestedName = String(optionsPayload.name || '').trim();
         const requestedId = String(optionsPayload.id || '').trim();
         const derivedId = normalizePresetId(requestedId || requestedName || `preset-${Date.now()}`);
         if (!derivedId) {
-            return { success: false, reason: 'invalid_preset_id', changedKeys: [], metadata: null };
+            return createSettingsMutationFailure('invalid_preset_id');
         }
 
         const metadata = createPresetMetadata({

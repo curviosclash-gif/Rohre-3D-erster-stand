@@ -7,16 +7,7 @@ import {
     setDeveloperTheme,
     setDeveloperVisibilityMode,
 } from '../../composition/core-ui/CoreSettingsPorts.js';
-
-function withMutationChangedKeys(result, changedKeys, metadata = null) {
-    return {
-        ...result,
-        changedKeys: result?.success ? changedKeys.slice() : [],
-        metadata: result?.success && metadata && typeof metadata === 'object'
-            ? { ...metadata }
-            : null,
-    };
-}
+import { withMutationChangedKeys } from './SettingsMutationResult.js';
 
 export function createSettingsDeveloperFacade() {
     function setDeveloperMode(settings, enabled, accessContext = null) {

@@ -111,7 +111,7 @@ export function syncMenuDeveloperState({
 
     const selectedTextId = String(ui.developerTextIdSelect?.value || '').trim();
     if (ui.developerTextOverrideInput) {
-        const overrideValue = settingsManager?.menuTextOverrideStore?.getOverride?.(selectedTextId) || '';
+        const overrideValue = settingsManager?.getMenuTextOverridePort?.()?.getOverride?.(selectedTextId) || '';
         if (ui.developerTextOverrideInput.value !== overrideValue) {
             ui.developerTextOverrideInput.value = overrideValue;
         }

@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import test from 'node:test';
 
 import { SETTINGS_CHANGE_KEYS } from '../src/composition/core-ui/CoreSettingsPorts.js';
 import { SettingsManager } from '../src/core/SettingsManager.js';
+import { createSettingsSessionDraftFacade } from '../src/core/settings/SettingsSessionDraftFacade.js';
 import { SettingsStore } from '../src/ui/SettingsStore.js';
 import { STORAGE_KEYS } from '../src/ui/StorageKeys.js';
 import { MENU_TEXT_CATALOG } from '../src/ui/menu/MenuTextCatalog.js';
@@ -85,6 +87,23 @@ function withMockLocalStorage(run) {
     }
 }
 
+function readProductiveSourceFiles(rootUrl, relativePath = '') {
+    const directoryUrl = new URL(`../src/${relativePath}`, rootUrl);
+    const entries = fs.readdirSync(directoryUrl, { withFileTypes: true });
+    const files = [];
+    for (const entry of entries) {
+        const entryPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+        if (entry.isDirectory()) {
+            files.push(...readProductiveSourceFiles(rootUrl, entryPath));
+            continue;
+        }
+        if (!entry.name.endsWith('.js')) continue;
+        if (entryPath === 'core/SettingsManager.js') continue;
+        files.push(entryPath);
+    }
+    return files;
+}
+
 test('V103 SettingsManager loadSettings rewrites persisted snapshots to canonical save shape', () => {
     const storagePlatform = createMemoryStoragePlatform({
         [STORAGE_KEYS.settings]: {
@@ -164,6 +183,7 @@ test('V103 SettingsManager exposes a narrow record-store port for runtime consum
     const manager = new SettingsManager({ storagePlatform });
     const recordPort = manager.getSettingsRecordStorePort();
 
+    assert.equal('store' in manager, false);
     assert.equal(typeof recordPort.loadJsonRecord, 'function');
     assert.equal(typeof recordPort.saveJsonRecord, 'function');
     assert.equal('loadSettings' in recordPort, false);
@@ -177,6 +197,140 @@ test('V103 SettingsManager exposes a narrow record-store port for runtime consum
         },
     });
     assert.deepEqual(recordPort.loadJsonRecord('custom.record', null), { ok: true });
+});
+
+test('V103 SettingsManager exposes text overrides through a narrow read port', () => {
+    withMockLocalStorage(() => {
+        const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+        const textId = Object.keys(MENU_TEXT_CATALOG)[0];
+
+        const port = manager.getMenuTextOverridePort();
+        const result = manager.setMenuTextOverride(textId, 'Port override');
+
+        assert.equal(Object.isFrozen(port), true);
+        assert.equal(typeof port.getOverride, 'function');
+        assert.equal(typeof port.listOverrides, 'function');
+        assert.equal('setOverride' in port, false);
+        assert.equal(result.success, true);
+        assert.equal(port.getOverride(textId), 'Port override');
+        assert.deepEqual(port.listOverrides(), { [textId]: 'Port override' });
+    });
+});
+
+test('V103 SettingsManager diffSettings reports changed paths and known change keys', () => {
+    const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+    const before = manager.createDefaultSettings();
+    const after = manager.sanitizeSettings({
+        ...before,
+        gameplay: {
+            ...before.gameplay,
+            speed: before.gameplay.speed + 1,
+        },
+        localSettings: {
+            ...before.localSettings,
+            sessionType: 'single',
+        },
+    });
+
+    const diff = manager.diffSettings(before, after);
+
+    assert.equal(diff.changed, true);
+    assert.ok(diff.changedKeys.includes(SETTINGS_CHANGE_KEYS.GAMEPLAY_SPEED));
+    assert.ok(diff.changedKeys.includes(SETTINGS_CHANGE_KEYS.SESSION_TYPE));
+    assert.ok(diff.changes.some((change) => (
+        change.path === 'gameplay.speed'
+        && change.changeKey === SETTINGS_CHANGE_KEYS.GAMEPLAY_SPEED
+    )));
+});
+
+test('V103 SettingsManager previewMenuConfigImport does not mutate source settings and returns changes', () => {
+    const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+    const settings = manager.createDefaultSettings();
+    const originalSnapshot = JSON.parse(JSON.stringify(settings));
+    const inputValue = JSON.stringify({
+        contractVersion: 'menu-config-share.v1',
+        payload: {
+            sessionType: 'single',
+            modePath: 'normal',
+            themeMode: 'hell',
+            mode: '1p',
+            gameMode: 'classic',
+            mapKey: 'standard',
+            numBots: settings.numBots,
+            botDifficulty: settings.botDifficulty,
+            winsNeeded: settings.winsNeeded,
+            autoRoll: settings.autoRoll,
+            portalsEnabled: settings.portalsEnabled,
+            vehicles: settings.vehicles,
+            hunt: settings.hunt,
+            gameplay: {
+                ...settings.gameplay,
+                speed: settings.gameplay.speed + 2,
+            },
+            recording: settings.recording,
+            cameraPerspective: settings.cameraPerspective,
+        },
+    });
+
+    const preview = manager.previewMenuConfigImport(settings, inputValue, createOwnerAccessContext());
+
+    assert.equal(preview.success, true);
+    assert.equal(preview.reason, 'imported');
+    assert.deepEqual(settings, originalSnapshot);
+    assert.ok(preview.changedKeys.includes(SETTINGS_CHANGE_KEYS.GAMEPLAY_SPEED));
+    assert.ok(preview.changedKeys.includes(SETTINGS_CHANGE_KEYS.MODE_PATH));
+    assert.ok(Array.isArray(preview.changes));
+    assert.ok(preview.changes.length > 0);
+    assert.deepEqual(preview.blockedPaths, []);
+    assert.equal(preview.usedLegacyFallback, false);
+});
+
+test('V103 SettingsManager health snapshot exposes narrow diagnostic fields only', () => {
+    withMockLocalStorage(() => {
+        const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+        const settings = manager.createDefaultSettings();
+        settings.localSettings.sessionType = 'splitscreen';
+        settings.matchSettings.activePresetId = 'fixed-classic';
+        settings.matchSettings.activePresetKind = 'fixed';
+        const textId = Object.keys(MENU_TEXT_CATALOG)[0];
+        manager.setMenuTextOverride(textId, 'Health override');
+
+        const health = manager.getSettingsHealthSnapshot(settings);
+
+        assert.deepEqual(Object.keys(health).sort(), [
+            'activePresetId',
+            'activePresetKind',
+            'hasMenuTextOverridePort',
+            'hasProfileStorePort',
+            'hasRecordStorePort',
+            'presetCount',
+            'sessionType',
+            'telemetryAvailable',
+            'textOverrideCount',
+        ].sort());
+        assert.equal(health.hasRecordStorePort, true);
+        assert.equal(health.hasProfileStorePort, true);
+        assert.equal(health.hasMenuTextOverridePort, true);
+        assert.equal(health.telemetryAvailable, true);
+        assert.equal(health.activePresetId, 'fixed-classic');
+        assert.equal(health.activePresetKind, 'fixed');
+        assert.equal(health.sessionType, 'splitscreen');
+        assert.equal(health.textOverrideCount, 1);
+        assert.equal(typeof health.presetCount, 'number');
+        assert.equal('settings' in health, false);
+        assert.equal('store' in health, false);
+    });
+});
+
+test('V103 SettingsManager productive consumers avoid direct settings store reach-throughs', () => {
+    const productiveConsumers = readProductiveSourceFiles(import.meta.url);
+    for (const filePath of productiveConsumers) {
+        const source = fs.readFileSync(new URL(`../src/${filePath}`, import.meta.url), 'utf8');
+        assert.equal(source.includes('settingsManager?.store'), false, filePath);
+        assert.equal(source.includes('settingsManager.store'), false, filePath);
+        assert.equal(source.includes('settingsManager?.menuTextOverrideStore'), false, filePath);
+        assert.equal(source.includes('settingsManager.menuTextOverrideStore'), false, filePath);
+    }
 });
 
 test('V103 SettingsManager persistence contract maps invalid_key, quota_exceeded and storage_failed reasons', () => {
@@ -331,4 +485,22 @@ test('V103 SettingsManager mutation contracts preserve ownership and failure rea
     assert.equal(unknownTextResult.success, false);
     assert.equal(unknownTextResult.reason, 'unknown_text_id');
     assert.deepEqual(unknownTextResult.changedKeys, []);
+});
+
+test('V103 Settings session draft facade preserves store failure reasons', () => {
+    const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+    const facade = createSettingsSessionDraftFacade({
+        menuDraftStore: {
+            saveDraft() {
+                return { success: false, reason: 'quota_exceeded' };
+            },
+        },
+    });
+
+    const result = facade.saveSessionDraft(manager.createDefaultSettings(), 'single');
+
+    assert.equal(result.success, false);
+    assert.equal(result.reason, 'quota_exceeded');
+    assert.deepEqual(result.changedKeys, []);
+    assert.equal(result.metadata.persistedDraftState, false);
 });

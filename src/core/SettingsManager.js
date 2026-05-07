@@ -26,6 +26,7 @@ import { createSettingsPresetFacade } from './settings/SettingsPresetFacade.js';
 import { createSettingsDeveloperFacade } from './settings/SettingsDeveloperFacade.js';
 import { createSettingsTextOverrideFacade } from './settings/SettingsTextOverrideFacade.js';
 import { createSettingsTelemetryFacade } from './settings/SettingsTelemetryFacade.js';
+import { attachSettingsDiagnosticsFacade } from './settings/SettingsDiagnosticsFacade.js';
 
 export class SettingsManager {
     constructor(options = {}) {
@@ -37,8 +38,6 @@ export class SettingsManager {
             sanitizeSettings: (settings) => this.sanitizeSettings(settings),
             createDefaultSettings: () => this.createDefaultSettings(),
         });
-        // Temporary legacy alias until remaining external consumers migrate to named ports.
-        this.store = this.settingsStore;
         this.menuPresetStore = new MenuPresetStore({
             fixedCatalog: getFixedMenuPresetCatalog(),
         });
@@ -75,6 +74,11 @@ export class SettingsManager {
             loadJsonRecord: (storageKey, fallbackValue = null) => this.settingsStore.loadJsonRecord(storageKey, fallbackValue),
             saveJsonRecord: (storageKey, value) => this.settingsStore.saveJsonRecord(storageKey, value),
         });
+        this.menuTextOverridePort = Object.freeze({
+            listOverrides: () => this.textOverrideFacade.listMenuTextOverrides(),
+            getOverride: (textId) => this.menuTextOverrideStore.getOverride(textId),
+        });
+        attachSettingsDiagnosticsFacade(this);
     }
 
     createDefaultSettings() {
@@ -193,5 +197,9 @@ export class SettingsManager {
 
     getSettingsRecordStorePort() {
         return this.settingsRecordStorePort;
+    }
+
+    getMenuTextOverridePort() {
+        return this.menuTextOverridePort;
     }
 }

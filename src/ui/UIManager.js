@@ -119,7 +119,7 @@ export class UIManager {
         this._activeSyncCycle = null;
         this.menuTextRuntime = game?.menuTextRuntime instanceof MenuTextRuntime
             ? game.menuTextRuntime
-            : new MenuTextRuntime({ overrideStore: this.settingsManager?.menuTextOverrideStore });
+            : new MenuTextRuntime({ overridePort: this.settingsManager?.getMenuTextOverridePort?.() });
 
         const controllerPortDeps = { manager: this, game };
         this._startSync = new UIStartSyncController({ ui: this.ui, manager: this, port: createStartSetupControllerPortFromManager({ ...controllerPortDeps, settingsManager: this.settingsManager, getMapDefinitions: () => this._getGameplayConfig()?.MAPS || {} }) });
@@ -253,7 +253,7 @@ export class UIManager {
         this._listen(select, 'change', () => {
             const selectedTextId = String(select.value || '').trim();
             if (!this.ui.developerTextOverrideInput) return;
-            const overrideValue = this.settingsManager?.menuTextOverrideStore?.getOverride?.(selectedTextId) || '';
+            const overrideValue = this.settingsManager?.getMenuTextOverridePort?.()?.getOverride?.(selectedTextId) || '';
             this.ui.developerTextOverrideInput.value = overrideValue;
         });
     }

@@ -192,7 +192,6 @@ export class ArcadeRunRuntime {
 
     _resolveSettingsRecordStore() {
         return this.settingsManager?.getSettingsRecordStorePort?.()
-            || this.settingsManager?.store
             || null;
     }
 

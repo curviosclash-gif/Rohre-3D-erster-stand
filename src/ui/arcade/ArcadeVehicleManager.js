@@ -82,7 +82,6 @@ export function setupArcadeVehicleManager(ctx = {}) {
     const bind = typeof ctx.bind === 'function' ? ctx.bind : null;
     const store = runtimeAccess?.getSettingsStore?.()
         || ctx.settingsManager?.getSettingsRecordStorePort?.()
-        || ctx.settingsManager?.store
         || null;
     if (!bind) return null;
 

@@ -9,6 +9,8 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 ## Stand-Snapshot 2026-05-07
 
 - Build-/Desktop-Bugfix ausserhalb eines aktiven Blocks: `ParcoursProgressSystem` unterschreitet den Architektur-`max-lines`-Guard durch Auslagerung der Progress-Snapshot-/HUD-DTO-Erzeugung; die Desktop-CSP bleibt self-contained, weil der Google-Fonts-Import entfernt wurde und Vite-`data:`-Buildartefakte fuer `browser-demo-surface-policy.export.v1.json` ohne XHR gelesen werden. `tmp/` ist aus dem Git-Index entfernt, lokale transiente Artefakte bleiben durch `.gitignore` unversioniert.
+- Settings-Follow-up ausserhalb eines aktiven Blocks: SettingsManager kapselt Menu-Text-Overrides jetzt ueber einen schmalen Read-Port, produktive Arcade-/UI-Consumer nutzen keine direkten settingsManager.store-Fallbacks mehr, und die Settings-Mutationsfacades teilen sich einen kleinen Result-Helper fuer konsistente changedKeys-/metadata-Formen.
+- Settings-Diagnose-Follow-up ausserhalb eines aktiven Blocks: `diffSettings`, `previewMenuConfigImport` und `getSettingsHealthSnapshot` machen Settings-Aenderungen, Import-Auswirkungen und Port-Verfuegbarkeit sichtbar, ohne interne Stores oder komplette Settings-Dumps an Runtime-/UI-Consumer zu leaken; der Import-Preview-Pfad mutiert nur einen geklonten und sanitizten Snapshot. Gruen: `node --test tests/settings-manager.contract.test.mjs`.
 
 ## Stand-Snapshot 2026-04-28
 

@@ -64,7 +64,7 @@ export function createSettingsSessionDraftFacade(options = {}) {
         }
         return {
             ...result,
-            reason: result.success ? 'saved' : 'storage_failed',
+            reason: result.success ? 'saved' : String(result.reason || 'storage_failed'),
             changedKeys: [],
             metadata: {
                 sessionType: normalizedSessionType,
