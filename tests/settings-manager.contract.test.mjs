@@ -7,6 +7,10 @@ import { SettingsManager } from '../src/core/SettingsManager.js';
 import { createSettingsSessionDraftFacade } from '../src/core/settings/SettingsSessionDraftFacade.js';
 import { SettingsStore } from '../src/ui/SettingsStore.js';
 import { STORAGE_KEYS } from '../src/ui/StorageKeys.js';
+import {
+    applyMenuConfigPayload,
+    parseMenuConfigImportInput,
+} from '../src/ui/menu/MenuConfigShareOps.js';
 import { MENU_TEXT_CATALOG } from '../src/ui/menu/MenuTextCatalog.js';
 
 function createMemoryStoragePlatform(initialRecords = {}, options = {}) {
@@ -243,6 +247,56 @@ test('V103 SettingsManager diffSettings reports changed paths and known change k
     )));
 });
 
+test('V103 SettingsManager diffSettings uses central path contracts and leaves unknown paths unmapped', () => {
+    const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+    const before = manager.createDefaultSettings();
+    const after = {
+        ...before,
+        localSettings: {
+            ...before.localSettings,
+            developerThemeId: 'classic-blue',
+        },
+        customDiagnostics: {
+            flag: true,
+        },
+    };
+
+    const diff = manager.diffSettings(before, after);
+
+    assert.ok(diff.changedKeys.includes(SETTINGS_CHANGE_KEYS.DEVELOPER_THEME_ID));
+    assert.ok(diff.changes.some((change) => (
+        change.path === 'localSettings.developerThemeId'
+        && change.changeKey === SETTINGS_CHANGE_KEYS.DEVELOPER_THEME_ID
+    )));
+    assert.ok(diff.changes.some((change) => (
+        change.path === 'customDiagnostics'
+        && change.changeKey === null
+    )));
+});
+
+test('V103 menu config import parsing is pure and apply owns mutation', () => {
+    const settings = { mapKey: 'before', localSettings: { sessionType: 'single' } };
+    const inputValue = JSON.stringify({
+        contractVersion: 'menu-config-share.v1',
+        payload: {
+            mapKey: 'arena_simple',
+            mode: '1p',
+            gameMode: 'classic',
+            sessionType: 'splitscreen',
+        },
+    });
+
+    const parsed = parseMenuConfigImportInput(inputValue);
+
+    assert.equal(parsed.success, true);
+    assert.equal(parsed.reason, 'imported');
+    assert.equal(settings.mapKey, 'before');
+    assert.equal(settings.localSettings.sessionType, 'single');
+    assert.equal(applyMenuConfigPayload(settings, parsed.payload), true);
+    assert.equal(settings.mapKey, 'arena_simple');
+    assert.equal(settings.localSettings.sessionType, 'splitscreen');
+});
+
 test('V103 SettingsManager previewMenuConfigImport does not mutate source settings and returns changes', () => {
     const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
     const settings = manager.createDefaultSettings();
@@ -303,6 +357,8 @@ test('V103 SettingsManager health snapshot exposes narrow diagnostic fields only
             'hasMenuTextOverridePort',
             'hasProfileStorePort',
             'hasRecordStorePort',
+            'lastPersistenceReason',
+            'persistenceStatus',
             'presetCount',
             'sessionType',
             'telemetryAvailable',
@@ -317,9 +373,31 @@ test('V103 SettingsManager health snapshot exposes narrow diagnostic fields only
         assert.equal(health.sessionType, 'splitscreen');
         assert.equal(health.textOverrideCount, 1);
         assert.equal(typeof health.presetCount, 'number');
+        assert.deepEqual(health.persistenceStatus, {
+            settings: 'unknown',
+            profiles: 'unknown',
+            records: 'unknown',
+        });
+        assert.equal(health.lastPersistenceReason, '');
         assert.equal('settings' in health, false);
         assert.equal('store' in health, false);
+        assert.equal('settingsStore' in health, false);
     });
+});
+
+test('V103 SettingsManager health snapshot includes narrow persistence status after writes', () => {
+    const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
+
+    manager.saveSettings(manager.createDefaultSettings());
+    const health = manager.getSettingsHealthSnapshot();
+
+    assert.deepEqual(health.persistenceStatus, {
+        settings: 'ok',
+        profiles: 'unknown',
+        records: 'unknown',
+    });
+    assert.equal(health.lastPersistenceReason, 'ok');
+    assert.equal('metadata' in health.persistenceStatus, false);
 });
 
 test('V103 SettingsManager productive consumers avoid direct settings store reach-throughs', () => {

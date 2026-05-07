@@ -13,6 +13,15 @@ function normalizeString(value) {
     return typeof value === 'string' ? value.trim() : '';
 }
 
+function normalizePersistenceStatus(value) {
+    const source = value && typeof value === 'object' ? value : {};
+    return {
+        settings: normalizeString(source?.settings?.status) || 'unknown',
+        profiles: normalizeString(source?.profiles?.status) || 'unknown',
+        records: normalizeString(source?.records?.status) || 'unknown',
+    };
+}
+
 export function createSettingsHealthSnapshot({
     settings = null,
     recordStorePort = null,
@@ -20,6 +29,7 @@ export function createSettingsHealthSnapshot({
     menuTextOverridePort = null,
     listMenuPresets = null,
     telemetryFacade = null,
+    persistenceStatus = null,
 } = {}) {
     const source = settings && typeof settings === 'object' ? settings : {};
     return {
@@ -48,5 +58,7 @@ export function createSettingsHealthSnapshot({
         activePresetId: normalizeString(source?.matchSettings?.activePresetId),
         activePresetKind: normalizeString(source?.matchSettings?.activePresetKind),
         sessionType: normalizeString(source?.localSettings?.sessionType),
+        persistenceStatus: normalizePersistenceStatus(persistenceStatus),
+        lastPersistenceReason: normalizeString(persistenceStatus?.lastPersistenceReason),
     };
 }

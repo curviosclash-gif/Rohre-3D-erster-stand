@@ -11,5 +11,7 @@ export { LanMenuMultiplayerBridge } from './LanMenuMultiplayerBridge.js';
 export {
     exportMenuConfigAsCode,
     exportMenuConfigAsJson,
+    applyMenuConfigPayload,
     importMenuConfigFromInput,
+    parseMenuConfigImportInput,
 } from '../../ui/menu/MenuConfigShareOps.js';

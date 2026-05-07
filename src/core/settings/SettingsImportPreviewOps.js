@@ -1,4 +1,7 @@
-import { importMenuConfigFromInput } from '../../composition/core-ui/CoreUiMenuPorts.js';
+import {
+    applyMenuConfigPayload,
+    parseMenuConfigImportInput,
+} from '../../composition/core-ui/CoreUiMenuPorts.js';
 import { diffSettingsSnapshots } from './SettingsDiffOps.js';
 
 function deepClone(value) {
@@ -24,7 +27,7 @@ export function previewMenuConfigImport({
         : (snapshot) => snapshot;
     const before = sanitize(deepClone(settings));
     const previewSnapshot = deepClone(before);
-    const importResult = importMenuConfigFromInput(previewSnapshot, inputValue);
+    const importResult = parseMenuConfigImportInput(inputValue);
 
     if (!importResult.success) {
         return {
@@ -40,7 +43,19 @@ export function previewMenuConfigImport({
         };
     }
 
-    // importMenuConfigFromInput intentionally mutates its target; preview keeps that mutation on a clone.
+    if (!applyMenuConfigPayload(previewSnapshot, importResult.payload)) {
+        return {
+            success: false,
+            reason: 'apply_failed',
+            message: 'Config-Import konnte nicht uebernommen werden.',
+            tone: 'error',
+            changedKeys: [],
+            changes: [],
+            warnings: normalizeWarnings(importResult.warnings),
+            blockedPaths: [],
+            usedLegacyFallback: importResult.usedLegacyFallback === true,
+        };
+    }
     const compatibilityResult = typeof applyMenuCompatibilityRules === 'function'
         ? applyMenuCompatibilityRules(previewSnapshot, {
             accessContext,

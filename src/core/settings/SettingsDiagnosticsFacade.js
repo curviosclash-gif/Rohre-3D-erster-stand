@@ -19,5 +19,6 @@ export function attachSettingsDiagnosticsFacade(manager) {
         menuTextOverridePort: manager.menuTextOverridePort,
         listMenuPresets: () => manager.listMenuPresets(),
         telemetryFacade: manager.telemetryFacade,
+        persistenceStatus: manager.settingsStore.getPersistenceStatus(),
     });
 }

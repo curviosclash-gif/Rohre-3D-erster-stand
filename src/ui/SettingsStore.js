@@ -94,6 +94,24 @@ function mapStorageWriteToPersistenceResult(writeResult, metadata = null) {
     return createPersistenceResult(false, SETTINGS_PERSISTENCE_REASONS.STORAGE_FAILED, normalizedMetadata);
 }
 
+function createInitialPersistenceStatus() {
+    return {
+        settings: { status: 'unknown', reason: '' },
+        profiles: { status: 'unknown', reason: '' },
+        records: { status: 'unknown', reason: '' },
+        lastPersistenceStatus: 'unknown',
+        lastPersistenceReason: '',
+    };
+}
+
+function summarizePersistenceResult(result) {
+    const reason = String(result?.reason || '');
+    return {
+        status: result?.success === true ? 'ok' : 'failed',
+        reason,
+    };
+}
+
 export class SettingsStore {
     constructor(options = {}) {
         this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
@@ -119,6 +137,29 @@ export class SettingsStore {
         this.menuPresetsStorageLegacyKeys = Array.isArray(options.menuPresetsStorageLegacyKeys)
             ? [...options.menuPresetsStorageLegacyKeys]
             : [...MENU_PRESETS_STORAGE_LEGACY_KEYS];
+        this.persistenceStatus = createInitialPersistenceStatus();
+    }
+
+    _recordPersistenceResult(channel, result) {
+        const key = String(channel || '').trim();
+        if (!key || !Object.prototype.hasOwnProperty.call(this.persistenceStatus, key)) {
+            return result;
+        }
+        const summary = summarizePersistenceResult(result);
+        this.persistenceStatus[key] = summary;
+        this.persistenceStatus.lastPersistenceStatus = summary.status;
+        this.persistenceStatus.lastPersistenceReason = summary.reason;
+        return result;
+    }
+
+    getPersistenceStatus() {
+        return {
+            settings: { ...this.persistenceStatus.settings },
+            profiles: { ...this.persistenceStatus.profiles },
+            records: { ...this.persistenceStatus.records },
+            lastPersistenceStatus: this.persistenceStatus.lastPersistenceStatus,
+            lastPersistenceReason: this.persistenceStatus.lastPersistenceReason,
+        };
     }
 
     _warnPersistenceFailure(contextLabel, result) {
@@ -161,9 +202,13 @@ export class SettingsStore {
                     this.settingsStorageKey,
                     persistenceState.canonicalSettings
                 );
+                const writeBackResult = this._recordPersistenceResult(
+                    'settings',
+                    mapStorageWriteToPersistenceResult(writeBack, { key: this.settingsStorageKey })
+                );
                 this._warnPersistenceFailure(
                     'loadSettings canonical write-back',
-                    mapStorageWriteToPersistenceResult(writeBack, { key: this.settingsStorageKey })
+                    writeBackResult
                 );
             }
             return persistenceState.canonicalSettings;
@@ -181,7 +226,10 @@ export class SettingsStore {
             this.settingsStorageKey,
             persistenceState.canonicalSettings
         );
-        return mapStorageWriteToPersistenceResult(result, { key: this.settingsStorageKey });
+        return this._recordPersistenceResult(
+            'settings',
+            mapStorageWriteToPersistenceResult(result, { key: this.settingsStorageKey })
+        );
     }
 
     loadProfiles() {
@@ -225,9 +273,13 @@ export class SettingsStore {
                     schemaVersion: SETTINGS_PROFILES_SCHEMA_VERSION,
                     profiles: normalized,
                 });
+                const writeBackResult = this._recordPersistenceResult(
+                    'profiles',
+                    mapStorageWriteToPersistenceResult(writeBack, { key: this.settingsProfilesStorageKey })
+                );
                 this._warnPersistenceFailure(
                     'loadProfiles canonical write-back',
-                    mapStorageWriteToPersistenceResult(writeBack, { key: this.settingsProfilesStorageKey })
+                    writeBackResult
                 );
             }
             return normalized;
@@ -247,7 +299,10 @@ export class SettingsStore {
                 profiles: normalizeProfileEntries(profiles),
             }
         );
-        return mapStorageWriteToPersistenceResult(result, { key: this.settingsProfilesStorageKey });
+        return this._recordPersistenceResult(
+            'profiles',
+            mapStorageWriteToPersistenceResult(result, { key: this.settingsProfilesStorageKey })
+        );
     }
 
     loadJsonRecord(storageKey, fallbackValue = null) {
@@ -271,12 +326,18 @@ export class SettingsStore {
     saveJsonRecord(storageKey, value) {
         const key = String(storageKey || '').trim();
         if (!key) {
-            return createPersistenceResult(false, SETTINGS_PERSISTENCE_REASONS.INVALID_KEY, {
-                key: String(storageKey ?? ''),
-            });
+            return this._recordPersistenceResult(
+                'records',
+                createPersistenceResult(false, SETTINGS_PERSISTENCE_REASONS.INVALID_KEY, {
+                    key: String(storageKey ?? ''),
+                })
+            );
         }
         const result = this.storagePlatform.writeJson(key, value);
-        return mapStorageWriteToPersistenceResult(result, { key });
+        return this._recordPersistenceResult(
+            'records',
+            mapStorageWriteToPersistenceResult(result, { key })
+        );
     }
 
     _resolveLegacyKeysForStorageKey(storageKey) {

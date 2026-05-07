@@ -61,6 +61,81 @@ export const SETTINGS_CHANGE_KEYS = Object.freeze({
 
 const SETTINGS_CHANGE_KEY_SET = new Set(Object.values(SETTINGS_CHANGE_KEYS));
 
+const CHANGE_KEY_PATH_OVERRIDES = Object.freeze({
+    [SETTINGS_CHANGE_KEYS.SESSION_TYPE]: 'localSettings.sessionType',
+    [SETTINGS_CHANGE_KEYS.MODE_PATH]: 'localSettings.modePath',
+    [SETTINGS_CHANGE_KEYS.MULTIPLAYER_TRANSPORT]: 'localSettings.multiplayerTransport',
+    [SETTINGS_CHANGE_KEYS.ARCADE_GHOST_DUEL_MODE]: 'localSettings.startSetup.arcadeGhostDuelMode',
+    [SETTINGS_CHANGE_KEYS.BOTS_COUNT]: 'numBots',
+    [SETTINGS_CHANGE_KEYS.BOTS_DIFFICULTY]: 'botDifficulty',
+    [SETTINGS_CHANGE_KEYS.RULES_WINS_NEEDED]: 'winsNeeded',
+    [SETTINGS_CHANGE_KEYS.RULES_AUTO_ROLL]: 'autoRoll',
+    [SETTINGS_CHANGE_KEYS.RULES_PORTALS_ENABLED]: 'portalsEnabled',
+    [SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_ID]: 'matchSettings.activePresetId',
+    [SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_KIND]: 'matchSettings.activePresetKind',
+    [SETTINGS_CHANGE_KEYS.PRESET_STATUS]: 'matchSettings.activePresetSourceId',
+    [SETTINGS_CHANGE_KEYS.DEVELOPER_MODE_ENABLED]: 'localSettings.developerModeEnabled',
+    [SETTINGS_CHANGE_KEYS.DEVELOPER_THEME_ID]: 'localSettings.developerThemeId',
+    [SETTINGS_CHANGE_KEYS.DEVELOPER_VISIBILITY_MODE]: 'localSettings.developerModeVisibility',
+    [SETTINGS_CHANGE_KEYS.DEVELOPER_FIXED_PRESET_LOCK]: 'localSettings.fixedPresetLockEnabled',
+    [SETTINGS_CHANGE_KEYS.DEVELOPER_ACTOR_ID]: 'localSettings.actorId',
+    [SETTINGS_CHANGE_KEYS.DEVELOPER_RELEASE_PREVIEW]: 'localSettings.releasePreviewEnabled',
+});
+
+const CHANGE_KEY_ROOT_PATHS = Object.freeze({
+    cameraPerspective: 'cameraPerspective',
+    gameplay: 'gameplay',
+    hunt: 'hunt',
+    local: 'localSettings',
+    recording: 'recording',
+    rules: '',
+    vehicles: 'vehicles',
+});
+
+function capitalize(value) {
+    const source = String(value || '');
+    return source ? `${source[0].toUpperCase()}${source.slice(1)}` : '';
+}
+
+function stripLeadingDot(value) {
+    return String(value || '').replace(/^\./, '');
+}
+
+function deriveSettingsPathFromChangeKey(changeKey) {
+    if (Object.prototype.hasOwnProperty.call(CHANGE_KEY_PATH_OVERRIDES, changeKey)) {
+        return CHANGE_KEY_PATH_OVERRIDES[changeKey];
+    }
+    const [root, ...segments] = String(changeKey || '').split('.');
+    if (!root) return '';
+    if (segments.length === 0) return root;
+    if (!Object.prototype.hasOwnProperty.call(CHANGE_KEY_ROOT_PATHS, root)) return '';
+
+    const rootPath = CHANGE_KEY_ROOT_PATHS[root];
+    if (root === 'rules' && segments[0] === 'invertPitch') {
+        return segments.join('.');
+    }
+    if (root === 'rules' && segments[0] === 'cockpitCamera') {
+        return segments.join('.');
+    }
+    if (root === 'local') {
+        return stripLeadingDot(`${rootPath}.${segments.join('.')}`);
+    }
+    if (root === 'developer') {
+        return `localSettings.developer${capitalize(segments.join('.'))}`;
+    }
+    return stripLeadingDot(`${rootPath}.${segments.join('.')}`);
+}
+
+export const SETTINGS_CHANGE_PATH_ENTRIES = Object.freeze(
+    Object.values(SETTINGS_CHANGE_KEYS)
+        .map((changeKey) => [deriveSettingsPathFromChangeKey(changeKey), changeKey])
+        .filter(([path]) => path)
+);
+
+export const SETTINGS_CHANGE_PATHS = Object.freeze(
+    Object.fromEntries(SETTINGS_CHANGE_PATH_ENTRIES)
+);
+
 export function isSettingsChangeKey(value) {
     return SETTINGS_CHANGE_KEY_SET.has(value);
 }

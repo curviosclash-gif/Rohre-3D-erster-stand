@@ -71,7 +71,7 @@ function createSharePayload(settings) {
     };
 }
 
-function applySharePayload(settings, payload) {
+export function applyMenuConfigPayload(settings, payload) {
     if (!settings || typeof settings !== 'object' || !payload || typeof payload !== 'object') {
         return false;
     }
@@ -136,6 +136,25 @@ export function exportMenuConfigAsCode(settings) {
 }
 
 export function importMenuConfigFromInput(settings, inputValue) {
+    const parseResult = parseMenuConfigImportInput(inputValue);
+    if (!parseResult.success) {
+        return parseResult;
+    }
+
+    const applied = applyMenuConfigPayload(settings, parseResult.payload);
+    if (!applied) {
+        return createImportFeedback({
+            success: false,
+            reason: 'apply_failed',
+            error: 'Config-Import konnte nicht auf die aktuellen Menue-Einstellungen angewendet werden.',
+            message: 'Config-Import konnte nicht uebernommen werden.',
+        });
+    }
+
+    return parseResult;
+}
+
+export function parseMenuConfigImportInput(inputValue) {
     const raw = sanitizeString(inputValue);
     if (!raw) {
         return createImportFeedback({
@@ -193,16 +212,6 @@ export function importMenuConfigFromInput(settings, inputValue) {
             reason: 'invalid_payload_shape',
             error: 'Config-Import-Huelle ist unvollstaendig oder veraltet (payload fehlt).',
             message: 'Config-Import enthaelt keine nutzbaren Einstellungsdaten.',
-        });
-    }
-
-    const applied = applySharePayload(settings, sourcePayload);
-    if (!applied) {
-        return createImportFeedback({
-            success: false,
-            reason: 'apply_failed',
-            error: 'Config-Import konnte nicht auf die aktuellen Menue-Einstellungen angewendet werden.',
-            message: 'Config-Import konnte nicht uebernommen werden.',
         });
     }
 
