@@ -301,6 +301,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `V76` ist abgeschlossen (`76.99` done): `docs/plaene/aktiv/V76.md` steht jetzt auf `status: done`, `76.99` ist geschlossen und `76.99.2` dokumentiert den produktnahen Verifikationslauf.
 - Neuer Hangar-Contract-Smoke `tests/hangar-desktop-flow.contract.test.mjs` verifiziert Fight-/Arcade-Entry, mode-spezifischen Selection-Writeback sowie den einheitlichen Lifecycle-Return zu Menue und Match-Start; zusammen mit `tests/arcade-hangar-rules.contract.test.mjs` laeuft der Scope mit 9/9 PASS.
 - Abschluss-Gates sind gruen: `npm run build` sowie `npm run gates:pre-commit` (`plan:check`, `graph:check`, `docs:sync`, `docs:check`) liefern Exit-Code 0.
+
+## Tooling-Notiz 2026-05-08 (Bot-Spielanalyse)
+
+- Neuer CLI-Pfad `npm run bot:analyze`: Der vorhandene Bot-Validation-Runner spielt konfigurierbare Szenarien, danach klassifiziert `scripts/bot-play-analysis.mjs` Survival-, Wand-/Trail-, Stuck-, Winrate- und Forced-Round-Signale zu priorisierten Tuning-Hinweisen.
+- Standardausgaben landen in `tmp/`; mit `--publish true` werden JSON/Markdown-Evidence nach `data/` und `docs/tests/` geschrieben.
+- Evidence: `npm run bot:analyze -- --skip-run true --source-json data/bot_validation_report.json --report-json tmp/bot-play-analysis-npm-test.json --report-md tmp/bot-play-analysis-npm-test.md`, `node --check scripts/bot-play-analysis.mjs` und `npm run plan:check` sind gruen.
 - Der Master-Index spiegelt `V76` jetzt unter den abgeschlossenen Bloecken; die naechste freie Intake-Reihenfolge bleibt `V99 -> V100 -> V102`.
 
 ## Stand-Snapshot 2026-04-29 (Subphase `V104 104.2.2`)
