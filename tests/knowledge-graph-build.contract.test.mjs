@@ -20,6 +20,7 @@ import {
     CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
     validateCriticalDesktopMappings,
     validateCoverageArtifact,
+    validateGraphContradictions,
     validatePredicateConstraints,
     validateRuntimeMappingIntegrity,
 } from '../scripts/check-knowledge-graph.mjs';
@@ -518,6 +519,101 @@ test('predicate constraints guard mapping domain, range and relation layer', () 
     assert.ok(codes.includes('KG_PREDICATE_RANGE'));
     assert.ok(codes.includes('KG_PREDICATE_LAYER'));
     assert.ok(codes.includes('KG_PREDICATE_CONSTRAINT_MISSING'));
+});
+
+test('contradiction rules split critical failures from non-critical warnings', () => {
+    const rules = {
+        contract: 'knowledge-graph.contradictions.v1',
+        schema_version: 1,
+        rules: [
+            {
+                id: 'critical-path-edge-overlap',
+                type: 'critical_path_edge_overlap',
+                severity: 'error',
+                relation_types: ['emits'],
+            },
+            {
+                id: 'runtime-event-direction-conflict',
+                type: 'runtime_event_direction_conflict',
+                severity: 'error',
+            },
+            {
+                id: 'domain-drift',
+                type: 'domain_drift',
+                severity: 'warning',
+                relation_types: ['writes_state'],
+            },
+        ],
+    };
+    const graph = {
+        nodes: [
+            {
+                id: 'runtime:fixture',
+                type: 'runtime',
+                attributes: {
+                    mappingId: 'fixture',
+                    criticalPath: 'spawn',
+                    domain: 'entity-lifecycle',
+                },
+            },
+            {
+                id: 'event:fixture',
+                type: 'event',
+                attributes: {
+                    mappingId: 'fixture',
+                    criticalPath: 'round-end',
+                    domain: 'match-flow',
+                },
+            },
+            {
+                id: 'state:fixture',
+                type: 'state',
+                attributes: {
+                    mappingId: 'fixture',
+                    criticalPath: 'spawn',
+                    domain: 'combat',
+                },
+            },
+        ],
+        edges: [
+            {
+                from: 'runtime:fixture',
+                to: 'event:fixture',
+                type: 'emits',
+                attributes: {
+                    mappingId: 'fixture',
+                },
+            },
+            {
+                from: 'runtime:fixture',
+                to: 'event:fixture',
+                type: 'consumes',
+                attributes: {
+                    mappingId: 'fixture',
+                },
+            },
+            {
+                from: 'runtime:fixture',
+                to: 'state:fixture',
+                type: 'writes_state',
+                attributes: {
+                    mappingId: 'fixture',
+                },
+            },
+        ],
+    };
+
+    const violations = [];
+    const warnings = [];
+    validateGraphContradictions(graph, rules, violations, warnings);
+
+    assert.deepEqual(violations.map((violation) => violation.code), [
+        'KG_CONTRADICTION_CRITICAL_PATH',
+        'KG_CONTRADICTION_EVENT_DIRECTION',
+    ]);
+    assert.deepEqual(warnings.map((warning) => warning.code), [
+        'KG_CONTRADICTION_DOMAIN_DRIFT',
+    ]);
 });
 
 test('runtime mapping integrity reports orphan, missing validation and unknown references', () => {

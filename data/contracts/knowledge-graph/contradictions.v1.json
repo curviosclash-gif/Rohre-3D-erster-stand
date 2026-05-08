@@ -1,0 +1,39 @@
+{
+  "contract": "knowledge-graph.contradictions.v1",
+  "schema_version": 1,
+  "contradiction_id": "desktop-critical-contradictions",
+  "description": "Kritische Fail- und nicht-kritische Warnregeln fuer Widersprueche in produktiven Wissensgraph-Mappings.",
+  "rules": [
+    {
+      "id": "critical-path-edge-overlap",
+      "severity": "error",
+      "type": "critical_path_edge_overlap",
+      "relation_types": [
+        "emits",
+        "consumes",
+        "reads_state",
+        "writes_state",
+        "validated_by"
+      ],
+      "description": "Kritische Runtime-, Event-, State- und Test-Kanten muessen mindestens einen gemeinsamen criticalPath tragen."
+    },
+    {
+      "id": "runtime-event-direction-conflict",
+      "severity": "error",
+      "type": "runtime_event_direction_conflict",
+      "description": "Ein Runtime-Knoten darf dasselbe Event nicht zugleich emittieren und konsumieren."
+    },
+    {
+      "id": "domain-drift",
+      "severity": "warning",
+      "type": "domain_drift",
+      "relation_types": [
+        "emits",
+        "consumes",
+        "reads_state",
+        "writes_state"
+      ],
+      "description": "Unterschiedliche optionale Domaenen an verbundenen Runtime/Event/State-Knoten werden als Drift-Warnung reportet."
+    }
+  ]
+}

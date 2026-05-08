@@ -130,11 +130,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1815,
-    "rawCoveredFileCount": 1459,
+    "trackedFileCount": 1816,
+    "rawCoveredFileCount": 1460,
     "rawCoveragePercent": 80.4,
-    "adjustedTrackedFileCount": 1553,
-    "adjustedCoveredFileCount": 1319,
+    "adjustedTrackedFileCount": 1554,
+    "adjustedCoveredFileCount": 1320,
     "adjustedCoveragePercent": 84.9,
     "uncoveredFileCount": 356,
     "uncoveredActiveFileCount": 234,
@@ -178,8 +178,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 922,
-        "coveredCount": 907
+        "count": 923,
+        "coveredCount": 908
       },
       {
         "classification": "product-docs",
@@ -4125,6 +4125,25 @@
       "covered": false,
       "coverageSources": [],
       "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/contradictions.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111"
+      ],
       "surfaces": [],
       "classification": "product-code",
       "excludedFromCoverage": false,

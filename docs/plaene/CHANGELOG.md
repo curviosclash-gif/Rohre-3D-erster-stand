@@ -443,6 +443,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Fixpfad: Profil-/Observation-Helfer der Heuristik und Recording-/Kamera-Menuebinding wurden in schmale Nachbarmodule ausgelagert, ohne Runtime-Verhalten oder UI-Vertraege zu aendern.
 - Evidence: `npm run lint:architecture`, `node --test tests/heuristic-bot-survival-regression.test.mjs`, `npm run plan:check` und `npm run docs:check` sind gruen.
 
+## Stand-Snapshot 2026-05-08 (Subphase `V110 110.2.1`)
+
+- `110.2.1` ist geschlossen: `data/contracts/knowledge-graph/contradictions.v1.json` versioniert Widerspruchsregeln fuer CriticalPath-Overlap, Runtime/Event-Richtungswiderspruch und optionale Domain-Drift.
+- `scripts/check-knowledge-graph.mjs` fuehrt die Regeln in `graph:check` aus und trennt harte Violations von nicht-blockierenden Warnings; der Contract-Test belegt beide Pfade deterministisch.
+- Evidence: `node --test tests/knowledge-graph-build.contract.test.mjs`, `npm run graph:build`, `npm run graph:check` und `npm run plan:check` sind gruen. Naechste offene Subphase ist `110.2.2` fuer Telemetrie-Replay-Fixtures.
+
 ## Bugfix-Notiz 2026-05-08 (Round-Ghost Bot-Spuren)
 
 - Nutzerfeedback: Im Einzelspiel mit Bots entstanden mehrere Ghost-Spuren, obwohl der Parcours-Ghost Human-only gedacht ist.

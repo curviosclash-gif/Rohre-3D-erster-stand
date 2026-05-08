@@ -2082,7 +2082,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 18,
+          "concreteCount": 19,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -2230,7 +2230,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 28,
+          "concreteCount": 29,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2280,7 +2280,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 114,
+          "concreteCount": 115,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -17011,8 +17011,8 @@
     {
       "id": "V110.2.1",
       "type": "subphase",
-      "title": "Contradiction-Detection mit kritischem Fail-Pfad und nicht-kritischer Warnklassifikation implementieren.",
-      "status": "open",
+      "title": "Contradiction-Detection mit kritischem Fail-Pfad und nicht-kritischer Warnklassifikation implementieren. (abgeschlossen: 2026-05-08; evidence: Contradiction-Contract `knowledge-graph.contradictions.v1` deckt `critical_path_edge_overlap`, `runtime_event_direction_conflict` und `domain_drift` ab; `scripts/check-knowledge-graph.mjs` trennt Violations von Warnings; Contract-Test beweist kritische Fails und nicht-kritische Warnklasse; `graph:check` PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.2",
@@ -28658,6 +28658,23 @@
           "BT93E",
           "BT93F",
           "BT93M"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/contradictions.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -97025,6 +97042,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/contradictions.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
       "type": "scope",
       "hint": null,
@@ -98304,6 +98330,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/contradictions.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
       "type": "scope",
       "hint": null,
@@ -98757,6 +98792,15 @@
     {
       "from": "V111",
       "to": ".agents/workflows/status.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/contradictions.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {

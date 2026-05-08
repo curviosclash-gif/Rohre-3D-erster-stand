@@ -16,11 +16,14 @@ const ROOT = process.cwd();
 const GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
 const PREDICATE_CONSTRAINTS_PATH = 'data/contracts/knowledge-graph/predicate-constraints.v1.json';
+const CONTRADICTIONS_PATH = 'data/contracts/knowledge-graph/contradictions.v1.json';
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
 const BOT_TRAINING_MASTER_PATH = 'docs/bot-training/Bot_Trainingsplan.md';
 const ACTIVE_PLANS_DIR = 'docs/plaene/aktiv';
 const PREDICATE_CONSTRAINTS_CONTRACT = 'knowledge-graph.predicate-constraints.v1';
 const PREDICATE_CONSTRAINTS_SCHEMA_VERSION = 1;
+const CONTRADICTIONS_CONTRACT = 'knowledge-graph.contradictions.v1';
+const CONTRADICTIONS_SCHEMA_VERSION = 1;
 const REQUIRED_KNOWLEDGE_GRAPH_MAPPING_IDS = Object.freeze([
     'runtime-taxonomy',
     'desktop-critical-paths',
@@ -132,6 +135,10 @@ function addViolation(violations, code, message) {
     violations.push({ code, message });
 }
 
+function addWarning(warnings, code, message) {
+    warnings.push({ code, message });
+}
+
 function nodeHasMappingId(node, mappingId) {
     return String(node?.attributes?.mappingId || '').trim() === mappingId;
 }
@@ -163,7 +170,18 @@ async function readPredicateConstraints() {
     return JSON.parse(raw);
 }
 
+async function readContradictionRules() {
+    const raw = await fs.readFile(path.join(ROOT, CONTRADICTIONS_PATH), 'utf8');
+    return JSON.parse(raw);
+}
+
 function normalizeTypeList(value) {
+    return Array.isArray(value)
+        ? value.map((entry) => String(entry || '').trim()).filter(Boolean)
+        : [];
+}
+
+function normalizeRelationTypeList(value) {
     return Array.isArray(value)
         ? value.map((entry) => String(entry || '').trim()).filter(Boolean)
         : [];
@@ -389,6 +407,151 @@ function validatePredicateConstraints(graph, constraints, violations) {
             );
         }
     }
+}
+
+function addContradictionFinding(rule, violations, warnings, code, message) {
+    if (rule.severity === 'warning') {
+        addWarning(warnings, code, message);
+        return;
+    }
+    addViolation(violations, code, message);
+}
+
+function hasCriticalPathOverlap(leftNode, rightNode) {
+    const leftPaths = new Set(getCriticalPaths(leftNode));
+    const rightPaths = getCriticalPaths(rightNode);
+    if (leftPaths.size === 0 || rightPaths.length === 0) return true;
+    return rightPaths.some((criticalPath) => leftPaths.has(criticalPath));
+}
+
+function validateCriticalPathEdgeOverlapRule(rule, graph, nodeById, violations, warnings) {
+    const relationTypes = new Set(normalizeRelationTypeList(rule.relation_types));
+    if (relationTypes.size === 0) {
+        addViolation(violations, 'KG_CONTRADICTION_RULE_INVALID', `Contradiction-Regel ${rule.id} ohne relation_types`);
+        return;
+    }
+
+    const mappingEdges = (Array.isArray(graph.edges) ? graph.edges : [])
+        .filter((edge) => String(edge?.attributes?.mappingId || '').trim())
+        .filter((edge) => relationTypes.has(edge.type));
+
+    for (const edge of mappingEdges) {
+        const fromNode = nodeById.get(edge.from) || null;
+        const toNode = nodeById.get(edge.to) || null;
+        if (!fromNode || !toNode || hasCriticalPathOverlap(fromNode, toNode)) continue;
+        addContradictionFinding(
+            rule,
+            violations,
+            warnings,
+            'KG_CONTRADICTION_CRITICAL_PATH',
+            `CriticalPath-Widerspruch (${rule.id}): ${edge.type} ${edge.from} -> ${edge.to}`
+        );
+    }
+}
+
+function validateRuntimeEventDirectionConflictRule(rule, graph, violations, warnings) {
+    const mappingEdges = (Array.isArray(graph.edges) ? graph.edges : [])
+        .filter((edge) => String(edge?.attributes?.mappingId || '').trim())
+        .filter((edge) => edge.type === 'emits' || edge.type === 'consumes');
+    const directionByRuntimeEvent = new Map();
+
+    for (const edge of mappingEdges) {
+        const key = `${edge.from}::${edge.to}`;
+        if (!directionByRuntimeEvent.has(key)) directionByRuntimeEvent.set(key, new Set());
+        directionByRuntimeEvent.get(key).add(edge.type);
+    }
+
+    for (const [key, directions] of directionByRuntimeEvent.entries()) {
+        if (!(directions.has('emits') && directions.has('consumes'))) continue;
+        addContradictionFinding(
+            rule,
+            violations,
+            warnings,
+            'KG_CONTRADICTION_EVENT_DIRECTION',
+            `Event-Richtungswiderspruch (${rule.id}): ${key.replace('::', ' -> ')} ist emits und consumes`
+        );
+    }
+}
+
+function validateDomainDriftRule(rule, graph, nodeById, violations, warnings) {
+    const relationTypes = new Set(normalizeRelationTypeList(rule.relation_types));
+    if (relationTypes.size === 0) {
+        addViolation(violations, 'KG_CONTRADICTION_RULE_INVALID', `Contradiction-Regel ${rule.id} ohne relation_types`);
+        return;
+    }
+
+    const mappingEdges = (Array.isArray(graph.edges) ? graph.edges : [])
+        .filter((edge) => String(edge?.attributes?.mappingId || '').trim())
+        .filter((edge) => relationTypes.has(edge.type));
+
+    for (const edge of mappingEdges) {
+        const fromNode = nodeById.get(edge.from) || null;
+        const toNode = nodeById.get(edge.to) || null;
+        const fromDomain = String(fromNode?.attributes?.domain || '').trim();
+        const toDomain = String(toNode?.attributes?.domain || '').trim();
+        if (!fromDomain || !toDomain || fromDomain === toDomain) continue;
+        addContradictionFinding(
+            rule,
+            violations,
+            warnings,
+            'KG_CONTRADICTION_DOMAIN_DRIFT',
+            `Domain-Drift (${rule.id}): ${edge.type} ${edge.from} (${fromDomain}) -> ${edge.to} (${toDomain})`
+        );
+    }
+}
+
+function validateGraphContradictions(graph, contradictionRules, violations, warnings = []) {
+    if (!contradictionRules || typeof contradictionRules !== 'object') {
+        addViolation(violations, 'KG_CONTRADICTION_CONTRACT_MISSING', `Contradiction-Contract fehlt: ${CONTRADICTIONS_PATH}`);
+        return warnings;
+    }
+
+    if (String(contradictionRules.contract || '').trim() !== CONTRADICTIONS_CONTRACT) {
+        addViolation(violations, 'KG_CONTRADICTION_CONTRACT_UNSUPPORTED', `Contradiction-Contract unsupported: ${contradictionRules.contract || '<empty>'}`);
+        return warnings;
+    }
+    if (Number(contradictionRules.schema_version) !== CONTRADICTIONS_SCHEMA_VERSION) {
+        addViolation(violations, 'KG_CONTRADICTION_SCHEMA_UNSUPPORTED', `Contradiction schema_version unsupported: ${contradictionRules.schema_version}`);
+        return warnings;
+    }
+
+    const rules = Array.isArray(contradictionRules.rules) ? contradictionRules.rules : [];
+    if (rules.length === 0) {
+        addViolation(violations, 'KG_CONTRADICTION_RULE_MISSING', 'Contradiction-Contract enthaelt keine Regeln');
+        return warnings;
+    }
+
+    const nodeById = new Map((Array.isArray(graph.nodes) ? graph.nodes : []).map((node) => [node.id, node]));
+    const seenRuleIds = new Set();
+    for (const [index, rawRule] of rules.entries()) {
+        const rule = {
+            ...rawRule,
+            id: String(rawRule?.id || '').trim(),
+            type: String(rawRule?.type || '').trim(),
+            severity: String(rawRule?.severity || '').trim(),
+        };
+        if (!rule.id || !rule.type || !['error', 'warning'].includes(rule.severity)) {
+            addViolation(violations, 'KG_CONTRADICTION_RULE_INVALID', `Contradiction-Regel rules[${index}] ist unvollstaendig`);
+            continue;
+        }
+        if (seenRuleIds.has(rule.id)) {
+            addViolation(violations, 'KG_CONTRADICTION_RULE_DUPLICATE', `Contradiction-Regel ${rule.id} ist doppelt deklariert`);
+            continue;
+        }
+        seenRuleIds.add(rule.id);
+
+        if (rule.type === 'critical_path_edge_overlap') {
+            validateCriticalPathEdgeOverlapRule(rule, graph, nodeById, violations, warnings);
+        } else if (rule.type === 'runtime_event_direction_conflict') {
+            validateRuntimeEventDirectionConflictRule(rule, graph, violations, warnings);
+        } else if (rule.type === 'domain_drift') {
+            validateDomainDriftRule(rule, graph, nodeById, violations, warnings);
+        } else {
+            addViolation(violations, 'KG_CONTRADICTION_RULE_UNSUPPORTED', `Contradiction-Regel ${rule.id} nutzt unbekannten Typ: ${rule.type}`);
+        }
+    }
+
+    return warnings;
 }
 
 function validateCriticalDesktopMappings(graph, violations) {
@@ -787,13 +950,15 @@ async function validateDependencyMergeConsistency(graph, violations) {
 
 async function runChecks() {
     const violations = [];
+    const warnings = [];
 
-    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock, predicateConstraints] = await Promise.all([
+    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock, predicateConstraints, contradictionRules] = await Promise.all([
         readExistingArtifact(GRAPH_PATH),
         readExistingArtifact(COVERAGE_PATH),
         buildKnowledgeGraphArtifacts(),
         readScopeOverlapAllowances(),
         readPredicateConstraints(),
+        readContradictionRules(),
     ]);
 
     const generatedGraphRaw = artifactToString(generatedArtifacts.graph);
@@ -809,6 +974,7 @@ async function runChecks() {
     ensureAllEdgeEndpointsExist(existingGraph.parsed, violations);
     validateRuntimeMappingIntegrity(existingGraph.parsed, violations);
     validatePredicateConstraints(existingGraph.parsed, predicateConstraints, violations);
+    validateGraphContradictions(existingGraph.parsed, contradictionRules, violations, warnings);
     validateCriticalDesktopMappings(existingGraph.parsed, violations);
     ensureDependsTargetsExist(existingGraph.parsed, violations);
     detectHardDependsCycles(existingGraph.parsed, violations);
@@ -819,6 +985,12 @@ async function runChecks() {
     await validateDependencyMergeConsistency(existingGraph.parsed, violations);
 
     if (violations.length === 0) {
+        if (warnings.length > 0) {
+            process.stderr.write('[graph:check] warnings\n');
+            for (const warning of warnings) {
+                process.stderr.write(`- [${warning.code}] ${warning.message}\n`);
+            }
+        }
         process.stdout.write('[graph:check] passed\n');
         return 0;
     }
@@ -826,6 +998,9 @@ async function runChecks() {
     process.stderr.write('[graph:check] failed\n');
     for (const violation of violations) {
         process.stderr.write(`- [${violation.code}] ${violation.message}\n`);
+    }
+    for (const warning of warnings) {
+        process.stderr.write(`- [warning:${warning.code}] ${warning.message}\n`);
     }
     return 1;
 }
@@ -843,6 +1018,7 @@ export {
     CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
     validateCriticalDesktopMappings,
     validateCoverageArtifact,
+    validateGraphContradictions,
     validatePredicateConstraints,
     validateRuntimeMappingIntegrity,
 };
