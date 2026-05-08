@@ -1,0 +1,149 @@
+---
+id: V114
+title: SurfacePolicyPort fuer Demo- und Vollversionsgrenze
+status: draft
+priority: P1
+owner: user-intake
+depends_on:
+  - V98.99
+  - V103.99
+  - V104.99
+blocked_by: []
+affected_area: product-surface-policy
+plan_file: docs/plaene/aktiv/V114.md
+scope_files:
+  - src/shared/contracts/PlatformCapabilityData.js
+  - src/shared/contracts/PlatformCapabilityRegistry.js
+  - src/shared/contracts/PlatformSurfacePolicyOps.js
+  - src/shared/runtime/UiControllerRuntimePorts.js
+  - src/shared/runtime/GameRuntimePorts.js
+  - src/core/runtime/MenuRuntimeSessionService.js
+  - src/core/runtime/MenuRuntimePresetConfigService.js
+  - src/core/runtime/MatchStartValidationService.js
+  - src/core/runtime/GameRuntimeSettingsHandler.js
+  - src/ui/menu/MenuSurfacePolicyUiSync.js
+  - src/ui/menu/MenuPresetStateSync.js
+  - src/ui/UIStartSyncController.js
+  - src/ui/UIManager.js
+  - tests/platform-capabilities.contract.test.mjs
+  - tests/menu-runtime-session-service.contract.test.mjs
+  - tests/menu-runtime-preset-config-service.contract.test.mjs
+  - tests/runtime-regressions.contract.test.mjs
+  - docs/referenz/ai_architecture_context.md
+---
+
+# V114 SurfacePolicyPort fuer Demo- und Vollversionsgrenze
+
+## Ziel
+
+Die Trennung zwischen Desktop-Vollversion und Browser-Demo soll nicht mehr davon abhaengen, dass einzelne Runtime-/Menu-Actions `productSurfaceId` korrekt von Hand an `PlatformSurfacePolicyOps` weiterreichen.
+
+Stattdessen wird ein zentraler `SurfacePolicyPort` eingefuehrt, ueber den produktive Actions ihre Surface-Gates abfragen:
+
+- Desktop-App bleibt `default-full` und autoritativ fuer Splitscreen, freie Maps, eigene Presets, Quickstarts, Host-/Desktop-Pfade und Tooling.
+- Browser-Demo bleibt `default-deny`, kuratiert und read-only fuer ausgelieferte Policy-Artefakte.
+- `SettingsManager` bleibt fuer Nutzer-/Runtime-Settings verantwortlich, nicht fuer Produktlizenz- oder Demo-Grenzen.
+- Settings Studio darf Demo-Grenzen weiter konfigurieren/exportieren, aber als separater Policy-Pfad aus V98, nicht als normale Spieler-Settings.
+- Runtime-/Menu-Code konsumiert keine direkten `isSurface*Allowed(...)`-Aufrufe ohne expliziten Surface-Kontext mehr.
+
+## Ausgangslage
+
+V98 hat Browser-Demo-Grenzen als eigene Surface-Policy mit Settings-Studio-Editor und read-only Browser-Export gebaut. V103 hat den SettingsManager auf schmalere Settings-Facades und Mutationsresultate zugeschnitten. V104 hat den generellen Zielpfad `Contract -> Snapshot -> Intent-Port -> Feature-Adapter` etabliert.
+
+Die Bugfixes vom 2026-05-08 zeigen jedoch eine verbleibende Fehlerklasse: Runtime-Actions konnten Surface-Resolver ohne `productSurfaceId` aufrufen. Der Resolver fiel dann auf Browser-Demo/Web zurueck, wodurch Desktop-Funktionen wie Splitscreen, Quickstart oder freie Presets versehentlich wie Demo-Funktionen behandelt wurden.
+
+## Nicht-Ziel
+
+- Kein Verschieben der Produktgrenze in `SettingsManager`.
+- Kein neuer zweiter Policy-Vertrag neben `PlatformCapabilityRegistry`/`PlatformSurfacePolicyOps`.
+- Kein Browser-Schreibpfad fuer Demo-Policy.
+- Kein Aufweiten der Demo durch lokale Settings, Profilimport, LocalStorage oder Dev-Panel.
+- Kein Produkt-/UX-Redesign der Demo; dieser Block haertet zuerst die technische Grenze.
+
+## Architekturentscheidung
+
+Empfohlener Zielzustand:
+
+```text
+Platform/Build Layer
+  -> bestimmt productSurfaceId und Policy-Artefakte
+
+SurfacePolicyPort
+  -> kapselt resolveSurfacePolicy + isSurface*Allowed + Fallbacks
+
+SettingsManager
+  -> verwaltet Nutzerwahl und Settings-Mutationen innerhalb erlaubter Grenzen
+
+Runtime/Menu Actions
+  -> fragen nur den SurfacePolicyPort, bevor sie Settings mutieren oder Matches starten
+```
+
+Der `SettingsManager` darf den Port konsumieren oder Diagnose-/Mutationsresultate damit anreichern, bleibt aber nicht die Quelle der Demo-/Vollversionsentscheidung. Produktgrenzen bleiben Build-/Surface-Policy.
+
+## Definition of Done
+
+- [ ] DoD.1 Ein zentraler `SurfacePolicyPort` existiert und kapselt die haeufigen Gate-Operationen (`isSessionTypeAllowed`, `isModePathAllowed`, `isMapAllowed`, `isPresetAllowed`, `isQuickStartAllowed`, Fallback-Resolver, Blocked-Feedback).
+- [ ] DoD.2 Produktive Runtime-/Menu-Actions rufen Surface-Gates nicht mehr direkt ohne Port oder ohne expliziten Surface-Kontext auf.
+- [ ] DoD.3 Desktop-App und Browser-Demo sind als Produktmatrix in Contract-Tests abgedeckt: Session-Typen, Mode-Paths, Maps, Presets, Quickstarts, Host/Join und Startvalidierung.
+- [ ] DoD.4 `SettingsManager`-Rolle ist dokumentiert: normale Settings-Fassade ja, Produktgrenzen nein; Demo-Policy bleibt V98-Policy-Service/Export-Artefakt.
+- [ ] DoD.5 Guard oder Contract-Scan verhindert neue direkte `isSurface*Allowed(...)`-Runtime-Aufrufe ohne Kontext.
+- [ ] DoD.6 Demo-Fallbacks bleiben fail-safe; Desktop-Fallbacks duerfen nicht still auf Demo-Restriktionen fallen.
+
+## Risiken
+
+- R1 | hoch | Demo-Grenzen werden versehentlich auf Desktop angewendet, wenn der Port nicht konsequent konsumiert wird.
+- R2 | hoch | Demo wird versehentlich aufgeweitet, wenn Settings-/Profil-/Importpfade Produktgrenzen als normale Settings behandeln.
+- R3 | mittel | Zu breiter Port wird selbst zum neuen God-Object, wenn er nicht als schmaler Surface-Gate-Port begrenzt bleibt.
+- R4 | mittel | Tests decken nur reine Resolver ab, aber nicht die produktiven Menu-/Runtime-Actions.
+- R5 | niedrig | Settings-Studio- und Runtime-Begriffe driften, wenn `runtimeKind`, `productSurfaceId`, `capability` und `surfacePolicy` nicht klar dokumentiert bleiben.
+
+## Phasen
+
+### 114.1 Zielvertrag und Matrix
+status: planned
+goal: Surface-Gate-Zielbild und Produktmatrix festziehen
+output: Port-Vertrag, Produktmatrix und Consumer-Inventar
+
+- [ ] 114.1.1 Direkte produktive Surface-Gate-Aufrufe inventarisieren und nach UI-Sync, Runtime-Action, Startvalidierung, Feature-Launch und Contract-only trennen.
+- [ ] 114.1.2 Produktmatrix fuer Desktop-App vs Browser-Demo definieren: erlaubt/verboten/fallback fuer Session, Mode, Map, Preset, Quickstart, Host/Join und Tooling.
+
+### 114.2 SurfacePolicyPort einziehen
+status: planned
+goal: Einen einzigen produktiven Gate-Zugang schaffen
+output: Port-/Adapter-Schicht fuer Surface-Policy-Abfragen
+
+- [ ] 114.2.1 `SurfacePolicyPort` in Shared-/Runtime-Port-Schicht einfuehren und aus bestehendem `surfacePolicy`-/`productSurfaceId`-Snapshot speisen.
+- [ ] 114.2.2 Menu-/Runtime-Actions auf den Port umstellen; direkte Resolver-Aufrufe bleiben nur in `PlatformSurfacePolicyOps`, Contract-Tests oder klar markierten Adapterstellen.
+
+### 114.3 SettingsManager-Abgrenzung
+status: planned
+goal: Settings-Fassade und Produktgrenze sauber trennen
+output: Dokumentierte Rolle plus abgesicherte Import-/Draft-/Preset-Pfade
+
+- [ ] 114.3.1 SettingsManager-/Facade-Pfade pruefen, die Session-Drafts, Presets oder Config-Import mutieren; Produktgrenzen muessen beim Apply/Start ueber SurfacePolicyPort gelten.
+- [ ] 114.3.2 Architekturkontext nachziehen: `SettingsManager` speichert Nutzerwunsch, SurfacePolicyPort entscheidet Produktgrenze, V98-Settings-Studio exportiert nur Demo-Policy.
+
+### 114.4 Tests und Ratchet
+status: planned
+goal: Fehlerklasse strukturell verhindern
+output: Produktmatrix-Tests und Guard gegen kontextlose Surface-Gates
+
+- [ ] 114.4.1 Contract-Tests fuer Desktop-Default-Full und Browser-Demo-Default-Deny ueber echte Actions statt nur Resolver erweitern.
+- [ ] 114.4.2 Lightweight-Guard oder Contract-Scan fuer produktive Dateien einfuehren: keine neuen `isSurface*Allowed(...)`-/Fallback-Aufrufe ohne Port oder expliziten Kontext.
+
+### 114.99 Abschluss-Gate
+status: planned
+goal: Demo-/Vollversionsgrenze reproduzierbar haerten
+output: Gruene Contract-/Plan-/Architektur-Nachweise
+
+- [ ] 114.99.1 Gezielte Surface-Policy-Port- und Produktmatrix-Tests sind gruen.
+- [ ] 114.99.2 `npm run plan:check` und relevante Architektur-/Docs-Gates sind gruen.
+- [ ] 114.99.3 Nachscan zeigt keine produktiven kontextlosen Surface-Gate-Aufrufe im migrierten Scope.
+
+## Intake-Hinweis
+
+- Ziel-Masterplan: `docs/Umsetzungsplan.md`
+- Vorgeschlagene Block-ID: `V114`
+- Vorgeschlagene Prioritaet: `P1`, weil die Grenze Demo/Vollversion ein Produkt- und Release-Risiko ist.
+- Hard dependencies: `V98.99`, `V103.99`, `V104.99`
+- Manuelle Uebernahme erforderlich: Dieser Entwurf ist nur Intake unter `docs/plaene/neu/`; der Master-Index und eine kanonische `docs/plaene/aktiv/V114.md` muessen separat vom User bzw. im Intake-Schritt angelegt werden.
