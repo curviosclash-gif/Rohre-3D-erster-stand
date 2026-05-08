@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 187,
+          "concreteCount": 188,
           "plannedCount": 0
         }
       }
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 450,
+          "concreteCount": 451,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2082,7 +2082,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 20,
+          "concreteCount": 21,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -2199,7 +2199,7 @@
         ],
         "priority": "P2",
         "owner": "codex",
-        "currentPhase": "110.3",
+        "currentPhase": "110.4",
         "planFile": "docs/plaene/aktiv/V110.md",
         "scopeDeclarations": [
           ".agents/workflows/status.md",
@@ -2224,13 +2224,15 @@
           "docs/prozess/Open_Findings.md",
           "docs/referenz/ai_architecture_context.md",
           "docs/Umsetzungsplan.md",
+          "package.json",
           "scripts/build-knowledge-graph.mjs",
           "scripts/check-knowledge-graph.mjs",
+          "scripts/migrate-knowledge-graph.mjs",
           "scripts/query-knowledge-graph.mjs",
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 30,
+          "concreteCount": 33,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2280,7 +2282,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 116,
+          "concreteCount": 117,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -6185,7 +6187,7 @@
       "id": "V110.3",
       "type": "phase",
       "title": "Delta-Validation und Migration",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.3"
@@ -17033,8 +17035,8 @@
     {
       "id": "V110.3.1",
       "type": "subphase",
-      "title": "`impact-diff`-basierte Delta-Gates fuer geaenderte Subgraphen als Standardpfad dokumentieren und mit Referenzdiffs belegen.",
-      "status": "open",
+      "title": "`impact-diff`-basierte Delta-Gates fuer geaenderte Subgraphen als Standardpfad dokumentieren und mit Referenzdiffs belegen. (abgeschlossen: 2026-05-08; evidence: `scripts/query-knowledge-graph.mjs impact-diff [--base <REF>] [FILE...]` gibt geaenderte Dateien, `riskStatus`, kritische Pfade, betroffenen Runtime-Subgraph und empfohlene Delta-Checks aus; Referenzdiff fuer `scripts/query-knowledge-graph.mjs scripts/migrate-knowledge-graph.mjs` ist reproduzierbar und niedriges Risiko; `node --test tests/knowledge-graph-build.contract.test.mjs` belegt einen Settings-Risikodiff mit `event-flow settings`-Empfehlung)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.3",
@@ -17044,8 +17046,8 @@
     {
       "id": "V110.3.2",
       "type": "subphase",
-      "title": "Ontology-Migrationen (`schema`/`id`) als versionierte Skripte inkl. Backfill-/Regressionstest absichern.",
-      "status": "open",
+      "title": "Ontology-Migrationen (`schema`/`id`) als versionierte Skripte inkl. Backfill-/Regressionstest absichern. (abgeschlossen: 2026-05-08; evidence: `data/contracts/knowledge-graph/schema-migrations.v1.json` und `scripts/migrate-knowledge-graph.mjs` definieren den Current-v1-Migrationspfad mit Backfill-Kommando `npm run graph:build`; `npm run graph:migrate` meldet `status=current`; Contract-Test validiert Current-v1 und fehlenden Current-Pfad)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.3",
@@ -28748,6 +28750,23 @@
       }
     },
     {
+      "id": "data/contracts/knowledge-graph/schema-migrations.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/performance_ki_baseline_report.json",
       "type": "file",
       "title": null,
@@ -37668,6 +37687,7 @@
           "BT93K",
           "BT93L",
           "BT93M",
+          "V110",
           "V112",
           "V75",
           "V87",
@@ -40953,6 +40973,25 @@
         "scopeBlocks": [
           "B13",
           "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/migrate-knowledge-graph.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110"
         ],
         "exists": true
       }
@@ -59603,6 +59642,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/migrate-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/perf-host-budget-v41.mjs",
       "type": "scope",
       "hint": null,
@@ -68074,6 +68122,15 @@
     {
       "from": "BT91",
       "to": "scripts/heal-git-acl-windows.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "scripts/migrate-knowledge-graph.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97104,6 +97161,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/schema-migrations.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "docs/generated/knowledge-graph.coverage.json",
       "type": "scope",
       "hint": null,
@@ -98401,6 +98467,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/schema-migrations.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
       "type": "scope",
       "hint": null,
@@ -98581,6 +98656,15 @@
     },
     {
       "from": "V110",
+      "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "scripts/build-knowledge-graph.mjs",
       "type": "scope",
       "hint": null,
@@ -98591,6 +98675,15 @@
     {
       "from": "V110",
       "to": "scripts/check-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "scripts/migrate-knowledge-graph.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98872,6 +98965,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/runtime-telemetry-replay.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/schema-migrations.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {

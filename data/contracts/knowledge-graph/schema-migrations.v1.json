@@ -1,0 +1,34 @@
+{
+  "contract": "knowledge-graph.schema-migrations.v1",
+  "schema_version": 1,
+  "current": {
+    "graph_schema_version": 1,
+    "coverage_schema_version": 1,
+    "mapping_schema_version": 1
+  },
+  "migrations": [
+    {
+      "id": "knowledge-graph-schema-v1-current",
+      "from": {
+        "graph_schema_version": 1,
+        "coverage_schema_version": 1,
+        "mapping_schema_version": 1
+      },
+      "to": {
+        "graph_schema_version": 1,
+        "coverage_schema_version": 1,
+        "mapping_schema_version": 1
+      },
+      "mode": "noop",
+      "status": "active",
+      "backfill": {
+        "required": false,
+        "command": "npm run graph:build"
+      },
+      "regression": {
+        "command": "node --test tests/knowledge-graph-build.contract.test.mjs",
+        "assertion": "Current v1 graph, coverage and mapping artifacts are accepted without rewrite."
+      }
+    }
+  ]
+}

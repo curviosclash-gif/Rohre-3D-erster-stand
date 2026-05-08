@@ -11,6 +11,9 @@ import {
     parseFrontmatter,
     parseMasterRows,
 } from './build-knowledge-graph.mjs';
+import {
+    validateKnowledgeGraphMigrationContract,
+} from './migrate-knowledge-graph.mjs';
 
 const ROOT = process.cwd();
 const GRAPH_PATH = 'docs/generated/knowledge-graph.json';
@@ -18,6 +21,7 @@ const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
 const PREDICATE_CONSTRAINTS_PATH = 'data/contracts/knowledge-graph/predicate-constraints.v1.json';
 const CONTRADICTIONS_PATH = 'data/contracts/knowledge-graph/contradictions.v1.json';
 const RUNTIME_TELEMETRY_REPLAY_PATH = 'data/contracts/knowledge-graph/runtime-telemetry-replay.v1.json';
+const SCHEMA_MIGRATIONS_PATH = 'data/contracts/knowledge-graph/schema-migrations.v1.json';
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
 const BOT_TRAINING_MASTER_PATH = 'docs/bot-training/Bot_Trainingsplan.md';
 const ACTIVE_PLANS_DIR = 'docs/plaene/aktiv';
@@ -181,6 +185,11 @@ async function readContradictionRules() {
 
 async function readRuntimeTelemetryReplay() {
     const raw = await fs.readFile(path.join(ROOT, RUNTIME_TELEMETRY_REPLAY_PATH), 'utf8');
+    return JSON.parse(raw);
+}
+
+async function readSchemaMigrations() {
+    const raw = await fs.readFile(path.join(ROOT, SCHEMA_MIGRATIONS_PATH), 'utf8');
     return JSON.parse(raw);
 }
 
@@ -1078,7 +1087,7 @@ async function runChecks() {
     const violations = [];
     const warnings = [];
 
-    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock, predicateConstraints, contradictionRules, runtimeTelemetryReplay] = await Promise.all([
+    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock, predicateConstraints, contradictionRules, runtimeTelemetryReplay, schemaMigrations] = await Promise.all([
         readExistingArtifact(GRAPH_PATH),
         readExistingArtifact(COVERAGE_PATH),
         buildKnowledgeGraphArtifacts(),
@@ -1086,6 +1095,7 @@ async function runChecks() {
         readPredicateConstraints(),
         readContradictionRules(),
         readRuntimeTelemetryReplay(),
+        readSchemaMigrations(),
     ]);
 
     const generatedGraphRaw = artifactToString(generatedArtifacts.graph);
@@ -1103,6 +1113,7 @@ async function runChecks() {
     validatePredicateConstraints(existingGraph.parsed, predicateConstraints, violations);
     validateGraphContradictions(existingGraph.parsed, contradictionRules, violations, warnings);
     validateRuntimeTelemetryReplay(existingGraph.parsed, runtimeTelemetryReplay, violations);
+    validateKnowledgeGraphMigrationContract(schemaMigrations, violations);
     validateCriticalDesktopMappings(existingGraph.parsed, violations);
     ensureDependsTargetsExist(existingGraph.parsed, violations);
     detectHardDependsCycles(existingGraph.parsed, violations);

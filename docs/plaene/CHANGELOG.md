@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-08 (Subphase `V110 110.3`)
+
+- `110.3.1` ist abgeschlossen: `impact-diff` ist als Delta-Query fuer PR-/Commit-Sicht verfuegbar und reportet geaenderte Dateien, kritische Pfade, Runtime-Subgraph, Risikodateien und empfohlene Graph-Checks. Referenzdiffs sind reproduzierbar ueber explizite Dateiliste oder `--base <REF>`.
+- `110.3.2` ist abgeschlossen: Der Ontology-Migrationspfad ist mit `data/contracts/knowledge-graph/schema-migrations.v1.json` versioniert, `npm run graph:migrate` prueft den aktuellen v1-Pfad und `graph:check` validiert den Migrationsvertrag. Der Block wechselt damit auf `110.4`.
+
 ## Stand-Snapshot 2026-05-08 (Subphase `V110 110.1.1`)
 
 - Planlogik-Fix 2026-05-08: Master-Kopf und empfohlene Reihenfolge trennen jetzt aktiven Lock `V110 110.2` vom naechsten freien P1-Startpfad `V102 102.1`; `Open_Findings` spiegelt den aktuellen V90-Audit-Rest als 2 moderate Root-Befunde. `V105`/`V113` dokumentieren die breiten Scope-Overlaps enger, der aktive Planordner ist als aktive plus referenzierte Detailablage beschrieben, und der Bot-Trainingsplan markiert `BT93M` als operative PPO-Claim-Quelle statt alter Legacy-active-Zeilen.

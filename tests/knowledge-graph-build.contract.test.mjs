@@ -28,9 +28,14 @@ import {
 import {
     queryCriticalPathHealth,
     queryEventFlow,
+    queryImpactDiff,
     queryImpactForFile,
     queryUntestedSystems,
 } from '../scripts/query-knowledge-graph.mjs';
+import {
+    resolveKnowledgeGraphMigration,
+    validateKnowledgeGraphMigrationContract,
+} from '../scripts/migrate-knowledge-graph.mjs';
 
 test('parseFrontmatter tolerates missing status and variant field order', () => {
     const content = [
@@ -828,6 +833,90 @@ test('knowledge graph core runtime queries return stable JSON shapes', async () 
     assert.deepEqual(healthByPath.get('round-end').missingLayers, []);
     assert.ok(healthByPath.get('round-end').requiredLayers.includes('config'));
     assert.equal(healthByPath.get('settings').status, 'ok');
+});
+
+test('impact-diff reports changed runtime subgraphs and recommended delta checks', async () => {
+    const graph = await buildKnowledgeGraph();
+    const coverage = {
+        files: [
+            {
+                path: 'src/core/SettingsManager.js',
+                covered: true,
+                coveredInCore: true,
+                coveredByOverlay: false,
+                classification: 'product-code',
+                scopeBlocks: ['V103', 'V110'],
+                surfaces: [],
+            },
+            {
+                path: 'README.md',
+                covered: true,
+                coveredInCore: true,
+                coveredByOverlay: false,
+                classification: 'product-docs',
+                scopeBlocks: [],
+                surfaces: [],
+            },
+        ],
+    };
+
+    const result = queryImpactDiff(graph, coverage, ['src\\core\\SettingsManager.js', 'README.md'], { baseRef: 'HEAD~1' });
+
+    assert.equal(result.query, 'impact-diff');
+    assert.equal(result.baseRef, 'HEAD~1');
+    assert.equal(result.riskStatus, 'review');
+    assert.ok(result.criticalPaths.includes('settings'));
+    assert.ok(result.riskFiles.some((entry) => entry.file === 'src/core/SettingsManager.js'));
+    assert.ok(result.subgraph.nodes.some((node) => node.id === 'runtime:settings-manager'));
+    assert.ok(result.subgraph.edges.some((edge) => edge.type === 'validated_by' && edge.to === 'test:settings-manager-contract'));
+    assert.ok(result.recommendedChecks.includes('npm run graph:check'));
+    assert.ok(result.recommendedChecks.some((command) => command.includes('event-flow settings')));
+});
+
+test('knowledge graph schema migrations accept current v1 artifacts and reject missing current path', () => {
+    const contract = {
+        contract: 'knowledge-graph.schema-migrations.v1',
+        schema_version: 1,
+        current: {
+            graph_schema_version: 1,
+            coverage_schema_version: 1,
+            mapping_schema_version: 1,
+        },
+        migrations: [
+            {
+                id: 'knowledge-graph-schema-v1-current',
+                from: {
+                    graph_schema_version: 1,
+                    coverage_schema_version: 1,
+                    mapping_schema_version: 1,
+                },
+                to: {
+                    graph_schema_version: 1,
+                    coverage_schema_version: 1,
+                    mapping_schema_version: 1,
+                },
+                mode: 'noop',
+                status: 'active',
+            },
+        ],
+    };
+    const violations = validateKnowledgeGraphMigrationContract(contract, []);
+    const decision = resolveKnowledgeGraphMigration({
+        graph_schema_version: 1,
+        coverage_schema_version: 1,
+        mapping_schema_version: 1,
+    }, contract);
+
+    assert.deepEqual(violations, []);
+    assert.equal(decision.status, 'current');
+    assert.equal(decision.migration.id, 'knowledge-graph-schema-v1-current');
+
+    const missingPath = {
+        ...contract,
+        migrations: [],
+    };
+    const missingPathViolations = validateKnowledgeGraphMigrationContract(missingPath, []);
+    assert.ok(missingPathViolations.some((violation) => violation.code === 'KG_MIGRATION_RULE_MISSING'));
 });
 
 test('parseAuditMasterRows extracts audit blocks, findings paths and core scope references', () => {

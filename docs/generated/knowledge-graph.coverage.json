@@ -130,11 +130,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1817,
-    "rawCoveredFileCount": 1461,
+    "trackedFileCount": 1819,
+    "rawCoveredFileCount": 1463,
     "rawCoveragePercent": 80.4,
-    "adjustedTrackedFileCount": 1555,
-    "adjustedCoveredFileCount": 1321,
+    "adjustedTrackedFileCount": 1557,
+    "adjustedCoveredFileCount": 1323,
     "adjustedCoveragePercent": 85,
     "uncoveredFileCount": 356,
     "uncoveredActiveFileCount": 234,
@@ -178,8 +178,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 924,
-        "coveredCount": 909
+        "count": 926,
+        "coveredCount": 911
       },
       {
         "classification": "product-docs",
@@ -4208,6 +4208,25 @@
     },
     {
       "path": "data/contracts/knowledge-graph/runtime-telemetry-replay.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/schema-migrations.v1.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -15780,6 +15799,7 @@
         "BT93K",
         "BT93L",
         "BT93M",
+        "V110",
         "V112",
         "V75",
         "V87",
@@ -19593,6 +19613,27 @@
       "scopeBlocks": [
         "B13",
         "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/migrate-knowledge-graph.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110"
       ],
       "surfaces": [],
       "classification": "product-code",

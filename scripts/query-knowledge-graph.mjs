@@ -2,11 +2,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { execFile as execFileCallback } from 'node:child_process';
+import { promisify } from 'node:util';
 
 const ROOT = process.cwd();
 const GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
 const GIT_HOTSPOT_OVERLAY_ID = 'GIT-HISTORY-HOTSPOTS';
+const execFile = promisify(execFileCallback);
 const RUNTIME_QUERY_NODE_TYPES = new Set(['runtime', 'event', 'state', 'config', 'test']);
 const RUNTIME_QUERY_EDGE_TYPES = new Set([
     'implements',
@@ -60,6 +63,29 @@ async function readArtifacts() {
         readArtifact(COVERAGE_PATH),
     ]);
     return { graph, coverage };
+}
+
+async function runGitCommand(args) {
+    try {
+        const { stdout } = await execFile('git', args, {
+            cwd: ROOT,
+            maxBuffer: 10 * 1024 * 1024,
+            windowsHide: true,
+        });
+        return stdout;
+    } catch {
+        return '';
+    }
+}
+
+async function readChangedFiles(baseRef = 'HEAD') {
+    const normalizedBase = String(baseRef || 'HEAD').trim() || 'HEAD';
+    const stdout = await runGitCommand(['diff', '--name-only', normalizedBase, '--']);
+    return stdout
+        .split(/\r?\n/)
+        .map((line) => normalizePath(line))
+        .filter(Boolean)
+        .sort((left, right) => left.localeCompare(right));
 }
 
 function buildCoverageFileIndex(coverage) {
@@ -369,6 +395,83 @@ function queryImpactForFile(graph, coverage, filePath) {
         relatedNodes: sortNodeSummaries(relatedNodes),
         relationEdges: sortEdgeSummaries(relationEdges),
         criticalPaths,
+    };
+}
+
+function buildImpactedSubgraph(graph, impactedNodeIds) {
+    const { nodes, edges, nodeById } = buildGraphIndexes(graph);
+    const nodeIdSet = impactedNodeIds instanceof Set ? impactedNodeIds : new Set(impactedNodeIds || []);
+    const relationEdges = edges
+        .filter((edge) => RUNTIME_QUERY_EDGE_TYPES.has(edge.type))
+        .filter((edge) => nodeIdSet.has(edge.from) || nodeIdSet.has(edge.to));
+
+    for (const edge of relationEdges) {
+        nodeIdSet.add(edge.from);
+        nodeIdSet.add(edge.to);
+    }
+
+    const subgraphNodes = Array.from(nodeIdSet)
+        .map((nodeId) => nodeById.get(nodeId))
+        .filter((node) => node && RUNTIME_QUERY_NODE_TYPES.has(node.type))
+        .map(nodeSummary)
+        .filter(Boolean);
+
+    return {
+        nodes: sortNodeSummaries(subgraphNodes),
+        edges: sortEdgeSummaries(relationEdges.map((edge) => edgeSummary(edge, nodeById))),
+    };
+}
+
+function queryImpactDiff(graph, coverage, changedFiles, { baseRef = null } = {}) {
+    const normalizedFiles = Array.from(new Set((changedFiles || [])
+        .map((filePath) => normalizePath(filePath))
+        .filter(Boolean)))
+        .sort((left, right) => left.localeCompare(right));
+    const fileImpacts = normalizedFiles.map((filePath) => queryImpactForFile(graph, coverage, filePath));
+    const impactedNodeIds = new Set();
+    const criticalPaths = new Set();
+    const riskFiles = [];
+
+    for (const impact of fileImpacts) {
+        for (const criticalPath of impact.criticalPaths || []) {
+            criticalPaths.add(criticalPath);
+        }
+        for (const node of [...impact.implementedNodes, ...impact.relatedNodes]) {
+            impactedNodeIds.add(node.id);
+        }
+        const isRuntimeMapped = impact.implementedNodes.length > 0 || impact.relationEdges.length > 0;
+        const isActiveProductCode = impact.coverage?.excludedFromCoverage !== true
+            && ['product-code', 'product-docs', 'dev-tooling', 'governance-tooling'].includes(impact.coverage?.classification || '');
+        if (isRuntimeMapped || (isActiveProductCode && impact.criticalPaths.length > 0)) {
+            riskFiles.push({
+                file: impact.file,
+                criticalPaths: impact.criticalPaths,
+                implementedNodeCount: impact.implementedNodes.length,
+                relationEdgeCount: impact.relationEdges.length,
+            });
+        }
+    }
+
+    const subgraph = buildImpactedSubgraph(graph, impactedNodeIds);
+    const sortedCriticalPaths = Array.from(criticalPaths).sort((left, right) => left.localeCompare(right));
+
+    return {
+        query: 'impact-diff',
+        baseRef,
+        changedFileCount: normalizedFiles.length,
+        changedFiles: normalizedFiles,
+        riskStatus: riskFiles.length > 0 ? 'review' : 'low',
+        criticalPaths: sortedCriticalPaths,
+        riskFiles,
+        subgraph,
+        recommendedChecks: [
+            'npm run graph:build',
+            'npm run graph:check',
+            ...(sortedCriticalPaths.length > 0
+                ? sortedCriticalPaths.map((criticalPath) => `node scripts/query-knowledge-graph.mjs event-flow ${criticalPath} --json`)
+                : []),
+        ],
+        fileImpacts,
     };
 }
 
@@ -717,6 +820,21 @@ function printText(result) {
         return;
     }
 
+    if (result.query === 'impact-diff') {
+        process.stdout.write(`impact-diff${result.baseRef ? ` base=${result.baseRef}` : ''}\n`);
+        process.stdout.write(`- changed files=${result.changedFileCount} risk=${result.riskStatus}\n`);
+        process.stdout.write(`- critical paths=${result.criticalPaths.join(', ') || 'none'}\n`);
+        if (result.riskFiles.length > 0) {
+            process.stdout.write('risk files\n');
+            for (const entry of result.riskFiles) {
+                process.stdout.write(`- ${entry.file} paths=${entry.criticalPaths.join('|') || 'none'} nodes=${entry.implementedNodeCount} edges=${entry.relationEdgeCount}\n`);
+            }
+        }
+        process.stdout.write(`- subgraph nodes=${result.subgraph.nodes.length} edges=${result.subgraph.edges.length}\n`);
+        process.stdout.write(`- checks=${result.recommendedChecks.join(' && ')}\n`);
+        return;
+    }
+
     if (result.query === 'event-flow') {
         process.stdout.write(`event-flow ${result.selector}\n`);
         const contextEdges = (result.contextEdges || [])
@@ -774,6 +892,7 @@ function usage() {
         + '  node scripts/query-knowledge-graph.mjs files-for-block <BLOCK_ID> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs bt-status [BLOCK_ID] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs impact-for-file <FILE_PATH> [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs impact-diff [--base <REF>] [FILE_PATH...] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs event-flow <EVENT_ID|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs untested-systems [CRITICAL_PATH] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs critical-path-health [--json]\n'
@@ -786,6 +905,7 @@ export {
     queryCriticalPathHealth,
     queryEventFlow,
     queryFilesForBlock,
+    queryImpactDiff,
     queryImpactForFile,
     queryOpenDeps,
     queryScopeCollisions,
@@ -856,6 +976,16 @@ if (isDirectRun) {
                 process.exit(1);
             }
             result = queryImpactForFile(graph, coverage, filePath);
+        } else if (command === 'impact-diff') {
+            const baseIndex = positional.indexOf('--base');
+            const baseRef = baseIndex >= 0 ? positional[baseIndex + 1] : null;
+            const explicitFiles = positional
+                .slice(1)
+                .filter((arg, index, args) => arg !== '--base' && args[index - 1] !== '--base');
+            const changedFiles = explicitFiles.length > 0
+                ? explicitFiles
+                : await readChangedFiles(baseRef || 'HEAD');
+            result = queryImpactDiff(graph, coverage, changedFiles, { baseRef });
         } else if (command === 'event-flow') {
             const selector = positional[1];
             if (!selector) {
