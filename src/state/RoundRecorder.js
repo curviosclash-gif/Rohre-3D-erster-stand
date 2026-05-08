@@ -51,6 +51,7 @@ export class RoundRecorder {
             maxTrackedPlayers: MAX_TRACKED_PLAYERS,
             timeProvider: () => this._elapsedSeconds(),
         });
+        this._roundFinalizedListeners = new Set();
 
         this._bindCompatibilityAliases();
     }
@@ -169,7 +170,26 @@ export class RoundRecorder {
             roundSummary.winnerIndex,
             `duration=${duration} reason=${reason} parcours=${parcoursFlag} route=${routeId}`
         );
+        this._notifyRoundFinalized(roundSummary);
         return roundSummary;
+    }
+
+    onRoundFinalized(listener) {
+        if (typeof listener !== 'function') return () => {};
+        this._roundFinalizedListeners.add(listener);
+        return () => {
+            this._roundFinalizedListeners.delete(listener);
+        };
+    }
+
+    _notifyRoundFinalized(roundSummary) {
+        for (const listener of this._roundFinalizedListeners) {
+            try {
+                listener(roundSummary, this);
+            } catch (error) {
+                logger.warn('Round-finalized listener failed', error);
+            }
+        }
     }
 
     getLastRoundMetrics() {

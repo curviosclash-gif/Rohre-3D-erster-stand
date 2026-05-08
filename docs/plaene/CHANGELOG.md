@@ -400,3 +400,8 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Ursache: Die Observation-Felder `WALL_DISTANCE_LEFT`/`WALL_DISTANCE_RIGHT` waren im Runtime-Sampling semantisch vertauscht, weil die lokale Seitenbasis `WORLD_UP x forward` links statt rechts zeigt; die Heuristik wich dadurch in die blockierte Seite aus. Der RuleBased-Fallback hatte denselben links-positiven Yaw-Vertrag beim Input-Mapping invertiert.
 - Fixpfad: `ObservationSystem` befuellt links/rechts wieder schema-korrekt; `BotActionOps` und `BotRecoveryOps` mappen positive Yaw-Entscheidungen konsistent auf `yawLeft`. Der Regressionstest `heuristic-bot-survival-regression` deckt Observation, Heuristik-Ausweichen und RuleBased-Yaw ab.
 - Evidence: `node --test tests/heuristic-bot-survival-regression.test.mjs` und `npm run plan:check` sind gruen.
+
+## Tooling-Notiz 2026-05-08 (Automatische Bot-Spielanalyse)
+- Normales Spielen triggert jetzt ueber `RoundRecorder.onRoundFinalized` automatisch alle drei Bot-Runden eine Bot-Spielanalyse; `GameDebugApi` haelt den letzten Report in Memory, loggt ihn und zeigt bei Hinweisen einen Status-Toast.
+- `botAnalysis=0` deaktiviert den Auto-Pfad, `botAnalysisRounds=N` setzt das Intervall; manuell bleiben `GAME_INSTANCE.debugApi.runBotPlayAnalysis()` und `getBotPlayAnalysisStatus()` verfuegbar.
+- Evidence: `node --test tests/bot-play-analysis-runtime.test.mjs`, `npm run check:architecture:touched-strict`, `npm run plan:check`.

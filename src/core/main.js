@@ -82,6 +82,7 @@ export class Game {
         this.recorder = new RoundRecorder();
         this._recorderFrameCaptureEnabled = this.debugApi.resolveRecorderFrameCaptureEnabledDefault();
         this.recorder.setFrameCaptureEnabled(this._recorderFrameCaptureEnabled);
+        this.debugApi.bindBotPlayAnalysisRecorder(this.recorder);
 
         this.profileUiController = new ProfileUiController({
             profileManager: this.profileManager,

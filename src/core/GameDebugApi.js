@@ -1,4 +1,5 @@
 import { BotValidationService } from '../state/validation/BotValidationService.js';
+import { BotPlayAnalysisService } from '../state/validation/BotPlayAnalysisService.js';
 import { DeveloperTrainingController } from './DeveloperTrainingController.js';
 import { createRuntimeAccess } from '../shared/runtime/RuntimeAccessFactory.js';
 import {
@@ -54,6 +55,13 @@ export class GameDebugApi {
         this.validationService = new BotValidationService({
             getRecorder: () => this.runtimeAccess.getRecorder?.() || null,
         });
+        this.botPlayAnalysis = new BotPlayAnalysisService({
+            enabled: this.resolveAutoBotPlayAnalysisEnabledDefault(),
+            roundInterval: this.resolveAutoBotPlayAnalysisRoundIntervalDefault(),
+            logger: console,
+            onReport: (report) => this._onBotPlayAnalysisReport(report),
+        });
+        this._unbindBotPlayAnalysisRecorder = null;
         this.trainingController = new DeveloperTrainingController();
         this.trainingAutomationState = {
             latestBatch: null,
@@ -97,6 +105,67 @@ export class GameDebugApi {
 
     setRecorderFrameCaptureEnabled(enabled) {
         this.runtimeAccess.setRecorderFrameCaptureEnabled?.(enabled);
+    }
+
+    resolveAutoBotPlayAnalysisEnabledDefault() {
+        try {
+            const params = new URLSearchParams(window.location.search || '');
+            const raw = params.get('botAnalysis') || params.get('botPlayAnalysis');
+            if (raw == null) return true;
+            const normalized = String(raw).trim().toLowerCase();
+            return !['0', 'false', 'off', 'no'].includes(normalized);
+        } catch {
+            return true;
+        }
+    }
+
+    resolveAutoBotPlayAnalysisRoundIntervalDefault() {
+        try {
+            const params = new URLSearchParams(window.location.search || '');
+            const raw = Number(params.get('botAnalysisRounds') || params.get('botPlayAnalysisRounds'));
+            return Number.isFinite(raw) && raw > 0 ? Math.trunc(raw) : 3;
+        } catch {
+            return 3;
+        }
+    }
+
+    bindBotPlayAnalysisRecorder(recorder) {
+        this._unbindBotPlayAnalysisRecorder?.();
+        this._unbindBotPlayAnalysisRecorder = null;
+        if (!recorder?.onRoundFinalized) return false;
+        this._unbindBotPlayAnalysisRecorder = recorder.onRoundFinalized((roundSummary, sourceRecorder) => {
+            this.botPlayAnalysis.handleRoundFinalized(sourceRecorder, roundSummary);
+        });
+        return true;
+    }
+
+    configureBotPlayAnalysis(options = {}) {
+        return this.botPlayAnalysis.configure(options);
+    }
+
+    runBotPlayAnalysis(options = {}) {
+        const recorder = this.runtimeAccess.getRecorder?.() || null;
+        const limit = Number(options?.limit);
+        const rounds = recorder?.getRoundSummaries?.(Number.isFinite(limit) ? limit : null) || [];
+        return this.botPlayAnalysis.runAnalysis(rounds);
+    }
+
+    getBotPlayAnalysisStatus() {
+        return this.botPlayAnalysis.getStatus();
+    }
+
+    _onBotPlayAnalysisReport(report) {
+        const findingCount = Array.isArray(report?.findings) ? report.findings.length : 0;
+        const highCount = Array.isArray(report?.findings)
+            ? report.findings.filter((finding) => finding.severity === 'high').length
+            : 0;
+        if (findingCount > 0) {
+            this.runtimeAccess.actionShowStatusToast?.(
+                `Bot-Analyse: ${findingCount} Hinweise (${highCount} hoch)`,
+                2600,
+                highCount > 0 ? 'warning' : 'info'
+            );
+        }
     }
 
     captureBotBaseline(label = 'BASELINE') {
