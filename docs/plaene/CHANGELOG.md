@@ -426,3 +426,10 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Pre-push blockierte auf `lint:architecture`, weil `HeuristicBotPolicy` und `MenuGameplayBindings` den `max-lines`-Guard ueberschritten.
 - Fixpfad: Profil-/Observation-Helfer der Heuristik und Recording-/Kamera-Menuebinding wurden in schmale Nachbarmodule ausgelagert, ohne Runtime-Verhalten oder UI-Vertraege zu aendern.
 - Evidence: `npm run lint:architecture`, `node --test tests/heuristic-bot-survival-regression.test.mjs`, `npm run plan:check` und `npm run docs:check` sind gruen.
+
+## Bugfix-Notiz 2026-05-08 (Round-Ghost Bot-Spuren)
+
+- Nutzerfeedback: Im Einzelspiel mit Bots entstanden mehrere Ghost-Spuren, obwohl der Parcours-Ghost Human-only gedacht ist.
+- Ursache: Der RoundRecorder-Fallback erzeugte Last-Round-Ghost-Clips aus allen Snapshot-Spielern inklusive Bots; diese Clips wurden am Rundenende abgespielt und fuer die Arcade-Ghost-Library persistiert.
+- Fixpfad: `RoundRecorder.getLastRoundGhostClip` filtert Bots standardmaessig aus Frames und Player-Metadaten; Bot-Spuren bleiben nur ueber `includeBots: true` fuer explizite Debug-Pfade verfuegbar.
+- Evidence: `node --test tests/round-recorder-ghost-fallback.contract.test.mjs tests/parcours-ghost.contract.test.mjs tests/last-round-ghost-system.contract.test.mjs`, `npm run plan:check` und `git diff --check` sind gruen.

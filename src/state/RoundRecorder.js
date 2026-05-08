@@ -242,6 +242,7 @@ export class RoundRecorder {
     }
 
     getLastRoundGhostClip(players = [], options = {}) {
+        const includeBots = options?.includeBots === true;
         let orderedSnapshots = this._snapshotStore.getOrderedSnapshots();
         if (orderedSnapshots.length < 2 && Array.isArray(players) && players.length > 0) {
             this.captureSnapshotNow(players);
@@ -277,15 +278,16 @@ export class RoundRecorder {
                 ? previousTime + fallbackSnapshotStep
                 : rawTime;
             const srcPlayers = Array.isArray(snapshot?.players) ? snapshot.players : [];
-            const framePlayers = new Array(srcPlayers.length);
+            const framePlayers = [];
             for (let j = 0; j < srcPlayers.length; j++) {
                 const p = srcPlayers[j];
-                framePlayers[j] = {
+                if (!includeBots && p?.bot === true) continue;
+                framePlayers.push({
                     idx: p.idx, alive: p.alive,
                     x: p.x, y: p.y, z: p.z,
                     qx: p.qx, qy: p.qy, qz: p.qz, qw: p.qw,
                     bot: p.bot,
-                };
+                });
             }
             normalizedFrames[index] = { time: normalizedTime, players: framePlayers };
         }
@@ -294,6 +296,7 @@ export class RoundRecorder {
 
         const clipPlayers = Array.isArray(players)
             ? players
+                .filter((player) => includeBots || player?.isBot !== true)
                 .map((player) => normalizeGhostPlayerMeta({
                     idx: player?.index,
                     color: player?.color,
