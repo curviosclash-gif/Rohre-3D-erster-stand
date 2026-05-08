@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { resolveProductiveMultiplayerTransport } from '../src/core/runtime/MenuRuntimeSessionService.js';
+import {
+    handleSessionTypeChangeAction,
+    resolveProductiveMultiplayerTransport,
+} from '../src/core/runtime/MenuRuntimeSessionService.js';
 import { PLATFORM_PRODUCT_SURFACE_IDS } from '../src/shared/contracts/PlatformCapabilityRegistry.js';
 import { MULTIPLAYER_TRANSPORTS } from '../src/shared/contracts/RuntimeSessionContract.js';
 
@@ -20,6 +23,47 @@ function createGame(multiplayerTransport = '') {
             },
         },
     };
+}
+
+function createSessionSwitchGame(productSurfaceId = PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP) {
+    const calls = {
+        switchSessionType: [],
+        settingsChanged: [],
+        toasts: [],
+    };
+    const game = {
+        settings: {
+            mode: '1p',
+            localSettings: {
+                sessionType: 'single',
+                multiplayerTransport: '',
+            },
+        },
+        settingsManager: {
+            switchSessionType(settings, sessionType) {
+                calls.switchSessionType.push(sessionType);
+                settings.localSettings.sessionType = sessionType;
+                settings.mode = sessionType === 'splitscreen' ? '2p' : '1p';
+                return {
+                    success: true,
+                    targetSessionType: sessionType,
+                    loadedDraft: false,
+                    changedKeys: ['localSettings.sessionType', 'mode'],
+                };
+            },
+        },
+        uiManager: {
+            _runtimeFeatureFlags: {
+                surfacePolicy: {
+                    productSurfaceId,
+                },
+            },
+        },
+        _showStatusToast(message, duration, tone) {
+            calls.toasts.push({ message, duration, tone });
+        },
+    };
+    return { game, calls };
 }
 
 test('resolveProductiveMultiplayerTransport falls back to LAN when online is selected without configured signaling', () => {
@@ -60,4 +104,22 @@ test('resolveProductiveMultiplayerTransport keeps online when signaling is confi
             delete globalThis.__SIGNALING_URL__;
         }
     }
+});
+
+test('handleSessionTypeChangeAction keeps desktop splitscreen instead of browser-demo fallback', () => {
+    const { game, calls } = createSessionSwitchGame(PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP);
+
+    handleSessionTypeChangeAction({
+        game,
+        event: { sessionType: 'splitscreen' },
+        onSettingsChanged(payload) {
+            calls.settingsChanged.push(payload);
+        },
+    });
+
+    assert.deepEqual(calls.switchSessionType, ['splitscreen']);
+    assert.equal(game.settings.localSettings.sessionType, 'splitscreen');
+    assert.equal(game.settings.mode, '2p');
+    assert.equal(calls.settingsChanged.length, 1);
+    assert.match(calls.toasts[0]?.message || '', /Splitscreen/);
 });

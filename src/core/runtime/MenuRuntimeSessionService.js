@@ -190,10 +190,13 @@ export function handleSessionTypeChangeAction(ctx) {
     const { game, event, onSettingsChanged } = ctx;
     const requestedSessionType = String(event?.sessionType || '').trim().toLowerCase();
     if (!requestedSessionType) return;
-    const requestedAllowed = isSurfaceSessionTypeAllowed(requestedSessionType);
+    const productSurfaceId = resolveProductSurfaceId(game);
+    const requestedAllowed = isSurfaceSessionTypeAllowed(requestedSessionType, {
+        productSurfaceId,
+    });
     const targetSessionType = requestedAllowed
         ? requestedSessionType
-        : resolveSurfaceFallbackSessionType();
+        : resolveSurfaceFallbackSessionType({ productSurfaceId });
 
     const result = game.settingsManager.switchSessionType(game.settings, targetSessionType);
     if (!result.success) {
