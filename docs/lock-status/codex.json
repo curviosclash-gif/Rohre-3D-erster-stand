@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-07T11:22:16.096Z",
+  "timestamp": "2026-05-08T16:14:52.694Z",
   "locks": [
     {
       "block_id": "V103",
@@ -208,15 +208,41 @@
       "target_completion": "2026-05-07",
       "status": "completed",
       "notes": "V107 core graph, runtime query layer, coverage gate and workflow documentation closed"
+    },
+    {
+      "block_id": "V110",
+      "phase": "110.1",
+      "scope_files": [
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.schema.json",
+        "scripts/build-knowledge-graph.mjs",
+        "scripts/check-knowledge-graph.mjs",
+        "scripts/query-knowledge-graph.mjs",
+        "data/contracts/knowledge-graph/**",
+        "tests/knowledge-graph-build.contract.test.mjs",
+        "docs/referenz/ai_architecture_context.md",
+        ".agents/workflows/status.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/plaene/aktiv/V90.md",
+        "docs/plaene/aktiv/V96.md",
+        "docs/plaene/aktiv/V102.md",
+        "docs/plaene/aktiv/V105.md",
+        "docs/plaene/aktiv/V110.md",
+        "docs/plaene/aktiv/V111.md",
+        "docs/plaene/aktiv/V113.md",
+        "docs/plaene/aktiv/V114.md"
+      ],
+      "start_date": "2026-05-08",
+      "target_completion": "2026-05-08",
+      "status": "in-progress",
+      "notes": "Predicate constraints and provenance foundation"
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "107.99",
+    "phase_id": "110.1",
     "completed_items": [
-      "107.5.1",
-      "107.5.2",
-      "107.99.1",
-      "107.99.2"
+      "110.1.1"
     ],
     "last_commit": ""
   }

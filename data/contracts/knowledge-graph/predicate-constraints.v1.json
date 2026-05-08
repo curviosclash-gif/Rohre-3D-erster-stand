@@ -1,0 +1,84 @@
+{
+  "contract": "knowledge-graph.predicate-constraints.v1",
+  "schema_version": 1,
+  "constraint_id": "desktop-critical-predicate-constraints",
+  "description": "Domain-/Range- und Layer-Constraints fuer produktiv genutzte Wissensgraph-Relationen im Desktop-Kernscope.",
+  "relations": [
+    {
+      "type": "implements",
+      "domain": [
+        "file"
+      ],
+      "range": [
+        "config",
+        "runtime",
+        "test"
+      ],
+      "layer": "runtime"
+    },
+    {
+      "type": "emits",
+      "domain": [
+        "runtime"
+      ],
+      "range": [
+        "event"
+      ],
+      "layer": "event"
+    },
+    {
+      "type": "consumes",
+      "domain": [
+        "runtime"
+      ],
+      "range": [
+        "event"
+      ],
+      "layer": "event"
+    },
+    {
+      "type": "reads_config",
+      "domain": [
+        "config",
+        "runtime"
+      ],
+      "range": [
+        "config"
+      ],
+      "layer": "config"
+    },
+    {
+      "type": "reads_state",
+      "domain": [
+        "runtime"
+      ],
+      "range": [
+        "state"
+      ],
+      "layer": "state"
+    },
+    {
+      "type": "writes_state",
+      "domain": [
+        "runtime"
+      ],
+      "range": [
+        "state"
+      ],
+      "layer": "state"
+    },
+    {
+      "type": "validated_by",
+      "domain": [
+        "runtime"
+      ],
+      "range": [
+        "test"
+      ],
+      "layer": "test",
+      "cardinality": {
+        "critical_runtime_min_out": 1
+      }
+    }
+  ]
+}

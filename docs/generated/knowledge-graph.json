@@ -172,7 +172,7 @@
           "src/ui/UIStartSyncController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 67,
+          "concreteCount": 68,
           "plannedCount": 0
         }
       }
@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 186,
+          "concreteCount": 187,
           "plannedCount": 0
         }
       }
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 449,
+          "concreteCount": 450,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -1832,6 +1832,7 @@
           "V111",
           "V112",
           "V113",
+          "V114",
           "V90",
           "V96"
         ],
@@ -1980,7 +1981,7 @@
           "tsconfig.architecture.json"
         ],
         "scopeResolution": {
-          "concreteCount": 244,
+          "concreteCount": 245,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1991,6 +1992,7 @@
           "V111",
           "V112",
           "V113",
+          "V114",
           "V90",
           "V96"
         ],
@@ -2080,7 +2082,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 17,
+          "concreteCount": 18,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -2188,7 +2190,7 @@
       "id": "V110",
       "type": "block",
       "title": "Wissensgraph Ops-, Guard- und Integritaets-Haertung",
-      "status": "planned",
+      "status": "active",
       "attributes": {
         "source": [
           "block-plan",
@@ -2196,23 +2198,32 @@
           "master-index"
         ],
         "priority": "P2",
-        "owner": "frei",
+        "owner": "codex",
         "currentPhase": "110.1",
         "planFile": "docs/plaene/aktiv/V110.md",
         "scopeDeclarations": [
           ".agents/workflows/status.md",
-          "data/contracts/knowledge-graph/",
+          "data/contracts/knowledge-graph/**",
+          "docs/generated/knowledge-graph.coverage.json",
           "docs/generated/knowledge-graph.json",
           "docs/generated/knowledge-graph.schema.json",
+          "docs/plaene/aktiv/V102.md",
+          "docs/plaene/aktiv/V105.md",
           "docs/plaene/aktiv/V110.md",
+          "docs/plaene/aktiv/V111.md",
+          "docs/plaene/aktiv/V113.md",
+          "docs/plaene/aktiv/V114.md",
+          "docs/plaene/aktiv/V90.md",
+          "docs/plaene/aktiv/V96.md",
+          "docs/plaene/CHANGELOG.md",
           "docs/referenz/ai_architecture_context.md",
           "scripts/build-knowledge-graph.mjs",
           "scripts/check-knowledge-graph.mjs",
           "scripts/query-knowledge-graph.mjs",
-          "tests/"
+          "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 111,
+          "concreteCount": 21,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2223,6 +2234,7 @@
           "V111",
           "V112",
           "V113",
+          "V114",
           "V90",
           "V96"
         ],
@@ -2261,7 +2273,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 112,
+          "concreteCount": 114,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -2272,6 +2284,7 @@
           "V110",
           "V112",
           "V113",
+          "V114",
           "V90",
           "V96"
         ],
@@ -2358,7 +2371,7 @@
           "tests/hangar-desktop-flow.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 73,
+          "concreteCount": 74,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2369,6 +2382,57 @@
           "V110",
           "V111",
           "V112",
+          "V114",
+          "V90",
+          "V96"
+        ],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V114",
+      "type": "block",
+      "title": "SurfacePolicyPort fuer Demo- und Vollversionsgrenze",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "currentPhase": "114.1",
+        "planFile": "docs/plaene/aktiv/V114.md",
+        "scopeDeclarations": [
+          "docs/referenz/ai_architecture_context.md",
+          "src/core/runtime/GameRuntimeSettingsHandler.js",
+          "src/core/runtime/MatchStartValidationService.js",
+          "src/core/runtime/MenuRuntimePresetConfigService.js",
+          "src/core/runtime/MenuRuntimeSessionService.js",
+          "src/shared/contracts/PlatformCapabilityData.js",
+          "src/shared/contracts/PlatformCapabilityRegistry.js",
+          "src/shared/contracts/PlatformSurfacePolicyOps.js",
+          "src/shared/runtime/GameRuntimePorts.js",
+          "src/shared/runtime/UiControllerRuntimePorts.js",
+          "src/ui/menu/MenuPresetStateSync.js",
+          "src/ui/menu/MenuSurfacePolicyUiSync.js",
+          "src/ui/UIManager.js",
+          "src/ui/UIStartSyncController.js",
+          "tests/menu-runtime-preset-config-service.contract.test.mjs",
+          "tests/menu-runtime-session-service.contract.test.mjs",
+          "tests/platform-capabilities.contract.test.mjs",
+          "tests/runtime-regressions.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 18,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [
+          "V102",
+          "V105",
+          "V110",
+          "V111",
+          "V113",
           "V90",
           "V96"
         ],
@@ -2660,7 +2724,7 @@
           "src/ui/UIStartSyncController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 78,
+          "concreteCount": 79,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3088,7 +3152,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 299,
+          "concreteCount": 302,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3249,7 +3313,7 @@
           "src/state/**"
         ],
         "scopeResolution": {
-          "concreteCount": 262,
+          "concreteCount": 263,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3289,7 +3353,7 @@
           "tests/persistence-version-migration.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 183,
+          "concreteCount": 184,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3535,6 +3599,7 @@
           "V111",
           "V112",
           "V113",
+          "V114",
           "V96"
         ],
         "unknownFrontmatterFields": []
@@ -3582,7 +3647,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 262,
+          "concreteCount": 263,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3827,6 +3892,7 @@
           "V111",
           "V112",
           "V113",
+          "V114",
           "V90"
         ],
         "unknownFrontmatterFields": []
@@ -6336,6 +6402,56 @@
       "attributes": {
         "blockId": "V113",
         "phaseCode": "113.99"
+      }
+    },
+    {
+      "id": "V114.1",
+      "type": "phase",
+      "title": "Zielvertrag und Matrix",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.1"
+      }
+    },
+    {
+      "id": "V114.2",
+      "type": "phase",
+      "title": "SurfacePolicyPort einziehen",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.2"
+      }
+    },
+    {
+      "id": "V114.3",
+      "type": "phase",
+      "title": "SettingsManager-Abgrenzung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.3"
+      }
+    },
+    {
+      "id": "V114.4",
+      "type": "phase",
+      "title": "Tests und Ratchet",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.4"
+      }
+    },
+    {
+      "id": "V114.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.99"
       }
     },
     {
@@ -16866,8 +16982,8 @@
     {
       "id": "V110.1.1",
       "type": "subphase",
-      "title": "Predicate-Constraints fuer produktiv genutzte Relationen versionieren und in `graph:check` fail-fast validieren.",
-      "status": "open",
+      "title": "Predicate-Constraints fuer produktiv genutzte Relationen versionieren und in `graph:check` fail-fast validieren. (abgeschlossen: 2026-05-08; evidence: `data/contracts/knowledge-graph/predicate-constraints.v1.json` versioniert Domain-/Range-/Layer-Regeln fuer alle produktiven Mapping-Relationen; `node --test tests/knowledge-graph-build.contract.test.mjs` prueft Domain-, Range-, Layer- und Missing-Constraint-Fails; `npm run graph:build`, `npm run graph:check`, `npm run plan:check` PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.1",
@@ -17774,6 +17890,127 @@
         "blockId": "V113",
         "phaseCode": "113.99",
         "subphaseCode": "113.99.5"
+      }
+    },
+    {
+      "id": "V114.1.1",
+      "type": "subphase",
+      "title": "Direkte produktive Surface-Gate-Aufrufe inventarisieren und nach UI-Sync, Runtime-Action, Startvalidierung, Feature-Launch und Contract-only trennen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.1",
+        "subphaseCode": "114.1.1"
+      }
+    },
+    {
+      "id": "V114.1.2",
+      "type": "subphase",
+      "title": "Produktmatrix fuer Desktop-App vs Browser-Demo definieren: erlaubt/verboten/fallback fuer Session, Mode, Map, Preset, Quickstart, Host/Join und Tooling.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.1",
+        "subphaseCode": "114.1.2"
+      }
+    },
+    {
+      "id": "V114.2.1",
+      "type": "subphase",
+      "title": "`SurfacePolicyPort` in Shared-/Runtime-Port-Schicht einfuehren und aus bestehendem `surfacePolicy`-/`productSurfaceId`-Snapshot speisen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.2",
+        "subphaseCode": "114.2.1"
+      }
+    },
+    {
+      "id": "V114.2.2",
+      "type": "subphase",
+      "title": "Menu-/Runtime-Actions auf den Port umstellen; direkte Resolver-Aufrufe bleiben nur in `PlatformSurfacePolicyOps`, Contract-Tests oder klar markierten Adapterstellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.2",
+        "subphaseCode": "114.2.2"
+      }
+    },
+    {
+      "id": "V114.3.1",
+      "type": "subphase",
+      "title": "SettingsManager-/Facade-Pfade pruefen, die Session-Drafts, Presets oder Config-Import mutieren; Produktgrenzen muessen beim Apply/Start ueber SurfacePolicyPort gelten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.3",
+        "subphaseCode": "114.3.1"
+      }
+    },
+    {
+      "id": "V114.3.2",
+      "type": "subphase",
+      "title": "Architekturkontext nachziehen: `SettingsManager` speichert Nutzerwunsch, SurfacePolicyPort entscheidet Produktgrenze, V98-Settings-Studio exportiert nur Demo-Policy.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.3",
+        "subphaseCode": "114.3.2"
+      }
+    },
+    {
+      "id": "V114.4.1",
+      "type": "subphase",
+      "title": "Contract-Tests fuer Desktop-Default-Full und Browser-Demo-Default-Deny ueber echte Actions statt nur Resolver erweitern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.4",
+        "subphaseCode": "114.4.1"
+      }
+    },
+    {
+      "id": "V114.4.2",
+      "type": "subphase",
+      "title": "Lightweight-Guard oder Contract-Scan fuer produktive Dateien einfuehren: keine neuen `isSurface*Allowed(...)`-/Fallback-Aufrufe ohne Port oder expliziten Kontext.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.4",
+        "subphaseCode": "114.4.2"
+      }
+    },
+    {
+      "id": "V114.99.1",
+      "type": "subphase",
+      "title": "Gezielte Surface-Policy-Port- und Produktmatrix-Tests sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.99",
+        "subphaseCode": "114.99.1"
+      }
+    },
+    {
+      "id": "V114.99.2",
+      "type": "subphase",
+      "title": "`npm run plan:check` und relevante Architektur-/Docs-Gates sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.99",
+        "subphaseCode": "114.99.2"
+      }
+    },
+    {
+      "id": "V114.99.3",
+      "type": "subphase",
+      "title": "Nachscan zeigt keine produktiven kontextlosen Surface-Gate-Aufrufe im migrierten Scope.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.99",
+        "subphaseCode": "114.99.3"
       }
     },
     {
@@ -28290,6 +28527,23 @@
       }
     },
     {
+      "id": "data/contracts/knowledge-graph/predicate-constraints.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
       "type": "file",
       "title": null,
@@ -33126,7 +33380,8 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V107"
+          "V107",
+          "V110"
         ],
         "exists": true
       }
@@ -33238,6 +33493,7 @@
         ],
         "scopeBlocks": [
           "V102",
+          "V110",
           "V77"
         ],
         "exists": true
@@ -33284,6 +33540,7 @@
         ],
         "scopeBlocks": [
           "V105",
+          "V110",
           "V77"
         ],
         "exists": true
@@ -33379,6 +33636,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V110",
           "V111",
           "V77"
         ],
@@ -33410,7 +33668,24 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V110",
           "V113",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V114.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V110",
           "V77"
         ],
         "exists": true
@@ -33629,6 +33904,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V110",
           "V77",
           "V90"
         ],
@@ -33722,6 +33998,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V110",
           "V77",
           "V96"
         ],
@@ -34361,6 +34638,21 @@
       }
     },
     {
+      "id": "docs/plaene/alt/Feature_SurfacePolicyPort_Demo_Vollversion_Grenze_V114.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/alt/Feature_Testlandschaft_Umbau_V78.md",
       "type": "file",
       "title": null,
@@ -34627,6 +34919,7 @@
         "scopeBlocks": [
           "V107",
           "V109",
+          "V110",
           "V77",
           "V93"
         ],
@@ -35911,6 +36204,7 @@
           "V108",
           "V110",
           "V111",
+          "V114",
           "V74",
           "V77",
           "V83",
@@ -42815,6 +43109,7 @@
         "scopeBlocks": [
           "B01",
           "V105",
+          "V114",
           "V74",
           "V77",
           "V89",
@@ -42893,6 +43188,7 @@
         "scopeBlocks": [
           "B01",
           "V105",
+          "V114",
           "V64",
           "V74",
           "V77",
@@ -43110,6 +43406,7 @@
           "B01",
           "V103",
           "V105",
+          "V114",
           "V74",
           "V77",
           "V89",
@@ -43133,6 +43430,7 @@
           "B07",
           "V103",
           "V105",
+          "V114",
           "V64",
           "V74",
           "V77",
@@ -43999,6 +44297,21 @@
     },
     {
       "id": "src/entities/ai/HeuristicBotPolicy.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V84"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/entities/ai/HeuristicBotPolicyOps.js",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -47631,6 +47944,7 @@
         "scopeBlocks": [
           "B11",
           "V105",
+          "V114",
           "V74",
           "V83",
           "V84",
@@ -47658,6 +47972,7 @@
           "V102",
           "V104",
           "V105",
+          "V114",
           "V74",
           "V77",
           "V83",
@@ -47776,6 +48091,7 @@
         "scopeBlocks": [
           "B11",
           "V105",
+          "V114",
           "V74",
           "V77",
           "V83",
@@ -48211,6 +48527,7 @@
         "scopeBlocks": [
           "B11",
           "V104",
+          "V114",
           "V74",
           "V83",
           "V87",
@@ -48297,6 +48614,7 @@
           "B05",
           "B11",
           "V104",
+          "V114",
           "V87"
         ],
         "exists": true
@@ -50695,6 +51013,7 @@
           "B05",
           "V105",
           "V113",
+          "V114",
           "V64",
           "V77",
           "V85",
@@ -50786,6 +51105,28 @@
           "B05",
           "V105",
           "V108",
+          "V113",
+          "V64",
+          "V77",
+          "V85",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/ui/menu/MenuRecordingCameraBindings.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B05",
+          "V105",
           "V113",
           "V64",
           "V77",
@@ -50920,6 +51261,7 @@
           "B05",
           "V105",
           "V113",
+          "V114",
           "V64",
           "V77",
           "V85",
@@ -51623,6 +51965,7 @@
           "V100",
           "V104",
           "V105",
+          "V114",
           "V64",
           "V91"
         ],
@@ -51683,6 +52026,7 @@
           "V104",
           "V105",
           "V108",
+          "V114",
           "V64",
           "V66",
           "V91"
@@ -51735,7 +52079,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V88"
         ],
@@ -51757,7 +52100,6 @@
           "B13",
           "BT91",
           "V108",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -51777,7 +52119,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V113"
         ],
@@ -51798,7 +52139,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -51818,7 +52158,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -51838,7 +52177,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V88"
         ],
@@ -51859,7 +52197,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -51879,7 +52216,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -51899,7 +52235,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -51921,7 +52256,6 @@
           "BT91",
           "V102",
           "V105",
-          "V110",
           "V111",
           "V112",
           "V88",
@@ -51945,7 +52279,6 @@
           "B13",
           "BT91",
           "V100",
-          "V110",
           "V111",
           "V88",
           "V89"
@@ -51970,7 +52303,6 @@
           "BT91",
           "V100",
           "V105",
-          "V110",
           "V111",
           "V112",
           "V88",
@@ -51998,7 +52330,6 @@
           "V104",
           "V105",
           "V108",
-          "V110",
           "V111",
           "V112",
           "V88",
@@ -52021,7 +52352,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V88"
         ],
@@ -52043,7 +52373,6 @@
           "B13",
           "BT91",
           "V106",
-          "V110",
           "V111",
           "V87",
           "V88",
@@ -52066,7 +52395,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V112",
           "V51",
@@ -52096,7 +52424,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V99"
         ],
@@ -52117,7 +52444,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52137,7 +52463,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V65"
         ],
@@ -52158,7 +52483,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V88",
           "V89"
@@ -52180,7 +52504,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52200,7 +52523,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52220,7 +52542,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V72"
         ],
@@ -52241,7 +52562,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52261,7 +52581,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52281,7 +52600,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52302,7 +52620,6 @@
           "B13",
           "BT91",
           "V104",
-          "V110",
           "V111",
           "V113"
         ],
@@ -52323,7 +52640,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52343,7 +52659,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V112",
           "V87",
@@ -52367,7 +52682,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52409,7 +52723,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52429,7 +52742,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V99"
         ],
@@ -52450,7 +52762,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52470,7 +52781,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V92"
         ],
@@ -52491,7 +52801,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52511,7 +52820,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V99"
         ],
@@ -52532,7 +52840,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52552,7 +52859,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52572,9 +52878,28 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V88"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/menu-runtime-preset-config-service.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V111",
+          "V114"
         ],
         "exists": true
       }
@@ -52593,8 +52918,8 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
-          "V111"
+          "V111",
+          "V114"
         ],
         "exists": true
       }
@@ -52613,7 +52938,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V99"
         ],
@@ -52634,7 +52958,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V88",
           "V89"
@@ -52656,7 +52979,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52676,7 +52998,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52696,7 +53017,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52716,7 +53036,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52736,7 +53055,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52756,7 +53074,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52776,7 +53093,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52796,7 +53112,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52816,7 +53131,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52836,7 +53150,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -52857,7 +53170,6 @@
           "B07",
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V85",
           "V97"
@@ -52881,7 +53193,6 @@
           "B13",
           "BT91",
           "V106",
-          "V110",
           "V111",
           "V51",
           "V88",
@@ -52908,7 +53219,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V63",
           "V69",
@@ -52935,7 +53245,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V69",
           "V88",
@@ -52961,8 +53270,8 @@
           "V101",
           "V102",
           "V104",
-          "V110",
           "V111",
+          "V114",
           "V77",
           "V88",
           "V91",
@@ -52986,7 +53295,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53006,7 +53314,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V88",
           "V89"
@@ -53028,7 +53335,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V87",
           "V88",
@@ -53051,7 +53357,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53071,7 +53376,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53092,7 +53396,6 @@
           "B13",
           "BT91",
           "V105",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53112,7 +53415,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V88",
           "V89"
@@ -53134,7 +53436,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53154,7 +53455,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53174,7 +53474,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53199,8 +53498,8 @@
           "V102",
           "V104",
           "V105",
-          "V110",
           "V111",
+          "V114",
           "V91",
           "V92"
         ],
@@ -53227,7 +53526,6 @@
           "BT91",
           "V103",
           "V108",
-          "V110",
           "V111",
           "V97"
         ],
@@ -53253,7 +53551,6 @@
           "B13",
           "BT91",
           "V103",
-          "V110",
           "V111"
         ],
         "mappedNodes": [
@@ -53277,7 +53574,6 @@
           "B13",
           "BT91",
           "V101",
-          "V110",
           "V111",
           "V97",
           "V98"
@@ -53314,7 +53610,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V51",
           "V63"
@@ -53336,7 +53631,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53356,7 +53650,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53376,7 +53669,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53396,7 +53688,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53416,7 +53707,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53436,7 +53726,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53456,7 +53745,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53476,7 +53764,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53496,7 +53783,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53516,7 +53802,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53536,7 +53821,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53556,7 +53840,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53577,7 +53860,6 @@
           "B13",
           "BT20",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53598,7 +53880,6 @@
           "B13",
           "BT80C",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53619,7 +53900,6 @@
           "B13",
           "BT91",
           "BT93E",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53657,7 +53937,6 @@
           "BT80C",
           "BT91",
           "BT93E",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53679,7 +53958,6 @@
           "BT80C",
           "BT91",
           "BT93E",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53703,7 +53981,6 @@
           "BT93E",
           "BT93G",
           "BT93N",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53725,7 +54002,6 @@
           "BT80C",
           "BT91",
           "BT93E",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53748,7 +54024,6 @@
           "BT91",
           "BT93E",
           "BT93N",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53769,7 +54044,6 @@
           "B13",
           "BT91",
           "BT93E",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53789,7 +54063,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111",
           "V99"
         ],
@@ -53810,7 +54083,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53830,7 +54102,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53850,7 +54121,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53870,7 +54140,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53890,7 +54159,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -53910,7 +54178,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V110",
           "V111"
         ],
         "exists": true
@@ -56469,6 +56736,15 @@
     {
       "from": "B05",
       "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B05",
+      "to": "src/ui/menu/MenuRecordingCameraBindings.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -59763,6 +60039,15 @@
     {
       "from": "B13",
       "to": "tests/menu-multiplayer-bridge.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/menu-runtime-preset-config-service.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -68233,6 +68518,15 @@
     {
       "from": "BT91",
       "to": "tests/menu-multiplayer-bridge.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "tests/menu-runtime-preset-config-service.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -89777,7 +90071,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "runtime-taxonomy",
-        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89787,7 +90082,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "runtime-taxonomy",
-        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89874,7 +90170,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "runtime-taxonomy",
-        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89884,7 +90181,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "runtime-taxonomy",
-        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89894,7 +90192,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89915,7 +90214,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89925,7 +90225,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89935,7 +90236,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89945,7 +90247,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89955,7 +90258,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89965,7 +90269,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -89997,7 +90302,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "runtime-taxonomy",
-        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -90007,7 +90313,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "runtime-taxonomy",
-        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -90017,7 +90324,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "runtime-taxonomy",
-        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -90038,7 +90346,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -90059,7 +90368,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -90069,7 +90379,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -90079,7 +90390,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -90089,7 +90401,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -90099,7 +90412,8 @@
       "hint": null,
       "attributes": {
         "mappingId": "desktop-critical-paths",
-        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json"
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "relationLayer": "runtime"
       }
     },
     {
@@ -93993,6 +94307,15 @@
     },
     {
       "from": "V105",
+      "to": "src/ui/menu/MenuRecordingCameraBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
       "to": "src/ui/menu/MenuRuntimeFeatureFlags.js",
       "type": "scope",
       "hint": null,
@@ -96284,6 +96607,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/predicate-constraints.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
       "type": "scope",
       "hint": null,
@@ -97554,7 +97886,25 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/predicate-constraints.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/generated/knowledge-graph.coverage.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97581,7 +97931,79 @@
     },
     {
       "from": "V110",
+      "to": "docs/plaene/aktiv/V102.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/plaene/aktiv/V105.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "docs/plaene/aktiv/V110.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/plaene/aktiv/V111.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/plaene/aktiv/V113.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/plaene/aktiv/V114.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/plaene/aktiv/V90.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/plaene/aktiv/V96.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/plaene/CHANGELOG.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97626,907 +98048,7 @@
     },
     {
       "from": "V110",
-      "to": "tests/arcade-blueprint.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/arcade-ghost-library.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/arcade-hangar-rules.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/audio.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/bot-play-analysis-runtime.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/bot-targeting.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/browser-demo-surface-policy-override.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/checkpoint-ring-runtime.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/content-descriptor-registries.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/core-targeted-platform.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/core-targeted-regressions.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/core-targeted-runtime.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/core-targeted-surface.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/core-targeted.shared.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/core-targeted.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/core.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/desktop-multiinstance-smoke.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/editor-authoring-contract.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/editor-map-ui.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/editor-vehicle.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/electron-renderer-dist-drift.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/game-mode-strategy.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/gameplay-powerups-portals-gates.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/ghost-selfduel-allmaps.desktop.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/ghost-selfduel-roundtrip.desktop.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/gpu.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/hangar-desktop-flow.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/helpers.desktop.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/helpers.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/heuristic-bot-survival-regression.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
       "to": "tests/knowledge-graph-build.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/knowledge-graph-query.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/lan-signaling-hardening.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/last-round-ghost-system.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/lifecycle-capability.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/map-mode-eligibility.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/match-start-validation-connectivity.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/media-recorder-engine.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/media-recorder-lifecycle.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/menu-multiplayer-bridge.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/menu-runtime-session-service.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/multiplayer-lifecycle-and-signaling.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/network-adapter.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/observation-bridge-policy-runtime.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/offline-session-compatibility.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/online-signaling-config.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/parcours-ghost.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/parcours-map-schema.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/parcours-minimap.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/parcours-progress-audio.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/parcours-progress-utils.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/parcours-ring-glow-settings.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/parcours-start.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/persistence-version-migration.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/physics-core.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/physics-hunt.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/physics-policy.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/platform-capabilities.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/playing-state-ghost-playback.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/playwright-readiness.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/playwright.global-setup.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/playwright.global-teardown.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/recording-video-export-job.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/recording-video-export.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/recording.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/round-recorder-ghost-fallback.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/runtime-access-seams.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/runtime-facade.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/runtime-regressions.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/runtime-settings-live-apply.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/settings-manager.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/settings-studio-override.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/stress.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/tmp-shorts-diagnostic.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v34-bridge.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v34-checkpoint.integration.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v34-deterministic-smoke.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v34-loop.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v34-match-resume.integration.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v34-model.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v34-replay.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v34-resume-latest.integration.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v34-run-fallback.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v34-server.integration.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v35-model.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v36-action-safety.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/trainer-v36-algorithm-profile.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/training-automation-core.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/training-benchmark-artifacts.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/training-e2e.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/training-environment.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/training-gate.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/training-reward-survival.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/training-runtime-near-architecture.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/transport-verification-matrix.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/tuning-ipc.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/tuning-preset-manager.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/tuning-runtime-bridge.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/tuning-window.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/v28-regression.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V110",
-      "to": "tests/validate-umsetzungsplan.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98754,6 +98276,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/predicate-constraints.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -99195,6 +98726,15 @@
     {
       "from": "V111",
       "to": "tests/menu-multiplayer-bridge.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/menu-runtime-preset-config-service.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -100879,6 +100419,15 @@
     },
     {
       "from": "V113",
+      "to": "src/ui/menu/MenuRecordingCameraBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V113",
       "to": "src/ui/menu/MenuRuntimeFeatureFlags.js",
       "type": "scope",
       "hint": null,
@@ -101665,6 +101214,393 @@
         "blockId": "V113",
         "phaseCode": "113.99",
         "subphaseCode": "113.99.5"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/core/runtime/GameRuntimeSettingsHandler.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/core/runtime/MatchStartValidationService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/core/runtime/MenuRuntimePresetConfigService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/core/runtime/MenuRuntimeSessionService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/shared/contracts/PlatformCapabilityData.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/shared/contracts/PlatformCapabilityRegistry.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/shared/contracts/PlatformSurfacePolicyOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/shared/runtime/GameRuntimePorts.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/shared/runtime/UiControllerRuntimePorts.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/ui/menu/MenuPresetStateSync.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/ui/menu/MenuSurfacePolicyUiSync.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/ui/UIManager.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "src/ui/UIStartSyncController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "tests/menu-runtime-preset-config-service.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "tests/menu-runtime-session-service.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "tests/platform-capabilities.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "tests/runtime-regressions.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "V103",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "SettingsManager-Zuschnitt und Mutationsvertrag bleiben Grundlage fuer die Abgrenzung Settings vs. Produktgrenze",
+      "attributes": {
+        "dependsPhase": "103.99",
+        "rawToken": "V103.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V114",
+      "to": "V104",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Port-/Snapshot-Zielpfad ist Grundlage fuer den zentralen SurfacePolicyPort",
+      "attributes": {
+        "dependsPhase": "104.99",
+        "rawToken": "V104.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V114",
+      "to": "V114.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.1"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "V114.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.2"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "V114.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.3"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "V114.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.4"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "V114.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.99"
+      }
+    },
+    {
+      "from": "V114",
+      "to": "V98",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Browser-Demo-Policy, Settings-Studio-Export und read-only Demo-Lesepfad sind Grundlage fuer den SurfacePolicyPort",
+      "attributes": {
+        "dependsPhase": "98.99",
+        "rawToken": "V98.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V114.1",
+      "to": "V114.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.1",
+        "subphaseCode": "114.1.1"
+      }
+    },
+    {
+      "from": "V114.1",
+      "to": "V114.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.1",
+        "subphaseCode": "114.1.2"
+      }
+    },
+    {
+      "from": "V114.2",
+      "to": "V114.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.2",
+        "subphaseCode": "114.2.1"
+      }
+    },
+    {
+      "from": "V114.2",
+      "to": "V114.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.2",
+        "subphaseCode": "114.2.2"
+      }
+    },
+    {
+      "from": "V114.3",
+      "to": "V114.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.3",
+        "subphaseCode": "114.3.1"
+      }
+    },
+    {
+      "from": "V114.3",
+      "to": "V114.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.3",
+        "subphaseCode": "114.3.2"
+      }
+    },
+    {
+      "from": "V114.4",
+      "to": "V114.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.4",
+        "subphaseCode": "114.4.1"
+      }
+    },
+    {
+      "from": "V114.4",
+      "to": "V114.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.4",
+        "subphaseCode": "114.4.2"
+      }
+    },
+    {
+      "from": "V114.99",
+      "to": "V114.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.99",
+        "subphaseCode": "114.99.1"
+      }
+    },
+    {
+      "from": "V114.99",
+      "to": "V114.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.99",
+        "subphaseCode": "114.99.2"
+      }
+    },
+    {
+      "from": "V114.99",
+      "to": "V114.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V114",
+        "phaseCode": "114.99",
+        "subphaseCode": "114.99.3"
       }
     },
     {
@@ -105410,6 +105346,15 @@
     {
       "from": "V64",
       "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V64",
+      "to": "src/ui/menu/MenuRecordingCameraBindings.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -111715,6 +111660,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V114.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V64.md",
       "type": "scope",
       "hint": null,
@@ -112265,6 +112219,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/alt/Feature_Strategy_Pattern_V47.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/Feature_SurfacePolicyPort_Demo_Vollversion_Grenze_V114.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -114011,6 +113974,15 @@
     {
       "from": "V77",
       "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "src/ui/menu/MenuRecordingCameraBindings.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -117230,6 +117202,15 @@
     {
       "from": "V84",
       "to": "src/entities/ai/HeuristicBotPolicy.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
+      "to": "src/entities/ai/HeuristicBotPolicyOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -120895,6 +120876,15 @@
     {
       "from": "V85",
       "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/ui/menu/MenuRecordingCameraBindings.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -126049,6 +126039,15 @@
     {
       "from": "V91",
       "to": "src/ui/menu/MenuRecordingCameraBindingOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/ui/menu/MenuRecordingCameraBindings.js",
       "type": "scope",
       "hint": null,
       "attributes": {

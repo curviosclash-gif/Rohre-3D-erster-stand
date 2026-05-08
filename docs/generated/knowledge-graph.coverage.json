@@ -130,11 +130,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1809,
-    "rawCoveredFileCount": 1453,
-    "rawCoveragePercent": 80.3,
-    "adjustedTrackedFileCount": 1547,
-    "adjustedCoveredFileCount": 1313,
+    "trackedFileCount": 1815,
+    "rawCoveredFileCount": 1459,
+    "rawCoveragePercent": 80.4,
+    "adjustedTrackedFileCount": 1553,
+    "adjustedCoveredFileCount": 1319,
     "adjustedCoveragePercent": 84.9,
     "uncoveredFileCount": 356,
     "uncoveredActiveFileCount": 234,
@@ -178,14 +178,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 918,
-        "coveredCount": 903
+        "count": 922,
+        "coveredCount": 907
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 391,
-        "coveredCount": 206
+        "count": 393,
+        "coveredCount": 208
       },
       {
         "classification": "prototype",
@@ -4132,6 +4132,25 @@
     },
     {
       "path": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/predicate-constraints.v1.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -10842,7 +10861,8 @@
         "scope-files"
       ],
       "scopeBlocks": [
-        "V107"
+        "V107",
+        "V110"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -11072,6 +11092,7 @@
       ],
       "scopeBlocks": [
         "V102",
+        "V110",
         "V77"
       ],
       "surfaces": [],
@@ -11124,6 +11145,7 @@
       ],
       "scopeBlocks": [
         "V105",
+        "V110",
         "V77"
       ],
       "surfaces": [],
@@ -11231,6 +11253,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V110",
         "V111",
         "V77"
       ],
@@ -11266,7 +11289,26 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V110",
         "V113",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V114.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V110",
         "V77"
       ],
       "surfaces": [],
@@ -11513,6 +11555,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V110",
         "V77",
         "V90"
       ],
@@ -11618,6 +11661,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V110",
         "V77",
         "V96"
       ],
@@ -12343,6 +12387,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/alt/Feature_SurfacePolicyPort_Demo_Vollversion_Grenze_V114.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/alt/Feature_Testlandschaft_Umbau_V78.md",
       "tracked": true,
       "coveredInCore": true,
@@ -12643,6 +12704,7 @@
       "scopeBlocks": [
         "V107",
         "V109",
+        "V110",
         "V77",
         "V93"
       ],
@@ -14208,6 +14270,7 @@
         "V108",
         "V110",
         "V111",
+        "V114",
         "V74",
         "V77",
         "V83",
@@ -22306,6 +22369,7 @@
       "scopeBlocks": [
         "B01",
         "V105",
+        "V114",
         "V74",
         "V77",
         "V89",
@@ -22375,6 +22439,7 @@
       "scopeBlocks": [
         "B01",
         "V105",
+        "V114",
         "V64",
         "V74",
         "V77",
@@ -22612,6 +22677,7 @@
         "B01",
         "V103",
         "V105",
+        "V114",
         "V74",
         "V77",
         "V89",
@@ -22637,6 +22703,7 @@
         "B07",
         "V103",
         "V105",
+        "V114",
         "V64",
         "V74",
         "V77",
@@ -23644,6 +23711,23 @@
     },
     {
       "path": "src/entities/ai/HeuristicBotPolicy.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V84"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/entities/ai/HeuristicBotPolicyOps.js",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -27576,6 +27660,7 @@
       "scopeBlocks": [
         "B11",
         "V105",
+        "V114",
         "V74",
         "V83",
         "V84",
@@ -27605,6 +27690,7 @@
         "V102",
         "V104",
         "V105",
+        "V114",
         "V74",
         "V77",
         "V83",
@@ -27733,6 +27819,7 @@
       "scopeBlocks": [
         "B11",
         "V105",
+        "V114",
         "V74",
         "V77",
         "V83",
@@ -28203,6 +28290,7 @@
       "scopeBlocks": [
         "B11",
         "V104",
+        "V114",
         "V74",
         "V83",
         "V87",
@@ -28306,6 +28394,7 @@
         "B05",
         "B11",
         "V104",
+        "V114",
         "V87"
       ],
       "surfaces": [],
@@ -30907,6 +30996,7 @@
         "B05",
         "V105",
         "V113",
+        "V114",
         "V64",
         "V77",
         "V85",
@@ -31006,6 +31096,30 @@
         "B05",
         "V105",
         "V108",
+        "V113",
+        "V64",
+        "V77",
+        "V85",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/ui/menu/MenuRecordingCameraBindings.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B05",
+        "V105",
         "V113",
         "V64",
         "V77",
@@ -31152,6 +31266,7 @@
         "B05",
         "V105",
         "V113",
+        "V114",
         "V64",
         "V77",
         "V85",
@@ -31923,6 +32038,7 @@
         "V100",
         "V104",
         "V105",
+        "V114",
         "V64",
         "V91"
       ],
@@ -31989,6 +32105,7 @@
         "V104",
         "V105",
         "V108",
+        "V114",
         "V64",
         "V66",
         "V91"
@@ -32164,7 +32281,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V88"
       ],
@@ -32188,7 +32304,6 @@
         "B13",
         "BT91",
         "V108",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32210,7 +32325,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V113"
       ],
@@ -32233,7 +32347,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32255,7 +32368,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32277,7 +32389,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V88"
       ],
@@ -32300,7 +32411,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32322,7 +32432,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32344,7 +32453,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32368,7 +32476,6 @@
         "BT91",
         "V102",
         "V105",
-        "V110",
         "V111",
         "V112",
         "V88",
@@ -32394,7 +32501,6 @@
         "B13",
         "BT91",
         "V100",
-        "V110",
         "V111",
         "V88",
         "V89"
@@ -32421,7 +32527,6 @@
         "BT91",
         "V100",
         "V105",
-        "V110",
         "V111",
         "V112",
         "V88",
@@ -32451,7 +32556,6 @@
         "V104",
         "V105",
         "V108",
-        "V110",
         "V111",
         "V112",
         "V88",
@@ -32476,7 +32580,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V88"
       ],
@@ -32500,7 +32603,6 @@
         "B13",
         "BT91",
         "V106",
-        "V110",
         "V111",
         "V87",
         "V88",
@@ -32525,7 +32627,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V112",
         "V51",
@@ -32557,7 +32658,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V99"
       ],
@@ -32580,7 +32680,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32602,7 +32701,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V65"
       ],
@@ -32625,7 +32723,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V88",
         "V89"
@@ -32649,7 +32746,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32671,7 +32767,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32693,7 +32788,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V72"
       ],
@@ -32716,7 +32810,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32738,7 +32831,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32760,7 +32852,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32783,7 +32874,6 @@
         "B13",
         "BT91",
         "V104",
-        "V110",
         "V111",
         "V113"
       ],
@@ -32806,7 +32896,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32828,7 +32917,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V112",
         "V87",
@@ -32854,7 +32942,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32900,7 +32987,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32922,7 +33008,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V99"
       ],
@@ -32945,7 +33030,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -32967,7 +33051,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V92"
       ],
@@ -32990,7 +33073,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33012,7 +33094,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V99"
       ],
@@ -33035,7 +33116,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33057,7 +33137,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33079,9 +33158,30 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V88"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/menu-runtime-preset-config-service.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V111",
+        "V114"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33102,8 +33202,8 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
-        "V111"
+        "V111",
+        "V114"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33124,7 +33224,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V99"
       ],
@@ -33147,7 +33246,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V88",
         "V89"
@@ -33171,7 +33269,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33193,7 +33290,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33215,7 +33311,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33237,7 +33332,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33259,7 +33353,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33281,7 +33374,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33303,7 +33395,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33325,7 +33416,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33347,7 +33437,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33369,7 +33458,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33392,7 +33480,6 @@
         "B07",
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V85",
         "V97"
@@ -33418,7 +33505,6 @@
         "B13",
         "BT91",
         "V106",
-        "V110",
         "V111",
         "V51",
         "V88",
@@ -33444,7 +33530,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V63",
         "V69",
@@ -33470,7 +33555,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V69",
         "V88",
@@ -33498,8 +33582,8 @@
         "V101",
         "V102",
         "V104",
-        "V110",
         "V111",
+        "V114",
         "V77",
         "V88",
         "V91",
@@ -33525,7 +33609,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33547,7 +33630,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V88",
         "V89"
@@ -33571,7 +33653,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V87",
         "V88",
@@ -33596,7 +33677,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33618,7 +33698,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33641,7 +33720,6 @@
         "B13",
         "BT91",
         "V105",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33663,7 +33741,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V88",
         "V89"
@@ -33687,7 +33764,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33709,7 +33785,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33731,7 +33806,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33758,8 +33832,8 @@
         "V102",
         "V104",
         "V105",
-        "V110",
         "V111",
+        "V114",
         "V91",
         "V92"
       ],
@@ -33785,7 +33859,6 @@
         "BT91",
         "V103",
         "V108",
-        "V110",
         "V111",
         "V97"
       ],
@@ -33810,7 +33883,6 @@
         "B13",
         "BT91",
         "V103",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33833,7 +33905,6 @@
         "B13",
         "BT91",
         "V101",
-        "V110",
         "V111",
         "V97",
         "V98"
@@ -33857,7 +33928,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V51",
         "V63"
@@ -33881,7 +33951,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33903,7 +33972,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33925,7 +33993,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33947,7 +34014,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33969,7 +34035,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -33991,7 +34056,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34013,7 +34077,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34035,7 +34098,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34057,7 +34119,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34079,7 +34140,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34101,7 +34161,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34123,7 +34182,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34146,7 +34204,6 @@
         "B13",
         "BT20",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34169,7 +34226,6 @@
         "B13",
         "BT80C",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34192,7 +34248,6 @@
         "B13",
         "BT91",
         "BT93E",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34216,7 +34271,6 @@
         "BT80C",
         "BT91",
         "BT93E",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34240,7 +34294,6 @@
         "BT80C",
         "BT91",
         "BT93E",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34266,7 +34319,6 @@
         "BT93E",
         "BT93G",
         "BT93N",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34290,7 +34342,6 @@
         "BT80C",
         "BT91",
         "BT93E",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34315,7 +34366,6 @@
         "BT91",
         "BT93E",
         "BT93N",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34338,7 +34388,6 @@
         "B13",
         "BT91",
         "BT93E",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34360,7 +34409,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111",
         "V99"
       ],
@@ -34383,7 +34431,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34405,7 +34452,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34427,7 +34473,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34449,7 +34494,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34471,7 +34515,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],
@@ -34493,7 +34536,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V110",
         "V111"
       ],
       "surfaces": [],

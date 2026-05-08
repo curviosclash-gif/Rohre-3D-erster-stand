@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-08 (Subphase `V110 110.1.1`)
+
+- V107 ist fachlich geschlossen; die Fortsetzung laeuft im entsperrten Folgeblock `V110`.
+- `110.1.1` ist abgeschlossen: `data/contracts/knowledge-graph/predicate-constraints.v1.json` versioniert Domain-/Range-/Layer-Constraints fuer produktive Mapping-Relationen, und `graph:check` validiert diese Constraints fail-fast gegen Mapping-Kanten.
+- Der frisch promovierte Folgeblock `V114` ist in den beidseitigen Scope-Overlap-Freigaben der betroffenen aktiven Bloecke nachgetragen, damit der Graph-Guard wieder zwischen erlaubter Planueberlappung und echter Kollision unterscheiden kann.
+- Der Slice schuetzt die V107-Graphbasis gegen semantisch falsche Kanten, ohne den Builder auf eine neue Graph-Datenbank oder breite Runtime-Aenderungen umzubauen.
+
 ## Stand-Snapshot 2026-05-08
 
 - Splitscreen-Bugfix ausserhalb eines aktiven Blocks: `MenuRuntimeSessionService` prueft Session-Wechsel jetzt gegen die tatsaechliche Runtime-Surface der Desktop-App statt gegen den Browser-Demo-Default. Dadurch wird `splitscreen` im Desktop nicht mehr vor dem Matchstart auf `single` zurueckgebogen; der lokale 2P-Pfad kann wieder `mode=2p`, zwei lokale Spieler und zwei Kameras erzeugen. Gruen: `node --test tests/menu-runtime-session-service.contract.test.mjs`; `node --test tests/offline-session-compatibility.contract.test.mjs`.

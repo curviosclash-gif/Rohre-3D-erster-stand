@@ -15,9 +15,12 @@ import {
 const ROOT = process.cwd();
 const GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
+const PREDICATE_CONSTRAINTS_PATH = 'data/contracts/knowledge-graph/predicate-constraints.v1.json';
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
 const BOT_TRAINING_MASTER_PATH = 'docs/bot-training/Bot_Trainingsplan.md';
 const ACTIVE_PLANS_DIR = 'docs/plaene/aktiv';
+const PREDICATE_CONSTRAINTS_CONTRACT = 'knowledge-graph.predicate-constraints.v1';
+const PREDICATE_CONSTRAINTS_SCHEMA_VERSION = 1;
 const REQUIRED_KNOWLEDGE_GRAPH_MAPPING_IDS = Object.freeze([
     'runtime-taxonomy',
     'desktop-critical-paths',
@@ -153,6 +156,17 @@ async function readExistingArtifact(relativePath) {
     };
 }
 
+async function readPredicateConstraints() {
+    const raw = await fs.readFile(path.join(ROOT, PREDICATE_CONSTRAINTS_PATH), 'utf8');
+    return JSON.parse(raw);
+}
+
+function normalizeTypeList(value) {
+    return Array.isArray(value)
+        ? value.map((entry) => String(entry || '').trim()).filter(Boolean)
+        : [];
+}
+
 function hasSource(node, sourceTag) {
     return Array.isArray(node?.attributes?.source) && node.attributes.source.includes(sourceTag);
 }
@@ -281,6 +295,88 @@ function validateRuntimeMappingIntegrity(graph, violations) {
         const hasTestValidation = validationEdges.some((edge) => nodeById.get(edge.to)?.type === 'test');
         if (!hasTestValidation) {
             addViolation(violations, 'KG_RUNTIME_VALIDATION_MISSING', `Kritischer Runtime-Knoten ohne validated_by-Testkante: ${runtimeNode.id} (${criticalPaths.join(', ')})`);
+        }
+    }
+}
+
+function validatePredicateConstraints(graph, constraints, violations) {
+    if (!constraints || typeof constraints !== 'object') {
+        addViolation(violations, 'KG_PREDICATE_CONTRACT_MISSING', `Predicate-Constraint-Contract fehlt: ${PREDICATE_CONSTRAINTS_PATH}`);
+        return;
+    }
+
+    if (String(constraints.contract || '').trim() !== PREDICATE_CONSTRAINTS_CONTRACT) {
+        addViolation(violations, 'KG_PREDICATE_CONTRACT_UNSUPPORTED', `Predicate-Constraint-Contract unsupported: ${constraints.contract || '<empty>'}`);
+        return;
+    }
+    if (Number(constraints.schema_version) !== PREDICATE_CONSTRAINTS_SCHEMA_VERSION) {
+        addViolation(violations, 'KG_PREDICATE_SCHEMA_UNSUPPORTED', `Predicate-Constraint schema_version unsupported: ${constraints.schema_version}`);
+        return;
+    }
+
+    const relationConstraints = Array.isArray(constraints.relations) ? constraints.relations : [];
+    const constraintByType = new Map();
+    for (const [index, entry] of relationConstraints.entries()) {
+        const relationType = String(entry?.type || '').trim();
+        const domain = normalizeTypeList(entry?.domain);
+        const range = normalizeTypeList(entry?.range);
+        const layer = String(entry?.layer || '').trim();
+        if (!relationType || domain.length === 0 || range.length === 0 || !layer) {
+            addViolation(violations, 'KG_PREDICATE_CONSTRAINT_INVALID', `Predicate-Constraint relations[${index}] ist unvollstaendig`);
+            continue;
+        }
+        if (constraintByType.has(relationType)) {
+            addViolation(violations, 'KG_PREDICATE_CONSTRAINT_DUPLICATE', `Predicate-Constraint fuer ${relationType} ist doppelt deklariert`);
+            continue;
+        }
+        constraintByType.set(relationType, {
+            type: relationType,
+            domain: new Set(domain),
+            range: new Set(range),
+            layer,
+        });
+    }
+
+    const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
+    const edges = Array.isArray(graph.edges) ? graph.edges : [];
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const mappingEdges = edges.filter((edge) => String(edge?.attributes?.mappingId || '').trim());
+    const relationTypesInGraph = Array.from(new Set(mappingEdges.map((edge) => edge.type))).sort((left, right) => left.localeCompare(right));
+
+    for (const relationType of relationTypesInGraph) {
+        if (!constraintByType.has(relationType)) {
+            addViolation(violations, 'KG_PREDICATE_CONSTRAINT_MISSING', `Produktive Mapping-Relation ohne Predicate-Constraint: ${relationType}`);
+        }
+    }
+
+    for (const edge of mappingEdges) {
+        const constraint = constraintByType.get(edge.type);
+        if (!constraint) continue;
+
+        const fromNode = nodeById.get(edge.from) || null;
+        const toNode = nodeById.get(edge.to) || null;
+        if (!fromNode || !toNode) continue;
+
+        if (!constraint.domain.has(fromNode.type)) {
+            addViolation(
+                violations,
+                'KG_PREDICATE_DOMAIN',
+                `Relation ${edge.type} verletzt Domain: ${edge.from} (${fromNode.type}) -> ${edge.to}; erlaubt: ${Array.from(constraint.domain).join(', ')}`
+            );
+        }
+        if (!constraint.range.has(toNode.type)) {
+            addViolation(
+                violations,
+                'KG_PREDICATE_RANGE',
+                `Relation ${edge.type} verletzt Range: ${edge.from} -> ${edge.to} (${toNode.type}); erlaubt: ${Array.from(constraint.range).join(', ')}`
+            );
+        }
+        if (String(edge.attributes?.relationLayer || '').trim() !== constraint.layer) {
+            addViolation(
+                violations,
+                'KG_PREDICATE_LAYER',
+                `Relation ${edge.type} erwartet relationLayer=${constraint.layer}, gefunden ${edge.attributes?.relationLayer || '<empty>'}: ${edge.from} -> ${edge.to}`
+            );
         }
     }
 }
@@ -682,11 +778,12 @@ async function validateDependencyMergeConsistency(graph, violations) {
 async function runChecks() {
     const violations = [];
 
-    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock] = await Promise.all([
+    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock, predicateConstraints] = await Promise.all([
         readExistingArtifact(GRAPH_PATH),
         readExistingArtifact(COVERAGE_PATH),
         buildKnowledgeGraphArtifacts(),
         readScopeOverlapAllowances(),
+        readPredicateConstraints(),
     ]);
 
     const generatedGraphRaw = artifactToString(generatedArtifacts.graph);
@@ -701,6 +798,7 @@ async function runChecks() {
     validateNodeIdAndOrphans(existingGraph.parsed, violations);
     ensureAllEdgeEndpointsExist(existingGraph.parsed, violations);
     validateRuntimeMappingIntegrity(existingGraph.parsed, violations);
+    validatePredicateConstraints(existingGraph.parsed, predicateConstraints, violations);
     validateCriticalDesktopMappings(existingGraph.parsed, violations);
     ensureDependsTargetsExist(existingGraph.parsed, violations);
     detectHardDependsCycles(existingGraph.parsed, violations);
@@ -735,5 +833,6 @@ export {
     CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
     validateCriticalDesktopMappings,
     validateCoverageArtifact,
+    validatePredicateConstraints,
     validateRuntimeMappingIntegrity,
 };

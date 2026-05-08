@@ -740,6 +740,9 @@ async function readKnowledgeGraphMappings() {
     for (const fileName of mappingFiles) {
         const relativePath = normalizeRepoPath(path.join(KNOWLEDGE_GRAPH_MAPPING_DIR, fileName));
         const raw = JSON.parse(await fs.readFile(path.join(ROOT, relativePath), 'utf8'));
+        if (String(raw?.contract || '').trim() !== GRAPH_MAPPING_CONTRACT) {
+            continue;
+        }
         const normalized = normalizeKnowledgeGraphMappingContract(raw);
         mappings.push({
             ...normalized,
@@ -2188,6 +2191,7 @@ function emitKnowledgeGraphMappings(nodes, edges, mappings) {
                     attributes: {
                         mappingId: mapping.mapping_id,
                         mappingFile: mapping.filePath,
+                        relationLayer: classifyMappingRelationLayer('implements'),
                     },
                 });
             }

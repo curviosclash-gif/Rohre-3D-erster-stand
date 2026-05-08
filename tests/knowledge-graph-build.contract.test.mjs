@@ -20,6 +20,7 @@ import {
     CRITICAL_DESKTOP_GRAPH_REQUIREMENTS,
     validateCriticalDesktopMappings,
     validateCoverageArtifact,
+    validatePredicateConstraints,
     validateRuntimeMappingIntegrity,
 } from '../scripts/check-knowledge-graph.mjs';
 import {
@@ -437,6 +438,72 @@ test('buildKnowledgeGraph keeps required desktop critical-path mappings intact',
         relationLayerByEdge.get('runtime:entity-spawn-ops::event:spawn::emits'),
         'event'
     );
+});
+
+test('predicate constraints guard mapping domain, range and relation layer', () => {
+    const constraints = {
+        contract: 'knowledge-graph.predicate-constraints.v1',
+        schema_version: 1,
+        relations: [
+            {
+                type: 'validated_by',
+                domain: ['runtime'],
+                range: ['test'],
+                layer: 'test',
+            },
+            {
+                type: 'writes_state',
+                domain: ['runtime'],
+                range: ['state'],
+                layer: 'state',
+            },
+        ],
+    };
+    const graph = {
+        nodes: [
+            { id: 'runtime:fixture', type: 'runtime', attributes: { mappingId: 'fixture' } },
+            { id: 'state:fixture', type: 'state', attributes: { mappingId: 'fixture' } },
+            { id: 'test:fixture', type: 'test', attributes: { mappingId: 'fixture' } },
+        ],
+        edges: [
+            {
+                from: 'runtime:fixture',
+                to: 'test:fixture',
+                type: 'validated_by',
+                attributes: {
+                    mappingId: 'fixture',
+                    relationLayer: 'test',
+                },
+            },
+            {
+                from: 'state:fixture',
+                to: 'runtime:fixture',
+                type: 'writes_state',
+                attributes: {
+                    mappingId: 'fixture',
+                    relationLayer: 'event',
+                },
+            },
+            {
+                from: 'runtime:fixture',
+                to: 'state:fixture',
+                type: 'reads_state',
+                attributes: {
+                    mappingId: 'fixture',
+                    relationLayer: 'state',
+                },
+            },
+        ],
+    };
+
+    const violations = [];
+    validatePredicateConstraints(graph, constraints, violations);
+    const codes = violations.map((violation) => violation.code);
+
+    assert.ok(codes.includes('KG_PREDICATE_DOMAIN'));
+    assert.ok(codes.includes('KG_PREDICATE_RANGE'));
+    assert.ok(codes.includes('KG_PREDICATE_LAYER'));
+    assert.ok(codes.includes('KG_PREDICATE_CONSTRAINT_MISSING'));
 });
 
 test('runtime mapping integrity reports orphan, missing validation and unknown references', () => {
