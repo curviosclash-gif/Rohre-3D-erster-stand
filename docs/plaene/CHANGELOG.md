@@ -9,6 +9,7 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 ## Stand-Snapshot 2026-05-07
 
 - Build-/Desktop-Bugfix ausserhalb eines aktiven Blocks: `ParcoursProgressSystem` unterschreitet den Architektur-`max-lines`-Guard durch Auslagerung der Progress-Snapshot-/HUD-DTO-Erzeugung; die Desktop-CSP bleibt self-contained, weil der Google-Fonts-Import entfernt wurde und Vite-`data:`-Buildartefakte fuer `browser-demo-surface-policy.export.v1.json` ohne XHR gelesen werden. `tmp/` ist aus dem Git-Index entfernt, lokale transiente Artefakte bleiben durch `.gitignore` unversioniert.
+- Ghost-Bugfix ausserhalb eines aktiven Blocks: `ArcadeGhostLibrary` liest bei `schemaVersion=arcade-ghost-library.v2` jetzt auch gemischte Legacy-Top-Level-Routeneintraege mit ein und schreibt sie anschliessend kanonisch zurueck; damit bleibt das Selbstduell-/Ghost-Rendering in Desktop/Electron auf Maps mit `routeId`-Aliasen auch dann stabil, wenn bestehende lokale Storage-Daten noch vor der vollstaendigen v2-Migration entstanden sind.
 - Settings-Follow-up ausserhalb eines aktiven Blocks: SettingsManager kapselt Menu-Text-Overrides jetzt ueber einen schmalen Read-Port, produktive Arcade-/UI-Consumer nutzen keine direkten settingsManager.store-Fallbacks mehr, und die Settings-Mutationsfacades teilen sich einen kleinen Result-Helper fuer konsistente changedKeys-/metadata-Formen.
 - Settings-Diagnose-Follow-up ausserhalb eines aktiven Blocks: `diffSettings`, `previewMenuConfigImport` und `getSettingsHealthSnapshot` machen Settings-Aenderungen, Import-Auswirkungen und Port-Verfuegbarkeit sichtbar, ohne interne Stores oder komplette Settings-Dumps an Runtime-/UI-Consumer zu leaken; der Import-Preview-Pfad mutiert nur einen geklonten und sanitizten Snapshot. Gruen: `node --test tests/settings-manager.contract.test.mjs`.
 - Settings-Refactor-Follow-up ausserhalb eines aktiven Blocks: Menu-Config-Import trennt reine Parse-/Normalize-Diagnostik von Apply-Mutation, `diffSettings` nutzt einen zentralen ChangeKey-Pfadvertrag, und der Health-Snapshot zeigt nur schmale Persistenzsignale ohne Settings-Dumps oder Store-Leaks.
@@ -301,12 +302,6 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `V76` ist abgeschlossen (`76.99` done): `docs/plaene/aktiv/V76.md` steht jetzt auf `status: done`, `76.99` ist geschlossen und `76.99.2` dokumentiert den produktnahen Verifikationslauf.
 - Neuer Hangar-Contract-Smoke `tests/hangar-desktop-flow.contract.test.mjs` verifiziert Fight-/Arcade-Entry, mode-spezifischen Selection-Writeback sowie den einheitlichen Lifecycle-Return zu Menue und Match-Start; zusammen mit `tests/arcade-hangar-rules.contract.test.mjs` laeuft der Scope mit 9/9 PASS.
 - Abschluss-Gates sind gruen: `npm run build` sowie `npm run gates:pre-commit` (`plan:check`, `graph:check`, `docs:sync`, `docs:check`) liefern Exit-Code 0.
-
-## Tooling-Notiz 2026-05-08 (Bot-Spielanalyse)
-
-- Neuer CLI-Pfad `npm run bot:analyze`: Der vorhandene Bot-Validation-Runner spielt konfigurierbare Szenarien, danach klassifiziert `scripts/bot-play-analysis.mjs` Survival-, Wand-/Trail-, Stuck-, Winrate- und Forced-Round-Signale zu priorisierten Tuning-Hinweisen.
-- Standardausgaben landen in `tmp/`; mit `--publish true` werden JSON/Markdown-Evidence nach `data/` und `docs/tests/` geschrieben.
-- Evidence: `npm run bot:analyze -- --skip-run true --source-json data/bot_validation_report.json --report-json tmp/bot-play-analysis-npm-test.json --report-md tmp/bot-play-analysis-npm-test.md`, `node --check scripts/bot-play-analysis.mjs` und `npm run plan:check` sind gruen.
 - Der Master-Index spiegelt `V76` jetzt unter den abgeschlossenen Bloecken; die naechste freie Intake-Reihenfolge bleibt `V99 -> V100 -> V102`.
 
 ## Stand-Snapshot 2026-04-29 (Subphase `V104 104.2.2`)
@@ -370,6 +365,18 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Der fokussierte Contract-Test haertet die neuen Fehlercodes `KG_RUNTIME_ORPHAN`, `KG_RUNTIME_VALIDATION_MISSING`, `KG_UNKNOWN_REFERENCE` und `KG_UNKNOWN_FILE_REFERENCE`; `node --test tests/knowledge-graph-build.contract.test.mjs` lief mit 15/15 PASS.
 - `npm run graph:check` erreicht die neuen V107-Regeln, bleibt im aktuellen Dirty-Workspace aber an fremden Intake-/Scope-Drifts blockiert (`GRAPH_DIFF`, `COVERAGE_DIFF`, V113-Scope-Kollisionen). Naechste V107-Subphase ist `107.3.2` fuer Coverage-Gate-Regeln.
 
+## Stand-Snapshot 2026-05-07 (Subphase `V107 107.4.1`)
+
+- `107.4.1` ist geschlossen: `event-flow` gibt fuer Spawn, Combat/Hit und Round-Ende nicht mehr nur Event-Kanten aus, sondern auch Runtime-Systeme, States, Configs, Tests und die zugehoerigen Kontextkanten.
+- Die Query bleibt rueckwaertskompatibel ueber `edges` fuer Event-Kanten; neue Diagnosefelder `states`, `configs`, `tests` und `contextEdges` machen die kritischen Desktop-Pfade direkt querybar.
+- Evidence: `node --test tests/knowledge-graph-build.contract.test.mjs` (16/16 PASS), `node scripts/query-knowledge-graph.mjs event-flow spawn`, `node scripts/query-knowledge-graph.mjs event-flow combat-hit --json`, `node scripts/query-knowledge-graph.mjs event-flow round-end`. Naechste V107-Subphase ist `107.4.2` fuer die `SettingManager`-Pflichtreferenz.
+
+## Stand-Snapshot 2026-05-08 (V107 Abschluss-Sync)
+
+- `V107` ist im Master-Index geschlossen: `docs/plaene/aktiv/V107.md` steht auf `status: done`, `current_phase: 107.99`, und der Master spiegelt den Block jetzt unter den abgeschlossenen referenzierten Bloecken.
+- Die V107-Abhaengigkeiten fuer `V110` und `V111` sind im Master als erfuellt markiert; `V111` bleibt weiter durch `V110.99` gesperrt.
+- Abschluss-Evidence bleibt im Blockplan reproduzierbar: `graph:build`, `graph:check`, `plan:check`, `docs:sync`, `docs:check`, `gates:pre-commit` sowie die Kernqueries `critical-path-health`, `coverage-report` und `event-flow settings`.
+
 ## Commit-Notizen 2026-05-06
 
 - `43a510fe` `fix: harden parcours runtime feedback and sync flows`: Parcours-Feedback, Ring-/Minimap-Zustand und Start-Setup-Sync wurden gemeinsam gehoben, damit Branch-/Checkpoint-Fortschritt im Runtime-, UI- und Testpfad denselben Zustand lesen und der Nutzer keine widerspruechlichen Signale zwischen Overlay, Audio und Replay-Fallback bekommt.
@@ -394,6 +401,13 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Fixpfad: Das Start-Menue speichert `arcadeGhostTrailCollisionEnabled`; `RuntimeConfig` und `EntityRuntimeConfig` reichen die Option bis zum `LastRoundGhostSystem` durch. Bei aktivem Toggle registriert die Ghost-Spur ihre Segmente im normalen Trail-Spatial-Index mit eigener Ghost-Owner-ID, damit P1 nicht als eigener frischer Trail uebersprungen wird.
 - Evidence: `node --test tests/last-round-ghost-system.contract.test.mjs tests/runtime-settings-live-apply.contract.test.mjs` und `git diff --check` sind gruen.
 
+## Stand-Snapshot 2026-05-07 (Intake-Abgleich offener Feature-Plaene)
+
+- Alle nicht abgeloesten Feature-Intake-Entwuerfe aus `docs/plaene/neu/` sind gegen den Master abgeglichen und mit kanonischen `docs/plaene/aktiv/VXX.md`-Dateien aufgenommen.
+- Neu im Master sind `V90`, `V96`, `V102`, `V105`, `V106` und `V113`; bereits vorhandene aktive Detaildateien `V91`, `V101` und `V108` sind als abgeschlossene referenzierte Bloecke ergaenzt.
+- Bot-Training-Entwuerfe bleiben gemaess Master-Regel ausserhalb von `docs/Umsetzungsplan.md`; der abgeloeste V112-Repro-Alternativentwurf bleibt nur Ideenspeicher, weil der kanonische V112-Block bereits `Feature_Spielaudit_Playtest_Improvement_Paket_V112.md` ist.
+- `V90` und `V105` starten blockiert, weil ihre Abschluss-/Startpfade von stabiler Build-/Typecheck- bzw. `V102.99`-Evidence abhaengen; `V102`, `V96`, `V106` und `V113` sind geplant.
+
 ## Bugfix-Notiz 2026-05-07 (Heuristik-Bot Survival)
 
 - Nutzerfeedback: Der Heuristik-Bot stirbt sehr schnell.
@@ -401,7 +415,8 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Fixpfad: `ObservationSystem` befuellt links/rechts wieder schema-korrekt; `BotActionOps` und `BotRecoveryOps` mappen positive Yaw-Entscheidungen konsistent auf `yawLeft`. Der Regressionstest `heuristic-bot-survival-regression` deckt Observation, Heuristik-Ausweichen und RuleBased-Yaw ab.
 - Evidence: `node --test tests/heuristic-bot-survival-regression.test.mjs` und `npm run plan:check` sind gruen.
 
-## Tooling-Notiz 2026-05-08 (Automatische Bot-Spielanalyse)
-- Normales Spielen triggert jetzt ueber `RoundRecorder.onRoundFinalized` automatisch alle drei Bot-Runden eine Bot-Spielanalyse; `GameDebugApi` haelt den letzten Report in Memory, loggt ihn und zeigt bei Hinweisen einen Status-Toast.
-- `botAnalysis=0` deaktiviert den Auto-Pfad, `botAnalysisRounds=N` setzt das Intervall; manuell bleiben `GAME_INSTANCE.debugApi.runBotPlayAnalysis()` und `getBotPlayAnalysisStatus()` verfuegbar.
-- Evidence: `node --test tests/bot-play-analysis-runtime.test.mjs`, `npm run check:architecture:touched-strict`, `npm run plan:check`.
+## Tooling-Notiz 2026-05-08 (Bot-Spielanalyse)
+
+- Neuer CLI-Pfad `npm run bot:analyze`: Der vorhandene Bot-Validation-Runner spielt konfigurierbare Szenarien, danach klassifiziert `scripts/bot-play-analysis.mjs` Survival-, Wand-/Trail-, Stuck-, Winrate- und Forced-Round-Signale zu priorisierten Tuning-Hinweisen.
+- Standardausgaben landen in `tmp/`; mit `--publish true` werden JSON/Markdown-Evidence nach `data/` und `docs/tests/` geschrieben.
+- Evidence: `npm run bot:analyze -- --skip-run true --source-json data/bot_validation_report.json --report-json tmp/bot-play-analysis-npm-test.json --report-md tmp/bot-play-analysis-npm-test.md`, `node --check scripts/bot-play-analysis.mjs` und `npm run plan:check` sind gruen.

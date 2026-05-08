@@ -1,6 +1,6 @@
 ﻿# Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-07. Aktuelle offene Subphase: `V107 107.5.1`.
+Stand: 2026-05-08. Aktuelle offene Subphase: `V102 102.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -37,6 +37,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V104 | Runtime- und UI-God-Object-Sunset mit Port-Zuschnitt | done | P2 | frei | V92.99,V103.99 | 104.99 | `docs/plaene/aktiv/V104.md` |
 | V100 | Runtime Rebuild-, Remount- und StartSync-Stabilisierung | done | P1 | frei | V92.99 | 100.99 | `docs/plaene/aktiv/V100.md` |
 | V108 | Arcade-Ghost Selbstduell (laengste Spur pro Route) | done | P2 | frei | V82.99 | 108.99 | `docs/plaene/aktiv/V108.md` |
+| V107 | Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer | done | P2 | frei | V94.99 | 107.99 | `docs/plaene/aktiv/V107.md` |
 
 ### Abgeschlossene Bloecke (offener Abgleich vor Archivierung)
 
@@ -54,7 +55,6 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V112 | Spielaudit- und Playtest-Improvement-Paket | blocked | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
-| V107 | Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer | active | P2 | codex | V94.99 | 107.5 | `docs/plaene/aktiv/V107.md` |
 | V110 | Wissensgraph Ops-, Guard- und Integritaets-Haertung | planned | P2 | frei | V107.99 | 110.1 | `docs/plaene/aktiv/V110.md` |
 | V111 | Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz | planned | P2 | frei | V107.99,V110.99 | 111.1 | `docs/plaene/aktiv/V111.md` |
 | V113 | Hangar Shell Productivierung und Rules Panel | planned | P2 | frei | V76.99,V103.99 | 113.1 | `docs/plaene/aktiv/V113.md` |
@@ -81,8 +81,8 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V96 | V64.99 | hard | ja | Desktop-Multiplayer-/Runtime-Basis bleibt Grundlage fuer Application-Boundary-Schnitt |
 | V107 | V94.99 | hard | ja | V94 ist abgeschlossen; V107 kann als Core-Graph-Block gestartet werden |
 | V108 | V82.99 | hard | ja | Arcade-Parcours-/Ghost-/Leaderboard-Basis ist abgeschlossen |
-| V110 | V107.99 | hard | nein | V110 haertet den Wissensgraphen erst nach Core-Claim aus V107 |
-| V111 | V107.99 | hard | nein | V111 baut auf dem mehrschichtigen Graph-Core aus V107 auf |
+| V110 | V107.99 | hard | ja | Core-Graph, Query-Layer, Coverage-Gate und Workflow-Spiegelung aus V107 sind abgeschlossen |
+| V111 | V107.99 | hard | ja | Mehrschichtiger Graph-Core aus V107 ist abgeschlossen; V110 bleibt als weitere Voraussetzung offen |
 | V111 | V110.99 | hard | nein | V111 setzt die Ops-/Guard-Haertung aus V110 voraus |
 | V112 | V102.99 | hard | nein | V112 startet erst nach Security-/Runtime-Hardening aus V102 |
 | V112 | V105.99 | hard | nein | V112 startet erst nach Guard-/Typecheck-Recovery aus V105 |
@@ -111,7 +111,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V105 | - | blockiert | Wartet auf V102.99 |
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
-| codex | V107 | 2026-05-07 | active | 107.5.1 Doku-Leseweg spiegeln |
+| - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
 | - | V110 | - | frei | Geplant |
 | - | V111 | - | frei | Geplant |
 | - | V112 | - | blockiert | Wartet auf V102.99 und V105.99 |
@@ -122,9 +122,8 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 1. `V102` (Security-/Runtime-/Contract-Hardening).
 2. Danach `V105` (Guard-/Typecheck-Recovery).
 3. Danach `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
-4. Parallel oder danach `V107` abschliessen (Wissensgraph-Ausbaustufe; aktuell aktiv).
-5. Danach `V110` (Wissensgraph Ops-/Guard-Haertung).
-6. Danach `V111` (Wissensgraph adaptive Diagnose- und Entscheidungsintelligenz).
+4. Danach `V110` (Wissensgraph Ops-/Guard-Haertung).
+5. Danach `V111` (Wissensgraph adaptive Diagnose- und Entscheidungsintelligenz).
 7. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
 8. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
 9. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
