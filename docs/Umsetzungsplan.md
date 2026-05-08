@@ -56,7 +56,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V112 | Spielaudit- und Playtest-Improvement-Paket | blocked | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
-| V110 | Wissensgraph Ops-, Guard- und Integritaets-Haertung | planned | P2 | frei | V107.99 | 110.1 | `docs/plaene/aktiv/V110.md` |
+| V110 | Wissensgraph Ops-, Guard- und Integritaets-Haertung | active | P2 | codex | V107.99 | 110.1 | `docs/plaene/aktiv/V110.md` |
 | V111 | Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz | planned | P2 | frei | V107.99,V110.99 | 111.1 | `docs/plaene/aktiv/V111.md` |
 | V113 | Hangar Shell Productivierung und Rules Panel | planned | P2 | frei | V76.99,V103.99 | 113.1 | `docs/plaene/aktiv/V113.md` |
 
@@ -117,7 +117,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
-| - | V110 | - | frei | Geplant |
+| codex | V110 | 2026-05-08 | active | 110.1 Constraints- und Provenance-Fundament |
 | - | V111 | - | frei | Geplant |
 | - | V112 | - | blockiert | Wartet auf V102.99 und V105.99 |
 | - | V113 | - | frei | Geplant |
