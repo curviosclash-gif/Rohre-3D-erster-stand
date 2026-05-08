@@ -51,6 +51,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V90 | Toolchain-Security und Dependency-Upgrade | blocked | P1 | frei | - | 90.2 | `docs/plaene/aktiv/V90.md` |
 | V102 | Security-, Runtime- und Contract-Hardening | planned | P1 | frei | V99.99,V100.99 | 102.1 | `docs/plaene/aktiv/V102.md` |
+| V114 | SurfacePolicyPort fuer Demo- und Vollversionsgrenze | planned | P1 | frei | V98.99,V103.99,V104.99 | 114.1 | `docs/plaene/aktiv/V114.md` |
 | V105 | Architecture-Guard- und Typecheck-Regression-Recovery | blocked | P1 | frei | V99.99,V102.99,V104.99 | 105.1 | `docs/plaene/aktiv/V105.md` |
 | V112 | Spielaudit- und Playtest-Improvement-Paket | blocked | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
@@ -88,6 +89,9 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V112 | V105.99 | hard | nein | V112 startet erst nach Guard-/Typecheck-Recovery aus V105 |
 | V113 | V76.99 | hard | ja | Hangar-Contracts und Shell-Zielbild aus V76 sind abgeschlossen |
 | V113 | V103.99 | hard | ja | Settings-Domain- und Persistenzpfad aus V103 sind Grundlage fuer Hangar-Writeback |
+| V114 | V98.99 | hard | ja | Browser-Demo-Policy, Settings-Studio-Export und read-only Demo-Lesepfad sind Grundlage fuer den SurfacePolicyPort |
+| V114 | V103.99 | hard | ja | SettingsManager-Zuschnitt und Mutationsvertrag bleiben Grundlage fuer die Abgrenzung Settings vs. Produktgrenze |
+| V114 | V104.99 | hard | ja | Port-/Snapshot-Zielpfad ist Grundlage fuer den zentralen SurfacePolicyPort |
 
 ## Lock-Status
 
@@ -108,6 +112,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V100 | 2026-05-05 | closed | Abgeschlossen 2026-05-06 |
 | - | V108 | - | closed | Abgeschlossen 2026-05-01 |
 | - | V102 | - | frei | Geplant |
+| - | V114 | - | frei | Geplant |
 | - | V105 | - | blockiert | Wartet auf V102.99 |
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
@@ -120,10 +125,11 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 ## Empfohlene Reihenfolge
 
 1. `V102` (Security-/Runtime-/Contract-Hardening).
-2. Danach `V105` (Guard-/Typecheck-Recovery).
-3. Danach `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
-4. Danach `V110` (Wissensgraph Ops-/Guard-Haertung).
-5. Danach `V111` (Wissensgraph adaptive Diagnose- und Entscheidungsintelligenz).
+2. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), damit Produktgrenzen vor weiteren Release-/Playtest-Schnitten strukturell stabil sind.
+3. Danach `V105` (Guard-/Typecheck-Recovery).
+4. Danach `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
+5. Danach `V110` (Wissensgraph Ops-/Guard-Haertung).
+6. Danach `V111` (Wissensgraph adaptive Diagnose- und Entscheidungsintelligenz).
 7. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
 8. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
 9. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
