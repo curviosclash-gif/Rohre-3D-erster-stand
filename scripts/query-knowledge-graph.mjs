@@ -25,6 +25,12 @@ const EVENT_FLOW_CONTEXT_EDGE_TYPES = new Set([
     'writes_state',
     'validated_by',
 ]);
+const CRITICAL_PATH_LAYER_REQUIREMENTS = Object.freeze({
+    'combat-hit': ['runtime', 'event', 'state', 'config', 'test'],
+    'round-end': ['runtime', 'event', 'state', 'config', 'test'],
+    settings: ['runtime', 'state', 'config', 'test'],
+    spawn: ['runtime', 'event', 'state', 'config', 'test'],
+});
 
 function normalizePath(value) {
     return String(value || '')
@@ -91,6 +97,7 @@ function nodeSummary(node) {
         type: node.type,
         title: node.title || null,
         file: node.attributes?.file || null,
+        provenance: node.attributes?.provenance || null,
         criticalPaths: getCriticalPaths(node),
         mappingId: node.attributes?.mappingId || null,
     };
@@ -105,6 +112,7 @@ function edgeSummary(edge, nodeById) {
         type: edge.type,
         relationLayer: edge.attributes?.relationLayer || null,
         mappingId: edge.attributes?.mappingId || null,
+        provenance: edge.attributes?.provenance || null,
     };
 }
 
@@ -470,7 +478,9 @@ function queryCriticalPathHealth(graph) {
         const eventEdges = edges
             .filter((edge) => (edge.type === 'emits' || edge.type === 'consumes') && eventIds.has(edge.to))
             .map((edge) => edgeSummary(edge, nodeById));
-        const status = counts.runtime > 0 && counts.test > 0 && missingValidation.length === 0
+        const requiredLayers = CRITICAL_PATH_LAYER_REQUIREMENTS[criticalPath] || ['runtime', 'test'];
+        const missingLayers = requiredLayers.filter((layer) => (counts[layer] || 0) === 0);
+        const status = missingLayers.length === 0 && missingValidation.length === 0
             ? 'ok'
             : 'needs-attention';
 
@@ -478,6 +488,8 @@ function queryCriticalPathHealth(graph) {
             criticalPath,
             status,
             counts,
+            requiredLayers,
+            missingLayers,
             missingValidation: sortNodeSummaries(missingValidation),
             eventEdges: sortEdgeSummaries(eventEdges),
         };

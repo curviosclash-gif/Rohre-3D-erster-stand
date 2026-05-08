@@ -74,11 +74,13 @@ const CRITICAL_DESKTOP_GRAPH_REQUIREMENTS = Object.freeze([
             { id: 'event:round-end', type: 'event', mappingId: 'runtime-taxonomy' },
             { id: 'state:round-outcome', type: 'state', mappingId: 'runtime-taxonomy' },
             { id: 'state:round-end-overlay', type: 'state', mappingId: 'runtime-taxonomy' },
+            { id: 'config:gameplay-config-contract', type: 'config', mappingId: 'runtime-taxonomy' },
             { id: 'runtime:round-outcome-system', type: 'runtime', mappingId: 'desktop-critical-paths' },
             { id: 'runtime:round-end-coordinator', type: 'runtime', mappingId: 'desktop-critical-paths' },
             { id: 'test:runtime-regressions-round-end', type: 'test', mappingId: 'desktop-critical-paths' },
         ],
         requiredEdges: [
+            { from: 'runtime:round-outcome-system', to: 'config:gameplay-config-contract', type: 'reads_config', mappingId: 'desktop-critical-paths' },
             { from: 'runtime:round-outcome-system', to: 'state:round-outcome', type: 'writes_state', mappingId: 'desktop-critical-paths' },
             { from: 'runtime:round-outcome-system', to: 'event:round-end', type: 'emits', mappingId: 'desktop-critical-paths' },
             { from: 'runtime:round-outcome-system', to: 'test:runtime-regressions-round-end', type: 'validated_by', mappingId: 'desktop-critical-paths' },
@@ -261,6 +263,10 @@ function validateRuntimeMappingIntegrity(graph, violations) {
     const mappingEdges = edges.filter((edge) => String(edge?.attributes?.mappingId || '').trim());
 
     for (const edge of mappingEdges) {
+        const provenance = edge.attributes?.provenance || {};
+        if (!provenance.file || !Number.isInteger(provenance.line) || provenance.line < 1 || !provenance.commit) {
+            addViolation(violations, 'KG_EDGE_PROVENANCE_MISSING', `Mapping-Kante ohne vollstaendige Provenance: ${edge.type} ${edge.from} -> ${edge.to}`);
+        }
         if (!nodeById.has(edge.from)) {
             addViolation(violations, 'KG_UNKNOWN_REFERENCE', `Mapping-Kante referenziert unbekannte Quelle: ${edge.type} ${edge.from} -> ${edge.to}`);
         }
@@ -270,6 +276,10 @@ function validateRuntimeMappingIntegrity(graph, violations) {
     }
 
     for (const node of mappingNodes) {
+        const provenance = node.attributes?.provenance || {};
+        if (!provenance.file || !Number.isInteger(provenance.line) || provenance.line < 1 || !provenance.commit) {
+            addViolation(violations, 'KG_NODE_PROVENANCE_MISSING', `Mapping-Knoten ohne vollstaendige Provenance: ${node.id}`);
+        }
         const filePath = String(node?.attributes?.file || '').trim();
         if (!filePath) continue;
         const fileNode = fileNodeByPath.get(filePath) || null;

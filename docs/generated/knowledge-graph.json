@@ -2199,31 +2199,38 @@
         ],
         "priority": "P2",
         "owner": "codex",
-        "currentPhase": "110.1",
+        "currentPhase": "110.2",
         "planFile": "docs/plaene/aktiv/V110.md",
         "scopeDeclarations": [
           ".agents/workflows/status.md",
           "data/contracts/knowledge-graph/**",
+          "docs/bot-training/Bot_Trainingsplan.md",
           "docs/generated/knowledge-graph.coverage.json",
           "docs/generated/knowledge-graph.json",
           "docs/generated/knowledge-graph.schema.json",
+          "docs/plaene/aktiv/README.md",
           "docs/plaene/aktiv/V102.md",
           "docs/plaene/aktiv/V105.md",
+          "docs/plaene/aktiv/V106.md",
+          "docs/plaene/aktiv/V107.md",
           "docs/plaene/aktiv/V110.md",
           "docs/plaene/aktiv/V111.md",
           "docs/plaene/aktiv/V113.md",
           "docs/plaene/aktiv/V114.md",
           "docs/plaene/aktiv/V90.md",
           "docs/plaene/aktiv/V96.md",
+          "docs/plaene/aktiv/V99.md",
           "docs/plaene/CHANGELOG.md",
+          "docs/prozess/Open_Findings.md",
           "docs/referenz/ai_architecture_context.md",
+          "docs/Umsetzungsplan.md",
           "scripts/build-knowledge-graph.mjs",
           "scripts/check-knowledge-graph.mjs",
           "scripts/query-knowledge-graph.mjs",
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 21,
+          "concreteCount": 28,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -6158,7 +6165,7 @@
       "id": "V110.1",
       "type": "phase",
       "title": "Constraints- und Provenance-Fundament",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.1"
@@ -16234,7 +16241,7 @@
     {
       "id": "V105.1.2",
       "type": "subphase",
-      "title": "Fuer jeden Cluster festhalten, was in `V105` gehoert und was bewusst bei `V99`, `V102` oder `V104` bleibt; Recovery darf nur owning Restfehler ziehen, nicht fremde Blockziele verdoppeln.",
+      "title": "Fuer jeden Cluster festhalten, was in `V105` gehoert und was bewusst bei `V99`, `V102`, `V104`, `V113`, `V114` oder `V96` bleibt; Recovery darf nur owning Restfehler ziehen, nicht fremde Blockziele verdoppeln.",
       "status": "open",
       "attributes": {
         "blockId": "V105",
@@ -16608,7 +16615,7 @@
     {
       "id": "V107.99.2",
       "type": "subphase",
-      "title": "Kernqueries, kritische Pfade, Coverage-Evidence und `SettingManager`-Referenz sind dokumentiert und reproduzierbar. (abgeschlossen: 2026-05-08; evidence: `node scripts/query-knowledge-graph.mjs critical-path-health` meldet Spawn, Combat/Hit, Round-End und Settings `ok`; `coverage-report` meldet `gate: pass`; `event-flow settings` zeigt `runtime:settings-manager` mit Config-/State-/Test-Kanten)",
+      "title": "Kernqueries, kritische Pfade, Coverage-Evidence und `SettingManager`-Referenz sind dokumentiert und reproduzierbar. (abgeschlossen: 2026-05-08; evidence: `node scripts/query-knowledge-graph.mjs critical-path-health` meldet Spawn, Combat/Hit, Round-End und Settings `ok`; `coverage-report` meldet `gate: pass`; `event-flow settings` zeigt `runtime:settings-manager` mit Config-/State-/Test-Kanten; Nachzug 2026-05-08: `event-flow round-end` zeigt jetzt ebenfalls `reads_config` auf `config:gameplay-config-contract`, und `critical-path-health` prueft die erwarteten Layer pro Kernpfad)",
       "status": "done",
       "attributes": {
         "blockId": "V107",
@@ -16993,8 +17000,8 @@
     {
       "id": "V110.1.2",
       "type": "subphase",
-      "title": "Evidence-Provenance (`file`, `line`, `commit`) fuer kritische Knoten/Kanten in Builder und Query-Ausgaben vollstaendig einziehen.",
-      "status": "open",
+      "title": "Evidence-Provenance (`file`, `line`, `commit`) fuer kritische Knoten/Kanten in Builder und Query-Ausgaben vollstaendig einziehen. (abgeschlossen: 2026-05-08; evidence: `scripts/build-knowledge-graph.mjs` ermittelt Mapping-Zeilen plus letzten Git-Commit je Contract-Datei, `scripts/check-knowledge-graph.mjs` validiert `KG_NODE_PROVENANCE_MISSING`/`KG_EDGE_PROVENANCE_MISSING`, `scripts/query-knowledge-graph.mjs impact-for-file src/core/SettingsManager.js --json` zeigt Provenance fuer Node und RelationEdges; `node --test tests/knowledge-graph-build.contract.test.mjs` PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.1",
@@ -25867,6 +25874,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 8,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/runtime/EntitySpawnOps.js",
         "criticalPath": "spawn",
@@ -25884,6 +25896,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 28,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/HuntCombatSystem.js",
         "criticalPath": "combat-hit",
@@ -25901,6 +25918,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 48,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/hunt/mg/MGHitResolver.js",
         "criticalPath": "combat-hit",
@@ -25918,6 +25940,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 38,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/projectile/ProjectileHitResolver.js",
         "criticalPath": "combat-hit",
@@ -25935,6 +25962,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 68,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/state/RoundEndCoordinator.js",
         "criticalPath": "round-end",
@@ -25952,6 +25984,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 58,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/RoundOutcomeSystem.js",
         "criticalPath": "round-end",
@@ -25969,6 +26006,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 78,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/core/SettingsManager.js",
         "criticalPath": "settings",
@@ -25987,6 +26029,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 18,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/SpawnPlacementSystem.js",
         "criticalPath": "spawn",
@@ -26004,6 +26051,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 17,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "criticalPath": "combat-hit",
         "domain": "combat"
@@ -26020,6 +26072,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 26,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "criticalPath": "round-end",
         "domain": "match-flow"
@@ -26036,6 +26093,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 8,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "criticalPath": "spawn",
         "domain": "entity-lifecycle"
@@ -26052,6 +26114,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 44,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "criticalPath": "combat-hit",
         "domain": "combat"
@@ -26068,6 +26135,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 62,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "criticalPath": "round-end",
         "domain": "match-flow"
@@ -26084,6 +26156,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 53,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "criticalPath": "round-end",
         "domain": "match-flow"
@@ -26100,6 +26177,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 80,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "criticalPath": "settings",
         "domain": "settings"
@@ -26116,6 +26198,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 71,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "criticalPath": "settings",
         "domain": "settings"
@@ -26132,6 +26219,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 35,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "criticalPath": "spawn",
         "domain": "entity-lifecycle"
@@ -26148,6 +26240,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 125,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "file": "src/core/Config.js",
         "criticalPath": "settings",
@@ -26165,6 +26262,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 103,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "file": "src/shared/contracts/EntityRuntimeConfig.js",
         "criticalPaths": [
@@ -26184,11 +26286,17 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 89,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "file": "src/shared/contracts/GameplayConfigContract.js",
         "criticalPaths": [
           "spawn",
-          "combat-hit"
+          "combat-hit",
+          "round-end"
         ],
         "domain": "settings"
       }
@@ -26204,6 +26312,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 115,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "file": "src/core/RuntimeConfig.js",
         "criticalPath": "settings",
@@ -26221,6 +26334,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 145,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "file": "src/shared/contracts/RuntimeSessionContract.js",
         "criticalPath": "settings",
@@ -26238,6 +26356,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 135,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "file": "src/core/config/SettingsRuntimeContract.js",
         "criticalPath": "settings",
@@ -26255,6 +26378,11 @@
         ],
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 155,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Versionierte Event- und State-Taxonomie fuer die kritischen Desktop-Kernpfade des Wissensgraphen.",
         "file": "src/core/settings/SettingsRuntimeLimits.js",
         "criticalPath": "settings",
@@ -26272,6 +26400,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 89,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/physics-core.spec.js",
         "criticalPath": "spawn",
@@ -26289,6 +26422,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 99,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/physics-hunt.spec.js",
         "criticalPath": "combat-hit",
@@ -26306,6 +26444,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 109,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/runtime-regressions.contract.test.mjs",
         "criticalPath": "round-end",
@@ -26323,6 +26466,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 119,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/runtime-settings-live-apply.contract.test.mjs",
         "criticalPath": "settings",
@@ -26340,6 +26488,11 @@
         ],
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 129,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/settings-manager.contract.test.mjs",
         "criticalPath": "settings",
@@ -33209,7 +33362,8 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "BT10",
@@ -33242,7 +33396,8 @@
           "BT93P",
           "BT94A",
           "BT94B",
-          "BT95"
+          "BT95",
+          "V110"
         ],
         "exists": true
       }
@@ -33447,6 +33602,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V110",
           "V77"
         ],
         "exists": true
@@ -33557,6 +33713,7 @@
         ],
         "scopeBlocks": [
           "V106",
+          "V110",
           "V77"
         ],
         "exists": true
@@ -33573,6 +33730,7 @@
         ],
         "scopeBlocks": [
           "V107",
+          "V110",
           "V77"
         ],
         "exists": true
@@ -34045,6 +34203,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V110",
           "V77"
         ],
         "exists": true
@@ -35923,7 +36082,8 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V109"
+          "V109",
+          "V110"
         ],
         "exists": true
       }
@@ -36336,6 +36496,7 @@
         "scopeBlocks": [
           "BT40",
           "V109",
+          "V110",
           "V51",
           "V69",
           "V89",
@@ -89676,6 +89837,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 266,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "config"
       }
     },
@@ -89687,6 +89853,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 266,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "config"
       }
     },
@@ -89698,6 +89869,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 266,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "config"
       }
     },
@@ -89709,6 +89885,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 271,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "config"
       }
     },
@@ -89731,6 +89912,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 141,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "config"
       }
     },
@@ -89742,6 +89928,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 156,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "event"
       }
     },
@@ -89753,6 +89944,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 141,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "state"
       }
     },
@@ -89764,6 +89960,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 156,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "test"
       }
     },
@@ -89775,6 +89976,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 171,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "config"
       }
     },
@@ -89786,6 +89992,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 171,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "state"
       }
     },
@@ -89797,6 +90008,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 201,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "test"
       }
     },
@@ -89808,6 +90024,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 191,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "config"
       }
     },
@@ -89819,6 +90040,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 191,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "event"
       }
     },
@@ -89830,6 +90056,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 196,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "test"
       }
     },
@@ -89841,6 +90072,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 181,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "config"
       }
     },
@@ -89852,6 +90088,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 181,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "event"
       }
     },
@@ -89863,6 +90104,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 206,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "test"
       }
     },
@@ -89874,6 +90120,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 231,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "event"
       }
     },
@@ -89885,6 +90136,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 231,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "state"
       }
     },
@@ -89896,7 +90152,28 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 236,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:round-outcome-system",
+      "to": "config:gameplay-config-contract",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 216,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
+        "relationLayer": "config"
       }
     },
     {
@@ -89907,6 +90184,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 221,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "event"
       }
     },
@@ -89918,6 +90200,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 216,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "state"
       }
     },
@@ -89929,6 +90216,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 241,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "test"
       }
     },
@@ -89940,6 +90232,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 251,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "config"
       }
     },
@@ -89951,6 +90248,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 251,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "state"
       }
     },
@@ -89962,6 +90264,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 251,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "state"
       }
     },
@@ -89973,6 +90280,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 286,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "test"
       }
     },
@@ -89984,6 +90296,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 286,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "test"
       }
     },
@@ -89995,6 +90312,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 151,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "state"
       }
     },
@@ -90006,6 +90328,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 166,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "test"
       }
     },
@@ -90072,6 +90399,11 @@
       "attributes": {
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 125,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90083,6 +90415,11 @@
       "attributes": {
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 135,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90171,6 +90508,11 @@
       "attributes": {
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 115,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90182,6 +90524,11 @@
       "attributes": {
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 155,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90193,6 +90540,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 78,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90215,6 +90567,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 8,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90226,6 +90583,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 28,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90237,6 +90599,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 38,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90248,6 +90615,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 58,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90259,6 +90631,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 18,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90270,6 +90647,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 48,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90303,6 +90685,11 @@
       "attributes": {
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 103,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90314,6 +90701,11 @@
       "attributes": {
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 89,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90325,6 +90717,11 @@
       "attributes": {
         "mappingId": "runtime-taxonomy",
         "mappingFile": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+          "line": 145,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90347,6 +90744,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 68,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90369,6 +90771,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 89,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90380,6 +90787,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 99,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90391,6 +90803,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 109,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90402,6 +90819,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 119,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -90413,6 +90835,11 @@
       "attributes": {
         "mappingId": "desktop-critical-paths",
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 129,
+          "commit": "df198f7b83d2fe2d0b2c12361efb80c3b416ca52"
+        },
         "relationLayer": "runtime"
       }
     },
@@ -97904,6 +98331,15 @@
     },
     {
       "from": "V110",
+      "to": "docs/bot-training/Bot_Trainingsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "docs/generated/knowledge-graph.coverage.json",
       "type": "scope",
       "hint": null,
@@ -97931,6 +98367,15 @@
     },
     {
       "from": "V110",
+      "to": "docs/plaene/aktiv/README.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "docs/plaene/aktiv/V102.md",
       "type": "scope",
       "hint": null,
@@ -97941,6 +98386,24 @@
     {
       "from": "V110",
       "to": "docs/plaene/aktiv/V105.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/plaene/aktiv/V106.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/plaene/aktiv/V107.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98003,6 +98466,15 @@
     },
     {
       "from": "V110",
+      "to": "docs/plaene/aktiv/V99.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "docs/plaene/CHANGELOG.md",
       "type": "scope",
       "hint": null,
@@ -98012,7 +98484,25 @@
     },
     {
       "from": "V110",
+      "to": "docs/prozess/Open_Findings.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/Umsetzungsplan.md",
       "type": "scope",
       "hint": null,
       "attributes": {

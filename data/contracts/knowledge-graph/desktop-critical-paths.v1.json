@@ -214,6 +214,11 @@
     },
     {
       "from": "runtime:round-outcome-system",
+      "to": "config:gameplay-config-contract",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:round-outcome-system",
       "to": "state:round-outcome",
       "type": "writes_state"
     },

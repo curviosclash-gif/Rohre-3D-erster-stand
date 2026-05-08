@@ -93,7 +93,8 @@
       "attributes": {
         "criticalPaths": [
           "spawn",
-          "combat-hit"
+          "combat-hit",
+          "round-end"
         ],
         "domain": "settings"
       }

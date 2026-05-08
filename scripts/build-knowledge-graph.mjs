@@ -713,6 +713,33 @@ function normalizeKnowledgeGraphMappingContract(rawMapping) {
     };
 }
 
+function findMappingNodeLine(rawContent, nodeId) {
+    const lines = String(rawContent || '').replace(/\r\n/g, '\n').split('\n');
+    const needle = `"id": "${nodeId}"`;
+    const index = lines.findIndex((line) => line.includes(needle));
+    return index >= 0 ? index + 1 : null;
+}
+
+function findMappingEdgeLine(rawContent, edge) {
+    const lines = String(rawContent || '').replace(/\r\n/g, '\n').split('\n');
+    for (let index = 0; index < lines.length; index += 1) {
+        if (!lines[index].includes(`"from": "${edge.from}"`)) continue;
+        const window = lines.slice(index, index + 12).join('\n');
+        if (window.includes(`"to": "${edge.to}"`) && window.includes(`"type": "${edge.type}"`)) {
+            return index + 1;
+        }
+    }
+    return null;
+}
+
+function buildMappingProvenance({ filePath, line, commit }) {
+    return {
+        file: filePath,
+        line,
+        commit,
+    };
+}
+
 function classifyMappingRelationLayer(edgeType) {
     if (edgeType === 'validated_by') return 'test';
     if (edgeType === 'reads_state' || edgeType === 'writes_state') return 'state';
@@ -720,6 +747,11 @@ function classifyMappingRelationLayer(edgeType) {
     if (edgeType === 'emits' || edgeType === 'consumes') return 'event';
     if (edgeType === 'implements') return 'runtime';
     return 'runtime';
+}
+
+async function readLastCommitForPath(relativePath) {
+    const stdout = await runGitCommand(['log', '-n', '1', '--format=%H', '--', relativePath]);
+    return stdout.trim() || null;
 }
 
 async function readKnowledgeGraphMappings() {
@@ -739,14 +771,32 @@ async function readKnowledgeGraphMappings() {
     const mappings = [];
     for (const fileName of mappingFiles) {
         const relativePath = normalizeRepoPath(path.join(KNOWLEDGE_GRAPH_MAPPING_DIR, fileName));
-        const raw = JSON.parse(await fs.readFile(path.join(ROOT, relativePath), 'utf8'));
+        const rawContent = await fs.readFile(path.join(ROOT, relativePath), 'utf8');
+        const raw = JSON.parse(rawContent);
         if (String(raw?.contract || '').trim() !== GRAPH_MAPPING_CONTRACT) {
             continue;
         }
+        const commit = await readLastCommitForPath(relativePath);
         const normalized = normalizeKnowledgeGraphMappingContract(raw);
         mappings.push({
             ...normalized,
             filePath: relativePath,
+            nodes: normalized.nodes.map((node) => ({
+                ...node,
+                provenance: buildMappingProvenance({
+                    filePath: relativePath,
+                    line: findMappingNodeLine(rawContent, node.id),
+                    commit,
+                }),
+            })),
+            edges: normalized.edges.map((edge) => ({
+                ...edge,
+                provenance: buildMappingProvenance({
+                    filePath: relativePath,
+                    line: findMappingEdgeLine(rawContent, edge),
+                    commit,
+                }),
+            })),
         });
     }
 
@@ -2167,6 +2217,7 @@ function emitKnowledgeGraphMappings(nodes, edges, mappings) {
                     source: ['knowledge-graph-mapping'],
                     mappingId: mapping.mapping_id,
                     mappingFile: mapping.filePath,
+                    provenance: node.provenance,
                     ...(mapping.description ? { mappingDescription: mapping.description } : {}),
                     ...(node.file ? { file: node.file } : {}),
                     ...(node.attributes || {}),
@@ -2191,6 +2242,7 @@ function emitKnowledgeGraphMappings(nodes, edges, mappings) {
                     attributes: {
                         mappingId: mapping.mapping_id,
                         mappingFile: mapping.filePath,
+                        provenance: node.provenance,
                         relationLayer: classifyMappingRelationLayer('implements'),
                     },
                 });
@@ -2207,6 +2259,7 @@ function emitKnowledgeGraphMappings(nodes, edges, mappings) {
                 attributes: {
                     mappingId: mapping.mapping_id,
                     mappingFile: mapping.filePath,
+                    provenance: edge.provenance,
                     relationLayer: classifyMappingRelationLayer(edge.type),
                     ...(edge.attributes || {}),
                 },

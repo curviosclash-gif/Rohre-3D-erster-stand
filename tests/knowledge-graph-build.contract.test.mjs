@@ -426,6 +426,20 @@ test('buildKnowledgeGraph keeps required desktop critical-path mappings intact',
             .filter((edge) => edge.attributes?.mappingId === 'desktop-critical-paths')
             .map((edge) => [`${edge.from}::${edge.to}::${edge.type}`, edge.attributes?.relationLayer])
     );
+    const spawnNode = nodeById.get('runtime:entity-spawn-ops');
+    assert.equal(spawnNode.attributes.provenance.file, 'data/contracts/knowledge-graph/desktop-critical-paths.v1.json');
+    assert.equal(typeof spawnNode.attributes.provenance.line, 'number');
+    assert.match(spawnNode.attributes.provenance.commit, /^[0-9a-f]{40}$/);
+
+    const spawnEdge = graph.edges.find((edge) => (
+        edge.from === 'runtime:entity-spawn-ops'
+        && edge.to === 'state:spawn-context'
+        && edge.type === 'writes_state'
+    ));
+    assert.equal(spawnEdge.attributes.provenance.file, 'data/contracts/knowledge-graph/desktop-critical-paths.v1.json');
+    assert.equal(typeof spawnEdge.attributes.provenance.line, 'number');
+    assert.match(spawnEdge.attributes.provenance.commit, /^[0-9a-f]{40}$/);
+
     assert.equal(
         relationLayerByEdge.get('runtime:entity-spawn-ops::state:spawn-context::writes_state'),
         'state'
@@ -570,6 +584,8 @@ test('runtime mapping integrity reports orphan, missing validation and unknown r
     assert.ok(codes.includes('KG_RUNTIME_VALIDATION_MISSING'));
     assert.ok(codes.includes('KG_UNKNOWN_REFERENCE'));
     assert.ok(codes.includes('KG_UNKNOWN_FILE_REFERENCE'));
+    assert.ok(codes.includes('KG_NODE_PROVENANCE_MISSING'));
+    assert.ok(codes.includes('KG_EDGE_PROVENANCE_MISSING'));
 });
 
 test('knowledge graph core runtime queries return stable JSON shapes', async () => {
@@ -593,6 +609,10 @@ test('knowledge graph core runtime queries return stable JSON shapes', async () 
     assert.equal(impact.file, 'src/core/SettingsManager.js');
     assert.deepEqual(impact.criticalPaths, ['settings']);
     assert.ok(impact.implementedNodes.some((node) => node.id === 'runtime:settings-manager'));
+    assert.equal(
+        impact.implementedNodes.find((node) => node.id === 'runtime:settings-manager').provenance.file,
+        'data/contracts/knowledge-graph/desktop-critical-paths.v1.json'
+    );
     assert.ok(impact.relationEdges.some((edge) => edge.type === 'validated_by' && edge.to === 'test:settings-manager-contract'));
 
     const eventFlow = queryEventFlow(graph, 'round-end');
@@ -606,7 +626,9 @@ test('knowledge graph core runtime queries return stable JSON shapes', async () 
     ]);
     assert.ok(eventFlow.states.some((node) => node.id === 'state:round-outcome'));
     assert.ok(eventFlow.states.some((node) => node.id === 'state:round-end-overlay'));
+    assert.ok(eventFlow.configs.some((node) => node.id === 'config:gameplay-config-contract'));
     assert.ok(eventFlow.tests.some((node) => node.id === 'test:runtime-regressions-round-end'));
+    assert.ok(eventFlow.contextEdges.some((edge) => edge.type === 'reads_config' && edge.to === 'config:gameplay-config-contract'));
     assert.ok(eventFlow.contextEdges.some((edge) => edge.type === 'writes_state' && edge.to === 'state:round-outcome'));
     assert.ok(eventFlow.contextEdges.some((edge) => edge.type === 'validated_by' && edge.to === 'test:runtime-regressions-round-end'));
 
@@ -633,6 +655,8 @@ test('knowledge graph core runtime queries return stable JSON shapes', async () 
     assert.equal(healthByPath.get('spawn').status, 'ok');
     assert.equal(healthByPath.get('combat-hit').status, 'ok');
     assert.equal(healthByPath.get('round-end').status, 'ok');
+    assert.deepEqual(healthByPath.get('round-end').missingLayers, []);
+    assert.ok(healthByPath.get('round-end').requiredLayers.includes('config'));
     assert.equal(healthByPath.get('settings').status, 'ok');
 });
 

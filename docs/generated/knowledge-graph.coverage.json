@@ -10243,7 +10243,8 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "BT10",
@@ -10276,7 +10277,8 @@
         "BT93P",
         "BT94A",
         "BT94B",
-        "BT95"
+        "BT95",
+        "V110"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -11040,6 +11042,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V110",
         "V77"
       ],
       "surfaces": [],
@@ -11164,6 +11167,7 @@
       ],
       "scopeBlocks": [
         "V106",
+        "V110",
         "V77"
       ],
       "surfaces": [],
@@ -11182,6 +11186,7 @@
       ],
       "scopeBlocks": [
         "V107",
+        "V110",
         "V77"
       ],
       "surfaces": [],
@@ -11714,6 +11719,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V110",
         "V77"
       ],
       "surfaces": [],
@@ -13864,7 +13870,8 @@
         "scope-files"
       ],
       "scopeBlocks": [
-        "V109"
+        "V109",
+        "V110"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -14468,6 +14475,7 @@
       "scopeBlocks": [
         "BT40",
         "V109",
+        "V110",
         "V51",
         "V69",
         "V89",
