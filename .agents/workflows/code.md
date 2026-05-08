@@ -30,6 +30,7 @@ Optional (nur bei Bedarf):
 - Bestehende Projekt-Patterns folgen.
 - Keine hartkodierten Config-Werte.
 - Fuer neue Runtime-Objekte Cleanup/Dispose mitdenken.
+- Nicht-offensichtliche Kompatibilitaets-, Migrations-, Alias- oder Fallback-Zweige mit einem kurzen lokalen Why-Kommentar markieren.
 - Totcode oder Legacy-Pfade vor einem Remove erst klassifizieren: `duplicate-backed`, `legacy-with-replacement`, `contract-first/plan-drift`, `unverified-altpath`.
 - Nur exakte Dubletten/Shims oder nachweislich ersetzte Altpfade entfernen; sonst im Scope als `legacy`, `compatibility path`, `shim` oder `plan-drift` markieren.
 - Wenn ein neuer Pfad einen alten ersetzt, verbleibende Konsumenten und Delete-Kriterium im aktiven Block oder den Scope-Docs festhalten.
@@ -57,6 +58,7 @@ Optional (nur bei Bedarf):
 - Git-Policy: `.agents/rules/git_and_commits.md` (Scope, Commit-Slice, Safety).
 - Wenn die angeforderte Aufgabe nach Self-check/Gates abgeschlossen ist und scoped Repo-Aenderungen vorliegen, den Commit im selben Turn erstellen; keinen eigenen offenen Worktree zuruecklassen.
 - Vor oder zusammen mit dem Commit kurze Notizen hinterlassen, die Zweck und Effekt des Delivery-Slices erklaeren (Block-Evidence und/oder `docs/plaene/CHANGELOG.md`).
+- Nicht-offensichtliche Restpfade sind erst abschliessbar, wenn Kommentar im Code und Notiz im passenden Repo-Kontext vorhanden sind.
 - `npm run guard:main`.
 - Windows vor Staging: `npm run git:acl:heal`.
 - `git add [scoped-files]` -> `git commit -m "[type]: [name] - [short reason]"`.

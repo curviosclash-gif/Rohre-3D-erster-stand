@@ -16,6 +16,7 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 ## 1. Implement
 
 - Aenderung direkt anwenden. Bestehende Patterns folgen. Desktop-App ist primaeres Ziel.
+- Bleibt ein nicht-offensichtlicher Kompatibilitaets-, Migrations-, Alias- oder Fallback-Pfad stehen, einen kurzen lokalen Why-Kommentar direkt dort hinterlassen.
 - Wenn die Aenderung auf Totcode-Loeschung oder Legacy-Ablosung hinauslaeuft, Quick-Path verlassen und `.agents/workflows/code.md` oder `.agents/workflows/cleanup.md` nutzen.
 
 ## 2. Verify
@@ -30,5 +31,6 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 
 - Wenn die kleine Aufgabe abgeschlossen ist und scoped Aenderungen erzeugt hat, Commit direkt im selben Turn erstellen.
 - Eine kurze Notiz zum Commit-Zweck im passenden Kontext hinterlassen; bei fehlendem Block mindestens in `docs/plaene/CHANGELOG.md`, wenn Repo-Governance oder Statuswissen betroffen ist.
+- Nicht-offensichtliche Restpfade sind im Quick-Path nur fertig, wenn Why-Kommentar im Code und passende Repo-Notiz beide vorhanden sind.
 - `git add [scoped-files]` -> `[type]: [short reason]`.
 - Scope pruefen: `git diff --name-only`.

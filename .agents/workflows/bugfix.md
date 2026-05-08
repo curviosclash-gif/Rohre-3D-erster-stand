@@ -28,6 +28,7 @@ Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/p
 - Desktop-first bleibt Prioritaet (siehe `product_focus.md`).
 - Verdaechtige Altpfade nicht still mitloeschen; nur entfernen, wenn ein juengerer produktiver Ersatzpfad oder eine exakte Dublette belegt ist.
 - Wenn der Fix einen alten Pfad umgeht oder ersetzt, verbleibende Konsumenten und Delete-Kriterium im Scope dokumentieren.
+- Wenn der Fix einen nicht-offensichtlichen Kompatibilitaets-, Migrations-, Alias- oder Fallback-Pfad behaelt, einen kurzen lokalen Why-Kommentar direkt an dieser Stelle hinterlassen.
 - Tests sind user-owned. Vor `*.99` sind kleine, risikoadjustierte Signale erlaubt (enger Contract-/Build-/Runtime-Check).
 
 ## 4. Governance + Gate-Strategie
@@ -42,6 +43,7 @@ Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/p
 - Git-Policy: `.agents/rules/git_and_commits.md`.
 - Nach erfolgreicher Root-Cause-Behebung und Verifikation den scoped Commit im selben Turn erstellen, statt die Fix-Aenderungen offen liegen zu lassen.
 - Vor Abschluss kurze Bugfix-Notiz mit Ursache und wirksamem Fixpfad hinterlassen (Block-Evidence, Fehlerbericht oder `docs/plaene/CHANGELOG.md`).
+- Abschluss erst, wenn sowohl die Repo-Notiz als auch der notwendige lokale Why-Kommentar fuer nicht-offensichtliche Restpfade vorhanden sind.
 - `git add [scoped-files]` -> `fix: [short reason]`.
 - Scope pruefen: `git diff --name-only`.
 

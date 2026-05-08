@@ -12,6 +12,7 @@ description: Code quality, debugging, performance, and lifecycle (consolidated)
 - Before modifying complex functions, consider splitting into smaller testable units.
 - Validate edge cases and potential null values proactively.
 - Prefer explicit naming over comments. Comments explain *why*, not *what*.
+- When a fix keeps a non-obvious compatibility, migration, alias, or fallback path alive, leave a short inline comment at that seam so the next reader understands why the branch still exists.
 
 ## Dead Code Prevention
 
@@ -27,6 +28,7 @@ description: Code quality, debugging, performance, and lifecycle (consolidated)
 - Verify proposed fixes for unintended side effects in related components.
 - Test execution is user-owned; identify smallest relevant command and wait for user feedback.
 - Prefer fixing the source of invalid data over generic null checks at the destination.
+- Root-cause fixes are not done until the durable repo context is updated as well: add a short note in the appropriate block evidence, governance context, or `docs/plaene/CHANGELOG.md`.
 
 ## Performance (Hot Path)
 

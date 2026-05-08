@@ -45,6 +45,7 @@ description: Plan governance, bot-training governance, and blocker reporting (co
 - Einzeln falls noetig: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`.
 - Abschluss eines Tasks oder einer Subphase mit Repo-Aenderungen ist erst uebergabefaehig, wenn Evidence und passender scoped Commit vorliegen.
 - Offene eigene Scope-Aenderungen nach bestandenem Gate gelten als Closure-Luecke; vor Abschluss committen oder den fehlenden Abschlussgrund explizit dokumentieren.
+- Nicht-offensichtliche Kompatibilitaets-, Migrations-, Alias- oder Fallback-Pfade brauchen vor Abschluss einen kurzen lokalen Why-Kommentar direkt am Code-Seam.
 - Abschluss-Notizen muessen den Commit fachlich erklaeren; reine Hash-/Message-Wiederholung reicht nicht.
 - Fuer Block-/Phasenarbeit gehoeren diese Notizen in die Evidence oder nach `docs/plaene/CHANGELOG.md`; fuer Governance-Slices in den passenden Doku-/Workflow-Kontext.
 - If scope includes dead-code or legacy cleanup, closure evidence must also name the replacement proof or the explicit retention reason.
