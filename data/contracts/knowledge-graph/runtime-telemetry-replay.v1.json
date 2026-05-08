@@ -1,0 +1,177 @@
+{
+  "contract": "knowledge-graph.runtime-telemetry-replay.v1",
+  "schema_version": 1,
+  "replay_id": "desktop-critical-runtime-telemetry",
+  "description": "Kompakte Replay-Fixtures fuer den Abgleich kritischer Desktop-Runtime-Telemetrie mit modellierten Wissensgraph-Flows.",
+  "fixtures": [
+    {
+      "id": "spawn-basic",
+      "critical_path": "spawn",
+      "telemetry": [
+        {
+          "step": 1,
+          "system": "runtime:entity-spawn-ops",
+          "event": "event:spawn",
+          "edge_type": "emits"
+        },
+        {
+          "step": 2,
+          "system": "runtime:spawn-placement-system",
+          "state": "state:spawn-context",
+          "edge_type": "reads_state"
+        }
+      ],
+      "expected": {
+        "events": [
+          "event:spawn"
+        ],
+        "systems": [
+          "runtime:entity-spawn-ops",
+          "runtime:spawn-placement-system"
+        ],
+        "states": [
+          "state:spawn-context"
+        ],
+        "configs": [
+          "config:gameplay-config-contract"
+        ],
+        "tests": [
+          "test:physics-core-spawn"
+        ],
+        "edges": [
+          {
+            "from": "runtime:entity-spawn-ops",
+            "to": "event:spawn",
+            "type": "emits"
+          },
+          {
+            "from": "runtime:spawn-placement-system",
+            "to": "state:spawn-context",
+            "type": "reads_state"
+          }
+        ]
+      }
+    },
+    {
+      "id": "combat-hit-basic",
+      "critical_path": "combat-hit",
+      "telemetry": [
+        {
+          "step": 1,
+          "system": "runtime:hunt-combat-system",
+          "state": "state:hunt-combat-lock-on",
+          "edge_type": "writes_state"
+        },
+        {
+          "step": 2,
+          "system": "runtime:projectile-hit-resolver",
+          "event": "event:hunt-damage",
+          "edge_type": "emits"
+        },
+        {
+          "step": 3,
+          "system": "runtime:mg-hit-resolver",
+          "event": "event:hunt-damage",
+          "edge_type": "emits"
+        }
+      ],
+      "expected": {
+        "events": [
+          "event:hunt-damage"
+        ],
+        "systems": [
+          "runtime:hunt-combat-system",
+          "runtime:mg-hit-resolver",
+          "runtime:projectile-hit-resolver"
+        ],
+        "states": [
+          "state:hunt-combat-lock-on"
+        ],
+        "configs": [
+          "config:entity-runtime-config",
+          "config:gameplay-config-contract"
+        ],
+        "tests": [
+          "test:physics-hunt-combat"
+        ],
+        "edges": [
+          {
+            "from": "runtime:hunt-combat-system",
+            "to": "state:hunt-combat-lock-on",
+            "type": "writes_state"
+          },
+          {
+            "from": "runtime:projectile-hit-resolver",
+            "to": "event:hunt-damage",
+            "type": "emits"
+          },
+          {
+            "from": "runtime:mg-hit-resolver",
+            "to": "event:hunt-damage",
+            "type": "emits"
+          }
+        ]
+      }
+    },
+    {
+      "id": "round-end-basic",
+      "critical_path": "round-end",
+      "telemetry": [
+        {
+          "step": 1,
+          "system": "runtime:round-outcome-system",
+          "event": "event:round-end",
+          "edge_type": "emits"
+        },
+        {
+          "step": 2,
+          "system": "runtime:round-end-coordinator",
+          "event": "event:round-end",
+          "edge_type": "consumes"
+        },
+        {
+          "step": 3,
+          "system": "runtime:round-end-coordinator",
+          "state": "state:round-end-overlay",
+          "edge_type": "writes_state"
+        }
+      ],
+      "expected": {
+        "events": [
+          "event:round-end"
+        ],
+        "systems": [
+          "runtime:round-end-coordinator",
+          "runtime:round-outcome-system"
+        ],
+        "states": [
+          "state:round-end-overlay",
+          "state:round-outcome"
+        ],
+        "configs": [
+          "config:gameplay-config-contract"
+        ],
+        "tests": [
+          "test:runtime-regressions-round-end"
+        ],
+        "edges": [
+          {
+            "from": "runtime:round-outcome-system",
+            "to": "event:round-end",
+            "type": "emits"
+          },
+          {
+            "from": "runtime:round-end-coordinator",
+            "to": "event:round-end",
+            "type": "consumes"
+          },
+          {
+            "from": "runtime:round-end-coordinator",
+            "to": "state:round-end-overlay",
+            "type": "writes_state"
+          }
+        ]
+      }
+    }
+  ]
+}

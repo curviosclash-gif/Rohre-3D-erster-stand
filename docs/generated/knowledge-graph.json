@@ -2082,7 +2082,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 19,
+          "concreteCount": 20,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -2199,7 +2199,7 @@
         ],
         "priority": "P2",
         "owner": "codex",
-        "currentPhase": "110.2",
+        "currentPhase": "110.3",
         "planFile": "docs/plaene/aktiv/V110.md",
         "scopeDeclarations": [
           ".agents/workflows/status.md",
@@ -2230,7 +2230,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 29,
+          "concreteCount": 30,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2280,7 +2280,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 115,
+          "concreteCount": 116,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -6175,7 +6175,7 @@
       "id": "V110.2",
       "type": "phase",
       "title": "Integritaet und Laufzeitabgleich",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.2"
@@ -17022,8 +17022,8 @@
     {
       "id": "V110.2.2",
       "type": "subphase",
-      "title": "Telemetrie-Replay-Fixtures fuer Spawn, Combat/Hit, Round-Ende anbinden und Abweichungsreport in `graph:check` integrieren.",
-      "status": "open",
+      "title": "Telemetrie-Replay-Fixtures fuer Spawn, Combat/Hit, Round-Ende anbinden und Abweichungsreport in `graph:check` integrieren. (abgeschlossen: 2026-05-08; evidence: Runtime-Replay-Contract `knowledge-graph.runtime-telemetry-replay.v1` deckt die drei kritischen Desktop-Pfade mit erwarteten Events, Systemen, States, Configs, Tests und Telemetrie-Schritten ab; `scripts/check-knowledge-graph.mjs` integriert den Abweichungsreport in `graph:check`; Contract-Test belegt Drift-Fehlercodes)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.2",
@@ -28715,6 +28715,23 @@
     },
     {
       "id": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/runtime-telemetry-replay.v1.json",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -97078,6 +97095,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/runtime-telemetry-replay.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "docs/generated/knowledge-graph.coverage.json",
       "type": "scope",
       "hint": null,
@@ -98366,6 +98392,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/runtime-telemetry-replay.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "docs/bot-training/Bot_Trainingsplan.md",
       "type": "scope",
       "hint": null,
@@ -98828,6 +98863,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/runtime-telemetry-replay.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {

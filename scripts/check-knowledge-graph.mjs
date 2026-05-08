@@ -17,6 +17,7 @@ const GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
 const PREDICATE_CONSTRAINTS_PATH = 'data/contracts/knowledge-graph/predicate-constraints.v1.json';
 const CONTRADICTIONS_PATH = 'data/contracts/knowledge-graph/contradictions.v1.json';
+const RUNTIME_TELEMETRY_REPLAY_PATH = 'data/contracts/knowledge-graph/runtime-telemetry-replay.v1.json';
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
 const BOT_TRAINING_MASTER_PATH = 'docs/bot-training/Bot_Trainingsplan.md';
 const ACTIVE_PLANS_DIR = 'docs/plaene/aktiv';
@@ -24,6 +25,9 @@ const PREDICATE_CONSTRAINTS_CONTRACT = 'knowledge-graph.predicate-constraints.v1
 const PREDICATE_CONSTRAINTS_SCHEMA_VERSION = 1;
 const CONTRADICTIONS_CONTRACT = 'knowledge-graph.contradictions.v1';
 const CONTRADICTIONS_SCHEMA_VERSION = 1;
+const RUNTIME_TELEMETRY_REPLAY_CONTRACT = 'knowledge-graph.runtime-telemetry-replay.v1';
+const RUNTIME_TELEMETRY_REPLAY_SCHEMA_VERSION = 1;
+const REQUIRED_RUNTIME_REPLAY_PATHS = Object.freeze(['spawn', 'combat-hit', 'round-end']);
 const REQUIRED_KNOWLEDGE_GRAPH_MAPPING_IDS = Object.freeze([
     'runtime-taxonomy',
     'desktop-critical-paths',
@@ -172,6 +176,11 @@ async function readPredicateConstraints() {
 
 async function readContradictionRules() {
     const raw = await fs.readFile(path.join(ROOT, CONTRADICTIONS_PATH), 'utf8');
+    return JSON.parse(raw);
+}
+
+async function readRuntimeTelemetryReplay() {
+    const raw = await fs.readFile(path.join(ROOT, RUNTIME_TELEMETRY_REPLAY_PATH), 'utf8');
     return JSON.parse(raw);
 }
 
@@ -552,6 +561,123 @@ function validateGraphContradictions(graph, contradictionRules, violations, warn
     }
 
     return warnings;
+}
+
+function buildEdgeKey(edge) {
+    return [
+        String(edge?.from || '').trim(),
+        String(edge?.to || '').trim(),
+        String(edge?.type || '').trim(),
+    ].join('::');
+}
+
+function addMissingReplayItems(violations, fixture, fieldName, expectedIds, actualIds) {
+    for (const expectedId of expectedIds) {
+        if (actualIds.has(expectedId)) continue;
+        addViolation(
+            violations,
+            'KG_TELEMETRY_REPLAY_MISMATCH',
+            `Replay ${fixture.id} (${fixture.critical_path}) erwartet ${fieldName} ${expectedId}, aber der Graph-Flow enthaelt ihn nicht`
+        );
+    }
+}
+
+function validateReplayTelemetrySteps(fixture, edgeKeySet, nodeById, violations) {
+    const telemetry = Array.isArray(fixture.telemetry) ? fixture.telemetry : [];
+    if (telemetry.length === 0) {
+        addViolation(violations, 'KG_TELEMETRY_REPLAY_EMPTY', `Replay ${fixture.id} enthaelt keine Telemetrie-Schritte`);
+        return;
+    }
+
+    for (const [index, step] of telemetry.entries()) {
+        const system = String(step?.system || '').trim();
+        const target = String(step?.event || step?.state || step?.config || step?.test || '').trim();
+        const edgeType = String(step?.edge_type || '').trim();
+        if (!system || !target || !edgeType) {
+            addViolation(violations, 'KG_TELEMETRY_REPLAY_STEP_INVALID', `Replay ${fixture.id} step[${index}] ist unvollstaendig`);
+            continue;
+        }
+        if (!nodeById.has(system)) {
+            addViolation(violations, 'KG_TELEMETRY_REPLAY_NODE_MISSING', `Replay ${fixture.id} referenziert unbekanntes System ${system}`);
+        }
+        if (!nodeById.has(target)) {
+            addViolation(violations, 'KG_TELEMETRY_REPLAY_NODE_MISSING', `Replay ${fixture.id} referenziert unbekanntes Ziel ${target}`);
+        }
+        const edgeKey = `${system}::${target}::${edgeType}`;
+        if (!edgeKeySet.has(edgeKey)) {
+            addViolation(violations, 'KG_TELEMETRY_REPLAY_EDGE_MISSING', `Replay ${fixture.id} step[${index}] findet keine Graph-Kante ${system} -> ${target} (${edgeType})`);
+        }
+    }
+}
+
+function validateRuntimeTelemetryReplay(graph, replayContract, violations) {
+    if (!replayContract || typeof replayContract !== 'object') {
+        addViolation(violations, 'KG_TELEMETRY_REPLAY_CONTRACT_MISSING', `Telemetry-Replay-Contract fehlt: ${RUNTIME_TELEMETRY_REPLAY_PATH}`);
+        return;
+    }
+
+    if (String(replayContract.contract || '').trim() !== RUNTIME_TELEMETRY_REPLAY_CONTRACT) {
+        addViolation(violations, 'KG_TELEMETRY_REPLAY_CONTRACT_UNSUPPORTED', `Telemetry-Replay-Contract unsupported: ${replayContract.contract || '<empty>'}`);
+        return;
+    }
+    if (Number(replayContract.schema_version) !== RUNTIME_TELEMETRY_REPLAY_SCHEMA_VERSION) {
+        addViolation(violations, 'KG_TELEMETRY_REPLAY_SCHEMA_UNSUPPORTED', `Telemetry-Replay schema_version unsupported: ${replayContract.schema_version}`);
+        return;
+    }
+
+    const fixtures = Array.isArray(replayContract.fixtures) ? replayContract.fixtures : [];
+    if (fixtures.length === 0) {
+        addViolation(violations, 'KG_TELEMETRY_REPLAY_FIXTURE_MISSING', 'Telemetry-Replay-Contract enthaelt keine Fixtures');
+        return;
+    }
+
+    const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
+    const edges = Array.isArray(graph.edges) ? graph.edges : [];
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const edgeKeySet = new Set(edges.map((edge) => buildEdgeKey(edge)));
+    const fixturesByPath = new Map();
+
+    for (const [index, rawFixture] of fixtures.entries()) {
+        const fixture = {
+            ...rawFixture,
+            id: String(rawFixture?.id || '').trim(),
+            critical_path: String(rawFixture?.critical_path || '').trim(),
+        };
+        if (!fixture.id || !fixture.critical_path || !fixture.expected || typeof fixture.expected !== 'object') {
+            addViolation(violations, 'KG_TELEMETRY_REPLAY_FIXTURE_INVALID', `Telemetry-Replay fixture[${index}] ist unvollstaendig`);
+            continue;
+        }
+        if (!fixturesByPath.has(fixture.critical_path)) fixturesByPath.set(fixture.critical_path, []);
+        fixturesByPath.get(fixture.critical_path).push(fixture.id);
+
+        const pathNodes = nodes.filter((node) => getCriticalPaths(node).includes(fixture.critical_path));
+        const actualByType = {
+            events: new Set(pathNodes.filter((node) => node.type === 'event').map((node) => node.id)),
+            systems: new Set(pathNodes.filter((node) => node.type === 'runtime').map((node) => node.id)),
+            states: new Set(pathNodes.filter((node) => node.type === 'state').map((node) => node.id)),
+            configs: new Set(pathNodes.filter((node) => node.type === 'config').map((node) => node.id)),
+            tests: new Set(pathNodes.filter((node) => node.type === 'test').map((node) => node.id)),
+        };
+
+        for (const fieldName of Object.keys(actualByType)) {
+            const expectedIds = normalizeTypeList(fixture.expected?.[fieldName]);
+            addMissingReplayItems(violations, fixture, fieldName, expectedIds, actualByType[fieldName]);
+        }
+
+        const expectedEdges = Array.isArray(fixture.expected?.edges) ? fixture.expected.edges : [];
+        for (const expectedEdge of expectedEdges) {
+            const edgeKey = buildEdgeKey(expectedEdge);
+            if (edgeKeySet.has(edgeKey)) continue;
+            addViolation(violations, 'KG_TELEMETRY_REPLAY_MISMATCH', `Replay ${fixture.id} erwartet Kante ${expectedEdge.from} -> ${expectedEdge.to} (${expectedEdge.type})`);
+        }
+
+        validateReplayTelemetrySteps(fixture, edgeKeySet, nodeById, violations);
+    }
+
+    for (const criticalPath of REQUIRED_RUNTIME_REPLAY_PATHS) {
+        if (fixturesByPath.has(criticalPath)) continue;
+        addViolation(violations, 'KG_TELEMETRY_REPLAY_PATH_MISSING', `Telemetry-Replay fehlt fuer kritischen Pfad ${criticalPath}`);
+    }
 }
 
 function validateCriticalDesktopMappings(graph, violations) {
@@ -952,13 +1078,14 @@ async function runChecks() {
     const violations = [];
     const warnings = [];
 
-    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock, predicateConstraints, contradictionRules] = await Promise.all([
+    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock, predicateConstraints, contradictionRules, runtimeTelemetryReplay] = await Promise.all([
         readExistingArtifact(GRAPH_PATH),
         readExistingArtifact(COVERAGE_PATH),
         buildKnowledgeGraphArtifacts(),
         readScopeOverlapAllowances(),
         readPredicateConstraints(),
         readContradictionRules(),
+        readRuntimeTelemetryReplay(),
     ]);
 
     const generatedGraphRaw = artifactToString(generatedArtifacts.graph);
@@ -975,6 +1102,7 @@ async function runChecks() {
     validateRuntimeMappingIntegrity(existingGraph.parsed, violations);
     validatePredicateConstraints(existingGraph.parsed, predicateConstraints, violations);
     validateGraphContradictions(existingGraph.parsed, contradictionRules, violations, warnings);
+    validateRuntimeTelemetryReplay(existingGraph.parsed, runtimeTelemetryReplay, violations);
     validateCriticalDesktopMappings(existingGraph.parsed, violations);
     ensureDependsTargetsExist(existingGraph.parsed, violations);
     detectHardDependsCycles(existingGraph.parsed, violations);
@@ -1019,6 +1147,7 @@ export {
     validateCriticalDesktopMappings,
     validateCoverageArtifact,
     validateGraphContradictions,
+    validateRuntimeTelemetryReplay,
     validatePredicateConstraints,
     validateRuntimeMappingIntegrity,
 };

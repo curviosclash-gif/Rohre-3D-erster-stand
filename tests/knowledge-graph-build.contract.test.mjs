@@ -23,6 +23,7 @@ import {
     validateGraphContradictions,
     validatePredicateConstraints,
     validateRuntimeMappingIntegrity,
+    validateRuntimeTelemetryReplay,
 } from '../scripts/check-knowledge-graph.mjs';
 import {
     queryCriticalPathHealth,
@@ -614,6 +615,79 @@ test('contradiction rules split critical failures from non-critical warnings', (
     assert.deepEqual(warnings.map((warning) => warning.code), [
         'KG_CONTRADICTION_DOMAIN_DRIFT',
     ]);
+});
+
+test('runtime telemetry replay fixtures report graph drift', () => {
+    const replay = {
+        contract: 'knowledge-graph.runtime-telemetry-replay.v1',
+        schema_version: 1,
+        fixtures: [
+            {
+                id: 'spawn-fixture',
+                critical_path: 'spawn',
+                telemetry: [
+                    {
+                        system: 'runtime:spawn-system',
+                        event: 'event:spawn',
+                        edge_type: 'emits',
+                    },
+                ],
+                expected: {
+                    events: ['event:spawn'],
+                    systems: ['runtime:spawn-system', 'runtime:missing-system'],
+                    states: ['state:spawn-context'],
+                    configs: [],
+                    tests: [],
+                    edges: [
+                        {
+                            from: 'runtime:spawn-system',
+                            to: 'event:spawn',
+                            type: 'emits',
+                        },
+                    ],
+                },
+            },
+        ],
+    };
+    const graph = {
+        nodes: [
+            {
+                id: 'runtime:spawn-system',
+                type: 'runtime',
+                attributes: {
+                    criticalPath: 'spawn',
+                },
+            },
+            {
+                id: 'event:spawn',
+                type: 'event',
+                attributes: {
+                    criticalPath: 'spawn',
+                },
+            },
+            {
+                id: 'state:spawn-context',
+                type: 'state',
+                attributes: {
+                    criticalPath: 'spawn',
+                },
+            },
+        ],
+        edges: [
+            {
+                from: 'runtime:spawn-system',
+                to: 'event:spawn',
+                type: 'emits',
+            },
+        ],
+    };
+
+    const violations = [];
+    validateRuntimeTelemetryReplay(graph, replay, violations);
+    const codes = violations.map((violation) => violation.code);
+
+    assert.ok(codes.includes('KG_TELEMETRY_REPLAY_MISMATCH'));
+    assert.ok(codes.includes('KG_TELEMETRY_REPLAY_PATH_MISSING'));
 });
 
 test('runtime mapping integrity reports orphan, missing validation and unknown references', () => {
