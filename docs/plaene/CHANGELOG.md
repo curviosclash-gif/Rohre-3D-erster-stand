@@ -381,6 +381,7 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `V107` ist im Master-Index geschlossen: `docs/plaene/aktiv/V107.md` steht auf `status: done`, `current_phase: 107.99`, und der Master spiegelt den Block jetzt unter den abgeschlossenen referenzierten Bloecken.
 - Die V107-Abhaengigkeiten fuer `V110` und `V111` sind im Master als erfuellt markiert; `V111` bleibt weiter durch `V110.99` gesperrt.
 - Abschluss-Evidence bleibt im Blockplan reproduzierbar: `graph:build`, `graph:check`, `plan:check`, `docs:sync`, `docs:check`, `gates:pre-commit` sowie die Kernqueries `critical-path-health`, `coverage-report` und `event-flow settings`.
+- Nachtrag: Die Zwischenphase `107.4` ist im Blockplan ebenfalls auf `done` gesetzt, weil `107.4.1` und `107.4.2` bereits mit Runtime-/Settings-Evidence abgeschlossen waren; der V107-Abschlussstand ist damit intern konsistent.
 
 ## Commit-Notizen 2026-05-06
 
