@@ -17,7 +17,7 @@
         },
         {
           "path": "src/core/GameDebugApi.js",
-          "changeCount": 8,
+          "changeCount": 9,
           "dirty": false
         },
         {
@@ -130,11 +130,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1807,
-    "rawCoveredFileCount": 1451,
+    "trackedFileCount": 1809,
+    "rawCoveredFileCount": 1453,
     "rawCoveragePercent": 80.3,
-    "adjustedTrackedFileCount": 1545,
-    "adjustedCoveredFileCount": 1311,
+    "adjustedTrackedFileCount": 1547,
+    "adjustedCoveredFileCount": 1313,
     "adjustedCoveragePercent": 84.9,
     "uncoveredFileCount": 356,
     "uncoveredActiveFileCount": 234,
@@ -178,8 +178,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 916,
-        "coveredCount": 901
+        "count": 918,
+        "coveredCount": 903
       },
       {
         "classification": "product-docs",
@@ -21281,7 +21281,7 @@
         {
           "blockId": "GIT-HISTORY-HOTSPOTS",
           "coverageSource": "git-history",
-          "changeCount": 8,
+          "changeCount": 9,
           "dirty": false
         }
       ]
@@ -29352,6 +29352,24 @@
       "excludeReason": null
     },
     {
+      "path": "src/state/validation/BotPlayAnalysisService.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V84",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/state/validation/BotValidationMatrix.js",
       "tracked": true,
       "coveredInCore": true,
@@ -32203,6 +32221,28 @@
     },
     {
       "path": "tests/audio.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/bot-play-analysis-runtime.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

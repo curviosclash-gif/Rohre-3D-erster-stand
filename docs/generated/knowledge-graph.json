@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 185,
+          "concreteCount": 186,
           "plannedCount": 0
         }
       }
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 448,
+          "concreteCount": 449,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2046,7 +2046,7 @@
       "id": "V107",
       "type": "block",
       "title": "Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer",
-      "status": "active",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2054,8 +2054,8 @@
           "master-index"
         ],
         "priority": "P2",
-        "owner": "codex",
-        "currentPhase": "107.5",
+        "owner": "frei",
+        "currentPhase": "107.99",
         "planFile": "docs/plaene/aktiv/V107.md",
         "scopeDeclarations": [
           ".agents/rules/token_efficiency_and_tools.md",
@@ -2212,7 +2212,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 110,
+          "concreteCount": 111,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2261,7 +2261,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 111,
+          "concreteCount": 112,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -3249,7 +3249,7 @@
           "src/state/**"
         ],
         "scopeResolution": {
-          "concreteCount": 261,
+          "concreteCount": 262,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3582,7 +3582,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 261,
+          "concreteCount": 262,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -49248,6 +49248,22 @@
       }
     },
     {
+      "id": "src/state/validation/BotPlayAnalysisService.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V84",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/state/validation/BotValidationMatrix.js",
       "type": "file",
       "title": null,
@@ -51770,6 +51786,26 @@
     },
     {
       "id": "tests/audio.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/bot-play-analysis-runtime.test.mjs",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -59403,6 +59439,15 @@
     {
       "from": "B13",
       "to": "tests/audio.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/bot-play-analysis-runtime.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -67864,6 +67909,15 @@
     {
       "from": "BT91",
       "to": "tests/audio.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "tests/bot-play-analysis-runtime.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97608,6 +97662,15 @@
     },
     {
       "from": "V110",
+      "to": "tests/bot-play-analysis-runtime.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "tests/bot-targeting.spec.js",
       "type": "scope",
       "hint": null,
@@ -98476,8 +98539,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "V110 haertet den Wissensgraphen erst nach Core-Claim aus V107",
+      "fulfilled": true,
+      "hint": "Core-Graph, Query-Layer, Coverage-Gate und Workflow-Spiegelung aus V107 sind abgeschlossen",
       "attributes": {
         "dependsPhase": "107.99",
         "rawToken": "V107.99",
@@ -98808,6 +98871,15 @@
     {
       "from": "V111",
       "to": "tests/audio.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "tests/bot-play-analysis-runtime.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -99711,8 +99783,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "V111 baut auf dem mehrschichtigen Graph-Core aus V107 auf",
+      "fulfilled": true,
+      "hint": "Mehrschichtiger Graph-Core aus V107 ist abgeschlossen; V110 bleibt als weitere Voraussetzung offen",
       "attributes": {
         "dependsPhase": "107.99",
         "rawToken": "V107.99",
@@ -119200,6 +119272,15 @@
     },
     {
       "from": "V84",
+      "to": "src/state/validation/BotPlayAnalysisService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
       "to": "src/state/validation/BotValidationMatrix.js",
       "type": "scope",
       "hint": null,
@@ -125302,6 +125383,15 @@
     {
       "from": "V91",
       "to": "src/state/training/TrainingPromotionPolicy.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/state/validation/BotPlayAnalysisService.js",
       "type": "scope",
       "hint": null,
       "attributes": {
