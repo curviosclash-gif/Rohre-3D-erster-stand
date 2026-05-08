@@ -1,0 +1,221 @@
+---
+id: V113
+title: Hangar Shell Productivierung und Rules Panel
+status: draft
+priority: P2
+owner: frei
+depends_on:
+  - V76.99
+  - V103.99
+planned_block_id: V113
+planned_plan_file: docs/plaene/aktiv/V113.md
+affected_area: desktop-hangar
+scope_files:
+  - src/ui/hangar/**
+  - src/ui/arcade/ArcadeMenuSurface.js
+  - src/ui/arcade/ArcadeVehicleManager.js
+  - src/ui/menu/**
+  - src/ui/start-setup/**
+  - src/shared/contracts/HangarModeContract.js
+  - src/shared/contracts/ArcadeHangarRulesContract.js
+  - src/shared/contracts/FightHangarBalanceContract.js
+  - src/entities/arcade/ArcadeBlueprintSchema.js
+  - src/state/arcade/ArcadeVehicleProfile.js
+  - tests/hangar-desktop-flow.contract.test.mjs
+  - tests/arcade-hangar-rules.contract.test.mjs
+verification:
+  - node --test tests/hangar-desktop-flow.contract.test.mjs tests/arcade-hangar-rules.contract.test.mjs
+  - npm run build
+  - npm run plan:check
+  - npm run docs:sync
+  - npm run docs:check
+created_at: 2026-05-07
+---
+
+# V113 Hangar Shell Productivierung und Rules Panel
+
+## Ziel
+
+Den in V76 definierten Desktop-Hangar aus dem Contract-only-Zustand in eine produktive Desktop-Oberflaeche ueberfuehren. Arcade und Fight sollen eine gemeinsame Hangar-Shell nutzen, aber weiterhin getrennte Regelvertraege, Datenraeume, Startpfade und Statusanzeigen behalten.
+
+Der wichtigste Produktnutzen ist: Der Spieler sieht im Hangar sofort, welches Fahrzeug aktiv ist, welche Regeln gelten, warum eine Auswahl erlaubt oder blockiert ist, und kann von dort nachvollziehbar in Werkstatt, Matchstart oder Menue wechseln.
+
+## Ausgangslage
+
+- V76 hat die Zielarchitektur abgeschlossen: `HangarModeContract`, `HangarShellLayoutContract`, `HangarLifecycleContract`, `HangarSelectionWritebackContract`, Arcade-/Fight-Regelvertraege und Workshop-Persistenzfassade existieren.
+- `HangarShellLayoutContract` meldet aber weiterhin `runtimeStatus: contract-only` und `activeProductSurface: src/ui/arcade/ArcadeMenuSurface.js`.
+- Produktiv sind Auswahl und Progression vor allem ueber `ArcadeMenuSurface`, `ArcadeVehicleManager`, Start-Setup und Menue-Bindings sichtbar.
+- Die Regelvertraege sind stark, aber im UI noch nicht als permanente Live-Erklaerung und Diagnostik angekommen.
+
+## Nicht-Ziele
+
+- Kein neuer Browser-Hauptpfad fuer Hangar oder Werkstatt.
+- Keine Vermischung von Arcade- und Fight-Datenraeumen.
+- Keine direkten Electron-Zugriffe aus Renderer-Code.
+- Kein paralleler neuer Persistenzpfad neben `HangarSelectionWritebackContract`.
+- Keine grosse Vehicle-Lab-Neuimplementierung; die Werkstatt wird in diesem Block nur sauber eingebettet und angebunden.
+
+## Architekturentscheidungen
+
+- Desktop-app-first: Der produktive Hangar ist eine Desktop-Renderer-Oberflaeche, kein Online-/Browser-Demo-Feature.
+- Reuse-first: Bestehende V76-Contracts bleiben Quelle fuer Mode, Navigation, Lifecycle, Writeback und Rules.
+- Neue Laufzeit-Shell: `src/ui/hangar/HangarShellSurface.js` oder ein gleichwertiger lokaler Modulzuschnitt rendert die bisher nur vertraglich beschriebenen Regionen.
+- Store-Fassade statt UI-Pfaddetails: Eine kleine `HangarSelectionStore`-Schicht kapselt Read/Write/Snapshot-Aufrufe, damit UI-Komponenten nicht direkt alle Settings-Pfade kennen.
+- Rules Panel als echtes Produktfeature: Arcade zeigt Progression/Gates/Budgets; Fight zeigt derived Stats, Hitbox-Band, Tier-Effekte und Exploit-Guard.
+- Legacy-Klassifikation: `ArcadeMenuSurface` bleibt zunaechst produktiver Compatibility-Pfad, wird aber als `legacy-with-replacement` fuer Hangar-nahe Aufgaben klassifiziert. Nachfolger ist die neue Hangar-Shell.
+
+## Risiko
+
+Risiko: mittel.
+
+- R1 | mittel | Eine neue Shell dupliziert versehentlich Start-Setup-/Menue-Writeback.
+- R2 | mittel | Arcade und Fight teilen UI, aber Regeln werden optisch oder logisch vermischt.
+- R3 | mittel | `ArcadeMenuSurface` bleibt dauerhaft halb-produktiver Hangar-Ersatz.
+- R4 | niedrig | Contract-Tests bleiben gruen, obwohl die neue Oberflaeche visuell nicht produktiv genug ist.
+- R5 | mittel | Werkstatt-Integration bleibt technisch als Modul beschrieben, aber im Nutzerfluss nicht erkennbar.
+
+## Definition of Done
+
+- [ ] DoD.1 Es gibt eine produktive Hangar-Shell unter `src/ui/hangar/**`, die die Contract-Regionen wirklich rendert.
+- [ ] DoD.2 Arcade und Fight teilen Shell-Komponenten, aber nicht Rule-Contract, Datenraum, Start-Event oder Statusdiagnostik.
+- [ ] DoD.3 Das Rules Panel erklaert live erlaubte, gesperrte und verletzte Build-Aspekte.
+- [ ] DoD.4 Map-/Vehicle-Auswahl nutzt weiterhin genau den gemeinsamen Writeback-Pfad.
+- [ ] DoD.5 Werkstatt, Matchstart und Menue-Rueckkehr laufen ueber den bestehenden Lifecycle-/Capability-Vertrag.
+- [ ] DoD.6 `HangarShellLayoutContract` ist nicht mehr `contract-only`, oder der verbleibende Compatibility-Status benennt klare Restnutzer und Delete-Kriterium.
+- [ ] DoD.7 Gezielte Contract- und leichte Desktop-Smoke-Verifikation belegen den produktiven Pfad.
+
+## Phasen
+
+### 113.1 Shell-Runtime-Schnitt und Mount-Pfad
+status: draft
+goal: Aus dem Shell-Contract eine echte produktive Oberflaeche machen
+output: Mountbare Hangar-Shell mit Mode, Snapshot und Actions
+
+- [ ] 113.1.1 Bestehende Hangar-Konsumenten final kartieren: `ArcadeMenuSurface`, Start-Setup, Menue-Bindings, `ArcadeVehicleManager`, Tests.
+- [ ] 113.1.2 `HangarShellSurface` mit klarer Init-/Update-/Dispose-Schnittstelle anlegen.
+- [ ] 113.1.3 Region-Renderer fuer Header, Vehicle Catalog, Vehicle Preview, Rules Panel, Loadout Panel, Action Bar und Status Bar erstellen.
+- [ ] 113.1.4 Mode-Wechsel nur ueber `resolveHangarMode()` und `resolveHangarShellLayout()` fuehren.
+- [ ] 113.1.5 Lifecycle-Cleanup sicherstellen: alle Listener und DOM-Referenzen werden beim Verlassen geloest.
+
+Evidence-Format:
+- `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result>)`
+
+### 113.2 Selection Store und Writeback-Kapselung
+status: draft
+goal: UI-Code von Settings-Pfaddetails entkoppeln
+output: Kleine Store-Fassade ueber dem bestehenden Writeback-Contract
+
+- [ ] 113.2.1 `HangarSelectionStore` oder aequivalente Fassade einfuehren, die Snapshot, Map-Write, Vehicle-Write und Active-Mode kapselt.
+- [ ] 113.2.2 Start-Setup- und Menue-Bindings schrittweise auf die Fassade umstellen, ohne Datenformat zu aendern.
+- [ ] 113.2.3 Mode-spezifisches Mirroring pruefen: aktive Auswahl spiegelt nach `settings.mapKey` und `settings.vehicles.*`, inaktive Auswahl bleibt isoliert.
+- [ ] 113.2.4 Favorite-/Recent-Listen weiter unter `settings.localSettings.startSetup` halten; keine zweite Listenquelle schaffen.
+- [ ] 113.2.5 Contract-Test fuer Snapshot- und Writeback-Verhalten erweitern.
+
+### 113.3 Arcade Rules Panel
+status: draft
+goal: Arcade-Progression und Build-Gates sichtbar und entscheidbar machen
+output: Live-Erklaerung fuer Level, Unlocks, Slots, Tiers und Budgets
+
+- [ ] 113.3.1 Arcade-Panel aus `ArcadeHangarRulesContract` speisen: Level-Band, Chassis-Gates, Slot-Gates, Part-Families, Tier-Gates.
+- [ ] 113.3.2 Budget-Anzeige fuer Editor, Masse, Power, Heat und Part-Anzahl einbauen.
+- [ ] 113.3.3 Ungueltige Blueprints nicht nur blockieren, sondern konkrete Gruende anzeigen.
+- [ ] 113.3.4 XP-/Mastery-Snapshot aus bestehender Arcade-Profile-Quelle anbinden.
+- [ ] 113.3.5 Tests fuer typische Levelgrenzen: Recruit, Veteran, Elite.
+
+### 113.4 Fight Rules Panel
+status: draft
+goal: Fight-Balance transparent und exploit-resistent darstellen
+output: Live-Erklaerung fuer Hitbox-Klasse, Tiers, derived Stats und Guard-Warnungen
+
+- [ ] 113.4.1 Fight-Panel aus `FightHangarBalanceContract` speisen: Hitbox-Klasse, Tiers, derived HP/Speed/Slots/MG.
+- [ ] 113.4.2 Direkte Stat-Overrides als UI-Warnung und Contract-Guard sichtbar machen.
+- [ ] 113.4.3 Tier-Aenderungen als Delta anzeigen, damit Spieler Tradeoffs versteht.
+- [ ] 113.4.4 Safety-Envelope fuer kompakt, standard und schwer anzeigen.
+- [ ] 113.4.5 Tests fuer Direct-Override-Block, Tier-Bounds und abgeleitete Werte erweitern.
+
+### 113.5 Werkstatt- und Action-Bar-Integration
+status: draft
+goal: Hangar, Werkstatt, Matchstart und Rueckkehr als einen Desktop-Loop fuehlbar machen
+output: Action-Bar mit interner Werkstattnavigation und sicheren Startaktionen
+
+- [ ] 113.5.1 Action-Bar an `HANGAR_NAV_EVENTS` und `HANGAR_CAPABILITY_IDS` anbinden.
+- [ ] 113.5.2 Werkstatt-Oeffnen und -Schliessen ueber `resolveHangarWorkshopViewSwitch()` fuehren.
+- [ ] 113.5.3 Matchstart nur nach gueltigem Selection-Snapshot und Rule-Status erlauben.
+- [ ] 113.5.4 Status-Bar fuer Save-State, Validierungswarnungen und letzten Writeback einbauen.
+- [ ] 113.5.5 Legacy-`window.open`-Status als Restpfad mit Nachfolger und Delete-Kriterium dokumentieren.
+
+### 113.6 Legacy-Abbau und Produktpfad-Umschaltung
+status: draft
+goal: Contract-only-Drift beseitigen und aktive Oberflaeche umschalten
+output: Neue Shell ist produktiver Hangar-Pfad; alte Arcade-Menue-Anteile sind eingegrenzt
+
+- [ ] 113.6.1 `HANGAR_SHELL_SURFACE_STATUS` aktualisieren: Produktstatus, aktive Surface und Restpfade.
+- [ ] 113.6.2 Main-Menu-/Start-Setup-Einstieg auf die neue Shell routen, soweit Desktop-Lifecycle dies zulaesst.
+- [ ] 113.6.3 `ArcadeMenuSurface`-Hangar-Anteile als Compatibility-Pfad markieren oder entfernen, wenn keine produktiven Konsumenten bleiben.
+- [ ] 113.6.4 Knowledge-Graph-/Architektur-Referenzen bei Intake oder Abschluss aktualisieren.
+- [ ] 113.6.5 Keine toten alternativen UI-Pfade ohne Besitzer stehen lassen.
+
+Legacy-Kandidaten:
+- `src/ui/arcade/ArcadeMenuSurface.js` Hangar-nahe Fahrzeug-/Mastery-Anteile
+  - Klassifikation: `legacy-with-replacement`
+  - Nachfolger: `src/ui/hangar/HangarShellSurface.js`
+  - Verbleibende Konsumenten: Arcade-Menue und Progressionsanzeige bis Umschaltung abgeschlossen ist
+  - Delete-Kriterium: Desktop-Hangar-Shell rendert Auswahl, Mastery und Action-Loop produktiv; Contract- und Smoke-Tests laufen auf neuem Pfad
+- `HANGAR_WORKSHOP_LEGACY_NAVIGATION.legacyMethod = window.open`
+  - Klassifikation: `legacy-with-replacement`
+  - Nachfolger: `internal-view-switch`
+  - Verbleibende Konsumenten: nur Contract-/Migrationshinweis
+  - Delete-Kriterium: keine Runtime- oder Testnutzung benoetigt den Legacy-Hinweis mehr
+
+### 113.7 Tests, Desktop-Smoke und Dokumentation
+status: draft
+goal: Produktiven Hangar-Pfad gezielt absichern
+output: Gruene Contract-Gates und leichte UI-Smokes
+
+- [ ] 113.7.1 `tests/hangar-desktop-flow.contract.test.mjs` fuer Shell-Status, Store-Fassade und Action-Bar erweitern.
+- [ ] 113.7.2 `tests/arcade-hangar-rules.contract.test.mjs` fuer UI-relevante Gate-Gruende erweitern.
+- [ ] 113.7.3 Fight-Balance-Contract-Test fuer Panel-Ausgaben und Guard-Codes ergaenzen oder bestehenden Hangar-Test erweitern.
+- [ ] 113.7.4 Leichten Desktop-Smoke fuer Oeffnen, Moduswechsel, Auswahl, Rule-Status, Werkstatt-Aktion und Rueckkehr definieren.
+- [ ] 113.7.5 Plan-/Docs-Status nach Intake synchronisieren.
+
+### 113.99 Abschluss-Gate
+status: draft
+goal: Produktive Hangar-Shell ohne Contract-only-Drift abschliessen
+output: Nachweisbarer Desktop-Hangar mit sauberem Regel- und Rueckschreibepfad
+
+- [ ] 113.99.1 `node --test tests/hangar-desktop-flow.contract.test.mjs tests/arcade-hangar-rules.contract.test.mjs` ist gruen.
+- [ ] 113.99.2 `npm run build` ist gruen.
+- [ ] 113.99.3 `npm run plan:check` ist gruen.
+- [ ] 113.99.4 Nach Intake: `npm run docs:sync && npm run docs:check` ist gruen.
+- [ ] 113.99.5 Abschlussnotiz in `docs/plaene/CHANGELOG.md` beschreibt Produktpfad, Legacy-Restpfade und Delete-Kriterien.
+
+## Dependencies
+
+Hard:
+- V76.99: Hangar-Contracts, Lifecycle, Writeback und Rule-Contracts muessen als Basis vorhanden sein.
+- V103.99: Settings-Domain und Persistenzpfad muessen stabil sein, damit die Store-Fassade keinen neuen Nebenpfad erzeugt.
+
+Soft:
+- V107.99: Knowledge-Graph-Ausbau hilft beim Drift-Abgleich, ist aber fuer die produktive Shell nicht zwingend.
+- V112: Spielaudit kann spaeter UX-/Playtest-Feedback liefern, sollte diesen Scope aber nicht blockieren.
+
+## Scope-Collision-Abgleich
+
+Graph-Query `scope-collisions --json` zeigt aktuell Kollisionen zwischen V107/V110/V111/V112 im Graph- und Testbereich, aber keine direkte Hangar-Scope-Kollision fuer diesen neuen Draft.
+
+## Dokumentationsimpact
+
+- `docs/Umsetzungsplan.md`: manueller Intake als neuer Block V113 empfohlen.
+- `docs/plaene/aktiv/V113.md`: kanonische Blockdatei nach Intake.
+- `docs/plaene/CHANGELOG.md`: Abschlussnotiz nach verifizierten Repo-Aenderungen.
+- `docs/generated/knowledge-graph.json`: nach Intake/Abschluss via Docs-/Graph-Sync aktualisieren.
+
+## Intake-Hinweis
+
+Ziel-Masterplan: `docs/Umsetzungsplan.md`
+
+Vorgeschlagene Block-ID: `V113`
+
+Vorgeschlagener kanonischer Plan: `docs/plaene/aktiv/V113.md`
+
+Manuelle Uebernahme erforderlich: Dieser Draft ist nur ein Intake-Entwurf unter `docs/plaene/neu/`. Der Master-Index und die aktive Blockdatei sollen erst nach User-Intake angepasst werden.
