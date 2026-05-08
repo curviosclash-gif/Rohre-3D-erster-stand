@@ -3,15 +3,6 @@ import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
 import { EDITOR_VIEW_PATHS } from '../../shared/contracts/EditorPathContract.js';
 import { normalizeShadowQuality } from '../../shared/contracts/ShadowQualityContract.js';
 import { PLATFORM_SURFACE_FEATURE_IDS } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
-import {
-    createDefaultRecordingCaptureSettings,
-    RECORDING_CAPTURE_PROFILE,
-    RECORDING_HUD_MODE,
-} from '../../shared/contracts/RecordingCaptureContract.js';
-import {
-    CAMERA_PERSPECTIVE_MODE,
-    createDefaultCameraPerspectiveSettings,
-} from '../../shared/contracts/CameraPerspectiveContract.js';
 import { GAMEPLAY_COCKPIT_CAMERA_ENABLED } from '../../shared/contracts/CameraModeContract.js';
 import { clamp } from '../../utils/MathOps.js';
 import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
@@ -19,12 +10,7 @@ import { bindMenuMultiplayerTransportButtons } from './MenuMultiplayerTransportB
 import { createRuntimeSettingsLimitsForRuntime } from '../../shared/contracts/SettingsRuntimeLimitsContract.js';
 import { bindMenuExtrasButtons } from './MenuExtrasBindings.js';
 import { bindArcadeGhostDuelModeSelect } from './MenuArcadeGhostDuelBindings.js';
-import {
-    readCameraPerspectiveIntensityFromSlider,
-    resolveNormalCameraPerspectiveLabel,
-    resolveRecordingHudLabel,
-    resolveRecordingProfileLabel,
-} from './MenuRecordingCameraBindingOps.js';
+import { bindMenuRecordingCameraControls } from './MenuRecordingCameraBindings.js';
 import {
     HANGAR_SELECTION_PLAYER_SLOTS,
     writeHangarMapSelection,
@@ -48,18 +34,6 @@ export function setupMenuGameplayBindings(ctx) {
     const fightMgDamageLimits = gameplayLimits.fightMgDamage;
     settings.cockpitCamera = { ...(settings.cockpitCamera && typeof settings.cockpitCamera === 'object' ? settings.cockpitCamera : {}), PLAYER_1: GAMEPLAY_COCKPIT_CAMERA_ENABLED, PLAYER_2: GAMEPLAY_COCKPIT_CAMERA_ENABLED };
     [ui.cockpitCamP1, ui.cockpitCamP2].forEach((toggle) => { if (toggle) { toggle.checked = GAMEPLAY_COCKPIT_CAMERA_ENABLED; toggle.disabled = true; } });
-    const ensureRecordingSettings = () => {
-        if (!settings.recording || typeof settings.recording !== 'object') {
-            settings.recording = createDefaultRecordingCaptureSettings();
-        }
-        return settings.recording;
-    };
-    const ensureCameraPerspectiveSettings = () => {
-        if (!settings.cameraPerspective || typeof settings.cameraPerspective !== 'object') {
-            settings.cameraPerspective = createDefaultCameraPerspectiveSettings();
-        }
-        return settings.cameraPerspective;
-    };
     const resolveCurrentHangarModePath = () => String(settings?.localSettings?.modePath || 'normal').trim().toLowerCase() || 'normal';
     const isFightModePathActive = () => resolveCurrentHangarModePath() === 'fight';
     const applyPlanarMode = (enabled) => {
@@ -434,103 +408,7 @@ export function setupMenuGameplayBindings(ctx) {
             queueInputSettingsChanged([keys.LOCAL_SHADOW_QUALITY]);
         });
     }
-    if (ui.recordingProfileSelect) {
-        bind(ui.recordingProfileSelect, 'change', () => {
-            const recordingSettings = ensureRecordingSettings();
-            const profile = String(ui.recordingProfileSelect.value || '').trim().toLowerCase();
-            recordingSettings.profile = profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
-                ? RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
-                : RECORDING_CAPTURE_PROFILE.STANDARD;
-            emitSettingsChangedImmediate([keys.RECORDING_PROFILE]);
-            emit(eventTypes.SHOW_STATUS_TOAST, {
-                message: `Recording-Profil: ${resolveRecordingProfileLabel(recordingSettings.profile)} (${resolveRecordingHudLabel(recordingSettings.hudMode)})`,
-                duration: 1300,
-                tone: 'info',
-            });
-        });
-    }
-    if (ui.recordingHudModeSelect) {
-        bind(ui.recordingHudModeSelect, 'change', () => {
-            const recordingSettings = ensureRecordingSettings();
-            const hudMode = String(ui.recordingHudModeSelect.value || '').trim().toLowerCase();
-            recordingSettings.hudMode = hudMode === RECORDING_HUD_MODE.WITH_HUD
-                ? RECORDING_HUD_MODE.WITH_HUD
-                : RECORDING_HUD_MODE.CLEAN;
-            emitSettingsChangedImmediate([keys.RECORDING_HUD_MODE]);
-            emit(eventTypes.SHOW_STATUS_TOAST, {
-                message: `Recording-HUD: ${resolveRecordingHudLabel(recordingSettings.hudMode)}`,
-                duration: 1300,
-                tone: 'info',
-            });
-        });
-    }
-    if (ui.normalCameraPerspectiveSelect) {
-        bind(ui.normalCameraPerspectiveSelect, 'change', () => {
-            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
-            const perspective = String(ui.normalCameraPerspectiveSelect.value || '').trim().toLowerCase();
-            if (perspective === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT) {
-                cameraPerspectiveSettings.normal = CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT;
-            } else if (perspective === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION) {
-                cameraPerspectiveSettings.normal = CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION;
-            } else {
-                cameraPerspectiveSettings.normal = CAMERA_PERSPECTIVE_MODE.CLASSIC;
-            }
-            emitSettingsChangedImmediate([keys.CAMERA_PERSPECTIVE_NORMAL]);
-            emit(eventTypes.SHOW_STATUS_TOAST, {
-                message: `Video-Perspektive: ${resolveNormalCameraPerspectiveLabel(cameraPerspectiveSettings.normal)}`,
-                duration: 1300,
-                tone: 'info',
-            });
-        });
-    }
-    if (ui.normalCameraReduceMotionToggle) {
-        bind(ui.normalCameraReduceMotionToggle, 'change', () => {
-            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
-            cameraPerspectiveSettings.reduceMotion = !!ui.normalCameraReduceMotionToggle.checked;
-            emitSettingsChangedImmediate([keys.CAMERA_PERSPECTIVE_REDUCE_MOTION]);
-            emit(eventTypes.SHOW_STATUS_TOAST, {
-                message: cameraPerspectiveSettings.reduceMotion
-                    ? 'Video-Perspektive: beruhigt'
-                    : 'Video-Perspektive: dynamisch',
-                duration: 1300,
-                tone: 'info',
-            });
-        });
-    }
-    if (ui.normalCameraSpeedFovToggle) {
-        bind(ui.normalCameraSpeedFovToggle, 'change', () => {
-            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
-            cameraPerspectiveSettings.speedFovEnabled = !!ui.normalCameraSpeedFovToggle.checked;
-            emitSettingsChangedImmediate([keys.CAMERA_PERSPECTIVE_SPEED_FOV_ENABLED]);
-        });
-    }
-    if (ui.normalCameraSpeedFovIntensitySlider) {
-        bind(ui.normalCameraSpeedFovIntensitySlider, 'input', () => {
-            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
-            cameraPerspectiveSettings.speedFovIntensity = readCameraPerspectiveIntensityFromSlider(
-                ui.normalCameraSpeedFovIntensitySlider,
-                cameraPerspectiveSettings.speedFovIntensity
-            );
-            queueInputSettingsChanged([keys.CAMERA_PERSPECTIVE_SPEED_FOV_INTENSITY]);
-        });
-    }
-    if (ui.normalCameraThrusterExhaustToggle) {
-        bind(ui.normalCameraThrusterExhaustToggle, 'change', () => {
-            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
-            cameraPerspectiveSettings.thrusterExhaustEnabled = !!ui.normalCameraThrusterExhaustToggle.checked;
-            emitSettingsChangedImmediate([keys.CAMERA_PERSPECTIVE_THRUSTER_EXHAUST_ENABLED]);
-        });
-    }
-    if (ui.normalCameraThrusterExhaustIntensitySlider) {
-        bind(ui.normalCameraThrusterExhaustIntensitySlider, 'input', () => {
-            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
-            cameraPerspectiveSettings.thrusterExhaustIntensity = readCameraPerspectiveIntensityFromSlider(
-                ui.normalCameraThrusterExhaustIntensitySlider,
-                cameraPerspectiveSettings.thrusterExhaustIntensity
-            );
-            queueInputSettingsChanged([keys.CAMERA_PERSPECTIVE_THRUSTER_EXHAUST_INTENSITY]);
-        });
-    }
+    bindMenuRecordingCameraControls(ctx);
 
     bind(ui.startButton, 'click', () => {
         emit(eventTypes.START_MATCH);

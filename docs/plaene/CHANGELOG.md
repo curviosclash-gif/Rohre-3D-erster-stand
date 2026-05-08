@@ -420,3 +420,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Neuer CLI-Pfad `npm run bot:analyze`: Der vorhandene Bot-Validation-Runner spielt konfigurierbare Szenarien, danach klassifiziert `scripts/bot-play-analysis.mjs` Survival-, Wand-/Trail-, Stuck-, Winrate- und Forced-Round-Signale zu priorisierten Tuning-Hinweisen.
 - Standardausgaben landen in `tmp/`; mit `--publish true` werden JSON/Markdown-Evidence nach `data/` und `docs/tests/` geschrieben.
 - Evidence: `npm run bot:analyze -- --skip-run true --source-json data/bot_validation_report.json --report-json tmp/bot-play-analysis-npm-test.json --report-md tmp/bot-play-analysis-npm-test.md`, `node --check scripts/bot-play-analysis.mjs` und `npm run plan:check` sind gruen.
+
+## Guard-Fix-Notiz 2026-05-08 (Pre-push max-lines)
+
+- Pre-push blockierte auf `lint:architecture`, weil `HeuristicBotPolicy` und `MenuGameplayBindings` den `max-lines`-Guard ueberschritten.
+- Fixpfad: Profil-/Observation-Helfer der Heuristik und Recording-/Kamera-Menuebinding wurden in schmale Nachbarmodule ausgelagert, ohne Runtime-Verhalten oder UI-Vertraege zu aendern.
+- Evidence: `npm run lint:architecture`, `node --test tests/heuristic-bot-survival-regression.test.mjs`, `npm run plan:check` und `npm run docs:check` sind gruen.
