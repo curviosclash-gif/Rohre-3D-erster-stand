@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+    handleQuickStartLastStartAction,
     handleSessionTypeChangeAction,
     resolveProductiveMultiplayerTransport,
 } from '../src/core/runtime/MenuRuntimeSessionService.js';
@@ -50,6 +51,34 @@ function createSessionSwitchGame(productSurfaceId = PLATFORM_PRODUCT_SURFACE_IDS
                     loadedDraft: false,
                     changedKeys: ['localSettings.sessionType', 'mode'],
                 };
+            },
+        },
+        uiManager: {
+            _runtimeFeatureFlags: {
+                surfacePolicy: {
+                    productSurfaceId,
+                },
+            },
+        },
+        _showStatusToast(message, duration, tone) {
+            calls.toasts.push({ message, duration, tone });
+        },
+    };
+    return { game, calls };
+}
+
+function createQuickStartGame(productSurfaceId = PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP) {
+    const calls = {
+        settingsChanged: [],
+        telemetry: [],
+        startMatch: 0,
+        toasts: [],
+    };
+    const game = {
+        settings: {
+            localSettings: {
+                sessionType: 'single',
+                modePath: 'normal',
             },
         },
         uiManager: {
@@ -122,4 +151,26 @@ test('handleSessionTypeChangeAction keeps desktop splitscreen instead of browser
     assert.equal(game.settings.mode, '2p');
     assert.equal(calls.settingsChanged.length, 1);
     assert.match(calls.toasts[0]?.message || '', /Splitscreen/);
+});
+
+test('handleQuickStartLastStartAction allows desktop default-full quickstart', () => {
+    const { game, calls } = createQuickStartGame(PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP);
+
+    handleQuickStartLastStartAction({
+        game,
+        onSettingsChanged(payload) {
+            calls.settingsChanged.push(payload);
+        },
+        recordMenuTelemetry(type, payload) {
+            calls.telemetry.push({ type, payload });
+        },
+        startMatch() {
+            calls.startMatch += 1;
+        },
+    });
+
+    assert.equal(game.settings.localSettings.modePath, 'quick_action');
+    assert.equal(calls.settingsChanged.length, 1);
+    assert.equal(calls.telemetry[0]?.type, 'quickstart');
+    assert.equal(calls.startMatch, 1);
 });

@@ -11,6 +11,7 @@ import {
     isSurfacePresetAllowed,
     resolveSurfaceBlockedFeatureFeedback,
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import { PLATFORM_PRODUCT_SURFACE_IDS } from '../../shared/contracts/PlatformCapabilityRegistry.js';
 
 function resolveMutationChangedKeys(result, fallbackKeys = []) {
     return Array.isArray(result?.changedKeys) && result.changedKeys.length > 0
@@ -80,6 +81,13 @@ export function handleConfigImportAction({
     }
 }
 
+function resolveProductSurfaceId(game) {
+    return String(
+        game?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId
+        || PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO
+    ).trim().toLowerCase();
+}
+
 export function applyMenuPresetAction({
     game,
     presetId,
@@ -92,8 +100,9 @@ export function applyMenuPresetAction({
         game._showStatusToast('Preset fehlt.', 1500, 'error');
         return;
     }
-    if (!isSurfacePresetAllowed(presetId)) {
-        const feedback = resolveSurfaceBlockedFeatureFeedback('Dieses Preset');
+    const productSurfaceId = resolveProductSurfaceId(game);
+    if (!isSurfacePresetAllowed(presetId, { productSurfaceId })) {
+        const feedback = resolveSurfaceBlockedFeatureFeedback('Dieses Preset', { productSurfaceId });
         game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
         return;
     }

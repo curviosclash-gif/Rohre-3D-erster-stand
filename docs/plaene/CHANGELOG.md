@@ -9,6 +9,7 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 ## Stand-Snapshot 2026-05-08
 
 - Splitscreen-Bugfix ausserhalb eines aktiven Blocks: `MenuRuntimeSessionService` prueft Session-Wechsel jetzt gegen die tatsaechliche Runtime-Surface der Desktop-App statt gegen den Browser-Demo-Default. Dadurch wird `splitscreen` im Desktop nicht mehr vor dem Matchstart auf `single` zurueckgebogen; der lokale 2P-Pfad kann wieder `mode=2p`, zwei lokale Spieler und zwei Kameras erzeugen. Gruen: `node --test tests/menu-runtime-session-service.contract.test.mjs`; `node --test tests/offline-session-compatibility.contract.test.mjs`.
+- Surface-Gate-Follow-up ausserhalb eines aktiven Blocks: Weitere Runtime-Actions im gleichen Muster wurden auf expliziten `productSurfaceId` umgestellt: Mode-/Map-Fallbacks, Quickstart-Aktionen und Preset-Apply. Damit behandeln Desktop-Default-Full-Pfade freie Quickstarts, nicht kuratierte Vollversions-Maps und eigene Presets nicht mehr versehentlich wie Browser-Demo-Restriktionen. Gruen: `node --test tests/menu-runtime-session-service.contract.test.mjs tests/menu-runtime-preset-config-service.contract.test.mjs`; `npm run plan:check`.
 
 ## Stand-Snapshot 2026-05-07
 
