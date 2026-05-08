@@ -1,6 +1,6 @@
 ﻿# Open Findings (Kanonische Nebenablage)
 
-Stand: 2026-05-04.
+Stand: 2026-05-08.
 Diese Datei ist die kanonische Ablage fuer offene Findings, Review-Reste und Audit-Follow-ups ausserhalb des kompakten Master-Index.
 
 ## Zuordnung nach Zielblock
@@ -20,7 +20,7 @@ Diese Datei ist die kanonische Ablage fuer offene Findings, Review-Reste und Aud
 | P7 | `vulkan_odyssey.js` | Precision-Plattformen (4x2 Einheiten) vermutlich unspielbar | hoch |
 | P12 | `CheckpointRingMeshFactory.js` | Material-Leak: jeder Checkpoint bekommt neues Material ohne Disposal | mittel |
 | P14 | `UIStartSyncController.js` | Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()`; nachhaltige Behebung ueber Ownership-/Port-Zuschnitt in `V104` | mittel |
-| P21 | `package.json`, `package-lock.json` | `npm audit` meldet 5 Befunde (2 high, 3 moderate); Dependency-Security als Draft `V90` vorbereitet | hoch |
+| P21 | `package.json`, `package-lock.json` | `npm audit --json` meldet noch 2 moderate Root-Befunde (`vite`/`esbuild`); V90 haelt den Major-Upgrade-Blocker und das Build-/Typecheck-Abschlussgate fest | mittel |
 | P22 | `tmp/`, `.codex_tmp/`, `assets/models/jets/cc0/spaceship_pack/dist/*` | Repo-Hygiene/Retention fuer gewichtige Artefakte offen | mittel |
 | P23 | `src/ui/menu/MenuExpertLoginRuntime.js` | Hartcodiertes Expertenpasswort `1307` darf nicht als Sicherheitsbarriere gelten | mittel |
 | P24 | `tests/playwright.global-setup.js`, `dev/scripts/verify-lock.mjs`, `scripts/run-playwright-*.mjs` | `spawn EPERM` blockiert weiter `test:contract`, `test:smoke`, `test:targeted` | hoch |

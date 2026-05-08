@@ -1,6 +1,6 @@
 # Bot Trainingsplan (Aktiver Master)
 
-Stand: 2026-04-29
+Stand: 2026-05-08
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
@@ -288,6 +288,7 @@ Mikro-Claim-Regel:
 
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
+| - | Operativer PPO-Claim | - | frei | Naechster claimbarer Block ist `BT93M`; aeltere active-Zeilen sind historische Legacy-/Trainingsfenster, keine aktuelle Claim-Quelle |
 | Train-Ops | BT10 | 2026-03-22 | active | 2026-03-22 |
 | Bot-Codex | BT11 | 2026-03-23 | frei | 2026-03-24 (abgeschlossen) |
 | Bot-Codex | BT12 | 2026-03-25 | active | 2026-03-25 |
@@ -296,7 +297,7 @@ Mikro-Claim-Regel:
 | Bot-B | BT30 | 2026-03-22 | frei | - |
 | Bot-C | BT40 | 2026-03-22 | frei | - |
 | - | BT73 | - | frei | Intake 2026-03-31 abgeschlossen; Claim nach BT20-/BT30-/BT40-Abstimmung |
-| Bot-Codex | BT80C | 2026-04-03 | active | 80.99 offen; 80.7-80.9 repo-technisch vorgezogen |
+| Bot-Codex | BT80C | 2026-04-03 | frei | Historischer Legacy-Validation-Kontext; keine operative PPO-Claim-Quelle |
 | Bot-Codex | BT90 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT91 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT92 | 2026-04-23 | frei | 2026-04-23 (abgeschlossen) |
@@ -810,7 +811,7 @@ Hinweis 2026-04-04 (V84-Folgeverbrauch): Die stabile Kandidaten-Validation fuer 
 ## Geplante Folgeleiter: BT90 PPO-Zweitpfad
 
 Diese Leiter integriert den Draft aus `docs/plaene/neu/BT90_GoldStandard/**` in kleine aktive BT-Bloecke.
-Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke geclaimt wird, laufen Lock, Evidence und Restpunktpflege ausschliesslich in diesem Master weiter.
+Wichtig: Der Draft-Ordner bleibt Referenz- und `source_history`-Material; operative `plan_file`-Wahrheit, Lock, Evidence und Restpunktpflege laufen ausschliesslich in diesem Master weiter.
 
 | id | titel | status | prio | depends_on | current_phase | quelle |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -825,10 +826,10 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93J | Root-Cause-Blocker-Repair | completed | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 + R2-Plananpassung 2026-04-26 | 93J.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
 | BT93K | Survival-First Objective Reset | completed | P2 | BT93J.99 (`diagnose-loop-required`) + User-Intake 2026-04-27 | 93K.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/plaene/neu/BT93K_Survival_First_Objective_Reset_2026-04-27.md` |
 | BT93L | Objective-Reachability und Survival-Task-Definition | completed | P1 | BT93K.99 (`diagnose-loop-required`) + Diagnosebericht 2026-04-28 | 93L.99 abgeschlossen; `diagnose-loop-required`, kein BT94A | `docs/bot-training/PPO_Diagnose_und_Neustartplan_2026-04-28.md` |
-| BT93M | Gate-Wahrheit und DQN-Same-Matrix-Anker | planned | P1 | BT93L.99 (`diagnose-loop-required`) + User-Intake 2026-04-29 | 93M.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
-| BT93N | DeathBefore60-Stability und Terminal-Root-Cause | planned | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
-| BT93O | Action-/Objective-Quality und Anti-Plateau | planned | P2 | BT93N.99 ohne `death-before60-still-blocking` | 93O.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
-| BT93P | PPO Trainingsleiter und BT94A-Reentry-Gate | planned | P2 | BT93O.99 + gruene Action-/Objective-/Anti-Plateau-Gates | 93P.1 | `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
+| BT93M | Gate-Wahrheit und DQN-Same-Matrix-Anker | planned | P1 | BT93L.99 (`diagnose-loop-required`) + User-Intake 2026-04-29 | 93M.1 | dieser Master; Quelle `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
+| BT93N | DeathBefore60-Stability und Terminal-Root-Cause | planned | P1 | BT93M.99 + Same-Matrix-DQN-Anker oder harter Loader-Blocker | 93N.1 | dieser Master; Quelle `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
+| BT93O | Action-/Objective-Quality und Anti-Plateau | planned | P2 | BT93N.99 ohne `death-before60-still-blocking` | 93O.1 | dieser Master; Quelle `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
+| BT93P | PPO Trainingsleiter und BT94A-Reentry-Gate | planned | P2 | BT93O.99 + gruene Action-/Objective-/Anti-Plateau-Gates | 93P.1 | dieser Master; Quelle `docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93P.4 (`BT94A-ready`) + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |

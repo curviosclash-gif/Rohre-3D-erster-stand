@@ -8,10 +8,13 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 
 ## Stand-Snapshot 2026-05-08 (Subphase `V110 110.1.1`)
 
+- Planlogik-Fix 2026-05-08: Master-Kopf und empfohlene Reihenfolge trennen jetzt aktiven Lock `V110 110.2` vom naechsten freien P1-Startpfad `V102 102.1`; `Open_Findings` spiegelt den aktuellen V90-Audit-Rest als 2 moderate Root-Befunde. `V105`/`V113` dokumentieren die breiten Scope-Overlaps enger, der aktive Planordner ist als aktive plus referenzierte Detailablage beschrieben, und der Bot-Trainingsplan markiert `BT93M` als operative PPO-Claim-Quelle statt alter Legacy-active-Zeilen.
 - V107 ist fachlich geschlossen; die Fortsetzung laeuft im entsperrten Folgeblock `V110`.
 - `110.1.1` ist abgeschlossen: `data/contracts/knowledge-graph/predicate-constraints.v1.json` versioniert Domain-/Range-/Layer-Constraints fuer produktive Mapping-Relationen, und `graph:check` validiert diese Constraints fail-fast gegen Mapping-Kanten.
+- `110.1.2` ist abgeschlossen: Mapping-Knoten und -Kanten tragen jetzt `file`/`line`/`commit`-Provenance aus den Contract-Dateien; `graph:check` stoppt fehlende Provenance, und die Kernqueries geben die Evidence fuer Incident- und Review-Pfade direkt aus. Der Block steht damit bei `110.2`.
 - Der frisch promovierte Folgeblock `V114` ist in den beidseitigen Scope-Overlap-Freigaben der betroffenen aktiven Bloecke nachgetragen, damit der Graph-Guard wieder zwischen erlaubter Planueberlappung und echter Kollision unterscheiden kann.
 - Der Slice schuetzt die V107-Graphbasis gegen semantisch falsche Kanten, ohne den Builder auf eine neue Graph-Datenbank oder breite Runtime-Aenderungen umzubauen.
+- V107-Nachzug: `round-end` liest jetzt explizit `config:gameplay-config-contract`, und `critical-path-health` prueft je Kernpfad die erwarteten Layer statt nur Runtime/Test. Damit ist der Abschluss-Claim Runtime/State/Config/Test auch fuer Round-End maschinell sichtbar.
 
 ## Stand-Snapshot 2026-05-08
 
