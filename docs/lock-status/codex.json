@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-09T13:26:23.326Z",
+  "timestamp": "2026-05-09T13:37:14.996Z",
   "locks": [
     {
       "block_id": "V103",
@@ -272,31 +272,6 @@
       "start_date": "2026-05-08",
       "target_completion": "2026-05-08",
       "status": "completed",
-      "notes": ""
-    },
-    {
-      "block_id": "V111",
-      "phase": "111.1.1",
-      "scope_files": [
-        "docs/generated/knowledge-graph.json",
-        "docs/generated/knowledge-graph.schema.json",
-        "scripts/build-knowledge-graph.mjs",
-        "scripts/check-knowledge-graph.mjs",
-        "scripts/query-knowledge-graph.mjs",
-        "scripts/export-knowledge-graph-view.mjs",
-        "tools/graph-viewer/index.html",
-        "tools/graph-viewer/viewer.js",
-        "tools/graph-viewer/viewer.css",
-        "data/contracts/knowledge-graph/",
-        "tests/",
-        "docs/referenz/ai_architecture_context.md",
-        ".agents/rules/token_efficiency_and_tools.md",
-        ".agents/workflows/status.md",
-        "docs/plaene/aktiv/V111.md"
-      ],
-      "start_date": "2026-05-09",
-      "target_completion": "2026-05-09",
-      "status": "in-progress",
       "notes": ""
     }
   ],
