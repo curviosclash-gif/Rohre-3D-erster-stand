@@ -6,6 +6,17 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-09 (Subphase `V110 110.4`)
+
+- `110.4.1` ist abgeschlossen: `data/contracts/knowledge-graph/query-ops.v1.json` versioniert Query-SLO-Profile fuer `desktop-local` und `ci-linux`, `scripts/check-knowledge-graph-slos.mjs` misst Kernqueries mit Warm-up plus 7 Samples, und `npm run graph:slo` ist als Regression-Gate verankert.
+- `110.4.2` ist abgeschlossen: `critical-path-health` und `change-risk` besitzen verlinkbare Failure-Playbooks mit Triggern, Triage-Queries, Recovery-Schritten und Exit-Kriterien. `change-risk` ist als Operator-Alias fuer den bestehenden Delta-Risikopfad in `scripts/query-knowledge-graph.mjs` verfuegbar.
+- Lokales Evidence-Signal: `node --test tests/knowledge-graph-build.contract.test.mjs` PASS; `npm run graph:slo` PASS mit `desktop-local` p95-Samples fuer Health, Change-Risk, Event-Flows und Settings-Impact. Der Block wechselt damit auf `110.99`.
+
+## Stand-Snapshot 2026-05-09 (Subphase `V110 110.99`)
+
+- `V110` ist abgeschlossen: Wissensgraph-Constraints, Provenance, Widerspruchserkennung, Telemetrie-Replay, Delta-Gates, Migrationspfad, Query-SLOs und Operator-Playbooks sind versioniert und gate-wirksam.
+- Abschluss-Gates gruen: `npm run graph:build`, `npm run graph:check`, `npm run graph:slo`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`. `V111` ist damit durch `V110.99` entsperrt.
+
 ## Stand-Snapshot 2026-05-08 (Subphase `V110 110.3`)
 
 - `110.3.1` ist abgeschlossen: `impact-diff` ist als Delta-Query fuer PR-/Commit-Sicht verfuegbar und reportet geaenderte Dateien, kritische Pfade, Runtime-Subgraph, Risikodateien und empfohlene Graph-Checks. Referenzdiffs sind reproduzierbar ueber explizite Dateiliste oder `--base <REF>`.

@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 188,
+          "concreteCount": 189,
           "plannedCount": 0
         }
       }
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 451,
+          "concreteCount": 452,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2082,7 +2082,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 21,
+          "concreteCount": 22,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -2190,7 +2190,7 @@
       "id": "V110",
       "type": "block",
       "title": "Wissensgraph Ops-, Guard- und Integritaets-Haertung",
-      "status": "active",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2198,8 +2198,8 @@
           "master-index"
         ],
         "priority": "P2",
-        "owner": "codex",
-        "currentPhase": "110.4",
+        "owner": "frei",
+        "currentPhase": "110.99",
         "planFile": "docs/plaene/aktiv/V110.md",
         "scopeDeclarations": [
           ".agents/workflows/status.md",
@@ -2221,18 +2221,22 @@
           "docs/plaene/aktiv/V96.md",
           "docs/plaene/aktiv/V99.md",
           "docs/plaene/CHANGELOG.md",
+          "docs/prozess/Dokumentationsstatus.md",
           "docs/prozess/Open_Findings.md",
           "docs/referenz/ai_architecture_context.md",
+          "docs/referenz/ai_project_onboarding.md",
+          "docs/referenz/architektur_ausfuehrlich.md",
           "docs/Umsetzungsplan.md",
           "package.json",
           "scripts/build-knowledge-graph.mjs",
+          "scripts/check-knowledge-graph-slos.mjs",
           "scripts/check-knowledge-graph.mjs",
           "scripts/migrate-knowledge-graph.mjs",
           "scripts/query-knowledge-graph.mjs",
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 33,
+          "concreteCount": 38,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2282,7 +2286,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 117,
+          "concreteCount": 118,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -6197,7 +6201,7 @@
       "id": "V110.4",
       "type": "phase",
       "title": "SLOs und Operator-Pfade",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.4"
@@ -6207,7 +6211,7 @@
       "id": "V110.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.99"
@@ -17057,8 +17061,8 @@
     {
       "id": "V110.4.1",
       "type": "subphase",
-      "title": "Query-SLO-Messung fuer Kernqueries in `desktop-local` und `ci-linux` etablieren; Regression-Gate mit Toleranzfenstern verankern.",
-      "status": "open",
+      "title": "Query-SLO-Messung fuer Kernqueries in `desktop-local` und `ci-linux` etablieren; Regression-Gate mit Toleranzfenstern verankern. (abgeschlossen: 2026-05-09; evidence: `data/contracts/knowledge-graph/query-ops.v1.json` fuehrt Profile und p95-Budgets fuer `critical-path-health`, `change-risk`, `event-flow`-Kernpfade und `impact-for-file`; `scripts/check-knowledge-graph-slos.mjs` misst mit Warm-up plus 7 Samples; `npm run graph:slo` PASS mit `desktop-local` p95: health 50.139ms, change-risk 31.05ms, spawn 23.477ms, combat-hit 17.515ms, round-end 10.116ms, impact-settings 23.02ms)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.4",
@@ -17068,8 +17072,8 @@
     {
       "id": "V110.4.2",
       "type": "subphase",
-      "title": "Failure-Playbooks fuer `critical-path-health` und `change-risk` schreiben, verlinken und mit Referenz-Incident testen.",
-      "status": "open",
+      "title": "Failure-Playbooks fuer `critical-path-health` und `change-risk` schreiben, verlinken und mit Referenz-Incident testen. (abgeschlossen: 2026-05-09; evidence: `query-ops.v1.json` enthaelt verlinkbare Playbooks fuer Health- und Change-Risk-Incidents; `scripts/query-knowledge-graph.mjs change-risk src/core/SettingsManager.js --json` liefert denselben Delta-Risikopfad als Operator-Alias; Contract-Test validiert Alias und Playbook-Pflichtfelder)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.4",
@@ -17079,8 +17083,8 @@
     {
       "id": "V110.99.1",
       "type": "subphase",
-      "title": "`npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen.",
-      "status": "open",
+      "title": "`npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-09; evidence: `npm run graph:build`, `npm run graph:check`, `npm run graph:slo`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.99",
@@ -17090,8 +17094,8 @@
     {
       "id": "V110.99.2",
       "type": "subphase",
-      "title": "Constraints, Provenance, Contradiction-Detection und Replay sind mit Referenzartefakten nachweisbar aktiv.",
-      "status": "open",
+      "title": "Constraints, Provenance, Contradiction-Detection und Replay sind mit Referenzartefakten nachweisbar aktiv. (abgeschlossen: 2026-05-09; evidence: `predicate-constraints.v1.json`, `contradictions.v1.json`, `runtime-telemetry-replay.v1.json`, Mapping-Provenance in `docs/generated/knowledge-graph.json` und `graph:check`-Validation)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.99",
@@ -17101,8 +17105,8 @@
     {
       "id": "V110.99.3",
       "type": "subphase",
-      "title": "Delta-Gates und Migrationspfad sind dokumentiert, reproduzierbar und mit mindestens einem Referenzfall belegt.",
-      "status": "open",
+      "title": "Delta-Gates und Migrationspfad sind dokumentiert, reproduzierbar und mit mindestens einem Referenzfall belegt. (abgeschlossen: 2026-05-09; evidence: `impact-diff`/`change-risk` liefern Settings-Referenzrisiko und empfohlene Checks; `schema-migrations.v1.json` plus `graph:migrate`-Pfad bleiben validiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.99",
@@ -17112,8 +17116,8 @@
     {
       "id": "V110.99.4",
       "type": "subphase",
-      "title": "SLO-Messungen (`desktop-local`, `ci-linux`) und Playbooks sind versioniert und im Workflow verankert.",
-      "status": "open",
+      "title": "SLO-Messungen (`desktop-local`, `ci-linux`) und Playbooks sind versioniert und im Workflow verankert. (abgeschlossen: 2026-05-09; evidence: `query-ops.v1.json` versioniert Profile, Budgets und Playbooks; `npm run graph:slo` PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V110",
         "phaseCode": "110.99",
@@ -28716,6 +28720,23 @@
       }
     },
     {
+      "id": "data/contracts/knowledge-graph/query-ops.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
       "type": "file",
       "title": null,
@@ -36120,6 +36141,7 @@
         "scopeBlocks": [
           "V107",
           "V109",
+          "V110",
           "V90"
         ],
         "exists": true
@@ -36450,6 +36472,7 @@
         "scopeBlocks": [
           "BT93K",
           "V107",
+          "V110",
           "V89",
           "V91"
         ],
@@ -36468,7 +36491,8 @@
         ],
         "scopeBlocks": [
           "BT93K",
-          "V107"
+          "V107",
+          "V110"
         ],
         "exists": true
       }
@@ -40655,6 +40679,25 @@
         "scopeBlocks": [
           "B13",
           "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/check-knowledge-graph-slos.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91",
+          "V110"
         ],
         "exists": true
       }
@@ -59489,6 +59532,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/check-knowledge-graph-slos.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/check-knowledge-graph.mjs",
       "type": "scope",
       "hint": null,
@@ -67969,6 +68021,15 @@
     {
       "from": "BT91",
       "to": "scripts/check-eslint-touched-strict.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "scripts/check-knowledge-graph-slos.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97143,6 +97204,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/query-ops.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
       "type": "scope",
       "hint": null,
@@ -98449,6 +98519,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/query-ops.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
       "type": "scope",
       "hint": null,
@@ -98629,6 +98708,15 @@
     },
     {
       "from": "V110",
+      "to": "docs/prozess/Dokumentationsstatus.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "docs/prozess/Open_Findings.md",
       "type": "scope",
       "hint": null,
@@ -98639,6 +98727,24 @@
     {
       "from": "V110",
       "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/referenz/ai_project_onboarding.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "docs/referenz/architektur_ausfuehrlich.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98666,6 +98772,15 @@
     {
       "from": "V110",
       "to": "scripts/build-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "scripts/check-knowledge-graph-slos.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98947,6 +99062,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/predicate-constraints.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/query-ops.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -100021,8 +100145,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "V111 setzt die Ops-/Guard-Haertung aus V110 voraus",
+      "fulfilled": true,
+      "hint": "Ops-/Guard-Haertung aus V110 ist abgeschlossen",
       "attributes": {
         "dependsPhase": "110.99",
         "rawToken": "V110.99",

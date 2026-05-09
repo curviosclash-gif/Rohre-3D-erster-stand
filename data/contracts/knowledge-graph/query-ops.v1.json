@@ -1,0 +1,175 @@
+{
+  "contract": "knowledge-graph.query-ops.v1",
+  "schema_version": 1,
+  "description": "Query-SLOs und Operator-Playbooks fuer kritische Wissensgraph-Abfragen.",
+  "profiles": [
+    {
+      "id": "desktop-local",
+      "measured_at": "2026-05-09",
+      "environment": "Windows desktop local Node.js gate runner",
+      "sample_count": 7
+    },
+    {
+      "id": "ci-linux",
+      "measured_at": "2026-05-09",
+      "environment": "CI Linux Node.js gate runner",
+      "sample_count": 7
+    }
+  ],
+  "regression_gate": {
+    "command": "npm run graph:slo",
+    "min_samples": 7,
+    "tolerance_percent": 75
+  },
+  "queries": [
+    {
+      "id": "critical-path-health",
+      "command": "node scripts/query-knowledge-graph.mjs critical-path-health --json",
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:critical-path-health",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 50,
+          "p95_ms": 90
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 75,
+          "p95_ms": 135
+        }
+      }
+    },
+    {
+      "id": "change-risk",
+      "command": "node scripts/query-knowledge-graph.mjs change-risk src/core/SettingsManager.js --json",
+      "sample_files": [
+        "src/core/SettingsManager.js"
+      ],
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:change-risk",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 30,
+          "p95_ms": 80
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 45,
+          "p95_ms": 120
+        }
+      }
+    },
+    {
+      "id": "event-flow-spawn",
+      "command": "node scripts/query-knowledge-graph.mjs event-flow spawn --json",
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:critical-path-health",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 25,
+          "p95_ms": 80
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 38,
+          "p95_ms": 120
+        }
+      }
+    },
+    {
+      "id": "event-flow-combat-hit",
+      "command": "node scripts/query-knowledge-graph.mjs event-flow combat-hit --json",
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:critical-path-health",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 8,
+          "p95_ms": 50
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 12,
+          "p95_ms": 75
+        }
+      }
+    },
+    {
+      "id": "event-flow-round-end",
+      "command": "node scripts/query-knowledge-graph.mjs event-flow round-end --json",
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:critical-path-health",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 25,
+          "p95_ms": 80
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 38,
+          "p95_ms": 120
+        }
+      }
+    },
+    {
+      "id": "impact-settings-manager",
+      "command": "node scripts/query-knowledge-graph.mjs impact-for-file src/core/SettingsManager.js --json",
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:change-risk",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 40,
+          "p95_ms": 72
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 60,
+          "p95_ms": 108
+        }
+      }
+    }
+  ],
+  "playbooks": [
+    {
+      "id": "critical-path-health",
+      "link": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:critical-path-health",
+      "trigger_codes": [
+        "KG_QUERY_SLO_MISSING",
+        "KG_QUERY_SLO_BUDGET_MISSING",
+        "KG_QUERY_SLO_GATE_INVALID",
+        "KG_CRITICAL_NODE_MISSING",
+        "KG_CRITICAL_EDGE_MISSING",
+        "KG_RUNTIME_VALIDATION_MISSING"
+      ],
+      "triage_queries": [
+        "node scripts/query-knowledge-graph.mjs critical-path-health --json",
+        "node scripts/query-knowledge-graph.mjs event-flow spawn --json",
+        "node scripts/query-knowledge-graph.mjs event-flow combat-hit --json",
+        "node scripts/query-knowledge-graph.mjs event-flow round-end --json",
+        "node scripts/query-knowledge-graph.mjs untested-systems --json"
+      ],
+      "recovery_steps": [
+        "Identify missing layer, validation edge or runtime node from critical-path-health output.",
+        "Repair the productive mapping contract in data/contracts/knowledge-graph before changing generated artifacts.",
+        "Run npm run graph:build, npm run graph:check and npm run graph:slo after the mapping repair."
+      ],
+      "exit_criteria": [
+        "critical-path-health reports status=ok for spawn, combat-hit, round-end and settings.",
+        "npm run graph:slo passes for the active profile.",
+        "No KG_CRITICAL_* or KG_RUNTIME_VALIDATION_MISSING violation remains."
+      ]
+    },
+    {
+      "id": "change-risk",
+      "link": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:change-risk",
+      "trigger_codes": [
+        "KG_QUERY_PLAYBOOK_MISSING",
+        "KG_QUERY_PLAYBOOK_INVALID",
+        "KG_QUERY_SLO_MISSING",
+        "KG_QUERY_SLO_BUDGET_MISSING"
+      ],
+      "triage_queries": [
+        "node scripts/query-knowledge-graph.mjs change-risk --json",
+        "node scripts/query-knowledge-graph.mjs impact-for-file src/core/SettingsManager.js --json",
+        "node scripts/query-knowledge-graph.mjs critical-path-health --json"
+      ],
+      "recovery_steps": [
+        "Review riskFiles and criticalPaths from change-risk before choosing follow-up checks.",
+        "For every reported critical path, run the recommended event-flow query and compare relation edges.",
+        "If risk is unexpected, repair coverage or mapping provenance, then rerun graph:build, graph:check and graph:slo."
+      ],
+      "exit_criteria": [
+        "change-risk returns the expected riskStatus for the changed file set.",
+        "Recommended checks include graph:build and graph:check plus event-flow checks for affected critical paths.",
+        "The SLO gate remains green for change-risk."
+      ]
+    }
+  ]
+}

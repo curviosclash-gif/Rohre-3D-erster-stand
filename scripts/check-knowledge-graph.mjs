@@ -22,6 +22,7 @@ const PREDICATE_CONSTRAINTS_PATH = 'data/contracts/knowledge-graph/predicate-con
 const CONTRADICTIONS_PATH = 'data/contracts/knowledge-graph/contradictions.v1.json';
 const RUNTIME_TELEMETRY_REPLAY_PATH = 'data/contracts/knowledge-graph/runtime-telemetry-replay.v1.json';
 const SCHEMA_MIGRATIONS_PATH = 'data/contracts/knowledge-graph/schema-migrations.v1.json';
+const QUERY_OPS_PATH = 'data/contracts/knowledge-graph/query-ops.v1.json';
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
 const BOT_TRAINING_MASTER_PATH = 'docs/bot-training/Bot_Trainingsplan.md';
 const ACTIVE_PLANS_DIR = 'docs/plaene/aktiv';
@@ -31,7 +32,12 @@ const CONTRADICTIONS_CONTRACT = 'knowledge-graph.contradictions.v1';
 const CONTRADICTIONS_SCHEMA_VERSION = 1;
 const RUNTIME_TELEMETRY_REPLAY_CONTRACT = 'knowledge-graph.runtime-telemetry-replay.v1';
 const RUNTIME_TELEMETRY_REPLAY_SCHEMA_VERSION = 1;
+const QUERY_OPS_CONTRACT = 'knowledge-graph.query-ops.v1';
+const QUERY_OPS_SCHEMA_VERSION = 1;
 const REQUIRED_RUNTIME_REPLAY_PATHS = Object.freeze(['spawn', 'combat-hit', 'round-end']);
+const REQUIRED_QUERY_SLO_PROFILES = Object.freeze(['desktop-local', 'ci-linux']);
+const REQUIRED_QUERY_SLO_IDS = Object.freeze(['critical-path-health', 'change-risk']);
+const REQUIRED_QUERY_PLAYBOOK_IDS = Object.freeze(['critical-path-health', 'change-risk']);
 const REQUIRED_KNOWLEDGE_GRAPH_MAPPING_IDS = Object.freeze([
     'runtime-taxonomy',
     'desktop-critical-paths',
@@ -190,6 +196,11 @@ async function readRuntimeTelemetryReplay() {
 
 async function readSchemaMigrations() {
     const raw = await fs.readFile(path.join(ROOT, SCHEMA_MIGRATIONS_PATH), 'utf8');
+    return JSON.parse(raw);
+}
+
+async function readQueryOpsContract() {
+    const raw = await fs.readFile(path.join(ROOT, QUERY_OPS_PATH), 'utf8');
     return JSON.parse(raw);
 }
 
@@ -689,6 +700,73 @@ function validateRuntimeTelemetryReplay(graph, replayContract, violations) {
     }
 }
 
+function validateQueryOpsContract(contract, violations) {
+    if (!contract || typeof contract !== 'object') {
+        addViolation(violations, 'KG_QUERY_OPS_CONTRACT_MISSING', `Query-Ops-Contract fehlt: ${QUERY_OPS_PATH}`);
+        return;
+    }
+
+    if (String(contract.contract || '').trim() !== QUERY_OPS_CONTRACT) {
+        addViolation(violations, 'KG_QUERY_OPS_CONTRACT_UNSUPPORTED', `Query-Ops-Contract unsupported: ${contract.contract || '<empty>'}`);
+        return;
+    }
+    if (Number(contract.schema_version) !== QUERY_OPS_SCHEMA_VERSION) {
+        addViolation(violations, 'KG_QUERY_OPS_SCHEMA_UNSUPPORTED', `Query-Ops schema_version unsupported: ${contract.schema_version}`);
+        return;
+    }
+
+    const profiles = Array.isArray(contract.profiles) ? contract.profiles : [];
+    const profileIds = new Set(profiles.map((profile) => String(profile?.id || '').trim()).filter(Boolean));
+    for (const profileId of REQUIRED_QUERY_SLO_PROFILES) {
+        if (!profileIds.has(profileId)) {
+            addViolation(violations, 'KG_QUERY_SLO_PROFILE_MISSING', `Query-SLO-Profil fehlt: ${profileId}; playbook=${QUERY_OPS_PATH}#playbook:critical-path-health`);
+        }
+    }
+
+    const queries = Array.isArray(contract.queries) ? contract.queries : [];
+    const queryById = new Map(queries.map((query) => [String(query?.id || '').trim(), query]));
+    for (const queryId of REQUIRED_QUERY_SLO_IDS) {
+        const query = queryById.get(queryId);
+        if (!query) {
+            addViolation(violations, 'KG_QUERY_SLO_MISSING', `Query-SLO fehlt: ${queryId}; playbook=${QUERY_OPS_PATH}#playbook:${queryId}`);
+            continue;
+        }
+        if (!String(query.command || '').trim()) {
+            addViolation(violations, 'KG_QUERY_SLO_COMMAND_MISSING', `Query-SLO ${queryId} hat kein Kommando`);
+        }
+        const budgets = query.profile_budgets && typeof query.profile_budgets === 'object'
+            ? query.profile_budgets
+            : {};
+        for (const profileId of REQUIRED_QUERY_SLO_PROFILES) {
+            const budget = budgets[profileId] || null;
+            if (!budget || Number(budget.p95_ms) <= 0 || Number(budget.baseline_p95_ms) <= 0) {
+                addViolation(violations, 'KG_QUERY_SLO_BUDGET_MISSING', `Query-SLO ${queryId} fehlt belastbares Budget fuer ${profileId}`);
+            }
+        }
+    }
+
+    const gate = contract.regression_gate || {};
+    if (!String(gate.command || '').trim() || Number(gate.min_samples) < 3 || Number(gate.tolerance_percent) < 0) {
+        addViolation(violations, 'KG_QUERY_SLO_GATE_INVALID', `Query-SLO Regression-Gate ist unvollstaendig; playbook=${QUERY_OPS_PATH}#playbook:critical-path-health`);
+    }
+
+    const playbooks = Array.isArray(contract.playbooks) ? contract.playbooks : [];
+    const playbookById = new Map(playbooks.map((playbook) => [String(playbook?.id || '').trim(), playbook]));
+    for (const playbookId of REQUIRED_QUERY_PLAYBOOK_IDS) {
+        const playbook = playbookById.get(playbookId);
+        if (!playbook) {
+            addViolation(violations, 'KG_QUERY_PLAYBOOK_MISSING', `Failure-Playbook fehlt: ${playbookId}`);
+            continue;
+        }
+        const triageQueries = Array.isArray(playbook.triage_queries) ? playbook.triage_queries : [];
+        const recoverySteps = Array.isArray(playbook.recovery_steps) ? playbook.recovery_steps : [];
+        const exitCriteria = Array.isArray(playbook.exit_criteria) ? playbook.exit_criteria : [];
+        if (!String(playbook.link || '').includes(`#playbook:${playbookId}`) || triageQueries.length === 0 || recoverySteps.length === 0 || exitCriteria.length === 0) {
+            addViolation(violations, 'KG_QUERY_PLAYBOOK_INVALID', `Failure-Playbook ${playbookId} ist nicht aus Check-Ausgaben verlinkbar oder operativ unvollstaendig`);
+        }
+    }
+}
+
 function validateCriticalDesktopMappings(graph, violations) {
     const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
     const edges = Array.isArray(graph.edges) ? graph.edges : [];
@@ -1087,7 +1165,7 @@ async function runChecks() {
     const violations = [];
     const warnings = [];
 
-    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock, predicateConstraints, contradictionRules, runtimeTelemetryReplay, schemaMigrations] = await Promise.all([
+    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock, predicateConstraints, contradictionRules, runtimeTelemetryReplay, schemaMigrations, queryOpsContract] = await Promise.all([
         readExistingArtifact(GRAPH_PATH),
         readExistingArtifact(COVERAGE_PATH),
         buildKnowledgeGraphArtifacts(),
@@ -1096,6 +1174,7 @@ async function runChecks() {
         readContradictionRules(),
         readRuntimeTelemetryReplay(),
         readSchemaMigrations(),
+        readQueryOpsContract(),
     ]);
 
     const generatedGraphRaw = artifactToString(generatedArtifacts.graph);
@@ -1114,6 +1193,7 @@ async function runChecks() {
     validateGraphContradictions(existingGraph.parsed, contradictionRules, violations, warnings);
     validateRuntimeTelemetryReplay(existingGraph.parsed, runtimeTelemetryReplay, violations);
     validateKnowledgeGraphMigrationContract(schemaMigrations, violations);
+    validateQueryOpsContract(queryOpsContract, violations);
     validateCriticalDesktopMappings(existingGraph.parsed, violations);
     ensureDependsTargetsExist(existingGraph.parsed, violations);
     detectHardDependsCycles(existingGraph.parsed, violations);
@@ -1159,6 +1239,7 @@ export {
     validateCoverageArtifact,
     validateGraphContradictions,
     validateRuntimeTelemetryReplay,
+    validateQueryOpsContract,
     validatePredicateConstraints,
     validateRuntimeMappingIntegrity,
 };

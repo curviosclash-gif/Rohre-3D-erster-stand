@@ -21,11 +21,13 @@ import {
     validateCriticalDesktopMappings,
     validateCoverageArtifact,
     validateGraphContradictions,
+    validateQueryOpsContract,
     validatePredicateConstraints,
     validateRuntimeMappingIntegrity,
     validateRuntimeTelemetryReplay,
 } from '../scripts/check-knowledge-graph.mjs';
 import {
+    queryChangeRisk,
     queryCriticalPathHealth,
     queryEventFlow,
     queryImpactDiff,
@@ -871,6 +873,95 @@ test('impact-diff reports changed runtime subgraphs and recommended delta checks
     assert.ok(result.subgraph.edges.some((edge) => edge.type === 'validated_by' && edge.to === 'test:settings-manager-contract'));
     assert.ok(result.recommendedChecks.includes('npm run graph:check'));
     assert.ok(result.recommendedChecks.some((command) => command.includes('event-flow settings')));
+});
+
+test('change-risk aliases impact-diff with operator playbook context', async () => {
+    const graph = await buildKnowledgeGraph();
+    const coverage = {
+        files: [
+            {
+                path: 'src/core/SettingsManager.js',
+                covered: true,
+                coveredInCore: true,
+                coveredByOverlay: false,
+                classification: 'product-code',
+                scopeBlocks: ['V103', 'V110'],
+                surfaces: [],
+            },
+        ],
+    };
+
+    const result = queryChangeRisk(graph, coverage, ['src/core/SettingsManager.js'], { baseRef: 'HEAD~1' });
+
+    assert.equal(result.query, 'change-risk');
+    assert.equal(result.sourceQuery, 'impact-diff');
+    assert.equal(result.riskStatus, 'review');
+    assert.ok(result.criticalPaths.includes('settings'));
+    assert.ok(result.recommendedChecks.some((command) => command.includes('event-flow settings')));
+});
+
+test('query ops contract requires SLO profiles and operator playbooks', () => {
+    const contract = {
+        contract: 'knowledge-graph.query-ops.v1',
+        schema_version: 1,
+        profiles: [
+            { id: 'desktop-local' },
+            { id: 'ci-linux' },
+        ],
+        regression_gate: {
+            command: 'npm run graph:slo',
+            min_samples: 7,
+            tolerance_percent: 75,
+        },
+        queries: [
+            {
+                id: 'critical-path-health',
+                command: 'node scripts/query-knowledge-graph.mjs critical-path-health --json',
+                profile_budgets: {
+                    'desktop-local': { baseline_p95_ms: 2, p95_ms: 25 },
+                    'ci-linux': { baseline_p95_ms: 3, p95_ms: 35 },
+                },
+            },
+            {
+                id: 'change-risk',
+                command: 'node scripts/query-knowledge-graph.mjs change-risk src/core/SettingsManager.js --json',
+                profile_budgets: {
+                    'desktop-local': { baseline_p95_ms: 4, p95_ms: 40 },
+                    'ci-linux': { baseline_p95_ms: 6, p95_ms: 55 },
+                },
+            },
+        ],
+        playbooks: [
+            {
+                id: 'critical-path-health',
+                link: 'data/contracts/knowledge-graph/query-ops.v1.json#playbook:critical-path-health',
+                triage_queries: ['node scripts/query-knowledge-graph.mjs critical-path-health --json'],
+                recovery_steps: ['repair mapping'],
+                exit_criteria: ['health ok'],
+            },
+            {
+                id: 'change-risk',
+                link: 'data/contracts/knowledge-graph/query-ops.v1.json#playbook:change-risk',
+                triage_queries: ['node scripts/query-knowledge-graph.mjs change-risk --json'],
+                recovery_steps: ['review riskFiles'],
+                exit_criteria: ['risk expected'],
+            },
+        ],
+    };
+    const violations = [];
+    validateQueryOpsContract(contract, violations);
+    assert.deepEqual(violations, []);
+
+    const broken = {
+        ...contract,
+        profiles: [{ id: 'desktop-local' }],
+        playbooks: [],
+    };
+    const brokenViolations = [];
+    validateQueryOpsContract(broken, brokenViolations);
+    const codes = brokenViolations.map((violation) => violation.code);
+    assert.ok(codes.includes('KG_QUERY_SLO_PROFILE_MISSING'));
+    assert.ok(codes.includes('KG_QUERY_PLAYBOOK_MISSING'));
 });
 
 test('knowledge graph schema migrations accept current v1 artifacts and reject missing current path', () => {

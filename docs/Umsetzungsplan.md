@@ -1,6 +1,6 @@
 ﻿# Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-08. Aktiver Lock: `V110 110.4`; naechster freier P1-Startpfad: `V102 102.1`.
+Stand: 2026-05-09. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V102 102.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -38,6 +38,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V100 | Runtime Rebuild-, Remount- und StartSync-Stabilisierung | done | P1 | frei | V92.99 | 100.99 | `docs/plaene/aktiv/V100.md` |
 | V108 | Arcade-Ghost Selbstduell (laengste Spur pro Route) | done | P2 | frei | V82.99 | 108.99 | `docs/plaene/aktiv/V108.md` |
 | V107 | Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer | done | P2 | frei | V94.99 | 107.99 | `docs/plaene/aktiv/V107.md` |
+| V110 | Wissensgraph Ops-, Guard- und Integritaets-Haertung | done | P2 | frei | V107.99 | 110.99 | `docs/plaene/aktiv/V110.md` |
 
 ### Abgeschlossene Bloecke (offener Abgleich vor Archivierung)
 
@@ -56,7 +57,6 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V112 | Spielaudit- und Playtest-Improvement-Paket | blocked | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
-| V110 | Wissensgraph Ops-, Guard- und Integritaets-Haertung | active | P2 | codex | V107.99 | 110.4 | `docs/plaene/aktiv/V110.md` |
 | V111 | Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz | planned | P2 | frei | V107.99,V110.99 | 111.1 | `docs/plaene/aktiv/V111.md` |
 | V113 | Hangar Shell Productivierung und Rules Panel | planned | P2 | frei | V76.99,V103.99 | 113.1 | `docs/plaene/aktiv/V113.md` |
 
@@ -84,7 +84,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V108 | V82.99 | hard | ja | Arcade-Parcours-/Ghost-/Leaderboard-Basis ist abgeschlossen |
 | V110 | V107.99 | hard | ja | Core-Graph, Query-Layer, Coverage-Gate und Workflow-Spiegelung aus V107 sind abgeschlossen |
 | V111 | V107.99 | hard | ja | Mehrschichtiger Graph-Core aus V107 ist abgeschlossen; V110 bleibt als weitere Voraussetzung offen |
-| V111 | V110.99 | hard | nein | V111 setzt die Ops-/Guard-Haertung aus V110 voraus |
+| V111 | V110.99 | hard | ja | Ops-/Guard-Haertung aus V110 ist abgeschlossen |
 | V112 | V102.99 | hard | nein | V112 startet erst nach Security-/Runtime-Hardening aus V102 |
 | V112 | V105.99 | hard | nein | V112 startet erst nach Guard-/Typecheck-Recovery aus V105 |
 | V113 | V76.99 | hard | ja | Hangar-Contracts und Shell-Zielbild aus V76 sind abgeschlossen |
@@ -117,19 +117,18 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
-| codex | V110 | 2026-05-08 | active | 110.4 SLOs und Operator-Pfade |
+| - | V110 | 2026-05-08 | closed | Abgeschlossen 2026-05-09 |
 | - | V111 | - | frei | Geplant |
 | - | V112 | - | blockiert | Wartet auf V102.99 und V105.99 |
 | - | V113 | - | frei | Geplant |
 
 ## Empfohlene Reihenfolge
 
-0. `V110` laeuft bereits als aktiver Codex-Lock; nicht als freier P1-Startpfad behandeln.
 1. `V102` (Security-/Runtime-/Contract-Hardening) als naechster freier P1-Startpfad.
 2. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), damit Produktgrenzen vor weiteren Release-/Playtest-Schnitten strukturell stabil sind.
 3. Danach `V105` (Guard-/Typecheck-Recovery), sobald `V102.99` erreicht ist.
 4. Danach `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
-5. Danach `V111` (Wissensgraph adaptive Diagnose- und Entscheidungsintelligenz), sobald `V110.99` erreicht ist.
+5. Danach `V111` (Wissensgraph adaptive Diagnose- und Entscheidungsintelligenz), jetzt durch `V110.99` entsperrt.
 6. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
 7. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
 8. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.

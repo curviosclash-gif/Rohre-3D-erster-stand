@@ -475,6 +475,15 @@ function queryImpactDiff(graph, coverage, changedFiles, { baseRef = null } = {})
     };
 }
 
+function queryChangeRisk(graph, coverage, changedFiles, { baseRef = null } = {}) {
+    const impact = queryImpactDiff(graph, coverage, changedFiles, { baseRef });
+    return {
+        ...impact,
+        query: 'change-risk',
+        sourceQuery: impact.query,
+    };
+}
+
 function queryEventFlow(graph, selector) {
     const normalizedSelector = String(selector || '').trim();
     const criticalPathFilter = normalizedSelector.startsWith('event:') ? '' : normalizeCriticalPathFilter(normalizedSelector);
@@ -835,6 +844,21 @@ function printText(result) {
         return;
     }
 
+    if (result.query === 'change-risk') {
+        process.stdout.write(`change-risk${result.baseRef ? ` base=${result.baseRef}` : ''}\n`);
+        process.stdout.write(`- changed files=${result.changedFileCount} risk=${result.riskStatus}\n`);
+        process.stdout.write(`- critical paths=${result.criticalPaths.join(', ') || 'none'}\n`);
+        if (result.riskFiles.length > 0) {
+            process.stdout.write('risk files\n');
+            for (const entry of result.riskFiles) {
+                process.stdout.write(`- ${entry.file} paths=${entry.criticalPaths.join('|') || 'none'} nodes=${entry.implementedNodeCount} edges=${entry.relationEdgeCount}\n`);
+            }
+        }
+        process.stdout.write(`- playbook=data/contracts/knowledge-graph/query-ops.v1.json#playbook:change-risk\n`);
+        process.stdout.write(`- checks=${result.recommendedChecks.join(' && ')}\n`);
+        return;
+    }
+
     if (result.query === 'event-flow') {
         process.stdout.write(`event-flow ${result.selector}\n`);
         const contextEdges = (result.contextEdges || [])
@@ -893,6 +917,7 @@ function usage() {
         + '  node scripts/query-knowledge-graph.mjs bt-status [BLOCK_ID] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs impact-for-file <FILE_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs impact-diff [--base <REF>] [FILE_PATH...] [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs change-risk [--base <REF>] [FILE_PATH...] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs event-flow <EVENT_ID|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs untested-systems [CRITICAL_PATH] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs critical-path-health [--json]\n'
@@ -901,6 +926,7 @@ function usage() {
 
 export {
     queryBtStatus,
+    queryChangeRisk,
     queryCoverageReport,
     queryCriticalPathHealth,
     queryEventFlow,
@@ -986,6 +1012,16 @@ if (isDirectRun) {
                 ? explicitFiles
                 : await readChangedFiles(baseRef || 'HEAD');
             result = queryImpactDiff(graph, coverage, changedFiles, { baseRef });
+        } else if (command === 'change-risk') {
+            const baseIndex = positional.indexOf('--base');
+            const baseRef = baseIndex >= 0 ? positional[baseIndex + 1] : null;
+            const explicitFiles = positional
+                .slice(1)
+                .filter((arg, index, args) => arg !== '--base' && args[index - 1] !== '--base');
+            const changedFiles = explicitFiles.length > 0
+                ? explicitFiles
+                : await readChangedFiles(baseRef || 'HEAD');
+            result = queryChangeRisk(graph, coverage, changedFiles, { baseRef });
         } else if (command === 'event-flow') {
             const selector = positional[1];
             if (!selector) {

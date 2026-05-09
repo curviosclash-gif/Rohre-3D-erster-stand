@@ -46,6 +46,7 @@
     "graph:build": "node scripts/build-knowledge-graph.mjs",
     "graph:check": "node scripts/check-knowledge-graph.mjs",
     "graph:migrate": "node scripts/migrate-knowledge-graph.mjs",
+    "graph:slo": "node scripts/check-knowledge-graph-slos.mjs",
     "graph:query": "node scripts/query-knowledge-graph.mjs",
     "parcours:check": "node scripts/check-parcours-routes.mjs",
     "scope:check": "node .agents/scripts/scope-validator.js",

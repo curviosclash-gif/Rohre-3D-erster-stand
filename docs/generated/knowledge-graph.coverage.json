@@ -130,11 +130,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1819,
-    "rawCoveredFileCount": 1463,
-    "rawCoveragePercent": 80.4,
-    "adjustedTrackedFileCount": 1557,
-    "adjustedCoveredFileCount": 1323,
+    "trackedFileCount": 1821,
+    "rawCoveredFileCount": 1465,
+    "rawCoveragePercent": 80.5,
+    "adjustedTrackedFileCount": 1559,
+    "adjustedCoveredFileCount": 1325,
     "adjustedCoveragePercent": 85,
     "uncoveredFileCount": 356,
     "uncoveredActiveFileCount": 234,
@@ -178,8 +178,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 926,
-        "coveredCount": 911
+        "count": 928,
+        "coveredCount": 913
       },
       {
         "classification": "product-docs",
@@ -4170,6 +4170,25 @@
     },
     {
       "path": "data/contracts/knowledge-graph/predicate-constraints.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/query-ops.v1.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -13897,6 +13916,7 @@
       "scopeBlocks": [
         "V107",
         "V109",
+        "V110",
         "V90"
       ],
       "surfaces": [],
@@ -14369,6 +14389,7 @@
       "scopeBlocks": [
         "BT93K",
         "V107",
+        "V110",
         "V89",
         "V91"
       ],
@@ -14389,7 +14410,8 @@
       ],
       "scopeBlocks": [
         "BT93K",
-        "V107"
+        "V107",
+        "V110"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -19277,6 +19299,27 @@
       "scopeBlocks": [
         "B13",
         "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/check-knowledge-graph-slos.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91",
+        "V110"
       ],
       "surfaces": [],
       "classification": "product-code",
