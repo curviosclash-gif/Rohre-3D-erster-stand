@@ -33,7 +33,10 @@ import {
     queryEventFlow,
     queryImpactDiff,
     queryImpactForFile,
+    queryIncidentAutoMinimize,
     queryQualityScorecard,
+    querySchemaLint,
+    queryTemporalAnomalies,
     queryUntestedSystems,
     queryWhatIfRemove,
     queryWhatIfReplace,
@@ -1081,6 +1084,51 @@ test('counterfactual queries expose blast radius and uncertainty budget for refe
     assert.ok(['low', 'medium', 'high'].includes(replace.uncertaintyBudget.tier));
 });
 
+test('adaptive diagnostics expose minimization, temporal anomalies and schema lint', async () => {
+    const graph = await buildKnowledgeGraph();
+    const coverage = buildCoverageArtifact(graph, ['src/core/SettingsManager.js'], null, null);
+    const scorecard = buildQualityScorecardArtifact(graph, coverage, [
+        {
+            id: 'previous',
+            source: 'fixture',
+            graphPath: 'docs/generated/knowledge-graph.json',
+            coveragePath: 'docs/generated/knowledge-graph.coverage.json',
+            score: 99,
+            status: 'pass',
+            metrics: {
+                adjustedCoveragePercent: 100,
+                coverageGateStatus: 'pass',
+                criticalPathOkPercent: 100,
+                mappedNodeValidationRatio: 0.4,
+            },
+        },
+    ]);
+    const driftingScorecard = {
+        ...scorecard,
+        trend: {
+            previousId: 'previous',
+            scoreDelta: -1.4,
+            direction: 'down',
+        },
+    };
+
+    const minimized = queryIncidentAutoMinimize(graph, coverage, ['src/core/SettingsManager.js']);
+    assert.equal(minimized.query, 'incident-auto-minimize');
+    assert.equal(minimized.status, 'review');
+    assert.ok(minimized.minimizedCandidates[0].criticalPaths.includes('settings'));
+    assert.ok(minimized.minimizedCandidates[0].recommendedChecks.some((command) => command.includes('why-not settings')));
+
+    const anomalies = queryTemporalAnomalies(driftingScorecard);
+    assert.equal(anomalies.query, 'temporal-anomalies');
+    assert.ok(['watch', 'review'].includes(anomalies.status));
+    assert.ok(anomalies.anomalies.some((entry) => entry.id === 'score-drift' || entry.id === 'score-drop'));
+
+    const lint = querySchemaLint(graph, coverage, scorecard);
+    assert.equal(lint.query, 'schema-lint');
+    assert.equal(lint.status, 'pass');
+    assert.equal(lint.summary.violationCount, 0);
+});
+
 test('query ops contract requires SLO profiles and operator playbooks', () => {
     const contract = {
         contract: 'knowledge-graph.query-ops.v1',
@@ -1111,6 +1159,22 @@ test('query ops contract requires SLO profiles and operator playbooks', () => {
                     'ci-linux': { baseline_p95_ms: 6, p95_ms: 55 },
                 },
             },
+            {
+                id: 'temporal-anomalies',
+                command: 'node scripts/query-knowledge-graph.mjs temporal-anomalies --json',
+                profile_budgets: {
+                    'desktop-local': { baseline_p95_ms: 2, p95_ms: 25 },
+                    'ci-linux': { baseline_p95_ms: 3, p95_ms: 35 },
+                },
+            },
+            {
+                id: 'schema-lint',
+                command: 'node scripts/query-knowledge-graph.mjs schema-lint --json',
+                profile_budgets: {
+                    'desktop-local': { baseline_p95_ms: 2, p95_ms: 25 },
+                    'ci-linux': { baseline_p95_ms: 3, p95_ms: 35 },
+                },
+            },
         ],
         playbooks: [
             {
@@ -1126,6 +1190,13 @@ test('query ops contract requires SLO profiles and operator playbooks', () => {
                 triage_queries: ['node scripts/query-knowledge-graph.mjs change-risk --json'],
                 recovery_steps: ['review riskFiles'],
                 exit_criteria: ['risk expected'],
+            },
+            {
+                id: 'adaptive-diagnostics',
+                link: 'data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-diagnostics',
+                triage_queries: ['node scripts/query-knowledge-graph.mjs schema-lint --json'],
+                recovery_steps: ['review adaptive diagnostics'],
+                exit_criteria: ['schema lint pass'],
             },
         ],
     };

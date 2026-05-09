@@ -504,3 +504,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `111.3.1` ist geschlossen: `export-view` ist der lokale Export-/Viewer-Handoff und nutzt standardmaessig `default-redacted` fuer PII-/Secret-aehnliche Schluessel und Werte.
 - Der rohe Auditpfad ist bewusst explizit: `--unsafe-raw` setzt `safety.mode=unsafe-raw` und ist in `query-ops.v1.json#playbook:export-view-safety` sowie im Architekturkontext als local-only Override dokumentiert.
 - Evidence: `node --test tests/knowledge-graph-query.contract.test.mjs`, `node --test --test-name-pattern "query ops contract|export-view" tests/knowledge-graph-build.contract.test.mjs tests/knowledge-graph-query.contract.test.mjs`, `npm run graph:build`, `npm run graph:check` und `npm run plan:check` sind gruen. Naechste V111-Subphase ist `111.3.2` fuer Scorecard, Counterfactuals und Uncertainty-Budget.
+
+## Stand-Snapshot 2026-05-09 (Subphase `V111 111.4.1`)
+
+- `111.4.1` ist geschlossen: `incident-auto-minimize`, `temporal-anomalies` und `schema-lint` sind als lokale Graph-Queries verfuegbar und im Playbook `adaptive-diagnostics` dokumentiert.
+- Der Settings-Referenzfall wird auf einen minimierten Kandidaten mit Root-Evidence und konkreten Folgechecks reduziert; die Scorecard-Drift wird als `watch` signalisiert, und Schema-Lint bleibt vor `graph:check` als schneller Shape-Check nutzbar.
+- Evidence: `node --test --test-name-pattern "adaptive diagnostics|query ops contract" tests/knowledge-graph-build.contract.test.mjs`, `node scripts/query-knowledge-graph.mjs incident-auto-minimize src/core/SettingsManager.js --json`, `node scripts/query-knowledge-graph.mjs temporal-anomalies --json`, `node scripts/query-knowledge-graph.mjs schema-lint --json` und `npm run graph:build` sind gruen. Naechste V111-Subphase ist `111.4.2` fuer Test-Prioritization, Policy-as-Data und Feedback-Loop.

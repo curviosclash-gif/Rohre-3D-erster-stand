@@ -2266,7 +2266,7 @@
         ],
         "priority": "P2",
         "owner": "codex",
-        "currentPhase": "111.3",
+        "currentPhase": "111.4",
         "planFile": "docs/plaene/aktiv/V111.md",
         "scopeDeclarations": [
           ".agents/rules/token_efficiency_and_tools.md",
@@ -17197,8 +17197,8 @@
     {
       "id": "V111.4.1",
       "type": "subphase",
-      "title": "Incident-Auto-Minimization, Temporal-Anomaly-Detection und Schema-Lint als dokumentierte Diagnose-/Gate-Pfade aktivieren.",
-      "status": "open",
+      "title": "Incident-Auto-Minimization, Temporal-Anomaly-Detection und Schema-Lint als dokumentierte Diagnose-/Gate-Pfade aktivieren. (abgeschlossen: 2026-05-09; evidence: `query-ops.v1.json#playbook:adaptive-diagnostics` dokumentiert Auto-Minimize, Temporal-Anomaly und Schema-Lint; `node scripts/query-knowledge-graph.mjs incident-auto-minimize src/core/SettingsManager.js --json` -> `candidateCount=1`, `status=review`, `confidenceScore=0.8`; `node scripts/query-knowledge-graph.mjs temporal-anomalies --json` -> `status=watch`, `score-drift`; `node scripts/query-knowledge-graph.mjs schema-lint --json` -> `status=pass`, `violationCount=0`; `node --test --test-name-pattern \"adaptive diagnostics|query ops contract\" tests/knowledge-graph-build.contract.test.mjs` gruen; `npm run graph:build` gruen)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.4",

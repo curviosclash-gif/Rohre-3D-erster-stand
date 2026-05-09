@@ -37,8 +37,8 @@ const QUERY_OPS_CONTRACT = 'knowledge-graph.query-ops.v1';
 const QUERY_OPS_SCHEMA_VERSION = 1;
 const REQUIRED_RUNTIME_REPLAY_PATHS = Object.freeze(['spawn', 'combat-hit', 'round-end']);
 const REQUIRED_QUERY_SLO_PROFILES = Object.freeze(['desktop-local', 'ci-linux']);
-const REQUIRED_QUERY_SLO_IDS = Object.freeze(['critical-path-health', 'change-risk']);
-const REQUIRED_QUERY_PLAYBOOK_IDS = Object.freeze(['critical-path-health', 'change-risk']);
+const REQUIRED_QUERY_SLO_IDS = Object.freeze(['critical-path-health', 'change-risk', 'temporal-anomalies', 'schema-lint']);
+const REQUIRED_QUERY_PLAYBOOK_IDS = Object.freeze(['critical-path-health', 'change-risk', 'adaptive-diagnostics']);
 const REQUIRED_KNOWLEDGE_GRAPH_MAPPING_IDS = Object.freeze([
     'runtime-taxonomy',
     'desktop-critical-paths',

@@ -1057,6 +1057,203 @@ function queryQualityScorecard(scorecard) {
     };
 }
 
+function queryIncidentAutoMinimize(graph, coverage, changedFiles, { baseRef = null } = {}) {
+    const impact = queryChangeRisk(graph, coverage, changedFiles, { baseRef, preset: 'incident' });
+    const candidates = (impact.riskFiles || [])
+        .map((riskFile) => {
+            const selector = riskFile.file;
+            const counterfactual = queryWhatIfRemove(graph, coverage, selector);
+            const topEdges = (riskFile.primaryImpactEdges || []).slice(0, 2);
+            const criticalPaths = Array.from(new Set([
+                ...(riskFile.criticalPaths || []),
+                ...(counterfactual.blastRadius?.criticalPaths || []),
+            ])).sort((left, right) => left.localeCompare(right));
+            const confidenceScore = Math.max(
+                0,
+                Math.min(1, 1 - Number(counterfactual.uncertaintyBudget?.score || 0))
+            );
+            return {
+                file: selector,
+                criticalPaths,
+                maxCausalScore: riskFile.maxCausalScore,
+                uncertaintyTier: counterfactual.uncertaintyBudget?.tier || 'unknown',
+                confidenceScore: Number(confidenceScore.toFixed(2)),
+                rootEvidence: topEdges.map((edge) => `${edge.from} -> ${edge.to} (${edge.type})`),
+                recommendedChecks: Array.from(new Set([
+                    `node scripts/query-knowledge-graph.mjs impact-for-file ${selector} --json`,
+                    ...criticalPaths.map((criticalPath) => `node scripts/query-knowledge-graph.mjs event-flow ${criticalPath} --json`),
+                    ...criticalPaths.map((criticalPath) => `node scripts/query-knowledge-graph.mjs why-not ${criticalPath} --json`),
+                ])),
+            };
+        })
+        .sort((left, right) => (
+            right.maxCausalScore - left.maxCausalScore
+            || right.confidenceScore - left.confidenceScore
+            || left.file.localeCompare(right.file)
+        ));
+
+    return {
+        query: 'incident-auto-minimize',
+        sourceQuery: impact.query,
+        baseRef,
+        changedFiles: impact.changedFiles,
+        candidateCount: candidates.length,
+        status: candidates.length > 0 ? 'review' : 'low',
+        minimizedCandidates: candidates.slice(0, 3),
+        recommendedChecks: Array.from(new Set([
+            'npm run graph:build',
+            'npm run graph:check',
+            ...candidates.slice(0, 3).flatMap((candidate) => candidate.recommendedChecks),
+        ])),
+    };
+}
+
+function queryTemporalAnomalies(scorecard) {
+    const current = scorecard?.current || {};
+    const history = Array.isArray(scorecard?.history) ? scorecard.history : [];
+    const previous = history.length > 0 ? history[history.length - 1] : null;
+    const scoreDelta = Number(scorecard?.trend?.scoreDelta ?? (previous ? current.score - previous.score : 0));
+    const anomalies = [];
+    if (String(current.status || '').trim() !== 'pass') {
+        anomalies.push({
+            id: 'scorecard-status',
+            severity: 'high',
+            signal: `current status is ${current.status || 'unknown'}`,
+        });
+    }
+    if (scoreDelta <= -1) {
+        anomalies.push({
+            id: 'score-drop',
+            severity: 'high',
+            signal: `score delta ${scoreDelta.toFixed(1)} is below -1.0`,
+        });
+    } else if (scoreDelta < 0) {
+        anomalies.push({
+            id: 'score-drift',
+            severity: 'medium',
+            signal: `score delta ${scoreDelta.toFixed(1)} is negative`,
+        });
+    }
+
+    const previousValidationRatio = Number(previous?.metrics?.mappedNodeValidationRatio);
+    const currentValidationRatio = Number(current?.metrics?.mappedNodeValidationRatio);
+    if (Number.isFinite(previousValidationRatio) && Number.isFinite(currentValidationRatio)) {
+        const ratioDelta = Number((currentValidationRatio - previousValidationRatio).toFixed(3));
+        if (ratioDelta < -0.05) {
+            anomalies.push({
+                id: 'validation-ratio-drop',
+                severity: 'medium',
+                signal: `mappedNodeValidationRatio delta ${ratioDelta} is below -0.05`,
+            });
+        }
+    }
+
+    return {
+        query: 'temporal-anomalies',
+        contract: scorecard?.contract || 'knowledge-graph.scorecard.v1',
+        current: {
+            id: current.id || 'current',
+            score: current.score ?? null,
+            status: current.status || 'unknown',
+        },
+        trend: scorecard?.trend || null,
+        previous: previous ? {
+            id: previous.id,
+            score: previous.score,
+            status: previous.status,
+        } : null,
+        status: anomalies.some((entry) => entry.severity === 'high') ? 'review' : anomalies.length > 0 ? 'watch' : 'ok',
+        anomalies,
+        recommendedChecks: [
+            'node scripts/query-knowledge-graph.mjs quality-scorecard --json',
+            'npm run graph:build',
+            'npm run graph:check',
+        ],
+    };
+}
+
+function querySchemaLint(graph, coverage, scorecard) {
+    const violations = [];
+    const warnings = [];
+    const nodes = Array.isArray(graph?.nodes) ? graph.nodes : [];
+    const edges = Array.isArray(graph?.edges) ? graph.edges : [];
+    const nodeIds = new Set(nodes.map((node) => String(node?.id || '').trim()).filter(Boolean));
+    const lintContract = (artifactName, artifact, expectedContract) => {
+        if (String(artifact?.contract || '').trim() !== expectedContract) {
+            violations.push({
+                code: 'KG_SCHEMA_CONTRACT_MISMATCH',
+                artifact: artifactName,
+                expected: expectedContract,
+                actual: artifact?.contract || null,
+            });
+        }
+        if (Number(artifact?.schema_version) !== 1) {
+            violations.push({
+                code: 'KG_SCHEMA_VERSION_UNSUPPORTED',
+                artifact: artifactName,
+                expected: 1,
+                actual: artifact?.schema_version ?? null,
+            });
+        }
+    };
+
+    lintContract('graph', graph, 'knowledge-graph.v1');
+    lintContract('coverage', coverage, 'knowledge-graph.coverage.v1');
+    lintContract('scorecard', scorecard, 'knowledge-graph.scorecard.v1');
+
+    for (const edge of edges) {
+        if (!nodeIds.has(edge.from) || !nodeIds.has(edge.to)) {
+            const finding = {
+                code: 'KG_SCHEMA_EDGE_ENDPOINT_MISSING',
+                edge: `${edge.from || '<empty>'} -> ${edge.to || '<empty>'} (${edge.type || '<empty>'})`,
+            };
+            if (edge.type === 'contains_subphase') {
+                warnings.push(finding);
+            } else {
+                violations.push(finding);
+            }
+        }
+        if (!String(edge?.type || '').trim()) {
+            violations.push({
+                code: 'KG_SCHEMA_EDGE_TYPE_MISSING',
+                edge: `${edge.from || '<empty>'} -> ${edge.to || '<empty>'}`,
+            });
+        }
+    }
+    for (const node of nodes) {
+        if (!String(node?.id || '').trim() || !String(node?.type || '').trim()) {
+            violations.push({
+                code: 'KG_SCHEMA_NODE_SHAPE_INVALID',
+                node: node?.id || '<empty>',
+            });
+        }
+    }
+    if (Array.isArray(coverage?.files) && coverage.files.length === 0) {
+        warnings.push({
+            code: 'KG_SCHEMA_COVERAGE_EMPTY',
+            message: 'coverage artifact has no files',
+        });
+    }
+
+    return {
+        query: 'schema-lint',
+        status: violations.length === 0 ? 'pass' : 'fail',
+        summary: {
+            nodeCount: nodes.length,
+            edgeCount: edges.length,
+            coverageFileCount: Array.isArray(coverage?.files) ? coverage.files.length : 0,
+            violationCount: violations.length,
+            warningCount: warnings.length,
+        },
+        violations,
+        warnings,
+        recommendedChecks: [
+            'npm run graph:build',
+            'npm run graph:check',
+        ],
+    };
+}
+
 function queryWhyNot(graph, selector) {
     const normalizedSelector = String(selector || '').trim();
     const { nodes, edges, nodeById } = buildGraphIndexes(graph);
@@ -1474,6 +1671,33 @@ function printText(result) {
         return;
     }
 
+    if (result.query === 'incident-auto-minimize') {
+        process.stdout.write(`incident-auto-minimize status=${result.status} candidates=${result.candidateCount}\n`);
+        for (const candidate of result.minimizedCandidates || []) {
+            process.stdout.write(`- ${candidate.file}: paths=${candidate.criticalPaths.join(',') || 'none'} confidence=${candidate.confidenceScore} uncertainty=${candidate.uncertaintyTier}\n`);
+        }
+        process.stdout.write(`- checks=${result.recommendedChecks.join(' && ')}\n`);
+        return;
+    }
+
+    if (result.query === 'temporal-anomalies') {
+        process.stdout.write(`temporal-anomalies status=${result.status} anomalies=${result.anomalies?.length || 0}\n`);
+        for (const anomaly of result.anomalies || []) {
+            process.stdout.write(`- [${anomaly.severity}] ${anomaly.id}: ${anomaly.signal}\n`);
+        }
+        process.stdout.write(`- checks=${result.recommendedChecks.join(' && ')}\n`);
+        return;
+    }
+
+    if (result.query === 'schema-lint') {
+        process.stdout.write(`schema-lint status=${result.status} violations=${result.summary?.violationCount ?? 0} warnings=${result.summary?.warningCount ?? 0}\n`);
+        for (const violation of result.violations || []) {
+            process.stdout.write(`- [${violation.code}] ${violation.artifact || violation.edge || violation.node || ''}\n`);
+        }
+        process.stdout.write(`- checks=${result.recommendedChecks.join(' && ')}\n`);
+        return;
+    }
+
     if (result.query === 'what-if-remove') {
         process.stdout.write(`what-if-remove ${result.selector} (${result.selectorType})\n`);
         process.stdout.write(`- nodes=${result.blastRadius.nodeCount} edges=${result.blastRadius.edgeCount} uncertainty=${result.uncertaintyBudget.tier}/${result.uncertaintyBudget.score}\n`);
@@ -1577,6 +1801,9 @@ function usage() {
         + '  node scripts/query-knowledge-graph.mjs impact-diff [--base <REF>] [--preset incident|review|balance|onboarding] [FILE_PATH...] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs change-risk [--base <REF>] [--preset incident|review|balance|onboarding] [FILE_PATH...] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs quality-scorecard [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs incident-auto-minimize [--base <REF>] [FILE_PATH...] [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs temporal-anomalies [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs schema-lint [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs what-if-remove <NODE_ID|FILE_PATH|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs what-if-replace <FROM_NODE_OR_FILE> <TO_NODE_OR_FILE> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs why-not <NODE_ID|CRITICAL_PATH> [--json]\n'
@@ -1598,10 +1825,13 @@ export {
     queryFilesForBlock,
     queryImpactDiff,
     queryImpactForFile,
+    queryIncidentAutoMinimize,
     queryOpenDeps,
     queryQualityScorecard,
+    querySchemaLint,
     queryScopeCollisions,
     querySurfacesForFile,
+    queryTemporalAnomalies,
     queryUntestedSystems,
     queryWhatIfRemove,
     queryWhatIfReplace,
@@ -1709,6 +1939,25 @@ if (isDirectRun) {
         } else if (command === 'quality-scorecard') {
             const scorecard = await readArtifact(SCORECARD_PATH);
             result = queryQualityScorecard(scorecard);
+        } else if (command === 'incident-auto-minimize') {
+            const baseIndex = positional.indexOf('--base');
+            const baseRef = baseIndex >= 0 ? positional[baseIndex + 1] : null;
+            const explicitFiles = positional
+                .slice(1)
+                .filter((arg, index, args) => (
+                    arg !== '--base'
+                    && args[index - 1] !== '--base'
+                ));
+            const changedFiles = explicitFiles.length > 0
+                ? explicitFiles
+                : await readChangedFiles(baseRef || 'HEAD');
+            result = queryIncidentAutoMinimize(graph, coverage, changedFiles, { baseRef });
+        } else if (command === 'temporal-anomalies') {
+            const scorecard = await readArtifact(SCORECARD_PATH);
+            result = queryTemporalAnomalies(scorecard);
+        } else if (command === 'schema-lint') {
+            const scorecard = await readArtifact(SCORECARD_PATH);
+            result = querySchemaLint(graph, coverage, scorecard);
         } else if (command === 'what-if-remove') {
             const selector = positional[1];
             if (!selector) {

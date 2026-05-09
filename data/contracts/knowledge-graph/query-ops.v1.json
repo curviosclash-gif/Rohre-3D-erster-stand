@@ -86,6 +86,54 @@
       }
     },
     {
+      "id": "incident-auto-minimize-settings",
+      "command": "node scripts/query-knowledge-graph.mjs incident-auto-minimize src/core/SettingsManager.js --json",
+      "sample_files": [
+        "src/core/SettingsManager.js"
+      ],
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-diagnostics",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 55,
+          "p95_ms": 110
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 83,
+          "p95_ms": 165
+        }
+      }
+    },
+    {
+      "id": "temporal-anomalies",
+      "command": "node scripts/query-knowledge-graph.mjs temporal-anomalies --json",
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-diagnostics",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 20,
+          "p95_ms": 60
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 30,
+          "p95_ms": 90
+        }
+      }
+    },
+    {
+      "id": "schema-lint",
+      "command": "node scripts/query-knowledge-graph.mjs schema-lint --json",
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-diagnostics",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 25,
+          "p95_ms": 75
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 38,
+          "p95_ms": 113
+        }
+      }
+    },
+    {
       "id": "what-if-remove-settings",
       "command": "node scripts/query-knowledge-graph.mjs what-if-remove src/core/SettingsManager.js --json",
       "sample_files": [
@@ -302,6 +350,31 @@
         "Counterfactual output includes blastRadius, recommendedChecks and uncertaintyBudget.",
         "Affected critical paths are explicit and reproducible for the reference Settings case.",
         "No removal proceeds without replacement evidence for validation or guardrail edges."
+      ]
+    },
+    {
+      "id": "adaptive-diagnostics",
+      "link": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-diagnostics",
+      "trigger_codes": [
+        "KG_QUERY_PLAYBOOK_INVALID",
+        "KG_SCHEMA_CONTRACT_MISMATCH",
+        "KG_SCHEMA_EDGE_ENDPOINT_MISSING",
+        "SCORECARD_DIFF"
+      ],
+      "triage_queries": [
+        "node scripts/query-knowledge-graph.mjs incident-auto-minimize src/core/SettingsManager.js --json",
+        "node scripts/query-knowledge-graph.mjs temporal-anomalies --json",
+        "node scripts/query-knowledge-graph.mjs schema-lint --json"
+      ],
+      "recovery_steps": [
+        "Use incident-auto-minimize to reduce changed files to the smallest critical-path evidence set.",
+        "Use temporal-anomalies before accepting scorecard drift after a graph contract or mapping change.",
+        "Use schema-lint as the fast shape check before graph:check when schema drift is suspected."
+      ],
+      "exit_criteria": [
+        "Auto-minimization names reproducible candidate files, root evidence and checks for the incident slice.",
+        "Temporal anomaly output is ok/watch with any review signal documented before merge.",
+        "Schema-lint reports status=pass before generated artifacts are treated as stable."
       ]
     }
   ]
