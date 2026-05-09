@@ -2,8 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+    applyGraphSafetyFilter,
     queryBtStatus,
     queryCoverageReport,
+    queryExportView,
     queryFilesForBlock,
     queryOpenDeps,
     queryUncoveredFiles,
@@ -254,4 +256,59 @@ test('queryBtStatus summarizes BT block progress', () => {
     assert.equal(detail.block.openDependencyCount, 1);
     assert.equal(detail.block.scopeFileCount, 1);
     assert.equal(detail.block.doneSubphaseCount, 1);
+});
+
+test('export-view redacts PII and secrets by default with explicit raw override', () => {
+    const sensitiveGraph = {
+        contract: 'knowledge-graph.v1',
+        schema_version: 1,
+        generated_at: '2026-05-09T12:00:00.000Z',
+        nodes: [
+            {
+                id: 'runtime:sensitive',
+                type: 'runtime',
+                attributes: {
+                    ownerEmail: 'ops@example.com',
+                    apiToken: 'ghp_1234567890abcdefghijklmnop',
+                    note: 'handoff to ops@example.com',
+                },
+            },
+        ],
+        edges: [],
+    };
+    const coverage = {
+        summary: {},
+        gate: { status: 'pass' },
+    };
+
+    const safe = queryExportView(sensitiveGraph, coverage);
+    assert.equal(safe.safety.mode, 'default-redacted');
+    assert.equal(safe.safety.redactionApplied, true);
+    assert.equal(safe.nodes[0].attributes.ownerEmail, '[REDACTED:pii]');
+    assert.equal(safe.nodes[0].attributes.apiToken, '[REDACTED:secret]');
+    assert.equal(safe.nodes[0].attributes.note, '[REDACTED:pii]');
+    assert.deepEqual(safe.safety.redactedFields, ['apiToken', 'note', 'ownerEmail']);
+
+    const raw = queryExportView(sensitiveGraph, coverage, { unsafeRaw: true });
+    assert.equal(raw.safety.mode, 'unsafe-raw');
+    assert.equal(raw.safety.redactionApplied, false);
+    assert.equal(raw.nodes[0].attributes.ownerEmail, 'ops@example.com');
+    assert.equal(raw.nodes[0].attributes.apiToken, 'ghp_1234567890abcdefghijklmnop');
+});
+
+test('graph safety filter redacts nested sensitive values without changing raw override payload', () => {
+    const payload = {
+        query: 'fixture',
+        nested: {
+            credential: 'local-secret',
+            contact: 'reviewer@example.com',
+        },
+    };
+
+    const safe = applyGraphSafetyFilter(payload);
+    const raw = applyGraphSafetyFilter(payload, { unsafeRaw: true });
+
+    assert.equal(safe.nested.credential, '[REDACTED:secret]');
+    assert.equal(safe.nested.contact, '[REDACTED:pii]');
+    assert.equal(raw.nested.credential, 'local-secret');
 });

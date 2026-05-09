@@ -115,6 +115,12 @@ const QUERY_INTENT_PRESETS = Object.freeze({
         includeOnboardingFlow: true,
     },
 });
+const SECRET_ATTRIBUTE_PATTERN = /(api[-_]?key|auth|credential|password|secret|token)/i;
+const PII_ATTRIBUTE_PATTERN = /(email|phone|person|user[-_]?name)/i;
+const EMAIL_VALUE_PATTERN = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i;
+const SECRET_VALUE_PATTERN = /\b(?:sk|ghp|pat|xox[baprs]|AKIA)[A-Za-z0-9_-]{12,}\b/;
+const REDACTED_SECRET_VALUE = '[REDACTED:secret]';
+const REDACTED_PII_VALUE = '[REDACTED:pii]';
 
 function normalizePath(value) {
     return String(value || '')
@@ -122,6 +128,81 @@ function normalizePath(value) {
         .replace(/\\/g, '/')
         .replace(/^\.\/+/, '')
         .replace(/\/{2,}/g, '/');
+}
+
+function shouldRedactKey(key) {
+    const normalized = String(key || '').trim();
+    return SECRET_ATTRIBUTE_PATTERN.test(normalized) || PII_ATTRIBUTE_PATTERN.test(normalized);
+}
+
+function redactStringValue(value) {
+    if (EMAIL_VALUE_PATTERN.test(value)) {
+        return REDACTED_PII_VALUE;
+    }
+    if (SECRET_VALUE_PATTERN.test(value)) {
+        return REDACTED_SECRET_VALUE;
+    }
+    return value;
+}
+
+function redactForGraphSafety(value, audit, currentKey = '') {
+    if (value == null) return value;
+    if (Array.isArray(value)) {
+        return value.map((entry) => redactForGraphSafety(entry, audit, currentKey));
+    }
+    if (typeof value === 'object') {
+        const redacted = {};
+        for (const [key, entry] of Object.entries(value)) {
+            if (shouldRedactKey(key)) {
+                audit.redactedFields.add(key);
+                redacted[key] = SECRET_ATTRIBUTE_PATTERN.test(key) ? REDACTED_SECRET_VALUE : REDACTED_PII_VALUE;
+                continue;
+            }
+            redacted[key] = redactForGraphSafety(entry, audit, key);
+        }
+        return redacted;
+    }
+    if (typeof value === 'string') {
+        const redacted = redactStringValue(value);
+        if (redacted !== value) {
+            audit.redactedFields.add(currentKey || '<value>');
+        }
+        return redacted;
+    }
+    return value;
+}
+
+function applyGraphSafetyFilter(payload, { unsafeRaw = false } = {}) {
+    if (unsafeRaw) {
+        return {
+            ...payload,
+            safety: {
+                mode: 'unsafe-raw',
+                redactionApplied: false,
+                override: {
+                    flag: '--unsafe-raw',
+                    reason: 'Explicit local audit override requested by the operator.',
+                },
+            },
+        };
+    }
+
+    const audit = {
+        redactedFields: new Set(),
+    };
+    const redactedPayload = redactForGraphSafety(payload, audit);
+    return {
+        ...redactedPayload,
+        safety: {
+            mode: 'default-redacted',
+            redactionApplied: audit.redactedFields.size > 0,
+            redactedFields: Array.from(audit.redactedFields).sort((left, right) => left.localeCompare(right)),
+            override: {
+                flag: '--unsafe-raw',
+                reason: 'Local-only raw export for incident audit; do not commit or share raw output.',
+            },
+        },
+    };
 }
 
 function hasSource(node, sourceTag) {
@@ -443,6 +524,28 @@ function queryCoverageReport(coverage) {
         overlayBlocks: Array.isArray(coverage.overlayBlocks) ? coverage.overlayBlocks : [],
         gate: coverage.gate || null,
     };
+}
+
+function queryExportView(graph, coverage, { unsafeRaw = false } = {}) {
+    const { nodes, edges } = buildGraphIndexes(graph);
+    const payload = {
+        query: 'export-view',
+        contract: graph.contract || null,
+        schemaVersion: graph.schema_version ?? null,
+        generatedAt: graph.generated_at || null,
+        summary: graph.summary || {
+            nodeCount: nodes.length,
+            edgeCount: edges.length,
+        },
+        coverage: {
+            summary: coverage.summary || {},
+            gate: coverage.gate || null,
+        },
+        nodes,
+        edges,
+    };
+
+    return applyGraphSafetyFilter(payload, { unsafeRaw });
 }
 
 function queryUncoveredFiles(coverage, prefix = '') {
@@ -1227,6 +1330,16 @@ function printText(result) {
             const counts = entry.counts;
             process.stdout.write(`- ${entry.criticalPath}: ${entry.status} runtime=${counts.runtime} event=${counts.event} state=${counts.state} config=${counts.config} test=${counts.test} missingValidation=${entry.missingValidation.length}\n`);
         }
+        return;
+    }
+
+    if (result.query === 'export-view') {
+        process.stdout.write(`export-view safety=${result.safety?.mode || 'unknown'} redacted=${result.safety?.redactionApplied === true}\n`);
+        process.stdout.write(`- nodes=${result.summary?.nodeCount ?? result.nodes?.length ?? 0} edges=${result.summary?.edgeCount ?? result.edges?.length ?? 0}\n`);
+        process.stdout.write(`- coverage gate=${result.coverage?.gate?.status || 'unknown'}\n`);
+        if (Array.isArray(result.safety?.redactedFields) && result.safety.redactedFields.length > 0) {
+            process.stdout.write(`- redacted fields=${result.safety.redactedFields.join(', ')}\n`);
+        }
     }
 }
 
@@ -1248,15 +1361,18 @@ function usage() {
         + '  node scripts/query-knowledge-graph.mjs event-flow <EVENT_ID|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs untested-systems [CRITICAL_PATH] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs critical-path-health [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs export-view [--unsafe-raw] [--json]\n'
     );
 }
 
 export {
+    applyGraphSafetyFilter,
     queryBtStatus,
     queryChangeRisk,
     queryCoverageReport,
     queryCriticalPathHealth,
     queryEventFlow,
+    queryExportView,
     queryFilesForBlock,
     queryImpactDiff,
     queryImpactForFile,
@@ -1275,7 +1391,8 @@ const isDirectRun = process.argv[1]
 if (isDirectRun) {
     const args = process.argv.slice(2);
     const jsonOutput = args.includes('--json');
-    const positional = args.filter((arg) => arg !== '--json');
+    const unsafeRaw = args.includes('--unsafe-raw');
+    const positional = args.filter((arg) => arg !== '--json' && arg !== '--unsafe-raw');
     const command = positional[0];
 
     if (!command) {
@@ -1382,6 +1499,8 @@ if (isDirectRun) {
             result = queryUntestedSystems(graph, positional[1] || '');
         } else if (command === 'critical-path-health') {
             result = queryCriticalPathHealth(graph);
+        } else if (command === 'export-view') {
+            result = queryExportView(graph, coverage, { unsafeRaw });
         } else {
             usage();
             process.exit(1);

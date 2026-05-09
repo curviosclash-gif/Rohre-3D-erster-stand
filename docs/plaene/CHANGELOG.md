@@ -493,3 +493,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `111.2` ist geschlossen: Kritische Runtime-Knoten tragen jetzt Owner-/Stability-Metadaten, und `impact-diff`/`change-risk` geben diese zusammen mit ADR-/Issue-/PR-Handoff-Artefakten und Explainability-Treibern aus.
 - Die Presets `incident`, `review`, `balance` und `onboarding` steuern reproduzierbar die empfohlenen Folgechecks; `change-risk` nutzt `incident` als Default, waehrend `impact-diff` weiterhin mit `balance` startet.
 - Evidence: `npm run graph:build`, `npm run graph:check`, fokussierte Graph-Contract-Tests fuer Runtime-Queries/Presets sowie `change-risk --preset incident src/core/SettingsManager.js --json` sind gruen. Naechste V111-Subphase ist `111.3` fuer Safety, Scorecard und What-if-Analyse.
+
+## Stand-Snapshot 2026-05-09 (Subphase `V111 111.3.1`)
+
+- `111.3.1` ist geschlossen: `export-view` ist der lokale Export-/Viewer-Handoff und nutzt standardmaessig `default-redacted` fuer PII-/Secret-aehnliche Schluessel und Werte.
+- Der rohe Auditpfad ist bewusst explizit: `--unsafe-raw` setzt `safety.mode=unsafe-raw` und ist in `query-ops.v1.json#playbook:export-view-safety` sowie im Architekturkontext als local-only Override dokumentiert.
+- Evidence: `node --test tests/knowledge-graph-query.contract.test.mjs`, `node --test --test-name-pattern "query ops contract|export-view" tests/knowledge-graph-build.contract.test.mjs tests/knowledge-graph-query.contract.test.mjs`, `npm run graph:build`, `npm run graph:check` und `npm run plan:check` sind gruen. Naechste V111-Subphase ist `111.3.2` fuer Scorecard, Counterfactuals und Uncertainty-Budget.

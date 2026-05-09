@@ -33070,11 +33070,13 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-code",
