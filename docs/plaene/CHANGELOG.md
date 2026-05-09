@@ -487,3 +487,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Ursache: Der RoundRecorder-Fallback erzeugte Last-Round-Ghost-Clips aus allen Snapshot-Spielern inklusive Bots; diese Clips wurden am Rundenende abgespielt und fuer die Arcade-Ghost-Library persistiert.
 - Fixpfad: `RoundRecorder.getLastRoundGhostClip` filtert Bots standardmaessig aus Frames und Player-Metadaten; Bot-Spuren bleiben nur ueber `includeBots: true` fuer explizite Debug-Pfade verfuegbar.
 - Evidence: `node --test tests/round-recorder-ghost-fallback.contract.test.mjs tests/parcours-ghost.contract.test.mjs tests/last-round-ghost-system.contract.test.mjs`, `npm run plan:check` und `git diff --check` sind gruen.
+
+## Stand-Snapshot 2026-05-09 (Subphase `V111 111.2`)
+
+- `111.2` ist geschlossen: Kritische Runtime-Knoten tragen jetzt Owner-/Stability-Metadaten, und `impact-diff`/`change-risk` geben diese zusammen mit ADR-/Issue-/PR-Handoff-Artefakten und Explainability-Treibern aus.
+- Die Presets `incident`, `review`, `balance` und `onboarding` steuern reproduzierbar die empfohlenen Folgechecks; `change-risk` nutzt `incident` als Default, waehrend `impact-diff` weiterhin mit `balance` startet.
+- Evidence: `npm run graph:build`, `npm run graph:check`, fokussierte Graph-Contract-Tests fuer Runtime-Queries/Presets sowie `change-risk --preset incident src/core/SettingsManager.js --json` sind gruen. Naechste V111-Subphase ist `111.3` fuer Safety, Scorecard und What-if-Analyse.

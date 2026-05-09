@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T13:38:44.014Z",
+  "generated_at": "2026-05-09T14:23:00.809Z",
   "locks": [
     {
       "person": "codex",
@@ -281,6 +281,34 @@
       "start_date": "2026-05-08",
       "target_completion": "2026-05-08",
       "status": "completed",
+      "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V111",
+      "phase": "111.3",
+      "scope_files": [
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.schema.json",
+        "scripts/build-knowledge-graph.mjs",
+        "scripts/check-knowledge-graph.mjs",
+        "scripts/query-knowledge-graph.mjs",
+        "scripts/export-knowledge-graph-view.mjs",
+        "tools/graph-viewer/index.html",
+        "tools/graph-viewer/viewer.js",
+        "tools/graph-viewer/viewer.css",
+        "data/contracts/knowledge-graph/**",
+        "tests/knowledge-graph-build.contract.test.mjs",
+        "docs/referenz/ai_architecture_context.md",
+        ".agents/rules/token_efficiency_and_tools.md",
+        ".agents/workflows/status.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/plaene/aktiv/V111.md"
+      ],
+      "start_date": "2026-05-09",
+      "target_completion": "",
+      "status": "in-progress",
       "notes": ""
     }
   ],

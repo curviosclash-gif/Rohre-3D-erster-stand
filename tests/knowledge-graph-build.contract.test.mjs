@@ -791,6 +791,30 @@ test('knowledge graph core runtime queries return stable JSON shapes', async () 
         impact.implementedNodes.find((node) => node.id === 'runtime:settings-manager').provenance.file,
         'data/contracts/knowledge-graph/desktop-critical-paths.v1.json'
     );
+    assert.deepEqual(
+        impact.implementedNodes.find((node) => node.id === 'runtime:settings-manager').ownership,
+        {
+            team: 'settings-runtime',
+            steward: 'settings-domain',
+            escalation: 'V111 incident preset',
+        }
+    );
+    assert.equal(
+        impact.implementedNodes.find((node) => node.id === 'runtime:settings-manager').stability.index,
+        0.9
+    );
+    assert.ok(
+        impact.implementedNodes.find((node) => node.id === 'runtime:settings-manager').artifacts
+            .some((artifact) => artifact.type === 'adr' && artifact.id === 'V103-settings-mutation-contract')
+    );
+    assert.ok(
+        impact.implementedNodes.find((node) => node.id === 'runtime:settings-manager').artifacts
+            .some((artifact) => artifact.type === 'issue' && artifact.id === 'V111-DoD3')
+    );
+    assert.ok(
+        impact.implementedNodes.find((node) => node.id === 'runtime:settings-manager').artifacts
+            .some((artifact) => artifact.type === 'pr' && artifact.id === 'V111-local-review-slice')
+    );
     assert.ok(impact.relationEdges.some((edge) => edge.type === 'validated_by' && edge.to === 'test:settings-manager-contract'));
     assert.deepEqual(
         impact.relationEdges.slice(0, 3).map((edge) => `${edge.type}:${edge.to}:${edge.causalScore}`),
@@ -844,6 +868,14 @@ test('knowledge graph core runtime queries return stable JSON shapes', async () 
     assert.deepEqual(healthByPath.get('round-end').missingLayers, []);
     assert.ok(healthByPath.get('round-end').requiredLayers.includes('config'));
     assert.equal(healthByPath.get('settings').status, 'ok');
+    assert.deepEqual(healthByPath.get('settings').ownership, [
+        {
+            team: 'settings-runtime',
+            steward: 'settings-domain',
+            escalation: 'V111 incident preset',
+        },
+    ]);
+    assert.equal(healthByPath.get('settings').stability.tier, 'stable');
 });
 
 test('why-not query prioritizes explicit negative graph blockers', async () => {
@@ -893,10 +925,17 @@ test('impact-diff reports changed runtime subgraphs and recommended delta checks
     assert.equal(result.query, 'impact-diff');
     assert.equal(result.baseRef, 'HEAD~1');
     assert.equal(result.riskStatus, 'review');
+    assert.equal(result.preset.id, 'balance');
     assert.ok(result.criticalPaths.includes('settings'));
     assert.ok(result.riskFiles.some((entry) => entry.file === 'src/core/SettingsManager.js'));
     const settingsRisk = result.riskFiles.find((entry) => entry.file === 'src/core/SettingsManager.js');
     assert.equal(settingsRisk.maxCausalScore, 3.96);
+    assert.equal(settingsRisk.stability.tier, 'stable');
+    assert.ok(settingsRisk.ownership.some((owner) => owner.team === 'settings-runtime'));
+    assert.ok(settingsRisk.artifacts.some((artifact) => artifact.id === 'V103-settings-mutation-contract'));
+    assert.ok(settingsRisk.artifacts.some((artifact) => artifact.type === 'issue'));
+    assert.ok(settingsRisk.artifacts.some((artifact) => artifact.type === 'pr'));
+    assert.ok(settingsRisk.explainability.drivers[0].edge.includes('forbidden_by'));
     assert.deepEqual(settingsRisk.primaryImpactEdges.map((edge) => edge.type), [
         'forbidden_by',
         'writes_state',
@@ -930,9 +969,38 @@ test('change-risk aliases impact-diff with operator playbook context', async () 
 
     assert.equal(result.query, 'change-risk');
     assert.equal(result.sourceQuery, 'impact-diff');
+    assert.equal(result.preset.id, 'incident');
     assert.equal(result.riskStatus, 'review');
     assert.ok(result.criticalPaths.includes('settings'));
+    assert.ok(result.recommendedChecks.some((command) => command.includes('why-not settings')));
+    assert.ok(result.recommendedChecks.some((command) => command.includes('untested-systems settings')));
     assert.ok(result.recommendedChecks.some((command) => command.includes('event-flow settings')));
+});
+
+test('query intent presets tune impact-diff checks without changing core risk evidence', async () => {
+    const graph = await buildKnowledgeGraph();
+    const coverage = {
+        files: [
+            {
+                path: 'src/core/SettingsManager.js',
+                covered: true,
+                coveredInCore: true,
+                coveredByOverlay: false,
+                classification: 'product-code',
+                scopeBlocks: ['V103', 'V110'],
+                surfaces: [],
+            },
+        ],
+    };
+
+    const review = queryImpactDiff(graph, coverage, ['src/core/SettingsManager.js'], { preset: 'review' });
+    const onboarding = queryImpactDiff(graph, coverage, ['src/core/SettingsManager.js'], { preset: 'onboarding' });
+
+    assert.equal(review.preset.id, 'review');
+    assert.ok(review.recommendedChecks.some((command) => command.includes('untested-systems settings')));
+    assert.equal(onboarding.preset.id, 'onboarding');
+    assert.ok(onboarding.recommendedChecks.includes('node scripts/query-knowledge-graph.mjs critical-path-health --json'));
+    assert.equal(review.riskFiles[0].maxCausalScore, onboarding.riskFiles[0].maxCausalScore);
 });
 
 test('query ops contract requires SLO profiles and operator playbooks', () => {

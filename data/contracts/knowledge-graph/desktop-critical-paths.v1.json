@@ -11,7 +11,28 @@
       "file": "src/entities/runtime/EntitySpawnOps.js",
       "attributes": {
         "criticalPath": "spawn",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "runtime-core",
+          "steward": "entity-lifecycle",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.86,
+          "tier": "stable",
+          "signals": [
+            "desktop-e2e-validation",
+            "authored-spawn-contract"
+          ]
+        },
+        "artifacts": [
+          {
+            "type": "adr",
+            "id": "V76-hangar-spawn-contract",
+            "path": "docs/plaene/aktiv/V76.md",
+            "role": "spawn baseline"
+          }
+        ]
       }
     },
     {
@@ -21,7 +42,20 @@
       "file": "src/entities/systems/SpawnPlacementSystem.js",
       "attributes": {
         "criticalPath": "spawn",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "runtime-core",
+          "steward": "entity-lifecycle",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.82,
+          "tier": "watch",
+          "signals": [
+            "desktop-e2e-validation",
+            "placement-boundary-sensitive"
+          ]
+        }
       }
     },
     {
@@ -31,7 +65,20 @@
       "file": "src/entities/systems/HuntCombatSystem.js",
       "attributes": {
         "criticalPath": "combat-hit",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "combat-runtime",
+          "steward": "hunt-systems",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.78,
+          "tier": "watch",
+          "signals": [
+            "desktop-e2e-validation",
+            "multi-resolver-coupling"
+          ]
+        }
       }
     },
     {
@@ -41,7 +88,20 @@
       "file": "src/entities/systems/projectile/ProjectileHitResolver.js",
       "attributes": {
         "criticalPath": "combat-hit",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "combat-runtime",
+          "steward": "projectile-resolver",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.8,
+          "tier": "watch",
+          "signals": [
+            "desktop-e2e-validation",
+            "damage-event-emitter"
+          ]
+        }
       }
     },
     {
@@ -51,7 +111,20 @@
       "file": "src/hunt/mg/MGHitResolver.js",
       "attributes": {
         "criticalPath": "combat-hit",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "combat-runtime",
+          "steward": "mg-resolver",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.8,
+          "tier": "watch",
+          "signals": [
+            "desktop-e2e-validation",
+            "damage-event-emitter"
+          ]
+        }
       }
     },
     {
@@ -61,7 +134,20 @@
       "file": "src/entities/systems/RoundOutcomeSystem.js",
       "attributes": {
         "criticalPath": "round-end",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "match-flow",
+          "steward": "round-outcome",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.88,
+          "tier": "stable",
+          "signals": [
+            "node-contract-validation",
+            "snapshot-first"
+          ]
+        }
       }
     },
     {
@@ -71,7 +157,20 @@
       "file": "src/state/RoundEndCoordinator.js",
       "attributes": {
         "criticalPath": "round-end",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "match-flow",
+          "steward": "round-end-ui",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.74,
+          "tier": "watch",
+          "signals": [
+            "node-contract-validation",
+            "blocked-by-outcome-snapshot"
+          ]
+        }
       }
     },
     {
@@ -82,7 +181,41 @@
       "attributes": {
         "criticalPath": "settings",
         "layer": "runtime",
-        "requiredReference": true
+        "requiredReference": true,
+        "owner": {
+          "team": "settings-runtime",
+          "steward": "settings-domain",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.9,
+          "tier": "stable",
+          "signals": [
+            "node-contract-validation",
+            "live-apply-contract",
+            "runtime-limit-guardrail"
+          ]
+        },
+        "artifacts": [
+          {
+            "type": "adr",
+            "id": "V103-settings-mutation-contract",
+            "path": "docs/plaene/aktiv/V103.md",
+            "role": "settings mutation baseline"
+          },
+          {
+            "type": "issue",
+            "id": "V111-DoD3",
+            "path": "docs/plaene/aktiv/V111.md",
+            "role": "ownership stability evidence"
+          },
+          {
+            "type": "pr",
+            "id": "V111-local-review-slice",
+            "path": "docs/plaene/CHANGELOG.md",
+            "role": "review handoff note"
+          }
+        ]
       }
     },
     {

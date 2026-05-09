@@ -2258,7 +2258,7 @@
       "id": "V111",
       "type": "block",
       "title": "Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz",
-      "status": "planned",
+      "status": "active",
       "attributes": {
         "source": [
           "block-plan",
@@ -2266,27 +2266,29 @@
         ],
         "priority": "P2",
         "owner": "codex",
-        "currentPhase": "111.2",
+        "currentPhase": "111.3",
         "planFile": "docs/plaene/aktiv/V111.md",
         "scopeDeclarations": [
           ".agents/rules/token_efficiency_and_tools.md",
           ".agents/workflows/status.md",
-          "data/contracts/knowledge-graph/",
+          "data/contracts/knowledge-graph/**",
+          "docs/generated/knowledge-graph.coverage.json",
           "docs/generated/knowledge-graph.json",
           "docs/generated/knowledge-graph.schema.json",
           "docs/plaene/aktiv/V111.md",
+          "docs/plaene/CHANGELOG.md",
           "docs/referenz/ai_architecture_context.md",
           "scripts/build-knowledge-graph.mjs",
           "scripts/check-knowledge-graph.mjs",
           "scripts/export-knowledge-graph-view.mjs",
           "scripts/query-knowledge-graph.mjs",
-          "tests/",
+          "tests/knowledge-graph-build.contract.test.mjs",
           "tools/graph-viewer/index.html",
           "tools/graph-viewer/viewer.css",
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 118,
+          "concreteCount": 19,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -6231,7 +6233,7 @@
       "id": "V111.2",
       "type": "phase",
       "title": "Ownership, Presets und Explainability",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.2"
@@ -17149,8 +17151,8 @@
     {
       "id": "V111.2.1",
       "type": "subphase",
-      "title": "Ownership-Layer und Stability-Index fuer kritische Pfade integrieren; Ausgabe in Incident-/Review-Queries sicherstellen.",
-      "status": "open",
+      "title": "Ownership-Layer und Stability-Index fuer kritische Pfade integrieren; Ausgabe in Incident-/Review-Queries sicherstellen. (abgeschlossen: 2026-05-09; evidence: `desktop-critical-paths.v1.json` fuehrt `owner`/`stability` fuer kritische Runtime-Knoten; `change-risk --preset incident src/core/SettingsManager.js --json` liefert Owner `settings-runtime/settings-domain` und Stability `stable`; `critical-path-health` aggregiert die Werte pro Critical Path)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.2",
@@ -17160,8 +17162,8 @@
     {
       "id": "V111.2.2",
       "type": "subphase",
-      "title": "Query-Intent-Presets sowie Cross-Artifact-Linking (PR/Issue/ADR) und Explainability fuer Referenzfaelle stabilisieren.",
-      "status": "open",
+      "title": "Query-Intent-Presets sowie Cross-Artifact-Linking (PR/Issue/ADR) und Explainability fuer Referenzfaelle stabilisieren. (abgeschlossen: 2026-05-09; evidence: `impact-diff`/`change-risk` liefern Preset-Metadaten, preset-spezifische Checks, `explainability.drivers`, Owner/Stability und Artefakte; Settings-Referenz verlinkt ADR `V103-settings-mutation-contract`, Issue `V111-DoD3` und PR-Handoff `V111-local-review-slice`; fokussierte Golden-Tests gruen)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.2",
@@ -25883,12 +25885,33 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 8,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/runtime/EntitySpawnOps.js",
         "criticalPath": "spawn",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "runtime-core",
+          "steward": "entity-lifecycle",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.86,
+          "tier": "stable",
+          "signals": [
+            "desktop-e2e-validation",
+            "authored-spawn-contract"
+          ]
+        },
+        "artifacts": [
+          {
+            "type": "adr",
+            "id": "V76-hangar-spawn-contract",
+            "path": "docs/plaene/aktiv/V76.md",
+            "role": "spawn baseline"
+          }
+        ]
       }
     },
     {
@@ -25904,13 +25927,26 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 28,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 62,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/HuntCombatSystem.js",
         "criticalPath": "combat-hit",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "combat-runtime",
+          "steward": "hunt-systems",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.78,
+          "tier": "watch",
+          "signals": [
+            "desktop-e2e-validation",
+            "multi-resolver-coupling"
+          ]
+        }
       }
     },
     {
@@ -25926,13 +25962,26 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 48,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 108,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/hunt/mg/MGHitResolver.js",
         "criticalPath": "combat-hit",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "combat-runtime",
+          "steward": "mg-resolver",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.8,
+          "tier": "watch",
+          "signals": [
+            "desktop-e2e-validation",
+            "damage-event-emitter"
+          ]
+        }
       }
     },
     {
@@ -25948,13 +25997,26 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 38,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 85,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/projectile/ProjectileHitResolver.js",
         "criticalPath": "combat-hit",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "combat-runtime",
+          "steward": "projectile-resolver",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.8,
+          "tier": "watch",
+          "signals": [
+            "desktop-e2e-validation",
+            "damage-event-emitter"
+          ]
+        }
       }
     },
     {
@@ -25970,13 +26032,26 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 68,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 154,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/state/RoundEndCoordinator.js",
         "criticalPath": "round-end",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "match-flow",
+          "steward": "round-end-ui",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.74,
+          "tier": "watch",
+          "signals": [
+            "node-contract-validation",
+            "blocked-by-outcome-snapshot"
+          ]
+        }
       }
     },
     {
@@ -25992,13 +26067,26 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 58,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 131,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/RoundOutcomeSystem.js",
         "criticalPath": "round-end",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "match-flow",
+          "steward": "round-outcome",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.88,
+          "tier": "stable",
+          "signals": [
+            "node-contract-validation",
+            "snapshot-first"
+          ]
+        }
       }
     },
     {
@@ -26014,14 +26102,48 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 78,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 177,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/core/SettingsManager.js",
         "criticalPath": "settings",
         "layer": "runtime",
-        "requiredReference": true
+        "requiredReference": true,
+        "owner": {
+          "team": "settings-runtime",
+          "steward": "settings-domain",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.9,
+          "tier": "stable",
+          "signals": [
+            "node-contract-validation",
+            "live-apply-contract",
+            "runtime-limit-guardrail"
+          ]
+        },
+        "artifacts": [
+          {
+            "type": "adr",
+            "id": "V103-settings-mutation-contract",
+            "path": "docs/plaene/aktiv/V103.md",
+            "role": "settings mutation baseline"
+          },
+          {
+            "type": "issue",
+            "id": "V111-DoD3",
+            "path": "docs/plaene/aktiv/V111.md",
+            "role": "ownership stability evidence"
+          },
+          {
+            "type": "pr",
+            "id": "V111-local-review-slice",
+            "path": "docs/plaene/CHANGELOG.md",
+            "role": "review handoff note"
+          }
+        ]
       }
     },
     {
@@ -26037,13 +26159,26 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 18,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 39,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/SpawnPlacementSystem.js",
         "criticalPath": "spawn",
-        "layer": "runtime"
+        "layer": "runtime",
+        "owner": {
+          "team": "runtime-core",
+          "steward": "entity-lifecycle",
+          "escalation": "V111 incident preset"
+        },
+        "stability": {
+          "index": 0.82,
+          "tier": "watch",
+          "signals": [
+            "desktop-e2e-validation",
+            "placement-boundary-sensitive"
+          ]
+        }
       }
     },
     {
@@ -26408,8 +26543,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 89,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 222,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/physics-core.spec.js",
@@ -26430,8 +26565,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 99,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 232,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/physics-hunt.spec.js",
@@ -26452,8 +26587,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 109,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 242,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/runtime-regressions.contract.test.mjs",
@@ -26474,8 +26609,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 119,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 252,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/runtime-settings-live-apply.contract.test.mjs",
@@ -26496,8 +26631,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 129,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 262,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/settings-manager.contract.test.mjs",
@@ -33610,7 +33745,8 @@
         ],
         "scopeBlocks": [
           "V107",
-          "V110"
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -35153,6 +35289,7 @@
           "V107",
           "V109",
           "V110",
+          "V111",
           "V77",
           "V93"
         ],
@@ -52356,7 +52493,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V88"
         ],
         "exists": true
@@ -52376,8 +52512,7 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V108",
-          "V111"
+          "V108"
         ],
         "exists": true
       }
@@ -52396,7 +52531,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V113"
         ],
         "exists": true
@@ -52410,13 +52544,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52429,13 +52561,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52454,7 +52584,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V88"
         ],
         "exists": true
@@ -52468,13 +52597,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52487,13 +52614,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52506,13 +52631,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52533,7 +52656,6 @@
           "BT91",
           "V102",
           "V105",
-          "V111",
           "V112",
           "V88",
           "V89"
@@ -52556,7 +52678,6 @@
           "B13",
           "BT91",
           "V100",
-          "V111",
           "V88",
           "V89"
         ],
@@ -52580,7 +52701,6 @@
           "BT91",
           "V100",
           "V105",
-          "V111",
           "V112",
           "V88",
           "V89"
@@ -52607,7 +52727,6 @@
           "V104",
           "V105",
           "V108",
-          "V111",
           "V112",
           "V88",
           "V89"
@@ -52629,7 +52748,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V88"
         ],
         "exists": true
@@ -52650,7 +52768,6 @@
           "B13",
           "BT91",
           "V106",
-          "V111",
           "V87",
           "V88",
           "V89"
@@ -52672,7 +52789,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V112",
           "V51",
           "V53",
@@ -52701,7 +52817,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V99"
         ],
         "exists": true
@@ -52715,13 +52830,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52740,7 +52853,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V65"
         ],
         "exists": true
@@ -52760,7 +52872,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V88",
           "V89"
         ],
@@ -52775,13 +52886,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52794,13 +52903,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52819,7 +52926,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V72"
         ],
         "exists": true
@@ -52833,13 +52939,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52852,13 +52956,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52871,13 +52973,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52897,7 +52997,6 @@
           "B13",
           "BT91",
           "V104",
-          "V111",
           "V113"
         ],
         "exists": true
@@ -52911,13 +53010,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52936,7 +53033,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V112",
           "V87",
           "V88",
@@ -52953,13 +53049,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -52994,13 +53088,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53019,7 +53111,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V99"
         ],
         "exists": true
@@ -53033,13 +53124,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53058,7 +53147,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V92"
         ],
         "exists": true
@@ -53072,13 +53160,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53097,7 +53183,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V99"
         ],
         "exists": true
@@ -53111,13 +53196,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53130,13 +53213,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53155,7 +53236,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V88"
         ],
         "exists": true
@@ -53175,7 +53255,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V114"
         ],
         "exists": true
@@ -53195,7 +53274,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V114"
         ],
         "exists": true
@@ -53215,7 +53293,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V99"
         ],
         "exists": true
@@ -53235,7 +53312,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V88",
           "V89"
         ],
@@ -53250,13 +53326,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53269,13 +53343,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53288,13 +53360,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53307,13 +53377,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53326,13 +53394,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53345,13 +53411,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53364,13 +53428,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53383,13 +53445,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53402,13 +53462,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53421,13 +53479,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53447,7 +53503,6 @@
           "B07",
           "B13",
           "BT91",
-          "V111",
           "V85",
           "V97"
         ],
@@ -53470,7 +53525,6 @@
           "B13",
           "BT91",
           "V106",
-          "V111",
           "V51",
           "V88",
           "V89"
@@ -53496,7 +53550,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V63",
           "V69",
           "V88",
@@ -53522,7 +53575,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V69",
           "V88",
           "V89"
@@ -53547,7 +53599,6 @@
           "V101",
           "V102",
           "V104",
-          "V111",
           "V114",
           "V77",
           "V88",
@@ -53566,13 +53617,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53591,7 +53640,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V88",
           "V89"
         ],
@@ -53612,7 +53660,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V87",
           "V88",
           "V89"
@@ -53628,13 +53675,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53647,13 +53692,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53672,8 +53715,7 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V105",
-          "V111"
+          "V105"
         ],
         "exists": true
       }
@@ -53692,7 +53734,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V88",
           "V89"
         ],
@@ -53707,13 +53748,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53726,13 +53765,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53745,13 +53782,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53775,7 +53810,6 @@
           "V102",
           "V104",
           "V105",
-          "V111",
           "V114",
           "V91",
           "V92"
@@ -53803,7 +53837,6 @@
           "BT91",
           "V103",
           "V108",
-          "V111",
           "V97"
         ],
         "mappedNodes": [
@@ -53827,8 +53860,7 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V103",
-          "V111"
+          "V103"
         ],
         "mappedNodes": [
           "test:settings-manager-contract"
@@ -53851,7 +53883,6 @@
           "B13",
           "BT91",
           "V101",
-          "V111",
           "V97",
           "V98"
         ],
@@ -53887,7 +53918,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V51",
           "V63"
         ],
@@ -53902,13 +53932,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53921,13 +53949,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53940,13 +53966,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53959,13 +53983,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53978,13 +54000,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -53997,13 +54017,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54016,13 +54034,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54035,13 +54051,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54054,13 +54068,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54073,13 +54085,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54092,13 +54102,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54111,13 +54119,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54130,14 +54136,12 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
           "BT20",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54150,14 +54154,12 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
           "BT80C",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54170,14 +54172,12 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
           "BT91",
-          "BT93E",
-          "V111"
+          "BT93E"
         ],
         "exists": true
       }
@@ -54206,15 +54206,13 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
           "BT80C",
           "BT91",
-          "BT93E",
-          "V111"
+          "BT93E"
         ],
         "exists": true
       }
@@ -54227,15 +54225,13 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
           "BT80C",
           "BT91",
-          "BT93E",
-          "V111"
+          "BT93E"
         ],
         "exists": true
       }
@@ -54248,8 +54244,7 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
@@ -54257,8 +54252,7 @@
           "BT91",
           "BT93E",
           "BT93G",
-          "BT93N",
-          "V111"
+          "BT93N"
         ],
         "exists": true
       }
@@ -54271,15 +54265,13 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
           "BT80C",
           "BT91",
-          "BT93E",
-          "V111"
+          "BT93E"
         ],
         "exists": true
       }
@@ -54292,16 +54284,14 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
           "BT20",
           "BT91",
           "BT93E",
-          "BT93N",
-          "V111"
+          "BT93N"
         ],
         "exists": true
       }
@@ -54314,14 +54304,12 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
           "BT91",
-          "BT93E",
-          "V111"
+          "BT93E"
         ],
         "exists": true
       }
@@ -54340,7 +54328,6 @@
         "scopeBlocks": [
           "B13",
           "BT91",
-          "V111",
           "V99"
         ],
         "exists": true
@@ -54354,13 +54341,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54373,13 +54358,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54392,13 +54375,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54411,13 +54392,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54430,13 +54409,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -54449,13 +54426,11 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan",
-          "scope-files"
+          "bot-training-plan"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91",
-          "V111"
+          "BT91"
         ],
         "exists": true
       }
@@ -89991,8 +89966,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 286,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 419,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "config"
       }
@@ -90007,8 +89982,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 286,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 419,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "config"
       }
@@ -90023,8 +89998,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 286,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 419,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "config"
       }
@@ -90039,8 +90014,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 291,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 424,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "config"
       }
@@ -90066,8 +90041,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 141,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 274,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "config"
       }
@@ -90082,8 +90057,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 156,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 289,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "event"
       }
@@ -90098,8 +90073,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 141,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 274,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "state"
       }
@@ -90114,8 +90089,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 156,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 289,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "test"
       }
@@ -90130,8 +90105,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 171,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 304,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "config"
       }
@@ -90146,8 +90121,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 171,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 304,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "state"
       }
@@ -90162,8 +90137,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 201,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 334,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "test"
       }
@@ -90178,8 +90153,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 191,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 324,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "config"
       }
@@ -90194,8 +90169,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 191,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 324,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "event"
       }
@@ -90210,8 +90185,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 196,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 329,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "test"
       }
@@ -90226,8 +90201,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 181,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 314,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "config"
       }
@@ -90242,8 +90217,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 181,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 314,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "event"
       }
@@ -90258,8 +90233,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 206,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 339,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "test"
       }
@@ -90274,8 +90249,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 235,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 368,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "event"
       }
@@ -90290,8 +90265,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 235,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 368,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "state",
         "strength": 0.88,
@@ -90308,8 +90283,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 328,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 461,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "blocker",
         "reason": "Round-End-UI darf erst nach finalem Outcome-Snapshot fortschreiben.",
@@ -90329,8 +90304,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 240,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 373,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "test"
       }
@@ -90345,8 +90320,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 216,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 349,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "config"
       }
@@ -90361,8 +90336,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 221,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 354,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "event"
       }
@@ -90377,8 +90352,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 216,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 349,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "state",
         "strength": 0.96,
@@ -90395,8 +90370,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 249,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 382,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "test"
       }
@@ -90411,8 +90386,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 259,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 392,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "config",
         "strength": 0.86,
@@ -90429,8 +90404,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 311,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 444,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "blocker",
         "reason": "Live Settings-Mutationen duerfen Runtime-Limits nicht aufweiten.",
@@ -90450,8 +90425,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 268,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 401,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "state",
         "strength": 0.9,
@@ -90468,8 +90443,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 259,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 392,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "state",
         "strength": 0.94,
@@ -90486,8 +90461,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 306,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 439,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "test"
       }
@@ -90502,8 +90477,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 306,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 439,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "test"
       }
@@ -90518,8 +90493,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 340,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 473,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "blocker",
         "reason": "Spawn-Placement ist kein Combat-Damage-Emitter.",
@@ -90537,8 +90512,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 151,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 284,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "state"
       }
@@ -90553,8 +90528,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 166,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 299,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "test"
       }
@@ -90765,8 +90740,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 78,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 177,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -90793,7 +90768,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 8,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -90808,8 +90783,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 28,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 62,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -90824,8 +90799,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 38,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 85,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -90840,8 +90815,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 58,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 131,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -90856,8 +90831,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 18,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 39,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -90872,8 +90847,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 48,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 108,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -90969,8 +90944,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 68,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 154,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -90996,8 +90971,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 89,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 222,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -91012,8 +90987,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 99,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 232,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -91028,8 +91003,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 109,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 242,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -91044,8 +91019,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 119,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 252,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -91060,8 +91035,8 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 129,
-          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+          "line": 262,
+          "commit": "e30a3d7c1be6db51c29942a9f448aa1bf839275a"
         },
         "relationLayer": "runtime"
       }
@@ -99177,6 +99152,15 @@
     },
     {
       "from": "V111",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
       "to": "docs/generated/knowledge-graph.json",
       "type": "scope",
       "hint": null,
@@ -99196,6 +99180,15 @@
     {
       "from": "V111",
       "to": "docs/plaene/aktiv/V111.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "docs/plaene/CHANGELOG.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -99249,916 +99242,7 @@
     },
     {
       "from": "V111",
-      "to": "tests/arcade-blueprint.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/arcade-ghost-library.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/arcade-hangar-rules.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/audio.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/bot-play-analysis-runtime.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/bot-targeting.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/browser-demo-surface-policy-override.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/checkpoint-ring-runtime.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/content-descriptor-registries.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/core-targeted-platform.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/core-targeted-regressions.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/core-targeted-runtime.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/core-targeted-surface.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/core-targeted.shared.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/core-targeted.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/core.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/desktop-multiinstance-smoke.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/editor-authoring-contract.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/editor-map-ui.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/editor-vehicle.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/electron-renderer-dist-drift.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/game-mode-strategy.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/gameplay-powerups-portals-gates.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/ghost-selfduel-allmaps.desktop.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/ghost-selfduel-roundtrip.desktop.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/gpu.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/hangar-desktop-flow.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/helpers.desktop.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/helpers.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/heuristic-bot-survival-regression.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
       "to": "tests/knowledge-graph-build.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/knowledge-graph-query.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/lan-signaling-hardening.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/last-round-ghost-system.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/lifecycle-capability.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/map-mode-eligibility.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/match-start-validation-connectivity.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/media-recorder-engine.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/media-recorder-lifecycle.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/menu-multiplayer-bridge.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/menu-runtime-preset-config-service.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/menu-runtime-session-service.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/multiplayer-lifecycle-and-signaling.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/network-adapter.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/observation-bridge-policy-runtime.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/offline-session-compatibility.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/online-signaling-config.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/parcours-ghost.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/parcours-map-schema.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/parcours-minimap.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/parcours-progress-audio.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/parcours-progress-utils.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/parcours-ring-glow-settings.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/parcours-start.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/persistence-version-migration.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/physics-core.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/physics-hunt.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/physics-policy.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/platform-capabilities.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/playing-state-ghost-playback.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/playwright-readiness.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/playwright.global-setup.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/playwright.global-teardown.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/recording-video-export-job.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/recording-video-export.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/recording.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/round-recorder-ghost-fallback.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/runtime-access-seams.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/runtime-facade.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/runtime-regressions.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/runtime-settings-live-apply.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/settings-manager.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/settings-studio-override.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/stress.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/tmp-shorts-diagnostic.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v34-bridge.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v34-checkpoint.integration.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v34-deterministic-smoke.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v34-loop.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v34-match-resume.integration.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v34-model.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v34-replay.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v34-resume-latest.integration.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v34-run-fallback.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v34-server.integration.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v35-model.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v36-action-safety.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/trainer-v36-algorithm-profile.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/training-automation-core.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/training-benchmark-artifacts.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/training-e2e.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/training-environment.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/training-gate.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/training-reward-survival.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/training-runtime-near-architecture.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/transport-verification-matrix.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/tuning-ipc.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/tuning-preset-manager.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/tuning-runtime-bridge.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/tuning-window.contract.test.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/v28-regression.spec.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V111",
-      "to": "tests/validate-umsetzungsplan.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {

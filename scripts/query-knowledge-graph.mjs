@@ -81,6 +81,40 @@ const CRITICAL_PATH_LAYER_REQUIREMENTS = Object.freeze({
     settings: ['runtime', 'state', 'config', 'test'],
     spawn: ['runtime', 'event', 'state', 'config', 'test'],
 });
+const QUERY_INTENT_PRESETS = Object.freeze({
+    balance: {
+        id: 'balance',
+        description: 'Default profile for balanced impact triage.',
+        maxPrimaryEdges: 3,
+        includeWhyNot: false,
+        includeUntestedSystems: false,
+        includeOnboardingFlow: false,
+    },
+    incident: {
+        id: 'incident',
+        description: 'Prioritizes blockers, owner handoff and fast recovery checks.',
+        maxPrimaryEdges: 5,
+        includeWhyNot: true,
+        includeUntestedSystems: true,
+        includeOnboardingFlow: false,
+    },
+    review: {
+        id: 'review',
+        description: 'Prioritizes validation, provenance and untested-system checks.',
+        maxPrimaryEdges: 4,
+        includeWhyNot: false,
+        includeUntestedSystems: true,
+        includeOnboardingFlow: false,
+    },
+    onboarding: {
+        id: 'onboarding',
+        description: 'Adds readable event-flow context for unfamiliar critical paths.',
+        maxPrimaryEdges: 3,
+        includeWhyNot: false,
+        includeUntestedSystems: false,
+        includeOnboardingFlow: true,
+    },
+});
 
 function normalizePath(value) {
     return String(value || '')
@@ -163,6 +197,69 @@ function getCriticalPaths(node) {
         .sort((left, right) => left.localeCompare(right));
 }
 
+function normalizeArtifactLinks(value) {
+    if (!Array.isArray(value)) return [];
+    return value
+        .map((entry) => {
+            if (!entry || typeof entry !== 'object') return null;
+            const type = String(entry.type || '').trim();
+            const id = String(entry.id || '').trim();
+            const pathValue = String(entry.path || '').trim();
+            const url = String(entry.url || '').trim();
+            if (!type || !id) return null;
+            return {
+                type,
+                id,
+                path: pathValue || null,
+                url: url || null,
+                role: String(entry.role || '').trim() || null,
+            };
+        })
+        .filter(Boolean)
+        .sort((left, right) => {
+            const typeCompare = left.type.localeCompare(right.type);
+            if (typeCompare !== 0) return typeCompare;
+            return left.id.localeCompare(right.id);
+        });
+}
+
+function summarizeOwnership(node) {
+    const owner = node?.attributes?.owner;
+    if (!owner || typeof owner !== 'object' || Array.isArray(owner)) {
+        return null;
+    }
+    const team = String(owner.team || '').trim();
+    const steward = String(owner.steward || '').trim();
+    return {
+        team: team || null,
+        steward: steward || null,
+        escalation: String(owner.escalation || '').trim() || null,
+    };
+}
+
+function summarizeStability(node) {
+    const stability = node?.attributes?.stability;
+    if (!stability || typeof stability !== 'object' || Array.isArray(stability)) {
+        return null;
+    }
+    const rawIndex = Number(stability.index);
+    const index = Number.isFinite(rawIndex)
+        ? Number(Math.max(0, Math.min(1, rawIndex)).toFixed(2))
+        : null;
+    return {
+        index,
+        tier: String(stability.tier || '').trim() || null,
+        signals: Array.isArray(stability.signals)
+            ? stability.signals.map((signal) => String(signal || '').trim()).filter(Boolean).sort((left, right) => left.localeCompare(right))
+            : [],
+    };
+}
+
+function resolveQueryIntentPreset(value) {
+    const id = String(value || 'balance').trim() || 'balance';
+    return QUERY_INTENT_PRESETS[id] || QUERY_INTENT_PRESETS.balance;
+}
+
 function nodeSummary(node) {
     if (!node) return null;
     return {
@@ -173,6 +270,9 @@ function nodeSummary(node) {
         provenance: node.attributes?.provenance || null,
         criticalPaths: getCriticalPaths(node),
         mappingId: node.attributes?.mappingId || null,
+        ownership: summarizeOwnership(node),
+        stability: summarizeStability(node),
+        artifacts: normalizeArtifactLinks(node.attributes?.artifacts),
     };
 }
 
@@ -192,6 +292,11 @@ function edgeSummary(edge, nodeById) {
         directness: causal.directness,
         causalScore: causal.score,
         provenance: edge.attributes?.provenance || null,
+        explainability: {
+            reason: edge.attributes?.reason || null,
+            mappingFile: edge.attributes?.mappingFile || null,
+            provenance: edge.attributes?.provenance || null,
+        },
     };
 }
 
@@ -495,7 +600,88 @@ function buildImpactedSubgraph(graph, impactedNodeIds) {
     };
 }
 
-function queryImpactDiff(graph, coverage, changedFiles, { baseRef = null } = {}) {
+function summarizeNodeOwnership(nodes) {
+    const seen = new Set();
+    return (nodes || [])
+        .map((node) => node.ownership)
+        .filter(Boolean)
+        .filter((entry) => {
+            const key = `${entry.team || ''}::${entry.steward || ''}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        })
+        .sort((left, right) => `${left.team || ''}:${left.steward || ''}`.localeCompare(`${right.team || ''}:${right.steward || ''}`));
+}
+
+function summarizeNodeStability(nodes) {
+    const indexes = (nodes || [])
+        .map((node) => node.stability?.index)
+        .filter((value) => Number.isFinite(value));
+    if (indexes.length === 0) {
+        return {
+            minIndex: null,
+            averageIndex: null,
+            tier: null,
+        };
+    }
+    const minIndex = Math.min(...indexes);
+    const averageIndex = indexes.reduce((sum, value) => sum + value, 0) / indexes.length;
+    return {
+        minIndex: Number(minIndex.toFixed(2)),
+        averageIndex: Number(averageIndex.toFixed(2)),
+        tier: minIndex >= 0.85 ? 'stable' : (minIndex >= 0.7 ? 'watch' : 'fragile'),
+    };
+}
+
+function summarizeArtifacts(nodes) {
+    const artifactByKey = new Map();
+    for (const node of nodes || []) {
+        for (const artifact of node.artifacts || []) {
+            artifactByKey.set(`${artifact.type}::${artifact.id}`, artifact);
+        }
+    }
+    return Array.from(artifactByKey.values())
+        .sort((left, right) => `${left.type}:${left.id}`.localeCompare(`${right.type}:${right.id}`));
+}
+
+function buildExplainability(primaryImpactEdges, nodes) {
+    const owners = summarizeNodeOwnership(nodes);
+    const stability = summarizeNodeStability(nodes);
+    const artifacts = summarizeArtifacts(nodes);
+    return {
+        drivers: (primaryImpactEdges || []).map((edge) => ({
+            edge: `${edge.from} -> ${edge.to} (${edge.type})`,
+            causalScore: edge.causalScore,
+            directness: edge.directness,
+        })),
+        owners,
+        stability,
+        artifacts,
+    };
+}
+
+function buildRecommendedChecks(criticalPaths, preset) {
+    const sortedCriticalPaths = Array.from(criticalPaths || []).sort((left, right) => left.localeCompare(right));
+    const checks = [
+        'npm run graph:build',
+        'npm run graph:check',
+        ...sortedCriticalPaths.map((criticalPath) => `node scripts/query-knowledge-graph.mjs event-flow ${criticalPath} --json`),
+    ];
+    if (preset.includeWhyNot) {
+        checks.push(...sortedCriticalPaths.map((criticalPath) => `node scripts/query-knowledge-graph.mjs why-not ${criticalPath} --json`));
+    }
+    if (preset.includeUntestedSystems) {
+        checks.push(...sortedCriticalPaths.map((criticalPath) => `node scripts/query-knowledge-graph.mjs untested-systems ${criticalPath} --json`));
+    }
+    if (preset.includeOnboardingFlow) {
+        checks.push('node scripts/query-knowledge-graph.mjs critical-path-health --json');
+    }
+    return Array.from(new Set(checks));
+}
+
+function queryImpactDiff(graph, coverage, changedFiles, { baseRef = null, preset = 'balance' } = {}) {
+    const intentPreset = resolveQueryIntentPreset(preset);
     const normalizedFiles = Array.from(new Set((changedFiles || [])
         .map((filePath) => normalizePath(filePath))
         .filter(Boolean)))
@@ -516,8 +702,9 @@ function queryImpactDiff(graph, coverage, changedFiles, { baseRef = null } = {})
         const isActiveProductCode = impact.coverage?.excludedFromCoverage !== true
             && ['product-code', 'product-docs', 'dev-tooling', 'governance-tooling'].includes(impact.coverage?.classification || '');
         if (isRuntimeMapped || (isActiveProductCode && impact.criticalPaths.length > 0)) {
+            const impactedNodes = [...impact.implementedNodes, ...impact.relatedNodes];
             const primaryImpactEdges = (impact.relationEdges || [])
-                .slice(0, 3)
+                .slice(0, intentPreset.maxPrimaryEdges)
                 .map((edge) => ({
                     from: edge.from,
                     to: edge.to,
@@ -533,6 +720,10 @@ function queryImpactDiff(graph, coverage, changedFiles, { baseRef = null } = {})
                 relationEdgeCount: impact.relationEdges.length,
                 maxCausalScore: primaryImpactEdges[0]?.causalScore ?? 0,
                 primaryImpactEdges,
+                ownership: summarizeNodeOwnership(impactedNodes),
+                stability: summarizeNodeStability(impactedNodes),
+                artifacts: summarizeArtifacts(impactedNodes),
+                explainability: buildExplainability(primaryImpactEdges, impactedNodes),
             });
         }
     }
@@ -543,25 +734,23 @@ function queryImpactDiff(graph, coverage, changedFiles, { baseRef = null } = {})
     return {
         query: 'impact-diff',
         baseRef,
+        preset: {
+            id: intentPreset.id,
+            description: intentPreset.description,
+        },
         changedFileCount: normalizedFiles.length,
         changedFiles: normalizedFiles,
         riskStatus: riskFiles.length > 0 ? 'review' : 'low',
         criticalPaths: sortedCriticalPaths,
         riskFiles,
         subgraph,
-        recommendedChecks: [
-            'npm run graph:build',
-            'npm run graph:check',
-            ...(sortedCriticalPaths.length > 0
-                ? sortedCriticalPaths.map((criticalPath) => `node scripts/query-knowledge-graph.mjs event-flow ${criticalPath} --json`)
-                : []),
-        ],
+        recommendedChecks: buildRecommendedChecks(sortedCriticalPaths, intentPreset),
         fileImpacts,
     };
 }
 
-function queryChangeRisk(graph, coverage, changedFiles, { baseRef = null } = {}) {
-    const impact = queryImpactDiff(graph, coverage, changedFiles, { baseRef });
+function queryChangeRisk(graph, coverage, changedFiles, { baseRef = null, preset = 'incident' } = {}) {
+    const impact = queryImpactDiff(graph, coverage, changedFiles, { baseRef, preset });
     return {
         ...impact,
         query: 'change-risk',
@@ -708,6 +897,8 @@ function queryCriticalPathHealth(graph) {
             .map((edge) => edgeSummary(edge, nodeById));
         const requiredLayers = CRITICAL_PATH_LAYER_REQUIREMENTS[criticalPath] || ['runtime', 'test'];
         const missingLayers = requiredLayers.filter((layer) => (counts[layer] || 0) === 0);
+        const ownership = summarizeNodeOwnership(pathNodes.map(nodeSummary).filter(Boolean));
+        const stability = summarizeNodeStability(pathNodes.map(nodeSummary).filter(Boolean));
         const status = missingLayers.length === 0 && missingValidation.length === 0
             ? 'ok'
             : 'needs-attention';
@@ -719,6 +910,8 @@ function queryCriticalPathHealth(graph) {
             requiredLayers,
             missingLayers,
             missingValidation: sortNodeSummaries(missingValidation),
+            ownership,
+            stability,
             eventEdges: sortEdgeSummaries(eventEdges),
         };
     });
@@ -1049,8 +1242,8 @@ function usage() {
         + '  node scripts/query-knowledge-graph.mjs files-for-block <BLOCK_ID> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs bt-status [BLOCK_ID] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs impact-for-file <FILE_PATH> [--json]\n'
-        + '  node scripts/query-knowledge-graph.mjs impact-diff [--base <REF>] [FILE_PATH...] [--json]\n'
-        + '  node scripts/query-knowledge-graph.mjs change-risk [--base <REF>] [FILE_PATH...] [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs impact-diff [--base <REF>] [--preset incident|review|balance|onboarding] [FILE_PATH...] [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs change-risk [--base <REF>] [--preset incident|review|balance|onboarding] [FILE_PATH...] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs why-not <NODE_ID|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs event-flow <EVENT_ID|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs untested-systems [CRITICAL_PATH] [--json]\n'
@@ -1140,23 +1333,37 @@ if (isDirectRun) {
         } else if (command === 'impact-diff') {
             const baseIndex = positional.indexOf('--base');
             const baseRef = baseIndex >= 0 ? positional[baseIndex + 1] : null;
+            const presetIndex = positional.indexOf('--preset');
+            const preset = presetIndex >= 0 ? positional[presetIndex + 1] : 'balance';
             const explicitFiles = positional
                 .slice(1)
-                .filter((arg, index, args) => arg !== '--base' && args[index - 1] !== '--base');
+                .filter((arg, index, args) => (
+                    arg !== '--base'
+                    && args[index - 1] !== '--base'
+                    && arg !== '--preset'
+                    && args[index - 1] !== '--preset'
+                ));
             const changedFiles = explicitFiles.length > 0
                 ? explicitFiles
                 : await readChangedFiles(baseRef || 'HEAD');
-            result = queryImpactDiff(graph, coverage, changedFiles, { baseRef });
+            result = queryImpactDiff(graph, coverage, changedFiles, { baseRef, preset });
         } else if (command === 'change-risk') {
             const baseIndex = positional.indexOf('--base');
             const baseRef = baseIndex >= 0 ? positional[baseIndex + 1] : null;
+            const presetIndex = positional.indexOf('--preset');
+            const preset = presetIndex >= 0 ? positional[presetIndex + 1] : 'incident';
             const explicitFiles = positional
                 .slice(1)
-                .filter((arg, index, args) => arg !== '--base' && args[index - 1] !== '--base');
+                .filter((arg, index, args) => (
+                    arg !== '--base'
+                    && args[index - 1] !== '--base'
+                    && arg !== '--preset'
+                    && args[index - 1] !== '--preset'
+                ));
             const changedFiles = explicitFiles.length > 0
                 ? explicitFiles
                 : await readChangedFiles(baseRef || 'HEAD');
-            result = queryChangeRisk(graph, coverage, changedFiles, { baseRef });
+            result = queryChangeRisk(graph, coverage, changedFiles, { baseRef, preset });
         } else if (command === 'why-not') {
             const selector = positional[1];
             if (!selector) {

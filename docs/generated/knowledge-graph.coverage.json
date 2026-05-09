@@ -10940,7 +10940,8 @@
       ],
       "scopeBlocks": [
         "V107",
-        "V110"
+        "V110",
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -12787,6 +12788,7 @@
         "V107",
         "V109",
         "V110",
+        "V111",
         "V77",
         "V93"
       ],
@@ -32411,7 +32413,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V88"
       ],
       "surfaces": [],
@@ -32433,8 +32434,7 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V108",
-        "V111"
+        "V108"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32455,7 +32455,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V113"
       ],
       "surfaces": [],
@@ -32471,13 +32470,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32492,13 +32489,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32519,7 +32514,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V88"
       ],
       "surfaces": [],
@@ -32535,13 +32529,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32556,13 +32548,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32577,13 +32567,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32606,7 +32594,6 @@
         "BT91",
         "V102",
         "V105",
-        "V111",
         "V112",
         "V88",
         "V89"
@@ -32631,7 +32618,6 @@
         "B13",
         "BT91",
         "V100",
-        "V111",
         "V88",
         "V89"
       ],
@@ -32657,7 +32643,6 @@
         "BT91",
         "V100",
         "V105",
-        "V111",
         "V112",
         "V88",
         "V89"
@@ -32686,7 +32671,6 @@
         "V104",
         "V105",
         "V108",
-        "V111",
         "V112",
         "V88",
         "V89"
@@ -32710,7 +32694,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V88"
       ],
       "surfaces": [],
@@ -32733,7 +32716,6 @@
         "B13",
         "BT91",
         "V106",
-        "V111",
         "V87",
         "V88",
         "V89"
@@ -32757,7 +32739,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V112",
         "V51",
         "V53",
@@ -32788,7 +32769,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V99"
       ],
       "surfaces": [],
@@ -32804,13 +32784,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32831,7 +32809,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V65"
       ],
       "surfaces": [],
@@ -32853,7 +32830,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V88",
         "V89"
       ],
@@ -32870,13 +32846,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32891,13 +32865,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32918,7 +32890,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V72"
       ],
       "surfaces": [],
@@ -32934,13 +32905,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32955,13 +32924,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32976,13 +32943,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33004,7 +32969,6 @@
         "B13",
         "BT91",
         "V104",
-        "V111",
         "V113"
       ],
       "surfaces": [],
@@ -33020,13 +32984,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33047,7 +33009,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V112",
         "V87",
         "V88",
@@ -33066,13 +33027,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33111,13 +33070,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33138,7 +33095,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V99"
       ],
       "surfaces": [],
@@ -33154,13 +33110,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33181,7 +33135,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V92"
       ],
       "surfaces": [],
@@ -33197,13 +33150,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33224,7 +33175,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V99"
       ],
       "surfaces": [],
@@ -33240,13 +33190,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33261,13 +33209,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33288,7 +33234,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V88"
       ],
       "surfaces": [],
@@ -33310,7 +33255,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V114"
       ],
       "surfaces": [],
@@ -33332,7 +33276,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V114"
       ],
       "surfaces": [],
@@ -33354,7 +33297,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V99"
       ],
       "surfaces": [],
@@ -33376,7 +33318,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V88",
         "V89"
       ],
@@ -33393,13 +33334,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33414,13 +33353,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33435,13 +33372,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33456,13 +33391,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33477,13 +33410,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33498,13 +33429,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33519,13 +33448,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33540,13 +33467,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33561,13 +33486,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33582,13 +33505,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33610,7 +33531,6 @@
         "B07",
         "B13",
         "BT91",
-        "V111",
         "V85",
         "V97"
       ],
@@ -33635,7 +33555,6 @@
         "B13",
         "BT91",
         "V106",
-        "V111",
         "V51",
         "V88",
         "V89"
@@ -33660,7 +33579,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V63",
         "V69",
         "V88",
@@ -33685,7 +33603,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V69",
         "V88",
         "V89"
@@ -33712,7 +33629,6 @@
         "V101",
         "V102",
         "V104",
-        "V111",
         "V114",
         "V77",
         "V88",
@@ -33733,13 +33649,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33760,7 +33674,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V88",
         "V89"
       ],
@@ -33783,7 +33696,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V87",
         "V88",
         "V89"
@@ -33801,13 +33713,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33822,13 +33732,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33849,8 +33757,7 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V105",
-        "V111"
+        "V105"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33871,7 +33778,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V88",
         "V89"
       ],
@@ -33888,13 +33794,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33909,13 +33813,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33930,13 +33832,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33962,7 +33862,6 @@
         "V102",
         "V104",
         "V105",
-        "V111",
         "V114",
         "V91",
         "V92"
@@ -33989,7 +33888,6 @@
         "BT91",
         "V103",
         "V108",
-        "V111",
         "V97"
       ],
       "surfaces": [],
@@ -34012,8 +33910,7 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V103",
-        "V111"
+        "V103"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34035,7 +33932,6 @@
         "B13",
         "BT91",
         "V101",
-        "V111",
         "V97",
         "V98"
       ],
@@ -34058,7 +33954,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V51",
         "V63"
       ],
@@ -34075,13 +33970,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34096,13 +33989,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34117,13 +34008,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34138,13 +34027,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34159,13 +34046,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34180,13 +34065,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34201,13 +34084,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34222,13 +34103,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34243,13 +34122,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34264,13 +34141,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34285,13 +34160,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34306,13 +34179,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34327,14 +34198,12 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
         "BT20",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34349,14 +34218,12 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
         "BT80C",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34371,14 +34238,12 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
         "BT91",
-        "BT93E",
-        "V111"
+        "BT93E"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34393,15 +34258,13 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
         "BT80C",
         "BT91",
-        "BT93E",
-        "V111"
+        "BT93E"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34416,15 +34279,13 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
         "BT80C",
         "BT91",
-        "BT93E",
-        "V111"
+        "BT93E"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34439,8 +34300,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
@@ -34448,8 +34308,7 @@
         "BT91",
         "BT93E",
         "BT93G",
-        "BT93N",
-        "V111"
+        "BT93N"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34464,15 +34323,13 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
         "BT80C",
         "BT91",
-        "BT93E",
-        "V111"
+        "BT93E"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34487,16 +34344,14 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
         "BT20",
         "BT91",
         "BT93E",
-        "BT93N",
-        "V111"
+        "BT93N"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34511,14 +34366,12 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
         "BT91",
-        "BT93E",
-        "V111"
+        "BT93E"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34539,7 +34392,6 @@
       "scopeBlocks": [
         "B13",
         "BT91",
-        "V111",
         "V99"
       ],
       "surfaces": [],
@@ -34555,13 +34407,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34576,13 +34426,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34597,13 +34445,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34618,13 +34464,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34639,13 +34483,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34660,13 +34502,11 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan",
-        "scope-files"
+        "bot-training-plan"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91",
-        "V111"
+        "BT91"
       ],
       "surfaces": [],
       "classification": "product-code",
