@@ -79,6 +79,45 @@
       "cardinality": {
         "critical_runtime_min_out": 1
       }
+    },
+    {
+      "type": "cannot",
+      "domain": [
+        "config",
+        "runtime"
+      ],
+      "range": [
+        "config",
+        "event",
+        "state"
+      ],
+      "layer": "blocker"
+    },
+    {
+      "type": "forbidden_by",
+      "domain": [
+        "config",
+        "runtime",
+        "state"
+      ],
+      "range": [
+        "config",
+        "state"
+      ],
+      "layer": "blocker"
+    },
+    {
+      "type": "blocked_by",
+      "domain": [
+        "runtime",
+        "state"
+      ],
+      "range": [
+        "config",
+        "event",
+        "state"
+      ],
+      "layer": "blocker"
     }
   ]
 }

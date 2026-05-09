@@ -291,6 +291,36 @@
       "from": "runtime:settings-manager",
       "to": "test:settings-manager-contract",
       "type": "validated_by"
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "config:settings-runtime-limits",
+      "type": "forbidden_by",
+      "attributes": {
+        "reason": "Live Settings-Mutationen duerfen Runtime-Limits nicht aufweiten.",
+        "severity": "error",
+        "criticalPath": "settings"
+      }
+    },
+    {
+      "from": "runtime:round-end-coordinator",
+      "to": "state:round-outcome",
+      "type": "blocked_by",
+      "attributes": {
+        "reason": "Round-End-UI darf erst nach finalem Outcome-Snapshot fortschreiben.",
+        "severity": "warning",
+        "criticalPath": "round-end"
+      }
+    },
+    {
+      "from": "runtime:spawn-placement-system",
+      "to": "event:hunt-damage",
+      "type": "cannot",
+      "attributes": {
+        "reason": "Spawn-Placement ist kein Combat-Damage-Emitter.",
+        "severity": "info",
+        "criticalPath": "spawn"
+      }
     }
   ]
 }

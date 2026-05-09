@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-09 (Subphase `V111 111.1.1`)
+
+- `111.1.1` ist abgeschlossen: `cannot`, `forbidden_by` und `blocked_by` sind als produktive Mapping-Kanten in Schema, Builder und Predicate-Constraints verankert. `why-not` priorisiert explizite Blocker nach Relationstyp und Severity und gibt Reason-/Provenance-Kontext fuer Incident- und Review-Fragen aus.
+- Referenzsignale: `settings` meldet `forbidden_by runtime:settings-manager -> config:settings-runtime-limits`, `round-end` meldet `blocked_by runtime:round-end-coordinator -> state:round-outcome`. Der Slice schafft die Blocker-Basis fuer die folgende Causal-Weighting-Subphase, ohne die bestehenden Integritaets- und Runtime-Health-Queries zu ersetzen.
+
 ## Stand-Snapshot 2026-05-09 (Subphase `V110 110.4`)
 
 - `110.4.1` ist abgeschlossen: `data/contracts/knowledge-graph/query-ops.v1.json` versioniert Query-SLO-Profile fuer `desktop-local` und `ci-linux`, `scripts/check-knowledge-graph-slos.mjs` misst Kernqueries mit Warm-up plus 7 Samples, und `npm run graph:slo` ist als Regression-Gate verankert.

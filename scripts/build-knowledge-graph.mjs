@@ -142,6 +142,9 @@ const KNOWLEDGE_GRAPH_MAPPING_EDGE_TYPES = new Set([
     'reads_state',
     'writes_state',
     'validated_by',
+    'cannot',
+    'forbidden_by',
+    'blocked_by',
 ]);
 
 const KNOWN_FRONTMATTER_FIELDS = new Set([
@@ -742,6 +745,7 @@ function buildMappingProvenance({ filePath, line, commit }) {
 
 function classifyMappingRelationLayer(edgeType) {
     if (edgeType === 'validated_by') return 'test';
+    if (edgeType === 'cannot' || edgeType === 'forbidden_by' || edgeType === 'blocked_by') return 'blocker';
     if (edgeType === 'reads_state' || edgeType === 'writes_state') return 'state';
     if (edgeType === 'reads_config') return 'config';
     if (edgeType === 'emits' || edgeType === 'consumes') return 'event';

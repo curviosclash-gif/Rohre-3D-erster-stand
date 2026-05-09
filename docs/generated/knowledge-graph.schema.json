@@ -76,7 +76,10 @@
         "reads_config",
         "reads_state",
         "writes_state",
-        "validated_by"
+        "validated_by",
+        "cannot",
+        "forbidden_by",
+        "blocked_by"
       ]
     },
     "dependsSourceType": {

@@ -33,6 +33,7 @@ import {
     queryImpactDiff,
     queryImpactForFile,
     queryUntestedSystems,
+    queryWhyNot,
 } from '../scripts/query-knowledge-graph.mjs';
 import {
     resolveKnowledgeGraphMigration,
@@ -835,6 +836,23 @@ test('knowledge graph core runtime queries return stable JSON shapes', async () 
     assert.deepEqual(healthByPath.get('round-end').missingLayers, []);
     assert.ok(healthByPath.get('round-end').requiredLayers.includes('config'));
     assert.equal(healthByPath.get('settings').status, 'ok');
+});
+
+test('why-not query prioritizes explicit negative graph blockers', async () => {
+    const graph = await buildKnowledgeGraph();
+
+    const settings = queryWhyNot(graph, 'settings');
+    assert.equal(settings.query, 'why-not');
+    assert.ok(settings.blockers.length >= 1);
+    assert.deepEqual(settings.blockers.map((edge) => edge.type), ['forbidden_by']);
+    assert.equal(settings.blockers[0].from, 'runtime:settings-manager');
+    assert.equal(settings.blockers[0].to, 'config:settings-runtime-limits');
+    assert.equal(settings.blockers[0].severity, 'error');
+    assert.match(settings.blockers[0].reason, /Runtime-Limits/);
+
+    const roundEnd = queryWhyNot(graph, 'round-end');
+    assert.equal(roundEnd.blockers[0].type, 'blocked_by');
+    assert.equal(roundEnd.blockers[0].from, 'runtime:round-end-coordinator');
 });
 
 test('impact-diff reports changed runtime subgraphs and recommended delta checks', async () => {

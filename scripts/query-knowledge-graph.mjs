@@ -19,7 +19,21 @@ const RUNTIME_QUERY_EDGE_TYPES = new Set([
     'reads_state',
     'writes_state',
     'validated_by',
+    'cannot',
+    'forbidden_by',
+    'blocked_by',
 ]);
+const NEGATIVE_EDGE_TYPES = new Set(['cannot', 'forbidden_by', 'blocked_by']);
+const NEGATIVE_EDGE_TYPE_RANK = Object.freeze({
+    forbidden_by: 0,
+    blocked_by: 1,
+    cannot: 2,
+});
+const NEGATIVE_EDGE_SEVERITY_RANK = Object.freeze({
+    error: 0,
+    warning: 1,
+    info: 2,
+});
 const EVENT_FLOW_CONTEXT_EDGE_TYPES = new Set([
     'emits',
     'consumes',
@@ -27,6 +41,9 @@ const EVENT_FLOW_CONTEXT_EDGE_TYPES = new Set([
     'reads_state',
     'writes_state',
     'validated_by',
+    'cannot',
+    'forbidden_by',
+    'blocked_by',
 ]);
 const CRITICAL_PATH_LAYER_REQUIREMENTS = Object.freeze({
     'combat-hit': ['runtime', 'event', 'state', 'config', 'test'],
@@ -138,6 +155,8 @@ function edgeSummary(edge, nodeById) {
         type: edge.type,
         relationLayer: edge.attributes?.relationLayer || null,
         mappingId: edge.attributes?.mappingId || null,
+        reason: edge.attributes?.reason || null,
+        severity: edge.attributes?.severity || null,
         provenance: edge.attributes?.provenance || null,
     };
 }
@@ -152,6 +171,10 @@ function sortNodeSummaries(entries) {
 
 function sortEdgeSummaries(entries) {
     return entries.sort((left, right) => {
+        const typeRankCompare = (NEGATIVE_EDGE_TYPE_RANK[left.type] ?? 99) - (NEGATIVE_EDGE_TYPE_RANK[right.type] ?? 99);
+        if (typeRankCompare !== 0) return typeRankCompare;
+        const severityCompare = (NEGATIVE_EDGE_SEVERITY_RANK[left.severity] ?? 99) - (NEGATIVE_EDGE_SEVERITY_RANK[right.severity] ?? 99);
+        if (severityCompare !== 0) return severityCompare;
         const fromCompare = String(left.from || '').localeCompare(String(right.from || ''));
         if (fromCompare !== 0) return fromCompare;
         const toCompare = String(left.to || '').localeCompare(String(right.to || ''));
@@ -481,6 +504,37 @@ function queryChangeRisk(graph, coverage, changedFiles, { baseRef = null } = {})
         ...impact,
         query: 'change-risk',
         sourceQuery: impact.query,
+    };
+}
+
+function queryWhyNot(graph, selector) {
+    const normalizedSelector = String(selector || '').trim();
+    const { nodes, edges, nodeById } = buildGraphIndexes(graph);
+    const selectedCriticalPath = normalizeCriticalPathFilter(normalizedSelector);
+    const selectedNode = nodeById.get(normalizedSelector) || null;
+    const selectedNodeIds = new Set();
+
+    if (selectedNode) {
+        selectedNodeIds.add(selectedNode.id);
+    } else if (selectedCriticalPath) {
+        for (const node of nodes) {
+            if (RUNTIME_QUERY_NODE_TYPES.has(node.type) && nodeMatchesCriticalPath(node, selectedCriticalPath)) {
+                selectedNodeIds.add(node.id);
+            }
+        }
+    }
+
+    const explicitBlockers = edges
+        .filter((edge) => NEGATIVE_EDGE_TYPES.has(edge.type))
+        .filter((edge) => selectedNodeIds.size === 0 || selectedNodeIds.has(edge.from) || selectedNodeIds.has(edge.to))
+        .map((edge) => edgeSummary(edge, nodeById));
+
+    return {
+        query: 'why-not',
+        selector: normalizedSelector,
+        selectorType: selectedNode ? 'node' : 'critical-path',
+        explicitBlockerCount: explicitBlockers.length,
+        blockers: sortEdgeSummaries(explicitBlockers),
     };
 }
 
@@ -859,6 +913,23 @@ function printText(result) {
         return;
     }
 
+    if (result.query === 'why-not') {
+        process.stdout.write(`why-not ${result.selector}\n`);
+        if (result.blockers.length === 0) {
+            process.stdout.write('- none\n');
+            return;
+        }
+        for (const blocker of result.blockers) {
+            const flags = [
+                `severity=${blocker.severity || 'unknown'}`,
+                `layer=${blocker.relationLayer || 'unknown'}`,
+            ];
+            if (blocker.reason) flags.push(`reason=${blocker.reason}`);
+            process.stdout.write(`- ${blocker.type}: ${blocker.from} -> ${blocker.to} (${flags.join(', ')})\n`);
+        }
+        return;
+    }
+
     if (result.query === 'event-flow') {
         process.stdout.write(`event-flow ${result.selector}\n`);
         const contextEdges = (result.contextEdges || [])
@@ -918,6 +989,7 @@ function usage() {
         + '  node scripts/query-knowledge-graph.mjs impact-for-file <FILE_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs impact-diff [--base <REF>] [FILE_PATH...] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs change-risk [--base <REF>] [FILE_PATH...] [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs why-not <NODE_ID|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs event-flow <EVENT_ID|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs untested-systems [CRITICAL_PATH] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs critical-path-health [--json]\n'
@@ -938,6 +1010,7 @@ export {
     querySurfacesForFile,
     queryUntestedSystems,
     queryUncoveredFiles,
+    queryWhyNot,
     queryWhyFile,
 };
 
@@ -1022,6 +1095,13 @@ if (isDirectRun) {
                 ? explicitFiles
                 : await readChangedFiles(baseRef || 'HEAD');
             result = queryChangeRisk(graph, coverage, changedFiles, { baseRef });
+        } else if (command === 'why-not') {
+            const selector = positional[1];
+            if (!selector) {
+                usage();
+                process.exit(1);
+            }
+            result = queryWhyNot(graph, selector);
         } else if (command === 'event-flow') {
             const selector = positional[1];
             if (!selector) {
