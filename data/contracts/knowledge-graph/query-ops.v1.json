@@ -71,6 +71,58 @@
       }
     },
     {
+      "id": "quality-scorecard",
+      "command": "node scripts/query-knowledge-graph.mjs quality-scorecard --json",
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:quality-scorecard",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 20,
+          "p95_ms": 60
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 30,
+          "p95_ms": 90
+        }
+      }
+    },
+    {
+      "id": "what-if-remove-settings",
+      "command": "node scripts/query-knowledge-graph.mjs what-if-remove src/core/SettingsManager.js --json",
+      "sample_files": [
+        "src/core/SettingsManager.js"
+      ],
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:counterfactual-analysis",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 40,
+          "p95_ms": 90
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 60,
+          "p95_ms": 135
+        }
+      }
+    },
+    {
+      "id": "what-if-replace-settings-validation",
+      "command": "node scripts/query-knowledge-graph.mjs what-if-replace src/core/SettingsManager.js tests/runtime-settings-live-apply.contract.test.mjs --json",
+      "sample_files": [
+        "src/core/SettingsManager.js",
+        "tests/runtime-settings-live-apply.contract.test.mjs"
+      ],
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:counterfactual-analysis",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 45,
+          "p95_ms": 95
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 68,
+          "p95_ms": 143
+        }
+      }
+    },
+    {
       "id": "event-flow-spawn",
       "command": "node scripts/query-knowledge-graph.mjs event-flow spawn --json",
       "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:critical-path-health",
@@ -206,6 +258,50 @@
         "Default export-view reports safety.mode=default-redacted.",
         "PII and secret-like keys or values are replaced with redaction markers.",
         "Raw output is available only through the explicit --unsafe-raw override."
+      ]
+    },
+    {
+      "id": "quality-scorecard",
+      "link": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:quality-scorecard",
+      "trigger_codes": [
+        "SCORECARD_DIFF",
+        "KG_QUERY_PLAYBOOK_INVALID"
+      ],
+      "triage_queries": [
+        "node scripts/query-knowledge-graph.mjs quality-scorecard --json",
+        "npm run graph:build",
+        "npm run graph:check"
+      ],
+      "recovery_steps": [
+        "Inspect scorecard current.metrics and trend before changing generated artifacts.",
+        "If the score regressed, compare criticalPaths and coverage gate output to identify the affected graph layer.",
+        "Repair mapping or coverage sources, then rerun graph:build and graph:check."
+      ],
+      "exit_criteria": [
+        "quality-scorecard reports a pass status or a documented review reason.",
+        "knowledge-graph.scorecard.json is byte-identical to graph:build output.",
+        "Trend direction and scoreDelta are reproducible from committed history."
+      ]
+    },
+    {
+      "id": "counterfactual-analysis",
+      "link": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:counterfactual-analysis",
+      "trigger_codes": [
+        "KG_QUERY_PLAYBOOK_INVALID"
+      ],
+      "triage_queries": [
+        "node scripts/query-knowledge-graph.mjs what-if-remove src/core/SettingsManager.js --json",
+        "node scripts/query-knowledge-graph.mjs what-if-replace src/core/SettingsManager.js tests/runtime-settings-live-apply.contract.test.mjs --json"
+      ],
+      "recovery_steps": [
+        "Review blastRadius, predictedEffects and uncertaintyBudget before accepting a removal or replacement.",
+        "Run every recommended event-flow query for affected critical paths.",
+        "Treat medium or high uncertainty as human-review evidence, not an automatic approval."
+      ],
+      "exit_criteria": [
+        "Counterfactual output includes blastRadius, recommendedChecks and uncertaintyBudget.",
+        "Affected critical paths are explicit and reproducible for the reference Settings case.",
+        "No removal proceeds without replacement evidence for validation or guardrail edges."
       ]
     }
   ]

@@ -130,11 +130,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1821,
-    "rawCoveredFileCount": 1465,
+    "trackedFileCount": 1823,
+    "rawCoveredFileCount": 1467,
     "rawCoveragePercent": 80.5,
-    "adjustedTrackedFileCount": 1559,
-    "adjustedCoveredFileCount": 1325,
+    "adjustedTrackedFileCount": 1561,
+    "adjustedCoveredFileCount": 1327,
     "adjustedCoveragePercent": 85,
     "uncoveredFileCount": 356,
     "uncoveredActiveFileCount": 234,
@@ -178,14 +178,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 928,
-        "coveredCount": 913
+        "count": 929,
+        "coveredCount": 914
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 393,
-        "coveredCount": 208
+        "count": 394,
+        "coveredCount": 209
       },
       {
         "classification": "prototype",
@@ -4170,6 +4170,25 @@
     },
     {
       "path": "data/contracts/knowledge-graph/predicate-constraints.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/quality-scorecard-history.v1.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -10982,6 +11001,23 @@
         "V110",
         "V111",
         "V94"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/generated/knowledge-graph.scorecard.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V111"
       ],
       "surfaces": [],
       "classification": "product-docs",

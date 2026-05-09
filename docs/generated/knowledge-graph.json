@@ -2082,7 +2082,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 22,
+          "concreteCount": 23,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -2236,7 +2236,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 38,
+          "concreteCount": 39,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2275,6 +2275,7 @@
           "docs/generated/knowledge-graph.coverage.json",
           "docs/generated/knowledge-graph.json",
           "docs/generated/knowledge-graph.schema.json",
+          "docs/generated/knowledge-graph.scorecard.json",
           "docs/plaene/aktiv/V111.md",
           "docs/plaene/CHANGELOG.md",
           "docs/referenz/ai_architecture_context.md",
@@ -2289,7 +2290,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 20,
+          "concreteCount": 22,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -6244,7 +6245,7 @@
       "id": "V111.3",
       "type": "phase",
       "title": "Safety, Scorecard und What-if-Analyse",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.3"
@@ -17185,8 +17186,8 @@
     {
       "id": "V111.3.2",
       "type": "subphase",
-      "title": "Graph-Quality-Scorecard historisieren sowie Counterfactual-Queries (`what-if-remove`, `what-if-replace`) und Uncertainty-Budget reproduzierbar machen.",
-      "status": "open",
+      "title": "Graph-Quality-Scorecard historisieren sowie Counterfactual-Queries (`what-if-remove`, `what-if-replace`) und Uncertainty-Budget reproduzierbar machen. (abgeschlossen: 2026-05-09; evidence: `docs/generated/knowledge-graph.scorecard.json` wird aus `data/contracts/knowledge-graph/quality-scorecard-history.v1.json` plus Build-Metriken erzeugt; `node scripts/query-knowledge-graph.mjs quality-scorecard --json` -> `score=94.8`, `status=pass`, `trend.direction=down`, `scoreDelta=-0.4`; `what-if-remove src/core/SettingsManager.js --json` -> `criticalPaths=[\"settings\"]`, `blockerEdgeCount=1`, `uncertaintyBudget.tier=low`; `what-if-replace src/core/SettingsManager.js tests/runtime-settings-live-apply.contract.test.mjs --json` -> `sharedCriticalPaths=[\"settings\"]`, `validationEdgeDelta=-1`, `maxCausalScoreDelta=-3.46`; fokussierter Contract-Run fuer `quality scorecard|counterfactual|impact-diff|change-risk` gruen)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.3",
@@ -28856,6 +28857,23 @@
       }
     },
     {
+      "id": "data/contracts/knowledge-graph/quality-scorecard-history.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/contracts/knowledge-graph/query-ops.v1.json",
       "type": "file",
       "title": null,
@@ -33784,6 +33802,21 @@
           "V110",
           "V111",
           "V94"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/generated/knowledge-graph.scorecard.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V111"
         ],
         "exists": true
       }
@@ -97253,6 +97286,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/quality-scorecard-history.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/query-ops.v1.json",
       "type": "scope",
       "hint": null,
@@ -98568,6 +98610,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/quality-scorecard-history.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/query-ops.v1.json",
       "type": "scope",
       "hint": null,
@@ -99119,6 +99170,15 @@
     },
     {
       "from": "V111",
+      "to": "data/contracts/knowledge-graph/quality-scorecard-history.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
       "to": "data/contracts/knowledge-graph/query-ops.v1.json",
       "type": "scope",
       "hint": null,
@@ -99174,6 +99234,15 @@
     {
       "from": "V111",
       "to": "docs/generated/knowledge-graph.schema.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "docs/generated/knowledge-graph.scorecard.json",
       "type": "scope",
       "hint": null,
       "attributes": {

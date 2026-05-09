@@ -17,7 +17,9 @@ const ARCHIVED_COMPLETED_BLOCKS_PATH = 'docs/plaene/archiv/abgeschlossene-bloeck
 const GUARD_MATRIX_PATH = 'scripts/architecture/legacy-surface-guard-matrix.json';
 const OUTPUT_PATH = 'docs/generated/knowledge-graph.json';
 const COVERAGE_OUTPUT_PATH = 'docs/generated/knowledge-graph.coverage.json';
+const SCORECARD_OUTPUT_PATH = 'docs/generated/knowledge-graph.scorecard.json';
 const KNOWLEDGE_GRAPH_MAPPING_DIR = 'data/contracts/knowledge-graph';
+const QUALITY_SCORECARD_HISTORY_PATH = 'data/contracts/knowledge-graph/quality-scorecard-history.v1.json';
 const GIT_HOTSPOT_OVERLAY_ID = 'GIT-HISTORY-HOTSPOTS';
 const GIT_HOTSPOT_MAX_FILES = 96;
 const GIT_HOTSPOT_MIN_CHANGES = 5;
@@ -49,6 +51,8 @@ const GRAPH_MAPPING_SCHEMA_VERSION = 1;
 const COVERAGE_CONTRACT = 'knowledge-graph.coverage.v1';
 const COVERAGE_SCHEMA_VERSION = 1;
 const COVERAGE_GATE_CONTRACT = 'knowledge-graph.coverage.gate.v1';
+const SCORECARD_CONTRACT = 'knowledge-graph.scorecard.v1';
+const SCORECARD_SCHEMA_VERSION = 1;
 const COVERAGE_NO_NEW_UNCOVERED_RULE = 'no-new-active-uncovered-files';
 const execFile = promisify(execFileCallback);
 const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
@@ -126,6 +130,7 @@ const NODE_TYPE_ORDER = Object.freeze({
     file: 8,
     surface: 9,
 });
+const SCORECARD_CRITICAL_PATHS = Object.freeze(['combat-hit', 'round-end', 'settings', 'spawn']);
 
 const KNOWLEDGE_GRAPH_MAPPING_NODE_TYPES = new Set([
     'runtime',
@@ -1993,6 +1998,154 @@ function buildCoverageArtifact(coreGraph, trackedFiles, hotspotOverlay, baseline
     };
 }
 
+async function readQualityScorecardHistory() {
+    try {
+        const raw = await fs.readFile(path.join(ROOT, QUALITY_SCORECARD_HISTORY_PATH), 'utf8');
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed.snapshots) ? parsed.snapshots : [];
+    } catch {
+        return [];
+    }
+}
+
+function calculateScore(value, target) {
+    const numericValue = Number(value);
+    const numericTarget = Number(target);
+    if (!Number.isFinite(numericValue) || !Number.isFinite(numericTarget) || numericTarget <= 0) {
+        return 0;
+    }
+    return Number(Math.max(0, Math.min(100, (numericValue / numericTarget) * 100)).toFixed(1));
+}
+
+function getNodeCriticalPaths(node) {
+    const attributes = node?.attributes || {};
+    const values = Array.isArray(attributes.criticalPaths)
+        ? attributes.criticalPaths
+        : [attributes.criticalPath];
+    return values
+        .map((value) => String(value || '').trim())
+        .filter(Boolean);
+}
+
+function summarizeCriticalPathHealthForScorecard(graph) {
+    const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const mappedEdges = Array.isArray(graph.edges)
+        ? graph.edges.filter((edge) => String(edge?.attributes?.mappingId || '').trim())
+        : [];
+    const paths = [...SCORECARD_CRITICAL_PATHS].sort((left, right) => left.localeCompare(right));
+
+    const entries = paths.map((criticalPath) => {
+        const pathNodes = nodes.filter((node) => getNodeCriticalPaths(node).includes(criticalPath));
+        const nodeIds = new Set(pathNodes.map((node) => node.id));
+        const presentLayers = new Set(pathNodes.map((node) => node.type));
+        const missingRequiredNodes = [];
+        const missingRequiredEdges = [];
+        const validationEdges = mappedEdges.filter((edge) => edge.type === 'validated_by' && nodeIds.has(edge.from));
+        const status = missingRequiredNodes.length === 0
+            && missingRequiredEdges.length === 0
+            && validationEdges.length > 0
+            ? 'ok'
+            : 'review';
+
+        return {
+            criticalPath,
+            status,
+            nodeCount: pathNodes.length,
+            edgeCount: mappedEdges.filter((edge) => nodeIds.has(edge.from) || nodeIds.has(edge.to)).length,
+            layers: Array.from(presentLayers).sort((left, right) => left.localeCompare(right)),
+            validationEdgeCount: validationEdges.length,
+            missingRequiredNodes,
+            missingRequiredEdges,
+        };
+    });
+
+    const okCount = entries.filter((entry) => entry.status === 'ok').length;
+    return {
+        okCount,
+        totalCount: entries.length,
+        okPercent: entries.length > 0 ? Number((okCount / entries.length * 100).toFixed(1)) : 0,
+        entries,
+    };
+}
+
+function buildQualityScorecardArtifact(graph, coverage, historySnapshots = []) {
+    const mappedEdges = Array.isArray(graph.edges)
+        ? graph.edges.filter((edge) => String(edge?.attributes?.mappingId || '').trim())
+        : [];
+    const mappedNodes = Array.isArray(graph.nodes)
+        ? graph.nodes.filter((node) => String(node?.attributes?.mappingId || '').trim())
+        : [];
+    const validationEdgeCount = mappedEdges.filter((edge) => edge.type === 'validated_by').length;
+    const negativeEdgeCount = mappedEdges.filter((edge) => ['cannot', 'forbidden_by', 'blocked_by'].includes(edge.type)).length;
+    const criticalPathHealth = summarizeCriticalPathHealthForScorecard(graph);
+    const coveragePercent = Number(coverage?.summary?.adjustedCoveragePercent || 0);
+    const coverageGateStatus = String(coverage?.gate?.status || 'unknown');
+    const mappedNodeValidationRatio = mappedNodes.length > 0
+        ? Number((validationEdgeCount / mappedNodes.length).toFixed(3))
+        : 0;
+    const metrics = {
+        adjustedCoveragePercent: coveragePercent,
+        coverageGateStatus,
+        criticalPathOkPercent: criticalPathHealth.okPercent,
+        criticalPathOkCount: criticalPathHealth.okCount,
+        criticalPathTotalCount: criticalPathHealth.totalCount,
+        mappedNodeCount: mappedNodes.length,
+        mappedEdgeCount: mappedEdges.length,
+        validationEdgeCount,
+        negativeEdgeCount,
+        mappedNodeValidationRatio,
+    };
+    const score = Number((
+        calculateScore(metrics.adjustedCoveragePercent, 100) * 0.35
+        + calculateScore(metrics.criticalPathOkPercent, 100) * 0.35
+        + calculateScore(metrics.mappedNodeValidationRatio, 0.2) * 0.2
+        + (coverageGateStatus === 'pass' ? 100 : 0) * 0.1
+    ).toFixed(1));
+    const current = {
+        id: 'current',
+        source: 'build',
+        graphPath: OUTPUT_PATH,
+        coveragePath: COVERAGE_OUTPUT_PATH,
+        score,
+        status: score >= 90 && coverageGateStatus === 'pass' && criticalPathHealth.okPercent === 100 ? 'pass' : 'review',
+        metrics,
+    };
+    const history = [...historySnapshots, current]
+        .map((entry) => ({
+            id: String(entry.id || '').trim() || 'unknown',
+            source: String(entry.source || '').trim() || 'unknown',
+            graphPath: String(entry.graphPath || OUTPUT_PATH).trim(),
+            coveragePath: String(entry.coveragePath || COVERAGE_OUTPUT_PATH).trim(),
+            score: Number(entry.score || 0),
+            status: String(entry.status || 'unknown').trim() || 'unknown',
+            metrics: entry.metrics && typeof entry.metrics === 'object' ? entry.metrics : {},
+        }))
+        .slice(-8);
+    const previous = history.length > 1 ? history[history.length - 2] : null;
+
+    return {
+        schema_version: SCORECARD_SCHEMA_VERSION,
+        contract: SCORECARD_CONTRACT,
+        graph_contract: GRAPH_CONTRACT,
+        coverage_contract: COVERAGE_CONTRACT,
+        current,
+        trend: {
+            previousId: previous?.id || null,
+            scoreDelta: previous ? Number((current.score - Number(previous.score || 0)).toFixed(1)) : null,
+            direction: !previous
+                ? 'baseline'
+                : current.score > Number(previous.score || 0)
+                    ? 'up'
+                    : current.score < Number(previous.score || 0)
+                        ? 'down'
+                        : 'flat',
+        },
+        criticalPaths: criticalPathHealth.entries,
+        history,
+    };
+}
+
 function createNodeStore() {
     const map = new Map();
     return {
@@ -2564,10 +2717,13 @@ export async function buildKnowledgeGraphArtifacts() {
         buildGitHotspotOverlay(coveredFileIds, trackedFiles),
         readCoverageBaseline(),
     ]);
+    const scorecardHistory = await readQualityScorecardHistory();
     const coverage = buildCoverageArtifact(graph, trackedFiles, hotspotOverlay, baselineCoverage);
+    const scorecard = buildQualityScorecardArtifact(graph, coverage, scorecardHistory);
     return {
         graph,
         coverage,
+        scorecard,
     };
 }
 
@@ -2580,11 +2736,13 @@ async function writeJsonArtifact(outputPath, payload) {
 export async function writeKnowledgeGraphArtifacts({
     graphPath = OUTPUT_PATH,
     coveragePath = COVERAGE_OUTPUT_PATH,
+    scorecardPath = SCORECARD_OUTPUT_PATH,
 } = {}) {
     const artifacts = await buildKnowledgeGraphArtifacts();
     await Promise.all([
         writeJsonArtifact(graphPath, artifacts.graph),
         writeJsonArtifact(coveragePath, artifacts.coverage),
+        writeJsonArtifact(scorecardPath, artifacts.scorecard),
     ]);
     return artifacts;
 }
@@ -2592,6 +2750,7 @@ export async function writeKnowledgeGraphArtifacts({
 export {
     buildCoverageArtifact,
     buildGitHotspotOverlay,
+    buildQualityScorecardArtifact,
     classifyCoveragePath,
     isActiveUncoveredCoverageFile,
     normalizeKnowledgeGraphMappingContract,
@@ -2612,10 +2771,11 @@ const isDirectRun = process.argv[1]
 
 if (isDirectRun) {
     try {
-        const { graph, coverage } = await writeKnowledgeGraphArtifacts();
+        const { graph, coverage, scorecard } = await writeKnowledgeGraphArtifacts();
         process.stdout.write(
             `[graph:build] core nodes=${graph.nodes.length} edges=${graph.edges.length} -> ${OUTPUT_PATH}; `
-            + `coverage tracked=${coverage.summary.trackedFileCount} adjusted=${coverage.summary.adjustedCoveragePercent}% -> ${COVERAGE_OUTPUT_PATH}\n`
+            + `coverage tracked=${coverage.summary.trackedFileCount} adjusted=${coverage.summary.adjustedCoveragePercent}% -> ${COVERAGE_OUTPUT_PATH}; `
+            + `scorecard ${scorecard.current.score} (${scorecard.current.status}) -> ${SCORECARD_OUTPUT_PATH}\n`
         );
     } catch (error) {
         const message = error instanceof Error ? error.stack || error.message : String(error);

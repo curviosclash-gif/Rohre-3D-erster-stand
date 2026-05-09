@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
     buildKnowledgeGraph,
     buildCoverageArtifact,
+    buildQualityScorecardArtifact,
     classifyCoveragePath,
     normalizeKnowledgeGraphMappingContract,
     parseAuditFindingsMetadata,
@@ -32,7 +33,10 @@ import {
     queryEventFlow,
     queryImpactDiff,
     queryImpactForFile,
+    queryQualityScorecard,
     queryUntestedSystems,
+    queryWhatIfRemove,
+    queryWhatIfReplace,
     queryWhyNot,
 } from '../scripts/query-knowledge-graph.mjs';
 import {
@@ -1001,6 +1005,80 @@ test('query intent presets tune impact-diff checks without changing core risk ev
     assert.equal(onboarding.preset.id, 'onboarding');
     assert.ok(onboarding.recommendedChecks.includes('node scripts/query-knowledge-graph.mjs critical-path-health --json'));
     assert.equal(review.riskFiles[0].maxCausalScore, onboarding.riskFiles[0].maxCausalScore);
+});
+
+test('quality scorecard is generated with reproducible trend metrics', async () => {
+    const graph = await buildKnowledgeGraph();
+    const coverage = buildCoverageArtifact(graph, ['src/core/SettingsManager.js'], null, null);
+    const scorecard = buildQualityScorecardArtifact(graph, coverage, [
+        {
+            id: 'baseline',
+            source: 'fixture',
+            graphPath: 'docs/generated/knowledge-graph.json',
+            coveragePath: 'docs/generated/knowledge-graph.coverage.json',
+            score: 80,
+            status: 'review',
+            metrics: {
+                adjustedCoveragePercent: 90,
+            },
+        },
+    ]);
+    const result = queryQualityScorecard(scorecard);
+
+    assert.equal(result.query, 'quality-scorecard');
+    assert.equal(result.contract, 'knowledge-graph.scorecard.v1');
+    assert.equal(result.current.graphPath, 'docs/generated/knowledge-graph.json');
+    assert.equal(result.current.coveragePath, 'docs/generated/knowledge-graph.coverage.json');
+    assert.ok(result.current.score > 80);
+    assert.equal(result.trend.previousId, 'baseline');
+    assert.equal(result.trend.direction, 'up');
+    assert.ok(result.current.metrics.criticalPathOkPercent >= 100);
+    assert.ok(result.history.some((entry) => entry.id === 'current'));
+});
+
+test('counterfactual queries expose blast radius and uncertainty budget for reference changes', async () => {
+    const graph = await buildKnowledgeGraph();
+    const coverage = {
+        files: [
+            {
+                path: 'src/core/SettingsManager.js',
+                covered: true,
+                coveredInCore: true,
+                coveredByOverlay: false,
+                classification: 'product-code',
+                scopeBlocks: ['V103', 'V110'],
+                surfaces: [],
+            },
+            {
+                path: 'tests/runtime-settings-live-apply.contract.test.mjs',
+                covered: true,
+                coveredInCore: true,
+                coveredByOverlay: false,
+                classification: 'product-code',
+                scopeBlocks: ['V103'],
+                surfaces: [],
+            },
+        ],
+    };
+
+    const remove = queryWhatIfRemove(graph, coverage, 'src/core/SettingsManager.js');
+    assert.equal(remove.query, 'what-if-remove');
+    assert.equal(remove.selectorType, 'file');
+    assert.ok(remove.blastRadius.criticalPaths.includes('settings'));
+    assert.equal(remove.blastRadius.blockerEdgeCount, 1);
+    assert.ok(remove.uncertaintyBudget.score > 0);
+    assert.ok(remove.recommendedChecks.some((command) => command.includes('event-flow settings')));
+
+    const replace = queryWhatIfReplace(
+        graph,
+        coverage,
+        'src/core/SettingsManager.js',
+        'tests/runtime-settings-live-apply.contract.test.mjs'
+    );
+    assert.equal(replace.query, 'what-if-replace');
+    assert.ok(replace.comparison.sharedCriticalPaths.includes('settings'));
+    assert.ok(replace.comparison.validationEdgeDelta < 0);
+    assert.ok(['low', 'medium', 'high'].includes(replace.uncertaintyBudget.tier));
 });
 
 test('query ops contract requires SLO profiles and operator playbooks', () => {

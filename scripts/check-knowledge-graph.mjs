@@ -18,6 +18,7 @@ import {
 const ROOT = process.cwd();
 const GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
+const SCORECARD_PATH = 'docs/generated/knowledge-graph.scorecard.json';
 const PREDICATE_CONSTRAINTS_PATH = 'data/contracts/knowledge-graph/predicate-constraints.v1.json';
 const CONTRADICTIONS_PATH = 'data/contracts/knowledge-graph/contradictions.v1.json';
 const RUNTIME_TELEMETRY_REPLAY_PATH = 'data/contracts/knowledge-graph/runtime-telemetry-replay.v1.json';
@@ -1165,9 +1166,10 @@ async function runChecks() {
     const violations = [];
     const warnings = [];
 
-    const [existingGraph, existingCoverage, generatedArtifacts, allowancesByBlock, predicateConstraints, contradictionRules, runtimeTelemetryReplay, schemaMigrations, queryOpsContract] = await Promise.all([
+    const [existingGraph, existingCoverage, existingScorecard, generatedArtifacts, allowancesByBlock, predicateConstraints, contradictionRules, runtimeTelemetryReplay, schemaMigrations, queryOpsContract] = await Promise.all([
         readExistingArtifact(GRAPH_PATH),
         readExistingArtifact(COVERAGE_PATH),
+        readExistingArtifact(SCORECARD_PATH),
         buildKnowledgeGraphArtifacts(),
         readScopeOverlapAllowances(),
         readPredicateConstraints(),
@@ -1179,11 +1181,15 @@ async function runChecks() {
 
     const generatedGraphRaw = artifactToString(generatedArtifacts.graph);
     const generatedCoverageRaw = artifactToString(generatedArtifacts.coverage);
+    const generatedScorecardRaw = artifactToString(generatedArtifacts.scorecard);
     if (existingGraph.raw !== generatedGraphRaw) {
         addViolation(violations, 'GRAPH_DIFF', 'knowledge-graph.json ist nicht byteidentisch zum Build-Output (run: npm run graph:build)');
     }
     if (existingCoverage.raw !== generatedCoverageRaw) {
         addViolation(violations, 'COVERAGE_DIFF', 'knowledge-graph.coverage.json ist nicht byteidentisch zum Build-Output (run: npm run graph:build)');
+    }
+    if (existingScorecard.raw !== generatedScorecardRaw) {
+        addViolation(violations, 'SCORECARD_DIFF', 'knowledge-graph.scorecard.json ist nicht byteidentisch zum Build-Output (run: npm run graph:build)');
     }
 
     validateNodeIdAndOrphans(existingGraph.parsed, violations);

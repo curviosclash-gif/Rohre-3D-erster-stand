@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-09 (Subphase `V111 111.3.2`)
+
+- `111.3.2` ist abgeschlossen: `npm run graph:build` erzeugt jetzt neben Graph und Coverage eine deterministische `docs/generated/knowledge-graph.scorecard.json`, gespeist aus Build-Metriken plus `data/contracts/knowledge-graph/quality-scorecard-history.v1.json`. `graph:check` prueft die Scorecard bytegleich gegen den Build-Output.
+- Neue Entscheidungsqueries: `quality-scorecard`, `what-if-remove` und `what-if-replace` liefern Score/Trend, Blast-Radius, empfohlene Checks und ein explizites `uncertaintyBudget`. Referenzfall Settings: Scorecard `94.8/pass`, `what-if-remove src/core/SettingsManager.js` meldet `settings`, `blockerEdgeCount=1`, `uncertainty=low`; `what-if-replace src/core/SettingsManager.js tests/runtime-settings-live-apply.contract.test.mjs` meldet `validationEdgeDelta=-1` und `maxCausalScoreDelta=-3.46`.
+
 ## Stand-Snapshot 2026-05-09 (Subphase `V111 111.1.2`)
 
 - `111.1.2` ist abgeschlossen: zentrale Settings- und Round-End-Kanten im Desktop-Critical-Path-Contract tragen `strength` und `directness`; `impact-for-file` und `impact-diff` berechnen daraus `causalScore` und sortieren Impact-Kanten reproduzierbar nach Entscheidungsrelevanz.

@@ -8,6 +8,7 @@ import { promisify } from 'node:util';
 const ROOT = process.cwd();
 const GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
+const SCORECARD_PATH = 'docs/generated/knowledge-graph.scorecard.json';
 const GIT_HOTSPOT_OVERLAY_ID = 'GIT-HISTORY-HOTSPOTS';
 const execFile = promisify(execFileCallback);
 const RUNTIME_QUERY_NODE_TYPES = new Set(['runtime', 'event', 'state', 'config', 'test']);
@@ -861,6 +862,201 @@ function queryChangeRisk(graph, coverage, changedFiles, { baseRef = null, preset
     };
 }
 
+function resolveWhatIfSelection(graph, coverage, selector) {
+    const normalizedSelector = normalizePath(selector);
+    const { nodes, edges, nodeById } = buildGraphIndexes(graph);
+    const coverageByPath = buildCoverageFileIndex(coverage);
+    const preferFileSelection = coverageByPath.has(normalizedSelector) || normalizedSelector.includes('/');
+    if (preferFileSelection) {
+        const fileImpact = queryImpactForFile(graph, coverage, normalizedSelector);
+        if (fileImpact.implementedNodes.length > 0 || fileImpact.relatedNodes.length > 0 || fileImpact.relationEdges.length > 0) {
+            const impactedNodeIds = new Set([
+                ...fileImpact.implementedNodes.map((node) => node.id),
+                ...fileImpact.relatedNodes.map((node) => node.id),
+            ]);
+            return {
+                selector: normalizedSelector,
+                selectorType: 'file',
+                nodes: Array.from(impactedNodeIds).map((nodeId) => nodeById.get(nodeId)).filter(Boolean),
+                edges: fileImpact.relationEdges,
+                fileImpact,
+            };
+        }
+    }
+    const selectedNode = nodeById.get(normalizedSelector) || null;
+    if (selectedNode) {
+        return {
+            selector: normalizedSelector,
+            selectorType: 'node',
+            nodes: [selectedNode],
+            edges: edges.filter((edge) => edge.from === selectedNode.id || edge.to === selectedNode.id),
+            fileImpact: null,
+        };
+    }
+
+    const fileImpact = queryImpactForFile(graph, coverage, normalizedSelector);
+    if (fileImpact.implementedNodes.length > 0 || fileImpact.relatedNodes.length > 0 || fileImpact.relationEdges.length > 0) {
+        const impactedNodeIds = new Set([
+            ...fileImpact.implementedNodes.map((node) => node.id),
+            ...fileImpact.relatedNodes.map((node) => node.id),
+        ]);
+        return {
+            selector: normalizedSelector,
+            selectorType: 'file',
+            nodes: Array.from(impactedNodeIds).map((nodeId) => nodeById.get(nodeId)).filter(Boolean),
+            edges: fileImpact.relationEdges,
+            fileImpact,
+        };
+    }
+
+    const criticalPath = normalizeCriticalPathFilter(normalizedSelector);
+    const pathNodes = nodes.filter((node) => nodeMatchesCriticalPath(node, criticalPath) && RUNTIME_QUERY_NODE_TYPES.has(node.type));
+    const pathNodeIds = new Set(pathNodes.map((node) => node.id));
+    return {
+        selector: normalizedSelector,
+        selectorType: 'critical-path',
+        nodes: pathNodes,
+        edges: edges.filter((edge) => pathNodeIds.has(edge.from) || pathNodeIds.has(edge.to)).map((edge) => edgeSummary(edge, nodeById)),
+        fileImpact: null,
+    };
+}
+
+function summarizeWhatIfSelection(selection) {
+    const criticalPaths = Array.from(new Set((selection.nodes || []).flatMap((node) => getCriticalPaths(node))))
+        .sort((left, right) => left.localeCompare(right));
+    const edgeTypes = Array.from(new Set((selection.edges || []).map((edge) => edge.type)))
+        .sort((left, right) => left.localeCompare(right));
+    const validationEdges = (selection.edges || []).filter((edge) => edge.type === 'validated_by');
+    const blockerEdges = (selection.edges || []).filter((edge) => NEGATIVE_EDGE_TYPES.has(edge.type));
+    const maxCausalScore = (selection.edges || [])
+        .map((edge) => edge.causalScore ?? summarizeCausalWeight(edge).score)
+        .reduce((maxScore, score) => Math.max(maxScore, Number(score) || 0), 0);
+
+    return {
+        nodeCount: selection.nodes.length,
+        edgeCount: selection.edges.length,
+        criticalPaths,
+        edgeTypes,
+        validationEdgeCount: validationEdges.length,
+        blockerEdgeCount: blockerEdges.length,
+        maxCausalScore: Number(maxCausalScore.toFixed(3)),
+    };
+}
+
+function buildUncertaintyBudget(selection, summary) {
+    const reasons = [];
+    let score = 0.12;
+    if (selection.selectorType === 'critical-path') {
+        score += 0.18;
+        reasons.push('critical-path selectors include all mapped runtime nodes and may over-approximate local file ownership');
+    }
+    if (selection.selectorType === 'file' && selection.fileImpact?.coverage?.coveredByOverlay === true && selection.fileImpact?.coverage?.coveredInCore !== true) {
+        score += 0.22;
+        reasons.push('file is covered by overlay metadata instead of core graph mapping');
+    }
+    if (summary.validationEdgeCount === 0) {
+        score += 0.2;
+        reasons.push('no validation edge anchors this selection');
+    }
+    if (summary.blockerEdgeCount > 0) {
+        score += 0.08;
+        reasons.push('negative guardrail edges are present and require human interpretation');
+    }
+    if (selection.nodes.length === 0) {
+        score += 0.3;
+        reasons.push('selector did not resolve to mapped runtime nodes');
+    }
+
+    const normalizedScore = Number(Math.min(1, score).toFixed(2));
+    return {
+        score: normalizedScore,
+        tier: normalizedScore <= 0.25 ? 'low' : normalizedScore <= 0.55 ? 'medium' : 'high',
+        reasons,
+    };
+}
+
+function queryWhatIfRemove(graph, coverage, selector) {
+    const selection = resolveWhatIfSelection(graph, coverage, selector);
+    const summary = summarizeWhatIfSelection(selection);
+    return {
+        query: 'what-if-remove',
+        selector: selection.selector,
+        selectorType: selection.selectorType,
+        hypothesis: 'remove selected graph surface',
+        blastRadius: summary,
+        uncertaintyBudget: buildUncertaintyBudget(selection, summary),
+        predictedEffects: [
+            ...summary.criticalPaths.map((criticalPath) => ({
+                criticalPath,
+                effect: summary.validationEdgeCount > 0 ? 'validation coverage may shrink' : 'runtime context may lose an unvalidated mapping',
+            })),
+            ...(summary.blockerEdgeCount > 0 ? [{
+                criticalPath: summary.criticalPaths[0] || null,
+                effect: 'guardrail/blocker evidence would need replacement before removal',
+            }] : []),
+        ],
+        recommendedChecks: [
+            'npm run graph:build',
+            'npm run graph:check',
+            ...summary.criticalPaths.map((criticalPath) => `node scripts/query-knowledge-graph.mjs event-flow ${criticalPath} --json`),
+        ],
+    };
+}
+
+function queryWhatIfReplace(graph, coverage, fromSelector, toSelector) {
+    const fromSelection = resolveWhatIfSelection(graph, coverage, fromSelector);
+    const toSelection = resolveWhatIfSelection(graph, coverage, toSelector);
+    const fromSummary = summarizeWhatIfSelection(fromSelection);
+    const toSummary = summarizeWhatIfSelection(toSelection);
+    const fromPaths = new Set(fromSummary.criticalPaths);
+    const toPaths = new Set(toSummary.criticalPaths);
+    const lostCriticalPaths = fromSummary.criticalPaths.filter((criticalPath) => !toPaths.has(criticalPath));
+    const gainedCriticalPaths = toSummary.criticalPaths.filter((criticalPath) => !fromPaths.has(criticalPath));
+    const sharedCriticalPaths = fromSummary.criticalPaths.filter((criticalPath) => toPaths.has(criticalPath));
+    const uncertainty = buildUncertaintyBudget(fromSelection, fromSummary);
+    const replacementUncertainty = buildUncertaintyBudget(toSelection, toSummary);
+    uncertainty.score = Number(Math.min(1, Math.max(uncertainty.score, replacementUncertainty.score)).toFixed(2));
+    uncertainty.tier = uncertainty.score <= 0.25 ? 'low' : uncertainty.score <= 0.55 ? 'medium' : 'high';
+    uncertainty.reasons = Array.from(new Set([...uncertainty.reasons, ...replacementUncertainty.reasons]))
+        .sort((left, right) => left.localeCompare(right));
+
+    return {
+        query: 'what-if-replace',
+        from: {
+            selector: fromSelection.selector,
+            selectorType: fromSelection.selectorType,
+            blastRadius: fromSummary,
+        },
+        to: {
+            selector: toSelection.selector,
+            selectorType: toSelection.selectorType,
+            blastRadius: toSummary,
+        },
+        comparison: {
+            sharedCriticalPaths,
+            lostCriticalPaths,
+            gainedCriticalPaths,
+            validationEdgeDelta: toSummary.validationEdgeCount - fromSummary.validationEdgeCount,
+            maxCausalScoreDelta: Number((toSummary.maxCausalScore - fromSummary.maxCausalScore).toFixed(3)),
+        },
+        uncertaintyBudget: uncertainty,
+        recommendedChecks: [
+            'npm run graph:build',
+            'npm run graph:check',
+            ...Array.from(new Set([...fromSummary.criticalPaths, ...toSummary.criticalPaths]))
+                .sort((left, right) => left.localeCompare(right))
+                .map((criticalPath) => `node scripts/query-knowledge-graph.mjs event-flow ${criticalPath} --json`),
+        ],
+    };
+}
+
+function queryQualityScorecard(scorecard) {
+    return {
+        query: 'quality-scorecard',
+        ...scorecard,
+    };
+}
+
 function queryWhyNot(graph, selector) {
     const normalizedSelector = String(selector || '').trim();
     const { nodes, edges, nodeById } = buildGraphIndexes(graph);
@@ -1271,6 +1467,29 @@ function printText(result) {
         return;
     }
 
+    if (result.query === 'quality-scorecard') {
+        process.stdout.write(`quality-scorecard score=${result.current?.score ?? 'unknown'} status=${result.current?.status || 'unknown'}\n`);
+        process.stdout.write(`- coverage=${result.current?.metrics?.adjustedCoveragePercent ?? 'unknown'} gate=${result.current?.metrics?.coverageGateStatus || 'unknown'}\n`);
+        process.stdout.write(`- critical paths=${result.current?.metrics?.criticalPathOkCount ?? 0}/${result.current?.metrics?.criticalPathTotalCount ?? 0} trend=${result.trend?.direction || 'unknown'} delta=${result.trend?.scoreDelta ?? 'n/a'}\n`);
+        return;
+    }
+
+    if (result.query === 'what-if-remove') {
+        process.stdout.write(`what-if-remove ${result.selector} (${result.selectorType})\n`);
+        process.stdout.write(`- nodes=${result.blastRadius.nodeCount} edges=${result.blastRadius.edgeCount} uncertainty=${result.uncertaintyBudget.tier}/${result.uncertaintyBudget.score}\n`);
+        process.stdout.write(`- critical paths=${result.blastRadius.criticalPaths.join(', ') || 'none'}\n`);
+        process.stdout.write(`- checks=${result.recommendedChecks.join(' && ')}\n`);
+        return;
+    }
+
+    if (result.query === 'what-if-replace') {
+        process.stdout.write(`what-if-replace ${result.from.selector} -> ${result.to.selector}\n`);
+        process.stdout.write(`- shared paths=${result.comparison.sharedCriticalPaths.join(', ') || 'none'} lost=${result.comparison.lostCriticalPaths.join(', ') || 'none'} gained=${result.comparison.gainedCriticalPaths.join(', ') || 'none'}\n`);
+        process.stdout.write(`- validationEdgeDelta=${result.comparison.validationEdgeDelta} causalDelta=${result.comparison.maxCausalScoreDelta} uncertainty=${result.uncertaintyBudget.tier}/${result.uncertaintyBudget.score}\n`);
+        process.stdout.write(`- checks=${result.recommendedChecks.join(' && ')}\n`);
+        return;
+    }
+
     if (result.query === 'why-not') {
         process.stdout.write(`why-not ${result.selector}\n`);
         if (result.blockers.length === 0) {
@@ -1357,6 +1576,9 @@ function usage() {
         + '  node scripts/query-knowledge-graph.mjs impact-for-file <FILE_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs impact-diff [--base <REF>] [--preset incident|review|balance|onboarding] [FILE_PATH...] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs change-risk [--base <REF>] [--preset incident|review|balance|onboarding] [FILE_PATH...] [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs quality-scorecard [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs what-if-remove <NODE_ID|FILE_PATH|CRITICAL_PATH> [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs what-if-replace <FROM_NODE_OR_FILE> <TO_NODE_OR_FILE> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs why-not <NODE_ID|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs event-flow <EVENT_ID|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs untested-systems [CRITICAL_PATH] [--json]\n'
@@ -1377,9 +1599,12 @@ export {
     queryImpactDiff,
     queryImpactForFile,
     queryOpenDeps,
+    queryQualityScorecard,
     queryScopeCollisions,
     querySurfacesForFile,
     queryUntestedSystems,
+    queryWhatIfRemove,
+    queryWhatIfReplace,
     queryUncoveredFiles,
     queryWhyNot,
     queryWhyFile,
@@ -1481,6 +1706,24 @@ if (isDirectRun) {
                 ? explicitFiles
                 : await readChangedFiles(baseRef || 'HEAD');
             result = queryChangeRisk(graph, coverage, changedFiles, { baseRef, preset });
+        } else if (command === 'quality-scorecard') {
+            const scorecard = await readArtifact(SCORECARD_PATH);
+            result = queryQualityScorecard(scorecard);
+        } else if (command === 'what-if-remove') {
+            const selector = positional[1];
+            if (!selector) {
+                usage();
+                process.exit(1);
+            }
+            result = queryWhatIfRemove(graph, coverage, selector);
+        } else if (command === 'what-if-replace') {
+            const fromSelector = positional[1];
+            const toSelector = positional[2];
+            if (!fromSelector || !toSelector) {
+                usage();
+                process.exit(1);
+            }
+            result = queryWhatIfReplace(graph, coverage, fromSelector, toSelector);
         } else if (command === 'why-not') {
             const selector = positional[1];
             if (!selector) {

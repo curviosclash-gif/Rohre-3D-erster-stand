@@ -1,0 +1,35 @@
+{
+  "contract": "knowledge-graph.quality-scorecard-history.v1",
+  "schema_version": 1,
+  "description": "Deterministische Trend-Baseline fuer die pro Build erzeugte Wissensgraph-Quality-Scorecard.",
+  "snapshots": [
+    {
+      "id": "V110.99",
+      "source": "closed-block-baseline",
+      "graphPath": "docs/generated/knowledge-graph.json",
+      "coveragePath": "docs/generated/knowledge-graph.coverage.json",
+      "score": 94.6,
+      "status": "pass",
+      "metrics": {
+        "adjustedCoveragePercent": 100,
+        "coverageGateStatus": "pass",
+        "criticalPathOkPercent": 100,
+        "mappedNodeValidationRatio": 0.19
+      }
+    },
+    {
+      "id": "V111.3.1",
+      "source": "secure-export-slice",
+      "graphPath": "docs/generated/knowledge-graph.json",
+      "coveragePath": "docs/generated/knowledge-graph.coverage.json",
+      "score": 95.2,
+      "status": "pass",
+      "metrics": {
+        "adjustedCoveragePercent": 100,
+        "coverageGateStatus": "pass",
+        "criticalPathOkPercent": 100,
+        "mappedNodeValidationRatio": 0.2
+      }
+    }
+  ]
+}

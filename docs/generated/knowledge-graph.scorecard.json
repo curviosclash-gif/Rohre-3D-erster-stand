@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "contract": "knowledge-graph.scorecard.v1",
+  "graph_contract": "knowledge-graph.v1",
+  "coverage_contract": "knowledge-graph.coverage.v1",
+  "current": {
+    "id": "current",
+    "source": "build",
+    "graphPath": "docs/generated/knowledge-graph.json",
+    "coveragePath": "docs/generated/knowledge-graph.coverage.json",
+    "score": 94.8,
+    "status": "pass",
+    "metrics": {
+      "adjustedCoveragePercent": 85,
+      "coverageGateStatus": "pass",
+      "criticalPathOkPercent": 100,
+      "criticalPathOkCount": 4,
+      "criticalPathTotalCount": 4,
+      "mappedNodeCount": 29,
+      "mappedEdgeCount": 54,
+      "validationEdgeCount": 9,
+      "negativeEdgeCount": 3,
+      "mappedNodeValidationRatio": 0.31
+    }
+  },
+  "trend": {
+    "previousId": "V111.3.1",
+    "scoreDelta": -0.4,
+    "direction": "down"
+  },
+  "criticalPaths": [
+    {
+      "criticalPath": "combat-hit",
+      "status": "ok",
+      "nodeCount": 8,
+      "edgeCount": 18,
+      "layers": [
+        "config",
+        "event",
+        "runtime",
+        "state",
+        "test"
+      ],
+      "validationEdgeCount": 3,
+      "missingRequiredNodes": [],
+      "missingRequiredEdges": []
+    },
+    {
+      "criticalPath": "round-end",
+      "status": "ok",
+      "nodeCount": 7,
+      "edgeCount": 14,
+      "layers": [
+        "config",
+        "event",
+        "runtime",
+        "state",
+        "test"
+      ],
+      "validationEdgeCount": 2,
+      "missingRequiredNodes": [],
+      "missingRequiredEdges": []
+    },
+    {
+      "criticalPath": "settings",
+      "status": "ok",
+      "nodeCount": 10,
+      "edgeCount": 18,
+      "layers": [
+        "config",
+        "runtime",
+        "state",
+        "test"
+      ],
+      "validationEdgeCount": 2,
+      "missingRequiredNodes": [],
+      "missingRequiredEdges": []
+    },
+    {
+      "criticalPath": "spawn",
+      "status": "ok",
+      "nodeCount": 6,
+      "edgeCount": 13,
+      "layers": [
+        "config",
+        "event",
+        "runtime",
+        "state",
+        "test"
+      ],
+      "validationEdgeCount": 2,
+      "missingRequiredNodes": [],
+      "missingRequiredEdges": []
+    }
+  ],
+  "history": [
+    {
+      "id": "V110.99",
+      "source": "closed-block-baseline",
+      "graphPath": "docs/generated/knowledge-graph.json",
+      "coveragePath": "docs/generated/knowledge-graph.coverage.json",
+      "score": 94.6,
+      "status": "pass",
+      "metrics": {
+        "adjustedCoveragePercent": 100,
+        "coverageGateStatus": "pass",
+        "criticalPathOkPercent": 100,
+        "mappedNodeValidationRatio": 0.19
+      }
+    },
+    {
+      "id": "V111.3.1",
+      "source": "secure-export-slice",
+      "graphPath": "docs/generated/knowledge-graph.json",
+      "coveragePath": "docs/generated/knowledge-graph.coverage.json",
+      "score": 95.2,
+      "status": "pass",
+      "metrics": {
+        "adjustedCoveragePercent": 100,
+        "coverageGateStatus": "pass",
+        "criticalPathOkPercent": 100,
+        "mappedNodeValidationRatio": 0.2
+      }
+    },
+    {
+      "id": "current",
+      "source": "build",
+      "graphPath": "docs/generated/knowledge-graph.json",
+      "coveragePath": "docs/generated/knowledge-graph.coverage.json",
+      "score": 94.8,
+      "status": "pass",
+      "metrics": {
+        "adjustedCoveragePercent": 85,
+        "coverageGateStatus": "pass",
+        "criticalPathOkPercent": 100,
+        "criticalPathOkCount": 4,
+        "criticalPathTotalCount": 4,
+        "mappedNodeCount": 29,
+        "mappedEdgeCount": 54,
+        "validationEdgeCount": 9,
+        "negativeEdgeCount": 3,
+        "mappedNodeValidationRatio": 0.31
+      }
+    }
+  ]
+}
