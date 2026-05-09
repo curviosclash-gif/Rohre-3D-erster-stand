@@ -2265,7 +2265,7 @@
           "master-index"
         ],
         "priority": "P2",
-        "owner": "frei",
+        "owner": "codex",
         "currentPhase": "111.1",
         "planFile": "docs/plaene/aktiv/V111.md",
         "scopeDeclarations": [
@@ -17127,8 +17127,8 @@
     {
       "id": "V111.1.1",
       "type": "subphase",
-      "title": "Negative-Edge-Model (`cannot`, `forbidden_by`, `blocked_by`) einziehen und `why-not` auf explizite Blocker priorisieren.",
-      "status": "open",
+      "title": "Negative-Edge-Model (`cannot`, `forbidden_by`, `blocked_by`) einziehen und `why-not` auf explizite Blocker priorisieren. (abgeschlossen: 2026-05-09; evidence: `node scripts/query-knowledge-graph.mjs why-not settings` -> `forbidden_by runtime:settings-manager -> config:settings-runtime-limits`; `node scripts/query-knowledge-graph.mjs why-not round-end --json` -> `blocked_by runtime:round-end-coordinator -> state:round-outcome`)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.1",
@@ -25883,7 +25883,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 8,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/runtime/EntitySpawnOps.js",
@@ -25905,7 +25905,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 28,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/HuntCombatSystem.js",
@@ -25927,7 +25927,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 48,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/hunt/mg/MGHitResolver.js",
@@ -25949,7 +25949,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 38,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/projectile/ProjectileHitResolver.js",
@@ -25971,7 +25971,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 68,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/state/RoundEndCoordinator.js",
@@ -25993,7 +25993,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 58,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/RoundOutcomeSystem.js",
@@ -26015,7 +26015,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 78,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/core/SettingsManager.js",
@@ -26038,7 +26038,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 18,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "src/entities/systems/SpawnPlacementSystem.js",
@@ -26409,7 +26409,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 89,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/physics-core.spec.js",
@@ -26431,7 +26431,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 99,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/physics-hunt.spec.js",
@@ -26453,7 +26453,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 109,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/runtime-regressions.contract.test.mjs",
@@ -26475,7 +26475,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 119,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/runtime-settings-live-apply.contract.test.mjs",
@@ -26497,7 +26497,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 129,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "mappingDescription": "Runtime-, Test- und Kernkanten-Mapping fuer Spawn-, Combat/Hit-, Round-End- und SettingsManager-Pfade im Desktop-Kernscope.",
         "file": "tests/settings-manager.contract.test.mjs",
@@ -89992,7 +89992,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 266,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
       }
@@ -90008,7 +90008,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 266,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
       }
@@ -90024,7 +90024,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 266,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
       }
@@ -90040,7 +90040,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 271,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
       }
@@ -90067,7 +90067,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 141,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
       }
@@ -90083,7 +90083,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 156,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "event"
       }
@@ -90099,7 +90099,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 141,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "state"
       }
@@ -90115,7 +90115,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 156,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
       }
@@ -90131,7 +90131,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 171,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
       }
@@ -90147,7 +90147,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 171,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "state"
       }
@@ -90163,7 +90163,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 201,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
       }
@@ -90179,7 +90179,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 191,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
       }
@@ -90195,7 +90195,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 191,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "event"
       }
@@ -90211,7 +90211,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 196,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
       }
@@ -90227,7 +90227,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 181,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
       }
@@ -90243,7 +90243,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 181,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "event"
       }
@@ -90259,7 +90259,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 206,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
       }
@@ -90275,7 +90275,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 231,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "event"
       }
@@ -90291,9 +90291,28 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 231,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:round-end-coordinator",
+      "to": "state:round-outcome",
+      "type": "blocked_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 306,
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+        },
+        "relationLayer": "blocker",
+        "reason": "Round-End-UI darf erst nach finalem Outcome-Snapshot fortschreiben.",
+        "severity": "warning",
+        "criticalPath": "round-end"
       }
     },
     {
@@ -90307,7 +90326,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 236,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
       }
@@ -90323,7 +90342,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 216,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
       }
@@ -90339,7 +90358,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 221,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "event"
       }
@@ -90355,7 +90374,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 216,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "state"
       }
@@ -90371,7 +90390,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 241,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
       }
@@ -90387,9 +90406,28 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 251,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:settings-manager",
+      "to": "config:settings-runtime-limits",
+      "type": "forbidden_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 291,
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+        },
+        "relationLayer": "blocker",
+        "reason": "Live Settings-Mutationen duerfen Runtime-Limits nicht aufweiten.",
+        "severity": "error",
+        "criticalPath": "settings"
       }
     },
     {
@@ -90403,7 +90441,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 251,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "state"
       }
@@ -90419,7 +90457,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 251,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "state"
       }
@@ -90435,7 +90473,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 286,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
       }
@@ -90451,9 +90489,28 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 286,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:spawn-placement-system",
+      "to": "event:hunt-damage",
+      "type": "cannot",
+      "hint": null,
+      "attributes": {
+        "mappingId": "desktop-critical-paths",
+        "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+          "line": 316,
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
+        },
+        "relationLayer": "blocker",
+        "reason": "Spawn-Placement ist kein Combat-Damage-Emitter.",
+        "severity": "info",
+        "criticalPath": "spawn"
       }
     },
     {
@@ -90467,7 +90524,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 151,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "state"
       }
@@ -90483,7 +90540,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 166,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
       }
@@ -90695,7 +90752,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 78,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90722,7 +90779,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 8,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90738,7 +90795,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 28,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90754,7 +90811,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 38,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90770,7 +90827,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 58,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90786,7 +90843,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 18,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90802,7 +90859,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 48,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90899,7 +90956,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 68,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90926,7 +90983,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 89,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90942,7 +90999,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 99,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90958,7 +91015,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 109,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90974,7 +91031,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 119,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
@@ -90990,7 +91047,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 129,
-          "commit": "b3a94fad329c787c0665d575a07a58701f9a7567"
+          "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "runtime"
       }
