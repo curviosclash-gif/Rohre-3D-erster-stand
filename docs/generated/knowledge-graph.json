@@ -2266,7 +2266,7 @@
         ],
         "priority": "P2",
         "owner": "codex",
-        "currentPhase": "111.1",
+        "currentPhase": "111.2",
         "planFile": "docs/plaene/aktiv/V111.md",
         "scopeDeclarations": [
           ".agents/rules/token_efficiency_and_tools.md",
@@ -6221,7 +6221,7 @@
       "id": "V111.1",
       "type": "phase",
       "title": "Semantische Diagnose-Tiefe",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.1"
@@ -17138,8 +17138,8 @@
     {
       "id": "V111.1.2",
       "type": "subphase",
-      "title": "Causal-Weighting (`strength`, `directness`) fuer zentrale Relationen aktivieren und Ranking in `impact-for-file`/`impact-diff` testbar fixieren.",
-      "status": "open",
+      "title": "Causal-Weighting (`strength`, `directness`) fuer zentrale Relationen aktivieren und Ranking in `impact-for-file`/`impact-diff` testbar fixieren. (abgeschlossen: 2026-05-09; evidence: `desktop-critical-paths.v1.json` fuehrt `strength`/`directness` fuer Settings-/Round-End-Zentralkanten; `impact-for-file src/core/SettingsManager.js --json` sortiert nach `causalScore` mit `forbidden_by` 3.96 vor direkten State-Writes; `impact-diff src/core/SettingsManager.js --json` gibt `primaryImpactEdges` und `maxCausalScore=3.96` aus; Contract-Test `knowledge graph core runtime queries|impact-diff|why-not` gruen)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.1",
@@ -89991,7 +89991,7 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 266,
+          "line": 286,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
@@ -90007,7 +90007,7 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 266,
+          "line": 286,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
@@ -90023,7 +90023,7 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 266,
+          "line": 286,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
@@ -90039,7 +90039,7 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 271,
+          "line": 291,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "config"
@@ -90274,7 +90274,7 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 231,
+          "line": 235,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "event"
@@ -90290,10 +90290,12 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 231,
+          "line": 235,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
-        "relationLayer": "state"
+        "relationLayer": "state",
+        "strength": 0.88,
+        "directness": "direct"
       }
     },
     {
@@ -90306,13 +90308,15 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 306,
+          "line": 328,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "blocker",
         "reason": "Round-End-UI darf erst nach finalem Outcome-Snapshot fortschreiben.",
         "severity": "warning",
-        "criticalPath": "round-end"
+        "criticalPath": "round-end",
+        "strength": 0.93,
+        "directness": "guardrail"
       }
     },
     {
@@ -90325,7 +90329,7 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 236,
+          "line": 240,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
@@ -90376,7 +90380,9 @@
           "line": 216,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
-        "relationLayer": "state"
+        "relationLayer": "state",
+        "strength": 0.96,
+        "directness": "direct"
       }
     },
     {
@@ -90389,7 +90395,7 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 241,
+          "line": 249,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
@@ -90405,10 +90411,12 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 251,
+          "line": 259,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
-        "relationLayer": "config"
+        "relationLayer": "config",
+        "strength": 0.86,
+        "directness": "indirect"
       }
     },
     {
@@ -90421,13 +90429,15 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 291,
+          "line": 311,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "blocker",
         "reason": "Live Settings-Mutationen duerfen Runtime-Limits nicht aufweiten.",
         "severity": "error",
-        "criticalPath": "settings"
+        "criticalPath": "settings",
+        "strength": 0.99,
+        "directness": "guardrail"
       }
     },
     {
@@ -90440,10 +90450,12 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 251,
+          "line": 268,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
-        "relationLayer": "state"
+        "relationLayer": "state",
+        "strength": 0.9,
+        "directness": "direct"
       }
     },
     {
@@ -90456,10 +90468,12 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 251,
+          "line": 259,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
-        "relationLayer": "state"
+        "relationLayer": "state",
+        "strength": 0.94,
+        "directness": "direct"
       }
     },
     {
@@ -90472,7 +90486,7 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 286,
+          "line": 306,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
@@ -90488,7 +90502,7 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 286,
+          "line": 306,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "test"
@@ -90504,7 +90518,7 @@
         "mappingFile": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
-          "line": 316,
+          "line": 340,
           "commit": "006988820b5e2b73b10c10d6a6859c53cd821aab"
         },
         "relationLayer": "blocker",

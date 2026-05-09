@@ -34,6 +34,36 @@ const NEGATIVE_EDGE_SEVERITY_RANK = Object.freeze({
     warning: 1,
     info: 2,
 });
+const CAUSAL_DIRECTNESS_SCORE = Object.freeze({
+    guardrail: 4,
+    direct: 3,
+    indirect: 2,
+    context: 1,
+});
+const DEFAULT_CAUSAL_STRENGTH_BY_EDGE_TYPE = Object.freeze({
+    forbidden_by: 0.98,
+    blocked_by: 0.9,
+    cannot: 0.75,
+    writes_state: 0.86,
+    emits: 0.82,
+    consumes: 0.78,
+    reads_config: 0.72,
+    reads_state: 0.68,
+    validated_by: 0.5,
+    implements: 0.4,
+});
+const DEFAULT_CAUSAL_DIRECTNESS_BY_EDGE_TYPE = Object.freeze({
+    forbidden_by: 'guardrail',
+    blocked_by: 'guardrail',
+    cannot: 'guardrail',
+    writes_state: 'direct',
+    emits: 'direct',
+    consumes: 'direct',
+    reads_config: 'indirect',
+    reads_state: 'indirect',
+    validated_by: 'context',
+    implements: 'context',
+});
 const EVENT_FLOW_CONTEXT_EDGE_TYPES = new Set([
     'emits',
     'consumes',
@@ -147,6 +177,7 @@ function nodeSummary(node) {
 }
 
 function edgeSummary(edge, nodeById) {
+    const causal = summarizeCausalWeight(edge);
     return {
         from: edge.from,
         fromType: nodeById.get(edge.from)?.type || null,
@@ -157,7 +188,24 @@ function edgeSummary(edge, nodeById) {
         mappingId: edge.attributes?.mappingId || null,
         reason: edge.attributes?.reason || null,
         severity: edge.attributes?.severity || null,
+        strength: causal.strength,
+        directness: causal.directness,
+        causalScore: causal.score,
         provenance: edge.attributes?.provenance || null,
+    };
+}
+
+function summarizeCausalWeight(edge) {
+    const rawStrength = Number(edge?.attributes?.strength);
+    const strength = Number.isFinite(rawStrength)
+        ? Math.max(0, Math.min(1, rawStrength))
+        : DEFAULT_CAUSAL_STRENGTH_BY_EDGE_TYPE[edge?.type] ?? 0.35;
+    const directness = String(edge?.attributes?.directness || DEFAULT_CAUSAL_DIRECTNESS_BY_EDGE_TYPE[edge?.type] || 'context').trim();
+    const directnessScore = CAUSAL_DIRECTNESS_SCORE[directness] ?? CAUSAL_DIRECTNESS_SCORE.context;
+    return {
+        strength,
+        directness,
+        score: Number((strength * directnessScore).toFixed(3)),
     };
 }
 
@@ -171,6 +219,8 @@ function sortNodeSummaries(entries) {
 
 function sortEdgeSummaries(entries) {
     return entries.sort((left, right) => {
+        const causalCompare = (right.causalScore ?? 0) - (left.causalScore ?? 0);
+        if (causalCompare !== 0) return causalCompare;
         const typeRankCompare = (NEGATIVE_EDGE_TYPE_RANK[left.type] ?? 99) - (NEGATIVE_EDGE_TYPE_RANK[right.type] ?? 99);
         if (typeRankCompare !== 0) return typeRankCompare;
         const severityCompare = (NEGATIVE_EDGE_SEVERITY_RANK[left.severity] ?? 99) - (NEGATIVE_EDGE_SEVERITY_RANK[right.severity] ?? 99);
@@ -466,11 +516,23 @@ function queryImpactDiff(graph, coverage, changedFiles, { baseRef = null } = {})
         const isActiveProductCode = impact.coverage?.excludedFromCoverage !== true
             && ['product-code', 'product-docs', 'dev-tooling', 'governance-tooling'].includes(impact.coverage?.classification || '');
         if (isRuntimeMapped || (isActiveProductCode && impact.criticalPaths.length > 0)) {
+            const primaryImpactEdges = (impact.relationEdges || [])
+                .slice(0, 3)
+                .map((edge) => ({
+                    from: edge.from,
+                    to: edge.to,
+                    type: edge.type,
+                    strength: edge.strength,
+                    directness: edge.directness,
+                    causalScore: edge.causalScore,
+                }));
             riskFiles.push({
                 file: impact.file,
                 criticalPaths: impact.criticalPaths,
                 implementedNodeCount: impact.implementedNodes.length,
                 relationEdgeCount: impact.relationEdges.length,
+                maxCausalScore: primaryImpactEdges[0]?.causalScore ?? 0,
+                primaryImpactEdges,
             });
         }
     }
@@ -890,7 +952,7 @@ function printText(result) {
         if (result.riskFiles.length > 0) {
             process.stdout.write('risk files\n');
             for (const entry of result.riskFiles) {
-                process.stdout.write(`- ${entry.file} paths=${entry.criticalPaths.join('|') || 'none'} nodes=${entry.implementedNodeCount} edges=${entry.relationEdgeCount}\n`);
+                process.stdout.write(`- ${entry.file} paths=${entry.criticalPaths.join('|') || 'none'} nodes=${entry.implementedNodeCount} edges=${entry.relationEdgeCount} maxCausalScore=${entry.maxCausalScore}\n`);
             }
         }
         process.stdout.write(`- subgraph nodes=${result.subgraph.nodes.length} edges=${result.subgraph.edges.length}\n`);
@@ -905,7 +967,7 @@ function printText(result) {
         if (result.riskFiles.length > 0) {
             process.stdout.write('risk files\n');
             for (const entry of result.riskFiles) {
-                process.stdout.write(`- ${entry.file} paths=${entry.criticalPaths.join('|') || 'none'} nodes=${entry.implementedNodeCount} edges=${entry.relationEdgeCount}\n`);
+                process.stdout.write(`- ${entry.file} paths=${entry.criticalPaths.join('|') || 'none'} nodes=${entry.implementedNodeCount} edges=${entry.relationEdgeCount} maxCausalScore=${entry.maxCausalScore}\n`);
             }
         }
         process.stdout.write(`- playbook=data/contracts/knowledge-graph/query-ops.v1.json#playbook:change-risk\n`);

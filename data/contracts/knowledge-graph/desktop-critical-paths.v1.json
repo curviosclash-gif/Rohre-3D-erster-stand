@@ -220,7 +220,11 @@
     {
       "from": "runtime:round-outcome-system",
       "to": "state:round-outcome",
-      "type": "writes_state"
+      "type": "writes_state",
+      "attributes": {
+        "strength": 0.96,
+        "directness": "direct"
+      }
     },
     {
       "from": "runtime:round-outcome-system",
@@ -235,7 +239,11 @@
     {
       "from": "runtime:round-end-coordinator",
       "to": "state:round-end-overlay",
-      "type": "writes_state"
+      "type": "writes_state",
+      "attributes": {
+        "strength": 0.88,
+        "directness": "direct"
+      }
     },
     {
       "from": "runtime:round-outcome-system",
@@ -250,17 +258,29 @@
     {
       "from": "runtime:settings-manager",
       "to": "state:settings-snapshot",
-      "type": "writes_state"
+      "type": "writes_state",
+      "attributes": {
+        "strength": 0.94,
+        "directness": "direct"
+      }
     },
     {
       "from": "runtime:settings-manager",
       "to": "config:runtime-config-builder",
-      "type": "reads_config"
+      "type": "reads_config",
+      "attributes": {
+        "strength": 0.86,
+        "directness": "indirect"
+      }
     },
     {
       "from": "runtime:settings-manager",
       "to": "state:runtime-config-snapshot",
-      "type": "writes_state"
+      "type": "writes_state",
+      "attributes": {
+        "strength": 0.9,
+        "directness": "direct"
+      }
     },
     {
       "from": "config:runtime-config-builder",
@@ -299,7 +319,9 @@
       "attributes": {
         "reason": "Live Settings-Mutationen duerfen Runtime-Limits nicht aufweiten.",
         "severity": "error",
-        "criticalPath": "settings"
+        "criticalPath": "settings",
+        "strength": 0.99,
+        "directness": "guardrail"
       }
     },
     {
@@ -309,7 +331,9 @@
       "attributes": {
         "reason": "Round-End-UI darf erst nach finalem Outcome-Snapshot fortschreiben.",
         "severity": "warning",
-        "criticalPath": "round-end"
+        "criticalPath": "round-end",
+        "strength": 0.93,
+        "directness": "guardrail"
       }
     },
     {

@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-09 (Subphase `V111 111.1.2`)
+
+- `111.1.2` ist abgeschlossen: zentrale Settings- und Round-End-Kanten im Desktop-Critical-Path-Contract tragen `strength` und `directness`; `impact-for-file` und `impact-diff` berechnen daraus `causalScore` und sortieren Impact-Kanten reproduzierbar nach Entscheidungsrelevanz.
+- Referenzsignal: `impact-for-file src/core/SettingsManager.js --json` priorisiert `forbidden_by runtime:settings-manager -> config:settings-runtime-limits` mit Score 3.96 vor den direkten State-Writes 2.82/2.70; `impact-diff` gibt dieselben Top-Kanten als `primaryImpactEdges` plus `maxCausalScore` aus. V111 wechselt damit auf `111.2` fuer Ownership, Presets und Explainability.
+
 ## Stand-Snapshot 2026-05-09 (Subphase `V111 111.1.1`)
 
 - `111.1.1` ist abgeschlossen: `cannot`, `forbidden_by` und `blocked_by` sind als produktive Mapping-Kanten in Schema, Builder und Predicate-Constraints verankert. `why-not` priorisiert explizite Blocker nach Relationstyp und Severity und gibt Reason-/Provenance-Kontext fuer Incident- und Review-Fragen aus.

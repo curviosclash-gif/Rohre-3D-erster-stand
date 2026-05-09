@@ -792,6 +792,14 @@ test('knowledge graph core runtime queries return stable JSON shapes', async () 
         'data/contracts/knowledge-graph/desktop-critical-paths.v1.json'
     );
     assert.ok(impact.relationEdges.some((edge) => edge.type === 'validated_by' && edge.to === 'test:settings-manager-contract'));
+    assert.deepEqual(
+        impact.relationEdges.slice(0, 3).map((edge) => `${edge.type}:${edge.to}:${edge.causalScore}`),
+        [
+            'forbidden_by:config:settings-runtime-limits:3.96',
+            'writes_state:state:settings-snapshot:2.82',
+            'writes_state:state:runtime-config-snapshot:2.7',
+        ]
+    );
 
     const eventFlow = queryEventFlow(graph, 'round-end');
     assert.equal(eventFlow.query, 'event-flow');
@@ -887,7 +895,16 @@ test('impact-diff reports changed runtime subgraphs and recommended delta checks
     assert.equal(result.riskStatus, 'review');
     assert.ok(result.criticalPaths.includes('settings'));
     assert.ok(result.riskFiles.some((entry) => entry.file === 'src/core/SettingsManager.js'));
+    const settingsRisk = result.riskFiles.find((entry) => entry.file === 'src/core/SettingsManager.js');
+    assert.equal(settingsRisk.maxCausalScore, 3.96);
+    assert.deepEqual(settingsRisk.primaryImpactEdges.map((edge) => edge.type), [
+        'forbidden_by',
+        'writes_state',
+        'writes_state',
+    ]);
     assert.ok(result.subgraph.nodes.some((node) => node.id === 'runtime:settings-manager'));
+    assert.equal(result.subgraph.edges[0].type, 'forbidden_by');
+    assert.equal(result.subgraph.edges[0].causalScore, 3.96);
     assert.ok(result.subgraph.edges.some((edge) => edge.type === 'validated_by' && edge.to === 'test:settings-manager-contract'));
     assert.ok(result.recommendedChecks.includes('npm run graph:check'));
     assert.ok(result.recommendedChecks.some((command) => command.includes('event-flow settings')));
