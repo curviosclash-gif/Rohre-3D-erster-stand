@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-10T00:48:41.334Z",
+  "generated_at": "2026-05-10T02:25:17.955Z",
   "locks": [
     {
       "person": "codex",
@@ -371,9 +371,9 @@
         "docs/referenz/architektur_ausfuehrlich.md"
       ],
       "start_date": "2026-05-10",
-      "target_completion": "",
-      "status": "in-progress",
-      "notes": "Abschluss-Gate pending"
+      "target_completion": "2026-05-10",
+      "status": "completed",
+      "notes": "V111 Abschluss-Gate passed; block closed with graph, plan and docs gates green."
     }
   ],
   "metadata": {

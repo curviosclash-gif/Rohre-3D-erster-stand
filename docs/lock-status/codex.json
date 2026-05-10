@@ -359,15 +359,16 @@
         "docs/referenz/architektur_ausfuehrlich.md"
       ],
       "start_date": "2026-05-10",
-      "target_completion": "",
-      "status": "in-progress",
-      "notes": "Abschluss-Gate pending"
+      "target_completion": "2026-05-10",
+      "status": "completed",
+      "notes": "V111 Abschluss-Gate passed; block closed with graph, plan and docs gates green."
     }
   ],
   "current_phase_evidence": {
     "phase_id": "111.99",
     "completed_items": [
-      "111.4.2"
+      "111.4.2",
+      "111.99"
     ],
     "last_commit": ""
   }

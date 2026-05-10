@@ -515,3 +515,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `111.4.1` ist geschlossen: `incident-auto-minimize`, `temporal-anomalies` und `schema-lint` sind als lokale Graph-Queries verfuegbar und im Playbook `adaptive-diagnostics` dokumentiert.
 - Der Settings-Referenzfall wird auf einen minimierten Kandidaten mit Root-Evidence und konkreten Folgechecks reduziert; die Scorecard-Drift wird als `watch` signalisiert, und Schema-Lint bleibt vor `graph:check` als schneller Shape-Check nutzbar.
 - Evidence: `node --test --test-name-pattern "adaptive diagnostics|query ops contract" tests/knowledge-graph-build.contract.test.mjs`, `node scripts/query-knowledge-graph.mjs incident-auto-minimize src/core/SettingsManager.js --json`, `node scripts/query-knowledge-graph.mjs temporal-anomalies --json`, `node scripts/query-knowledge-graph.mjs schema-lint --json` und `npm run graph:build` sind gruen. Naechste V111-Subphase ist `111.4.2` fuer Test-Prioritization, Policy-as-Data und Feedback-Loop.
+
+## Abschluss-Snapshot 2026-05-10 (Block `V111 111.99`)
+
+- `V111` ist geschlossen: Negative Edges, Causal-Weighting, Query-Presets, Ownership/Stability, Safety-Export, Scorecard, Counterfactuals, Uncertainty-Budget, Auto-Minimization, Anomaly-Detection, Test-Prioritization, Policy-as-Data und Feedback-Loop sind im lokalen Wissensgraph-Workflow verankert.
+- Der Abschluss bleibt bewusst local-first: Exporte sind per Default redacted, rohe Auditdaten laufen nur ueber den expliziten `--unsafe-raw`-Pfad, und adaptive Feedback-Signale bleiben durch Human-Review-Guardrails auf `watch`.
+- Evidence: `npm run graph:build` -> core nodes=3709 edges=8002, coverage adjusted=85%, scorecard 94.8/pass; `npm run graph:check`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen.

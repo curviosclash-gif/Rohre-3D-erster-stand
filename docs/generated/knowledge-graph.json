@@ -2258,7 +2258,7 @@
       "id": "V111",
       "type": "block",
       "title": "Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz",
-      "status": "active",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -6268,7 +6268,7 @@
       "id": "V111.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.99"
@@ -17222,8 +17222,8 @@
     {
       "id": "V111.99.1",
       "type": "subphase",
-      "title": "`npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen.",
-      "status": "open",
+      "title": "`npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-10; evidence: `npm run graph:build` -> core nodes=3709 edges=8002, coverage adjusted=85%, scorecard 94.8/pass; `npm run graph:check` passed; `npm run plan:check` passed; `npm run docs:sync` updated=0; `npm run docs:check` passed)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.99",
@@ -17233,8 +17233,8 @@
     {
       "id": "V111.99.2",
       "type": "subphase",
-      "title": "Negative-Edges, Causal-Weighting, Presets und Explainability sind mit Golden-/Fixture-Evidence stabil belegt.",
-      "status": "open",
+      "title": "Negative-Edges, Causal-Weighting, Presets und Explainability sind mit Golden-/Fixture-Evidence stabil belegt. (abgeschlossen: 2026-05-10; evidence: DoD.1-DoD.5 und Subphasen 111.1/111.2 belegen `why-not`, `impact-for-file`, `impact-diff`, `change-risk --preset incident`, Golden-/Contract-Tests und Explainability-/Artifact-Ausgaben)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.99",
@@ -17244,8 +17244,8 @@
     {
       "id": "V111.99.3",
       "type": "subphase",
-      "title": "Safety-Filter, Scorecard, Counterfactuals, Uncertainty-Budget und Auto-Minimization sind reproduzierbar dokumentiert.",
-      "status": "open",
+      "title": "Safety-Filter, Scorecard, Counterfactuals, Uncertainty-Budget und Auto-Minimization sind reproduzierbar dokumentiert. (abgeschlossen: 2026-05-10; evidence: DoD.5-DoD.7 und 111.3/111.4.1 belegen `export-view` Default-Redaction/`--unsafe-raw`, `quality-scorecard`, `what-if-remove`, `what-if-replace`, Uncertainty-Budget und `incident-auto-minimize`)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.99",
@@ -17255,8 +17255,8 @@
     {
       "id": "V111.99.4",
       "type": "subphase",
-      "title": "Anomaly-Detection, Test-Prioritization, Policy-as-Data und Feedback-Loop sind im Workflow verankert und mit Referenzartefakten verifiziert.",
-      "status": "open",
+      "title": "Anomaly-Detection, Test-Prioritization, Policy-as-Data und Feedback-Loop sind im Workflow verankert und mit Referenzartefakten verifiziert. (abgeschlossen: 2026-05-10; evidence: DoD.8 und 111.4.1/111.4.2 belegen `temporal-anomalies`, `schema-lint`, `test-prioritization`, `policy-evaluate`, `feedback-loop` und die Playbooks `adaptive-diagnostics`/`adaptive-quality-control`)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.99",

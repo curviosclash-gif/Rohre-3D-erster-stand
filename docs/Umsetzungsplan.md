@@ -1,6 +1,6 @@
 ﻿# Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-09. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V102 102.1`.
+Stand: 2026-05-10. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V102 102.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -39,6 +39,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V108 | Arcade-Ghost Selbstduell (laengste Spur pro Route) | done | P2 | frei | V82.99 | 108.99 | `docs/plaene/aktiv/V108.md` |
 | V107 | Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer | done | P2 | frei | V94.99 | 107.99 | `docs/plaene/aktiv/V107.md` |
 | V110 | Wissensgraph Ops-, Guard- und Integritaets-Haertung | done | P2 | frei | V107.99 | 110.99 | `docs/plaene/aktiv/V110.md` |
+| V111 | Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz | done | P2 | frei | V107.99,V110.99 | 111.99 | `docs/plaene/aktiv/V111.md` |
 
 ### Abgeschlossene Bloecke (offener Abgleich vor Archivierung)
 
@@ -57,7 +58,6 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V112 | Spielaudit- und Playtest-Improvement-Paket | blocked | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
-| V111 | Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz | active | P2 | codex | V107.99,V110.99 | 111.99 | `docs/plaene/aktiv/V111.md` |
 | V113 | Hangar Shell Productivierung und Rules Panel | planned | P2 | frei | V76.99,V103.99 | 113.1 | `docs/plaene/aktiv/V113.md` |
 
 ## Abhaengigkeiten
@@ -118,7 +118,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V106 | - | frei | Geplant |
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
 | - | V110 | 2026-05-08 | closed | Abgeschlossen 2026-05-09 |
-| Codex | V111 | 2026-05-09 | active | 111.99 Abschluss-Gate |
+| - | V111 | 2026-05-09 | closed | Abgeschlossen 2026-05-10 |
 | - | V112 | - | blockiert | Wartet auf V102.99 und V105.99 |
 | - | V113 | - | frei | Geplant |
 
@@ -128,10 +128,9 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 2. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), damit Produktgrenzen vor weiteren Release-/Playtest-Schnitten strukturell stabil sind.
 3. Danach `V105` (Guard-/Typecheck-Recovery), sobald `V102.99` erreicht ist.
 4. Danach `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
-5. Danach `V111` (Wissensgraph adaptive Diagnose- und Entscheidungsintelligenz), jetzt durch `V110.99` entsperrt.
-6. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
-7. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
-8. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
+5. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
+6. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
+7. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
 
 ## Conflict-Log
 
