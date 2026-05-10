@@ -34,9 +34,12 @@ import {
     queryImpactDiff,
     queryImpactForFile,
     queryIncidentAutoMinimize,
+    queryFeedbackLoop,
+    queryPolicyEvaluation,
     queryQualityScorecard,
     querySchemaLint,
     queryTemporalAnomalies,
+    queryTestPrioritization,
     queryUntestedSystems,
     queryWhatIfRemove,
     queryWhatIfReplace,
@@ -1127,6 +1130,71 @@ test('adaptive diagnostics expose minimization, temporal anomalies and schema li
     assert.equal(lint.query, 'schema-lint');
     assert.equal(lint.status, 'pass');
     assert.equal(lint.summary.violationCount, 0);
+});
+
+test('adaptive quality control prioritizes tests, evaluates policies and surfaces feedback', async () => {
+    const graph = await buildKnowledgeGraph();
+    const coverage = buildCoverageArtifact(graph, ['src/core/SettingsManager.js'], null, null);
+    const scorecard = buildQualityScorecardArtifact(graph, coverage, [
+        {
+            id: 'previous',
+            source: 'fixture',
+            graphPath: 'docs/generated/knowledge-graph.json',
+            coveragePath: 'docs/generated/knowledge-graph.coverage.json',
+            score: 94,
+            status: 'pass',
+            metrics: {
+                adjustedCoveragePercent: 100,
+                coverageGateStatus: 'pass',
+                criticalPathOkPercent: 100,
+                mappedNodeValidationRatio: 0.4,
+            },
+        },
+    ]);
+    const queryOpsContract = {
+        contract: 'knowledge-graph.query-ops.v1',
+        policies: [
+            {
+                id: 'adaptive-quality-default',
+                severity: 'medium',
+                requires: ['scorecard-pass', 'schema-lint-pass', 'no-high-temporal-anomaly'],
+                playbook: 'data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-quality-control',
+            },
+        ],
+        feedback_loop: {
+            accepted_signal_types: ['human-confirmed', 'false-positive', 'missing-test'],
+            guardrails: ['human review required'],
+            reference_signals: [
+                {
+                    id: 'settings-priority-confirmed',
+                    type: 'human-confirmed',
+                    confidence: 0.82,
+                    files: ['src/core/SettingsManager.js'],
+                    critical_paths: ['settings'],
+                    target: 'test:runtime-settings-live-apply',
+                    action: 'keep-priority-test',
+                },
+            ],
+        },
+    };
+
+    const prioritized = queryTestPrioritization(graph, coverage, ['src/core/SettingsManager.js']);
+    assert.equal(prioritized.query, 'test-prioritization');
+    assert.ok(prioritized.criticalPaths.includes('settings'));
+    assert.ok(prioritized.priorityTests.some((entry) => entry.file === 'tests/runtime-settings-live-apply.contract.test.mjs'));
+    assert.ok(prioritized.recommendedChecks.some((command) => command.includes('node --test tests/runtime-settings-live-apply.contract.test.mjs')));
+
+    const policies = queryPolicyEvaluation(graph, coverage, scorecard, queryOpsContract);
+    assert.equal(policies.query, 'policy-evaluate');
+    assert.equal(policies.status, 'pass');
+    assert.equal(policies.decisions[0].status, 'pass');
+    assert.equal(policies.schemaLint.status, 'pass');
+
+    const feedback = queryFeedbackLoop(graph, coverage, ['src/core/SettingsManager.js'], queryOpsContract);
+    assert.equal(feedback.query, 'feedback-loop');
+    assert.equal(feedback.status, 'watch');
+    assert.ok(feedback.acceptedSignalTypes.includes('human-confirmed'));
+    assert.ok(feedback.proposedAdjustments.some((entry) => entry.target === 'test:runtime-settings-live-apply'));
 });
 
 test('query ops contract requires SLO profiles and operator playbooks', () => {

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T17:01:56.929Z",
+  "generated_at": "2026-05-10T00:48:07.737Z",
   "locks": [
     {
       "person": "codex",
@@ -338,8 +338,42 @@
       ],
       "start_date": "2026-05-09",
       "target_completion": "",
+      "status": "completed",
+      "notes": "Adaptive diagnostics, test prioritization, policy-as-data and feedback-loop completed; V111 moves to Abschluss-Gate."
+    },
+    {
+      "person": "codex",
+      "block_id": "V111",
+      "phase": "111.99",
+      "scope_files": [
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.scorecard.json",
+        "docs/generated/knowledge-graph.schema.json",
+        "scripts/build-knowledge-graph.mjs",
+        "scripts/check-knowledge-graph.mjs",
+        "scripts/query-knowledge-graph.mjs",
+        "scripts/export-knowledge-graph-view.mjs",
+        "tools/graph-viewer/index.html",
+        "tools/graph-viewer/viewer.js",
+        "tools/graph-viewer/viewer.css",
+        "data/contracts/knowledge-graph/**",
+        "tests/knowledge-graph-build.contract.test.mjs",
+        "tests/knowledge-graph-query.contract.test.mjs",
+        "docs/referenz/ai_architecture_context.md",
+        ".agents/rules/token_efficiency_and_tools.md",
+        ".agents/workflows/status.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/plaene/aktiv/V111.md",
+        "docs/Umsetzungsplan.md",
+        "docs/prozess/Dokumentationsstatus.md",
+        "docs/referenz/ai_project_onboarding.md",
+        "docs/referenz/architektur_ausfuehrlich.md"
+      ],
+      "start_date": "2026-05-10",
+      "target_completion": "",
       "status": "in-progress",
-      "notes": ""
+      "notes": "Abschluss-Gate pending"
     }
   ],
   "metadata": {

@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-10 (Subphase `V111 111.4.2`)
+
+- `111.4.2` ist abgeschlossen: `test-prioritization`, `policy-evaluate` und `feedback-loop` erweitern den Wissensgraphen um graphgestuetzte Testauswahl, Policy-as-Data und auditierbares Human-Feedback. Referenzfall Settings priorisiert `tests/runtime-settings-live-apply.contract.test.mjs` und `tests/settings-manager.contract.test.mjs`, Policy-Evaluation meldet `pass`, und Feedback bleibt bewusst `watch` mit Guardrails statt automatischer Preset-Mutation.
+- Operative Verankerung: `query-ops.v1.json#playbook:adaptive-quality-control` fuehrt SLOs, Policies und Feedback-Regeln; `docs/referenz/ai_architecture_context.md` nennt die neuen Standardqueries. Gruen: fokussierter Contract-Run fuer `adaptive quality control|adaptive diagnostics|query ops contract`; `npm run graph:build` mit Scorecard `94.8/pass`.
+
 ## Stand-Snapshot 2026-05-09 (Subphase `V111 111.3.2`)
 
 - `111.3.2` ist abgeschlossen: `npm run graph:build` erzeugt jetzt neben Graph und Coverage eine deterministische `docs/generated/knowledge-graph.scorecard.json`, gespeist aus Build-Metriken plus `data/contracts/knowledge-graph/quality-scorecard-history.v1.json`. `graph:check` prueft die Scorecard bytegleich gegen den Build-Output.

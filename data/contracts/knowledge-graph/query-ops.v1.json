@@ -134,6 +134,57 @@
       }
     },
     {
+      "id": "test-prioritization-settings",
+      "command": "node scripts/query-knowledge-graph.mjs test-prioritization src/core/SettingsManager.js --json",
+      "sample_files": [
+        "src/core/SettingsManager.js"
+      ],
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-quality-control",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 60,
+          "p95_ms": 130
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 90,
+          "p95_ms": 195
+        }
+      }
+    },
+    {
+      "id": "policy-evaluate",
+      "command": "node scripts/query-knowledge-graph.mjs policy-evaluate --json",
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-quality-control",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 35,
+          "p95_ms": 90
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 53,
+          "p95_ms": 135
+        }
+      }
+    },
+    {
+      "id": "feedback-loop-settings",
+      "command": "node scripts/query-knowledge-graph.mjs feedback-loop src/core/SettingsManager.js --json",
+      "sample_files": [
+        "src/core/SettingsManager.js"
+      ],
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-quality-control",
+      "profile_budgets": {
+        "desktop-local": {
+          "baseline_p95_ms": 70,
+          "p95_ms": 150
+        },
+        "ci-linux": {
+          "baseline_p95_ms": 105,
+          "p95_ms": 225
+        }
+      }
+    },
+    {
       "id": "what-if-remove-settings",
       "command": "node scripts/query-knowledge-graph.mjs what-if-remove src/core/SettingsManager.js --json",
       "sample_files": [
@@ -376,6 +427,85 @@
         "Temporal anomaly output is ok/watch with any review signal documented before merge.",
         "Schema-lint reports status=pass before generated artifacts are treated as stable."
       ]
+    },
+    {
+      "id": "adaptive-quality-control",
+      "link": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-quality-control",
+      "trigger_codes": [
+        "KG_QUERY_PLAYBOOK_INVALID",
+        "KG_TEST_PRIORITY_MISSING",
+        "KG_POLICY_REVIEW_REQUIRED"
+      ],
+      "triage_queries": [
+        "node scripts/query-knowledge-graph.mjs test-prioritization src/core/SettingsManager.js --json",
+        "node scripts/query-knowledge-graph.mjs policy-evaluate --json",
+        "node scripts/query-knowledge-graph.mjs feedback-loop src/core/SettingsManager.js --json"
+      ],
+      "recovery_steps": [
+        "Use test-prioritization to select the smallest graph-backed contract-test set for changed critical paths.",
+        "Use policy-evaluate to check scorecard, schema and temporal guardrails before accepting adaptive query output.",
+        "Treat feedback-loop adjustments as human-reviewed recommendations; do not auto-write preset or policy changes from noisy signals."
+      ],
+      "exit_criteria": [
+        "Prioritized tests include concrete node --test commands for each affected critical path.",
+        "Policy evaluation reports pass or a documented review reason.",
+        "Feedback recommendations name accepted signal types and guardrails before changing query presets."
+      ]
     }
-  ]
+  ],
+  "policies": [
+    {
+      "id": "adaptive-quality-default",
+      "severity": "medium",
+      "requires": [
+        "scorecard-pass",
+        "schema-lint-pass",
+        "no-high-temporal-anomaly"
+      ],
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-quality-control"
+    },
+    {
+      "id": "settings-runtime-review",
+      "severity": "high",
+      "requires": [
+        "schema-lint-pass",
+        "no-high-temporal-anomaly"
+      ],
+      "critical_paths": [
+        "settings"
+      ],
+      "required_queries": [
+        "node scripts/query-knowledge-graph.mjs test-prioritization src/core/SettingsManager.js --json",
+        "node scripts/query-knowledge-graph.mjs feedback-loop src/core/SettingsManager.js --json"
+      ],
+      "playbook": "data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-quality-control"
+    }
+  ],
+  "feedback_loop": {
+    "accepted_signal_types": [
+      "human-confirmed",
+      "false-positive",
+      "missing-test"
+    ],
+    "guardrails": [
+      "Never auto-apply feedback to committed presets without human review.",
+      "Require a concrete file or critical-path match before proposing a priority adjustment.",
+      "Keep raw incident notes out of generated graph artifacts."
+    ],
+    "reference_signals": [
+      {
+        "id": "settings-priority-confirmed",
+        "type": "human-confirmed",
+        "confidence": 0.82,
+        "files": [
+          "src/core/SettingsManager.js"
+        ],
+        "critical_paths": [
+          "settings"
+        ],
+        "target": "test:runtime-settings-live-apply",
+        "action": "keep-priority-test"
+      }
+    ]
+  }
 }

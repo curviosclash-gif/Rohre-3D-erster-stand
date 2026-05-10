@@ -2266,7 +2266,7 @@
         ],
         "priority": "P2",
         "owner": "codex",
-        "currentPhase": "111.4",
+        "currentPhase": "111.99",
         "planFile": "docs/plaene/aktiv/V111.md",
         "scopeDeclarations": [
           ".agents/rules/token_efficiency_and_tools.md",
@@ -2278,7 +2278,10 @@
           "docs/generated/knowledge-graph.scorecard.json",
           "docs/plaene/aktiv/V111.md",
           "docs/plaene/CHANGELOG.md",
+          "docs/prozess/Dokumentationsstatus.md",
           "docs/referenz/ai_architecture_context.md",
+          "docs/referenz/ai_project_onboarding.md",
+          "docs/referenz/architektur_ausfuehrlich.md",
           "scripts/build-knowledge-graph.mjs",
           "scripts/check-knowledge-graph.mjs",
           "scripts/export-knowledge-graph-view.mjs",
@@ -2290,7 +2293,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 22,
+          "concreteCount": 25,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -6255,7 +6258,7 @@
       "id": "V111.4",
       "type": "phase",
       "title": "Adaptive Qualitaetssteuerung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.4"
@@ -17208,8 +17211,8 @@
     {
       "id": "V111.4.2",
       "type": "subphase",
-      "title": "Graph-Backed-Test-Prioritization, Policy-as-Data und Human-Feedback-Loop implementieren und mit Referenzfaellen evaluieren.",
-      "status": "open",
+      "title": "Graph-Backed-Test-Prioritization, Policy-as-Data und Human-Feedback-Loop implementieren und mit Referenzfaellen evaluieren. (abgeschlossen: 2026-05-10; evidence: `scripts/query-knowledge-graph.mjs` stellt `test-prioritization`, `policy-evaluate` und `feedback-loop` bereit; `query-ops.v1.json#playbook:adaptive-quality-control` versioniert SLOs, Policies und Feedback-Guardrails; Settings-Referenz priorisiert `runtime-settings-live-apply`/`settings-manager-contract`, Policy-Status ist `pass`, Feedback bleibt `watch` mit Human-Review-Guardrails; `node --test --test-name-pattern \"adaptive quality control|adaptive diagnostics|query ops contract\" tests/knowledge-graph-build.contract.test.mjs` -> tests 3 pass 3; `npm run graph:build` -> core nodes=3709 edges=7999, scorecard 94.8/pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V111",
         "phaseCode": "111.4",
@@ -36313,6 +36316,7 @@
           "V107",
           "V109",
           "V110",
+          "V111",
           "V90"
         ],
         "exists": true
@@ -36644,6 +36648,7 @@
           "BT93K",
           "V107",
           "V110",
+          "V111",
           "V89",
           "V91"
         ],
@@ -36663,7 +36668,8 @@
         "scopeBlocks": [
           "BT93K",
           "V107",
-          "V110"
+          "V110",
+          "V111"
         ],
         "exists": true
       }
@@ -99269,7 +99275,34 @@
     },
     {
       "from": "V111",
+      "to": "docs/prozess/Dokumentationsstatus.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
       "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "docs/referenz/ai_project_onboarding.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "docs/referenz/architektur_ausfuehrlich.md",
       "type": "scope",
       "hint": null,
       "attributes": {

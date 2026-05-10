@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-05-09
+Stand: 2026-05-10
 
 ## 1. Architekturparadigma
 
@@ -854,6 +854,7 @@ Dead-Code-/Legacy-Einordnung (V104.1.3/1.4):
 - Fuer Runtime-Diagnosen dient derselbe Wissensgraph als erster Leseweg vor Volltextsuche: `node scripts/query-knowledge-graph.mjs impact-for-file <PATH> --json` zeigt Datei-, Runtime-, State-, Config- und Test-Kontext; `node scripts/query-knowledge-graph.mjs event-flow spawn|combat-hit|round-end|settings` zeigt kritische Desktop-Flows mit Systemen, States, Configs, Tests und Kontextkanten.
 - Fuer Graph-Gesundheit und Testabdeckung sind die Standardfragen `node scripts/query-knowledge-graph.mjs critical-path-health`, `node scripts/query-knowledge-graph.mjs untested-systems [CRITICAL_PATH] --json`, `node scripts/query-knowledge-graph.mjs coverage-report` und `node scripts/query-knowledge-graph.mjs quality-scorecard --json`; `graph:check` validiert Coverage- und Scorecard-Artefakte gegen den Build-Output.
 - Fuer Entscheidungs-What-ifs liefern `node scripts/query-knowledge-graph.mjs what-if-remove <NODE_ID|FILE_PATH|CRITICAL_PATH> --json` und `node scripts/query-knowledge-graph.mjs what-if-replace <FROM> <TO> --json` Blast-Radius, empfohlene Checks und ein explizites `uncertaintyBudget`; mittlere oder hohe Unsicherheit ist Review-Evidence, keine automatische Freigabe.
+- Fuer adaptive Qualitaetssteuerung priorisiert `node scripts/query-knowledge-graph.mjs test-prioritization <PATH...> --json` die kleinste graphnahe Testauswahl, `policy-evaluate --json` prueft Policy-as-Data aus `query-ops.v1.json`, und `feedback-loop <PATH...> --json` gibt Human-Feedback nur als auditierbare Empfehlung mit Guardrails weiter.
 - Fuer Viewer-/Export-Handoffs ist `node scripts/query-knowledge-graph.mjs export-view --json` der sichere Default: PII- und Secret-aehnliche Attribute/Werte werden maskiert. Der rohe lokale Auditpfad ist nur explizit ueber `--unsafe-raw` zulaessig und darf nicht als Commit- oder Sharing-Evidence verwendet werden.
 - Neue Feature-Arbeit waehlt immer den leichtesten passenden Layer: `node-contract` vor `desktop-smoke`, `desktop-e2e` nur fuer produktnahe Integrationen ueber den Smoke-Kern hinaus, `browser-compat` nur fuer Browser-Demo/Web-API-/Fallback-Scope und `heavy-diagnostic` nur fuer bestehende schwere Cluster oder Diagnosebedarf.
 - `desktop-smoke` ist das primaere Produktsignal fuer die Desktop-App; es deckt App-Boot, Menu, Matchstart, Input-Ankunft und Return-to-Menu ueber die echte Electron-Shell ab.

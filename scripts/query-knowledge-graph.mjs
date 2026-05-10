@@ -1108,6 +1108,102 @@ function queryIncidentAutoMinimize(graph, coverage, changedFiles, { baseRef = nu
     };
 }
 
+function collectValidationTestCandidates(graph, criticalPaths, impactedNodeIds) {
+    const { nodes, edges, nodeById } = buildGraphIndexes(graph);
+    const criticalPathSet = new Set(criticalPaths || []);
+    const impactedSet = impactedNodeIds instanceof Set ? impactedNodeIds : new Set(impactedNodeIds || []);
+    const candidateById = new Map();
+
+    const addCandidate = (testNode, reason, scoreBoost = 0) => {
+        if (!testNode || testNode.type !== 'test') return;
+        const summary = nodeSummary(testNode);
+        if (!summary?.file) return;
+        const matchedCriticalPaths = summary.criticalPaths.filter((criticalPath) => criticalPathSet.has(criticalPath));
+        const key = testNode.id;
+        const existing = candidateById.get(key) || {
+            testId: testNode.id,
+            title: testNode.title || null,
+            file: summary.file,
+            criticalPaths: matchedCriticalPaths,
+            reasons: [],
+            score: 0,
+            command: `node --test ${summary.file}`,
+        };
+        existing.criticalPaths = Array.from(new Set([...existing.criticalPaths, ...matchedCriticalPaths]))
+            .sort((left, right) => left.localeCompare(right));
+        existing.reasons.push(reason);
+        existing.score += scoreBoost;
+        candidateById.set(key, existing);
+    };
+
+    for (const edge of edges) {
+        if (edge.type !== 'validated_by') continue;
+        const testNode = nodeById.get(edge.to);
+        if (!testNode || testNode.type !== 'test') continue;
+        const sourceNode = nodeById.get(edge.from);
+        const edgeCriticalPaths = Array.from(new Set([
+            ...getCriticalPaths(sourceNode),
+            ...getCriticalPaths(testNode),
+        ]));
+        const matchesPath = edgeCriticalPaths.some((criticalPath) => criticalPathSet.has(criticalPath));
+        const matchesImpact = impactedSet.has(edge.from);
+        if (matchesImpact || matchesPath) {
+            const causal = summarizeCausalWeight(edge);
+            addCandidate(
+                testNode,
+                matchesImpact ? `validates impacted node ${edge.from}` : `validates critical path ${edgeCriticalPaths.join(',')}`,
+                (matchesImpact ? 2 : 1) + causal.score
+            );
+        }
+    }
+
+    for (const node of nodes) {
+        if (node.type !== 'test') continue;
+        const nodePaths = getCriticalPaths(node);
+        if (nodePaths.some((criticalPath) => criticalPathSet.has(criticalPath))) {
+            addCandidate(node, `covers critical path ${nodePaths.filter((criticalPath) => criticalPathSet.has(criticalPath)).join(',')}`, 1);
+        }
+    }
+
+    return Array.from(candidateById.values())
+        .map((candidate) => ({
+            ...candidate,
+            score: Number(candidate.score.toFixed(3)),
+            reasons: Array.from(new Set(candidate.reasons)).sort((left, right) => left.localeCompare(right)),
+        }))
+        .sort((left, right) => (
+            right.score - left.score
+            || left.file.localeCompare(right.file)
+            || left.testId.localeCompare(right.testId)
+        ));
+}
+
+function queryTestPrioritization(graph, coverage, changedFiles, { baseRef = null, preset = 'incident' } = {}) {
+    const impact = queryChangeRisk(graph, coverage, changedFiles, { baseRef, preset });
+    const impactedNodeIds = new Set((impact.subgraph?.nodes || []).map((node) => node.id));
+    const priorityTests = collectValidationTestCandidates(graph, impact.criticalPaths, impactedNodeIds)
+        .map((candidate, index) => ({
+            rank: index + 1,
+            ...candidate,
+        }));
+
+    return {
+        query: 'test-prioritization',
+        sourceQuery: impact.query,
+        baseRef,
+        preset: impact.preset,
+        changedFiles: impact.changedFiles,
+        riskStatus: impact.riskStatus,
+        criticalPaths: impact.criticalPaths,
+        priorityTests,
+        recommendedChecks: Array.from(new Set([
+            'npm run graph:build',
+            'npm run graph:check',
+            ...priorityTests.slice(0, 5).map((candidate) => candidate.command),
+        ])),
+    };
+}
+
 function queryTemporalAnomalies(scorecard) {
     const current = scorecard?.current || {};
     const history = Array.isArray(scorecard?.history) ? scorecard.history : [];
@@ -1169,6 +1265,108 @@ function queryTemporalAnomalies(scorecard) {
             'npm run graph:build',
             'npm run graph:check',
         ],
+    };
+}
+
+function evaluateGraphPolicies(graph, coverage, scorecard, queryOpsContract = null) {
+    const policies = Array.isArray(queryOpsContract?.policies) ? queryOpsContract.policies : [];
+    const schemaLint = querySchemaLint(graph, coverage, scorecard);
+    const anomalies = queryTemporalAnomalies(scorecard);
+    const scorecardStatus = String(scorecard?.current?.status || 'unknown');
+    const decisions = policies.map((policy) => {
+        const id = String(policy?.id || '').trim();
+        const requires = Array.isArray(policy?.requires) ? policy.requires : [];
+        const failedSignals = [];
+        if (requires.includes('scorecard-pass') && scorecardStatus !== 'pass') {
+            failedSignals.push(`scorecard status is ${scorecardStatus}`);
+        }
+        if (requires.includes('schema-lint-pass') && schemaLint.status !== 'pass') {
+            failedSignals.push(`schema-lint status is ${schemaLint.status}`);
+        }
+        if (requires.includes('no-high-temporal-anomaly') && anomalies.anomalies.some((entry) => entry.severity === 'high')) {
+            failedSignals.push('high temporal anomaly present');
+        }
+        return {
+            id,
+            severity: String(policy?.severity || 'medium'),
+            status: failedSignals.length > 0 ? 'review' : 'pass',
+            requires,
+            failedSignals,
+            playbook: String(policy?.playbook || '').trim() || null,
+        };
+    });
+
+    const fallbackDecision = decisions.length === 0 ? [{
+        id: 'adaptive-quality-default',
+        severity: 'medium',
+        status: schemaLint.status === 'pass' && !anomalies.anomalies.some((entry) => entry.severity === 'high') ? 'pass' : 'review',
+        requires: ['schema-lint-pass', 'no-high-temporal-anomaly'],
+        failedSignals: [],
+        playbook: 'data/contracts/knowledge-graph/query-ops.v1.json#playbook:adaptive-diagnostics',
+    }] : decisions;
+
+    return {
+        query: 'policy-evaluate',
+        contract: queryOpsContract?.contract || 'knowledge-graph.query-ops.v1',
+        dataSource: 'data/contracts/knowledge-graph/query-ops.v1.json#policies',
+        status: fallbackDecision.some((decision) => decision.status === 'review') ? 'review' : 'pass',
+        scorecard: {
+            score: scorecard?.current?.score ?? null,
+            status: scorecardStatus,
+        },
+        schemaLint: {
+            status: schemaLint.status,
+            violationCount: schemaLint.summary.violationCount,
+        },
+        temporalAnomalies: {
+            status: anomalies.status,
+            highCount: anomalies.anomalies.filter((entry) => entry.severity === 'high').length,
+            totalCount: anomalies.anomalies.length,
+        },
+        decisions: fallbackDecision,
+        recommendedChecks: Array.from(new Set([
+            'node scripts/query-knowledge-graph.mjs policy-evaluate --json',
+            ...schemaLint.recommendedChecks,
+            ...anomalies.recommendedChecks,
+        ])),
+    };
+}
+
+function queryFeedbackLoop(graph, coverage, changedFiles, queryOpsContract = null, { baseRef = null } = {}) {
+    const prioritization = queryTestPrioritization(graph, coverage, changedFiles, { baseRef, preset: 'incident' });
+    const feedback = queryOpsContract?.feedback_loop && typeof queryOpsContract.feedback_loop === 'object'
+        ? queryOpsContract.feedback_loop
+        : {};
+    const signals = Array.isArray(feedback.reference_signals) ? feedback.reference_signals : [];
+    const matchingSignals = signals.filter((signal) => {
+        const files = Array.isArray(signal?.files) ? signal.files.map((filePath) => normalizePath(filePath)) : [];
+        const paths = Array.isArray(signal?.critical_paths) ? signal.critical_paths : [];
+        return files.some((filePath) => prioritization.changedFiles.includes(filePath))
+            || paths.some((criticalPath) => prioritization.criticalPaths.includes(criticalPath));
+    });
+    const proposedAdjustments = matchingSignals.map((signal) => ({
+        signalId: String(signal.id || '').trim(),
+        signalType: String(signal.type || '').trim(),
+        confidence: Number(signal.confidence ?? 0),
+        action: String(signal.action || 'review-priority').trim(),
+        target: String(signal.target || prioritization.priorityTests[0]?.testId || '').trim() || null,
+    }));
+
+    return {
+        query: 'feedback-loop',
+        sourceQuery: prioritization.query,
+        dataSource: 'data/contracts/knowledge-graph/query-ops.v1.json#feedback_loop',
+        status: proposedAdjustments.length > 0 ? 'watch' : 'ok',
+        acceptedSignalTypes: Array.isArray(feedback.accepted_signal_types) ? feedback.accepted_signal_types : [],
+        guardrails: Array.isArray(feedback.guardrails) ? feedback.guardrails : [],
+        changedFiles: prioritization.changedFiles,
+        criticalPaths: prioritization.criticalPaths,
+        proposedAdjustments,
+        recommendedChecks: Array.from(new Set([
+            'node scripts/query-knowledge-graph.mjs test-prioritization --json',
+            'node scripts/query-knowledge-graph.mjs policy-evaluate --json',
+            ...prioritization.recommendedChecks,
+        ])),
     };
 }
 
@@ -1698,6 +1896,33 @@ function printText(result) {
         return;
     }
 
+    if (result.query === 'test-prioritization') {
+        process.stdout.write(`test-prioritization status=${result.riskStatus} tests=${result.priorityTests.length}\n`);
+        for (const testEntry of result.priorityTests.slice(0, 5)) {
+            process.stdout.write(`- #${testEntry.rank} ${testEntry.file} score=${testEntry.score} paths=${testEntry.criticalPaths.join(',') || 'none'}\n`);
+        }
+        process.stdout.write(`- checks=${result.recommendedChecks.join(' && ')}\n`);
+        return;
+    }
+
+    if (result.query === 'policy-evaluate') {
+        process.stdout.write(`policy-evaluate status=${result.status} policies=${result.decisions.length}\n`);
+        for (const decision of result.decisions) {
+            process.stdout.write(`- ${decision.id}: ${decision.status}\n`);
+        }
+        process.stdout.write(`- checks=${result.recommendedChecks.join(' && ')}\n`);
+        return;
+    }
+
+    if (result.query === 'feedback-loop') {
+        process.stdout.write(`feedback-loop status=${result.status} signals=${result.proposedAdjustments.length}\n`);
+        for (const adjustment of result.proposedAdjustments) {
+            process.stdout.write(`- ${adjustment.signalId}: ${adjustment.action} -> ${adjustment.target || 'none'} confidence=${adjustment.confidence}\n`);
+        }
+        process.stdout.write(`- checks=${result.recommendedChecks.join(' && ')}\n`);
+        return;
+    }
+
     if (result.query === 'what-if-remove') {
         process.stdout.write(`what-if-remove ${result.selector} (${result.selectorType})\n`);
         process.stdout.write(`- nodes=${result.blastRadius.nodeCount} edges=${result.blastRadius.edgeCount} uncertainty=${result.uncertaintyBudget.tier}/${result.uncertaintyBudget.score}\n`);
@@ -1804,6 +2029,9 @@ function usage() {
         + '  node scripts/query-knowledge-graph.mjs incident-auto-minimize [--base <REF>] [FILE_PATH...] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs temporal-anomalies [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs schema-lint [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs test-prioritization [--base <REF>] [FILE_PATH...] [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs policy-evaluate [--json]\n'
+        + '  node scripts/query-knowledge-graph.mjs feedback-loop [--base <REF>] [FILE_PATH...] [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs what-if-remove <NODE_ID|FILE_PATH|CRITICAL_PATH> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs what-if-replace <FROM_NODE_OR_FILE> <TO_NODE_OR_FILE> [--json]\n'
         + '  node scripts/query-knowledge-graph.mjs why-not <NODE_ID|CRITICAL_PATH> [--json]\n'
@@ -1826,12 +2054,15 @@ export {
     queryImpactDiff,
     queryImpactForFile,
     queryIncidentAutoMinimize,
+    queryFeedbackLoop,
     queryOpenDeps,
+    evaluateGraphPolicies as queryPolicyEvaluation,
     queryQualityScorecard,
     querySchemaLint,
     queryScopeCollisions,
     querySurfacesForFile,
     queryTemporalAnomalies,
+    queryTestPrioritization,
     queryUntestedSystems,
     queryWhatIfRemove,
     queryWhatIfReplace,
@@ -1958,6 +2189,39 @@ if (isDirectRun) {
         } else if (command === 'schema-lint') {
             const scorecard = await readArtifact(SCORECARD_PATH);
             result = querySchemaLint(graph, coverage, scorecard);
+        } else if (command === 'test-prioritization') {
+            const baseIndex = positional.indexOf('--base');
+            const baseRef = baseIndex >= 0 ? positional[baseIndex + 1] : null;
+            const explicitFiles = positional
+                .slice(1)
+                .filter((arg, index, args) => (
+                    arg !== '--base'
+                    && args[index - 1] !== '--base'
+                ));
+            const changedFiles = explicitFiles.length > 0
+                ? explicitFiles
+                : await readChangedFiles(baseRef || 'HEAD');
+            result = queryTestPrioritization(graph, coverage, changedFiles, { baseRef });
+        } else if (command === 'policy-evaluate') {
+            const [scorecard, queryOpsContract] = await Promise.all([
+                readArtifact(SCORECARD_PATH),
+                readArtifact('data/contracts/knowledge-graph/query-ops.v1.json'),
+            ]);
+            result = evaluateGraphPolicies(graph, coverage, scorecard, queryOpsContract);
+        } else if (command === 'feedback-loop') {
+            const baseIndex = positional.indexOf('--base');
+            const baseRef = baseIndex >= 0 ? positional[baseIndex + 1] : null;
+            const explicitFiles = positional
+                .slice(1)
+                .filter((arg, index, args) => (
+                    arg !== '--base'
+                    && args[index - 1] !== '--base'
+                ));
+            const changedFiles = explicitFiles.length > 0
+                ? explicitFiles
+                : await readChangedFiles(baseRef || 'HEAD');
+            const queryOpsContract = await readArtifact('data/contracts/knowledge-graph/query-ops.v1.json');
+            result = queryFeedbackLoop(graph, coverage, changedFiles, queryOpsContract, { baseRef });
         } else if (command === 'what-if-remove') {
             const selector = positional[1];
             if (!selector) {
