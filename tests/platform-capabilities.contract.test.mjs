@@ -67,24 +67,13 @@ function createBrowserDemoBuildArtifactRuntimeGlobal({
     status = 200,
     body = '',
 } = {}) {
-    class MockXMLHttpRequest {
-        constructor() {
-            this.status = 0;
-            this.responseText = '';
-        }
-
-        open(_method, _url, _asyncFlag) {
-            // no-op: test double only needs send().
-        }
-
-        send() {
-            this.status = status;
-            this.responseText = body;
-        }
-    }
-
     return {
-        XMLHttpRequest: MockXMLHttpRequest,
+        fetch: async () => {
+            return {
+                status,
+                text: async () => body,
+            };
+        },
     };
 }
 
@@ -275,7 +264,7 @@ test('V98.2.3 override diagnostics report fallback and reject reason-codes for b
     );
 });
 
-test('V98.4.3 browser runtime reads build export artifact and applies monotone override clamp', () => {
+test('V98.4.3 browser runtime reads build export artifact and applies monotone override clamp', async () => {
     const runtimeGlobal = createBrowserDemoBuildArtifactRuntimeGlobal({
         body: JSON.stringify({
             contractVersion: 'browser-demo-surface-policy-export.v1',
@@ -298,6 +287,9 @@ test('V98.4.3 browser runtime reads build export artifact and applies monotone o
         }),
     });
 
+    resolveSurfacePolicy({ runtimeGlobal });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     const policy = resolveSurfacePolicy({ runtimeGlobal });
     assert.deepEqual(policy.allowedSessionTypes, ['single']);
     assert.deepEqual(policy.allowedModePaths, ['fight']);
@@ -313,7 +305,7 @@ test('V98.4.3 browser runtime reads build export artifact and applies monotone o
     assert.equal(saveCapability.browserDemoOverrideDiagnostics.source, 'build-artifact');
 });
 
-test('V98.4.3 browser runtime falls back to base policy when build export artifact contract is invalid', () => {
+test('V98.4.3 browser runtime falls back to base policy when build export artifact contract is invalid', async () => {
     const runtimeGlobal = createBrowserDemoBuildArtifactRuntimeGlobal({
         body: JSON.stringify({
             contractVersion: 'browser-demo-surface-policy-export.v9',
@@ -325,6 +317,9 @@ test('V98.4.3 browser runtime falls back to base policy when build export artifa
             },
         }),
     });
+
+    resolveSurfacePolicy({ runtimeGlobal });
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
     const policy = resolveSurfacePolicy({ runtimeGlobal });
     assert.deepEqual(policy.allowedModePaths, ['arcade', 'fight', 'normal']);

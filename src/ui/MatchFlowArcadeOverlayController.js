@@ -72,7 +72,9 @@ export class MatchFlowArcadeOverlayController {
         const panel = this._arcadeOverlayPanel;
         if (!panel) return;
         panel.classList.add('hidden');
-        panel.innerHTML = '';
+        while (panel.firstChild) {
+            panel.removeChild(panel.firstChild);
+        }
     }
 
     _animateArcadeXpCounter(node, toValue, durationMs = 900) {
@@ -101,6 +103,11 @@ export class MatchFlowArcadeOverlayController {
         const intermission = runtimeState?.intermission;
         if (!panel || !intermission || typeof intermission !== 'object') return false;
 
+        // Clear panel securely
+        while (panel.firstChild) {
+            panel.removeChild(panel.firstChild);
+        }
+
         const choices = Array.isArray(intermission.choices) ? intermission.choices : [];
         const rewards = Array.isArray(intermission.rewardChoices) ? intermission.rewardChoices : [];
         const nextSectorIndex = Math.max(1, Math.floor(toSafeNumber(intermission.nextSectorIndex, 1)));
@@ -111,66 +118,131 @@ export class MatchFlowArcadeOverlayController {
         const preview = intermission.nextSectorPreview && typeof intermission.nextSectorPreview === 'object'
             ? intermission.nextSectorPreview
             : {};
-        const choiceButtons = choices.map((entry) => {
-            const active = entry?.id === intermission.selectedChoiceId;
-            const mapLabel = String(entry?.mapLabel || entry?.mapKey || 'Unbekannte Map');
-            const modifierLabel = String(entry?.modifierLabel || 'Kein Modifier');
-            const effect = String(entry?.modifierEffect || '').trim();
-            return `<button type="button" class="arcade-overlay-choice-btn${active ? ' is-active' : ''}" data-arcade-choice-id="${String(entry?.id || '')}">
-                <strong>${mapLabel}</strong>
-                <span>${modifierLabel}</span>
-                <small>${effect || 'Standardsektor'}</small>
-            </button>`;
-        }).join('');
-        const rewardButtons = rewards.map((entry) => {
-            const active = entry?.id === intermission.selectedRewardId;
-            return `<button type="button" class="arcade-overlay-reward-btn${active ? ' is-active' : ''}" data-arcade-reward-id="${String(entry?.id || '')}">
-                <strong>${String(entry?.label || entry?.id || '')}</strong>
-                <small>${String(entry?.effectText || '').trim() || 'Kein Effekttext'}</small>
-            </button>`;
-        }).join('');
 
-        panel.innerHTML = `
-            <header class="arcade-overlay-header">
-                <h3>Intermission Sektor ${nextSectorIndex}</h3>
-                <p>Letzter Sektor: ${lastSectorPoints} Punkte | ${lastSectorXp} XP | Missionen ${missionsCompleted}/${missionsTotal}</p>
-            </header>
-            <div class="arcade-overlay-body">
-                <section class="arcade-overlay-section">
-                    <h4>Naechster Sektor</h4>
-                    <p>${String(preview.mapLabel || preview.mapKey || 'Unbekannte Map')} | ${String(preview.modifierLabel || 'Kein Modifier')}</p>
-                    <p>${String(preview.modifierEffect || '').trim() || 'Keine zusaetzliche Wirkung.'}</p>
-                </section>
-                <section class="arcade-overlay-section">
-                    <h4>Map-/Modifier-Wahl</h4>
-                    <div class="arcade-overlay-choice-grid">${choiceButtons || '<p class="arcade-overlay-empty">Keine Optionen verfuegbar.</p>'}</div>
-                </section>
-                <section class="arcade-overlay-section">
-                    <h4>Reward-Auswahl</h4>
-                    <div class="arcade-overlay-reward-grid">${rewardButtons || '<p class="arcade-overlay-empty">Keine Rewards verfuegbar.</p>'}</div>
-                </section>
-            </div>
-        `;
+        const header = document.createElement('header');
+        header.className = 'arcade-overlay-header';
 
-        panel.querySelectorAll('[data-arcade-choice-id]').forEach((button) => {
-            button.addEventListener('click', () => {
-                const choiceId = String(button.getAttribute('data-arcade-choice-id') || '').trim();
-                if (!choiceId) return;
-                selectArcadeIntermissionChoice(this.runtimePort, this.game, choiceId);
-                const nextState = getArcadeMenuSurfaceState(this.runtimePort, this.game);
-                this._renderArcadeIntermissionPanel(nextState);
+        const h3 = document.createElement('h3');
+        h3.textContent = `Intermission Sektor ${nextSectorIndex}`;
+        header.appendChild(h3);
+
+        const headerP = document.createElement('p');
+        headerP.textContent = `Letzter Sektor: ${lastSectorPoints} Punkte | ${lastSectorXp} XP | Missionen ${missionsCompleted}/${missionsTotal}`;
+        header.appendChild(headerP);
+        panel.appendChild(header);
+
+        const bodyDiv = document.createElement('div');
+        bodyDiv.className = 'arcade-overlay-body';
+
+        // Section 1: Naechster Sektor
+        const sect1 = document.createElement('section');
+        sect1.className = 'arcade-overlay-section';
+        const s1h4 = document.createElement('h4');
+        s1h4.textContent = 'Naechster Sektor';
+        sect1.appendChild(s1h4);
+
+        const s1p1 = document.createElement('p');
+        s1p1.textContent = `${String(preview.mapLabel || preview.mapKey || 'Unbekannte Map')} | ${String(preview.modifierLabel || 'Kein Modifier')}`;
+        sect1.appendChild(s1p1);
+
+        const s1p2 = document.createElement('p');
+        s1p2.textContent = String(preview.modifierEffect || '').trim() || 'Keine zusaetzliche Wirkung.';
+        sect1.appendChild(s1p2);
+        bodyDiv.appendChild(sect1);
+
+        // Section 2: Map-/Modifier-Wahl
+        const sect2 = document.createElement('section');
+        sect2.className = 'arcade-overlay-section';
+        const s2h4 = document.createElement('h4');
+        s2h4.textContent = 'Map-/Modifier-Wahl';
+        sect2.appendChild(s2h4);
+
+        const choiceGrid = document.createElement('div');
+        choiceGrid.className = 'arcade-overlay-choice-grid';
+        if (choices.length === 0) {
+            const emptyP = document.createElement('p');
+            emptyP.className = 'arcade-overlay-empty';
+            emptyP.textContent = 'Keine Optionen verfuegbar.';
+            choiceGrid.appendChild(emptyP);
+        } else {
+            choices.forEach((entry) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                const active = entry?.id === intermission.selectedChoiceId;
+                btn.className = `arcade-overlay-choice-btn${active ? ' is-active' : ''}`;
+                const choiceId = String(entry?.id || '');
+                btn.setAttribute('data-arcade-choice-id', choiceId);
+
+                const strong = document.createElement('strong');
+                strong.textContent = String(entry?.mapLabel || entry?.mapKey || 'Unbekannte Map');
+                btn.appendChild(strong);
+
+                const span = document.createElement('span');
+                span.textContent = String(entry?.modifierLabel || 'Kein Modifier');
+                btn.appendChild(span);
+
+                const small = document.createElement('small');
+                small.textContent = String(entry?.modifierEffect || '').trim() || 'Standardsektor';
+                btn.appendChild(small);
+
+                btn.addEventListener('click', () => {
+                    if (!choiceId) return;
+                    selectArcadeIntermissionChoice(this.runtimePort, this.game, choiceId);
+                    const nextState = getArcadeMenuSurfaceState(this.runtimePort, this.game);
+                    this._renderArcadeIntermissionPanel(nextState);
+                });
+
+                choiceGrid.appendChild(btn);
             });
-        });
-        panel.querySelectorAll('[data-arcade-reward-id]').forEach((button) => {
-            button.addEventListener('click', () => {
-                const rewardId = String(button.getAttribute('data-arcade-reward-id') || '').trim();
-                if (!rewardId) return;
-                selectArcadeReward(this.runtimePort, this.game, rewardId);
-                const nextState = getArcadeMenuSurfaceState(this.runtimePort, this.game);
-                this._renderArcadeIntermissionPanel(nextState);
-            });
-        });
+        }
+        sect2.appendChild(choiceGrid);
+        bodyDiv.appendChild(sect2);
 
+        // Section 3: Reward-Auswahl
+        const sect3 = document.createElement('section');
+        sect3.className = 'arcade-overlay-section';
+        const s3h4 = document.createElement('h4');
+        s3h4.textContent = 'Reward-Auswahl';
+        sect3.appendChild(s3h4);
+
+        const rewardGrid = document.createElement('div');
+        rewardGrid.className = 'arcade-overlay-reward-grid';
+        if (rewards.length === 0) {
+            const emptyP = document.createElement('p');
+            emptyP.className = 'arcade-overlay-empty';
+            emptyP.textContent = 'Keine Rewards verfuegbar.';
+            rewardGrid.appendChild(emptyP);
+        } else {
+            rewards.forEach((entry) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                const active = entry?.id === intermission.selectedRewardId;
+                btn.className = `arcade-overlay-reward-btn${active ? ' is-active' : ''}`;
+                const rewardId = String(entry?.id || '');
+                btn.setAttribute('data-arcade-reward-id', rewardId);
+
+                const strong = document.createElement('strong');
+                strong.textContent = String(entry?.label || entry?.id || '');
+                btn.appendChild(strong);
+
+                const small = document.createElement('small');
+                small.textContent = String(entry?.effectText || '').trim() || 'Kein Effekttext';
+                btn.appendChild(small);
+
+                btn.addEventListener('click', () => {
+                    if (!rewardId) return;
+                    selectArcadeReward(this.runtimePort, this.game, rewardId);
+                    const nextState = getArcadeMenuSurfaceState(this.runtimePort, this.game);
+                    this._renderArcadeIntermissionPanel(nextState);
+                });
+
+                rewardGrid.appendChild(btn);
+            });
+        }
+        sect3.appendChild(rewardGrid);
+        bodyDiv.appendChild(sect3);
+
+        panel.appendChild(bodyDiv);
         panel.classList.remove('hidden');
         return true;
     }
@@ -179,42 +251,117 @@ export class MatchFlowArcadeOverlayController {
         const panel = this._ensureArcadeOverlayPanel();
         const summary = runtimeState?.postRunSummary;
         if (!panel || !summary || typeof summary !== 'object') return false;
+
+        // Clear panel securely
+        while (panel.firstChild) {
+            panel.removeChild(panel.firstChild);
+        }
+
         const score = Math.max(0, Math.round(toSafeNumber(summary.score, 0)));
         const bestCombo = Math.max(0, Math.floor(toSafeNumber(summary.bestCombo, 0)));
         const missionRate = formatPercent(summary.missionCompletionRate);
         const xpEarned = Math.max(0, Math.round(toSafeNumber(summary.xpEarned, 0)));
-        const sectorRows = Array.isArray(summary.scorePerSector)
-            ? summary.scorePerSector.slice(0, 8).map((entry) => (
-                `<li>S${Math.max(0, Math.floor(toSafeNumber(entry?.sectorIndex, 0)))} | ${String(entry?.mapKey || '-')} | ${Math.max(0, Math.round(toSafeNumber(entry?.awardedPoints, 0)))} Punkte</li>`
-            )).join('')
-            : '';
+
         const replay = runtimeState?.replay && typeof runtimeState.replay === 'object' ? runtimeState.replay : {};
-        const replayHint = replay.playbackAvailable
+        const replayHintText = replay.playbackAvailable
             ? 'Replay verfuegbar'
             : (replay.payloadAvailable ? 'Replay als Export-Fallback verfuegbar' : 'Replay nicht verfuegbar');
 
-        panel.innerHTML = `
-            <header class="arcade-overlay-header">
-                <h3>Arcade Run abgeschlossen</h3>
-                <p>Gesamtscore ${score} | Best Combo ${bestCombo} | Mission-Rate ${missionRate}</p>
-            </header>
-            <div class="arcade-overlay-body">
-                <section class="arcade-overlay-section">
-                    <h4>Score pro Sektor</h4>
-                    <ul class="arcade-overlay-list">${sectorRows || '<li>Keine Sektordaten.</li>'}</ul>
-                </section>
-                <section class="arcade-overlay-section">
-                    <h4>XP</h4>
-                    <p id="arcade-overlay-xp-counter">0 XP</p>
-                    <p>${Math.max(1, Math.round(toSafeNumber(summary.peakMultiplier, 1) * 10) / 10)}x Peak-Multi</p>
-                </section>
-                <section class="arcade-overlay-section">
-                    <h4>Replay</h4>
-                    <p>${replayHint}</p>
-                    <button type="button" class="arcade-overlay-action-btn" id="btn-arcade-overlay-replay">Replay/Fallback</button>
-                </section>
-            </div>
-        `;
+        const header = document.createElement('header');
+        header.className = 'arcade-overlay-header';
+        
+        const h3 = document.createElement('h3');
+        h3.textContent = 'Arcade Run abgeschlossen';
+        header.appendChild(h3);
+        
+        const headerP = document.createElement('p');
+        headerP.textContent = `Gesamtscore ${score} | Best Combo ${bestCombo} | Mission-Rate ${missionRate}`;
+        header.appendChild(headerP);
+        panel.appendChild(header);
+
+        const bodyDiv = document.createElement('div');
+        bodyDiv.className = 'arcade-overlay-body';
+
+        // Section 1: Score pro Sektor
+        const sect1 = document.createElement('section');
+        sect1.className = 'arcade-overlay-section';
+        const s1h4 = document.createElement('h4');
+        s1h4.textContent = 'Score pro Sektor';
+        sect1.appendChild(s1h4);
+        
+        const ul = document.createElement('ul');
+        ul.className = 'arcade-overlay-list';
+        if (Array.isArray(summary.scorePerSector) && summary.scorePerSector.length > 0) {
+            summary.scorePerSector.slice(0, 8).forEach((entry) => {
+                const li = document.createElement('li');
+                const sectorIdx = Math.max(0, Math.floor(toSafeNumber(entry?.sectorIndex, 0)));
+                const mapKey = String(entry?.mapKey || '-');
+                const awarded = Math.max(0, Math.round(toSafeNumber(entry?.awardedPoints, 0)));
+                li.textContent = `S${sectorIdx} | ${mapKey} | ${awarded} Punkte`;
+                ul.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.textContent = 'Keine Sektordaten.';
+            ul.appendChild(li);
+        }
+        sect1.appendChild(ul);
+        bodyDiv.appendChild(sect1);
+
+        // Section 2: XP
+        const sect2 = document.createElement('section');
+        sect2.className = 'arcade-overlay-section';
+        const s2h4 = document.createElement('h4');
+        s2h4.textContent = 'XP';
+        sect2.appendChild(s2h4);
+        
+        const xpP = document.createElement('p');
+        xpP.id = 'arcade-overlay-xp-counter';
+        xpP.textContent = '0 XP';
+        sect2.appendChild(xpP);
+        
+        const multiP = document.createElement('p');
+        multiP.textContent = `${Math.max(1, Math.round(toSafeNumber(summary.peakMultiplier, 1) * 10) / 10)}x Peak-Multi`;
+        sect2.appendChild(multiP);
+        bodyDiv.appendChild(sect2);
+
+        // Section 3: Replay
+        const sect3 = document.createElement('section');
+        sect3.className = 'arcade-overlay-section';
+        const s3h4 = document.createElement('h4');
+        s3h4.textContent = 'Replay';
+        sect3.appendChild(s3h4);
+        
+        const replayP = document.createElement('p');
+        replayP.textContent = replayHintText;
+        sect3.appendChild(replayP);
+        
+        const replayBtn = document.createElement('button');
+        replayBtn.type = 'button';
+        replayBtn.className = 'arcade-overlay-action-btn';
+        replayBtn.id = 'btn-arcade-overlay-replay';
+        replayBtn.textContent = 'Replay/Fallback';
+        
+        replayBtn.addEventListener('click', () => {
+            const result = requestArcadeReplayPlayback(this.runtimePort, this.game);
+            const code = String(result?.code || 'replay_unknown');
+            const tone = code === 'replay_player_unavailable' ? 'warning' : 'info';
+            const message = code === 'ghost_fallback_started'
+                ? 'Ghost-Fallback wird abgespielt.'
+                : (code === 'replay_player_unavailable'
+                ? 'Replay-Player fehlt, Export-Fallback bereit.'
+                : (code === 'replay_disabled'
+                    ? 'Replay ist in den Runtime-Einstellungen deaktiviert.'
+                    : (code === 'replay_unavailable'
+                        ? 'Kein Replay fuer diesen Run verfuegbar.'
+                        : 'Replay-Status aktualisiert.')));
+            this.game?._showStatusToast?.(message, 1800, tone);
+        });
+        
+        sect3.appendChild(replayBtn);
+        bodyDiv.appendChild(sect3);
+
+        panel.appendChild(bodyDiv);
         panel.classList.remove('hidden');
 
         const xpCounter = panel.querySelector('#arcade-overlay-xp-counter');
@@ -223,25 +370,6 @@ export class MatchFlowArcadeOverlayController {
             xpEarned,
             Math.max(260, Math.round(toSafeNumber(summary?.xpAnimation?.durationMs, 900)))
         );
-
-        const replayButton = panel.querySelector('#btn-arcade-overlay-replay');
-        if (replayButton) {
-            replayButton.addEventListener('click', () => {
-                const result = requestArcadeReplayPlayback(this.runtimePort, this.game);
-                const code = String(result?.code || 'replay_unknown');
-                const tone = code === 'replay_player_unavailable' ? 'warning' : 'info';
-                const message = code === 'ghost_fallback_started'
-                    ? 'Ghost-Fallback wird abgespielt.'
-                    : (code === 'replay_player_unavailable'
-                    ? 'Replay-Player fehlt, Export-Fallback bereit.'
-                    : (code === 'replay_disabled'
-                        ? 'Replay ist in den Runtime-Einstellungen deaktiviert.'
-                        : (code === 'replay_unavailable'
-                            ? 'Kein Replay fuer diesen Run verfuegbar.'
-                            : 'Replay-Status aktualisiert.')));
-                this.game?._showStatusToast?.(message, 1800, tone);
-            });
-        }
 
         return true;
     }

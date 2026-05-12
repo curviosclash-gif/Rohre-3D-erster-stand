@@ -3,6 +3,7 @@
 // ============================================
 
 import http from 'node:http';
+import crypto from 'node:crypto';
 import {
     SIGNALING_HTTP_ROUTES,
     SIGNALING_SESSION_CONTRACT_VERSION,
@@ -24,14 +25,15 @@ function toPlayerId(value) {
 function generateLobbyCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code = '';
+    const randomBytes = crypto.randomBytes(8);
     for (let i = 0; i < 8; i += 1) {
-        code += chars[Math.floor(Math.random() * chars.length)];
+        code += chars[randomBytes[i] % chars.length];
     }
     return code;
 }
 
 function generateAccessToken(prefix = 'tok') {
-    return `${prefix}-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
+    return `${prefix}-${crypto.randomBytes(16).toString('hex')}`;
 }
 
 function jsonResponse(res, data, status = 200) {
@@ -49,7 +51,7 @@ function jsonResponse(res, data, status = 200) {
 
 function readBody(req) {
     return new Promise((resolve) => {
-        let body = '';
+        const chunks = [];
         let totalBytes = 0;
         let settled = false;
 
@@ -61,25 +63,29 @@ function readBody(req) {
 
         req.on('data', (chunk) => {
             if (settled) return;
-            const chunkBytes = Buffer.isBuffer(chunk)
-                ? chunk.length
-                : Buffer.byteLength(String(chunk), 'utf8');
-            totalBytes += chunkBytes;
+            const chunkBuffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, 'utf8');
+            totalBytes += chunkBuffer.length;
             if (totalBytes > MAX_REQUEST_BODY_BYTES) {
+                req.pause();
                 settle({ __tooLarge: true });
                 return;
             }
-            body += chunk;
+            chunks.push(chunkBuffer);
         });
         req.on('end', () => {
             if (settled) return;
-            try {
-                settle(JSON.parse(body));
-            } catch {
+            if (chunks.length === 0) {
                 settle({});
+                return;
+            }
+            try {
+                const bodyString = Buffer.concat(chunks).toString('utf-8');
+                settle(JSON.parse(bodyString));
+            } catch {
+                settle({ __badJson: true });
             }
         });
-        req.on('error', () => settle({}));
+        req.on('error', () => settle({ __badJson: true }));
     });
 }
 
@@ -220,6 +226,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
                 jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
                 return;
             }
+            if (body?.__badJson === true) {
+                jsonResponse(res, { ok: false, message: 'bad_json' }, 400);
+                return;
+            }
             const requestedMaxPlayers = Number(body.maxPlayers);
             lobby.code = generateLobbyCode();
             lobby.hostToken = generateAccessToken('host');
@@ -247,6 +257,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             const body = await readBody(req);
             if (body?.__tooLarge === true) {
                 jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
+            if (body?.__badJson === true) {
+                jsonResponse(res, { ok: false, message: 'bad_json' }, 400);
                 return;
             }
             const requestedLobbyCode = normalizeLobbyCode(body.lobbyCode);
@@ -284,6 +298,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
                 jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
                 return;
             }
+            if (body?.__badJson === true) {
+                jsonResponse(res, { ok: false, message: 'bad_json' }, 400);
+                return;
+            }
             const playerId = toPlayerId(body.playerId);
             const ready = body.ready === true;
             if (isHostPeerId(playerId)) {
@@ -314,6 +332,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             const body = await readBody(req);
             if (body?.__tooLarge === true) {
                 jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
+            if (body?.__badJson === true) {
+                jsonResponse(res, { ok: false, message: 'bad_json' }, 400);
                 return;
             }
             const playerId = toPlayerId(body.playerId);
@@ -362,6 +384,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
                 jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
                 return;
             }
+            if (body?.__badJson === true) {
+                jsonResponse(res, { ok: false, message: 'bad_json' }, 400);
+                return;
+            }
             const hostPeerId = toPlayerId(body.hostPeerId || body.playerId);
             if (!isHostPeerId(hostPeerId)) {
                 jsonResponse(res, { ok: false, message: 'host_required' }, 403);
@@ -401,6 +427,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
                 jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
                 return;
             }
+            if (body?.__badJson === true) {
+                jsonResponse(res, { ok: false, message: 'bad_json' }, 400);
+                return;
+            }
             const playerId = toPlayerId(body.playerId);
             if (playerId) {
                 lobby.pendingPlayers = lobby.pendingPlayers.filter((entry) => entry.playerId !== playerId);
@@ -414,6 +444,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             const body = await readBody(req);
             if (body?.__tooLarge === true) {
                 jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
+            if (body?.__badJson === true) {
+                jsonResponse(res, { ok: false, message: 'bad_json' }, 400);
                 return;
             }
             const hostPeerId = toPlayerId(body.hostPeerId || body.playerId || 'host');
@@ -456,6 +490,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
                 jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
                 return;
             }
+            if (body?.__badJson === true) {
+                jsonResponse(res, { ok: false, message: 'bad_json' }, 400);
+                return;
+            }
             const targetPlayerId = toPlayerId(body.targetPlayerId);
             if (targetPlayerId) {
                 lobby.offers.set(targetPlayerId, body.offer);
@@ -478,6 +516,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             const body = await readBody(req);
             if (body?.__tooLarge === true) {
                 jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
+                return;
+            }
+            if (body?.__badJson === true) {
+                jsonResponse(res, { ok: false, message: 'bad_json' }, 400);
                 return;
             }
             const playerId = toPlayerId(body.playerId);
@@ -504,6 +546,10 @@ export function createLANSignalingServer(port = 9090, options = {}) {
                 jsonResponse(res, { ok: false, message: 'payload_too_large' }, 413);
                 return;
             }
+            if (body?.__badJson === true) {
+                jsonResponse(res, { ok: false, message: 'bad_json' }, 400);
+                return;
+            }
             const fromPlayerId = toPlayerId(body.playerId);
             const targetPlayerId = toPlayerId(body.targetPlayerId) || fromPlayerId;
             if (!targetPlayerId) {
@@ -513,7 +559,12 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             if (!lobby.ice.has(targetPlayerId)) {
                 lobby.ice.set(targetPlayerId, []);
             }
-            lobby.ice.get(targetPlayerId).push({
+            const iceQueue = lobby.ice.get(targetPlayerId);
+            if (iceQueue.length >= 200) {
+                jsonResponse(res, { ok: false, message: 'ice_queue_full' }, 429);
+                return;
+            }
+            iceQueue.push({
                 fromPlayerId: fromPlayerId || 'unknown',
                 candidate: body.candidate,
             });

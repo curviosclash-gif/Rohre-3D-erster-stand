@@ -45,7 +45,12 @@ export function pushRecentEntry(list, value, maxItems = 6) {
 
 export function renderQuickList(container, items, dataKey) {
     if (!container) return;
-    container.innerHTML = '';
+    
+    // Clear container securely
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+    
     if (!Array.isArray(items) || items.length === 0) {
         const empty = document.createElement('span');
         empty.className = 'menu-hint';
@@ -76,38 +81,82 @@ export function humanizePreviewCategory(value) {
 export function renderSummaryBlocks(container, blocks) {
     if (!container) return;
     const normalizedBlocks = Array.isArray(blocks) ? blocks.filter(Boolean) : [];
+
+    // Clear container securely
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
     if (normalizedBlocks.length === 0) {
         container.textContent = 'Keine Auswahl vorhanden.';
         return;
     }
-    container.innerHTML = normalizedBlocks.map((block) => {
+
+    normalizedBlocks.forEach((block) => {
         const label = String(block.label || '').trim();
         const value = String(block.value || '').trim();
-        const toneClass = block.muted ? ' is-muted' : '';
-        return `
-                <div class="start-summary-block">
-                    <span class="start-summary-label">${label}</span>
-                    <span class="start-summary-value${toneClass}">${value}</span>
-                </div>
-            `;
-    }).join('');
+
+        const blockDiv = document.createElement('div');
+        blockDiv.className = 'start-summary-block';
+
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'start-summary-label';
+        labelSpan.textContent = label;
+
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'start-summary-value';
+        if (block.muted) valueSpan.classList.add('is-muted');
+        valueSpan.textContent = value;
+
+        blockDiv.appendChild(labelSpan);
+        blockDiv.appendChild(valueSpan);
+        container.appendChild(blockDiv);
+    });
 }
 
 export function renderPreviewCard(container, payload = {}) {
     if (!container) return;
-    const title = String(payload.title || '').trim() || 'Vorschau';
+    const titleText = String(payload.title || '').trim() || 'Vorschau';
     const badges = Array.isArray(payload.badges) ? payload.badges.filter(Boolean) : [];
     const facts = Array.isArray(payload.facts) ? payload.facts.filter(Boolean) : [];
-    const badgesMarkup = badges.map((badge) => `<span class="preview-badge">${String(badge)}</span>`).join('');
-    const factsMarkup = facts.map((fact) => `
-            <div class="preview-kv">
-                <span class="preview-kv-label">${String(fact.label || '')}</span>
-                <span class="preview-kv-value">${String(fact.value || '')}</span>
-            </div>
-        `).join('');
-    container.innerHTML = `
-            <div class="preview-card-title">${title}</div>
-            <div class="preview-card-meta">${badgesMarkup}</div>
-            <div class="preview-kv-grid">${factsMarkup}</div>
-        `;
+
+    // Clear container securely
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'preview-card-title';
+    titleDiv.textContent = titleText;
+    container.appendChild(titleDiv);
+
+    const metaDiv = document.createElement('div');
+    metaDiv.className = 'preview-card-meta';
+    badges.forEach((badge) => {
+        const badgeSpan = document.createElement('span');
+        badgeSpan.className = 'preview-badge';
+        badgeSpan.textContent = String(badge);
+        metaDiv.appendChild(badgeSpan);
+    });
+    container.appendChild(metaDiv);
+
+    const gridDiv = document.createElement('div');
+    gridDiv.className = 'preview-kv-grid';
+    facts.forEach((fact) => {
+        const kvDiv = document.createElement('div');
+        kvDiv.className = 'preview-kv';
+
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'preview-kv-label';
+        labelSpan.textContent = String(fact.label || '');
+
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'preview-kv-value';
+        valueSpan.textContent = String(fact.value || '');
+
+        kvDiv.appendChild(labelSpan);
+        kvDiv.appendChild(valueSpan);
+        gridDiv.appendChild(kvDiv);
+    });
+    container.appendChild(gridDiv);
 }

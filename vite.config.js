@@ -389,7 +389,7 @@ function loadGeneratedVehicleConfigsFromDisk() {
 }
 
 function isGeneratedVehicleId(vehicleId) {
-    return typeof vehicleId === 'string' && vehicleId.startsWith(GENERATED_EDITOR_VEHICLE_KEY_PREFIX);
+    return typeof vehicleId === 'string' && /^editor_vehicle_[a-z0-9-]+$/.test(vehicleId);
 }
 
 function ensureGeneratedVehicleIdEditable(vehicleId) {
@@ -541,9 +541,17 @@ function editorDiskSaveApiPlugin() {
                         createJsonResponse(res, 400, withEditorDiskIoContract({ ok: false, error: 'x-file-name header required' }));
                         return;
                     }
+
                     const safeName = String(fileNameHeader).replace(/[^a-zA-Z0-9.\-_/]/g, '');
-                    const videoDir = path.resolve(__dirname, path.dirname(safeName));
-                    const outPath = path.resolve(__dirname, safeName);
+                    const allowedVideoRoot = path.resolve(__dirname, 'videos');
+                    const outPath = path.resolve(allowedVideoRoot, safeName);
+
+                    if (!outPath.startsWith(allowedVideoRoot + path.sep)) {
+                        createJsonResponse(res, 403, withEditorDiskIoContract({ ok: false, error: 'Path traversal blocked. Video must be saved inside videos directory.' }));
+                        return;
+                    }
+
+                    const videoDir = path.dirname(outPath);
 
                     if (!existsSync(videoDir)) {
                         mkdirSync(videoDir, { recursive: true });
@@ -551,7 +559,7 @@ function editorDiskSaveApiPlugin() {
 
                     const buffer = await readVideoBody(req);
                     writeFileSync(outPath, buffer);
-                    createJsonResponse(res, 200, withEditorDiskIoContract({ ok: true, file: safeName }));
+                    createJsonResponse(res, 200, withEditorDiskIoContract({ ok: true, file: path.relative(__dirname, outPath).replace(/\\/g, '/') }));
                     return;
                 }
                 if (isVehicleList) {
@@ -706,11 +714,11 @@ function trainingDashboardApiPlugin() {
 
     function buildCliArgs(config) {
         const args = [];
-        if (config.episodes) args.push('--episodes', String(config.episodes));
-        if (config.modes) args.push('--modes', String(config.modes));
-        if (config.seed) args.push('--seeds', String(config.seed));
-        if (config.resumeCheckpoint) args.push('--resume-checkpoint', String(config.resumeCheckpoint));
-        if (config.maxSteps) args.push('--max-steps', String(config.maxSteps));
+        if (config.episodes) args.push('--episodes', String(parseInt(config.episodes, 10) || 20));
+        if (config.modes) args.push('--modes', String(config.modes).replace(/[^a-zA-Z0-9\-_,]/g, ''));
+        if (config.seed) args.push('--seeds', String(config.seed).replace(/[^0-9,]/g, ''));
+        if (config.resumeCheckpoint) args.push('--resume-checkpoint', String(config.resumeCheckpoint).replace(/[^a-zA-Z0-9\-_./\\]/g, ''));
+        if (config.maxSteps) args.push('--max-steps', String(parseInt(config.maxSteps, 10) || 5000));
         return args;
     }
 

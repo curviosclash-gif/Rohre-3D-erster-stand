@@ -187,30 +187,133 @@ function resolveBrowserDemoSurfacePolicyOverrideDraftFromBuildArtifact(runtimeGl
         return cached;
     }
 
-    let responseText = '';
-    let responseStatus = 0;
+    const processResponse = (status, text) => {
+        const hasHttpSuccess = status >= 200 && status < 300;
+        const hasFileSuccess = status === 0 && text.trim().length > 0;
+        if (!hasHttpSuccess && !hasFileSuccess) {
+            const unavailable = createBrowserDemoOverrideDraftResolution({
+                status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
+                reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SOURCE_UNAVAILABLE,
+                reason: `Build-Artefakt nicht verfuegbar (status: ${status}).`,
+                source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+            });
+            BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, unavailable);
+            return unavailable;
+        }
+
+        if (!text.trim()) {
+            const missingDraft = createBrowserDemoOverrideDraftResolution({
+                status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
+                reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.DRAFT_MISSING,
+                reason: 'Build-Artefakt fuer Browser-Demo-Override ist leer.',
+                source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+            });
+            BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, missingDraft);
+            return missingDraft;
+        }
+
+        let parsedArtifact = null;
+        try {
+            parsedArtifact = JSON.parse(text);
+        } catch (error) {
+            const invalidArtifact = createBrowserDemoOverrideDraftResolution({
+                status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
+                reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SNAPSHOT_INVALID,
+                reason: error instanceof Error ? error.message : String(error || 'build_artifact_parse_failed'),
+                source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+            });
+            BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, invalidArtifact);
+            return invalidArtifact;
+        }
+
+        if (!isPlainObject(parsedArtifact)) {
+            const invalidArtifact = createBrowserDemoOverrideDraftResolution({
+                status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
+                reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SNAPSHOT_INVALID,
+                reason: 'Build-Artefakt fuer Browser-Demo-Override muss ein Objekt sein.',
+                source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+            });
+            BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, invalidArtifact);
+            return invalidArtifact;
+        }
+
+        const contractVersion = normalizeString(parsedArtifact.contractVersion, '');
+        if (contractVersion !== BROWSER_DEMO_POLICY_EXPORT_CONTRACT_VERSION) {
+            const invalidArtifact = createBrowserDemoOverrideDraftResolution({
+                status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
+                reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SNAPSHOT_INVALID,
+                reason: `Build-Artefakt contractVersion ist ungueltig: ${contractVersion || '<missing>'}.`,
+                source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+            });
+            BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, invalidArtifact);
+            return invalidArtifact;
+        }
+
+        if (!isPlainObject(parsedArtifact.draft)) {
+            const missingDraft = createBrowserDemoOverrideDraftResolution({
+                status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
+                reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.DRAFT_MISSING,
+                reason: 'Build-Artefakt enthaelt keinen gueltigen Draft.',
+                source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+            });
+            BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, missingDraft);
+            return missingDraft;
+        }
+
+        const resolved = createBrowserDemoOverrideDraftResolution({
+            status: 'provided',
+            source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+            draft: parsedArtifact.draft,
+        });
+        BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, resolved);
+        return resolved;
+    };
+
     try {
         const dataUrlResponseText = readBrowserDemoPolicyExportDataUrl(runtimeGlobal);
         if (dataUrlResponseText !== null) {
-            responseStatus = 200;
-            responseText = dataUrlResponseText;
+            return processResponse(200, dataUrlResponseText);
         } else {
-            const XMLHttpRequestCtor = runtimeGlobal.XMLHttpRequest;
-            if (typeof XMLHttpRequestCtor !== 'function') {
+            const pendingResolution = createBrowserDemoOverrideDraftResolution({
+                status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
+                reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SOURCE_UNAVAILABLE,
+                reason: 'Build-Artefakt wird asynchron geladen.',
+                source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+            });
+            BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, pendingResolution);
+
+            const fetchFn = typeof runtimeGlobal.fetch === 'function'
+                ? runtimeGlobal.fetch.bind(runtimeGlobal)
+                : (typeof globalThis.fetch === 'function' ? globalThis.fetch.bind(globalThis) : null);
+
+            if (fetchFn) {
+                fetchFn(BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL)
+                    .then(response => {
+                        return response.text().then(text => ({ status: response.status, text }));
+                    })
+                    .then(({ status, text }) => {
+                        processResponse(status, text);
+                    })
+                    .catch(error => {
+                        const readFailed = createBrowserDemoOverrideDraftResolution({
+                            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
+                            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.READ_FAILED,
+                            reason: error instanceof Error ? error.message : String(error || 'build_artifact_read_failed'),
+                            source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+                        });
+                        BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, readFailed);
+                    });
+            } else {
                 const unavailable = createBrowserDemoOverrideDraftResolution({
                     status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
                     reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SOURCE_UNAVAILABLE,
-                    reason: 'XMLHttpRequest ist fuer den Build-Artefakt-Lesepfad nicht verfuegbar.',
+                    reason: 'Keine Fetch-API fuer den asynchronen Build-Artefakt-Lesepfad verfuegbar.',
                     source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
                 });
                 BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, unavailable);
                 return unavailable;
             }
-            const request = new XMLHttpRequestCtor();
-            request.open('GET', BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL, false);
-            request.send(null);
-            responseStatus = Number(request.status || 0);
-            responseText = String(request.responseText || '');
+            return pendingResolution;
         }
     } catch (error) {
         const readFailed = createBrowserDemoOverrideDraftResolution({
@@ -222,86 +325,6 @@ function resolveBrowserDemoSurfacePolicyOverrideDraftFromBuildArtifact(runtimeGl
         BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, readFailed);
         return readFailed;
     }
-
-    const hasHttpSuccess = responseStatus >= 200 && responseStatus < 300;
-    const hasFileSuccess = responseStatus === 0 && responseText.trim().length > 0;
-    if (!hasHttpSuccess && !hasFileSuccess) {
-        const unavailable = createBrowserDemoOverrideDraftResolution({
-            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
-            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SOURCE_UNAVAILABLE,
-            reason: `Build-Artefakt nicht verfuegbar (status: ${responseStatus}).`,
-            source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
-        });
-        BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, unavailable);
-        return unavailable;
-    }
-
-    if (!responseText.trim()) {
-        const missingDraft = createBrowserDemoOverrideDraftResolution({
-            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
-            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.DRAFT_MISSING,
-            reason: 'Build-Artefakt fuer Browser-Demo-Override ist leer.',
-            source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
-        });
-        BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, missingDraft);
-        return missingDraft;
-    }
-
-    let parsedArtifact = null;
-    try {
-        parsedArtifact = JSON.parse(responseText);
-    } catch (error) {
-        const invalidArtifact = createBrowserDemoOverrideDraftResolution({
-            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
-            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SNAPSHOT_INVALID,
-            reason: error instanceof Error ? error.message : String(error || 'build_artifact_parse_failed'),
-            source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
-        });
-        BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, invalidArtifact);
-        return invalidArtifact;
-    }
-
-    if (!isPlainObject(parsedArtifact)) {
-        const invalidArtifact = createBrowserDemoOverrideDraftResolution({
-            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
-            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SNAPSHOT_INVALID,
-            reason: 'Build-Artefakt fuer Browser-Demo-Override muss ein Objekt sein.',
-            source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
-        });
-        BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, invalidArtifact);
-        return invalidArtifact;
-    }
-
-    const contractVersion = normalizeString(parsedArtifact.contractVersion, '');
-    if (contractVersion !== BROWSER_DEMO_POLICY_EXPORT_CONTRACT_VERSION) {
-        const invalidArtifact = createBrowserDemoOverrideDraftResolution({
-            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
-            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SNAPSHOT_INVALID,
-            reason: `Build-Artefakt contractVersion ist ungueltig: ${contractVersion || '<missing>'}.`,
-            source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
-        });
-        BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, invalidArtifact);
-        return invalidArtifact;
-    }
-
-    if (!isPlainObject(parsedArtifact.draft)) {
-        const missingDraft = createBrowserDemoOverrideDraftResolution({
-            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
-            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.DRAFT_MISSING,
-            reason: 'Build-Artefakt enthaelt keinen gueltigen Draft.',
-            source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
-        });
-        BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, missingDraft);
-        return missingDraft;
-    }
-
-    const resolved = createBrowserDemoOverrideDraftResolution({
-        status: 'provided',
-        source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
-        draft: parsedArtifact.draft,
-    });
-    BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, resolved);
-    return resolved;
 }
 
 function resolveBrowserDemoSurfacePolicyOverrideDraft(options = {}) {

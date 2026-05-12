@@ -129,30 +129,47 @@ function createLifecycleContract() {
     });
 }
 
-function readMenuDefaultsOverrideSnapshot() {
-    try {
-        const snapshot = ipcRenderer.sendSync('settings-defaults:read-override-sync');
-        if (snapshot && typeof snapshot === 'object') {
-            return snapshot;
-        }
-    } catch (error) {
-        return {
+let cachedOverrideSnapshot = null;
+
+// Start fetching the snapshot immediately in the background
+ipcRenderer.invoke('settings-defaults:read-override').then((snapshot) => {
+    if (snapshot && typeof snapshot === 'object') {
+        cachedOverrideSnapshot = snapshot;
+    } else {
+        cachedOverrideSnapshot = {
             contractVersion: PRELOAD_CONTRACT_VERSIONS.settingsDefaults,
             filePath: '',
             exists: false,
             loadedAt: Date.now(),
-            readError: error instanceof Error ? error.message : String(error || 'override_sync_failed'),
+            readError: 'override_sync_unavailable',
             parseError: null,
             draft: null,
         };
     }
+}).catch((error) => {
+    cachedOverrideSnapshot = {
+        contractVersion: PRELOAD_CONTRACT_VERSIONS.settingsDefaults,
+        filePath: '',
+        exists: false,
+        loadedAt: Date.now(),
+        readError: error instanceof Error ? error.message : String(error || 'override_sync_failed'),
+        parseError: null,
+        draft: null,
+    };
+});
 
+function readMenuDefaultsOverrideSnapshot() {
+    if (cachedOverrideSnapshot !== null) {
+        return cachedOverrideSnapshot;
+    }
+    
+    // Fallback if requested before the async fetch finishes (rare, but avoids sync block)
     return {
         contractVersion: PRELOAD_CONTRACT_VERSIONS.settingsDefaults,
         filePath: '',
         exists: false,
         loadedAt: Date.now(),
-        readError: 'override_sync_unavailable',
+        readError: 'override_sync_pending',
         parseError: null,
         draft: null,
     };

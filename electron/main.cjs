@@ -878,6 +878,10 @@ ipcMain.on('settings-defaults:read-override-sync', (event) => {
     event.returnValue = readMenuDefaultsOverrideSnapshotSync();
 });
 
+ipcMain.handle('settings-defaults:read-override', async () => {
+    return readMenuDefaultsOverrideSnapshotSync();
+});
+
 async function shutdownRuntime() {
     stopDiscoveryListener();
     unregisterTuningShortcut();
