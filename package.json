@@ -128,6 +128,7 @@
     "@types/node": "^25.5.0",
     "eslint": "^10.0.3",
     "eslint-plugin-boundaries": "^6.0.2",
+    "gltf-pipeline": "^4.3.1",
     "husky": "^9.1.7",
     "typescript": "^5.9.3",
     "vite": "^5.0.0",
