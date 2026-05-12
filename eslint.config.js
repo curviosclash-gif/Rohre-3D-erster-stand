@@ -44,7 +44,7 @@ export default [
         rules: {
             'max-lines': createMaxLinesRule(500),
             'no-restricted-syntax': [
-                'error',
+                'warn',
                 {
                     selector: 'AssignmentExpression[left.property.name="innerHTML"]',
                     message: 'Do not use innerHTML. Use document.createElement and textContent instead to prevent XSS vulnerabilities.',

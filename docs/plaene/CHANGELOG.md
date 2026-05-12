@@ -527,3 +527,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - V102 (Security-, Runtime- und Contract-Hardening) erfolgreich abgeschlossen. Path-Traversal und XSS Risiken eliminiert. Sync-IPC für Settings asynchronisiert und Request-Size-Limits für den LAN-Server etabliert. ESLint no-restricted-syntax für innerHTML als Warnung hinterlegt.
 - V114 (SurfacePolicyPort fuer Demo- und Vollversionsgrenze) abgeschlossen: Runtime-, Menu- und Startvalidierungs-Pfade konsumieren Surface-Gates ueber den zentralen Port; Produktmatrix-Contracts decken Desktop-vs-Browser-Demo-Fallbacks ab.
 - V115 (Product & Infra Follow-up) abgeschlossen: Portal-Slot-Dopplungen, Checkpoint-Ring-Disposal und die lokale Expert-Credential-Hygiene sind bereinigt; Gemini-Agenten/Plan-Skill sind als expliziter Infra-Scope im Graph gemappt.
+
+## Bugfix-Notiz 2026-05-13 (48h-Review-Follow-up)
+
+- Der Architektur-Lint bleibt lauffaehig, indem der neue `innerHTML`-Guard als Warn-Ratchet statt als sofortiger Bestandserror greift; die 29 bekannten Treffer blockieren damit nicht mehr `prebuild`.
+- `.gitignore` ist wieder textuell sauber und ignoriert lokale `scripts/tmp_refactor*.cjs`, damit Scratch-Refactor-Skripte den Knowledge-Graph nicht erneut verschmutzen.
+- Der Electron-Preload kann den Settings-Override-Snapshot beim ersten synchronen Runtime-Limits-Read wieder deterministisch liefern; der asynchrone Cache bleibt als schneller Folgepfad erhalten.

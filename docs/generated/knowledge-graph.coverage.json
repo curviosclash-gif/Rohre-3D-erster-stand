@@ -130,11 +130,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1839,
-    "rawCoveredFileCount": 1484,
-    "rawCoveragePercent": 80.7,
-    "adjustedTrackedFileCount": 1577,
-    "adjustedCoveredFileCount": 1344,
+    "trackedFileCount": 1833,
+    "rawCoveredFileCount": 1478,
+    "rawCoveragePercent": 80.6,
+    "adjustedTrackedFileCount": 1571,
+    "adjustedCoveredFileCount": 1338,
     "adjustedCoveragePercent": 85.2,
     "uncoveredFileCount": 355,
     "uncoveredActiveFileCount": 233,
@@ -178,8 +178,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 938,
-        "coveredCount": 924
+        "count": 932,
+        "coveredCount": 918
       },
       {
         "classification": "product-docs",
@@ -20176,120 +20176,6 @@
     },
     {
       "path": "scripts/test-cleanup.mjs",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "audit-scope",
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "B13",
-        "BT91"
-      ],
-      "surfaces": [],
-      "classification": "product-code",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "scripts/tmp_refactor.cjs",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "audit-scope",
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "B13",
-        "BT91"
-      ],
-      "surfaces": [],
-      "classification": "product-code",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "scripts/tmp_refactor2.cjs",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "audit-scope",
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "B13",
-        "BT91"
-      ],
-      "surfaces": [],
-      "classification": "product-code",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "scripts/tmp_refactor3.cjs",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "audit-scope",
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "B13",
-        "BT91"
-      ],
-      "surfaces": [],
-      "classification": "product-code",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "scripts/tmp_refactor4.cjs",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "audit-scope",
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "B13",
-        "BT91"
-      ],
-      "surfaces": [],
-      "classification": "product-code",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "scripts/tmp_refactor5.cjs",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "audit-scope",
-        "bot-training-plan"
-      ],
-      "scopeBlocks": [
-        "B13",
-        "BT91"
-      ],
-      "surfaces": [],
-      "classification": "product-code",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "scripts/tmp_refactor6.cjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

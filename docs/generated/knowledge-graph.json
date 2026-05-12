@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 197,
+          "concreteCount": 191,
           "plannedCount": 0
         }
       }
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 460,
+          "concreteCount": 454,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -41765,108 +41765,6 @@
       }
     },
     {
-      "id": "scripts/tmp_refactor.cjs",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "audit-scope",
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "B13",
-          "BT91"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "scripts/tmp_refactor2.cjs",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "audit-scope",
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "B13",
-          "BT91"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "scripts/tmp_refactor3.cjs",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "audit-scope",
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "B13",
-          "BT91"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "scripts/tmp_refactor4.cjs",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "audit-scope",
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "B13",
-          "BT91"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "scripts/tmp_refactor5.cjs",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "audit-scope",
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "B13",
-          "BT91"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "scripts/tmp_refactor6.cjs",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "audit-scope",
-          "bot-training-plan"
-        ],
-        "scopeBlocks": [
-          "B13",
-          "BT91"
-        ],
-        "exists": true
-      }
-    },
-    {
       "id": "scripts/trainer-server.mjs",
       "type": "file",
       "title": null,
@@ -60289,60 +60187,6 @@
     },
     {
       "from": "B13",
-      "to": "scripts/tmp_refactor.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "audit-scope"
-      }
-    },
-    {
-      "from": "B13",
-      "to": "scripts/tmp_refactor2.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "audit-scope"
-      }
-    },
-    {
-      "from": "B13",
-      "to": "scripts/tmp_refactor3.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "audit-scope"
-      }
-    },
-    {
-      "from": "B13",
-      "to": "scripts/tmp_refactor4.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "audit-scope"
-      }
-    },
-    {
-      "from": "B13",
-      "to": "scripts/tmp_refactor5.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "audit-scope"
-      }
-    },
-    {
-      "from": "B13",
-      "to": "scripts/tmp_refactor6.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "audit-scope"
-      }
-    },
-    {
-      "from": "B13",
       "to": "scripts/trainer-server.mjs",
       "type": "scope",
       "hint": null,
@@ -68850,60 +68694,6 @@
     {
       "from": "BT91",
       "to": "scripts/test-cleanup.mjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT91",
-      "to": "scripts/tmp_refactor.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT91",
-      "to": "scripts/tmp_refactor2.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT91",
-      "to": "scripts/tmp_refactor3.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT91",
-      "to": "scripts/tmp_refactor4.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT91",
-      "to": "scripts/tmp_refactor5.cjs",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "bot-training-plan"
-      }
-    },
-    {
-      "from": "BT91",
-      "to": "scripts/tmp_refactor6.cjs",
       "type": "scope",
       "hint": null,
       "attributes": {
