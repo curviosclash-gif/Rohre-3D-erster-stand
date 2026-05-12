@@ -10,4 +10,4 @@ Deine Aufgaben umfassen:
 2. **Infrastruktur-Recovery:** Behebe wiederkehrende Fehler in der Testausführung, wie z.B. Datei-Sperr-Probleme (`EPERM`), Timeouts oder asynchrone Race-Conditions ("Flaky Tests").
 3. **Test-Erstellung:** Schreibe neue End-to-End (E2E) Tests für definierte User-Journeys in Playwright oder ergänze Unit-Tests für geschäftslogikkritische Module.
 
-Halte dich stets an die Vorgaben aus den `Open_Findings.md` bezüglich bekannter Testschulden und nutze die etablierten Test-Skripte im Projekt (z.B. in `package.json` definierte `npm run test` oder `npm run test:e2e:desktop`).
+Halte dich stets an die kanonischen Test- und Findings-Quellen des Repos: `.agents/test_mapping.md` fuer die guenstigste passende Testauswahl, `docs/qa/**` fuer Audit-Findings und `docs/plaene/aktiv/VXX.md` fuer blockbezogene DoD-/Evidence-Vorgaben. Nutze die etablierten Skripte aus `package.json`, z.B. `npm run test:fast`, `npm run test:contract`, `npm run test:desktop:smoke` oder gezielte Playwright-Profile.

@@ -533,3 +533,7 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Der Architektur-Lint bleibt lauffaehig, indem der neue `innerHTML`-Guard als Warn-Ratchet statt als sofortiger Bestandserror greift; die 29 bekannten Treffer blockieren damit nicht mehr `prebuild`.
 - `.gitignore` ist wieder textuell sauber und ignoriert lokale `scripts/tmp_refactor*.cjs`, damit Scratch-Refactor-Skripte den Knowledge-Graph nicht erneut verschmutzen.
 - Der Electron-Preload kann den Settings-Override-Snapshot beim ersten synchronen Runtime-Limits-Read wieder deterministisch liefern; der asynchrone Cache bleibt als schneller Folgepfad erhalten.
+
+## Stand-Snapshot 2026-05-13 (Gemini-Governance-Hygiene)
+
+- Gemini-Gedaechtnis-/Skill-Definitionen nachgezogen: `.gemini/skills/plan-generator/SKILL.md` respektiert jetzt die User-owned Intake-Governance (`docs/plaene/neu/` statt direkter Master-/Aktivblock-Aenderung), und `.gemini/agents/test_engineer.md` verweist auf `.agents/test_mapping.md`, `docs/qa/**` und aktive Blockplaene statt auf eine nicht vorhandene `Open_Findings.md`.
