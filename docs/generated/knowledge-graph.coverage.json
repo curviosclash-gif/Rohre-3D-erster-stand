@@ -130,14 +130,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1823,
-    "rawCoveredFileCount": 1467,
-    "rawCoveragePercent": 80.5,
-    "adjustedTrackedFileCount": 1561,
-    "adjustedCoveredFileCount": 1327,
-    "adjustedCoveragePercent": 85,
-    "uncoveredFileCount": 356,
-    "uncoveredActiveFileCount": 234,
+    "trackedFileCount": 1839,
+    "rawCoveredFileCount": 1484,
+    "rawCoveragePercent": 80.7,
+    "adjustedTrackedFileCount": 1577,
+    "adjustedCoveredFileCount": 1344,
+    "adjustedCoveragePercent": 85.2,
+    "uncoveredFileCount": 355,
+    "uncoveredActiveFileCount": 233,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -172,20 +172,20 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 211,
-        "coveredCount": 190
+        "count": 217,
+        "coveredCount": 196
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 929,
-        "coveredCount": 914
+        "count": 938,
+        "coveredCount": 924
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 394,
-        "coveredCount": 209
+        "count": 395,
+        "coveredCount": 210
       },
       {
         "classification": "prototype",
@@ -794,6 +794,108 @@
       ],
       "scopeBlocks": [
         "V77"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": ".gemini/agents/3d_math_optimizer.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V115"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": ".gemini/agents/contract_validator.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V115"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": ".gemini/agents/doc_sync.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V115"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": ".gemini/agents/security_auditor.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V115"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": ".gemini/agents/test_engineer.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V115"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": ".gemini/skills/plan-generator/SKILL.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V115"
       ],
       "surfaces": [],
       "classification": "other",
@@ -4120,11 +4222,15 @@
     {
       "path": "data/contracts/browser-demo-surface-policy.export.v1.json",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V114"
+      ],
       "surfaces": [],
       "classification": "product-code",
       "excludedFromCoverage": false,
@@ -11427,6 +11533,23 @@
       ],
       "scopeBlocks": [
         "V110",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V115.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
         "V77"
       ],
       "surfaces": [],
@@ -19491,6 +19614,44 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/cleanup-logs.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/compress-3d-assets.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/create-main-snapshot-tag.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -20033,6 +20194,120 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/tmp_refactor.cjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/tmp_refactor2.cjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/tmp_refactor3.cjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/tmp_refactor4.cjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/tmp_refactor5.cjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/tmp_refactor6.cjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "bot-training-plan"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "BT91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/trainer-server.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -20332,11 +20607,13 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "bot-training-plan"
+        "bot-training-plan",
+        "scope-files"
       ],
       "scopeBlocks": [
         "B13",
-        "BT91"
+        "BT91",
+        "V115"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -24579,6 +24856,7 @@
       ],
       "scopeBlocks": [
         "B03",
+        "V115",
         "V74",
         "V84"
       ],
@@ -24623,6 +24901,7 @@
       "scopeBlocks": [
         "B03",
         "V100",
+        "V115",
         "V51",
         "V72",
         "V74",
@@ -28552,6 +28831,23 @@
       "excludeReason": null
     },
     {
+      "path": "src/shared/runtime/SurfacePolicyPort.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B11"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/shared/runtime/UiControllerRuntimePorts.js",
       "tracked": true,
       "coveredInCore": true,
@@ -30920,6 +31216,7 @@
         "B05",
         "V105",
         "V113",
+        "V115",
         "V64",
         "V77",
         "V81",

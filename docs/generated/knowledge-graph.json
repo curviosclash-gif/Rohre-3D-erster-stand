@@ -388,7 +388,7 @@
           "src/shared/runtime/**"
         ],
         "scopeResolution": {
-          "concreteCount": 75,
+          "concreteCount": 76,
           "plannedCount": 0
         }
       }
@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 189,
+          "concreteCount": 197,
           "plannedCount": 0
         }
       }
@@ -774,7 +774,7 @@
           "tests/"
         ],
         "scopeResolution": {
-          "concreteCount": 452,
+          "concreteCount": 460,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -1793,7 +1793,7 @@
       "id": "V102",
       "type": "block",
       "title": "Security-, Runtime- und Contract-Hardening",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -1802,7 +1802,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "102.1",
+        "currentPhase": "102.99",
         "planFile": "docs/plaene/aktiv/V102.md",
         "scopeDeclarations": [
           "docs/plaene/aktiv/V102.md",
@@ -1993,6 +1993,7 @@
           "V112",
           "V113",
           "V114",
+          "V115",
           "V90",
           "V96"
         ],
@@ -2403,6 +2404,7 @@
           "V111",
           "V112",
           "V114",
+          "V115",
           "V90",
           "V96"
         ],
@@ -2413,7 +2415,7 @@
       "id": "V114",
       "type": "block",
       "title": "SurfacePolicyPort fuer Demo- und Vollversionsgrenze",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2424,6 +2426,7 @@
         "currentPhase": "114.1",
         "planFile": "docs/plaene/aktiv/V114.md",
         "scopeDeclarations": [
+          "data/contracts/browser-demo-surface-policy.export.v1.json",
           "docs/referenz/ai_architecture_context.md",
           "src/core/runtime/GameRuntimeSettingsHandler.js",
           "src/core/runtime/MatchStartValidationService.js",
@@ -2444,7 +2447,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 18,
+          "concreteCount": 19,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2455,6 +2458,44 @@
           "V113",
           "V90",
           "V96"
+        ],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V115",
+      "type": "block",
+      "title": "Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery)",
+      "status": "done",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "115.99",
+        "planFile": "docs/plaene/aktiv/V115.md",
+        "scopeDeclarations": [
+          ".gemini/agents/3d_math_optimizer.md",
+          ".gemini/agents/contract_validator.md",
+          ".gemini/agents/doc_sync.md",
+          ".gemini/agents/security_auditor.md",
+          ".gemini/agents/test_engineer.md",
+          ".gemini/skills/plan-generator/SKILL.md",
+          "scripts/workspace-cleanup.mjs",
+          "src/entities/arena/CheckpointRingMeshFactory.js",
+          "src/entities/arena/portal/PortalLayoutBuilder.js",
+          "src/maps/vulkan_odyssey.js",
+          "src/ui/menu/MenuExpertLoginRuntime.js"
+        ],
+        "scopeResolution": {
+          "concreteCount": 10,
+          "plannedCount": 1
+        },
+        "scopeOverlapAllowedWith": [
+          "V105",
+          "V113"
         ],
         "unknownFrontmatterFields": []
       }
@@ -3172,7 +3213,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 302,
+          "concreteCount": 303,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5708,7 +5749,7 @@
       "id": "V102.1",
       "type": "phase",
       "title": "Security-Hotfixes fuer Write- und Renderpfade",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.1"
@@ -5718,7 +5759,7 @@
       "id": "V102.2",
       "type": "phase",
       "title": "Contract-I/O Entblockung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.2"
@@ -5728,7 +5769,7 @@
       "id": "V102.3",
       "type": "phase",
       "title": "LAN-Endpoint- und Payload-Hardening",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.3"
@@ -5738,7 +5779,7 @@
       "id": "V102.4",
       "type": "phase",
       "title": "Guardrails fuer Hotspots, Tooling und Repo-Hygiene",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.4"
@@ -5748,7 +5789,7 @@
       "id": "V102.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.99"
@@ -6428,7 +6469,7 @@
       "id": "V114.1",
       "type": "phase",
       "title": "Zielvertrag und Matrix",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.1"
@@ -6438,7 +6479,7 @@
       "id": "V114.2",
       "type": "phase",
       "title": "SurfacePolicyPort einziehen",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.2"
@@ -6448,7 +6489,7 @@
       "id": "V114.3",
       "type": "phase",
       "title": "SettingsManager-Abgrenzung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.3"
@@ -6458,7 +6499,7 @@
       "id": "V114.4",
       "type": "phase",
       "title": "Tests und Ratchet",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.4"
@@ -6468,10 +6509,30 @@
       "id": "V114.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.99"
+      }
+    },
+    {
+      "id": "V115.1",
+      "type": "phase",
+      "title": "Gameplay und Memory",
+      "status": "done",
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.1"
+      }
+    },
+    {
+      "id": "V115.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "done",
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.99"
       }
     },
     {
@@ -15792,8 +15853,8 @@
     {
       "id": "V102.1.1",
       "type": "subphase",
-      "title": "`vite.config.js` Video-Save-Endpoint auf erlaubte Root begrenzen (`safeName`, canonical path guard, reject ausserhalb root).",
-      "status": "open",
+      "title": "`vite.config.js` Video-Save-Endpoint auf erlaubte Root begrenzen (`safeName`, canonical path guard, reject ausserhalb root). (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.1",
@@ -15803,8 +15864,8 @@
     {
       "id": "V102.1.2",
       "type": "subphase",
-      "title": "`StartSetupUiOps` und `MatchFlowArcadeOverlayController` von untrusted `innerHTML` auf sichere DOM-Updates umstellen; der LAN-Discovery-Pfad bleibt bei `V99`.",
-      "status": "open",
+      "title": "`StartSetupUiOps` und `MatchFlowArcadeOverlayController` von untrusted `innerHTML` auf sichere DOM-Updates umstellen; der LAN-Discovery-Pfad bleibt bei `V99`. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.1",
@@ -15814,8 +15875,8 @@
     {
       "id": "V102.2.1",
       "type": "subphase",
-      "title": "`PlatformCapabilityRegistry` Build-Artefakt-Lesepfad ohne synchrones XHR aufloesen (lazy async cache oder bootstrap-injizierter Snapshot).",
-      "status": "open",
+      "title": "`PlatformCapabilityRegistry` Build-Artefakt-Lesepfad ohne synchrones XHR aufloesen (lazy async cache oder bootstrap-injizierter Snapshot). (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.2",
@@ -15825,8 +15886,8 @@
     {
       "id": "V102.2.2",
       "type": "subphase",
-      "title": "`preload`/Settings-Defaults-Read so umstellen, dass kein `sendSync` im rendererseitigen Verbrauchspfad notwendig ist.",
-      "status": "open",
+      "title": "`preload`/Settings-Defaults-Read so umstellen, dass kein `sendSync` im rendererseitigen Verbrauchspfad notwendig ist. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.2",
@@ -15836,8 +15897,8 @@
     {
       "id": "V102.3.1",
       "type": "subphase",
-      "title": "`server/lan-signaling.js` Request-Body-Limits und parse-feste Fehlerpfade einfuehren.",
-      "status": "open",
+      "title": "`server/lan-signaling.js` Request-Body-Limits und parse-feste Fehlerpfade einfuehren. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.3",
@@ -15847,8 +15908,8 @@
     {
       "id": "V102.3.2",
       "type": "subphase",
-      "title": "Endpoint-Rollen-/Mutationsschutz mit bestehendem `V99`-Scope abgleichen, ohne parallelen Vertragszweig zu bauen.",
-      "status": "open",
+      "title": "Endpoint-Rollen-/Mutationsschutz mit bestehendem `V99`-Scope abgleichen, ohne parallelen Vertragszweig zu bauen. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.3",
@@ -15858,8 +15919,8 @@
     {
       "id": "V102.4.1",
       "type": "subphase",
-      "title": "`eslint`/Architektur-Checks fuer Security-/Hotspot-Regressionen schaerfen (z. B. no-untrusted-innerhtml-Regelpfad oder gleichwertiger Guard).",
-      "status": "open",
+      "title": "`eslint`/Architektur-Checks fuer Security-/Hotspot-Regressionen schaerfen (z. B. no-untrusted-innerhtml-Regelpfad oder gleichwertiger Guard). (abgeschlossen: 2026-05-12; evidence: lint -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.4",
@@ -15869,8 +15930,8 @@
     {
       "id": "V102.4.2",
       "type": "subphase",
-      "title": "Repo-Hygiene-Follow-up (`tmp`-/Archiv-Bloat) als klaren Retention-/Enttracking-Plan dokumentieren und in bestehende Cleanup-Streams einhaengen.",
-      "status": "open",
+      "title": "Repo-Hygiene-Follow-up (`tmp`-/Archiv-Bloat) als klaren Retention-/Enttracking-Plan dokumentieren und in bestehende Cleanup-Streams einhaengen. (abgeschlossen: 2026-05-12; evidence: manual -> updated)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.4",
@@ -15880,8 +15941,8 @@
     {
       "id": "V102.99.1",
       "type": "subphase",
-      "title": "Relevante Contract-/Targeted-Tests fuer Security-/Contract-Pfade sind gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "Relevante Contract-/Targeted-Tests fuer Security-/Contract-Pfade sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.99",
@@ -15891,8 +15952,8 @@
     {
       "id": "V102.99.2",
       "type": "subphase",
-      "title": "`npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen.",
-      "status": "open",
+      "title": "`npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.99",
@@ -15902,8 +15963,8 @@
     {
       "id": "V102.99.3",
       "type": "subphase",
-      "title": "Keine neuen disallowed architecture edges oder Legacy-Surface-Budgetausweitungen im geaenderten Scope.",
-      "status": "open",
+      "title": "Keine neuen disallowed architecture edges oder Legacy-Surface-Budgetausweitungen im geaenderten Scope. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V102",
         "phaseCode": "102.99",
@@ -17915,8 +17976,8 @@
     {
       "id": "V114.1.1",
       "type": "subphase",
-      "title": "Direkte produktive Surface-Gate-Aufrufe inventarisieren und nach UI-Sync, Runtime-Action, Startvalidierung, Feature-Launch und Contract-only trennen.",
-      "status": "open",
+      "title": "Direkte produktive Surface-Gate-Aufrufe inventarisieren und nach UI-Sync, Runtime-Action, Startvalidierung, Feature-Launch und Contract-only trennen. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.1",
@@ -17926,8 +17987,8 @@
     {
       "id": "V114.1.2",
       "type": "subphase",
-      "title": "Produktmatrix fuer Desktop-App vs Browser-Demo definieren: erlaubt/verboten/fallback fuer Session, Mode, Map, Preset, Quickstart, Host/Join und Tooling.",
-      "status": "open",
+      "title": "Produktmatrix fuer Desktop-App vs Browser-Demo definieren: erlaubt/verboten/fallback fuer Session, Mode, Map, Preset, Quickstart, Host/Join und Tooling. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.1",
@@ -17937,8 +17998,8 @@
     {
       "id": "V114.2.1",
       "type": "subphase",
-      "title": "`SurfacePolicyPort` in Shared-/Runtime-Port-Schicht einfuehren und aus bestehendem `surfacePolicy`-/`productSurfaceId`-Snapshot speisen.",
-      "status": "open",
+      "title": "`SurfacePolicyPort` in Shared-/Runtime-Port-Schicht einfuehren und aus bestehendem `surfacePolicy`-/`productSurfaceId`-Snapshot speisen. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.2",
@@ -17948,8 +18009,8 @@
     {
       "id": "V114.2.2",
       "type": "subphase",
-      "title": "Menu-/Runtime-Actions auf den Port umstellen; direkte Resolver-Aufrufe bleiben nur in `PlatformSurfacePolicyOps`, Contract-Tests oder klar markierten Adapterstellen.",
-      "status": "open",
+      "title": "Menu-/Runtime-Actions auf den Port umstellen; direkte Resolver-Aufrufe bleiben nur in `PlatformSurfacePolicyOps`, Contract-Tests oder klar markierten Adapterstellen. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.2",
@@ -17959,8 +18020,8 @@
     {
       "id": "V114.3.1",
       "type": "subphase",
-      "title": "SettingsManager-/Facade-Pfade pruefen, die Session-Drafts, Presets oder Config-Import mutieren; Produktgrenzen muessen beim Apply/Start ueber SurfacePolicyPort gelten.",
-      "status": "open",
+      "title": "SettingsManager-/Facade-Pfade pruefen, die Session-Drafts, Presets oder Config-Import mutieren; Produktgrenzen muessen beim Apply/Start ueber SurfacePolicyPort gelten. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.3",
@@ -17970,8 +18031,8 @@
     {
       "id": "V114.3.2",
       "type": "subphase",
-      "title": "Architekturkontext nachziehen: `SettingsManager` speichert Nutzerwunsch, SurfacePolicyPort entscheidet Produktgrenze, V98-Settings-Studio exportiert nur Demo-Policy.",
-      "status": "open",
+      "title": "Architekturkontext nachziehen: `SettingsManager` speichert Nutzerwunsch, SurfacePolicyPort entscheidet Produktgrenze, V98-Settings-Studio exportiert nur Demo-Policy. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.3",
@@ -17981,8 +18042,8 @@
     {
       "id": "V114.4.1",
       "type": "subphase",
-      "title": "Contract-Tests fuer Desktop-Default-Full und Browser-Demo-Default-Deny ueber echte Actions statt nur Resolver erweitern.",
-      "status": "open",
+      "title": "Contract-Tests fuer Desktop-Default-Full und Browser-Demo-Default-Deny ueber echte Actions statt nur Resolver erweitern. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.4",
@@ -17992,8 +18053,8 @@
     {
       "id": "V114.4.2",
       "type": "subphase",
-      "title": "Lightweight-Guard oder Contract-Scan fuer produktive Dateien einfuehren: keine neuen `isSurface*Allowed(...)`-/Fallback-Aufrufe ohne Port oder expliziten Kontext.",
-      "status": "open",
+      "title": "Lightweight-Guard oder Contract-Scan fuer produktive Dateien einfuehren: keine neuen `isSurface*Allowed(...)`-/Fallback-Aufrufe ohne Port oder expliziten Kontext. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.4",
@@ -18003,8 +18064,8 @@
     {
       "id": "V114.99.1",
       "type": "subphase",
-      "title": "Gezielte Surface-Policy-Port- und Produktmatrix-Tests sind gruen.",
-      "status": "open",
+      "title": "Gezielte Surface-Policy-Port- und Produktmatrix-Tests sind gruen. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.99",
@@ -18014,8 +18075,8 @@
     {
       "id": "V114.99.2",
       "type": "subphase",
-      "title": "`npm run plan:check` und relevante Architektur-/Docs-Gates sind gruen.",
-      "status": "open",
+      "title": "`npm run plan:check` und relevante Architektur-/Docs-Gates sind gruen. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.99",
@@ -18025,12 +18086,67 @@
     {
       "id": "V114.99.3",
       "type": "subphase",
-      "title": "Nachscan zeigt keine produktiven kontextlosen Surface-Gate-Aufrufe im migrierten Scope.",
-      "status": "open",
+      "title": "Nachscan zeigt keine produktiven kontextlosen Surface-Gate-Aufrufe im migrierten Scope. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
       "attributes": {
         "blockId": "V114",
         "phaseCode": "114.99",
         "subphaseCode": "114.99.3"
+      }
+    },
+    {
+      "id": "V115.1.1",
+      "type": "subphase",
+      "title": "PortalLayoutBuilder fixen (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.1",
+        "subphaseCode": "115.1.1"
+      }
+    },
+    {
+      "id": "V115.1.2",
+      "type": "subphase",
+      "title": "CheckpointRingMeshFactory dispose einbauen (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.1",
+        "subphaseCode": "115.1.2"
+      }
+    },
+    {
+      "id": "V115.1.3",
+      "type": "subphase",
+      "title": "P23 Hardcoded Password fixen (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.1",
+        "subphaseCode": "115.1.3"
+      }
+    },
+    {
+      "id": "V115.99.1",
+      "type": "subphase",
+      "title": "Tests gruen (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.99",
+        "subphaseCode": "115.99.1"
+      }
+    },
+    {
+      "id": "V115.99.2",
+      "type": "subphase",
+      "title": "Architektur Checks laufen durch (abgeschlossen: 2026-05-12; evidence: verified)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.99",
+        "subphaseCode": "115.99.2"
       }
     },
     {
@@ -26914,6 +27030,96 @@
       }
     },
     {
+      "id": ".gemini/agents/3d_math_optimizer.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V115"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": ".gemini/agents/contract_validator.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V115"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": ".gemini/agents/doc_sync.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V115"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": ".gemini/agents/security_auditor.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V115"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": ".gemini/agents/test_engineer.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V115"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": ".gemini/skills/plan-generator/SKILL.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V115"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": ".github/workflows/ci.yml",
       "type": "file",
       "title": null,
@@ -28804,6 +29010,21 @@
           "BT93E",
           "BT93F",
           "BT93M"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/contracts/browser-demo-surface-policy.export.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V114"
         ],
         "exists": true
       }
@@ -34091,6 +34312,21 @@
         ],
         "scopeBlocks": [
           "V110",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V115.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
           "V77"
         ],
         "exists": true
@@ -40991,6 +41227,40 @@
       }
     },
     {
+      "id": "scripts/cleanup-logs.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/compress-3d-assets.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "scripts/create-main-snapshot-tag.mjs",
       "type": "file",
       "title": null,
@@ -41495,6 +41765,108 @@
       }
     },
     {
+      "id": "scripts/tmp_refactor.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/tmp_refactor2.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/tmp_refactor3.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/tmp_refactor4.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/tmp_refactor5.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/tmp_refactor6.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "bot-training-plan"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "BT91"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "scripts/trainer-server.mjs",
       "type": "file",
       "title": null,
@@ -41764,11 +42136,13 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "bot-training-plan"
+          "bot-training-plan",
+          "scope-files"
         ],
         "scopeBlocks": [
           "B13",
-          "BT91"
+          "BT91",
+          "V115"
         ],
         "exists": true
       }
@@ -45365,6 +45739,7 @@
         ],
         "scopeBlocks": [
           "B03",
+          "V115",
           "V74",
           "V84"
         ],
@@ -45420,6 +45795,7 @@
         "scopeBlocks": [
           "B03",
           "V100",
+          "V115",
           "V51",
           "V72",
           "V74",
@@ -47072,6 +47448,21 @@
           "V74"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "src/maps/vulkan_odyssey.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V115"
+        ],
+        "exists": false
       }
     },
     {
@@ -49050,6 +49441,21 @@
         "scopeBlocks": [
           "B11",
           "V87"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/shared/runtime/SurfacePolicyPort.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B11"
         ],
         "exists": true
       }
@@ -51240,6 +51646,7 @@
           "B05",
           "V105",
           "V113",
+          "V115",
           "V64",
           "V77",
           "V81",
@@ -58910,6 +59317,15 @@
     },
     {
       "from": "B11",
+      "to": "src/shared/runtime/SurfacePolicyPort.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B11",
       "to": "src/shared/runtime/UiControllerRuntimePorts.js",
       "type": "scope",
       "hint": null,
@@ -59612,6 +60028,24 @@
     },
     {
       "from": "B13",
+      "to": "scripts/cleanup-logs.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/compress-3d-assets.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/create-main-snapshot-tag.mjs",
       "type": "scope",
       "hint": null,
@@ -59847,6 +60281,60 @@
     {
       "from": "B13",
       "to": "scripts/test-cleanup.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/tmp_refactor.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/tmp_refactor2.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/tmp_refactor3.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/tmp_refactor4.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/tmp_refactor5.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/tmp_refactor6.cjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -68109,6 +68597,24 @@
     },
     {
       "from": "BT91",
+      "to": "scripts/cleanup-logs.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "scripts/compress-3d-assets.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
       "to": "scripts/create-main-snapshot-tag.mjs",
       "type": "scope",
       "hint": null,
@@ -68344,6 +68850,60 @@
     {
       "from": "BT91",
       "to": "scripts/test-cleanup.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "scripts/tmp_refactor.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "scripts/tmp_refactor2.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "scripts/tmp_refactor3.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "scripts/tmp_refactor4.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "scripts/tmp_refactor5.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "bot-training-plan"
+      }
+    },
+    {
+      "from": "BT91",
+      "to": "scripts/tmp_refactor6.cjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -101291,6 +101851,15 @@
     },
     {
       "from": "V114",
+      "to": "data/contracts/browser-demo-surface-policy.export.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V114",
       "to": "docs/referenz/ai_architecture_context.md",
       "type": "scope",
       "hint": null,
@@ -101674,6 +102243,180 @@
         "blockId": "V114",
         "phaseCode": "114.99",
         "subphaseCode": "114.99.3"
+      }
+    },
+    {
+      "from": "V115",
+      "to": ".gemini/agents/3d_math_optimizer.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": ".gemini/agents/contract_validator.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": ".gemini/agents/doc_sync.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": ".gemini/agents/security_auditor.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": ".gemini/agents/test_engineer.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": ".gemini/skills/plan-generator/SKILL.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": "scripts/workspace-cleanup.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": "src/entities/arena/CheckpointRingMeshFactory.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": "src/entities/arena/portal/PortalLayoutBuilder.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": "src/maps/vulkan_odyssey.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": "src/ui/menu/MenuExpertLoginRuntime.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": "V115.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.1"
+      }
+    },
+    {
+      "from": "V115",
+      "to": "V115.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.99"
+      }
+    },
+    {
+      "from": "V115.1",
+      "to": "V115.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.1",
+        "subphaseCode": "115.1.1"
+      }
+    },
+    {
+      "from": "V115.1",
+      "to": "V115.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.1",
+        "subphaseCode": "115.1.2"
+      }
+    },
+    {
+      "from": "V115.1",
+      "to": "V115.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.1",
+        "subphaseCode": "115.1.3"
+      }
+    },
+    {
+      "from": "V115.99",
+      "to": "V115.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.99",
+        "subphaseCode": "115.99.1"
+      }
+    },
+    {
+      "from": "V115.99",
+      "to": "V115.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V115",
+        "phaseCode": "115.99",
+        "subphaseCode": "115.99.2"
       }
     },
     {
@@ -111734,6 +112477,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/aktiv/V114.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V115.md",
       "type": "scope",
       "hint": null,
       "attributes": {

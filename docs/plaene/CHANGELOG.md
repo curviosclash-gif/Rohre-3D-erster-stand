@@ -521,3 +521,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `V111` ist geschlossen: Negative Edges, Causal-Weighting, Query-Presets, Ownership/Stability, Safety-Export, Scorecard, Counterfactuals, Uncertainty-Budget, Auto-Minimization, Anomaly-Detection, Test-Prioritization, Policy-as-Data und Feedback-Loop sind im lokalen Wissensgraph-Workflow verankert.
 - Der Abschluss bleibt bewusst local-first: Exporte sind per Default redacted, rohe Auditdaten laufen nur ueber den expliziten `--unsafe-raw`-Pfad, und adaptive Feedback-Signale bleiben durch Human-Review-Guardrails auf `watch`.
 - Evidence: `npm run graph:build` -> core nodes=3709 edges=8002, coverage adjusted=85%, scorecard 94.8/pass; `npm run graph:check`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen.
+
+## Stand-Snapshot 2026-05-12 (Subphase V102 102.99)
+
+- V102 (Security-, Runtime- und Contract-Hardening) erfolgreich abgeschlossen. Path-Traversal und XSS Risiken eliminiert. Sync-IPC für Settings asynchronisiert und Request-Size-Limits für den LAN-Server etabliert. ESLint no-restricted-syntax für innerHTML als Warnung hinterlegt.
+- V114 (SurfacePolicyPort fuer Demo- und Vollversionsgrenze) abgeschlossen: Runtime-, Menu- und Startvalidierungs-Pfade konsumieren Surface-Gates ueber den zentralen Port; Produktmatrix-Contracts decken Desktop-vs-Browser-Demo-Fallbacks ab.
+- V115 (Product & Infra Follow-up) abgeschlossen: Portal-Slot-Dopplungen, Checkpoint-Ring-Disposal und die lokale Expert-Credential-Hygiene sind bereinigt; Gemini-Agenten/Plan-Skill sind als expliziter Infra-Scope im Graph gemappt.

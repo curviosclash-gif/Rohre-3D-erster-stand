@@ -1,4 +1,4 @@
-﻿# Umsetzungsplan (Master-Index)
+# Umsetzungsplan (Master-Index)
 
 Stand: 2026-05-10. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V102 102.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
@@ -52,8 +52,9 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V90 | Toolchain-Security und Dependency-Upgrade | blocked | P1 | frei | - | 90.2 | `docs/plaene/aktiv/V90.md` |
-| V102 | Security-, Runtime- und Contract-Hardening | planned | P1 | frei | V99.99,V100.99 | 102.1 | `docs/plaene/aktiv/V102.md` |
-| V114 | SurfacePolicyPort fuer Demo- und Vollversionsgrenze | planned | P1 | frei | V98.99,V103.99,V104.99 | 114.1 | `docs/plaene/aktiv/V114.md` |
+| V102 | Security-, Runtime- und Contract-Hardening | done | P1 | frei | V99.99,V100.99 | 102.99 | `docs/plaene/aktiv/V102.md` |
+| V114 | SurfacePolicyPort fuer Demo- und Vollversionsgrenze | done | P1 | frei | V98.99,V103.99,V104.99 | 114.1 | `docs/plaene/aktiv/V114.md` |
+| V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | done | P2 | frei | - | 115.99 | `docs/plaene/aktiv/V115.md` |
 | V105 | Architecture-Guard- und Typecheck-Regression-Recovery | blocked | P1 | frei | V99.99,V102.99,V104.99 | 105.1 | `docs/plaene/aktiv/V105.md` |
 | V112 | Spielaudit- und Playtest-Improvement-Paket | blocked | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
@@ -111,26 +112,27 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V109 | 2026-05-04 | closed | Abgeschlossen 2026-05-04 |
 | - | V100 | 2026-05-05 | closed | Abgeschlossen 2026-05-06 |
 | - | V108 | - | closed | Abgeschlossen 2026-05-01 |
-| - | V102 | - | frei | Geplant |
+| - | V102 | 2026-05-12 | closed | Abgeschlossen 2026-05-12 |
 | - | V114 | - | frei | Geplant |
-| - | V105 | - | blockiert | Wartet auf V102.99 |
+| - | V115 | 2026-05-12 | closed | Abgeschlossen 2026-05-12 |
+| - | V105 | - | frei | Geplant |
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
 | - | V110 | 2026-05-08 | closed | Abgeschlossen 2026-05-09 |
 | - | V111 | 2026-05-09 | closed | Abgeschlossen 2026-05-10 |
-| - | V112 | - | blockiert | Wartet auf V102.99 und V105.99 |
+| - | V112 | - | blockiert | Wartet auf V105.99 |
 | - | V113 | - | frei | Geplant |
 
 ## Empfohlene Reihenfolge
 
-1. `V102` (Security-/Runtime-/Contract-Hardening) als naechster freier P1-Startpfad.
-2. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), damit Produktgrenzen vor weiteren Release-/Playtest-Schnitten strukturell stabil sind.
-3. Danach `V105` (Guard-/Typecheck-Recovery), sobald `V102.99` erreicht ist.
-4. Danach `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
-5. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
+1. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), damit Produktgrenzen vor weiteren Release-/Playtest-Schnitten strukturell stabil sind.
+2. `V105` (Guard-/Typecheck-Recovery), da V102.99 erreicht ist.
+3. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
+4. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
 6. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
 7. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
+8. `V115` (Product & Infra Follow-up) parallel zu den P2-Content-Bloecken abarbeiten, um Gameplay-Bugs und Test-Schulden zu bereinigen.
 
 ## Conflict-Log
 
