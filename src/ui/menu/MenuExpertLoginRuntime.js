@@ -3,7 +3,9 @@ import { resolveSurfaceDeveloperAccess } from '../../shared/contracts/PlatformCa
 // Dev-only diagnostic credential — not a security barrier, license check, or product feature.
 // Changing or removing this does not affect product security; it only controls local dev-tool access.
 // See docs/referenz/ai_architecture_context.md section 4.6.4.17 and V77 77.6.5.
-const EXPERT_PASSWORD = '1307';
+const EXPERT_PASSWORD = typeof process !== 'undefined' && process.env && process.env.CURVIOS_EXPERT_PASSWORD
+    ? process.env.CURVIOS_EXPERT_PASSWORD
+    : 'dev';
 // Symbol key for attaching the expert state to the settings object as an optional lookup bridge.
 // The canonical expert state is owned by MenuExpertLoginRuntime and does not require this attachment.
 const MENU_EXPERT_STATE_KEY = Symbol('menuExpertState');

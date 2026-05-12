@@ -350,9 +350,20 @@ export class PortalLayoutBuilder {
         if (slots.length < 2) return;
 
         for (let i = 0; i < pairCount; i++) {
-            const slotA = slots[(i * 2) % slots.length];
-            const slotB = slots[(i * 2 + 5) % slots.length];
-            const slotBAlt = slots[(i * 2 + 7) % slots.length];
+            const slotAIdx = (i * 2) % slots.length;
+            const slotA = slots[slotAIdx];
+            
+            let slotBIdx = (i * 2 + 5) % slots.length;
+            if (slotBIdx === slotAIdx) {
+                slotBIdx = (slotBIdx + 1) % slots.length;
+            }
+            const slotB = slots[slotBIdx];
+            
+            let slotBAltIdx = (i * 2 + 7) % slots.length;
+            while (slotBAltIdx === slotAIdx || slotBAltIdx === slotBIdx) {
+                slotBAltIdx = (slotBAltIdx + 1) % slots.length;
+            }
+            const slotBAlt = slots[slotBAltIdx];
 
             const posA = portalPositionFromSlot(slotA, i * 13 + 5, this.arena, config.PORTAL);
             let posB = portalPositionFromSlot(slotB, i * 17 + 9, this.arena, config.PORTAL);

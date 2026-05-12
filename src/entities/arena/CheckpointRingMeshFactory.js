@@ -159,3 +159,20 @@ export function createFinishRingMesh(position, rotation, renderer, visualRadius 
     renderer?.addToScene?.(group);
     return group;
 }
+
+export function disposeCheckpointRingMesh(group) {
+    if (!group) return;
+    group.traverse((child) => {
+        if (child.isMesh) {
+            if (child.material) {
+                child.material.dispose();
+            }
+            if (child.geometry && !child.geometry.userData.__sharedNoDispose) {
+                child.geometry.dispose();
+            }
+        }
+    });
+    if (group.parent) {
+        group.parent.remove(group);
+    }
+}
