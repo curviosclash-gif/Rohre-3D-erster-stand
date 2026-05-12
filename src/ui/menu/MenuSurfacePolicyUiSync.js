@@ -1,12 +1,10 @@
 import { PLATFORM_SURFACE_QUICK_START_ACTION_IDS } from '../../shared/contracts/PlatformCapabilityRegistry.js';
 import {
     PLATFORM_SURFACE_FEATURE_IDS,
-    isSurfaceModePathAllowed,
-    isSurfaceQuickStartActionAllowed,
-    isSurfaceSessionTypeAllowed,
     resolveSurfaceMenuState,
     resolveSurfaceEntryCopy,
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import { createSurfacePolicyPort } from '../../shared/runtime/SurfacePolicyPort.js';
 import { syncDesktopOnlyFeatureButton } from './MenuSurfaceFeatureAccess.js';
 
 export function syncMenuSurfacePolicyUi({
@@ -16,6 +14,10 @@ export function syncMenuSurfacePolicyUi({
     surfacePolicy = null,
     huntFeatureEnabled = true,
 }) {
+    const surfacePolicyPort = createSurfacePolicyPort({
+        getProductSurfaceId: () => surfacePolicy?.productSurfaceId || '',
+        getSettings: () => settings
+    });
     const surfaceMenuState = surfacePolicy
         ? resolveSurfaceMenuState(settings, {
             productSurfaceId: surfacePolicy.productSurfaceId,
@@ -34,9 +36,7 @@ export function syncMenuSurfacePolicyUi({
     if (Array.isArray(ui.sessionButtons)) {
         ui.sessionButtons.forEach((button) => {
             const buttonSessionType = String(button?.dataset?.sessionType || '').trim().toLowerCase();
-            const surfaceAllowed = !surfacePolicy || isSurfaceSessionTypeAllowed(buttonSessionType, {
-                productSurfaceId: surfacePolicy.productSurfaceId,
-            });
+            const surfaceAllowed = !surfacePolicy || surfacePolicyPort.isSessionTypeAllowed(buttonSessionType);
             const labelNode = button?.querySelector?.('.nav-btn-label') || button;
             if (labelNode && !button.dataset.surfaceDefaultLabel) {
                 button.dataset.surfaceDefaultLabel = String(labelNode.textContent || '').trim();
@@ -59,9 +59,7 @@ export function syncMenuSurfacePolicyUi({
     if (Array.isArray(ui.modePathButtons)) {
         ui.modePathButtons.forEach((button) => {
             const buttonModePath = String(button?.dataset?.modePath || '').trim().toLowerCase();
-            const surfaceAllowed = !surfacePolicy || isSurfaceModePathAllowed(buttonModePath, {
-                productSurfaceId: surfacePolicy.productSurfaceId,
-            });
+            const surfaceAllowed = !surfacePolicy || surfacePolicyPort.isModePathAllowed(buttonModePath);
             const isActive = buttonModePath === modePath;
             const disabledByFeatureFlag = buttonModePath === 'fight' && !huntFeatureEnabled;
             button.classList.toggle('active', isActive);
@@ -79,9 +77,7 @@ export function syncMenuSurfacePolicyUi({
         if (!button) {
             return;
         }
-        const surfaceAllowed = !surfacePolicy || isSurfaceQuickStartActionAllowed(actionId, {
-            productSurfaceId: surfacePolicy.productSurfaceId,
-        });
+        const surfaceAllowed = !surfacePolicy || surfacePolicyPort.isQuickStartAllowed(actionId);
         button.classList.toggle('hidden', !surfaceAllowed);
         button.setAttribute('aria-hidden', String(!surfaceAllowed));
         button.disabled = !surfaceAllowed;

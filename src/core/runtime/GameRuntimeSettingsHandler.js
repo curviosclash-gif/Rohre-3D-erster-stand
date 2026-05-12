@@ -3,7 +3,7 @@ import { SETTINGS_CHANGE_KEYS } from '../../composition/core-ui/CoreUiMenuPorts.
 import { CONFIG } from '../Config.js';
 import { MATCH_SETTING_CHANGE_KEY_SET, START_VALIDATION_RELEVANT_KEY_SET } from './GameRuntimeSettingsKeySets.js';
 import { resolveMatchStartValidationIssue } from './MatchStartValidationService.js';
-import { applySurfaceMenuState } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import { createSurfacePolicyPort } from '../../shared/runtime/SurfacePolicyPort.js';
 import {
     applyMultiplayerMatchSettingsSnapshot,
     createMultiplayerMatchSettingsSnapshot,
@@ -65,8 +65,10 @@ export class GameRuntimeSettingsHandler {
         const game = this._facade?.game;
         if (!game?.settings) return null;
 
-        const migration = applySurfaceMenuState(game.settings, {
-            productSurfaceId: game?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId || '',
+        const surfacePolicyPort = createSurfacePolicyPort({
+            getProductSurfaceId: () => game?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId || ''
+        });
+        const migration = surfacePolicyPort.applyMenuState(game.settings, {
             maps: CONFIG?.MAPS,
         });
         if (!migration?.changed) {

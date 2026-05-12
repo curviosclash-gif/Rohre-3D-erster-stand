@@ -2,9 +2,7 @@
 // MatchStartValidationService.js - validates menu state before match start
 // ============================================
 // @ts-nocheck
-import {
-    resolveSurfaceMultiplayerGateAccess,
-} from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import { createSurfacePolicyPort } from '../../shared/runtime/SurfacePolicyPort.js';
 import { resolveDesktopConnectivityProfile } from '../../shared/contracts/DesktopMultiplayerRoleContract.js';
 import { isMapEligibleForModePath } from '../../shared/contracts/MapModeContract.js';
 import { resolveRuntimeSessionContract } from '../../shared/contracts/RuntimeSessionContract.js';
@@ -55,7 +53,8 @@ export function resolveMatchStartValidationIssue({
             ? multiplayerSessionState
             : null;
         const connectivityProfile = resolveDesktopConnectivityProfile();
-        const hostGate = resolveSurfaceMultiplayerGateAccess('host', { productSurfaceId });
+        const surfacePolicyPort = createSurfacePolicyPort({ getProductSurfaceId: () => productSurfaceId });
+        const hostGate = surfacePolicyPort.resolveMultiplayerGateAccess('host');
         const legacyTransportActive = sessionContract.isLegacyTransport === true;
         const requestedTransport = String(
             sessionState?.transport || sessionContract.multiplayerTransport || 'lan'

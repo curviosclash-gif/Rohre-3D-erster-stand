@@ -84,6 +84,13 @@ function resolveArcadeGhostDuelMode(settings = null, { sessionType = '' } = {}) 
     );
 }
 
+/**
+ * @param {object|null} settings
+ * @param {object} context
+ * @param {string} [context.sessionType='']
+ * @param {string} [context.ghostDuelMode=ARCADE_GHOST_DUEL_MODES.OFF]
+ * @returns {boolean}
+ */
 function resolveArcadeGhostTrailCollisionEnabled(settings = null, { sessionType = '', ghostDuelMode = ARCADE_GHOST_DUEL_MODES.OFF } = {}) {
     if (sessionType !== 'single' || !isArcadeGhostDuelPlaybackEnabled(ghostDuelMode)) {
         return false;

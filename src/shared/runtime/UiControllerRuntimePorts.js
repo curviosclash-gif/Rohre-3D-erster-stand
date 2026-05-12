@@ -1,3 +1,5 @@
+import { createSurfacePolicyPort } from './SurfacePolicyPort.js';
+
 function resolveCallback(callback, fallback) {
     return typeof callback === 'function' ? callback : fallback;
 }
@@ -8,6 +10,12 @@ export function createStartSetupControllerPort(deps = {}) {
     const getMapDefinitions = resolveCallback(deps.getMapDefinitions, () => ({}));
     const getMultiplayerSessionState = resolveCallback(deps.getMultiplayerSessionState, () => null);
     const resolveSurfacePolicy = resolveCallback(deps.resolveSurfacePolicy, () => null);
+    const getProductSurfaceId = resolveCallback(deps.getProductSurfaceId, () => '');
+
+    const surfacePolicyPort = createSurfacePolicyPort({
+        getProductSurfaceId,
+        getSettings,
+    });
 
     return Object.freeze({
         getSettings: () => getSettings(),
@@ -15,6 +23,7 @@ export function createStartSetupControllerPort(deps = {}) {
         getMapDefinitions: () => getMapDefinitions() || {},
         getMultiplayerSessionState: () => getMultiplayerSessionState() || null,
         resolveSurfacePolicy: (settings = undefined) => resolveSurfacePolicy(settings) || null,
+        surfacePolicyPort,
     });
 }
 
@@ -57,6 +66,7 @@ export function createStartSetupControllerPortFromManager({
         getMapDefinitions: () => (typeof getMapDefinitions === 'function' ? getMapDefinitions() : {}),
         getMultiplayerSessionState: () => game?.menuMultiplayerBridge?.getSessionState?.() || null,
         resolveSurfacePolicy: (settings = manager?.settings) => manager?.resolveSurfacePolicy?.(settings || manager?.settings) || null,
+        getProductSurfaceId: () => game?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId || manager?.settings?.localSettings?.toolsState?.surfacePolicy?.productSurfaceId || '',
     });
 }
 

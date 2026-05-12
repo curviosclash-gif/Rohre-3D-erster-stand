@@ -7,10 +7,7 @@ import {
     exportMenuConfigAsJson,
     importMenuConfigFromInput,
 } from '../../composition/core-ui/CoreUiMenuPorts.js';
-import {
-    isSurfacePresetAllowed,
-    resolveSurfaceBlockedFeatureFeedback,
-} from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import { createSurfacePolicyPort } from '../../shared/runtime/SurfacePolicyPort.js';
 import { PLATFORM_PRODUCT_SURFACE_IDS } from '../../shared/contracts/PlatformCapabilityRegistry.js';
 
 function resolveMutationChangedKeys(result, fallbackKeys = []) {
@@ -81,6 +78,13 @@ export function handleConfigImportAction({
     }
 }
 
+function getSurfacePort(game) {
+    return createSurfacePolicyPort({
+        getProductSurfaceId: () => resolveProductSurfaceId(game),
+        getSettings: () => game?.settings
+    });
+}
+
 function resolveProductSurfaceId(game) {
     return String(
         game?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId
@@ -101,8 +105,8 @@ export function applyMenuPresetAction({
         return;
     }
     const productSurfaceId = resolveProductSurfaceId(game);
-    if (!isSurfacePresetAllowed(presetId, { productSurfaceId })) {
-        const feedback = resolveSurfaceBlockedFeatureFeedback('Dieses Preset', { productSurfaceId });
+    if (!getSurfacePort(game).isPresetAllowed(presetId)) {
+        const feedback = getSurfacePort(game).resolveBlockedFeatureFeedback('Dieses Preset');
         game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
         return;
     }

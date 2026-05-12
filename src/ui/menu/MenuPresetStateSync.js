@@ -1,11 +1,13 @@
-// ============================================
-// MenuPresetStateSync.js - sync helper for preset-related UI state
-// ============================================
-
-import { isSurfacePresetAllowed } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import { createSurfacePolicyPort } from '../../shared/runtime/SurfacePolicyPort.js';
 
 export function syncMenuPresetState({ ui, settings, settingsManager, surfacePolicy = null }) {
     if (!ui || !settings) return;
+
+    const surfacePolicyPort = createSurfacePolicyPort({
+        getProductSurfaceId: () => surfacePolicy?.productSurfaceId || '',
+        getSettings: () => settings
+    });
+
     const activePresetId = String(settings?.matchSettings?.activePresetId || '');
     const activePresetKind = String(settings?.matchSettings?.activePresetKind || '');
     const isPresetVisible = (presetId) => {
@@ -16,9 +18,7 @@ export function syncMenuPresetState({ ui, settings, settingsManager, surfacePoli
         if (!surfacePolicy) {
             return true;
         }
-        return isSurfacePresetAllowed(normalizedPresetId, {
-            productSurfaceId: surfacePolicy.productSurfaceId,
-        });
+        return surfacePolicyPort.isPresetAllowed(normalizedPresetId);
     };
     const visibleActivePresetId = isPresetVisible(activePresetId) ? activePresetId : '';
 

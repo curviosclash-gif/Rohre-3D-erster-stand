@@ -16,19 +16,8 @@ import {
 } from '../../shared/contracts/MapModeContract.js';
 import {
     PLATFORM_SURFACE_QUICK_START_ACTION_IDS,
-    resolveSurfacePolicy,
 } from '../../shared/contracts/PlatformCapabilityRegistry.js';
-import {
-    isSurfaceMapKeyAllowedForModePath,
-    isSurfaceModePathAllowed,
-    isSurfaceQuickStartActionAllowed,
-    isSurfaceSessionTypeAllowed,
-    listSurfaceAllowedMapKeysForModePath,
-    resolveSurfaceEntryCopy,
-    resolveSurfaceBlockedFeatureFeedback,
-    resolveSurfaceFallbackModePath,
-    resolveSurfaceFallbackSessionType,
-} from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import { createSurfacePolicyPort } from '../../shared/runtime/SurfacePolicyPort.js';
 import {
     MULTIPLAYER_TRANSPORTS,
     isLegacyMultiplayerTransport,
@@ -135,6 +124,14 @@ function resolveQuickStartRng(game, event = null) {
     return createRuntimeRng({ seed: Number(event.seed) });
 }
 
+
+function getSurfacePort(game) {
+    return createSurfacePolicyPort({
+        getProductSurfaceId: () => resolveProductSurfaceId(game),
+        getSettings: () => game?.settings
+    });
+}
+
 function resolveProductSurfaceId(game) {
     const productSurfaceId = String(
         game?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId || ''
@@ -143,9 +140,7 @@ function resolveProductSurfaceId(game) {
 }
 
 export function resolveProductiveMultiplayerTransport(game, requestedTransport = '') {
-    const surfacePolicy = resolveSurfacePolicy({
-        productSurfaceId: resolveProductSurfaceId(game),
-    });
+    const surfacePolicy = getSurfacePort(game).resolvePolicy();
     const onlineConfigured = hasConfiguredOnlineSignalingUrl({
         runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
     });
@@ -191,12 +186,10 @@ export function handleSessionTypeChangeAction(ctx) {
     const requestedSessionType = String(event?.sessionType || '').trim().toLowerCase();
     if (!requestedSessionType) return;
     const productSurfaceId = resolveProductSurfaceId(game);
-    const requestedAllowed = isSurfaceSessionTypeAllowed(requestedSessionType, {
-        productSurfaceId,
-    });
+    const requestedAllowed = getSurfacePort(game).isSessionTypeAllowed(requestedSessionType);
     const targetSessionType = requestedAllowed
         ? requestedSessionType
-        : resolveSurfaceFallbackSessionType({ productSurfaceId });
+        : getSurfacePort(game).resolveFallbackSessionType();
 
     const result = game.settingsManager.switchSessionType(game.settings, targetSessionType);
     if (!result.success) {
@@ -215,10 +208,7 @@ export function handleSessionTypeChangeAction(ctx) {
     }
 
     onSettingsChanged({ changedKeys: Array.from(new Set(changedKeys)) });
-    const surfaceEntryCopy = resolveSurfaceEntryCopy({
-        productSurfaceId: resolveProductSurfaceId(game),
-        sessionType: result.targetSessionType,
-    });
+    const surfaceEntryCopy = getSurfacePort(game).resolveEntryCopy(result.targetSessionType);
     const label = surfaceEntryCopy.sessionLabels[result.targetSessionType]
         || (result.targetSessionType === 'splitscreen'
             ? 'Splitscreen'
@@ -230,7 +220,7 @@ export function handleSessionTypeChangeAction(ctx) {
         const blockedLabel = requestedSessionType === 'splitscreen'
             ? 'Splitscreen'
             : 'Dieser Einstieg';
-        const feedback = resolveSurfaceBlockedFeatureFeedback(blockedLabel, { productSurfaceId });
+        const feedback = getSurfacePort(game).resolveBlockedFeatureFeedback(blockedLabel);
         game._showStatusToast(`${feedback.message} ${label} wurde gesetzt.`, 1700, feedback.tone);
         return;
     }
@@ -251,8 +241,8 @@ export function handleModePathChangeAction(ctx) {
     let modePath = requestedModePath === 'arcade' || requestedModePath === 'fight' || requestedModePath === 'normal'
         ? requestedModePath
         : 'normal';
-    if (!isSurfaceModePathAllowed(modePath, { productSurfaceId })) {
-        modePath = resolveSurfaceFallbackModePath({ productSurfaceId });
+    if (!getSurfacePort(game).isModePathAllowed(modePath)) {
+        modePath = getSurfacePort(game).resolveFallbackModePath();
     }
     if (modePath === 'fight' && !huntFeatureEnabled) {
         modePath = 'normal';
@@ -277,10 +267,10 @@ export function handleModePathChangeAction(ctx) {
     const currentMapKey = String(game.settings?.mapKey || '').trim();
     if (currentMapKey !== 'custom') {
     const currentMapDefinition = CONFIG?.MAPS?.[currentMapKey];
-    const curatedFallbackMapKey = listSurfaceAllowedMapKeysForModePath(modePath, { productSurfaceId })
+    const curatedFallbackMapKey = getSurfacePort(game).listAllowedMapKeysForModePath(modePath)
         .find((mapKey) => CONFIG?.MAPS?.[mapKey] && isMapEligibleForModePath(CONFIG.MAPS[mapKey], modePath));
     if (!isMapEligibleForModePath(currentMapDefinition, modePath)
-        || !isSurfaceMapKeyAllowedForModePath(currentMapKey, modePath, { productSurfaceId })) {
+        || !getSurfacePort(game).isMapAllowed(currentMapKey, modePath)) {
         game.settings.mapKey = curatedFallbackMapKey || resolveModePathFallbackMapKey(CONFIG?.MAPS, modePath, currentMapKey);
         changedKeys.push(SETTINGS_CHANGE_KEYS.MAP_KEY);
     }
@@ -309,8 +299,8 @@ export function handleModePathChangeAction(ctx) {
     });
 
     const label = modePath === 'fight' ? 'Fight' : (modePath === 'arcade' ? 'Arcade' : 'Normal');
-    if (requestedModePath && requestedModePath !== modePath && !isSurfaceModePathAllowed(requestedModePath, { productSurfaceId })) {
-        const feedback = resolveSurfaceBlockedFeatureFeedback('Dieser Modus', { productSurfaceId });
+    if (requestedModePath && requestedModePath !== modePath && !getSurfacePort(game).isModePathAllowed(requestedModePath)) {
+        const feedback = getSurfacePort(game).resolveBlockedFeatureFeedback('Dieser Modus');
         game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
     } else if (requestedModePath === 'fight' && !huntFeatureEnabled) {
         game._showStatusToast('Fight ist deaktiviert. Normal wurde gesetzt.', 1500, 'warning');
@@ -322,8 +312,8 @@ export function handleModePathChangeAction(ctx) {
 export function handleQuickStartLastStartAction(ctx) {
     const { game, onSettingsChanged, recordMenuTelemetry, startMatch } = ctx;
     const productSurfaceId = resolveProductSurfaceId(game);
-    if (!isSurfaceQuickStartActionAllowed(PLATFORM_SURFACE_QUICK_START_ACTION_IDS.LAST_SETTINGS, { productSurfaceId })) {
-        const feedback = resolveSurfaceBlockedFeatureFeedback('Direktstart', { productSurfaceId });
+    if (!getSurfacePort(game).isQuickStartAllowed(PLATFORM_SURFACE_QUICK_START_ACTION_IDS.LAST_SETTINGS)) {
+        const feedback = getSurfacePort(game).resolveBlockedFeatureFeedback('Direktstart');
         game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
         return;
     }
@@ -340,8 +330,8 @@ export function handleQuickStartLastStartAction(ctx) {
 export async function handleQuickStartEventPlaylistStartAction(ctx) {
     const { game, onSettingsChanged, resolveMenuAccessContext, recordMenuTelemetry, startMatch } = ctx;
     const productSurfaceId = resolveProductSurfaceId(game);
-    if (!isSurfaceQuickStartActionAllowed(PLATFORM_SURFACE_QUICK_START_ACTION_IDS.EVENT_PLAYLIST, { productSurfaceId })) {
-        const feedback = resolveSurfaceBlockedFeatureFeedback('Event-Playlist', { productSurfaceId });
+    if (!getSurfacePort(game).isQuickStartAllowed(PLATFORM_SURFACE_QUICK_START_ACTION_IDS.EVENT_PLAYLIST)) {
+        const feedback = getSurfacePort(game).resolveBlockedFeatureFeedback('Event-Playlist');
         game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
         return;
     }
@@ -407,8 +397,8 @@ export async function handleQuickStartEventPlaylistStartAction(ctx) {
 export function handleQuickStartRandomStartAction(ctx) {
     const { game, event, onSettingsChanged, recordMenuTelemetry, startMatch } = ctx;
     const productSurfaceId = resolveProductSurfaceId(game);
-    if (!isSurfaceQuickStartActionAllowed(PLATFORM_SURFACE_QUICK_START_ACTION_IDS.RANDOM_MAP, { productSurfaceId })) {
-        const feedback = resolveSurfaceBlockedFeatureFeedback('Random-Start', { productSurfaceId });
+    if (!getSurfacePort(game).isQuickStartAllowed(PLATFORM_SURFACE_QUICK_START_ACTION_IDS.RANDOM_MAP)) {
+        const feedback = getSurfacePort(game).resolveBlockedFeatureFeedback('Random-Start');
         game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
         return;
     }

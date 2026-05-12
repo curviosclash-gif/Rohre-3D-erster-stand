@@ -19,13 +19,10 @@ import {
     resolveModePathFallbackMapKey,
 } from '../shared/contracts/MapModeContract.js';
 import {
-    isSurfaceMapKeyAllowedForModePath,
-    isSurfaceModePathAllowed,
-    listSurfaceAllowedMapKeysForModePath,
     resolveSurfaceEntryCopy,
     resolveSurfaceMenuState,
-    resolveSurfaceFallbackModePath,
 } from '../shared/contracts/PlatformSurfacePolicyOps.js';
+import { createSurfacePolicyPort } from '../shared/runtime/SurfacePolicyPort.js';
 import {
     ensureStartSetupLocalState,
     humanizePreviewCategory,
@@ -84,6 +81,14 @@ export class UIStartSyncController {
         return this.port?.getSettings?.() || this.manager?.settings || null;
     }
 
+    _getSurfacePolicyPort() {
+        if (this.port?.surfacePolicyPort) return this.port.surfacePolicyPort;
+        return createSurfacePolicyPort({
+            getProductSurfaceId: () => this._resolveSurfacePolicy()?.productSurfaceId || '',
+            getSettings: () => this._getSettings()
+        });
+    }
+
     _getSettingsManager() {
         return this.port?.getSettingsManager?.() || null;
     }
@@ -137,7 +142,7 @@ export class UIStartSyncController {
         select.innerHTML = '';
 
         Object.entries(maps).forEach(([key, mapDef]) => {
-            if (!isMapEligibleForModePath(mapDef, modePath) || !this._isSurfaceMapAllowed(key, modePath)) {
+            if (!isMapEligibleForModePath(mapDef, modePath) || !this._getSurfacePolicyPort().isMapAllowed(key, modePath)) {
                 return;
             }
             const opt = document.createElement('option');
@@ -162,7 +167,7 @@ export class UIStartSyncController {
 
         if (maps?.[currentValue]
             && isMapEligibleForModePath(maps[currentValue], modePath)
-            && this._isSurfaceMapAllowed(currentValue, modePath)) {
+            && this._getSurfacePolicyPort().isMapAllowed(currentValue, modePath)) {
             select.value = currentValue;
         } else if (currentValue === 'custom' && this._hasStoredCustomMap()) {
             select.value = 'custom';
@@ -263,36 +268,17 @@ export class UIStartSyncController {
 
     _resolveAllowedModePath(requestedModePath) {
         const normalizedModePath = String(requestedModePath || 'normal').trim().toLowerCase() || 'normal';
-        const surfacePolicy = this._resolveSurfacePolicy();
-        if (!surfacePolicy) {
-            return normalizedModePath;
-        }
-        return isSurfaceModePathAllowed(normalizedModePath, {
-            productSurfaceId: surfacePolicy.productSurfaceId,
-        })
+        return this._getSurfacePolicyPort().isModePathAllowed(normalizedModePath)
             ? normalizedModePath
-            : resolveSurfaceFallbackModePath({
-                productSurfaceId: surfacePolicy.productSurfaceId,
-            });
-    }
-
-    _isSurfaceMapAllowed(mapKey, modePath) {
-        const surfacePolicy = this._resolveSurfacePolicy();
-        if (!surfacePolicy) {
-            return true;
-        }
-        return isSurfaceMapKeyAllowedForModePath(mapKey, modePath, {
-            productSurfaceId: surfacePolicy.productSurfaceId,
-        });
+            : this._getSurfacePolicyPort().resolveFallbackModePath();
     }
 
     _resolveSurfaceFallbackMapKey(maps, modePath, currentMapKey = '') {
         const surfacePolicy = this._resolveSurfacePolicy();
         const normalizedModePath = this._resolveAllowedModePath(modePath);
         if (surfacePolicy?.requiresCuratedMaps === true) {
-            const curatedMapKeys = listSurfaceAllowedMapKeysForModePath(normalizedModePath, {
-                productSurfaceId: surfacePolicy.productSurfaceId,
-            }).filter((mapKey) => maps?.[mapKey] && isMapEligibleForModePath(maps[mapKey], normalizedModePath));
+            const curatedMapKeys = this._getSurfacePolicyPort().listAllowedMapKeysForModePath(normalizedModePath)
+                .filter((mapKey) => maps?.[mapKey] && isMapEligibleForModePath(maps[mapKey], normalizedModePath));
             if (curatedMapKeys.includes(String(currentMapKey || '').trim())) {
                 return String(currentMapKey || '').trim();
             }
@@ -485,7 +471,7 @@ export class UIStartSyncController {
                     const matchesFilter = mapFilter === 'all' || entry.category === mapFilter;
                     const mapDefinition = runtimeMaps?.[entry.key];
                     const matchesModePath = isMapEligibleForModePath(mapDefinition, modePath);
-                    const matchesSurfacePolicy = this._isSurfaceMapAllowed(entry.key, modePath);
+                    const matchesSurfacePolicy = this._getSurfacePolicyPort().isMapAllowed(entry.key, modePath);
                     return matchesSearch && matchesFilter && matchesModePath && matchesSurfacePolicy;
                 })
                 .forEach((entry) => {
@@ -580,12 +566,12 @@ export class UIStartSyncController {
 
         renderQuickList(
             this.ui.mapFavoritesList,
-            startSetup.favoriteMaps.filter((mapKey) => this._isSurfaceMapAllowed(mapKey, modePath)),
+            startSetup.favoriteMaps.filter((mapKey) => this._getSurfacePolicyPort().isMapAllowed(mapKey, modePath)),
             'mapKey'
         );
         renderQuickList(
             this.ui.mapRecentList,
-            startSetup.recentMaps.filter((mapKey) => this._isSurfaceMapAllowed(mapKey, modePath)),
+            startSetup.recentMaps.filter((mapKey) => this._getSurfacePolicyPort().isMapAllowed(mapKey, modePath)),
             'mapKey'
         );
         renderQuickList(this.ui.vehicleFavoritesList, startSetup.favoriteVehicles, 'vehicleId');
