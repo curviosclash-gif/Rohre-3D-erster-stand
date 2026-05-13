@@ -537,3 +537,4 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 ## Stand-Snapshot 2026-05-13 (Gemini-Governance-Hygiene)
 
 - Gemini-Gedaechtnis-/Skill-Definitionen nachgezogen: `.gemini/skills/plan-generator/SKILL.md` respektiert jetzt die User-owned Intake-Governance (`docs/plaene/neu/` statt direkter Master-/Aktivblock-Aenderung), und `.gemini/agents/test_engineer.md` verweist auf `.agents/test_mapping.md`, `docs/qa/**` und aktive Blockplaene statt auf eine nicht vorhandene `Open_Findings.md`.
+- Alle Gemini-Agenten haben jetzt eine gemeinsame Repo-Governance-Praeambel: erst `AGENTS.md`, passende Rules und Workflows lesen; bei Konflikt gewinnt die Repo-Governance; Audit-/Review-Aufgaben sollen Findings berichten statt Produktlogik ungefragt zu aendern. `doc_sync` ist zusaetzlich gegen eigenmaechtige Master-Index- und Archivierungsaktionen begrenzt.
