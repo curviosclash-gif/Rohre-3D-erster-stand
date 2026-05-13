@@ -1106,9 +1106,7 @@ async function validateDependencyMergeConsistency(graph, violations) {
     const masterContent = await fs.readFile(path.join(ROOT, MASTER_PLAN_PATH), 'utf8');
     const masterRows = parseMasterRows(masterContent);
     const dependencyRows = parseDependencyTable(masterContent);
-    const btDependencyRows = (await fs.access(path.join(ROOT, BOT_TRAINING_MASTER_PATH)).then(() => true).catch(() => false))
-        ? parseBotTrainingDependencyTable(await fs.readFile(path.join(ROOT, BOT_TRAINING_MASTER_PATH), 'utf8'))
-        : [];
+    const btDependencyRows = [];
     const blockStatusById = new Map(
         (Array.isArray(graph.nodes) ? graph.nodes : [])
             .filter((node) => node.type === 'block')

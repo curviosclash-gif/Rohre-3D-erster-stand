@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { execFile as execFileCallback } from 'node:child_process';
-import fs from 'node:fs/promises';
+import fs from 'node:fs/promises';       
 import path from 'node:path';
-import { promisify } from 'node:util';
+import { promisify } from 'node:util';   
 import { pathToFileURL } from 'node:url';
+import { querySchemaLint } from './query-knowledge-graph.mjs';
 
 const ROOT = process.cwd();
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
@@ -56,6 +57,12 @@ const SCORECARD_SCHEMA_VERSION = 1;
 const COVERAGE_NO_NEW_UNCOVERED_RULE = 'no-new-active-uncovered-files';
 const execFile = promisify(execFileCallback);
 const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
+    {
+        classification: 'bot-training',
+        prefixes: ['data/training/', 'docs/bot-training/', 'docs/plaene/neu/BT'],
+        excludedFromCoverage: true,
+        reason: 'Bot training data and plans are excluded from the main architecture graph.',
+    },
     {
         classification: 'asset',
         prefixes: ['assets/'],
@@ -151,6 +158,24 @@ const KNOWLEDGE_GRAPH_MAPPING_EDGE_TYPES = new Set([
     'forbidden_by',
     'blocked_by',
 ]);
+
+const VALID_EDGE_ENDPOINTS = Object.freeze({
+    emits: { from: ['runtime', 'file'], to: ['event'] },
+    consumes: { from: ['runtime', 'file'], to: ['event'] },
+    reads_config: { from: ['runtime', 'file', 'config'], to: ['config'] },
+    reads_state: { from: ['runtime', 'file'], to: ['state'] },
+    writes_state: { from: ['runtime', 'file'], to: ['state'] },
+    validated_by: { from: ['runtime', 'file', 'event', 'state', 'config'], to: ['test'] },
+    implements: { from: ['file'], to: ['runtime', 'event', 'state', 'config', 'test'] },
+    cannot: { from: ['runtime', 'file'], to: ['event', 'state', 'config', 'runtime', 'file'] },
+    forbidden_by: { from: ['runtime', 'file'], to: ['config', 'state', 'event'] },
+    blocked_by: { from: ['runtime', 'file'], to: ['state', 'config', 'event'] },
+    contains_phase: { from: ['block'], to: ['phase'] },
+    contains_subphase: { from: ['phase'], to: ['subphase'] },
+    scope: { from: ['block'], to: ['file'] },
+    touches: { from: ['file'], to: ['surface'] },
+    depends_on: { from: ['block'], to: ['block'] },
+});
 
 const KNOWN_FRONTMATTER_FIELDS = new Set([
     'id',
@@ -952,7 +977,7 @@ function parseChecklistPhases(lines, phaseRoot) {
 
 function parsePhaseHeadings(lines, phaseRoot) {
     const phases = [];
-    const regex = new RegExp(`^###\\s+(${phaseRoot}\\.\\d+)\\b\\s*(.*)$`);
+    const regex = new RegExp(`^###\\s+(?:Phase\\s+)?(${phaseRoot}\\.\\d+)\\b(?:\\s*:)?\\s*(.*)$`);
 
     for (let index = 0; index < lines.length; index += 1) {
         const match = lines[index].match(regex);
@@ -2446,11 +2471,9 @@ async function buildKnowledgeGraphModel() {
         Array.from(fallbackBlockMetadata.entries())
             .map(([blockId, plan]) => [blockId, materializeScopePlan(plan, trackedFiles, trackedFileSet)])
     );
-    const botTrainingPlans = await readBotTrainingPlans(trackedFiles, trackedFileSet);
+    const botTrainingPlans = []; // Removed bot training data from graph
     const auditPlans = await readAuditPlans(trackedFiles, trackedFileSet);
-    const botTrainingDependencyRows = (await pathExists(BOT_TRAINING_MASTER_PATH))
-        ? parseBotTrainingDependencyTable(await fs.readFile(path.join(ROOT, BOT_TRAINING_MASTER_PATH), 'utf8'))
-        : [];
+    const botTrainingDependencyRows = []; // Removed bot training data from graph
 
     const nodes = createNodeStore();
     const edges = createEdgeStore();
@@ -2682,6 +2705,26 @@ async function buildKnowledgeGraphModel() {
     const sortedNodes = sortNodes(allNodes);
     const sortedEdges = sortEdges(edges.values());
 
+    const nodeTypeById = new Map(sortedNodes.map((node) => [node.id, node.type]));
+    const invalidEdges = [];
+    for (const edge of sortedEdges) {
+        const fromType = nodeTypeById.get(edge.from);
+        const toType = nodeTypeById.get(edge.to);
+        const rule = VALID_EDGE_ENDPOINTS[edge.type];
+        if (rule) {
+            if (fromType && !rule.from.includes(fromType)) {
+                invalidEdges.push(`Edge ${edge.from} (${fromType}) -> ${edge.to} (${toType}) hat unlogischen from-Typ für '${edge.type}'. Erlaubt: ${rule.from.join(', ')}`);
+            }
+            if (toType && !rule.to.includes(toType)) {
+                invalidEdges.push(`Edge ${edge.from} (${fromType}) -> ${edge.to} (${toType}) hat unlogischen to-Typ für '${edge.type}'. Erlaubt: ${rule.to.join(', ')}`);
+            }
+        }
+    }
+
+    if (invalidEdges.length > 0) {
+        throw new Error(`Graph-Build fehlgeschlagen wegen unlogischer Kanten-Typen:\n${invalidEdges.join('\n')}`);
+    }
+
     return {
         graph: {
             schema_version: GRAPH_SCHEMA_VERSION,
@@ -2739,6 +2782,13 @@ export async function writeKnowledgeGraphArtifacts({
     scorecardPath = SCORECARD_OUTPUT_PATH,
 } = {}) {
     const artifacts = await buildKnowledgeGraphArtifacts();
+
+    const lintResult = querySchemaLint(artifacts.graph, artifacts.coverage, artifacts.scorecard);
+    if (lintResult.summary?.warningCount > 0) {
+        const warningDetails = (lintResult.warnings || []).map((w) => `[${w.code}] ${w.edge || w.node || w.message || ''}`).join('; ');
+        throw new Error(`schema-lint meldet ${lintResult.summary.warningCount} Warnungen. Der Build schlaegt fehl. Details: ${warningDetails}`);
+    }
+
     await Promise.all([
         writeJsonArtifact(graphPath, artifacts.graph),
         writeJsonArtifact(coveragePath, artifacts.coverage),
