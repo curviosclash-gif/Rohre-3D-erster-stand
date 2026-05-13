@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Meta-Gate fuer V93/V94: fuehrt plan:check -> graph:check -> docs:sync -> docs:check in fester Reihenfolge aus.
+// Meta-Gate fuer V93/V94: fuehrt plan:check -> graph:check -> docs:sync -> docs:check -> check:gemini in fester Reihenfolge aus.
 // Jedes Einzel-Gate erhaelt eigenen Exit-Status und eigene Ausgabe, damit Einzelfehler nicht
 // hinter einem Sammelexit verschwinden (Risiko R3 aus V93).
 import { spawnSync } from 'node:child_process';
@@ -13,6 +13,7 @@ const steps = [
   ['docs:sync', 'scripts/docs-freshness.mjs', ['--write']],
   ['docs:check', 'scripts/docs-freshness.mjs', ['--check']],
   ['docs:check/plan:check', 'scripts/validate-umsetzungsplan.mjs', []],
+  ['docs:check/check:gemini', 'scripts/check-gemini-governance.mjs', []],
 ];
 
 let failed = null;
