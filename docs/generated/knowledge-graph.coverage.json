@@ -6967,10 +6967,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V115"
       ],
       "surfaces": [],
       "classification": "dev-tooling",
@@ -9841,6 +9843,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V115",
         "V77"
       ],
       "surfaces": [],
@@ -11238,6 +11241,7 @@
         "V109",
         "V110",
         "V111",
+        "V115",
         "V77",
         "V93"
       ],
@@ -12375,7 +12379,8 @@
       ],
       "scopeBlocks": [
         "V109",
-        "V110"
+        "V110",
+        "V115"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -17175,6 +17180,7 @@
       ],
       "scopeBlocks": [
         "B13",
+        "V115",
         "V89"
       ],
       "surfaces": [],
@@ -17194,6 +17200,7 @@
       ],
       "scopeBlocks": [
         "B13",
+        "V115",
         "V88",
         "V89"
       ],
@@ -17214,6 +17221,7 @@
       ],
       "scopeBlocks": [
         "B13",
+        "V115",
         "V88",
         "V89"
       ],
@@ -17234,6 +17242,7 @@
       ],
       "scopeBlocks": [
         "B13",
+        "V115",
         "V87",
         "V88",
         "V89"
@@ -19119,6 +19128,7 @@
       "scopeBlocks": [
         "B10",
         "V105",
+        "V115",
         "V75",
         "V77",
         "V85"
@@ -24171,6 +24181,7 @@
       "scopeBlocks": [
         "B11",
         "V105",
+        "V115",
         "V74",
         "V83",
         "V84",
@@ -24887,6 +24898,7 @@
       "scopeBlocks": [
         "B11",
         "V105",
+        "V115",
         "V74",
         "V83",
         "V84",
@@ -29811,10 +29823,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V115"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -29927,6 +29941,7 @@
       ],
       "scopeBlocks": [
         "B13",
+        "V115",
         "V88"
       ],
       "surfaces": [],
@@ -30792,6 +30807,7 @@
         "V102",
         "V104",
         "V114",
+        "V115",
         "V77",
         "V88",
         "V91",
@@ -30852,6 +30868,7 @@
       ],
       "scopeBlocks": [
         "B13",
+        "V115",
         "V87",
         "V88",
         "V89"

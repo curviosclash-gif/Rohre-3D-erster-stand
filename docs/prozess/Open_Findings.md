@@ -1,6 +1,6 @@
 ﻿# Open Findings (Kanonische Nebenablage)
 
-Stand: 2026-05-08.
+Stand: 2026-05-13.
 Diese Datei ist die kanonische Ablage fuer offene Findings, Review-Reste und Audit-Follow-ups ausserhalb des kompakten Master-Index.
 
 ## Zuordnung nach Zielblock
@@ -9,7 +9,7 @@ Diese Datei ist die kanonische Ablage fuer offene Findings, Review-Reste und Aud
 - `V102`: `P41` bis `P46`
 - `V104`: `P14` plus architektureller Zuschnitt aus `P45` fuer `UIStartSyncController`, `UIManager`-nahe Menuepfade und `ArcadeVehicleManager`
 - `V105`: `P47` bis `P48`
-- `V115`: `P6`, `P7`, `P12`, `P22` bis `P31` (Product & Infra Follow-up)
+- `V115`: `P7`, `P22` bis `P31` (Product & Infra Follow-up; `P6`, `P12` und `P23` sind in `115.1` erledigt)
 - Delta-Folgearbeit Spielaudit B01-B13 (ohne Doppelung zu `V99`/`V102`/`V104`/`V105`): `docs/qa/Spielaudit_2026-04-28/Audit_Umsetzungsplan_B01-B13.md` (D1-D6)
 
 ## Offene Findings

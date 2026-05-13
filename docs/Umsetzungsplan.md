@@ -54,7 +54,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V90 | Toolchain-Security und Dependency-Upgrade | blocked | P1 | frei | - | 90.2 | `docs/plaene/aktiv/V90.md` |
 | V102 | Security-, Runtime- und Contract-Hardening | done | P1 | frei | V99.99,V100.99 | 102.99 | `docs/plaene/aktiv/V102.md` |
 | V114 | SurfacePolicyPort fuer Demo- und Vollversionsgrenze | done | P1 | frei | V98.99,V103.99,V104.99 | 114.1 | `docs/plaene/aktiv/V114.md` |
-| V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | done | P2 | frei | - | 115.99 | `docs/plaene/aktiv/V115.md` |
+| V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | planned | P2 | frei | - | 115.2 | `docs/plaene/aktiv/V115.md` |
 | V105 | Architecture-Guard- und Typecheck-Regression-Recovery | done | P1 | frei | V99.99,V102.99,V104.99 | 105.99 | `docs/plaene/aktiv/V105.md` |
 | V112 | Spielaudit- und Playtest-Improvement-Paket | planned | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
@@ -114,7 +114,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V108 | - | closed | Abgeschlossen 2026-05-01 |
 | - | V102 | 2026-05-12 | closed | Abgeschlossen 2026-05-12 |
 | - | V114 | - | frei | Geplant |
-| - | V115 | 2026-05-12 | closed | Abgeschlossen 2026-05-12 |
+| - | V115 | - | frei | Reopened 2026-05-13 nach Closure-Abgleich; naechste Phase 115.2 |
 | - | V105 | 2026-05-13 | closed | Abgeschlossen 2026-05-13 |
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |

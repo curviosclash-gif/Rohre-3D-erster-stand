@@ -538,6 +538,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `.gitignore` ist wieder textuell sauber und ignoriert lokale `scripts/tmp_refactor*.cjs`, damit Scratch-Refactor-Skripte den Knowledge-Graph nicht erneut verschmutzen.
 - Der Electron-Preload kann den Settings-Override-Snapshot beim ersten synchronen Runtime-Limits-Read wieder deterministisch liefern; der asynchrone Cache bleibt als schneller Folgepfad erhalten.
 
+## Plan-Korrektur 2026-05-13 (Block `V115`)
+
+- `V115` ist nach erneutem Closure-Abgleich wieder offen: Der vorherige Abschluss deckte nur `P6`, `P12` und `P23` belastbar ab, waehrend `P7`, `P22` und `P24` bis `P31` weiterhin in `docs/prozess/Open_Findings.md` offen standen.
+- Die erledigte Teilmenge bleibt als `115.1` dokumentiert, inklusive der bereits gemappten Gemini-Infra-Governance; offene Map-, Repo-Hygiene-, Test-Harness- und Contract-/API-Reste sind jetzt in `115.2` bis `115.4` mit eigenem Abschluss-Gate `115.99` geplant.
+- Master-Index, Lock-Status-Zeile und Findings-Zuordnung zeigen damit wieder denselben Stand; erneutes Closure verlangt konkrete Evidence statt pauschalem `verified` sowie `npm run gates:pre-commit`.
+
 ## Stand-Snapshot 2026-05-13 (Gemini-Governance-Hygiene)
 
 - Gemini-Gedaechtnis-/Skill-Definitionen nachgezogen: `.gemini/skills/plan-generator/SKILL.md` respektiert jetzt die User-owned Intake-Governance (`docs/plaene/neu/` statt direkter Master-/Aktivblock-Aenderung), und `.gemini/agents/test_engineer.md` verweist auf `.agents/test_mapping.md`, `docs/qa/**` und aktive Blockplaene statt auf eine nicht vorhandene `Open_Findings.md`.
