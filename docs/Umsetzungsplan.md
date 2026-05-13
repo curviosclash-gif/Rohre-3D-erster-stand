@@ -55,8 +55,8 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V102 | Security-, Runtime- und Contract-Hardening | done | P1 | frei | V99.99,V100.99 | 102.99 | `docs/plaene/aktiv/V102.md` |
 | V114 | SurfacePolicyPort fuer Demo- und Vollversionsgrenze | done | P1 | frei | V98.99,V103.99,V104.99 | 114.1 | `docs/plaene/aktiv/V114.md` |
 | V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | done | P2 | frei | - | 115.99 | `docs/plaene/aktiv/V115.md` |
-| V105 | Architecture-Guard- und Typecheck-Regression-Recovery | blocked | P1 | frei | V99.99,V102.99,V104.99 | 105.1 | `docs/plaene/aktiv/V105.md` |
-| V112 | Spielaudit- und Playtest-Improvement-Paket | blocked | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
+| V105 | Architecture-Guard- und Typecheck-Regression-Recovery | done | P1 | frei | V99.99,V102.99,V104.99 | 105.99 | `docs/plaene/aktiv/V105.md` |
+| V112 | Spielaudit- und Playtest-Improvement-Paket | planned | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
 | V113 | Hangar Shell Productivierung und Rules Panel | planned | P2 | frei | V76.99,V103.99 | 113.1 | `docs/plaene/aktiv/V113.md` |
@@ -75,7 +75,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V102 | V99.99 | hard | ja | Netzwerk-/Signaling-Hardening aus V99 ist Grundlage fuer Security-Folgearbeit |
 | V102 | V100.99 | hard | ja | Runtime-StartSync-Stabilisierung ist Baseline fuer sync-I/O- und Contract-Hardening |
 | V105 | V99.99 | hard | ja | Guard-Recovery darf LAN-/Signaling-Abschluss aus V99 voraussetzen |
-| V105 | V102.99 | hard | nein | V105 setzt die Security-/Runtime-/Contract-Haertung aus V102 voraus |
+| V105 | V102.99 | hard | ja | Security-/Runtime-/Contract-Haertung aus V102 ist abgeschlossen und war V105-Baseline |
 | V105 | V104.99 | hard | ja | God-Object-/Port-Zuschnitt ist abgeschlossen und Baseline fuer Boundary-Recovery |
 | V76 | V64.99 | hard | ja | Abschluss vorhanden; verbleibt nur im offenen Abgleich vor Archivierung |
 | V76 | V77.99 | hard | ja | Surface-Policy-Baseline weiterhin erfuellt |
@@ -86,8 +86,8 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V110 | V107.99 | hard | ja | Core-Graph, Query-Layer, Coverage-Gate und Workflow-Spiegelung aus V107 sind abgeschlossen |
 | V111 | V107.99 | hard | ja | Mehrschichtiger Graph-Core aus V107 ist abgeschlossen; V110 bleibt als weitere Voraussetzung offen |
 | V111 | V110.99 | hard | ja | Ops-/Guard-Haertung aus V110 ist abgeschlossen |
-| V112 | V102.99 | hard | nein | V112 startet erst nach Security-/Runtime-Hardening aus V102 |
-| V112 | V105.99 | hard | nein | V112 startet erst nach Guard-/Typecheck-Recovery aus V105 |
+| V112 | V102.99 | hard | ja | Security-/Runtime-Hardening aus V102 ist abgeschlossen |
+| V112 | V105.99 | hard | ja | Guard-/Typecheck-Recovery aus V105 ist abgeschlossen |
 | V113 | V76.99 | hard | ja | Hangar-Contracts und Shell-Zielbild aus V76 sind abgeschlossen |
 | V113 | V103.99 | hard | ja | Settings-Domain- und Persistenzpfad aus V103 sind Grundlage fuer Hangar-Writeback |
 | V114 | V98.99 | hard | ja | Browser-Demo-Policy, Settings-Studio-Export und read-only Demo-Lesepfad sind Grundlage fuer den SurfacePolicyPort |
@@ -115,13 +115,13 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V102 | 2026-05-12 | closed | Abgeschlossen 2026-05-12 |
 | - | V114 | - | frei | Geplant |
 | - | V115 | 2026-05-12 | closed | Abgeschlossen 2026-05-12 |
-| - | V105 | - | frei | Geplant |
+| - | V105 | 2026-05-13 | closed | Abgeschlossen 2026-05-13 |
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
 | - | V110 | 2026-05-08 | closed | Abgeschlossen 2026-05-09 |
 | - | V111 | 2026-05-09 | closed | Abgeschlossen 2026-05-10 |
-| - | V112 | - | blockiert | Wartet auf V105.99 |
+| - | V112 | - | frei | Geplant |
 | - | V113 | - | frei | Geplant |
 
 ## Empfohlene Reihenfolge
