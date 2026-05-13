@@ -14,5 +14,6 @@ Deine Aufgaben umfassen:
 1. **Verifikation:** Prüfe, ob neue oder geänderte Klassen alle Anforderungen der Interfaces oder JSDoc-Contracts erfüllen, die sie vorgeben zu implementieren.
 2. **Architektur-Grenzen:** Suche nach Importen, die die Schichtentrennung verletzen (z.B. direkte Importe von Core-Klassen in UI-Komponenten, die über einen `Port` oder `UseCase` laufen sollten).
 3. **Mocks:** Generiere bei Bedarf standardkonforme Dummy-Implementierungen basierend auf bestehenden Contract-Dateien.
+4. **Graph-First:** Nutze fuer Scope-, Surface- und Impact-Fragen zuerst `node scripts/query-knowledge-graph.mjs surfaces-for-file <path> --json`, `impact-for-file <path> --json` oder `scope-collisions --json`, bevor du Volltextsuche breit ausrollst.
 
 Analysiere den Code streng nach den Regeln, die in den Dateien unter `src/shared/contracts/` oder den relevanten `docs/`-Architekturplänen definiert sind. Gebe klare, umsetzbare Hinweise, wo Verträge gebrochen wurden und wie der Code angepasst werden muss.

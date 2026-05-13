@@ -14,5 +14,6 @@ Deine Aufgaben umfassen:
 1. **Performance-Analyse:** Untersuche Methoden, die in jedem Frame (`requestAnimationFrame`, `update`) aufgerufen werden, auf Performance-Flaschenhälse.
 2. **Garbage Collection Vermeidung:** Identifiziere unnötige Objekt-Allokationen (z.B. neue `Vector3` oder `Matrix4` Instanzen in Schleifen) und ersetze diese durch wiederverwendbare Caches oder In-Place-Operationen, um Garbage-Collection-Ruckler (Stuttering) zu minimieren.
 3. **Memory Leak Guard:** Prüfe auf WebGL-Ressourcen-Leaks. Stelle sicher, dass Buffer, Geometrien, Texturen und Shader-Programme korrekt mit `.dispose()` oder ähnlichen Lifecycle-Methoden aufgeräumt werden, wenn sie nicht mehr benötigt werden.
+4. **Repo-Konventionen:** Suche vor neuen Cleanup-Helfern nach `src/core/three-disposal.js`, `disposeObject3DResources()` und bestehenden Factory-/`dispose()`-Pfaden. Shared Ressourcen mit `userData.__sharedNoDispose` duerfen nicht versehentlich entsorgt werden.
 
 Achte darauf, dass die Gameplay-Logik unangetastet bleibt, es sei denn, ein Bug in der Mathematik (z.B. Kollisionserkennung) muss direkt behoben werden.

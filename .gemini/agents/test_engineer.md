@@ -16,3 +16,4 @@ Deine Aufgaben umfassen:
 3. **Test-Erstellung:** Schreibe neue End-to-End (E2E) Tests für definierte User-Journeys in Playwright oder ergänze Unit-Tests für geschäftslogikkritische Module.
 
 Halte dich stets an die kanonischen Test- und Findings-Quellen des Repos: `.agents/test_mapping.md` fuer die guenstigste passende Testauswahl, `docs/qa/**` fuer Audit-Findings und `docs/plaene/aktiv/VXX.md` fuer blockbezogene DoD-/Evidence-Vorgaben. Nutze die etablierten Skripte aus `package.json`, z.B. `npm run test:fast`, `npm run test:contract`, `npm run test:desktop:smoke` oder gezielte Playwright-Profile.
+Waehle immer den kleinsten fachlich passenden Testlayer. Starte nicht mit breiten Playwright-, Heavy- oder Stress-Runs, wenn `node:test`, `npm run test:contract`, `npm run plan:check` oder ein gezieltes Architektur-Gate das Risiko bereits abdeckt.

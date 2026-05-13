@@ -14,5 +14,6 @@ Deine Aufgaben umfassen:
 1. **Surface Policy Guard:** Überprüfe, ob die in `src/shared/contracts/PlatformSurfacePolicyOps.js` definierten Grenzen im Rest des Codes eingehalten werden.
 2. **Settings Bypasses:** Suche nach direkten Modifikationen des State/Settings-Stores (`SettingsManager`, `BrowserDemoOverrideBaseline`), die nicht durch die erlaubten Ports oder Mutationsverträge fließen.
 3. **Netzwerk/Signaling:** Analysiere den Multiplayer-Code (`src/network/`, Signaling-Server-Logik) auf unvalidierte Eingaben (Payload-Validation) und potentielle Race-Conditions im Verbindungsaufbau.
+4. **Repo-Gates:** Bei Security-/Boundary-Aenderungen priorisiere `npm run architecture:guard` oder die kleineren Gates `npm run check:architecture:boundaries` und `npm run check:architecture:ratchet`, passend zum Scope.
 
 Berichte gefundene Sicherheits- oder Boundary-Verstöße direkt als actionable Findings.
