@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-const ROOT = process.cwd();
 const GEMINI_ROOT = '.gemini';
 const AGENTS_ROOT = '.gemini/agents';
 const PLAN_GENERATOR = '.gemini/skills/plan-generator/SKILL.md';
@@ -25,12 +25,12 @@ const forbiddenPatterns = [
     },
     {
         id: 'direct-master-update',
-        pattern: /F[uü]ge\s+.*docs\/Umsetzungsplan\.md/i,
+        pattern: /F(?:u|ue|ü)ge\s+.*docs\/Umsetzungsplan\.md/i,
         message: 'Master-Index-Aufnahme ist User-owned; Gemini darf hoechstens Intake-Hinweise im Draft notieren.',
     },
     {
         id: 'master-claim',
-        pattern: /in den Master-Index [uü]bernommen wurde/i,
+        pattern: /in den Master-Index (?:u|ue|ü)bernommen wurde/i,
         message: 'Gemini darf keine Master-Aufnahme behaupten, solange sie nicht explizit erfolgt ist.',
     },
 ];
@@ -39,17 +39,17 @@ function normalizePath(value) {
     return value.replace(/\\/g, '/');
 }
 
-async function exists(relPath) {
+async function exists(root, relPath) {
     try {
-        await fs.access(path.join(ROOT, relPath));
+        await fs.access(path.join(root, relPath));
         return true;
     } catch {
         return false;
     }
 }
 
-async function listMarkdownFiles(relDir) {
-    const fullDir = path.join(ROOT, relDir);
+async function listMarkdownFiles(root, relDir) {
+    const fullDir = path.join(root, relDir);
     const out = [];
     let entries = [];
 
@@ -62,7 +62,7 @@ async function listMarkdownFiles(relDir) {
     for (const entry of entries) {
         const relPath = normalizePath(path.join(relDir, entry.name));
         if (entry.isDirectory()) {
-            out.push(...await listMarkdownFiles(relPath));
+            out.push(...await listMarkdownFiles(root, relPath));
         } else if (entry.isFile() && relPath.endsWith('.md')) {
             out.push(relPath);
         }
@@ -87,22 +87,26 @@ function addViolation(violations, file, line, id, message) {
     violations.push({ file, line, id, message });
 }
 
-async function readUtf8(relPath) {
-    return fs.readFile(path.join(ROOT, relPath), 'utf8');
+async function readUtf8(root, relPath) {
+    return fs.readFile(path.join(root, relPath), 'utf8');
 }
 
-async function main() {
-    if (!await exists(GEMINI_ROOT)) {
-        console.log('[gemini-governance] skipped: .gemini fehlt');
-        return;
+export async function validateGeminiGovernance({ root = process.cwd() } = {}) {
+    if (!await exists(root, GEMINI_ROOT)) {
+        return {
+            skipped: true,
+            markdownFileCount: 0,
+            agentFileCount: 0,
+            violations: [],
+        };
     }
 
-    const markdownFiles = await listMarkdownFiles(GEMINI_ROOT);
+    const markdownFiles = await listMarkdownFiles(root, GEMINI_ROOT);
     const violations = [];
     const contentByFile = new Map();
 
     for (const file of markdownFiles) {
-        const text = await readUtf8(file);
+        const text = await readUtf8(root, file);
         contentByFile.set(file, text);
 
         for (const rule of forbiddenPatterns) {
@@ -127,8 +131,8 @@ async function main() {
         }
     }
 
-    if (await exists(PLAN_GENERATOR)) {
-        const planGenerator = contentByFile.get(PLAN_GENERATOR) || await readUtf8(PLAN_GENERATOR);
+    if (await exists(root, PLAN_GENERATOR)) {
+        const planGenerator = contentByFile.get(PLAN_GENERATOR) || await readUtf8(root, PLAN_GENERATOR);
         const requiredSnippets = [
             ['docs/plaene/neu/', 'plan-generator muss Intake-Drafts unter docs/plaene/neu/ verankern.'],
             ['User-owned', 'plan-generator muss User-owned Master-/Intake-Governance benennen.'],
@@ -142,20 +146,40 @@ async function main() {
         }
     }
 
-    if (violations.length > 0) {
-        console.error(`[gemini-governance] ${violations.length} violation(s)`);
-        for (const violation of violations) {
+    return {
+        skipped: false,
+        markdownFileCount: markdownFiles.length,
+        agentFileCount: agentFiles.length,
+        violations,
+    };
+}
+
+async function main() {
+    const result = await validateGeminiGovernance();
+
+    if (result.skipped) {
+        console.log('[gemini-governance] skipped: .gemini fehlt');
+        return;
+    }
+
+    if (result.violations.length > 0) {
+        console.error(`[gemini-governance] ${result.violations.length} violation(s)`);
+        for (const violation of result.violations) {
             console.error(`- ${violation.file}:${violation.line} [${violation.id}] ${violation.message}`);
         }
         process.exitCode = 1;
         return;
     }
 
-    console.log(`[gemini-governance] ok files=${markdownFiles.length} agents=${agentFiles.length}`);
+    console.log(`[gemini-governance] ok files=${result.markdownFileCount} agents=${result.agentFileCount}`);
 }
 
-main().catch((error) => {
-    console.error(`[gemini-governance] failed: ${error?.message || error}`);
-    process.exitCode = 1;
-});
+const isDirectRun = process.argv[1]
+    && import.meta.url === pathToFileURL(process.argv[1]).href;
 
+if (isDirectRun) {
+    main().catch((error) => {
+        console.error(`[gemini-governance] failed: ${error?.message || error}`);
+        process.exitCode = 1;
+    });
+}
