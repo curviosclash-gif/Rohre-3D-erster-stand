@@ -1,10 +1,11 @@
 import { spawn } from 'node:child_process';
-import { open, readFile, rm } from 'node:fs/promises';
+import { mkdir, open, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
 const MASTER_PLAN_PATH = path.resolve('docs', 'Umsetzungsplan.md');
 const PLAN_LOCK_REGEX = /<!--\s*LOCK:\s*(.+?)\s*-->/gi;
+const PLAYWRIGHT_SPAWN_DIAGNOSTICS_FILE = 'playwright-spawn-diagnostics.json';
 
 function toPositiveInt(rawValue, fallback, min = 1, max = Number.MAX_SAFE_INTEGER) {
     const numeric = Number.parseInt(String(rawValue || ''), 10);
@@ -124,6 +125,47 @@ function resolvePlaywrightIsolationEnv(env = process.env) {
     };
 }
 
+function isWindowsSpawnPolicyError(error) {
+    const code = String(error?.code || '').toUpperCase();
+    return process.platform === 'win32' && (code === 'EPERM' || code === 'EACCES');
+}
+
+function quoteCmdArg(value) {
+    const stringValue = String(value ?? '');
+    if (stringValue.length === 0) return '""';
+    if (!/[ \t"&|<>^()]/.test(stringValue)) {
+        return stringValue;
+    }
+    return `"${stringValue.replace(/"/g, '""')}"`;
+}
+
+function resolveWindowsShellFallback(command, args) {
+    return {
+        command: process.env.ComSpec || 'cmd.exe',
+        args: ['/d', '/s', '/c', [command, ...args].map((entry) => quoteCmdArg(entry)).join(' ')],
+        shell: false,
+    };
+}
+
+async function writePlaywrightSpawnDiagnostics(outputDir, payload) {
+    const resolvedOutputDir = path.resolve(process.cwd(), outputDir || 'test-results');
+    await mkdir(resolvedOutputDir, { recursive: true });
+    const diagnosticsPath = path.resolve(resolvedOutputDir, PLAYWRIGHT_SPAWN_DIAGNOSTICS_FILE);
+    await writeFile(`${diagnosticsPath}`, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+    return diagnosticsPath;
+}
+
+function formatSpawnError(error, diagnosticsPath) {
+    return [
+        '[verify-lock] Playwright child spawn failed',
+        `code=${error?.code || 'unknown'}`,
+        `syscall=${error?.syscall || 'spawn'}`,
+        `path=${error?.path || 'n/a'}`,
+        `diagnostics=${diagnosticsPath || 'n/a'}`,
+        `message=${error?.message || String(error)}`,
+    ].join(' ');
+}
+
 function escapeRegex(value) {
     return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -190,6 +232,7 @@ function resolveCommand(commandArgs) {
             command: process.execPath,
             args: [path.resolve('node_modules', '@playwright', 'test', 'cli.js'), ...playwrightArgs],
             shell: false,
+            fallbackEligible: true,
         };
     }
 
@@ -197,19 +240,12 @@ function resolveCommand(commandArgs) {
         && (normalized === 'npx' || normalized === 'npm' || normalized === 'playwright');
 
     if (useCmdShell) {
-        const quoteCmdArg = (value) => {
-            const stringValue = String(value ?? '');
-            if (stringValue.length === 0) return '""';
-            if (!/[ \t"&|<>^()]/.test(stringValue)) {
-                return stringValue;
-            }
-            return `"${stringValue.replace(/"/g, '""')}"`;
-        };
         const commandLine = [rawCommand, ...normalizedArgs].map((entry) => quoteCmdArg(entry)).join(' ');
         return {
             command: process.env.ComSpec || 'cmd.exe',
             args: ['/d', '/s', '/c', commandLine],
             shell: false,
+            fallbackEligible: false,
         };
     }
 
@@ -217,6 +253,7 @@ function resolveCommand(commandArgs) {
         command: rawCommand,
         args: normalizedArgs,
         shell: false,
+        fallbackEligible: true,
     };
 }
 
@@ -224,7 +261,7 @@ async function runWithPlaywrightIsolation(rawCommandArgs) {
     const commandArgs = rawCommandArgs[0] === '--'
         ? rawCommandArgs.slice(1)
         : rawCommandArgs.slice();
-    const { command, args, shell } = resolveCommand(commandArgs);
+    const { command, args, shell, fallbackEligible } = resolveCommand(commandArgs);
     const isolatedEnv = resolvePlaywrightIsolationEnv(process.env);
     const lockPath = path.resolve(
         process.cwd(),
@@ -275,15 +312,16 @@ async function runWithPlaywrightIsolation(rawCommandArgs) {
     process.once('SIGTERM', forwardSignal);
 
     try {
-        const exitCode = await new Promise((resolve, reject) => {
-            child = spawn(command, args, {
-                cwd: process.cwd(),
-                stdio: 'inherit',
-                env: childEnv,
-                shell: shell === true,
-                windowsHide: true,
-            });
+        const spawnOptions = {
+            cwd: process.cwd(),
+            stdio: 'inherit',
+            env: childEnv,
+            shell: shell === true,
+            windowsHide: true,
+        };
 
+        const runSpawn = (spawnCommand, spawnArgs, options) => new Promise((resolve, reject) => {
+            child = spawn(spawnCommand, spawnArgs, options);
             child.once('error', reject);
             child.once('exit', (code, signal) => {
                 if (signal) {
@@ -293,6 +331,61 @@ async function runWithPlaywrightIsolation(rawCommandArgs) {
                 resolve(code ?? 0);
             });
         });
+
+        let exitCode = 0;
+        try {
+            exitCode = await runSpawn(command, args, spawnOptions);
+        } catch (error) {
+            if (!fallbackEligible || !isWindowsSpawnPolicyError(error)) {
+                const diagnosticsPath = await writePlaywrightSpawnDiagnostics(isolatedEnv.outputDir, {
+                    stage: 'verify-lock.spawn',
+                    fallbackAttempted: false,
+                    command,
+                    args,
+                    cwd: process.cwd(),
+                    runTag: isolatedEnv.runTag,
+                    testPort: isolatedEnv.testPort,
+                    outputDir: isolatedEnv.outputDir,
+                    workers: isolatedEnv.workers,
+                    error: {
+                        code: error?.code || null,
+                        syscall: error?.syscall || null,
+                        path: error?.path || null,
+                        message: error?.message || String(error),
+                    },
+                });
+                throw new Error(formatSpawnError(error, diagnosticsPath));
+            }
+
+            const fallback = resolveWindowsShellFallback(command, args);
+            const diagnosticsPath = await writePlaywrightSpawnDiagnostics(isolatedEnv.outputDir, {
+                stage: 'verify-lock.spawn',
+                fallbackAttempted: true,
+                fallbackCommand: fallback.command,
+                fallbackArgs: fallback.args,
+                command,
+                args,
+                cwd: process.cwd(),
+                runTag: isolatedEnv.runTag,
+                testPort: isolatedEnv.testPort,
+                outputDir: isolatedEnv.outputDir,
+                workers: isolatedEnv.workers,
+                error: {
+                    code: error?.code || null,
+                    syscall: error?.syscall || null,
+                    path: error?.path || null,
+                    message: error?.message || String(error),
+                },
+            });
+            console.warn(`[verify-lock] direct spawn failed; retrying through cmd fallback. diagnostics=${diagnosticsPath}`);
+            exitCode = await runSpawn(fallback.command, fallback.args, {
+                cwd: process.cwd(),
+                stdio: 'inherit',
+                env: childEnv,
+                shell: fallback.shell === true,
+                windowsHide: true,
+            });
+        }
 
         if (exitCode !== 0) {
             process.exitCode = exitCode;

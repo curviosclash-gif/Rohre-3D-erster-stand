@@ -14,6 +14,7 @@ import {
     PLATFORM_CAPABILITY_IDS,
 } from '../src/shared/contracts/PlatformCapabilityContract.js';
 import {
+    PLATFORM_CAPABILITY_REGISTRY,
     PLATFORM_PRODUCT_SURFACE_IDS,
     PLATFORM_PROVIDER_KINDS,
     PLATFORM_SURFACE_DEVELOPER_ACCESS_MODES,
@@ -105,6 +106,28 @@ test('V87.3 Electron discovery adapter suppresses stale capability availability 
     assert.equal(adapter.onDiscoveredHosts, null);
     assert.equal(adapter.capability.degradedReason, 'discovery_unavailable');
     assert.equal(adapter.capability.supportsSubscribe, false);
+});
+
+test('V115.4.5 platform capability registries and resolved policies stay immutable', () => {
+    const desktopPolicy = resolveSurfacePolicy({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserEnvironment = resolveDefaultLobbyTransport({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+    const desktopProduct = PLATFORM_CAPABILITY_REGISTRY.products[PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP];
+
+    assert.equal(browserEnvironment, 'lan');
+    assert.equal(Object.isFrozen(PLATFORM_CAPABILITY_REGISTRY), true);
+    assert.equal(Object.isFrozen(PLATFORM_CAPABILITY_REGISTRY.products), true);
+    assert.equal(Object.isFrozen(desktopProduct), true);
+    assert.equal(Object.isFrozen(desktopProduct.surfacePolicy), true);
+    assert.equal(Object.isFrozen(desktopProduct.surfacePolicy.allowedSessionTypes), true);
+    assert.equal(Object.isFrozen(desktopPolicy), true);
+    assert.equal(Object.isFrozen(desktopPolicy.allowedSessionTypes), true);
+    assert.throws(() => {
+        desktopPolicy.allowedSessionTypes.push('mutated');
+    }, TypeError);
 });
 
 test('V87.3 Browser discovery port stays unavailable when desktop fallbacks are absent', async () => {

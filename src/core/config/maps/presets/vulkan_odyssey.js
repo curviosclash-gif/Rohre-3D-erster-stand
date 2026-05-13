@@ -83,10 +83,10 @@ export const VULKAN_ODYSSEY_MAP = {
             // Mini-Plattform am Brueckenende
             { pos: [72, 58, 0], size: [8, 3, 8] },
 
-            // Praezisions-Sprungfolge (3 winzige Bloecke, Zickzack)
-            { pos: [80, 60, -8], size: [4, 2, 4] },
-            { pos: [88, 62, 6], size: [4, 2, 4] },
-            { pos: [96, 64, -4], size: [4, 2, 4] },
+            // Praezisions-Sprungfolge (3 kleine Bloecke, Zickzack)
+            { pos: [80, 60, -8], size: [7, 2, 7] },
+            { pos: [88, 62, 6], size: [7, 2, 7] },
+            { pos: [96, 64, -4], size: [7, 2, 7] },
 
             // Foam-Auffangfeld darunter (Rettung, aber Zeitverlust)
             { pos: [88, 48, 0], size: [36, 4, 24], kind: 'foam' },

@@ -7,8 +7,18 @@ import {
     createContentRegistryDescriptor,
 } from './ContentDescriptorContract.js';
 
+function freezeMissionType(typeDef) {
+    const defaultParams = typeDef.defaultParams && typeof typeDef.defaultParams === 'object'
+        ? Object.freeze({ ...typeDef.defaultParams })
+        : Object.freeze({});
+    return Object.freeze({
+        ...typeDef,
+        defaultParams,
+    });
+}
+
 export const MISSION_TYPES = Object.freeze({
-    KILL_COUNT: Object.freeze({
+    KILL_COUNT: freezeMissionType({
         id: 'KILL_COUNT',
         label: 'Eliminate',
         icon: 'crosshair',
@@ -16,7 +26,7 @@ export const MISSION_TYPES = Object.freeze({
         check: (progress) => (progress.kills || 0) >= (progress.target || 5),
         format: (progress) => `${Math.min(progress.kills || 0, progress.target || 5)}/${progress.target || 5}`,
     }),
-    COLLECT_ITEMS: Object.freeze({
+    COLLECT_ITEMS: freezeMissionType({
         id: 'COLLECT_ITEMS',
         label: 'Collect',
         icon: 'gem',
@@ -24,7 +34,7 @@ export const MISSION_TYPES = Object.freeze({
         check: (progress) => (progress.collected || 0) >= (progress.target || 3),
         format: (progress) => `${Math.min(progress.collected || 0, progress.target || 3)}/${progress.target || 3}`,
     }),
-    SURVIVE_DURATION: Object.freeze({
+    SURVIVE_DURATION: freezeMissionType({
         id: 'SURVIVE_DURATION',
         label: 'Survive',
         icon: 'clock',
@@ -32,7 +42,7 @@ export const MISSION_TYPES = Object.freeze({
         check: (progress) => (progress.survived || 0) >= (progress.target || 45),
         format: (progress) => `${Math.floor(progress.survived || 0)}/${progress.target || 45}s`,
     }),
-    REACH_PORTAL: Object.freeze({
+    REACH_PORTAL: freezeMissionType({
         id: 'REACH_PORTAL',
         label: 'Reach Exit',
         icon: 'portal',
@@ -40,7 +50,7 @@ export const MISSION_TYPES = Object.freeze({
         check: (progress) => progress.reached === true,
         format: (progress) => progress.reached ? 'Done' : 'Find the exit portal',
     }),
-    TIME_TRIAL: Object.freeze({
+    TIME_TRIAL: freezeMissionType({
         id: 'TIME_TRIAL',
         label: 'Speed Run',
         icon: 'stopwatch',
@@ -49,7 +59,7 @@ export const MISSION_TYPES = Object.freeze({
         format: (progress) => `${Math.floor(progress.elapsed || 0)}/${progress.target || 30}s`,
     }),
     // 61.3.1 — New mission types
-    NO_DAMAGE: Object.freeze({
+    NO_DAMAGE: freezeMissionType({
         id: 'NO_DAMAGE',
         label: 'No Damage',
         icon: 'shield',
@@ -57,7 +67,7 @@ export const MISSION_TYPES = Object.freeze({
         check: (progress) => progress.hitCount === 0,
         format: (progress) => (progress.hitCount || 0) === 0 ? 'Untouched' : `Hits: ${progress.hitCount}`,
     }),
-    MULTI_KILL: Object.freeze({
+    MULTI_KILL: freezeMissionType({
         id: 'MULTI_KILL',
         label: 'Multi-Kill',
         icon: 'burst',
@@ -65,7 +75,7 @@ export const MISSION_TYPES = Object.freeze({
         check: (progress) => (progress.windowKills || 0) >= (progress.target || 3),
         format: (progress) => `${Math.min(progress.windowKills || 0, progress.target || 3)}/${progress.target || 3} in ${progress.windowSec || 15}s`,
     }),
-    TRAIL_MASTER: Object.freeze({
+    TRAIL_MASTER: freezeMissionType({
         id: 'TRAIL_MASTER',
         label: 'Trail Master',
         icon: 'trail',
@@ -74,7 +84,7 @@ export const MISSION_TYPES = Object.freeze({
         format: (progress) => `${Math.floor(progress.metersSafe || 0)}/${progress.target || 100}m`,
     }),
     // 61.3.2 — Additional new mission types
-    ITEM_CHAIN: Object.freeze({
+    ITEM_CHAIN: freezeMissionType({
         id: 'ITEM_CHAIN',
         label: 'Item Chain',
         icon: 'chain',
@@ -82,7 +92,7 @@ export const MISSION_TYPES = Object.freeze({
         check: (progress) => (progress.chain || 0) >= (progress.target || 3),
         format: (progress) => `${Math.min(progress.chain || 0, progress.target || 3)}/${progress.target || 3} chain`,
     }),
-    CLOSE_CALL: Object.freeze({
+    CLOSE_CALL: freezeMissionType({
         id: 'CLOSE_CALL',
         label: 'Close Call',
         icon: 'heartbeat',
@@ -105,6 +115,7 @@ export function formatMissionProgress(mission) {
 }
 
 export function listArcadeMissionDescriptors() {
+    // Runtime consumers use this descriptor list to validate authored mission pools before instantiation.
     return Object.values(MISSION_TYPES)
         .map((typeDef) => ({
             id: typeDef.id,

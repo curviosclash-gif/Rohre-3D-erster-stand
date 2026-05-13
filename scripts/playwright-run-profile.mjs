@@ -122,6 +122,15 @@ export function runPlaywrightProfile(profileName, argv, options = {}) {
         windowsHide: true,
     });
 
+    child.on('error', (error) => {
+        console.error(
+            `[playwright:${profile.name}] CLI spawn failed ` +
+            `code=${error?.code || 'unknown'} path=${error?.path || command.command} ` +
+            `message=${error?.message || String(error)}`
+        );
+        process.exit(1);
+    });
+
     child.on('exit', (code, signal) => {
         if (signal) {
             process.kill(process.pid, signal);

@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { readFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { resolvePlaywrightFailureTaxonomy } from '../tests/playwright-readiness.js';
@@ -20,6 +20,7 @@ const HEAVY_DIAGNOSTIC_CLUSTERS = Object.freeze([
     { id: 'bot-targeting', specs: ['tests/bot-targeting.spec.js'] },
 ]);
 const PLAYWRIGHT_STARTUP_DIAGNOSTICS_FILE = 'playwright-startup-diagnostics.json';
+const PLAYWRIGHT_SPAWN_DIAGNOSTICS_FILE = 'playwright-spawn-diagnostics.json';
 const ALL_CLUSTERS = Object.freeze([
     ...DESKTOP_E2E_CLUSTERS,
     ...HEAVY_DIAGNOSTIC_CLUSTERS,
@@ -157,26 +158,121 @@ function buildClusterEnv(cluster, index) {
     return env;
 }
 
-function runCluster(cluster, playwrightArgs, index, total) {
-    return new Promise((resolve) => {
-        const clusterArgs = [path.resolve('scripts', 'run-playwright-targeted.mjs'), ...cluster.specs, ...playwrightArgs];
-        const clusterEnv = buildClusterEnv(cluster, index);
-        console.log(`[playwright:desktop-e2e] (${index + 1}/${total}) ${cluster.id} -> ${cluster.specs.join(', ')}`);
+function serializeSpawnError(error) {
+    return {
+        code: error?.code || null,
+        syscall: error?.syscall || null,
+        path: error?.path || null,
+        message: error?.message || String(error),
+    };
+}
 
-        const child = spawn(process.execPath, clusterArgs, {
+function isWindowsSpawnPolicyError(error) {
+    const code = String(error?.code || '').toUpperCase();
+    return process.platform === 'win32' && (code === 'EPERM' || code === 'EACCES');
+}
+
+function quoteCmdArg(value) {
+    const stringValue = String(value ?? '');
+    if (stringValue.length === 0) return '""';
+    if (!/[ \t"&|<>^()]/.test(stringValue)) {
+        return stringValue;
+    }
+    return `"${stringValue.replace(/"/g, '""')}"`;
+}
+
+function resolveWindowsShellFallback(command, args) {
+    return {
+        command: process.env.ComSpec || 'cmd.exe',
+        args: ['/d', '/s', '/c', [command, ...args].map((entry) => quoteCmdArg(entry)).join(' ')],
+    };
+}
+
+async function writeClusterSpawnDiagnostics(cluster, env, payload) {
+    const outputDir = path.resolve(env.PW_OUTPUT_DIR || path.join('test-results', cluster.id));
+    await mkdir(outputDir, { recursive: true });
+    const diagnosticsPath = path.resolve(outputDir, PLAYWRIGHT_SPAWN_DIAGNOSTICS_FILE);
+    await writeFile(diagnosticsPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+    return diagnosticsPath;
+}
+
+function runCluster(cluster, playwrightArgs, index, total) {
+    const clusterArgs = [path.resolve('scripts', 'run-playwright-targeted.mjs'), ...cluster.specs, ...playwrightArgs];
+    const clusterEnv = buildClusterEnv(cluster, index);
+    console.log(`[playwright:desktop-e2e] (${index + 1}/${total}) ${cluster.id} -> ${cluster.specs.join(', ')}`);
+
+    const spawnOnce = (command, args, extra = {}) => new Promise((resolve) => {
+        const child = spawn(command, args, {
             stdio: 'inherit',
             env: clusterEnv,
             windowsHide: true,
+            ...extra,
         });
 
-        child.on('exit', (code, signal) => {
+        child.once('error', (error) => {
+            resolve({
+                cluster,
+                code: 1,
+                signal: null,
+                outputDir: clusterEnv.PW_OUTPUT_DIR,
+                spawnError: serializeSpawnError(error),
+            });
+        });
+        child.once('exit', (code, signal) => {
             resolve({
                 cluster,
                 code: code ?? 1,
                 signal: signal || null,
                 outputDir: clusterEnv.PW_OUTPUT_DIR,
+                spawnError: null,
             });
         });
+    });
+
+    return spawnOnce(process.execPath, clusterArgs).then(async (result) => {
+        if (!result.spawnError) {
+            return result;
+        }
+        if (!isWindowsSpawnPolicyError(result.spawnError)) {
+            result.spawnDiagnosticsPath = await writeClusterSpawnDiagnostics(cluster, clusterEnv, {
+                stage: 'cluster.spawn',
+                fallbackAttempted: false,
+                clusterId: cluster.id,
+                command: process.execPath,
+                args: clusterArgs,
+                cwd: process.cwd(),
+                runTag: clusterEnv.PW_RUN_TAG,
+                testPort: clusterEnv.TEST_PORT || null,
+                outputDir: clusterEnv.PW_OUTPUT_DIR,
+                error: result.spawnError,
+            });
+            return result;
+        }
+
+        const fallback = resolveWindowsShellFallback(process.execPath, clusterArgs);
+        const diagnosticsPath = await writeClusterSpawnDiagnostics(cluster, clusterEnv, {
+            stage: 'cluster.spawn',
+            fallbackAttempted: true,
+            fallbackCommand: fallback.command,
+            fallbackArgs: fallback.args,
+            clusterId: cluster.id,
+            command: process.execPath,
+            args: clusterArgs,
+            cwd: process.cwd(),
+            runTag: clusterEnv.PW_RUN_TAG,
+            testPort: clusterEnv.TEST_PORT || null,
+            outputDir: clusterEnv.PW_OUTPUT_DIR,
+            error: result.spawnError,
+        });
+        console.warn(
+            `[playwright:desktop-e2e] ${cluster.id} direct spawn failed; ` +
+            `retrying through cmd fallback. diagnostics=${diagnosticsPath}`
+        );
+        const fallbackResult = await spawnOnce(fallback.command, fallback.args);
+        if (fallbackResult.spawnError) {
+            fallbackResult.spawnDiagnosticsPath = diagnosticsPath;
+        }
+        return fallbackResult;
     });
 }
 
@@ -204,6 +300,19 @@ function collectServerLogPaths(rawDiagnostics) {
 }
 
 async function classifyClusterFailure(result) {
+    if (result.spawnError) {
+        return {
+            clusterId: result.cluster.id,
+            failureClass: 'harness-spawn-error',
+            failureReason: String(result.spawnError.code || result.spawnError.message || 'spawn_error'),
+            runProfile: 'desktop-e2e',
+            runTag: '',
+            outputDir: path.resolve(result.outputDir || ''),
+            diagnosticsPath: result.spawnDiagnosticsPath || null,
+            serverLogPaths: [],
+        };
+    }
+
     const diagnosticsPath = path.resolve(result.outputDir || '', PLAYWRIGHT_STARTUP_DIAGNOSTICS_FILE);
     let diagnostics = null;
     try {

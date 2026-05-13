@@ -9,25 +9,16 @@ Diese Datei ist die kanonische Ablage fuer offene Findings, Review-Reste und Aud
 - `V102`: `P41` bis `P46`
 - `V104`: `P14` plus architektureller Zuschnitt aus `P45` fuer `UIStartSyncController`, `UIManager`-nahe Menuepfade und `ArcadeVehicleManager`
 - `V105`: `P47` bis `P48`
-- `V115`: `P7`, `P22` bis `P31` (Product & Infra Follow-up; `P6`, `P12` und `P23` sind in `115.1` erledigt)
+- `V115`: `P27` (Product & Infra Follow-up; `P6`, `P7`, `P12`, `P22`, `P23`, `P24`, `P25`, `P26`, `P28`, `P29`, `P30` und `P31` sind erledigt)
 - Delta-Folgearbeit Spielaudit B01-B13 (ohne Doppelung zu `V99`/`V102`/`V104`/`V105`): `docs/qa/Spielaudit_2026-04-28/Audit_Umsetzungsplan_B01-B13.md` (D1-D6)
 
 ## Offene Findings
 
 | ID | Datei(en) | Problem | Schwere |
 | --- | --- | --- | --- |
-| P7 | `vulkan_odyssey.js` | Precision-Plattformen (4x2 Einheiten) vermutlich unspielbar | hoch |
 | P14 | `UIStartSyncController.js` | Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()`; nachhaltige Behebung ueber Ownership-/Port-Zuschnitt in `V104` | mittel |
 | P21 | `package.json`, `package-lock.json` | `npm audit --json` meldet noch 2 moderate Root-Befunde (`vite`/`esbuild`); V90 haelt den Major-Upgrade-Blocker und das Build-/Typecheck-Abschlussgate fest | mittel |
-| P22 | `tmp/`, `.codex_tmp/`, `assets/models/jets/cc0/spaceship_pack/dist/*` | Repo-Hygiene/Retention fuer gewichtige Artefakte offen | mittel |
-| P24 | `tests/playwright.global-setup.js`, `dev/scripts/verify-lock.mjs`, `scripts/run-playwright-*.mjs` | `spawn EPERM` blockiert weiter `test:contract`, `test:smoke`, `test:targeted` | hoch |
-| P25 | `scripts/run-playwright-targeted-clusters.mjs` | Cluster laufen sequentiell ohne abgestufte Degradation | mittel |
-| P26 | `tests/core-targeted.shared.js` | Test-Barrel exportiert sehr breit; Abhaengigkeiten bleiben opak | mittel |
 | P27 | `docs/plaene/aktiv/*.md`, `docs/Umsetzungsplan.md` | Evidence-Strings teils laenger als eigentlicher Arbeitsnachweis | niedrig |
-| P28 | `src/shared/contracts/MatchRuntimeProjectionContract.js` | Traversal-Felder ohne Versions-Bump (`match-runtime-projection.v1`) | mittel |
-| P29 | `src/core/recording/DownloadService.js` | Fehlender Null-Guard fuer `downloadHandler`; inkonsistente Warning-Akkumulation | mittel |
-| P30 | `src/shared/contracts/ArcadeMissionContract.js` | `getArcadeMissionRegistryDescriptor()` nur in Tests genutzt; Runtime-API-Surface klaeren | niedrig |
-| P31 | `tests/content-descriptor-registries.contract.test.mjs`, `tests/platform-capabilities.contract.test.mjs` | Keine Immutability-Tests fuer `Object.freeze()`-gesicherte Registries | niedrig |
 | P45 | `tests/audio.contract.test.mjs` | Test-Isolation fuer `MockAudioContext` in `afterEach` nicht konsistent (`global.AudioContext` reset fehlt) | niedrig |
 | P45 | `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `vite.config.js` | Hohe Komplexitaet in Hotspots erhoeht Regressionsrisiko | mittel |
 | P46 | `eslint.config.js`, `tsconfig.architecture.json` | Tooling-Gates decken nur engen Laufzeitpfad ab | mittel |

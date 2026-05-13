@@ -2,6 +2,21 @@ import { normalizeString } from './ContractNormalizeUtils.js';
 import { GAMEPLAY_CAMERA_MODE_ID } from './CameraModeContract.js';
 
 export const MATCH_RUNTIME_PROJECTION_CONTRACT_VERSION = 'match-runtime-projection.v1';
+export const MATCH_RUNTIME_PROJECTION_TRAVERSAL_COMPATIBILITY = Object.freeze({
+    introducedIn: MATCH_RUNTIME_PROJECTION_CONTRACT_VERSION,
+    policy: 'additive-v1-fields',
+    fields: Object.freeze([
+        'portalsEnabled',
+        'portalCooldownRemaining',
+        'gateCooldownRemaining',
+        'gateCount',
+        'exitPortal',
+        'exitPortalCooldownRemaining',
+        'postPortalActive',
+        'postPortalRemainingSeconds',
+        'lastPortalTravelAtMs',
+    ]),
+});
 
 function normalizeNumber(value, fallback = 0) {
     const numeric = Number(value);
@@ -116,6 +131,7 @@ function createExitPortalTraversalProjection(value = null) {
 
 function createTraversalProjection(value = null) {
     const source = value && typeof value === 'object' ? value : {};
+    // P28: traversal stayed additive inside v1; absent producer fields normalize to v1-safe defaults.
     return {
         portalsEnabled: source.portalsEnabled !== false,
         portalCooldownRemaining: Math.max(0, normalizeNumber(source.portalCooldownRemaining, 0)),

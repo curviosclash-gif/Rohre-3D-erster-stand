@@ -11,6 +11,11 @@ import { GameRuntimeFacade } from '../src/core/GameRuntimeFacade.js';
 import { GameRuntimeCoordinator } from '../src/core/runtime/GameRuntimeCoordinator.js';
 import { toggleCinematicRecordingFromHotkey } from '../src/core/runtime/GameRuntimeRecordingSupport.js';
 import { RECORDING_CAPTURE_PROFILE } from '../src/shared/contracts/RecordingCaptureContract.js';
+import {
+    MATCH_RUNTIME_PROJECTION_CONTRACT_VERSION,
+    MATCH_RUNTIME_PROJECTION_TRAVERSAL_COMPATIBILITY,
+    createMatchRuntimeProjection,
+} from '../src/shared/contracts/MatchRuntimeProjectionContract.js';
 import { createStartMatchCommand } from '../src/shared/contracts/SessionRuntimeCommandContract.js';
 import { SESSION_RUNTIME_EVENT_TYPES } from '../src/shared/contracts/SessionRuntimeEventContract.js';
 import { createArcadePort } from '../src/shared/runtime/GameRuntimeFeaturePorts.js';
@@ -83,6 +88,43 @@ test('MatchFlow UI controller port forwards runtime projections when provided', 
 
     assert.equal(port.getSessionRuntimeSnapshot(), runtimeSnapshot);
     assert.equal(port.getMatchRuntimeProjection(), runtimeProjection);
+});
+
+test('V115.4.2 match runtime traversal fields stay additive within projection v1', () => {
+    const projection = createMatchRuntimeProjection({
+        players: [{
+            playerIndex: 0,
+            traversal: {
+                portalsEnabled: false,
+                gateCount: 2,
+                exitPortal: {
+                    totalCount: 3,
+                    activeCount: 5,
+                },
+                postPortalActive: true,
+            },
+        }],
+    });
+
+    assert.equal(projection.contractVersion, MATCH_RUNTIME_PROJECTION_CONTRACT_VERSION);
+    assert.equal(MATCH_RUNTIME_PROJECTION_TRAVERSAL_COMPATIBILITY.introducedIn, 'match-runtime-projection.v1');
+    assert.equal(MATCH_RUNTIME_PROJECTION_TRAVERSAL_COMPATIBILITY.policy, 'additive-v1-fields');
+    assert.ok(Object.isFrozen(MATCH_RUNTIME_PROJECTION_TRAVERSAL_COMPATIBILITY.fields));
+    assert.deepEqual(projection.players[0].traversal, {
+        portalsEnabled: false,
+        portalCooldownRemaining: 0,
+        gateCooldownRemaining: 0,
+        gateCount: 2,
+        exitPortal: {
+            totalCount: 3,
+            activeCount: 3,
+            inactiveCount: 0,
+        },
+        exitPortalCooldownRemaining: 0,
+        postPortalActive: true,
+        postPortalRemainingSeconds: 0,
+        lastPortalTravelAtMs: 0,
+    });
 });
 
 test('AppInitializer aborts remount when previous dispose fails before publishing a new runtime (V100)', async () => {

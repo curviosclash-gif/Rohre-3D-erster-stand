@@ -21,7 +21,12 @@ import {
 } from '../editor/js/ui/EditorBuildCatalog.js';
 import {
     getArcadeMissionRegistryDescriptor,
+    listArcadeMissionDescriptors,
+    MISSION_TYPES,
 } from '../src/shared/contracts/ArcadeMissionContract.js';
+import {
+    createMissionInstance,
+} from '../src/state/arcade/ArcadeMissionState.js';
 import {
     getArcadeModifierRegistryDescriptor,
 } from '../src/shared/contracts/ArcadeModifierContract.js';
@@ -81,6 +86,30 @@ test('V85.3 content descriptors expose shared registry envelopes', () => {
     const vehicleRegistry = getVehicleRegistryDescriptor();
     assertRegistryEnvelope(vehicleRegistry, CONTENT_DESCRIPTOR_TYPES.VEHICLES);
     assert.ok(vehicleRegistry.entries.some((entry) => entry.id === 'ship5'));
+});
+
+test('V115.4.4 arcade mission descriptors are a runtime-consumed API surface', () => {
+    const descriptorIds = listArcadeMissionDescriptors().map((entry) => entry.id);
+
+    assert.ok(descriptorIds.includes('KILL_COUNT'));
+    assert.equal(createMissionInstance('KILL_COUNT', { target: 2 })?.type, 'KILL_COUNT');
+    assert.equal(createMissionInstance('UNKNOWN_MISSION_TYPE'), null);
+});
+
+test('V115.4.5 content descriptor registries expose frozen envelopes and entries', () => {
+    const missionRegistry = getArcadeMissionRegistryDescriptor();
+    const firstMissionEntry = missionRegistry.entries[0];
+
+    assert.equal(Object.isFrozen(CONTENT_DESCRIPTOR_TYPES), true);
+    assert.equal(Object.isFrozen(MISSION_TYPES), true);
+    assert.equal(Object.isFrozen(MISSION_TYPES.KILL_COUNT), true);
+    assert.equal(Object.isFrozen(MISSION_TYPES.KILL_COUNT.defaultParams), true);
+    assert.equal(Object.isFrozen(missionRegistry), true);
+    assert.equal(Object.isFrozen(missionRegistry.entries), true);
+    assert.equal(Object.isFrozen(firstMissionEntry), true);
+    assert.throws(() => {
+        missionRegistry.entries.push({ id: 'mutated' });
+    }, TypeError);
 });
 
 test('V85.3 arcade sector pools resolve against descriptor-backed registries', () => {

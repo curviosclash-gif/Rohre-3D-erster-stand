@@ -370,9 +370,10 @@ async function runBrowserPrewarm(url, options = {}) {
             error: null,
             durationMs: 0,
         };
-        const browser = await chromium.launch();
+        let browser = null;
         let page = null;
         try {
+            browser = await chromium.launch();
             page = await browser.newPage();
             page.on('console', (msg) => {
                 const type = String(msg?.type?.() || '').trim().toLowerCase();
@@ -464,7 +465,9 @@ async function runBrowserPrewarm(url, options = {}) {
             browserAttempt.error = serializeError(error);
             browserAttempt.durationMs = Math.max(0, Date.now() - startedAt);
             attempts.push(browserAttempt);
-            await browser.close();
+            if (browser) {
+                await browser.close();
+            }
             if (attempt < maxAttempts) {
                 await sleep(retryDelayMs * attempt);
             }

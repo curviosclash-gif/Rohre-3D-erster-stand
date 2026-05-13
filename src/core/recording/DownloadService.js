@@ -320,6 +320,11 @@ export async function attemptAutoDownload({
             : null,
     });
     const statusWarnings = [];
+    const pushStatusWarning = (message) => {
+        const normalized = typeof message === 'string' ? message.trim() : '';
+        if (!normalized || statusWarnings.includes(normalized)) return;
+        statusWarnings.push(normalized);
+    };
     const withTranscodeDegradationWarning = (warnings, transcodeApplied = false) => {
         if (!requestTranscodeRequested || transcodeApplied === true) {
             return warnings;
@@ -330,10 +335,17 @@ export async function attemptAutoDownload({
         ];
     };
     if (fileIoFeatureClassification.classification === PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY && !desktopSaveAdapter.isAvailable()) {
-        statusWarnings.push('Dateioperationen bleiben desktop-only; ohne Desktop-Speicheradapter wird ein degradiertes Fallback genutzt.');
+        pushStatusWarning('Dateioperationen bleiben desktop-only; ohne Desktop-Speicheradapter wird ein degradiertes Fallback genutzt.');
     }
     const downloadViaBrowser = async (reason, error = null) => {
         if (saveSurfaceCapability.available !== true) {
+            return false;
+        }
+        if (typeof browserSaveAdapter.saveVideo !== 'function') {
+            pushStatusWarning('Browser-Download-Handler ist nicht verfuegbar; Download-Fallback wurde uebersprungen.');
+            if (error) {
+                logger?.warn?.(`[DownloadService] recording export fallback unavailable (${reason})`, error);
+            }
             return false;
         }
         if (error) {
@@ -348,7 +360,7 @@ export async function attemptAutoDownload({
     };
     if (desktopSaveAdapter.isAvailable() && !desktopSaveAdapterVersionSupported) {
         logger?.warn?.('[DownloadService] recording export desktop save skipped due to unsupported adapter contractVersion', desktopSaveAdapter?.contractVersion || null);
-        statusWarnings.push('Desktop-Speicheradapter ist veraltet oder inkompatibel; Browser-/API-Fallback wird verwendet.');
+        pushStatusWarning('Desktop-Speicheradapter ist veraltet oder inkompatibel; Browser-/API-Fallback wird verwendet.');
     }
     if (
         desktopSaveAdapterVersionSupported
@@ -397,11 +409,11 @@ export async function attemptAutoDownload({
                 });
             }
             if (appResult?.code) {
-                statusWarnings.push(`Desktop-Speicheradapter meldete ${appResult.code}.`);
+                pushStatusWarning(`Desktop-Speicheradapter meldete ${appResult.code}.`);
             }
         } catch (error) {
             logger?.warn?.('[DownloadService] recording export app save failed', error);
-            statusWarnings.push('Desktop-App konnte die Aufnahme nicht direkt speichern; Dateipfad-Fallback wird versucht.');
+            pushStatusWarning('Desktop-App konnte die Aufnahme nicht direkt speichern; Dateipfad-Fallback wird versucht.');
         }
     }
     if (typeof fetch !== 'function') {

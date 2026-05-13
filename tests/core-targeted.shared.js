@@ -102,8 +102,10 @@ async function loadGameWithRetry(page, attempts = 4) {
 }
 
 export {
+    // Playwright primitives.
     test,
     expect,
+    // Runtime/menu helpers.
     CONFIG,
     collectErrors,
     lockExpertMode,
@@ -121,19 +123,26 @@ export {
     startGame,
     startGameWithBots,
     unlockExpertMode,
+    loadGameWithRetry,
+    // Map/editor contract helpers.
     createMapDocument,
     parseMapJSON,
     stringifyMapDocument,
     toArenaMapDefinition,
     generateJSONExport,
     importFromJSON,
+    createMockEditorManager,
+    buildLegacyRuntimeCustomMap,
+    // Runtime contract modules.
     RoundMetricsStore,
+    createMatchRuntimeProjection,
+    // Arcade and player-domain helpers.
     getVehicleManagerInteractionRules,
     listVehicleManagerCatalogEntries,
     resolveVehicleManagerCatalogEntry,
     applyPlayerPowerup,
     updatePlayerEffects,
-    createMatchRuntimeProjection,
+    // Storage contract keys.
     SETTINGS_STORAGE_KEY,
     SETTINGS_PROFILES_STORAGE_KEY,
     LEGACY_SETTINGS_STORAGE_KEY,
@@ -143,7 +152,4 @@ export {
     ARCADE_VEHICLE_PROFILE_STORAGE_KEY,
     ARCADE_VEHICLE_LOADOUT_STORAGE_KEY,
     ARCADE_LAST_RUN_STORAGE_KEY,
-    buildLegacyRuntimeCustomMap,
-    createMockEditorManager,
-    loadGameWithRetry,
 };

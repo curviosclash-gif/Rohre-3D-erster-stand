@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-import { forwardLegacyScriptAndExit } from './_forward-legacy-script.mjs';
-
-await forwardLegacyScriptAndExit('verify-lock.mjs');
+// Import the canonical script in-process so Windows policy blocks on node.exe spawning
+// do not prevent the lock/diagnostic layer from running at all.
+await import('../../scripts/verify-lock.mjs');

@@ -544,6 +544,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Die erledigte Teilmenge bleibt als `115.1` dokumentiert, inklusive der bereits gemappten Gemini-Infra-Governance; offene Map-, Repo-Hygiene-, Test-Harness- und Contract-/API-Reste sind jetzt in `115.2` bis `115.4` mit eigenem Abschluss-Gate `115.99` geplant.
 - Master-Index, Lock-Status-Zeile und Findings-Zuordnung zeigen damit wieder denselben Stand; erneutes Closure verlangt konkrete Evidence statt pauschalem `verified` sowie `npm run gates:pre-commit`.
 
+## Stand-Snapshot 2026-05-13 (Block `V115 115.2-115.4`)
+
+- `115.2` ist geschlossen: Vulkan-Odyssey-Precision-Footprints sind verbreitert, und P22-Retention ist ohne destruktive Asset-/Tmp-Bereinigung klassifiziert.
+- `115.3` ist geschlossen: Playwright-/Targeted-Harness-Spawnfehler erhalten Diagnoseartefakte, Windows-Spawn-Fallbacks und pro Cluster klassifizierte `harness-spawn-error`-Reports; der breite Test-Barrel ist nach Consumer-Gruppen dokumentiert.
+- `115.4` ist bis auf P27 geschlossen: P28 bleibt als additiver v1-Traversal-Pfad dokumentiert und getestet, P29 wirft bei fehlendem Download-Handler nicht mehr, P30 hat einen Runtime-Consumer-Nachweis, und P31 ergaenzt Registry-Immutability-Tests. Offen bleibt nur die repo-weite P27-Evidence-Kuerzung.
+
 ## Stand-Snapshot 2026-05-13 (Gemini-Governance-Hygiene)
 
 - Gemini-Gedaechtnis-/Skill-Definitionen nachgezogen: `.gemini/skills/plan-generator/SKILL.md` respektiert jetzt die User-owned Intake-Governance (`docs/plaene/neu/` statt direkter Master-/Aktivblock-Aenderung), und `.gemini/agents/test_engineer.md` verweist auf `.agents/test_mapping.md`, `docs/qa/**` und aktive Blockplaene statt auf eine nicht vorhandene `Open_Findings.md`.
