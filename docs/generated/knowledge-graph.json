@@ -706,7 +706,7 @@
       "id": "V105",
       "type": "block",
       "title": "Architecture-Guard- und Typecheck-Regression-Recovery",
-      "status": "blocked",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -715,10 +715,14 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "105.1",
+        "currentPhase": "105.99",
         "planFile": "docs/plaene/aktiv/V105.md",
         "scopeDeclarations": [
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.scorecard.json",
           "docs/plaene/aktiv/V105.md",
+          "docs/plaene/CHANGELOG.md",
           "docs/referenz/ai_architecture_context.md",
           "src/core/AppInitializer.js",
           "src/core/MediaRecorderSystem.js",
@@ -738,7 +742,7 @@
           "tsconfig.architecture.json"
         ],
         "scopeResolution": {
-          "concreteCount": 245,
+          "concreteCount": 249,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1073,7 +1077,7 @@
       "id": "V112",
       "type": "block",
       "title": "Spielaudit- und Playtest-Improvement-Paket",
-      "status": "blocked",
+      "status": "planned",
       "attributes": {
         "source": [
           "block-plan",
@@ -7180,7 +7184,7 @@
     {
       "id": "V105.5.1",
       "type": "subphase",
-      "title": "Targeted-/Contract-Tests oder gleichwertige Guard-Pruefungen fuer den neuen Test-Import-Schnitt sowie fuer Recording-/Export-Result-Shapes nachziehen. (abgeschlossen: 2026-05-13; evidence: npm run test:core passed)",
+      "title": "Targeted-/Contract-Tests oder gleichwertige Guard-Pruefungen fuer den neuen Test-Import-Schnitt sowie fuer Recording-/Export-Result-Shapes nachziehen. (abgeschlossen: 2026-05-13; evidence: npm run test:core passed; WebCodecs getBuffer fallback covered by T20aj5b)",
       "status": "done",
       "attributes": {
         "blockId": "V105",
@@ -20184,6 +20188,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V105",
           "V107",
           "V110",
           "V111"
@@ -20201,6 +20206,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V105",
           "V107",
           "V110",
           "V111",
@@ -20237,6 +20243,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V105",
           "V111"
         ],
         "exists": true
@@ -21754,6 +21761,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V105",
           "V107",
           "V109",
           "V110",
@@ -47805,7 +47813,43 @@
     },
     {
       "from": "V105",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
+      "to": "docs/generated/knowledge-graph.scorecard.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
       "to": "docs/plaene/aktiv/V105.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
+      "to": "docs/plaene/CHANGELOG.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -50014,8 +50058,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "V105 setzt die Security-/Runtime-/Contract-Haertung aus V102 voraus",
+      "fulfilled": true,
+      "hint": "Security-/Runtime-/Contract-Haertung aus V102 ist abgeschlossen und war V105-Baseline",
       "attributes": {
         "dependsPhase": "102.99",
         "rawToken": "V102.99",
@@ -54344,8 +54388,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "V112 startet erst nach Security-/Runtime-Hardening aus V102",
+      "fulfilled": true,
+      "hint": "Security-/Runtime-Hardening aus V102 ist abgeschlossen",
       "attributes": {
         "dependsPhase": "102.99",
         "rawToken": "V102.99",
@@ -54362,8 +54406,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "V112 startet erst nach Guard-/Typecheck-Recovery aus V105",
+      "fulfilled": true,
+      "hint": "Guard-/Typecheck-Recovery aus V105 ist abgeschlossen",
       "attributes": {
         "dependsPhase": "105.99",
         "rawToken": "V105.99",

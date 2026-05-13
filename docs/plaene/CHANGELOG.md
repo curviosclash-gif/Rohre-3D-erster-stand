@@ -6,6 +6,10 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V105 Follow-up 2026-05-13
+
+- Abschlussabgleich nach Review nachgezogen: Master-Index und Blockfrontmatter stehen wieder auf `done/105.99`, V112 ist durch die erfuellten V102/V105-Abhaengigkeiten entblockt, und der WebCodecs-Muxer-Buffer-Fallback ist mit `T20aj5b` gegen Targets abgesichert, die nur `getBuffer()` anbieten. Zweck: V105 nicht nur gate-gruen, sondern governance-konsistent und regressionsfester abschliessen.
+
 ## Stand-Snapshot 2026-05-10 (Subphase `V111 111.4.2`)
 
 - `111.4.2` ist abgeschlossen: `test-prioritization`, `policy-evaluate` und `feedback-loop` erweitern den Wissensgraphen um graphgestuetzte Testauswahl, Policy-as-Data und auditierbares Human-Feedback. Referenzfall Settings priorisiert `tests/runtime-settings-live-apply.contract.test.mjs` und `tests/settings-manager.contract.test.mjs`, Policy-Evaluation meldet `pass`, und Feedback bleibt bewusst `watch` mit Guardrails statt automatischer Preset-Mutation.

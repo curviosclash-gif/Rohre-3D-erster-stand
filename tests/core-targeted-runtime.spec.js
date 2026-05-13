@@ -1409,6 +1409,43 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         expect(result.stopResult.partialReason).toBe('flush_timeout');
     });
 
+    test('T20aj5b: WebCodecs-Stop liest Muxer-Buffer aus getBuffer-Fallback', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { WebCodecsRecorderEngine } = await window.__curviosImport('/src/core/recording/engines/WebCodecsRecorderEngine.js');
+            const engine = new WebCodecsRecorderEngine({ globalScope: {} });
+            let finalizeCalls = 0;
+            let getBufferCalls = 0;
+
+            engine._muxer = {
+                finalize() {
+                    finalizeCalls += 1;
+                },
+                target: {
+                    getBuffer() {
+                        getBufferCalls += 1;
+                        return new ArrayBuffer(12);
+                    },
+                },
+            };
+
+            const stopResult = await engine.stop();
+            return {
+                ok: !!stopResult?.ok,
+                bufferSize: Number(stopResult?.bufferSize || 0),
+                blobSize: stopResult?.blob instanceof Blob ? stopResult.blob.size : 0,
+                finalizeCalls,
+                getBufferCalls,
+            };
+        });
+
+        expect(result.ok).toBeTruthy();
+        expect(result.bufferSize).toBe(12);
+        expect(result.blobSize).toBe(12);
+        expect(result.finalizeCalls).toBe(1);
+        expect(result.getBufferCalls).toBe(1);
+    });
+
     test('T20ak: Recorder normalisiert Export-Zeitstempel bei fehlerhafter Stop-Reihenfolge', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {

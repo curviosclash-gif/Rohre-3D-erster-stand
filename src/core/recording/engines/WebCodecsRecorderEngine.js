@@ -262,7 +262,7 @@ export class WebCodecsRecorderEngine {
             }
             this._muxer.finalize();
             const buffer = this._muxer?.target?.buffer
-                || /** @type {any} */ (this._muxer?.target)?.buffer
+                || this._muxer?.target?.getBuffer?.()
                 || new ArrayBuffer(0);
             const bufferSize = Number(buffer?.byteLength || 0);
             if (flushState.timedOut && bufferSize <= 0) {
