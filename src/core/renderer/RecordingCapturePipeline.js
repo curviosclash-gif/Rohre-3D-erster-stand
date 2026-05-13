@@ -274,7 +274,7 @@ export class RecordingCapturePipeline {
     }
 
     _resolveShortsSlotStyle() {
-        const mode = this._cameraPerspectiveSettings?.normal || CAMERA_PERSPECTIVE_MODE.CLASSIC;
+        const mode = /** @type {string} */ (this._cameraPerspectiveSettings?.normal || CAMERA_PERSPECTIVE_MODE.CLASSIC);
         if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT) {
             return SLOT_STYLE.CINEMATIC;
         }
@@ -285,7 +285,7 @@ export class RecordingCapturePipeline {
     }
 
     _resolveShortsDt(renderDelta) {
-        const mode = this._cameraPerspectiveSettings?.normal || CAMERA_PERSPECTIVE_MODE.CLASSIC;
+        const mode = /** @type {string} */ (this._cameraPerspectiveSettings?.normal || CAMERA_PERSPECTIVE_MODE.CLASSIC);
         const reduceMotion = this._cameraPerspectiveSettings?.reduceMotion === true;
         const baseScale = mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION
             ? 0.96
@@ -373,7 +373,7 @@ export class RecordingCapturePipeline {
             this._storeMeta({
                 profile: RECORDING_CAPTURE_PROFILE.STANDARD,
                 hudMode: this._settings.hudMode,
-                overlay: this._settings.hudMode === RECORDING_HUD_MODE.WITH_HUD ? 'hud' : 'clean',
+                overlay: /** @type {string} */ (this._settings.hudMode) === RECORDING_HUD_MODE.WITH_HUD ? 'hud' : 'clean',
                 layout: 'single',
                 width,
                 height,
@@ -392,7 +392,7 @@ export class RecordingCapturePipeline {
             segments.push({ x: 0, y: 0, width, height, player: player1, label: 'P1' });
         }
 
-        if (this._settings.hudMode === RECORDING_HUD_MODE.WITH_HUD) {
+        if (/** @type {string} */ (this._settings.hudMode) === RECORDING_HUD_MODE.WITH_HUD) {
             drawHudOverlay({
                 ctx,
                 width,
@@ -405,7 +405,7 @@ export class RecordingCapturePipeline {
         this._storeMeta({
             profile: RECORDING_CAPTURE_PROFILE.STANDARD,
             hudMode: this._settings.hudMode,
-            overlay: this._settings.hudMode === RECORDING_HUD_MODE.WITH_HUD ? 'hud' : 'clean',
+            overlay: /** @type {string} */ (this._settings.hudMode) === RECORDING_HUD_MODE.WITH_HUD ? 'hud' : 'clean',
             layout: splitScreen && player2 ? 'split_horizontal' : 'single',
             width,
             height,
@@ -460,7 +460,7 @@ export class RecordingCapturePipeline {
             this._storeMeta({
                 profile: RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT,
                 hudMode: this._settings.hudMode,
-                overlay: this._settings.hudMode === RECORDING_HUD_MODE.WITH_HUD ? 'hud' : 'clean',
+                overlay: /** @type {string} */ (this._settings.hudMode) === RECORDING_HUD_MODE.WITH_HUD ? 'hud' : 'clean',
                 layout: 'shorts_vertical_split',
                 width: sizes.width,
                 height: sizes.height,
@@ -502,7 +502,7 @@ export class RecordingCapturePipeline {
             { x: 0, y: 0, width: sizes.width, height: halfHeight, player: player1, label: 'P1 oben', slotIndex: 0 },
             { x: 0, y: halfHeight, width: sizes.width, height: halfHeight, player: player2, label: 'P2 unten', slotIndex: 1 },
         ];
-        if (this._settings.hudMode === RECORDING_HUD_MODE.WITH_HUD) {
+        if (/** @type {string} */ (this._settings.hudMode) === RECORDING_HUD_MODE.WITH_HUD) {
             drawHudOverlay({
                 ctx: this._captureCtx,
                 width: sizes.width,
@@ -521,7 +521,7 @@ export class RecordingCapturePipeline {
         this._storeMeta({
             profile: RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT,
             hudMode: this._settings.hudMode,
-            overlay: this._settings.hudMode === RECORDING_HUD_MODE.WITH_HUD ? 'hud' : 'clean',
+            overlay: /** @type {string} */ (this._settings.hudMode) === RECORDING_HUD_MODE.WITH_HUD ? 'hud' : 'clean',
             layout: 'shorts_vertical_split',
             width: sizes.width,
             height: sizes.height,
@@ -532,11 +532,11 @@ export class RecordingCapturePipeline {
     }
 
     getCaptureCanvas() {
-        if (this._settings.profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT) {
+        if (/** @type {string} */ (this._settings.profile) === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT) {
             const sizes = this._resolveShortsCaptureSize();
             return this._ensureCaptureCanvas(sizes.width, sizes.height) || this.sourceCanvas;
         }
-        if (this._settings.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC) {
+        if (/** @type {string} */ (this._settings.profile) === RECORDING_CAPTURE_PROFILE.CINEMATIC) {
             const sizes = this._resolveCinematicCaptureSize();
             return this._ensureCaptureCanvas(sizes.width, sizes.height) || this.sourceCanvas;
         }
@@ -556,11 +556,11 @@ export class RecordingCapturePipeline {
         if (!this._active) {
             this.setActive(true);
         }
-        if (this._settings.profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT) {
+        if (/** @type {string} */ (this._settings.profile) === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT) {
             this._prepareShortsSurface({ renderProjection, renderDelta, splitScreen, arena });
             return;
         }
-        if (this._settings.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC) {
+        if (/** @type {string} */ (this._settings.profile) === RECORDING_CAPTURE_PROFILE.CINEMATIC) {
             this._prepareCinematicSurface({ renderProjection, renderDelta, arena });
             return;
         }

@@ -43,22 +43,22 @@ export const PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS = Object.freeze({
 const VALID_SURFACE_FEATURE_IDS = new Set(Object.values(PLATFORM_SURFACE_FEATURE_IDS));
 
 function normalizeSurfaceMenuModePath(value, fallback = '') {
-    const normalized = normalizeString(value, '').toLowerCase();
+    const normalized = /** @type {any} */ (normalizeString(value, '').toLowerCase());
     return VALID_SURFACE_MENU_MODE_PATHS.has(normalized) ? normalized : fallback;
 }
 
 function normalizeSurfaceSessionType(value, fallback = '') {
-    const normalized = normalizeString(value, '').toLowerCase();
+    const normalized = /** @type {any} */ (normalizeString(value, '').toLowerCase());
     return VALID_SURFACE_SESSION_TYPES.has(normalized) ? normalized : fallback;
 }
 
 function normalizeSurfaceQuickStartActionId(value, fallback = '') {
-    const normalized = normalizeString(value, '').toLowerCase();
+    const normalized = /** @type {any} */ (normalizeString(value, '').toLowerCase());
     return VALID_SURFACE_QUICK_START_ACTION_IDS.has(normalized) ? normalized : fallback;
 }
 
 function normalizeSurfaceFeatureId(value, fallback = '') {
-    const normalized = normalizeString(value, '').toLowerCase();
+    const normalized = /** @type {any} */ (normalizeString(value, '').toLowerCase());
     return VALID_SURFACE_FEATURE_IDS.has(normalized) ? normalized : fallback;
 }
 
@@ -89,6 +89,10 @@ export function isSurfaceSessionTypeAllowed(sessionType, options = {}) {
     return listSurfaceAllowedSessionTypes(options).includes(normalizedSessionType);
 }
 
+/**
+ * @param {any} settings
+ * @param {any} options
+ */
 export function resolveSurfaceMenuState(settings = {}, options = {}) {
     const policy = resolveSurfacePolicy(options);
     const productSurfaceId = policy.productSurfaceId;
@@ -152,6 +156,10 @@ export function resolveSurfaceMenuState(settings = {}, options = {}) {
     });
 }
 
+/**
+ * @param {any} settings
+ * @param {any} options
+ */
 export function applySurfaceMenuState(settings = {}, options = {}) {
     const source = settings && typeof settings === 'object' ? settings : null;
     const resolvedState = resolveSurfaceMenuState(source || {}, options);

@@ -7,6 +7,9 @@ import { resolveDesktopConnectivityProfile } from '../../shared/contracts/Deskto
 import { isMapEligibleForModePath } from '../../shared/contracts/MapModeContract.js';
 import { resolveRuntimeSessionContract } from '../../shared/contracts/RuntimeSessionContract.js';
 
+/**
+ * @param {{ settings?: any, ui?: any, multiplayerSessionState?: any, surfaceState?: any, currentFallbackModePath?: string }}
+ */
 export function resolveMatchStartValidationIssue({
     settings = {},
     ui = null,

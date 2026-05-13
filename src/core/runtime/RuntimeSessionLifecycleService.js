@@ -111,7 +111,7 @@ export function stopRuntimeStateBroadcast(facade) {
  */
 export function setupRuntimeHostFullStateSyncHandler(facade) {
     if (!facade?.session?.isHost) return;
-    facade._onFullStateSyncNeededHandler = ({ peerId } = {}) => {
+    facade._onFullStateSyncNeededHandler = (/** @type {any} */ { peerId } = {}) => {
         const normalizedPeerId = typeof peerId === 'string' ? peerId.trim() : '';
         if (!normalizedPeerId) return;
         const game = facade?.game;

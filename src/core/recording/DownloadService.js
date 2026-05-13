@@ -189,7 +189,7 @@ export function buildDownloadFileName(downloadDirectoryName, fileName) {
  *   downloadHandler: function,
  *   logger: object
  * }} params
- * @returns {Promise<{requested: boolean, transport: string, status: string, fallbackReason: string|null, apiStatus: number|null}>}
+ * @returns {Promise<{requested: boolean, transport: string, status: string, fallbackReason: string|null, apiStatus: number|null, masterContainer?: string, deliveryContainer?: string, container?: string, transcodeApplied?: boolean, masterPath?: string, filePath?: string, deliveryPath?: string, warnings?: string[], failureReason?: string, nativeTranscodeCapability?: any, transcodeFailureCode?: string, saveCapabilityId?: string, saveCode?: string, exportMatrix?: any}>}
  */
 export async function attemptAutoDownload({
     blob,

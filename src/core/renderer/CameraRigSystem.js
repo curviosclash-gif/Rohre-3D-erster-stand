@@ -265,7 +265,7 @@ export class CameraRigSystem {
         }
 
         const actionPerspective = perspectiveMode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION;
-        const slotStyle = actionPerspective ? SLOT_STYLE.ACTION : SLOT_STYLE.CINEMATIC;
+        const slotStyle = /** @type {'action' | 'cinematic'} */ (actionPerspective ? SLOT_STYLE.ACTION : SLOT_STYLE.CINEMATIC);
         const baseTimeScale = actionPerspective ? 0.86 : 0.72;
         const timeScale = reduceMotion ? (baseTimeScale * 0.72) : baseTimeScale;
         const safeDt = Math.max(0, Number(dt) || 0) * timeScale;

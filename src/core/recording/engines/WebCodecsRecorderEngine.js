@@ -108,7 +108,7 @@ export class WebCodecsRecorderEngine {
         }
 
         try {
-            const muxerCodec = typeof resolvedCandidate === 'object' ? resolvedCandidate.muxerCodec : 'avc';
+            const muxerCodec = typeof resolvedCandidate === 'object' ? /** @type {'avc' | 'vp9'} */ (resolvedCandidate.muxerCodec) : 'avc';
             this._muxer = new Mp4Muxer.Muxer({
                 target: new Mp4Muxer.ArrayBufferTarget(),
                 video: {
@@ -262,7 +262,7 @@ export class WebCodecsRecorderEngine {
             }
             this._muxer.finalize();
             const buffer = this._muxer?.target?.buffer
-                || this._muxer?.target?.getBuffer?.()
+                || /** @type {any} */ (this._muxer?.target)?.buffer
                 || new ArrayBuffer(0);
             const bufferSize = Number(buffer?.byteLength || 0);
             if (flushState.timedOut && bufferSize <= 0) {

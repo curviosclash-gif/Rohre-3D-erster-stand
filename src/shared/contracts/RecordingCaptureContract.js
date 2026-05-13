@@ -57,6 +57,11 @@ export function normalizeEnumValue(value, validSet, defaultValue) {
     return validSet.has(defaultValue) ? defaultValue : validSet.values().next().value;
 }
 
+/**
+ * @param {unknown} value
+ * @param {'standard' | 'youtube_short' | 'cinematic'} [fallback]
+ * @returns {'standard' | 'youtube_short' | 'cinematic'}
+ */
 export function normalizeRecordingCaptureProfile(value, fallback = DEFAULT_RECORDING_CAPTURE_SETTINGS.profile) {
     const normalizedFallback = normalizeCaptureProfileCandidate(fallback);
     const fallbackValue = VALID_PROFILE_SET.has(normalizedFallback)
@@ -69,10 +74,20 @@ export function normalizeRecordingCaptureProfile(value, fallback = DEFAULT_RECOR
     return fallbackValue;
 }
 
+/**
+ * @param {unknown} value
+ * @param {'clean' | 'with_hud'} [fallback]
+ * @returns {'clean' | 'with_hud'}
+ */
 export function normalizeRecordingHudMode(value, fallback = DEFAULT_RECORDING_CAPTURE_SETTINGS.hudMode) {
     return normalizeEnumValue(value, VALID_HUD_MODE_SET, fallback);
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 export function normalizeRecordingExportPreset(value, fallback = DEFAULT_RECORDING_CAPTURE_SETTINGS.exportPreset) {
     return normalizeEnumValue(value, VALID_EXPORT_PRESET_SET, fallback);
 }
@@ -81,6 +96,8 @@ export function isCinematicCaptureProfile(value) {
     return normalizeCaptureProfileCandidate(value) === RECORDING_CAPTURE_PROFILE.CINEMATIC;
 }
 
+/** @returns {{ profile: 'standard' | 'youtube_short' | 'cinematic', hudMode: 'clean' | 'with_hud', exportPreset: string }} */
+/** @returns {Readonly<{ profile: 'standard' | 'youtube_short' | 'cinematic', hudMode: 'clean' | 'with_hud', exportPreset: string }>} */
 export function createDefaultRecordingCaptureSettings() {
     return {
         profile: DEFAULT_RECORDING_CAPTURE_SETTINGS.profile,
@@ -89,8 +106,13 @@ export function createDefaultRecordingCaptureSettings() {
     };
 }
 
+/**
+ * @param {unknown} source
+ * @param {Readonly<{ profile: 'standard' | 'youtube_short' | 'cinematic', hudMode: 'clean' | 'with_hud', exportPreset: string }>} [fallback]
+ * @returns {Readonly<{ profile: 'standard' | 'youtube_short' | 'cinematic', hudMode: 'clean' | 'with_hud', exportPreset: string }>}
+ */
 export function normalizeRecordingCaptureSettings(source, fallback = DEFAULT_RECORDING_CAPTURE_SETTINGS) {
-    const src = source && typeof source === 'object' ? source : {};
+    const src = source && typeof source === 'object' ? /** @type {any} */ (source) : {};
     const normalizedFallback = fallback && typeof fallback === 'object'
         ? fallback
         : DEFAULT_RECORDING_CAPTURE_SETTINGS;

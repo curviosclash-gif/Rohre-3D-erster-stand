@@ -71,11 +71,9 @@ export function normalizeMultiplayerSessionMessage(rawMessage, fallbackType = ''
 }
 
 function resolveStateUpdateMessageType(source, fallbackType = MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT) {
-    const normalizedFallbackType = normalizeType(fallbackType, MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT);
+    const normalizedFallbackType = /** @type {any} */ (normalizeType(fallbackType, MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT));
     const normalizedType = normalizeType(source?.messageType || source?.type, normalizedFallbackType);
-    return isMultiplayerMessageType(normalizedType)
-        ? normalizedType
-        : MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT;
+    return isMultiplayerMessageType(normalizedType) ? /** @type {any} */ (normalizedType) : /** @type {any} */ (MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT);
 }
 
 export function buildMultiplayerStateUpdateEvent(rawState, options = {}) {
@@ -96,6 +94,7 @@ export function buildMultiplayerStateUpdateEvent(rawState, options = {}) {
  * Message types that the HOST peer sends with authority.
  * Consumers use this to distinguish host-driven updates from peer-driven messages.
  */
+/** @type {Readonly<Set<any>>} */
 export const MULTIPLAYER_HOST_AUTHORITATIVE_MESSAGE_TYPES = Object.freeze(new Set([
     MULTIPLAYER_MESSAGE_TYPES.FULL_STATE_SYNC,
     MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT,
@@ -112,6 +111,7 @@ export const MULTIPLAYER_HOST_AUTHORITATIVE_MESSAGE_TYPES = Object.freeze(new Se
 /**
  * Message types that only a CLIENT peer sends.
  */
+/** @type {Readonly<Set<any>>} */
 export const MULTIPLAYER_CLIENT_ONLY_MESSAGE_TYPES = Object.freeze(new Set([
     MULTIPLAYER_MESSAGE_TYPES.JOIN,
     MULTIPLAYER_MESSAGE_TYPES.RECONNECT,
