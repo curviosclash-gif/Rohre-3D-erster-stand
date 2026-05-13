@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 193,
+          "concreteCount": 195,
           "plannedCount": 0
         }
       }
@@ -800,6 +800,7 @@
           "V111",
           "V112",
           "V113",
+          "V115",
           "V90",
           "V96"
         ],
@@ -1235,7 +1236,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "115.2",
+        "currentPhase": "115.4",
         "planFile": "docs/plaene/aktiv/V115.md",
         "scopeDeclarations": [
           ".gemini/agents/3d_math_optimizer.md",
@@ -1251,10 +1252,10 @@
           "scripts/run-playwright-*.mjs",
           "scripts/run-playwright-targeted-clusters.mjs",
           "scripts/workspace-cleanup.mjs",
+          "src/core/config/maps/presets/vulkan_odyssey.js",
           "src/core/recording/DownloadService.js",
           "src/entities/arena/CheckpointRingMeshFactory.js",
           "src/entities/arena/portal/PortalLayoutBuilder.js",
-          "src/maps/vulkan_odyssey.js",
           "src/shared/contracts/ArcadeMissionContract.js",
           "src/shared/contracts/MatchRuntimeProjectionContract.js",
           "src/ui/menu/MenuExpertLoginRuntime.js",
@@ -1264,11 +1265,12 @@
           "tests/playwright.global-setup.js"
         ],
         "scopeResolution": {
-          "concreteCount": 25,
-          "plannedCount": 1
+          "concreteCount": 26,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
           "V105",
+          "V106",
           "V113",
           "V96"
         ],
@@ -3775,7 +3777,7 @@
       "id": "V115.2",
       "type": "phase",
       "title": "Map-Spielbarkeit und Repo-Retention",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.2"
@@ -3785,7 +3787,7 @@
       "id": "V115.3",
       "type": "phase",
       "title": "Test-Harness-Recovery",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.3"
@@ -8978,8 +8980,8 @@
     {
       "id": "V115.2.1",
       "type": "subphase",
-      "title": "`src/maps/vulkan_odyssey.js` auf die Precision-Plattformen mit 4x2-Einheiten pruefen; Layout, Spawn-/Landing-Toleranz oder Plattformdaten so anpassen, dass der Abschnitt reproduzierbar spielbar ist.",
-      "status": "open",
+      "title": "`src/core/config/maps/presets/vulkan_odyssey.js` auf die Precision-Plattformen mit 4x2-Einheiten pruefen; Layout, Spawn-/Landing-Toleranz oder Plattformdaten so anpassen, dass der Abschnitt reproduzierbar spielbar ist. (abgeschlossen: 2026-05-13; evidence: P3-Precision-Footprints von 4x2x4 auf 7x2x7 verbreitert; gezielter Contract-Test ergaenzt)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.2",
@@ -8989,8 +8991,8 @@
     {
       "id": "V115.2.2",
       "type": "subphase",
-      "title": "P22-Artefakte (`tmp/`, `.codex_tmp/`, `assets/models/jets/cc0/spaceship_pack/dist/*`) nach Retention-Klasse trennen: produktiv benoetigt, regenerierbar, lokal ignoriert oder loeschbar.",
-      "status": "open",
+      "title": "P22-Artefakte (`tmp/`, `.codex_tmp/`, `assets/models/jets/cc0/spaceship_pack/dist/*`) nach Retention-Klasse trennen: produktiv benoetigt, regenerierbar, lokal ignoriert oder loeschbar. (abgeschlossen: 2026-05-13; evidence: `tmp/` = lokal ignorierte/regenerierbare Test-, Log- und Diagnoseartefakte; neue `.codex_tmp/`-Reste = lokal ignoriert, vorhandene getrackte `.codex_tmp/*` = Alt-/Patch-Evidence ohne neue Consumer; `assets/models/jets/cc0/spaceship_pack/dist/obj_mtl/*` = produktiv benoetigt via `OBJVehicleMesh`; `dist/blend`, `dist/fbx`, `preview_633.png` = vendor-/lizenznahe Quellen/Preview, retention-safe behalten)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.2",
@@ -9000,8 +9002,8 @@
     {
       "id": "V115.2.3",
       "type": "subphase",
-      "title": "Repo-Hygiene-Aenderungen mit minimalem Diff umsetzen und in `docs/prozess/Open_Findings.md` nur nach tatsaechlichem Abschluss austragen.",
-      "status": "open",
+      "title": "Repo-Hygiene-Aenderungen mit minimalem Diff umsetzen und in `docs/prozess/Open_Findings.md` nur nach tatsaechlichem Abschluss austragen. (abgeschlossen: 2026-05-13; evidence: P7/P22 aus `docs/prozess/Open_Findings.md` entfernt; keine destruktive Bereinigung von `tmp/`, `.codex_tmp/` oder Spaceship-Pack-Assets)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.2",
@@ -9011,8 +9013,8 @@
     {
       "id": "V115.3.1",
       "type": "subphase",
-      "title": "`spawn EPERM` fuer `tests/playwright.global-setup.js`, `dev/scripts/verify-lock.mjs` und `scripts/run-playwright-*.mjs` reproduzieren, Ursache eingrenzen und eine lokale Windows-taugliche Start-/Fallback-Strategie festlegen.",
-      "status": "open",
+      "title": "`spawn EPERM` fuer `tests/playwright.global-setup.js`, `dev/scripts/verify-lock.mjs` und `scripts/run-playwright-*.mjs` reproduzieren, Ursache eingrenzen und eine lokale Windows-taugliche Start-/Fallback-Strategie festlegen. (abgeschlossen: 2026-05-13; evidence: lokaler Repro zeigte keinen EPERM auf Forwarder/Lock/CLI-Dry-Run, daher Recovery-Pfad umgesetzt: `dev/scripts/verify-lock.mjs` laeuft in-process, `scripts/verify-lock.mjs` schreibt `playwright-spawn-diagnostics.json` und versucht bei Windows `EPERM`/`EACCES` einen `cmd`-Fallback; `tests/playwright.global-setup.js` klassifiziert Browser-Launch-Fehler im Readiness-Contract.)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.3",
@@ -9022,8 +9024,8 @@
     {
       "id": "V115.3.2",
       "type": "subphase",
-      "title": "`scripts/run-playwright-targeted-clusters.mjs` mit abgestufter Degradation versehen, damit einzelne Cluster- oder Spawn-Fehler nachvollziehbar reportet werden statt den Gesamtpfad opak zu blockieren.",
-      "status": "open",
+      "title": "`scripts/run-playwright-targeted-clusters.mjs` mit abgestufter Degradation versehen, damit einzelne Cluster- oder Spawn-Fehler nachvollziehbar reportet werden statt den Gesamtpfad opak zu blockieren. (abgeschlossen: 2026-05-13; evidence: Cluster-Spawnfehler werden als `harness-spawn-error` klassifiziert, erhalten `playwright-spawn-diagnostics.json` und blockieren nicht die Klassifizierung nachfolgender Cluster.)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.3",
@@ -9033,8 +9035,8 @@
     {
       "id": "V115.3.3",
       "type": "subphase",
-      "title": "`tests/core-targeted.shared.js` so schneiden, dass Exporte, Consumer und Harness-Abhaengigkeiten expliziter werden; breite Barrel-Exporte nur mit begruendetem Consumer-Nachweis behalten.",
-      "status": "open",
+      "title": "`tests/core-targeted.shared.js` so schneiden, dass Exporte, Consumer und Harness-Abhaengigkeiten expliziter werden; breite Barrel-Exporte nur mit begruendetem Consumer-Nachweis behalten. (abgeschlossen: 2026-05-13; evidence: Exportliste nach Playwright-, Runtime-, Map/Editor-, Contract-, Arcade- und Storage-Gruppen kategorisiert; ESLint der bekannten Consumer meldet keine ungenutzten Shared-Imports.)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.3",
@@ -9055,8 +9057,8 @@
     {
       "id": "V115.4.2",
       "type": "subphase",
-      "title": "`MatchRuntimeProjectionContract` fuer P28 pruefen: Traversal-Felder entweder versionskonform bumpen/migrieren oder als kompatiblen v1-Pfad begruenden.",
-      "status": "open",
+      "title": "`MatchRuntimeProjectionContract` fuer P28 pruefen: Traversal-Felder entweder versionskonform bumpen/migrieren oder als kompatiblen v1-Pfad begruenden. (abgeschlossen: 2026-05-13; evidence: `MATCH_RUNTIME_PROJECTION_TRAVERSAL_COMPATIBILITY` dokumentiert additive v1-Felder; `tests/runtime-regressions.contract.test.mjs` prueft Version, Defaults und Exit-Portal-Clamp)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.4",
@@ -9066,8 +9068,8 @@
     {
       "id": "V115.4.3",
       "type": "subphase",
-      "title": "`DownloadService` fuer P29 um Null-Guard und konsistente Warning-Akkumulation haerten; gezielten Contract- oder Unit-Nachweis ergaenzen.",
-      "status": "open",
+      "title": "`DownloadService` fuer P29 um Null-Guard und konsistente Warning-Akkumulation haerten; gezielten Contract- oder Unit-Nachweis ergaenzen. (abgeschlossen: 2026-05-13; evidence: `node --test tests/recording-download-service.contract.test.mjs` prueft fehlenden `downloadHandler` nach Desktop-Save-Failure als `download_failed` statt TypeError und dedupliziert Warnungen)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.4",
@@ -9077,8 +9079,8 @@
     {
       "id": "V115.4.4",
       "type": "subphase",
-      "title": "`ArcadeMissionContract` fuer P30 klaeren: Runtime-Consumer anbinden, API als Test-only markieren oder Surface reduzieren; Entscheidung im Plan dokumentieren.",
-      "status": "open",
+      "title": "`ArcadeMissionContract` fuer P30 klaeren: Runtime-Consumer anbinden, API als Test-only markieren oder Surface reduzieren; Entscheidung im Plan dokumentieren. (abgeschlossen: 2026-05-13; evidence: `ArcadeMissionState` nutzt `listArcadeMissionDescriptors()` produktiv zur Mission-Type-Validierung; `tests/content-descriptor-registries.contract.test.mjs` deckt bekannten/unknown Runtime-Pfad ab)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.4",
@@ -9088,8 +9090,8 @@
     {
       "id": "V115.4.5",
       "type": "subphase",
-      "title": "Registry-Immutability fuer P31 mit Contract-Tests absichern, insbesondere fuer `Object.freeze()`-gesicherte Content-/Platform-Registries.",
-      "status": "open",
+      "title": "Registry-Immutability fuer P31 mit Contract-Tests absichern, insbesondere fuer `Object.freeze()`-gesicherte Content-/Platform-Registries. (abgeschlossen: 2026-05-13; evidence: `tests/content-descriptor-registries.contract.test.mjs` und `tests/platform-capabilities.contract.test.mjs` pruefen Frozen Registry-Envelopes, Arrays und Resolver-Ausgaben)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.4",
@@ -26692,6 +26694,7 @@
         ],
         "scopeBlocks": [
           "V106",
+          "V115",
           "V85",
           "V86"
         ],
@@ -31097,21 +31100,6 @@
           "V74"
         ],
         "exists": true
-      }
-    },
-    {
-      "id": "src/maps/vulkan_odyssey.js",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V115"
-        ],
-        "exists": false
       }
     },
     {
@@ -37675,6 +37663,21 @@
       }
     },
     {
+      "id": "tests/recording-download-service.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/recording-video-export-job.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -38343,6 +38346,21 @@
           "V66"
         ],
         "exists": false
+      }
+    },
+    {
+      "id": "tests/vulkan-odyssey-playability.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
       }
     },
     {
@@ -44430,6 +44448,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/recording-download-service.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/recording-video-export-job.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -44773,6 +44800,15 @@
     {
       "from": "B13",
       "to": "tests/validate-umsetzungsplan.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/vulkan-odyssey-playability.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -56657,6 +56693,15 @@
     },
     {
       "from": "V115",
+      "to": "src/core/config/maps/presets/vulkan_odyssey.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
       "to": "src/core/recording/DownloadService.js",
       "type": "scope",
       "hint": null,
@@ -56676,15 +56721,6 @@
     {
       "from": "V115",
       "to": "src/entities/arena/portal/PortalLayoutBuilder.js",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V115",
-      "to": "src/maps/vulkan_odyssey.js",
       "type": "scope",
       "hint": null,
       "attributes": {

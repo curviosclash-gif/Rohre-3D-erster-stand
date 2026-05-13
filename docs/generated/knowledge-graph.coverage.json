@@ -160,11 +160,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1837,
-    "rawCoveredFileCount": 1186,
+    "trackedFileCount": 1839,
+    "rawCoveredFileCount": 1188,
     "rawCoveragePercent": 64.6,
-    "adjustedTrackedFileCount": 1356,
-    "adjustedCoveredFileCount": 1003,
+    "adjustedTrackedFileCount": 1358,
+    "adjustedCoveredFileCount": 1005,
     "adjustedCoveragePercent": 74,
     "uncoveredFileCount": 651,
     "uncoveredActiveFileCount": 353,
@@ -214,8 +214,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 934,
-        "coveredCount": 811
+        "count": 936,
+        "coveredCount": 813
       },
       {
         "classification": "product-docs",
@@ -18635,6 +18635,7 @@
       ],
       "scopeBlocks": [
         "V106",
+        "V115",
         "V85",
         "V86"
       ],
@@ -30896,6 +30897,23 @@
       "excludeReason": null
     },
     {
+      "path": "tests/recording-download-service.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "tests/recording-video-export-job.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -31574,6 +31592,23 @@
     },
     {
       "path": "tests/validate-umsetzungsplan.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/vulkan-odyssey-playability.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
