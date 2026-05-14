@@ -140,7 +140,8 @@ Ergebnis:
 - `docs/CURRENT_CONTEXT.md` darf als optionaler, maximal einseitiger Lagezettel eingefuehrt werden. Die Datei ersetzt keinen Masterplan, enthaelt keine eigenen Phasen oder DoD und dupliziert keine Projektsteuerung. Sie wird manuell gepflegt; Skripte pruefen hoechstens Laenge und verbotene Planlogik.
 - Der graph-gestuetzte Plan-Kontext-Report startet als Report-/Check-Werkzeug. Er darf Archivkandidaten vorschlagen, aber keine Plaene automatisch verschieben. Auto-Move wird erst spaeter entschieden, wenn der Report mehrfach plausibel war und ein explizites Apply-Flag/User-Freigabe existiert.
 - Alte Plaene sollen aus dem Standard-Kontext heraus, aber nicht nach Alter archiviert werden. Archivierung erfolgt nur nach Klassifikation: `master-referenziert`, `dependency-source`, `closure-evidence`, `superseded`, `archive-candidate`. Unklare Plaene bleiben geschuetzt.
-- Planarchivierung nutzt Unterordner, z. B. `docs/plaene/alt/context-cleanup-2026-05/`, damit V116-Verschiebungen spaeter nachvollziehbar bleiben.
+- Planarchivierung nutzt Unterordner mit eigenem Archivindex, z. B. `docs/plaene/alt/context-cleanup-2026-05/README.md`, damit V116-Verschiebungen spaeter nachvollziehbar bleiben und nicht wie aktuelle Plaene wirken.
+- Archivierte Plaene verlieren aktive Autoritaet. Sie bleiben fuer Historie, Evidence und Abgleich lesbar, aber der Archivindex, der Knowledge-Graph und `docs/plaene/CHANGELOG.md` muessen auf die neue kanonische Quelle zeigen.
 - Grosse lokale Artefakte werden intern archiviert, wenn sie eindeutig generiert oder veraltet sind. `videos/` bleibt ausdruecklich geschuetzt, weil der Ordner zum Cinematic-Camera-System gehoert; Video-Retention oder Auslagerung braucht einen eigenen Cinematic-/Recording-Scope.
 - `check:agent-context` startet als eigenes, nicht pauschal blockierendes Gate. Eine spaetere Integration in `docs:check` oder `gates:pre-commit` ist erst nach stabilen, rauscharmen Laeufen sinnvoll.
 - Ein Rebuild/Reborn ist kein Default-Pfad. Er ist nur als separater Spike mit eigenem Plan, Zeitlimit, Paritaetsmatrix und User-Freigabe erlaubt. Das Hauptrepo bleibt Source of Truth.
@@ -202,6 +203,78 @@ Optional kann `docs/CURRENT_CONTEXT.md` als maximal einseitiger Lagezettel entst
 - lokale Logs, Screenshots, Videos, Test-Outputs
 - `.claude/`, `.codex_tmp/`, `tmp/`, `logs/`
 
+## Archivstruktur und Verankerung
+
+Archiv ist Nachvollziehbarkeit, nicht aktuelle Steuerung. V116 darf Archive deshalb nur so aufbauen, dass Agenten die historische Rolle, die neue kanonische Quelle und die Read-Regel maschinell und menschlich erkennen.
+
+### Zielstruktur
+
+```text
+docs/plaene/aktiv/
+  V116.md
+  V117.md
+
+docs/plaene/neu/
+  README.md
+  <nur echte Intake-Drafts>
+
+docs/plaene/alt/
+  README.md
+  context-cleanup-2026-05/
+    README.md
+    <verschobene Planakten>
+  superseded-intakes-2026-05/
+    README.md
+    <uebernommene Drafts>
+
+docs/archive/
+  <historische Gesamtstaende, groessere Reports, alte Masterstaende>
+```
+
+`docs/plaene/alt/` ist fuer abgeloeste Planakten. `docs/archive/` ist fuer groessere historische Pakete, alte Masterstaende, Audit-/Workspace-Historie oder nicht blockgebundene Langzeitnachweise. Bot-Training-Drafts werden nicht normal archiviert; sie werden gegen `docs/bot-training/Bot_Trainingsplan.md` bewertet und separat geschuetzt oder ausgewiesen.
+
+### Archivindex
+
+Jeder neue Archivordner braucht eine `README.md` mit:
+
+- Zweck und Datum der Archivierung.
+- Ausloesender Block und Report, z. B. `V116` und `tmp/plan-context-report.json`.
+- Verschobene Dateien mit Klassifikation: `superseded`, `closure-evidence`, `dependency-source`, `archive-candidate`.
+- Neue kanonische Quelle je Datei: Master-Index, aktive `VXX.md`, `docs/plaene/CHANGELOG.md`, Bot-Training-Master oder bewusst `none`.
+- Read-Regel: nur bei Historien-, Evidence-, Dependency- oder Abgleichsauftrag lesen.
+
+Verschobene Planfiles selbst muessen nicht massenhaft umgeschrieben werden, wenn der Archivindex eindeutig ist. Wenn ein Plan direkt besonders leicht mit aktueller Arbeit verwechselt werden kann, erhaelt er zusaetzlich eine kurze Archiv-Markierung im Frontmatter oder Kopfbereich:
+
+```yaml
+archived_by: V116
+archived_reason: superseded-by-master-intake
+canonical_source: docs/plaene/aktiv/VXXX.md
+archive_read_rule: only-for-history-or-evidence
+```
+
+### Graph- und Changelog-Verknuepfung
+
+Der Knowledge-Graph muss Archivplaene als historische Quellen behandeln, nicht als aktive Steuerquelle. V116 plant dafuer Attribute oder Kanten wie:
+
+- `archive_index`
+- `archived_by`
+- `archived_reason`
+- `superseded_by`
+- `evidence_for`
+- `canonical_source`
+
+`plan-context-report` weist Master, aktive Plaene, Intake-Drafts, Archivindex und Graph-Status getrennt aus. `graph:check` soll mindestens warnen, spaeter optional blockieren, wenn ein archivierter Plan noch als aktueller Master-/Aktivplan referenziert wird.
+
+Jede Archivierungsaktion erhaelt ausserdem einen kompakten Eintrag in `docs/plaene/CHANGELOG.md`:
+
+```text
+V116 Archivierung:
+- verschoben: <Dateien/Ordner>
+- Grund: superseded / closure-evidence / dependency-source / archive-candidate
+- kanonische Quelle jetzt: <Pfad>
+- Report: <Reportpfad>
+```
+
 ## Definition of Done
 
 - [ ] DoD.1 Baseline ist dokumentiert: Git-Status, Plancheck, Knowledge-Graph-Signal und Cleanup-Dry-Run liegen vor.
@@ -215,7 +288,9 @@ Optional kann `docs/CURRENT_CONTEXT.md` als maximal einseitiger Lagezettel entst
 - [ ] DoD.9 Refactor-Kandidaten sind inventarisiert, priorisiert und mit Test-/Gate-Signal versehen; noch kein breiter Code-Umbau im Cleanup-Scope.
 - [ ] DoD.10 Rebuild-/Reborn-Spikes sind ausdruecklich als Nicht-Default abgegrenzt und duerfen den Hauptrepo-Pfad nicht ohne Paritaetsgate ersetzen.
 - [ ] DoD.11 `videos/` bleibt als Cinematic-Camera-System-Pfad geschuetzt; lokale Artefakt-Archivierung trifft nur eindeutig generierte/veraltete Nicht-Video-Artefakte.
-- [ ] DoD.12 Abschluss-Gates fuer Docs-/Governance-Scope sind gruen oder blockerfest dokumentiert: `npm run plan:check`, `npm run check:gemini`, `npm run gates:pre-commit`.
+- [ ] DoD.12 Archivordner besitzen einen Archivindex mit Klassifikation, neuer kanonischer Quelle, Read-Regel und Report-/Blockbezug.
+- [ ] DoD.13 Knowledge-Graph und `docs/plaene/CHANGELOG.md` verknuepfen Archiventscheidungen mit `archived_by`, `archived_reason`, `canonical_source` oder gleichwertigen Nachweisen.
+- [ ] DoD.14 Abschluss-Gates fuer Docs-/Governance-Scope sind gruen oder blockerfest dokumentiert: `npm run plan:check`, `npm run check:gemini`, `npm run gates:pre-commit`.
 - [ ] DoD.99 Der Block ist erst geschlossen, wenn Master, aktive Detaildatei, Open Findings und Changelog denselben Status zeigen.
 
 ## Phasen
@@ -296,8 +371,11 @@ output: Weniger Plan-Rauschen fuer Agenten, ohne Dependency-Evidence zu verliere
 - [ ] 116.4.5 Quarantine-first fuer Planverschiebungen: `archive-candidate` wird zuerst nur im proposed-move Report gefuehrt; danach User-Gate; erst dann Verschiebung in `docs/plaene/alt/context-cleanup-2026-05/` oder passenden Unterordner.
 - [ ] 116.4.6 `docs/plaene/neu/` auf echte Intake-Drafts reduzieren: bereits uebernommene Drafts nach `alt/`, Bot-Training-Drafts nicht normal archivieren, sondern gegen `docs/bot-training/Bot_Trainingsplan.md` bewerten und schuetzen oder separat ausweisen.
 - [ ] 116.4.7 Evidence-Kompression anwenden: Plan-Evidence nennt Pfad, Gate und Ergebnis, aber keine langen Terminal-Logs oder wiederholten Dateilisten.
-- [ ] 116.4.8 `docs/plaene/aktiv/README.md` und `docs/plaene/neu/README.md` aktualisieren, damit Agenten die Klassen erkennen.
-- [ ] 116.4.9 Keine Master-Intake-Aenderungen ohne User-owned Uebernahme. Der Planentwurf bleibt in `docs/plaene/neu/`, bis der User ihn in den Master aufnimmt.
+- [ ] 116.4.8 Archivordner mit `README.md`/Index anlegen oder aktualisieren: Zweck, Datum, V116-Report, verschobene Dateien, Klassifikation, kanonische Quelle und Read-Regel.
+- [ ] 116.4.9 Knowledge-Graph-Verknuepfung fuer Archivplaene planen oder umsetzen: `archive_index`, `archived_by`, `archived_reason`, `superseded_by`, `evidence_for`, `canonical_source` oder gleichwertige Attribute/Kanten.
+- [ ] 116.4.10 `docs/plaene/CHANGELOG.md` pro Archivierungsaktion kompakt aktualisieren: verschoben, Grund, neue kanonische Quelle, Reportpfad.
+- [ ] 116.4.11 `docs/plaene/aktiv/README.md`, `docs/plaene/neu/README.md` und `docs/plaene/alt/README.md` aktualisieren, damit Agenten aktive Plaene, Intake und Archiv eindeutig unterscheiden.
+- [ ] 116.4.12 Keine Master-Intake-Aenderungen ohne User-owned Uebernahme. Der Planentwurf bleibt in `docs/plaene/neu/`, bis der User ihn in den Master aufnimmt.
 
 Gate:
 
@@ -419,7 +497,7 @@ output: Weniger Kontext-Rauschen, klare Agenten-Einstiege und vorbereitete Refac
 
 | Risiko | Schwere | Beschreibung | Gegenmassnahme |
 | --- | --- | --- | --- |
-| R1 | hoch | Zu aggressive Archivierung entfernt noch relevante Plan-Evidence. | Nie nach Datum verschieben; nur nach Master-/Dependency-/Closure-Klassifikation plus Graph-Abgleich. |
+| R1 | hoch | Zu aggressive Archivierung entfernt noch relevante Plan-Evidence. | Nie nach Datum verschieben; nur nach Master-/Dependency-/Closure-Klassifikation plus Graph-Abgleich; Archivindex nennt neue kanonische Quelle. |
 | R2 | hoch | Cleanup entfernt produktive oder lizenzrelevante Assets. | `workspace-cleanup` nutzt Dry-Run, getrackte-Datei-Schutz und No-Touch-Klassen; Assets nur nach Consumer-Pruefung; `videos/` ist als Cinematic-Camera-System-Pfad geschuetzt. |
 | R3 | mittel | Agenten lesen trotz Policy alte Plaene. | Onboarding und Tool-Ignore-Regeln schaerfen; Archive nur bei explizitem Auftrag. |
 | R4 | mittel | Governance-Straffung entfernt wichtige Safety-Regeln. | Dead-Code-, Git-, Lock- und Commit-Regeln unveraendert pruefen; `gates:pre-commit`. |
@@ -429,6 +507,7 @@ output: Weniger Kontext-Rauschen, klare Agenten-Einstiege und vorbereitete Refac
 | R8 | mittel | `CURRENT_CONTEXT.md` driftet vom Master ab. | Maximal einseitig, manuell gepflegt, nur Lagezettel; Check prueft Laenge und verbotene Planlogik. |
 | R9 | mittel | Rebuild-Spike wird unbemerkt zum zweiten Hauptprojekt. | Eigener User-Intake, Paritaetsgate und Abbruchkriterien vor jedem Spike. |
 | R10 | mittel | Knowledge-Graph ist stale und stuetzt falsche Plan-Klassifikation. | `graph:check`/`docs:sync` bei Graph-Diff; Report muss Master und Graph getrennt ausweisen. |
+| R11 | mittel | Archivierte Plaene werden spaeter wieder als aktuelle Plaene gelesen. | Archivordner-README, Graph-Attribute und Changelog-Link markieren Archivplaene als historische Evidence statt aktive Steuerung. |
 
 ## Automatisierungsstrategie
 
@@ -443,6 +522,7 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 7. Planverschiebungen erst nach graph-gestuetztem `plan-context-report`; keine Datum- oder Namensheuristik als alleinige Entscheidungsgrundlage.
 8. Rebuild-/Reborn-Pfade nur als separater Spike mit User-Intake und Paritaetsgate.
 9. `videos/` ist kein allgemeiner Artefakt-Muellpfad, sondern gehoert zum Cinematic-Camera-System und bleibt in V116 geschuetzt.
+10. Jede Planarchivierung schreibt oder aktualisiert einen Archivindex, verknuepft die neue kanonische Quelle im Graph/Report und hinterlaesst einen kompakten Changelog-Eintrag.
 
 ## Vorgeschlagene Master-Intake-Daten
 

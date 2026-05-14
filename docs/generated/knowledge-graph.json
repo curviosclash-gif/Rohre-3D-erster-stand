@@ -9247,6 +9247,17 @@
       }
     },
     {
+      "id": "V117.1.4",
+      "type": "subphase",
+      "title": "Repo-Organisationsregeln fuer Zweckklasse, Zielort und Schattenwahrheits-Vermeidung gegen V116-Archiv- und Kontextregeln abgleichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.1",
+        "subphaseCode": "117.1.4"
+      }
+    },
+    {
       "id": "V117.2.1",
       "type": "subphase",
       "title": "`.agents/rules/planning_and_governance.md` um Decision Framework oder Verweis ergaenzen.",
@@ -9337,7 +9348,7 @@
     {
       "id": "V117.99.3",
       "type": "subphase",
-      "title": "Kein neuer Schattenprozess oder neue parallele Statusablage wurde eingefuehrt.",
+      "title": "Kein neuer Schattenprozess, keine parallele Statusablage und keine unklassifizierte dauerhafte Ablage wurde eingefuehrt.",
       "status": "open",
       "attributes": {
         "blockId": "V117",
@@ -57609,6 +57620,17 @@
         "blockId": "V117",
         "phaseCode": "117.1",
         "subphaseCode": "117.1.3"
+      }
+    },
+    {
+      "from": "V117.1",
+      "to": "V117.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.1",
+        "subphaseCode": "117.1.4"
       }
     },
     {
