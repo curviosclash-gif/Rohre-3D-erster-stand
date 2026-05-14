@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T14:37:59.586Z",
+  "generated_at": "2026-05-14T15:14:14.375Z",
   "locks": [
     {
       "person": "codex",
@@ -374,6 +374,32 @@
       "target_completion": "2026-05-10",
       "status": "completed",
       "notes": "V111 Abschluss-Gate passed; block closed with graph, plan and docs gates green."
+    },
+    {
+      "person": "codex",
+      "block_id": "V117",
+      "phase": "117.1",
+      "scope_files": [
+        "AGENTS.md",
+        ".agents/rules/planning_and_governance.md",
+        ".agents/rules/git_and_commits.md",
+        ".agents/rules/code_quality_and_debugging.md",
+        ".agents/rules/token_efficiency_and_tools.md",
+        ".agents/workflows/plan.md",
+        ".agents/workflows/code.md",
+        ".agents/workflows/quick.md",
+        ".agents/workflows/bugfix.md",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/neu/Feature_Repo_Context_Cleanup.md",
+        "docs/referenz/ai_project_onboarding.md",
+        "scripts/check-ai-decision-policy.mjs",
+        "docs/plaene/aktiv/V117.md",
+        "docs/plaene/CHANGELOG.md"
+      ],
+      "start_date": "2026-05-14",
+      "target_completion": "2026-05-14",
+      "status": "in-progress",
+      "notes": ""
     }
   ],
   "metadata": {

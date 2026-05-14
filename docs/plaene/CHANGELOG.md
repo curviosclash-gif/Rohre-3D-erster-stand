@@ -571,3 +571,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `npm run check:gemini` schuetzt die repo-lokalen Gemini-Definitionen gegen erneute Governance-Drifts: fehlende Repo-Governance-Praeambeln, alte Findings-/Testskript-Verweise und direkte Master-/Aktivblock-Intake-Anweisungen werden im `docs:check`-Pfad blockiert.
 - Der Gemini-Governance-Check ist als importierbare Funktion testbar und mit `tests/gemini-governance.contract.test.mjs` im `test:contract`-Layer gegen Positiv- und Drift-Fixtures abgesichert.
 - `scripts/gates-pre-commit.mjs` ruft den Gemini-Governance-Check jetzt explizit auf, weil der Meta-Gate-Pfad die Doku-Skripte direkt startet und den `npm run docs:check`-Wrapper bewusst umgeht.
+
+## Stand-Snapshot 2026-05-14 (Subphase `V117 117.1`)
+
+- `117.1` ist geschlossen: Das AI Decision Framework ist fachlich fixiert, D0-D4 sind gegen V116, Dead-Code, Planarchivierung, Rebuild und Refactor abgeglichen.
+- Der Referenz-Onboarding-Pfad verweist wieder auf `AGENTS.md`, passende Rules/Workflows, Master-Index und aktive Detailplaene statt eigene Steuerlogik aufzubauen.
+- Decision: V117 117.1 bleibt D3-Governance-Scope; Chosen: kompakte Plan-/Referenzklaerung statt breiter Workflow-Umbau; Evidence: `open-deps V117`, `scope-collisions`, `npm run plan:check`; Gate: `npm run plan:check`.
