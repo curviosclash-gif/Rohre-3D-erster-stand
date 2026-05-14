@@ -448,4 +448,5 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 
 - `docs/plaene/neu/Feature_AI_Decision_Framework.md` plant die repo-weite Verallgemeinerung der V116-AI-Ausfuehrungsmatrix zu einem Decision Framework mit Entscheidungsklassen, Evidence-/Confidence-Regeln, Blast-Radius-Check, Stop-Loss und User-Gates. Dieser Plan soll vor V116 aufgenommen werden.
 - `docs/plaene/neu/Feature_Runtime_UI_Entflechtung_Slice_1.md` plant den nachgelagerten V118-Entflechtungsblock. V116 bereitet nur Kandidaten, Gates und Kontext vor; produktive Entflechtung bleibt V118.
+- V118 ist bewusst nur als Vorab-Draft angelegt. V116.7 liefert die Reports, Kandidatenbewertung und `Do not touch yet`-Tabelle, mit denen V118 vor Intake finalisiert werden muss.
 - V116 bleibt auf Repo-Kontext-Cleanup und Planarchiv-Hygiene fokussiert; das allgemeine Autonomie-Framework soll nicht in V116 versteckt werden.

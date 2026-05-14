@@ -28,6 +28,18 @@ scope_files:
 
 Dieser Plan ist der nachgelagerte Entflechtungsblock nach V117 und V116. Er startet keinen breiten God-Class-Umbau, sondern waehlt genau einen sicheren ersten Slice aus Runtime-/UI-Hotspots aus und setzt ihn mit vorherigem Test-/Graph-/Consumer-Nachweis um.
 
+## Planungsstatus
+
+Dieser Plan ist ein Vorab-Draft und darf nicht direkt umgesetzt werden. Nach Abschluss von `V117.99` und `V116.99` muss V118 zuerst aktualisiert werden:
+
+- V116-Reports und `Do not touch yet`-Tabelle auswerten.
+- Finalen Kandidaten waehlen.
+- Konkrete Test-/Contract-/Graph-Signale festlegen.
+- `scope_files` auf den gewaehlten Kandidaten und direkt notwendige Tests/Imports reduzieren.
+- Risiken, DoD und Phasen gegen den finalen Scope pruefen.
+
+Erst danach darf V118 in den Master aufgenommen oder umgesetzt werden.
+
 ## Geplante Reihenfolge
 
 1. `V117` AI Decision Framework und Autonomie-Gates.
@@ -167,4 +179,3 @@ Gate:
 - Hard dependencies: `V116.99`, `V117.99`
 - Current phase nach Intake: `118.1`
 - Manuelle Uebernahme erforderlich: ja
-
