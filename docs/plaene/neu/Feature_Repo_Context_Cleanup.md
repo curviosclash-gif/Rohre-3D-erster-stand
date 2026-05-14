@@ -23,9 +23,12 @@ scope_files:
   - docs/plaene/neu/*.md
   - docs/plaene/alt/*.md
   - docs/prozess/Open_Findings.md
+  - docs/CURRENT_CONTEXT.md
   - docs/referenz/ai_project_onboarding.md
   - docs/generated/knowledge-graph.json
   - scripts/workspace-cleanup.mjs
+  - scripts/plan-context-report.mjs
+  - scripts/check-agent-context.mjs
   - scripts/validate-umsetzungsplan.mjs
   - scripts/check-gemini-governance.mjs
   - scripts/query-knowledge-graph.mjs
@@ -89,6 +92,7 @@ Ergebnis:
 
 - Kein kompletter Code-Neubau.
 - Kein einzelnes riesiges `CURRENT_MASTER_PLAN.md`, das alle Detailplaene ersetzt.
+- Kein Reborn-/Neubau-Spike als heimlicher Ersatz des Hauptrepos; ein Spike braucht eigenen Plan, eigene Gates und Paritaetsvergleich.
 - Kein pauschales Loeschen oder Zippen von `docs/archive/`, `docs/plaene/alt/`, `docs/plaene/aktiv/`, `.claude/` oder `tmp/` ohne Klassifikation.
 - Keine Massensanierung aller TypeScript-, ESLint- oder Playwright-Probleme in einem Schritt.
 - Keine God-Class-Entflechtung, bevor Meta-Cleanup, Gates und Refactor-Kandidat dokumentiert sind.
@@ -102,6 +106,8 @@ Ergebnis:
 - Datum allein ist kein Archivierungs- oder Loeschkriterium.
 - Dead-Code-Removal nur nach Klassifikation und Ersatz-/Consumer-Beweis.
 - Jeder automatisierte Cleanup startet im Dry-Run.
+- Maschinelle Reports gehen vor Verschiebungen: erst klassifizieren, dann bewegen.
+- Evidence wird komprimiert, aber nicht entkernt: geaenderter Pfad, Gate und Ergebnis muessen nachvollziehbar bleiben.
 - Code-Refactoring wird als eigener, kleiner Delivery-Slice behandelt.
 - Der Master bleibt Index; Details bleiben in kanonischen Detaildateien.
 
@@ -116,6 +122,19 @@ Ergebnis:
 - relevante `docs/plaene/aktiv/VXX.md`
 - `docs/prozess/Open_Findings.md`
 - `docs/bot-training/Bot_Trainingsplan.md` nur fuer Bot-Training-Scope
+
+### Standard-Read-Budget
+
+Ein normaler Agenten-Start darf ohne expliziten Anlass nur diese Quellen laden:
+
+- `AGENTS.md`
+- `docs/Umsetzungsplan.md`
+- genau eine relevante aktive `docs/plaene/aktiv/VXX.md`
+- `.agents/rules/` und `.agents/workflows/` nur passend zum Task
+- `docs/prozess/Open_Findings.md` nur bei Finding-, Audit- oder Closure-Bezug
+- `docs/bot-training/Bot_Trainingsplan.md` nur bei Bot-Training-Scope
+
+Optional kann `docs/CURRENT_CONTEXT.md` als maximal einseitiger Lagezettel entstehen. Diese Datei darf den Master nicht ersetzen; sie zeigt nur aktuellen Fokus, aktive Bloecke, Nicht-Lesezonen, bekannte Blocker und letzten Cleanup-Stand.
 
 ### Nur bei explizitem Bedarf lesen
 
@@ -132,10 +151,13 @@ Ergebnis:
 - [ ] DoD.2 Lokale Artefakte sind ueber `scripts/workspace-cleanup.mjs` konservativ bereinigt oder bewusst geschuetzt; keine produktiven oder getrackten Dateien wurden versehentlich entfernt.
 - [ ] DoD.3 KI-Leseweg ist eindeutig dokumentiert: Agenten lesen standardmaessig nur kanonische Quellen und ignorieren Archive/Altplaene/Logs ohne expliziten Auftrag.
 - [ ] DoD.4 Plan-Kontext ist klassifiziert: Master-referenzierte, dependency-relevante, historische und archivfaehige Plan-Dateien sind getrennt.
-- [ ] DoD.5 `docs/plaene/neu/` enthaelt nur echte Intake-Drafts oder ist entsprechend dokumentiert; bereits uebernommene Drafts sind abgeloest oder archiviert.
-- [ ] DoD.6 Agenten-Regeln wurden nur gestrafft, nicht neu erfunden; bestehende Dead-Code-, Scope-, Lock- und Commit-Sicherungen bleiben erhalten.
-- [ ] DoD.7 Refactor-Kandidaten sind inventarisiert, priorisiert und mit Test-/Gate-Signal versehen; noch kein breiter Code-Umbau im Cleanup-Scope.
-- [ ] DoD.8 Abschluss-Gates fuer Docs-/Governance-Scope sind gruen oder blockerfest dokumentiert: `npm run plan:check`, `npm run check:gemini`, `npm run gates:pre-commit`.
+- [ ] DoD.5 Ein maschineller Plan-Kontext-Report existiert oder ist begruendet verworfen; Planverschiebungen erfolgen nicht ohne Report.
+- [ ] DoD.6 `docs/plaene/neu/` enthaelt nur echte Intake-Drafts oder ist entsprechend dokumentiert; bereits uebernommene Drafts sind abgeloest oder archiviert.
+- [ ] DoD.7 Agenten-Kontext-Gate prueft Tool-Ignore-/Leseweg-Regeln fuer lokale Artefakte, Archive und Tool-spezifische Adapter.
+- [ ] DoD.8 Agenten-Regeln wurden nur gestrafft, nicht neu erfunden; bestehende Dead-Code-, Scope-, Lock- und Commit-Sicherungen bleiben erhalten.
+- [ ] DoD.9 Refactor-Kandidaten sind inventarisiert, priorisiert und mit Test-/Gate-Signal versehen; noch kein breiter Code-Umbau im Cleanup-Scope.
+- [ ] DoD.10 Rebuild-/Reborn-Spikes sind ausdruecklich als Nicht-Default abgegrenzt und duerfen den Hauptrepo-Pfad nicht ohne Paritaetsgate ersetzen.
+- [ ] DoD.11 Abschluss-Gates fuer Docs-/Governance-Scope sind gruen oder blockerfest dokumentiert: `npm run plan:check`, `npm run check:gemini`, `npm run gates:pre-commit`.
 - [ ] DoD.99 Der Block ist erst geschlossen, wenn Master, aktive Detaildatei, Open Findings und Changelog denselben Status zeigen.
 
 ## Phasen
@@ -168,7 +190,8 @@ output: Bereinigter Arbeitsbaum fuer ignorierte Artefakte und aktualisierte Rete
 - [ ] 116.2.2 Dry-Run-Kandidaten klassifizieren: `delete`, `archive`, `protect`; riskante Kandidaten manuell ausnehmen.
 - [ ] 116.2.3 Apply nur fuer konservative Kandidaten: Root-Logs, alte Dev-Logs, nicht aktive `test-results`, eindeutig generierte tmp-Diagnoseartefakte, alte Videos nach Retention-Regel.
 - [ ] 116.2.4 Nach Apply `git status --short` pruefen: keine unerwarteten tracked Deletes; falls doch, stoppen und Bericht in `docs/Fehlerberichte/` oder Block-Evidence.
-- [ ] 116.2.5 `.gitignore` nur dann anpassen, wenn neue generierte Muster wiederholt auftauchen und nicht bereits abgedeckt sind.
+- [ ] 116.2.5 `workspace-cleanup` um eine kompakte Summary-/Explain-Sicht erweitern, falls der Dry-Run fuer Agenten zu lang ist: `safe delete`, `safe archive`, `protected tracked`, `protected unknown`, `needs user decision`.
+- [ ] 116.2.6 `.gitignore` nur dann anpassen, wenn neue generierte Muster wiederholt auftauchen und nicht bereits abgedeckt sind.
 
 Gate:
 
@@ -184,13 +207,16 @@ output: Kurzer, verbindlicher Leseweg fuer Codex/Gemini/Claude.
 
 - [ ] 116.3.1 `AGENTS.md` gegen `.gemini/README.md` und `CLAUDE.md` abgleichen: eine klare Prioritaet dokumentieren, keine konkurrierenden Regeln.
 - [ ] 116.3.2 `docs/referenz/ai_project_onboarding.md` erstellen oder aktualisieren: Standard-Leseweg, Bot-Training-Sonderweg, Archive-Read-Regel, tmp/log/video-Regel, Graph-First-Hinweise.
-- [ ] 116.3.3 Falls Tool-spezifische Ignore-Dateien existieren oder sinnvoll sind, nur Kontext-Ausschluesse fuer lokale/archivierte Quellen definieren: `docs/archive/`, `docs/plaene/alt/`, `tmp/`, `logs/`, `.claude/`, `.codex_tmp/`, `videos/`, `dist/`, `test-results/`.
-- [ ] 116.3.4 Sicherstellen, dass Archive nicht aus Git-Historie oder Dokumentation verschwinden; sie werden nur aus dem Standard-Kontext ausgeschlossen.
-- [ ] 116.3.5 `check:gemini` erweitern oder nutzen, um versehentliche Gemini-Memory-/Log-Artefakte im Repo zu verhindern.
+- [ ] 116.3.3 Optional `docs/CURRENT_CONTEXT.md` als maximal einseitigen Lagezettel einfuehren: aktueller Fokus, aktive Bloecke, nicht zu lesende Zonen, bekannte Blocker, letzter Cleanup-Stand.
+- [ ] 116.3.4 Falls Tool-spezifische Ignore-Dateien existieren oder sinnvoll sind, nur Kontext-Ausschluesse fuer lokale/archivierte Quellen definieren: `docs/archive/`, `docs/plaene/alt/`, `tmp/`, `logs/`, `.claude/`, `.codex_tmp/`, `videos/`, `dist/`, `test-results/`.
+- [ ] 116.3.5 Sicherstellen, dass Archive nicht aus Git-Historie oder Dokumentation verschwinden; sie werden nur aus dem Standard-Kontext ausgeschlossen.
+- [ ] 116.3.6 `check:gemini` erweitern oder nutzen, um versehentliche Gemini-Memory-/Log-Artefakte im Repo zu verhindern.
+- [ ] 116.3.7 Neues oder erweitertes Agenten-Kontext-Gate definieren: `npm run check:agent-context` prueft Standard-Read-Budget, Ignore-/Kontext-Ausschluesse und Adapter-Prioritaeten.
 
 Gate:
 
 - `npm run check:gemini`
+- `npm run check:agent-context` wenn eingefuehrt
 - `npm run plan:check`
 - Bei Governance-Diff: `npm run gates:pre-commit`
 
@@ -201,19 +227,22 @@ goal: `docs/plaene/aktiv/`, `neu/` und `alt/` wieder semantisch eindeutig machen
 output: Weniger Plan-Rauschen fuer Agenten, ohne Dependency-Evidence zu verlieren.
 
 - [ ] 116.4.1 Master-referenzierte aktive Plaene automatisch erfassen: alle `docs/plaene/aktiv/VXX.md`, die in `docs/Umsetzungsplan.md` verlinkt sind.
-- [ ] 116.4.2 Nicht referenzierte aktive Plaene in Klassen teilen:
+- [ ] 116.4.2 `scripts/plan-context-report.mjs` erstellen oder erweitern; der Report listet master-referenzierte aktive Plaene, nicht referenzierte aktive Plaene, bereits uebernommene Intake-Drafts, Bot-Training-Sonderfaelle und Archivkandidaten.
+- [ ] 116.4.3 Nicht referenzierte aktive Plaene in Klassen teilen:
   - `dependency-source`: noch in Depends-On, Historie oder Closure-Abgleich relevant.
   - `closure-evidence`: abgeschlossen, aber noch als Nachweis wichtig.
   - `superseded`: durch neueren Block oder `CHANGELOG.md` abgeloest.
   - `archive-candidate`: nicht referenziert, nicht dependency-relevant, nicht aktuelle Evidence.
-- [ ] 116.4.3 Nur `archive-candidate`-Dateien verschieben; alle anderen mit Retention-Grund dokumentieren.
-- [ ] 116.4.4 `docs/plaene/neu/` auf echte Intake-Drafts reduzieren: bereits uebernommene Drafts nach `alt/`, Bot-Training-Drafts gegen Bot-Training-Master klassifizieren.
-- [ ] 116.4.5 `docs/plaene/aktiv/README.md` und `docs/plaene/neu/README.md` aktualisieren, damit Agenten die Klassen erkennen.
-- [ ] 116.4.6 Keine Master-Intake-Aenderungen ohne User-owned Uebernahme. Der Planentwurf bleibt in `docs/plaene/neu/`, bis der User ihn in den Master aufnimmt.
+- [ ] 116.4.4 Nur `archive-candidate`-Dateien verschieben; alle anderen mit Retention-Grund dokumentieren.
+- [ ] 116.4.5 `docs/plaene/neu/` auf echte Intake-Drafts reduzieren: bereits uebernommene Drafts nach `alt/`, Bot-Training-Drafts gegen Bot-Training-Master klassifizieren.
+- [ ] 116.4.6 Evidence-Kompression anwenden: Plan-Evidence nennt Pfad, Gate und Ergebnis, aber keine langen Terminal-Logs oder wiederholten Dateilisten.
+- [ ] 116.4.7 `docs/plaene/aktiv/README.md` und `docs/plaene/neu/README.md` aktualisieren, damit Agenten die Klassen erkennen.
+- [ ] 116.4.8 Keine Master-Intake-Aenderungen ohne User-owned Uebernahme. Der Planentwurf bleibt in `docs/plaene/neu/`, bis der User ihn in den Master aufnimmt.
 
 Gate:
 
 - `npm run plan:check`
+- `node scripts/plan-context-report.mjs --check` wenn eingefuehrt
 - Wenn Planstruktur geaendert wurde: `npm run gates:pre-commit`
 - Stichprobe: ein neuer Agent kann aus `AGENTS.md` und `docs/Umsetzungsplan.md` den richtigen aktuellen Plan finden, ohne Altplaene zu lesen.
 
@@ -265,14 +294,15 @@ output: Priorisierte Kandidatenliste mit Verbrauchern, Risiko und Tests.
   - `src/ui/UIManager.js`
   - `src/ui/arcade/ArcadeVehicleManager.js`
 - [ ] 116.7.2 Fuer jeden Kandidaten Verbraucher, aktive Blocks, offene Findings und Knowledge-Graph-Surface erfassen.
-- [ ] 116.7.3 Kandidaten nach Risiko/Nutzen priorisieren:
+- [ ] 116.7.3 Fuer jeden Kandidaten eine `Do not touch yet`-Tabelle pflegen: Datei, Problem, Consumer, erster sicherer Slice, Testsignal, Risiko.
+- [ ] 116.7.4 Kandidaten nach Risiko/Nutzen priorisieren:
   - Produktstabilitaet
   - Bot-/Headless-Performance
   - Testbarkeit
   - Coupling zu Electron/Desktop
   - Coupling zu UI
-- [ ] 116.7.4 Pro Kandidat einen moeglichen ersten Extraktions-Slice definieren, z. B. reine Calculation-/Policy-/Adapter-Funktion statt UI- oder Runtime-Grossumbau.
-- [ ] 116.7.5 Einen Kandidaten fuer Folgeblock vorschlagen; Umsetzung nicht in diesem Cleanup-Block erzwingen.
+- [ ] 116.7.5 Pro Kandidat einen moeglichen ersten Extraktions-Slice definieren, z. B. reine Calculation-/Policy-/Adapter-Funktion statt UI- oder Runtime-Grossumbau.
+- [ ] 116.7.6 Einen Kandidaten fuer Folgeblock vorschlagen; Umsetzung nicht in diesem Cleanup-Block erzwingen.
 
 Gate:
 
@@ -297,6 +327,22 @@ Gate:
 - `npm run plan:check`
 - Bei `*.99` oder Docs-/Governance-Scope: `npm run gates:pre-commit`
 
+### 116.9 Rebuild-Spike-Grenze und Paritaetsgate
+
+status: draft
+goal: Clean-Slate-Ideen als Experiment erlauben, aber nicht als unkontrollierten Hauptpfad.
+output: Klare Stop-Regel fuer Reborn-/Neubau-Vorschlaege.
+
+- [ ] 116.9.1 Dokumentieren: Ein Reborn-/Neubau-Spike ist kein Ersatz fuer das Hauptrepo, solange Feature-Paritaet, Desktop-Start, Bot-/Headless-Pfad, Recording, Multiplayer und relevante Tests nicht verglichen sind.
+- [ ] 116.9.2 Falls ein Spike vorgeschlagen wird, eigenen Plan unter `docs/plaene/neu/` verlangen: Ziel, maximale Laufzeit, importierte Referenzen, Nicht-Ziele, Paritaetsmatrix, Abbruchkriterien.
+- [ ] 116.9.3 Automatisierungs-Skripte duerfen keinen neuen `CurviosClash_Reborn`-Pfad als Default erzeugen, solange dieser Block nicht explizit aufgenommen wurde.
+- [ ] 116.9.4 Hauptrepo bleibt Source of Truth; alter Code darf als Referenz fuer Spikes gelesen werden, aber nicht durch Spike-Code ersetzt werden.
+
+Gate:
+
+- `npm run plan:check`
+- Kein neuer Rebuild-Pfad ohne eigenen User-Intake.
+
 ### 116.99 Abschluss-Gate
 
 status: draft
@@ -306,7 +352,8 @@ output: Weniger Kontext-Rauschen, klare Agenten-Einstiege und vorbereitete Refac
 - [ ] 116.99.1 `docs/Umsetzungsplan.md`, aktive V116-Detaildatei, `docs/prozess/Open_Findings.md` und `docs/plaene/CHANGELOG.md` zeigen denselben Abschlussstand.
 - [ ] 116.99.2 Keine offenen eigenen Cleanup-Aenderungen bleiben uncommitted.
 - [ ] 116.99.3 Abschluss-Evidence nennt konkret: entfernte/archivierte Artefaktklassen, geschuetzte Klassen, Plan-Klassifikation, Agenten-Kontext-Regel und Refactor-Folgeempfehlung.
-- [ ] 116.99.4 Gates: `npm run plan:check`, `npm run check:gemini`, `npm run gates:pre-commit`; weitere technische Gates nur fuer tatsaechlich geaenderte Codepfade.
+- [ ] 116.99.4 Abschluss-Evidence nennt auch: Standard-Read-Budget, Plan-Kontext-Report, Agenten-Kontext-Gate, Evidence-Kompressionsregel und Rebuild-Spike-Abgrenzung.
+- [ ] 116.99.5 Gates: `npm run plan:check`, `npm run check:gemini`, `npm run check:agent-context` falls eingefuehrt, `npm run gates:pre-commit`; weitere technische Gates nur fuer tatsaechlich geaenderte Codepfade.
 
 ## Risiko-Register
 
@@ -319,6 +366,8 @@ output: Weniger Kontext-Rauschen, klare Agenten-Einstiege und vorbereitete Refac
 | R5 | mittel | Type-/Lint-Haertung eskaliert zu breitem Reparaturprojekt. | Gate-Matrix statt Pauschalauftrag; Fehlerklassen separaten Blocks zuordnen. |
 | R6 | mittel | Erster Code-Refactor vermischt Feature-Arbeit und Entflechtung. | 116.8 optional und nur nach User-Bestaetigung; genau eine Verantwortlichkeit. |
 | R7 | niedrig | Weniger Standardkontext macht Historie schwerer findbar. | Historie bleibt erhalten; README/Onboarding beschreibt explizite Suchpfade. |
+| R8 | mittel | `CURRENT_CONTEXT.md` driftet vom Master ab. | Maximal einseitig, nur Lagezettel, Check gegen Master oder bewusst optional halten. |
+| R9 | mittel | Rebuild-Spike wird unbemerkt zum zweiten Hauptprojekt. | Eigener User-Intake, Paritaetsgate und Abbruchkriterien vor jedem Spike. |
 
 ## Automatisierungsstrategie
 
@@ -330,6 +379,8 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 4. Keine pauschalen Voll-Test-Suites ohne User-Entscheidung.
 5. Keine Loeschungen in `src/`, `docs/plaene/aktiv/`, `docs/bot-training/`, `assets/`, `data/` oder `prototypes/` ohne explizite Klassifikation.
 6. Keine Veraenderung an Bot-Training-Parametern, Physik-Tuning, Kollisionslogik oder Recording-Verhalten in Cleanup-Phasen.
+7. Planverschiebungen erst nach `plan-context-report`; keine Datum- oder Namensheuristik als alleinige Entscheidungsgrundlage.
+8. Rebuild-/Reborn-Pfade nur als separater Spike mit User-Intake und Paritaetsgate.
 
 ## Vorgeschlagene Master-Intake-Daten
 
@@ -350,4 +401,6 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 - Soll der erste Code-Entflechtungs-Slice Teil von V116 bleiben oder als eigener Folgeblock geplant werden?
 - Welche Agenten sollen aktiv ueber Ignore-/Kontextregeln gesteuert werden: Codex, Gemini, Claude oder alle drei?
 - Sollen Videos und grosse lokale Artefakte nur archiviert oder auch extern ausgelagert werden?
-
+- Soll `docs/CURRENT_CONTEXT.md` als einseitiger Lagezettel eingefuehrt werden oder reicht `AGENTS.md` plus Master-Index?
+- Soll `check:agent-context` ein neues Gate werden oder in `check:gemini`/`docs:check` integriert werden?
+- Soll der Plan-Kontext-Report nur berichten oder spaeter auch sichere Verschiebungen automatisieren?
