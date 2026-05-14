@@ -6,6 +6,12 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-14 (Intake `V116 116.1`)
+
+- Neuer geplanter P1-Block `V116` ist nach User-Freigabe im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V116.md`; der fruehere Intake-Draft `docs/plaene/neu/Feature_Repo_Context_Cleanup.md` ist damit abgeloest.
+- Nachschaerfung: V116 startet nach `V115.99` und `V117.99`, fuehrt `check:agent-context` erst als kleines eigenstaendiges Gate ein, laesst `plan-context-report` vorerst report-only und schliesst Auto-Move/Archivverschiebungen ohne User-Gate aus.
+- Zweck: Agenten-Leseweg, Planhygiene, Archivklassifikation und Workspace-Cleanup werden als D3/D4-nahe Sanierung gefuehrt, ohne produktive Spiel-, Physik-, Recording-, Bot-Training- oder UI-Logik im Cleanup-Scope zu veraendern.
+
 ## V117 Review-Follow-up 2026-05-14
 
 - Review-Follow-up umgesetzt: `check:ai-decision-policy --all` bewertet nun Markdown-Abschnitte statt nur ein enges Zeilenfenster, ignoriert Frontmatter-/Scope-Dateilisten und nutzt engere Muster fuer Source-of-truth- und neue-Ablage-Hinweise. Zweck: Baseline-Review bleibt report-only, aber deutlich rauschaermer (`63/48` -> `14/3` Warn-/Info-Signal im lokalen Vergleich); `.agents/workflows/cleanup.md` ist bewusst als D3/D4-nahe Pruefflaeche dokumentiert.

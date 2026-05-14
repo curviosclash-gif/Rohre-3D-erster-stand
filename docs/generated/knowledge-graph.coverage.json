@@ -8,7 +8,7 @@
       "id": "GIT-HISTORY-HOTSPOTS",
       "title": "Git-History Hotspots ausserhalb des Core-Graphen",
       "coverageSource": "git-history",
-      "fileCount": 8,
+      "fileCount": 7,
       "files": [
         {
           "path": "python/eval.py",
@@ -23,11 +23,6 @@
         {
           "path": "python/train.py",
           "changeCount": 11,
-          "dirty": false
-        },
-        {
-          "path": "README.md",
-          "changeCount": 10,
           "dirty": false
         },
         {
@@ -160,12 +155,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1846,
-    "rawCoveredFileCount": 1196,
+    "trackedFileCount": 1848,
+    "rawCoveredFileCount": 1198,
     "rawCoveragePercent": 64.8,
-    "adjustedTrackedFileCount": 1365,
-    "adjustedCoveredFileCount": 1012,
-    "adjustedCoveragePercent": 74.1,
+    "adjustedTrackedFileCount": 1367,
+    "adjustedCoveredFileCount": 1014,
+    "adjustedCoveragePercent": 74.2,
     "uncoveredFileCount": 650,
     "uncoveredActiveFileCount": 353,
     "classifications": [
@@ -214,14 +209,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 938,
-        "coveredCount": 815
+        "count": 939,
+        "coveredCount": 816
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 349,
-        "coveredCount": 157
+        "count": 350,
+        "coveredCount": 158
       },
       {
         "classification": "prototype",
@@ -350,6 +345,7 @@
         "V107",
         "V109",
         "V111",
+        "V116",
         "V117",
         "V93",
         "V94"
@@ -565,6 +561,7 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V116",
         "V117",
         "V93",
         "V94"
@@ -629,6 +626,7 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V116",
         "V117",
         "V93",
         "V94"
@@ -1004,6 +1002,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V116",
         "V71"
       ],
       "surfaces": [],
@@ -1060,6 +1059,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V116",
         "V117",
         "V93"
       ],
@@ -4240,6 +4240,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V116",
         "V93"
       ],
       "surfaces": [],
@@ -9570,6 +9571,7 @@
       ],
       "scopeBlocks": [
         "V110",
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -9859,6 +9861,24 @@
       ],
       "scopeBlocks": [
         "V115",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V116.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -12400,6 +12420,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -12920,6 +12941,7 @@
         "V107",
         "V110",
         "V111",
+        "V116",
         "V117",
         "V89",
         "V91"
@@ -13069,6 +13091,7 @@
       "scopeBlocks": [
         "V109",
         "V110",
+        "V116",
         "V117",
         "V51",
         "V69",
@@ -16352,25 +16375,19 @@
     {
       "path": "README.md",
       "tracked": true,
-      "coveredInCore": false,
-      "coveredByOverlay": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "git-history"
+        "scope-files"
       ],
-      "scopeBlocks": [],
+      "scopeBlocks": [
+        "V116"
+      ],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
-      "excludeReason": null,
-      "overlays": [
-        {
-          "blockId": "GIT-HISTORY-HOTSPOTS",
-          "coverageSource": "git-history",
-          "changeCount": 10,
-          "dirty": false
-        }
-      ]
+      "excludeReason": null
     },
     {
       "path": "scripts/arcade-run-smoke.mjs",
@@ -16745,10 +16762,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V116"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -17186,10 +17205,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V116"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -17266,6 +17287,7 @@
         "V107",
         "V110",
         "V111",
+        "V116",
         "V94"
       ],
       "surfaces": [],
@@ -17655,10 +17677,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V116"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -17694,7 +17718,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V115"
+        "V115",
+        "V116"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -29811,6 +29836,23 @@
       ],
       "surfaces": [],
       "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/ai-decision-policy.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
       "excludedFromCoverage": false,
       "excludeReason": null
     },

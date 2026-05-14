@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-14. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V112 112.1`.
+Stand: 2026-05-14. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V116 116.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -57,6 +57,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | done | P2 | frei | - | 115.99 | `docs/plaene/aktiv/V115.md` |
 | V105 | Architecture-Guard- und Typecheck-Regression-Recovery | done | P1 | frei | V99.99,V102.99,V104.99 | 105.99 | `docs/plaene/aktiv/V105.md` |
 | V117 | AI Decision Framework und Autonomie-Gates | done | P1 | frei | V109.99 | 117.99 | `docs/plaene/aktiv/V117.md` |
+| V116 | Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung | planned | P1 | frei | V109.99,V117.99,V115.99 | 116.1 | `docs/plaene/aktiv/V116.md` |
 | V112 | Spielaudit- und Playtest-Improvement-Paket | planned | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
@@ -95,6 +96,9 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V114 | V103.99 | hard | ja | SettingsManager-Zuschnitt und Mutationsvertrag bleiben Grundlage fuer die Abgrenzung Settings vs. Produktgrenze |
 | V114 | V104.99 | hard | ja | Port-/Snapshot-Zielpfad ist Grundlage fuer den zentralen SurfacePolicyPort |
 | V117 | V109.99 | hard | ja | Governance-/Workflow-Entschlackung aus V109 ist abgeschlossen und Grundlage fuer das allgemeine AI Decision Framework |
+| V116 | V109.99 | hard | ja | Governance-/Workflow-Entschlackung aus V109 ist Baseline fuer Kontext- und Planhygiene |
+| V116 | V117.99 | hard | ja | AI Decision Framework, D3/D4-User-Gates und Zweckklassen sind Grundlage fuer Cleanup-, Archiv- und Governance-Scope |
+| V116 | V115.99 | hard | ja | Product-/Infra-Follow-up und P22-Retention sind abgeschlossen; V116 darf Retention nicht doppelt entscheiden |
 
 ## Lock-Status
 
@@ -119,6 +123,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V115 | - | closed | Abgeschlossen 2026-05-14 |
 | - | V105 | 2026-05-13 | closed | Abgeschlossen 2026-05-13 |
 | - | V117 | 2026-05-14 | closed | Abgeschlossen 2026-05-14 |
+| - | V116 | - | frei | Geplant |
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
@@ -129,11 +134,12 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 ## Empfohlene Reihenfolge
 
-1. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
-2. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
-3. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
-4. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
-5. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
+1. `V116` (Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung) als P1-Kontextfenster vor weiterer breiter Plan-/Agentenarbeit.
+2. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
+3. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
+4. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
+5. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
+6. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
 
 ## Conflict-Log
 
