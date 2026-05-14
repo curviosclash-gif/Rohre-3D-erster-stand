@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-14 (Intake `V117 117.1`)
+
+- Neuer geplanter Governance-Block `V117` ist nach User-Freigabe im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V117.md`.
+- Der Block macht das vorhandene Draft-Ziel zum aktiven P1-Startpfad: D0-D4-Entscheidungsklassen, Evidence-/Confidence-Regeln, Blast-Radius, Stop-Loss und User-Gates werden vor V116 zentralisiert. Zweck: Cleanup-, Archivierungs-, Governance- und Refactor-Arbeit nicht als automatische Routinearbeit fehlzuklassifizieren.
+
 ## V105 Follow-up 2026-05-13
 
 - Abschlussabgleich nach Review nachgezogen: Master-Index und Blockfrontmatter stehen wieder auf `done/105.99`, V112 ist durch die erfuellten V102/V105-Abhaengigkeiten entblockt, und der WebCodecs-Muxer-Buffer-Fallback ist mit `T20aj5b` gegen Targets abgesichert, die nur `getBuffer()` anbieten. Zweck: V105 nicht nur gate-gruen, sondern governance-konsistent und regressionsfester abschliessen.

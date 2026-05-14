@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-10. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V102 102.1`.
+Stand: 2026-05-14. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V117 117.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -56,6 +56,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V114 | SurfacePolicyPort fuer Demo- und Vollversionsgrenze | done | P1 | frei | V98.99,V103.99,V104.99 | 114.1 | `docs/plaene/aktiv/V114.md` |
 | V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | done | P2 | frei | - | 115.99 | `docs/plaene/aktiv/V115.md` |
 | V105 | Architecture-Guard- und Typecheck-Regression-Recovery | done | P1 | frei | V99.99,V102.99,V104.99 | 105.99 | `docs/plaene/aktiv/V105.md` |
+| V117 | AI Decision Framework und Autonomie-Gates | planned | P1 | frei | V109.99 | 117.1 | `docs/plaene/aktiv/V117.md` |
 | V112 | Spielaudit- und Playtest-Improvement-Paket | planned | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
@@ -93,6 +94,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V114 | V98.99 | hard | ja | Browser-Demo-Policy, Settings-Studio-Export und read-only Demo-Lesepfad sind Grundlage fuer den SurfacePolicyPort |
 | V114 | V103.99 | hard | ja | SettingsManager-Zuschnitt und Mutationsvertrag bleiben Grundlage fuer die Abgrenzung Settings vs. Produktgrenze |
 | V114 | V104.99 | hard | ja | Port-/Snapshot-Zielpfad ist Grundlage fuer den zentralen SurfacePolicyPort |
+| V117 | V109.99 | hard | ja | Governance-/Workflow-Entschlackung aus V109 ist abgeschlossen und Grundlage fuer das allgemeine AI Decision Framework |
 
 ## Lock-Status
 
@@ -116,6 +118,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V114 | - | frei | Geplant |
 | - | V115 | - | closed | Abgeschlossen 2026-05-14 |
 | - | V105 | 2026-05-13 | closed | Abgeschlossen 2026-05-13 |
+| - | V117 | - | frei | Geplant |
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
@@ -126,13 +129,12 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 ## Empfohlene Reihenfolge
 
-1. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), damit Produktgrenzen vor weiteren Release-/Playtest-Schnitten strukturell stabil sind.
-2. `V105` (Guard-/Typecheck-Recovery), da V102.99 erreicht ist.
+1. `V117` (AI Decision Framework und Autonomie-Gates), damit V116 und nachgelagerte Cleanup-/Entflechtungsbloecke unter klaren User-Gates laufen.
+2. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), damit Produktgrenzen vor weiteren Release-/Playtest-Schnitten strukturell stabil sind.
 3. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
 4. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
-6. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
-7. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
-8. `V115` (Product & Infra Follow-up) parallel zu den P2-Content-Bloecken abarbeiten, um Gameplay-Bugs und Test-Schulden zu bereinigen.
+5. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
+6. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
 
 ## Conflict-Log
 

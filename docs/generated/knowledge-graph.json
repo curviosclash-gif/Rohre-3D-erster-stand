@@ -916,6 +916,7 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P1",
@@ -1276,6 +1277,45 @@
           "V113",
           "V96"
         ],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V117",
+      "type": "block",
+      "title": "AI Decision Framework und Autonomie-Gates",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "currentPhase": "117.1",
+        "planFile": "docs/plaene/aktiv/V117.md",
+        "scopeDeclarations": [
+          ".agents/rules/code_quality_and_debugging.md",
+          ".agents/rules/git_and_commits.md",
+          ".agents/rules/planning_and_governance.md",
+          ".agents/rules/token_efficiency_and_tools.md",
+          ".agents/workflows/bugfix.md",
+          ".agents/workflows/code.md",
+          ".agents/workflows/plan.md",
+          ".agents/workflows/quick.md",
+          "AGENTS.md",
+          "docs/plaene/aktiv/V117.md",
+          "docs/plaene/CHANGELOG.md",
+          "docs/plaene/neu/Feature_Repo_Context_Cleanup.md",
+          "docs/referenz/ai_project_onboarding.md",
+          "docs/Umsetzungsplan.md",
+          "scripts/check-ai-decision-policy.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 14,
+          "plannedCount": 1
+        },
+        "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
       }
     },
@@ -1992,7 +2032,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 306,
+          "concreteCount": 307,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3813,6 +3853,46 @@
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.99"
+      }
+    },
+    {
+      "id": "V117.1",
+      "type": "phase",
+      "title": "Framework finalisieren",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.1"
+      }
+    },
+    {
+      "id": "V117.2",
+      "type": "phase",
+      "title": "Governance integrieren",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.2"
+      }
+    },
+    {
+      "id": "V117.3",
+      "type": "phase",
+      "title": "Check-Strategie",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.3"
+      }
+    },
+    {
+      "id": "V117.99",
+      "type": "phase",
+      "title": "Abschluss",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.99"
       }
     },
     {
@@ -9131,6 +9211,138 @@
         "blockId": "V115",
         "phaseCode": "115.99",
         "subphaseCode": "115.99.3"
+      }
+    },
+    {
+      "id": "V117.1.1",
+      "type": "subphase",
+      "title": "D0-D4 Klassen final pruefen und Beispiele aus V116, Dead-Code, Planarchivierung, Rebuild und Refactor aufnehmen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.1",
+        "subphaseCode": "117.1.1"
+      }
+    },
+    {
+      "id": "V117.1.2",
+      "type": "subphase",
+      "title": "Confidence-, Evidence-, Zwei-Quellen- und Blast-Radius-Regeln auf kurze, agentenlesbare Form bringen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.1",
+        "subphaseCode": "117.1.2"
+      }
+    },
+    {
+      "id": "V117.1.3",
+      "type": "subphase",
+      "title": "Stop-Loss-Regeln gegen Git-Safety, Dead-Code-Governance und Test-Ownership abgleichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.1",
+        "subphaseCode": "117.1.3"
+      }
+    },
+    {
+      "id": "V117.2.1",
+      "type": "subphase",
+      "title": "`.agents/rules/planning_and_governance.md` um Decision Framework oder Verweis ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.2",
+        "subphaseCode": "117.2.1"
+      }
+    },
+    {
+      "id": "V117.2.2",
+      "type": "subphase",
+      "title": "`.agents/rules/git_and_commits.md` nur dann anpassen, wenn Recovery-/Rollback-Regeln unklar sind.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.2",
+        "subphaseCode": "117.2.2"
+      }
+    },
+    {
+      "id": "V117.2.3",
+      "type": "subphase",
+      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md` und `bugfix.md` mit knappen Verweisen versehen, falls noetig.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.2",
+        "subphaseCode": "117.2.3"
+      }
+    },
+    {
+      "id": "V117.3.1",
+      "type": "subphase",
+      "title": "Pruefen, welche Regeln maschinell sinnvoll validierbar sind: verbotene Auto-Move-Claims, fehlende User-Gates, D4 ohne Freigabe, grosse Diffs ohne Blast-Radius.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.3",
+        "subphaseCode": "117.3.1"
+      }
+    },
+    {
+      "id": "V117.3.2",
+      "type": "subphase",
+      "title": "Optional `scripts/check-ai-decision-policy.mjs` planen; zuerst nur Report, nicht blockierend. Der Check validiert nur grobe Muster wie Auto-Move-Claims, D4-Woerter ohne User-Gate, planstrukturveraendernde Skripte oder grosse Diffs ohne Blast-Radius; er versucht nicht, \"gute Entscheidungen\" vollautomatisch zu bewerten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.3",
+        "subphaseCode": "117.3.2"
+      }
+    },
+    {
+      "id": "V117.3.3",
+      "type": "subphase",
+      "title": "Entscheiden, ob der Check eigenstaendig bleibt oder spaeter in `docs:check`/`gates:pre-commit` integriert wird.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.3",
+        "subphaseCode": "117.3.3"
+      }
+    },
+    {
+      "id": "V117.99.1",
+      "type": "subphase",
+      "title": "Regeln, Workflows und V116-Verweise sind konsistent.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.99",
+        "subphaseCode": "117.99.1"
+      }
+    },
+    {
+      "id": "V117.99.2",
+      "type": "subphase",
+      "title": "Abschluss-Evidence nennt Beispiele fuer D0-D4 und ihre jeweiligen User-Gates.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.99",
+        "subphaseCode": "117.99.2"
+      }
+    },
+    {
+      "id": "V117.99.3",
+      "type": "subphase",
+      "title": "Kein neuer Schattenprozess oder neue parallele Statusablage wurde eingefuehrt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.99",
+        "subphaseCode": "117.99.3"
       }
     },
     {
@@ -17755,6 +17967,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V117",
           "V93"
         ],
         "exists": true
@@ -17771,6 +17984,7 @@
         ],
         "scopeBlocks": [
           "V109",
+          "V117",
           "V93"
         ],
         "exists": true
@@ -17787,6 +18001,7 @@
         ],
         "scopeBlocks": [
           "V109",
+          "V117",
           "V93",
           "V94"
         ],
@@ -17821,6 +18036,7 @@
           "V107",
           "V109",
           "V111",
+          "V117",
           "V93",
           "V94"
         ],
@@ -17876,6 +18092,7 @@
         ],
         "scopeBlocks": [
           "V109",
+          "V117",
           "V93"
         ],
         "exists": true
@@ -17892,6 +18109,7 @@
         ],
         "scopeBlocks": [
           "V109",
+          "V117",
           "V93",
           "V94"
         ],
@@ -17925,6 +18143,7 @@
         ],
         "scopeBlocks": [
           "V109",
+          "V117",
           "V93",
           "V94"
         ],
@@ -17942,6 +18161,7 @@
         ],
         "scopeBlocks": [
           "V109",
+          "V117",
           "V93"
         ],
         "exists": true
@@ -18144,6 +18364,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V117",
           "V93"
         ],
         "exists": true
@@ -20734,6 +20955,22 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V117.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V117",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V64.md",
       "type": "file",
       "title": null,
@@ -21088,6 +21325,21 @@
         ],
         "scopeBlocks": [
           "V110",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/Feature_AI_Decision_Framework.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
           "V77"
         ],
         "exists": true
@@ -21964,6 +22216,7 @@
           "V110",
           "V111",
           "V115",
+          "V117",
           "V77",
           "V93"
         ],
@@ -22616,21 +22869,6 @@
       }
     },
     {
-      "id": "docs/plaene/neu/Feature_AI_Decision_Framework.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V77"
-        ],
-        "exists": true
-      }
-    },
-    {
       "id": "docs/plaene/neu/Feature_Arcade_Ghost_Selbstduell_Laengste_Spur_V108.md",
       "type": "file",
       "title": null,
@@ -22790,6 +23028,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V117",
           "V77"
         ],
         "exists": true
@@ -23301,6 +23540,7 @@
           "V107",
           "V110",
           "V111",
+          "V117",
           "V89",
           "V91"
         ],
@@ -23352,6 +23592,7 @@
         "scopeBlocks": [
           "V109",
           "V110",
+          "V117",
           "V51",
           "V69",
           "V89",
@@ -24883,6 +25124,21 @@
           "V94"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "scripts/check-ai-decision-policy.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V117"
+        ],
+        "exists": false
       }
     },
     {
@@ -57130,6 +57386,331 @@
       }
     },
     {
+      "from": "V117",
+      "to": ".agents/rules/code_quality_and_debugging.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": ".agents/rules/git_and_commits.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": ".agents/rules/planning_and_governance.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": ".agents/rules/token_efficiency_and_tools.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": ".agents/workflows/bugfix.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": ".agents/workflows/code.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": ".agents/workflows/plan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": ".agents/workflows/quick.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "AGENTS.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "docs/plaene/aktiv/V117.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "docs/plaene/neu/Feature_Repo_Context_Cleanup.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "docs/referenz/ai_project_onboarding.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "docs/Umsetzungsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "scripts/check-ai-decision-policy.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "V109",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Governance-/Workflow-Entschlackung aus V109 ist abgeschlossen und Grundlage fuer das allgemeine AI Decision Framework",
+      "attributes": {
+        "dependsPhase": "109.99",
+        "rawToken": "V109.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V117",
+      "to": "V117.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.1"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "V117.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.2"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "V117.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.3"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "V117.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.99"
+      }
+    },
+    {
+      "from": "V117.1",
+      "to": "V117.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.1",
+        "subphaseCode": "117.1.1"
+      }
+    },
+    {
+      "from": "V117.1",
+      "to": "V117.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.1",
+        "subphaseCode": "117.1.2"
+      }
+    },
+    {
+      "from": "V117.1",
+      "to": "V117.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.1",
+        "subphaseCode": "117.1.3"
+      }
+    },
+    {
+      "from": "V117.2",
+      "to": "V117.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.2",
+        "subphaseCode": "117.2.1"
+      }
+    },
+    {
+      "from": "V117.2",
+      "to": "V117.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.2",
+        "subphaseCode": "117.2.2"
+      }
+    },
+    {
+      "from": "V117.2",
+      "to": "V117.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.2",
+        "subphaseCode": "117.2.3"
+      }
+    },
+    {
+      "from": "V117.3",
+      "to": "V117.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.3",
+        "subphaseCode": "117.3.1"
+      }
+    },
+    {
+      "from": "V117.3",
+      "to": "V117.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.3",
+        "subphaseCode": "117.3.2"
+      }
+    },
+    {
+      "from": "V117.3",
+      "to": "V117.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.3",
+        "subphaseCode": "117.3.3"
+      }
+    },
+    {
+      "from": "V117.99",
+      "to": "V117.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.99",
+        "subphaseCode": "117.99.1"
+      }
+    },
+    {
+      "from": "V117.99",
+      "to": "V117.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.99",
+        "subphaseCode": "117.99.2"
+      }
+    },
+    {
+      "from": "V117.99",
+      "to": "V117.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.99",
+        "subphaseCode": "117.99.3"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -67244,6 +67825,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V117.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V64.md",
       "type": "scope",
       "hint": null,
@@ -67443,6 +68033,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/aktiv/V99.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/Feature_AI_Decision_Framework.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -68352,15 +68951,6 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
-      "to": "docs/plaene/neu/Feature_AI_Decision_Framework.md",
       "type": "scope",
       "hint": null,
       "attributes": {

@@ -15,7 +15,7 @@ scope_files:
   - src/ui/UIManager.js
   - src/ui/arcade/ArcadeVehicleManager.js
   - docs/plaene/neu/Feature_Repo_Context_Cleanup.md
-  - docs/plaene/neu/Feature_AI_Decision_Framework.md
+  - docs/plaene/aktiv/V117.md
   - docs/generated/knowledge-graph.json
   - scripts/query-knowledge-graph.mjs
   - tests/**/*.mjs

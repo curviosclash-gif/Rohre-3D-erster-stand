@@ -160,11 +160,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1843,
-    "rawCoveredFileCount": 1192,
+    "trackedFileCount": 1844,
+    "rawCoveredFileCount": 1193,
     "rawCoveragePercent": 64.7,
-    "adjustedTrackedFileCount": 1362,
-    "adjustedCoveredFileCount": 1009,
+    "adjustedTrackedFileCount": 1363,
+    "adjustedCoveredFileCount": 1010,
     "adjustedCoveragePercent": 74.1,
     "uncoveredFileCount": 651,
     "uncoveredActiveFileCount": 353,
@@ -220,8 +220,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 347,
-        "coveredCount": 155
+        "count": 348,
+        "coveredCount": 156
       },
       {
         "classification": "prototype",
@@ -273,6 +273,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V117",
         "V93"
       ],
       "surfaces": [],
@@ -291,6 +292,7 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V117",
         "V93"
       ],
       "surfaces": [],
@@ -309,6 +311,7 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V117",
         "V93",
         "V94"
       ],
@@ -347,6 +350,7 @@
         "V107",
         "V109",
         "V111",
+        "V117",
         "V93",
         "V94"
       ],
@@ -525,6 +529,7 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V117",
         "V93"
       ],
       "surfaces": [],
@@ -556,6 +561,7 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V117",
         "V93",
         "V94"
       ],
@@ -619,6 +625,7 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V117",
         "V93",
         "V94"
       ],
@@ -638,6 +645,7 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V117",
         "V93"
       ],
       "surfaces": [],
@@ -1048,6 +1056,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V117",
         "V93"
       ],
       "surfaces": [],
@@ -9854,6 +9863,24 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V117.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V117",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V64.md",
       "tracked": true,
       "coveredInCore": true,
@@ -10252,6 +10279,23 @@
       ],
       "scopeBlocks": [
         "V110",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/alt/Feature_AI_Decision_Framework.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
         "V77"
       ],
       "surfaces": [],
@@ -11244,6 +11288,7 @@
         "V110",
         "V111",
         "V115",
+        "V117",
         "V77",
         "V93"
       ],
@@ -11984,23 +12029,6 @@
       "excludeReason": "Bot training data and plans are excluded from the main architecture graph."
     },
     {
-      "path": "docs/plaene/neu/Feature_AI_Decision_Framework.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
       "path": "docs/plaene/neu/Feature_Arcade_Ghost_Selbstduell_Laengste_Spur_V108.md",
       "tracked": true,
       "coveredInCore": true,
@@ -12180,6 +12208,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V117",
         "V77"
       ],
       "surfaces": [],
@@ -12870,6 +12899,7 @@
         "V107",
         "V110",
         "V111",
+        "V117",
         "V89",
         "V91"
       ],
@@ -13018,6 +13048,7 @@
       "scopeBlocks": [
         "V109",
         "V110",
+        "V117",
         "V51",
         "V69",
         "V89",
