@@ -17,6 +17,7 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 
 - Aenderung direkt anwenden. Bestehende Patterns folgen. Desktop-App ist primaeres Ziel.
 - Quick-Path bleibt nur fuer `D0` bis klare `D2`-Scopes geeignet; `D3`/`D4` nach `.agents/rules/planning_and_governance.md` verlassen den Quick-Path und brauchen User-Gate.
+- Keine Subagent-Nutzung im Quick-Path; wenn Delegation sinnvoll wird, auf `code.md` oder den passenden Plan-Workflow wechseln.
 - Neue dauerhafte Ablagen nur nach Zweckklasse anlegen und bestehende kanonische Zielquelle bevorzugen.
 - Bleibt ein nicht-offensichtlicher Kompatibilitaets-, Migrations-, Alias- oder Fallback-Pfad stehen, einen kurzen lokalen Why-Kommentar direkt dort hinterlassen.
 - Wenn die Aenderung auf Totcode-Loeschung oder Legacy-Ablosung hinauslaeuft, Quick-Path verlassen und `.agents/workflows/code.md` oder `.agents/workflows/cleanup.md` nutzen.

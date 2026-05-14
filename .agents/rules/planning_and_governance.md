@@ -53,6 +53,15 @@ Fuer `D3` und `D4` braucht es vor Umsetzung: mindestens zwei Quellen, Alternativ
 
 Agenten stoppen und fragen nach, wenn Graph, Master, Findings oder Locks widersprechen, ein unerwartetes Gate rot wird, der Diff groesser als angekuendigt wird, fremde uncommittete Aenderungen in betroffenen Dateien liegen, getrackte Dateien geloescht/verschoben wuerden, ein Cleanup-Skript mehr Klassen trifft als angekuendigt, ein Refactor produktive Parameter/Physik/Bot-Training/Recording/Multiplayer beruehrt oder ein Rebuild-/Reborn-Pfad entstehen soll.
 
+## Subagent and Parallel Agent Use
+
+- Subagents oder Parallel-Agenten duerfen nur eingesetzt werden, wenn der User sie explizit erlaubt oder anfragt; normale Tool-Parallelisierung bleibt davon unberuehrt.
+- Eine allgemeine Freigabe wie "Subagents, wenn sinnvoll" erlaubt nur klar unabhaengige Recherche-, Review-, Verifikations- oder disjunkte Implementierungsaufgaben.
+- Subagents umgehen keine Decision-Klassen: `D3`/`D4` brauchen weiterhin User-Gate, Evidence, Blast-Radius und bei `D4` Recovery-/Rollback-Pfad.
+- Vor delegierter Implementierung muss die fuehrende Agenteninstanz Ownership und betroffene Dateien/Oberflaechen abgrenzen; mehrere Worker duerfen nicht ohne harte Grenze an denselben Dateien arbeiten.
+- Der fuehrende Agent bleibt verantwortlich fuer Klassifikation, Integration, Konfliktauflosung, Abschluss-Evidence, passende Gates und scoped Commit.
+- Bei planrelevanter Subagent-Nutzung dokumentiert die fuehrende Instanz kurz delegierte Frage oder Ownership, Ergebnis, Integrationsentscheidung und verbleibendes Risiko im aktiven Block, Report oder Changelog.
+
 ## Repo Organization
 
 Vor neuen Dateien, Reports oder dauerhaften Doku-Ablagen klassifiziert der Agent den Zweck und nutzt vorhandene kanonische Zielquellen, statt neue Schatten-Wahrheiten zu erzeugen.

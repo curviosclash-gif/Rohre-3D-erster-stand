@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-14 (Subphase `V117 117.2`)
+
+- `117.2` ist geschlossen: Das Decision Framework, Repo-Organisationsregeln und Subagent-/Parallel-Agent-Regeln sind operativ in `planning_and_governance.md` verankert; `plan.md`, `code.md`, `quick.md` und `bugfix.md` enthalten nur knappe Verweise statt duplizierter Formularlogik.
+- Decision: `V117 117.2` bleibt D3-Governance-Scope; Chosen: zentrale Rule als Wahrheit plus minimale Workflow-Anker; Alternatives: breite Workflow-Duplikation oder neuer Parallelprozess wurden verworfen; Risk: Governance-Diff, reversibel per scoped Commit; Gate: `npm run gates:pre-commit`.
+
 ## Stand-Snapshot 2026-05-14 (Intake `V117 117.1`)
 
 - Neuer geplanter Governance-Block `V117` ist nach User-Freigabe im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V117.md`.

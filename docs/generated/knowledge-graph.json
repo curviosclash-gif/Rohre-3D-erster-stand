@@ -1292,7 +1292,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "117.2",
+        "currentPhase": "117.3",
         "planFile": "docs/plaene/aktiv/V117.md",
         "scopeDeclarations": [
           ".agents/rules/code_quality_and_debugging.md",
@@ -3869,7 +3869,7 @@
       "id": "V117.2",
       "type": "phase",
       "title": "Governance integrieren",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.2"
@@ -9260,8 +9260,8 @@
     {
       "id": "V117.2.1",
       "type": "subphase",
-      "title": "`.agents/rules/planning_and_governance.md` um Decision Framework und Repo-Organisationsregeln als operative zentrale Wahrheit ergaenzen.",
-      "status": "open",
+      "title": "`.agents/rules/planning_and_governance.md` um Decision Framework und Repo-Organisationsregeln als operative zentrale Wahrheit ergaenzen. (abgeschlossen: 2026-05-14; evidence: `.agents/rules/planning_and_governance.md` AI Decision Framework + Repo Organization + `npm run gates:pre-commit` -> commit)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.2",
@@ -9271,8 +9271,8 @@
     {
       "id": "V117.2.2",
       "type": "subphase",
-      "title": "`.agents/rules/git_and_commits.md` nur dann anpassen, wenn Recovery-/Rollback-Regeln unklar sind.",
-      "status": "open",
+      "title": "`.agents/rules/git_and_commits.md` nur dann anpassen, wenn Recovery-/Rollback-Regeln unklar sind. (abgeschlossen: 2026-05-14; evidence: vorhandene Recovery-Regel `snapshot:tag` vor Push und D4-Recovery-Verweis in `planning_and_governance.md`; keine Git-Rule-Aenderung noetig + `npm run gates:pre-commit` -> commit)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.2",
@@ -9282,8 +9282,8 @@
     {
       "id": "V117.2.3",
       "type": "subphase",
-      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md` und `bugfix.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen.",
-      "status": "open",
+      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md` und `bugfix.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen. (abgeschlossen: 2026-05-14; evidence: Workflow-Verweise auf Decision-Klassen, Zweckklassen und Gate-Pfade + `npm run gates:pre-commit` -> commit)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.2",
@@ -9293,8 +9293,8 @@
     {
       "id": "V117.2.4",
       "type": "subphase",
-      "title": "Subagent-/Parallel-Agent-Regeln zentral verankern: explizite User-Erlaubnis, nur unabhaengige oder disjunkte Teilaufgaben, klare Ownership, keine Gate-Umgehung, fuehrender Agent bleibt integrations- und evidence-verantwortlich.",
-      "status": "open",
+      "title": "Subagent-/Parallel-Agent-Regeln zentral verankern: explizite User-Erlaubnis, nur unabhaengige oder disjunkte Teilaufgaben, klare Ownership, keine Gate-Umgehung, fuehrender Agent bleibt integrations- und evidence-verantwortlich. (abgeschlossen: 2026-05-14; evidence: `.agents/rules/planning_and_governance.md` Abschnitt `Subagent and Parallel Agent Use` + Workflow-Kurzverweise + `npm run gates:pre-commit` -> commit)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.2",
