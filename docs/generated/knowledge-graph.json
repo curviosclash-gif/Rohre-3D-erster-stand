@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 195,
+          "concreteCount": 196,
           "plannedCount": 0
         }
       }
@@ -1990,7 +1990,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 303,
+          "concreteCount": 304,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -22762,6 +22762,21 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_Repo_Context_Cleanup.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
       "type": "file",
       "title": null,
@@ -25337,6 +25352,21 @@
     },
     {
       "id": "scripts/perf-lifecycle-measure.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/plan-context-report.mjs",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -43612,6 +43642,15 @@
     {
       "from": "B13",
       "to": "scripts/perf-lifecycle-measure.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/plan-context-report.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -68351,6 +68390,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Legacy_Runtime_Surface_Sunset_V91.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Repo_Context_Cleanup.md",
       "type": "scope",
       "hint": null,
       "attributes": {

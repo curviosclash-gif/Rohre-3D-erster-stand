@@ -125,6 +125,29 @@ Ergebnis:
 - `check:agent-context` startet als eigenes, nicht pauschal blockierendes Gate. Eine spaetere Integration in `docs:check` oder `gates:pre-commit` ist erst nach stabilen, rauscharmen Laeufen sinnvoll.
 - Ein Rebuild/Reborn ist kein Default-Pfad. Er ist nur als separater Spike mit eigenem Plan, Zeitlimit, Paritaetsmatrix und User-Freigabe erlaubt. Das Hauptrepo bleibt Source of Truth.
 
+## AI-Ausfuehrungsmatrix
+
+Diese Matrix ist bindend fuer Agenten, die V116 oder daraus abgeleitete Cleanup-Plaene ausfuehren. Bei `[REVIEW]` oder `[USER-GATE]` muss der Agent vor Datei-Aenderungen, Apply-Modi, Verschiebungen, Governance-Edits, Code-Refactors oder Rebuild-Spikes stoppen und den User explizit fragen.
+
+| Phase | Modus | Erlaubt ohne Rueckfrage | Stop-/Rueckfragepflicht |
+| --- | --- | --- | --- |
+| 116.1 Baseline | `[AUTO]` | Read-only Status, `plan:check`, Graph-Abfragen, Cleanup-Dry-Run, Reports | Sobald eine Datei geaendert, geloescht, verschoben oder erzeugt werden soll |
+| 116.2 Workspace-Rauschen | `[AUTO]` fuer Dry-Run, `[USER-GATE]` fuer Apply | Dry-Run, Kandidatenreport, Schutzklassen pruefen | Jeder Apply-/Delete-/Archive-Modus; `videos/` immer protected |
+| 116.3 KI-Kontext-Policy | `[REVIEW]` | Abgleich, Vorschlaege, Diff-Plan | Aenderungen an `AGENTS.md`, `CLAUDE.md`, `.gemini/`, `docs/CURRENT_CONTEXT.md` oder Ignore-/Kontextregeln |
+| 116.4 Plan-Kontext | `[REVIEW]` | `plan-context-report`, Graph-/Master-Abgleich, Archivvorschlaege | Jede Planverschiebung, Master-/Aktivplan-Aenderung oder Auto-Move-Logik |
+| 116.5 Governance/Workflow | `[USER-GATE]` | Analyse und konkrete Patch-Vorschlaege | Jede Aenderung an `.agents/rules/`, `.agents/workflows/`, Governance-Skripten oder Gates |
+| 116.6 Gate-Matrix | `[AUTO/REVIEW]` | Gates inventarisieren, rot/gruen Status berichten, Risiken zuordnen | Breite Fixes, neue Pflicht-Gates oder Volltest-Policy-Aenderungen |
+| 116.7 Refactor-Kandidaten | `[AUTO/REVIEW]` | Messen, listen, Graph-Surfaces/Consumer ausgeben, `Do not touch yet`-Tabelle | Produktcode-Aenderungen oder Refactor-Start |
+| 116.8 Code-Entflechtung | `[USER-GATE]` | Nur Folgeblock-Vorschlag | Jeder Code-Refactor |
+| 116.9 Rebuild-Spike | `[USER-GATE]` | Nur Spike-Plan vorschlagen | Neuer Reborn-/Rebuild-Ordner, Code-Port oder Hauptrepo-Ersatz |
+| 116.99 Abschluss | `[USER-GATE]` | Gate-Plan und Abschlussvorschlag | Closure-Status, Master-Intake, `*.99`-Markierung oder Abschluss-Commit ohne User-Freigabe |
+
+Legende:
+
+- `[AUTO]`: Read-only oder explizit konservative Report-Schritte duerfen ohne Rueckfrage laufen.
+- `[REVIEW]`: Agenten duerfen analysieren und Vorschlaege machen, aber keine betroffenen Dateien aendern.
+- `[USER-GATE]`: Agenten muessen vor Umsetzung explizit nachfragen.
+
 ## Betroffene Quellen
 
 ### Primaere Einstiegsschicht

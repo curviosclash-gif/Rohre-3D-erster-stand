@@ -160,11 +160,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1839,
-    "rawCoveredFileCount": 1188,
+    "trackedFileCount": 1841,
+    "rawCoveredFileCount": 1190,
     "rawCoveragePercent": 64.6,
-    "adjustedTrackedFileCount": 1358,
-    "adjustedCoveredFileCount": 1005,
+    "adjustedTrackedFileCount": 1360,
+    "adjustedCoveredFileCount": 1007,
     "adjustedCoveragePercent": 74,
     "uncoveredFileCount": 651,
     "uncoveredActiveFileCount": 353,
@@ -214,14 +214,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 936,
-        "coveredCount": 813
+        "count": 937,
+        "coveredCount": 814
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 344,
-        "coveredCount": 152
+        "count": 345,
+        "coveredCount": 153
       },
       {
         "classification": "prototype",
@@ -12152,6 +12152,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/Feature_Repo_Context_Cleanup.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
       "tracked": true,
       "coveredInCore": true,
@@ -17040,6 +17057,23 @@
     },
     {
       "path": "scripts/perf-lifecycle-measure.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/plan-context-report.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

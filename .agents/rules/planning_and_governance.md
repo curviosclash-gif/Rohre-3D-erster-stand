@@ -24,6 +24,15 @@ description: Plan governance, bot-training governance, and blocker reporting (co
 - Abschluss-Evidence muss nachvollziehbar sein, aber darf kompakt pro Subphase oder Deliverable gebuendelt werden (kein Pflicht-Mikroprotokoll pro Einzel-Checkbox).
 - In aktiven Blockplaenen gilt weiterhin mindestens-2-Unterphasen pro Top-Level-Phase (Validator-kompatibel); die Entschlackung erfolgt ueber kompaktere Evidence- und Commit-Slices statt Mikro-Unterteilung.
 
+## AI Execution Gates
+
+- Blockplaene duerfen Phasen oder Arbeitspakete mit `[AUTO]`, `[REVIEW]` und `[USER-GATE]` markieren.
+- `[AUTO]`: Read-only-Checks, Reports und explizit konservative Schritte duerfen ohne Rueckfrage laufen, solange keine produktiven oder governance-relevanten Dateien geaendert, geloescht oder verschoben werden.
+- `[REVIEW]`: Der Agent darf analysieren, klassifizieren und konkrete Vorschlaege machen, muss aber vor Datei-Aenderungen, Apply-Modi, Planverschiebungen, Master-/Aktivplan-Edits, Governance-Edits oder Code-Aenderungen stoppen und den User fragen.
+- `[USER-GATE]`: Der Agent muss vor jeder Umsetzung explizit User-Freigabe einholen; ohne Freigabe nur Bericht oder Planvorschlag.
+- Wenn ein Plan eine AI-Ausfuehrungsmatrix enthaelt, gewinnt die strengere Markierung gegen allgemeinere Workflow-Defaults.
+- Cleanup-, Archivierungs-, Governance-, Agenten-Kontext-, Rebuild- und Code-Entflechtungsphasen duerfen nicht als vollautomatische Umsetzung interpretiert werden, solange sie `[REVIEW]` oder `[USER-GATE]` enthalten.
+
 ## Dead-Code Governance
 
 - Dead code may be removed only when a newer better path with real consumers or an exact productive duplicate-/shim-replacement is proven.
