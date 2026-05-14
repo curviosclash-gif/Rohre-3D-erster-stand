@@ -27,7 +27,7 @@ scope_files:
 
 ## Kurzfassung
 
-Dieser Plan fuehrt ein allgemeines Entscheidungsmodell fuer AI-Agenten ein. V116 regelt, welche Cleanup-Phasen automatisch, als Review oder nur nach User-Freigabe laufen duerfen. Dieser Folgeplan macht daraus eine repo-weite Entscheidungslogik fuer alle kuenftigen AI-Arbeiten: Entscheidungsklassen, Evidenzpflicht, Confidence, Blast-Radius, Stop-Loss und Eskalation.
+Dieser Plan fuehrt ein allgemeines Entscheidungsmodell fuer AI-Agenten ein. Er soll vor V116 aufgenommen werden, damit der anschliessende Repo-Kontext-Cleanup bereits unter repo-weiten Autonomie-, Evidence- und User-Gate-Regeln laeuft.
 
 Ziel ist nicht mehr Governance um der Governance willen. Ziel ist, dass Agenten bessere, nachvollziehbare Entscheidungen treffen und bei riskanten Entscheidungen rechtzeitig stoppen.
 
@@ -50,9 +50,15 @@ Ziel ist nicht mehr Governance um der Governance willen. Ziel ist, dass Agenten 
 ## Abgrenzung zu V116
 
 - V116: Repo-Kontext-Reduktion, Planarchiv-Hygiene, Agenten-Leseweg und Cleanup-Automatisierung.
-- V117: Allgemeines Entscheidungsframework fuer alle AI-Arbeiten im Repo.
+- V117: Allgemeines Entscheidungsframework fuer alle AI-Arbeiten im Repo; wird vor V116 geplant, damit V116 nicht ohne Entscheidungsleitplanken ausgefuehrt wird.
 
-V116 darf seine lokale AI-Ausfuehrungsmatrix behalten. V117 zieht die wiederverwendbaren Entscheidungsregeln daraus in die zentrale Governance.
+V116 darf seine lokale AI-Ausfuehrungsmatrix behalten. V117 liefert die repo-weiten Entscheidungsregeln, auf die V116 als harte Voraussetzung verweisen soll.
+
+## Geplante Reihenfolge
+
+1. `V117` AI Decision Framework und Autonomie-Gates.
+2. `V116` Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung.
+3. `V118` Runtime-/UI-Entflechtung Slice 1.
 
 ## Entscheidungsklassen
 
@@ -245,7 +251,6 @@ Gate:
 - Prioritaet: `P1`
 - Owner: `frei`
 - Hard dependencies: `V109.99`
-- Soft dependencies: `V116` fuer praktische Cleanup-Matrix-Erfahrung
+- Soft dependencies: keine; V116 nutzt V117 als Folgebasis
 - Current phase nach Intake: `117.1`
 - Manuelle Uebernahme erforderlich: ja
-

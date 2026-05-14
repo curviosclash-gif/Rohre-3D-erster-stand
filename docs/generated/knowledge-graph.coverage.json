@@ -160,11 +160,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1842,
-    "rawCoveredFileCount": 1191,
+    "trackedFileCount": 1843,
+    "rawCoveredFileCount": 1192,
     "rawCoveragePercent": 64.7,
-    "adjustedTrackedFileCount": 1361,
-    "adjustedCoveredFileCount": 1008,
+    "adjustedTrackedFileCount": 1362,
+    "adjustedCoveredFileCount": 1009,
     "adjustedCoveragePercent": 74.1,
     "uncoveredFileCount": 651,
     "uncoveredActiveFileCount": 353,
@@ -220,8 +220,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 346,
-        "coveredCount": 154
+        "count": 347,
+        "coveredCount": 155
       },
       {
         "classification": "prototype",
@@ -12204,6 +12204,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Runtime_UI_Entflechtung_Slice_1.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

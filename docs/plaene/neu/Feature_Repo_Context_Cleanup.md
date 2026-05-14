@@ -6,6 +6,7 @@ owner: user-intake
 planned_block_id: V116
 depends_on:
   - V109.99
+  - V117.99
   - V115.99
 affected_area: governance-context-cleanup
 scope_files:
@@ -115,7 +116,8 @@ Ergebnis:
 ## Beschlossene Leitentscheidungen
 
 - V116.1 und V116.2 duerfen parallel zu V115 laufen, weil sie nur Baseline, Dry-Run und lokalen Artefakt-Cleanup betreffen. V116.3 und alle folgenden Phasen warten auf V115.99, damit Governance-, Planstruktur- und Agenten-Kontext-Aenderungen nicht mit offenem V115-Abschluss kollidieren.
-- 116.8 bleibt in V116 nur als optionaler Ausblick und Exit-Kriterium. Der erste echte Code-Entflechtungs-Slice wird als eigener Folgeblock geplant, z. B. V117. V116 veraendert keine produktive Spiel-, Physik-, Bot-, Recording- oder UI-Logik.
+- V116 wird nach V117 geplant, damit der Repo-Kontext-Cleanup bereits unter dem allgemeinen AI Decision Framework laeuft.
+- 116.8 bleibt in V116 nur als optionaler Ausblick und Exit-Kriterium. Der erste echte Code-Entflechtungs-Slice wird als eigener Folgeblock V118 geplant. V116 veraendert keine produktive Spiel-, Physik-, Bot-, Recording- oder UI-Logik.
 - Kontextregeln gelten fuer Codex, Gemini und Claude. `AGENTS.md` bleibt oberste Repo-Wahrheit; `.agents/rules/` und `.agents/workflows/` sind operative Regeln; `.gemini/README.md` und `CLAUDE.md` sind Tool-Adapter, keine konkurrierenden Projektwahrheiten.
 - `docs/CURRENT_CONTEXT.md` darf als optionaler, maximal einseitiger Lagezettel eingefuehrt werden. Die Datei ersetzt keinen Masterplan, enthaelt keine eigenen Phasen oder DoD und dupliziert keine Projektsteuerung. Sie wird manuell gepflegt; Skripte pruefen hoechstens Laenge und verbotene Planlogik.
 - Der graph-gestuetzte Plan-Kontext-Report startet als Report-/Check-Werkzeug. Er darf Archivkandidaten vorschlagen, aber keine Plaene automatisch verschieben. Auto-Move wird erst spaeter entschieden, wenn der Report mehrfach plausibel war und ein explizites Apply-Flag/User-Freigabe existiert.
@@ -432,7 +434,7 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 - Status: `planned`
 - Prioritaet: `P1`
 - Owner: `frei`
-- Hard dependencies: `V109.99`, `V115.99`
+- Hard dependencies: `V109.99`, `V117.99`, `V115.99`
 - Soft dependencies: `V107.99` fuer Knowledge-Graph-Nutzung, `V90` fuer Toolchain-Blocker-Kontext
 - Current phase nach Intake: `116.1`
 - Manuelle Uebernahme erforderlich: ja
@@ -444,5 +446,6 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 
 ## Angrenzender Folgeplan
 
-- `docs/plaene/neu/Feature_AI_Decision_Framework.md` plant die repo-weite Verallgemeinerung der V116-AI-Ausfuehrungsmatrix zu einem Decision Framework mit Entscheidungsklassen, Evidence-/Confidence-Regeln, Blast-Radius-Check, Stop-Loss und User-Gates.
+- `docs/plaene/neu/Feature_AI_Decision_Framework.md` plant die repo-weite Verallgemeinerung der V116-AI-Ausfuehrungsmatrix zu einem Decision Framework mit Entscheidungsklassen, Evidence-/Confidence-Regeln, Blast-Radius-Check, Stop-Loss und User-Gates. Dieser Plan soll vor V116 aufgenommen werden.
+- `docs/plaene/neu/Feature_Runtime_UI_Entflechtung_Slice_1.md` plant den nachgelagerten V118-Entflechtungsblock. V116 bereitet nur Kandidaten, Gates und Kontext vor; produktive Entflechtung bleibt V118.
 - V116 bleibt auf Repo-Kontext-Cleanup und Planarchiv-Hygiene fokussiert; das allgemeine Autonomie-Framework soll nicht in V116 versteckt werden.
