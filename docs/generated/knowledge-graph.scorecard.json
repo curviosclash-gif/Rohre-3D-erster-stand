@@ -11,7 +11,7 @@
     "score": 90.9,
     "status": "pass",
     "metrics": {
-      "adjustedCoveragePercent": 74,
+      "adjustedCoveragePercent": 74.1,
       "coverageGateStatus": "pass",
       "criticalPathOkPercent": 100,
       "criticalPathOkCount": 4,
@@ -130,7 +130,7 @@
       "score": 90.9,
       "status": "pass",
       "metrics": {
-        "adjustedCoveragePercent": 74,
+        "adjustedCoveragePercent": 74.1,
         "coverageGateStatus": "pass",
         "criticalPathOkPercent": 100,
         "criticalPathOkCount": 4,

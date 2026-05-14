@@ -1990,7 +1990,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 304,
+          "concreteCount": 305,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -22598,6 +22598,21 @@
     },
     {
       "id": "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_AI_Decision_Framework.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -68300,6 +68315,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/BT93M_Bis_BT94B_PPO_Root_Cause_Replan_Intake_2026-04-29.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_AI_Decision_Framework.md",
       "type": "scope",
       "hint": null,
       "attributes": {

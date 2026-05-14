@@ -160,12 +160,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1841,
-    "rawCoveredFileCount": 1190,
-    "rawCoveragePercent": 64.6,
-    "adjustedTrackedFileCount": 1360,
-    "adjustedCoveredFileCount": 1007,
-    "adjustedCoveragePercent": 74,
+    "trackedFileCount": 1842,
+    "rawCoveredFileCount": 1191,
+    "rawCoveragePercent": 64.7,
+    "adjustedTrackedFileCount": 1361,
+    "adjustedCoveredFileCount": 1008,
+    "adjustedCoveragePercent": 74.1,
     "uncoveredFileCount": 651,
     "uncoveredActiveFileCount": 353,
     "classifications": [
@@ -220,8 +220,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 345,
-        "coveredCount": 153
+        "count": 346,
+        "coveredCount": 154
       },
       {
         "classification": "prototype",
@@ -11980,6 +11980,23 @@
       "classification": "bot-training",
       "excludedFromCoverage": true,
       "excludeReason": "Bot training data and plans are excluded from the main architecture graph."
+    },
+    {
+      "path": "docs/plaene/neu/Feature_AI_Decision_Framework.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
     },
     {
       "path": "docs/plaene/neu/Feature_Arcade_Ghost_Selbstduell_Laengste_Spur_V108.md",

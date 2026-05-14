@@ -441,3 +441,8 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 
 - Soll `check:agent-context` nach stabilen Laeufen dauerhaft eigenstaendig bleiben oder spaeter in `docs:check`/`gates:pre-commit` integriert werden?
 - Soll der graph-gestuetzte Plan-Kontext-Report nur berichten oder spaeter auch sichere Verschiebungen automatisieren?
+
+## Angrenzender Folgeplan
+
+- `docs/plaene/neu/Feature_AI_Decision_Framework.md` plant die repo-weite Verallgemeinerung der V116-AI-Ausfuehrungsmatrix zu einem Decision Framework mit Entscheidungsklassen, Evidence-/Confidence-Regeln, Blast-Radius-Check, Stop-Loss und User-Gates.
+- V116 bleibt auf Repo-Kontext-Cleanup und Planarchiv-Hygiene fokussiert; das allgemeine Autonomie-Framework soll nicht in V116 versteckt werden.
