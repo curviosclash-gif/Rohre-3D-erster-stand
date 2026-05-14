@@ -22,6 +22,8 @@ Optional (nur bei Bedarf):
 
 - Zielpfade und erwartetes Verhalten festlegen.
 - Desktop-App-Ergebnis priorisieren; Online/Browser-Parity nur explizit auf Wunsch oder bei geringem Aufwand.
+- Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; `D3`/`D4`-Source-of-truth-, Planstruktur-, Archivierungs-, Move-/Delete- oder High-Blast-Radius-Aenderungen brauchen User-Gate.
+- Neue dauerhafte Ablagen nach Zweckklasse klassifizieren und bestehende kanonische Zielquelle bevorzugen.
 - Bei klarem Scope direkt weiter. Nur bei kritisch fehlender Information nachfragen.
 - Fremde uncommittete Aenderungen nicht absorbieren; nur scoped Dateien committen.
 

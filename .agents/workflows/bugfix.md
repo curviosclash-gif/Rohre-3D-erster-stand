@@ -26,6 +26,8 @@ Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/p
 
 - Kleinste sichere Aenderung fuer Root-Cause.
 - Desktop-first bleibt Prioritaet (siehe `product_focus.md`).
+- Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; Bugfixes bleiben klein, aber Source-of-truth-, Planstruktur-, Archivierungs-, Move-/Delete- oder High-Blast-Radius-Aenderungen brauchen User-Gate.
+- Neue dauerhafte Ablagen nur nach Zweckklasse anlegen und bestehende kanonische Zielquelle bevorzugen.
 - Verdaechtige Altpfade nicht still mitloeschen; nur entfernen, wenn ein juengerer produktiver Ersatzpfad oder eine exakte Dublette belegt ist.
 - Wenn der Fix einen alten Pfad umgeht oder ersetzt, verbleibende Konsumenten und Delete-Kriterium im Scope dokumentieren.
 - Wenn der Fix einen nicht-offensichtlichen Kompatibilitaets-, Migrations-, Alias- oder Fallback-Pfad behaelt, einen kurzen lokalen Why-Kommentar direkt an dieser Stelle hinterlassen.

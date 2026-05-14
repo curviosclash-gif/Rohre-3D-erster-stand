@@ -33,6 +33,41 @@ description: Plan governance, bot-training governance, and blocker reporting (co
 - Wenn ein Plan eine AI-Ausfuehrungsmatrix enthaelt, gewinnt die strengere Markierung gegen allgemeinere Workflow-Defaults.
 - Cleanup-, Archivierungs-, Governance-, Agenten-Kontext-, Rebuild- und Code-Entflechtungsphasen duerfen nicht als vollautomatische Umsetzung interpretiert werden, solange sie `[REVIEW]` oder `[USER-GATE]` enthalten.
 
+## AI Decision Framework
+
+Vor Repo-Aenderungen klassifiziert der Agent Risiko und Reversibilitaet. Die strengere Planmatrix gewinnt immer gegen diese Defaults.
+
+| Klasse | Bedeutung | Default |
+| --- | --- | --- |
+| `D0` | Read-only: Status lesen, Graph-Abfragen, Reports, Dry-Run | darf laufen |
+| `D1` | Reversible local: lokale Reports unter `tmp/`, nicht-getrackte Diagnoseartefakte | darf laufen, wenn klar begrenzt |
+| `D2` | Scoped repo change: kleine Docs-/Code-/Test-Aenderung mit klarem Scope, Evidence und Gate | darf laufen, wenn Confidence und Scope klar sind |
+| `D3` | Source-of-truth/Governance: `AGENTS.md`, `.agents/rules/`, Workflows, Master-/Aktivplan-Struktur, Planarchivierung, dauerhafte Governance-/Statusablagen | Analyse erlaubt; Aenderung nur mit User-Gate |
+| `D4` | High-blast-radius/destructive: Loeschungen, Auto-Move, Rebuild, grosse Refactors, produktive Parameter, History-/Git-Risiko | immer User-Gate |
+
+`D2` darf keine Master-, Aktivplan-, Rule-, Workflow-, Loesch-, Move-, Archivstruktur- oder produktiven Parameteraenderungen enthalten. Sobald ein kleiner Scope eine dieser Flaechen beruehrt, wird er auf `D3` oder `D4` hochgestuft.
+
+Fuer `D2` nennt der Agent Scope, Evidence, Confidence (`high`/`medium`/`low`) und kleinstes sinnvolles Gate. Bei `medium` oder `low` Confidence vor produktiven Pfaden nachfragen.
+
+Fuer `D3` und `D4` braucht es vor Umsetzung: mindestens zwei Quellen, Alternativen, Blast-Radius (`files`, `surface`, `reversibility`, `user-visible-risk`), User-Gate und bei `D4` einen Recovery-/Rollback-Pfad. Analyse, Klassifikation und Patch-Vorschlaege sind bei `D3` ohne Freigabe erlaubt; Datei-Aenderungen nicht.
+
+Agenten stoppen und fragen nach, wenn Graph, Master, Findings oder Locks widersprechen, ein unerwartetes Gate rot wird, der Diff groesser als angekuendigt wird, fremde uncommittete Aenderungen in betroffenen Dateien liegen, getrackte Dateien geloescht/verschoben wuerden, ein Cleanup-Skript mehr Klassen trifft als angekuendigt, ein Refactor produktive Parameter/Physik/Bot-Training/Recording/Multiplayer beruehrt oder ein Rebuild-/Reborn-Pfad entstehen soll.
+
+## Repo Organization
+
+Vor neuen Dateien, Reports oder dauerhaften Doku-Ablagen klassifiziert der Agent den Zweck und nutzt vorhandene kanonische Zielquellen, statt neue Schatten-Wahrheiten zu erzeugen.
+
+| Zweckklasse | Zielort | Regel |
+| --- | --- | --- |
+| `transient` | `tmp/` oder lokaler ignorierter Arbeitsordner | Diagnose-/Zwischenergebnis; nicht als dauerhafte Doku verwenden. |
+| `evidence` | aktive `docs/plaene/aktiv/VXX.md`, relevanter Report oder `docs/plaene/CHANGELOG.md` | Kompakt: Pfad, Gate, Ergebnis, kurzer Effekt; keine langen Terminal-Logs. |
+| `reference` | `docs/referenz/` | Dauerhafte Anleitung oder Erklaerung, keine Phasen-/Statussteuerung. |
+| `governance` | `AGENTS.md`, `.agents/rules/`, `.agents/workflows/` | Source-of-truth-Regel; Aenderung ist `D3` und braucht User-Gate. |
+| `plan` | Draft in `docs/plaene/neu/`, aktiver Block in `docs/plaene/aktiv/VXX.md`, abgeloest in `docs/plaene/alt/` | Genau eine kanonische aktive Detaildatei pro Block. |
+| `archive-index` | `docs/plaene/alt/<archivordner>/README.md` oder `docs/archive/<bereich>/README.md` | Erklaert historische Ablage, neue kanonische Quelle und Read-Regel. |
+
+Ab `D2` nennt der Agent vor dem Anlegen neuer dauerhafter Dateien kurz Zweckklasse, Zielpfad, bestehende Zielquelle und ob dadurch eine zweite Wahrheit entstehen koennte. Archivierte Plaene verlieren aktive Autoritaet und duerfen nur fuer Historie, Evidence, Dependency- oder Abgleichsauftraege gelesen werden, wenn Master-Index, aktive VXX-Datei oder Changelog eine neuere kanonische Quelle nennen.
+
 ## Dead-Code Governance
 
 - Dead code may be removed only when a newer better path with real consumers or an exact productive duplicate-/shim-replacement is proven.

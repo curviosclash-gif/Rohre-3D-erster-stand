@@ -9260,7 +9260,7 @@
     {
       "id": "V117.2.1",
       "type": "subphase",
-      "title": "`.agents/rules/planning_and_governance.md` um Decision Framework oder Verweis ergaenzen.",
+      "title": "`.agents/rules/planning_and_governance.md` um Decision Framework und Repo-Organisationsregeln als operative zentrale Wahrheit ergaenzen.",
       "status": "open",
       "attributes": {
         "blockId": "V117",
@@ -9282,7 +9282,7 @@
     {
       "id": "V117.2.3",
       "type": "subphase",
-      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md` und `bugfix.md` mit knappen Verweisen versehen, falls noetig.",
+      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md` und `bugfix.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen.",
       "status": "open",
       "attributes": {
         "blockId": "V117",
@@ -9304,7 +9304,7 @@
     {
       "id": "V117.3.2",
       "type": "subphase",
-      "title": "Optional `scripts/check-ai-decision-policy.mjs` planen; zuerst nur Report, nicht blockierend. Der Check validiert nur grobe Muster wie Auto-Move-Claims, D4-Woerter ohne User-Gate, planstrukturveraendernde Skripte oder grosse Diffs ohne Blast-Radius; er versucht nicht, \"gute Entscheidungen\" vollautomatisch zu bewerten.",
+      "title": "Optional `scripts/check-ai-decision-policy.mjs` und NPM-Script `check:ai-decision-policy` planen; zuerst nur Report, nicht blockierend. Der Check validiert nur grobe Muster wie D4-Woerter ohne User-Gate, Auto-Move-Claims, Archivierungsplaene ohne `canonical_source`, Archivordner ohne `README.md`, neue dauerhafte `docs/`-Ablagen ohne Zweckklasse, planstrukturveraendernde Skripte oder grosse Diffs ohne Blast-Radius; er versucht nicht, \"gute Entscheidungen\" vollautomatisch zu bewerten.",
       "status": "open",
       "attributes": {
         "blockId": "V117",
@@ -9337,7 +9337,7 @@
     {
       "id": "V117.99.2",
       "type": "subphase",
-      "title": "Abschluss-Evidence nennt Beispiele fuer D0-D4 und ihre jeweiligen User-Gates.",
+      "title": "Abschluss-Evidence nennt Beispiele fuer D0-D4 und ihre jeweiligen User-Gates: D0 `plan:check`/Graph-Abfrage/Dry-Run, D1 lokaler Report in `tmp/`, D2 kleine scoped Aenderung mit Evidence/Gate, D3 Rule-/Workflow-Aenderung nur mit User-Gate, D4 Archiv-Move/Delete/Rebuild/grosser Refactor nur mit User-Gate und Recovery-Pfad.",
       "status": "open",
       "attributes": {
         "blockId": "V117",
