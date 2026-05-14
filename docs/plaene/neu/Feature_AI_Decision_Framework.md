@@ -52,7 +52,7 @@ Ziel ist nicht mehr Governance um der Governance willen. Ziel ist, dass Agenten 
 - V116: Repo-Kontext-Reduktion, Planarchiv-Hygiene, Agenten-Leseweg und Cleanup-Automatisierung.
 - V117: Allgemeines Entscheidungsframework fuer alle AI-Arbeiten im Repo; wird vor V116 geplant, damit V116 nicht ohne Entscheidungsleitplanken ausgefuehrt wird.
 
-V116 darf seine lokale AI-Ausfuehrungsmatrix behalten. V117 liefert die repo-weiten Entscheidungsregeln, auf die V116 als harte Voraussetzung verweisen soll.
+V116 dient nur als Beispiel und Folgeabhaengigkeit. V117 darf V116 nicht inhaltlich miteditieren oder Cleanup-Planpflege mit Framework-Aufbau vermischen; V116 darf seine lokale AI-Ausfuehrungsmatrix behalten und verweist nach Intake auf die repo-weiten V117-Regeln.
 
 ## Geplante Reihenfolge
 
@@ -66,8 +66,8 @@ V116 darf seine lokale AI-Ausfuehrungsmatrix behalten. V117 liefert die repo-wei
 | --- | --- | --- | --- |
 | D0 | Read-only | Status lesen, Reports erzeugen, Graph-Abfragen, Dry-Run | Agent darf ausfuehren |
 | D1 | Reversible local | lokale Reports unter `tmp/`, nicht-getrackte Diagnoseartefakte | Agent darf ausfuehren, wenn klar begrenzt |
-| D2 | Scoped repo change | kleine Docs-/Code-Aenderung mit klarem Scope und Gate | Agent darf ausfuehren, wenn Evidence und Scope klar sind |
-| D3 | Source-of-truth / Governance | `AGENTS.md`, `.agents/rules/`, Workflows, Master-/Aktivplan-Struktur, Planarchivierung | Review oder User-Gate |
+| D2 | Scoped repo change | kleine begrenzte Docs-/Code-Aenderung mit klarem Scope und Gate; keine Master-, Aktivplan-, Rule-, Workflow-, Loesch-, Move- oder produktiven Parameteraenderung | Agent darf ausfuehren, wenn Evidence, Confidence und Scope klar sind |
+| D3 | Source-of-truth / Governance | `AGENTS.md`, `.agents/rules/`, Workflows, Master-/Aktivplan-Struktur, Planarchivierung | Analyse ohne Freigabe erlaubt; Aenderung nur mit User-Gate |
 | D4 | High-blast-radius / destructive | Loeschungen, Auto-Move, Rebuild, grosse Refactors, produktive Parameter, History-/Git-Risiko | Immer User-Gate |
 
 ## Decision Requirements
@@ -81,17 +81,20 @@ V116 darf seine lokale AI-Ausfuehrungsmatrix behalten. V117 liefert die repo-wei
 ### D2
 
 - Scope benennen.
+- Ausschluss pruefen: D2 darf keine Master-, Aktivplan-, Rule-, Workflow-, Loesch-, Move- oder produktiven Parameteraenderungen enthalten.
 - Evidence nennen: relevante Datei, Plan, Graph, Test oder Contract.
 - Confidence einschaetzen: `high`, `medium`, `low`.
 - Kleinstes sinnvolles Gate nennen oder ausfuehren.
 - Bei `medium` oder `low` Confidence vor Umsetzung nachfragen, wenn produktive Pfade betroffen sind.
+- Wenn ein D2-Scope Source-of-truth, Planstruktur, Archivierung, Auto-Move, produktive Parameter oder breite Refactor-Flaeche beruehrt, wird er auf D3 oder D4 hochgestuft.
 
 ### D3
 
 - Mindestens zwei Quellen heranziehen.
 - Alternativen nennen: konservativ vs. staerker automatisiert.
 - Blast-Radius einschaetzen.
-- User-Freigabe einholen, bevor Source-of-truth-Dateien geaendert werden.
+- Analyse, Klassifikation und konkrete Patch-Vorschlaege sind ohne Freigabe erlaubt.
+- Jede Aenderung an Source-of-truth-, Governance-, Master-/Aktivplan-, Workflow- oder Planarchivierungsdateien braucht User-Gate.
 
 ### D4
 
@@ -212,7 +215,7 @@ goal: Entscheiden, ob ein maschineller Check sinnvoll ist.
 output: Check-Plan oder bewusster Verzicht.
 
 - [ ] 117.3.1 Pruefen, welche Regeln maschinell sinnvoll validierbar sind: verbotene Auto-Move-Claims, fehlende User-Gates, D4 ohne Freigabe, grosse Diffs ohne Blast-Radius.
-- [ ] 117.3.2 Optional `scripts/check-ai-decision-policy.mjs` planen; zuerst nur Report, nicht blockierend.
+- [ ] 117.3.2 Optional `scripts/check-ai-decision-policy.mjs` planen; zuerst nur Report, nicht blockierend. Der Check validiert nur grobe Muster wie Auto-Move-Claims, D4-Woerter ohne User-Gate, planstrukturveraendernde Skripte oder grosse Diffs ohne Blast-Radius; er versucht nicht, "gute Entscheidungen" vollautomatisch zu bewerten.
 - [ ] 117.3.3 Entscheiden, ob der Check eigenstaendig bleibt oder spaeter in `docs:check`/`gates:pre-commit` integriert wird.
 
 Gate:

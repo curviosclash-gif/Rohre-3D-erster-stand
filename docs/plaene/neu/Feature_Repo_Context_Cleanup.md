@@ -100,6 +100,24 @@ Ergebnis:
 - Keine Aenderung produktiver Spielparameter, Bot-Training-Parameter, Physik-Logik oder Recording-Verhalten in diesem Block.
 - Keine neuen parallelen Governance-Systeme neben `AGENTS.md`, `.agents/rules/`, `.agents/workflows/` und `docs/Umsetzungsplan.md`.
 
+## Scope-Modell
+
+`scope_files` beschreibt die breite Analyseflaeche dieses Drafts, nicht automatisch den Schreibscope jeder Phase. Agenten muessen pro Phase zwischen Lese- und Schreibscope unterscheiden.
+
+### Read-Scope
+
+- Master-, Aktiv-, Intake- und Altplaene zur Klassifikation.
+- `.agents/`, `.gemini/`, `CLAUDE.md` und Onboarding-Dateien zur Kontext-Policy.
+- Cleanup-/Graph-/Plan-Reports.
+- V115/P22-Kontext nur zum Abgleich, nicht zur erneuten Retention-Entscheidung.
+- Bot-Training-Drafts nur gegen `docs/bot-training/Bot_Trainingsplan.md`.
+
+### Write-Scope
+
+- Pro Phase nur die konkret freigegebenen Plan-, Report-, README-, Rule- oder Check-Dateien.
+- Keine produktive Runtime, keine produktiven Assets, keine Videos, keine Bot-Training-Parameter, keine Physik-/Recording-/Multiplayer-Logik.
+- Planverschiebungen nur nach Report, User-Gate und Zielpfad-Freigabe.
+
 ## Leitprinzipien
 
 - Radikal im Leseweg, konservativ im Dateisystem.
@@ -117,7 +135,7 @@ Ergebnis:
 
 - V116.1 und V116.2 duerfen parallel zu V115 laufen, weil sie nur Baseline, Dry-Run und lokalen Artefakt-Cleanup betreffen. V116.3 und alle folgenden Phasen warten auf V115.99, damit Governance-, Planstruktur- und Agenten-Kontext-Aenderungen nicht mit offenem V115-Abschluss kollidieren.
 - V116 wird nach V117 geplant, damit der Repo-Kontext-Cleanup bereits unter dem allgemeinen AI Decision Framework laeuft.
-- 116.8 bleibt in V116 nur als optionaler Ausblick und Exit-Kriterium. Der erste echte Code-Entflechtungs-Slice wird als eigener Folgeblock V118 geplant. V116 veraendert keine produktive Spiel-, Physik-, Bot-, Recording- oder UI-Logik.
+- 116.8 finalisiert nur den V118-Folgeblock als Plan. Der erste echte Code-Entflechtungs-Slice wird als eigener Folgeblock V118 geplant. V116 veraendert keine produktive Spiel-, Physik-, Bot-, Recording- oder UI-Logik.
 - Kontextregeln gelten fuer Codex, Gemini und Claude. `AGENTS.md` bleibt oberste Repo-Wahrheit; `.agents/rules/` und `.agents/workflows/` sind operative Regeln; `.gemini/README.md` und `CLAUDE.md` sind Tool-Adapter, keine konkurrierenden Projektwahrheiten.
 - `docs/CURRENT_CONTEXT.md` darf als optionaler, maximal einseitiger Lagezettel eingefuehrt werden. Die Datei ersetzt keinen Masterplan, enthaelt keine eigenen Phasen oder DoD und dupliziert keine Projektsteuerung. Sie wird manuell gepflegt; Skripte pruefen hoechstens Laenge und verbotene Planlogik.
 - Der graph-gestuetzte Plan-Kontext-Report startet als Report-/Check-Werkzeug. Er darf Archivkandidaten vorschlagen, aber keine Plaene automatisch verschieben. Auto-Move wird erst spaeter entschieden, wenn der Report mehrfach plausibel war und ein explizites Apply-Flag/User-Freigabe existiert.
@@ -140,7 +158,7 @@ Diese Matrix ist bindend fuer Agenten, die V116 oder daraus abgeleitete Cleanup-
 | 116.5 Governance/Workflow | `[USER-GATE]` | Analyse und konkrete Patch-Vorschlaege | Jede Aenderung an `.agents/rules/`, `.agents/workflows/`, Governance-Skripten oder Gates |
 | 116.6 Gate-Matrix | `[AUTO/REVIEW]` | Gates inventarisieren, rot/gruen Status berichten, Risiken zuordnen | Breite Fixes, neue Pflicht-Gates oder Volltest-Policy-Aenderungen |
 | 116.7 Refactor-Kandidaten | `[AUTO/REVIEW]` | Messen, listen, Graph-Surfaces/Consumer ausgeben, `Do not touch yet`-Tabelle | Produktcode-Aenderungen oder Refactor-Start |
-| 116.8 Code-Entflechtung | `[USER-GATE]` | Nur Folgeblock-Vorschlag | Jeder Code-Refactor |
+| 116.8 V118-Folgeblock finalisieren | `[REVIEW]` | Kandidat, Risiko, Testsignal und Scope-Dateien fuer V118 vorschlagen | Jede produktive Code-Aenderung oder V118-Umsetzung |
 | 116.9 Rebuild-Spike | `[USER-GATE]` | Nur Spike-Plan vorschlagen | Neuer Reborn-/Rebuild-Ordner, Code-Port oder Hauptrepo-Ersatz |
 | 116.99 Abschluss | `[USER-GATE]` | Gate-Plan und Abschlussvorschlag | Closure-Status, Master-Intake, `*.99`-Markierung oder Abschluss-Commit ohne User-Freigabe |
 
@@ -229,9 +247,10 @@ output: Bereinigter Arbeitsbaum fuer ignorierte Artefakte und aktualisierte Rete
 - [ ] 116.2.1 `scripts/workspace-cleanup.mjs` pruefen: Schutz fuer getrackte Dateien, aktive Playwright-Locks, `prototypes/`, Recording-Pfade und Retention-Artefakte bestaetigen.
 - [ ] 116.2.2 Dry-Run-Kandidaten klassifizieren: `delete`, `archive`, `protect`; riskante Kandidaten manuell ausnehmen.
 - [ ] 116.2.3 Apply nur fuer konservative Kandidaten: Root-Logs, alte Dev-Logs, nicht aktive `test-results` und eindeutig generierte tmp-Diagnoseartefakte. `videos/` wird nicht archiviert oder geloescht, weil der Ordner zum Cinematic-Camera-System gehoert.
-- [ ] 116.2.4 Nach Apply `git status --short` pruefen: keine unerwarteten tracked Deletes; falls doch, stoppen und Bericht in `docs/Fehlerberichte/` oder Block-Evidence.
-- [ ] 116.2.5 `workspace-cleanup` um eine kompakte Summary-/Explain-Sicht erweitern, falls der Dry-Run fuer Agenten zu lang ist: `safe delete`, `safe archive`, `protected tracked`, `protected unknown`, `needs user decision`.
-- [ ] 116.2.6 `.gitignore` nur dann anpassen, wenn neue generierte Muster wiederholt auftauchen und nicht bereits abgedeckt sind.
+- [ ] 116.2.4 V115/P22-Abgleich: keine erneute Retention-Entscheidung fuer bereits entschiedene P22-Artefakte; V116 darf nur neue Klassen anwenden, schuetzen oder als User-Entscheidung markieren.
+- [ ] 116.2.5 Nach Apply `git status --short` pruefen: keine unerwarteten tracked Deletes; falls doch, stoppen und Bericht in `docs/Fehlerberichte/` oder Block-Evidence.
+- [ ] 116.2.6 `workspace-cleanup` um eine kompakte Summary-/Explain-Sicht erweitern, falls der Dry-Run fuer Agenten zu lang ist: `safe delete`, `safe archive`, `protected tracked`, `protected unknown`, `needs user decision`.
+- [ ] 116.2.7 `.gitignore` nur dann anpassen, wenn neue generierte Muster wiederholt auftauchen und nicht bereits abgedeckt sind.
 
 Gate:
 
@@ -251,7 +270,7 @@ output: Kurzer, verbindlicher Leseweg fuer Codex/Gemini/Claude.
 - [ ] 116.3.4 Falls Tool-spezifische Ignore-Dateien existieren oder sinnvoll sind, nur Kontext-Ausschluesse fuer lokale/archivierte Quellen definieren: `docs/archive/`, `docs/plaene/alt/`, `tmp/`, `logs/`, `.claude/`, `.codex_tmp/`, `videos/`, `dist/`, `test-results/`.
 - [ ] 116.3.5 Sicherstellen, dass Archive nicht aus Git-Historie oder Dokumentation verschwinden; sie werden nur aus dem Standard-Kontext ausgeschlossen.
 - [ ] 116.3.6 `check:gemini` erweitern oder nutzen, um versehentliche Gemini-Memory-/Log-Artefakte im Repo zu verhindern.
-- [ ] 116.3.7 Neues oder erweitertes Agenten-Kontext-Gate definieren: `npm run check:agent-context` prueft Standard-Read-Budget, Ignore-/Kontext-Ausschluesse, Adapter-Prioritaeten und `CURRENT_CONTEXT.md`-Grenzen. Das Gate startet eigenstaendig und wird nicht sofort pauschal in `gates:pre-commit` erzwungen.
+- [ ] 116.3.7 Neues oder erweitertes Agenten-Kontext-Gate definieren: `npm run check:agent-context` startet klein und prueft nur AGENTS-Leseweg, Adapter-Prioritaet, verbotene Master-Duplikation in `CURRENT_CONTEXT.md` sowie bekannte Ignore-/Nicht-Lesezonen. Keine semantische Vollpruefung. Das Gate startet eigenstaendig und wird nicht sofort pauschal in `gates:pre-commit` erzwungen.
 
 Gate:
 
@@ -274,8 +293,8 @@ output: Weniger Plan-Rauschen fuer Agenten, ohne Dependency-Evidence zu verliere
   - `closure-evidence`: abgeschlossen, aber noch als Nachweis wichtig.
   - `superseded`: durch neueren Block oder `CHANGELOG.md` abgeloest.
   - `archive-candidate`: nicht referenziert, nicht dependency-relevant, nicht aktuelle Evidence.
-- [ ] 116.4.5 Nur `archive-candidate`-Dateien verschieben; alle anderen mit Retention-Grund dokumentieren. Zielpfad fuer V116-Verschiebungen ist ein nachvollziehbarer Unterordner, z. B. `docs/plaene/alt/context-cleanup-2026-05/`.
-- [ ] 116.4.6 `docs/plaene/neu/` auf echte Intake-Drafts reduzieren: bereits uebernommene Drafts nach `alt/`, Bot-Training-Drafts gegen Bot-Training-Master klassifizieren.
+- [ ] 116.4.5 Quarantine-first fuer Planverschiebungen: `archive-candidate` wird zuerst nur im proposed-move Report gefuehrt; danach User-Gate; erst dann Verschiebung in `docs/plaene/alt/context-cleanup-2026-05/` oder passenden Unterordner.
+- [ ] 116.4.6 `docs/plaene/neu/` auf echte Intake-Drafts reduzieren: bereits uebernommene Drafts nach `alt/`, Bot-Training-Drafts nicht normal archivieren, sondern gegen `docs/bot-training/Bot_Trainingsplan.md` bewerten und schuetzen oder separat ausweisen.
 - [ ] 116.4.7 Evidence-Kompression anwenden: Plan-Evidence nennt Pfad, Gate und Ergebnis, aber keine langen Terminal-Logs oder wiederholten Dateilisten.
 - [ ] 116.4.8 `docs/plaene/aktiv/README.md` und `docs/plaene/neu/README.md` aktualisieren, damit Agenten die Klassen erkennen.
 - [ ] 116.4.9 Keine Master-Intake-Aenderungen ohne User-owned Uebernahme. Der Planentwurf bleibt in `docs/plaene/neu/`, bis der User ihn in den Master aufnimmt.
@@ -351,23 +370,22 @@ Gate:
 - Kein produktiver Code-Diff ausser optionaler Mess-/Report-Datei.
 - `npm run plan:check`
 
-### 116.8 Erster kontrollierter Code-Entflechtungs-Slice
+### 116.8 V118-Folgeblock finalisieren
 
-status: optional
-goal: Nur wenn 116.1 bis 116.7 stabil sind, ein kleines Modul extrahieren.
-output: Ein nachweislich unveraendertes Verhalten mit kleinerem Modulzuschnitt.
+status: draft
+goal: V118 vor Intake konkretisieren, ohne Code zu aendern.
+output: Finalisierungsvorschlag fuer Kandidat, Risiko, Testsignal und Scope-Dateien des V118-Drafts.
 
-- [ ] 116.8.1 User bestaetigt den ersten Kandidaten und Scope.
-- [ ] 116.8.2 Vorher-Test oder Contract-Signal definieren und ausfuehren.
-- [ ] 116.8.3 Genau eine Verantwortlichkeit extrahieren; keine Feature-Arbeit, keine Parameter-Tuning-Aenderung.
-- [ ] 116.8.4 Imports aktualisieren und Legacy-/Compatibility-Pfade nur mit Why-Kommentar behalten.
-- [ ] 116.8.5 Nachher-Test ausfuehren und Ergebnis im aktiven Block dokumentieren.
+- [ ] 116.8.1 V116.7-Reports, Graph-Surfaces, offene Findings und `Do not touch yet`-Tabelle auswerten.
+- [ ] 116.8.2 Einen empfohlenen V118-Kandidaten und zwei verworfene Alternativen dokumentieren.
+- [ ] 116.8.3 Konkrete Test-/Contract-/Graph-Signale fuer V118 vorschlagen.
+- [ ] 116.8.4 V118-`scope_files`, Risiken und DoD als Patch-Vorschlag aktualisieren; keine produktive Code-Aenderung.
+- [ ] 116.8.5 User-Gate fuer V118-Intake explizit markieren.
 
 Gate:
 
-- Kandidatenspezifischer Contract-/Build-/Runtime-Check.
 - `npm run plan:check`
-- Bei `*.99` oder Docs-/Governance-Scope: `npm run gates:pre-commit`
+- Bei Plan-/Graph-Aenderung: `npm run gates:pre-commit`
 
 ### 116.9 Rebuild-Spike-Grenze und Paritaetsgate
 
@@ -406,7 +424,7 @@ output: Weniger Kontext-Rauschen, klare Agenten-Einstiege und vorbereitete Refac
 | R3 | mittel | Agenten lesen trotz Policy alte Plaene. | Onboarding und Tool-Ignore-Regeln schaerfen; Archive nur bei explizitem Auftrag. |
 | R4 | mittel | Governance-Straffung entfernt wichtige Safety-Regeln. | Dead-Code-, Git-, Lock- und Commit-Regeln unveraendert pruefen; `gates:pre-commit`. |
 | R5 | mittel | Type-/Lint-Haertung eskaliert zu breitem Reparaturprojekt. | Gate-Matrix statt Pauschalauftrag; Fehlerklassen separaten Blocks zuordnen. |
-| R6 | mittel | Erster Code-Refactor vermischt Feature-Arbeit und Entflechtung. | 116.8 optional und nur nach User-Bestaetigung; genau eine Verantwortlichkeit. |
+| R6 | mittel | V116 vermischt Cleanup mit Code-Entflechtung. | 116.8 finalisiert nur V118 als Plan; produktive Entflechtung bleibt V118. |
 | R7 | niedrig | Weniger Standardkontext macht Historie schwerer findbar. | Historie bleibt erhalten; README/Onboarding beschreibt explizite Suchpfade. |
 | R8 | mittel | `CURRENT_CONTEXT.md` driftet vom Master ab. | Maximal einseitig, manuell gepflegt, nur Lagezettel; Check prueft Laenge und verbotene Planlogik. |
 | R9 | mittel | Rebuild-Spike wird unbemerkt zum zweiten Hauptprojekt. | Eigener User-Intake, Paritaetsgate und Abbruchkriterien vor jedem Spike. |
