@@ -107,6 +107,7 @@ Ergebnis:
 - Dead-Code-Removal nur nach Klassifikation und Ersatz-/Consumer-Beweis.
 - Jeder automatisierte Cleanup startet im Dry-Run.
 - Maschinelle Reports gehen vor Verschiebungen: erst klassifizieren, dann bewegen.
+- Der Knowledge-Graph ist bevorzugte Querpruefung fuer Scope-, Consumer-, Surface- und Dependency-Fragen.
 - Evidence wird komprimiert, aber nicht entkernt: geaenderter Pfad, Gate und Ergebnis muessen nachvollziehbar bleiben.
 - Code-Refactoring wird als eigener, kleiner Delivery-Slice behandelt.
 - Der Master bleibt Index; Details bleiben in kanonischen Detaildateien.
@@ -151,7 +152,7 @@ Optional kann `docs/CURRENT_CONTEXT.md` als maximal einseitiger Lagezettel entst
 - [ ] DoD.2 Lokale Artefakte sind ueber `scripts/workspace-cleanup.mjs` konservativ bereinigt oder bewusst geschuetzt; keine produktiven oder getrackten Dateien wurden versehentlich entfernt.
 - [ ] DoD.3 KI-Leseweg ist eindeutig dokumentiert: Agenten lesen standardmaessig nur kanonische Quellen und ignorieren Archive/Altplaene/Logs ohne expliziten Auftrag.
 - [ ] DoD.4 Plan-Kontext ist klassifiziert: Master-referenzierte, dependency-relevante, historische und archivfaehige Plan-Dateien sind getrennt.
-- [ ] DoD.5 Ein maschineller Plan-Kontext-Report existiert oder ist begruendet verworfen; Planverschiebungen erfolgen nicht ohne Report.
+- [ ] DoD.5 Ein graph-gestuetzter Plan-Kontext-Report existiert oder ist begruendet verworfen; Planverschiebungen erfolgen nicht ohne Report und Graph-/Master-Abgleich.
 - [ ] DoD.6 `docs/plaene/neu/` enthaelt nur echte Intake-Drafts oder ist entsprechend dokumentiert; bereits uebernommene Drafts sind abgeloest oder archiviert.
 - [ ] DoD.7 Agenten-Kontext-Gate prueft Tool-Ignore-/Leseweg-Regeln fuer lokale Artefakte, Archive und Tool-spezifische Adapter.
 - [ ] DoD.8 Agenten-Regeln wurden nur gestrafft, nicht neu erfunden; bestehende Dead-Code-, Scope-, Lock- und Commit-Sicherungen bleiben erhalten.
@@ -228,21 +229,23 @@ output: Weniger Plan-Rauschen fuer Agenten, ohne Dependency-Evidence zu verliere
 
 - [ ] 116.4.1 Master-referenzierte aktive Plaene automatisch erfassen: alle `docs/plaene/aktiv/VXX.md`, die in `docs/Umsetzungsplan.md` verlinkt sind.
 - [ ] 116.4.2 `scripts/plan-context-report.mjs` erstellen oder erweitern; der Report listet master-referenzierte aktive Plaene, nicht referenzierte aktive Plaene, bereits uebernommene Intake-Drafts, Bot-Training-Sonderfaelle und Archivkandidaten.
-- [ ] 116.4.3 Nicht referenzierte aktive Plaene in Klassen teilen:
+- [ ] 116.4.3 `plan-context-report` graph-gestuetzt machen: Eingaben sind `docs/Umsetzungsplan.md`, VXX-Frontmatter, `docs/generated/knowledge-graph.json` und bei Bedarf `scripts/query-knowledge-graph.mjs` fuer `open-deps`, `scope-collisions` und `surfaces-for-file`.
+- [ ] 116.4.4 Nicht referenzierte aktive Plaene in Klassen teilen:
   - `dependency-source`: noch in Depends-On, Historie oder Closure-Abgleich relevant.
   - `closure-evidence`: abgeschlossen, aber noch als Nachweis wichtig.
   - `superseded`: durch neueren Block oder `CHANGELOG.md` abgeloest.
   - `archive-candidate`: nicht referenziert, nicht dependency-relevant, nicht aktuelle Evidence.
-- [ ] 116.4.4 Nur `archive-candidate`-Dateien verschieben; alle anderen mit Retention-Grund dokumentieren.
-- [ ] 116.4.5 `docs/plaene/neu/` auf echte Intake-Drafts reduzieren: bereits uebernommene Drafts nach `alt/`, Bot-Training-Drafts gegen Bot-Training-Master klassifizieren.
-- [ ] 116.4.6 Evidence-Kompression anwenden: Plan-Evidence nennt Pfad, Gate und Ergebnis, aber keine langen Terminal-Logs oder wiederholten Dateilisten.
-- [ ] 116.4.7 `docs/plaene/aktiv/README.md` und `docs/plaene/neu/README.md` aktualisieren, damit Agenten die Klassen erkennen.
-- [ ] 116.4.8 Keine Master-Intake-Aenderungen ohne User-owned Uebernahme. Der Planentwurf bleibt in `docs/plaene/neu/`, bis der User ihn in den Master aufnimmt.
+- [ ] 116.4.5 Nur `archive-candidate`-Dateien verschieben; alle anderen mit Retention-Grund dokumentieren.
+- [ ] 116.4.6 `docs/plaene/neu/` auf echte Intake-Drafts reduzieren: bereits uebernommene Drafts nach `alt/`, Bot-Training-Drafts gegen Bot-Training-Master klassifizieren.
+- [ ] 116.4.7 Evidence-Kompression anwenden: Plan-Evidence nennt Pfad, Gate und Ergebnis, aber keine langen Terminal-Logs oder wiederholten Dateilisten.
+- [ ] 116.4.8 `docs/plaene/aktiv/README.md` und `docs/plaene/neu/README.md` aktualisieren, damit Agenten die Klassen erkennen.
+- [ ] 116.4.9 Keine Master-Intake-Aenderungen ohne User-owned Uebernahme. Der Planentwurf bleibt in `docs/plaene/neu/`, bis der User ihn in den Master aufnimmt.
 
 Gate:
 
 - `npm run plan:check`
 - `node scripts/plan-context-report.mjs --check` wenn eingefuehrt
+- `npm run graph:check` wenn `docs/generated/knowledge-graph.json` oder Graph-bezogene Reportlogik geaendert wurde
 - Wenn Planstruktur geaendert wurde: `npm run gates:pre-commit`
 - Stichprobe: ein neuer Agent kann aus `AGENTS.md` und `docs/Umsetzungsplan.md` den richtigen aktuellen Plan finden, ohne Altplaene zu lesen.
 
@@ -293,7 +296,7 @@ output: Priorisierte Kandidatenliste mit Verbrauchern, Risiko und Tests.
   - `src/ui/UIStartSyncController.js`
   - `src/ui/UIManager.js`
   - `src/ui/arcade/ArcadeVehicleManager.js`
-- [ ] 116.7.2 Fuer jeden Kandidaten Verbraucher, aktive Blocks, offene Findings und Knowledge-Graph-Surface erfassen.
+- [ ] 116.7.2 Fuer jeden Kandidaten Verbraucher, aktive Blocks, offene Findings und Knowledge-Graph-Surface erfassen; bevorzugt ueber `impact-for-file`, `surfaces-for-file`, `event-flow`, `critical-path-health` und `coverage-report`.
 - [ ] 116.7.3 Fuer jeden Kandidaten eine `Do not touch yet`-Tabelle pflegen: Datei, Problem, Consumer, erster sicherer Slice, Testsignal, Risiko.
 - [ ] 116.7.4 Kandidaten nach Risiko/Nutzen priorisieren:
   - Produktstabilitaet
@@ -352,14 +355,14 @@ output: Weniger Kontext-Rauschen, klare Agenten-Einstiege und vorbereitete Refac
 - [ ] 116.99.1 `docs/Umsetzungsplan.md`, aktive V116-Detaildatei, `docs/prozess/Open_Findings.md` und `docs/plaene/CHANGELOG.md` zeigen denselben Abschlussstand.
 - [ ] 116.99.2 Keine offenen eigenen Cleanup-Aenderungen bleiben uncommitted.
 - [ ] 116.99.3 Abschluss-Evidence nennt konkret: entfernte/archivierte Artefaktklassen, geschuetzte Klassen, Plan-Klassifikation, Agenten-Kontext-Regel und Refactor-Folgeempfehlung.
-- [ ] 116.99.4 Abschluss-Evidence nennt auch: Standard-Read-Budget, Plan-Kontext-Report, Agenten-Kontext-Gate, Evidence-Kompressionsregel und Rebuild-Spike-Abgrenzung.
+- [ ] 116.99.4 Abschluss-Evidence nennt auch: Standard-Read-Budget, graph-gestuetzten Plan-Kontext-Report, Agenten-Kontext-Gate, Evidence-Kompressionsregel und Rebuild-Spike-Abgrenzung.
 - [ ] 116.99.5 Gates: `npm run plan:check`, `npm run check:gemini`, `npm run check:agent-context` falls eingefuehrt, `npm run gates:pre-commit`; weitere technische Gates nur fuer tatsaechlich geaenderte Codepfade.
 
 ## Risiko-Register
 
 | Risiko | Schwere | Beschreibung | Gegenmassnahme |
 | --- | --- | --- | --- |
-| R1 | hoch | Zu aggressive Archivierung entfernt noch relevante Plan-Evidence. | Nie nach Datum verschieben; nur nach Master-/Dependency-/Closure-Klassifikation. |
+| R1 | hoch | Zu aggressive Archivierung entfernt noch relevante Plan-Evidence. | Nie nach Datum verschieben; nur nach Master-/Dependency-/Closure-Klassifikation plus Graph-Abgleich. |
 | R2 | hoch | Cleanup entfernt produktive oder lizenzrelevante Assets. | `workspace-cleanup` nutzt Dry-Run, getrackte-Datei-Schutz und No-Touch-Klassen; Assets nur nach Consumer-Pruefung. |
 | R3 | mittel | Agenten lesen trotz Policy alte Plaene. | Onboarding und Tool-Ignore-Regeln schaerfen; Archive nur bei explizitem Auftrag. |
 | R4 | mittel | Governance-Straffung entfernt wichtige Safety-Regeln. | Dead-Code-, Git-, Lock- und Commit-Regeln unveraendert pruefen; `gates:pre-commit`. |
@@ -368,6 +371,7 @@ output: Weniger Kontext-Rauschen, klare Agenten-Einstiege und vorbereitete Refac
 | R7 | niedrig | Weniger Standardkontext macht Historie schwerer findbar. | Historie bleibt erhalten; README/Onboarding beschreibt explizite Suchpfade. |
 | R8 | mittel | `CURRENT_CONTEXT.md` driftet vom Master ab. | Maximal einseitig, nur Lagezettel, Check gegen Master oder bewusst optional halten. |
 | R9 | mittel | Rebuild-Spike wird unbemerkt zum zweiten Hauptprojekt. | Eigener User-Intake, Paritaetsgate und Abbruchkriterien vor jedem Spike. |
+| R10 | mittel | Knowledge-Graph ist stale und stuetzt falsche Plan-Klassifikation. | `graph:check`/`docs:sync` bei Graph-Diff; Report muss Master und Graph getrennt ausweisen. |
 
 ## Automatisierungsstrategie
 
@@ -379,7 +383,7 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 4. Keine pauschalen Voll-Test-Suites ohne User-Entscheidung.
 5. Keine Loeschungen in `src/`, `docs/plaene/aktiv/`, `docs/bot-training/`, `assets/`, `data/` oder `prototypes/` ohne explizite Klassifikation.
 6. Keine Veraenderung an Bot-Training-Parametern, Physik-Tuning, Kollisionslogik oder Recording-Verhalten in Cleanup-Phasen.
-7. Planverschiebungen erst nach `plan-context-report`; keine Datum- oder Namensheuristik als alleinige Entscheidungsgrundlage.
+7. Planverschiebungen erst nach graph-gestuetztem `plan-context-report`; keine Datum- oder Namensheuristik als alleinige Entscheidungsgrundlage.
 8. Rebuild-/Reborn-Pfade nur als separater Spike mit User-Intake und Paritaetsgate.
 
 ## Vorgeschlagene Master-Intake-Daten
@@ -403,4 +407,4 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 - Sollen Videos und grosse lokale Artefakte nur archiviert oder auch extern ausgelagert werden?
 - Soll `docs/CURRENT_CONTEXT.md` als einseitiger Lagezettel eingefuehrt werden oder reicht `AGENTS.md` plus Master-Index?
 - Soll `check:agent-context` ein neues Gate werden oder in `check:gemini`/`docs:check` integriert werden?
-- Soll der Plan-Kontext-Report nur berichten oder spaeter auch sichere Verschiebungen automatisieren?
+- Soll der graph-gestuetzte Plan-Kontext-Report nur berichten oder spaeter auch sichere Verschiebungen automatisieren?
