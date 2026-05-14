@@ -1,0 +1,290 @@
+---
+planned_block_id: V119
+title: Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet
+status: draft
+priority: P2
+owner: frei
+depends_on:
+  - V107.99
+  - V110.99
+  - V111.99
+soft_depends_on:
+  - V112.99
+  - V96.99
+  - V106.99
+  - V113.99
+blocked_by: []
+affected_area: knowledge-graph-product-semantics
+scope_files:
+  - data/contracts/knowledge-graph/**
+  - docs/generated/knowledge-graph.json
+  - docs/generated/knowledge-graph.coverage.json
+  - docs/generated/knowledge-graph.scorecard.json
+  - docs/generated/knowledge-graph.schema.json
+  - scripts/build-knowledge-graph.mjs
+  - scripts/check-knowledge-graph.mjs
+  - scripts/check-knowledge-graph-slos.mjs
+  - scripts/query-knowledge-graph.mjs
+  - scripts/export-knowledge-graph-view.mjs
+  - tests/knowledge-graph-build.contract.test.mjs
+  - tests/knowledge-graph-query.contract.test.mjs
+  - docs/referenz/ai_architecture_context.md
+  - docs/referenz/ai_project_onboarding.md
+  - docs/prozess/Open_Findings.md
+  - .agents/test_mapping.md
+  - docs/plaene/aktiv/V119.md
+  - docs/plaene/CHANGELOG.md
+scope_overlap_allowed_with:
+  - V96
+  - V106
+  - V107
+  - V110
+  - V111
+  - V112
+  - V113
+verification:
+  - npm run graph:build
+  - npm run graph:check
+  - npm run graph:slo
+  - npm run plan:check
+  - npm run docs:sync
+  - npm run docs:check
+source_history:
+  - docs/plaene/neu/Feature_Wissensgraph_Produktsemantik_Ausbau_V119.md
+---
+
+# Feature: Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet (V119)
+
+## Ziel
+
+Den bestehenden Wissensgraphen aus `V107`, `V110` und `V111` von einem starken Plan-/Scope-/Diagnoseindex zu einem nachhaltig nuetzlichen Produktsemantik-Layer ausbauen.
+
+Der Fokus liegt nicht auf mehr Graph-Tooling, sondern auf mehr belastbarem Spielwissen: Gameplay-Flows, UI-/Overlay-Flows, Runtime-/Boundary-Flows, Authoring-/Map-Flows, Training-/Validation-Beruehrungen und die jeweils kleinste sinnvolle Test-/Gate-Evidence sollen so modelliert werden, dass Agents und Menschen weniger Volltextsuche brauchen und schneller belastbare Entscheidungen treffen.
+
+## Problemstand
+
+- Der aktuelle Graph ist operational gesund: `graph:check`, `schema-lint`, `critical-path-health` und Coverage-Gate sind gruen.
+- Der semantische Produktkern ist aber noch klein: wenige Runtime-, Event- und Test-Knoten tragen sehr viel Nutzwert, waehrend Datei-, Phase- und Subphase-Knoten den Graphen dominieren.
+- `coverage-report` zeigt weiterhin viele aktive uncovered Files. Das Coverage-Gate verhindert neue Luecken, reduziert aber bestehende Luecken nicht automatisch.
+- Folgearbeiten wie `V112`, `V96`, `V106` und `V113` erzeugen voraussichtlich genau die Produktsemantik, die im Graphen dauerhaft sichtbar werden sollte.
+- Ohne gezielten Ratchet bleibt der Graph zwar technisch korrekt, aber sein Name "Spiel-Wissensgraph" bleibt groesser als sein tatsaechlicher Produktinhalt.
+
+## Nicht-Ziel
+
+- Kein neues externes Graphdatenbank-, BI- oder Reporting-System.
+- Kein Rewrite von Builder, Query-CLI oder Viewer ohne konkreten Nutzwert.
+- Kein automatisches Verschieben, Archivieren oder Masterplan-Editieren.
+- Kein produktiver Gameplay-, UI-, Physik-, Bot-Training- oder Boundary-Refactor in diesem Block.
+- Keine Vollabdeckung aller Dateien um jeden Preis; wichtiger ist priorisierte, erklaerbare und wartbare Semantik.
+- Keine Verwendung von Graph-Outputs als automatische Freigabe bei mittlerer oder hoher Unsicherheit.
+
+## Desktop-first Scope
+
+- Primaerer Zielpfad bleibt die Desktop-App: Boot, Menu, Matchstart, Ingame-HUD, Input, Kollision, Arcade, Round-End, Settings, Maps/Authoring und relevante Runtime-Boundaries.
+- Browser-/Demo-Pfade werden nur modelliert, wenn sie dieselben Shared-Contracts, Plattformadapter oder Surface-Policies betreffen.
+- Bot-Training wird nicht in den Masterplan gezogen. Training-/Validation-Beruehrungen werden nur als Rand- oder Handoff-Semantik modelliert, wenn sie produktive Runtime-, Terminal-, Seed- oder Evaluation-Vertraege erklaeren.
+
+## Geplanter Nutzwert
+
+- `impact-for-file` soll fuer produktnahe Hotspots nicht nur Plan-Scopes, sondern echte Spielbedeutung, kritische Flows, Tests, Owner, Stability und Guardrails liefern.
+- `event-flow` soll mehr als vier Kernpfade tragen und die wichtigsten UI-/Gameplay-/Authoring-Flows reproduzierbar abbilden.
+- `test-prioritization` soll fuer V112-/V96-/V106-/V113-nahe Dateien die kleinste sinnvolle Testauswahl liefern.
+- `coverage-report` soll nicht nur neue Luecken verhindern, sondern priorisierte Alt-Luecken abbauen.
+- `quality-scorecard` soll Produktsemantik separat von Plan-/Governance-Masse ausweisen.
+- Agents sollen bei Plan-, Bugfix- und Review-Arbeit zuerst Graph-Queries nutzen koennen, ohne durch Planrauschen oder zu breite Kanten irregefuehrt zu werden.
+
+## Planungsprinzipien
+
+- Produktsemantik vor Graphmenge: Ein neuer Knoten muss eine konkrete Frage besser beantworten.
+- Query-first: Jede modellierte Semantik bekommt mindestens eine Zielquery, die dadurch messbar besser wird.
+- Evidence-first: Kritische Kanten brauchen Provenance, Test- oder Contract-Bezug und eine klare Unsicherheitsklasse.
+- Ratchet statt Big Bang: Bestehende Luecken werden nach Risiko und Hotspot-Wert abgebaut, nicht pauschal.
+- Kein Schattenwissen: Neue dauerhafte Daten leben in `data/contracts/knowledge-graph/**`, aktive Plan-Evidence oder Referenzdoku, nicht in verstreuten Statusdateien.
+- Manuelle Kanten bleiben erlaubt, muessen aber als solche erkennbar und reviewbar sein.
+
+## Vorgeschlagene Block-ID und Intake
+
+- Ziel-Masterplan: `docs/Umsetzungsplan.md`
+- Vorgeschlagene Block-ID: `V119`
+- Geplante aktive Datei nach User-Intake: `docs/plaene/aktiv/V119.md`
+- Dieser Draft bleibt bis zur manuellen Uebernahme unter `docs/plaene/neu/`.
+- Manuelle Uebernahme erforderlich: Master-Index und aktive Blockdatei werden nicht automatisch geaendert.
+
+## Abhaengigkeiten
+
+### Hard
+
+- `V107.99`: Basis-Graph, Runtime-/Event-/State-/Config-/Test-Knoten, Kernqueries.
+- `V110.99`: Constraints, Provenance, Contradictions, Replay, SLOs, Delta-Gates.
+- `V111.99`: Ownership/Stability, Weighting, Scorecard, What-if, Test-Priorisierung, Policy/Feedback.
+
+### Soft
+
+- `V112.99`: Liefert produktnahe Input-, Collision-, Arcade-, Overlay- und CSP-Funde als beste erste Semantikquelle.
+- `V96.99`: Liefert Boundary-, Port- und Legacy-Surface-Entscheidungen fuer Runtime/Application-Semantik.
+- `V106.99`: Liefert Map-/Authoring-/GLB-Semantik.
+- `V113.99`: Liefert Hangar-/Rules-Panel- und Mode-Regel-Semantik.
+
+V119 kann als Planung nach `V111.99` vorbereitet werden. Die groesste Produktwirkung entsteht aber, wenn mindestens `V112`-Ergebnisse als erste Harvest-Quelle verfuegbar sind.
+
+## Decision-Klasse und AI-Ausfuehrungsmatrix
+
+| Bereich | Klasse | Default | Grenze |
+| --- | --- | --- | --- |
+| Graph-Reports, Query-Auswertung, Coverage-Priorisierung | D0/D1 | [AUTO] | Keine getrackten Source-of-truth-Dateien aendern |
+| Mapping-Ergaenzungen in `data/contracts/knowledge-graph/**` | D2 | [REVIEW] | Nur nach klarer Query-/Evidence-Begruendung |
+| Builder-/Query-/Check-Aenderungen | D2/D3 | [REVIEW] | Nur wenn Mapping allein die Frage nicht loest |
+| Masterplan, aktive Blockdatei, Rule-/Workflow-Aenderungen | D3 | [USER-GATE] | Keine automatische Umsetzung |
+| Produktcode-, Physik-, UI-, Bot-, Training-, Recording- oder Multiplayer-Aenderungen | D4 falls Teil dieses Blocks | [USER-GATE] | In V119 grundsaetzlich Nicht-Ziel |
+
+## Definition of Done
+
+- [ ] DoD.1 Produktsemantik-Katalog fuer mindestens sechs priorisierte Desktop-Flows existiert und ist querybar.
+- [ ] DoD.2 Mindestens vier neue oder deutlich erweiterte `event-flow`-/`impact-for-file`-Referenzfaelle liefern Runtime-, UI-/Surface-, State-, Config-, Test-, Owner- und Stability-Kontext.
+- [ ] DoD.3 Aktive uncovered Files sind risikobasiert klassifiziert; mindestens die Top-Hotspots aus Produktcode oder Produktdocs sind entweder abgedeckt, bewusst ausgeschlossen oder mit Nachfolgeblock begruendet.
+- [ ] DoD.4 Produktive Graph-Sicht trennt Plan-/Governance-Masse von Spielsemantik, ohne bestehende Governance-Queries zu brechen.
+- [ ] DoD.5 Kanten tragen fuer produktive Semantik eine erkennbare Evidence-Qualitaet (`sourceKind`, Confidence oder gleichwertige Attribute) und `graph:check` validiert Mindestfelder fuer kritische Kanten.
+- [ ] DoD.6 Query-Nutzwert ist gemessen: Referenzqueries liefern weniger Rauschen, passende Tests und klare Unsicherheitsbudgets; `graph:slo` bleibt gruen.
+- [ ] DoD.7 V112-/V96-/V106-/V113-nahe Handoffs sind dokumentiert: welche Semantik wurde uebernommen, welche bewusst vertagt, welche Risiken bleiben.
+- [ ] DoD.8 `npm run graph:build`, `npm run graph:check`, `npm run graph:slo`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert.
+
+## Erfolgsmessung
+
+| Signal | Startpunkt | Ziel |
+| --- | --- | --- |
+| Kritische Pfade | 4 ok | mindestens 8 produktnahe Flows mit Health-/Impact-Sicht |
+| Produktsemantik-Knoten | klein gegenueber Datei-/Planmasse | sichtbarer Ausbau in Runtime/Event/State/Config/Test/Surface/Domain |
+| Aktive uncovered Files | ca. 353 | priorisierte Top-Luecken reduziert oder erklaert |
+| Adjusted Coverage | ca. 74 Prozent | Verbesserung ohne Scheinabdeckung |
+| Query-SLOs | gruen | gruen trotz Semantik-Ausbau |
+| Test-Priorisierung | Settings stark | V112-/V96-nahe Hotspots liefern sinnvolle Testauswahl |
+| Scorecard | pass | Produktsemantik separat ausgewiesen, Trend erklaerbar |
+
+## Risiken
+
+| Risiko | Schwere | Mitigation |
+| --- | --- | --- |
+| Graph wird groesser, aber nicht nuetzlicher | hoch | Jede neue Semantik an Query-Frage und Evidence koppeln |
+| Manuelle Kanten erzeugen Scheingenauigkeit | hoch | Confidence/sourceKind, Provenance und Review-Gates fuer kritische Kanten |
+| Plan-/Governance-Rauschen ueberdeckt Produktantworten | mittel | Produktive Query-Sicht und Filterprofile |
+| Coverage-Ratchet fuehrt zu oberflaechlicher Scheinabdeckung | mittel | Top-Hotspot-Priorisierung und Ausschlussbegruendung statt Quote um jeden Preis |
+| V119 kollidiert mit V112/V96/V106/V113 | mittel | Harvest-/Handoff-Phasen, keine produktiven Code-Aenderungen |
+| Query-Outputs werden zu breit | mittel | Presets und Default-Minimierung; Details nur per `--json`/erweitertem Profil |
+| Builder-/Check-Aenderungen destabilisieren bestehende Gates | mittel | Mapping-first, kleine Contract-Tests, `graph:slo` vor Abschluss |
+| Bot-Training-Wissen wird versehentlich in Master-Governance gezogen | mittel | Nur Handoff-Kanten fuer produktive Runtime-/Terminal-Vertraege; Bot-Master bleibt separat |
+
+## Phasen
+
+### 119.1 Baseline, Fragenkatalog und Priorisierung
+status: open
+goal: echte Nutzfragen fixieren, bevor neue Semantik modelliert wird
+output: priorisierte Semantik-Backlogliste mit Query-Zielen und Evidence-Anforderungen
+
+- [ ] 119.1.1 Aktuellen Graph-Zustand erfassen: `critical-path-health`, `coverage-report`, `quality-scorecard`, `schema-lint`, `scope-collisions`, `test-prioritization` fuer Settings und je einen V112-/V96-Hotspot.
+- [ ] 119.1.2 Produktfragenkatalog erstellen: mindestens 12 Fragen aus Bugfix, Review, Playtest, Runtime-Diagnose, UI-Hardening, Map/Authoring und Boundary-Arbeit.
+- [ ] 119.1.3 Fragen auf Zielqueries mappen: `impact-for-file`, `event-flow`, `change-risk`, `what-if-*`, `test-prioritization`, `coverage-report`, `surfaces-for-file`.
+- [ ] 119.1.4 Priorisierungsmatrix festlegen: Nutzerwirkung, Regression-Risiko, Hotspot-Haeufigkeit, vorhandene Tests, vorhandene Contracts, Unsicherheit.
+
+### 119.2 Produktsemantik-Taxonomie
+status: open
+goal: ein kleines, klares Modell fuer Spielwissen statt freier Ad-hoc-Kanten
+output: versionierte Produktsemantik-Konventionen fuer neue Knoten und Kanten
+
+- [ ] 119.2.1 Node-Typen und Attribute pruefen/erweitern: `surface`, `domain`, `mode`, `authoring`, `validation`, optional `flow` oder gleichwertige existierende Typen wiederverwenden.
+- [ ] 119.2.2 Relationstypen begrenzen und dokumentieren: keine Synonymflut; neue Relationen nur mit Query-Nutzen und Predicate-Constraints.
+- [ ] 119.2.3 Evidence-Felder fuer kritische Produktkanten definieren: `sourceKind`, `confidence`, `sourceWindow`, `reviewRequired` oder kompatible bestehende Attribute.
+- [ ] 119.2.4 Produktive Sicht definieren: Default-Filter, der Plan-/Subphase-Masse ausblendet, ohne `open-deps`, `scope-collisions` und Governance-Queries zu schwachen.
+
+### 119.3 V112-Flow-Harvest
+status: open
+goal: Spielaudit- und Playtest-Funde als erste grosse Produktsemantikquelle nutzen
+output: modellierte Input-, Collision-, Arcade- und UI-Overlay-Flows
+
+- [ ] 119.3.1 Input-Lifecycle modellieren: `InputManager`, Fokuswechsel, Textinput, Match/Menu-Uebergaenge, relevante Tests und Open-Finding-Bezug.
+- [ ] 119.3.2 Collision-/Bounce-/Replay-Semantik modellieren: deterministische Pfade, Runtime-Systeme, State-/Config-Bezuege, Testsignale.
+- [ ] 119.3.3 Arcade-Run-Semantik modellieren: Seed-Quelle, Sudden-Death-Lifecycle, Run-State, Overlay-Abhaengigkeiten, Contract-/Targeted-Tests.
+- [ ] 119.3.4 Surface-/Injection-Semantik modellieren: Start-Setup, Arcade-Overlay, sichere DOM-Erzeugung, Negativtests und CSP-Nebenpfad.
+
+### 119.4 Boundary-, Map- und Rules-Harvest
+status: open
+goal: Folgeblockwissen aus V96/V106/V113 in graphnahe Produktentscheidungen ueberfuehren
+output: Boundary-, Authoring- und Rules-Flows mit Handoff-Kanten
+
+- [ ] 119.4.1 V96-nahe Boundary-Semantik modellieren: Application/Core/UI-Port-Grenzen, Runtime-Ports, Legacy-Surface-Reste, Ratchet-Gates.
+- [ ] 119.4.2 V106-nahe Map-/Authoring-Semantik modellieren: GLB-Presets, Collider-Modi, Editor-/JSON-/Runtime-Roundtrip, Asset-Herkunft.
+- [ ] 119.4.3 V113-nahe Hangar-/Rules-Semantik modellieren: Mode-Regeln, Rules Panel, Hangar Contracts, Start-/Preview-Surfaces.
+- [ ] 119.4.4 Handoff-Regel einfuehren: abgeschlossene Produktbloecke nennen, welche Semantik in den Graphen gehoert und welche bewusst nicht.
+
+### 119.5 Coverage- und Hotspot-Ratchet
+status: open
+goal: bestehende Graph-Luecken nachhaltig reduzieren, ohne Scheinabdeckung zu erzeugen
+output: priorisierte Coverage-Reduktion mit begruendeten Ausschluessen
+
+- [ ] 119.5.1 `uncoveredActiveFileCount` nach Klasse, Hotspot, Produktnaehe und Risiko clustern.
+- [ ] 119.5.2 Top-Produktcode-Luecken in drei Klassen einteilen: `semantic-coverage-now`, `covered-by-parent-flow`, `defer-with-owner`.
+- [ ] 119.5.3 Top-Produktdoc-Luecken pruefen: Referenzdoku, aktive Evidence, historische Ablage oder bewusst nicht graphrelevant.
+- [ ] 119.5.4 Coverage-Gate erweitern: nicht nur "keine neuen Luecken", sondern optional "Top-Hotspot darf nicht unerklaert bleiben".
+
+### 119.6 Query-UX und Rauschreduktion
+status: open
+goal: produktive Antworten knapper und alltagstauglicher machen
+output: bessere Defaults fuer Agents, Reviews und Incident-Diagnosen
+
+- [ ] 119.6.1 Produktive Filterprofile ergaenzen: `product`, `review`, `incident`, `onboarding` auf Output-Breite und Relevanz pruefen.
+- [ ] 119.6.2 `impact-for-file` fuer gemischte Dateien verbessern: Plan-/Scope-Kontext sekundar, Produktsemantik primaer, wenn vorhanden.
+- [ ] 119.6.3 `event-flow` fuer neue Flows stabilisieren: Textausgabe knapp, JSON vollstaendig, ContextEdges sortiert nach Causal-/Evidence-Wert.
+- [ ] 119.6.4 `test-prioritization` gegen neue Produktflows testen: keine Testflut, klare Begruendung pro vorgeschlagenem Test.
+
+### 119.7 Governance, Stewardship und Nachhaltigkeit
+status: open
+goal: der Graph bleibt lebendig, aber wird kein Pflegegrab
+output: klare Pflege- und Review-Regeln fuer Produktsemantik
+
+- [ ] 119.7.1 Ownership-Modell fuer Produktsemantik festlegen: pro Flow Owner/Steward, Review-Bedarf, Delete-/Update-Kriterium.
+- [ ] 119.7.2 Abschlussregel fuer produktnahe Folgeblocks ergaenzen: Wenn ein Block kritische Runtime-/UI-/Authoring-Semantik aendert, muss Graph-Handoff geprueft oder begruendet verworfen werden.
+- [ ] 119.7.3 Drift-Review planen: monatlich oder pro Release `quality-scorecard`, `coverage-report`, `critical-path-health`, `temporal-anomalies`.
+- [ ] 119.7.4 Bot-/Training-Abgrenzung dokumentieren: produktive Runtime-Vertraege ja, Trainingsmaster bleibt eigene Quelle.
+
+### 119.8 Verifikation und Referenzfaelle
+status: open
+goal: nachhaltige Aussagen durch reproduzierbare Checks absichern
+output: Contract-/Query-/SLO-Evidence fuer neue Semantik
+
+- [ ] 119.8.1 Golden-Referenzen fuer mindestens vier neue Flows in Contract-Tests oder Query-Fixtures absichern.
+- [ ] 119.8.2 `graph:check` um neue Mindestvalidierungen erweitern, falls Mapping-Konventionen allein nicht reichen.
+- [ ] 119.8.3 `graph:slo` nach Semantik-Ausbau pruefen und Budgets nur begruendet anpassen.
+- [ ] 119.8.4 Vor Abschluss alle Referenzqueries dokumentieren: Befehl, erwarteter Nutzwert, wichtigste Evidence.
+
+### 119.99 Abschluss-Gate
+status: open
+goal: Produktsemantik-Ausbau belastbar und ohne neue Pflegefalle abschliessen
+output: gruene Graph-/Plan-/Docs-Gates mit klarer Nutzwert-Evidence
+
+- [ ] 119.99.1 Alle frueheren Phasen sind abgeschlossen oder blockerfest mit Nachfolgeentscheid dokumentiert.
+- [ ] 119.99.2 `npm run graph:build`, `npm run graph:check`, `npm run graph:slo`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen.
+- [ ] 119.99.3 Referenzqueries zeigen den verbesserten Nutzwert fuer mindestens vier neue Produktflows.
+- [ ] 119.99.4 Coverage-/Hotspot-Ratchet ist sichtbar: Top-Luecken reduziert, erklaert oder mit Owner/Nachfolgeblock versehen.
+- [ ] 119.99.5 Abschlussnotiz in `docs/plaene/CHANGELOG.md` erklaert Produktnutzen, Grenzen, verbleibende Risiken und naechste Semantik-Kandidaten.
+
+## Vorgeschlagene Referenzqueries
+
+```bash
+node scripts/query-knowledge-graph.mjs critical-path-health --json
+node scripts/query-knowledge-graph.mjs coverage-report --json
+node scripts/query-knowledge-graph.mjs quality-scorecard --json
+node scripts/query-knowledge-graph.mjs schema-lint --json
+node scripts/query-knowledge-graph.mjs scope-collisions --json
+node scripts/query-knowledge-graph.mjs impact-for-file src/core/InputManager.js --json
+node scripts/query-knowledge-graph.mjs impact-for-file src/entities/systems/CollisionResponseSystem.js --json
+node scripts/query-knowledge-graph.mjs impact-for-file src/core/arcade/ArcadeRunRuntime.js --json
+node scripts/query-knowledge-graph.mjs impact-for-file src/ui/start-setup/StartSetupUiOps.js --json
+node scripts/query-knowledge-graph.mjs test-prioritization src/core/InputManager.js src/core/arcade/ArcadeRunRuntime.js --json
+```
+
+## Intake-Hinweis fuer den User
+
+- Dieser Draft ist bewusst ausfuehrlich, aber noch kein aktiver Masterplan-Block.
+- Fuer Intake in den Master bitte `V119` oder eine andere freie Block-ID bestaetigen.
+- Bei Intake sollte `V119` als P2 geplant werden, mit `V107.99`, `V110.99`, `V111.99` als harte Dependencies und `V112`, `V96`, `V106`, `V113` als weiche Harvest-Quellen.
+- Empfohlener Startzeitpunkt: nach oder parallel zu den ersten abgeschlossenen V112-Slices, damit der Graph echte Playtest-/Audit-Semantik statt abstrakter Wunschkanten bekommt.
+- Manuelle Uebernahme erforderlich: erst nach User-Entscheidung in `docs/Umsetzungsplan.md` und `docs/plaene/aktiv/V119.md` ueberfuehren.
