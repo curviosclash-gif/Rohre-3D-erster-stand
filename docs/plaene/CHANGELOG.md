@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-14 (Subphase `V117 117.3`)
+
+- `117.3` ist geschlossen: `scripts/check-ai-decision-policy.mjs` und `npm run check:ai-decision-policy` liefern einen eigenstaendigen Report-only-Check fuer D4-nahe Begriffe, Source-of-truth-Flaechen und neue dauerhafte Ablagen ohne den Pre-Commit-Pfad zu blockieren.
+- Decision: Check bleibt bewusst ausserhalb `docs:check` und `gates:pre-commit`; Chosen: niedrigschwelliger Review-Hinweis statt harter Policy-Blocker; Risk: Muster koennen rauschen, deshalb Exit 0 und spaetere Gate-Integration nur nach Stabilisierung.
+
 ## Stand-Snapshot 2026-05-14 (Subphase `V117 117.2`)
 
 - `117.2` ist geschlossen: Das Decision Framework, Repo-Organisationsregeln und Subagent-/Parallel-Agent-Regeln sind operativ in `planning_and_governance.md` verankert; `plan.md`, `code.md`, `quick.md` und `bugfix.md` enthalten nur knappe Verweise statt duplizierter Formularlogik.
