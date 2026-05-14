@@ -9291,6 +9291,17 @@
       }
     },
     {
+      "id": "V117.2.4",
+      "type": "subphase",
+      "title": "Subagent-/Parallel-Agent-Regeln zentral verankern: explizite User-Erlaubnis, nur unabhaengige oder disjunkte Teilaufgaben, klare Ownership, keine Gate-Umgehung, fuehrender Agent bleibt integrations- und evidence-verantwortlich.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.2",
+        "subphaseCode": "117.2.4"
+      }
+    },
+    {
       "id": "V117.3.1",
       "type": "subphase",
       "title": "Pruefen, welche Regeln maschinell sinnvoll validierbar sind: verbotene Auto-Move-Claims, fehlende User-Gates, D4 ohne Freigabe, grosse Diffs ohne Blast-Radius.",
@@ -9354,6 +9365,17 @@
         "blockId": "V117",
         "phaseCode": "117.99",
         "subphaseCode": "117.99.3"
+      }
+    },
+    {
+      "id": "V117.99.4",
+      "type": "subphase",
+      "title": "Subagent-Nutzung ist mit der operativen Rule konsistent und in Abschluss-Evidence nur dort erwaehnt, wo sie tatsaechlich fuer parallele Recherche, Review, Verifikation oder disjunkte Umsetzung genutzt wurde.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.99",
+        "subphaseCode": "117.99.4"
       }
     },
     {
@@ -57667,6 +57689,17 @@
       }
     },
     {
+      "from": "V117.2",
+      "to": "V117.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.2",
+        "subphaseCode": "117.2.4"
+      }
+    },
+    {
       "from": "V117.3",
       "to": "V117.3.1",
       "type": "contains_subphase",
@@ -57730,6 +57763,17 @@
         "blockId": "V117",
         "phaseCode": "117.99",
         "subphaseCode": "117.99.3"
+      }
+    },
+    {
+      "from": "V117.99",
+      "to": "V117.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V117",
+        "phaseCode": "117.99",
+        "subphaseCode": "117.99.4"
       }
     },
     {

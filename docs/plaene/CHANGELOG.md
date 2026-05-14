@@ -12,6 +12,7 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - Der Block macht das vorhandene Draft-Ziel zum aktiven P1-Startpfad: D0-D4-Entscheidungsklassen, Evidence-/Confidence-Regeln, Blast-Radius, Stop-Loss und User-Gates werden vor V116 zentralisiert. Zweck: Cleanup-, Archivierungs-, Governance- und Refactor-Arbeit nicht als automatische Routinearbeit fehlzuklassifizieren.
 - Plan-Schaerfung 2026-05-14: V117 fuehrt Repo-Organisationsregeln mit Zweckklassen fuer neue Ablagen ein; V116 verankert darauf aufbauend Archivordner mit README/Index, Knowledge-Graph-/Report-Verknuepfung und kompakter Changelog-Pflicht. Zweck: Archiv bleibt nachvollziehbare Historie, verliert aber aktive Plan-Autoritaet und wird fuer Agenten nicht mit aktuellen Plaenen verwechselt.
 - Governance-Schaerfung 2026-05-14: V117s gewaehlter Umsetzungspfad ist zentral in `planning_and_governance.md` verankert; die Workflows verweisen nur knapp auf Decision-Klassen und Zweckklassen. Zweck: D3/D4-User-Gates und Ablage-Disziplin werden operativ sichtbar, ohne kleine D2-Arbeit mit Formularpflicht zu ueberladen.
+- Plan-Erweiterung 2026-05-14: V117 nimmt Subagent-/Parallel-Agent-Nutzung als optionales Ausfuehrungsmuster auf. Zweck: parallele Recherche, Review, Verifikation oder disjunkte Umsetzung ermoeglichen, aber nur mit expliziter User-Erlaubnis, klarer Ownership und ohne Umgehung von D3/D4-Gates oder Abschluss-Evidence.
 
 ## V105 Follow-up 2026-05-13
 
