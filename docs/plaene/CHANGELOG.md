@@ -550,6 +550,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `115.3` ist geschlossen: Playwright-/Targeted-Harness-Spawnfehler erhalten Diagnoseartefakte, Windows-Spawn-Fallbacks und pro Cluster klassifizierte `harness-spawn-error`-Reports; der breite Test-Barrel ist nach Consumer-Gruppen dokumentiert.
 - `115.4` ist bis auf P27 geschlossen: P28 bleibt als additiver v1-Traversal-Pfad dokumentiert und getestet, P29 wirft bei fehlendem Download-Handler nicht mehr, P30 hat einen Runtime-Consumer-Nachweis, und P31 ergaenzt Registry-Immutability-Tests. Offen bleibt nur die repo-weite P27-Evidence-Kuerzung.
 
+## Abschluss-Snapshot 2026-05-14 (Block `V115 115.99`)
+
+- `V115` ist geschlossen: P27 ist aus den offenen Findings entfernt, und die V115-Evidence bleibt in den Planstellen kompakt mit konkreten Commands, Commits oder Artefakten statt pauschalen `verified`-Claims.
+- Der Master-Index steht fuer V115 auf `done`/`115.99`; `docs/prozess/Open_Findings.md` enthaelt keine V115-Zuordnung mehr.
+- Abschluss-Evidence: `npm run test:fast`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, `npm run graph:build` und `npm run gates:pre-commit` im Closure-Slice.
+
 ## Stand-Snapshot 2026-05-13 (Gemini-Governance-Hygiene)
 
 - Gemini-Gedaechtnis-/Skill-Definitionen nachgezogen: `.gemini/skills/plan-generator/SKILL.md` respektiert jetzt die User-owned Intake-Governance (`docs/plaene/neu/` statt direkter Master-/Aktivblock-Aenderung), und `.gemini/agents/test_engineer.md` verweist auf `.agents/test_mapping.md`, `docs/qa/**` und aktive Blockplaene statt auf eine nicht vorhandene `Open_Findings.md`.

@@ -9,7 +9,6 @@ Diese Datei ist die kanonische Ablage fuer offene Findings, Review-Reste und Aud
 - `V102`: `P41` bis `P46`
 - `V104`: `P14` plus architektureller Zuschnitt aus `P45` fuer `UIStartSyncController`, `UIManager`-nahe Menuepfade und `ArcadeVehicleManager`
 - `V105`: `P47` bis `P48`
-- `V115`: `P27` (Product & Infra Follow-up; `P6`, `P7`, `P12`, `P22`, `P23`, `P24`, `P25`, `P26`, `P28`, `P29`, `P30` und `P31` sind erledigt)
 - Delta-Folgearbeit Spielaudit B01-B13 (ohne Doppelung zu `V99`/`V102`/`V104`/`V105`): `docs/qa/Spielaudit_2026-04-28/Audit_Umsetzungsplan_B01-B13.md` (D1-D6)
 
 ## Offene Findings
@@ -18,7 +17,6 @@ Diese Datei ist die kanonische Ablage fuer offene Findings, Review-Reste und Aud
 | --- | --- | --- | --- |
 | P14 | `UIStartSyncController.js` | Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()`; nachhaltige Behebung ueber Ownership-/Port-Zuschnitt in `V104` | mittel |
 | P21 | `package.json`, `package-lock.json` | `npm audit --json` meldet noch 2 moderate Root-Befunde (`vite`/`esbuild`); V90 haelt den Major-Upgrade-Blocker und das Build-/Typecheck-Abschlussgate fest | mittel |
-| P27 | `docs/plaene/aktiv/*.md`, `docs/Umsetzungsplan.md` | Evidence-Strings teils laenger als eigentlicher Arbeitsnachweis | niedrig |
 | P45 | `tests/audio.contract.test.mjs` | Test-Isolation fuer `MockAudioContext` in `afterEach` nicht konsistent (`global.AudioContext` reset fehlt) | niedrig |
 | P45 | `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `vite.config.js` | Hohe Komplexitaet in Hotspots erhoeht Regressionsrisiko | mittel |
 | P46 | `eslint.config.js`, `tsconfig.architecture.json` | Tooling-Gates decken nur engen Laufzeitpfad ab | mittel |

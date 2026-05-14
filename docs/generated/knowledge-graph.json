@@ -1228,7 +1228,7 @@
       "id": "V115",
       "type": "block",
       "title": "Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery)",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -1236,7 +1236,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "115.4",
+        "currentPhase": "115.99",
         "planFile": "docs/plaene/aktiv/V115.md",
         "scopeDeclarations": [
           ".gemini/agents/3d_math_optimizer.md",
@@ -1246,6 +1246,8 @@
           ".gemini/agents/test_engineer.md",
           ".gemini/skills/plan-generator/SKILL.md",
           "dev/scripts/verify-lock.mjs",
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
           "docs/plaene/aktiv/V115.md",
           "docs/plaene/CHANGELOG.md",
           "docs/prozess/Open_Findings.md",
@@ -1265,7 +1267,7 @@
           "tests/playwright.global-setup.js"
         ],
         "scopeResolution": {
-          "concreteCount": 26,
+          "concreteCount": 28,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -3797,7 +3799,7 @@
       "id": "V115.4",
       "type": "phase",
       "title": "Contract-, Evidence- und API-Reste",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.4"
@@ -3807,7 +3809,7 @@
       "id": "V115.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.99"
@@ -9046,8 +9048,8 @@
     {
       "id": "V115.4.1",
       "type": "subphase",
-      "title": "P27-Evidence in betroffenen Plan- und Masterstellen auf kompakte, nachvollziehbare Claims bringen, ohne Gate-Kommandos oder Commit-/Artefaktbelege zu verlieren.",
-      "status": "open",
+      "title": "P27-Evidence in betroffenen Plan- und Masterstellen auf kompakte, nachvollziehbare Claims bringen, ohne Gate-Kommandos oder Commit-/Artefaktbelege zu verlieren. (abgeschlossen: 2026-05-14; evidence: V115 nutzt je Item kurze Zweck-Claims mit konkreten Commands, Commits oder Artefaktbelegen; `docs/prozess/Open_Findings.md` fuehrt P27 nicht mehr offen)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.4",
@@ -9101,8 +9103,8 @@
     {
       "id": "V115.99.1",
       "type": "subphase",
-      "title": "Alle offenen V115-Findings sind erledigt, bewusst in einen neuen User-owned Intake verschoben oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "Alle offenen V115-Findings sind erledigt, bewusst in einen neuen User-owned Intake verschoben oder blockerfest dokumentiert. (abgeschlossen: 2026-05-14; evidence: `docs/prozess/Open_Findings.md` enthaelt keine V115-Zuordnung mehr)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.99",
@@ -9112,8 +9114,8 @@
     {
       "id": "V115.99.2",
       "type": "subphase",
-      "title": "`docs/prozess/Open_Findings.md`, `docs/Umsetzungsplan.md`, `docs/plaene/aktiv/V115.md` und `docs/plaene/CHANGELOG.md` nennen denselben Status.",
-      "status": "open",
+      "title": "`docs/prozess/Open_Findings.md`, `docs/Umsetzungsplan.md`, `docs/plaene/aktiv/V115.md` und `docs/plaene/CHANGELOG.md` nennen denselben Status. (abgeschlossen: 2026-05-14; evidence: V115 steht auf `done`/`115.99`; Changelog dokumentiert den Abschluss)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.99",
@@ -9123,8 +9125,8 @@
     {
       "id": "V115.99.3",
       "type": "subphase",
-      "title": "`npm run test:fast`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run gates:pre-commit` sind gruen oder mit konkretem Fehlerbericht in `docs/Fehlerberichte/` blockiert.",
-      "status": "open",
+      "title": "`npm run test:fast`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run gates:pre-commit` sind gruen oder mit konkretem Fehlerbericht in `docs/Fehlerberichte/` blockiert. (abgeschlossen: 2026-05-14; evidence: Closure-Gates im Abschlusslauf ausgefuehrt; `npm run graph:build` aktualisierte `docs/generated/knowledge-graph.json` fuer `done`/`115.99`)",
+      "status": "done",
       "attributes": {
         "blockId": "V115",
         "phaseCode": "115.99",
@@ -20383,7 +20385,8 @@
           "V105",
           "V107",
           "V110",
-          "V111"
+          "V111",
+          "V115"
         ],
         "exists": true
       }
@@ -20402,6 +20405,7 @@
           "V107",
           "V110",
           "V111",
+          "V115",
           "V94"
         ],
         "exists": true
@@ -56682,6 +56686,24 @@
     {
       "from": "V115",
       "to": "dev/scripts/verify-lock.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": "docs/generated/knowledge-graph.json",
       "type": "scope",
       "hint": null,
       "attributes": {
