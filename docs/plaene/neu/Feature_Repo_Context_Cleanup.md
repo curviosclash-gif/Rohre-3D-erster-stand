@@ -112,6 +112,19 @@ Ergebnis:
 - Code-Refactoring wird als eigener, kleiner Delivery-Slice behandelt.
 - Der Master bleibt Index; Details bleiben in kanonischen Detaildateien.
 
+## Beschlossene Leitentscheidungen
+
+- V116.1 und V116.2 duerfen parallel zu V115 laufen, weil sie nur Baseline, Dry-Run und lokalen Artefakt-Cleanup betreffen. V116.3 und alle folgenden Phasen warten auf V115.99, damit Governance-, Planstruktur- und Agenten-Kontext-Aenderungen nicht mit offenem V115-Abschluss kollidieren.
+- 116.8 bleibt in V116 nur als optionaler Ausblick und Exit-Kriterium. Der erste echte Code-Entflechtungs-Slice wird als eigener Folgeblock geplant, z. B. V117. V116 veraendert keine produktive Spiel-, Physik-, Bot-, Recording- oder UI-Logik.
+- Kontextregeln gelten fuer Codex, Gemini und Claude. `AGENTS.md` bleibt oberste Repo-Wahrheit; `.agents/rules/` und `.agents/workflows/` sind operative Regeln; `.gemini/README.md` und `CLAUDE.md` sind Tool-Adapter, keine konkurrierenden Projektwahrheiten.
+- `docs/CURRENT_CONTEXT.md` darf als optionaler, maximal einseitiger Lagezettel eingefuehrt werden. Die Datei ersetzt keinen Masterplan, enthaelt keine eigenen Phasen oder DoD und dupliziert keine Projektsteuerung. Sie wird manuell gepflegt; Skripte pruefen hoechstens Laenge und verbotene Planlogik.
+- Der graph-gestuetzte Plan-Kontext-Report startet als Report-/Check-Werkzeug. Er darf Archivkandidaten vorschlagen, aber keine Plaene automatisch verschieben. Auto-Move wird erst spaeter entschieden, wenn der Report mehrfach plausibel war und ein explizites Apply-Flag/User-Freigabe existiert.
+- Alte Plaene sollen aus dem Standard-Kontext heraus, aber nicht nach Alter archiviert werden. Archivierung erfolgt nur nach Klassifikation: `master-referenziert`, `dependency-source`, `closure-evidence`, `superseded`, `archive-candidate`. Unklare Plaene bleiben geschuetzt.
+- Planarchivierung nutzt Unterordner, z. B. `docs/plaene/alt/context-cleanup-2026-05/`, damit V116-Verschiebungen spaeter nachvollziehbar bleiben.
+- Grosse lokale Artefakte werden intern archiviert, wenn sie eindeutig generiert oder veraltet sind. `videos/` bleibt ausdruecklich geschuetzt, weil der Ordner zum Cinematic-Camera-System gehoert; Video-Retention oder Auslagerung braucht einen eigenen Cinematic-/Recording-Scope.
+- `check:agent-context` startet als eigenes, nicht pauschal blockierendes Gate. Eine spaetere Integration in `docs:check` oder `gates:pre-commit` ist erst nach stabilen, rauscharmen Laeufen sinnvoll.
+- Ein Rebuild/Reborn ist kein Default-Pfad. Er ist nur als separater Spike mit eigenem Plan, Zeitlimit, Paritaetsmatrix und User-Freigabe erlaubt. Das Hauptrepo bleibt Source of Truth.
+
 ## Betroffene Quellen
 
 ### Primaere Einstiegsschicht
@@ -158,7 +171,8 @@ Optional kann `docs/CURRENT_CONTEXT.md` als maximal einseitiger Lagezettel entst
 - [ ] DoD.8 Agenten-Regeln wurden nur gestrafft, nicht neu erfunden; bestehende Dead-Code-, Scope-, Lock- und Commit-Sicherungen bleiben erhalten.
 - [ ] DoD.9 Refactor-Kandidaten sind inventarisiert, priorisiert und mit Test-/Gate-Signal versehen; noch kein breiter Code-Umbau im Cleanup-Scope.
 - [ ] DoD.10 Rebuild-/Reborn-Spikes sind ausdruecklich als Nicht-Default abgegrenzt und duerfen den Hauptrepo-Pfad nicht ohne Paritaetsgate ersetzen.
-- [ ] DoD.11 Abschluss-Gates fuer Docs-/Governance-Scope sind gruen oder blockerfest dokumentiert: `npm run plan:check`, `npm run check:gemini`, `npm run gates:pre-commit`.
+- [ ] DoD.11 `videos/` bleibt als Cinematic-Camera-System-Pfad geschuetzt; lokale Artefakt-Archivierung trifft nur eindeutig generierte/veraltete Nicht-Video-Artefakte.
+- [ ] DoD.12 Abschluss-Gates fuer Docs-/Governance-Scope sind gruen oder blockerfest dokumentiert: `npm run plan:check`, `npm run check:gemini`, `npm run gates:pre-commit`.
 - [ ] DoD.99 Der Block ist erst geschlossen, wenn Master, aktive Detaildatei, Open Findings und Changelog denselben Status zeigen.
 
 ## Phasen
@@ -189,7 +203,7 @@ output: Bereinigter Arbeitsbaum fuer ignorierte Artefakte und aktualisierte Rete
 
 - [ ] 116.2.1 `scripts/workspace-cleanup.mjs` pruefen: Schutz fuer getrackte Dateien, aktive Playwright-Locks, `prototypes/`, Recording-Pfade und Retention-Artefakte bestaetigen.
 - [ ] 116.2.2 Dry-Run-Kandidaten klassifizieren: `delete`, `archive`, `protect`; riskante Kandidaten manuell ausnehmen.
-- [ ] 116.2.3 Apply nur fuer konservative Kandidaten: Root-Logs, alte Dev-Logs, nicht aktive `test-results`, eindeutig generierte tmp-Diagnoseartefakte, alte Videos nach Retention-Regel.
+- [ ] 116.2.3 Apply nur fuer konservative Kandidaten: Root-Logs, alte Dev-Logs, nicht aktive `test-results` und eindeutig generierte tmp-Diagnoseartefakte. `videos/` wird nicht archiviert oder geloescht, weil der Ordner zum Cinematic-Camera-System gehoert.
 - [ ] 116.2.4 Nach Apply `git status --short` pruefen: keine unerwarteten tracked Deletes; falls doch, stoppen und Bericht in `docs/Fehlerberichte/` oder Block-Evidence.
 - [ ] 116.2.5 `workspace-cleanup` um eine kompakte Summary-/Explain-Sicht erweitern, falls der Dry-Run fuer Agenten zu lang ist: `safe delete`, `safe archive`, `protected tracked`, `protected unknown`, `needs user decision`.
 - [ ] 116.2.6 `.gitignore` nur dann anpassen, wenn neue generierte Muster wiederholt auftauchen und nicht bereits abgedeckt sind.
@@ -212,7 +226,7 @@ output: Kurzer, verbindlicher Leseweg fuer Codex/Gemini/Claude.
 - [ ] 116.3.4 Falls Tool-spezifische Ignore-Dateien existieren oder sinnvoll sind, nur Kontext-Ausschluesse fuer lokale/archivierte Quellen definieren: `docs/archive/`, `docs/plaene/alt/`, `tmp/`, `logs/`, `.claude/`, `.codex_tmp/`, `videos/`, `dist/`, `test-results/`.
 - [ ] 116.3.5 Sicherstellen, dass Archive nicht aus Git-Historie oder Dokumentation verschwinden; sie werden nur aus dem Standard-Kontext ausgeschlossen.
 - [ ] 116.3.6 `check:gemini` erweitern oder nutzen, um versehentliche Gemini-Memory-/Log-Artefakte im Repo zu verhindern.
-- [ ] 116.3.7 Neues oder erweitertes Agenten-Kontext-Gate definieren: `npm run check:agent-context` prueft Standard-Read-Budget, Ignore-/Kontext-Ausschluesse und Adapter-Prioritaeten.
+- [ ] 116.3.7 Neues oder erweitertes Agenten-Kontext-Gate definieren: `npm run check:agent-context` prueft Standard-Read-Budget, Ignore-/Kontext-Ausschluesse, Adapter-Prioritaeten und `CURRENT_CONTEXT.md`-Grenzen. Das Gate startet eigenstaendig und wird nicht sofort pauschal in `gates:pre-commit` erzwungen.
 
 Gate:
 
@@ -235,7 +249,7 @@ output: Weniger Plan-Rauschen fuer Agenten, ohne Dependency-Evidence zu verliere
   - `closure-evidence`: abgeschlossen, aber noch als Nachweis wichtig.
   - `superseded`: durch neueren Block oder `CHANGELOG.md` abgeloest.
   - `archive-candidate`: nicht referenziert, nicht dependency-relevant, nicht aktuelle Evidence.
-- [ ] 116.4.5 Nur `archive-candidate`-Dateien verschieben; alle anderen mit Retention-Grund dokumentieren.
+- [ ] 116.4.5 Nur `archive-candidate`-Dateien verschieben; alle anderen mit Retention-Grund dokumentieren. Zielpfad fuer V116-Verschiebungen ist ein nachvollziehbarer Unterordner, z. B. `docs/plaene/alt/context-cleanup-2026-05/`.
 - [ ] 116.4.6 `docs/plaene/neu/` auf echte Intake-Drafts reduzieren: bereits uebernommene Drafts nach `alt/`, Bot-Training-Drafts gegen Bot-Training-Master klassifizieren.
 - [ ] 116.4.7 Evidence-Kompression anwenden: Plan-Evidence nennt Pfad, Gate und Ergebnis, aber keine langen Terminal-Logs oder wiederholten Dateilisten.
 - [ ] 116.4.8 `docs/plaene/aktiv/README.md` und `docs/plaene/neu/README.md` aktualisieren, damit Agenten die Klassen erkennen.
@@ -363,13 +377,13 @@ output: Weniger Kontext-Rauschen, klare Agenten-Einstiege und vorbereitete Refac
 | Risiko | Schwere | Beschreibung | Gegenmassnahme |
 | --- | --- | --- | --- |
 | R1 | hoch | Zu aggressive Archivierung entfernt noch relevante Plan-Evidence. | Nie nach Datum verschieben; nur nach Master-/Dependency-/Closure-Klassifikation plus Graph-Abgleich. |
-| R2 | hoch | Cleanup entfernt produktive oder lizenzrelevante Assets. | `workspace-cleanup` nutzt Dry-Run, getrackte-Datei-Schutz und No-Touch-Klassen; Assets nur nach Consumer-Pruefung. |
+| R2 | hoch | Cleanup entfernt produktive oder lizenzrelevante Assets. | `workspace-cleanup` nutzt Dry-Run, getrackte-Datei-Schutz und No-Touch-Klassen; Assets nur nach Consumer-Pruefung; `videos/` ist als Cinematic-Camera-System-Pfad geschuetzt. |
 | R3 | mittel | Agenten lesen trotz Policy alte Plaene. | Onboarding und Tool-Ignore-Regeln schaerfen; Archive nur bei explizitem Auftrag. |
 | R4 | mittel | Governance-Straffung entfernt wichtige Safety-Regeln. | Dead-Code-, Git-, Lock- und Commit-Regeln unveraendert pruefen; `gates:pre-commit`. |
 | R5 | mittel | Type-/Lint-Haertung eskaliert zu breitem Reparaturprojekt. | Gate-Matrix statt Pauschalauftrag; Fehlerklassen separaten Blocks zuordnen. |
 | R6 | mittel | Erster Code-Refactor vermischt Feature-Arbeit und Entflechtung. | 116.8 optional und nur nach User-Bestaetigung; genau eine Verantwortlichkeit. |
 | R7 | niedrig | Weniger Standardkontext macht Historie schwerer findbar. | Historie bleibt erhalten; README/Onboarding beschreibt explizite Suchpfade. |
-| R8 | mittel | `CURRENT_CONTEXT.md` driftet vom Master ab. | Maximal einseitig, nur Lagezettel, Check gegen Master oder bewusst optional halten. |
+| R8 | mittel | `CURRENT_CONTEXT.md` driftet vom Master ab. | Maximal einseitig, manuell gepflegt, nur Lagezettel; Check prueft Laenge und verbotene Planlogik. |
 | R9 | mittel | Rebuild-Spike wird unbemerkt zum zweiten Hauptprojekt. | Eigener User-Intake, Paritaetsgate und Abbruchkriterien vor jedem Spike. |
 | R10 | mittel | Knowledge-Graph ist stale und stuetzt falsche Plan-Klassifikation. | `graph:check`/`docs:sync` bei Graph-Diff; Report muss Master und Graph getrennt ausweisen. |
 
@@ -385,6 +399,7 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 6. Keine Veraenderung an Bot-Training-Parametern, Physik-Tuning, Kollisionslogik oder Recording-Verhalten in Cleanup-Phasen.
 7. Planverschiebungen erst nach graph-gestuetztem `plan-context-report`; keine Datum- oder Namensheuristik als alleinige Entscheidungsgrundlage.
 8. Rebuild-/Reborn-Pfade nur als separater Spike mit User-Intake und Paritaetsgate.
+9. `videos/` ist kein allgemeiner Artefakt-Muellpfad, sondern gehoert zum Cinematic-Camera-System und bleibt in V116 geschuetzt.
 
 ## Vorgeschlagene Master-Intake-Daten
 
@@ -399,12 +414,7 @@ Das Automatisierungs-Skript soll diesen Plan nicht als Abrissauftrag interpretie
 - Current phase nach Intake: `116.1`
 - Manuelle Uebernahme erforderlich: ja
 
-## Offene Entscheidungen fuer den User
+## Verbleibende offene Entscheidungen fuer den User
 
-- Soll V116 erst nach V115.99 starten oder darf 116.1/116.2 als Vorarbeit parallel laufen?
-- Soll der erste Code-Entflechtungs-Slice Teil von V116 bleiben oder als eigener Folgeblock geplant werden?
-- Welche Agenten sollen aktiv ueber Ignore-/Kontextregeln gesteuert werden: Codex, Gemini, Claude oder alle drei?
-- Sollen Videos und grosse lokale Artefakte nur archiviert oder auch extern ausgelagert werden?
-- Soll `docs/CURRENT_CONTEXT.md` als einseitiger Lagezettel eingefuehrt werden oder reicht `AGENTS.md` plus Master-Index?
-- Soll `check:agent-context` ein neues Gate werden oder in `check:gemini`/`docs:check` integriert werden?
+- Soll `check:agent-context` nach stabilen Laeufen dauerhaft eigenstaendig bleiben oder spaeter in `docs:check`/`gates:pre-commit` integriert werden?
 - Soll der graph-gestuetzte Plan-Kontext-Report nur berichten oder spaeter auch sichere Verschiebungen automatisieren?
