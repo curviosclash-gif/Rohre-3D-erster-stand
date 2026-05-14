@@ -1284,14 +1284,14 @@
       "id": "V117",
       "type": "block",
       "title": "AI Decision Framework und Autonomie-Gates",
-      "status": "active",
+      "status": "planned",
       "attributes": {
         "source": [
           "block-plan",
           "master-index"
         ],
         "priority": "P1",
-        "owner": "Codex",
+        "owner": "frei",
         "currentPhase": "117.2",
         "planFile": "docs/plaene/aktiv/V117.md",
         "scopeDeclarations": [

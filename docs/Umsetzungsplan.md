@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-14. Aktiver Lock: `V117 117.2` (Codex); naechster freier P1-Startpfad: `V112 112.1`.
+Stand: 2026-05-14. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V117 117.2`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -56,7 +56,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V114 | SurfacePolicyPort fuer Demo- und Vollversionsgrenze | done | P1 | frei | V98.99,V103.99,V104.99 | 114.1 | `docs/plaene/aktiv/V114.md` |
 | V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | done | P2 | frei | - | 115.99 | `docs/plaene/aktiv/V115.md` |
 | V105 | Architecture-Guard- und Typecheck-Regression-Recovery | done | P1 | frei | V99.99,V102.99,V104.99 | 105.99 | `docs/plaene/aktiv/V105.md` |
-| V117 | AI Decision Framework und Autonomie-Gates | active | P1 | Codex | V109.99 | 117.2 | `docs/plaene/aktiv/V117.md` |
+| V117 | AI Decision Framework und Autonomie-Gates | planned | P1 | frei | V109.99 | 117.2 | `docs/plaene/aktiv/V117.md` |
 | V112 | Spielaudit- und Playtest-Improvement-Paket | planned | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
@@ -118,7 +118,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V114 | - | frei | Geplant |
 | - | V115 | - | closed | Abgeschlossen 2026-05-14 |
 | - | V105 | 2026-05-13 | closed | Abgeschlossen 2026-05-13 |
-| Codex | V117 | 2026-05-14 | active | 117.2 Governance integrieren |
+| - | V117 | - | frei | 117.2 Governance integrieren |
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
