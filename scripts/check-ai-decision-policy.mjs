@@ -24,7 +24,7 @@ const rules = [
     id: 'd4-term-without-user-gate-nearby',
     severity: 'warn',
     pattern: /\b(D4|Auto-Move|auto-?move|Rebuild|Reborn|Loesch|Loeschung|Loeschen|delete|move|verschieb|Archivierung|Archiv-Move|gross(?:e|er|en)? Refactor)\b/i,
-    nearby: /\b(User-Gate|USER-GATE|User-Freigabe|explizite Freigabe|Recovery|Rollback|confirmation|approved|stoppen|fragen|Rueckfrage|Rueckfragepflicht)\b/i,
+    nearby: /\b(User-Gate|USER-GATE|User-Freigabe|explizite Freigabe|Recovery|Rollback|confirmation|confirms|approved|freigegeben|stoppen|fragen|Rueckfrage|Rueckfragepflicht)\b/i,
     message: 'D4-nahe Begriffe sollten nahe User-Gate und Recovery/Rollback nennen.',
   },
   {
@@ -221,11 +221,16 @@ function isIgnorableLine(line) {
     || trimmed.startsWith('affected_area:')
     || /^-\s+Kein(?:e|er|es)?\b/.test(trimmed)
     || /^-\s+Nicht\b/.test(trimmed)
+    || /^-\s+Do not (?:create|change|delete|move|remove)\b/i.test(trimmed)
     || /\bdarf keine\b/i.test(trimmed)
     || /\bdelete[- ]proof\b/i.test(trimmed)
     || /\bdelete[- ]criterion\b/i.test(trimmed)
     || /\bDelete-Kriterium\b/i.test(trimmed)
     || /\bNo file deletion in dry-run\b/i.test(trimmed)
+    || /\bMeta-Gate\b/i.test(trimmed)
+    || /\bwird (?:er )?auf D3 oder D4 hochgestuft\b/i.test(trimmed)
+    || /\bFuer D3\/D4\b/i.test(trimmed)
+    || /\bfreigegebenen\b/i.test(trimmed)
     || /\(abgeschlossen:.*evidence:/i.test(trimmed)
     || /^\|\s*R\d+\s*\|/.test(trimmed)
     || /^-\s+[`'"]?[\w./\\*-]+\.(?:md|mjs|js|json|cjs)[`'"]?\s*$/.test(trimmed);
