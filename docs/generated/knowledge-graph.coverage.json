@@ -160,11 +160,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1844,
-    "rawCoveredFileCount": 1193,
+    "trackedFileCount": 1845,
+    "rawCoveredFileCount": 1194,
     "rawCoveragePercent": 64.7,
-    "adjustedTrackedFileCount": 1363,
-    "adjustedCoveredFileCount": 1010,
+    "adjustedTrackedFileCount": 1364,
+    "adjustedCoveredFileCount": 1011,
     "adjustedCoveragePercent": 74.1,
     "uncoveredFileCount": 651,
     "uncoveredActiveFileCount": 353,
@@ -214,8 +214,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 937,
-        "coveredCount": 814
+        "count": 938,
+        "coveredCount": 815
       },
       {
         "classification": "product-docs",
@@ -16573,6 +16573,25 @@
         "V110",
         "V111",
         "V94"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/check-ai-decision-policy.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V117"
       ],
       "surfaces": [],
       "classification": "product-code",

@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 196,
+          "concreteCount": 197,
           "plannedCount": 0
         }
       }
@@ -1292,7 +1292,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "117.3",
+        "currentPhase": "117.99",
         "planFile": "docs/plaene/aktiv/V117.md",
         "scopeDeclarations": [
           ".agents/rules/code_quality_and_debugging.md",
@@ -1312,8 +1312,8 @@
           "scripts/check-ai-decision-policy.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 14,
-          "plannedCount": 1
+          "concreteCount": 15,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -3879,7 +3879,7 @@
       "id": "V117.3",
       "type": "phase",
       "title": "Check-Strategie",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.3"
@@ -9304,8 +9304,8 @@
     {
       "id": "V117.3.1",
       "type": "subphase",
-      "title": "Pruefen, welche Regeln maschinell sinnvoll validierbar sind: verbotene Auto-Move-Claims, fehlende User-Gates, D4 ohne Freigabe, grosse Diffs ohne Blast-Radius.",
-      "status": "open",
+      "title": "Pruefen, welche Regeln maschinell sinnvoll validierbar sind: verbotene Auto-Move-Claims, fehlende User-Gates, D4 ohne Freigabe, grosse Diffs ohne Blast-Radius. (abgeschlossen: 2026-05-14; evidence: `scripts/check-ai-decision-policy.mjs` Muster fuer D4-nahe Begriffe, Source-of-truth-Flaechen und neue Ablagen + `npm run check:ai-decision-policy` -> report-only)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.3",
@@ -9315,8 +9315,8 @@
     {
       "id": "V117.3.2",
       "type": "subphase",
-      "title": "Optional `scripts/check-ai-decision-policy.mjs` und NPM-Script `check:ai-decision-policy` planen; zuerst nur Report, nicht blockierend. Der Check validiert nur grobe Muster wie D4-Woerter ohne User-Gate, Auto-Move-Claims, Archivierungsplaene ohne `canonical_source`, Archivordner ohne `README.md`, neue dauerhafte `docs/`-Ablagen ohne Zweckklasse, planstrukturveraendernde Skripte oder grosse Diffs ohne Blast-Radius; er versucht nicht, \"gute Entscheidungen\" vollautomatisch zu bewerten.",
-      "status": "open",
+      "title": "Optional `scripts/check-ai-decision-policy.mjs` und NPM-Script `check:ai-decision-policy` planen; zuerst nur Report, nicht blockierend. Der Check validiert nur grobe Muster wie D4-Woerter ohne User-Gate, Auto-Move-Claims, Archivierungsplaene ohne `canonical_source`, Archivordner ohne `README.md`, neue dauerhafte `docs/`-Ablagen ohne Zweckklasse, planstrukturveraendernde Skripte oder grosse Diffs ohne Blast-Radius; er versucht nicht, \"gute Entscheidungen\" vollautomatisch zu bewerten. (abgeschlossen: 2026-05-14; evidence: `package.json` Script `check:ai-decision-policy`, keine Integration in `docs:check` oder `gates:pre-commit` + `npm run check:ai-decision-policy` -> exit 0)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.3",
@@ -9326,8 +9326,8 @@
     {
       "id": "V117.3.3",
       "type": "subphase",
-      "title": "Entscheiden, ob der Check eigenstaendig bleibt oder spaeter in `docs:check`/`gates:pre-commit` integriert wird.",
-      "status": "open",
+      "title": "Entscheiden, ob der Check eigenstaendig bleibt oder spaeter in `docs:check`/`gates:pre-commit` integriert wird. (abgeschlossen: 2026-05-14; evidence: eigenstaendiger Report-only-Check bleibt bewusst ausserhalb blockierender Gates; spaetere Integration nur nach rauscharmer Stabilisierung + `npm run gates:pre-commit` -> commit)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.3",
@@ -25166,12 +25166,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V117"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -43686,6 +43688,15 @@
     {
       "from": "B13",
       "to": "scripts/build-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/check-ai-decision-policy.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {

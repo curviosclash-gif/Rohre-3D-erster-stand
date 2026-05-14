@@ -17,6 +17,7 @@
     "check:eslint:touched-strict": "node scripts/check-eslint-touched-strict.mjs",
     "check:runtime:determinism": "node scripts/check-runtime-determinism.mjs",
     "check:runtime:encoding": "node scripts/check-runtime-encoding.mjs",
+    "check:ai-decision-policy": "node scripts/check-ai-decision-policy.mjs",
     "check:gemini": "node scripts/check-gemini-governance.mjs",
     "dev": "node scripts/dev-with-logs.mjs",
     "dev:logged": "node scripts/dev-with-logs.mjs",
