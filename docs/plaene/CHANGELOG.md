@@ -6,6 +6,12 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-14 (Subphase `V117 117.99`)
+
+- `V117` ist abgeschlossen: D0-D4, Zweckklassen, Stop-Loss, D3/D4-User-Gates, Subagent-Regeln und der nicht blockierende Decision-Policy-Report sind repo-weit verankert.
+- Abschluss-Evidence: D0 bleibt `plan:check`/Graph/Dry-Run, D1 bleibt lokaler Report unter `tmp/`, D2 bleibt scoped Aenderung mit Evidence/Confidence/Gate, D3 braucht User-Gate fuer Governance-/Plan-/Workflow-Aenderungen, D4 braucht User-Gate plus Recovery-/Rollback-Pfad fuer Delete/Move/Rebuild/grosse Refactors.
+- V116 verweist auf `V117.99` und behaelt seine lokale AI-Ausfuehrungsmatrix; kein neuer Schattenprozess oder paralleler Statusspeicher wurde eingefuehrt. Subagents wurden in V117 nicht genutzt.
+
 ## Stand-Snapshot 2026-05-14 (Subphase `V117 117.3`)
 
 - `117.3` ist geschlossen: `scripts/check-ai-decision-policy.mjs` und `npm run check:ai-decision-policy` liefern einen eigenstaendigen Report-only-Check fuer D4-nahe Begriffe, Source-of-truth-Flaechen und neue dauerhafte Ablagen ohne den Pre-Commit-Pfad zu blockieren.

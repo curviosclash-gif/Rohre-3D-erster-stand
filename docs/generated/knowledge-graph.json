@@ -1284,7 +1284,7 @@
       "id": "V117",
       "type": "block",
       "title": "AI Decision Framework und Autonomie-Gates",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -3889,7 +3889,7 @@
       "id": "V117.99",
       "type": "phase",
       "title": "Abschluss",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.99"
@@ -9337,8 +9337,8 @@
     {
       "id": "V117.99.1",
       "type": "subphase",
-      "title": "Regeln, Workflows und V116-Verweise sind konsistent.",
-      "status": "open",
+      "title": "Regeln, Workflows und V116-Verweise sind konsistent. (abgeschlossen: 2026-05-14; evidence: `.agents/rules/planning_and_governance.md`, `.agents/workflows/{plan,code,quick,bugfix}.md`, `docs/plaene/neu/Feature_Repo_Context_Cleanup.md` + `npm run gates:pre-commit` -> commit)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.99",
@@ -9348,8 +9348,8 @@
     {
       "id": "V117.99.2",
       "type": "subphase",
-      "title": "Abschluss-Evidence nennt Beispiele fuer D0-D4 und ihre jeweiligen User-Gates: D0 `plan:check`/Graph-Abfrage/Dry-Run, D1 lokaler Report in `tmp/`, D2 kleine scoped Aenderung mit Evidence/Gate, D3 Rule-/Workflow-Aenderung nur mit User-Gate, D4 Archiv-Move/Delete/Rebuild/grosser Refactor nur mit User-Gate und Recovery-Pfad.",
-      "status": "open",
+      "title": "Abschluss-Evidence nennt Beispiele fuer D0-D4 und ihre jeweiligen User-Gates: D0 `plan:check`/Graph-Abfrage/Dry-Run, D1 lokaler Report in `tmp/`, D2 kleine scoped Aenderung mit Evidence/Gate, D3 Rule-/Workflow-Aenderung nur mit User-Gate, D4 Archiv-Move/Delete/Rebuild/grosser Refactor nur mit User-Gate und Recovery-Pfad. (abgeschlossen: 2026-05-14; evidence: `docs/plaene/aktiv/V117.md` Decision Requirements + Finaler Abgleich 117.1 + `npm run gates:pre-commit` -> commit)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.99",
@@ -9359,8 +9359,8 @@
     {
       "id": "V117.99.3",
       "type": "subphase",
-      "title": "Kein neuer Schattenprozess, keine parallele Statusablage und keine unklassifizierte dauerhafte Ablage wurde eingefuehrt.",
-      "status": "open",
+      "title": "Kein neuer Schattenprozess, keine parallele Statusablage und keine unklassifizierte dauerhafte Ablage wurde eingefuehrt. (abgeschlossen: 2026-05-14; evidence: zentrale Rule, bestehendes `docs/plaene/CHANGELOG.md`, eigenstaendiger Report-only-Check ohne neue Statusablage + `npm run gates:pre-commit` -> commit)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.99",
@@ -9370,8 +9370,8 @@
     {
       "id": "V117.99.4",
       "type": "subphase",
-      "title": "Subagent-Nutzung ist mit der operativen Rule konsistent und in Abschluss-Evidence nur dort erwaehnt, wo sie tatsaechlich fuer parallele Recherche, Review, Verifikation oder disjunkte Umsetzung genutzt wurde.",
-      "status": "open",
+      "title": "Subagent-Nutzung ist mit der operativen Rule konsistent und in Abschluss-Evidence nur dort erwaehnt, wo sie tatsaechlich fuer parallele Recherche, Review, Verifikation oder disjunkte Umsetzung genutzt wurde. (abgeschlossen: 2026-05-14; evidence: `.agents/rules/planning_and_governance.md` Subagent and Parallel Agent Use; keine Subagents in V117-Umsetzung genutzt + `npm run gates:pre-commit` -> commit)",
+      "status": "done",
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.99",
