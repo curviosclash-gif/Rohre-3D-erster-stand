@@ -1,9 +1,21 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
-const DEFAULT_SCAN_ROOTS = ['AGENTS.md', '.agents', 'docs/plaene/aktiv', 'docs/plaene/neu'];
+const BASELINE_SCAN_ROOTS = [
+  'AGENTS.md',
+  '.agents/rules/planning_and_governance.md',
+  '.agents/rules/git_and_commits.md',
+  '.agents/workflows/plan.md',
+  '.agents/workflows/code.md',
+  '.agents/workflows/quick.md',
+  '.agents/workflows/bugfix.md',
+  '.agents/workflows/cleanup.md',
+  'docs/plaene/aktiv/V117.md',
+  'docs/plaene/neu/Feature_Repo_Context_Cleanup.md',
+];
 const EXCLUDED_PARTS = ['/alt/', '/archive/', '/generated/', '/CHANGELOG.md'];
 const MAX_PRINTED_FINDINGS = 40;
 
@@ -78,9 +90,76 @@ async function listFiles(root, relPath) {
   return out;
 }
 
+function isScannableChangedFile(relPath) {
+  const normalized = normalizePath(relPath);
+  if (isExcluded(normalized)) {
+    return false;
+  }
+
+  if (normalized === 'AGENTS.md') {
+    return true;
+  }
+
+  if (!normalized.endsWith('.md')) {
+    return false;
+  }
+
+  return normalized.startsWith('.agents/')
+    || normalized.startsWith('docs/plaene/aktiv/')
+    || normalized.startsWith('docs/plaene/neu/');
+}
+
+function listChangedLineNumbers(root) {
+  const result = spawnSync('git', ['diff', '--unified=5', '--diff-filter=ACMRT', 'HEAD', '--'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  if (result.status !== 0) {
+    return new Map();
+  }
+
+  const changed = new Map();
+  let currentFile = null;
+  let newLineNumber = 0;
+
+  for (const rawLine of result.stdout.split(/\r?\n/)) {
+    if (rawLine.startsWith('+++ b/')) {
+      const relPath = normalizePath(rawLine.slice('+++ b/'.length));
+      currentFile = isScannableChangedFile(relPath) ? relPath : null;
+      if (currentFile && !changed.has(currentFile)) {
+        changed.set(currentFile, new Set());
+      }
+      continue;
+    }
+
+    const hunkMatch = rawLine.match(/^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+    if (hunkMatch) {
+      newLineNumber = Number.parseInt(hunkMatch[1], 10);
+      continue;
+    }
+
+    if (!currentFile || rawLine.startsWith('--- ')) {
+      continue;
+    }
+
+    if (rawLine.startsWith('+')) {
+      changed.get(currentFile).add(newLineNumber);
+      newLineNumber += 1;
+      continue;
+    }
+
+    if (rawLine.startsWith(' ')) {
+      newLineNumber += 1;
+    }
+  }
+
+  return changed;
+}
+
 function hasNearby(lines, index, pattern) {
-  const start = Math.max(0, index - 3);
-  const end = Math.min(lines.length - 1, index + 3);
+  const start = Math.max(0, index - 5);
+  const end = Math.min(lines.length - 1, index + 5);
   for (let cursor = start; cursor <= end; cursor += 1) {
     pattern.lastIndex = 0;
     if (pattern.test(lines[cursor])) {
@@ -90,12 +169,16 @@ function hasNearby(lines, index, pattern) {
   return false;
 }
 
-async function scanFile(root, relPath) {
+async function scanFile(root, relPath, targetLineNumbers = null) {
   const text = await fs.readFile(path.join(root, relPath), 'utf8');
   const lines = text.split(/\r?\n/);
   const findings = [];
 
   for (let index = 0; index < lines.length; index += 1) {
+    if (targetLineNumbers && !targetLineNumbers.has(index + 1)) {
+      continue;
+    }
+
     const line = lines[index];
     for (const rule of rules) {
       rule.pattern.lastIndex = 0;
@@ -120,27 +203,35 @@ async function scanFile(root, relPath) {
   return findings;
 }
 
-export async function runAiDecisionPolicyReport({ root = process.cwd() } = {}) {
+export async function runAiDecisionPolicyReport({ root = process.cwd(), scanAll = false } = {}) {
   const files = [];
-  for (const scanRoot of DEFAULT_SCAN_ROOTS) {
-    files.push(...await listFiles(root, scanRoot));
+  const changedLines = scanAll ? null : listChangedLineNumbers(root);
+  if (scanAll) {
+    for (const scanRoot of BASELINE_SCAN_ROOTS) {
+      files.push(...await listFiles(root, scanRoot));
+    }
+  } else {
+    files.push(...changedLines.keys());
   }
 
   const uniqueFiles = Array.from(new Set(files)).sort((a, b) => a.localeCompare(b));
   const findings = [];
   for (const file of uniqueFiles) {
-    findings.push(...await scanFile(root, file));
+    findings.push(...await scanFile(root, file, changedLines?.get(file) || null));
   }
 
   return { files: uniqueFiles, findings };
 }
 
 async function main() {
-  const report = await runAiDecisionPolicyReport();
+  const args = new Set(process.argv.slice(2));
+  const scanAll = args.has('--all');
+  const report = await runAiDecisionPolicyReport({ scanAll });
   const warnCount = report.findings.filter((finding) => finding.severity === 'warn').length;
   const infoCount = report.findings.filter((finding) => finding.severity === 'info').length;
 
-  process.stdout.write(`[ai-decision-policy] report-only files=${report.files.length} warnings=${warnCount} info=${infoCount}\n`);
+  const mode = scanAll ? 'baseline' : 'changed-files';
+  process.stdout.write(`[ai-decision-policy] report-only mode=${mode} files=${report.files.length} warnings=${warnCount} info=${infoCount}\n`);
 
   for (const finding of report.findings.slice(0, MAX_PRINTED_FINDINGS)) {
     process.stdout.write(`- ${finding.severity.toUpperCase()} ${finding.file}:${finding.line} [${finding.id}] ${finding.message}\n`);

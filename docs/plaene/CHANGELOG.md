@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V117 Review-Follow-up 2026-05-14
+
+- Review-Fund nachgezogen: `check:ai-decision-policy` scannt im Standardmodus nur hinzugefuegte/geaenderte Diff-Zeilen in Markdown-/Governance-Dateien seit `HEAD`; der breite Baseline-Scan bleibt optional ueber `--all`. Zweck: Report-only bleibt als Review-Signal nutzbar und erzeugt weniger Alarmrauschen.
+- Evidence-Text in `V117` ist korrigiert: Der Check behauptet keine Archivordner-, `canonical_source`-, Diff- oder Skriptstrukturpruefung mehr, sondern beschreibt die tatsaechlichen Markdown-Muster. Der Intake-Reststatus ist auf `done` geglaettet.
+
 ## Stand-Snapshot 2026-05-14 (Subphase `V117 117.99`)
 
 - `V117` ist abgeschlossen: D0-D4, Zweckklassen, Stop-Loss, D3/D4-User-Gates, Subagent-Regeln und der nicht blockierende Decision-Policy-Report sind repo-weit verankert.

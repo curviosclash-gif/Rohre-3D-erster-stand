@@ -160,11 +160,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1845,
-    "rawCoveredFileCount": 1194,
+    "trackedFileCount": 1846,
+    "rawCoveredFileCount": 1195,
     "rawCoveragePercent": 64.7,
-    "adjustedTrackedFileCount": 1364,
-    "adjustedCoveredFileCount": 1011,
+    "adjustedTrackedFileCount": 1365,
+    "adjustedCoveredFileCount": 1012,
     "adjustedCoveragePercent": 74.1,
     "uncoveredFileCount": 651,
     "uncoveredActiveFileCount": 353,
@@ -220,8 +220,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 348,
-        "coveredCount": 156
+        "count": 349,
+        "coveredCount": 157
       },
       {
         "classification": "prototype",
@@ -12354,6 +12354,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Wissensgraph_Ops_Guards_Haertung_V110.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Wissensgraph_Produktsemantik_Ausbau_V119.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

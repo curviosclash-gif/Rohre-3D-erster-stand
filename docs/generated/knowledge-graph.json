@@ -2032,7 +2032,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 307,
+          "concreteCount": 308,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -9304,7 +9304,7 @@
     {
       "id": "V117.3.1",
       "type": "subphase",
-      "title": "Pruefen, welche Regeln maschinell sinnvoll validierbar sind: verbotene Auto-Move-Claims, fehlende User-Gates, D4 ohne Freigabe, grosse Diffs ohne Blast-Radius. (abgeschlossen: 2026-05-14; evidence: `scripts/check-ai-decision-policy.mjs` Muster fuer D4-nahe Begriffe, Source-of-truth-Flaechen und neue Ablagen + `npm run check:ai-decision-policy` -> report-only)",
+      "title": "Pruefen, welche Regeln maschinell sinnvoll validierbar sind: verbotene Auto-Move-Claims, fehlende User-Gates, D4 ohne Freigabe, grosse Diffs ohne Blast-Radius. (abgeschlossen: 2026-05-14; evidence: `scripts/check-ai-decision-policy.mjs` Report-only-Muster fuer D4-nahe Begriffe, Source-of-truth-Flaechen und neue Ablagen; Standardmodus scannt nur hinzugefuegte/geaenderte Diff-Zeilen in Markdown-/Governance-Dateien, `--all` bleibt Baseline-Option; Archivordner- und Skriptstrukturpruefungen bleiben bewusst ausserhalb dieses ersten Checks + `npm run check:ai-decision-policy` -> report-only)",
       "status": "done",
       "attributes": {
         "blockId": "V117",
@@ -9315,7 +9315,7 @@
     {
       "id": "V117.3.2",
       "type": "subphase",
-      "title": "Optional `scripts/check-ai-decision-policy.mjs` und NPM-Script `check:ai-decision-policy` planen; zuerst nur Report, nicht blockierend. Der Check validiert nur grobe Muster wie D4-Woerter ohne User-Gate, Auto-Move-Claims, Archivierungsplaene ohne `canonical_source`, Archivordner ohne `README.md`, neue dauerhafte `docs/`-Ablagen ohne Zweckklasse, planstrukturveraendernde Skripte oder grosse Diffs ohne Blast-Radius; er versucht nicht, \"gute Entscheidungen\" vollautomatisch zu bewerten. (abgeschlossen: 2026-05-14; evidence: `package.json` Script `check:ai-decision-policy`, keine Integration in `docs:check` oder `gates:pre-commit` + `npm run check:ai-decision-policy` -> exit 0)",
+      "title": "Optional `scripts/check-ai-decision-policy.mjs` und NPM-Script `check:ai-decision-policy` planen; zuerst nur Report, nicht blockierend. Der Check validiert nur grobe Markdown-Muster fuer D4-nahe Begriffe ohne nahen Gate-/Recovery-Kontext, Source-of-truth-Flaechen ohne D3-/User-Gate-Kontext und neue dauerhafte Ablagen ohne Zweckklassenkontext; er versucht nicht, Archivordner, `canonical_source`, Diffs, Skripte oder \"gute Entscheidungen\" vollautomatisch zu bewerten. (abgeschlossen: 2026-05-14; evidence: `package.json` Script `check:ai-decision-policy`, keine Integration in `docs:check` oder `gates:pre-commit`; `--all` ist nur manueller Baseline-Report + `npm run check:ai-decision-policy` -> exit 0)",
       "status": "done",
       "attributes": {
         "blockId": "V117",
@@ -23189,6 +23189,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Wissensgraph_Ops_Guards_Haertung_V110.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Wissensgraph_Produktsemantik_Ausbau_V119.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -69208,6 +69223,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Wissensgraph_Ops_Guards_Haertung_V110.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Wissensgraph_Produktsemantik_Ausbau_V119.md",
       "type": "scope",
       "hint": null,
       "attributes": {
