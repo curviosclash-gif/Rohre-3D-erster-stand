@@ -23,25 +23,27 @@ const rules = [
   {
     id: 'd4-term-without-user-gate-nearby',
     severity: 'warn',
-    pattern: /\b(D4|Auto-Move|auto-?move|Rebuild|Reborn|Loesch|Lösch|delete|move|verschieb|Archivierung|Archiv-Move|gross(?:e|er|en)? Refactor|groß(?:e|er|en)? Refactor)\b/i,
-    nearby: /\b(User-Gate|USER-GATE|User-Freigabe|explizite Freigabe|Recovery|Rollback)\b/i,
+    pattern: /\b(D4|Auto-Move|auto-?move|Rebuild|Reborn|Loesch|Loeschung|Loeschen|delete|move|verschieb|Archivierung|Archiv-Move|gross(?:e|er|en)? Refactor)\b/i,
+    nearby: /\b(User-Gate|USER-GATE|User-Freigabe|explizite Freigabe|Recovery|Rollback|confirmation|approved|stoppen|fragen|Rueckfrage|Rueckfragepflicht)\b/i,
     message: 'D4-nahe Begriffe sollten nahe User-Gate und Recovery/Rollback nennen.',
   },
   {
     id: 'source-of-truth-change-without-d3',
     severity: 'warn',
-    pattern: /\b(AGENTS\.md|\.agents\/rules|\.agents\\rules|\.agents\/workflows|\.agents\\workflows|Umsetzungsplan\.md|Planstruktur|Governance-Edits?)\b/i,
+    pattern: /(?=.*\b(aender|change|edit|anpass|ergaenz|touch|beruehr|Governance-Edits?|Planstruktur)\b)(?=.*\b(AGENTS\.md|\.agents\/rules|\.agents\\rules|\.agents\/workflows|\.agents\\workflows|Umsetzungsplan\.md|Master-\/Aktivplan|Master-\/Blockplan|Source-of-truth|Governance)\b)/i,
     nearby: /\b(D3|User-Gate|USER-GATE|User-Freigabe)\b/i,
     message: 'Source-of-truth-/Governance-Flaechen sollten als D3 oder User-Gate-nahe beschrieben sein.',
   },
   {
     id: 'new-doc-storage-without-purpose-class',
     severity: 'info',
-    pattern: /\b(neue(?:r|s|n)?\s+(?:Datei|Ablage|Report|Doku)|docs\/(?:referenz|prozess|plaene|archive)|docs\\(?:referenz|prozess|plaene|archive))\b/i,
+    pattern: /\b(neue(?:r|s|n)?\s+(?:dauerhafte\s+)?(?:Datei|Ablage|Report|Doku|Statusablage|Referenz)|anlegen|erzeugen|erstelle(?:n|t)?|hinzufuegen)\b/i,
     nearby: /\b(Zweckklasse|transient|evidence|reference|governance|archive-index|Schatten-Wahrheit|Schattenwahrheit)\b/i,
     message: 'Neue dauerhafte Ablagen sollten Zweckklasse und kanonische Zielquelle nennen.',
   },
 ];
+
+const REVIEW_CONTEXT_PATTERN = /\b(D3|D4|Decision|Decision-Klasse|User-Gate|USER-GATE|User-Freigabe|explizite Freigabe|Recovery|Rollback|Zweckklasse)\b/i;
 
 function normalizePath(value) {
   return value.replace(/\\/g, '/');
@@ -157,9 +159,41 @@ function listChangedLineNumbers(root) {
   return changed;
 }
 
+function getMarkdownSectionBounds(lines, index) {
+  let start = 0;
+  let end = lines.length - 1;
+  const currentHeading = lines[index].match(/^(#{1,6})\s+/);
+  const currentLevel = currentHeading ? currentHeading[1].length : null;
+
+  for (let cursor = index; cursor >= 0; cursor -= 1) {
+    const heading = lines[cursor].match(/^(#{1,6})\s+/);
+    if (!heading) {
+      continue;
+    }
+
+    if (currentLevel === null || heading[1].length <= currentLevel) {
+      start = cursor;
+      break;
+    }
+  }
+
+  for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
+    const heading = lines[cursor].match(/^(#{1,6})\s+/);
+    if (!heading) {
+      continue;
+    }
+
+    if (currentLevel === null || heading[1].length <= currentLevel) {
+      end = cursor - 1;
+      break;
+    }
+  }
+
+  return { start, end };
+}
+
 function hasNearby(lines, index, pattern) {
-  const start = Math.max(0, index - 5);
-  const end = Math.min(lines.length - 1, index + 5);
+  const { start, end } = getMarkdownSectionBounds(lines, index);
   for (let cursor = start; cursor <= end; cursor += 1) {
     pattern.lastIndex = 0;
     if (pattern.test(lines[cursor])) {
@@ -167,6 +201,34 @@ function hasNearby(lines, index, pattern) {
     }
   }
   return false;
+}
+
+function hasReviewContext(lines, index) {
+  return hasNearby(lines, index, REVIEW_CONTEXT_PATTERN);
+}
+
+function isIgnorableLine(line) {
+  const trimmed = line.trim();
+  return trimmed === ''
+    || trimmed === '---'
+    || trimmed.startsWith('title:')
+    || trimmed.startsWith('description:')
+    || trimmed.startsWith('scope_files:')
+    || trimmed.startsWith('source_history:')
+    || trimmed.startsWith('verification:')
+    || trimmed.startsWith('depends_on:')
+    || trimmed.startsWith('blocked_by:')
+    || trimmed.startsWith('affected_area:')
+    || /^-\s+Kein(?:e|er|es)?\b/.test(trimmed)
+    || /^-\s+Nicht\b/.test(trimmed)
+    || /\bdarf keine\b/i.test(trimmed)
+    || /\bdelete[- ]proof\b/i.test(trimmed)
+    || /\bdelete[- ]criterion\b/i.test(trimmed)
+    || /\bDelete-Kriterium\b/i.test(trimmed)
+    || /\bNo file deletion in dry-run\b/i.test(trimmed)
+    || /\(abgeschlossen:.*evidence:/i.test(trimmed)
+    || /^\|\s*R\d+\s*\|/.test(trimmed)
+    || /^-\s+[`'"]?[\w./\\*-]+\.(?:md|mjs|js|json|cjs)[`'"]?\s*$/.test(trimmed);
 }
 
 async function scanFile(root, relPath, targetLineNumbers = null) {
@@ -180,6 +242,10 @@ async function scanFile(root, relPath, targetLineNumbers = null) {
     }
 
     const line = lines[index];
+    if (isIgnorableLine(line)) {
+      continue;
+    }
+
     for (const rule of rules) {
       rule.pattern.lastIndex = 0;
       if (!rule.pattern.test(line)) {
@@ -187,6 +253,10 @@ async function scanFile(root, relPath, targetLineNumbers = null) {
       }
 
       if (hasNearby(lines, index, rule.nearby)) {
+        continue;
+      }
+
+      if (rule.severity === 'info' && hasReviewContext(lines, index)) {
         continue;
       }
 

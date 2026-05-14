@@ -1300,6 +1300,7 @@
           ".agents/rules/planning_and_governance.md",
           ".agents/rules/token_efficiency_and_tools.md",
           ".agents/workflows/bugfix.md",
+          ".agents/workflows/cleanup.md",
           ".agents/workflows/code.md",
           ".agents/workflows/plan.md",
           ".agents/workflows/quick.md",
@@ -1312,7 +1313,7 @@
           "scripts/check-ai-decision-policy.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 15,
+          "concreteCount": 16,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -9282,7 +9283,7 @@
     {
       "id": "V117.2.3",
       "type": "subphase",
-      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md` und `bugfix.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen. (abgeschlossen: 2026-05-14; evidence: Workflow-Verweise auf Decision-Klassen, Zweckklassen und Gate-Pfade + `npm run gates:pre-commit` -> commit)",
+      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md` und `bugfix.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen; `.agents/workflows/cleanup.md` bleibt bewusst in der Decision-Policy-Pruefflaeche, weil Cleanup-, Archivierungs-, Move-/Delete- und D4-Risiken dort gebuendelt sind. (abgeschlossen: 2026-05-14; evidence: Workflow-Verweise auf Decision-Klassen, Zweckklassen und Gate-Pfade + `npm run gates:pre-commit` -> commit)",
       "status": "done",
       "attributes": {
         "blockId": "V117",
@@ -9337,7 +9338,7 @@
     {
       "id": "V117.99.1",
       "type": "subphase",
-      "title": "Regeln, Workflows und V116-Verweise sind konsistent. (abgeschlossen: 2026-05-14; evidence: `.agents/rules/planning_and_governance.md`, `.agents/workflows/{plan,code,quick,bugfix}.md`, `docs/plaene/neu/Feature_Repo_Context_Cleanup.md` + `npm run gates:pre-commit` -> commit)",
+      "title": "Regeln, Workflows und V116-Verweise sind konsistent. (abgeschlossen: 2026-05-14; evidence: `.agents/rules/planning_and_governance.md`, `.agents/workflows/{plan,code,quick,bugfix,cleanup}.md`, `docs/plaene/neu/Feature_Repo_Context_Cleanup.md` + `npm run gates:pre-commit` -> commit)",
       "status": "done",
       "attributes": {
         "blockId": "V117",
@@ -18127,6 +18128,21 @@
           "V109",
           "V117",
           "V93"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": ".agents/workflows/cleanup.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V117"
         ],
         "exists": true
       }
@@ -57483,6 +57499,15 @@
     {
       "from": "V117",
       "to": ".agents/workflows/bugfix.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": ".agents/workflows/cleanup.md",
       "type": "scope",
       "hint": null,
       "attributes": {

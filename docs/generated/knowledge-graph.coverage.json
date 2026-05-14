@@ -161,19 +161,19 @@
   ],
   "summary": {
     "trackedFileCount": 1846,
-    "rawCoveredFileCount": 1195,
-    "rawCoveragePercent": 64.7,
+    "rawCoveredFileCount": 1196,
+    "rawCoveragePercent": 64.8,
     "adjustedTrackedFileCount": 1365,
     "adjustedCoveredFileCount": 1012,
     "adjustedCoveragePercent": 74.1,
-    "uncoveredFileCount": 651,
+    "uncoveredFileCount": 650,
     "uncoveredActiveFileCount": 353,
     "classifications": [
       {
         "classification": "agent-workflow",
         "excludedFromCoverage": true,
         "count": 18,
-        "coveredCount": 8
+        "coveredCount": 9
       },
       {
         "classification": "archive",
@@ -540,11 +540,15 @@
     {
       "path": ".agents/workflows/cleanup.md",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V117"
+      ],
       "surfaces": [],
       "classification": "agent-workflow",
       "excludedFromCoverage": true,

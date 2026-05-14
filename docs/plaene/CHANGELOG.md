@@ -8,6 +8,7 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 
 ## V117 Review-Follow-up 2026-05-14
 
+- Review-Follow-up umgesetzt: `check:ai-decision-policy --all` bewertet nun Markdown-Abschnitte statt nur ein enges Zeilenfenster, ignoriert Frontmatter-/Scope-Dateilisten und nutzt engere Muster fuer Source-of-truth- und neue-Ablage-Hinweise. Zweck: Baseline-Review bleibt report-only, aber deutlich rauschaermer (`63/48` -> `14/3` Warn-/Info-Signal im lokalen Vergleich); `.agents/workflows/cleanup.md` ist bewusst als D3/D4-nahe Pruefflaeche dokumentiert.
 - Review-Fund nachgezogen: `check:ai-decision-policy` scannt im Standardmodus nur hinzugefuegte/geaenderte Diff-Zeilen in Markdown-/Governance-Dateien seit `HEAD`; der breite Baseline-Scan bleibt optional ueber `--all`. Zweck: Report-only bleibt als Review-Signal nutzbar und erzeugt weniger Alarmrauschen.
 - Evidence-Text in `V117` ist korrigiert: Der Check behauptet keine Archivordner-, `canonical_source`-, Diff- oder Skriptstrukturpruefung mehr, sondern beschreibt die tatsaechlichen Markdown-Muster. Der Intake-Reststatus ist auf `done` geglaettet.
 
