@@ -11,6 +11,7 @@ const execFileAsync = promisify(execFile);
 const cwd = process.cwd();
 const args = new Set(process.argv.slice(2));
 const applyMode = args.has('--apply');
+const verboseMode = args.has('--verbose');
 const reportPath = path.resolve(
     cwd,
     String(process.env.WORKSPACE_CLEAN_REPORT || 'tmp/workspace-cleanup-report.json').trim()
@@ -622,9 +623,93 @@ function summarize(items) {
     }, { delete: 0, archive: 0, protect: 0 });
 }
 
+function topLevelPath(relativePath) {
+    const [first, second] = String(relativePath || '').split('/');
+    if (!first) return '.';
+    if (first === 'tmp' && second === 'dev-logs') return 'tmp/dev-logs';
+    if (first === 'tmp') return 'tmp';
+    return first;
+}
+
+function classifyExplainGroup(item) {
+    if (item.action === 'delete' && item.risk === 'low') return 'safeDelete';
+    if (item.action === 'archive' && item.risk !== 'high') return 'safeArchive';
+    if (item.action === 'protect' && /versionierte Dateien/i.test(item.reason)) return 'protectedTracked';
+    if (item.action === 'protect' && /Nicht in konservativer/i.test(item.reason)) return 'protectedUnknown';
+    if (item.action === 'protect' && item.risk !== 'low') return 'needsUserDecision';
+    return 'protectedKnown';
+}
+
+function buildExplainSummary(items) {
+    const groups = {
+        safeDelete: {
+            label: 'safe delete',
+            count: 0,
+            topLevel: {},
+            samples: [],
+        },
+        safeArchive: {
+            label: 'safe archive',
+            count: 0,
+            topLevel: {},
+            samples: [],
+        },
+        protectedTracked: {
+            label: 'protected tracked',
+            count: 0,
+            topLevel: {},
+            samples: [],
+        },
+        protectedKnown: {
+            label: 'protected known',
+            count: 0,
+            topLevel: {},
+            samples: [],
+        },
+        protectedUnknown: {
+            label: 'protected unknown',
+            count: 0,
+            topLevel: {},
+            samples: [],
+        },
+        needsUserDecision: {
+            label: 'needs user decision',
+            count: 0,
+            topLevel: {},
+            samples: [],
+        },
+    };
+
+    for (const item of items) {
+        const group = groups[classifyExplainGroup(item)];
+        group.count += 1;
+        const topLevel = topLevelPath(item.path);
+        group.topLevel[topLevel] = (group.topLevel[topLevel] || 0) + 1;
+        if (group.samples.length < 8) {
+            group.samples.push({
+                path: item.path,
+                action: item.action,
+                risk: item.risk,
+                reason: item.reason,
+            });
+        }
+    }
+
+    return groups;
+}
+
+function formatTopLevelSummary(topLevel) {
+    const entries = Object.entries(topLevel)
+        .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+        .slice(0, 5)
+        .map(([name, count]) => `${name}:${count}`);
+    return entries.length > 0 ? entries.join(',') : 'none';
+}
+
 async function main() {
     const { items, activeLock } = await collectInventory();
     const summary = summarize(items);
+    const explainSummary = buildExplainSummary(items);
     const protectionSources = collectRootRuntimeProtectionSources(cwd);
     const report = {
         generatedAt: new Date(now).toISOString(),
@@ -634,6 +719,7 @@ async function main() {
         activePlaywrightLock: activeLock,
         protectionSources,
         summary,
+        explainSummary,
         items,
         archiveResults: [],
         applyResults: [],
@@ -644,10 +730,20 @@ async function main() {
     process.stdout.write(`[cleanup:workspace] protection_sources=${protectionSources.length}\n`);
     process.stdout.write(`[cleanup:workspace] delete=${summary.delete} archive=${summary.archive} protect=${summary.protect}\n`);
 
-    for (const item of items) {
+    for (const group of Object.values(explainSummary)) {
         process.stdout.write(
-            `[cleanup:workspace] ${item.action} ${item.type} ${item.path} :: ${item.reason}\n`
+            `[cleanup:workspace] ${group.label}=${group.count} top=${formatTopLevelSummary(group.topLevel)}\n`
         );
+    }
+
+    if (verboseMode) {
+        for (const item of items) {
+            process.stdout.write(
+                `[cleanup:workspace] ${item.action} ${item.type} ${item.path} :: ${item.reason}\n`
+            );
+        }
+    } else {
+        process.stdout.write('[cleanup:workspace] detail=use --verbose or inspect report for item-level candidates\n');
     }
 
     if (applyMode) {
