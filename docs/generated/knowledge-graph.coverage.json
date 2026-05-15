@@ -155,12 +155,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1850,
-    "rawCoveredFileCount": 1200,
+    "trackedFileCount": 1853,
+    "rawCoveredFileCount": 1203,
     "rawCoveragePercent": 64.9,
-    "adjustedTrackedFileCount": 1369,
-    "adjustedCoveredFileCount": 1016,
-    "adjustedCoveragePercent": 74.2,
+    "adjustedTrackedFileCount": 1372,
+    "adjustedCoveredFileCount": 1019,
+    "adjustedCoveragePercent": 74.3,
     "uncoveredFileCount": 650,
     "uncoveredActiveFileCount": 353,
     "classifications": [
@@ -209,8 +209,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 941,
-        "coveredCount": 818
+        "count": 944,
+        "coveredCount": 821
       },
       {
         "classification": "product-docs",
@@ -16391,6 +16391,23 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/agent-preflight.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/arcade-run-smoke.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -16612,6 +16629,23 @@
         "V110",
         "V111",
         "V94"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/check-agent-commit-message.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -29857,6 +29891,23 @@
       ],
       "surfaces": [],
       "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/agent-governance.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
       "excludedFromCoverage": false,
       "excludeReason": null
     },

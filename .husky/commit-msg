@@ -1,6 +1,9 @@
 #!/bin/sh
+set -e
+
 if [ -f ".husky/.bypass" ]; then
   exit 0
 fi
 
-npx --no -- commitlint --edit $1
+npx --no -- commitlint --edit "$1"
+node scripts/check-agent-commit-message.mjs "$1"

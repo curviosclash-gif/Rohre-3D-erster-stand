@@ -624,3 +624,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `.agents/workflows/plan.md` verlangt fuer neue Plaene bei Glob- oder "alle X"-Evidence konkrete File-by-File-Evidence oder eine Assertion in `check-plan-evidence-claims`.
 - `.agents/workflows/code.md` macht `npm run check:plan-evidence-claims` bei aktiven Plan-, Workflow-, Rule-, Scope- oder Abschluss-Evidence-Aenderungen zum vorgesehenen Governance-Gate.
 - Der Claim-Check blockiert jetzt auch Rule-/Docs-Globs, "alle Rules/Regeln", "alle/vollstaendige scope_files" und repo-weite Konsistenzclaims ohne passende Assertion.
+
+## Governance-Haertung 2026-05-15 (Agent-Workflow-Erzwingung)
+
+- Bot-Commits muessen im Commit-Body jetzt `Workflow:`, `Decision:` und `Evidence:` enthalten; D3-Scope braucht zusaetzlich `Gate:`, D4-Scope zusaetzlich explizites User-Gate und `Recovery:`.
+- `npm run agent:preflight` prueft denselben Envelope gegen gestagte Dateien und blockiert unterklassifizierte Governance-/Plan-Source-of-truth-Aenderungen sowie getrackte Deletes/Renames ohne D4-Recovery-Pfad.
+- `.husky/commit-msg` ruft nach `commitlint` den neuen Agent-Commit-Check auf, damit die Workflow-Nutzung als technische Spur erzwungen wird statt nur als Markdown-Regel zu existieren.

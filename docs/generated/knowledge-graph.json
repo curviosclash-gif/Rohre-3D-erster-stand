@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 200,
+          "concreteCount": 203,
           "plannedCount": 0
         }
       }
@@ -25868,6 +25868,21 @@
       }
     },
     {
+      "id": "scripts/agent-preflight.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "scripts/arcade-run-smoke.mjs",
       "type": "file",
       "title": null,
@@ -26067,6 +26082,21 @@
           "V110",
           "V111",
           "V94"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/check-agent-commit-message.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
         ],
         "exists": true
       }
@@ -37870,6 +37900,21 @@
       }
     },
     {
+      "id": "tests/agent-governance.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/ai-decision-policy.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -44588,6 +44633,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/agent-preflight.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/arcade-run-smoke.mjs",
       "type": "scope",
       "hint": null,
@@ -44688,6 +44742,15 @@
     {
       "from": "B13",
       "to": "scripts/build-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/check-agent-commit-message.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -45246,6 +45309,15 @@
     {
       "from": "B13",
       "to": "scripts/workspace-cleanup.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/agent-governance.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
