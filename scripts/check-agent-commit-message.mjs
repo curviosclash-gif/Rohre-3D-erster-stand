@@ -17,6 +17,11 @@ function extractField(text, name) {
   return match ? match[1].trim() : '';
 }
 
+function extractFields(text, name) {
+  const pattern = new RegExp(`^${name}:\\s*(.+?)\\s*$`, 'gmi');
+  return Array.from(text.matchAll(pattern), (match) => match[1].trim()).filter(Boolean);
+}
+
 function isAutoCommitMessage(text) {
   return /^(Merge|Revert)\b/.test(text.trim());
 }
@@ -25,6 +30,7 @@ export async function validateAgentCommitMessage({
   root = process.cwd(),
   messageText,
   changes = null,
+  uncommittedFiles = null,
 } = {}) {
   const text = stripComments(messageText || '');
   if (isAutoCommitMessage(text)) {
@@ -36,6 +42,10 @@ export async function validateAgentCommitMessage({
   const evidence = extractField(text, 'Evidence');
   const gate = extractField(text, 'Gate');
   const recovery = extractField(text, 'Recovery');
+  const scope = extractFields(text, 'Scope').join(',');
+  const knownUncommitted = extractFields(text, 'Known-uncommitted').join(',');
+  const residualRisk = extractField(text, 'Residual-risk');
+  const notChecked = extractField(text, 'Not-checked');
 
   const result = await validateAgentEnvelope({
     root,
@@ -44,7 +54,13 @@ export async function validateAgentCommitMessage({
     evidence,
     gate,
     recovery,
+    scope,
+    knownUncommitted,
+    residualRisk,
+    notChecked,
     changes,
+    uncommittedFiles,
+    claimText: text,
   });
 
   return {
@@ -54,6 +70,10 @@ export async function validateAgentCommitMessage({
     evidence,
     gate,
     recovery,
+    scope,
+    knownUncommitted,
+    residualRisk,
+    notChecked,
     ...result,
   };
 }
@@ -87,6 +107,10 @@ async function main() {
     console.error('Workflow: code');
     console.error('Decision: D2');
     console.error('Evidence: npm run plan:check');
+    console.error('Scope: scripts/example.mjs, tests/example.test.mjs');
+    console.error('Known-uncommitted: none');
+    console.error('Residual-risk: none');
+    console.error('Not-checked: full test suite');
     console.error('Gate: User approved D3 scope');
     console.error('Recovery: git revert <commit>');
     process.exitCode = 1;

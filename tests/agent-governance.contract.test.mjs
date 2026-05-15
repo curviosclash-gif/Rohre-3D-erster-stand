@@ -27,8 +27,11 @@ test('agent envelope accepts scoped D2 code commit metadata', async () => {
     root,
     workflow: 'quick',
     decision: 'D2',
-    evidence: 'npm run plan:check',
+    evidence: 'npm run plan:check -> PASS',
+    scope: 'src/core/main.js',
+    knownUncommitted: 'none',
     changes: [{ status: 'M', file: 'src/core/main.js' }],
+    uncommittedFiles: ['src/core/main.js'],
   });
 
   assert.deepEqual(result.violations, []);
@@ -40,8 +43,11 @@ test('agent envelope blocks governance surfaces below D3', async () => {
     root,
     workflow: 'code',
     decision: 'D2',
-    evidence: 'npm run plan:check',
+    evidence: 'npm run plan:check -> PASS',
+    scope: '.agents/workflows/code.md',
+    knownUncommitted: 'none',
     changes: [{ status: 'M', file: '.agents/workflows/code.md' }],
+    uncommittedFiles: ['.agents/workflows/code.md'],
   });
 
   assert.equal(result.violations.length, 1);
@@ -54,9 +60,14 @@ test('agent envelope requires recovery for tracked deletions', async () => {
     root,
     workflow: 'code',
     decision: 'D3',
-    evidence: 'npm run plan:check',
+    evidence: 'npm run plan:check -> PASS',
     gate: 'User approved D3 scope',
+    scope: 'src/old-path.js',
+    knownUncommitted: 'none',
+    residualRisk: 'none',
+    notChecked: 'full suite',
     changes: [{ status: 'D', file: 'src/old-path.js' }],
+    uncommittedFiles: ['src/old-path.js'],
   });
 
   assert.equal(result.violations.length, 1);
@@ -69,6 +80,7 @@ test('commit message validator requires workflow decision and evidence trailers'
     root,
     messageText: 'fix: tiny fix\n',
     changes: [{ status: 'M', file: 'src/core/main.js' }],
+    uncommittedFiles: ['src/core/main.js'],
   });
   const ids = result.violations.map((violation) => violation.id).sort();
 
@@ -86,10 +98,15 @@ test('commit message validator accepts D3 governance commit with gate', async ()
       '',
       'Workflow: code',
       'Decision: D3',
-      'Evidence: npm run plan:check',
+      'Evidence: npm run plan:check -> PASS',
+      'Scope: .agents/workflows/code.md',
+      'Known-uncommitted: none',
+      'Residual-risk: none',
+      'Not-checked: full suite',
       'Gate: User requested repository enforcement',
     ].join('\n'),
     changes: [{ status: 'M', file: '.agents/workflows/code.md' }],
+    uncommittedFiles: ['.agents/workflows/code.md'],
   });
 
   assert.deepEqual(result.violations, []);
@@ -101,8 +118,11 @@ test('agent envelope reports missing graph as a warning only', async () => {
     root,
     workflow: 'quick',
     decision: 'D2',
-    evidence: 'npm run plan:check',
+    evidence: 'npm run plan:check -> PASS',
+    scope: 'src/core/main.js',
+    knownUncommitted: 'none',
     changes: [{ status: 'M', file: 'src/core/main.js' }],
+    uncommittedFiles: ['src/core/main.js'],
   });
 
   assert.deepEqual(result.violations, []);
@@ -137,12 +157,119 @@ test('agent envelope includes graph scope context for staged files', async () =>
     root,
     workflow: 'quick',
     decision: 'D2',
-    evidence: 'npm run plan:check',
+    evidence: 'npm run plan:check -> PASS',
+    scope: 'src/core/main.js',
+    knownUncommitted: 'none',
     changes: [{ status: 'M', file: 'src/core/main.js' }],
+    uncommittedFiles: ['src/core/main.js'],
   });
 
   assert.deepEqual(result.violations, []);
   assert.equal(result.graphContext.available, true);
   assert.equal(result.graphContext.files[0].inGraph, true);
   assert.deepEqual(result.graphContext.files[0].scopeBlocks, ['B13', 'V99']);
+});
+
+test('commit message validator blocks scope mismatch and unnamed uncommitted files', async () => {
+  const root = await createFixture();
+  const result = await validateAgentCommitMessage({
+    root,
+    messageText: [
+      'fix: tiny fix',
+      '',
+      'Workflow: quick',
+      'Decision: D2',
+      'Evidence: npm run plan:check -> PASS',
+      'Scope: src/core/other.js',
+      'Known-uncommitted: none',
+    ].join('\n'),
+    changes: [{ status: 'M', file: 'src/core/main.js' }],
+    uncommittedFiles: ['src/core/main.js', 'docs/user-note.md'],
+  });
+  const ids = result.violations.map((violation) => violation.id).sort();
+
+  assert(ids.includes('scope-missing-staged-files'));
+  assert(ids.includes('scope-has-unstaged-files'));
+  assert(ids.includes('known-uncommitted-missing-files'));
+});
+
+test('commit message validator requires D3 residual risk and not checked fields', async () => {
+  const root = await createFixture();
+  const result = await validateAgentCommitMessage({
+    root,
+    messageText: [
+      'docs: governance change',
+      '',
+      'Workflow: code',
+      'Decision: D3',
+      'Evidence: npm run gates:pre-commit -> PASS',
+      'Scope: .agents/workflows/code.md',
+      'Known-uncommitted: none',
+      'Gate: User requested repository enforcement',
+    ].join('\n'),
+    changes: [{ status: 'M', file: '.agents/workflows/code.md' }],
+    uncommittedFiles: ['.agents/workflows/code.md'],
+  });
+  const ids = result.violations.map((violation) => violation.id).sort();
+
+  assert(ids.includes('missing-residual-risk'));
+  assert(ids.includes('missing-not-checked'));
+});
+
+test('commit message validator blocks broad claims without broad evidence', async () => {
+  const root = await createFixture();
+  const result = await validateAgentCommitMessage({
+    root,
+    messageText: [
+      'docs: claim everything',
+      '',
+      'Everything is repo-weit konsistent.',
+      '',
+      'Workflow: code',
+      'Decision: D3',
+      'Evidence: npm run plan:check -> PASS',
+      'Scope: .agents/workflows/code.md',
+      'Known-uncommitted: none',
+      'Residual-risk: none',
+      'Not-checked: full suite',
+      'Gate: User requested repository enforcement',
+    ].join('\n'),
+    changes: [{ status: 'M', file: '.agents/workflows/code.md' }],
+    uncommittedFiles: ['.agents/workflows/code.md'],
+  });
+
+  assert(result.violations.some((violation) => violation.id === 'broad-claim-without-broad-evidence'));
+});
+
+test('commit message validator accepts repeated scope and known-uncommitted fields', async () => {
+  const root = await createFixture();
+  const result = await validateAgentCommitMessage({
+    root,
+    messageText: [
+      'docs: multiline fields',
+      '',
+      'Workflow: code',
+      'Decision: D3',
+      'Evidence: npm run plan:check -> PASS',
+      'Scope: scripts/agent-preflight.mjs',
+      'Scope: scripts/check-agent-commit-message.mjs',
+      'Known-uncommitted: docs/Umsetzungsplan.md',
+      'Known-uncommitted: docs/plaene/aktiv/V119.md',
+      'Residual-risk: none',
+      'Not-checked: full suite',
+      'Gate: User requested repository enforcement',
+    ].join('\n'),
+    changes: [
+      { status: 'M', file: 'scripts/agent-preflight.mjs' },
+      { status: 'M', file: 'scripts/check-agent-commit-message.mjs' },
+    ],
+    uncommittedFiles: [
+      'scripts/agent-preflight.mjs',
+      'scripts/check-agent-commit-message.mjs',
+      'docs/Umsetzungsplan.md',
+      'docs/plaene/aktiv/V119.md',
+    ],
+  });
+
+  assert.deepEqual(result.violations, []);
 });

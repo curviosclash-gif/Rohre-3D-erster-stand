@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-15 (Intake `V119 119.1`)
+
+- Neuer geplanter P1-Block `V119` ist nach User-Freigabe im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V119.md`.
+- Zweck: erledigte oder done-ish Plaene gegen Git-Historie, Top-Level-DoDs, `*.99`-Gates und Evidence-Qualitaet abgleichen, ohne alte Haken pauschal nachzutragen.
+- Ausgangsbefund: P1-Abschlusswidersprueche betreffen `V41`, `V48`, `V74`, `V75`, `V76`, `V81`, `V83`, `V84`, `V94`, `V102`, `V105`; P2-Evidence-Schaerfung betrifft `V52/V56`, `V54`, `V93`, `V102`, `V105`, `V114`.
+- Leitregel: Kein nachtraeglicher Abschlussclaim ohne konkrete Evidence aus Commit, Command, Testreport, Plan-/Changelog-Beleg oder explizitem User-Override; historische Restwidersprueche werden dokumentiert statt still geglaettet.
+
 ## Stand-Snapshot 2026-05-14 (Intake `V116 116.1`)
 
 - Neuer geplanter P1-Block `V116` ist nach User-Freigabe im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V116.md`; der fruehere Intake-Draft `docs/plaene/neu/Feature_Repo_Context_Cleanup.md` ist damit abgeloest.
@@ -636,3 +643,15 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `npm run agent:preflight` bleibt der technische Einstiegspunkt und liest jetzt fuer gestagte Dateien den Knowledge-Graph-Kontext, wenn `docs/generated/knowledge-graph.json` vorhanden ist.
 - Graph-Funde liefern Scope-Bloecke und Scope-Edges als Warn-/Orientierungsschicht; fehlende Graph-Eintraege blockieren nicht, damit der Graph Radar bleibt und keine zweite Policy-Quelle wird.
 - Die harten Blocks bleiben weiterhin Workflow/Decision/Evidence, D3/D4-Gates und Delete-/Rename-Recovery; der Graph hilft beim Einstieg, ersetzt aber nicht `AGENTS.md`, Rules oder Workflows.
+
+## Governance-Haertung 2026-05-15 (Agent-Claim-Nachvollziehbarkeit)
+
+- `Evidence:` muss jetzt ein Ergebnis wie `-> PASS`, `WARN` oder `FAIL` enthalten, statt nur einen Command-Namen zu behaupten.
+- `Scope:` wird gegen die gestagten Dateien geprueft; `Known-uncommitted:` muss ungestagte/untracked Restdateien nennen oder explizit `none` sagen.
+- D3/D4-Commits brauchen zusaetzlich `Residual-risk:` und `Not-checked:`; breite Claims wie "repo-weit konsistent" werden ohne breite Gate- oder File-by-File-Evidence blockiert.
+
+## Stand-Snapshot 2026-05-15 (Subphase `V116 116.2`)
+
+- `116.2` ist nach User-Gate geschlossen: `npm run cleanup:workspace:apply` entfernte 203 konservative Low-Risk-Artefakte aus ignorierten Build-, Playwright-, Root-Log-, Dev-Log- und tmp-Diagnosepfaden; Archivaktionen blieben bei 0 und es gab keine Apply-Fehler.
+- Geschuetzte Klassen blieben unberuehrt: `videos/`, `prototypes`, `.codex_tmp`, unklare `tmp/*`-Evidence und P22-nahe Retention-Artefakte wurden nicht neu entschieden. `git status --short` blieb nach Apply leer.
+- Der Master-Index wechselt damit auf `V116 116.3` fuer die KI-Kontext-Policy; V116 hat weiter keinen produktiven Code-, Asset-, Recording-, Physik- oder Bot-Training-Diff.

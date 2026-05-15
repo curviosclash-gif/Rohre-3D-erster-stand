@@ -24,6 +24,8 @@ const D3_SURFACE_PATTERNS = [
 ];
 
 const KNOWLEDGE_GRAPH_PATH = 'docs/generated/knowledge-graph.json';
+const NONE_VALUES = new Set(['none', 'keine', 'n/a', '-']);
+const BROAD_CLAIM_PATTERN = /\b(alles geprueft|vollstaendig verifiziert|repo-weit konsistent|alle workflows|alle rules|alle regeln|alle scope_files|vollstaendige scope_files|all workflows|all rules|entire repo|whole repo)\b/i;
 
 function normalizePath(value) {
   return value.replace(/\\/g, '/');
@@ -81,6 +83,16 @@ export function getStagedChanges({ root = process.cwd() } = {}) {
   return parseStagedNameStatus(runGit(['diff', '--cached', '--name-status'], { root }));
 }
 
+export function getUncommittedFiles({ root = process.cwd() } = {}) {
+  return runGit(['status', '--short'], { root })
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .filter(Boolean)
+    .map((line) => normalizePath(line.slice(3).trim()))
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
+}
+
 function isD3Surface(file) {
   return D3_SURFACE_PATTERNS.some((pattern) => pattern.test(file));
 }
@@ -91,6 +103,33 @@ function isTrackedDeletion(change) {
 
 function addViolation(violations, id, message, files = []) {
   violations.push({ id, message, files });
+}
+
+function parseListField(value) {
+  if (!value) {
+    return [];
+  }
+  if (NONE_VALUES.has(value.trim().toLowerCase())) {
+    return [];
+  }
+  return value
+    .split(/[,;]/)
+    .map((item) => normalizePath(item.trim()))
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
+}
+
+function normalizeUnique(values) {
+  return Array.from(new Set(values.map(normalizePath))).sort((a, b) => a.localeCompare(b));
+}
+
+function isPresent(value) {
+  return Boolean(value && value.trim());
+}
+
+function listDifference(left, right) {
+  const rightSet = new Set(right);
+  return left.filter((item) => !rightSet.has(item));
 }
 
 async function readKnowledgeGraph(root) {
@@ -176,14 +215,21 @@ export async function validateAgentEnvelope({
   evidence,
   gate,
   recovery,
+  scope,
+  knownUncommitted,
+  residualRisk,
+  notChecked,
   changes = null,
+  uncommittedFiles = null,
   graph = true,
+  claimText = '',
 } = {}) {
   const workflows = await listWorkflows({ root });
   const stagedChanges = changes || getStagedChanges({ root });
+  const actualUncommittedFiles = uncommittedFiles || getUncommittedFiles({ root });
   const violations = [];
   const warnings = [];
-  const stagedFiles = stagedChanges.map((change) => change.file);
+  const stagedFiles = normalizeUnique(stagedChanges.map((change) => change.file));
 
   if (!workflow) {
     addViolation(violations, 'missing-workflow', 'Commit/Preflight braucht `Workflow: <name>`.');
@@ -203,6 +249,51 @@ export async function validateAgentEnvelope({
 
   if (!evidence || /^none$/i.test(evidence.trim())) {
     addViolation(violations, 'missing-evidence', 'Commit/Preflight braucht `Evidence: <command/result>`.');
+  } else if (!/(->\s*)?(PASS|WARN|FAIL)\b/i.test(evidence)) {
+    addViolation(
+      violations,
+      'evidence-without-result',
+      '`Evidence:` muss ein pruefbares Ergebnis enthalten, z. B. `npm run plan:check -> PASS`.'
+    );
+  }
+
+  const declaredScope = parseListField(scope);
+  if (stagedFiles.length > 0 && declaredScope.length === 0) {
+    addViolation(violations, 'missing-scope', 'Commit/Preflight braucht `Scope:` mit den gestagten Dateien.');
+  } else if (declaredScope.length > 0) {
+    const missingFromScope = listDifference(stagedFiles, declaredScope);
+    const extraInScope = listDifference(declaredScope, stagedFiles);
+    if (missingFromScope.length > 0) {
+      addViolation(violations, 'scope-missing-staged-files', '`Scope:` nennt nicht alle gestagten Dateien.', missingFromScope);
+    }
+    if (extraInScope.length > 0) {
+      addViolation(violations, 'scope-has-unstaged-files', '`Scope:` enthaelt Dateien, die nicht gestaged sind.', extraInScope);
+    }
+  }
+
+  const declaredKnownUncommitted = parseListField(knownUncommitted);
+  const unstagedFiles = listDifference(actualUncommittedFiles, stagedFiles);
+  if (!knownUncommitted) {
+    addViolation(violations, 'missing-known-uncommitted', 'Commit/Preflight braucht `Known-uncommitted:` (`none` wenn sauber).');
+  } else {
+    const missingKnown = listDifference(unstagedFiles, declaredKnownUncommitted);
+    const extraKnown = listDifference(declaredKnownUncommitted, unstagedFiles);
+    if (missingKnown.length > 0) {
+      addViolation(
+        violations,
+        'known-uncommitted-missing-files',
+        '`Known-uncommitted:` nennt nicht alle ungestagten/untracked Dateien.',
+        missingKnown
+      );
+    }
+    if (extraKnown.length > 0) {
+      addViolation(
+        violations,
+        'known-uncommitted-extra-files',
+        '`Known-uncommitted:` enthaelt Dateien, die aktuell nicht uncommitted ausserhalb des Scope liegen.',
+        extraKnown
+      );
+    }
   }
 
   const d3Files = stagedFiles.filter(isD3Surface);
@@ -227,6 +318,14 @@ export async function validateAgentEnvelope({
 
   if (decision === 'D3' && !gate) {
     addViolation(violations, 'd3-missing-gate', '`Decision: D3` braucht `Gate: <User-Gate oder Grund>`.');
+  }
+
+  if ((decision === 'D3' || decision === 'D4') && !isPresent(residualRisk)) {
+    addViolation(violations, 'missing-residual-risk', '`Decision: D3/D4` braucht `Residual-risk:`.');
+  }
+
+  if ((decision === 'D3' || decision === 'D4') && !isPresent(notChecked)) {
+    addViolation(violations, 'missing-not-checked', '`Decision: D3/D4` braucht `Not-checked:`.');
   }
 
   if (decision === 'D4') {
@@ -259,6 +358,14 @@ export async function validateAgentEnvelope({
     warnings.push('Keine gestagten Dateien gefunden; nur Envelope-Felder wurden geprueft.');
   }
 
+  if (BROAD_CLAIM_PATTERN.test(`${claimText}\n${evidence || ''}`) && !/gates:pre-commit|check:plan-evidence-claims|file-by-file|konkrete/i.test(evidence || '')) {
+    addViolation(
+      violations,
+      'broad-claim-without-broad-evidence',
+      'Breite Claims brauchen breite Evidence, z. B. `npm run gates:pre-commit -> PASS` oder konkrete File-by-File-Evidence.'
+    );
+  }
+
   const graphContext = graph
     ? await readAgentGraphContext({ root, files: stagedFiles })
     : { available: false, files: [], warnings: [] };
@@ -267,6 +374,7 @@ export async function validateAgentEnvelope({
   return {
     workflows,
     stagedChanges,
+    uncommittedFiles: actualUncommittedFiles,
     graphContext,
     violations,
     warnings,
@@ -284,6 +392,10 @@ async function main() {
   const evidence = valueFromCliOrEnv(args, 'evidence', 'AGENT_EVIDENCE');
   const gate = valueFromCliOrEnv(args, 'gate', 'AGENT_GATE');
   const recovery = valueFromCliOrEnv(args, 'recovery', 'AGENT_RECOVERY');
+  const scope = valueFromCliOrEnv(args, 'scope', 'AGENT_SCOPE');
+  const knownUncommitted = valueFromCliOrEnv(args, 'known-uncommitted', 'AGENT_KNOWN_UNCOMMITTED');
+  const residualRisk = valueFromCliOrEnv(args, 'residual-risk', 'AGENT_RESIDUAL_RISK');
+  const notChecked = valueFromCliOrEnv(args, 'not-checked', 'AGENT_NOT_CHECKED');
 
   const result = await validateAgentEnvelope({
     workflow,
@@ -291,6 +403,10 @@ async function main() {
     evidence,
     gate,
     recovery,
+    scope,
+    knownUncommitted,
+    residualRisk,
+    notChecked,
   });
 
   if (result.violations.length > 0) {
