@@ -13,9 +13,34 @@ export const CLAIM_PATTERNS = [
     message: 'Workflow-Glob-Claims brauchen eine registrierte File-by-File-Assertion.',
   },
   {
+    id: 'rules-brace-glob',
+    pattern: /\.agents[\\/]+rules[\\/]+\{[^}]+\}\.md/i,
+    message: 'Rule-Glob-Claims brauchen eine registrierte File-by-File-Assertion.',
+  },
+  {
+    id: 'docs-brace-glob',
+    pattern: /docs[\\/]+[^`\s]*\{[^}]+\}[^`\s]*/i,
+    message: 'Docs-Glob-Claims brauchen eine registrierte File-by-File-Assertion.',
+  },
+  {
     id: 'all-workflows-claim',
     pattern: /\b(?:alle|all|core)\s+Workflows\b/i,
     message: '"Alle/core Workflows"-Claims brauchen eine registrierte File-by-File-Assertion.',
+  },
+  {
+    id: 'all-rules-claim',
+    pattern: /\b(?:alle|all|core)\s+Rules\b|\balle\s+Regeln\b/i,
+    message: '"Alle/core Rules/Regeln"-Claims brauchen eine registrierte File-by-File-Assertion.',
+  },
+  {
+    id: 'all-scope-files-claim',
+    pattern: /\b(?:alle|all)\s+scope_files\b|\bscope_files\s+(?:sind\s+)?(?:alle|vollstaendig|konsistent)\b/i,
+    message: '"Alle/vollstaendige scope_files"-Claims brauchen eine registrierte File-by-File-Assertion.',
+  },
+  {
+    id: 'repo-wide-consistency-claim',
+    pattern: /\b(repo-weit|repo-wide)\b.{0,80}\b(konsistent|consistent|abgeglichen|synchron|sync)\b/i,
+    message: 'Repo-weite Konsistenzclaims brauchen konkrete Gate-Evidence oder eine registrierte Assertion.',
   },
 ];
 

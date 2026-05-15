@@ -75,6 +75,29 @@ test('flags workflow glob claims without a matching assertion', async () => {
   assert.equal(report.violations[0].id, 'claim-coverage.workflow-brace-glob');
 });
 
+test('flags broad rule, scope and repo-wide claims without matching assertions', async () => {
+  const root = await createFixture({
+    'docs/plaene/aktiv/V201.md': [
+      '# V201',
+      '',
+      '- Evidence: `.agents/rules/{planning_and_governance,git_and_commits}.md` ist konsistent.',
+      '- Alle scope_files sind vollstaendig abgedeckt.',
+      '- Repo-weit konsistent nach Abschluss.',
+    ].join('\n'),
+  });
+
+  const report = await runPlanEvidenceClaimCheck({
+    root,
+    assertions: [],
+    activePlanFiles: ['docs/plaene/aktiv/V201.md'],
+  });
+  const ids = report.violations.map((violation) => violation.id);
+
+  assert(ids.includes('claim-coverage.rules-brace-glob'));
+  assert(ids.includes('claim-coverage.all-scope-files-claim'));
+  assert(ids.includes('claim-coverage.repo-wide-consistency-claim'));
+});
+
 test('default assertions cover the real V117 workflow evidence claim', async () => {
   const report = await runPlanEvidenceClaimCheck();
 

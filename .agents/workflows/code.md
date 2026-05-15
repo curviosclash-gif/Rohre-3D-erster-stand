@@ -25,6 +25,7 @@ Optional (nur bei Bedarf):
 - Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; `D3`/`D4`-Source-of-truth-, Planstruktur-, Archivierungs-, Move-/Delete- oder High-Blast-Radius-Aenderungen brauchen User-Gate.
 - Subagents nur mit expliziter User-Erlaubnis fuer unabhaengige oder disjunkte Teilaufgaben einsetzen; der fuehrende Agent bleibt fuer Integration, Evidence und Commit verantwortlich.
 - Neue dauerhafte Ablagen nach Zweckklasse klassifizieren und bestehende kanonische Zielquelle bevorzugen.
+- Breite Plan-Evidence-Claims mit Globs oder "alle Workflows/Rules/scope_files/repo-weit" nur abschliessen, wenn sie durch konkrete Evidence oder `scripts/check-plan-evidence-claims.mjs` abgesichert sind.
 - Bei klarem Scope direkt weiter. Nur bei kritisch fehlender Information nachfragen.
 - Fremde uncommittete Aenderungen nicht absorbieren; nur scoped Dateien committen.
 
@@ -52,6 +53,7 @@ Optional (nur bei Bedarf):
 
 // turbo
 - Immer: `npm run plan:check`.
+- Bei aktiven Plan-, Workflow-, Rule-, Scope- oder Abschluss-Evidence-Aenderungen: `npm run check:plan-evidence-claims`.
 - Wenn `docs/`, `.agents/`, `scripts/validate-umsetzungsplan.mjs`, Graph-Artefakte oder Master-/Blockplan-Struktur geaendert wurden: `npm run gates:pre-commit`.
 - Wenn `*.99` geschlossen wird: `npm run gates:pre-commit` verpflichtend.
 - Bei reinem Code-Scope ohne Doc-/Governance-Drift: nur kleinste sinnvolle Zusatzchecks (z. B. `npm run build` oder fokussierter Contract-Run).

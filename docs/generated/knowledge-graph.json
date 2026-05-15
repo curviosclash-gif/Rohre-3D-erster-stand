@@ -10107,7 +10107,7 @@
     {
       "id": "V117.2.3",
       "type": "subphase",
-      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md`, `bugfix.md` und `cleanup.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen; `.agents/workflows/cleanup.md` nennt D3/D4-nahe Cleanup-, Archivierungs-, Move-/Delete- und Refactor-Risiken explizit. (abgeschlossen: 2026-05-14; evidence: Workflow-Verweise auf Decision-Klassen, Zweckklassen und Gate-Pfade + Glob-Claim-Assertion in `scripts/check-plan-evidence-claims.mjs` + `npm run check:plan-evidence-claims` + `npm run gates:pre-commit` -> commit)",
+      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md`, `bugfix.md` und `cleanup.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen; `.agents/workflows/cleanup.md` nennt D3/D4-nahe Cleanup-, Archivierungs-, Move-/Delete- und Refactor-Risiken explizit. (abgeschlossen: 2026-05-14; evidence: Workflow-Verweise auf Decision-Klassen, Zweckklassen und Gate-Pfade + Glob-/Repo-Claim-Assertions in `scripts/check-plan-evidence-claims.mjs` + `npm run check:plan-evidence-claims` + `npm run gates:pre-commit` -> commit)",
       "status": "done",
       "attributes": {
         "blockId": "V117",

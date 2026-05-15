@@ -23,6 +23,7 @@ description: Create a compact implementation plan for a new feature or extension
 - Reuse vs new file decision.
 - Risk rating (low/medium/high).
 - Documentation impact list.
+- Evidence-Claim-Pruefung planen: Breite Claims mit Globs oder Formulierungen wie "alle Workflows/Rules/scope_files" oder "repo-weit konsistent" brauchen konkrete File-by-File-Evidence oder eine Assertion in `scripts/check-plan-evidence-claims.mjs`.
 - Note any intentional online-demo limitations or deferred parity work.
 - Datei-Ownership pruefen: kollidiert der Scope mit einem gelockten Block?
 - Dependencies klassifizieren (`hard`/`soft`).
@@ -45,6 +46,7 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 - Bei Legacy-/Dead-Code-Scope pro Kandidat: Klassifikation, geplanter Nachfolger, verbleibende Konsumenten und Delete-Kriterium.
 - Evidence format for completed items:
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
+- Keine Sammel-Evidence ohne pruefbaren Abgleich: Wenn der Plan mehrere Dateien per Glob oder "alle X" behauptet, Assertion in `check-plan-evidence-claims` ergaenzen oder die Evidence auf konkrete Dateien/Commands reduzieren.
 - Intake-Hinweis fuer den User:
   - Ziel-Masterplan (`docs/Umsetzungsplan.md` oder `docs/bot-training/Bot_Trainingsplan.md`)
   - vorgeschlagene Block-ID
@@ -63,6 +65,7 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 
 // turbo
 - `npm run plan:check`
+- `npm run check:plan-evidence-claims` wenn aktive Plaene, Workflow-/Rule-/Scope-Claims oder Plan-Evidence geaendert wurden.
 - `npm run graph:check` sobald der Draft in `docs/plaene/aktiv/VXX.md` oder den Master aufgenommen wurde.
 - `npm run docs:sync && npm run docs:check`
 

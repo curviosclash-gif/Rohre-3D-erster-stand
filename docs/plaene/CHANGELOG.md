@@ -618,3 +618,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `check-plan-evidence-claims` erkennt Workflow-Glob-Claims wie `.agents/workflows/{...}.md` und blockiert sie, wenn keine passende Assertion registriert ist.
 - Der Contract-Test prueft neben Fixtures auch die echten V117-Default-Assertions, damit geloeschte Workflow-Marker oder fehlende Claim-Abdeckung im Repo selbst auffallen.
 - `check:ai-decision-policy` meldet sich im Output als `ai-decision-policy:report-only`; `report:ai-decision-policy` ist als sprechender Alias verfuegbar, waehrend harte Evidence-Claims weiter ueber `check:plan-evidence-claims` laufen.
+
+## Workflow-Haertung 2026-05-15 (Plan-/Code-Workflow Evidence-Claims)
+
+- `.agents/workflows/plan.md` verlangt fuer neue Plaene bei Glob- oder "alle X"-Evidence konkrete File-by-File-Evidence oder eine Assertion in `check-plan-evidence-claims`.
+- `.agents/workflows/code.md` macht `npm run check:plan-evidence-claims` bei aktiven Plan-, Workflow-, Rule-, Scope- oder Abschluss-Evidence-Aenderungen zum vorgesehenen Governance-Gate.
+- Der Claim-Check blockiert jetzt auch Rule-/Docs-Globs, "alle Rules/Regeln", "alle/vollstaendige scope_files" und repo-weite Konsistenzclaims ohne passende Assertion.
