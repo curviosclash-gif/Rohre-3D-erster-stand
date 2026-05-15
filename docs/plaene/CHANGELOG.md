@@ -612,3 +612,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - P2-Fund geschlossen: `.agents/workflows/cleanup.md` hat jetzt einen direkten Decision-Klassen-/D3-D4-/User-Gate-/Zweckklassen-Verweis fuer Cleanup-, Archivierungs-, Move-/Delete- und Refactor-Scope.
 - Praevention: `scripts/check-plan-evidence-claims.mjs` prueft V117-Workflow-Integrationsclaims gegen konkrete Marker in den betroffenen Workflow-Dateien; `npm run check:plan-evidence-claims` laeuft im `gates:pre-commit`-Meta-Gate.
 - P3-Funde nachgeschaerft: Die verfruehte Lock-Freigabe bleibt als historischer Befund dokumentiert statt per History-Rewrite kaschiert; `check:ai-decision-policy` bleibt Report-only, waehrend harte Plan-Evidence-Claims jetzt einen blockierenden Assertion-Check haben.
+
+## Review-Haertung 2026-05-15 (Block `V117` Claim-Registry)
+
+- `check-plan-evidence-claims` erkennt Workflow-Glob-Claims wie `.agents/workflows/{...}.md` und blockiert sie, wenn keine passende Assertion registriert ist.
+- Der Contract-Test prueft neben Fixtures auch die echten V117-Default-Assertions, damit geloeschte Workflow-Marker oder fehlende Claim-Abdeckung im Repo selbst auffallen.
+- `check:ai-decision-policy` meldet sich im Output als `ai-decision-policy:report-only`; `report:ai-decision-policy` ist als sprechender Alias verfuegbar, waehrend harte Evidence-Claims weiter ueber `check:plan-evidence-claims` laufen.

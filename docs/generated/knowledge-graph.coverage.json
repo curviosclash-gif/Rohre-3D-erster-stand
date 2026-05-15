@@ -14355,6 +14355,7 @@
         "B13",
         "V110",
         "V112",
+        "V117",
         "V75",
         "V87",
         "V88",
@@ -16839,10 +16840,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V117"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -17103,6 +17106,7 @@
       ],
       "scopeBlocks": [
         "B13",
+        "V117",
         "V93",
         "V94"
       ],
@@ -30999,10 +31003,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V117"
       ],
       "surfaces": [],
       "classification": "product-code",

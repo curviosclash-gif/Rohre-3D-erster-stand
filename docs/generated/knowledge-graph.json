@@ -1359,10 +1359,14 @@
           "docs/plaene/neu/Feature_Repo_Context_Cleanup.md",
           "docs/referenz/ai_project_onboarding.md",
           "docs/Umsetzungsplan.md",
-          "scripts/check-ai-decision-policy.mjs"
+          "package.json",
+          "scripts/check-ai-decision-policy.mjs",
+          "scripts/check-plan-evidence-claims.mjs",
+          "scripts/gates-pre-commit.mjs",
+          "tests/plan-evidence-claims.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 16,
+          "concreteCount": 20,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -10103,7 +10107,7 @@
     {
       "id": "V117.2.3",
       "type": "subphase",
-      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md`, `bugfix.md` und `cleanup.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen; `.agents/workflows/cleanup.md` nennt D3/D4-nahe Cleanup-, Archivierungs-, Move-/Delete- und Refactor-Risiken explizit. (abgeschlossen: 2026-05-14; evidence: Workflow-Verweise auf Decision-Klassen, Zweckklassen und Gate-Pfade + `npm run check:plan-evidence-claims` + `npm run gates:pre-commit` -> commit)",
+      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md`, `bugfix.md` und `cleanup.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen; `.agents/workflows/cleanup.md` nennt D3/D4-nahe Cleanup-, Archivierungs-, Move-/Delete- und Refactor-Risiken explizit. (abgeschlossen: 2026-05-14; evidence: Workflow-Verweise auf Decision-Klassen, Zweckklassen und Gate-Pfade + Glob-Claim-Assertion in `scripts/check-plan-evidence-claims.mjs` + `npm run check:plan-evidence-claims` + `npm run gates:pre-commit` -> commit)",
       "status": "done",
       "attributes": {
         "blockId": "V117",
@@ -25651,6 +25655,7 @@
           "B13",
           "V110",
           "V112",
+          "V117",
           "V75",
           "V87",
           "V88",
@@ -26281,10 +26286,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V117"
         ],
         "exists": true
       }
@@ -26531,6 +26538,7 @@
         ],
         "scopeBlocks": [
           "B13",
+          "V117",
           "V93",
           "V94"
         ],
@@ -38890,10 +38898,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V117"
         ],
         "exists": true
       }
@@ -59588,7 +59598,43 @@
     },
     {
       "from": "V117",
+      "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
       "to": "scripts/check-ai-decision-policy.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "scripts/check-plan-evidence-claims.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "scripts/gates-pre-commit.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V117",
+      "to": "tests/plan-evidence-claims.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {

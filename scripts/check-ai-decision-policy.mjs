@@ -306,17 +306,17 @@ async function main() {
   const infoCount = report.findings.filter((finding) => finding.severity === 'info').length;
 
   const mode = scanAll ? 'baseline' : 'changed-files';
-  process.stdout.write(`[ai-decision-policy] report-only mode=${mode} files=${report.files.length} warnings=${warnCount} info=${infoCount}\n`);
+  process.stdout.write(`[ai-decision-policy:report-only] mode=${mode} files=${report.files.length} warnings=${warnCount} info=${infoCount}\n`);
 
   for (const finding of report.findings.slice(0, MAX_PRINTED_FINDINGS)) {
     process.stdout.write(`- ${finding.severity.toUpperCase()} ${finding.file}:${finding.line} [${finding.id}] ${finding.message}\n`);
   }
 
   if (report.findings.length > MAX_PRINTED_FINDINGS) {
-    process.stdout.write(`[ai-decision-policy] weitere Findings: ${report.findings.length - MAX_PRINTED_FINDINGS}\n`);
+    process.stdout.write(`[ai-decision-policy:report-only] weitere Findings: ${report.findings.length - MAX_PRINTED_FINDINGS}\n`);
   }
 
-  process.stdout.write('[ai-decision-policy] nicht blockierend; Findings sind Review-Hinweise.\n');
+  process.stdout.write('[ai-decision-policy:report-only] nicht blockierend; Findings sind Review-Hinweise.\n');
 }
 
 const isDirectRun = process.argv[1]

@@ -55,3 +55,28 @@ test('accepts cleanup evidence when decision class and user gate markers are pre
 
   assert.deepEqual(report.violations, []);
 });
+
+test('flags workflow glob claims without a matching assertion', async () => {
+  const root = await createFixture({
+    'docs/plaene/aktiv/V200.md': [
+      '# V200',
+      '',
+      '- Evidence: `.agents/workflows/{plan,code,cleanup}.md` ist konsistent.',
+    ].join('\n'),
+  });
+
+  const report = await runPlanEvidenceClaimCheck({
+    root,
+    assertions: [],
+    activePlanFiles: ['docs/plaene/aktiv/V200.md'],
+  });
+
+  assert.equal(report.violations.length, 1);
+  assert.equal(report.violations[0].id, 'claim-coverage.workflow-brace-glob');
+});
+
+test('default assertions cover the real V117 workflow evidence claim', async () => {
+  const report = await runPlanEvidenceClaimCheck();
+
+  assert.deepEqual(report.violations, []);
+});

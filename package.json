@@ -20,6 +20,7 @@
     "check:ai-decision-policy": "node scripts/check-ai-decision-policy.mjs",
     "check:plan-evidence-claims": "node scripts/check-plan-evidence-claims.mjs",
     "check:gemini": "node scripts/check-gemini-governance.mjs",
+    "report:ai-decision-policy": "node scripts/check-ai-decision-policy.mjs",
     "dev": "node scripts/dev-with-logs.mjs",
     "dev:logged": "node scripts/dev-with-logs.mjs",
     "dev:raw": "vite",

@@ -4,11 +4,27 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const ROOT = process.cwd();
+const ACTIVE_PLAN_ROOT = 'docs/plaene/aktiv';
 
-const ASSERTIONS = [
+export const CLAIM_PATTERNS = [
+  {
+    id: 'workflow-brace-glob',
+    pattern: /\.agents[\\/]+workflows[\\/]+\{[^}]+\}\.md/i,
+    message: 'Workflow-Glob-Claims brauchen eine registrierte File-by-File-Assertion.',
+  },
+  {
+    id: 'all-workflows-claim',
+    pattern: /\b(?:alle|all|core)\s+Workflows\b/i,
+    message: '"Alle/core Workflows"-Claims brauchen eine registrierte File-by-File-Assertion.',
+  },
+];
+
+export const ASSERTIONS = [
   {
     id: 'V117.workflow-decision-markers',
     claim: 'V117 claims all core workflows reference the AI decision framework.',
+    evidenceFiles: ['docs/plaene/aktiv/V117.md'],
+    coversClaimPatterns: ['workflow-brace-glob', 'all-workflows-claim'],
     files: [
       '.agents/workflows/plan.md',
       '.agents/workflows/code.md',
@@ -49,7 +65,69 @@ function formatPatterns(patterns) {
   return patterns.map((pattern) => pattern.toString()).join(', ');
 }
 
-export async function runPlanEvidenceClaimCheck({ root = ROOT, assertions = ASSERTIONS } = {}) {
+async function listActivePlanFiles(root) {
+  const planRoot = path.join(root, ACTIVE_PLAN_ROOT);
+  let entries = [];
+  try {
+    entries = await fs.readdir(planRoot, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+
+  return entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
+    .map((entry) => normalizePath(path.join(ACTIVE_PLAN_ROOT, entry.name)));
+}
+
+function findLineNumber(text, index) {
+  return text.slice(0, index).split(/\r?\n/).length;
+}
+
+function assertionCoversClaim(assertion, planFile, patternId) {
+  return assertion.evidenceFiles?.map(normalizePath).includes(normalizePath(planFile))
+    && assertion.coversClaimPatterns?.includes(patternId);
+}
+
+async function validatePlanClaimCoverage(root, assertions, activePlanFiles) {
+  const violations = [];
+
+  for (const planFile of activePlanFiles) {
+    let text = '';
+    try {
+      text = await readText(root, planFile);
+    } catch {
+      continue;
+    }
+
+    for (const claimPattern of CLAIM_PATTERNS) {
+      const match = claimPattern.pattern.exec(text);
+      if (!match) {
+        continue;
+      }
+
+      const covered = assertions.some((assertion) => (
+        assertionCoversClaim(assertion, planFile, claimPattern.id)
+      ));
+
+      if (!covered) {
+        violations.push({
+          id: `claim-coverage.${claimPattern.id}`,
+          file: normalizePath(planFile),
+          line: findLineNumber(text, match.index),
+          message: claimPattern.message,
+        });
+      }
+    }
+  }
+
+  return violations;
+}
+
+export async function runPlanEvidenceClaimCheck({
+  root = ROOT,
+  assertions = ASSERTIONS,
+  activePlanFiles = null,
+} = {}) {
   const violations = [];
 
   for (const assertion of assertions) {
@@ -89,19 +167,23 @@ export async function runPlanEvidenceClaimCheck({ root = ROOT, assertions = ASSE
     }
   }
 
-  return { assertions: assertions.length, violations };
+  const planFiles = activePlanFiles ?? await listActivePlanFiles(root);
+  violations.push(...await validatePlanClaimCoverage(root, assertions, planFiles));
+
+  return { assertions: assertions.length, activePlanFiles: planFiles.length, violations };
 }
 
 async function main() {
   const report = await runPlanEvidenceClaimCheck();
   if (report.violations.length === 0) {
-    console.log(`[plan-evidence-claims] passed assertions=${report.assertions}`);
+    console.log(`[plan-evidence-claims] passed assertions=${report.assertions} activePlans=${report.activePlanFiles}`);
     return;
   }
 
-  console.error(`[plan-evidence-claims] failed assertions=${report.assertions} violations=${report.violations.length}`);
+  console.error(`[plan-evidence-claims] failed assertions=${report.assertions} activePlans=${report.activePlanFiles} violations=${report.violations.length}`);
   for (const violation of report.violations) {
-    console.error(`- ${violation.file} [${violation.id}] ${violation.message}`);
+    const location = violation.line ? `${violation.file}:${violation.line}` : violation.file;
+    console.error(`- ${location} [${violation.id}] ${violation.message}`);
   }
   process.exit(1);
 }
