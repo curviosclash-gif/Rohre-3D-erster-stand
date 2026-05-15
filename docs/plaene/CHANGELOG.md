@@ -606,3 +606,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `117.1` ist geschlossen: Das AI Decision Framework ist fachlich fixiert, D0-D4 sind gegen V116, Dead-Code, Planarchivierung, Rebuild und Refactor abgeglichen.
 - Der Referenz-Onboarding-Pfad verweist wieder auf `AGENTS.md`, passende Rules/Workflows, Master-Index und aktive Detailplaene statt eigene Steuerlogik aufzubauen.
 - Decision: V117 117.1 bleibt D3-Governance-Scope; Chosen: kompakte Plan-/Referenzklaerung statt breiter Workflow-Umbau; Evidence: `open-deps V117`, `scope-collisions`, `npm run plan:check`; Gate: `npm run plan:check`.
+
+## Review-Fix 2026-05-15 (Block `V117` Evidence-Claim-Haertung)
+
+- P2-Fund geschlossen: `.agents/workflows/cleanup.md` hat jetzt einen direkten Decision-Klassen-/D3-D4-/User-Gate-/Zweckklassen-Verweis fuer Cleanup-, Archivierungs-, Move-/Delete- und Refactor-Scope.
+- Praevention: `scripts/check-plan-evidence-claims.mjs` prueft V117-Workflow-Integrationsclaims gegen konkrete Marker in den betroffenen Workflow-Dateien; `npm run check:plan-evidence-claims` laeuft im `gates:pre-commit`-Meta-Gate.
+- P3-Funde nachgeschaerft: Die verfruehte Lock-Freigabe bleibt als historischer Befund dokumentiert statt per History-Rewrite kaschiert; `check:ai-decision-policy` bleibt Report-only, waehrend harte Plan-Evidence-Claims jetzt einen blockierenden Assertion-Check haben.

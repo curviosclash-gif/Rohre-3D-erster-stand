@@ -8,6 +8,7 @@ import { spawnSync } from 'node:child_process';
 // `spawnSync npm.cmd EINVAL` sowie DEP0190 (shell-true-Warnung) zu vermeiden.
 const steps = [
   ['plan:check', 'scripts/validate-umsetzungsplan.mjs', []],
+  ['plan:evidence-claims', 'scripts/check-plan-evidence-claims.mjs', []],
   ['graph:check', 'scripts/check-knowledge-graph.mjs', []],
   ['parcours:check/strict', 'scripts/check-parcours-routes.mjs', ['--strict']],
   ['docs:sync', 'scripts/docs-freshness.mjs', ['--write']],

@@ -12,6 +12,8 @@ description: Detect and retire dead code/files with replacement-proof and safe d
 ## 1. Inventory
 
 // turbo
+- Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; Cleanup-, Archivierungs-, Move-/Delete- und breite Refactor-Schritte sind D3/D4-nahe und brauchen User-Gate vor Umsetzung.
+- Neue Reports, Ablagen oder Archiv-Indizes vorab nach Zweckklasse (`transient`, `evidence`, `reference`, `governance`, `plan`, `archive-index`) einordnen und bestehende kanonische Zielquellen bevorzugen.
 - `git ls-files "src/**/*.js" "editor/js/**/*.js" "tests/**/*.js" "tests/**/*.mjs"`
 - Cross-check with actual imports/references.
 - Classify each candidate as `duplicate-backed`, `legacy-with-replacement`, `contract-first/plan-drift`, or `unverified-altpath`.

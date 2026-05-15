@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 198,
+          "concreteCount": 200,
           "plannedCount": 0
         }
       }
@@ -10103,7 +10103,7 @@
     {
       "id": "V117.2.3",
       "type": "subphase",
-      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md` und `bugfix.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen; `.agents/workflows/cleanup.md` bleibt bewusst in der Decision-Policy-Pruefflaeche, weil Cleanup-, Archivierungs-, Move-/Delete- und D4-Risiken dort gebuendelt sind. (abgeschlossen: 2026-05-14; evidence: Workflow-Verweise auf Decision-Klassen, Zweckklassen und Gate-Pfade + `npm run gates:pre-commit` -> commit)",
+      "title": "`.agents/workflows/plan.md`, `code.md`, `quick.md`, `bugfix.md` und `cleanup.md` nur mit knappen Verweisen auf Decision-Klassen und Zweckklassen versehen; `.agents/workflows/cleanup.md` nennt D3/D4-nahe Cleanup-, Archivierungs-, Move-/Delete- und Refactor-Risiken explizit. (abgeschlossen: 2026-05-14; evidence: Workflow-Verweise auf Decision-Klassen, Zweckklassen und Gate-Pfade + `npm run check:plan-evidence-claims` + `npm run gates:pre-commit` -> commit)",
       "status": "done",
       "attributes": {
         "blockId": "V117",
@@ -10158,7 +10158,7 @@
     {
       "id": "V117.99.1",
       "type": "subphase",
-      "title": "Regeln, Workflows und V116-Verweise sind konsistent. (abgeschlossen: 2026-05-14; evidence: `.agents/rules/planning_and_governance.md`, `.agents/workflows/{plan,code,quick,bugfix,cleanup}.md`, `docs/plaene/neu/Feature_Repo_Context_Cleanup.md` + `npm run gates:pre-commit` -> commit)",
+      "title": "Regeln, Workflows und V116-Verweise sind konsistent. (abgeschlossen: 2026-05-14; evidence: `.agents/rules/planning_and_governance.md`, `.agents/workflows/{plan,code,quick,bugfix,cleanup}.md`, `docs/plaene/neu/Feature_Repo_Context_Cleanup.md` + `npm run check:plan-evidence-claims` + `npm run gates:pre-commit` -> commit)",
       "status": "done",
       "attributes": {
         "blockId": "V117",
@@ -26275,6 +26275,21 @@
       }
     },
     {
+      "id": "scripts/check-plan-evidence-claims.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "scripts/check-root-runtime-invariants.mjs",
       "type": "file",
       "title": null,
@@ -38869,6 +38884,21 @@
       }
     },
     {
+      "id": "tests/plan-evidence-claims.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/platform-capabilities.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -44755,6 +44785,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/check-plan-evidence-claims.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/check-root-runtime-invariants.mjs",
       "type": "scope",
       "hint": null,
@@ -45737,6 +45776,15 @@
     {
       "from": "B13",
       "to": "tests/physics-policy.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/plan-evidence-claims.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {

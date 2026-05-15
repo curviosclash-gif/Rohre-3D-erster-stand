@@ -155,11 +155,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1848,
-    "rawCoveredFileCount": 1198,
-    "rawCoveragePercent": 64.8,
-    "adjustedTrackedFileCount": 1367,
-    "adjustedCoveredFileCount": 1014,
+    "trackedFileCount": 1850,
+    "rawCoveredFileCount": 1200,
+    "rawCoveragePercent": 64.9,
+    "adjustedTrackedFileCount": 1369,
+    "adjustedCoveredFileCount": 1016,
     "adjustedCoveragePercent": 74.2,
     "uncoveredFileCount": 650,
     "uncoveredActiveFileCount": 353,
@@ -209,8 +209,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 939,
-        "coveredCount": 816
+        "count": 941,
+        "coveredCount": 818
       },
       {
         "classification": "product-docs",
@@ -16833,6 +16833,23 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/check-plan-evidence-claims.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/check-root-runtime-invariants.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -30969,6 +30986,23 @@
         "V69",
         "V88",
         "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/plan-evidence-claims.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
       ],
       "surfaces": [],
       "classification": "product-code",
