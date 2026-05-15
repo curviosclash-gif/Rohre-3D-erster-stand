@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-14T15:16:05.887Z",
+  "timestamp": "2026-05-15T12:58:10.756Z",
   "locks": [
     {
       "block_id": "V103",
@@ -362,10 +362,40 @@
       "target_completion": "2026-05-10",
       "status": "completed",
       "notes": "V111 Abschluss-Gate passed; block closed with graph, plan and docs gates green."
+    },
+    {
+      "block_id": "V116",
+      "phase": "116.2",
+      "scope_files": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".gemini/README.md",
+        ".gitignore",
+        ".agents/rules/token_efficiency_and_tools.md",
+        ".agents/workflows/plan.md",
+        ".agents/workflows/code.md",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V116.md",
+        "docs/plaene/aktiv/README.md",
+        "docs/plaene/neu/README.md",
+        "docs/CURRENT_CONTEXT.md",
+        "docs/referenz/ai_project_onboarding.md",
+        "scripts/workspace-cleanup.mjs",
+        "scripts/plan-context-report.mjs",
+        "scripts/check-agent-context.mjs",
+        "scripts/validate-umsetzungsplan.mjs",
+        "scripts/check-gemini-governance.mjs",
+        "scripts/query-knowledge-graph.mjs",
+        "tmp/workspace-cleanup-report.json"
+      ],
+      "start_date": "2026-05-15",
+      "target_completion": "2026-05-15",
+      "status": "in-progress",
+      "notes": "V116 cleanup summary and baseline continuation"
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "117.1",
+    "phase_id": "116.2",
     "completed_items": [],
     "last_commit": ""
   }

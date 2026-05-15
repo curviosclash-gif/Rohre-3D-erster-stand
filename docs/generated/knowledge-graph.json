@@ -1285,7 +1285,7 @@
       "id": "V116",
       "type": "block",
       "title": "Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung",
-      "status": "planned",
+      "status": "active",
       "attributes": {
         "source": [
           "block-plan",
@@ -1293,7 +1293,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "116.1",
+        "currentPhase": "116.2",
         "planFile": "docs/plaene/aktiv/V116.md",
         "scopeDeclarations": [
           ".agents/rules/token_efficiency_and_tools.md",
@@ -3913,7 +3913,7 @@
       "id": "V116.1",
       "type": "phase",
       "title": "Baseline und Schutzrahmen",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.1"
@@ -9370,8 +9370,8 @@
     {
       "id": "V116.1.1",
       "type": "subphase",
-      "title": "Git-Status erfassen und fremde uncommittete Aenderungen als No-Touch markieren. Keine Stashes, keine destruktiven Git-Kommandos.",
-      "status": "open",
+      "title": "Git-Status erfassen und fremde uncommittete Aenderungen als No-Touch markieren. Keine Stashes, keine destruktiven Git-Kommandos. (abgeschlossen: 2026-05-15; evidence: `git status --short` zeigte fremde Aenderungen in `docs/plaene/CHANGELOG.md`, `scripts/agent-preflight.mjs` und `tests/agent-governance.contract.test.mjs`; V116-Slice fasst diese Dateien nicht an.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.1",
@@ -9381,8 +9381,8 @@
     {
       "id": "V116.1.2",
       "type": "subphase",
-      "title": "Struktur-Gates erfassen: `npm run plan:check`, `node scripts/query-knowledge-graph.mjs critical-path-health`, optional `node scripts/query-knowledge-graph.mjs scope-collisions --json`.",
-      "status": "open",
+      "title": "Struktur-Gates erfassen: `npm run plan:check`, `node scripts/query-knowledge-graph.mjs critical-path-health`, optional `node scripts/query-knowledge-graph.mjs scope-collisions --json`. (abgeschlossen: 2026-05-15; evidence: `npm run plan:check` PASS; `critical-path-health` meldet `combat-hit`, `round-end`, `settings` und `spawn` als `ok`; `scope-collisions --json` meldet nur bekannte geplante Block-Kollisionen ohne V116-Treffer.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.1",
@@ -9392,8 +9392,8 @@
     {
       "id": "V116.1.3",
       "type": "subphase",
-      "title": "Cleanup-Dry-Run ausfuehren: `npm run cleanup:workspace`; Bericht `tmp/workspace-cleanup-report.json` nach Aktion, Risiko und Top-Level-Pfad zusammenfassen.",
-      "status": "open",
+      "title": "Cleanup-Dry-Run ausfuehren: `npm run cleanup:workspace`; Bericht `tmp/workspace-cleanup-report.json` nach Aktion, Risiko und Top-Level-Pfad zusammenfassen. (abgeschlossen: 2026-05-15; evidence: Dry-Run PASS mit `delete=203`, `archive=0`, `protect=37`; `explainSummary` gruppiert `safe delete`, `safe archive`, `protected tracked`, `protected unknown` und `needs user decision`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.1",
@@ -9403,8 +9403,8 @@
     {
       "id": "V116.1.4",
       "type": "subphase",
-      "title": "No-Touch-Klassen dokumentieren: produktive Assets, getrackte Dateien, aktive Locks, aktuelle Evidence, Bot-Training-Checkpoints, lizenz-/vendornahe Quellen, aktive Planreferenzen.",
-      "status": "open",
+      "title": "No-Touch-Klassen dokumentieren: produktive Assets, getrackte Dateien, aktive Locks, aktuelle Evidence, Bot-Training-Checkpoints, lizenz-/vendornahe Quellen, aktive Planreferenzen. (abgeschlossen: 2026-05-15; evidence: Cleanup-Report schuetzt `videos/`, `prototypes/`, `.codex_tmp`, `tmp`, aktive/unklare tmp-Evidence und getrackte Treffer; Apply bleibt gatepflichtig.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.1",
@@ -9436,8 +9436,8 @@
     {
       "id": "V116.2.2",
       "type": "subphase",
-      "title": "Dry-Run-Kandidaten klassifizieren: `delete`, `archive`, `protect`; riskante Kandidaten manuell ausnehmen.",
-      "status": "open",
+      "title": "Dry-Run-Kandidaten klassifizieren: `delete`, `archive`, `protect`; riskante Kandidaten manuell ausnehmen. (abgeschlossen: 2026-05-15; evidence: `tmp/workspace-cleanup-report.json` enthaelt `summary` und `explainSummary`; konservative Kandidaten sind `safe delete=203`, `safe archive=0`, `protected tracked=0`, `protected unknown=31`, `needs user decision=6`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.2",
@@ -9480,8 +9480,8 @@
     {
       "id": "V116.2.6",
       "type": "subphase",
-      "title": "`workspace-cleanup` um eine kompakte Summary-/Explain-Sicht erweitern, falls der Dry-Run fuer Agenten zu lang ist: `safe delete`, `safe archive`, `protected tracked`, `protected unknown`, `needs user decision`.",
-      "status": "open",
+      "title": "`workspace-cleanup` um eine kompakte Summary-/Explain-Sicht erweitern, falls der Dry-Run fuer Agenten zu lang ist: `safe delete`, `safe archive`, `protected tracked`, `protected unknown`, `needs user decision`. (abgeschlossen: 2026-05-15; evidence: `scripts/workspace-cleanup.mjs` schreibt `explainSummary` in den Report und zeigt standardmaessig nur die Gruppensicht; Einzelitems bleiben ueber `--verbose` oder `tmp/workspace-cleanup-report.json` verfuegbar.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.2",
