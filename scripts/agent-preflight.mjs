@@ -23,6 +23,8 @@ const D3_SURFACE_PATTERNS = [
   /^scripts\/gates-pre-commit\.mjs$/,
 ];
 
+const KNOWLEDGE_GRAPH_PATH = 'docs/generated/knowledge-graph.json';
+
 function normalizePath(value) {
   return value.replace(/\\/g, '/');
 }
@@ -91,6 +93,82 @@ function addViolation(violations, id, message, files = []) {
   violations.push({ id, message, files });
 }
 
+async function readKnowledgeGraph(root) {
+  const graphPath = path.join(root, KNOWLEDGE_GRAPH_PATH);
+  try {
+    const text = await fs.readFile(graphPath, 'utf8');
+    const graph = JSON.parse(text);
+    if (!Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
+      return { graph: null, warning: `${KNOWLEDGE_GRAPH_PATH} hat keine nodes/edges-Struktur.` };
+    }
+    return { graph, warning: null };
+  } catch (error) {
+    if (error?.code === 'ENOENT') {
+      return { graph: null, warning: `${KNOWLEDGE_GRAPH_PATH} fehlt; Graph-Kontext wird uebersprungen.` };
+    }
+    return { graph: null, warning: `${KNOWLEDGE_GRAPH_PATH} konnte nicht gelesen werden: ${error.message}` };
+  }
+}
+
+function collectGraphContext(graph, files) {
+  const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
+  const scopeEdgesByFile = new Map();
+  for (const edge of graph.edges) {
+    if (edge.type !== 'scope') {
+      continue;
+    }
+    if (!scopeEdgesByFile.has(edge.to)) {
+      scopeEdgesByFile.set(edge.to, []);
+    }
+    scopeEdgesByFile.get(edge.to).push(edge);
+  }
+
+  return files.map((file) => {
+    const node = nodeById.get(file);
+    const scopeEdges = scopeEdgesByFile.get(file) || [];
+    const scopeBlocks = new Set([
+      ...((node?.attributes?.scopeBlocks) || []),
+      ...scopeEdges.map((edge) => edge.from),
+    ]);
+    return {
+      file,
+      inGraph: Boolean(node),
+      nodeType: node?.type || null,
+      source: node?.attributes?.source || [],
+      scopeBlocks: Array.from(scopeBlocks).sort((a, b) => a.localeCompare(b)),
+      scopeEdgeCount: scopeEdges.length,
+    };
+  });
+}
+
+export async function readAgentGraphContext({ root = process.cwd(), files = [] } = {}) {
+  const uniqueFiles = Array.from(new Set(files.map(normalizePath))).sort((a, b) => a.localeCompare(b));
+  if (uniqueFiles.length === 0) {
+    return { available: false, files: [], warnings: [] };
+  }
+
+  const { graph, warning } = await readKnowledgeGraph(root);
+  if (!graph) {
+    return { available: false, files: [], warnings: warning ? [warning] : [] };
+  }
+
+  const graphFiles = collectGraphContext(graph, uniqueFiles);
+  const warnings = [];
+  const missing = graphFiles.filter((entry) => !entry.inGraph).map((entry) => entry.file);
+  if (missing.length > 0) {
+    warnings.push(`Graph kennt ${missing.length} gestagte Datei(en) noch nicht: ${missing.join(', ')}`);
+  }
+
+  const withoutScope = graphFiles
+    .filter((entry) => entry.inGraph && entry.scopeBlocks.length === 0)
+    .map((entry) => entry.file);
+  if (withoutScope.length > 0) {
+    warnings.push(`Graph hat fuer ${withoutScope.length} Datei(en) keine Scope-Bloecke: ${withoutScope.join(', ')}`);
+  }
+
+  return { available: true, files: graphFiles, warnings };
+}
+
 export async function validateAgentEnvelope({
   root = process.cwd(),
   workflow,
@@ -99,6 +177,7 @@ export async function validateAgentEnvelope({
   gate,
   recovery,
   changes = null,
+  graph = true,
 } = {}) {
   const workflows = await listWorkflows({ root });
   const stagedChanges = changes || getStagedChanges({ root });
@@ -180,9 +259,15 @@ export async function validateAgentEnvelope({
     warnings.push('Keine gestagten Dateien gefunden; nur Envelope-Felder wurden geprueft.');
   }
 
+  const graphContext = graph
+    ? await readAgentGraphContext({ root, files: stagedFiles })
+    : { available: false, files: [], warnings: [] };
+  warnings.push(...graphContext.warnings.map((warning) => `Graph: ${warning}`));
+
   return {
     workflows,
     stagedChanges,
+    graphContext,
     violations,
     warnings,
   };
@@ -222,6 +307,14 @@ async function main() {
 
   for (const warning of result.warnings) {
     console.warn(`[agent:preflight] warn: ${warning}`);
+  }
+  if (result.graphContext.available && result.graphContext.files.length > 0) {
+    console.log('[agent:preflight] graph context:');
+    for (const entry of result.graphContext.files) {
+      const scopes = entry.scopeBlocks.length > 0 ? entry.scopeBlocks.join(',') : 'none';
+      const marker = entry.inGraph ? 'ok' : 'missing';
+      console.log(`- ${marker} ${entry.file} scopes=${scopes}`);
+    }
   }
   console.log(`[agent:preflight] ok workflow=${workflow} decision=${decision} staged=${result.stagedChanges.length}`);
 }

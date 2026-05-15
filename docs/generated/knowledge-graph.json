@@ -9425,8 +9425,8 @@
     {
       "id": "V116.2.1",
       "type": "subphase",
-      "title": "`scripts/workspace-cleanup.mjs` pruefen: Schutz fuer getrackte Dateien, aktive Playwright-Locks, `prototypes/`, Recording-Pfade und Retention-Artefakte bestaetigen.",
-      "status": "open",
+      "title": "`scripts/workspace-cleanup.mjs` pruefen: Schutz fuer getrackte Dateien, aktive Playwright-Locks, `prototypes/`, Recording-Pfade und Retention-Artefakte bestaetigen. (abgeschlossen: 2026-05-15; evidence: `npm run cleanup:workspace` meldet nach Skriptkorrektur `archive=0` und `protect dir videos`; `videos/` wird nicht mehr als Retention-Archivkandidat eingesammelt.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.2",

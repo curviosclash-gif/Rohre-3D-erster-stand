@@ -630,3 +630,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Bot-Commits muessen im Commit-Body jetzt `Workflow:`, `Decision:` und `Evidence:` enthalten; D3-Scope braucht zusaetzlich `Gate:`, D4-Scope zusaetzlich explizites User-Gate und `Recovery:`.
 - `npm run agent:preflight` prueft denselben Envelope gegen gestagte Dateien und blockiert unterklassifizierte Governance-/Plan-Source-of-truth-Aenderungen sowie getrackte Deletes/Renames ohne D4-Recovery-Pfad.
 - `.husky/commit-msg` ruft nach `commitlint` den neuen Agent-Commit-Check auf, damit die Workflow-Nutzung als technische Spur erzwungen wird statt nur als Markdown-Regel zu existieren.
+
+## Governance-Haertung 2026-05-15 (Agent-Preflight als Graph-Radar)
+
+- `npm run agent:preflight` bleibt der technische Einstiegspunkt und liest jetzt fuer gestagte Dateien den Knowledge-Graph-Kontext, wenn `docs/generated/knowledge-graph.json` vorhanden ist.
+- Graph-Funde liefern Scope-Bloecke und Scope-Edges als Warn-/Orientierungsschicht; fehlende Graph-Eintraege blockieren nicht, damit der Graph Radar bleibt und keine zweite Policy-Quelle wird.
+- Die harten Blocks bleiben weiterhin Workflow/Decision/Evidence, D3/D4-Gates und Delete-/Rename-Recovery; der Graph hilft beim Einstieg, ersetzt aber nicht `AGENTS.md`, Rules oder Workflows.
