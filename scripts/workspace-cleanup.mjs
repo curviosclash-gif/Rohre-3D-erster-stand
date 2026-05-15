@@ -4,10 +4,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { promisify } from 'node:util';
 import { collectRootRuntimeProtectionSources } from './root-runtime-protection.mjs';
-import {
-    RECORDING_ARCHIVE_DIRECTORY,
-    RECORDING_DOWNLOAD_DIRECTORY,
-} from '../src/shared/contracts/RecordingCaptureContract.js';
+import { RECORDING_DOWNLOAD_DIRECTORY } from '../src/shared/contracts/RecordingCaptureContract.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -30,10 +27,6 @@ const activeThresholdMs = activeMinutes * 60 * 1000;
 const outputRetentionDays = Math.max(
     1,
     Number.parseInt(process.env.WORKSPACE_CLEAN_OUTPUT_RETENTION_DAYS || '14', 10) || 14
-);
-const videoRetentionDays = Math.max(
-    1,
-    Number.parseInt(process.env.WORKSPACE_CLEAN_VIDEO_RETENTION_DAYS || '14', 10) || 14
 );
 const retainLatestRuns = Math.max(
     1,
@@ -135,7 +128,7 @@ const PROTECTED_ROOTS = Object.freeze([
     {
         name: RECORDING_DOWNLOAD_DIRECTORY,
         risk: 'medium',
-        reason: 'Ordnername ist aktiver Recording-Contract und bleibt bestehen; alte Clips werden per Retention-Regel nach tmp/workspace-archive/videos verschoben.',
+        reason: 'Recording- und Cinematic-Camera-Artefakte bleiben in V116 vollstaendig lokal geschuetzt; keine automatische Archivierung.',
     },
 ]);
 
@@ -536,11 +529,6 @@ async function collectInventory() {
         archiveRoot,
     });
     items.push(...outputRetentionItems);
-    const videoRetentionItems = await collectRetentionArchiveItems(RECORDING_DOWNLOAD_DIRECTORY, {
-        retentionDays: videoRetentionDays,
-        archiveRoot: path.resolve(cwd, path.dirname(RECORDING_ARCHIVE_DIRECTORY)),
-    });
-    items.push(...videoRetentionItems);
 
     await protectTrackedDeleteTargets(items);
     items.sort((left, right) => left.path.localeCompare(right.path));
