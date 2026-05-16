@@ -14,6 +14,13 @@ description: Code quality, debugging, performance, and lifecycle (consolidated)
 - Prefer explicit naming over comments. Comments explain *why*, not *what*.
 - When a fix keeps a non-obvious compatibility, migration, alias, or fallback path alive, leave a short inline comment at that seam so the next reader understands why the branch still exists.
 
+## Agent Simplicity Guard
+
+- Before changing code, name critical ambiguity instead of silently choosing an interpretation.
+- Prefer the smallest implementation that satisfies the requested behavior.
+- Every changed line must trace back to the current scope; avoid adjacent refactors, formatting churn, or speculative cleanup.
+- For bugfixes or risky changes, define the smallest relevant verification signal before declaring the fix done.
+
 ## Dead Code Prevention
 
 - Replace-first: when a newer path is introduced, migrate active consumers and remove the old path in the same scope whenever safely possible.
