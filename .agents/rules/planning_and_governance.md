@@ -51,6 +51,8 @@ Fuer `D2` nennt der Agent Scope, Evidence, Confidence (`high`/`medium`/`low`) un
 
 Fuer `D3` und `D4` braucht es vor Umsetzung: mindestens zwei Quellen, Alternativen, Blast-Radius (`files`, `surface`, `reversibility`, `user-visible-risk`), User-Gate und bei `D4` einen Recovery-/Rollback-Pfad. Analyse, Klassifikation und Patch-Vorschlaege sind bei `D3` ohne Freigabe erlaubt; Datei-Aenderungen nicht.
 
+Vor jeder D3-/D4-Freigabefrage und vor Aenderungen in `[REVIEW]`- oder `[USER-GATE]`-Phasen klassifiziert der Agent die betroffenen Dateien oder Oberflaechen kompakt als `no-op`, `read-only evidence`, `optional` oder `edit required`. Die Freigabe darf nur die `edit required`-Teile umfassen; `no-op` und `read-only evidence` werden nicht als Aenderung verkauft, `optional` braucht eine ausdrueckliche Entscheidung oder bleibt unangetastet.
+
 Agenten stoppen und fragen nach, wenn Graph, Master, Findings oder Locks widersprechen, ein unerwartetes Gate rot wird, der Diff groesser als angekuendigt wird, fremde uncommittete Aenderungen in betroffenen Dateien liegen, getrackte Dateien geloescht/verschoben wuerden, ein Cleanup-Skript mehr Klassen trifft als angekuendigt, ein Refactor produktive Parameter/Physik/Bot-Training/Recording/Multiplayer beruehrt oder ein Rebuild-/Reborn-Pfad entstehen soll.
 
 ## Subagent and Parallel Agent Use

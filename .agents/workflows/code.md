@@ -23,6 +23,7 @@ Optional (nur bei Bedarf):
 - Zielpfade und erwartetes Verhalten festlegen.
 - Desktop-App-Ergebnis priorisieren; Online/Browser-Parity nur explizit auf Wunsch oder bei geringem Aufwand.
 - Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; `D3`/`D4`-Source-of-truth-, Planstruktur-, Archivierungs-, Move-/Delete- oder High-Blast-Radius-Aenderungen brauchen User-Gate.
+- Bei `D3`/`D4`, `[REVIEW]` oder `[USER-GATE]` vor der Freigabe betroffene Dateien/Oberflaechen als `no-op`, `read-only evidence`, `optional` oder `edit required` klassifizieren; nur `edit required` freigeben lassen.
 - Subagents nur mit expliziter User-Erlaubnis fuer unabhaengige oder disjunkte Teilaufgaben einsetzen; der fuehrende Agent bleibt fuer Integration, Evidence und Commit verantwortlich.
 - Neue dauerhafte Ablagen nach Zweckklasse klassifizieren und bestehende kanonische Zielquelle bevorzugen.
 - Breite Plan-Evidence-Claims mit Globs oder "alle Workflows/Rules/scope_files/repo-weit" nur abschliessen, wenn sie durch konkrete Evidence oder `scripts/check-plan-evidence-claims.mjs` abgesichert sind.

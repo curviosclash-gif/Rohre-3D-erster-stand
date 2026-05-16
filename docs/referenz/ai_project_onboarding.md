@@ -1,6 +1,6 @@
 # AI Project Onboarding (Aktiv)
 
-Stand: 2026-05-15
+Stand: 2026-05-16
 
 Diese Datei ist ein Referenz-Einstieg fuer KI-Assistenz in diesem Repository.
 Operativ fuehrend bleibt `AGENTS.md` mit den passenden Rules und Workflows.
@@ -33,6 +33,8 @@ Bei Scope-, Dependency- oder Surface-Fragen zuerst den Knowledge-Graph nutzen.
 Historische Deep-Dive-Dokumente liegen in `docs/archive/` und alte Planakten in `docs/plaene/alt/`.
 Diese Quellen nur bei explizitem Historien-, Evidence-, Dependency- oder Abgleichsauftrag lesen.
 
+Nicht als Standardkontext lesen: `tmp/`, `logs/`, `dist/`, `test-results/`, `.codex_tmp/`, `.claude/`, lokale Screenshots, generierte Reports und Videos. `videos/` ist als Cinematic-/Recording-nahe Ablage geschuetzt und kein generischer Muellpfad.
+
 ## 4. Entscheidungs- und Gate-Regeln
 
 - Vor Repo-Aenderungen die Decision-Klasse aus `.agents/rules/planning_and_governance.md` bestimmen.
@@ -40,6 +42,7 @@ Diese Quellen nur bei explizitem Historien-, Evidence-, Dependency- oder Abgleic
 - `D2`: kleiner scoped Repo-Diff mit klarer Evidence, Confidence und kleinstem sinnvollem Gate.
 - `D3`: Source-of-truth, Governance, Master-/Aktivplan, Workflow oder Archivstruktur; Analyse und Patch-Vorschlag erlaubt, Umsetzung nur mit User-Gate.
 - `D4`: Loeschung, Auto-Move, Rebuild, grosser Refactor, produktive Parameter oder History-Risiko; immer User-Gate plus Recovery-Pfad.
+- Vor D3-/D4-Freigaben und in `[REVIEW]`-/`[USER-GATE]`-Phasen zuerst betroffene Dateien/Oberflaechen als `no-op`, `read-only evidence`, `optional` oder `edit required` klassifizieren. Nur `edit required` gehoert in die Freigabe; `optional` bleibt ohne ausdrueckliche Entscheidung unangetastet.
 - Neue dauerhafte Ablagen brauchen Zweckklasse, Zielpfad und Abgleich gegen bestehende kanonische Quellen.
 
 ## 5. Harte Entwicklungsregeln

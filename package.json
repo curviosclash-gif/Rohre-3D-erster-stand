@@ -21,6 +21,8 @@
     "check:agent-commit": "node scripts/check-agent-commit-message.mjs",
     "check:plan-evidence-claims": "node scripts/check-plan-evidence-claims.mjs",
     "check:gemini": "node scripts/check-gemini-governance.mjs",
+    "check:agent-context": "node scripts/check-agent-context.mjs",
+    "test:agent-context": "node --test tests/agent-context.contract.test.mjs",
     "report:ai-decision-policy": "node scripts/check-ai-decision-policy.mjs",
     "dev": "node scripts/dev-with-logs.mjs",
     "dev:logged": "node scripts/dev-with-logs.mjs",

@@ -73,7 +73,7 @@ function manualGlobMatch(pattern, filePath) {
  * Returns object with key-value pairs (handles lists under keys).
  */
 function parseFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return {};
 
   const yaml = match[1];
