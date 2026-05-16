@@ -155,12 +155,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1853,
-    "rawCoveredFileCount": 1203,
-    "rawCoveragePercent": 64.9,
-    "adjustedTrackedFileCount": 1372,
-    "adjustedCoveredFileCount": 1019,
-    "adjustedCoveragePercent": 74.3,
+    "trackedFileCount": 1861,
+    "rawCoveredFileCount": 1211,
+    "rawCoveragePercent": 65.1,
+    "adjustedTrackedFileCount": 1380,
+    "adjustedCoveredFileCount": 1027,
+    "adjustedCoveragePercent": 74.4,
     "uncoveredFileCount": 650,
     "uncoveredActiveFileCount": 353,
     "classifications": [
@@ -209,14 +209,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 944,
-        "coveredCount": 821
+        "count": 946,
+        "coveredCount": 823
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 350,
-        "coveredCount": 158
+        "count": 356,
+        "coveredCount": 164
       },
       {
         "classification": "prototype",
@@ -306,7 +306,9 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V116",
         "V117",
+        "V123",
         "V93",
         "V94"
       ],
@@ -347,6 +349,7 @@
         "V111",
         "V116",
         "V117",
+        "V123",
         "V93",
         "V94"
       ],
@@ -563,6 +566,7 @@
         "V109",
         "V116",
         "V117",
+        "V123",
         "V93",
         "V94"
       ],
@@ -582,6 +586,7 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V116",
         "V93"
       ],
       "surfaces": [],
@@ -628,6 +633,7 @@
         "V109",
         "V116",
         "V117",
+        "V123",
         "V93",
         "V94"
       ],
@@ -1061,6 +1067,7 @@
       "scopeBlocks": [
         "V116",
         "V117",
+        "V123",
         "V93"
       ],
       "surfaces": [],
@@ -4379,7 +4386,8 @@
       "scopeBlocks": [
         "V107",
         "V110",
-        "V111"
+        "V111",
+        "V120"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -9372,7 +9380,8 @@
         "V107",
         "V110",
         "V111",
-        "V115"
+        "V115",
+        "V120"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -9394,6 +9403,7 @@
         "V110",
         "V111",
         "V115",
+        "V120",
         "V94"
       ],
       "surfaces": [],
@@ -9432,7 +9442,8 @@
       ],
       "scopeBlocks": [
         "V105",
-        "V111"
+        "V111",
+        "V120"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -9625,6 +9636,7 @@
       "scopeBlocks": [
         "V102",
         "V110",
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -9678,6 +9690,7 @@
       "scopeBlocks": [
         "V105",
         "V110",
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -9843,6 +9856,7 @@
       ],
       "scopeBlocks": [
         "V110",
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -9897,6 +9911,60 @@
       ],
       "scopeBlocks": [
         "V117",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V119.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V119",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V120.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V120",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V123.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V123",
         "V77"
       ],
       "surfaces": [],
@@ -9967,6 +10035,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -9984,6 +10053,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -10018,6 +10088,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77",
         "V94",
         "V96"
@@ -10197,6 +10268,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -10214,6 +10286,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77",
         "V94"
       ],
@@ -10405,6 +10478,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -10609,6 +10683,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -10643,6 +10718,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -11153,6 +11229,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -11221,6 +11298,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -11255,6 +11333,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -11272,6 +11351,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V119",
         "V77"
       ],
       "surfaces": [],
@@ -11313,6 +11393,9 @@
         "V111",
         "V115",
         "V117",
+        "V119",
+        "V120",
+        "V123",
         "V77",
         "V93"
       ],
@@ -12172,6 +12255,40 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/Feature_Graph_RAG_Lokaler_Context_Adapter.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Graph_RAG_Viewer_Evidence_Dashboard_V121.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
       "tracked": true,
       "coveredInCore": true,
@@ -12207,6 +12324,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Legacy_Runtime_Surface_Sunset_V91.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Repo_Agent_Memory_und_Ruflo_Orchestrierung_V122.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -13093,6 +13227,9 @@
         "V110",
         "V116",
         "V117",
+        "V119",
+        "V120",
+        "V123",
         "V51",
         "V69",
         "V89",
@@ -14355,7 +14492,9 @@
         "B13",
         "V110",
         "V112",
+        "V116",
         "V117",
+        "V123",
         "V75",
         "V87",
         "V88",
@@ -16628,6 +16767,8 @@
         "V107",
         "V110",
         "V111",
+        "V120",
+        "V123",
         "V94"
       ],
       "surfaces": [],
@@ -16646,6 +16787,25 @@
       ],
       "scopeBlocks": [
         "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/check-agent-context.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V116"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -16821,7 +16981,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V110"
+        "V110",
+        "V120"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -16843,6 +17004,7 @@
         "V107",
         "V110",
         "V111",
+        "V123",
         "V94"
       ],
       "surfaces": [],
@@ -16879,7 +17041,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V117"
+        "V117",
+        "V119"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -17265,7 +17428,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V116"
+        "V116",
+        "V123"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -17737,7 +17901,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V116"
+        "V116",
+        "V123"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -29895,6 +30060,25 @@
       "excludeReason": null
     },
     {
+      "path": "tests/agent-context.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V116"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "tests/agent-governance.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -31059,7 +31243,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V117"
+        "V117",
+        "V119"
       ],
       "surfaces": [],
       "classification": "product-code",

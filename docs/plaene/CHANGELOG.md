@@ -6,11 +6,27 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-16 (Intake `V123 123.1`)
+
+- Neuer geplanter P1-Block `V123` ist nach User-Freigabe im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V123.md`.
+- Zweck: Den Umsetzungsplan fuer AI-Agents ueber einen strukturierten `docs/plan-index.yaml`-Pilot robuster lesbar machen, ohne `docs/Umsetzungsplan.md` sofort als Master-Wahrheit abzuloesen.
+- Leitentscheidung: Zuerst entsteht ein nicht-kanonischer Spiegel mit Drift-Validator; erst nach stabilen Checks wird entschieden, ob YAML/JSON zur Source of Truth wird und Markdown/HTML nur generierte Menschenansichten sind.
+- Abgrenzung: `V121` bleibt als vorhandener Graph-RAG-Viewer-Draft reserviert; V123 betrifft Plan-Index, Leseweg, Validatoren und Source-of-Truth-Migration.
+
 ## Stand-Snapshot 2026-05-16 (Subphase `V116 116.4`)
 
 - `116.4` ist report-only fortgesetzt: `npm run plan:context:check` klassifiziert aktive Plaene und Intake-Drafts graph-gestuetzt gegen Master, Open Findings und `docs/generated/knowledge-graph.json`; `npm run plan:check` und `npm run graph:check` sind gruen.
 - Report-Ergebnis: 26 master-referenzierte aktive Plaene, 12 dependency-geschuetzte aktive Plaene, 5 aktive Archivkandidaten (`V75`, `V81`, `V85`, `V86`, `V89`), 41 Bot-Training-Sonderfaelle, 19 superseded Intake-Drafts und 4 Intake-Review-Faelle. Report: `tmp/plan-context-report.json`.
 - Keine Planverschiebung, kein Archivordner und keine Auto-Move-Logik wurden ausgefuehrt; Archivkandidaten bleiben bis zu einem separaten User-Gate nur proposed-move Evidence.
+
+## Stand-Snapshot 2026-05-15 (Intake `V120 120.1`)
+
+- Neuer geplanter P1-Block `V120` ist nach User-Freigabe im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V120.md`; der Intake-Draft `docs/plaene/neu/Feature_Graph_RAG_Lokaler_Context_Adapter.md` bleibt als `source_history` referenziert.
+- Zweck: Den bestehenden deterministischen Wissensgraphen um eine lokale Graph-RAG-Schicht erweitern, die relevante Textstellen, source-backed Evidence-Pakete und Kontextbudget-Signale liefert, ohne lokale AI zur Wahrheitsschicht oder zum Code-Agenten zu machen.
+- Einordnung: `V120` startet nach `V116.3/116.4` und mindestens `V119.1`, damit Quellenautoritaet, Archivhygiene und historische Evidence-Baseline vor Chunk-Index und RAG-Rollout geklaert oder als Restrisiko dokumentiert sind.
+- Lokale Modelle: Ollama ist der bevorzugte MVP-Adapter, llama.cpp/HTTP-/CLI-Adapter bleiben optional; regelbasierter Fallback, Healthcheck, Timeouts und Secret-/PII-Excludes sind verpflichtender Planbestandteil.
+- Abgrenzung: Der vorhandene V121-Viewer-Draft bleibt Folgeblock und Consumer stabiler V120-Outputs, nicht Teil des Graph-RAG-Kernblocks.
+
 ## Stand-Snapshot 2026-05-15 (Intake `V119 119.1`)
 
 - Neuer geplanter P1-Block `V119` ist nach User-Freigabe im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V119.md`.
@@ -660,3 +676,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `116.2` ist nach User-Gate geschlossen: `npm run cleanup:workspace:apply` entfernte 203 konservative Low-Risk-Artefakte aus ignorierten Build-, Playwright-, Root-Log-, Dev-Log- und tmp-Diagnosepfaden; Archivaktionen blieben bei 0 und es gab keine Apply-Fehler.
 - Geschuetzte Klassen blieben unberuehrt: `videos/`, `prototypes`, `.codex_tmp`, unklare `tmp/*`-Evidence und P22-nahe Retention-Artefakte wurden nicht neu entschieden. `git status --short` blieb nach Apply leer.
 - Der Master-Index wechselt damit auf `V116 116.3` fuer die KI-Kontext-Policy; V116 hat weiter keinen produktiven Code-, Asset-, Recording-, Physik- oder Bot-Training-Diff.
+
+## Stand-Snapshot 2026-05-15 (Subphase `V116 116.3`)
+
+- `116.3` ist geschlossen: Der Standard-Leseweg bleibt `AGENTS.md` -> passende Rules/Workflows -> Master-Index -> aktive Detaildatei; `CLAUDE.md` und `.gemini/README.md` sind nur Adapter, keine konkurrierenden Governance-Quellen.
+- Neu als nachhaltige Gate-Schaerfung: Vor D3-/D4-Freigaben und in `[REVIEW]`-/`[USER-GATE]`-Phasen muessen betroffene Dateien/Oberflaechen als `no-op`, `read-only evidence`, `optional` oder `edit required` klassifiziert werden; die Freigabe umfasst nur `edit required`.
+- `npm run check:agent-context` prueft den Leseweg, Adapter-Prioritaet, Nicht-Standardkontext-Zonen und optionale `CURRENT_CONTEXT.md`-Grenzen. `CURRENT_CONTEXT.md` wurde bewusst nicht angelegt; das Gate akzeptiert `currentContext=absent` und verhindert spaeter Plan-/Master-Duplikation.

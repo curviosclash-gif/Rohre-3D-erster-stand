@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-15. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V116 116.2`.
+Stand: 2026-05-15. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V116 116.4`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -57,7 +57,10 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | done | P2 | frei | - | 115.99 | `docs/plaene/aktiv/V115.md` |
 | V105 | Architecture-Guard- und Typecheck-Regression-Recovery | done | P1 | frei | V99.99,V102.99,V104.99 | 105.99 | `docs/plaene/aktiv/V105.md` |
 | V117 | AI Decision Framework und Autonomie-Gates | done | P1 | frei | V109.99 | 117.99 | `docs/plaene/aktiv/V117.md` |
-| V116 | Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung | active | P1 | frei | V109.99,V117.99,V115.99 | 116.2 | `docs/plaene/aktiv/V116.md` |
+| V116 | Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung | active | P1 | frei | V109.99,V117.99,V115.99 | 116.4 | `docs/plaene/aktiv/V116.md` |
+| V119 | Planabschluss-Evidence-Remediation und Git-Historienabgleich | planned | P1 | frei | V117.99 | 119.1 | `docs/plaene/aktiv/V119.md` |
+| V120 | Graph-RAG mit lokalem Context-Adapter | planned | P1 | frei | V107.99,V110.99,V111.99 | 120.1 | `docs/plaene/aktiv/V120.md` |
+| V123 | AI-optimierter Plan-Index und Source-of-Truth-Migration | planned | P1 | frei | V116.4,V119.1 | 123.1 | `docs/plaene/aktiv/V123.md` |
 | V112 | Spielaudit- und Playtest-Improvement-Paket | planned | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
@@ -99,6 +102,12 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V116 | V109.99 | hard | ja | Governance-/Workflow-Entschlackung aus V109 ist Baseline fuer Kontext- und Planhygiene |
 | V116 | V117.99 | hard | ja | AI Decision Framework, D3/D4-User-Gates und Zweckklassen sind Grundlage fuer Cleanup-, Archiv- und Governance-Scope |
 | V116 | V115.99 | hard | ja | Product-/Infra-Follow-up und P22-Retention sind abgeschlossen; V116 darf Retention nicht doppelt entscheiden |
+| V119 | V117.99 | hard | ja | AI Decision Framework und Evidence-Claim-Regeln sind Grundlage fuer nachtraegliche Planabschluss-Remediation ohne falsche Abschlussbehauptungen |
+| V120 | V107.99 | hard | ja | Core-Graph und Query-Layer sind Baseline fuer Graph-RAG-Kandidatenauswahl |
+| V120 | V110.99 | hard | ja | Graph Ops-, Guard-, SLO- und Playbook-Basis ist Voraussetzung fuer sichere RAG-Gates |
+| V120 | V111.99 | hard | ja | Adaptive Query-, Safety-, Scorecard- und Feedback-Mechanik ist Grundlage fuer Evidence-Pakete und lokale Adapter |
+| V123 | V116.4 | hard | ja | Plan-Kontext-Klassifikation und AI-Leseweg bilden die Baseline fuer den strukturierten Plan-Index-Pilot |
+| V123 | V119.1 | hard | nein | Evidence-/Abschluss-Baseline soll historische Drift vor Source-of-Truth-Entscheidungen sichtbar machen |
 
 ## Lock-Status
 
@@ -123,7 +132,10 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V115 | - | closed | Abgeschlossen 2026-05-14 |
 | - | V105 | 2026-05-13 | closed | Abgeschlossen 2026-05-13 |
 | - | V117 | 2026-05-14 | closed | Abgeschlossen 2026-05-14 |
-| codex | V116 | 2026-05-15 | active | 116.2 Cleanup-Summary und Baseline-Fortsetzung |
+| codex | V116 | 2026-05-15 | active | 116.4 Plan-Kontext |
+| - | V119 | - | frei | Geplant |
+| - | V120 | - | frei | Geplant |
+| - | V123 | - | frei | Geplant |
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
@@ -135,11 +147,14 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 ## Empfohlene Reihenfolge
 
 1. `V116` (Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung) als P1-Kontextfenster vor weiterer breiter Plan-/Agentenarbeit.
-2. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
-3. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
-4. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
-5. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
-6. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
+2. `V119` (Planabschluss-Evidence-Remediation und Git-Historienabgleich) vor neuen breiten Abschlussclaims, damit erledigte Plaene formal nachgezogen oder bewusst als historische Restwidersprueche dokumentiert sind.
+3. `V123` (AI-optimierter Plan-Index und Source-of-Truth-Migration) als strukturierter Pilot nach `V116.4` und `V119.1`, bevor ein kanonischer Quellenwechsel entschieden wird.
+4. `V120` (Graph-RAG mit lokalem Context-Adapter) nach `V116.3/116.4` und mindestens `V119.1` als Token-/Kontexthebel fuer anschliessende breite Agenten-, Audit- und Boundary-Arbeit.
+5. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
+6. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
+7. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
+8. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
+9. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
 
 ## Conflict-Log
 

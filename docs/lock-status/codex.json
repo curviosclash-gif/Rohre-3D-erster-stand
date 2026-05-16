@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-15T12:58:10.756Z",
+  "timestamp": "2026-05-15T14:16:02.142Z",
   "locks": [
     {
       "block_id": "V103",
@@ -390,12 +390,45 @@
       ],
       "start_date": "2026-05-15",
       "target_completion": "2026-05-15",
-      "status": "in-progress",
+      "status": "completed",
       "notes": "V116 cleanup summary and baseline continuation"
+    },
+    {
+      "block_id": "V116",
+      "phase": "116.4",
+      "scope_files": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".gemini/README.md",
+        ".gitignore",
+        ".agents/rules/planning_and_governance.md",
+        ".agents/rules/token_efficiency_and_tools.md",
+        ".agents/workflows/fix-planung.md",
+        ".agents/workflows/plan.md",
+        ".agents/workflows/code.md",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V116.md",
+        "docs/plaene/aktiv/README.md",
+        "docs/plaene/neu/README.md",
+        "docs/CURRENT_CONTEXT.md",
+        "docs/referenz/ai_project_onboarding.md",
+        "scripts/workspace-cleanup.mjs",
+        "scripts/plan-context-report.mjs",
+        "scripts/check-agent-context.mjs",
+        "scripts/validate-umsetzungsplan.mjs",
+        "scripts/check-gemini-governance.mjs",
+        "scripts/query-knowledge-graph.mjs",
+        "tests/agent-context.contract.test.mjs",
+        "tmp/workspace-cleanup-report.json"
+      ],
+      "start_date": "2026-05-15",
+      "target_completion": "2026-05-15",
+      "status": "in-progress",
+      "notes": ""
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "116.2",
+    "phase_id": "116.4",
     "completed_items": [],
     "last_commit": ""
   }

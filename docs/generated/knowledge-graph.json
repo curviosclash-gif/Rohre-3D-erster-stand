@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 203,
+          "concreteCount": 205,
           "plannedCount": 0
         }
       }
@@ -1026,10 +1026,11 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P2",
-        "owner": "codex",
+        "owner": "frei",
         "currentPhase": "111.99",
         "planFile": "docs/plaene/aktiv/V111.md",
         "scopeDeclarations": [
@@ -1119,6 +1120,8 @@
           "V110",
           "V111",
           "V113",
+          "V116",
+          "V123",
           "V90",
           "V96"
         ],
@@ -1289,15 +1292,18 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "116.2",
+        "currentPhase": "116.4",
         "planFile": "docs/plaene/aktiv/V116.md",
         "scopeDeclarations": [
+          ".agents/rules/planning_and_governance.md",
           ".agents/rules/token_efficiency_and_tools.md",
           ".agents/workflows/code.md",
+          ".agents/workflows/fix-planung.md",
           ".agents/workflows/plan.md",
           ".gemini/README.md",
           ".gitignore",
@@ -1309,19 +1315,27 @@
           "docs/plaene/neu/README.md",
           "docs/referenz/ai_project_onboarding.md",
           "docs/Umsetzungsplan.md",
+          "package.json",
           "scripts/check-agent-context.mjs",
           "scripts/check-gemini-governance.mjs",
           "scripts/plan-context-report.mjs",
           "scripts/query-knowledge-graph.mjs",
           "scripts/validate-umsetzungsplan.mjs",
           "scripts/workspace-cleanup.mjs",
+          "tests/agent-context.contract.test.mjs",
           "tmp/workspace-cleanup-report.json"
         ],
         "scopeResolution": {
-          "concreteCount": 17,
-          "plannedCount": 3
+          "concreteCount": 22,
+          "plannedCount": 2
         },
-        "scopeOverlapAllowedWith": [],
+        "scopeOverlapAllowedWith": [
+          "V112",
+          "V119",
+          "V120",
+          "V123",
+          "V90"
+        ],
         "unknownFrontmatterFields": [
           "planned_block_id",
           "scope_reference_files"
@@ -1371,6 +1385,156 @@
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V119",
+      "type": "block",
+      "title": "Planabschluss-Evidence-Remediation und Git-Historienabgleich",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "dependency-target",
+          "master-index"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "currentPhase": "119.1",
+        "planFile": "docs/plaene/aktiv/V119.md",
+        "scopeDeclarations": [
+          "docs/plaene/aktiv/V102.md",
+          "docs/plaene/aktiv/V105.md",
+          "docs/plaene/aktiv/V114.md",
+          "docs/plaene/aktiv/V119.md",
+          "docs/plaene/aktiv/V75.md",
+          "docs/plaene/aktiv/V76.md",
+          "docs/plaene/aktiv/V81.md",
+          "docs/plaene/aktiv/V93.md",
+          "docs/plaene/aktiv/V94.md",
+          "docs/plaene/alt/Feature_Architektur_Runtime_Entkopplung_V74.md",
+          "docs/plaene/alt/Feature_Fight_Modus_Qualitaet_V48.md",
+          "docs/plaene/alt/Feature_Gesamtfix_Architektur_Qualitaet_V54.md",
+          "docs/plaene/alt/Umsetzungsplan_Block_V41_Multiplayer_Rest-Gate_2026-03-23.md",
+          "docs/plaene/alt/Umsetzungsplan_Bloecke_V52-V57_Architektur-Haertung-bis-Arcade_2026-03-27.md",
+          "docs/plaene/alt/V83.md",
+          "docs/plaene/alt/V84.md",
+          "docs/plaene/CHANGELOG.md",
+          "docs/Umsetzungsplan.md",
+          "scripts/check-plan-evidence-claims.mjs",
+          "tests/plan-evidence-claims.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 20,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [
+          "V116",
+          "V120",
+          "V123",
+          "V96"
+        ],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V120",
+      "type": "block",
+      "title": "Graph-RAG mit lokalem Context-Adapter",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "currentPhase": "120.1",
+        "planFile": "docs/plaene/aktiv/V120.md",
+        "scopeDeclarations": [
+          "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+          "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+          "data/contracts/knowledge-graph/query-ops.v1.json",
+          "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+          "data/contracts/knowledge-graph/rag-sources.v1.json",
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.scorecard.json",
+          "docs/plaene/aktiv/V120.md",
+          "docs/plaene/CHANGELOG.md",
+          "docs/Umsetzungsplan.md",
+          "scripts/build-knowledge-graph.mjs",
+          "scripts/check-knowledge-graph-slos.mjs",
+          "scripts/graph-rag-context-adapter.mjs",
+          "scripts/graph-rag-index.mjs",
+          "scripts/graph-rag-local-llm-check.mjs",
+          "scripts/graph-rag-query.mjs",
+          "tests/graph-rag-context-adapter.contract.test.mjs",
+          "tests/graph-rag-index.contract.test.mjs",
+          "tests/graph-rag-local-llm-selection.contract.test.mjs",
+          "tests/graph-rag-query.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 9,
+          "plannedCount": 12
+        },
+        "scopeOverlapAllowedWith": [
+          "V116",
+          "V119",
+          "V123"
+        ],
+        "unknownFrontmatterFields": [
+          "scope_reference_files"
+        ]
+      }
+    },
+    {
+      "id": "V123",
+      "type": "block",
+      "title": "AI-optimierter Plan-Index und Source-of-Truth-Migration",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "currentPhase": "123.1",
+        "planFile": "docs/plaene/aktiv/V123.md",
+        "scopeDeclarations": [
+          ".agents/rules/planning_and_governance.md",
+          ".agents/rules/token_efficiency_and_tools.md",
+          ".agents/workflows/code.md",
+          ".agents/workflows/plan.md",
+          "AGENTS.md",
+          "docs/plaene/aktiv/V123.md",
+          "docs/plaene/CHANGELOG.md",
+          "docs/plan-index.yaml",
+          "docs/Umsetzungsplan.md",
+          "package.json",
+          "scripts/build-knowledge-graph.mjs",
+          "scripts/build-plan-index.mjs",
+          "scripts/check-knowledge-graph.mjs",
+          "scripts/plan-context-report.mjs",
+          "scripts/validate-plan-index.mjs",
+          "scripts/validate-umsetzungsplan.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 13,
+          "plannedCount": 3
+        },
+        "scopeOverlapAllowedWith": [
+          "V112",
+          "V116",
+          "V119",
+          "V120",
+          "V121",
+          "V90"
+        ],
+        "unknownFrontmatterFields": [
+          "scope_reference_files"
+        ]
       }
     },
     {
@@ -2086,7 +2250,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 309,
+          "concreteCount": 315,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2534,6 +2698,8 @@
           "V112",
           "V113",
           "V114",
+          "V116",
+          "V123",
           "V96"
         ],
         "unknownFrontmatterFields": []
@@ -2828,6 +2994,7 @@
           "V113",
           "V114",
           "V115",
+          "V119",
           "V90"
         ],
         "unknownFrontmatterFields": []
@@ -3923,7 +4090,7 @@
       "id": "V116.2",
       "type": "phase",
       "title": "Lokale Artefakte und Workspace-Rauschen",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.2"
@@ -3933,7 +4100,7 @@
       "id": "V116.3",
       "type": "phase",
       "title": "KI-Kontext-Policy",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.3"
@@ -4047,6 +4214,206 @@
       "attributes": {
         "blockId": "V117",
         "phaseCode": "117.99"
+      }
+    },
+    {
+      "id": "V119.1",
+      "type": "phase",
+      "title": "Audit-Baseline und Befundliste",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.1"
+      }
+    },
+    {
+      "id": "V119.2",
+      "type": "phase",
+      "title": "P1-Remediation: formale Abschlusswidersprueche",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.2"
+      }
+    },
+    {
+      "id": "V119.3",
+      "type": "phase",
+      "title": "P2-Remediation: schwache oder fehlende Evidence",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.3"
+      }
+    },
+    {
+      "id": "V119.4",
+      "type": "phase",
+      "title": "Praevention fuer kuenftige Plaene",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.4"
+      }
+    },
+    {
+      "id": "V119.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.99"
+      }
+    },
+    {
+      "id": "V120.1",
+      "type": "phase",
+      "title": "Graph-Basis und SLO-Stabilisierung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.1"
+      }
+    },
+    {
+      "id": "V120.2",
+      "type": "phase",
+      "title": "Quellenvertrag und Chunk-Index-MVP",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2"
+      }
+    },
+    {
+      "id": "V120.3",
+      "type": "phase",
+      "title": "Graph-gesteuerte Retrieval-Pipeline",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.3"
+      }
+    },
+    {
+      "id": "V120.4",
+      "type": "phase",
+      "title": "Lokale LLM-Auswahl und Installation",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4"
+      }
+    },
+    {
+      "id": "V120.5",
+      "type": "phase",
+      "title": "Lokaler Context-Adapter",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.5"
+      }
+    },
+    {
+      "id": "V120.6",
+      "type": "phase",
+      "title": "Evidence-Paket und Tests",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.6"
+      }
+    },
+    {
+      "id": "V120.7",
+      "type": "phase",
+      "title": "Rollout und Workflow-Integration",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.7"
+      }
+    },
+    {
+      "id": "V120.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99"
+      }
+    },
+    {
+      "id": "V123.1",
+      "type": "phase",
+      "title": "Schema und Spiegel-Pilot",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1"
+      }
+    },
+    {
+      "id": "V123.2",
+      "type": "phase",
+      "title": "Validator und Drift-Report",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2"
+      }
+    },
+    {
+      "id": "V123.3",
+      "type": "phase",
+      "title": "Agenten-Leseweg",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3"
+      }
+    },
+    {
+      "id": "V123.4",
+      "type": "phase",
+      "title": "Tool-Integration",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4"
+      }
+    },
+    {
+      "id": "V123.5",
+      "type": "phase",
+      "title": "Source-of-Truth-Entscheidung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5"
+      }
+    },
+    {
+      "id": "V123.6",
+      "type": "phase",
+      "title": "Generierte Ansichten",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.6"
+      }
+    },
+    {
+      "id": "V123.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99"
       }
     },
     {
@@ -9436,7 +9803,7 @@
     {
       "id": "V116.2.2",
       "type": "subphase",
-      "title": "Dry-Run-Kandidaten klassifizieren: `delete`, `archive`, `protect`; riskante Kandidaten manuell ausnehmen. (abgeschlossen: 2026-05-15; evidence: `tmp/workspace-cleanup-report.json` enthaelt `summary` und `explainSummary`; konservative Kandidaten sind `safe delete=203`, `safe archive=0`, `protected tracked=0`, `protected unknown=31`, `needs user decision=6`.)",
+      "title": "Dry-Run-Kandidaten klassifizieren: `delete`, `archive`, `protect`; riskante Kandidaten manuell ausnehmen. (abgeschlossen: 2026-05-15; evidence: `tmp/workspace-cleanup-report.json` enthaelt `summary` und `explainSummary`; konservative Kandidaten sind `safe delete=203`, `safe archive=0`, `protected tracked=0`, `protected unknown=33`, `needs user decision=6`.)",
       "status": "done",
       "attributes": {
         "blockId": "V116",
@@ -9447,8 +9814,8 @@
     {
       "id": "V116.2.3",
       "type": "subphase",
-      "title": "Apply nur fuer konservative Kandidaten: Root-Logs, alte Dev-Logs, nicht aktive `test-results` und eindeutig generierte tmp-Diagnoseartefakte. `videos/` wird nicht archiviert oder geloescht, weil der Ordner zum Cinematic-Camera-System gehoert.",
-      "status": "open",
+      "title": "Apply nur fuer konservative Kandidaten: Root-Logs, alte Dev-Logs, nicht aktive `test-results` und eindeutig generierte tmp-Diagnoseartefakte. `videos/` wird nicht archiviert oder geloescht, weil der Ordner zum Cinematic-Camera-System gehoert. (abgeschlossen: 2026-05-15; evidence: User-Gate \"los\"; `npm run cleanup:workspace:apply` loeschte 203 Low-Risk-Kandidaten, archivierte 0 Pfade und meldete `failed=0`; `videos/`, `prototypes`, `.codex_tmp` und unklare `tmp/*`-Evidence blieben geschuetzt.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.2",
@@ -9458,8 +9825,8 @@
     {
       "id": "V116.2.4",
       "type": "subphase",
-      "title": "V115/P22-Abgleich: keine erneute Retention-Entscheidung fuer bereits entschiedene P22-Artefakte; V116 darf nur neue Klassen anwenden, schuetzen oder als User-Entscheidung markieren.",
-      "status": "open",
+      "title": "V115/P22-Abgleich: keine erneute Retention-Entscheidung fuer bereits entschiedene P22-Artefakte; V116 darf nur neue Klassen anwenden, schuetzen oder als User-Entscheidung markieren. (abgeschlossen: 2026-05-15; evidence: Abgleich gegen V115/P22-Retention; produktive Spaceship-Pack-/Vendor-Assets und P22-Entscheidungen wurden nicht angefasst, V116 traf nur ignorierte Build-, Playwright-, Root-Log-, Dev-Log- und tmp-Diagnoseartefakte.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.2",
@@ -9469,8 +9836,8 @@
     {
       "id": "V116.2.5",
       "type": "subphase",
-      "title": "Nach Apply `git status --short` pruefen: keine unerwarteten tracked Deletes; falls doch, stoppen und Bericht in `docs/Fehlerberichte/` oder Block-Evidence.",
-      "status": "open",
+      "title": "Nach Apply `git status --short` pruefen: keine unerwarteten tracked Deletes; falls doch, stoppen und Bericht in `docs/Fehlerberichte/` oder Block-Evidence. (abgeschlossen: 2026-05-15; evidence: `git status --short` nach Apply blieb leer; keine getrackten Deletes oder Produktquellen betroffen.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.2",
@@ -9491,8 +9858,8 @@
     {
       "id": "V116.2.7",
       "type": "subphase",
-      "title": "`.gitignore` nur dann anpassen, wenn neue generierte Muster wiederholt auftauchen und nicht bereits abgedeckt sind.",
-      "status": "open",
+      "title": "`.gitignore` nur dann anpassen, wenn neue generierte Muster wiederholt auftauchen und nicht bereits abgedeckt sind. (abgeschlossen: 2026-05-15; evidence: `git check-ignore -v tmp tmp\\dev-logs dist test-results videos` bestaetigte bestehende Ignore-Regeln; keine `.gitignore`-Aenderung noetig.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.2",
@@ -9502,8 +9869,8 @@
     {
       "id": "V116.3.1",
       "type": "subphase",
-      "title": "`AGENTS.md` gegen `.gemini/README.md` und `CLAUDE.md` abgleichen: eine klare Prioritaet dokumentieren, keine konkurrierenden Regeln.",
-      "status": "open",
+      "title": "`AGENTS.md` gegen `.gemini/README.md` und `CLAUDE.md` abgleichen: eine klare Prioritaet dokumentieren, keine konkurrierenden Regeln. (abgeschlossen: 2026-05-15; evidence: `npm run check:agent-context` -> PASS; `AGENTS.md` bleibt erster Leseweg, `CLAUDE.md` und `.gemini/README.md` sind Adapter und definieren keine eigene Governance.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.3",
@@ -9513,8 +9880,8 @@
     {
       "id": "V116.3.2",
       "type": "subphase",
-      "title": "`docs/referenz/ai_project_onboarding.md` erstellen oder aktualisieren: Standard-Leseweg, Bot-Training-Sonderweg, Archive-Read-Regel, tmp/log/video-Regel, Graph-First-Hinweise.",
-      "status": "open",
+      "title": "`docs/referenz/ai_project_onboarding.md` erstellen oder aktualisieren: Standard-Leseweg, Bot-Training-Sonderweg, Archive-Read-Regel, tmp/log/video-Regel, Graph-First-Hinweise. (abgeschlossen: 2026-05-15; evidence: `docs/referenz/ai_project_onboarding.md` ergaenzt Nicht-Standardkontext fuer `tmp/`, `logs/`, `dist/`, `test-results/`, `.codex_tmp/`, `.claude/` und `videos/`; `npm run check:agent-context` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.3",
@@ -9524,8 +9891,8 @@
     {
       "id": "V116.3.3",
       "type": "subphase",
-      "title": "Optional `docs/CURRENT_CONTEXT.md` als maximal einseitigen Lagezettel einfuehren: aktueller Fokus, aktive Bloecke, nicht zu lesende Zonen, bekannte Blocker, letzter Cleanup-Stand.",
-      "status": "open",
+      "title": "Optional `docs/CURRENT_CONTEXT.md` als maximal einseitigen Lagezettel einfuehren: aktueller Fokus, aktive Bloecke, nicht zu lesende Zonen, bekannte Blocker, letzter Cleanup-Stand. (abgeschlossen: 2026-05-15; evidence: optionaler Lagezettel bewusst nicht angelegt; `npm run check:agent-context` meldet `currentContext=absent` und verhindert bei spaeterer Anlage Plan-/Master-Duplikation.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.3",
@@ -9535,8 +9902,8 @@
     {
       "id": "V116.3.4",
       "type": "subphase",
-      "title": "Falls Tool-spezifische Ignore-Dateien existieren oder sinnvoll sind, nur Kontext-Ausschluesse fuer lokale/archivierte Quellen definieren: `docs/archive/`, `docs/plaene/alt/`, `tmp/`, `logs/`, `.claude/`, `.codex_tmp/`, `videos/`, `dist/`, `test-results/`.",
-      "status": "open",
+      "title": "Falls Tool-spezifische Ignore-Dateien existieren oder sinnvoll sind, nur Kontext-Ausschluesse fuer lokale/archivierte Quellen definieren: `docs/archive/`, `docs/plaene/alt/`, `tmp/`, `logs/`, `.claude/`, `.codex_tmp/`, `videos/`, `dist/`, `test-results/`. (abgeschlossen: 2026-05-15; evidence: keine neue Tool-Ignore-Datei noetig; Onboarding und `check:agent-context` decken die Nicht-Standardkontext-Zonen ab.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.3",
@@ -9546,8 +9913,8 @@
     {
       "id": "V116.3.5",
       "type": "subphase",
-      "title": "Sicherstellen, dass Archive nicht aus Git-Historie oder Dokumentation verschwinden; sie werden nur aus dem Standard-Kontext ausgeschlossen.",
-      "status": "open",
+      "title": "Sicherstellen, dass Archive nicht aus Git-Historie oder Dokumentation verschwinden; sie werden nur aus dem Standard-Kontext ausgeschlossen. (abgeschlossen: 2026-05-15; evidence: keine Archiv-, Altplan- oder History-Verschiebung in 116.3; Onboarding erlaubt `docs/archive/` und `docs/plaene/alt/` weiter bei Historien-, Evidence-, Dependency- oder Abgleichsauftrag.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.3",
@@ -9557,8 +9924,8 @@
     {
       "id": "V116.3.6",
       "type": "subphase",
-      "title": "`check:gemini` erweitern oder nutzen, um versehentliche Gemini-Memory-/Log-Artefakte im Repo zu verhindern.",
-      "status": "open",
+      "title": "`check:gemini` erweitern oder nutzen, um versehentliche Gemini-Memory-/Log-Artefakte im Repo zu verhindern. (abgeschlossen: 2026-05-15; evidence: `npm run check:gemini` -> PASS; Gemini-Gate bleibt fuer Gemini-spezifische Drift zustaendig, `check:agent-context` ergaenzt repo-weite Kontext-Drift.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.3",
@@ -9568,8 +9935,8 @@
     {
       "id": "V116.3.7",
       "type": "subphase",
-      "title": "Neues Agenten-Kontext-Gate einfuehren: `npm run check:agent-context` und `scripts/check-agent-context.mjs` existieren zum Intake noch nicht, starten klein und pruefen nur AGENTS-Leseweg, Adapter-Prioritaet, verbotene Master-Duplikation in `CURRENT_CONTEXT.md` sowie bekannte Ignore-/Nicht-Lesezonen. Keine semantische Vollpruefung. Das Gate startet eigenstaendig und wird nicht sofort pauschal in `gates:pre-commit` erzwungen.",
-      "status": "open",
+      "title": "Neues Agenten-Kontext-Gate einfuehren: `npm run check:agent-context` und `scripts/check-agent-context.mjs` existieren zum Intake noch nicht, starten klein und pruefen nur AGENTS-Leseweg, Adapter-Prioritaet, verbotene Master-Duplikation in `CURRENT_CONTEXT.md` sowie bekannte Ignore-/Nicht-Lesezonen. Keine semantische Vollpruefung. Das Gate startet eigenstaendig und wird nicht sofort pauschal in `gates:pre-commit` erzwungen. (abgeschlossen: 2026-05-15; evidence: `scripts/check-agent-context.mjs`, `package.json`, `tests/agent-context.contract.test.mjs`; `npm run check:agent-context` -> PASS; `npm run test:agent-context` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.3",
@@ -9579,8 +9946,8 @@
     {
       "id": "V116.4.1",
       "type": "subphase",
-      "title": "Master-referenzierte aktive Plaene automatisch erfassen: alle `docs/plaene/aktiv/VXX.md`, die in `docs/Umsetzungsplan.md` verlinkt sind.",
-      "status": "open",
+      "title": "Master-referenzierte aktive Plaene automatisch erfassen: alle `docs/plaene/aktiv/VXX.md`, die in `docs/Umsetzungsplan.md` verlinkt sind. (abgeschlossen: 2026-05-16; evidence: `npm run plan:context:check` -> PASS, Report `tmp/plan-context-report.json` meldet `masterReferencedActivePlans=26` und `active protected-master-referenced=26`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.4",
@@ -9601,8 +9968,8 @@
     {
       "id": "V116.4.11",
       "type": "subphase",
-      "title": "`docs/plaene/aktiv/README.md`, `docs/plaene/neu/README.md` und `docs/plaene/alt/README.md` aktualisieren, damit Agenten aktive Plaene, Intake und Archiv eindeutig unterscheiden.",
-      "status": "open",
+      "title": "`docs/plaene/aktiv/README.md`, `docs/plaene/neu/README.md` und `docs/plaene/alt/README.md` aktualisieren, damit Agenten aktive Plaene, Intake und Archiv eindeutig unterscheiden. (abgeschlossen: 2026-05-16; evidence: README-Dateien nennen V116-Report-Regel: aktive Plaene bleiben kanonisch oder dependency-/evidence-geschuetzt, `neu/` ist Intake und Bot-Training-Sonderzone, `alt/` ist Historie ohne aktive Autoritaet.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.4",
@@ -9623,8 +9990,8 @@
     {
       "id": "V116.4.2",
       "type": "subphase",
-      "title": "`scripts/plan-context-report.mjs` erstellen oder erweitern; der Report listet master-referenzierte aktive Plaene, nicht referenzierte aktive Plaene, bereits uebernommene Intake-Drafts, Bot-Training-Sonderfaelle und Archivkandidaten.",
-      "status": "open",
+      "title": "`scripts/plan-context-report.mjs` erstellen oder erweitern; der Report listet master-referenzierte aktive Plaene, nicht referenzierte aktive Plaene, bereits uebernommene Intake-Drafts, Bot-Training-Sonderfaelle und Archivkandidaten. (abgeschlossen: 2026-05-16; evidence: `npm run plan:context:check` -> PASS, Report listet aktive Klassifikationen sowie Intake-Klassen `protected-bot-training-intake`, `superseded-by-master-intake`, `intake-review` und `protected-readme`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.4",
@@ -9634,8 +10001,8 @@
     {
       "id": "V116.4.3",
       "type": "subphase",
-      "title": "`plan-context-report` graph-gestuetzt machen: Eingaben sind `docs/Umsetzungsplan.md`, VXX-Frontmatter, `docs/generated/knowledge-graph.json` und bei Bedarf `scripts/query-knowledge-graph.mjs` fuer `open-deps`, `scope-collisions` und `surfaces-for-file`.",
-      "status": "open",
+      "title": "`plan-context-report` graph-gestuetzt machen: Eingaben sind `docs/Umsetzungsplan.md`, VXX-Frontmatter, `docs/generated/knowledge-graph.json` und bei Bedarf `scripts/query-knowledge-graph.mjs` fuer `open-deps`, `scope-collisions` und `surfaces-for-file`. (abgeschlossen: 2026-05-16; evidence: `tmp/plan-context-report.json` nennt Eingaben `docs/Umsetzungsplan.md`, `docs/prozess/Open_Findings.md` und `docs/generated/knowledge-graph.json`; `npm run graph:check` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.4",
@@ -9645,8 +10012,8 @@
     {
       "id": "V116.4.4",
       "type": "subphase",
-      "title": "Nicht referenzierte aktive Plaene in Klassen teilen:",
-      "status": "open",
+      "title": "Nicht referenzierte aktive Plaene in Klassen teilen: `dependency-source`, `closure-evidence`, `superseded` und `archive-candidate`. (abgeschlossen: 2026-05-16; evidence: `npm run plan:context:check` -> PASS; aktive Nicht-Master-Plaene sind in `protected-dependency-source` und `archive-candidate` getrennt, `V75`, `V81`, `V85`, `V86`, `V89` bleiben nur vorgeschlagene Archivkandidaten.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.4",
@@ -9656,8 +10023,8 @@
     {
       "id": "V116.4.5",
       "type": "subphase",
-      "title": "Quarantine-first fuer Planverschiebungen: `archive-candidate` wird zuerst nur im proposed-move Report gefuehrt; danach User-Gate; erst dann manuelle oder geskriptete Verschiebung in `docs/plaene/alt/context-cleanup-2026-05/` oder passenden Unterordner. Auto-Move bleibt bis nach stabilen Report-Laeufen ausgeschlossen.",
-      "status": "open",
+      "title": "Quarantine-first fuer Planverschiebungen: `archive-candidate` wird zuerst nur im proposed-move Report gefuehrt; danach User-Gate; erst dann manuelle oder geskriptete Verschiebung in `docs/plaene/alt/context-cleanup-2026-05/` oder passenden Unterordner. Auto-Move bleibt bis nach stabilen Report-Laeufen ausgeschlossen. (abgeschlossen: 2026-05-16; evidence: `tmp/plan-context-report.json` fuehrt die 5 aktiven Archivkandidaten nur als Report-/Proposed-Move-Signal; keine Datei wurde verschoben, kein Archivordner angelegt, keine Auto-Move-Logik ausgefuehrt.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.4",
@@ -9678,8 +10045,8 @@
     {
       "id": "V116.4.7",
       "type": "subphase",
-      "title": "Evidence-Kompression anwenden: Plan-Evidence nennt Pfad, Gate und Ergebnis, aber keine langen Terminal-Logs oder wiederholten Dateilisten.",
-      "status": "open",
+      "title": "Evidence-Kompression anwenden: Plan-Evidence nennt Pfad, Gate und Ergebnis, aber keine langen Terminal-Logs oder wiederholten Dateilisten. (abgeschlossen: 2026-05-16; evidence: V116- und Changelog-Evidence verweist kompakt auf `tmp/plan-context-report.json`, `npm run plan:context:check` -> PASS, `npm run plan:check` -> PASS und `npm run graph:check` -> PASS statt Terminal-Logs einzubetten.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.4",
@@ -10201,6 +10568,864 @@
         "blockId": "V117",
         "phaseCode": "117.99",
         "subphaseCode": "117.99.4"
+      }
+    },
+    {
+      "id": "V119.1.1",
+      "type": "subphase",
+      "title": "Read-only Audit-Script oder dokumentierten Shell-Abgleich fuer erledigte/done-ish Plaene aus `docs/plaene/aktiv` und `docs/plaene/alt` ausfuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.1",
+        "subphaseCode": "119.1.1"
+      }
+    },
+    {
+      "id": "V119.1.2",
+      "type": "subphase",
+      "title": "Befunde pro Plan klassifizieren: `OPEN_DOD`, `OPEN_99`, `CHECKED_WITHOUT_EVIDENCE`, `WEAK_EVIDENCE`, `TRACEABILITY_ONLY`, `FALSE_POSITIVE`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.1",
+        "subphaseCode": "119.1.2"
+      }
+    },
+    {
+      "id": "V119.1.3",
+      "type": "subphase",
+      "title": "Kanonische Remediation-Liste im Plan oder Changelog dokumentieren, ohne alte Plaene bereits zu aendern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.1",
+        "subphaseCode": "119.1.3"
+      }
+    },
+    {
+      "id": "V119.2.1",
+      "type": "subphase",
+      "title": "`V48` und `V74` gegen Git-Historie und Gates pruefen; offene `*.99`-Punkte entweder nachbelegen oder als historisch offen dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.2",
+        "subphaseCode": "119.2.1"
+      }
+    },
+    {
+      "id": "V119.2.2",
+      "type": "subphase",
+      "title": "`V75`, `V76`, `V81`, `V94`, `V102`, `V105` pruefen: Top-Level-DoDs nur dann spiegeln, wenn die jeweilige `*.99`-Evidence die DoD-Inhalte konkret deckt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.2",
+        "subphaseCode": "119.2.2"
+      }
+    },
+    {
+      "id": "V119.2.3",
+      "type": "subphase",
+      "title": "Archivfaelle `V41`, `V83`, `V84` pruefen und entscheiden, ob historische Abschlussnotiz reicht oder ein expliziter Restwiderspruch im Changelog bleibt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.2",
+        "subphaseCode": "119.2.3"
+      }
+    },
+    {
+      "id": "V119.3.1",
+      "type": "subphase",
+      "title": "`V93` DoDs mit konkreter Evidence nachtragen oder auf bestehende `93.99.*`-Evidence referenzieren, wenn der Nachweis inhaltlich deckungsgleich ist.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.3",
+        "subphaseCode": "119.3.1"
+      }
+    },
+    {
+      "id": "V119.3.2",
+      "type": "subphase",
+      "title": "`V102`, `V105`, `V114` generische Evidence (`verified`, `test -> pass`) gegen konkrete Commands, Commits oder Testreports nachschaerfen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.3",
+        "subphaseCode": "119.3.2"
+      }
+    },
+    {
+      "id": "V119.3.3",
+      "type": "subphase",
+      "title": "Archivierte Sammelfaelle `V52/V56` und `V54` bewerten; pauschale Evidence entweder konkretisieren oder als historische Minimal-Evidence belassen und markieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.3",
+        "subphaseCode": "119.3.3"
+      }
+    },
+    {
+      "id": "V119.4.1",
+      "type": "subphase",
+      "title": "Pruefen, ob `scripts/check-plan-evidence-claims.mjs` offene Top-Level-DoDs bei `status: done` und schwache Evidence-Muster stabil erkennen kann, ohne Altbestand sofort hart zu blockieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.4",
+        "subphaseCode": "119.4.1"
+      }
+    },
+    {
+      "id": "V119.4.2",
+      "type": "subphase",
+      "title": "Contract-Test fuer neue/aktive Plaene ergaenzen: `status: done` plus offene Top-Level-DoDs oder offenes `*.99` muss mindestens als Report-Finding erscheinen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.4",
+        "subphaseCode": "119.4.2"
+      }
+    },
+    {
+      "id": "V119.4.3",
+      "type": "subphase",
+      "title": "Workflow-Hinweis schaerfen: Abschlussclaims muessen DoD, `*.99`, Git-Historie und Evidence-Qualitaet zusammen pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.4",
+        "subphaseCode": "119.4.3"
+      }
+    },
+    {
+      "id": "V119.99.1",
+      "type": "subphase",
+      "title": "Alle P1-Befunde sind je Plan geloest oder bewusst als historischer Restwiderspruch dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.99",
+        "subphaseCode": "119.99.1"
+      }
+    },
+    {
+      "id": "V119.99.2",
+      "type": "subphase",
+      "title": "P2-Befunde sind nachgeschaerft oder als historische Minimal-Evidence begruendet.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.99",
+        "subphaseCode": "119.99.2"
+      }
+    },
+    {
+      "id": "V119.99.3",
+      "type": "subphase",
+      "title": "Praeventions-Check oder bewusst dokumentierte Nicht-Automatisierung ist vorhanden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.99",
+        "subphaseCode": "119.99.3"
+      }
+    },
+    {
+      "id": "V119.99.4",
+      "type": "subphase",
+      "title": "`npm run plan:check`, `npm run check:plan-evidence-claims`, `npm run graph:check`, `npm run docs:check` sind gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.99",
+        "subphaseCode": "119.99.4"
+      }
+    },
+    {
+      "id": "V120.1.1",
+      "type": "subphase",
+      "title": "`query-ops.v1.json` und `check-knowledge-graph-slos.mjs` synchronisieren; pro Query-ID entscheiden, ob sie ein SLO-Budget braucht oder nur einen Contract-Smoke bekommt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.1",
+        "subphaseCode": "120.1.1"
+      }
+    },
+    {
+      "id": "V120.1.2",
+      "type": "subphase",
+      "title": "Scorecard-, Coverage-, Critical-Path- und Scope-Collision-Ausgangswerte dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.1",
+        "subphaseCode": "120.1.2"
+      }
+    },
+    {
+      "id": "V120.1.3",
+      "type": "subphase",
+      "title": "Bekannte Scope-Kollisionen und fehlende File-Nodes als Referenz-/Risiko-Faelle fuer Graph-RAG erfassen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.1",
+        "subphaseCode": "120.1.3"
+      }
+    },
+    {
+      "id": "V120.2.1",
+      "type": "subphase",
+      "title": "Gate pruefen: `V116.3`/`V116.4` abgeschlossen oder verbleibendes Quellen-/Archivrisiko dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.1"
+      }
+    },
+    {
+      "id": "V120.2.2",
+      "type": "subphase",
+      "title": "`rag-sources.v1.json` mit Includes, Excludes, Klassifikationen und Safety-Regeln anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.2"
+      }
+    },
+    {
+      "id": "V120.2.3",
+      "type": "subphase",
+      "title": "Quellenprioritaet festschreiben: aktive Plaene, Master, Changelog und Referenzquellen zuerst; Altplaene nur historisch oder explizit graph-/changelog-referenziert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.3"
+      }
+    },
+    {
+      "id": "V120.2.4",
+      "type": "subphase",
+      "title": "`graph-rag-index.mjs` fuer Markdown-/Plan-Chunks mit stabilen IDs, Zeilenbereichen und Hashes implementieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.4"
+      }
+    },
+    {
+      "id": "V120.2.5",
+      "type": "subphase",
+      "title": "Cache-/Index-Ablage unter `tmp/graph-rag/` als transient und untracked absichern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.5"
+      }
+    },
+    {
+      "id": "V120.2.6",
+      "type": "subphase",
+      "title": "Generated Graph JSONs aus dem Volltextindex ausschliessen und nur ueber strukturierte Graph-Queries referenzieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.6"
+      }
+    },
+    {
+      "id": "V120.3.1",
+      "type": "subphase",
+      "title": "Intent-Router fuer Plan-, Runtime-, Datei-, Test-, Architektur- und Historienfragen als konservative Heuristik implementieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.3",
+        "subphaseCode": "120.3.1"
+      }
+    },
+    {
+      "id": "V120.3.2",
+      "type": "subphase",
+      "title": "`graph-rag-query.mjs` anlegen: User-Frage -> Graph-Queries -> Kandidaten -> Chunks -> Evidence-Paket.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.3",
+        "subphaseCode": "120.3.2"
+      }
+    },
+    {
+      "id": "V120.3.3",
+      "type": "subphase",
+      "title": "Referenzfragen fuer `scope-collisions`, `SettingsManager` und `spawn` als Contract-Fixtures ablegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.3",
+        "subphaseCode": "120.3.3"
+      }
+    },
+    {
+      "id": "V120.4.1",
+      "type": "subphase",
+      "title": "`local-llm-selection.v1.json` mit Runtime-Prioritaet, Modellprofilen, Hardware-Hinweisen, Timeouts und Fallback-Kriterien definieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4",
+        "subphaseCode": "120.4.1"
+      }
+    },
+    {
+      "id": "V120.4.2",
+      "type": "subphase",
+      "title": "Installationspfade fuer Ollama-first und llama.cpp-optional dokumentieren; Downloads und Installationen bleiben User-Aktion.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4",
+        "subphaseCode": "120.4.2"
+      }
+    },
+    {
+      "id": "V120.4.3",
+      "type": "subphase",
+      "title": "`graph-rag-local-llm-check.mjs` als lokalen Smoke-Check implementieren: Runtime erreichbar, Modell vorhanden, Mini-Fixture beantwortet, Output parsebar, Timeout eingehalten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4",
+        "subphaseCode": "120.4.3"
+      }
+    },
+    {
+      "id": "V120.4.4",
+      "type": "subphase",
+      "title": "Modellrollen festlegen: `fast-rerank`, `summary`, `fact-extract`, `fallback-rulebased`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4",
+        "subphaseCode": "120.4.4"
+      }
+    },
+    {
+      "id": "V120.4.5",
+      "type": "subphase",
+      "title": "Fallback-Regel pruefbar machen: kein Modell, langsames Modell oder invalides JSON blockiert Graph-RAG nicht.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4",
+        "subphaseCode": "120.4.5"
+      }
+    },
+    {
+      "id": "V120.5.1",
+      "type": "subphase",
+      "title": "`context-adapter-profiles.v1.json` fuer Adapterprofile, Timeouts, Max-Input, Max-Output und Fallbacks definieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.5",
+        "subphaseCode": "120.5.1"
+      }
+    },
+    {
+      "id": "V120.5.2",
+      "type": "subphase",
+      "title": "`graph-rag-context-adapter.mjs` als read-only Adapter fuer Rerank, Summary und Fact-Extraction implementieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.5",
+        "subphaseCode": "120.5.2"
+      }
+    },
+    {
+      "id": "V120.5.3",
+      "type": "subphase",
+      "title": "Mock-/No-Agent-Modus fuer Tests und Arbeitsplaetze ohne lokale AI bereitstellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.5",
+        "subphaseCode": "120.5.3"
+      }
+    },
+    {
+      "id": "V120.6.1",
+      "type": "subphase",
+      "title": "Gate pruefen: `V119.1` abgeschlossen oder historisches Evidence-Risiko dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.6",
+        "subphaseCode": "120.6.1"
+      }
+    },
+    {
+      "id": "V120.6.2",
+      "type": "subphase",
+      "title": "Evidence-Paket-Vertrag mit `claim`, `path`, `lineStart`, `lineEnd`, `confidence`, `uncertainties` validieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.6",
+        "subphaseCode": "120.6.2"
+      }
+    },
+    {
+      "id": "V120.6.3",
+      "type": "subphase",
+      "title": "Contract-Tests fuer Chunking, Quellenfilter, Graph-Kandidatenauswahl, LLM-Auswahlprofil, Install-Smoke-Fallback und Mock-Adapter ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.6",
+        "subphaseCode": "120.6.3"
+      }
+    },
+    {
+      "id": "V120.6.4",
+      "type": "subphase",
+      "title": "Kontextbudget messen und als Report ausgeben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.6",
+        "subphaseCode": "120.6.4"
+      }
+    },
+    {
+      "id": "V120.7.1",
+      "type": "subphase",
+      "title": "Kurze Nutzungshinweise in passendem Referenz-/Plan-Kontext dokumentieren, ohne einen neuen parallelen Steuerkanal aufzubauen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.7",
+        "subphaseCode": "120.7.1"
+      }
+    },
+    {
+      "id": "V120.7.2",
+      "type": "subphase",
+      "title": "Graph-First-Regel konkretisieren: Graph-RAG fuer Erklaerfragen und historische Entscheidungen, reine Graph-Queries fuer harte Scope-/Impact-Fakten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.7",
+        "subphaseCode": "120.7.2"
+      }
+    },
+    {
+      "id": "V120.7.3",
+      "type": "subphase",
+      "title": "Abschluss-Evidence im aktiven Block und/oder `docs/plaene/CHANGELOG.md` hinterlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.7",
+        "subphaseCode": "120.7.3"
+      }
+    },
+    {
+      "id": "V120.99.1",
+      "type": "subphase",
+      "title": "`npm run graph:slo` ist gruen oder documented-skip fuer nicht-SLO-faehige Queries ist contract-seitig begruendet.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99",
+        "subphaseCode": "120.99.1"
+      }
+    },
+    {
+      "id": "V120.99.2",
+      "type": "subphase",
+      "title": "`npm run graph:build`, `npm run graph:check` und `npm run plan:check` sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99",
+        "subphaseCode": "120.99.2"
+      }
+    },
+    {
+      "id": "V120.99.3",
+      "type": "subphase",
+      "title": "Relevante Graph-RAG-Contract-Tests sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99",
+        "subphaseCode": "120.99.3"
+      }
+    },
+    {
+      "id": "V120.99.4",
+      "type": "subphase",
+      "title": "`npm run docs:sync && npm run docs:check` ist nach Governance-Regel geprueft.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99",
+        "subphaseCode": "120.99.4"
+      }
+    },
+    {
+      "id": "V120.99.5",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt Nutzen, Restrisiko, Fallback und Tokenbudget-Effekt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99",
+        "subphaseCode": "120.99.5"
+      }
+    },
+    {
+      "id": "V123.1.1",
+      "type": "subphase",
+      "title": "Feldliste fuer den MVP finalisieren: `schema_version`, `updated`, `active_lock`, `next_free_p1_start`, `sources`, `blocks`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.1"
+      }
+    },
+    {
+      "id": "V123.1.2",
+      "type": "subphase",
+      "title": "Alle Master-Tabellenfelder aus `docs/Umsetzungsplan.md` in das Schema abbilden: `id`, `title`, `status`, `priority`, `owner`, `depends_on`, `current_phase`, `plan_file`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.2"
+      }
+    },
+    {
+      "id": "V123.1.3",
+      "type": "subphase",
+      "title": "Sonderfaelle dokumentieren: `-` fuer keine Dependencies, freie Owner, blockierte Bloecke, erledigte aber noch referenzierte Bloecke.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.3"
+      }
+    },
+    {
+      "id": "V123.1.4",
+      "type": "subphase",
+      "title": "Pilot-Regel im Plan festhalten: Bei Konflikt gewinnt bis zur spaeteren Migration der Markdown-Master.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.4"
+      }
+    },
+    {
+      "id": "V123.2.1",
+      "type": "subphase",
+      "title": "`scripts/validate-plan-index.mjs` entwerfen oder erstellen: YAML/JSON lesen, Master-Zeilen vergleichen, Feldmismatches berichten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2",
+        "subphaseCode": "123.2.1"
+      }
+    },
+    {
+      "id": "V123.2.2",
+      "type": "subphase",
+      "title": "Fehlertypen stabilisieren: `missing-in-index`, `missing-in-master`, `duplicate-id`, `field-mismatch`, `invalid-plan-file`, `unknown-dependency`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2",
+        "subphaseCode": "123.2.2"
+      }
+    },
+    {
+      "id": "V123.2.3",
+      "type": "subphase",
+      "title": "`package.json` um `plan:index:check` ergaenzen, aber noch nicht automatisch in `gates:pre-commit` erzwingen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2",
+        "subphaseCode": "123.2.3"
+      }
+    },
+    {
+      "id": "V123.2.4",
+      "type": "subphase",
+      "title": "Optional `scripts/build-plan-index.mjs` vorbereiten, aber nur als expliziten Generator, nicht als verdeckte Auto-Korrektur.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2",
+        "subphaseCode": "123.2.4"
+      }
+    },
+    {
+      "id": "V123.3.1",
+      "type": "subphase",
+      "title": "Leseweg fuer Pilotphase definieren: `AGENTS.md`, passende Rule/Workflow, `docs/plan-index.yaml` fuer Blockstatus, genau eine VXX-Datei fuer Details.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3",
+        "subphaseCode": "123.3.1"
+      }
+    },
+    {
+      "id": "V123.3.2",
+      "type": "subphase",
+      "title": "Konfliktregel dokumentieren: Bei Abweichung zwischen YAML und Markdown gewinnt bis zur Migration `docs/Umsetzungsplan.md`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3",
+        "subphaseCode": "123.3.2"
+      }
+    },
+    {
+      "id": "V123.3.3",
+      "type": "subphase",
+      "title": "Token-Effizienz-Regel ergaenzen: Agents duerfen nicht standardmaessig YAML, Markdown, Changelog und Reports alle zugleich lesen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3",
+        "subphaseCode": "123.3.3"
+      }
+    },
+    {
+      "id": "V123.3.4",
+      "type": "subphase",
+      "title": "Bot-Training-Sonderweg bestaetigen: `docs/bot-training/Bot_Trainingsplan.md` bleibt eigene Quelle und wird nicht in den normalen Master-Index-MVP gezogen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3",
+        "subphaseCode": "123.3.4"
+      }
+    },
+    {
+      "id": "V123.4.1",
+      "type": "subphase",
+      "title": "`plan-context-report` optional an `docs/plan-index.yaml` anbinden; wenn Datei fehlt, bleibt alter Markdown-Pfad aktiv.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4",
+        "subphaseCode": "123.4.1"
+      }
+    },
+    {
+      "id": "V123.4.2",
+      "type": "subphase",
+      "title": "Report-Felder trennen: `masterSource`, `structuredIndexSource`, `driftStatus`, `missingInYaml`, `missingInMaster`, `fieldMismatches`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4",
+        "subphaseCode": "123.4.2"
+      }
+    },
+    {
+      "id": "V123.4.3",
+      "type": "subphase",
+      "title": "`validate-umsetzungsplan` nicht sofort ersetzen, sondern gegen Drift-Check ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4",
+        "subphaseCode": "123.4.3"
+      }
+    },
+    {
+      "id": "V123.4.4",
+      "type": "subphase",
+      "title": "Graph-Build/Check nur dann umstellen, wenn der Index stabil ist und keine aktuelle Graph-Quelle stillschweigend verdrangt wird.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4",
+        "subphaseCode": "123.4.4"
+      }
+    },
+    {
+      "id": "V123.5.1",
+      "type": "subphase",
+      "title": "Option A bewerten: Markdown bleibt Wahrheit, YAML bleibt Spiegel.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.1"
+      }
+    },
+    {
+      "id": "V123.5.2",
+      "type": "subphase",
+      "title": "Option B bewerten: YAML wird Wahrheit, Markdown wird generierte Menschenansicht.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.2"
+      }
+    },
+    {
+      "id": "V123.5.3",
+      "type": "subphase",
+      "title": "Blast-Radius fuer Option B dokumentieren: Master, Validatoren, Graph, Workflows, Rules, Changelog, Agenten-Leseweg.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.3"
+      }
+    },
+    {
+      "id": "V123.5.4",
+      "type": "subphase",
+      "title": "User-Gate einholen, bevor eine Autoritaetsverschiebung umgesetzt wird.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.4"
+      }
+    },
+    {
+      "id": "V123.6.1",
+      "type": "subphase",
+      "title": "Falls YAML kanonisch wird, `docs/Umsetzungsplan.md` als generierte Ansicht markieren und gegen manuelle Drift schuetzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.6",
+        "subphaseCode": "123.6.1"
+      }
+    },
+    {
+      "id": "V123.6.2",
+      "type": "subphase",
+      "title": "Optionales `docs/generated/plan-dashboard.html` nur als Dashboard fuer Menschen erzeugen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.6",
+        "subphaseCode": "123.6.2"
+      }
+    },
+    {
+      "id": "V123.6.3",
+      "type": "subphase",
+      "title": "Dashboard-Funktionen begrenzen: Filter nach Status/Prioritaet, Links zu VXX-Dateien, Lock-Status, Dependency-Sicht.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.6",
+        "subphaseCode": "123.6.3"
+      }
+    },
+    {
+      "id": "V123.6.4",
+      "type": "subphase",
+      "title": "Dashboard darf keine Schreibfunktion und keine eigene Planlogik enthalten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.6",
+        "subphaseCode": "123.6.4"
+      }
+    },
+    {
+      "id": "V123.99.1",
+      "type": "subphase",
+      "title": "`npm run plan:check` ist gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.1"
+      }
+    },
+    {
+      "id": "V123.99.2",
+      "type": "subphase",
+      "title": "`npm run plan:index:check` ist gruen oder der Check ist bewusst noch nicht eingefuehrt und blockerfest begruendet.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.2"
+      }
+    },
+    {
+      "id": "V123.99.3",
+      "type": "subphase",
+      "title": "`npm run plan:context:check` zeigt keinen neuen Autoritaetskonflikt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.3"
+      }
+    },
+    {
+      "id": "V123.99.4",
+      "type": "subphase",
+      "title": "`npm run graph:check` ist gruen, falls Graph-Inputs oder Graph-Reports betroffen sind.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.4"
+      }
+    },
+    {
+      "id": "V123.99.5",
+      "type": "subphase",
+      "title": "`npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.5"
+      }
+    },
+    {
+      "id": "V123.99.6",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt: Pilot/Quelle, Konfliktregel, Drift-Check, Agenten-Leseweg, Restrisiko und Entscheidung zum Source-of-Truth-Wechsel.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.6"
       }
     },
     {
@@ -18859,7 +20084,9 @@
         ],
         "scopeBlocks": [
           "V109",
+          "V116",
           "V117",
+          "V123",
           "V93",
           "V94"
         ],
@@ -18896,6 +20123,7 @@
           "V111",
           "V116",
           "V117",
+          "V123",
           "V93",
           "V94"
         ],
@@ -18985,6 +20213,7 @@
           "V109",
           "V116",
           "V117",
+          "V123",
           "V93",
           "V94"
         ],
@@ -19002,6 +20231,7 @@
         ],
         "scopeBlocks": [
           "V109",
+          "V116",
           "V93"
         ],
         "exists": true
@@ -19020,6 +20250,7 @@
           "V109",
           "V116",
           "V117",
+          "V123",
           "V93",
           "V94"
         ],
@@ -19243,6 +20474,7 @@
         "scopeBlocks": [
           "V116",
           "V117",
+          "V123",
           "V93"
         ],
         "exists": true
@@ -21095,6 +22327,21 @@
       }
     },
     {
+      "id": "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "data/contracts/knowledge-graph/contradictions.v1.json",
       "type": "file",
       "title": null,
@@ -21126,6 +22373,21 @@
           "V111"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
       }
     },
     {
@@ -21174,9 +22436,40 @@
         "scopeBlocks": [
           "V107",
           "V110",
-          "V111"
+          "V111",
+          "V120"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/rag-sources.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
       }
     },
     {
@@ -21501,7 +22794,8 @@
           "V107",
           "V110",
           "V111",
-          "V115"
+          "V115",
+          "V120"
         ],
         "exists": true
       }
@@ -21521,6 +22815,7 @@
           "V110",
           "V111",
           "V115",
+          "V120",
           "V94"
         ],
         "exists": true
@@ -21555,7 +22850,8 @@
         ],
         "scopeBlocks": [
           "V105",
-          "V111"
+          "V111",
+          "V120"
         ],
         "exists": true
       }
@@ -21634,6 +22930,7 @@
         "scopeBlocks": [
           "V102",
           "V110",
+          "V119",
           "V77"
         ],
         "exists": true
@@ -21681,6 +22978,7 @@
         "scopeBlocks": [
           "V105",
           "V110",
+          "V119",
           "V77"
         ],
         "exists": true
@@ -21828,6 +23126,7 @@
         ],
         "scopeBlocks": [
           "V110",
+          "V119",
           "V77"
         ],
         "exists": true
@@ -21876,6 +23175,54 @@
         ],
         "scopeBlocks": [
           "V117",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V119.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V119",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V120.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V123.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V123",
           "V77"
         ],
         "exists": true
@@ -21938,6 +23285,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77"
         ],
         "exists": true
@@ -21953,6 +23301,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77"
         ],
         "exists": true
@@ -21983,6 +23332,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77",
           "V94",
           "V96"
@@ -22142,6 +23492,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77"
         ],
         "exists": true
@@ -22157,6 +23508,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77",
           "V94"
         ],
@@ -22326,6 +23678,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77"
         ],
         "exists": true
@@ -22506,6 +23859,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77"
         ],
         "exists": true
@@ -22536,6 +23890,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77"
         ],
         "exists": true
@@ -22986,6 +24341,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77"
         ],
         "exists": true
@@ -23046,6 +24402,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77"
         ],
         "exists": true
@@ -23076,6 +24433,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77"
         ],
         "exists": true
@@ -23091,6 +24449,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V119",
           "V77"
         ],
         "exists": true
@@ -23128,6 +24487,9 @@
           "V111",
           "V115",
           "V117",
+          "V119",
+          "V120",
+          "V123",
           "V77",
           "V93"
         ],
@@ -23885,6 +25247,36 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_Graph_RAG_Lokaler_Context_Adapter.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Graph_RAG_Viewer_Evidence_Dashboard_V121.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
       "type": "file",
       "title": null,
@@ -23916,6 +25308,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Legacy_Runtime_Surface_Sunset_V91.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Repo_Agent_Memory_und_Ruflo_Orchestrierung_V122.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -24124,6 +25531,21 @@
           "V77"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "docs/plan-index.yaml",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V123"
+        ],
+        "exists": false
       }
     },
     {
@@ -24522,6 +25944,9 @@
           "V110",
           "V116",
           "V117",
+          "V119",
+          "V120",
+          "V123",
           "V51",
           "V69",
           "V89",
@@ -25655,7 +27080,9 @@
           "B13",
           "V110",
           "V112",
+          "V116",
           "V117",
+          "V123",
           "V75",
           "V87",
           "V88",
@@ -26081,9 +27508,26 @@
           "V107",
           "V110",
           "V111",
+          "V120",
+          "V123",
           "V94"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "scripts/build-plan-index.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V123"
+        ],
+        "exists": false
       }
     },
     {
@@ -26108,12 +27552,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V116"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -26269,7 +27715,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V110"
+          "V110",
+          "V120"
         ],
         "exists": true
       }
@@ -26289,6 +27736,7 @@
           "V107",
           "V110",
           "V111",
+          "V123",
           "V94"
         ],
         "exists": true
@@ -26321,7 +27769,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V117"
+          "V117",
+          "V119"
         ],
         "exists": true
       }
@@ -26576,6 +28025,66 @@
       }
     },
     {
+      "id": "scripts/graph-rag-context-adapter.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "scripts/graph-rag-index.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "scripts/graph-rag-local-llm-check.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "scripts/graph-rag-query.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "scripts/headless-match-kernel-smoke.mjs",
       "type": "file",
       "title": null,
@@ -26679,7 +28188,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V116"
+          "V116",
+          "V123"
         ],
         "exists": true
       }
@@ -27088,6 +28598,21 @@
       }
     },
     {
+      "id": "scripts/validate-plan-index.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V123"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "scripts/validate-umsetzungsplan.mjs",
       "type": "file",
       "title": null,
@@ -27099,7 +28624,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V116"
+          "V116",
+          "V123"
         ],
         "exists": true
       }
@@ -37900,6 +39426,23 @@
       }
     },
     {
+      "id": "tests/agent-context.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "V116"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/agent-governance.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -38396,6 +39939,66 @@
           "B13"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "tests/graph-rag-context-adapter.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tests/graph-rag-index.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tests/graph-rag-local-llm-selection.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tests/graph-rag-query.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V120"
+        ],
+        "exists": false
       }
     },
     {
@@ -38948,7 +40551,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V117"
+          "V117",
+          "V119"
         ],
         "exists": true
       }
@@ -44759,6 +46363,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/check-agent-context.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/check-ai-decision-policy.mjs",
       "type": "scope",
       "hint": null,
@@ -45309,6 +46922,15 @@
     {
       "from": "B13",
       "to": "scripts/workspace-cleanup.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/agent-context.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -58530,6 +60152,15 @@
     },
     {
       "from": "V116",
+      "to": ".agents/rules/planning_and_governance.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V116",
       "to": ".agents/rules/token_efficiency_and_tools.md",
       "type": "scope",
       "hint": null,
@@ -58540,6 +60171,15 @@
     {
       "from": "V116",
       "to": ".agents/workflows/code.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V116",
+      "to": ".agents/workflows/fix-planung.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -58638,6 +60278,15 @@
     },
     {
       "from": "V116",
+      "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V116",
       "to": "README.md",
       "type": "scope",
       "hint": null,
@@ -58693,6 +60342,15 @@
     {
       "from": "V116",
       "to": "scripts/workspace-cleanup.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V116",
+      "to": "tests/agent-context.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -59934,6 +61592,1685 @@
         "blockId": "V117",
         "phaseCode": "117.99",
         "subphaseCode": "117.99.4"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/aktiv/V102.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/aktiv/V105.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/aktiv/V114.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/aktiv/V119.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/aktiv/V75.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/aktiv/V76.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/aktiv/V81.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/aktiv/V93.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/aktiv/V94.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/alt/Feature_Architektur_Runtime_Entkopplung_V74.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/alt/Feature_Fight_Modus_Qualitaet_V48.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/alt/Feature_Gesamtfix_Architektur_Qualitaet_V54.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/alt/Umsetzungsplan_Block_V41_Multiplayer_Rest-Gate_2026-03-23.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/alt/Umsetzungsplan_Bloecke_V52-V57_Architektur-Haertung-bis-Arcade_2026-03-27.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/alt/V83.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/alt/V84.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/Umsetzungsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "scripts/check-plan-evidence-claims.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "tests/plan-evidence-claims.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "V117",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "AI Decision Framework und Evidence-Claim-Regeln sind Grundlage fuer nachtraegliche Planabschluss-Remediation ohne falsche Abschlussbehauptungen",
+      "attributes": {
+        "dependsPhase": "117.99",
+        "rawToken": "V117.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V119",
+      "to": "V119.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.1"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "V119.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.2"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "V119.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.3"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "V119.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.4"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "V119.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.99"
+      }
+    },
+    {
+      "from": "V119.1",
+      "to": "V119.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.1",
+        "subphaseCode": "119.1.1"
+      }
+    },
+    {
+      "from": "V119.1",
+      "to": "V119.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.1",
+        "subphaseCode": "119.1.2"
+      }
+    },
+    {
+      "from": "V119.1",
+      "to": "V119.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.1",
+        "subphaseCode": "119.1.3"
+      }
+    },
+    {
+      "from": "V119.2",
+      "to": "V119.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.2",
+        "subphaseCode": "119.2.1"
+      }
+    },
+    {
+      "from": "V119.2",
+      "to": "V119.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.2",
+        "subphaseCode": "119.2.2"
+      }
+    },
+    {
+      "from": "V119.2",
+      "to": "V119.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.2",
+        "subphaseCode": "119.2.3"
+      }
+    },
+    {
+      "from": "V119.3",
+      "to": "V119.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.3",
+        "subphaseCode": "119.3.1"
+      }
+    },
+    {
+      "from": "V119.3",
+      "to": "V119.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.3",
+        "subphaseCode": "119.3.2"
+      }
+    },
+    {
+      "from": "V119.3",
+      "to": "V119.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.3",
+        "subphaseCode": "119.3.3"
+      }
+    },
+    {
+      "from": "V119.4",
+      "to": "V119.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.4",
+        "subphaseCode": "119.4.1"
+      }
+    },
+    {
+      "from": "V119.4",
+      "to": "V119.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.4",
+        "subphaseCode": "119.4.2"
+      }
+    },
+    {
+      "from": "V119.4",
+      "to": "V119.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.4",
+        "subphaseCode": "119.4.3"
+      }
+    },
+    {
+      "from": "V119.99",
+      "to": "V119.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.99",
+        "subphaseCode": "119.99.1"
+      }
+    },
+    {
+      "from": "V119.99",
+      "to": "V119.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.99",
+        "subphaseCode": "119.99.2"
+      }
+    },
+    {
+      "from": "V119.99",
+      "to": "V119.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.99",
+        "subphaseCode": "119.99.3"
+      }
+    },
+    {
+      "from": "V119.99",
+      "to": "V119.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V119",
+        "phaseCode": "119.99",
+        "subphaseCode": "119.99.4"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "data/contracts/knowledge-graph/query-ops.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "data/contracts/knowledge-graph/rag-sources.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "docs/generated/knowledge-graph.scorecard.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "docs/plaene/aktiv/V120.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "docs/Umsetzungsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "scripts/build-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "scripts/check-knowledge-graph-slos.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "scripts/graph-rag-context-adapter.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "scripts/graph-rag-index.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "scripts/graph-rag-local-llm-check.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "scripts/graph-rag-query.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "tests/graph-rag-context-adapter.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "tests/graph-rag-index.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "tests/graph-rag-local-llm-selection.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "tests/graph-rag-query.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V107",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Core-Graph und Query-Layer sind Baseline fuer Graph-RAG-Kandidatenauswahl",
+      "attributes": {
+        "dependsPhase": "107.99",
+        "rawToken": "V107.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V110",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Graph Ops-, Guard-, SLO- und Playbook-Basis ist Voraussetzung fuer sichere RAG-Gates",
+      "attributes": {
+        "dependsPhase": "110.99",
+        "rawToken": "V110.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V111",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Adaptive Query-, Safety-, Scorecard- und Feedback-Mechanik ist Grundlage fuer Evidence-Pakete und lokale Adapter",
+      "attributes": {
+        "dependsPhase": "111.99",
+        "rawToken": "V111.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V120.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.1"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V120.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V120.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.3"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V120.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V120.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.5"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V120.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.6"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V120.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.7"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "V120.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99"
+      }
+    },
+    {
+      "from": "V120.1",
+      "to": "V120.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.1",
+        "subphaseCode": "120.1.1"
+      }
+    },
+    {
+      "from": "V120.1",
+      "to": "V120.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.1",
+        "subphaseCode": "120.1.2"
+      }
+    },
+    {
+      "from": "V120.1",
+      "to": "V120.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.1",
+        "subphaseCode": "120.1.3"
+      }
+    },
+    {
+      "from": "V120.2",
+      "to": "V120.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.1"
+      }
+    },
+    {
+      "from": "V120.2",
+      "to": "V120.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.2"
+      }
+    },
+    {
+      "from": "V120.2",
+      "to": "V120.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.3"
+      }
+    },
+    {
+      "from": "V120.2",
+      "to": "V120.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.4"
+      }
+    },
+    {
+      "from": "V120.2",
+      "to": "V120.2.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.5"
+      }
+    },
+    {
+      "from": "V120.2",
+      "to": "V120.2.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.2",
+        "subphaseCode": "120.2.6"
+      }
+    },
+    {
+      "from": "V120.3",
+      "to": "V120.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.3",
+        "subphaseCode": "120.3.1"
+      }
+    },
+    {
+      "from": "V120.3",
+      "to": "V120.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.3",
+        "subphaseCode": "120.3.2"
+      }
+    },
+    {
+      "from": "V120.3",
+      "to": "V120.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.3",
+        "subphaseCode": "120.3.3"
+      }
+    },
+    {
+      "from": "V120.4",
+      "to": "V120.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4",
+        "subphaseCode": "120.4.1"
+      }
+    },
+    {
+      "from": "V120.4",
+      "to": "V120.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4",
+        "subphaseCode": "120.4.2"
+      }
+    },
+    {
+      "from": "V120.4",
+      "to": "V120.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4",
+        "subphaseCode": "120.4.3"
+      }
+    },
+    {
+      "from": "V120.4",
+      "to": "V120.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4",
+        "subphaseCode": "120.4.4"
+      }
+    },
+    {
+      "from": "V120.4",
+      "to": "V120.4.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.4",
+        "subphaseCode": "120.4.5"
+      }
+    },
+    {
+      "from": "V120.5",
+      "to": "V120.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.5",
+        "subphaseCode": "120.5.1"
+      }
+    },
+    {
+      "from": "V120.5",
+      "to": "V120.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.5",
+        "subphaseCode": "120.5.2"
+      }
+    },
+    {
+      "from": "V120.5",
+      "to": "V120.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.5",
+        "subphaseCode": "120.5.3"
+      }
+    },
+    {
+      "from": "V120.6",
+      "to": "V120.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.6",
+        "subphaseCode": "120.6.1"
+      }
+    },
+    {
+      "from": "V120.6",
+      "to": "V120.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.6",
+        "subphaseCode": "120.6.2"
+      }
+    },
+    {
+      "from": "V120.6",
+      "to": "V120.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.6",
+        "subphaseCode": "120.6.3"
+      }
+    },
+    {
+      "from": "V120.6",
+      "to": "V120.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.6",
+        "subphaseCode": "120.6.4"
+      }
+    },
+    {
+      "from": "V120.7",
+      "to": "V120.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.7",
+        "subphaseCode": "120.7.1"
+      }
+    },
+    {
+      "from": "V120.7",
+      "to": "V120.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.7",
+        "subphaseCode": "120.7.2"
+      }
+    },
+    {
+      "from": "V120.7",
+      "to": "V120.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.7",
+        "subphaseCode": "120.7.3"
+      }
+    },
+    {
+      "from": "V120.99",
+      "to": "V120.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99",
+        "subphaseCode": "120.99.1"
+      }
+    },
+    {
+      "from": "V120.99",
+      "to": "V120.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99",
+        "subphaseCode": "120.99.2"
+      }
+    },
+    {
+      "from": "V120.99",
+      "to": "V120.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99",
+        "subphaseCode": "120.99.3"
+      }
+    },
+    {
+      "from": "V120.99",
+      "to": "V120.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99",
+        "subphaseCode": "120.99.4"
+      }
+    },
+    {
+      "from": "V120.99",
+      "to": "V120.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V120",
+        "phaseCode": "120.99",
+        "subphaseCode": "120.99.5"
+      }
+    },
+    {
+      "from": "V123",
+      "to": ".agents/rules/planning_and_governance.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": ".agents/rules/token_efficiency_and_tools.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": ".agents/workflows/code.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": ".agents/workflows/plan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "AGENTS.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "docs/plaene/aktiv/V123.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "docs/plan-index.yaml",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "docs/Umsetzungsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "scripts/build-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "scripts/build-plan-index.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "scripts/check-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "scripts/plan-context-report.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "scripts/validate-plan-index.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "scripts/validate-umsetzungsplan.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "V116",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Plan-Kontext-Klassifikation und AI-Leseweg bilden die Baseline fuer den strukturierten Plan-Index-Pilot",
+      "attributes": {
+        "dependsPhase": "116.4",
+        "rawToken": "V116.4",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V123",
+      "to": "V119",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Evidence-/Abschluss-Baseline soll historische Drift vor Source-of-Truth-Entscheidungen sichtbar machen",
+      "attributes": {
+        "dependsPhase": "119.1",
+        "rawToken": "V119.1",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V123",
+      "to": "V123.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "V123.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "V123.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "V123.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "V123.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "V123.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.6"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "V123.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99"
+      }
+    },
+    {
+      "from": "V123.1",
+      "to": "V123.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.1"
+      }
+    },
+    {
+      "from": "V123.1",
+      "to": "V123.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.2"
+      }
+    },
+    {
+      "from": "V123.1",
+      "to": "V123.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.3"
+      }
+    },
+    {
+      "from": "V123.1",
+      "to": "V123.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.4"
+      }
+    },
+    {
+      "from": "V123.2",
+      "to": "V123.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2",
+        "subphaseCode": "123.2.1"
+      }
+    },
+    {
+      "from": "V123.2",
+      "to": "V123.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2",
+        "subphaseCode": "123.2.2"
+      }
+    },
+    {
+      "from": "V123.2",
+      "to": "V123.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2",
+        "subphaseCode": "123.2.3"
+      }
+    },
+    {
+      "from": "V123.2",
+      "to": "V123.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2",
+        "subphaseCode": "123.2.4"
+      }
+    },
+    {
+      "from": "V123.3",
+      "to": "V123.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3",
+        "subphaseCode": "123.3.1"
+      }
+    },
+    {
+      "from": "V123.3",
+      "to": "V123.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3",
+        "subphaseCode": "123.3.2"
+      }
+    },
+    {
+      "from": "V123.3",
+      "to": "V123.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3",
+        "subphaseCode": "123.3.3"
+      }
+    },
+    {
+      "from": "V123.3",
+      "to": "V123.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3",
+        "subphaseCode": "123.3.4"
+      }
+    },
+    {
+      "from": "V123.4",
+      "to": "V123.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4",
+        "subphaseCode": "123.4.1"
+      }
+    },
+    {
+      "from": "V123.4",
+      "to": "V123.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4",
+        "subphaseCode": "123.4.2"
+      }
+    },
+    {
+      "from": "V123.4",
+      "to": "V123.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4",
+        "subphaseCode": "123.4.3"
+      }
+    },
+    {
+      "from": "V123.4",
+      "to": "V123.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4",
+        "subphaseCode": "123.4.4"
+      }
+    },
+    {
+      "from": "V123.5",
+      "to": "V123.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.1"
+      }
+    },
+    {
+      "from": "V123.5",
+      "to": "V123.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.2"
+      }
+    },
+    {
+      "from": "V123.5",
+      "to": "V123.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.3"
+      }
+    },
+    {
+      "from": "V123.5",
+      "to": "V123.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.4"
+      }
+    },
+    {
+      "from": "V123.6",
+      "to": "V123.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.6",
+        "subphaseCode": "123.6.1"
+      }
+    },
+    {
+      "from": "V123.6",
+      "to": "V123.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.6",
+        "subphaseCode": "123.6.2"
+      }
+    },
+    {
+      "from": "V123.6",
+      "to": "V123.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.6",
+        "subphaseCode": "123.6.3"
+      }
+    },
+    {
+      "from": "V123.6",
+      "to": "V123.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.6",
+        "subphaseCode": "123.6.4"
+      }
+    },
+    {
+      "from": "V123.99",
+      "to": "V123.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.1"
+      }
+    },
+    {
+      "from": "V123.99",
+      "to": "V123.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.2"
+      }
+    },
+    {
+      "from": "V123.99",
+      "to": "V123.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.3"
+      }
+    },
+    {
+      "from": "V123.99",
+      "to": "V123.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.4"
+      }
+    },
+    {
+      "from": "V123.99",
+      "to": "V123.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.5"
+      }
+    },
+    {
+      "from": "V123.99",
+      "to": "V123.99.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.99",
+        "subphaseCode": "123.99.6"
       }
     },
     {
@@ -70069,6 +73406,33 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V119.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V120.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V123.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V64.md",
       "type": "scope",
       "hint": null,
@@ -71257,6 +74621,24 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/neu/Feature_Graph_RAG_Lokaler_Context_Adapter.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Graph_RAG_Viewer_Evidence_Dashboard_V121.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
       "type": "scope",
       "hint": null,
@@ -71276,6 +74658,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Legacy_Runtime_Surface_Sunset_V91.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Repo_Agent_Memory_und_Ruflo_Orchestrierung_V122.md",
       "type": "scope",
       "hint": null,
       "attributes": {
