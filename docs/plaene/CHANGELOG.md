@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-16 (Subphase `V116 116.4`)
+
+- `116.4` ist report-only fortgesetzt: `npm run plan:context:check` klassifiziert aktive Plaene und Intake-Drafts graph-gestuetzt gegen Master, Open Findings und `docs/generated/knowledge-graph.json`; `npm run plan:check` und `npm run graph:check` sind gruen.
+- Report-Ergebnis: 26 master-referenzierte aktive Plaene, 12 dependency-geschuetzte aktive Plaene, 5 aktive Archivkandidaten (`V75`, `V81`, `V85`, `V86`, `V89`), 41 Bot-Training-Sonderfaelle, 19 superseded Intake-Drafts und 4 Intake-Review-Faelle. Report: `tmp/plan-context-report.json`.
+- Keine Planverschiebung, kein Archivordner und keine Auto-Move-Logik wurden ausgefuehrt; Archivkandidaten bleiben bis zu einem separaten User-Gate nur proposed-move Evidence.
 ## Stand-Snapshot 2026-05-15 (Intake `V119 119.1`)
 
 - Neuer geplanter P1-Block `V119` ist nach User-Freigabe im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V119.md`.
