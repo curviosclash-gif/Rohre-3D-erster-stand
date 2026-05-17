@@ -7,8 +7,8 @@ owner: frei
 depends_on:
   - V116.99
   - V117.99
-soft_depends_on:
   - V119.1
+soft_depends_on:
   - V120.99
 blocked_by: []
 affected_area: repo-agent-memory-ruflo-orchestration
@@ -144,6 +144,7 @@ Folge:
 - V120 kann spaeter Memory-Sources oder Memory-Treffer als Retrieval-Quelle beruecksichtigen.
 - V122 darf sich nicht als RAG-System ausgeben.
 - Semantische Suche fuer Memory ist nur ein spaeter optionaler Ausbau und sollte V120 wiederverwenden, wenn V120 stabil ist.
+- Der CLI-only Memory-MVP darf ohne `V120.99` geplant werden. Alles, was Graph-RAG-Evidence-Pakete, semantische Suche, RAG-gestuetztes Memory-Ranking oder Ruflo-Orchestrierung mit RAG-Kontext nutzt, wartet auf `V120.99` oder ein explizites V120-`fixture-ready`-Gate.
 
 ## Memory-Grundmodell
 
@@ -380,7 +381,7 @@ status: open
 goal: Memory/Ruflo so schneiden, dass keine zweite Wahrheit entsteht
 output: finaler Scope, Gate-Entscheid und Quellenbewertung
 
-- [ ] 122.1.1 V116-, V117-, V119- und V120-Anschluss pruefen: Was ist harte Abhaengigkeit, was nur soft dependency?
+- [ ] 122.1.1 V116-, V117-, V119- und V120-Anschluss pruefen: `V119.1` ist harte Evidence-Baseline; `V120.99` bleibt nur fuer CLI-only Memory soft, wird aber fuer Graph-RAG-, semantische Such- oder Ruflo-RAG-Nutzung zum Gate.
 - [ ] 122.1.2 Entscheiden, ob Memory als eigener aktiver Block startet oder als V120-Folge nach Graph-RAG; Empfehlung und Gegenargumente dokumentieren.
 - [ ] 122.1.3 Ruflo-Dokumentation aktuell pruefen, Installationsmodi klassifizieren und Full-Init-Risiko gegen Repo-Governance abgrenzen.
 - [ ] 122.1.4 Zweckklasse fuer jede neue dauerhafte Datei festhalten: `plan`, `reference`, `governance`, `evidence` oder `tooling`.
@@ -424,6 +425,7 @@ goal: Repo-Memory als sicheres Tool fuer Agents anbieten
 output: optionaler MCP-Server ohne Schreibtools
 
 - [ ] 122.5.1 Entscheiden, ob MCP im aktiven Block noetig ist oder ob CLI fuer den ersten Rollout reicht.
+- [ ] 122.5.1a Vor MCP-Umsetzung pruefen, ob der MCP nur deterministische CLI-Memory-Treffer ausliefert. Sobald Graph-RAG-Evidence-Pakete, semantisches Ranking oder RAG-Kontext integriert werden, ist `V120.99` oder ein explizites V120-`fixture-ready`-Gate erforderlich.
 - [ ] 122.5.2 `scripts/agent-memory-mcp.mjs` nur mit read-only Tools implementieren.
 - [ ] 122.5.3 MCP-Tool-Ausgaben klein, source-backed und statusmarkiert halten.
 - [ ] 122.5.4 Schreibtools bewusst ausschliessen oder nur als spaeteres `propose_add` planen.
@@ -435,6 +437,7 @@ goal: Ruflo als externen Review-/Orchestrierungs-Layer bewerten, ohne Repo-Gover
 output: Sandbox-Report und Go/No-Go fuer MCP-Integration
 
 - [ ] 122.6.1 Ruflo-Version, Installationsweg, Dateiauswirkungen und MCP-Tools erneut aktuell pruefen.
+- [ ] 122.6.1a Ruflo-Orchestrierung mit Graph-RAG- oder Evidence-Paket-Kontext erst nach `V120.99` oder explizitem V120-`fixture-ready`-Gate planen; vorher nur isolierte Sandbox-Bewertung ohne Repo-Rueckschreibung.
 - [ ] 122.6.2 Sandbox- oder separaten Worktree-Pfad definieren; kein Full-Init im aktiven Hauptrepo.
 - [ ] 122.6.3 Zwei Testfragen ausfuehren: Architektur-Review und Testlueckenanalyse, jeweils mit vorherigem Repo-Memory-/Graph-Kontext.
 - [ ] 122.6.4 Ergebnisse nur als Bericht oder proposed Memory behandeln; keine automatische Rueckschreibung.
@@ -447,6 +450,7 @@ output: klare Folgeentscheidungen fuer Ruflo-Cache und semantische Suche
 
 - [ ] 122.7.1 Regel fuer Repo -> Ruflo Spiegel definieren: selektiv, kurz, verified-only, niemals automatisch umgekehrt.
 - [ ] 122.7.2 Semantische Suche nur als Backlog markieren und an V120-Outputs koppeln.
+- [ ] 122.7.2a Semantische Memory-Suche nicht im CLI-MVP bauen; sie bleibt ein Folgepfad nach stabilem V120-Output.
 - [ ] 122.7.3 Kriterien definieren, wann Embeddings noetig sind: Suchtrefferqualitaet, Memory-Groesse, Query-Latenz, Review-Aufwand.
 - [ ] 122.7.4 Lokale Embedding-/Vector-Pfade nicht im MVP bauen.
 - [ ] 122.7.5 Loesch-/Deprecation- und Source-Staleness-Report als spaeteres Wartungsfenster planen.
@@ -493,6 +497,6 @@ output: uebergabefaehiger Memory-/Orchestrierungs-Schnitt
 - Ziel-Masterplan: `docs/Umsetzungsplan.md`
 - vorgeschlagene Block-ID: `V122`
 - vorgeschlagene kanonische Datei nach Intake: `docs/plaene/aktiv/V122.md`
-- hard dependencies: `V116.99`, `V117.99`
-- soft dependencies: `V119.1`, `V120.99`
+- hard dependencies: `V116.99`, `V117.99`, `V119.1`
+- soft dependencies: `V120.99` fuer CLI-only Memory; hard gate fuer semantische Suche, Graph-RAG-Evidence-Pakete oder Ruflo-Orchestrierung mit RAG-Kontext
 - Manuelle Uebernahme erforderlich: Dieser Draft darf nicht automatisch in den Master oder in `docs/plaene/aktiv/` uebernommen werden.

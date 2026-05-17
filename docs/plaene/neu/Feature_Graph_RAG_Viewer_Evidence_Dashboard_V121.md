@@ -203,7 +203,7 @@ Regeln:
 
 ## Definition of Done
 
-- [ ] DoD.1 V120 ist abgeschlossen oder liefert stabile Evidence-/Export-Fixtures, die V121 ohne Kernumbau konsumieren kann.
+- [ ] DoD.1 V120 ist abgeschlossen. Ein frueherer V121-Start ist nur erlaubt, wenn der aktive V120-Block vorher ein explizites `fixture-ready`-Gate mit Evidence-Paket, Graph-RAG-Query-Ausgabe, LLM-/Adapter-Smoke-Status und Cache-/Export-Regeln dokumentiert.
 - [ ] DoD.2 Viewer-Export-Vertrag `graph-rag.viewer-export.v1` ist definiert und durch Contract-Test validiert.
 - [ ] DoD.3 `scripts/graph-rag-viewer-export.mjs` erzeugt einen default-redacted Export unter `tmp/graph-rag/viewer/`, ohne getrackte Cache-/Export-Artefakte.
 - [ ] DoD.4 `tools/graph-rag-viewer/index.html`, `viewer.js`, `viewer.css` stellen Graph-, RAG-, Evidence-, Safety- und Adapter-Status read-only dar.
@@ -305,7 +305,8 @@ output: verifizierter Abschluss
 
 ## Dependencies
 
-- hard: `V120.99` oder stabile V120-Fixtures fuer Evidence-Paket, Graph-RAG-Query und lokale LLM-/Adapter-Smoke-Ergebnisse.
+- hard: `V120.99`.
+- optional early-start gate: Nur wenn der aktive V120-Block ein explizites `fixture-ready`-Gate mit Evidence-Paket, Graph-RAG-Query-Ausgabe, lokaler LLM-/Adapter-Smoke-Evidence und Cache-/Export-Regeln dokumentiert, darf V121 vor `V120.99` als Fixture-Consumer starten.
 - hard: `V107.99`, `V110.99`, `V111.99` als historische Graph-/Export-/Safety-Basis.
 - phase gate: V120 muss entscheiden, wo Evidence-Pakete, Cache/Index und lokale Reports liegen, bevor V121 diese anzeigt.
 - soft: `V116.99` fuer Kontext-/Archivhygiene.
@@ -328,6 +329,7 @@ output: verifizierter Abschluss
 - vorgeschlagene Block-ID: `V121`
 - vorgeschlagene kanonische Blockdatei: `docs/plaene/aktiv/V121.md`
 - hard dependencies: `V120.99`, `V107.99`, `V110.99`, `V111.99`
+- optional early-start gate: nur bei explizitem V120-`fixture-ready`-Gate mit dokumentierten Fixture-Artefakten und Export-/Cache-Regeln
 - soft dependencies: `V116.99`, `V119.99`
 - historische Referenzen: V107/V111 Viewer-Reste
 - Hinweis: Bis zur aktiven Uebernahme in `docs/Umsetzungsplan.md` und `docs/generated/knowledge-graph.json` sind Graph-Dependency-Signale zu `V121` nicht aussagekraeftig.

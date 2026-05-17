@@ -1,5 +1,5 @@
 ---
-planned_block_id: V119
+planned_block_id: V124
 title: Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet
 status: draft
 priority: P2
@@ -32,7 +32,7 @@ scope_files:
   - docs/referenz/ai_project_onboarding.md
   - docs/prozess/Open_Findings.md
   - .agents/test_mapping.md
-  - docs/plaene/aktiv/V119.md
+  - docs/plaene/aktiv/V124.md
   - docs/plaene/CHANGELOG.md
 scope_overlap_allowed_with:
   - V96
@@ -50,10 +50,10 @@ verification:
   - npm run docs:sync
   - npm run docs:check
 source_history:
-  - docs/plaene/neu/Feature_Wissensgraph_Produktsemantik_Ausbau_V119.md
+  - docs/plaene/neu/Feature_Wissensgraph_Produktsemantik_Ausbau_V124.md
 ---
 
-# Feature: Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet (V119)
+# Feature: Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet (V124)
 
 ## Ziel
 
@@ -105,8 +105,8 @@ Der Fokus liegt nicht auf mehr Graph-Tooling, sondern auf mehr belastbarem Spiel
 ## Vorgeschlagene Block-ID und Intake
 
 - Ziel-Masterplan: `docs/Umsetzungsplan.md`
-- Vorgeschlagene Block-ID: `V119`
-- Geplante aktive Datei nach User-Intake: `docs/plaene/aktiv/V119.md`
+- Vorgeschlagene Block-ID: `V124`
+- Geplante aktive Datei nach User-Intake: `docs/plaene/aktiv/V124.md`
 - Dieser Draft bleibt bis zur manuellen Uebernahme unter `docs/plaene/neu/`.
 - Manuelle Uebernahme erforderlich: Master-Index und aktive Blockdatei werden nicht automatisch geaendert.
 
@@ -125,7 +125,7 @@ Der Fokus liegt nicht auf mehr Graph-Tooling, sondern auf mehr belastbarem Spiel
 - `V106.99`: Liefert Map-/Authoring-/GLB-Semantik.
 - `V113.99`: Liefert Hangar-/Rules-Panel- und Mode-Regel-Semantik.
 
-V119 kann als Planung nach `V111.99` vorbereitet werden. Die groesste Produktwirkung entsteht aber, wenn mindestens `V112`-Ergebnisse als erste Harvest-Quelle verfuegbar sind.
+V124 kann als Planung nach `V111.99` vorbereitet werden. Die groesste Produktwirkung entsteht aber, wenn mindestens `V112`-Ergebnisse als erste Harvest-Quelle verfuegbar sind.
 
 ## Decision-Klasse und AI-Ausfuehrungsmatrix
 
@@ -135,7 +135,7 @@ V119 kann als Planung nach `V111.99` vorbereitet werden. Die groesste Produktwir
 | Mapping-Ergaenzungen in `data/contracts/knowledge-graph/**` | D2 | [REVIEW] | Nur nach klarer Query-/Evidence-Begruendung |
 | Builder-/Query-/Check-Aenderungen | D2/D3 | [REVIEW] | Nur wenn Mapping allein die Frage nicht loest |
 | Masterplan, aktive Blockdatei, Rule-/Workflow-Aenderungen | D3 | [USER-GATE] | Keine automatische Umsetzung |
-| Produktcode-, Physik-, UI-, Bot-, Training-, Recording- oder Multiplayer-Aenderungen | D4 falls Teil dieses Blocks | [USER-GATE] | In V119 grundsaetzlich Nicht-Ziel |
+| Produktcode-, Physik-, UI-, Bot-, Training-, Recording- oder Multiplayer-Aenderungen | D4 falls Teil dieses Blocks | [USER-GATE] | In V124 grundsaetzlich Nicht-Ziel |
 
 ## Definition of Done
 
@@ -168,7 +168,7 @@ V119 kann als Planung nach `V111.99` vorbereitet werden. Die groesste Produktwir
 | Manuelle Kanten erzeugen Scheingenauigkeit | hoch | Confidence/sourceKind, Provenance und Review-Gates fuer kritische Kanten |
 | Plan-/Governance-Rauschen ueberdeckt Produktantworten | mittel | Produktive Query-Sicht und Filterprofile |
 | Coverage-Ratchet fuehrt zu oberflaechlicher Scheinabdeckung | mittel | Top-Hotspot-Priorisierung und Ausschlussbegruendung statt Quote um jeden Preis |
-| V119 kollidiert mit V112/V96/V106/V113 | mittel | Harvest-/Handoff-Phasen, keine produktiven Code-Aenderungen |
+| V124 kollidiert mit V112/V96/V106/V113 | mittel | Harvest-/Handoff-Phasen, keine produktiven Code-Aenderungen |
 | Query-Outputs werden zu breit | mittel | Presets und Default-Minimierung; Details nur per `--json`/erweitertem Profil |
 | Builder-/Check-Aenderungen destabilisieren bestehende Gates | mittel | Mapping-first, kleine Contract-Tests, `graph:slo` vor Abschluss |
 | Bot-Training-Wissen wird versehentlich in Master-Governance gezogen | mittel | Nur Handoff-Kanten fuer produktive Runtime-/Terminal-Vertraege; Bot-Master bleibt separat |
@@ -284,7 +284,7 @@ node scripts/query-knowledge-graph.mjs test-prioritization src/core/InputManager
 ## Intake-Hinweis fuer den User
 
 - Dieser Draft ist bewusst ausfuehrlich, aber noch kein aktiver Masterplan-Block.
-- Fuer Intake in den Master bitte `V119` oder eine andere freie Block-ID bestaetigen.
-- Bei Intake sollte `V119` als P2 geplant werden, mit `V107.99`, `V110.99`, `V111.99` als harte Dependencies und `V112`, `V96`, `V106`, `V113` als weiche Harvest-Quellen.
+- Fuer Intake in den Master bitte `V124` oder eine andere freie Block-ID bestaetigen.
+- Bei Intake sollte `V124` als P2 geplant werden, mit `V107.99`, `V110.99`, `V111.99` als harte Dependencies und `V112`, `V96`, `V106`, `V113` als weiche Harvest-Quellen.
 - Empfohlener Startzeitpunkt: nach oder parallel zu den ersten abgeschlossenen V112-Slices, damit der Graph echte Playtest-/Audit-Semantik statt abstrakter Wunschkanten bekommt.
-- Manuelle Uebernahme erforderlich: erst nach User-Entscheidung in `docs/Umsetzungsplan.md` und `docs/plaene/aktiv/V119.md` ueberfuehren.
+- Manuelle Uebernahme erforderlich: erst nach User-Entscheidung in `docs/Umsetzungsplan.md` und `docs/plaene/aktiv/V124.md` ueberfuehren.

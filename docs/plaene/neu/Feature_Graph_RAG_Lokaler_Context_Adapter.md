@@ -1,7 +1,16 @@
+---
+title: Graph-RAG mit lokalem Context-Adapter
+status: superseded
+planned_block_id: V120
+superseded_by: docs/plaene/aktiv/V120.md
+archive_read_rule: only-for-history-or-intake-trace
+updated_at: 2026-05-17
+---
+
 # Feature: Graph-RAG mit lokalem Context-Adapter
 
 Stand: 2026-05-15
-Status: Entwurf
+Status: abgeloest durch `docs/plaene/aktiv/V120.md`
 Owner: Codex
 Risiko: mittel
 plan_file: `docs/plaene/aktiv/V120.md`
