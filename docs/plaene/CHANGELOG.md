@@ -701,3 +701,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `116.3` ist geschlossen: Der Standard-Leseweg bleibt `AGENTS.md` -> passende Rules/Workflows -> Master-Index -> aktive Detaildatei; `CLAUDE.md` und `.gemini/README.md` sind nur Adapter, keine konkurrierenden Governance-Quellen.
 - Neu als nachhaltige Gate-Schaerfung: Vor D3-/D4-Freigaben und in `[REVIEW]`-/`[USER-GATE]`-Phasen muessen betroffene Dateien/Oberflaechen als `no-op`, `read-only evidence`, `optional` oder `edit required` klassifiziert werden; die Freigabe umfasst nur `edit required`.
 - `npm run check:agent-context` prueft den Leseweg, Adapter-Prioritaet, Nicht-Standardkontext-Zonen und optionale `CURRENT_CONTEXT.md`-Grenzen. `CURRENT_CONTEXT.md` wurde bewusst nicht angelegt; das Gate akzeptiert `currentContext=absent` und verhindert spaeter Plan-/Master-Duplikation.
+
+## Plan-Intake 2026-05-17 (Block `V125`)
+
+- `V125` ist als geplanter P1-Architektur-Compliance-Block im Master und in `docs/plaene/aktiv/V125.md` angelegt: Zweck ist die Verankerung von Architektur-Capsule, staged Architecture Guard, Acceptance-Regeln und Ratchet-/Boundary-Evidence fuer Folgearbeit.
+- Scope bleibt Governance-/Guard-Haertung; produktiver Runtime-, UI-, Multiplayer-, Recording-, Physik- oder Bot-Training-Code ist explizit nicht Teil dieses Plan-Slices.
+- Commit-/Gate-Signal fuer den Intake-Slice: `npm run plan:check` und `npm run gates:pre-commit`; Restrisiko bleibt die spaetere User-Gate-Freigabe fuer konkrete V125-Phasen mit Rule-, Workflow-, Hook- oder Budget-Aenderungen.

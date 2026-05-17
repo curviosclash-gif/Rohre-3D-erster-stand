@@ -60,6 +60,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V116 | Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung | active | P1 | frei | V109.99,V117.99,V115.99 | 116.4 | `docs/plaene/aktiv/V116.md` |
 | V119 | Planabschluss-Evidence-Remediation und Git-Historienabgleich | planned | P1 | frei | V117.99 | 119.1 | `docs/plaene/aktiv/V119.md` |
 | V123 | AI-optimierter Plan-Index und Source-of-Truth-Migration | planned | P1 | frei | V116.4,V119.1 | 123.1 | `docs/plaene/aktiv/V123.md` |
+| V125 | Architektur-Compliance fuer Folgearbeit | planned | P1 | frei | V91.99,V104.99,V117.99 | 125.1 | `docs/plaene/aktiv/V125.md` |
 | V120 | Graph-RAG mit lokalem Context-Adapter | planned | P1 | frei | V107.99,V110.99,V111.99 | 120.1 | `docs/plaene/aktiv/V120.md` |
 | V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.1 | `docs/plaene/aktiv/V121.md` |
 | V122 | Repo-natives Agent-Memory und externe Ruflo-Orchestrierung | planned | P2 | frei | V116.99,V117.99,V119.1 | 122.1 | `docs/plaene/aktiv/V122.md` |
@@ -111,6 +112,9 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V120 | V111.99 | hard | ja | Adaptive Query-, Safety-, Scorecard- und Feedback-Mechanik ist Grundlage fuer Evidence-Pakete und lokale Adapter |
 | V123 | V116.4 | hard | ja | Plan-Kontext-Klassifikation und AI-Leseweg bilden die Baseline fuer den strukturierten Plan-Index-Pilot |
 | V123 | V119.1 | hard | nein | Evidence-/Abschluss-Baseline soll historische Drift vor Source-of-Truth-Entscheidungen sichtbar machen |
+| V125 | V91.99 | hard | ja | Architektur-Ratchet und Legacy-Surface-Matrix sind die Baseline fuer die Workflow- und Guard-Verankerung |
+| V125 | V104.99 | hard | ja | God-Object-/Port-Zuschnitt liefert den aktuellen Contract-/Snapshot-/Intent-Port-Zielpfad fuer Folgearbeit |
+| V125 | V117.99 | hard | ja | AI Decision Framework und D3/D4-Gates begrenzen Governance-, Workflow- und Hook-Aenderungen |
 | V121 | V120.99 | hard | nein | Viewer bleibt Consumer von stabilen Graph-RAG-Evidence-Paketen oder einem explizit dokumentierten V120-`fixture-ready`-Gate |
 | V121 | V107.99 | hard | ja | Core-Graph und Export-/Viewer-Historie bilden die technische Basis |
 | V121 | V110.99 | hard | ja | Graph-Ops-, Guard- und SLO-Basis bleibt Voraussetzung fuer sichere Viewer-Exports |
@@ -149,6 +153,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | codex | V116 | 2026-05-15 | active | 116.4 Plan-Kontext |
 | - | V119 | - | frei | Geplant |
 | - | V123 | - | frei | Geplant |
+| - | V125 | - | frei | Geplant |
 | - | V120 | - | frei | Geplant |
 | - | V121 | - | frei | Geplant |
 | - | V122 | - | frei | Geplant |
@@ -166,15 +171,16 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 1. `V116` (Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung) als P1-Kontextfenster bis mindestens `116.4`, besser bis zur V118-Finalisierung in `116.8`, bevor neue breite Plan-/Agentenarbeit startet.
 2. `V119` (Planabschluss-Evidence-Remediation und Git-Historienabgleich) mit `119.1` vor neuen breiten Abschlussclaims abschliessen, damit erledigte Plaene formal nachgezogen oder bewusst als historische Restwidersprueche dokumentiert sind.
 3. `V123` (AI-optimierter Plan-Index und Source-of-Truth-Migration) als strukturierter Pilot nach `V116.4` und `V119.1`, bevor ein kanonischer Quellenwechsel entschieden wird.
-4. `V120` (Graph-RAG mit lokalem Context-Adapter) nach `V116.3/116.4` und mindestens `V119.1` als Token-/Kontexthebel fuer anschliessende breite Agenten-, Audit- und Boundary-Arbeit.
-5. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) erst nach `V120.99` oder einem expliziten V120-`fixture-ready`-Gate als read-only Consumer starten.
-6. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) nach V116/V119; vor `V120.99` nur als kleines CLI-only Memory-MVP, Graph-RAG-/Ruflo-Kontext erst danach.
-7. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) als geretteter Produktsemantik-Folgeblock; groesster Nutzen nach ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113.
-8. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
-9. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
-10. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
-11. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
-12. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
+4. `V125` (Architektur-Compliance fuer Folgearbeit) nach V91/V104/V117 als Governance-/Guard-Haertung starten, bevor neue breite Feature- oder Boundary-Arbeit weitere Architekturpfade aufweitet.
+5. `V120` (Graph-RAG mit lokalem Context-Adapter) nach `V116.3/116.4` und mindestens `V119.1` als Token-/Kontexthebel fuer anschliessende breite Agenten-, Audit- und Boundary-Arbeit.
+6. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) erst nach `V120.99` oder einem expliziten V120-`fixture-ready`-Gate als read-only Consumer starten.
+7. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) nach V116/V119; vor `V120.99` nur als kleines CLI-only Memory-MVP, Graph-RAG-/Ruflo-Kontext erst danach.
+8. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) als geretteter Produktsemantik-Folgeblock; groesster Nutzen nach ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113.
+9. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
+10. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
+11. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
+12. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
+13. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
 
 ## Conflict-Log
 

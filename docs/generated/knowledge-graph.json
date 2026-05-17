@@ -1122,6 +1122,7 @@
           "V113",
           "V116",
           "V123",
+          "V125",
           "V90",
           "V96"
         ],
@@ -1355,6 +1356,7 @@
           "V119",
           "V120",
           "V123",
+          "V125",
           "V90"
         ],
         "unknownFrontmatterFields": [
@@ -1453,6 +1455,7 @@
           "V116",
           "V120",
           "V123",
+          "V125",
           "V96"
         ],
         "unknownFrontmatterFields": []
@@ -1503,7 +1506,8 @@
         "scopeOverlapAllowedWith": [
           "V116",
           "V119",
-          "V123"
+          "V123",
+          "V125"
         ],
         "unknownFrontmatterFields": [
           "scope_reference_files"
@@ -1634,6 +1638,7 @@
           "V119",
           "V120",
           "V121",
+          "V125",
           "V90"
         ],
         "unknownFrontmatterFields": [
@@ -1677,6 +1682,73 @@
         "unknownFrontmatterFields": [
           "scope_reference_files",
           "soft_depends_on"
+        ]
+      }
+    },
+    {
+      "id": "V125",
+      "type": "block",
+      "title": "Architektur-Compliance fuer Folgearbeit",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "currentPhase": "125.1",
+        "planFile": "docs/plaene/aktiv/V125.md",
+        "scopeDeclarations": [
+          ".agents/rules/code_quality_and_debugging.md",
+          ".agents/rules/planning_and_governance.md",
+          ".agents/test_mapping.md",
+          ".agents/workflows/bugfix.md",
+          ".agents/workflows/code.md",
+          ".agents/workflows/fix-planung.md",
+          ".agents/workflows/performance.md",
+          ".agents/workflows/plan.md",
+          ".agents/workflows/quick.md",
+          ".agents/workflows/refactor.md",
+          ".husky/pre-commit",
+          "AGENTS.md",
+          "docs/plaene/aktiv/V125.md",
+          "docs/plaene/CHANGELOG.md",
+          "docs/referenz/ai_architecture_context.md",
+          "docs/referenz/ai_project_onboarding.md",
+          "docs/referenz/architektur_ausfuehrlich.md",
+          "docs/Umsetzungsplan.md",
+          "package.json",
+          "scripts/architecture/architecture-budget-ratchet.json",
+          "scripts/architecture/ArchitectureAnalysis.mjs",
+          "scripts/architecture/ArchitectureConfig.mjs",
+          "scripts/check-architecture-boundaries.mjs",
+          "scripts/check-architecture-metrics.mjs",
+          "scripts/check-architecture-ratchet.mjs",
+          "scripts/check-architecture-staged.mjs",
+          "scripts/check-architecture-touched-strict.mjs",
+          "scripts/check-plan-evidence-claims.mjs",
+          "scripts/validate-umsetzungsplan.mjs",
+          "tests/agent-governance.contract.test.mjs",
+          "tests/architecture-governance.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 29,
+          "plannedCount": 2
+        },
+        "scopeOverlapAllowedWith": [
+          "V112",
+          "V116",
+          "V117",
+          "V119",
+          "V120",
+          "V123",
+          "V124",
+          "V90",
+          "V96"
+        ],
+        "unknownFrontmatterFields": [
+          "scope_reference_files"
         ]
       }
     },
@@ -2393,7 +2465,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 320,
+          "concreteCount": 321,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2843,6 +2915,7 @@
           "V114",
           "V116",
           "V123",
+          "V125",
           "V96"
         ],
         "unknownFrontmatterFields": []
@@ -3138,6 +3211,7 @@
           "V114",
           "V115",
           "V119",
+          "V125",
           "V90"
         ],
         "unknownFrontmatterFields": []
@@ -4797,6 +4871,66 @@
       "attributes": {
         "blockId": "V124",
         "phaseCode": "124.99"
+      }
+    },
+    {
+      "id": "V125.1",
+      "type": "phase",
+      "title": "Workflow- und Rule-Verankerung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.1"
+      }
+    },
+    {
+      "id": "V125.2",
+      "type": "phase",
+      "title": "Plan-Acceptance und Evidence-Regeln",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.2"
+      }
+    },
+    {
+      "id": "V125.3",
+      "type": "phase",
+      "title": "Staged Architecture Guard",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.3"
+      }
+    },
+    {
+      "id": "V125.4",
+      "type": "phase",
+      "title": "ArchitectureAnalysis Boundary-Ausbau",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.4"
+      }
+    },
+    {
+      "id": "V125.5",
+      "type": "phase",
+      "title": "Ratchet- und Test-Haertung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.5"
+      }
+    },
+    {
+      "id": "V125.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.99"
       }
     },
     {
@@ -13052,6 +13186,270 @@
         "blockId": "V124",
         "phaseCode": "124.99",
         "subphaseCode": "124.99.5"
+      }
+    },
+    {
+      "id": "V125.1.1",
+      "type": "subphase",
+      "title": "`code_quality_and_debugging.md` ergaenzen: neue Featurepfade nutzen Contracts, Commands, Snapshots, Ports oder Capabilities statt neue Runtime-/Global-Surfaces.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.1",
+        "subphaseCode": "125.1.1"
+      }
+    },
+    {
+      "id": "V125.1.2",
+      "type": "subphase",
+      "title": "`code.md` auf die Capsule vereinheitlichen, ohne den bestehenden Startcheck zu duplizieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.1",
+        "subphaseCode": "125.1.2"
+      }
+    },
+    {
+      "id": "V125.1.3",
+      "type": "subphase",
+      "title": "`quick.md` um Eskalationsregel ergaenzen: neue Dependency-Kanten, Legacy-Surfaces, Runtime-Globals oder Application/UI/Core-Grenzen verlassen Quick.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.1",
+        "subphaseCode": "125.1.3"
+      }
+    },
+    {
+      "id": "V125.1.4",
+      "type": "subphase",
+      "title": "`bugfix.md`, `refactor.md`, `performance.md` und `fix-planung.md` um denselben architekturrelevanten Mindestcheck ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.1",
+        "subphaseCode": "125.1.4"
+      }
+    },
+    {
+      "id": "V125.2.1",
+      "type": "subphase",
+      "title": "`plan.md` um die Architecture-Acceptance-Sektion fuer Code-/Runtime-Scope ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.2",
+        "subphaseCode": "125.2.1"
+      }
+    },
+    {
+      "id": "V125.2.2",
+      "type": "subphase",
+      "title": "`validate-umsetzungsplan.mjs` oder `check-plan-evidence-claims.mjs` als Warn-/Report-Signal vorbereiten, wenn aktive Code-Plaene keine Acceptance-Sektion haben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.2",
+        "subphaseCode": "125.2.2"
+      }
+    },
+    {
+      "id": "V125.2.3",
+      "type": "subphase",
+      "title": "Abschlussclaims zu Architektur nur mit konkreter Guard-, Metrics-, Ratchet- oder Contract-Evidence erlauben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.2",
+        "subphaseCode": "125.2.3"
+      }
+    },
+    {
+      "id": "V125.2.4",
+      "type": "subphase",
+      "title": "Bestehende offene Bloecke wie V96, V112, V113 und V124 als Kandidaten fuer spaetere Acceptance-Nachschaerfung klassifizieren, aber nicht automatisch umschreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.2",
+        "subphaseCode": "125.2.4"
+      }
+    },
+    {
+      "id": "V125.3.1",
+      "type": "subphase",
+      "title": "`scripts/check-architecture-staged.mjs` anlegen: staged files klassifizieren und passende Checks auswaehlen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.3",
+        "subphaseCode": "125.3.1"
+      }
+    },
+    {
+      "id": "V125.3.2",
+      "type": "subphase",
+      "title": "`package.json` um `check:architecture:staged` ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.3",
+        "subphaseCode": "125.3.2"
+      }
+    },
+    {
+      "id": "V125.3.3",
+      "type": "subphase",
+      "title": "`.husky/pre-commit` fuer Architektur-Scope auf den staged Guard umstellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.3",
+        "subphaseCode": "125.3.3"
+      }
+    },
+    {
+      "id": "V125.3.4",
+      "type": "subphase",
+      "title": "Guard-Routing dokumentieren: `src` -> touched-strict, `scripts/architecture` -> boundaries/metrics/ratchet, `application` -> Application-Boundary, `electron/platform` -> Capability-/Global-Surface-Scan.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.3",
+        "subphaseCode": "125.3.4"
+      }
+    },
+    {
+      "id": "V125.4.1",
+      "type": "subphase",
+      "title": "`ArchitectureAnalysis.mjs` um `electron/**` als Source-Root oder gesonderten Scan erweitern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.4",
+        "subphaseCode": "125.4.1"
+      }
+    },
+    {
+      "id": "V125.4.2",
+      "type": "subphase",
+      "title": "`application -> ui` und `application -> core` als eigene Findings und Scorecard-Felder erfassen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.4",
+        "subphaseCode": "125.4.2"
+      }
+    },
+    {
+      "id": "V125.4.3",
+      "type": "subphase",
+      "title": "`ArchitectureConfig.mjs` um erlaubte Restkanten mit Begruendung erweitern, ohne neue Ausnahmen generisch zu erlauben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.4",
+        "subphaseCode": "125.4.3"
+      }
+    },
+    {
+      "id": "V125.4.4",
+      "type": "subphase",
+      "title": "`check:architecture:boundaries`, `metrics`, `ratchet` und `touched-strict` um die neuen Kategorien spiegeln.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.4",
+        "subphaseCode": "125.4.4"
+      }
+    },
+    {
+      "id": "V125.5.1",
+      "type": "subphase",
+      "title": "`curviosApp`-Budget von 3 auf aktuellen Iststand senken oder bewusst als offenes Drift-Fenster dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.5",
+        "subphaseCode": "125.5.1"
+      }
+    },
+    {
+      "id": "V125.5.2",
+      "type": "subphase",
+      "title": "DOM- und Metrics-/Ratchet-Budgetquellen abgleichen, sodass Reports nicht unterschiedliche Budgets zeigen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.5",
+        "subphaseCode": "125.5.2"
+      }
+    },
+    {
+      "id": "V125.5.3",
+      "type": "subphase",
+      "title": "`tests/architecture-governance.contract.test.mjs` fuer staged Guard Routing und Application-Kanten anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.5",
+        "subphaseCode": "125.5.3"
+      }
+    },
+    {
+      "id": "V125.5.4",
+      "type": "subphase",
+      "title": "`tests/agent-governance.contract.test.mjs` oder passenden Test erweitern: Workflows muessen Architektur-Capsule/Eskalationsregeln enthalten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.5",
+        "subphaseCode": "125.5.4"
+      }
+    },
+    {
+      "id": "V125.99.1",
+      "type": "subphase",
+      "title": "`npm run plan:check`, relevante `check:architecture:*`-Gates und `check:architecture:staged` sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.99",
+        "subphaseCode": "125.99.1"
+      }
+    },
+    {
+      "id": "V125.99.2",
+      "type": "subphase",
+      "title": "Relevante Governance-/Architecture-Contracttests sind gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.99",
+        "subphaseCode": "125.99.2"
+      }
+    },
+    {
+      "id": "V125.99.3",
+      "type": "subphase",
+      "title": "`npm run gates:pre-commit` ist gruen oder Graph-/Fremddiff-Restrisiko ist explizit als nicht eigener Blocker dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.99",
+        "subphaseCode": "125.99.3"
+      }
+    },
+    {
+      "id": "V125.99.4",
+      "type": "subphase",
+      "title": "Master, Blockfile und passende Abschlussnotiz nennen Purpose, Effekt, Not-checked und verbleibende Risiken.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.99",
+        "subphaseCode": "125.99.4"
       }
     },
     {
@@ -21692,6 +22090,7 @@
         ],
         "scopeBlocks": [
           "V117",
+          "V125",
           "V93"
         ],
         "exists": true
@@ -21728,6 +22127,7 @@
           "V116",
           "V117",
           "V123",
+          "V125",
           "V93",
           "V94"
         ],
@@ -21783,6 +22183,7 @@
         "scopeBlocks": [
           "V104",
           "V112",
+          "V125",
           "V88",
           "V89",
           "V90",
@@ -21821,6 +22222,7 @@
         "scopeBlocks": [
           "V109",
           "V117",
+          "V125",
           "V93"
         ],
         "exists": true
@@ -21855,6 +22257,7 @@
           "V116",
           "V117",
           "V123",
+          "V125",
           "V93",
           "V94"
         ],
@@ -21873,7 +22276,23 @@
         "scopeBlocks": [
           "V109",
           "V116",
+          "V125",
           "V93"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": ".agents/workflows/performance.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V125"
         ],
         "exists": true
       }
@@ -21892,6 +22311,7 @@
           "V116",
           "V117",
           "V123",
+          "V125",
           "V93",
           "V94"
         ],
@@ -21910,7 +22330,23 @@
         "scopeBlocks": [
           "V109",
           "V117",
+          "V125",
           "V93"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": ".agents/workflows/refactor.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V125"
         ],
         "exists": true
       }
@@ -22104,6 +22540,21 @@
       }
     },
     {
+      "id": ".husky/pre-commit",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V125"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "AGENTS.md",
       "type": "file",
       "title": null,
@@ -22116,6 +22567,7 @@
           "V116",
           "V117",
           "V123",
+          "V125",
           "V93"
         ],
         "exists": true
@@ -25097,6 +25549,22 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V125.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V125",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V64.md",
       "type": "file",
       "title": null,
@@ -26570,6 +27038,7 @@
           "V119",
           "V120",
           "V123",
+          "V125",
           "V77",
           "V93"
         ],
@@ -27772,6 +28241,7 @@
           "V110",
           "V111",
           "V114",
+          "V125",
           "V74",
           "V77",
           "V83",
@@ -27806,6 +28276,7 @@
           "V111",
           "V116",
           "V117",
+          "V125",
           "V89",
           "V91"
         ],
@@ -27824,7 +28295,8 @@
         "scopeBlocks": [
           "V107",
           "V110",
-          "V111"
+          "V111",
+          "V125"
         ],
         "exists": true
       }
@@ -27862,6 +28334,7 @@
           "V119",
           "V120",
           "V123",
+          "V125",
           "V51",
           "V69",
           "V89",
@@ -28998,6 +29471,7 @@
           "V116",
           "V117",
           "V123",
+          "V125",
           "V75",
           "V87",
           "V88",
@@ -29316,6 +29790,7 @@
         "scopeBlocks": [
           "B13",
           "V104",
+          "V125",
           "V96"
         ],
         "exists": true
@@ -29333,6 +29808,7 @@
         ],
         "scopeBlocks": [
           "B13",
+          "V125",
           "V96"
         ],
         "exists": true
@@ -29350,6 +29826,7 @@
         ],
         "scopeBlocks": [
           "B13",
+          "V125",
           "V96"
         ],
         "exists": true
@@ -29553,6 +30030,7 @@
         "scopeBlocks": [
           "B13",
           "V104",
+          "V125",
           "V91",
           "V92",
           "V96"
@@ -29573,6 +30051,7 @@
         "scopeBlocks": [
           "B13",
           "V104",
+          "V125",
           "V91",
           "V96"
         ],
@@ -29592,11 +30071,27 @@
         "scopeBlocks": [
           "B13",
           "V104",
+          "V125",
           "V91",
           "V92",
           "V96"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "scripts/check-architecture-staged.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V125"
+        ],
+        "exists": false
       }
     },
     {
@@ -29611,6 +30106,7 @@
         ],
         "scopeBlocks": [
           "B13",
+          "V125",
           "V91",
           "V96"
         ],
@@ -29731,7 +30227,8 @@
         "scopeBlocks": [
           "B13",
           "V117",
-          "V119"
+          "V119",
+          "V125"
         ],
         "exists": true
       }
@@ -30601,7 +31098,8 @@
         "scopeBlocks": [
           "B13",
           "V116",
-          "V123"
+          "V123",
+          "V125"
         ],
         "exists": true
       }
@@ -41425,10 +41923,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V125"
         ],
         "exists": true
       }
@@ -41527,6 +42027,21 @@
           "V113"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "tests/architecture-governance.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V125"
+        ],
+        "exists": false
       }
     },
     {
@@ -67564,6 +68079,663 @@
       }
     },
     {
+      "from": "V125",
+      "to": ".agents/rules/code_quality_and_debugging.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": ".agents/rules/planning_and_governance.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": ".agents/test_mapping.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": ".agents/workflows/bugfix.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": ".agents/workflows/code.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": ".agents/workflows/fix-planung.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": ".agents/workflows/performance.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": ".agents/workflows/plan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": ".agents/workflows/quick.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": ".agents/workflows/refactor.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": ".husky/pre-commit",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "AGENTS.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "docs/plaene/aktiv/V125.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "docs/referenz/ai_project_onboarding.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "docs/referenz/architektur_ausfuehrlich.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "docs/Umsetzungsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "scripts/architecture/architecture-budget-ratchet.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "scripts/architecture/ArchitectureAnalysis.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "scripts/architecture/ArchitectureConfig.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "scripts/check-architecture-boundaries.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "scripts/check-architecture-metrics.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "scripts/check-architecture-ratchet.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "scripts/check-architecture-staged.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "scripts/check-architecture-touched-strict.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "scripts/check-plan-evidence-claims.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "scripts/validate-umsetzungsplan.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "tests/agent-governance.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "tests/architecture-governance.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "V104",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "God-Object-/Port-Zuschnitt liefert den aktuellen Contract-/Snapshot-/Intent-Port-Zielpfad fuer Folgearbeit",
+      "attributes": {
+        "dependsPhase": "104.99",
+        "rawToken": "V104.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V125",
+      "to": "V117",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "AI Decision Framework und D3/D4-Gates begrenzen Governance-, Workflow- und Hook-Aenderungen",
+      "attributes": {
+        "dependsPhase": "117.99",
+        "rawToken": "V117.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V125",
+      "to": "V125.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.1"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "V125.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.2"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "V125.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.3"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "V125.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.4"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "V125.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.5"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "V125.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.99"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "V91",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Architektur-Ratchet und Legacy-Surface-Matrix sind die Baseline fuer die Workflow- und Guard-Verankerung",
+      "attributes": {
+        "dependsPhase": "91.99",
+        "rawToken": "V91.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V125.1",
+      "to": "V125.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.1",
+        "subphaseCode": "125.1.1"
+      }
+    },
+    {
+      "from": "V125.1",
+      "to": "V125.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.1",
+        "subphaseCode": "125.1.2"
+      }
+    },
+    {
+      "from": "V125.1",
+      "to": "V125.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.1",
+        "subphaseCode": "125.1.3"
+      }
+    },
+    {
+      "from": "V125.1",
+      "to": "V125.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.1",
+        "subphaseCode": "125.1.4"
+      }
+    },
+    {
+      "from": "V125.2",
+      "to": "V125.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.2",
+        "subphaseCode": "125.2.1"
+      }
+    },
+    {
+      "from": "V125.2",
+      "to": "V125.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.2",
+        "subphaseCode": "125.2.2"
+      }
+    },
+    {
+      "from": "V125.2",
+      "to": "V125.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.2",
+        "subphaseCode": "125.2.3"
+      }
+    },
+    {
+      "from": "V125.2",
+      "to": "V125.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.2",
+        "subphaseCode": "125.2.4"
+      }
+    },
+    {
+      "from": "V125.3",
+      "to": "V125.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.3",
+        "subphaseCode": "125.3.1"
+      }
+    },
+    {
+      "from": "V125.3",
+      "to": "V125.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.3",
+        "subphaseCode": "125.3.2"
+      }
+    },
+    {
+      "from": "V125.3",
+      "to": "V125.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.3",
+        "subphaseCode": "125.3.3"
+      }
+    },
+    {
+      "from": "V125.3",
+      "to": "V125.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.3",
+        "subphaseCode": "125.3.4"
+      }
+    },
+    {
+      "from": "V125.4",
+      "to": "V125.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.4",
+        "subphaseCode": "125.4.1"
+      }
+    },
+    {
+      "from": "V125.4",
+      "to": "V125.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.4",
+        "subphaseCode": "125.4.2"
+      }
+    },
+    {
+      "from": "V125.4",
+      "to": "V125.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.4",
+        "subphaseCode": "125.4.3"
+      }
+    },
+    {
+      "from": "V125.4",
+      "to": "V125.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.4",
+        "subphaseCode": "125.4.4"
+      }
+    },
+    {
+      "from": "V125.5",
+      "to": "V125.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.5",
+        "subphaseCode": "125.5.1"
+      }
+    },
+    {
+      "from": "V125.5",
+      "to": "V125.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.5",
+        "subphaseCode": "125.5.2"
+      }
+    },
+    {
+      "from": "V125.5",
+      "to": "V125.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.5",
+        "subphaseCode": "125.5.3"
+      }
+    },
+    {
+      "from": "V125.5",
+      "to": "V125.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.5",
+        "subphaseCode": "125.5.4"
+      }
+    },
+    {
+      "from": "V125.99",
+      "to": "V125.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.99",
+        "subphaseCode": "125.99.1"
+      }
+    },
+    {
+      "from": "V125.99",
+      "to": "V125.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.99",
+        "subphaseCode": "125.99.2"
+      }
+    },
+    {
+      "from": "V125.99",
+      "to": "V125.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.99",
+        "subphaseCode": "125.99.3"
+      }
+    },
+    {
+      "from": "V125.99",
+      "to": "V125.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V125",
+        "phaseCode": "125.99",
+        "subphaseCode": "125.99.4"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -77742,6 +78914,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/aktiv/V124.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V125.md",
       "type": "scope",
       "hint": null,
       "attributes": {

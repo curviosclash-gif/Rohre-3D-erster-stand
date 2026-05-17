@@ -156,20 +156,20 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1868,
-    "rawCoveredFileCount": 1217,
-    "rawCoveragePercent": 65.1,
-    "adjustedTrackedFileCount": 1373,
-    "adjustedCoveredFileCount": 1020,
+    "trackedFileCount": 1869,
+    "rawCoveredFileCount": 1221,
+    "rawCoveragePercent": 65.3,
+    "adjustedTrackedFileCount": 1374,
+    "adjustedCoveredFileCount": 1021,
     "adjustedCoveragePercent": 74.3,
-    "uncoveredFileCount": 651,
+    "uncoveredFileCount": 648,
     "uncoveredActiveFileCount": 353,
     "classifications": [
       {
         "classification": "agent-workflow",
         "excludedFromCoverage": true,
         "count": 19,
-        "coveredCount": 9
+        "coveredCount": 11
       },
       {
         "classification": "archive",
@@ -216,8 +216,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 349,
-        "coveredCount": 157
+        "count": 350,
+        "coveredCount": 158
       },
       {
         "classification": "prototype",
@@ -229,7 +229,7 @@
         "classification": "repo-ops",
         "excludedFromCoverage": true,
         "count": 5,
-        "coveredCount": 1
+        "coveredCount": 2
       },
       {
         "classification": "temp",
@@ -270,6 +270,7 @@
       ],
       "scopeBlocks": [
         "V117",
+        "V125",
         "V93"
       ],
       "surfaces": [],
@@ -310,6 +311,7 @@
         "V116",
         "V117",
         "V123",
+        "V125",
         "V93",
         "V94"
       ],
@@ -449,6 +451,7 @@
       "scopeBlocks": [
         "V104",
         "V112",
+        "V125",
         "V88",
         "V89",
         "V90",
@@ -543,6 +546,7 @@
       "scopeBlocks": [
         "V109",
         "V117",
+        "V125",
         "V93"
       ],
       "surfaces": [],
@@ -581,6 +585,7 @@
         "V116",
         "V117",
         "V123",
+        "V125",
         "V93",
         "V94"
       ],
@@ -601,6 +606,7 @@
       "scopeBlocks": [
         "V109",
         "V116",
+        "V125",
         "V93"
       ],
       "surfaces": [],
@@ -624,11 +630,15 @@
     {
       "path": ".agents/workflows/performance.md",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V125"
+      ],
       "surfaces": [],
       "classification": "agent-workflow",
       "excludedFromCoverage": true,
@@ -648,6 +658,7 @@
         "V116",
         "V117",
         "V123",
+        "V125",
         "V93",
         "V94"
       ],
@@ -668,6 +679,7 @@
       "scopeBlocks": [
         "V109",
         "V117",
+        "V125",
         "V93"
       ],
       "surfaces": [],
@@ -678,11 +690,15 @@
     {
       "path": ".agents/workflows/refactor.md",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V125"
+      ],
       "surfaces": [],
       "classification": "agent-workflow",
       "excludedFromCoverage": true,
@@ -1046,11 +1062,15 @@
     {
       "path": ".husky/pre-commit",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V125"
+      ],
       "surfaces": [],
       "classification": "repo-ops",
       "excludedFromCoverage": true,
@@ -1082,6 +1102,7 @@
         "V116",
         "V117",
         "V123",
+        "V125",
         "V93"
       ],
       "surfaces": [],
@@ -10072,6 +10093,24 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V125.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V125",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V64.md",
       "tracked": true,
       "coveredInCore": true,
@@ -11733,6 +11772,7 @@
         "V119",
         "V120",
         "V123",
+        "V125",
         "V77",
         "V93"
       ],
@@ -13191,6 +13231,7 @@
         "V110",
         "V111",
         "V114",
+        "V125",
         "V74",
         "V77",
         "V83",
@@ -13227,6 +13268,7 @@
         "V111",
         "V116",
         "V117",
+        "V125",
         "V89",
         "V91"
       ],
@@ -13247,7 +13289,8 @@
       "scopeBlocks": [
         "V107",
         "V110",
-        "V111"
+        "V111",
+        "V125"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -13380,6 +13423,7 @@
         "V119",
         "V120",
         "V123",
+        "V125",
         "V51",
         "V69",
         "V89",
@@ -14645,6 +14689,7 @@
         "V116",
         "V117",
         "V123",
+        "V125",
         "V75",
         "V87",
         "V88",
@@ -16747,6 +16792,7 @@
       "scopeBlocks": [
         "B13",
         "V104",
+        "V125",
         "V96"
       ],
       "surfaces": [],
@@ -16766,6 +16812,7 @@
       ],
       "scopeBlocks": [
         "B13",
+        "V125",
         "V96"
       ],
       "surfaces": [],
@@ -16785,6 +16832,7 @@
       ],
       "scopeBlocks": [
         "B13",
+        "V125",
         "V96"
       ],
       "surfaces": [],
@@ -16995,6 +17043,7 @@
       "scopeBlocks": [
         "B13",
         "V104",
+        "V125",
         "V91",
         "V92",
         "V96"
@@ -17017,6 +17066,7 @@
       "scopeBlocks": [
         "B13",
         "V104",
+        "V125",
         "V91",
         "V96"
       ],
@@ -17038,6 +17088,7 @@
       "scopeBlocks": [
         "B13",
         "V104",
+        "V125",
         "V91",
         "V92",
         "V96"
@@ -17059,6 +17110,7 @@
       ],
       "scopeBlocks": [
         "B13",
+        "V125",
         "V91",
         "V96"
       ],
@@ -17193,7 +17245,8 @@
       "scopeBlocks": [
         "B13",
         "V117",
-        "V119"
+        "V119",
+        "V125"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -18053,7 +18106,8 @@
       "scopeBlocks": [
         "B13",
         "V116",
-        "V123"
+        "V123",
+        "V125"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30236,10 +30290,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V125"
       ],
       "surfaces": [],
       "classification": "product-code",
