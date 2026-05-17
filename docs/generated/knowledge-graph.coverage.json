@@ -156,12 +156,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1872,
-    "rawCoveredFileCount": 1224,
+    "trackedFileCount": 1871,
+    "rawCoveredFileCount": 1223,
     "rawCoveragePercent": 65.4,
-    "adjustedTrackedFileCount": 1377,
-    "adjustedCoveredFileCount": 1024,
-    "adjustedCoveragePercent": 74.4,
+    "adjustedTrackedFileCount": 1376,
+    "adjustedCoveredFileCount": 1023,
+    "adjustedCoveragePercent": 74.3,
     "uncoveredFileCount": 648,
     "uncoveredActiveFileCount": 353,
     "classifications": [
@@ -216,8 +216,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 353,
-        "coveredCount": 161
+        "count": 352,
+        "coveredCount": 160
       },
       {
         "classification": "prototype",
@@ -12634,23 +12634,6 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Local_Dev_API_Preview_Tooling_Delivery_Hardening_V126.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

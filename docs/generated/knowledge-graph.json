@@ -2508,7 +2508,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 324,
+          "concreteCount": 323,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -28210,21 +28210,6 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V77"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "docs/plaene/neu/Feature_Local_Dev_API_Preview_Tooling_Delivery_Hardening_V126.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -81190,15 +81175,6 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
-      "to": "docs/plaene/neu/Feature_Local_Dev_API_Preview_Tooling_Delivery_Hardening_V126.md",
       "type": "scope",
       "hint": null,
       "attributes": {
