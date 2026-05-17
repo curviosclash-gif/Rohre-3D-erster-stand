@@ -3,7 +3,7 @@ description: Pruefe den zuletzt abgeschlossenen Plan gruendlich gegen Ziele, Evi
 ---
 // turbo
 
-Zweck: Den letzten fachlich abgeschlossenen Planblock auf Vollstaendigkeit pruefen, ohne Abschlussclaims automatisch zu korrigieren. Der Workflow erzeugt einen belastbaren Analysebericht mit konkreten Verbesserungsvorschlaegen.
+Zweck: Den letzten fachlich abgeschlossenen Planblock auf Vollstaendigkeit pruefen, ohne Abschlussclaims automatisch zu korrigieren. Der Workflow erzeugt einen belastbaren Analysebericht mit konkreten Verbesserungsvorschlaegen und einer moeglichst tiefen Codepruefung der planrelevanten Aenderungen.
 
 Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_and_commits.md`, `.agents/rules/token_efficiency_and_tools.md`.
 
@@ -80,6 +80,54 @@ Gruendlich pruefen, aber Ergebnisse kompakt halten:
 - Dead-Code-/Legacy-Regeln: kein Sunset-Claim ohne Nachfolger- und Konsumentenbeleg.
 - Folgeblock-Risiko: offene Findings muessen entweder als Follow-up, Intake, Risiko oder bewusster Nicht-Scope sichtbar sein.
 
+## 5. Codepruefung
+
+Die Codepruefung ist Pflicht, sobald der abgeschlossene Plan `src/`, `tests/`, `scripts/`, `electron/`, `editor/`, `data/` oder runtime-nahe Konfiguration beruehrt. Sie bleibt planbezogen, soll aber so tief wie praktikabel sein.
+
+### 5.1 Code-Scope bilden
+
+- Aus `scope_files`, relevanten Commits und Graph-Impact eine Code-Dateiliste bilden.
+- Fuer jeden relevanten Commit mindestens `git show --stat --summary <commit>` und `git show --name-only <commit>` lesen.
+- Fuer zentrale oder riskante Commits die Diffs lesen: `git show --find-renames --find-copies --stat --patch <commit> -- <relevante_pfade>`.
+- Wenn ein Commit sehr gross ist, nach Verantwortung schneiden: Runtime, UI, Tests, Scripts, Daten/Contracts, Electron, Editor.
+- Nicht nur Dateien mit Planbezug pruefen: auch direkt mitgeaenderte Tests, Contracts, Fixtures, JSON-Daten und Scripts lesen.
+- Bei unklarer Wirkung `node scripts/query-knowledge-graph.mjs impact-for-file <path> --json`, `event-flow`, `critical-path-health` oder `coverage-report` nutzen.
+
+### 5.2 Review-Fragen
+
+Code wie in einem Review gegen den Plan lesen:
+
+- Erfuellt der produktive Pfad wirklich das DoD oder nur ein Test-/Adapter-/Doku-Pfad?
+- Gibt es neue Bypaesse, globale Zugriffe, Fallbacks, Legacy-Shims oder parallele Alternativpfade?
+- Sind State-, Lifecycle-, Async-, Dispose-, Event- und Fehlerpfade stabil?
+- Sind Inputs, Grenzen, Security-/Path-/HTML-/IPC-/Network-Risiken und Datenmigrationen abgesichert?
+- Sind Contracts, Versionen, Schema-/Descriptor-/Preset-Felder und Migrationspfade konsistent?
+- Sind Tests nah genug am produktiven Pfad, oder pruefen sie nur isolierte Helfer?
+- Gibt es fehlende negative Tests, Regression-Tests oder Ratchets fuer das konkret behobene Risiko?
+- Ist Desktop-App-Verhalten primaer abgesichert und Demo-/Browser-Verhalten korrekt abgegrenzt?
+- Entstehen Performance-, Speicher-, Rebuild-, Listener-, Timer- oder Resource-Leak-Risiken?
+- Sind Fehlerbehandlung, Logging und Diagnostics hilfreich, ohne sensible Daten oder Rauschen zu erzeugen?
+- Gibt es Code, der den Plan zwar schliesst, aber Folgeblock-Arbeit erschwert oder verdeckte technische Schuld erzeugt?
+
+### 5.3 Code-Findings
+
+Findings muessen konkrete Datei-/Zeilen- oder Commit-Belege haben:
+
+- `P0`: produktiver Bug, Security-/Datenverlust-Risiko, Abschlussziel real nicht erfuellt.
+- `P1`: plausibler Runtime-/Lifecycle-/Contract-Bug oder fehlender Test fuer kritischen Pfad.
+- `P2`: Wartbarkeits-, Edge-Case-, Test- oder Legacy-Risiko mit begrenztem Blast-Radius.
+- `P3`: Lesbarkeit, kleine Nachschaerfung oder bessere Diagnose.
+
+Wenn keine Code-Findings gefunden werden, explizit sagen: `Keine planrelevanten Code-Findings gefunden`, plus verbleibende Test-/Review-Grenzen.
+
+### 5.4 Test- und Gate-Abgleich
+
+- Aus `.agents/test_mapping.md` nur die fuer die beruehrten Codepfade passenden Tests bestimmen.
+- Gelaufene Tests nur als Evidence zaehlen, wenn Ergebnis und Zeitpunkt klar sind.
+- Nicht gelaufene, aber naheliegende Tests als `not-checked` oder Verbesserungsvorschlag nennen.
+- Keine Voll-Suite automatisch starten, ausser der User hat das explizit erlaubt oder der Abschluss-Gate es verlangt.
+- Bei Testluecken unterscheiden: `missing-test`, `deferred-test`, `weak-test`, `wrong-layer-test`, `stale-test`.
+
 Bei Widerspruechen keine Plaene aendern. Findings nach Schwere sortieren:
 
 - `P0`: Abschlussclaim fachlich falsch oder produktiver Pfad unbewiesen.
@@ -87,7 +135,7 @@ Bei Widerspruechen keine Plaene aendern. Findings nach Schwere sortieren:
 - `P2`: Evidence unvollstaendig, aber Ziel wahrscheinlich erfuellt.
 - `P3`: Dokumentationsschaerfung oder bessere Nachvollziehbarkeit.
 
-## 5. Verbesserungsvorschlaege
+## 6. Verbesserungsvorschlaege
 
 Jeder Vorschlag braucht:
 
@@ -100,7 +148,7 @@ Jeder Vorschlag braucht:
 
 Keine neue aktive Planarbeit erfinden. Wenn ein Follow-up noetig ist, bevorzugt einen Intake-Vorschlag unter `docs/plaene/neu/` nur nach User-Gate; im Analysebericht reicht eine konkrete Draft-Empfehlung.
 
-## 6. Verifikation
+## 7. Verifikation
 
 Read-only Abschluss:
 
@@ -110,7 +158,7 @@ Read-only Abschluss:
 
 Wenn ein Report unter `tmp/` geschrieben wurde, im Final den Pfad nennen. Wenn keine Datei geschrieben wurde, Findings direkt im Chat ausgeben.
 
-## 7. Reportformat
+## 8. Reportformat
 
 Standardformat:
 
@@ -132,6 +180,12 @@ Git-Abgleich:
 - Relevante Commits: <hashes/messages>
 - Scope-Abdeckung: <kurz>
 - Nicht belegte Claims: <kurz oder none>
+
+Codepruefung:
+- Gepruefte Codepfade: <src/tests/scripts/...>
+- Diff-/Commit-Review: <kurz>
+- Code-Findings: <P0-P3 oder none>
+- Testabdeckung: <gelaufen / naheliegend nicht gelaufen / Luecken>
 
 Verbesserungsvorschlaege:
 - <Vorschlag> (Klasse: <...>, Gate: <...>, Risiko wenn offen: <...>)
