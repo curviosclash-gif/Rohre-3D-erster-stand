@@ -8,6 +8,7 @@ import { resolveDevLayoutRelativePath } from '../scripts/dev-layout-paths.mjs';
 
 const execFileAsync = promisify(execFile);
 const LATEST_INDEX_PATH = 'data/training/runs/latest.json';
+const LATEST_LOCK_DIR = 'tmp';
 const LATEST_LOCK_PATH = 'tmp/test-latest-index.lock';
 const TRAINING_RUN_SCRIPT = resolveDevLayoutRelativePath('scripts', 'training-run.mjs');
 const TRAINING_EVAL_SCRIPT = resolveDevLayoutRelativePath('scripts', 'training-eval.mjs');
@@ -42,6 +43,7 @@ async function acquireLatestIndexLock(timeoutMs = 30000) {
     const startedAt = Date.now();
     while ((Date.now() - startedAt) < timeoutMs) {
         try {
+            await mkdir(LATEST_LOCK_DIR, { recursive: true });
             await mkdir(LATEST_LOCK_PATH);
             return async () => {
                 await rm(LATEST_LOCK_PATH, { recursive: true, force: true });

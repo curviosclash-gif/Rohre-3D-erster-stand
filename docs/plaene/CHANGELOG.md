@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## CI-Fix 2026-05-17 (Workflow `bugfix`)
+
+- Ursache fuer das rote GitHub-X auf `origin/main`: `tests/training-gate.test.mjs` legte den Lock `tmp/test-latest-index.lock` direkt an, waehrend der frische GitHub-Actions-Checkout den Parent-Ordner `tmp/` nicht mitbrachte.
+- Fixpfad: Der Test-Helfer erstellt `tmp/` vor dem exklusiven Lock-Mkdir rekursiv und behaelt den Lock selbst als kollisionsfaehigen Ordner bei. Zweck: `Run Node Contract Tests` soll in CI wieder reproduzierbar starten, ohne produktive Training-Logik zu veraendern.
+
 ## Governance-Notiz 2026-05-17 (Workflow `abschluss-analyse`)
 
 - Neuer Workflow `.agents/workflows/abschluss-analyse.md` definiert einen read-only-first Analysepfad, um den zuletzt abgeschlossenen Plan gruendlich gegen Master, Blockfile, Changelog, Git-Historie, Scope-Dateien, DoD, `*.99`-Gate und Evidence-Qualitaet zu pruefen.
