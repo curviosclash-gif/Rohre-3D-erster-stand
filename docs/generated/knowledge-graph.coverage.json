@@ -155,19 +155,19 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1862,
+    "trackedFileCount": 1863,
     "rawCoveredFileCount": 1212,
     "rawCoveragePercent": 65.1,
     "adjustedTrackedFileCount": 1381,
     "adjustedCoveredFileCount": 1028,
     "adjustedCoveragePercent": 74.4,
-    "uncoveredFileCount": 650,
+    "uncoveredFileCount": 651,
     "uncoveredActiveFileCount": 353,
     "classifications": [
       {
         "classification": "agent-workflow",
         "excludedFromCoverage": true,
-        "count": 18,
+        "count": 19,
         "coveredCount": 9
       },
       {
@@ -460,6 +460,19 @@
       "classification": "other",
       "excludedFromCoverage": false,
       "excludeReason": null
+    },
+    {
+      "path": ".agents/workflows/abschluss-analyse.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "agent-workflow",
+      "excludedFromCoverage": true,
+      "excludeReason": "Agent workflow documents are governance references, not product/code coverage targets."
     },
     {
       "path": ".agents/workflows/aktualitaet-check.md",
@@ -12545,7 +12558,7 @@
       "excludeReason": null
     },
     {
-      "path": "docs/plaene/neu/Feature_Wissensgraph_Produktsemantik_Ausbau_V119.md",
+      "path": "docs/plaene/neu/Feature_Wissensgraph_Produktsemantik_Ausbau_V124.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

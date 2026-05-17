@@ -6,6 +6,11 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Governance-Notiz 2026-05-17 (Workflow `abschluss-analyse`)
+
+- Neuer Workflow `.agents/workflows/abschluss-analyse.md` definiert einen read-only-first Analysepfad, um den zuletzt abgeschlossenen Plan gruendlich gegen Master, Blockfile, Changelog, Git-Historie, Scope-Dateien, DoD, `*.99`-Gate und Evidence-Qualitaet zu pruefen.
+- Zweck: Abschlussdrift und Claim-only-Evidence sichtbar machen, ohne historische Planstatus automatisch zu korrigieren; konkrete Verbesserungen werden nach Risiko, Evidence-Pfad, Decision-Klasse und kleinstem Gate vorgeschlagen.
+
 ## Stand-Snapshot 2026-05-16 (Intake `V123 123.1`)
 
 - Neuer geplanter P1-Block `V123` ist nach User-Freigabe im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V123.md`.

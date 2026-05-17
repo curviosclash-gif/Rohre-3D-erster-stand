@@ -31,6 +31,7 @@ Policy-Details werden nicht in AGENTS.md wiederholt. Bei Konflikt gewinnt die Ru
 | Phasenausfuehrung aus Master | `.agents/workflows/fix-planung.md` |
 | Bot-Training | `.agents/workflows/bot-training-plan.md` |
 | Freshness-Check/Sync | `.agents/workflows/aktualitaet-check.md` / `aktualitaet-sync.md` |
+| Abschlussanalyse letzter Plan | `.agents/workflows/abschluss-analyse.md` |
 | Cleanup/Refactor/Release | passender Workflow in `.agents/workflows/` |
 
 ## Plan-Einstieg
