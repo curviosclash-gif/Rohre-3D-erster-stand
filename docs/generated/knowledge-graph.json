@@ -1251,6 +1251,7 @@
           ".gemini/agents/test_engineer.md",
           ".gemini/skills/plan-generator/SKILL.md",
           "dev/scripts/verify-lock.mjs",
+          "docs/Fehlerberichte/2026-05-16_main-push-blocked-by-downloadservice-max-lines.md",
           "docs/generated/knowledge-graph.coverage.json",
           "docs/generated/knowledge-graph.json",
           "docs/plaene/aktiv/V115.md",
@@ -1272,7 +1273,7 @@
           "tests/playwright.global-setup.js"
         ],
         "scopeResolution": {
-          "concreteCount": 28,
+          "concreteCount": 29,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -22776,6 +22777,21 @@
         ],
         "scopeBlocks": [
           "V88"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/Fehlerberichte/2026-05-16_main-push-blocked-by-downloadservice-max-lines.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V115"
         ],
         "exists": true
       }
@@ -59707,6 +59723,15 @@
     {
       "from": "V115",
       "to": "dev/scripts/verify-lock.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V115",
+      "to": "docs/Fehlerberichte/2026-05-16_main-push-blocked-by-downloadservice-max-lines.md",
       "type": "scope",
       "hint": null,
       "attributes": {

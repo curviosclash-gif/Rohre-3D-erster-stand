@@ -155,11 +155,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1861,
-    "rawCoveredFileCount": 1211,
+    "trackedFileCount": 1862,
+    "rawCoveredFileCount": 1212,
     "rawCoveragePercent": 65.1,
-    "adjustedTrackedFileCount": 1380,
-    "adjustedCoveredFileCount": 1027,
+    "adjustedTrackedFileCount": 1381,
+    "adjustedCoveredFileCount": 1028,
     "adjustedCoveragePercent": 74.4,
     "uncoveredFileCount": 650,
     "uncoveredActiveFileCount": 353,
@@ -215,8 +215,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 356,
-        "coveredCount": 164
+        "count": 357,
+        "coveredCount": 165
       },
       {
         "classification": "prototype",
@@ -9335,6 +9335,23 @@
       "covered": false,
       "coverageSources": [],
       "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/Fehlerberichte/2026-05-16_main-push-blocked-by-downloadservice-max-lines.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V115"
+      ],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,

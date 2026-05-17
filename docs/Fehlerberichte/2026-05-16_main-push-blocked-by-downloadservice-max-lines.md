@@ -3,7 +3,7 @@
 - Datum: 2026-05-16
 - Block: repo-git/push
 - Phase: nach scoped Commit-Sicherung
-- Status: offen
+- Status: behoben lokal, Push-Retry ausstehend
 
 ## Aufgabe/Kontext
 
@@ -60,13 +60,13 @@ Tatsaechliches Verhalten:
 
 ## Aktueller Stand
 
-- Status: offen.
+- Status 2026-05-17: lokal behoben.
 - Worktree war nach den scoped Commits sauber.
-- Push wurde nicht durchgefuehrt, weil der lokale Hook rot ist.
-- Root-Cause-Stand: `DownloadService.js` ueberschreitet das Architektur-Lint-Limit knapp um 3 Zeilen. Der Fehler liegt ausserhalb der gerade committeden Plan-/Governance-Aenderungen.
+- Push wurde am 2026-05-16 nicht durchgefuehrt, weil der lokale Hook rot war.
+- Root-Cause-Stand: `DownloadService.js` ueberschritt das Architektur-Lint-Limit knapp um 3 Zeilen. Der Fehler lag ausserhalb der gerade committeden Plan-/Governance-Aenderungen.
+- Behebung: `src/core/recording/DownloadService.js` wurde ohne Verhaltensaenderung kompakter formatiert; `npx eslint src/core/recording/DownloadService.js --max-warnings 29` ist gruen.
 
 ## Naechster Schritt
 
-- Kleinen, separaten Scope fuer `src/core/recording/DownloadService.js` freigeben oder planen.
-- Ziel: Datei unter das 500-Zeilen-Limit bringen, ohne Recording-Verhalten zu aendern.
-- Danach `npm run lint:architecture` und anschliessend `git push origin main` erneut ausfuehren.
+- `npm run lint:architecture` und den `pre-push`-Hook erneut ausfuehren.
+- Bei gruenem Hook `git push origin main` erneut ausfuehren.

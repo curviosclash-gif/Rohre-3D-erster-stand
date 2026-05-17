@@ -1,22 +1,11 @@
 import { EDITOR_API_ROUTES } from '../../shared/contracts/EditorPathContract.js';
 import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
 import { PLATFORM_CAPABILITY_IDS } from '../../shared/contracts/PlatformCapabilityContract.js';
-import {
-    PLATFORM_PRODUCT_SURFACE_IDS,
-    resolveSurfaceCapabilityAccess,
-} from '../../shared/contracts/PlatformCapabilityRegistry.js';
-import {
-    PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS,
-    PLATFORM_SURFACE_FEATURE_IDS,
-    resolveSurfaceBlockedFeatureFeedback,
-    resolveSurfaceFeatureClassification,
-} from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import { PLATFORM_PRODUCT_SURFACE_IDS, resolveSurfaceCapabilityAccess } from '../../shared/contracts/PlatformCapabilityRegistry.js';
+import { PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS, PLATFORM_SURFACE_FEATURE_IDS, resolveSurfaceBlockedFeatureFeedback, resolveSurfaceFeatureClassification } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
 import { createElectronPreloadSaveAdapter } from '../../platform/electron/ElectronPlatformBridge.js';
-import {
-    createRecordingVideoExportRequest,
-    RECORDING_DESKTOP_SAVE_CAPABILITY_IDS,
-} from './RecordingVideoExportContract.js';
+import { createRecordingVideoExportRequest, RECORDING_DESKTOP_SAVE_CAPABILITY_IDS } from './RecordingVideoExportContract.js';
 
 const DESKTOP_SAVE_VERSION_FIELDS = Object.freeze(['contractVersion']);
 const DESKTOP_SAVE_SUPPORTED_VERSIONS = Object.freeze(['preload.save.v1', 'preload.save.v2']);
@@ -58,12 +47,8 @@ function createDownloadStatus({
     transcodeFailureCode = null,
 }) {
     const resolvedMasterContainer = String(masterContainer || container || '').trim();
-    const resolvedDeliveryContainer = String(
-        deliveryContainer || container || masterContainer || ''
-    ).trim();
-    const resolvedDeliveryPath = deliveryPath
-        ? String(deliveryPath)
-        : (filePath ? String(filePath) : null);
+    const resolvedDeliveryContainer = String(deliveryContainer || container || masterContainer || '').trim();
+    const resolvedDeliveryPath = deliveryPath ? String(deliveryPath) : (filePath ? String(filePath) : null);
     const resolvedMasterPath = masterPath
         ? String(masterPath)
         : (resolvedDeliveryPath && transcodeApplied !== true ? resolvedDeliveryPath : null);
@@ -86,12 +71,8 @@ function createDownloadStatus({
         deliveryPath: resolvedDeliveryPath,
         saveCapabilityId: String(saveCapabilityId || '').trim() || null,
         saveCode: String(saveCode || '').trim() || null,
-        exportMatrix: exportMatrix && typeof exportMatrix === 'object'
-            ? { ...exportMatrix }
-            : null,
-        nativeTranscodeCapability: nativeTranscodeCapability && typeof nativeTranscodeCapability === 'object'
-            ? { ...nativeTranscodeCapability }
-            : null,
+        exportMatrix: exportMatrix && typeof exportMatrix === 'object' ? { ...exportMatrix } : null,
+        nativeTranscodeCapability: nativeTranscodeCapability && typeof nativeTranscodeCapability === 'object' ? { ...nativeTranscodeCapability } : null,
         transcodeFailureCode: String(transcodeFailureCode || '').trim() || null,
     };
 }
