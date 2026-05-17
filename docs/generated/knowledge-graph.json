@@ -1299,7 +1299,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "116.4",
+        "currentPhase": "116.6",
         "planFile": "docs/plaene/aktiv/V116.md",
         "scopeDeclarations": [
           ".agents/rules/planning_and_governance.md",
@@ -4383,7 +4383,7 @@
       "id": "V116.5",
       "type": "phase",
       "title": "Governance- und Workflow-Straffung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.5"
@@ -10701,8 +10701,8 @@
     {
       "id": "V116.5.1",
       "type": "subphase",
-      "title": "`.agents/rules/token_efficiency_and_tools.md` mit der neuen KI-Kontext-Policy abgleichen: Archive nur bei Bedarf, Graph-First fuer Scope-/Runtime-Fragen, keine redundanten Reads.",
-      "status": "open",
+      "title": "`.agents/rules/token_efficiency_and_tools.md` mit der neuen KI-Kontext-Policy abgleichen: Archive nur bei Bedarf, Graph-First fuer Scope-/Runtime-Fragen, keine redundanten Reads. (abgeschlossen: 2026-05-17; evidence: no-op-first/read-only Abgleich: Rule enthaelt bereits Teilreads, keine redundanten Reads, Graph-First fuer Plan-/Runtimefragen und Meta-Produktion vermeiden; Archiv-/Altplan-Nicht-Standardkontext ist in V116/Onboarding/`check:agent-context` abgedeckt, daher kein Rule-Diff.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.5",
@@ -10723,8 +10723,8 @@
     {
       "id": "V116.5.3",
       "type": "subphase",
-      "title": "Dead-Code-, Git-, Lock- und Commit-Sicherungen unveraendert stark halten; keine Safety-Reduktion nur fuer kuerzere Prompts.",
-      "status": "open",
+      "title": "Dead-Code-, Git-, Lock- und Commit-Sicherungen unveraendert stark halten; keine Safety-Reduktion nur fuer kuerzere Prompts. (abgeschlossen: 2026-05-17; evidence: no-op-first/read-only Abgleich gegen `planning_and_governance.md`, `fix-planung.md` und vorhandene Workflow-Governance; D3/D4-, Dead-Code-, Lock-, Test-Ownership-, Commit- und Preflight-Sicherungen bleiben unveraendert, keine Kuerzung fuer Kontextreduktion.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.5",
@@ -10734,8 +10734,8 @@
     {
       "id": "V116.5.4",
       "type": "subphase",
-      "title": "`CLAUDE.md` und `.gemini/README.md` als Adapter fuer Tool-Spezifika behandeln, nicht als zweite oder dritte Projektwahrheit.",
-      "status": "open",
+      "title": "`CLAUDE.md` und `.gemini/README.md` als Adapter fuer Tool-Spezifika behandeln, nicht als zweite oder dritte Projektwahrheit. (abgeschlossen: 2026-05-17; evidence: `CLAUDE.md` nennt sich Legacy-Hinweisdatei und verweist verbindlich auf `AGENTS.md`/Rules; `.gemini/README.md` begrenzt Gemini auf repo-lokale Agenten-/Skill-Definitionen und gibt `AGENTS.md`, Rules und Workflows Vorrang; kein Adapter-Diff noetig.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.5",

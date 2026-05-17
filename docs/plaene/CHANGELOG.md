@@ -713,3 +713,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Der Master-Index verankert die naechste P1-Reihenfolge jetzt als `V116` Abschluss-/Park-Slice, kurze `V90` Audit-Baseline und danach `V126 126.1` als produktnahen Dev-API-/Preview-Hardening-Start.
 - `V126` bleibt nur hart von `V102.99` und `V105.99` abhaengig; `V90.2` und `V125.3` sind Soft-Koordination fuer Package-/Lockfile-/CI-Upgrades sowie neue Pflicht-Gates, Hooks oder Pre-Commit-Policy.
 - Das V126-Startgate erlaubt den Start vor vollstaendigem `V119`, `V123`, `V120` oder `V125`, solange keine historischen Evidence-, Source-of-Truth-, Graph- oder RAG-Abschlussclaims entstehen.
+
+## Stand-Snapshot 2026-05-17 (Subphase `V116 116.5`)
+
+- `116.5` ist no-op-first geschlossen: `token_efficiency_and_tools.md`, `CLAUDE.md` und `.gemini/README.md` decken Kontext-Policy und Adapter-Prinzip bereits ab; daher keine Rule-/Workflow-/Adapter-Diffs.
+- Safety blieb unverkuerzt: Dead-Code-, Git-, Lock-, Commit-, D3/D4- und Test-Ownership-Regeln wurden nur als Evidence abgeglichen, nicht reduziert.
+- Der Master-Index springt fuer V116 auf `116.6 Gate-Matrix`; der Draft `docs/plaene/neu/Feature_Agent_Skills_statt_Regeltext.md` bleibt bewusst ausserhalb des Master-Intakes.
