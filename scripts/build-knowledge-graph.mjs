@@ -77,7 +77,7 @@ const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
     },
     {
         classification: 'archive',
-        prefixes: ['archive/'],
+        prefixes: ['archive/', 'docs/plaene/alt/superseded-intakes-2026-05/'],
         excludedFromCoverage: true,
         reason: 'Archived snapshots are intentionally excluded from active coverage.',
     },

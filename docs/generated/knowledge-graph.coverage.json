@@ -78,7 +78,8 @@
     {
       "classification": "archive",
       "prefixes": [
-        "archive/"
+        "archive/",
+        "docs/plaene/alt/superseded-intakes-2026-05/"
       ],
       "excludedFromCoverage": true,
       "reason": "Archived snapshots are intentionally excluded from active coverage."
@@ -155,12 +156,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1866,
-    "rawCoveredFileCount": 1215,
+    "trackedFileCount": 1868,
+    "rawCoveredFileCount": 1217,
     "rawCoveragePercent": 65.1,
-    "adjustedTrackedFileCount": 1384,
-    "adjustedCoveredFileCount": 1031,
-    "adjustedCoveragePercent": 74.5,
+    "adjustedTrackedFileCount": 1373,
+    "adjustedCoveredFileCount": 1020,
+    "adjustedCoveragePercent": 74.3,
     "uncoveredFileCount": 651,
     "uncoveredActiveFileCount": 353,
     "classifications": [
@@ -173,8 +174,8 @@
       {
         "classification": "archive",
         "excludedFromCoverage": true,
-        "count": 6,
-        "coveredCount": 0
+        "count": 19,
+        "coveredCount": 13
       },
       {
         "classification": "asset",
@@ -215,8 +216,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 360,
-        "coveredCount": 168
+        "count": 349,
+        "coveredCount": 157
       },
       {
         "classification": "prototype",
@@ -9411,6 +9412,7 @@
         "V110",
         "V111",
         "V115",
+        "V116",
         "V120"
       ],
       "surfaces": [],
@@ -9433,6 +9435,7 @@
         "V110",
         "V111",
         "V115",
+        "V116",
         "V120",
         "V94"
       ],
@@ -9473,6 +9476,7 @@
       "scopeBlocks": [
         "V105",
         "V111",
+        "V116",
         "V120"
       ],
       "surfaces": [],
@@ -9630,6 +9634,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -9647,6 +9652,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -9666,6 +9672,7 @@
       "scopeBlocks": [
         "V102",
         "V110",
+        "V116",
         "V119",
         "V77"
       ],
@@ -9684,6 +9691,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -9720,6 +9728,7 @@
       "scopeBlocks": [
         "V105",
         "V110",
+        "V116",
         "V119",
         "V77"
       ],
@@ -9759,6 +9768,7 @@
       "scopeBlocks": [
         "V107",
         "V110",
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -9777,6 +9787,7 @@
       ],
       "scopeBlocks": [
         "V108",
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -9795,6 +9806,7 @@
       ],
       "scopeBlocks": [
         "V109",
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -9813,6 +9825,7 @@
       ],
       "scopeBlocks": [
         "V110",
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -9832,6 +9845,7 @@
       "scopeBlocks": [
         "V110",
         "V111",
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -9849,6 +9863,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -10317,6 +10332,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -10460,6 +10476,7 @@
       ],
       "scopeBlocks": [
         "V110",
+        "V116",
         "V77"
       ],
       "surfaces": [],
@@ -11279,12 +11296,247 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V116",
         "V77"
       ],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
       "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Arcade_Ghost_Selbstduell_Laengste_Spur_V108.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Architecture_Guard_Typecheck_Regression_Recovery_V105.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Architecture_TypeSafety_Contract_Hardening_V101.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Governance_Workflow_Masterplan_Entschlackung_V109.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Kompletter_Spielwissensgraph_V107.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Legacy_Runtime_Surface_Sunset_V91.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Security_Runtime_Contract_Hardening_V102.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Settings_Domain_Nachhaltigkeit_Erweiterungspfad_V103.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Wissensgraph_Adaptive_Intelligence_Ausbau_V111.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Wissensgraph_Ops_Guards_Haertung_V110.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
+    },
+    {
+      "path": "docs/plaene/alt/superseded-intakes-2026-05/README.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "archive",
+      "excludedFromCoverage": true,
+      "excludeReason": "Archived snapshots are intentionally excluded from active coverage."
     },
     {
       "path": "docs/plaene/alt/Umsetzungsplan_Abgeschlossene_Bloecke_V58-V70_2026-03-31.md",
@@ -11476,6 +11728,7 @@
         "V110",
         "V111",
         "V115",
+        "V116",
         "V117",
         "V119",
         "V120",
@@ -12220,57 +12473,6 @@
       "excludeReason": "Bot training data and plans are excluded from the main architecture graph."
     },
     {
-      "path": "docs/plaene/neu/Feature_Arcade_Ghost_Selbstduell_Laengste_Spur_V108.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Architecture_Guard_Typecheck_Regression_Recovery_V105.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Architecture_TypeSafety_Contract_Hardening_V101.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
       "path": "docs/plaene/neu/Feature_Architektur_Application_Boundaries_V96.md",
       "tracked": true,
       "coveredInCore": true,
@@ -12305,24 +12507,7 @@
       "excludeReason": null
     },
     {
-      "path": "docs/plaene/neu/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Governance_Workflow_Masterplan_Entschlackung_V109.md",
+      "path": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -12374,40 +12559,6 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Kompletter_Spielwissensgraph_V107.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Legacy_Runtime_Surface_Sunset_V91.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -12476,58 +12627,7 @@
       "excludeReason": null
     },
     {
-      "path": "docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
       "path": "docs/plaene/neu/Feature_Runtime_UI_Entflechtung_Slice_1.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Security_Runtime_Contract_Hardening_V102.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Settings_Domain_Nachhaltigkeit_Erweiterungspfad_V103.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -12562,40 +12662,6 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Wissensgraph_Adaptive_Intelligence_Ausbau_V111.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Wissensgraph_Ops_Guards_Haertung_V110.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -16851,6 +16917,7 @@
         "V107",
         "V110",
         "V111",
+        "V116",
         "V120",
         "V123",
         "V94"

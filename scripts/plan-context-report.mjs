@@ -11,6 +11,7 @@ const reportPath = path.resolve(
     ROOT,
     String(process.env.PLAN_CONTEXT_REPORT || 'tmp/plan-context-report.json').trim()
 );
+const COMPLETED_PLAN_STATUSES = new Set(['done', 'closed']);
 
 function normalizePath(value) {
     return String(value || '').replace(/\\/g, '/');
@@ -97,19 +98,36 @@ function parseFrontmatter(content) {
 function parseMasterPlan(content) {
     const planFileMatches = [...content.matchAll(/`(docs\/plaene\/aktiv\/V\d+\.md)`/g)]
         .map((match) => normalizePath(match[1]));
-    const blockMatches = [...content.matchAll(/\|\s*(V\d+)\s*\|[^|\n]*\|[^|\n]*\|[^|\n]*\|[^|\n]*\|([^|\n]*)\|[^|\n]*\|\s*`(docs\/plaene\/aktiv\/V\d+\.md)`\s*\|/g)];
+    const rows = content
+        .split(/\r?\n/)
+        .map((line) => line.match(/^\|\s*(V\d+)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]*?)\s*\|\s*([^|]+?)\s*\|\s*`(docs\/plaene\/aktiv\/V\d+\.md)`\s*\|$/))
+        .filter(Boolean)
+        .map((match) => ({
+            blockId: match[1],
+            title: match[2].trim(),
+            status: match[3].trim(),
+            priority: match[4].trim(),
+            owner: match[5].trim(),
+            dependsOn: match[6].trim(),
+            phase: match[7].trim(),
+            planFile: normalizePath(match[8]),
+        }));
     const dependencyIds = [...content.matchAll(/\b(V\d+)(?:\.\d+)?\b/g)].map((match) => match[1]);
 
     return {
         referencedPlanFiles: unique(planFileMatches),
         referencedBlockIds: unique(planFileMatches.map((file) => path.basename(file, '.md'))),
         dependencyIds: unique(dependencyIds),
-        rows: blockMatches.map((match) => ({
-            blockId: match[1],
-            dependsOn: match[2].trim(),
-            planFile: normalizePath(match[3]),
-        })),
+        rows,
     };
+}
+
+function masterRowFor(master, blockId) {
+    return master.rows.find((row) => row.blockId === blockId) || null;
+}
+
+function masterStatusFor(master, blockId) {
+    return String(masterRowFor(master, blockId)?.status || '').trim().toLowerCase();
 }
 
 function indexKnowledgeGraph(graph) {
@@ -219,8 +237,12 @@ function classifyIntakeDraft({ file, content, master }) {
 
     const masterHits = plannedBlockIds.filter((blockId) => master.referencedBlockIds.includes(blockId));
     if (masterHits.length > 0 && classification !== 'protected-bot-training-intake') {
-        classification = 'superseded-by-master-intake';
-        reasons.push(`Geplante Block-ID oder Dateiname ist bereits im Master referenziert: ${masterHits.join(', ')}.`);
+        const openMasterHits = masterHits.filter((blockId) => !COMPLETED_PLAN_STATUSES.has(masterStatusFor(master, blockId)));
+        classification = openMasterHits.length > 0
+            ? 'adopted-by-open-master-block'
+            : 'adopted-by-done-master-block';
+        const hitDetails = masterHits.map((blockId) => `${blockId}:${masterStatusFor(master, blockId) || 'unknown'}`);
+        reasons.push(`Geplante Block-ID oder Dateiname ist bereits im Master referenziert: ${hitDetails.join(', ')}.`);
     }
 
     if (masterHits.length > 0 && classification === 'protected-bot-training-intake') {
@@ -359,12 +381,20 @@ function printHumanSummary(report) {
         console.log(`[plan-context] archive-candidate ${item.path} :: ${item.reasons.join(' ')}`);
     }
 
-    const supersededDrafts = report.intakeDrafts.filter((item) => item.classification === 'superseded-by-master-intake');
-    for (const item of supersededDrafts.slice(0, 20)) {
-        console.log(`[plan-context] superseded-intake ${item.path} :: ${item.reasons.join(' ')}`);
+    const doneDrafts = report.intakeDrafts.filter((item) => item.classification === 'adopted-by-done-master-block');
+    for (const item of doneDrafts.slice(0, 20)) {
+        console.log(`[plan-context] adopted-done-intake ${item.path} :: ${item.reasons.join(' ')}`);
     }
-    if (supersededDrafts.length > 20) {
-        console.log(`[plan-context] superseded-intake more=${supersededDrafts.length - 20}`);
+    if (doneDrafts.length > 20) {
+        console.log(`[plan-context] adopted-done-intake more=${doneDrafts.length - 20}`);
+    }
+
+    const openDrafts = report.intakeDrafts.filter((item) => item.classification === 'adopted-by-open-master-block');
+    for (const item of openDrafts.slice(0, 20)) {
+        console.log(`[plan-context] adopted-open-intake ${item.path} :: ${item.reasons.join(' ')}`);
+    }
+    if (openDrafts.length > 20) {
+        console.log(`[plan-context] adopted-open-intake more=${openDrafts.length - 20}`);
     }
 
     for (const violation of report.violations) {

@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-17 (Subphase `V116 116.4` Done-Intake-Archivierung)
+
+- `plan-context-report` trennt uebernommene Intake-Drafts jetzt nach Master-Status: `adopted-by-done-master-block` fuer erledigte Zielbloecke und `adopted-by-open-master-block` fuer geplante, aktive oder blockierte Zielbloecke.
+- Nach User-Gate `los` wurden 12 erledigt adoptierte Intake-Drafts nach `docs/plaene/alt/superseded-intakes-2026-05/` verschoben; der Archivindex nennt Klassifikation, V116-Report, kanonische `docs/plaene/aktiv/VXX.md`-Quelle und Read-Regel.
+- Bewusst nicht verschoben: 10 offen adoptierte Drafts, darunter V112, V116, V120, V121, V122 und V124; sie bleiben in `docs/plaene/neu/`, bis ihr Zielblock geschlossen oder separat entschieden ist. Bot-Training-Drafts bleiben geschuetzt.
+- `source_history` der erledigten aktiven Plaene verweist jetzt auf die Archivpfade. `V112` wurde statusseitig an den Master angeglichen (`planned`, Dependencies erfuellt), ohne eine V112-Umsetzungsphase als erledigt zu markieren.
+
 ## CI-Fix 2026-05-17 (Workflow `bugfix`)
 
 - Ursache fuer das rote GitHub-X auf `origin/main`: `tests/training-gate.test.mjs` legte den Lock `tmp/test-latest-index.lock` direkt an, waehrend der frische GitHub-Actions-Checkout den Parent-Ordner `tmp/` nicht mitbrachte.
@@ -260,7 +267,7 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 ## Stand-Snapshot 2026-04-24 (Deep-Code-Analyse Integration)
 
 - Deep-Code-Analyse-Befunde wurden als neue Follow-up-Punkte `P41` bis `P46` in `docs/Umsetzungsplan.md` verankert (Traversal-Hardening, XSS-Renderpfade ausserhalb Discovery, sync-I/O-Blocker, LAN-Body-Limits, Hotspot-Komplexitaet, Tooling-Abdeckung).
-- Neuer Intake-Entwurf `docs/plaene/neu/Feature_Security_Runtime_Contract_Hardening_V102.md` ist als uebernahmefaehiger Vorschlag fuer einen dedizierten Hardening-Block angelegt.
+- Neuer Intake-Entwurf `docs/plaene/alt/superseded-intakes-2026-05/Feature_Security_Runtime_Contract_Hardening_V102.md` ist als uebernahmefaehiger Vorschlag fuer einen dedizierten Hardening-Block angelegt.
 - Priorisierte Intake-Reihenfolge im Master wurde entsprechend erweitert: `V99 -> V100 -> V102`.
 
 ## Stand-Snapshot 2026-04-20 (Intake V98)
@@ -287,8 +294,8 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 
 - Architektur-Grenzen bleiben formal eingehalten (`check:architecture:boundaries` gruen, keine neuen disallowed edges), aber mehrere Legacy-Budgets laufen am aktuellen Ratchet-Limit.
 - Neue Audit-Hotspots wurden als umsetzbare Backlog-Eintraege `P32` bis `P40` in `docs/Umsetzungsplan.md` aufgenommen (LAN-Kapazitaet/Endpoint-Rollen, Polling-Backlog, UI-Injection-Pfad, Sync-IPC, Contract-Hotspots, Typecheck-Rotstand).
-- Der bestehende Intake-Entwurf `docs/plaene/neu/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md` wurde auf LAN-Hardening erweitert (Kapazitaets- und Rollen-Guards, Polling-Timeout/Inflight-Guards, sichere Discovery-UI-Renderpfade).
-- Neuer Intake-Entwurf `docs/plaene/neu/Feature_Architecture_TypeSafety_Contract_Hardening_V101.md` fuehrt den Type-Safety-/Lint-Hardening-Scope fuer den roten Architektur-Typecheck und die uebergrossen Contract-Dateien.
+- Der bestehende Intake-Entwurf `docs/plaene/alt/superseded-intakes-2026-05/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md` wurde auf LAN-Hardening erweitert (Kapazitaets- und Rollen-Guards, Polling-Timeout/Inflight-Guards, sichere Discovery-UI-Renderpfade).
+- Neuer Intake-Entwurf `docs/plaene/alt/superseded-intakes-2026-05/Feature_Architecture_TypeSafety_Contract_Hardening_V101.md` fuehrt den Type-Safety-/Lint-Hardening-Scope fuer den roten Architektur-Typecheck und die uebergrossen Contract-Dateien.
 
 ## Stand-Snapshot 2026-04-24 (Abschluss `V101 101.99`)
 
@@ -421,7 +428,7 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 
 ## Stand-Snapshot 2026-05-05 (Start `V100`, Subphasen `100.1` bis `100.3`)
 
-- `V100` wurde aus `docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md` als aktiver Block nach `docs/plaene/aktiv/V100.md` uebernommen und im Master auf `status: active` gespiegelt.
+- `V100` wurde aus `docs/plaene/alt/superseded-intakes-2026-05/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md` als aktiver Block nach `docs/plaene/aktiv/V100.md` uebernommen und im Master auf `status: active` gespiegelt.
 - `100.1` ist abgeschlossen: der Iststand zeigte Rebuild-Lecks bei Portal-/Gate-/Checkpoint-Visuals (Array-Reset ohne Registry-/Mesh-Dispose) sowie Remount ohne await auf vorherigem `dispose`.
 - `100.2` ist abgeschlossen: `PortalLayoutBuilder` fuehrt vor jedem Rebuild einen kanonischen Visual-Reset aus; `PortalGateVisualRegistry` besitzt ein explizites `dispose()`, und `PortalGateSystem` resettet Portal-/Checkpoint-Runtime-Zwischenstaende vor dem Neuaufbau.
 - `100.3` ist abgeschlossen: `AppInitializer` serialisiert Mounts ueber eine Queue und wartet den vorherigen `dispose`-Pfad (inkl. asynchronem Runtime-Finalize) vor neuem `createGame()` ab.
