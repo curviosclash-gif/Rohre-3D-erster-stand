@@ -707,3 +707,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `V125` ist als geplanter P1-Architektur-Compliance-Block im Master und in `docs/plaene/aktiv/V125.md` angelegt: Zweck ist die Verankerung von Architektur-Capsule, staged Architecture Guard, Acceptance-Regeln und Ratchet-/Boundary-Evidence fuer Folgearbeit.
 - Scope bleibt Governance-/Guard-Haertung; produktiver Runtime-, UI-, Multiplayer-, Recording-, Physik- oder Bot-Training-Code ist explizit nicht Teil dieses Plan-Slices.
 - Commit-/Gate-Signal fuer den Intake-Slice: `npm run plan:check` und `npm run gates:pre-commit`; Restrisiko bleibt die spaetere User-Gate-Freigabe fuer konkrete V125-Phasen mit Rule-, Workflow-, Hook- oder Budget-Aenderungen.
+
+## Reihenfolge-Anker 2026-05-17 (Block `V126`)
+
+- Der Master-Index verankert die naechste P1-Reihenfolge jetzt als `V116` Abschluss-/Park-Slice, kurze `V90` Audit-Baseline und danach `V126 126.1` als produktnahen Dev-API-/Preview-Hardening-Start.
+- `V126` bleibt nur hart von `V102.99` und `V105.99` abhaengig; `V90.2` und `V125.3` sind Soft-Koordination fuer Package-/Lockfile-/CI-Upgrades sowie neue Pflicht-Gates, Hooks oder Pre-Commit-Policy.
+- Das V126-Startgate erlaubt den Start vor vollstaendigem `V119`, `V123`, `V120` oder `V125`, solange keine historischen Evidence-, Source-of-Truth-, Graph- oder RAG-Abschlussclaims entstehen.

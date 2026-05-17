@@ -1693,6 +1693,7 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P1",
@@ -2923,6 +2924,7 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P1",
@@ -69298,6 +69300,23 @@
     },
     {
       "from": "V126",
+      "to": "V125",
+      "type": "depends_on",
+      "source": "frontmatter",
+      "hard": false,
+      "fulfilled": false,
+      "hint": "Neue Pflicht-Gates, Hooks oder Pre-Commit-Policy brauchen V125-Koordination; V126 darf ohne Hook-/Gate-Umbau starten",
+      "attributes": {
+        "dependsPhase": "125.3",
+        "rawToken": "V125.3",
+        "sourceBreakdown": [
+          "frontmatter"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V126",
       "to": "V126.1",
       "type": "contains_phase",
       "hint": null,
@@ -69354,6 +69373,23 @@
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.99"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "V90",
+      "type": "depends_on",
+      "source": "frontmatter",
+      "hard": false,
+      "fulfilled": false,
+      "hint": "Dependency-/Version-/Lockfile-Scope bleibt V90; V126 darf starten, solange Package-/Lockfile-/CI-Upgrades nicht Teil des Slices sind",
+      "attributes": {
+        "dependsPhase": "90.2",
+        "rawToken": "V90.2",
+        "sourceBreakdown": [
+          "frontmatter"
+        ],
+        "canonicalToken": true
       }
     },
     {

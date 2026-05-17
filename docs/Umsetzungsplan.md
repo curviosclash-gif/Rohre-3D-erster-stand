@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-17. Aktiver Lock: `codex` auf `V116 116.4`; naechster freier P1-Startpfad: `V119 119.1`.
+Stand: 2026-05-17. Aktiver Lock: `codex` auf `V116 116.4`; Startanker: `V116 Abschluss/Park-Slice` -> `V90 Audit-Baseline` -> `V126 126.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -118,6 +118,8 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V125 | V117.99 | hard | ja | AI Decision Framework und D3/D4-Gates begrenzen Governance-, Workflow- und Hook-Aenderungen |
 | V126 | V102.99 | hard | ja | Security-/Runtime-Hardening ist Baseline fuer lokale API- und Preview-Grenzen |
 | V126 | V105.99 | hard | ja | Guard-/Typecheck-Recovery ist Baseline fuer gezielte Tooling- und Preview-Verifikation |
+| V126 | V90.2 | soft | nein | Dependency-/Version-/Lockfile-Scope bleibt V90; V126 darf starten, solange Package-/Lockfile-/CI-Upgrades nicht Teil des Slices sind |
+| V126 | V125.3 | soft | nein | Neue Pflicht-Gates, Hooks oder Pre-Commit-Policy brauchen V125-Koordination; V126 darf ohne Hook-/Gate-Umbau starten |
 | V121 | V120.99 | hard | nein | Viewer bleibt Consumer von stabilen Graph-RAG-Evidence-Paketen oder einem explizit dokumentierten V120-`fixture-ready`-Gate |
 | V121 | V107.99 | hard | ja | Core-Graph und Export-/Viewer-Historie bilden die technische Basis |
 | V121 | V110.99 | hard | ja | Graph-Ops-, Guard- und SLO-Basis bleibt Voraussetzung fuer sichere Viewer-Exports |
@@ -172,19 +174,19 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 ## Empfohlene Reihenfolge
 
-1. `V116` (Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung) als P1-Kontextfenster bis mindestens `116.4`, besser bis zur V118-Finalisierung in `116.8`, bevor neue breite Plan-/Agentenarbeit startet.
-2. `V119` (Planabschluss-Evidence-Remediation und Git-Historienabgleich) mit `119.1` vor neuen breiten Abschlussclaims abschliessen, damit erledigte Plaene formal nachgezogen oder bewusst als historische Restwidersprueche dokumentiert sind.
-3. `V123` (AI-optimierter Plan-Index und Source-of-Truth-Migration) als strukturierter Pilot nach `V116.4` und `V119.1`, bevor ein kanonischer Quellenwechsel entschieden wird.
-4. `V125` (Architektur-Compliance fuer Folgearbeit) nach V91/V104/V117 als Governance-/Guard-Haertung starten, bevor neue breite Feature- oder Boundary-Arbeit weitere Architekturpfade aufweitet.
-5. `V126` (Local Dev-API, Preview- und Delivery-Hardening) als P1-Sicherheits- und Tooling-Rand nach `V102`/`V105` starten, bevor Preview-/Release- oder breite Tooling-Folgearbeit weitere lokale Mutationspfade nutzt.
-6. `V120` (Graph-RAG mit lokalem Context-Adapter) nach `V116.3/116.4` und mindestens `V119.1` als Token-/Kontexthebel fuer anschliessende breite Agenten-, Audit- und Boundary-Arbeit.
-7. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) erst nach `V120.99` oder einem expliziten V120-`fixture-ready`-Gate als read-only Consumer starten.
-8. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) nach V116/V119; vor `V120.99` nur als kleines CLI-only Memory-MVP, Graph-RAG-/Ruflo-Kontext erst danach.
-9. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) als geretteter Produktsemantik-Folgeblock; groesster Nutzen nach ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113.
-10. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
-11. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
-12. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
-13. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
+1. `V116` (Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung) kurz abschliessen oder bewusst parken: keine neue Meta-Schleife, nur verbleibende Gate-/Refactor-Inventare und klarer Handoff.
+2. `V90` als kurze Audit-Baseline aktualisieren: aktuelles `npm audit` gegen `docs/prozess/Open_Findings.md` abgleichen, aber kein Major-Upgrade und kein `npm audit fix` ohne separaten Gate-Scope.
+3. `V126` (Local Dev-API, Preview- und Delivery-Hardening) als naechsten produktnahen P1-Schnitt starten: Training-Spawn, Preview-Mutationsgrenze, lokale API-Matrix und erste `vite.config.js`-Entflechtung; keine Dependency-Upgrades, keine Hook-/Gate-Policy ohne V90/V125-Koordination.
+4. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster danach oder bei Gameplay-Prioritaet parallel mit disjunktem Scope starten.
+5. `V125` (Architektur-Compliance fuer Folgearbeit) als Architektur-Schutz nachziehen, besonders staged Architecture Guard und Workflow-Eskalation fuer neue Boundary-/Legacy-Surfaces.
+6. `V119` (Planabschluss-Evidence-Remediation und Git-Historienabgleich) vollstaendig abschliessen, bevor historische Plan-Evidence als Grundlage fuer neue Automatisierung, RAG oder Source-of-Truth-Migration verwendet wird.
+7. `V123` (AI-optimierter Plan-Index und Source-of-Truth-Migration) erst nach V119-Baseline als Plan-Index-Pilot starten; `docs/Umsetzungsplan.md` bleibt bis zur expliziten Migration kanonisch.
+8. `V120` (Graph-RAG mit lokalem Context-Adapter) erst nach frischem Graph-/SLO-Signal als Graph-RAG-Kontexthebel starten.
+9. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) erst nach `V120.99` oder einem expliziten V120-`fixture-ready`-Gate als read-only Consumer starten.
+10. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) nach V116/V119; vor `V120.99` nur als kleines CLI-only Memory-MVP, Graph-RAG-/Ruflo-Kontext erst danach.
+11. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) nach Graph-Frische und ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113 einordnen.
+12. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
+13. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Hardening- und Produktqualitaets-Schnitten einplanen.
 14. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
 
 ## Conflict-Log
