@@ -18,8 +18,11 @@ scope_files:
   - docs/agent-memory/memory.jsonl
   - docs/agent-memory/namespaces.md
   - docs/agent-memory/schema.json
+  - docs/agent-memory/role-profiles.v1.json
+  - docs/agent-memory/orchestration-modes.v1.json
   - scripts/agent-memory.mjs
   - scripts/agent-memory-mcp.mjs
+  - scripts/agent-orchestration-plan.mjs
   - package.json
   - .agents/rules/agent_memory.md
   - .agents/rules/token_efficiency_and_tools.md
@@ -29,6 +32,7 @@ scope_files:
   - docs/referenz/ai_project_onboarding.md
   - docs/plaene/CHANGELOG.md
   - tests/agent-memory.contract.test.mjs
+  - tests/agent-orchestration-plan.contract.test.mjs
 scope_reference_files:
   - AGENTS.md
   - .agents/rules/planning_and_governance.md
@@ -46,10 +50,11 @@ scope_overlap_allowed_with:
 verification:
   - npm run memory:check
   - npm run test:agent-memory
+  - npm run test:agent-orchestration
   - npm run check:agent-context
   - npm run plan:check
   - npm run gates:pre-commit
-updated_at: 2026-05-16
+updated_at: 2026-05-17
 ---
 
 # Feature: Repo-natives Agent-Memory und externe Ruflo-Orchestrierung
@@ -64,6 +69,12 @@ Der zentrale Schnitt ist bewusst konservativ:
 - Das neue Repo-Memory ist nur ein kuratierter Entscheidungs- und Hinweisindex.
 - Ruflo ist nur ein externer Orchestrierungs-, Review- und optionaler Cache-Layer.
 - Ruflo-Memory darf das Repo-Memory nie automatisch ersetzen oder zur Quelle fuer Repo-Aenderungen werden.
+
+Der eigentliche Produkthebel liegt nicht in einem grossen Swarm-System, sondern in drei kleinen Bausteinen:
+
+1. Ein kuratierter Memory-Index reduziert wiederholtes Lesen historischer Entscheidungen.
+2. Kleine Rollenprofile machen Subagent-Nutzung reproduzierbar und gate-faehig.
+3. Ruflo wird erst nach lokalem MVP als Sandbox-Adapter gegen diese Rollenprofile geprueft.
 
 ## Warum eigener Plan statt V116-Unterpunkt
 
@@ -112,6 +123,22 @@ Repo-Memory = versionierter Hinweis- und Entscheidungsindex
 Ruflo-Memory = optionaler Arbeitscache
 ```
 
+## Integrationsentscheidung
+
+V122 soll als eigener Plan starten. Der Grund ist nicht "mehr Meta", sondern ein sauberer Ownership-Schnitt:
+
+- V117 bleibt die operative Subagent- und Decision-Klassen-Regel.
+- V120 bleibt der Graph-RAG- und Evidence-Paket-Pfad.
+- V122 verantwortet nur Memory, Rollenprofile, Orchestrierungsmodi und die Ruflo-Sandbox-Entscheidung.
+
+Damit bleibt der erste lieferbare Slice klein:
+
+```text
+Memory-CLI + Check + Rollenprofile + deterministischer Orchestration-Plan
+```
+
+Ruflo wird nicht als Voraussetzung fuer diesen Slice betrachtet.
+
 ## Ausgangslage
 
 - Das Repo hat bereits einen festen Leseweg ueber `AGENTS.md`, `.agents/rules/`, `.agents/workflows/`, `docs/Umsetzungsplan.md`, aktive Blockplaene und Changelog.
@@ -146,6 +173,18 @@ Folge:
 - Semantische Suche fuer Memory ist nur ein spaeter optionaler Ausbau und sollte V120 wiederverwenden, wenn V120 stabil ist.
 - Der CLI-only Memory-MVP darf ohne `V120.99` geplant werden. Alles, was Graph-RAG-Evidence-Pakete, semantische Suche, RAG-gestuetztes Memory-Ranking oder Ruflo-Orchestrierung mit RAG-Kontext nutzt, wartet auf `V120.99` oder ein explizites V120-`fixture-ready`-Gate.
 
+## Abgrenzung zu V117
+
+V117 hat bereits entschieden, dass Subagents ein kontrolliertes Parallelisierungswerkzeug sind. V122 darf diese Regel nicht lockern. V122 konkretisiert nur, wie eine fuehrende Agenteninstanz vor einer erlaubten Delegation reproduzierbar plant:
+
+- Welche Rolle wird gebraucht?
+- Welche Dateien, Oberflaechen oder Fragen gehoeren zum Auftrag?
+- Welche Aktionen sind erlaubt: `read-only`, `review`, `verify`, `disjoint-edit`?
+- Welche Gate-Klasse gilt?
+- Welche Ausgabe muss zurueckkommen, damit der fuehrende Agent integrieren kann?
+
+V122 erzeugt also keinen neuen Autonomie-Level, sondern ein Formblatt und Tooling fuer bereits erlaubte Subagent-Nutzung.
+
 ## Memory-Grundmodell
 
 Geplante Dateiablage:
@@ -156,10 +195,13 @@ docs/agent-memory/
   memory.jsonl
   namespaces.md
   schema.json
+  role-profiles.v1.json
+  orchestration-modes.v1.json
 
 scripts/
   agent-memory.mjs
   agent-memory-mcp.mjs   # erst spaeter
+  agent-orchestration-plan.mjs
 ```
 
 Minimaler Eintrag:
@@ -243,7 +285,9 @@ Geplante npm-Scripts:
   "memory:deprecate": "node scripts/agent-memory.mjs deprecate",
   "memory:get": "node scripts/agent-memory.mjs get",
   "memory:check": "node scripts/agent-memory.mjs check",
-  "memory:rebuild": "node scripts/agent-memory.mjs rebuild"
+  "memory:rebuild": "node scripts/agent-memory.mjs rebuild",
+  "agent:orchestration-plan": "node scripts/agent-orchestration-plan.mjs",
+  "test:agent-orchestration": "node --test tests/agent-orchestration-plan.contract.test.mjs"
 }
 ```
 
@@ -253,6 +297,66 @@ MVP-Suche bleibt deterministisch:
 - Statusfilter: default `verified`; optional `--include-proposed`, `--include-deprecated`.
 - Quellenfilter: `--source docs/plaene/aktiv/V120.md`.
 - JSON-Ausgabe fuer Agenten: `--json`.
+
+## Rollenprofile
+
+Der MVP soll wenige, repo-spezifische Rollen definieren. Jede Rolle ist ein begrenztes Arbeitsmuster, keine eigene Autoritaet.
+
+| Rolle | Zweck | Erlaubter Modus | Nicht erlaubt |
+| --- | --- | --- | --- |
+| `plan-consistency-reviewer` | Plan, Changelog, Graph und Governance auf Widerspruch pruefen | `read-only`, `review` | Master-/Aktivplan-Edit ohne Gate |
+| `graph-auditor` | Scope, Dependencies, Impact und Coverage ueber Graph-Queries pruefen | `read-only`, `review` | Graph-Artefakte manuell als Wahrheit ueberschreiben |
+| `architecture-reviewer` | Architektur- und Boundary-Fragen source-backed bewerten | `read-only`, `review` | Produktive Refactors ausfuehren |
+| `test-gap-reviewer` | kleinste sinnvolle Verifikation und Testluecken vorschlagen | `read-only`, `review`, `verify` | Vollsuite als Default erzwingen |
+| `security-reviewer` | Secret-, PII-, Prompt-Injection- und Tooling-Risiken pruefen | `read-only`, `review` | externe Scans oder Installationen ohne Gate |
+| `performance-reviewer` | Hotpath-, Asset-, Memory- und Laufzeitrisiken bewerten | `read-only`, `review`, `verify` | produktive Parameter ohne Gate aendern |
+| `implementation-worker` | disjunkte, klar begrenzte Code- oder Doc-Slices umsetzen | `disjoint-edit` | an denselben Dateien wie andere Worker arbeiten |
+
+Pflichtfelder je Rolle:
+
+- `id`
+- `purpose`
+- `allowed_modes`
+- `default_output`
+- `forbidden_actions`
+- `required_inputs`
+- `evidence_requirements`
+- `max_scope`
+
+Die Datei `role-profiles.v1.json` bleibt klein und validierbar. Neue Rollen brauchen einen konkreten wiederkehrenden Nutzen; keine Rollen fuer einmalige Vorlieben.
+
+## Orchestrierungsmodi
+
+V122 definiert keine Swarm-Autonomie, sondern vier abrufbare Modi:
+
+| Modus | Wann sinnvoll | Ergebnis |
+| --- | --- | --- |
+| `single-review` | Eine klar abgegrenzte Frage braucht zweite Sicht | Review-Befund mit Quellen |
+| `parallel-review` | Mehrere unabhaengige Fragen koennen gleichzeitig gelesen werden | getrennte Befunde, fuehrender Agent integriert |
+| `consensus-review` | Riskante Architektur-/Governance-Frage braucht Gegenargumente | Pro/Contra, Unsicherheiten, Go/No-Go-Vorschlag |
+| `disjoint-worker-slice` | Mehrere Implementierungen haben harte Dateigrenzen | Patch pro Worker, fuehrender Agent prueft und merged |
+
+Jeder Modus muss vor Ausfuehrung einen kleinen Orchestration-Plan erzeugen:
+
+```json
+{
+  "mode": "parallel-review",
+  "decisionClass": "D2",
+  "leadAgentResponsibilities": ["classification", "integration", "evidence", "commit"],
+  "delegations": [
+    {
+      "role": "graph-auditor",
+      "question": "Welche Scope-Kollisionen betreffen V120/V122?",
+      "allowedActions": ["read-only"],
+      "writeScope": [],
+      "expectedOutput": "findings"
+    }
+  ],
+  "stopConditions": ["D3/D4 change needed", "scope collision", "conflicting evidence"]
+}
+```
+
+`agent-orchestration-plan.mjs` soll im MVP nur validieren und ausgeben, nicht Agents starten. Das Starten von Subagents bleibt eine explizite User- und Harness-Entscheidung.
 
 ## `memory:check`
 
@@ -339,6 +443,58 @@ Empfohlener Pruefpfad:
 4. Kein Commit von Ruflo-generierten Workspace-Dateien ohne explizite Klassifikation.
 5. Ergebnisse zuerst als Bericht oder proposed Memory behandeln, nie direkt als verified.
 
+## Ruflo-Bausteinmatrix
+
+| Ruflo-Konzept | V122-Entscheidung | Curvios-Schnitt |
+| --- | --- | --- |
+| Swarm Coordination | `adopt concept` | Orchestrierungsmodi als Plan/Review-Muster, keine Autonomie |
+| Specialized Agents | `adopt concept` | wenige Curvios-Rollenprofile statt grosser Agentenkatalog |
+| Persistent Memory | `adopt limited` | Repo-Memory als source-backed Hinweisindex; Ruflo-Memory nur Cache |
+| RAG Memory / Knowledge Graph | `defer to V120` | V120 Evidence-Pakete bleiben einziger RAG-Pfad |
+| Autopilot / Background Workers | `reject for MVP` | widerspricht Gate- und User-Ownership-Modell |
+| MCP Server | `sandbox-only first` | read-only pruefen; Registrierung ist D4/User-Gate |
+| Federation / remote agents | `reject for now` | kein Produkthebel, hohes Sicherheits-/Scope-Risiko |
+| Test generation | `sandbox-only` | nur Testlueckenanalyse, keine automatische Test-Erzeugung im Repo |
+| Security audit | `sandbox-only` | Befundbericht, keine automatische Remediation |
+| Docs generation | `reject for MVP` | Gefahr zweiter Wahrheit und Doku-Flut |
+
+Diese Matrix ist der erste Schutz gegen schleichendes Full-Init: Jeder Ruflo-Teil braucht eine explizite Kategorie, bevor er in einem aktiven Block genutzt wird.
+
+## Schnittstellenvertrag fuer Ruflo-Sandbox
+
+Die Sandbox bekommt nur ein begrenztes Kontextpaket:
+
+- Auftrag und Fragestellung.
+- relevante Graph-Query-Ausgaben oder spaeter V120-Evidence-Paket.
+- relevante Memory-Treffer mit Status und Quellen.
+- erlaubter Modus und verbotene Aktionen.
+- erwartetes Ausgabeformat.
+
+Die Sandbox darf nicht bekommen:
+
+- Secrets, `.env`, Tokens oder Credentials.
+- ungeklaerte lokale Logs, Testrohdaten oder tmp-Artefakte.
+- Schreibrechte in den aktiven Hauptarbeitsbaum.
+- Auftrag zum Committen, Verschieben, Loeschen oder Full-Init.
+
+Rueckgabeformat:
+
+```json
+{
+  "summary": "kurzer Befund",
+  "findings": [
+    {
+      "severity": "medium",
+      "claim": "source-backed Aussage",
+      "sources": [{"path": "docs/plaene/aktiv/V120.md", "lineStart": 66}],
+      "uncertainty": "offene Pruefung"
+    }
+  ],
+  "recommendedAction": "go|no-go|defer",
+  "repoWriteSuggested": false
+}
+```
+
 ## Externe Quellenlage
 
 Ruflo-Dokumentation wurde am 2026-05-16 als Planungsinput betrachtet:
@@ -355,6 +511,7 @@ Diese externen Quellen sind nicht kanonisch fuer das Repo. Weil Ruflo-Versionen 
 | Analyse, Quellenvergleich, Draft unter `docs/plaene/neu/` | D0/D2 | [AUTO] | Keine Master-/Governance-Aenderung |
 | `docs/agent-memory/*` MVP-Dateien | D2/D3 | [REVIEW] | Dauerhafte Agenten-Kontextquelle; vor Umsetzung Scope und Gate nennen |
 | `scripts/agent-memory.mjs`, Tests, npm-Scripts | D2 | [REVIEW] | Nur Memory-MVP, keine externen Installs |
+| Rollenprofile und Orchestration-Plan-Validator | D2/D3 | [REVIEW] | Kein automatisches Agent-Starten, kein Governance-Bypass |
 | `.agents/rules/*`, Workflows, AGENTS.md | D3 | [USER-GATE] | Governance-Quelle |
 | MCP-Server mit read-only Tools | D3 | [USER-GATE] | Tool-Oberflaeche fuer Agents |
 | Schreibende MCP-Tools | D3/D4 | [USER-GATE] | Nur proposed, nie still verified |
@@ -367,12 +524,14 @@ Diese externen Quellen sind nicht kanonisch fuer das Repo. Weil Ruflo-Versionen 
 - [ ] DoD.2 `scripts/agent-memory.mjs` bietet deterministische Suche, `add-proposed`, `verify`, `deprecate`, `get` und `check`.
 - [ ] DoD.3 `memory:check` validiert Schema, Quellen, Status, Namespace, Secret-Muster, Laengenlimit und Source-Staleness-Warnungen.
 - [ ] DoD.4 Governance-Dokumentation stellt klar: Memory-Treffer sind Hinweise, keine kanonische Wahrheit.
-- [ ] DoD.5 Erste Memory-Eintraege sind klein, source-backed und nur `verified`, wenn Review/Gate erfolgt ist.
-- [ ] DoD.6 Tests decken Parser, Suche, Check, Secret-Blocker, Source-Existenz, Statusuebergaenge und JSON-Ausgabe ab.
-- [ ] DoD.7 Read-only MCP ist optional implementiert oder bewusst auf Folgeblock verschoben.
-- [ ] DoD.8 Ruflo-Integration ist entweder als Sandbox-Report bewertet oder bewusst vertagt; kein Full-Init im Hauptrepo.
-- [ ] DoD.9 Abschluss-Evidence nennt Nutzen, Grenzen, Restrisiken und Verhaeltnis zu V116/V120.
-- [ ] DoD.10 `npm run plan:check`, `npm run check:agent-context`, `npm run memory:check`, relevante Tests und bei Governance-Diff `npm run gates:pre-commit` sind gruen oder blockerfest dokumentiert.
+- [ ] DoD.5 Rollenprofile und Orchestrierungsmodi sind versioniert, klein, validierbar und an V117-Gates gebunden.
+- [ ] DoD.6 Ein Orchestration-Plan-Validator kann Delegationsplaene pruefen, startet aber keine Agents.
+- [ ] DoD.7 Erste Memory-Eintraege sind klein, source-backed und nur `verified`, wenn Review/Gate erfolgt ist.
+- [ ] DoD.8 Tests decken Parser, Suche, Check, Secret-Blocker, Source-Existenz, Statusuebergaenge, Rollenprofile, Orchestrierungsmodi und JSON-Ausgabe ab.
+- [ ] DoD.9 Read-only MCP ist optional implementiert oder bewusst auf Folgeblock verschoben.
+- [ ] DoD.10 Ruflo-Integration ist entweder als Sandbox-Report bewertet oder bewusst vertagt; kein Full-Init im Hauptrepo.
+- [ ] DoD.11 Abschluss-Evidence nennt Nutzen, Grenzen, Restrisiken und Verhaeltnis zu V116/V117/V120.
+- [ ] DoD.12 `npm run plan:check`, `npm run check:agent-context`, `npm run memory:check`, relevante Tests und bei Governance-Diff `npm run gates:pre-commit` sind gruen oder blockerfest dokumentiert.
 
 ## Phasen
 
@@ -385,6 +544,8 @@ output: finaler Scope, Gate-Entscheid und Quellenbewertung
 - [ ] 122.1.2 Entscheiden, ob Memory als eigener aktiver Block startet oder als V120-Folge nach Graph-RAG; Empfehlung und Gegenargumente dokumentieren.
 - [ ] 122.1.3 Ruflo-Dokumentation aktuell pruefen, Installationsmodi klassifizieren und Full-Init-Risiko gegen Repo-Governance abgrenzen.
 - [ ] 122.1.4 Zweckklasse fuer jede neue dauerhafte Datei festhalten: `plan`, `reference`, `governance`, `evidence` oder `tooling`.
+- [ ] 122.1.5 Ruflo-Bausteine in `adopt concept`, `adopt limited`, `defer to V120`, `sandbox-only` oder `reject for MVP` klassifizieren.
+- [ ] 122.1.6 Minimalen ersten Liefer-Slice festlegen: Memory-CLI, Check, Rollenprofile und Orchestration-Plan-Validator ohne Ruflo-Installation.
 
 ### 122.2 Schema und Speicherformat
 status: open
@@ -408,6 +569,17 @@ output: `npm run memory:*` Scripts und Contract-Tests
 - [ ] 122.3.4 JSON-Ausgabe und kurze Textausgabe fuer Agenten-Arbeit bereitstellen.
 - [ ] 122.3.5 `tests/agent-memory.contract.test.mjs` fuer Happy Path, ungueltige Eintraege, Secret-Blocker und Source-Checks anlegen.
 
+### 122.3a Rollenprofile und Orchestration-Plan
+status: open
+goal: Subagent-Nutzung reproduzierbar planen, ohne Agents automatisch zu starten
+output: Rollen-/Modus-Vertraege und Plan-Validator
+
+- [ ] 122.3a.1 `role-profiles.v1.json` mit den MVP-Rollen anlegen: `plan-consistency-reviewer`, `graph-auditor`, `architecture-reviewer`, `test-gap-reviewer`, `security-reviewer`, `performance-reviewer`, `implementation-worker`.
+- [ ] 122.3a.2 `orchestration-modes.v1.json` fuer `single-review`, `parallel-review`, `consensus-review` und `disjoint-worker-slice` definieren.
+- [ ] 122.3a.3 `scripts/agent-orchestration-plan.mjs` implementieren: JSON-Plan validieren, D3/D4-Stopps erkennen, Write-Scope-Grenzen pruefen, kurze Text-/JSON-Ausgabe liefern.
+- [ ] 122.3a.4 Contract-Tests fuer erlaubte Rollen, verbotene Aktionen, fehlende Quellen, kollidierende Write-Scopes und D3/D4-Gate-Hinweise anlegen.
+- [ ] 122.3a.5 Klar dokumentieren: Das Tool startet keine Subagents und ersetzt keine User-Freigabe.
+
 ### 122.4 Governance-Einhaengung
 status: open
 goal: Agents nutzen Memory erst nach Repo-Leseweg und Graph-First
@@ -418,6 +590,8 @@ output: minimale Governance-Regel ohne Meta-Rauschen
 - [ ] 122.4.3 Workflows `plan.md`, `code.md` und `quick.md` nur punktuell anpassen, falls sie Memory-Nutzung sonst verhindern oder uebertreiben.
 - [ ] 122.4.4 `docs/referenz/ai_project_onboarding.md` um kurze Memory-Read-Regel ergaenzen.
 - [ ] 122.4.5 `check:agent-context` oder ein eigener Check verhindert, dass Memory als Masterplan, Changelog oder Rule-Ersatz formuliert wird.
+- [ ] 122.4.6 Subagent-Regel nur referenzieren, nicht duplizieren: V117/`planning_and_governance.md` bleiben operative Wahrheit.
+- [ ] 122.4.7 Orchestration-Plan-Nutzung als optionalen Vorbereitungscheck fuer explizit erlaubte Subagent-Arbeit dokumentieren.
 
 ### 122.5 Read-only MCP
 status: open
@@ -442,6 +616,8 @@ output: Sandbox-Report und Go/No-Go fuer MCP-Integration
 - [ ] 122.6.3 Zwei Testfragen ausfuehren: Architektur-Review und Testlueckenanalyse, jeweils mit vorherigem Repo-Memory-/Graph-Kontext.
 - [ ] 122.6.4 Ergebnisse nur als Bericht oder proposed Memory behandeln; keine automatische Rueckschreibung.
 - [ ] 122.6.5 Go/No-Go dokumentieren: Nutzen, Risiken, Version, Recovery-Pfad, erlaubte Einsatzfaelle.
+- [ ] 122.6.6 Ruflo-Ausgaben gegen das Orchestration-Plan-Format spiegeln: Rolle, Quellen, Findings, Unsicherheiten, keine Repo-Write-Aktion.
+- [ ] 122.6.7 Entscheiden, ob Ruflo nur als gelegentlicher externer Review-Layer bleibt oder ein spaeterer MCP-Adapter gerechtfertigt ist.
 
 ### 122.7 Optionaler Spiegel und Semantik-Backlog
 status: open
@@ -477,6 +653,9 @@ output: uebergabefaehiger Memory-/Orchestrierungs-Schnitt
 | Ruflo Full-Init erzeugt Governance-Drift | hoch | Sandbox zuerst, kein Full-Init im Hauptrepo, User-Gate fuer externe Tool-Initialisierung |
 | Ruflo-Memory ueberschreibt Repo-Memory | hoch | Ruflo -> Repo nie automatisch; nur Bericht oder proposed Entry |
 | V122 dupliziert V120 Graph-RAG | mittel | Memory bleibt kuratierter Index; semantische Suche erst spaeter und an V120 koppeln |
+| Rollenprofile wirken wie neue Governance | mittel | V117 bleibt Quelle; Rollenprofile sind Tooling-Vertrag, nicht Regelquelle |
+| Orchestration-Plan wird als Agent-Start-Automatik missverstanden | mittel | Validator startet keine Agents; User-Freigabe bleibt erforderlich |
+| Zu viele Rollen erzeugen Koordinationsrauschen | mittel | MVP-Rollen begrenzen, neue Rollen nur mit wiederkehrendem Nutzen |
 | Zu viel Meta-Arbeit statt Produktnutzen | mittel | MVP klein halten: CLI, Check, wenige Eintraege, messbarer Agenten-Nutzen |
 | Source-Staleness fuehrt zu falschen Hinweisen | mittel | source_hash-Warnungen, deprecate/supersede, Review nach Quellaenderung |
 | MCP-Schreibtools werden zu riskant | mittel | erster MCP read-only; Schreibtools nur spaeter als propose-only |
@@ -489,6 +668,8 @@ output: uebergabefaehiger Memory-/Orchestrierungs-Schnitt
 | Search-Nutzwert | relevante Treffer fuer Architektur-/Runtime-/Training-/Governance-Fragen ohne Volltextlesen |
 | Check-Nutzwert | invalides JSONL, Secrets, stale Quellen und zu lange Eintraege werden erkannt |
 | Governance-Klarheit | Agent kann aus README/Rule erkennen, dass Memory nicht kanonisch ist |
+| Rollenprofil-Nutzwert | Fuehrender Agent kann Delegation mit Rolle, Modus, Scope und Stopps knapp planen |
+| Orchestrierungs-Sicherheit | Kein Tool startet Agents, schreibt Memory-verified oder registriert MCP ohne Gate |
 | Ruflo-Nutzen | mindestens ein Review-Szenario liefert Mehrwert ohne Repo-Dateien unkontrolliert zu veraendern |
 | Kontextbudget | komplexe Agentenstarts lesen weniger breite historische Plaene |
 
