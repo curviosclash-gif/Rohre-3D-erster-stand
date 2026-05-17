@@ -21,6 +21,7 @@ Optional (nur bei Bedarf):
 ## 1. Scope
 
 - Zielpfade und erwartetes Verhalten festlegen.
+- Bei architekturrelevantem Code-Scope den Startcheck aus `docs/referenz/architektur_ausfuehrlich.md` anwenden: betroffene Schichten, neue Dependency-Kanten, Legacy-Surface-Nutzung, vorhandene Contracts/Ports/Commands/Snapshots und kleinstes Guard-Signal benennen. `docs/referenz/ai_architecture_context.md` nur gezielt fuer den betroffenen Scope nachladen.
 - Desktop-App-Ergebnis priorisieren; Online/Browser-Parity nur explizit auf Wunsch oder bei geringem Aufwand.
 - Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; `D3`/`D4`-Source-of-truth-, Planstruktur-, Archivierungs-, Move-/Delete- oder High-Blast-Radius-Aenderungen brauchen User-Gate.
 - Bei `D3`/`D4`, `[REVIEW]` oder `[USER-GATE]` vor der Freigabe betroffene Dateien/Oberflaechen als `no-op`, `read-only evidence`, `optional` oder `edit required` klassifizieren; nur `edit required` freigeben lassen.
@@ -57,6 +58,7 @@ Optional (nur bei Bedarf):
 - Bei aktiven Plan-, Workflow-, Rule-, Scope- oder Abschluss-Evidence-Aenderungen: `npm run check:plan-evidence-claims`.
 - Wenn `docs/`, `.agents/`, `scripts/validate-umsetzungsplan.mjs`, Graph-Artefakte oder Master-/Blockplan-Struktur geaendert wurden: `npm run gates:pre-commit`.
 - Wenn `*.99` geschlossen wird: `npm run gates:pre-commit` verpflichtend.
+- Bei Architektur-Scope: kleinstes passendes Signal aus `docs/referenz/architektur_ausfuehrlich.md` oder `.agents/test_mapping.md` waehlen; `npm run architecture:guard` nur fuer breite Boundary-, Legacy- oder Ratchet-Slices als Default.
 - Bei reinem Code-Scope ohne Doc-/Governance-Drift: nur kleinste sinnvolle Zusatzchecks (z. B. `npm run build` oder fokussierter Contract-Run).
 
 ## 5. Commit

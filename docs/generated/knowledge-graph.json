@@ -10452,8 +10452,8 @@
     {
       "id": "V116.5.2",
       "type": "subphase",
-      "title": "`.agents/workflows/plan.md`, `code.md` und `quick.md` nur punktuell anpassen, falls sie gegen die neue Kontext-Policy laufen.",
-      "status": "open",
+      "title": "`.agents/workflows/plan.md`, `code.md` und `quick.md` nur punktuell anpassen, falls sie gegen die neue Kontext-Policy laufen. (abgeschlossen: 2026-05-17; evidence: `docs/referenz/architektur_ausfuehrlich.md` als kurzer Architektur-Kompass geschaerft und `.agents/workflows/code.md` um Architektur-Startcheck plus kleines Guard-Signal ergaenzt; `plan.md`/`quick.md` blieben unangetastet, weil der Bedarf nur im Code-Workflow lag.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.5",
@@ -10485,8 +10485,8 @@
     {
       "id": "V116.5.5",
       "type": "subphase",
-      "title": "Abschlussnotiz im passenden Governance-Kontext hinterlassen: warum weniger Standardkontext die Produktarbeit entlastet.",
-      "status": "open",
+      "title": "Abschlussnotiz im passenden Governance-Kontext hinterlassen: warum weniger Standardkontext die Produktarbeit entlastet. (abgeschlossen: 2026-05-17; evidence: Architektur wird nicht als neue Quelle dupliziert, sondern im Einstieg verdichtet und im `code`-Workflow als kurzer Startcheck operationalisiert; dadurch muessen Agents bei Code-Scope weniger Langkontext laden und koennen Guards/Graph gezielter nutzen.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.5",
