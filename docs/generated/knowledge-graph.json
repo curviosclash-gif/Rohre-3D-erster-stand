@@ -1446,6 +1446,7 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P1",
@@ -1486,6 +1487,88 @@
         ],
         "unknownFrontmatterFields": [
           "scope_reference_files"
+        ]
+      }
+    },
+    {
+      "id": "V121",
+      "type": "block",
+      "title": "Lokaler Graph-RAG Viewer und Evidence-Dashboard",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "121.1",
+        "planFile": "docs/plaene/aktiv/V121.md",
+        "scopeDeclarations": [
+          "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
+          "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
+          "docs/plaene/aktiv/V121.md",
+          "scripts/graph-rag-viewer-export.mjs",
+          "tests/graph-rag-viewer-export.contract.test.mjs",
+          "tests/graph-rag-viewer-ui.contract.test.mjs",
+          "tools/graph-rag-viewer/index.html",
+          "tools/graph-rag-viewer/viewer.css",
+          "tools/graph-rag-viewer/viewer.js"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 8
+        },
+        "scopeOverlapAllowedWith": [
+          "V120",
+          "V123"
+        ],
+        "unknownFrontmatterFields": [
+          "scope_reference_files"
+        ]
+      }
+    },
+    {
+      "id": "V122",
+      "type": "block",
+      "title": "Repo-natives Agent-Memory und externe Ruflo-Orchestrierung",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "122.1",
+        "planFile": "docs/plaene/aktiv/V122.md",
+        "scopeDeclarations": [
+          ".agents/rules/agent_memory.md",
+          "docs/agent-memory/memory.jsonl",
+          "docs/agent-memory/namespaces.md",
+          "docs/agent-memory/orchestration-modes.v1.json",
+          "docs/agent-memory/README.md",
+          "docs/agent-memory/role-profiles.v1.json",
+          "docs/agent-memory/schema.json",
+          "docs/plaene/aktiv/V122.md",
+          "scripts/agent-memory-mcp.mjs",
+          "scripts/agent-memory.mjs",
+          "scripts/agent-orchestration-plan.mjs",
+          "tests/agent-memory.contract.test.mjs",
+          "tests/agent-orchestration-plan.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 12
+        },
+        "scopeOverlapAllowedWith": [
+          "V116",
+          "V119",
+          "V120"
+        ],
+        "unknownFrontmatterFields": [
+          "scope_reference_files",
+          "soft_depends_on"
         ]
       }
     },
@@ -1535,6 +1618,45 @@
         ],
         "unknownFrontmatterFields": [
           "scope_reference_files"
+        ]
+      }
+    },
+    {
+      "id": "V124",
+      "type": "block",
+      "title": "Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "124.1",
+        "planFile": "docs/plaene/aktiv/V124.md",
+        "scopeDeclarations": [
+          "data/contracts/knowledge-graph/product-flow-fixtures.v1.json",
+          "data/contracts/knowledge-graph/product-semantics.v1.json",
+          "docs/plaene/aktiv/V124.md",
+          "tests/knowledge-graph-product-semantics.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 3
+        },
+        "scopeOverlapAllowedWith": [
+          "V106",
+          "V107",
+          "V110",
+          "V111",
+          "V112",
+          "V113",
+          "V96"
+        ],
+        "unknownFrontmatterFields": [
+          "scope_reference_files",
+          "soft_depends_on"
         ]
       }
     },
@@ -2251,7 +2373,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 315,
+          "concreteCount": 318,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -4348,6 +4470,156 @@
       }
     },
     {
+      "id": "V121.1",
+      "type": "phase",
+      "title": "Intake und Scope-Abgrenzung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.1"
+      }
+    },
+    {
+      "id": "V121.2",
+      "type": "phase",
+      "title": "Viewer-Export und Fixture",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.2"
+      }
+    },
+    {
+      "id": "V121.3",
+      "type": "phase",
+      "title": "HTML-Dashboard-MVP",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3"
+      }
+    },
+    {
+      "id": "V121.4",
+      "type": "phase",
+      "title": "Safety, Explainability und Historical UX",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.4"
+      }
+    },
+    {
+      "id": "V121.5",
+      "type": "phase",
+      "title": "Tests und lokale Verifikation",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5"
+      }
+    },
+    {
+      "id": "V121.6",
+      "type": "phase",
+      "title": "Dokumentation und Rollout",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6"
+      }
+    },
+    {
+      "id": "V121.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99"
+      }
+    },
+    {
+      "id": "V122.1",
+      "type": "phase",
+      "title": "Scope-Entscheidung und Quellenanalyse",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1"
+      }
+    },
+    {
+      "id": "V122.2",
+      "type": "phase",
+      "title": "Schema und Speicherformat",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2"
+      }
+    },
+    {
+      "id": "V122.3",
+      "type": "phase",
+      "title": "CLI-MVP",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3"
+      }
+    },
+    {
+      "id": "V122.4",
+      "type": "phase",
+      "title": "Governance-Einhaengung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4"
+      }
+    },
+    {
+      "id": "V122.5",
+      "type": "phase",
+      "title": "Read-only MCP",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5"
+      }
+    },
+    {
+      "id": "V122.6",
+      "type": "phase",
+      "title": "Ruflo-Sandbox und Integrationsentscheidung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6"
+      }
+    },
+    {
+      "id": "V122.7",
+      "type": "phase",
+      "title": "Optionaler Spiegel und Semantik-Backlog",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7"
+      }
+    },
+    {
+      "id": "V122.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99"
+      }
+    },
+    {
       "id": "V123.1",
       "type": "phase",
       "title": "Schema und Spiegel-Pilot",
@@ -4415,6 +4687,96 @@
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.99"
+      }
+    },
+    {
+      "id": "V124.1",
+      "type": "phase",
+      "title": "Baseline, Fragenkatalog und Priorisierung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.1"
+      }
+    },
+    {
+      "id": "V124.2",
+      "type": "phase",
+      "title": "Produktsemantik-Taxonomie",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.2"
+      }
+    },
+    {
+      "id": "V124.3",
+      "type": "phase",
+      "title": "V112-Flow-Harvest",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.3"
+      }
+    },
+    {
+      "id": "V124.4",
+      "type": "phase",
+      "title": "Boundary-, Map- und Rules-Harvest",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.4"
+      }
+    },
+    {
+      "id": "V124.5",
+      "type": "phase",
+      "title": "Coverage- und Hotspot-Ratchet",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.5"
+      }
+    },
+    {
+      "id": "V124.6",
+      "type": "phase",
+      "title": "Query-UX und Rauschreduktion",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.6"
+      }
+    },
+    {
+      "id": "V124.7",
+      "type": "phase",
+      "title": "Governance, Stewardship und Nachhaltigkeit",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.7"
+      }
+    },
+    {
+      "id": "V124.8",
+      "type": "phase",
+      "title": "Verifikation und Referenzfaelle",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.8"
+      }
+    },
+    {
+      "id": "V124.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99"
       }
     },
     {
@@ -11100,6 +11462,842 @@
       }
     },
     {
+      "id": "V121.1.1",
+      "type": "subphase",
+      "title": "V120-Outputs pruefen: Evidence-Paket, Graph-RAG-Query-Ausgabe, LLM-Smoke-Report und Cache-/Export-Regeln.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.1",
+        "subphaseCode": "121.1.1"
+      }
+    },
+    {
+      "id": "V121.1.2",
+      "type": "subphase",
+      "title": "Historische V107/V111-Viewer-Reste klassifizieren: ersetzen, bewusst nicht wieder aufnehmen oder als Drift dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.1",
+        "subphaseCode": "121.1.2"
+      }
+    },
+    {
+      "id": "V121.1.3",
+      "type": "subphase",
+      "title": "Viewer-Scope begrenzen: read-only HTML, Export-Script, Fixture, Tests; keine Graph-/RAG-Kernlogik.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.1",
+        "subphaseCode": "121.1.3"
+      }
+    },
+    {
+      "id": "V121.1.4",
+      "type": "subphase",
+      "title": "`scope_files` fuer spaetere aktive Uebernahme vorbereiten, inklusive `tools/graph-rag-viewer/**`, Export-Script, Contract und Tests.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.1",
+        "subphaseCode": "121.1.4"
+      }
+    },
+    {
+      "id": "V121.2.1",
+      "type": "subphase",
+      "title": "`graph-rag.viewer-export.v1` definieren: Graph-Summary, Coverage, Critical Paths, Evidence, Chunks, Safety, Adapterstatus.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.2",
+        "subphaseCode": "121.2.1"
+      }
+    },
+    {
+      "id": "V121.2.2",
+      "type": "subphase",
+      "title": "`scripts/graph-rag-viewer-export.mjs` planen/implementieren: liest Graph-/RAG-/Smoke-Artefakte, schreibt redigierten Export nach `tmp/graph-rag/viewer/`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.2",
+        "subphaseCode": "121.2.2"
+      }
+    },
+    {
+      "id": "V121.2.3",
+      "type": "subphase",
+      "title": "Kleines getracktes Fixture fuer Tests anlegen, ohne Secrets, Raw-Quelltexte oder grosse Graph-Dumps.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.2",
+        "subphaseCode": "121.2.3"
+      }
+    },
+    {
+      "id": "V121.2.4",
+      "type": "subphase",
+      "title": "Contract-Test fuer Export-Schema, Redaction-Default, Historical-Markierung und fehlende LLM-Runtime ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.2",
+        "subphaseCode": "121.2.4"
+      }
+    },
+    {
+      "id": "V121.3.1",
+      "type": "subphase",
+      "title": "`tools/graph-rag-viewer/index.html` mit direktem Dashboard-Einstieg, File-Input oder Fixture-Load und Fehlermeldungen anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3",
+        "subphaseCode": "121.3.1"
+      }
+    },
+    {
+      "id": "V121.3.2",
+      "type": "subphase",
+      "title": "`viewer.js` fuer Contract-Validierung, Tab-/Filter-State, Tabellen, Detailpanels und Evidence-Rendering implementieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3",
+        "subphaseCode": "121.3.2"
+      }
+    },
+    {
+      "id": "V121.3.3",
+      "type": "subphase",
+      "title": "`viewer.css` fuer dichte, responsive Desktop-first Oberflaeche ohne Marketing-/Hero-Layout erstellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3",
+        "subphaseCode": "121.3.3"
+      }
+    },
+    {
+      "id": "V121.3.4",
+      "type": "subphase",
+      "title": "Ansichten fuer Overview, Critical Paths, Evidence, Chunks, Local Adapter und Safety umsetzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3",
+        "subphaseCode": "121.3.4"
+      }
+    },
+    {
+      "id": "V121.4.1",
+      "type": "subphase",
+      "title": "Redaction-Badge und Unsafe-Raw-Warnung anzeigen; Unsafe-Raw darf nur explizit als lokaler Auditmodus erscheinen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.4",
+        "subphaseCode": "121.4.1"
+      }
+    },
+    {
+      "id": "V121.4.2",
+      "type": "subphase",
+      "title": "`historical` Quellen optisch und textlich von aktiven Plan-/Graphquellen unterscheiden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.4",
+        "subphaseCode": "121.4.2"
+      }
+    },
+    {
+      "id": "V121.4.3",
+      "type": "subphase",
+      "title": "Evidence-Claims mit `path`, `lineStart`, `lineEnd`, `confidence`, `uncertainties` und Query-Herkunft anzeigen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.4",
+        "subphaseCode": "121.4.3"
+      }
+    },
+    {
+      "id": "V121.4.4",
+      "type": "subphase",
+      "title": "Kontextbudget und verworfene Kandidaten als Diagnose anzeigen, damit Tokenersparnis nachvollziehbar wird.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.4",
+        "subphaseCode": "121.4.4"
+      }
+    },
+    {
+      "id": "V121.5.1",
+      "type": "subphase",
+      "title": "Export-Contract-Test fuer Fixture und realen redigierten Export ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.1"
+      }
+    },
+    {
+      "id": "V121.5.2",
+      "type": "subphase",
+      "title": "UI-Smoke-Test mit Fixture: Dashboard laedt, Critical Paths sichtbar, Evidence sichtbar, Safety sichtbar, LLM-Fallback sichtbar.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.2"
+      }
+    },
+    {
+      "id": "V121.5.3",
+      "type": "subphase",
+      "title": "Negativtests: invalides Contract-Feld, fehlende Evidence-Liste, unsafe-raw Input, historical-only Quellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.3"
+      }
+    },
+    {
+      "id": "V121.5.4",
+      "type": "subphase",
+      "title": "Sicherstellen, dass keine Schreibpfade in Graph/Plans/Contracts/Cache aus dem Viewer existieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.4"
+      }
+    },
+    {
+      "id": "V121.6.1",
+      "type": "subphase",
+      "title": "`tools/graph-rag-viewer/README.md` dokumentiert Nutzung, Input-Dateien, Safety-Modi, Fallback und Nicht-Ziele.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.1"
+      }
+    },
+    {
+      "id": "V121.6.2",
+      "type": "subphase",
+      "title": "Referenz-/Plan-Kontext dokumentiert: Viewer ist Consumer von V120-Outputs und nicht Steuerquelle.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.2"
+      }
+    },
+    {
+      "id": "V121.6.3",
+      "type": "subphase",
+      "title": "Historische V107/V111-Viewer-Reste im Abschlusskontext erklaeren: ersetzt oder bewusst nicht fortgefuehrt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.3"
+      }
+    },
+    {
+      "id": "V121.6.4",
+      "type": "subphase",
+      "title": "Abschluss-Evidence im aktiven Block und/oder `docs/plaene/CHANGELOG.md` hinterlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.4"
+      }
+    },
+    {
+      "id": "V121.99.1",
+      "type": "subphase",
+      "title": "Relevante Viewer-Contract-Tests -> pass.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.1"
+      }
+    },
+    {
+      "id": "V121.99.2",
+      "type": "subphase",
+      "title": "UI-Smoke mit Fixture -> pass.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.2"
+      }
+    },
+    {
+      "id": "V121.99.3",
+      "type": "subphase",
+      "title": "`node scripts/check-knowledge-graph.mjs` -> pass.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.3"
+      }
+    },
+    {
+      "id": "V121.99.4",
+      "type": "subphase",
+      "title": "`npm run plan:check` -> pass.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.4"
+      }
+    },
+    {
+      "id": "V121.99.5",
+      "type": "subphase",
+      "title": "Bei aktiver Uebernahme: `npm run docs:sync && npm run docs:check` nach Governance-Regel pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.5"
+      }
+    },
+    {
+      "id": "V121.99.6",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt read-only Grenze, Safety-Status, V120-Dependency, historische Viewer-Reste und verbleibende Nicht-Ziele.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.6"
+      }
+    },
+    {
+      "id": "V122.1.1",
+      "type": "subphase",
+      "title": "V116-, V117-, V119- und V120-Anschluss pruefen: `V119.1` ist harte Evidence-Baseline; `V120.99` bleibt nur fuer CLI-only Memory soft, wird aber fuer Graph-RAG-, semantische Such- oder Ruflo-RAG-Nutzung zum Gate.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.1"
+      }
+    },
+    {
+      "id": "V122.1.2",
+      "type": "subphase",
+      "title": "Entscheiden, ob Memory als eigener aktiver Block startet oder als V120-Folge nach Graph-RAG; Empfehlung und Gegenargumente dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.2"
+      }
+    },
+    {
+      "id": "V122.1.3",
+      "type": "subphase",
+      "title": "Ruflo-Dokumentation aktuell pruefen, Installationsmodi klassifizieren und Full-Init-Risiko gegen Repo-Governance abgrenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.3"
+      }
+    },
+    {
+      "id": "V122.1.4",
+      "type": "subphase",
+      "title": "Zweckklasse fuer jede neue dauerhafte Datei festhalten: `plan`, `reference`, `governance`, `evidence` oder `tooling`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.4"
+      }
+    },
+    {
+      "id": "V122.1.5",
+      "type": "subphase",
+      "title": "Ruflo-Bausteine in `adopt concept`, `adopt limited`, `defer to V120`, `sandbox-only` oder `reject for MVP` klassifizieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.5"
+      }
+    },
+    {
+      "id": "V122.1.6",
+      "type": "subphase",
+      "title": "Minimalen ersten Liefer-Slice festlegen: Memory-CLI, Check, Rollenprofile und Orchestration-Plan-Validator ohne Ruflo-Installation.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.6"
+      }
+    },
+    {
+      "id": "V122.2.1",
+      "type": "subphase",
+      "title": "`docs/agent-memory/README.md` anlegen: Zweck, Nicht-Zweck, kanonische Quellen, Schreibfluss, Review-Regeln.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.1"
+      }
+    },
+    {
+      "id": "V122.2.2",
+      "type": "subphase",
+      "title": "`docs/agent-memory/schema.json` mit Pflichtfeldern, Enums, Laengenlimits und Source-Struktur definieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.2"
+      }
+    },
+    {
+      "id": "V122.2.3",
+      "type": "subphase",
+      "title": "`docs/agent-memory/namespaces.md` mit erlaubten Namespaces und Beispielen pflegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.3"
+      }
+    },
+    {
+      "id": "V122.2.4",
+      "type": "subphase",
+      "title": "`docs/agent-memory/memory.jsonl` initial leer oder mit maximal wenigen reviewed Seed-Eintraegen starten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.4"
+      }
+    },
+    {
+      "id": "V122.2.5",
+      "type": "subphase",
+      "title": "Retention-Regel definieren: deprecate statt loeschen; keine Locks, Logs, Secrets oder temporaeren Gedanken.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.5"
+      }
+    },
+    {
+      "id": "V122.3.1",
+      "type": "subphase",
+      "title": "`scripts/agent-memory.mjs` implementieren: `search`, `get`, `add-proposed`, `verify`, `deprecate`, `check`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.1"
+      }
+    },
+    {
+      "id": "V122.3.2",
+      "type": "subphase",
+      "title": "`package.json` um `memory:search`, `memory:get`, `memory:add-proposed`, `memory:verify`, `memory:deprecate`, `memory:check` erweitern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.2"
+      }
+    },
+    {
+      "id": "V122.3.3",
+      "type": "subphase",
+      "title": "Deterministische Suche mit Status-, Namespace-, Tag- und Source-Filtern implementieren; keine Embeddings.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.3"
+      }
+    },
+    {
+      "id": "V122.3.4",
+      "type": "subphase",
+      "title": "JSON-Ausgabe und kurze Textausgabe fuer Agenten-Arbeit bereitstellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.4"
+      }
+    },
+    {
+      "id": "V122.3.5",
+      "type": "subphase",
+      "title": "`tests/agent-memory.contract.test.mjs` fuer Happy Path, ungueltige Eintraege, Secret-Blocker und Source-Checks anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.5"
+      }
+    },
+    {
+      "id": "V122.4.1",
+      "type": "subphase",
+      "title": "Entscheiden: eigene `.agents/rules/agent_memory.md` oder kleine Erweiterung in bestehender Rule.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.1"
+      }
+    },
+    {
+      "id": "V122.4.2",
+      "type": "subphase",
+      "title": "Regel einhaengen: Memory-Suche nach Repo-Leseweg und Graph-First, nicht davor.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.2"
+      }
+    },
+    {
+      "id": "V122.4.3",
+      "type": "subphase",
+      "title": "Workflows `plan.md`, `code.md` und `quick.md` nur punktuell anpassen, falls sie Memory-Nutzung sonst verhindern oder uebertreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.3"
+      }
+    },
+    {
+      "id": "V122.4.4",
+      "type": "subphase",
+      "title": "`docs/referenz/ai_project_onboarding.md` um kurze Memory-Read-Regel ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.4"
+      }
+    },
+    {
+      "id": "V122.4.5",
+      "type": "subphase",
+      "title": "`check:agent-context` oder ein eigener Check verhindert, dass Memory als Masterplan, Changelog oder Rule-Ersatz formuliert wird.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.5"
+      }
+    },
+    {
+      "id": "V122.4.6",
+      "type": "subphase",
+      "title": "Subagent-Regel nur referenzieren, nicht duplizieren: V117/`planning_and_governance.md` bleiben operative Wahrheit.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.6"
+      }
+    },
+    {
+      "id": "V122.4.7",
+      "type": "subphase",
+      "title": "Orchestration-Plan-Nutzung als optionalen Vorbereitungscheck fuer explizit erlaubte Subagent-Arbeit dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.7"
+      }
+    },
+    {
+      "id": "V122.5.1",
+      "type": "subphase",
+      "title": "Entscheiden, ob MCP im aktiven Block noetig ist oder ob CLI fuer den ersten Rollout reicht.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5",
+        "subphaseCode": "122.5.1"
+      }
+    },
+    {
+      "id": "V122.5.2",
+      "type": "subphase",
+      "title": "`scripts/agent-memory-mcp.mjs` nur mit read-only Tools implementieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5",
+        "subphaseCode": "122.5.2"
+      }
+    },
+    {
+      "id": "V122.5.3",
+      "type": "subphase",
+      "title": "MCP-Tool-Ausgaben klein, source-backed und statusmarkiert halten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5",
+        "subphaseCode": "122.5.3"
+      }
+    },
+    {
+      "id": "V122.5.4",
+      "type": "subphase",
+      "title": "Schreibtools bewusst ausschliessen oder nur als spaeteres `propose_add` planen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5",
+        "subphaseCode": "122.5.4"
+      }
+    },
+    {
+      "id": "V122.5.5",
+      "type": "subphase",
+      "title": "Lokale Registrierungsanleitung dokumentieren, aber keine automatische MCP-Registrierung im Repo erzwingen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5",
+        "subphaseCode": "122.5.5"
+      }
+    },
+    {
+      "id": "V122.6.1",
+      "type": "subphase",
+      "title": "Ruflo-Version, Installationsweg, Dateiauswirkungen und MCP-Tools erneut aktuell pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.1"
+      }
+    },
+    {
+      "id": "V122.6.2",
+      "type": "subphase",
+      "title": "Sandbox- oder separaten Worktree-Pfad definieren; kein Full-Init im aktiven Hauptrepo.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.2"
+      }
+    },
+    {
+      "id": "V122.6.3",
+      "type": "subphase",
+      "title": "Zwei Testfragen ausfuehren: Architektur-Review und Testlueckenanalyse, jeweils mit vorherigem Repo-Memory-/Graph-Kontext.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.3"
+      }
+    },
+    {
+      "id": "V122.6.4",
+      "type": "subphase",
+      "title": "Ergebnisse nur als Bericht oder proposed Memory behandeln; keine automatische Rueckschreibung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.4"
+      }
+    },
+    {
+      "id": "V122.6.5",
+      "type": "subphase",
+      "title": "Go/No-Go dokumentieren: Nutzen, Risiken, Version, Recovery-Pfad, erlaubte Einsatzfaelle.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.5"
+      }
+    },
+    {
+      "id": "V122.6.6",
+      "type": "subphase",
+      "title": "Ruflo-Ausgaben gegen das Orchestration-Plan-Format spiegeln: Rolle, Quellen, Findings, Unsicherheiten, keine Repo-Write-Aktion.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.6"
+      }
+    },
+    {
+      "id": "V122.6.7",
+      "type": "subphase",
+      "title": "Entscheiden, ob Ruflo nur als gelegentlicher externer Review-Layer bleibt oder ein spaeterer MCP-Adapter gerechtfertigt ist.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.7"
+      }
+    },
+    {
+      "id": "V122.7.1",
+      "type": "subphase",
+      "title": "Regel fuer Repo -> Ruflo Spiegel definieren: selektiv, kurz, verified-only, niemals automatisch umgekehrt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.1"
+      }
+    },
+    {
+      "id": "V122.7.2",
+      "type": "subphase",
+      "title": "Semantische Suche nur als Backlog markieren und an V120-Outputs koppeln.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.2"
+      }
+    },
+    {
+      "id": "V122.7.3",
+      "type": "subphase",
+      "title": "Kriterien definieren, wann Embeddings noetig sind: Suchtrefferqualitaet, Memory-Groesse, Query-Latenz, Review-Aufwand.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.3"
+      }
+    },
+    {
+      "id": "V122.7.4",
+      "type": "subphase",
+      "title": "Lokale Embedding-/Vector-Pfade nicht im MVP bauen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.4"
+      }
+    },
+    {
+      "id": "V122.7.5",
+      "type": "subphase",
+      "title": "Loesch-/Deprecation- und Source-Staleness-Report als spaeteres Wartungsfenster planen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.5"
+      }
+    },
+    {
+      "id": "V122.99.1",
+      "type": "subphase",
+      "title": "Alle vorherigen Phasen sind abgeschlossen oder begruendet vertagt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.1"
+      }
+    },
+    {
+      "id": "V122.99.2",
+      "type": "subphase",
+      "title": "`npm run memory:check` ist gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.2"
+      }
+    },
+    {
+      "id": "V122.99.3",
+      "type": "subphase",
+      "title": "`npm run test:agent-memory` ist gruen, falls Tests eingefuehrt wurden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.3"
+      }
+    },
+    {
+      "id": "V122.99.4",
+      "type": "subphase",
+      "title": "`npm run check:agent-context` und `npm run plan:check` sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.4"
+      }
+    },
+    {
+      "id": "V122.99.5",
+      "type": "subphase",
+      "title": "Bei Governance-/MCP-/Ruflo-Diff ist `npm run gates:pre-commit` gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.5"
+      }
+    },
+    {
+      "id": "V122.99.6",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt: Memory ist Hinweisindex, kanonische Quellen bleiben unveraendert, Ruflo ist optionaler externer Layer, keine automatische Rueckschreibung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.6"
+      }
+    },
+    {
       "id": "V123.1.1",
       "type": "subphase",
       "title": "Feldliste fuer den MVP finalisieren: `schema_version`, `updated`, `active_lock`, `next_free_p1_start`, `sources`, `blocks`.",
@@ -11427,6 +12625,413 @@
         "blockId": "V123",
         "phaseCode": "123.99",
         "subphaseCode": "123.99.6"
+      }
+    },
+    {
+      "id": "V124.1.1",
+      "type": "subphase",
+      "title": "Aktuellen Graph-Zustand erfassen: `critical-path-health`, `coverage-report`, `quality-scorecard`, `schema-lint`, `scope-collisions`, `test-prioritization` fuer Settings und je einen V112-/V96-Hotspot.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.1",
+        "subphaseCode": "124.1.1"
+      }
+    },
+    {
+      "id": "V124.1.2",
+      "type": "subphase",
+      "title": "Produktfragenkatalog erstellen: mindestens 12 Fragen aus Bugfix, Review, Playtest, Runtime-Diagnose, UI-Hardening, Map/Authoring und Boundary-Arbeit.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.1",
+        "subphaseCode": "124.1.2"
+      }
+    },
+    {
+      "id": "V124.1.3",
+      "type": "subphase",
+      "title": "Fragen auf Zielqueries mappen: `impact-for-file`, `event-flow`, `change-risk`, `what-if-*`, `test-prioritization`, `coverage-report`, `surfaces-for-file`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.1",
+        "subphaseCode": "124.1.3"
+      }
+    },
+    {
+      "id": "V124.1.4",
+      "type": "subphase",
+      "title": "Priorisierungsmatrix festlegen: Nutzerwirkung, Regression-Risiko, Hotspot-Haeufigkeit, vorhandene Tests, vorhandene Contracts, Unsicherheit.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.1",
+        "subphaseCode": "124.1.4"
+      }
+    },
+    {
+      "id": "V124.2.1",
+      "type": "subphase",
+      "title": "Node-Typen und Attribute pruefen/erweitern: `surface`, `domain`, `mode`, `authoring`, `validation`, optional `flow` oder gleichwertige existierende Typen wiederverwenden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.2",
+        "subphaseCode": "124.2.1"
+      }
+    },
+    {
+      "id": "V124.2.2",
+      "type": "subphase",
+      "title": "Relationstypen begrenzen und dokumentieren: keine Synonymflut; neue Relationen nur mit Query-Nutzen und Predicate-Constraints.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.2",
+        "subphaseCode": "124.2.2"
+      }
+    },
+    {
+      "id": "V124.2.3",
+      "type": "subphase",
+      "title": "Evidence-Felder fuer kritische Produktkanten definieren: `sourceKind`, `confidence`, `sourceWindow`, `reviewRequired` oder kompatible bestehende Attribute.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.2",
+        "subphaseCode": "124.2.3"
+      }
+    },
+    {
+      "id": "V124.2.4",
+      "type": "subphase",
+      "title": "Produktive Sicht definieren: Default-Filter, der Plan-/Subphase-Masse ausblendet, ohne `open-deps`, `scope-collisions` und Governance-Queries zu schwachen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.2",
+        "subphaseCode": "124.2.4"
+      }
+    },
+    {
+      "id": "V124.3.1",
+      "type": "subphase",
+      "title": "Input-Lifecycle modellieren: `InputManager`, Fokuswechsel, Textinput, Match/Menu-Uebergaenge, relevante Tests und Open-Finding-Bezug.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.3",
+        "subphaseCode": "124.3.1"
+      }
+    },
+    {
+      "id": "V124.3.2",
+      "type": "subphase",
+      "title": "Collision-/Bounce-/Replay-Semantik modellieren: deterministische Pfade, Runtime-Systeme, State-/Config-Bezuege, Testsignale.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.3",
+        "subphaseCode": "124.3.2"
+      }
+    },
+    {
+      "id": "V124.3.3",
+      "type": "subphase",
+      "title": "Arcade-Run-Semantik modellieren: Seed-Quelle, Sudden-Death-Lifecycle, Run-State, Overlay-Abhaengigkeiten, Contract-/Targeted-Tests.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.3",
+        "subphaseCode": "124.3.3"
+      }
+    },
+    {
+      "id": "V124.3.4",
+      "type": "subphase",
+      "title": "Surface-/Injection-Semantik modellieren: Start-Setup, Arcade-Overlay, sichere DOM-Erzeugung, Negativtests und CSP-Nebenpfad.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.3",
+        "subphaseCode": "124.3.4"
+      }
+    },
+    {
+      "id": "V124.4.1",
+      "type": "subphase",
+      "title": "V96-nahe Boundary-Semantik modellieren: Application/Core/UI-Port-Grenzen, Runtime-Ports, Legacy-Surface-Reste, Ratchet-Gates.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.4",
+        "subphaseCode": "124.4.1"
+      }
+    },
+    {
+      "id": "V124.4.2",
+      "type": "subphase",
+      "title": "V106-nahe Map-/Authoring-Semantik modellieren: GLB-Presets, Collider-Modi, Editor-/JSON-/Runtime-Roundtrip, Asset-Herkunft.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.4",
+        "subphaseCode": "124.4.2"
+      }
+    },
+    {
+      "id": "V124.4.3",
+      "type": "subphase",
+      "title": "V113-nahe Hangar-/Rules-Semantik modellieren: Mode-Regeln, Rules Panel, Hangar Contracts, Start-/Preview-Surfaces.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.4",
+        "subphaseCode": "124.4.3"
+      }
+    },
+    {
+      "id": "V124.4.4",
+      "type": "subphase",
+      "title": "Handoff-Regel einfuehren: abgeschlossene Produktbloecke nennen, welche Semantik in den Graphen gehoert und welche bewusst nicht.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.4",
+        "subphaseCode": "124.4.4"
+      }
+    },
+    {
+      "id": "V124.5.1",
+      "type": "subphase",
+      "title": "`uncoveredActiveFileCount` nach Klasse, Hotspot, Produktnaehe und Risiko clustern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.5",
+        "subphaseCode": "124.5.1"
+      }
+    },
+    {
+      "id": "V124.5.2",
+      "type": "subphase",
+      "title": "Top-Produktcode-Luecken in drei Klassen einteilen: `semantic-coverage-now`, `covered-by-parent-flow`, `defer-with-owner`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.5",
+        "subphaseCode": "124.5.2"
+      }
+    },
+    {
+      "id": "V124.5.3",
+      "type": "subphase",
+      "title": "Top-Produktdoc-Luecken pruefen: Referenzdoku, aktive Evidence, historische Ablage oder bewusst nicht graphrelevant.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.5",
+        "subphaseCode": "124.5.3"
+      }
+    },
+    {
+      "id": "V124.5.4",
+      "type": "subphase",
+      "title": "Coverage-Gate erweitern: nicht nur \"keine neuen Luecken\", sondern optional \"Top-Hotspot darf nicht unerklaert bleiben\".",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.5",
+        "subphaseCode": "124.5.4"
+      }
+    },
+    {
+      "id": "V124.6.1",
+      "type": "subphase",
+      "title": "Produktive Filterprofile ergaenzen: `product`, `review`, `incident`, `onboarding` auf Output-Breite und Relevanz pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.6",
+        "subphaseCode": "124.6.1"
+      }
+    },
+    {
+      "id": "V124.6.2",
+      "type": "subphase",
+      "title": "`impact-for-file` fuer gemischte Dateien verbessern: Plan-/Scope-Kontext sekundar, Produktsemantik primaer, wenn vorhanden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.6",
+        "subphaseCode": "124.6.2"
+      }
+    },
+    {
+      "id": "V124.6.3",
+      "type": "subphase",
+      "title": "`event-flow` fuer neue Flows stabilisieren: Textausgabe knapp, JSON vollstaendig, ContextEdges sortiert nach Causal-/Evidence-Wert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.6",
+        "subphaseCode": "124.6.3"
+      }
+    },
+    {
+      "id": "V124.6.4",
+      "type": "subphase",
+      "title": "`test-prioritization` gegen neue Produktflows testen: keine Testflut, klare Begruendung pro vorgeschlagenem Test.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.6",
+        "subphaseCode": "124.6.4"
+      }
+    },
+    {
+      "id": "V124.7.1",
+      "type": "subphase",
+      "title": "Ownership-Modell fuer Produktsemantik festlegen: pro Flow Owner/Steward, Review-Bedarf, Delete-/Update-Kriterium.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.7",
+        "subphaseCode": "124.7.1"
+      }
+    },
+    {
+      "id": "V124.7.2",
+      "type": "subphase",
+      "title": "Abschlussregel fuer produktnahe Folgeblocks ergaenzen: Wenn ein Block kritische Runtime-/UI-/Authoring-Semantik aendert, muss Graph-Handoff geprueft oder begruendet verworfen werden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.7",
+        "subphaseCode": "124.7.2"
+      }
+    },
+    {
+      "id": "V124.7.3",
+      "type": "subphase",
+      "title": "Drift-Review planen: monatlich oder pro Release `quality-scorecard`, `coverage-report`, `critical-path-health`, `temporal-anomalies`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.7",
+        "subphaseCode": "124.7.3"
+      }
+    },
+    {
+      "id": "V124.7.4",
+      "type": "subphase",
+      "title": "Bot-/Training-Abgrenzung dokumentieren: produktive Runtime-Vertraege ja, Trainingsmaster bleibt eigene Quelle.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.7",
+        "subphaseCode": "124.7.4"
+      }
+    },
+    {
+      "id": "V124.8.1",
+      "type": "subphase",
+      "title": "Golden-Referenzen fuer mindestens vier neue Flows in Contract-Tests oder Query-Fixtures absichern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.8",
+        "subphaseCode": "124.8.1"
+      }
+    },
+    {
+      "id": "V124.8.2",
+      "type": "subphase",
+      "title": "`graph:check` um neue Mindestvalidierungen erweitern, falls Mapping-Konventionen allein nicht reichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.8",
+        "subphaseCode": "124.8.2"
+      }
+    },
+    {
+      "id": "V124.8.3",
+      "type": "subphase",
+      "title": "`graph:slo` nach Semantik-Ausbau pruefen und Budgets nur begruendet anpassen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.8",
+        "subphaseCode": "124.8.3"
+      }
+    },
+    {
+      "id": "V124.8.4",
+      "type": "subphase",
+      "title": "Vor Abschluss alle Referenzqueries dokumentieren: Befehl, erwarteter Nutzwert, wichtigste Evidence.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.8",
+        "subphaseCode": "124.8.4"
+      }
+    },
+    {
+      "id": "V124.99.1",
+      "type": "subphase",
+      "title": "Alle frueheren Phasen sind abgeschlossen oder blockerfest mit Nachfolgeentscheid dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.1"
+      }
+    },
+    {
+      "id": "V124.99.2",
+      "type": "subphase",
+      "title": "`npm run graph:build`, `npm run graph:check`, `npm run graph:slo`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.2"
+      }
+    },
+    {
+      "id": "V124.99.3",
+      "type": "subphase",
+      "title": "Referenzqueries zeigen den verbesserten Nutzwert fuer mindestens vier neue Produktflows.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.3"
+      }
+    },
+    {
+      "id": "V124.99.4",
+      "type": "subphase",
+      "title": "Coverage-/Hotspot-Ratchet ist sichtbar: Top-Luecken reduziert, erklaert oder mit Owner/Nachfolgeblock versehen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.4"
+      }
+    },
+    {
+      "id": "V124.99.5",
+      "type": "subphase",
+      "title": "Abschlussnotiz in `docs/plaene/CHANGELOG.md` erklaert Produktnutzen, Grenzen, verbleibende Risiken und naechste Semantik-Kandidaten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.5"
       }
     },
     {
@@ -20042,6 +21647,21 @@
       }
     },
     {
+      "id": ".agents/rules/agent_memory.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": ".agents/rules/code_quality_and_debugging.md",
       "type": "file",
       "title": null,
@@ -22377,6 +23997,36 @@
       }
     },
     {
+      "id": "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
       "type": "file",
       "title": null,
@@ -22406,6 +24056,36 @@
           "V111"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/product-flow-fixtures.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V124"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/product-semantics.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V124"
+        ],
+        "exists": false
       }
     },
     {
@@ -22734,6 +24414,96 @@
           "V74"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "docs/agent-memory/memory.jsonl",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "docs/agent-memory/namespaces.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "docs/agent-memory/orchestration-modes.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "docs/agent-memory/README.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "docs/agent-memory/role-profiles.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "docs/agent-memory/schema.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
       }
     },
     {
@@ -23229,6 +24999,38 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V121.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V122.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V123.md",
       "type": "file",
       "title": null,
@@ -23239,6 +25041,22 @@
         ],
         "scopeBlocks": [
           "V123",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V124.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V124",
           "V77"
         ],
         "exists": true
@@ -27311,6 +29129,51 @@
       }
     },
     {
+      "id": "scripts/agent-memory-mcp.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "scripts/agent-memory.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "scripts/agent-orchestration-plan.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "scripts/agent-preflight.mjs",
       "type": "file",
       "title": null,
@@ -28096,6 +29959,21 @@
         ],
         "scopeBlocks": [
           "V120"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "scripts/graph-rag-viewer-export.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
         ],
         "exists": false
       }
@@ -39474,6 +41352,36 @@
       }
     },
     {
+      "id": "tests/agent-memory.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tests/agent-orchestration-plan.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V122"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "tests/ai-decision-policy.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -40018,6 +41926,36 @@
       }
     },
     {
+      "id": "tests/graph-rag-viewer-export.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tests/graph-rag-viewer-ui.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "tests/hangar-desktop-flow.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -40103,6 +42041,21 @@
           "V94"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "tests/knowledge-graph-product-semantics.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V124"
+        ],
+        "exists": false
       }
     },
     {
@@ -41381,6 +43334,51 @@
           "V116"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "tools/graph-rag-viewer/index.html",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tools/graph-rag-viewer/viewer.css",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tools/graph-rag-viewer/viewer.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
       }
     },
     {
@@ -62719,6 +64717,1316 @@
       }
     },
     {
+      "from": "V121",
+      "to": "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "docs/plaene/aktiv/V121.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "scripts/graph-rag-viewer-export.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "tests/graph-rag-viewer-export.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "tests/graph-rag-viewer-ui.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "tools/graph-rag-viewer/index.html",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "tools/graph-rag-viewer/viewer.css",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "tools/graph-rag-viewer/viewer.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V107",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Core-Graph und Export-/Viewer-Historie bilden die technische Basis",
+      "attributes": {
+        "dependsPhase": "107.99",
+        "rawToken": "V107.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V110",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Graph-Ops-, Guard- und SLO-Basis bleibt Voraussetzung fuer sichere Viewer-Exports",
+      "attributes": {
+        "dependsPhase": "110.99",
+        "rawToken": "V110.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V111",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Safety-/Redaction- und adaptive Query-Grundlagen sind Basis fuer Evidence-Dashboard-Ausgaben",
+      "attributes": {
+        "dependsPhase": "111.99",
+        "rawToken": "V111.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V120",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Viewer bleibt Consumer von stabilen Graph-RAG-Evidence-Paketen oder einem explizit dokumentierten V120-`fixture-ready`-Gate",
+      "attributes": {
+        "dependsPhase": "120.99",
+        "rawToken": "V120.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V121.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.1"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V121.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.2"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V121.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V121.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.4"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V121.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V121.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "V121.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99"
+      }
+    },
+    {
+      "from": "V121.1",
+      "to": "V121.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.1",
+        "subphaseCode": "121.1.1"
+      }
+    },
+    {
+      "from": "V121.1",
+      "to": "V121.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.1",
+        "subphaseCode": "121.1.2"
+      }
+    },
+    {
+      "from": "V121.1",
+      "to": "V121.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.1",
+        "subphaseCode": "121.1.3"
+      }
+    },
+    {
+      "from": "V121.1",
+      "to": "V121.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.1",
+        "subphaseCode": "121.1.4"
+      }
+    },
+    {
+      "from": "V121.2",
+      "to": "V121.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.2",
+        "subphaseCode": "121.2.1"
+      }
+    },
+    {
+      "from": "V121.2",
+      "to": "V121.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.2",
+        "subphaseCode": "121.2.2"
+      }
+    },
+    {
+      "from": "V121.2",
+      "to": "V121.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.2",
+        "subphaseCode": "121.2.3"
+      }
+    },
+    {
+      "from": "V121.2",
+      "to": "V121.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.2",
+        "subphaseCode": "121.2.4"
+      }
+    },
+    {
+      "from": "V121.3",
+      "to": "V121.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3",
+        "subphaseCode": "121.3.1"
+      }
+    },
+    {
+      "from": "V121.3",
+      "to": "V121.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3",
+        "subphaseCode": "121.3.2"
+      }
+    },
+    {
+      "from": "V121.3",
+      "to": "V121.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3",
+        "subphaseCode": "121.3.3"
+      }
+    },
+    {
+      "from": "V121.3",
+      "to": "V121.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3",
+        "subphaseCode": "121.3.4"
+      }
+    },
+    {
+      "from": "V121.4",
+      "to": "V121.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.4",
+        "subphaseCode": "121.4.1"
+      }
+    },
+    {
+      "from": "V121.4",
+      "to": "V121.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.4",
+        "subphaseCode": "121.4.2"
+      }
+    },
+    {
+      "from": "V121.4",
+      "to": "V121.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.4",
+        "subphaseCode": "121.4.3"
+      }
+    },
+    {
+      "from": "V121.4",
+      "to": "V121.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.4",
+        "subphaseCode": "121.4.4"
+      }
+    },
+    {
+      "from": "V121.5",
+      "to": "V121.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.1"
+      }
+    },
+    {
+      "from": "V121.5",
+      "to": "V121.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.2"
+      }
+    },
+    {
+      "from": "V121.5",
+      "to": "V121.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.3"
+      }
+    },
+    {
+      "from": "V121.5",
+      "to": "V121.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.4"
+      }
+    },
+    {
+      "from": "V121.6",
+      "to": "V121.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.1"
+      }
+    },
+    {
+      "from": "V121.6",
+      "to": "V121.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.2"
+      }
+    },
+    {
+      "from": "V121.6",
+      "to": "V121.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.3"
+      }
+    },
+    {
+      "from": "V121.6",
+      "to": "V121.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.4"
+      }
+    },
+    {
+      "from": "V121.99",
+      "to": "V121.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.1"
+      }
+    },
+    {
+      "from": "V121.99",
+      "to": "V121.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.2"
+      }
+    },
+    {
+      "from": "V121.99",
+      "to": "V121.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.3"
+      }
+    },
+    {
+      "from": "V121.99",
+      "to": "V121.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.4"
+      }
+    },
+    {
+      "from": "V121.99",
+      "to": "V121.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.5"
+      }
+    },
+    {
+      "from": "V121.99",
+      "to": "V121.99.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.6"
+      }
+    },
+    {
+      "from": "V122",
+      "to": ".agents/rules/agent_memory.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "docs/agent-memory/memory.jsonl",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "docs/agent-memory/namespaces.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "docs/agent-memory/orchestration-modes.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "docs/agent-memory/README.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "docs/agent-memory/role-profiles.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "docs/agent-memory/schema.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "docs/plaene/aktiv/V122.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "scripts/agent-memory-mcp.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "scripts/agent-memory.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "scripts/agent-orchestration-plan.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "tests/agent-memory.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "tests/agent-orchestration-plan.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V116",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Repo-Kontext-Reduktion soll abgeschlossen sein, bevor dauerhaftes Agent-Memory als neue Kontextquelle startet",
+      "attributes": {
+        "dependsPhase": "116.99",
+        "rawToken": "V116.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V117",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Decision-Klassen, D3/D4-Gates und Zweckklassen begrenzen Memory-/Ruflo-Scope",
+      "attributes": {
+        "dependsPhase": "117.99",
+        "rawToken": "V117.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V119",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Evidence-Baseline muss geklaert sein, bevor dauerhafte Memory-Hinweise verifiziert werden",
+      "attributes": {
+        "dependsPhase": "119.1",
+        "rawToken": "V119.1",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V122.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V122.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V122.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V122.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V122.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V122.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V122.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7"
+      }
+    },
+    {
+      "from": "V122",
+      "to": "V122.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99"
+      }
+    },
+    {
+      "from": "V122.1",
+      "to": "V122.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.1"
+      }
+    },
+    {
+      "from": "V122.1",
+      "to": "V122.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.2"
+      }
+    },
+    {
+      "from": "V122.1",
+      "to": "V122.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.3"
+      }
+    },
+    {
+      "from": "V122.1",
+      "to": "V122.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.4"
+      }
+    },
+    {
+      "from": "V122.1",
+      "to": "V122.1.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.5"
+      }
+    },
+    {
+      "from": "V122.1",
+      "to": "V122.1.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.6"
+      }
+    },
+    {
+      "from": "V122.2",
+      "to": "V122.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.1"
+      }
+    },
+    {
+      "from": "V122.2",
+      "to": "V122.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.2"
+      }
+    },
+    {
+      "from": "V122.2",
+      "to": "V122.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.3"
+      }
+    },
+    {
+      "from": "V122.2",
+      "to": "V122.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.4"
+      }
+    },
+    {
+      "from": "V122.2",
+      "to": "V122.2.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.5"
+      }
+    },
+    {
+      "from": "V122.3",
+      "to": "V122.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.1"
+      }
+    },
+    {
+      "from": "V122.3",
+      "to": "V122.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.2"
+      }
+    },
+    {
+      "from": "V122.3",
+      "to": "V122.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.3"
+      }
+    },
+    {
+      "from": "V122.3",
+      "to": "V122.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.4"
+      }
+    },
+    {
+      "from": "V122.3",
+      "to": "V122.3.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.5"
+      }
+    },
+    {
+      "from": "V122.4",
+      "to": "V122.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.1"
+      }
+    },
+    {
+      "from": "V122.4",
+      "to": "V122.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.2"
+      }
+    },
+    {
+      "from": "V122.4",
+      "to": "V122.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.3"
+      }
+    },
+    {
+      "from": "V122.4",
+      "to": "V122.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.4"
+      }
+    },
+    {
+      "from": "V122.4",
+      "to": "V122.4.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.5"
+      }
+    },
+    {
+      "from": "V122.4",
+      "to": "V122.4.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.6"
+      }
+    },
+    {
+      "from": "V122.4",
+      "to": "V122.4.7",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.4",
+        "subphaseCode": "122.4.7"
+      }
+    },
+    {
+      "from": "V122.5",
+      "to": "V122.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5",
+        "subphaseCode": "122.5.1"
+      }
+    },
+    {
+      "from": "V122.5",
+      "to": "V122.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5",
+        "subphaseCode": "122.5.2"
+      }
+    },
+    {
+      "from": "V122.5",
+      "to": "V122.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5",
+        "subphaseCode": "122.5.3"
+      }
+    },
+    {
+      "from": "V122.5",
+      "to": "V122.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5",
+        "subphaseCode": "122.5.4"
+      }
+    },
+    {
+      "from": "V122.5",
+      "to": "V122.5.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.5",
+        "subphaseCode": "122.5.5"
+      }
+    },
+    {
+      "from": "V122.6",
+      "to": "V122.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.1"
+      }
+    },
+    {
+      "from": "V122.6",
+      "to": "V122.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.2"
+      }
+    },
+    {
+      "from": "V122.6",
+      "to": "V122.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.3"
+      }
+    },
+    {
+      "from": "V122.6",
+      "to": "V122.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.4"
+      }
+    },
+    {
+      "from": "V122.6",
+      "to": "V122.6.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.5"
+      }
+    },
+    {
+      "from": "V122.6",
+      "to": "V122.6.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.6"
+      }
+    },
+    {
+      "from": "V122.6",
+      "to": "V122.6.7",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.7"
+      }
+    },
+    {
+      "from": "V122.7",
+      "to": "V122.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.1"
+      }
+    },
+    {
+      "from": "V122.7",
+      "to": "V122.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.2"
+      }
+    },
+    {
+      "from": "V122.7",
+      "to": "V122.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.3"
+      }
+    },
+    {
+      "from": "V122.7",
+      "to": "V122.7.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.4"
+      }
+    },
+    {
+      "from": "V122.7",
+      "to": "V122.7.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.5"
+      }
+    },
+    {
+      "from": "V122.99",
+      "to": "V122.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.1"
+      }
+    },
+    {
+      "from": "V122.99",
+      "to": "V122.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.2"
+      }
+    },
+    {
+      "from": "V122.99",
+      "to": "V122.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.3"
+      }
+    },
+    {
+      "from": "V122.99",
+      "to": "V122.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.4"
+      }
+    },
+    {
+      "from": "V122.99",
+      "to": "V122.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.5"
+      }
+    },
+    {
+      "from": "V122.99",
+      "to": "V122.99.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.99",
+        "subphaseCode": "122.99.6"
+      }
+    },
+    {
       "from": "V123",
       "to": ".agents/rules/planning_and_governance.md",
       "type": "scope",
@@ -63296,6 +66604,593 @@
         "blockId": "V123",
         "phaseCode": "123.99",
         "subphaseCode": "123.99.6"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "data/contracts/knowledge-graph/product-flow-fixtures.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "data/contracts/knowledge-graph/product-semantics.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "docs/plaene/aktiv/V124.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "tests/knowledge-graph-product-semantics.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V107",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Core-Graph und Query-Layer sind Basis fuer Produktsemantik-Ausbau",
+      "attributes": {
+        "dependsPhase": "107.99",
+        "rawToken": "V107.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V110",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Graph-Ops-, Guard- und SLO-Basis begrenzen Semantik-Ratchet und Coverage-Ausbau",
+      "attributes": {
+        "dependsPhase": "110.99",
+        "rawToken": "V110.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V111",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Ownership, Stability, Scorecard und Test-Priorisierung sind Grundlage fuer Produktsemantik-Nutzwert",
+      "attributes": {
+        "dependsPhase": "111.99",
+        "rawToken": "V111.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V124.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.1"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V124.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.2"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V124.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.3"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V124.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.4"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V124.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.5"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V124.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.6"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V124.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.7"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V124.8",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.8"
+      }
+    },
+    {
+      "from": "V124",
+      "to": "V124.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99"
+      }
+    },
+    {
+      "from": "V124.1",
+      "to": "V124.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.1",
+        "subphaseCode": "124.1.1"
+      }
+    },
+    {
+      "from": "V124.1",
+      "to": "V124.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.1",
+        "subphaseCode": "124.1.2"
+      }
+    },
+    {
+      "from": "V124.1",
+      "to": "V124.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.1",
+        "subphaseCode": "124.1.3"
+      }
+    },
+    {
+      "from": "V124.1",
+      "to": "V124.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.1",
+        "subphaseCode": "124.1.4"
+      }
+    },
+    {
+      "from": "V124.2",
+      "to": "V124.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.2",
+        "subphaseCode": "124.2.1"
+      }
+    },
+    {
+      "from": "V124.2",
+      "to": "V124.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.2",
+        "subphaseCode": "124.2.2"
+      }
+    },
+    {
+      "from": "V124.2",
+      "to": "V124.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.2",
+        "subphaseCode": "124.2.3"
+      }
+    },
+    {
+      "from": "V124.2",
+      "to": "V124.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.2",
+        "subphaseCode": "124.2.4"
+      }
+    },
+    {
+      "from": "V124.3",
+      "to": "V124.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.3",
+        "subphaseCode": "124.3.1"
+      }
+    },
+    {
+      "from": "V124.3",
+      "to": "V124.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.3",
+        "subphaseCode": "124.3.2"
+      }
+    },
+    {
+      "from": "V124.3",
+      "to": "V124.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.3",
+        "subphaseCode": "124.3.3"
+      }
+    },
+    {
+      "from": "V124.3",
+      "to": "V124.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.3",
+        "subphaseCode": "124.3.4"
+      }
+    },
+    {
+      "from": "V124.4",
+      "to": "V124.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.4",
+        "subphaseCode": "124.4.1"
+      }
+    },
+    {
+      "from": "V124.4",
+      "to": "V124.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.4",
+        "subphaseCode": "124.4.2"
+      }
+    },
+    {
+      "from": "V124.4",
+      "to": "V124.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.4",
+        "subphaseCode": "124.4.3"
+      }
+    },
+    {
+      "from": "V124.4",
+      "to": "V124.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.4",
+        "subphaseCode": "124.4.4"
+      }
+    },
+    {
+      "from": "V124.5",
+      "to": "V124.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.5",
+        "subphaseCode": "124.5.1"
+      }
+    },
+    {
+      "from": "V124.5",
+      "to": "V124.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.5",
+        "subphaseCode": "124.5.2"
+      }
+    },
+    {
+      "from": "V124.5",
+      "to": "V124.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.5",
+        "subphaseCode": "124.5.3"
+      }
+    },
+    {
+      "from": "V124.5",
+      "to": "V124.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.5",
+        "subphaseCode": "124.5.4"
+      }
+    },
+    {
+      "from": "V124.6",
+      "to": "V124.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.6",
+        "subphaseCode": "124.6.1"
+      }
+    },
+    {
+      "from": "V124.6",
+      "to": "V124.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.6",
+        "subphaseCode": "124.6.2"
+      }
+    },
+    {
+      "from": "V124.6",
+      "to": "V124.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.6",
+        "subphaseCode": "124.6.3"
+      }
+    },
+    {
+      "from": "V124.6",
+      "to": "V124.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.6",
+        "subphaseCode": "124.6.4"
+      }
+    },
+    {
+      "from": "V124.7",
+      "to": "V124.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.7",
+        "subphaseCode": "124.7.1"
+      }
+    },
+    {
+      "from": "V124.7",
+      "to": "V124.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.7",
+        "subphaseCode": "124.7.2"
+      }
+    },
+    {
+      "from": "V124.7",
+      "to": "V124.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.7",
+        "subphaseCode": "124.7.3"
+      }
+    },
+    {
+      "from": "V124.7",
+      "to": "V124.7.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.7",
+        "subphaseCode": "124.7.4"
+      }
+    },
+    {
+      "from": "V124.8",
+      "to": "V124.8.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.8",
+        "subphaseCode": "124.8.1"
+      }
+    },
+    {
+      "from": "V124.8",
+      "to": "V124.8.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.8",
+        "subphaseCode": "124.8.2"
+      }
+    },
+    {
+      "from": "V124.8",
+      "to": "V124.8.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.8",
+        "subphaseCode": "124.8.3"
+      }
+    },
+    {
+      "from": "V124.8",
+      "to": "V124.8.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.8",
+        "subphaseCode": "124.8.4"
+      }
+    },
+    {
+      "from": "V124.99",
+      "to": "V124.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.1"
+      }
+    },
+    {
+      "from": "V124.99",
+      "to": "V124.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.2"
+      }
+    },
+    {
+      "from": "V124.99",
+      "to": "V124.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.3"
+      }
+    },
+    {
+      "from": "V124.99",
+      "to": "V124.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.4"
+      }
+    },
+    {
+      "from": "V124.99",
+      "to": "V124.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.5"
       }
     },
     {
@@ -73449,7 +77344,34 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V121.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V122.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V123.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V124.md",
       "type": "scope",
       "hint": null,
       "attributes": {

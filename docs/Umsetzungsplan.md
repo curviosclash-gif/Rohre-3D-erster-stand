@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-15. Aktiver Lock: keiner; naechster freier P1-Startpfad: `V116 116.4`.
+Stand: 2026-05-17. Aktiver Lock: `codex` auf `V116 116.4`; naechster freier P1-Startpfad: `V119 119.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -59,8 +59,11 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V117 | AI Decision Framework und Autonomie-Gates | done | P1 | frei | V109.99 | 117.99 | `docs/plaene/aktiv/V117.md` |
 | V116 | Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung | active | P1 | frei | V109.99,V117.99,V115.99 | 116.4 | `docs/plaene/aktiv/V116.md` |
 | V119 | Planabschluss-Evidence-Remediation und Git-Historienabgleich | planned | P1 | frei | V117.99 | 119.1 | `docs/plaene/aktiv/V119.md` |
-| V120 | Graph-RAG mit lokalem Context-Adapter | planned | P1 | frei | V107.99,V110.99,V111.99 | 120.1 | `docs/plaene/aktiv/V120.md` |
 | V123 | AI-optimierter Plan-Index und Source-of-Truth-Migration | planned | P1 | frei | V116.4,V119.1 | 123.1 | `docs/plaene/aktiv/V123.md` |
+| V120 | Graph-RAG mit lokalem Context-Adapter | planned | P1 | frei | V107.99,V110.99,V111.99 | 120.1 | `docs/plaene/aktiv/V120.md` |
+| V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.1 | `docs/plaene/aktiv/V121.md` |
+| V122 | Repo-natives Agent-Memory und externe Ruflo-Orchestrierung | planned | P2 | frei | V116.99,V117.99,V119.1 | 122.1 | `docs/plaene/aktiv/V122.md` |
+| V124 | Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet | planned | P2 | frei | V107.99,V110.99,V111.99 | 124.1 | `docs/plaene/aktiv/V124.md` |
 | V112 | Spielaudit- und Playtest-Improvement-Paket | planned | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
@@ -108,6 +111,17 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V120 | V111.99 | hard | ja | Adaptive Query-, Safety-, Scorecard- und Feedback-Mechanik ist Grundlage fuer Evidence-Pakete und lokale Adapter |
 | V123 | V116.4 | hard | ja | Plan-Kontext-Klassifikation und AI-Leseweg bilden die Baseline fuer den strukturierten Plan-Index-Pilot |
 | V123 | V119.1 | hard | nein | Evidence-/Abschluss-Baseline soll historische Drift vor Source-of-Truth-Entscheidungen sichtbar machen |
+| V121 | V120.99 | hard | nein | Viewer bleibt Consumer von stabilen Graph-RAG-Evidence-Paketen oder einem explizit dokumentierten V120-`fixture-ready`-Gate |
+| V121 | V107.99 | hard | ja | Core-Graph und Export-/Viewer-Historie bilden die technische Basis |
+| V121 | V110.99 | hard | ja | Graph-Ops-, Guard- und SLO-Basis bleibt Voraussetzung fuer sichere Viewer-Exports |
+| V121 | V111.99 | hard | ja | Safety-/Redaction- und adaptive Query-Grundlagen sind Basis fuer Evidence-Dashboard-Ausgaben |
+| V122 | V116.99 | hard | nein | Repo-Kontext-Reduktion soll abgeschlossen sein, bevor dauerhaftes Agent-Memory als neue Kontextquelle startet |
+| V122 | V117.99 | hard | ja | Decision-Klassen, D3/D4-Gates und Zweckklassen begrenzen Memory-/Ruflo-Scope |
+| V122 | V119.1 | hard | nein | Evidence-Baseline muss geklaert sein, bevor dauerhafte Memory-Hinweise verifiziert werden |
+| V124 | V107.99 | hard | ja | Core-Graph und Query-Layer sind Basis fuer Produktsemantik-Ausbau |
+| V124 | V110.99 | hard | ja | Graph-Ops-, Guard- und SLO-Basis begrenzen Semantik-Ratchet und Coverage-Ausbau |
+| V124 | V111.99 | hard | ja | Ownership, Stability, Scorecard und Test-Priorisierung sind Grundlage fuer Produktsemantik-Nutzwert |
+| V124 | V112.99,V96.99,V106.99,V113.99 | soft | nein | Produktbloecke liefern wertvolle Harvest-Quellen, sind aber keine Startblocker fuer Baseline und Taxonomie |
 
 ## Lock-Status
 
@@ -134,8 +148,11 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V117 | 2026-05-14 | closed | Abgeschlossen 2026-05-14 |
 | codex | V116 | 2026-05-15 | active | 116.4 Plan-Kontext |
 | - | V119 | - | frei | Geplant |
-| - | V120 | - | frei | Geplant |
 | - | V123 | - | frei | Geplant |
+| - | V120 | - | frei | Geplant |
+| - | V121 | - | frei | Geplant |
+| - | V122 | - | frei | Geplant |
+| - | V124 | - | frei | Geplant |
 | - | V96 | - | frei | Geplant |
 | - | V106 | - | frei | Geplant |
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
@@ -146,15 +163,18 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 ## Empfohlene Reihenfolge
 
-1. `V116` (Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung) als P1-Kontextfenster vor weiterer breiter Plan-/Agentenarbeit.
-2. `V119` (Planabschluss-Evidence-Remediation und Git-Historienabgleich) vor neuen breiten Abschlussclaims, damit erledigte Plaene formal nachgezogen oder bewusst als historische Restwidersprueche dokumentiert sind.
+1. `V116` (Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung) als P1-Kontextfenster bis mindestens `116.4`, besser bis zur V118-Finalisierung in `116.8`, bevor neue breite Plan-/Agentenarbeit startet.
+2. `V119` (Planabschluss-Evidence-Remediation und Git-Historienabgleich) mit `119.1` vor neuen breiten Abschlussclaims abschliessen, damit erledigte Plaene formal nachgezogen oder bewusst als historische Restwidersprueche dokumentiert sind.
 3. `V123` (AI-optimierter Plan-Index und Source-of-Truth-Migration) als strukturierter Pilot nach `V116.4` und `V119.1`, bevor ein kanonischer Quellenwechsel entschieden wird.
 4. `V120` (Graph-RAG mit lokalem Context-Adapter) nach `V116.3/116.4` und mindestens `V119.1` als Token-/Kontexthebel fuer anschliessende breite Agenten-, Audit- und Boundary-Arbeit.
-5. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
-6. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
-7. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
-8. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
-9. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
+5. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) erst nach `V120.99` oder einem expliziten V120-`fixture-ready`-Gate als read-only Consumer starten.
+6. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) nach V116/V119; vor `V120.99` nur als kleines CLI-only Memory-MVP, Graph-RAG-/Ruflo-Kontext erst danach.
+7. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) als geretteter Produktsemantik-Folgeblock; groesster Nutzen nach ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113.
+8. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster.
+9. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
+10. `V90` nach stabiler Build-/Typecheck-Basis wieder aufnehmen und abschliessen.
+11. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Recovery-Schnitten einplanen.
+12. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
 
 ## Conflict-Log
 
