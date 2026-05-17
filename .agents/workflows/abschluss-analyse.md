@@ -3,7 +3,7 @@ description: Pruefe den zuletzt abgeschlossenen Plan gruendlich gegen Ziele, Evi
 ---
 // turbo
 
-Zweck: Den letzten fachlich abgeschlossenen Planblock auf Vollstaendigkeit pruefen, ohne Abschlussclaims automatisch zu korrigieren. Der Workflow erzeugt einen belastbaren Analysebericht mit konkreten Verbesserungsvorschlaegen und einer moeglichst tiefen Codepruefung der planrelevanten Aenderungen.
+Zweck: Den letzten fachlich abgeschlossenen Planblock auf Vollstaendigkeit pruefen, ohne Abschlussclaims automatisch zu korrigieren. Der Workflow erzeugt einen belastbaren Analysebericht mit konkreten Verbesserungsvorschlaegen, Wissensgraph-Pruefung und einer moeglichst tiefen Codepruefung der planrelevanten Aenderungen.
 
 Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_and_commits.md`, `.agents/rules/token_efficiency_and_tools.md`.
 
@@ -67,7 +67,49 @@ Prueffragen:
 - Wurden Risiken, Nicht-Ziele oder Legacy-/Fallback-Pfade im Abschluss sauber abgegrenzt?
 - Wurden `*.99`-Gates erst nach den vorausgehenden Phasen geschlossen?
 
-## 4. Vollstaendigkeitspruefung
+## 4. Wissensgraph pruefen
+
+Der Wissensgraph ist Pflicht-Evidence fuer Scope-, Impact-, Coverage- und Abhaengigkeitsfragen. Er ersetzt keine Plan-/Code-/Git-Pruefung, sondern dient als zweiter Blick auf dieselbe Abschlussbehauptung.
+
+### 4.1 Graph-Frische und Integritaet
+
+- `npm run graph:check` ausfuehren oder, wenn der Analyseauftrag rein read-only bleiben soll und der Graph offenkundig stale ist, `graph:check -> FAIL/WARN` als Finding dokumentieren.
+- Bei `GRAPH_DIFF`, `COVERAGE_DIFF` oder Scorecard-Drift keine automatische Korrektur in Plan-/Analyse-Laeufen; als eigene Evidence-Luecke oder Vorbedingung fuer weitere Aussagekraft melden.
+- `docs/generated/knowledge-graph.json`, `docs/generated/knowledge-graph.coverage.json` und optional `docs/generated/knowledge-graph.scorecard.json` nur als generierte Evidence lesen, nicht manuell editieren.
+- Wenn Graph-Checks scheitern, Graph-basierte Aussagen mit `low` oder `medium` Confidence markieren und klar von Git-/Code-Evidence trennen.
+
+### 4.2 Pflicht-Queries
+
+Fuer den Kandidatenblock und seine wichtigsten Code-/Scope-Dateien ausfuehren:
+
+- `node scripts/query-knowledge-graph.mjs open-deps VXX --json`
+- `node scripts/query-knowledge-graph.mjs scope-collisions --json`
+- `node scripts/query-knowledge-graph.mjs coverage-report`
+- Fuer zentrale `scope_files`: `node scripts/query-knowledge-graph.mjs impact-for-file <path> --json`
+- Bei runtime-nahem Abschluss: `node scripts/query-knowledge-graph.mjs critical-path-health`
+- Bei Event-/Flow-Zielen: `node scripts/query-knowledge-graph.mjs event-flow spawn|combat-hit|round-end|settings`
+
+Wenn eine Query fuer den Block nicht passt, begruenden und durch die naechste passende Graph-Query ersetzen.
+
+### 4.3 Graph-Abgleich
+
+Graph-Ergebnisse gegen Plan und Git spiegeln:
+
+- Sind alle zentralen `scope_files` im Graph bekannt und sinnvoll klassifiziert?
+- Zeigt `open-deps`, dass der abgeschlossene Block keine unerfuellten harten Abhaengigkeiten mehr hat?
+- Meldet `scope-collisions` Konflikte, die im Abschluss nicht erwaehnt werden?
+- Deckt `coverage-report` neue oder planrelevante Coverage-Luecken auf?
+- Zeigt `impact-for-file` kritische Pfade, die im Code- oder Testabgleich fehlen?
+- Sind Event-Flows, Critical-Path-Health oder Change-Risk deckungsgleich mit dem Abschlussclaim?
+- Gibt es Graph-Kanten zu Legacy-, Demo-, Diagnostics- oder Follow-up-Pfaden, die der Plan verschweigt?
+
+Graph-Findings erhalten dieselben Schweregrade wie Code-/Plan-Findings. Zusaetzlich die Graph-Confidence nennen:
+
+- `graph-high`: Graph frisch, Query passend, Ergebnis durch Git/Plan bestaetigt.
+- `graph-medium`: Graph frisch, aber Query nur indirekt oder Ergebnis teilweise unklar.
+- `graph-low`: Graph stale, Query unpassend, fehlende Knoten oder Widerspruch zu Git/Plan.
+
+## 5. Vollstaendigkeitspruefung
 
 Gruendlich pruefen, aber Ergebnisse kompakt halten:
 
@@ -79,12 +121,13 @@ Gruendlich pruefen, aber Ergebnisse kompakt halten:
 - Test-Ownership: keine nicht gelaufenen Tests als PASS zaehlen; deferred Tests mit Grund und Risiko benennen.
 - Dead-Code-/Legacy-Regeln: kein Sunset-Claim ohne Nachfolger- und Konsumentenbeleg.
 - Folgeblock-Risiko: offene Findings muessen entweder als Follow-up, Intake, Risiko oder bewusster Nicht-Scope sichtbar sein.
+- Graph-Konsistenz: Graph-Checks, Impact, Coverage, Scope-Kollisionen und offene Dependencies widersprechen dem Abschluss nicht.
 
-## 5. Codepruefung
+## 6. Codepruefung
 
 Die Codepruefung ist Pflicht, sobald der abgeschlossene Plan `src/`, `tests/`, `scripts/`, `electron/`, `editor/`, `data/` oder runtime-nahe Konfiguration beruehrt. Sie bleibt planbezogen, soll aber so tief wie praktikabel sein.
 
-### 5.1 Code-Scope bilden
+### 6.1 Code-Scope bilden
 
 - Aus `scope_files`, relevanten Commits und Graph-Impact eine Code-Dateiliste bilden.
 - Fuer jeden relevanten Commit mindestens `git show --stat --summary <commit>` und `git show --name-only <commit>` lesen.
@@ -92,8 +135,9 @@ Die Codepruefung ist Pflicht, sobald der abgeschlossene Plan `src/`, `tests/`, `
 - Wenn ein Commit sehr gross ist, nach Verantwortung schneiden: Runtime, UI, Tests, Scripts, Daten/Contracts, Electron, Editor.
 - Nicht nur Dateien mit Planbezug pruefen: auch direkt mitgeaenderte Tests, Contracts, Fixtures, JSON-Daten und Scripts lesen.
 - Bei unklarer Wirkung `node scripts/query-knowledge-graph.mjs impact-for-file <path> --json`, `event-flow`, `critical-path-health` oder `coverage-report` nutzen.
+- Graph-Impact-Dateien, die nicht in `scope_files` stehen, als moegliche versteckte Wirkung pruefen oder als bewusstes Out-of-Scope-Risiko dokumentieren.
 
-### 5.2 Review-Fragen
+### 6.2 Review-Fragen
 
 Code wie in einem Review gegen den Plan lesen:
 
@@ -108,8 +152,9 @@ Code wie in einem Review gegen den Plan lesen:
 - Entstehen Performance-, Speicher-, Rebuild-, Listener-, Timer- oder Resource-Leak-Risiken?
 - Sind Fehlerbehandlung, Logging und Diagnostics hilfreich, ohne sensible Daten oder Rauschen zu erzeugen?
 - Gibt es Code, der den Plan zwar schliesst, aber Folgeblock-Arbeit erschwert oder verdeckte technische Schuld erzeugt?
+- Stimmen Codepfad und Graphpfad ueberein, oder zeigt der Graph produktive Konsumenten/Flows, die der Code-Review zuerst uebersehen hat?
 
-### 5.3 Code-Findings
+### 6.3 Code-Findings
 
 Findings muessen konkrete Datei-/Zeilen- oder Commit-Belege haben:
 
@@ -120,7 +165,7 @@ Findings muessen konkrete Datei-/Zeilen- oder Commit-Belege haben:
 
 Wenn keine Code-Findings gefunden werden, explizit sagen: `Keine planrelevanten Code-Findings gefunden`, plus verbleibende Test-/Review-Grenzen.
 
-### 5.4 Test- und Gate-Abgleich
+### 6.4 Test- und Gate-Abgleich
 
 - Aus `.agents/test_mapping.md` nur die fuer die beruehrten Codepfade passenden Tests bestimmen.
 - Gelaufene Tests nur als Evidence zaehlen, wenn Ergebnis und Zeitpunkt klar sind.
@@ -135,7 +180,7 @@ Bei Widerspruechen keine Plaene aendern. Findings nach Schwere sortieren:
 - `P2`: Evidence unvollstaendig, aber Ziel wahrscheinlich erfuellt.
 - `P3`: Dokumentationsschaerfung oder bessere Nachvollziehbarkeit.
 
-## 6. Verbesserungsvorschlaege
+## 7. Verbesserungsvorschlaege
 
 Jeder Vorschlag braucht:
 
@@ -145,20 +190,22 @@ Jeder Vorschlag braucht:
 - Decision-Klasse: meist `D2` fuer kleine Doku-Schaerfung, `D3` fuer Plan-/Governance-Status.
 - Kleinstes Gate: z. B. `npm run plan:check`, `npm run docs:check`, `npm run gates:pre-commit`.
 - Risiko, falls nichts getan wird.
+- Graph-Bezug: welche Query oder Graph-Luecke den Vorschlag stuetzt, sofern relevant.
 
 Keine neue aktive Planarbeit erfinden. Wenn ein Follow-up noetig ist, bevorzugt einen Intake-Vorschlag unter `docs/plaene/neu/` nur nach User-Gate; im Analysebericht reicht eine konkrete Draft-Empfehlung.
 
-## 7. Verifikation
+## 8. Verifikation
 
 Read-only Abschluss:
 
 - `npm run plan:check`
+- `npm run graph:check`
 - Bei Docs-/Governance-Drift-Verdacht: `npm run docs:check`
 - Bei Graph-/Scope-Fragen: passende `node scripts/query-knowledge-graph.mjs ...` Query nennen oder ausfuehren.
 
 Wenn ein Report unter `tmp/` geschrieben wurde, im Final den Pfad nennen. Wenn keine Datei geschrieben wurde, Findings direkt im Chat ausgeben.
 
-## 8. Reportformat
+## 9. Reportformat
 
 Standardformat:
 
@@ -180,6 +227,12 @@ Git-Abgleich:
 - Relevante Commits: <hashes/messages>
 - Scope-Abdeckung: <kurz>
 - Nicht belegte Claims: <kurz oder none>
+
+Wissensgraph:
+- Graph-Status: <graph:check PASS|WARN|FAIL>, Confidence: <graph-high|graph-medium|graph-low>
+- Queries: <open-deps, scope-collisions, coverage-report, impact-for-file, ...>
+- Graph-Findings: <P0-P3 oder none>
+- Scope-/Impact-Abgleich: <kurz>
 
 Codepruefung:
 - Gepruefte Codepfade: <src/tests/scripts/...>

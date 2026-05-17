@@ -16,6 +16,7 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - Neuer Workflow `.agents/workflows/abschluss-analyse.md` definiert einen read-only-first Analysepfad, um den zuletzt abgeschlossenen Plan gruendlich gegen Master, Blockfile, Changelog, Git-Historie, Scope-Dateien, DoD, `*.99`-Gate und Evidence-Qualitaet zu pruefen.
 - Zweck: Abschlussdrift und Claim-only-Evidence sichtbar machen, ohne historische Planstatus automatisch zu korrigieren; konkrete Verbesserungen werden nach Risiko, Evidence-Pfad, Decision-Klasse und kleinstem Gate vorgeschlagen.
 - Nachschaerfung: Die Abschlussanalyse enthaelt jetzt eine Pflicht-Codepruefung fuer planrelevante Runtime-, Test-, Script-, Electron-, Editor-, Daten- und Contract-Aenderungen inklusive Diff-Review, Legacy-/Fallback-Risiken, Testabgleich und Code-Findings.
+- Nachschaerfung: Der Wissensgraph ist jetzt Pflicht-Evidence fuer Abschlussanalysen; `graph:check`, Open-Dependencies, Scope-Kollisionen, Coverage, Impact-Queries und runtime-nahe Critical-/Event-Flow-Abfragen werden gegen Plan, Git und Code gespiegelt.
 
 ## Stand-Snapshot 2026-05-16 (Intake `V123 123.1`)
 
