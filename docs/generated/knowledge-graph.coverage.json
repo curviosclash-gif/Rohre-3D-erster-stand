@@ -156,12 +156,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1869,
-    "rawCoveredFileCount": 1221,
-    "rawCoveragePercent": 65.3,
-    "adjustedTrackedFileCount": 1374,
-    "adjustedCoveredFileCount": 1021,
-    "adjustedCoveragePercent": 74.3,
+    "trackedFileCount": 1872,
+    "rawCoveredFileCount": 1224,
+    "rawCoveragePercent": 65.4,
+    "adjustedTrackedFileCount": 1377,
+    "adjustedCoveredFileCount": 1024,
+    "adjustedCoveragePercent": 74.4,
     "uncoveredFileCount": 648,
     "uncoveredActiveFileCount": 353,
     "classifications": [
@@ -216,8 +216,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 350,
-        "coveredCount": 158
+        "count": 353,
+        "coveredCount": 161
       },
       {
         "classification": "prototype",
@@ -10111,6 +10111,24 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V126.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V126",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V64.md",
       "tracked": true,
       "coveredInCore": true,
@@ -10936,6 +10954,23 @@
     },
     {
       "path": "docs/plaene/alt/Feature_Komplexe_Showcase_Map_V39.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/alt/Feature_Local_Dev_API_Preview_Tooling_Delivery_Hardening_V126.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -12599,6 +12634,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Local_Dev_API_Preview_Tooling_Delivery_Hardening_V126.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -32618,6 +32670,7 @@
       "scopeBlocks": [
         "B13",
         "V102",
+        "V126",
         "V74",
         "V77",
         "V90"

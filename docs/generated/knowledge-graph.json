@@ -1753,6 +1753,49 @@
       }
     },
     {
+      "id": "V126",
+      "type": "block",
+      "title": "Local Dev-API, Preview- und Delivery-Hardening",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "currentPhase": "126.1",
+        "planFile": "docs/plaene/aktiv/V126.md",
+        "scopeDeclarations": [
+          "dev/io/**",
+          "dev/training/**",
+          "dev/vite/plugins/**",
+          "docs/plaene/aktiv/V126.md",
+          "tests/training-dashboard-log-buffer.contract.test.mjs",
+          "tests/training-dashboard-spawn.contract.test.mjs",
+          "tests/vite-preview-local-api.contract.test.mjs",
+          "vite.config.js"
+        ],
+        "scopeResolution": {
+          "concreteCount": 2,
+          "plannedCount": 3
+        },
+        "scopeOverlapAllowedWith": [
+          "V112",
+          "V124",
+          "V125",
+          "V90"
+        ],
+        "unknownFrontmatterFields": [
+          "created_at",
+          "plan_file",
+          "related_followup_blocks",
+          "scope_reference_files",
+          "source_findings"
+        ]
+      }
+    },
+    {
       "id": "V43",
       "type": "block",
       "title": "Projektstruktur Spiel Dev Ordner",
@@ -2465,7 +2508,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 321,
+          "concreteCount": 324,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2916,6 +2959,7 @@
           "V116",
           "V123",
           "V125",
+          "V126",
           "V96"
         ],
         "unknownFrontmatterFields": []
@@ -4931,6 +4975,66 @@
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.99"
+      }
+    },
+    {
+      "id": "V126.1",
+      "type": "phase",
+      "title": "Local-API- und Preview-Matrix",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.1"
+      }
+    },
+    {
+      "id": "V126.2",
+      "type": "phase",
+      "title": "Training-Spawn-Hardening",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2"
+      }
+    },
+    {
+      "id": "V126.3",
+      "type": "phase",
+      "title": "Preview Read-only",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3"
+      }
+    },
+    {
+      "id": "V126.4",
+      "type": "phase",
+      "title": "Training-Output-Ringbuffer",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.4"
+      }
+    },
+    {
+      "id": "V126.5",
+      "type": "phase",
+      "title": "Erste `vite.config.js`-Entflechtung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5"
+      }
+    },
+    {
+      "id": "V126.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99"
       }
     },
     {
@@ -13450,6 +13554,314 @@
         "blockId": "V125",
         "phaseCode": "125.99",
         "subphaseCode": "125.99.4"
+      }
+    },
+    {
+      "id": "V126.1.1",
+      "type": "subphase",
+      "title": "`vite.config.js` nach lokalen API-Routen, Middleware,",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.1",
+        "subphaseCode": "126.1.1"
+      }
+    },
+    {
+      "id": "V126.1.2",
+      "type": "subphase",
+      "title": "Jede Route klassifizieren:",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.1",
+        "subphaseCode": "126.1.2"
+      }
+    },
+    {
+      "id": "V126.1.3",
+      "type": "subphase",
+      "title": "Preview-Verhalten je Route entscheiden: aktiv, blockiert,",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.1",
+        "subphaseCode": "126.1.3"
+      }
+    },
+    {
+      "id": "V126.1.4",
+      "type": "subphase",
+      "title": "Kollisionen mit `V90`, `V112`, `V125` und Bot-Training-Scope",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.1",
+        "subphaseCode": "126.1.4"
+      }
+    },
+    {
+      "id": "V126.2.1",
+      "type": "subphase",
+      "title": "`buildCliArgs(config)` in eine testbare Funktion auslagern oder",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2",
+        "subphaseCode": "126.2.1"
+      }
+    },
+    {
+      "id": "V126.2.2",
+      "type": "subphase",
+      "title": "Allowlist definieren:",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2",
+        "subphaseCode": "126.2.2"
+      }
+    },
+    {
+      "id": "V126.2.3",
+      "type": "subphase",
+      "title": "Command-Resolver einfuehren:",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2",
+        "subphaseCode": "126.2.3"
+      }
+    },
+    {
+      "id": "V126.2.4",
+      "type": "subphase",
+      "title": "Fehlerpfade eindeutig machen: ungueltige Config gibt 400/422",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2",
+        "subphaseCode": "126.2.4"
+      }
+    },
+    {
+      "id": "V126.2.5",
+      "type": "subphase",
+      "title": "Contracttest fuer normale Config, ungueltige Modi,",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2",
+        "subphaseCode": "126.2.5"
+      }
+    },
+    {
+      "id": "V126.3.1",
+      "type": "subphase",
+      "title": "Gemeinsamen Helper definieren:",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3",
+        "subphaseCode": "126.3.1"
+      }
+    },
+    {
+      "id": "V126.3.2",
+      "type": "subphase",
+      "title": "Editor-Disk-Save-POSTs, Vehicle-Rename/Delete, Video-Save,",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3",
+        "subphaseCode": "126.3.2"
+      }
+    },
+    {
+      "id": "V126.3.3",
+      "type": "subphase",
+      "title": "Read-only-Routen explizit entscheiden:",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3",
+        "subphaseCode": "126.3.3"
+      }
+    },
+    {
+      "id": "V126.3.4",
+      "type": "subphase",
+      "title": "HTTP-Antwort fuer blockierte Preview-Mutation standardisieren,",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3",
+        "subphaseCode": "126.3.4"
+      }
+    },
+    {
+      "id": "V126.3.5",
+      "type": "subphase",
+      "title": "Tests fuer Dev aktiv, Preview blockiert, Preview mit Flag aktiv.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3",
+        "subphaseCode": "126.3.5"
+      }
+    },
+    {
+      "id": "V126.4.1",
+      "type": "subphase",
+      "title": "Ringbuffer-Helper mit Kapazitaet, monotonem Line-Index und",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.4",
+        "subphaseCode": "126.4.1"
+      }
+    },
+    {
+      "id": "V126.4.2",
+      "type": "subphase",
+      "title": "Bestehende `/api/training/progress?since=`-Semantik erhalten oder",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.4",
+        "subphaseCode": "126.4.2"
+      }
+    },
+    {
+      "id": "V126.4.3",
+      "type": "subphase",
+      "title": "Test fuer 1.000+ Zeilen: nur letzte 500 abrufbar, Indizes bleiben",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.4",
+        "subphaseCode": "126.4.3"
+      }
+    },
+    {
+      "id": "V126.4.4",
+      "type": "subphase",
+      "title": "Keine UI-Aenderung, solange die aktuelle Dashboard-Anzeige",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.4",
+        "subphaseCode": "126.4.4"
+      }
+    },
+    {
+      "id": "V126.5.1",
+      "type": "subphase",
+      "title": "Auslagerungskandidat waehlen:",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5",
+        "subphaseCode": "126.5.1"
+      }
+    },
+    {
+      "id": "V126.5.2",
+      "type": "subphase",
+      "title": "Zielmodul anlegen, z. B.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5",
+        "subphaseCode": "126.5.2"
+      }
+    },
+    {
+      "id": "V126.5.3",
+      "type": "subphase",
+      "title": "`vite.config.js` nur noch importieren und Plugin konfigurieren",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5",
+        "subphaseCode": "126.5.3"
+      }
+    },
+    {
+      "id": "V126.5.4",
+      "type": "subphase",
+      "title": "Kein gleichzeitiger Umbau von Maps, Vehicles, Video-Save und",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5",
+        "subphaseCode": "126.5.4"
+      }
+    },
+    {
+      "id": "V126.5.5",
+      "type": "subphase",
+      "title": "Test- und Importpfade so schneiden, dass Folgeauslagerungen in",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5",
+        "subphaseCode": "126.5.5"
+      }
+    },
+    {
+      "id": "V126.99.1",
+      "type": "subphase",
+      "title": "Alle frueheren Phasen sind abgeschlossen oder blockerfest mit",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99",
+        "subphaseCode": "126.99.1"
+      }
+    },
+    {
+      "id": "V126.99.2",
+      "type": "subphase",
+      "title": "Gezielte Contracttests fuer Spawn, Preview-Gating und Ringbuffer",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99",
+        "subphaseCode": "126.99.2"
+      }
+    },
+    {
+      "id": "V126.99.3",
+      "type": "subphase",
+      "title": "`npm run build` oder ein kleineres begruendetes Build-Signal ist",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99",
+        "subphaseCode": "126.99.3"
+      }
+    },
+    {
+      "id": "V126.99.4",
+      "type": "subphase",
+      "title": "`npm run plan:check` ist gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99",
+        "subphaseCode": "126.99.4"
+      }
+    },
+    {
+      "id": "V126.99.5",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt Folgeblocks `V127`, `V128`, `V129` und",
+      "status": "open",
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99",
+        "subphaseCode": "126.99.5"
       }
     },
     {
@@ -25565,6 +25977,22 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V126.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V126",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V64.md",
       "type": "file",
       "title": null,
@@ -26296,6 +26724,21 @@
     },
     {
       "id": "docs/plaene/alt/Feature_Komplexe_Showcase_Map_V39.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/Feature_Local_Dev_API_Preview_Tooling_Delivery_Hardening_V126.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -27767,6 +28210,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Local_Dev_API_Preview_Tooling_Delivery_Hardening_V126.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -43707,6 +44165,36 @@
       }
     },
     {
+      "id": "tests/training-dashboard-log-buffer.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V126"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tests/training-dashboard-spawn.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V126"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "tests/training-e2e.test.mjs",
       "type": "file",
       "title": null,
@@ -43899,6 +44387,21 @@
         ],
         "scopeBlocks": [
           "V66"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tests/vite-preview-local-api.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V126"
         ],
         "exists": false
       }
@@ -44283,6 +44786,7 @@
         "scopeBlocks": [
           "B13",
           "V102",
+          "V126",
           "V74",
           "V77",
           "V90"
@@ -68736,6 +69240,455 @@
       }
     },
     {
+      "from": "V126",
+      "to": "docs/plaene/aktiv/V126.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "tests/training-dashboard-log-buffer.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "tests/training-dashboard-spawn.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "tests/vite-preview-local-api.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "V102",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Security-/Runtime-Hardening ist Baseline fuer lokale API- und Preview-Grenzen",
+      "attributes": {
+        "dependsPhase": "102.99",
+        "rawToken": "V102.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V126",
+      "to": "V105",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Guard-/Typecheck-Recovery ist Baseline fuer gezielte Tooling- und Preview-Verifikation",
+      "attributes": {
+        "dependsPhase": "105.99",
+        "rawToken": "V105.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V126",
+      "to": "V126.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.1"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "V126.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "V126.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "V126.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.4"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "V126.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "V126.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "vite.config.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V126.1",
+      "to": "V126.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.1",
+        "subphaseCode": "126.1.1"
+      }
+    },
+    {
+      "from": "V126.1",
+      "to": "V126.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.1",
+        "subphaseCode": "126.1.2"
+      }
+    },
+    {
+      "from": "V126.1",
+      "to": "V126.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.1",
+        "subphaseCode": "126.1.3"
+      }
+    },
+    {
+      "from": "V126.1",
+      "to": "V126.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.1",
+        "subphaseCode": "126.1.4"
+      }
+    },
+    {
+      "from": "V126.2",
+      "to": "V126.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2",
+        "subphaseCode": "126.2.1"
+      }
+    },
+    {
+      "from": "V126.2",
+      "to": "V126.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2",
+        "subphaseCode": "126.2.2"
+      }
+    },
+    {
+      "from": "V126.2",
+      "to": "V126.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2",
+        "subphaseCode": "126.2.3"
+      }
+    },
+    {
+      "from": "V126.2",
+      "to": "V126.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2",
+        "subphaseCode": "126.2.4"
+      }
+    },
+    {
+      "from": "V126.2",
+      "to": "V126.2.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.2",
+        "subphaseCode": "126.2.5"
+      }
+    },
+    {
+      "from": "V126.3",
+      "to": "V126.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3",
+        "subphaseCode": "126.3.1"
+      }
+    },
+    {
+      "from": "V126.3",
+      "to": "V126.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3",
+        "subphaseCode": "126.3.2"
+      }
+    },
+    {
+      "from": "V126.3",
+      "to": "V126.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3",
+        "subphaseCode": "126.3.3"
+      }
+    },
+    {
+      "from": "V126.3",
+      "to": "V126.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3",
+        "subphaseCode": "126.3.4"
+      }
+    },
+    {
+      "from": "V126.3",
+      "to": "V126.3.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.3",
+        "subphaseCode": "126.3.5"
+      }
+    },
+    {
+      "from": "V126.4",
+      "to": "V126.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.4",
+        "subphaseCode": "126.4.1"
+      }
+    },
+    {
+      "from": "V126.4",
+      "to": "V126.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.4",
+        "subphaseCode": "126.4.2"
+      }
+    },
+    {
+      "from": "V126.4",
+      "to": "V126.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.4",
+        "subphaseCode": "126.4.3"
+      }
+    },
+    {
+      "from": "V126.4",
+      "to": "V126.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.4",
+        "subphaseCode": "126.4.4"
+      }
+    },
+    {
+      "from": "V126.5",
+      "to": "V126.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5",
+        "subphaseCode": "126.5.1"
+      }
+    },
+    {
+      "from": "V126.5",
+      "to": "V126.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5",
+        "subphaseCode": "126.5.2"
+      }
+    },
+    {
+      "from": "V126.5",
+      "to": "V126.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5",
+        "subphaseCode": "126.5.3"
+      }
+    },
+    {
+      "from": "V126.5",
+      "to": "V126.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5",
+        "subphaseCode": "126.5.4"
+      }
+    },
+    {
+      "from": "V126.5",
+      "to": "V126.5.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.5",
+        "subphaseCode": "126.5.5"
+      }
+    },
+    {
+      "from": "V126.99",
+      "to": "V126.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99",
+        "subphaseCode": "126.99.1"
+      }
+    },
+    {
+      "from": "V126.99",
+      "to": "V126.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99",
+        "subphaseCode": "126.99.2"
+      }
+    },
+    {
+      "from": "V126.99",
+      "to": "V126.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99",
+        "subphaseCode": "126.99.3"
+      }
+    },
+    {
+      "from": "V126.99",
+      "to": "V126.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99",
+        "subphaseCode": "126.99.4"
+      }
+    },
+    {
+      "from": "V126.99",
+      "to": "V126.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V126",
+        "phaseCode": "126.99",
+        "subphaseCode": "126.99.5"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -78931,6 +79884,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V126.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V64.md",
       "type": "scope",
       "hint": null,
@@ -79355,6 +80317,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/alt/Feature_Komplexe_Showcase_Map_V39.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/Feature_Local_Dev_API_Preview_Tooling_Delivery_Hardening_V126.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -80219,6 +81190,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Local_Dev_API_Preview_Tooling_Delivery_Hardening_V126.md",
       "type": "scope",
       "hint": null,
       "attributes": {
