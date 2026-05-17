@@ -156,12 +156,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1871,
-    "rawCoveredFileCount": 1223,
+    "trackedFileCount": 1872,
+    "rawCoveredFileCount": 1224,
     "rawCoveragePercent": 65.4,
-    "adjustedTrackedFileCount": 1376,
-    "adjustedCoveredFileCount": 1023,
-    "adjustedCoveragePercent": 74.3,
+    "adjustedTrackedFileCount": 1377,
+    "adjustedCoveredFileCount": 1024,
+    "adjustedCoveragePercent": 74.4,
     "uncoveredFileCount": 648,
     "uncoveredActiveFileCount": 353,
     "classifications": [
@@ -216,8 +216,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 352,
-        "coveredCount": 160
+        "count": 353,
+        "coveredCount": 161
       },
       {
         "classification": "prototype",
@@ -12546,6 +12546,23 @@
       "classification": "bot-training",
       "excludedFromCoverage": true,
       "excludeReason": "Bot training data and plans are excluded from the main architecture graph."
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Agent_Skills_statt_Regeltext.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
     },
     {
       "path": "docs/plaene/neu/Feature_Architektur_Application_Boundaries_V96.md",
