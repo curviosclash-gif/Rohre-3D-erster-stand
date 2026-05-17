@@ -22,6 +22,7 @@ Optional (nur bei Bedarf):
 
 - Zielpfade und erwartetes Verhalten festlegen.
 - Bei architekturrelevantem Code-Scope den Startcheck aus `docs/referenz/architektur_ausfuehrlich.md` anwenden: betroffene Schichten, neue Dependency-Kanten, Legacy-Surface-Nutzung, vorhandene Contracts/Ports/Commands/Snapshots und kleinstes Guard-Signal benennen. `docs/referenz/ai_architecture_context.md` nur gezielt fuer den betroffenen Scope nachladen.
+- Vor Implementierung kleinstes sinnvolles Verifikationssignal und bewusst nicht gepruefte Bereiche benennen; diese Entscheidung spaeter fuer Evidence und `Not-checked:` wiederverwenden.
 - Desktop-App-Ergebnis priorisieren; Online/Browser-Parity nur explizit auf Wunsch oder bei geringem Aufwand.
 - Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; `D3`/`D4`-Source-of-truth-, Planstruktur-, Archivierungs-, Move-/Delete- oder High-Blast-Radius-Aenderungen brauchen User-Gate.
 - Bei `D3`/`D4`, `[REVIEW]` oder `[USER-GATE]` vor der Freigabe betroffene Dateien/Oberflaechen als `no-op`, `read-only evidence`, `optional` oder `edit required` klassifizieren; nur `edit required` freigeben lassen.
@@ -59,6 +60,7 @@ Optional (nur bei Bedarf):
 - Wenn `docs/`, `.agents/`, `scripts/validate-umsetzungsplan.mjs`, Graph-Artefakte oder Master-/Blockplan-Struktur geaendert wurden: `npm run gates:pre-commit`.
 - Wenn `*.99` geschlossen wird: `npm run gates:pre-commit` verpflichtend.
 - Bei Architektur-Scope: kleinstes passendes Signal aus `docs/referenz/architektur_ausfuehrlich.md` oder `.agents/test_mapping.md` waehlen; `npm run architecture:guard` nur fuer breite Boundary-, Legacy- oder Ratchet-Slices als Default.
+- Bei rotem Gate zuerst Ursache klassifizieren: eigener Diff, generiertes Artefakt, bekannter Fremdblocker oder neuer Blocker. Nur eigenen Diff direkt reparieren; generierte Artefakte nachbauen und Diff pruefen; Fremd-/neue Blocker nicht absorbieren, sondern blockerfest dokumentieren.
 - Bei reinem Code-Scope ohne Doc-/Governance-Drift: nur kleinste sinnvolle Zusatzchecks (z. B. `npm run build` oder fokussierter Contract-Run).
 
 ## 5. Commit
@@ -69,8 +71,11 @@ Optional (nur bei Bedarf):
 - Nicht-offensichtliche Restpfade sind erst abschliessbar, wenn Kommentar im Code und Notiz im passenden Repo-Kontext vorhanden sind.
 - `npm run guard:main`.
 - Windows vor Staging: `npm run git:acl:heal`.
-- `git add [scoped-files]` -> `git commit -m "[type]: [name] - [short reason]"`.
-- Scope pruefen: `git diff --name-only`.
+- `git add [scoped-files]`.
+- Staged Scope pruefen: `git diff --cached --name-only`; Restdiffs mit `git status --short` erfassen und als `Known-uncommitted` benennen.
+- `npm run agent:preflight -- --workflow=code --decision=<D0-D4> --evidence="<gate> -> PASS" --scope="<staged files>" --known-uncommitted="<rest oder none>"` vor dem Commit ausfuehren; D3/D4-Felder vollstaendig setzen.
+- `git commit -m "[type]: [name] - [short reason]"`.
+- Nach Commit `git status --short`; eigene Restdiffs committen, blockerfest dokumentieren oder bekannte generierte Timestamp-/Registry-Nachwirkungen bereinigen.
 - Vor Push auf `main`: `npm run snapshot:tag`.
 
 ## Report
