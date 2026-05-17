@@ -319,6 +319,8 @@ Ziel:
 - Tooling-Code ausserhalb `src` bekommt eigene schnelle Gates.
 - Onboarding wird ueber `doctor`, `bootstrap` und `verify:local` reproduzierbar.
 - Script-Sprawl wird nicht blind geloescht, sondern kanonisch markiert.
+- Coverage- und Benchmark-Signale werden als budgetierte CI-/Local-Gates
+  planbar, ohne Playwright- oder Gameplay-Vollsuites pauschal zu erzwingen.
 
 Scope:
 
@@ -354,6 +356,25 @@ DoD:
 - [ ] Kanonische Scripts sind dokumentiert; alte Aliase bleiben nur mit
   Kompatibilitaetsgrund.
 - [ ] CI-Integration ist entweder warnend oder targeted, bevor sie hart wird.
+- [ ] `coverage:core` oder ein gleichwertiges Contract-/Core-Coverage-Signal
+  ist definiert; GUI-/Playwright-Flows bleiben bewusst ausserhalb harter
+  Coverage-Quoten.
+- [ ] `benchmark:budget` oder ein gleichwertiges Budget-Gate wertet vorhandene
+  JSON-Berichte fuer Lifecycle/Jitter/Bundle oder klar benannte Hotpaths aus.
+- [ ] Budget-Schwellen sind versioniert und unterscheiden `warn`, `fail` und
+  `not-measured`, damit lokale Hardware- oder CI-Rauschen nicht als falsche
+  Produktregression gezaehlt wird.
+- [ ] CI speichert Coverage-/Benchmark-Berichte als Artefakte oder nennt den
+  bewusst lokalen Ersatzpfad.
+
+V127 Teilphasen-Vorschlag:
+
+- 127.1 Repo-weites Lint-/Typecheck-Inventar und Include-Set.
+- 127.2 `lint:repo` und `typecheck:tooling` als nicht-invasive Gates.
+- 127.3 `doctor`, `bootstrap`, `verify:local` und Onboarding-Matrix.
+- 127.4 Script-Kanonisierung und Alias-Deprecation-Regel.
+- 127.5 Coverage-/Benchmark-Budget-Gates mit warn-before-fail Rollout.
+- 127.99 Abschluss mit kleinsten gruenen Tooling-/Budget-Signalen.
 
 ### V128 Release- und Asset-Compliance
 
@@ -392,6 +413,11 @@ DoD:
   SHA256-Checksums.
 - [ ] Desktop-Artefakt-Smoke prueft gebautes Artefakt oder dokumentiert
   Plattform-/CI-Grenzen.
+- [ ] Release-Budget-Check prueft Bundle-Groesse, grobe Artefaktgroesse und
+  mindestens ein Performance-/Smoke-Signal gegen definierte Schwellen.
+- [ ] Release-Artefakte enthalten oder referenzieren die Coverage-/Benchmark-
+  Berichte aus V127, falls diese bis dahin existieren; andernfalls ist der
+  nicht vorhandene Budgetpfad als Release-Risiko dokumentiert.
 - [ ] Release-Notes-/Changelog-Pfad ist definiert.
 - [ ] Exportierte Game-only-Repos enthalten dieselben Lizenzinfos.
 
@@ -445,6 +471,22 @@ DoD:
 3. `V128` spaetestens vor einem Release-Candidate-Fenster einplanen.
 4. `V129` nach `V126` und nach oder parallel zu editor-/mapnaher Folgearbeit
    einplanen.
+
+Konkrete Master-Intake-Zeile fuer `V126`:
+
+```md
+| V126 | Local Dev-API, Preview- und Delivery-Hardening | planned | P1 | frei | V102.99,V105.99 | 126.1 | `docs/plaene/aktiv/V126.md` |
+```
+
+Empfohlene Dependency-Zeilen:
+
+```md
+| V126 | V102.99 | hard | ja | Security-/Runtime-Hardening ist Baseline fuer lokale API- und Preview-Grenzen |
+| V126 | V105.99 | hard | ja | Guard-/Typecheck-Recovery ist Baseline fuer gezielte Tooling- und Preview-Verifikation |
+| V127 | V125.3 | soft | nein | Staged-Guard- und Architecture-Compliance-Scope sollte Package-/Hook-Kollisionen vorher eingrenzen |
+| V128 | V126.99 | soft | nein | Release-Compliance profitiert von geklaerten lokalen API- und Preview-Grenzen |
+| V129 | V126.99 | hard | nein | Generated-Content-Migration sollte erst nach erster Vite-Dev-API-Kapselung starten |
+```
 
 ## Intake-Hinweis fuer den User
 
