@@ -2921,7 +2921,7 @@
       "id": "V90",
       "type": "block",
       "title": "Toolchain-Security und Dependency-Upgrade",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2930,7 +2930,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "90.2",
+        "currentPhase": "90.99",
         "planFile": "docs/plaene/aktiv/V90.md",
         "scopeDeclarations": [
           ".agents/test_mapping.md",
@@ -2941,6 +2941,7 @@
           "docs/plaene/aktiv/V120.md",
           "docs/plaene/aktiv/V90.md",
           "docs/prozess/Dokumentationsstatus.md",
+          "docs/prozess/Open_Findings.md",
           "docs/referenz/ai_architecture_context.md",
           "electron/package-lock.json",
           "electron/package.json",
@@ -2951,7 +2952,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 16,
+          "concreteCount": 17,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -7030,7 +7031,7 @@
       "id": "V90.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V90",
         "phaseCode": "90.99"
@@ -19794,8 +19795,8 @@
     {
       "id": "V90.99.1",
       "type": "subphase",
-      "title": "`npm run architecture:guard`, `npm run build`, `npm run docs:check` und der kleinste relevante Dependency-Sanity-Check sind gruen.",
-      "status": "open",
+      "title": "`npm run architecture:guard`, `npm run build`, `npm run docs:check` und der kleinste relevante Dependency-Sanity-Check sind gruen. (abgeschlossen: 2026-05-18; evidence: `npm run architecture:guard` -> PASS mit bestehenden 29 `innerHTML`-Warnungen im Ratchet, `npm run build` -> PASS, `npm run docs:check` -> PASS, `npm ls vite esbuild rollup postcss --depth=3`, `npm --prefix electron ls electron electron-builder tar @tootallnate/once ip-address --depth=5`, `npm --prefix server ls ws --depth=2` -> erwartete Versionen)",
+      "status": "done",
       "attributes": {
         "blockId": "V90",
         "phaseCode": "90.99",
@@ -19805,8 +19806,8 @@
     {
       "id": "V90.99.2",
       "type": "subphase",
-      "title": "Verbleibende Security-Ausnahmen sind dokumentiert und haben ein Wiedervorlagedatum.",
-      "status": "open",
+      "title": "Verbleibende Security-Ausnahmen sind dokumentiert und haben ein Wiedervorlagedatum. (abgeschlossen: 2026-05-18; evidence: `npm audit --audit-level=low --json`, `npm --prefix electron audit --audit-level=low --json`, `npm --prefix server audit --audit-level=low --json`, `npm run graph:build`, `npm run gates:pre-commit` -> Root/Electron-Reste sind force-only Major-Pfade; Wiedervorlage 2026-06-17 oder frueher bei neuer non-force Fix-Verfuegbarkeit)",
+      "status": "done",
       "attributes": {
         "blockId": "V90",
         "phaseCode": "90.99",
@@ -28445,7 +28446,8 @@
         "scopeBlocks": [
           "V109",
           "V110",
-          "V115"
+          "V115",
+          "V90"
         ],
         "exists": true
       }
@@ -69419,8 +69421,8 @@
       "type": "depends_on",
       "source": "frontmatter",
       "hard": false,
-      "fulfilled": false,
-      "hint": "Dependency-/Version-/Lockfile-Scope bleibt V90; V126 darf starten, solange Package-/Lockfile-/CI-Upgrades nicht Teil des Slices sind",
+      "fulfilled": true,
+      "hint": "Dependency-/Version-/Lockfile-Scope ist mit dokumentierten Security-Ausnahmen geschlossen; V126 darf starten, solange Package-/Lockfile-/CI-Upgrades nicht Teil des Slices sind",
       "attributes": {
         "dependsPhase": "90.2",
         "rawToken": "V90.2",
@@ -92302,6 +92304,15 @@
     {
       "from": "V90",
       "to": "docs/prozess/Dokumentationsstatus.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V90",
+      "to": "docs/prozess/Open_Findings.md",
       "type": "scope",
       "hint": null,
       "attributes": {

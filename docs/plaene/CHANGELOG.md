@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Abschluss-Snapshot 2026-05-18 (Block `V90 90.99`)
+
+- `V90` ist geschlossen: non-force Fixes (`fast-uri`, `ip-address`, lockfile-kompatibler `@tootallnate/once`-Pfad) sind erledigt, Major-Upgrades bleiben getrennte Folge-Slices statt stiller `--force`-Sprung.
+- Verbleibende Security-Ausnahmen: Root hat 2 moderate `vite`/`esbuild`-Reste mit force-only `vite@8.0.13`; Electron hat 12 `electron`-/`electron-builder`-/`tar`-/`@tootallnate/once`-Reste mit force-only `electron@42.1.0` oder `electron-builder@26.8.1`; Server-Audit ist gruen.
+- Wiedervorlage: 2026-06-17 oder frueher, wenn `npm audit` fuer Root oder Electron einen non-force Fix ohne Vite-/Electron-/Electron-Builder-Major-Sprung meldet.
+- Abschluss-Evidence: `npm run architecture:guard`, `npm run build`, `npm run docs:check`, `npm run graph:build`, `npm run gates:pre-commit`, Root-/Electron-/Server-Audit-Snapshots, `npm ls`-Dependency-Sanity, `open-deps V90` und `scope-collisions`; V90/V120/V126-Overlaps bleiben bekannt und freigegeben.
+
 ## Stand-Snapshot 2026-05-18 (Subphase `V116 116.99`)
 
 - `V116` ist geschlossen: Master-Index, aktive Detaildatei, Open Findings und Changelog zeigen `done`/`116.99`; `V122` sieht `V116.99` jetzt als erfuellt, bleibt aber weiter von `V119.1` abhaengig.
