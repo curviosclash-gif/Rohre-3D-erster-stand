@@ -1299,7 +1299,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "116.9",
+        "currentPhase": "116.99",
         "planFile": "docs/plaene/aktiv/V116.md",
         "scopeDeclarations": [
           ".agents/rules/planning_and_governance.md",
@@ -4423,7 +4423,7 @@
       "id": "V116.9",
       "type": "phase",
       "title": "Rebuild-Spike-Grenze und Paritaetsgate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.9"
@@ -10932,8 +10932,8 @@
     {
       "id": "V116.9.1",
       "type": "subphase",
-      "title": "Dokumentieren: Ein Reborn-/Neubau-Spike ist kein Ersatz fuer das Hauptrepo, solange Feature-Paritaet, Desktop-Start, Bot-/Headless-Pfad, Recording, Multiplayer und relevante Tests nicht verglichen sind.",
-      "status": "open",
+      "title": "Dokumentieren: Ein Reborn-/Neubau-Spike ist kein Ersatz fuer das Hauptrepo, solange Feature-Paritaet, Desktop-Start, Bot-/Headless-Pfad, Recording, Multiplayer und relevante Tests nicht verglichen sind. (abgeschlossen: 2026-05-18; evidence: Rebuild-/Reborn-Grenze unten nennt Paritaetsmatrix und Hauptrepo-Source-of-Truth.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.9",
@@ -10943,8 +10943,8 @@
     {
       "id": "V116.9.2",
       "type": "subphase",
-      "title": "Falls ein Spike vorgeschlagen wird, eigenen Plan unter `docs/plaene/neu/` verlangen: Ziel, maximale Laufzeit, importierte Referenzen, Nicht-Ziele, Paritaetsmatrix, Abbruchkriterien.",
-      "status": "open",
+      "title": "Falls ein Spike vorgeschlagen wird, eigenen Plan unter `docs/plaene/neu/` verlangen: Ziel, maximale Laufzeit, importierte Referenzen, Nicht-Ziele, Paritaetsmatrix, Abbruchkriterien. (abgeschlossen: 2026-05-18; evidence: Tabelle unten; Spike bleibt eigener User-Intake, nicht V116- oder V118-Default.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.9",
@@ -10954,8 +10954,8 @@
     {
       "id": "V116.9.3",
       "type": "subphase",
-      "title": "Automatisierungs-Skripte duerfen keinen neuen `CurviosClash_Reborn`-Pfad als Default erzeugen, solange dieser Block nicht explizit aufgenommen wurde.",
-      "status": "open",
+      "title": "Automatisierungs-Skripte duerfen keinen neuen `CurviosClash_Reborn`-Pfad als Default erzeugen, solange dieser Block nicht explizit aufgenommen wurde. (abgeschlossen: 2026-05-18; evidence: `rg \"CurviosClash_Reborn|Reborn|Rebuild|clean-slate\" AGENTS.md .agents docs scripts package.json` -> keine produktive Skript-Default-Erzeugung fuer `CurviosClash_Reborn`; Treffer liegen in Governance-/Doku-Kontext oder existierendem V100-Rebuild-Begriff.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.9",
@@ -10965,8 +10965,8 @@
     {
       "id": "V116.9.4",
       "type": "subphase",
-      "title": "Hauptrepo bleibt Source of Truth; alter Code darf als Referenz fuer Spikes gelesen werden, aber nicht durch Spike-Code ersetzt werden.",
-      "status": "open",
+      "title": "Hauptrepo bleibt Source of Truth; alter Code darf als Referenz fuer Spikes gelesen werden, aber nicht durch Spike-Code ersetzt werden. (abgeschlossen: 2026-05-18; evidence: Grenze unten; kein neuer Rebuild-Pfad, kein Code-Port, kein Master-Intake.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.9",

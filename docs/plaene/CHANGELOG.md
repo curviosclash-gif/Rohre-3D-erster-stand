@@ -24,6 +24,12 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - Nicht in V118 Slice 1: `ArcadeRunRuntime`, `MediaRecorderSystem`, `ArcadeVehicleManager`, Recording, Gameplay-Parameter, Bot-/Headless-Training und Hangar-Legacy-Contract.
 - V118 bleibt Draft mit `owner: user-intake` und wird durch V116 nicht in den Master aufgenommen; die naechste V116-Phase ist nur die Rebuild-/Reborn-Grenze.
 
+## Stand-Snapshot 2026-05-18 (Subphase `V116 116.9`)
+
+- `116.9` ist als Rebuild-/Reborn-Grenze geschlossen: kein Clean-Slate- oder Reborn-Pfad ist Default, und das Hauptrepo bleibt Source of Truth.
+- Jeder Spike braucht einen eigenen User-Intake unter `docs/plaene/neu/` mit Zeitlimit, Nicht-Zielen, Paritaetsmatrix und Abbruchkriterien; automatisierte Skripte duerfen keinen `CurviosClash_Reborn`-Default erzeugen.
+- V116 steht damit auf `116.99`; das Abschluss-Gate bleibt wegen `[USER-GATE]` explizit freigabepflichtig.
+
 ## Stand-Snapshot 2026-05-17 (Subphase `V116 116.4` Done-Intake-Archivierung)
 
 - `plan-context-report` trennt uebernommene Intake-Drafts jetzt nach Master-Status: `adopted-by-done-master-block` fuer erledigte Zielbloecke und `adopted-by-open-master-block` fuer geplante, aktive oder blockierte Zielbloecke.
