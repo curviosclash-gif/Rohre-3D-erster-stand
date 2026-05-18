@@ -1299,7 +1299,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "116.6",
+        "currentPhase": "116.7",
         "planFile": "docs/plaene/aktiv/V116.md",
         "scopeDeclarations": [
           ".agents/rules/planning_and_governance.md",
@@ -4393,7 +4393,7 @@
       "id": "V116.6",
       "type": "phase",
       "title": "Type-, Lint- und Test-Haertung vorbereiten",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.6"
@@ -10756,8 +10756,8 @@
     {
       "id": "V116.6.1",
       "type": "subphase",
-      "title": "Bestehende Gate-Landschaft erfassen: `architecture:guard`, `typecheck:architecture`, `lint:architecture`, `test:contract`, Playwright-Smokes, Knowledge-Graph-Gates.",
-      "status": "open",
+      "title": "Bestehende Gate-Landschaft erfassen: `architecture:guard`, `typecheck:architecture`, `lint:architecture`, `test:contract`, Playwright-Smokes, Knowledge-Graph-Gates. (abgeschlossen: 2026-05-18; evidence: `package.json` und `.agents/test_mapping.md` inventarisiert; `npm run plan:check`, `npm run graph:check`, `npm run check:architecture:boundaries`, `npm run check:architecture:ratchet`, `npm run check:architecture:metrics` und `npm run typecheck:architecture` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.6",
@@ -10767,8 +10767,8 @@
     {
       "id": "V116.6.2",
       "type": "subphase",
-      "title": "Aktuelle bekannte Blocker und Findings abgleichen: `docs/prozess/Open_Findings.md`, V90 fuer Dependency-/Toolchain-Security, V105/V112 fuer Boundary-/Test-Recovery.",
-      "status": "open",
+      "title": "Aktuelle bekannte Blocker und Findings abgleichen: `docs/prozess/Open_Findings.md`, V90 fuer Dependency-/Toolchain-Security, V105/V112 fuer Boundary-/Test-Recovery. (abgeschlossen: 2026-05-18; evidence: `docs/prozess/Open_Findings.md`, `docs/plaene/aktiv/V90.md`, `docs/plaene/aktiv/V105.md` und `docs/plaene/aktiv/V112.md` abgeglichen; P21 bleibt V90/Audit-owned, V105-Architektur-/Typecheck-Baseline ist lokal gruen, V112 bleibt produktnaher Gameplay-/UI-Hardening-Owner.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.6",
@@ -10778,8 +10778,8 @@
     {
       "id": "V116.6.3",
       "type": "subphase",
-      "title": "Keine pauschalen Vollruns als Standard erzwingen; pro spaeterem Refactor-Kandidaten kleinste sinnvolle Tests definieren.",
-      "status": "open",
+      "title": "Keine pauschalen Vollruns als Standard erzwingen; pro spaeterem Refactor-Kandidaten kleinste sinnvolle Tests definieren. (abgeschlossen: 2026-05-18; evidence: Gate-Matrix unten begrenzt V118 auf `graph:query`/Impact, `plan:check`, passende Architekturchecks und kandidatenspezifische Contract-/Desktop-Signale; kein Voll-Playwright und kein `architecture:guard`-Vollrun als Default.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.6",
@@ -10789,8 +10789,8 @@
     {
       "id": "V116.6.4",
       "type": "subphase",
-      "title": "Falls ein Gate bereits strukturell rot ist, nicht breit reparieren, sondern Fehlerklasse einem bestehenden oder neuen Block zuordnen.",
-      "status": "open",
+      "title": "Falls ein Gate bereits strukturell rot ist, nicht breit reparieren, sondern Fehlerklasse einem bestehenden oder neuen Block zuordnen. (abgeschlossen: 2026-05-18; evidence: schmale lokale Gates waren gruen; bekannter Audit-/Dependency-Rest P21 bleibt bei V90 und wurde in V116 nicht gefixt oder per `npm audit fix` veraendert.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.6",
@@ -10800,8 +10800,8 @@
     {
       "id": "V116.6.5",
       "type": "subphase",
-      "title": "Dokumentieren, welche Gates fuer den ersten Code-Entflechtungs-Slice Pflicht sind.",
-      "status": "open",
+      "title": "Dokumentieren, welche Gates fuer den ersten Code-Entflechtungs-Slice Pflicht sind. (abgeschlossen: 2026-05-18; evidence: Gate-Matrix 2026-05-18 unten; V118 bleibt Draft und wurde nicht in den Master aufgenommen oder produktiv umgesetzt.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.6",
