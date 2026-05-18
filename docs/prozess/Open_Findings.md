@@ -17,7 +17,7 @@ Diese Datei ist die kanonische Ablage fuer offene Findings, Review-Reste und Aud
 | ID | Datei(en) | Problem | Schwere |
 | --- | --- | --- | --- |
 | P14 | `UIStartSyncController.js` | Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()`; nachhaltige Behebung ueber Ownership-/Port-Zuschnitt in `V104` | mittel |
-| P21 | `package.json`, `package-lock.json` | `npm audit --json` meldet noch 2 moderate Root-Befunde (`vite`/`esbuild`); V90 haelt den Major-Upgrade-Blocker und das Build-/Typecheck-Abschlussgate fest | mittel |
+| P21 | `package.json`, `package-lock.json`, `electron/package.json`, `electron/package-lock.json` | `npm audit --audit-level=low` meldet Root-Reste fuer `vite`/`esbuild` plus `fast-uri` (high, non-force Fix-Kandidat); `npm --prefix electron audit --audit-level=low` meldet Major-gebundene `electron`-/`electron-builder`-Reste plus `ip-address` (moderate, non-force Fix-Kandidat). V90 haelt den separaten Fix-Gate und Major-Upgrade-Blocker; Build-/Typecheck-Gate ist seit 2026-05-18 gruen | hoch |
 | P45 | `tests/audio.contract.test.mjs` | Test-Isolation fuer `MockAudioContext` in `afterEach` nicht konsistent (`global.AudioContext` reset fehlt) | niedrig |
 | P45 | `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `vite.config.js` | Hohe Komplexitaet in Hotspots erhoeht Regressionsrisiko | mittel |
 | P46 | `eslint.config.js`, `tsconfig.architecture.json` | Tooling-Gates decken nur engen Laufzeitpfad ab | mittel |

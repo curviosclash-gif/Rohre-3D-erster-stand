@@ -2920,7 +2920,7 @@
       "id": "V90",
       "type": "block",
       "title": "Toolchain-Security und Dependency-Upgrade",
-      "status": "blocked",
+      "status": "planned",
       "attributes": {
         "source": [
           "block-plan",
@@ -2937,6 +2937,7 @@
           "docs/plaene/aktiv/V90.md",
           "docs/prozess/Dokumentationsstatus.md",
           "docs/referenz/ai_architecture_context.md",
+          "electron/package-lock.json",
           "electron/package.json",
           "package-lock.json",
           "package.json",
@@ -2945,7 +2946,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 11,
+          "concreteCount": 12,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -19732,12 +19733,23 @@
     {
       "id": "V90.2.2",
       "type": "subphase",
-      "title": "Build-, Architektur- und Doku-Gates nachziehen. (blockiert: `npm run build` scheitert aktuell in `typecheck:architecture`; Boundary-Guard ist wieder gruen. Siehe `docs/Fehlerberichte/2026-04-29_v90-90.2.2-build-typecheck-architecture-blocked.md`)",
-      "status": "open",
+      "title": "Build-, Architektur- und Doku-Gates nachziehen. (abgeschlossen: 2026-05-18; evidence: `npm run architecture:guard`, `npm run build`, `npm run docs:check` -> PASS; der historische `typecheck:architecture`-Blocker aus `docs/Fehlerberichte/2026-04-29_v90-90.2.2-build-typecheck-architecture-blocked.md` ist fuer diesen Gate-Slice nicht mehr reproduzierbar)",
+      "status": "done",
       "attributes": {
         "blockId": "V90",
         "phaseCode": "90.2",
         "subphaseCode": "90.2.2"
+      }
+    },
+    {
+      "id": "V90.2.3",
+      "type": "subphase",
+      "title": "Nachgezogene non-force Audit-Fix-Kandidaten separat entscheiden und nur mit eigenem Gate-Scope anwenden (`fast-uri` im Root-Tooling, `ip-address` im Electron-Tree).",
+      "status": "open",
+      "attributes": {
+        "blockId": "V90",
+        "phaseCode": "90.2",
+        "subphaseCode": "90.2.3"
       }
     },
     {
@@ -29332,7 +29344,8 @@
         ],
         "scopeBlocks": [
           "V60",
-          "V89"
+          "V89",
+          "V90"
         ],
         "exists": true
       }
@@ -92260,6 +92273,15 @@
     },
     {
       "from": "V90",
+      "to": "electron/package-lock.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V90",
       "to": "electron/package.json",
       "type": "scope",
       "hint": null,
@@ -92394,6 +92416,17 @@
         "blockId": "V90",
         "phaseCode": "90.2",
         "subphaseCode": "90.2.2"
+      }
+    },
+    {
+      "from": "V90.2",
+      "to": "V90.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V90",
+        "phaseCode": "90.2",
+        "subphaseCode": "90.2.3"
       }
     },
     {

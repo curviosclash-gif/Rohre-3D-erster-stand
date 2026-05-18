@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-18. Aktiver Lock: `-`; Startanker: `V90 Audit-Baseline` -> `V126 126.1`.
+Stand: 2026-05-18. Aktiver Lock: `-`; Startanker: `V90 Audit-Baseline aktualisiert` -> `V126 126.1` ohne Package-/Lockfile-Scope.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -51,7 +51,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| V90 | Toolchain-Security und Dependency-Upgrade | blocked | P1 | frei | - | 90.2 | `docs/plaene/aktiv/V90.md` |
+| V90 | Toolchain-Security und Dependency-Upgrade | planned | P1 | frei | - | 90.2 | `docs/plaene/aktiv/V90.md` |
 | V102 | Security-, Runtime- und Contract-Hardening | done | P1 | frei | V99.99,V100.99 | 102.99 | `docs/plaene/aktiv/V102.md` |
 | V114 | SurfacePolicyPort fuer Demo- und Vollversionsgrenze | done | P1 | frei | V98.99,V103.99,V104.99 | 114.1 | `docs/plaene/aktiv/V114.md` |
 | V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | done | P2 | frei | - | 115.99 | `docs/plaene/aktiv/V115.md` |
@@ -139,7 +139,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
-| - | V90 | - | blockiert | Wartet auf Build-/Typecheck-Recovery vor Abschluss-Gate |
+| - | V90 | - | frei | Audit-Baseline aktualisiert; separater Gate-Scope fuer non-force Fixes offen |
 | - | V91 | - | closed | Abgeschlossen 2026-04-14 |
 | - | V92 | - | closed | Abgeschlossen 2026-04-15 |
 | - | V101 | - | closed | Abgeschlossen 2026-04-24 |
@@ -174,8 +174,8 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 ## Empfohlene Reihenfolge
 
-1. `V90` als kurze Audit-Baseline aktualisieren: aktuelles `npm audit` gegen `docs/prozess/Open_Findings.md` abgleichen, aber kein Major-Upgrade und kein `npm audit fix` ohne separaten Gate-Scope.
-2. `V126` (Local Dev-API, Preview- und Delivery-Hardening) als naechsten produktnahen P1-Schnitt starten: Training-Spawn, Preview-Mutationsgrenze, lokale API-Matrix und erste `vite.config.js`-Entflechtung; keine Dependency-Upgrades, keine Hook-/Gate-Policy ohne V90/V125-Koordination.
+1. `V90 90.2` offen halten fuer einen separaten Gate-Scope zu non-force Audit-Fixes (`fast-uri`, `ip-address`); kein Major-Upgrade und kein `npm audit fix` ohne ausdruecklichen Fix-Scope.
+2. `V126` (Local Dev-API, Preview- und Delivery-Hardening) als naechsten produktnahen P1-Schnitt starten, wenn der Slice keine Package-/Lockfile-/CI-Upgrades enthaelt: Training-Spawn, Preview-Mutationsgrenze, lokale API-Matrix und erste `vite.config.js`-Entflechtung; keine Dependency-Upgrades, keine Hook-/Gate-Policy ohne V90/V125-Koordination.
 3. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster danach oder bei Gameplay-Prioritaet parallel mit disjunktem Scope starten.
 4. `V125` (Architektur-Compliance fuer Folgearbeit) als Architektur-Schutz nachziehen, besonders staged Architecture Guard und Workflow-Eskalation fuer neue Boundary-/Legacy-Surfaces.
 5. `V119` (Planabschluss-Evidence-Remediation und Git-Historienabgleich) vollstaendig abschliessen, bevor historische Plan-Evidence als Grundlage fuer neue Automatisierung, RAG oder Source-of-Truth-Migration verwendet wird.
