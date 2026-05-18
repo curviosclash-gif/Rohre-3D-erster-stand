@@ -13,6 +13,7 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 - Aenderungen an `docs/Umsetzungsplan.md`, `docs/plaene/aktiv/VXX.md`, `docs/plaene/CHANGELOG.md`, `.agents/rules/` oder `.agents/workflows/` sind `D3` und brauchen ein User-Gate.
 - Keine Checkboxen, Statusfelder, Abschlussnotizen oder Evidence-Claims nachtraeglich setzen, solange die Analyse nur Pruefung angefordert hat.
 - Wenn ein Findings-Fix vorgeschlagen wird, erst am Ende als Option klassifizieren: `no-op`, `read-only evidence`, `optional`, `edit required`.
+- Verbesserungsvorschlaege sind immer direkt im Abschlussreport auszugeben, auch wenn keine Findings vorliegen. Wenn es wirklich keine sinnvollen Vorschlaege gibt, explizit `none` mit kurzem Grund schreiben.
 - Findings zusaetzlich als `blocker`, `follow-up`, `doc-only` oder `test-gap` markieren, damit Abschlussanalyse und Testanalyse gleich sortierbar bleiben.
 - Fremde uncommittete Aenderungen nur als Worktree-Risiko nennen; nicht stashen, nicht revertieren, nicht in die Analyse hineincommitten.
 - Abgrenzung: Dieser Workflow prueft abgeschlossene Planclaims. Testresultat- und Regressionsauswertung ohne Abschlussclaim gehoert in `.agents/workflows/analyse-planung.md`; reine Docs-/Workflow-/Rule-Frische in `.agents/workflows/aktualitaet-check.md`.
@@ -196,6 +197,8 @@ Bei Widerspruechen keine Plaene aendern. Findings nach Schwere sortieren:
 
 ## 7. Verbesserungsvorschlaege
 
+Dieser Abschnitt ist Pflicht und darf nicht nur auf Nachfrage oder nur bei Findings erscheinen. Er wird aus Findings, Not-checked-Grenzen, dokumentierten Ausnahmen, deferred Tests, Graph-/Coverage-Signalen, Gate-Warnungen und naechsten risikoarmen Evidence-Schritten abgeleitet.
+
 Jeder Vorschlag braucht:
 
 - Ziel: welche Luecke wird geschlossen?
@@ -205,6 +208,8 @@ Jeder Vorschlag braucht:
 - Kleinstes Gate: z. B. `npm run plan:check`, `npm run docs:check`, `npm run gates:pre-commit`.
 - Risiko, falls nichts getan wird.
 - Graph-Bezug: welche Query oder Graph-Luecke den Vorschlag stuetzt, sofern relevant.
+
+Wenn keine Findings gefunden wurden, trotzdem mindestens pruefen, ob aus `Not-checked`, bekannten Risiken, dokumentierten Ausnahmen oder Follow-up-Slices ein `read-only evidence`- oder `optional`-Vorschlag entsteht. Nur wenn auch das leer bleibt, `Verbesserungsvorschlaege: none - <Grund>` ausgeben.
 
 Keine neue aktive Planarbeit erfinden. Wenn ein Follow-up noetig ist, bevorzugt einen Intake-Vorschlag unter `docs/plaene/neu/` nur nach User-Gate; im Analysebericht reicht eine konkrete Draft-Empfehlung.
 
@@ -276,6 +281,7 @@ Codepruefung:
 Verbesserungsvorschlaege:
 - <Vorschlag> (Klasse: <...>, Gate: <...>, Risiko wenn offen: <...>)
 - Lifecycle: <bugfix|blocker-report|intake|doc-slice|testmapping|none>
+- Wenn keine Vorschlaege: `none - <kurzer Grund>`
 
 Offene Annahmen:
 - <nur echte Unsicherheiten>
