@@ -23,6 +23,7 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - Nachschaerfung: Beide Analyse-Workflows beschreiben den Finding-Lifecycle fuer `blocker`, `follow-up`, `doc-only`, `test-gap` und `graph-low`; Reports muessen bewusst nicht gepruefte Pfade nennen.
 - Qualitaetshebel: Findings muessen jetzt falsifizierbar sein (`Evidence`, `Produktpfad`, `Repro/Reasoning`, `Gegenbeweis`, `Confidence`, `Lifecycle`); `P0`/`P1` brauchen zwei unabhaengige Quellen oder bleiben `low confidence`.
 - Qualitaetshebel: Abschlussanalysen nutzen Risk-first Sampling (`scope_files` -> Graph-Impact -> Tests/Contracts -> grosse Diffs) und Testanalysen muessen ihre `.agents/test_mapping.md`-Auswahl begruenden.
+- Tiefenhebel: `P0`/`P1`-Findings muessen jetzt einen Trace ausweisen (`Signal -> Ursache -> Consumer -> Produktwirkung -> Gegenprobe`), damit harte Analysebefunde vom Symptom bis zur falsifizierbaren Produktwirkung reichen.
 
 ## Stand-Snapshot 2026-05-18 (Subphase `V116 116.6`)
 

@@ -28,6 +28,7 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 - Jede Finding-Evidence muss mindestens einen Test, eine Datei, einen Commit, eine Graph-Query oder eine Planstelle nennen.
 - Jede Finding muss falsifizierbar sein: `Evidence`, `Produktpfad`, `Repro/Reasoning`, `Gegenbeweis`, `Confidence` und `Lifecycle` nennen.
 - `P0`/`P1` brauchen zwei voneinander unabhaengige Quellen, z. B. `Test + Code`, `Git + Plan`, `Graph + Code` oder `Test + Plan`. Mit nur einer Quelle hoechstens als `P2` oder `low confidence` berichten.
+- `P0`/`P1` brauchen zusaetzlich `Trace: Signal -> Ursache -> Consumer -> Produktwirkung -> Gegenprobe`.
 - False-Positive-Bremse: Demo-/Test-/Doku-only, bereits dokumentierte Nicht-Ziele, fehlende Konsumenten oder nicht reproduzierbare Theorie ausdruecklich abgrenzen.
 
 ## 3. Wissensgraph pruefen
@@ -91,6 +92,7 @@ Findings:
   Repro/Reasoning: <wie nachvollzogen>
   Gegenbeweis: <welcher Befund wuerde das Finding entkraeften>
   Confidence: high|medium|low
+  Trace: <Signal -> Ursache -> Consumer -> Produktwirkung -> Gegenprobe, Pflicht fuer P0/P1>
 
 Testauswahl:
 - Mapping: <Pfad -> .agents/test_mapping.md-Zeile/Klasse>

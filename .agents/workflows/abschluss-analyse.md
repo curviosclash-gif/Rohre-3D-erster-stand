@@ -130,6 +130,7 @@ Finding-Qualitaet:
 
 - Jede Finding muss falsifizierbar sein: `Evidence`, `Produktpfad`, `Repro/Reasoning`, `Gegenbeweis`, `Confidence` und `Lifecycle` nennen.
 - `P0`/`P1` brauchen zwei voneinander unabhaengige Quellen, z. B. `Plan + Git`, `Code + Test`, `Graph + Code` oder `Git + Test`. Mit nur einer Quelle hoechstens als `P2` oder `low confidence` berichten.
+- `P0`/`P1` brauchen zusaetzlich `Trace: Signal -> Ursache -> Consumer -> Produktwirkung -> Gegenprobe`.
 - False-Positive-Bremse: Demo-/Test-/Doku-only, bereits dokumentierte Nicht-Ziele, fehlende Konsumenten, bekannte Deferred-Tests oder rein theoretische Risiken ausdruecklich abgrenzen.
 - Graph-only, Plan-only oder Commit-message-only reicht nicht fuer harte Abschlusskorrekturen.
 
@@ -248,6 +249,7 @@ Findings:
   Repro/Reasoning: <wie nachvollzogen>
   Gegenbeweis: <welcher Befund wuerde das Finding entkraeften>
   Confidence: high|medium|low
+  Trace: <Signal -> Ursache -> Consumer -> Produktwirkung -> Gegenprobe, Pflicht fuer P0/P1>
 
 Zielmatrix:
 - <DoD/Ziel>: <covered|partly-covered|claim-only|missing|contradicted> - <Evidence>
