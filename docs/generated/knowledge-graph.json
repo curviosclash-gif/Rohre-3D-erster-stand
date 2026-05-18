@@ -1507,7 +1507,8 @@
           "V116",
           "V119",
           "V123",
-          "V125"
+          "V125",
+          "V90"
         ],
         "unknownFrontmatterFields": [
           "scope_reference_files"
@@ -2934,6 +2935,10 @@
         "scopeDeclarations": [
           ".agents/test_mapping.md",
           ".github/workflows/ci.yml",
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.scorecard.json",
+          "docs/plaene/aktiv/V120.md",
           "docs/plaene/aktiv/V90.md",
           "docs/prozess/Dokumentationsstatus.md",
           "docs/referenz/ai_architecture_context.md",
@@ -2946,7 +2951,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 12,
+          "concreteCount": 16,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2960,6 +2965,7 @@
           "V113",
           "V114",
           "V116",
+          "V120",
           "V123",
           "V125",
           "V126",
@@ -7004,7 +7010,7 @@
       "id": "V90.2",
       "type": "phase",
       "title": "Nicht-breaking Security-Fixes",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V90",
         "phaseCode": "90.2"
@@ -19744,8 +19750,8 @@
     {
       "id": "V90.2.3",
       "type": "subphase",
-      "title": "Nachgezogene non-force Audit-Fix-Kandidaten separat entscheiden und nur mit eigenem Gate-Scope anwenden (`fast-uri` im Root-Tooling, `ip-address` im Electron-Tree).",
-      "status": "open",
+      "title": "Nachgezogene non-force Audit-Fix-Kandidaten separat entscheiden und nur mit eigenem Gate-Scope anwenden (`fast-uri` im Root-Tooling, `ip-address` im Electron-Tree). (abgeschlossen: 2026-05-18; evidence: `npm audit fix`, `npm --prefix electron audit fix`, `npm ls fast-uri`, `npm --prefix electron ls ip-address @tootallnate/once`, `npm audit --audit-level=low`, `npm --prefix electron audit --audit-level=low`, `npm --prefix server audit --audit-level=low`, `npm run architecture:guard`, `npm run build`, `npm run docs:check`, `npm run graph:build`, `npm run graph:check` -> `fast-uri@3.1.2`, `ip-address@10.2.0` und `@tootallnate/once@2.0.1` per non-force Lockfile-Scope uebernommen; Root bleibt bei 2 moderaten Vite/esbuild-Major-Resten, Electron bei 12 Electron-/Electron-Builder-/tar-/@tootallnate/once-Resten, Server-Audit und Gates PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V90",
         "phaseCode": "90.2",
@@ -25480,7 +25486,8 @@
           "V111",
           "V115",
           "V116",
-          "V120"
+          "V120",
+          "V90"
         ],
         "exists": true
       }
@@ -25502,6 +25509,7 @@
           "V115",
           "V116",
           "V120",
+          "V90",
           "V94"
         ],
         "exists": true
@@ -25538,7 +25546,8 @@
           "V105",
           "V111",
           "V116",
-          "V120"
+          "V120",
+          "V90"
         ],
         "exists": true
       }
@@ -25905,7 +25914,8 @@
         ],
         "scopeBlocks": [
           "V120",
-          "V77"
+          "V77",
+          "V90"
         ],
         "exists": true
       }
@@ -92238,6 +92248,42 @@
     {
       "from": "V90",
       "to": ".github/workflows/ci.yml",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V90",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V90",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V90",
+      "to": "docs/generated/knowledge-graph.scorecard.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V90",
+      "to": "docs/plaene/aktiv/V120.md",
       "type": "scope",
       "hint": null,
       "attributes": {

@@ -9434,7 +9434,8 @@
         "V111",
         "V115",
         "V116",
-        "V120"
+        "V120",
+        "V90"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -9458,6 +9459,7 @@
         "V115",
         "V116",
         "V120",
+        "V90",
         "V94"
       ],
       "surfaces": [],
@@ -9498,7 +9500,8 @@
         "V105",
         "V111",
         "V116",
-        "V120"
+        "V120",
+        "V90"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -10013,7 +10016,8 @@
       ],
       "scopeBlocks": [
         "V120",
-        "V77"
+        "V77",
+        "V90"
       ],
       "surfaces": [],
       "classification": "product-docs",
