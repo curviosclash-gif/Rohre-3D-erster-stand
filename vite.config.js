@@ -4,6 +4,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'node:child_process';
 import { WebSocketServer } from 'ws';
+import { buildTrainingSpawnCommand } from './dev/training/trainingSpawnArgs.js';
+import {
+    createPreviewLocalMutationDisabledResponse,
+    shouldBlockPreviewLocalMutation,
+} from './dev/vite/previewLocalApiGuard.js';
 import {
     createRendererBuildDefines,
     createRendererShellBuildConfig,
@@ -75,6 +80,13 @@ function createJsonResponse(res, statusCode, payload) {
     res.statusCode = statusCode;
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.end(JSON.stringify(payload));
+}
+
+function maybeBlockPreviewLocalMutation({ isPreviewServer = false, reqPath = '', res } = {}) {
+    if (!shouldBlockPreviewLocalMutation({ isPreviewServer })) return false;
+    const response = createPreviewLocalMutationDisabledResponse({ route: reqPath });
+    createJsonResponse(res, response.statusCode, response.payload);
+    return true;
 }
 
 function readRequestBody(req, maxBytes = 5 * 1024 * 1024) {
@@ -518,7 +530,7 @@ function editorDiskSaveApiPlugin() {
     const deleteVehicleRoutePath = EDITOR_API_ROUTES.DELETE_VEHICLE_DISK;
     const videoRoutePath = EDITOR_API_ROUTES.SAVE_VIDEO_DISK;
 
-    const registerMiddleware = (middlewares) => {
+    const registerMiddleware = (middlewares, { isPreviewServer = false } = {}) => {
         middlewares.use(async (req, res, next) => {
             const reqPath = String(req.url || '').split('?')[0];
             const isMapSave = req.method === 'POST' && reqPath === mapRoutePath;
@@ -531,6 +543,11 @@ function editorDiskSaveApiPlugin() {
 
             if (!isMapSave && !isVehicleSave && !isVehicleList && !isVehicleGet && !isVehicleRename && !isVehicleDelete && !isVideoSave) {
                 next();
+                return;
+            }
+
+            const isLocalMutation = isMapSave || isVehicleSave || isVehicleRename || isVehicleDelete || isVideoSave;
+            if (isLocalMutation && maybeBlockPreviewLocalMutation({ isPreviewServer, reqPath, res })) {
                 return;
             }
 
@@ -629,7 +646,7 @@ function editorDiskSaveApiPlugin() {
             registerMiddleware(server.middlewares);
         },
         configurePreviewServer(server) {
-            registerMiddleware(server.middlewares);
+            registerMiddleware(server.middlewares, { isPreviewServer: true });
         },
     };
 }
@@ -712,23 +729,11 @@ function trainingDashboardApiPlugin() {
         }
     }
 
-    function buildCliArgs(config) {
-        const args = [];
-        if (config.episodes) args.push('--episodes', String(parseInt(config.episodes, 10) || 20));
-        if (config.modes) args.push('--modes', String(config.modes).replace(/[^a-zA-Z0-9\-_,]/g, ''));
-        if (config.seed) args.push('--seeds', String(config.seed).replace(/[^0-9,]/g, ''));
-        if (config.resumeCheckpoint) args.push('--resume-checkpoint', String(config.resumeCheckpoint).replace(/[^a-zA-Z0-9\-_./\\]/g, ''));
-        if (config.maxSteps) args.push('--max-steps', String(parseInt(config.maxSteps, 10) || 5000));
-        return args;
-    }
-
     function spawnTraining(config, onExit) {
-        const cliArgs = buildCliArgs(config);
-        const npmArgs = ['run', 'training:e2e'];
-        if (cliArgs.length > 0) npmArgs.push('--', ...cliArgs);
+        const spawnCommand = buildTrainingSpawnCommand(config);
 
-        const child = spawn('npm', npmArgs, {
-            shell: true,
+        const child = spawn(spawnCommand.command, spawnCommand.args, {
+            shell: spawnCommand.shell,
             cwd: __dirname,
             stdio: ['ignore', 'pipe', 'pipe'],
             env: { ...process.env },
@@ -754,6 +759,25 @@ function trainingDashboardApiPlugin() {
         });
 
         return child;
+    }
+
+    function createCurriculumStageConfig(stage, stageIdx) {
+        return {
+            episodes: stage.episodes ?? 20,
+            modes: stage.modes || 'classic-3d',
+            maxSteps: stage.maxSteps ?? '',
+            resumeCheckpoint: stageIdx > 0 ? 'latest' : (stage.resumeCheckpoint || ''),
+        };
+    }
+
+    function validateTrainingConfig(config) {
+        buildTrainingSpawnCommand(config);
+    }
+
+    function getTrainingRequestErrorStatus(error) {
+        if (error instanceof SyntaxError) return 400;
+        if (error instanceof TypeError) return 422;
+        return 500;
     }
 
     function startSingle(config) {
@@ -820,12 +844,7 @@ function trainingDashboardApiPlugin() {
             appendOutputLine('system', `--- Curriculum Stage ${stageIdx + 1}/${stages.length}: ${stage.name || 'unnamed'} ---`);
             broadcast({ type: 'curriculum-stage', stage: stage.name, index: stageIdx, total: stages.length });
 
-            const stageConfig = {
-                episodes: stage.episodes || 20,
-                modes: stage.modes || 'classic-3d',
-                maxSteps: stage.maxSteps || '',
-                resumeCheckpoint: stageIdx > 0 ? 'latest' : (stage.resumeCheckpoint || ''),
-            };
+            const stageConfig = createCurriculumStageConfig(stage, stageIdx);
 
             const child = spawnTraining(stageConfig, (exitCode) => {
                 if (exitCode === 0 && trainingProcess?.shouldContinue) {
@@ -997,10 +1016,16 @@ function trainingDashboardApiPlugin() {
         }, ms);
     }
 
-    const registerMiddleware = (middlewares) => {
+    const registerMiddleware = (middlewares, { isPreviewServer = false } = {}) => {
         middlewares.use(async (req, res, next) => {
             const reqPath = String(req.url || '').split('?')[0];
             const urlParams = new URL(req.url || '', 'http://localhost').searchParams;
+            const isTrainingMutation = req.method === 'POST'
+                && ['/api/training/start', '/api/training/stop', '/api/training/schedule'].includes(reqPath);
+
+            if (isTrainingMutation && maybeBlockPreviewLocalMutation({ isPreviewServer, reqPath, res })) {
+                return;
+            }
 
             if (req.method === 'GET' && reqPath === '/api/training/status') {
                 const stamp = urlParams.get('stamp') || null;
@@ -1036,6 +1061,7 @@ function trainingDashboardApiPlugin() {
                     const mode = String(body.mode || 'single').toLowerCase();
 
                     if (mode === 'loop') {
+                        validateTrainingConfig(body);
                         startLoop(body);
                     } else if (mode === 'curriculum') {
                         const stages = Array.isArray(body.curriculum) ? body.curriculum : [
@@ -1043,13 +1069,15 @@ function trainingDashboardApiPlugin() {
                             { name: 'Combat', episodes: 20, modes: 'classic-3d,hunt-3d', maxSteps: 10000 },
                             { name: 'Full', episodes: 20, modes: 'classic-3d,classic-2d,hunt-3d,hunt-2d', maxSteps: 15000 },
                         ];
+                        stages.forEach((stage, stageIdx) => validateTrainingConfig(createCurriculumStageConfig(stage, stageIdx)));
                         startCurriculum(stages);
                     } else {
+                        validateTrainingConfig(body);
                         startSingle(body);
                     }
                     createJsonResponse(res, 200, { ok: true, pid: trainingProcess.pid, mode: trainingProcess.mode });
                 } catch (err) {
-                    createJsonResponse(res, 500, { ok: false, error: err.message });
+                    createJsonResponse(res, getTrainingRequestErrorStatus(err), { ok: false, error: err.message });
                 }
                 return;
             }
@@ -1130,7 +1158,7 @@ function trainingDashboardApiPlugin() {
             process.on('SIGTERM', cleanup);
         },
         configurePreviewServer(server) {
-            registerMiddleware(server.middlewares);
+            registerMiddleware(server.middlewares, { isPreviewServer: true });
         },
     };
 }

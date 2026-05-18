@@ -1,6 +1,6 @@
 # Architektur (Aktiver Einstieg)
 
-Stand: 2026-05-18
+Stand: 2026-05-19
 
 Dieses Dokument ist der aktive Einstiegspfad fuer die Architektur.
 Es ist ein Kompass und keine zweite Architektur-Wahrheit: Details bleiben in

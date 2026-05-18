@@ -773,3 +773,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 # 2026-05-18 - Codex Cloud Node runtime
 
 - Added `.nvmrc` with Node 24 so Codex Cloud setup uses a runtime compatible with Cesium's `>=22` engine requirement and the local Windows development setup.
+
+## V126 Review-Fix 2026-05-18 (Local API Preview)
+
+- `dev/training/trainingSpawnArgs.js` ist jetzt im Training-Dashboard-Pfad verdrahtet: `vite.config.js` startet `npm run training:e2e` ohne `shell: true` und nutzt den Windows-Command-Resolver.
+- Preview-Mutationen fuer Editor-Disk-POSTs und Training-Start/Stop/Schedule werden ohne `ENABLE_LOCAL_MUTATION_APIS=1` mit `403 preview-local-mutation-disabled` blockiert.
+- V126 bleibt offen fuer die read-only Artefakt-Entscheidung, den Log-Ringbuffer und die erste groessere `vite.config.js`-Entflechtung.

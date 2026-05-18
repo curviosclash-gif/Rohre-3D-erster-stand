@@ -156,12 +156,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1872,
-    "rawCoveredFileCount": 1224,
-    "rawCoveragePercent": 65.4,
-    "adjustedTrackedFileCount": 1377,
-    "adjustedCoveredFileCount": 1024,
-    "adjustedCoveragePercent": 74.4,
+    "trackedFileCount": 1878,
+    "rawCoveredFileCount": 1230,
+    "rawCoveragePercent": 65.5,
+    "adjustedTrackedFileCount": 1383,
+    "adjustedCoveredFileCount": 1030,
+    "adjustedCoveragePercent": 74.5,
     "uncoveredFileCount": 648,
     "uncoveredActiveFileCount": 353,
     "classifications": [
@@ -192,8 +192,8 @@
       {
         "classification": "dev-tooling",
         "excludedFromCoverage": false,
-        "count": 21,
-        "coveredCount": 14
+        "count": 23,
+        "coveredCount": 16
       },
       {
         "classification": "governance-tooling",
@@ -204,20 +204,20 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 51,
-        "coveredCount": 26
+        "count": 52,
+        "coveredCount": 27
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 946,
-        "coveredCount": 823
+        "count": 948,
+        "coveredCount": 825
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 353,
-        "coveredCount": 161
+        "count": 354,
+        "coveredCount": 162
       },
       {
         "classification": "prototype",
@@ -1088,6 +1088,23 @@
       "classification": "repo-ops",
       "excludedFromCoverage": true,
       "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": ".nvmrc",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V126"
+      ],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
     },
     {
       "path": "AGENTS.md",
@@ -7063,6 +7080,40 @@
       "excludeReason": null
     },
     {
+      "path": "dev/training/trainingSpawnArgs.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V126"
+      ],
+      "surfaces": [],
+      "classification": "dev-tooling",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "dev/vite/previewLocalApiGuard.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V126"
+      ],
+      "surfaces": [],
+      "classification": "dev-tooling",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "dev/vite/rendererShellConfig.js",
       "tracked": true,
       "coveredInCore": true,
@@ -10107,6 +10158,23 @@
       ],
       "scopeBlocks": [
         "V125",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V126_local_api_preview_matrix_2026-05-18.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
         "V77"
       ],
       "surfaces": [],
@@ -32126,6 +32194,25 @@
       "excludeReason": null
     },
     {
+      "path": "tests/training-dashboard-spawn.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V126"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "tests/training-e2e.test.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -32325,6 +32412,25 @@
       ],
       "scopeBlocks": [
         "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/vite-preview-local-api.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V126"
       ],
       "surfaces": [],
       "classification": "product-code",
