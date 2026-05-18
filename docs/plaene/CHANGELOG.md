@@ -769,3 +769,7 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `116.5` ist no-op-first geschlossen: `token_efficiency_and_tools.md`, `CLAUDE.md` und `.gemini/README.md` decken Kontext-Policy und Adapter-Prinzip bereits ab; daher keine Rule-/Workflow-/Adapter-Diffs.
 - Safety blieb unverkuerzt: Dead-Code-, Git-, Lock-, Commit-, D3/D4- und Test-Ownership-Regeln wurden nur als Evidence abgeglichen, nicht reduziert.
 - Der Master-Index springt fuer V116 auf `116.6 Gate-Matrix`; der Draft `docs/plaene/neu/Feature_Agent_Skills_statt_Regeltext.md` bleibt bewusst ausserhalb des Master-Intakes.
+
+# 2026-05-18 - Codex Cloud Node runtime
+
+- Added `.nvmrc` with Node 24 so Codex Cloud setup uses a runtime compatible with Cesium's `>=22` engine requirement and the local Windows development setup.
