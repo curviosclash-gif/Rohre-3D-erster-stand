@@ -13,6 +13,7 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 - Aenderungen an `docs/Umsetzungsplan.md`, `docs/plaene/aktiv/VXX.md`, `docs/plaene/CHANGELOG.md`, `.agents/rules/` oder `.agents/workflows/` sind `D3` und brauchen ein User-Gate.
 - Keine Checkboxen, Statusfelder, Abschlussnotizen oder Evidence-Claims nachtraeglich setzen, solange die Analyse nur Pruefung angefordert hat.
 - Wenn ein Findings-Fix vorgeschlagen wird, erst am Ende als Option klassifizieren: `no-op`, `read-only evidence`, `optional`, `edit required`.
+- Findings zusaetzlich als `blocker`, `follow-up`, `doc-only` oder `test-gap` markieren, damit Abschlussanalyse und Testanalyse gleich sortierbar bleiben.
 - Fremde uncommittete Aenderungen nur als Worktree-Risiko nennen; nicht stashen, nicht revertieren, nicht in die Analyse hineincommitten.
 
 ## 1. Kandidat bestimmen
@@ -204,6 +205,7 @@ Read-only Abschluss:
 - Bei Graph-/Scope-Fragen: passende `node scripts/query-knowledge-graph.mjs ...` Query nennen oder ausfuehren.
 
 Wenn ein Report unter `tmp/` geschrieben wurde, im Final den Pfad nennen. Wenn keine Datei geschrieben wurde, Findings direkt im Chat ausgeben.
+Default ist Chat-Ausgabe ohne neue Datei; ein Report unter `tmp/abschluss-analyse-VXX.md` ist nur noetig, wenn der User eine Datei will oder die Findings fuer einen Folge-Task persistiert werden sollen.
 
 ## 9. Reportformat
 
@@ -213,12 +215,13 @@ Standardformat:
 Abschlussanalyse: VXX - <Titel>
 Confidence: high|medium|low
 Quellen: <Master>, <Blockfile>, <Changelog>, <Git>
+Ablage: Chat|tmp/abschluss-analyse-VXX.md
 
 Kurzfazit:
 - <1-3 Saetze>
 
 Findings:
-- [P1] <Titel> - <konkreter Beleg> - <Risiko>
+- [P1][blocker|follow-up|doc-only|test-gap] <Titel> - <konkreter Beleg> - <Risiko>
 
 Zielmatrix:
 - <DoD/Ziel>: <covered|partly-covered|claim-only|missing|contradicted> - <Evidence>

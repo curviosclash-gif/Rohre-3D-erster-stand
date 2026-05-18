@@ -6,6 +6,12 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Governance-Notiz 2026-05-18 (Workflows `analyse-planung` / `abschluss-analyse`)
+
+- `analyse-planung` bindet den Wissensgraphen jetzt als Pflichtpruefung ein, sobald Testbefunde Scope-Dateien, `VXX`-Bloecke, Dependencies, Coverage oder Desktop-vs-Demo-Wirkung beruehren.
+- Das Analyse-Reportformat klassifiziert Findings einheitlich nach `P0`-`P3`, `blocker`/`follow-up`/`doc-only`/`test-gap`, Graph-Status und Graph-Confidence.
+- `abschluss-analyse` wurde spiegelnd geschaerft: Default bleibt Chat-Ausgabe oder optionaler `tmp/abschluss-analyse-VXX.md`-Report, Findings nutzen dieselben Kategorien wie die Testanalyse.
+
 ## Stand-Snapshot 2026-05-18 (Subphase `V116 116.6`)
 
 - `116.6` ist als Gate-Matrix-Slice geschlossen: vorhandene Plan-, Graph-, Agenten-Kontext- und Architektur-Signale wurden inventarisiert, ohne `architecture:guard` oder Playwright-Vollruns als neuen Default einzufuehren.
