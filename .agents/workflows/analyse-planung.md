@@ -15,6 +15,7 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 ## 1. Execute and persist
 
 - Use `.agents/test_mapping.md` to select commands based on changed paths.
+- Testauswahl begruenden: betroffene Pfade, passende Mapping-Zeile, gewaehlter Command und bewusst nicht gelaufene naheliegende Commands.
 - Run core, specialized, and smoke tests only after explicit user request.
 - Extra smoke commands, when requested: `npm run smoke:roundstate`, `npm run smoke:selftrail`.
 - Save user-provided or explicitly requested results to `docs/tests/Testergebnisse_YYYY-MM-DD.md` with per-test `PASS`/`FAIL`/`WARN`.
@@ -25,6 +26,9 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 - Document only: new issues, regressions, resolved items, and whether findings block the desktop app or only the online demo.
 - Findings nach `P0`/`P1`/`P2`/`P3` sortieren und zusaetzlich als `blocker`, `follow-up`, `doc-only` oder `test-gap` markieren.
 - Jede Finding-Evidence muss mindestens einen Test, eine Datei, einen Commit, eine Graph-Query oder eine Planstelle nennen.
+- Jede Finding muss falsifizierbar sein: `Evidence`, `Produktpfad`, `Repro/Reasoning`, `Gegenbeweis`, `Confidence` und `Lifecycle` nennen.
+- `P0`/`P1` brauchen zwei voneinander unabhaengige Quellen, z. B. `Test + Code`, `Git + Plan`, `Graph + Code` oder `Test + Plan`. Mit nur einer Quelle hoechstens als `P2` oder `low confidence` berichten.
+- False-Positive-Bremse: Demo-/Test-/Doku-only, bereits dokumentierte Nicht-Ziele, fehlende Konsumenten oder nicht reproduzierbare Theorie ausdruecklich abgrenzen.
 
 ## 3. Wissensgraph pruefen
 
@@ -65,6 +69,7 @@ Der Wissensgraph ist Pflicht, sobald Testbefunde, Scope-Dateien, ein `VXX`-Block
 - Keep `/fix-planung` compatibility.
 - Keine nicht gelaufenen Tests als `PASS` zaehlen; deferred Tests mit Grund und Risiko nennen.
 - Report muss immer `Not-checked:` oder eine gleichwertige Begrenzung enthalten.
+- Report muss `Testauswahl:` enthalten, sobald `.agents/test_mapping.md` beruehrt oder ausgewertet wurde.
 - Wenn eine Datei geschrieben wurde, im Final den Pfad nennen. Wenn keine Datei geschrieben wurde, Findings direkt im Chat ausgeben.
 
 ## Report
@@ -81,6 +86,16 @@ Kurzfazit:
 
 Findings:
 - [P1][blocker|follow-up|doc-only|test-gap] <Titel> - <Evidence> - <Risiko>
+  Evidence: <Test|Datei|Commit|Graph-Query|Planstelle>
+  Produktpfad: <Desktop|Browser-Demo|Test|Doku|unklar>
+  Repro/Reasoning: <wie nachvollzogen>
+  Gegenbeweis: <welcher Befund wuerde das Finding entkraeften>
+  Confidence: high|medium|low
+
+Testauswahl:
+- Mapping: <Pfad -> .agents/test_mapping.md-Zeile/Klasse>
+- Gewaehlt: <Command oder SKIPPED mit Grund>
+- Naheliegend nicht gelaufen: <Command/Risiko oder none>
 
 Wissensgraph:
 - Graph-Status: <graph:check PASS|WARN|FAIL|SKIPPED>, Confidence: <graph-high|graph-medium|graph-low|n/a>

@@ -126,6 +126,13 @@ Gruendlich pruefen, aber Ergebnisse kompakt halten:
 - Folgeblock-Risiko: offene Findings muessen entweder als Follow-up, Intake, Risiko oder bewusster Nicht-Scope sichtbar sein.
 - Graph-Konsistenz: Graph-Checks, Impact, Coverage, Scope-Kollisionen und offene Dependencies widersprechen dem Abschluss nicht.
 
+Finding-Qualitaet:
+
+- Jede Finding muss falsifizierbar sein: `Evidence`, `Produktpfad`, `Repro/Reasoning`, `Gegenbeweis`, `Confidence` und `Lifecycle` nennen.
+- `P0`/`P1` brauchen zwei voneinander unabhaengige Quellen, z. B. `Plan + Git`, `Code + Test`, `Graph + Code` oder `Git + Test`. Mit nur einer Quelle hoechstens als `P2` oder `low confidence` berichten.
+- False-Positive-Bremse: Demo-/Test-/Doku-only, bereits dokumentierte Nicht-Ziele, fehlende Konsumenten, bekannte Deferred-Tests oder rein theoretische Risiken ausdruecklich abgrenzen.
+- Graph-only, Plan-only oder Commit-message-only reicht nicht fuer harte Abschlusskorrekturen.
+
 ## 6. Codepruefung
 
 Die Codepruefung ist Pflicht, sobald der abgeschlossene Plan `src/`, `tests/`, `scripts/`, `electron/`, `editor/`, `data/` oder runtime-nahe Konfiguration beruehrt. Sie bleibt planbezogen, soll aber so tief wie praktikabel sein.
@@ -133,6 +140,8 @@ Die Codepruefung ist Pflicht, sobald der abgeschlossene Plan `src/`, `tests/`, `
 ### 6.1 Code-Scope bilden
 
 - Aus `scope_files`, relevanten Commits und Graph-Impact eine Code-Dateiliste bilden.
+- Risk-first Sampling: zuerst zentrale `scope_files`, dann Graph-Impact-Dateien, dann direkt geaenderte Tests/Contracts, dann grosse Diffs nach Verantwortung schneiden.
+- Nur bei `P0`/`P1`-Verdacht, widerspruechlicher Evidence oder unklarem Produktpfad tiefer in weitere Impact-Dateien expandieren.
 - Fuer jeden relevanten Commit mindestens `git show --stat --summary <commit>` und `git show --name-only <commit>` lesen.
 - Fuer zentrale oder riskante Commits die Diffs lesen: `git show --find-renames --find-copies --stat --patch <commit> -- <relevante_pfade>`.
 - Wenn ein Commit sehr gross ist, nach Verantwortung schneiden: Runtime, UI, Tests, Scripts, Daten/Contracts, Electron, Editor.
@@ -171,6 +180,7 @@ Wenn keine Code-Findings gefunden werden, explizit sagen: `Keine planrelevanten 
 ### 6.4 Test- und Gate-Abgleich
 
 - Aus `.agents/test_mapping.md` nur die fuer die beruehrten Codepfade passenden Tests bestimmen.
+- Testauswahl begruenden: betroffene Pfade, passende Mapping-Zeile/Klasse, gewaehlter Command und bewusst nicht gelaufene naheliegende Commands.
 - Gelaufene Tests nur als Evidence zaehlen, wenn Ergebnis und Zeitpunkt klar sind.
 - Nicht gelaufene, aber naheliegende Tests als `not-checked` oder Verbesserungsvorschlag nennen.
 - Keine Voll-Suite automatisch starten, ausser der User hat das explizit erlaubt oder der Abschluss-Gate es verlangt.
@@ -233,6 +243,11 @@ Kurzfazit:
 
 Findings:
 - [P1][blocker|follow-up|doc-only|test-gap] <Titel> - <konkreter Beleg> - <Risiko>
+  Evidence: <Plan|Git|Code|Test|Graph, moeglichst zwei Quellen fuer P0/P1>
+  Produktpfad: <Desktop|Browser-Demo|Test|Doku|unklar>
+  Repro/Reasoning: <wie nachvollzogen>
+  Gegenbeweis: <welcher Befund wuerde das Finding entkraeften>
+  Confidence: high|medium|low
 
 Zielmatrix:
 - <DoD/Ziel>: <covered|partly-covered|claim-only|missing|contradicted> - <Evidence>
@@ -250,9 +265,11 @@ Wissensgraph:
 
 Codepruefung:
 - Gepruefte Codepfade: <src/tests/scripts/...>
+- Sampling: <scope_files -> graph-impact -> tests/contracts -> grosse Diffs; Abweichungen begruenden>
 - Diff-/Commit-Review: <kurz>
 - Code-Findings: <P0-P3 oder none>
 - Testabdeckung: <gelaufen / naheliegend nicht gelaufen / Luecken>
+- Testauswahl: <Mapping-Klasse, gewaehlter Command, nicht gelaufene naheliegende Commands>
 
 Verbesserungsvorschlaege:
 - <Vorschlag> (Klasse: <...>, Gate: <...>, Risiko wenn offen: <...>)
