@@ -7020,7 +7020,7 @@
       "id": "V90.3",
       "type": "phase",
       "title": "Major-Upgrade-Entscheidungen",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V90",
         "phaseCode": "90.3"
@@ -19783,8 +19783,8 @@
     {
       "id": "V90.3.3",
       "type": "subphase",
-      "title": "TypeScript-/ESLint-/Playwright-Upgrades getrennt von Runtime-Dependencies schneiden.",
-      "status": "open",
+      "title": "TypeScript-/ESLint-/Playwright-Upgrades getrennt von Runtime-Dependencies schneiden. (abgeschlossen: 2026-05-18; evidence: `npm outdated --json`, `npm ls typescript eslint @playwright/test @commitlint/cli @commitlint/config-conventional @types/node ws --depth=1`, `npm audit --audit-level=low --json`, `npm view typescript@5.9.3 version engines bin dependencies peerDependencies optionalDependencies --json`, `npm view typescript@latest version engines bin dependencies peerDependencies optionalDependencies --json`, `npm view eslint@10.0.3 version engines bin dependencies peerDependencies optionalDependencies --json`, `npm view eslint@latest version engines bin dependencies peerDependencies optionalDependencies --json`, `npm view eslint-plugin-boundaries@6.0.2 version engines peerDependencies dependencies --json`, `npm view @playwright/test@1.58.2 version engines bin dependencies peerDependencies optionalDependencies --json`, `npm view @playwright/test@latest version engines bin dependencies peerDependencies optionalDependencies --json`, `npm view @commitlint/cli@latest version engines dependencies peerDependencies optionalDependencies --json`, `rg -n \"typescript|tsc|eslint|playwright|@playwright|commitlint|@types/node|\\\\bws\\\\b\" package.json package-lock.json playwright.config.js electron server scripts tests .agents/test_mapping.md` -> Matrix unten: TypeScript 6 ist separater Architecture-Typecheck-Slice; ESLint/Commitlint, Playwright und `ws` duerfen nicht mit Runtime-Upgrades vermischt werden)",
+      "status": "done",
       "attributes": {
         "blockId": "V90",
         "phaseCode": "90.3",
