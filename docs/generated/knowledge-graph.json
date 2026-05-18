@@ -19772,8 +19772,8 @@
     {
       "id": "V90.3.2",
       "type": "subphase",
-      "title": "Three-Upgrade separat bewerten, weil Rendering-, Loader- und Asset-Pfade betroffen sein koennen.",
-      "status": "open",
+      "title": "Three-Upgrade separat bewerten, weil Rendering-, Loader- und Asset-Pfade betroffen sein koennen. (abgeschlossen: 2026-05-18; evidence: `npm ls three --depth=3`, `npm outdated --json`, `npm audit --audit-level=low --json`, `npm view three@0.160.1 version engines dependencies peerDependencies optionalDependencies type sideEffects exports --json`, `npm view three@latest version engines dependencies peerDependencies optionalDependencies type sideEffects exports --json`, `rg -l \"from 'three'|from \\\"three\\\"|three/addons|three/examples|THREE\\\\.\" -- src editor tests dev scripts`, `rg -n \"three|OrbitControls|TransformControls|GLTFLoader|OBJLoader|MTLLoader|BufferGeometryUtils|outputColorSpace|toneMapping|WebGLRenderer\" src editor tests dev .agents/test_mapping.md` -> Matrix unten: Three hat keinen Audit-Befund, ist aber `0.160.1` -> `0.184.0` mit breitem Renderer-/Loader-/Editor-Scope)",
+      "status": "done",
       "attributes": {
         "blockId": "V90",
         "phaseCode": "90.3",

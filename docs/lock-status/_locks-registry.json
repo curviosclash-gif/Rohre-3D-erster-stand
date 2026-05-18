@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T10:28:56.231Z",
+  "generated_at": "2026-05-18T10:56:56.245Z",
   "locks": [
     {
       "person": "codex",
@@ -574,6 +574,33 @@
       "start_date": "2026-05-18",
       "target_completion": "2026-05-18",
       "status": "completed",
+      "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V90",
+      "phase": "90.3.2",
+      "scope_files": [
+        "package.json",
+        "package-lock.json",
+        "vite.config.js",
+        "playwright.config.js",
+        "electron/package.json",
+        "electron/package-lock.json",
+        "server/package.json",
+        ".github/workflows/ci.yml",
+        ".agents/test_mapping.md",
+        "docs/referenz/ai_architecture_context.md",
+        "docs/prozess/Dokumentationsstatus.md",
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.scorecard.json",
+        "docs/plaene/aktiv/V120.md",
+        "docs/plaene/aktiv/V90.md"
+      ],
+      "start_date": "2026-05-18",
+      "target_completion": "2026-05-18",
+      "status": "in-progress",
       "notes": ""
     }
   ],
