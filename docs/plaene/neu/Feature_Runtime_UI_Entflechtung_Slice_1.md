@@ -9,17 +9,16 @@ depends_on:
   - V117.99
 affected_area: runtime-ui-decoupling-slice-1
 scope_files:
-  - src/core/arcade/ArcadeRunRuntime.js
-  - src/core/MediaRecorderSystem.js
   - src/ui/UIStartSyncController.js
   - src/ui/UIManager.js
-  - src/ui/arcade/ArcadeVehicleManager.js
-  - docs/plaene/neu/Feature_Repo_Context_Cleanup.md
-  - docs/plaene/aktiv/V117.md
+  - src/ui/start-setup/StartSetupUiOps.js
+  - src/ui/start-setup/StartSetupControlBindings.js
+  - src/ui/start-setup/StartSetupValidationView.js
+  - tests/runtime-regressions.contract.test.mjs
+  - tests/core-targeted-runtime.spec.js
+  - docs/plaene/aktiv/V116.md
+  - docs/plaene/neu/Feature_Runtime_UI_Entflechtung_Slice_1.md
   - docs/generated/knowledge-graph.json
-  - scripts/query-knowledge-graph.mjs
-  - tests/**/*.mjs
-  - tests/**/*.js
 ---
 
 # Runtime-/UI-Entflechtung Slice 1
@@ -30,15 +29,14 @@ Dieser Plan ist der nachgelagerte Entflechtungsblock nach V117 und V116. Er star
 
 ## Planungsstatus
 
-Dieser Plan ist ein Vorab-Draft und darf nicht direkt umgesetzt werden. Nach Abschluss von `V117.99` und `V116.99` muss V118 zuerst aktualisiert werden:
+Dieser Plan ist ein Vorab-Draft und darf nicht direkt umgesetzt werden. V116.7 hat den ersten Kandidaten auf `src/ui/UIStartSyncController.js` eingegrenzt. Nach Abschluss von `V116.99` braucht V118 weiterhin einen manuellen User-Intake in den Master, aber der Draft ist jetzt kandidatenscharf:
 
-- V116-Reports und `Do not touch yet`-Tabelle auswerten.
-- Finalen Kandidaten waehlen.
-- Konkrete Test-/Contract-/Graph-Signale festlegen.
-- `scope_files` auf den gewaehlten Kandidaten und direkt notwendige Tests/Imports reduzieren.
-- Risiken, DoD und Phasen gegen den finalen Scope pruefen.
+- Empfohlener Kandidat: `src/ui/UIStartSyncController.js`.
+- Erster Slice: reine Start-Setup-Snapshot-/Viewmodel-Logik aus `syncStartSetupState()` und angrenzenden Resolvern extrahieren.
+- Direkt notwendige Nachbarpfade: `UIManager` als Snapshot-Aufrufer und `src/ui/start-setup/*` als vorhandene Start-Setup-Helfer.
+- Nicht im ersten Slice: `ArcadeRunRuntime`, `MediaRecorderSystem`, `ArcadeVehicleManager`, Recording, Gameplay-Parameter, Bot-/Headless-Training und Hangar-Legacy-Contract.
 
-Erst danach darf V118 in den Master aufgenommen oder umgesetzt werden.
+Erst nach User-Intake darf V118 umgesetzt werden.
 
 ## Geplante Reihenfolge
 
@@ -62,19 +60,19 @@ Erst danach darf V118 in den Master aufgenommen oder umgesetzt werden.
 - Kein Refactor ohne vorherigen Kandidaten-, Consumer- und Gate-Nachweis.
 - Kein Rebuild-/Reborn-Spike.
 
-## Kandidatenpool
+## Kandidatenentscheidung aus V116.7
 
-Die endgueltige Auswahl erfolgt erst in Phase 118.1. Startkandidaten:
-
-- `src/ui/UIStartSyncController.js`
-- `src/ui/UIManager.js`
-- `src/ui/arcade/ArcadeVehicleManager.js`
-- `src/core/arcade/ArcadeRunRuntime.js`
-- `src/core/MediaRecorderSystem.js`
+| Entscheidung | Datei | Grund |
+| --- | --- | --- |
+| empfohlen | `src/ui/UIStartSyncController.js` | Beste Kombination aus offenem Finding P14, vorhandenen Contract-Tests und moeglichem reinen Snapshot-/Viewmodel-Slice ohne Produktparameter. |
+| Alternative | `src/ui/UIManager.js` | Geeignet fuer einen spaeteren Shell-Orchestrierungs-Slice, aber zentraler fuer den Desktop-Menuefluss. |
+| zurueckgestellt | `src/ui/arcade/ArcadeVehicleManager.js` | Braucht V113/Hangar- und Legacy-Contract-Abgleich. |
+| zurueckgestellt | `src/core/MediaRecorderSystem.js` | Recording-/Capture-Hotpath mit V105/P48-Risiko; nicht erster V118-Slice. |
+| zurueckgestellt | `src/core/arcade/ArcadeRunRuntime.js` | Gameplay-/Arcade-Hotpath mit V112/V96-Overlap; nicht erster V118-Slice. |
 
 ## Definition of Done
 
-- [ ] DoD.1 Ein Kandidat ist ueber Graph, Consumer, offene Findings und Testsignal ausgewaehlt.
+- [ ] DoD.1 Der V116.7-Kandidat `UIStartSyncController` ist beim Intake erneut gegen Graph, Consumer, offene Findings und Testsignal bestaetigt.
 - [ ] DoD.2 Vorher-/Nachher-Gate ist definiert und ausgefuehrt oder blockerfest dokumentiert.
 - [ ] DoD.3 Genau eine Verantwortlichkeit wurde extrahiert oder entkoppelt.
 - [ ] DoD.4 Kein produktives Verhalten wurde absichtlich geaendert.
@@ -90,9 +88,9 @@ status: draft
 goal: Einen sicheren ersten Slice auswaehlen.
 output: Kandidat, Nicht-Ziele, Consumer-Liste und Gate-Plan.
 
-- [ ] 118.1.1 Kandidaten mit `query-knowledge-graph` pruefen: `impact-for-file`, `surfaces-for-file`, `coverage-report`, bei Event-Pfaden `event-flow`.
-- [ ] 118.1.2 Offene Findings aus `docs/prozess/Open_Findings.md` und V116-Reports abgleichen.
-- [ ] 118.1.3 Einen Kandidaten waehlen und alle anderen Kandidaten explizit als out-of-scope markieren.
+- [ ] 118.1.1 `src/ui/UIStartSyncController.js` mit `query-knowledge-graph` pruefen: `why-file`, `impact-for-file`, `surfaces-for-file`, `coverage-report`; `event-flow` nur, wenn neue Critical-Path-Kanten sichtbar werden.
+- [ ] 118.1.2 Offene Findings aus `docs/prozess/Open_Findings.md` und V116.7-`Do not touch yet`-Tabelle abgleichen.
+- [ ] 118.1.3 `UIStartSyncController` als einzigen Kandidaten bestaetigen und `UIManager`, `ArcadeVehicleManager`, `MediaRecorderSystem` und `ArcadeRunRuntime` explizit out-of-scope lassen.
 - [ ] 118.1.4 Blast-Radius nach V117 klassifizieren; bei D3/D4 stoppen und User-Freigabe einholen.
 
 Gate:
@@ -105,9 +103,9 @@ status: draft
 goal: Verhalten vor dem Refactor festhalten.
 output: Vorher-Signal fuer den gewaehlten Pfad.
 
-- [ ] 118.2.1 Kleinsten sinnvollen Contract-, Build-, Graph- oder Playwright-Check fuer den Kandidaten festlegen.
+- [ ] 118.2.1 Kleinste sinnvolle Signale festlegen: `npm run check:architecture:boundaries`, `npm run check:architecture:ratchet`, `npm run typecheck:architecture`, `npm run test:contract`; `desktop-e2e -- core-runtime` nur bei sichtbarem Flow-Diff.
 - [ ] 118.2.2 Vorher-Signal ausfuehren oder blockerfest dokumentieren.
-- [ ] 118.2.3 Riskante Randfaelle notieren: Lifecycle, Cleanup/Dispose, Restart, Recording, Input, Bot-/Headless-Pfad.
+- [ ] 118.2.3 Riskante Randfaelle notieren: Setup-Control-Idempotenz, Listener-Dispose, Mode-/Map-/Vehicle-Snapshot, Multiplayer-Transport-UI, Restart/Return-to-Menu.
 
 Gate:
 
@@ -119,9 +117,9 @@ status: draft
 goal: Genau eine Verantwortlichkeit extrahieren.
 output: Kleiner Code-Diff mit unveraendertem Verhalten.
 
-- [ ] 118.3.1 Nur den gewaehlten Kandidaten und direkt notwendige Tests/Imports anfassen.
+- [ ] 118.3.1 Nur `UIStartSyncController`, direkt notwendige `src/ui/start-setup/*`-Helper, `UIManager`-Aufrufstellen und passende Tests anfassen.
 - [ ] 118.3.2 Keine Feature-Arbeit, kein Parameter-Tuning, keine opportunistische Formatierung.
-- [ ] 118.3.3 Nicht-offensichtliche Compatibility-Pfade mit Why-Kommentar und Delete-Kriterium dokumentieren.
+- [ ] 118.3.3 Nicht-offensichtliche Compatibility-Pfade mit Why-Kommentar und Delete-Kriterium dokumentieren; bestehende Port-/DOM-Binding-Vertraege bleiben kompatibel.
 
 Gate:
 
@@ -167,6 +165,7 @@ Gate:
 | R2 | hoch | Slice wird zu breitem God-Class-Umbau. | Genau ein Kandidat, genau eine Verantwortlichkeit. |
 | R3 | mittel | UI-/Runtime-Pfade haben versteckte Lifecycle-Abhaengigkeiten. | Graph-, Consumer- und Restart-/Dispose-Pruefung. |
 | R4 | mittel | Tests decken den Kandidaten nicht direkt ab. | Kleinstes passendes Signal definieren oder Blocker dokumentieren. |
+| R5 | mittel | `UIStartSyncController`-Slice veraendert implizit Start-Setup-Auswahl, Surface-Policy oder Multiplayer-UI. | Snapshot-/Viewmodel-Extraktion zuerst, DOM- und Runtime-Mutation unveraendert lassen; Contract- und Desktop-Runtime-Signal nachziehen. |
 
 ## Vorgeschlagene Master-Intake-Daten
 

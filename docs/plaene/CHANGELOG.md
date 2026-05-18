@@ -18,6 +18,12 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - Graph-/Coverage-Signal: alle fuenf Dateien sind `covered=true` und `product-code`, haben aber keine direkten `surfaces` oder `criticalPaths`; die Graph-Risikowertung `low` wird deshalb fuer den ersten Code-Slice als Unsicherheit `medium` gelesen.
 - V118-Handoff: empfohlen ist `src/ui/UIStartSyncController.js` mit einem reinen Start-Setup-Snapshot-/Viewmodel-Slice. `ArcadeRunRuntime` und `MediaRecorderSystem` bleiben wegen V112/V96- bzw. V105/P48-Hotpath-Risiko zurueckgestellt.
 
+## Stand-Snapshot 2026-05-18 (Subphase `V116 116.8`)
+
+- Der V118-Draft ist kandidatenscharf: `src/ui/UIStartSyncController.js` ist der empfohlene erste Entflechtungs-Slice, begrenzt auf Snapshot-/Viewmodel-Logik plus direkte Start-Setup-/Testnachbarn.
+- Nicht in V118 Slice 1: `ArcadeRunRuntime`, `MediaRecorderSystem`, `ArcadeVehicleManager`, Recording, Gameplay-Parameter, Bot-/Headless-Training und Hangar-Legacy-Contract.
+- V118 bleibt Draft mit `owner: user-intake` und wird durch V116 nicht in den Master aufgenommen; die naechste V116-Phase ist nur die Rebuild-/Reborn-Grenze.
+
 ## Stand-Snapshot 2026-05-17 (Subphase `V116 116.4` Done-Intake-Archivierung)
 
 - `plan-context-report` trennt uebernommene Intake-Drafts jetzt nach Master-Status: `adopted-by-done-master-block` fuer erledigte Zielbloecke und `adopted-by-open-master-block` fuer geplante, aktive oder blockierte Zielbloecke.

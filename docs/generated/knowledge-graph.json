@@ -1299,7 +1299,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "116.8",
+        "currentPhase": "116.9",
         "planFile": "docs/plaene/aktiv/V116.md",
         "scopeDeclarations": [
           ".agents/rules/planning_and_governance.md",
@@ -4413,7 +4413,7 @@
       "id": "V116.8",
       "type": "phase",
       "title": "V118-Folgeblock finalisieren",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.8"
@@ -10877,8 +10877,8 @@
     {
       "id": "V116.8.1",
       "type": "subphase",
-      "title": "V116.7-Reports, Graph-Surfaces, offene Findings und `Do not touch yet`-Tabelle auswerten.",
-      "status": "open",
+      "title": "V116.7-Reports, Graph-Surfaces, offene Findings und `Do not touch yet`-Tabelle auswerten. (abgeschlossen: 2026-05-18; evidence: V116.7-Handoff in diesem Plan und V118-Draft abgeglichen.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.8",
@@ -10888,8 +10888,8 @@
     {
       "id": "V116.8.2",
       "type": "subphase",
-      "title": "Einen empfohlenen V118-Kandidaten und zwei verworfene Alternativen dokumentieren.",
-      "status": "open",
+      "title": "Einen empfohlenen V118-Kandidaten und zwei verworfene Alternativen dokumentieren. (abgeschlossen: 2026-05-18; evidence: V118-Draft empfiehlt `src/ui/UIStartSyncController.js`; `ArcadeRunRuntime` und `MediaRecorderSystem` sind wegen V112/V96- bzw. V105/P48-Hotpath-Risiko zurueckgestellt, `ArcadeVehicleManager` wegen V113/Hangar-Overlap.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.8",
@@ -10899,8 +10899,8 @@
     {
       "id": "V116.8.3",
       "type": "subphase",
-      "title": "Konkrete Test-/Contract-/Graph-Signale fuer V118 vorschlagen.",
-      "status": "open",
+      "title": "Konkrete Test-/Contract-/Graph-Signale fuer V118 vorschlagen. (abgeschlossen: 2026-05-18; evidence: V118-Draft nennt `why-file`, `impact-for-file`, `surfaces-for-file`, `check:architecture:boundaries`, `check:architecture:ratchet`, `typecheck:architecture`, `test:contract` und nur bei sichtbarem Flow `desktop-e2e -- core-runtime`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.8",
@@ -10910,8 +10910,8 @@
     {
       "id": "V116.8.4",
       "type": "subphase",
-      "title": "V118-`scope_files`, Risiken und DoD als Patch-Vorschlag aktualisieren; keine produktive Code-Aenderung.",
-      "status": "open",
+      "title": "V118-`scope_files`, Risiken und DoD als Patch-Vorschlag aktualisieren; keine produktive Code-Aenderung. (abgeschlossen: 2026-05-18; evidence: `docs/plaene/neu/Feature_Runtime_UI_Entflechtung_Slice_1.md` auf `UIStartSyncController` + direkte Start-Setup-/Testnachbarn reduziert; kein `src/**`-Diff.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.8",
@@ -10921,8 +10921,8 @@
     {
       "id": "V116.8.5",
       "type": "subphase",
-      "title": "User-Gate fuer V118-Intake explizit markieren; V116 darf V118 nur als Patch-Vorschlag schaerfen, nicht selbst in den Master aufnehmen.",
-      "status": "open",
+      "title": "User-Gate fuer V118-Intake explizit markieren; V116 darf V118 nur als Patch-Vorschlag schaerfen, nicht selbst in den Master aufnehmen. (abgeschlossen: 2026-05-18; evidence: V118-Draft bleibt `status: draft`, `owner: user-intake`, `Manuelle Uebernahme erforderlich: ja`; Master-Index nimmt V118 nicht auf.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.8",

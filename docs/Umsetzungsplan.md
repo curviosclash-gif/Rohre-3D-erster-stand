@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-18. Aktiver Lock: `codex` auf `V116 116.8`; Startanker: `V116 V118-Handoff` -> `V90 Audit-Baseline` -> `V126 126.1`.
+Stand: 2026-05-18. Aktiver Lock: `codex` auf `V116 116.9`; Startanker: `V116 Rebuild-Grenze` -> `V90 Audit-Baseline` -> `V126 126.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -57,7 +57,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | done | P2 | frei | - | 115.99 | `docs/plaene/aktiv/V115.md` |
 | V105 | Architecture-Guard- und Typecheck-Regression-Recovery | done | P1 | frei | V99.99,V102.99,V104.99 | 105.99 | `docs/plaene/aktiv/V105.md` |
 | V117 | AI Decision Framework und Autonomie-Gates | done | P1 | frei | V109.99 | 117.99 | `docs/plaene/aktiv/V117.md` |
-| V116 | Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung | active | P1 | frei | V109.99,V117.99,V115.99 | 116.8 | `docs/plaene/aktiv/V116.md` |
+| V116 | Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung | active | P1 | frei | V109.99,V117.99,V115.99 | 116.9 | `docs/plaene/aktiv/V116.md` |
 | V119 | Planabschluss-Evidence-Remediation und Git-Historienabgleich | planned | P1 | frei | V117.99 | 119.1 | `docs/plaene/aktiv/V119.md` |
 | V123 | AI-optimierter Plan-Index und Source-of-Truth-Migration | planned | P1 | frei | V116.4,V119.1 | 123.1 | `docs/plaene/aktiv/V123.md` |
 | V125 | Architektur-Compliance fuer Folgearbeit | planned | P1 | frei | V91.99,V104.99,V117.99 | 125.1 | `docs/plaene/aktiv/V125.md` |
@@ -155,7 +155,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V115 | - | closed | Abgeschlossen 2026-05-14 |
 | - | V105 | 2026-05-13 | closed | Abgeschlossen 2026-05-13 |
 | - | V117 | 2026-05-14 | closed | Abgeschlossen 2026-05-14 |
-| codex | V116 | 2026-05-18 | active | 116.8 V118-Handoff |
+| codex | V116 | 2026-05-18 | active | 116.9 Rebuild-Grenze |
 | - | V119 | - | frei | Geplant |
 | - | V123 | - | frei | Geplant |
 | - | V125 | - | frei | Geplant |

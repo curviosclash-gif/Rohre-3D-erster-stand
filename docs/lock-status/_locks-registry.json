@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T00:44:14.579Z",
+  "generated_at": "2026-05-18T00:48:22.570Z",
   "locks": [
     {
       "person": "codex",
@@ -512,6 +512,40 @@
       "person": "codex",
       "block_id": "V116",
       "phase": "116.8",
+      "scope_files": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".gemini/README.md",
+        ".gitignore",
+        ".agents/rules/planning_and_governance.md",
+        ".agents/rules/token_efficiency_and_tools.md",
+        ".agents/workflows/fix-planung.md",
+        ".agents/workflows/plan.md",
+        ".agents/workflows/code.md",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V116.md",
+        "docs/plaene/aktiv/README.md",
+        "docs/plaene/neu/README.md",
+        "docs/CURRENT_CONTEXT.md",
+        "docs/referenz/ai_project_onboarding.md",
+        "scripts/workspace-cleanup.mjs",
+        "scripts/plan-context-report.mjs",
+        "scripts/check-agent-context.mjs",
+        "scripts/validate-umsetzungsplan.mjs",
+        "scripts/check-gemini-governance.mjs",
+        "scripts/query-knowledge-graph.mjs",
+        "tests/agent-context.contract.test.mjs",
+        "tmp/workspace-cleanup-report.json"
+      ],
+      "start_date": "2026-05-18",
+      "target_completion": "2026-05-18",
+      "status": "completed",
+      "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V116",
+      "phase": "116.9",
       "scope_files": [
         "AGENTS.md",
         "CLAUDE.md",
