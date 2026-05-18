@@ -12,6 +12,12 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - Gruene lokale Evidence: `npm run plan:check`, `npm run check:gemini`, `npm run check:agent-context`, `npm run graph:check`, `node scripts/check-plan-evidence-claims.mjs`, `npm run check:architecture:boundaries`, `npm run check:architecture:ratchet`, `npm run check:architecture:metrics` und `npm run typecheck:architecture`.
 - Bekannte Restarbeit bleibt owning-block-scharf: P21/Dependency-Audit bleibt bei `V90`; produktnahe Gameplay-/UI-Hardening-Reste bleiben bei `V112`; der erste Runtime-/UI-Entflechtungs-Slice bleibt V118-Draft und wird erst nach V116.7/116.8 kandidatenscharf.
 
+## Stand-Snapshot 2026-05-18 (Subphase `V116 116.7`)
+
+- `116.7` inventarisiert die fuenf Refactor-Hotspots ohne Produktcode-Diff: `ArcadeRunRuntime`, `MediaRecorderSystem`, `UIStartSyncController`, `UIManager` und `ArcadeVehicleManager`.
+- Graph-/Coverage-Signal: alle fuenf Dateien sind `covered=true` und `product-code`, haben aber keine direkten `surfaces` oder `criticalPaths`; die Graph-Risikowertung `low` wird deshalb fuer den ersten Code-Slice als Unsicherheit `medium` gelesen.
+- V118-Handoff: empfohlen ist `src/ui/UIStartSyncController.js` mit einem reinen Start-Setup-Snapshot-/Viewmodel-Slice. `ArcadeRunRuntime` und `MediaRecorderSystem` bleiben wegen V112/V96- bzw. V105/P48-Hotpath-Risiko zurueckgestellt.
+
 ## Stand-Snapshot 2026-05-17 (Subphase `V116 116.4` Done-Intake-Archivierung)
 
 - `plan-context-report` trennt uebernommene Intake-Drafts jetzt nach Master-Status: `adopted-by-done-master-block` fuer erledigte Zielbloecke und `adopted-by-open-master-block` fuer geplante, aktive oder blockierte Zielbloecke.

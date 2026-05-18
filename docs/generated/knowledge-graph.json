@@ -1299,7 +1299,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "116.7",
+        "currentPhase": "116.8",
         "planFile": "docs/plaene/aktiv/V116.md",
         "scopeDeclarations": [
           ".agents/rules/planning_and_governance.md",
@@ -4403,7 +4403,7 @@
       "id": "V116.7",
       "type": "phase",
       "title": "Refactor-Kandidaten inventarisieren",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.7"
@@ -10811,8 +10811,8 @@
     {
       "id": "V116.7.1",
       "type": "subphase",
-      "title": "Groesste Dateien und Hotspots erfassen, mindestens:",
-      "status": "open",
+      "title": "Groesste Dateien und Hotspots erfassen, mindestens: (abgeschlossen: 2026-05-18; evidence: Lines-Abgleich und `npm run check:architecture:metrics` -> PASS; Kandidaten unten nach Zeilen und Risiko verdichtet.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.7",
@@ -10822,8 +10822,8 @@
     {
       "id": "V116.7.2",
       "type": "subphase",
-      "title": "Fuer jeden Kandidaten Verbraucher, aktive Blocks, offene Findings und Knowledge-Graph-Surface erfassen; bevorzugt ueber `impact-for-file`, `surfaces-for-file`, `event-flow`, `critical-path-health` und `coverage-report`.",
-      "status": "open",
+      "title": "Fuer jeden Kandidaten Verbraucher, aktive Blocks, offene Findings und Knowledge-Graph-Surface erfassen; bevorzugt ueber `impact-for-file`, `surfaces-for-file`, `event-flow`, `critical-path-health` und `coverage-report`. (abgeschlossen: 2026-05-18; evidence: `why-file`, `impact-for-file`, `surfaces-for-file`, `change-risk --preset review` und `rg`-Consumer-Abgleich; alle fuenf Kandidaten sind `covered=true`, `product-code`, `surfaces=none`, `criticalPaths=[]`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.7",
@@ -10833,8 +10833,8 @@
     {
       "id": "V116.7.3",
       "type": "subphase",
-      "title": "Fuer jeden Kandidaten eine `Do not touch yet`-Tabelle pflegen: Datei, Problem, Consumer, erster sicherer Slice, Testsignal, Risiko.",
-      "status": "open",
+      "title": "Fuer jeden Kandidaten eine `Do not touch yet`-Tabelle pflegen: Datei, Problem, Consumer, erster sicherer Slice, Testsignal, Risiko. (abgeschlossen: 2026-05-18; evidence: Tabelle unten.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.7",
@@ -10844,8 +10844,8 @@
     {
       "id": "V116.7.4",
       "type": "subphase",
-      "title": "Kandidaten nach Risiko/Nutzen priorisieren:",
-      "status": "open",
+      "title": "Kandidaten nach Risiko/Nutzen priorisieren: (abgeschlossen: 2026-05-18; evidence: Prioritaet unten; Graph meldet `riskStatus=low`, wird wegen fehlender direkter Surface-/Critical-Path-Knoten aber als Unsicherheit `medium` gelesen.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.7",
@@ -10855,8 +10855,8 @@
     {
       "id": "V116.7.5",
       "type": "subphase",
-      "title": "Pro Kandidat einen moeglichen ersten Extraktions-Slice definieren, z. B. reine Calculation-/Policy-/Adapter-Funktion statt UI- oder Runtime-Grossumbau.",
-      "status": "open",
+      "title": "Pro Kandidat einen moeglichen ersten Extraktions-Slice definieren, z. B. reine Calculation-/Policy-/Adapter-Funktion statt UI- oder Runtime-Grossumbau. (abgeschlossen: 2026-05-18; evidence: Tabelle unten.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.7",
@@ -10866,8 +10866,8 @@
     {
       "id": "V116.7.6",
       "type": "subphase",
-      "title": "Einen Kandidaten fuer Folgeblock vorschlagen; Umsetzung nicht in diesem Cleanup-Block erzwingen.",
-      "status": "open",
+      "title": "Einen Kandidaten fuer Folgeblock vorschlagen; Umsetzung nicht in diesem Cleanup-Block erzwingen. (abgeschlossen: 2026-05-18; evidence: V118-Empfehlung unten: `src/ui/UIStartSyncController.js`; keine Produktcode-Aenderung.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.7",
