@@ -49,6 +49,21 @@ Dieser Start-Slice ist absichtlich gefahrlos geschnitten:
 - Read-only Preview-Routen brauchen eine bewusste Expositionsentscheidung, weil lokale Trainings-/Vehicle-/Checkpoint-Artefakte trotzdem sensitiv sein koennen.
 - `trainingDashboardApiPlugin` ist der beste erste Auslagerungskandidat fuer `126.5`, weil dort Spawn, Log-Ringbuffer und Preview-Gating zusammenhaengen.
 
+## Umsetzungsstand 2026-05-18
+
+- `dev/vite/previewLocalApiGuard.js` ist in `vite.config.js` verdrahtet:
+  Editor-Disk-Mutationen und Training-Start/Stop/Schedule antworten in
+  `configurePreviewServer` ohne `ENABLE_LOCAL_MUTATION_APIS=1` mit
+  `403 preview-local-mutation-disabled`.
+- `dev/training/trainingSpawnArgs.js` ersetzt den lokalen
+  `buildCliArgs(config)`-Sanitizer im Training-Dashboard-Pfad. Der Spawn nutzt
+  `npm.cmd` auf Windows, `npm` auf anderen Plattformen und `shell: false`.
+- Ungueltige Training-Start-Konfigurationen werden vor dem Prozessstart
+  validiert und als `422` gemeldet; JSON-Syntaxfehler bleiben `400`.
+- Die read-only Artefakt-Routen bleiben bewusst als offene Folgeentscheidung
+  markiert, weil sie lokale Vehicle-, Checkpoint- und Trainingsartefakte
+  exponieren koennen.
+
 ## Kollisionen / Abgrenzung
 
 | Block | Status fuer diesen Slice | Entscheidung |
@@ -60,16 +75,17 @@ Dieser Start-Slice ist absichtlich gefahrlos geschnitten:
 
 ## Naechster kleinster Implementierungs-Slice
 
-1. Kleinen Helper fuer Preview-Mutation-Gating einfuehren.
-2. Mutierende Editor-/Training-POSTs in `configurePreviewServer` ohne Flag mit `403 preview-local-mutation-disabled` blockieren.
-3. `buildCliArgs(config)` und Command-Resolver in eine testbare Einheit schneiden.
-4. Contracttests fuer Preview-Gating und Spawn-Args ergaenzen.
+1. Read-only Preview-Routen final entscheiden: Health aktiv lassen,
+   Vehicle-/Checkpoint-/Training-Artefakt-Reads nur mit dokumentierter
+   Expositionsentscheidung.
+2. Training-Log-Ringbuffer aus `126.4` schneiden, damit lange Dashboard-Laeufe
+   keinen Array-Churn behalten.
+3. Erste zusammenhaengende `vite.config.js`-Plugin-Familie fuer `126.5`
+   auslagern, bevorzugt Training-Dashboard.
 
 ## Verifikation
 
-Nicht ausgefuehrt in diesem Start-Slice, weil der aktuelle Schritt ein read-only Analyse-Artefakt auf Branch ist und keine lokale Checkout-/Node-Ausfuehrung ueber den Connector verfuegbar war.
-
-Empfohlene Gates vor Merge oder Folgecommit:
+Ausgefuehrte und empfohlene Gates fuer diesen Branch-Slice:
 
 ```bash
 npm run plan:check

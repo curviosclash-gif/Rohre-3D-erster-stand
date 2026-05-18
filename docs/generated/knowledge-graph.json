@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 205,
+          "concreteCount": 207,
           "plannedCount": 0
         }
       }
@@ -1769,9 +1769,11 @@
         "currentPhase": "126.1",
         "planFile": "docs/plaene/aktiv/V126.md",
         "scopeDeclarations": [
+          ".nvmrc",
           "dev/io/**",
           "dev/training/**",
           "dev/vite/plugins/**",
+          "dev/vite/previewLocalApiGuard.js",
           "docs/plaene/aktiv/V126.md",
           "tests/training-dashboard-log-buffer.contract.test.mjs",
           "tests/training-dashboard-spawn.contract.test.mjs",
@@ -1779,8 +1781,8 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 2,
-          "plannedCount": 3
+          "concreteCount": 7,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [
           "V112",
@@ -2510,7 +2512,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 324,
+          "concreteCount": 325,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5001,7 +5003,7 @@
       "id": "V126.2",
       "type": "phase",
       "title": "Training-Spawn-Hardening",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.2"
@@ -13613,8 +13615,8 @@
     {
       "id": "V126.2.1",
       "type": "subphase",
-      "title": "`buildCliArgs(config)` in eine testbare Funktion auslagern oder",
-      "status": "open",
+      "title": "`buildCliArgs(config)` in eine testbare Funktion auslagern oder lokal kapseln. (abgeschlossen: 2026-05-18; evidence: `vite.config.js` nutzt `buildTrainingSpawnCommand(config)` aus `dev/training/trainingSpawnArgs.js`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.2",
@@ -13624,8 +13626,8 @@
     {
       "id": "V126.2.2",
       "type": "subphase",
-      "title": "Allowlist definieren:",
-      "status": "open",
+      "title": "Allowlist definieren: `modes in classic-3d|classic-2d|hunt-3d|hunt-2d`, positive Integer fuer `episodes`/`maxSteps`, Seeds nur numerisch oder klar definierte Seed-Liste, `resumeCheckpoint` nur `latest` oder strenge Checkpoint-ID. (abgeschlossen: 2026-05-18; evidence: `node --test tests/training-dashboard-spawn.contract.test.mjs` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.2",
@@ -13635,8 +13637,8 @@
     {
       "id": "V126.2.3",
       "type": "subphase",
-      "title": "Command-Resolver einfuehren:",
-      "status": "open",
+      "title": "Command-Resolver einfuehren: Windows `npm.cmd`, sonst `npm`; `shell: false`. (abgeschlossen: 2026-05-18; evidence: `buildTrainingSpawnCommand({ episodes: 1 }, { platform: 'win32' })` ist im Contracttest abgedeckt.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.2",
@@ -13646,8 +13648,8 @@
     {
       "id": "V126.2.4",
       "type": "subphase",
-      "title": "Fehlerpfade eindeutig machen: ungueltige Config gibt 400/422",
-      "status": "open",
+      "title": "Fehlerpfade eindeutig machen: ungueltige Config gibt 400/422 statt still bereinigter Argumente. (abgeschlossen: 2026-05-18; evidence: Training-Start validiert vor `startSingle`/`startLoop`/`startCurriculum`, `TypeError` wird als 422 gemeldet.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.2",
@@ -13657,8 +13659,8 @@
     {
       "id": "V126.2.5",
       "type": "subphase",
-      "title": "Contracttest fuer normale Config, ungueltige Modi,",
-      "status": "open",
+      "title": "Contracttest fuer normale Config, ungueltige Modi, path-artige Resume-Werte und Windows-Command-Resolver. (abgeschlossen: 2026-05-18; evidence: `node --test tests/training-dashboard-spawn.contract.test.mjs` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.2",
@@ -13668,8 +13670,8 @@
     {
       "id": "V126.3.1",
       "type": "subphase",
-      "title": "Gemeinsamen Helper definieren:",
-      "status": "open",
+      "title": "Gemeinsamen Helper definieren: `isLocalMutationApiEnabled(env)` oder gleichwertig. (abgeschlossen: 2026-05-18; evidence: `dev/vite/previewLocalApiGuard.js` exportiert den Helper und Contracttests decken Default/Opt-in ab.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.3",
@@ -13679,8 +13681,8 @@
     {
       "id": "V126.3.2",
       "type": "subphase",
-      "title": "Editor-Disk-Save-POSTs, Vehicle-Rename/Delete, Video-Save,",
-      "status": "open",
+      "title": "Editor-Disk-Save-POSTs, Vehicle-Rename/Delete, Video-Save, Training-Start/Stop/Schedule in Preview ohne Flag blockieren. (abgeschlossen: 2026-05-18; evidence: `vite.config.js` ruft `maybeBlockPreviewLocalMutation` fuer Editor- und Training-Mutationsrouten in `configurePreviewServer` auf.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.3",
@@ -13701,8 +13703,8 @@
     {
       "id": "V126.3.4",
       "type": "subphase",
-      "title": "HTTP-Antwort fuer blockierte Preview-Mutation standardisieren,",
-      "status": "open",
+      "title": "HTTP-Antwort fuer blockierte Preview-Mutation standardisieren, z. B. `403 preview-local-mutation-disabled`. (abgeschlossen: 2026-05-18; evidence: `createPreviewLocalMutationDisabledResponse` liefert `statusCode: 403` und `error: preview-local-mutation-disabled`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.3",
@@ -13712,8 +13714,8 @@
     {
       "id": "V126.3.5",
       "type": "subphase",
-      "title": "Tests fuer Dev aktiv, Preview blockiert, Preview mit Flag aktiv.",
-      "status": "open",
+      "title": "Tests fuer Dev aktiv, Preview blockiert, Preview mit Flag aktiv. (abgeschlossen: 2026-05-18; evidence: `node --test tests/vite-preview-local-api.contract.test.mjs` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.3",
@@ -22988,6 +22990,21 @@
       }
     },
     {
+      "id": ".nvmrc",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V126"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "AGENTS.md",
       "type": "file",
       "title": null,
@@ -25307,6 +25324,36 @@
       }
     },
     {
+      "id": "dev/training/trainingSpawnArgs.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V126"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "dev/vite/previewLocalApiGuard.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V126"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "dev/vite/rendererShellConfig.js",
       "type": "file",
       "title": null,
@@ -25996,6 +26043,21 @@
         ],
         "scopeBlocks": [
           "V125",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V126_local_api_preview_matrix_2026-05-18.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
           "V77"
         ],
         "exists": true
@@ -44213,12 +44275,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V126"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -44425,12 +44489,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V126"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -50936,6 +51002,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/training-dashboard-spawn.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/training-e2e.test.mjs",
       "type": "scope",
       "hint": null,
@@ -51036,6 +51111,15 @@
     {
       "from": "B13",
       "to": "tests/validate-umsetzungsplan.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/vite-preview-local-api.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -69268,6 +69352,33 @@
     },
     {
       "from": "V126",
+      "to": ".nvmrc",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "dev/training/trainingSpawnArgs.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "dev/vite/previewLocalApiGuard.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V126",
       "to": "docs/plaene/aktiv/V126.md",
       "type": "scope",
       "hint": null,
@@ -79937,6 +80048,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/aktiv/V125.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V126_local_api_preview_matrix_2026-05-18.md",
       "type": "scope",
       "hint": null,
       "attributes": {
