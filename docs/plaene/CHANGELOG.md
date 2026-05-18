@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-05-18 (Subphase `V116 116.99`)
+
+- `V116` ist geschlossen: Master-Index, aktive Detaildatei, Open Findings und Changelog zeigen `done`/`116.99`; `V122` sieht `V116.99` jetzt als erfuellt, bleibt aber weiter von `V119.1` abhaengig.
+- Abschluss-Evidence: Cleanup blieb konservativ (`delete=203`, `archive=0`, `failed=0`), `videos/`, produktive Assets, getrackte Dateien, Bot-Training-Checkpoints und unklare Evidence-Pfade blieben geschuetzt.
+- Abschluss-Gates waren gruen: `npm run plan:check`, `npm run check:gemini`, `npm run check:agent-context`, `npm run check:plan-evidence-claims`, `npm run plan:context:check`, `npm run graph:check` und `npm run gates:pre-commit`.
+- Folgearbeit bleibt bewusst ausserhalb von V116: `V90` aktualisiert die Audit-Baseline, V118 bleibt User-Intake fuer den ersten `UIStartSyncController`-Entflechtungs-Slice, V119 klaert historische Abschluss-Evidence.
+
 ## Governance-Notiz 2026-05-18 (Workflows `analyse-planung` / `abschluss-analyse`)
 
 - `analyse-planung` bindet den Wissensgraphen jetzt als Pflichtpruefung ein, sobald Testbefunde Scope-Dateien, `VXX`-Bloecke, Dependencies, Coverage oder Desktop-vs-Demo-Wirkung beruehren.

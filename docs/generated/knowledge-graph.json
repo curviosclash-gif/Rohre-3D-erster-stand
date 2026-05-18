@@ -1290,7 +1290,7 @@
       "id": "V116",
       "type": "block",
       "title": "Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung",
-      "status": "active",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -4433,7 +4433,7 @@
       "id": "V116.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.99"
@@ -10976,8 +10976,8 @@
     {
       "id": "V116.99.1",
       "type": "subphase",
-      "title": "`docs/Umsetzungsplan.md`, aktive V116-Detaildatei, `docs/prozess/Open_Findings.md` und `docs/plaene/CHANGELOG.md` zeigen denselben Abschlussstand.",
-      "status": "open",
+      "title": "`docs/Umsetzungsplan.md`, aktive V116-Detaildatei, `docs/prozess/Open_Findings.md` und `docs/plaene/CHANGELOG.md` zeigen denselben Abschlussstand. (abgeschlossen: 2026-05-18; evidence: Master-Index setzt V116 auf `done`/`116.99`, aktive Detaildatei auf `status: done`, Open Findings bleiben ohne V116-Restpunkt, Changelog enthaelt `V116 116.99` Abschluss-Snapshot.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.99",
@@ -10987,8 +10987,8 @@
     {
       "id": "V116.99.2",
       "type": "subphase",
-      "title": "Keine offenen eigenen Cleanup-Aenderungen bleiben uncommitted.",
-      "status": "open",
+      "title": "Keine offenen eigenen Cleanup-Aenderungen bleiben uncommitted. (abgeschlossen: 2026-05-18; evidence: `git status --short` war vor dem Abschluss-Slice sauber; Abschluss-Scope wird als scoped Commit mit Master, V116, Open Findings, Changelog und Lock-Release gesichert.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.99",
@@ -10998,8 +10998,8 @@
     {
       "id": "V116.99.3",
       "type": "subphase",
-      "title": "Abschluss-Evidence nennt konkret: entfernte/archivierte Artefaktklassen, geschuetzte Klassen, Plan-Klassifikation, Agenten-Kontext-Regel und Refactor-Folgeempfehlung.",
-      "status": "open",
+      "title": "Abschluss-Evidence nennt konkret: entfernte/archivierte Artefaktklassen, geschuetzte Klassen, Plan-Klassifikation, Agenten-Kontext-Regel und Refactor-Folgeempfehlung. (abgeschlossen: 2026-05-18; evidence: Abschluss-Evidence unten nennt `delete=203`, `archive=0`, geschuetzte Klassen, Plan-Kontext-Klassen, Agenten-Leseweg und V118-Folgeempfehlung `UIStartSyncController`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.99",
@@ -11009,8 +11009,8 @@
     {
       "id": "V116.99.4",
       "type": "subphase",
-      "title": "Abschluss-Evidence nennt auch: Standard-Read-Budget, graph-gestuetzten Plan-Kontext-Report, Agenten-Kontext-Gate, Evidence-Kompressionsregel und Rebuild-Spike-Abgrenzung.",
-      "status": "open",
+      "title": "Abschluss-Evidence nennt auch: Standard-Read-Budget, graph-gestuetzten Plan-Kontext-Report, Agenten-Kontext-Gate, Evidence-Kompressionsregel und Rebuild-Spike-Abgrenzung. (abgeschlossen: 2026-05-18; evidence: Abschluss-Evidence unten nennt Rules/Workflow-Leseweg, `plan:context:check`, `check:agent-context`, kompakte Evidence-Regel aus V117/V116 und Rebuild-/Reborn-Grenze.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.99",
@@ -11020,8 +11020,8 @@
     {
       "id": "V116.99.5",
       "type": "subphase",
-      "title": "Gates: `npm run plan:check`, `npm run check:gemini`, `npm run check:agent-context` falls eingefuehrt, `npm run gates:pre-commit`; weitere technische Gates nur fuer tatsaechlich geaenderte Codepfade.",
-      "status": "open",
+      "title": "Gates: `npm run plan:check`, `npm run check:gemini`, `npm run check:agent-context` falls eingefuehrt, `npm run gates:pre-commit`; weitere technische Gates nur fuer tatsaechlich geaenderte Codepfade. (abgeschlossen: 2026-05-18; evidence: `npm run plan:check` -> PASS; `npm run check:gemini` -> PASS; `npm run check:agent-context` -> PASS; `npm run gates:pre-commit` -> PASS; kein produktiver Codepfad geaendert.)",
+      "status": "done",
       "attributes": {
         "blockId": "V116",
         "phaseCode": "116.99",
@@ -66783,8 +66783,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "Repo-Kontext-Reduktion soll abgeschlossen sein, bevor dauerhaftes Agent-Memory als neue Kontextquelle startet",
+      "fulfilled": true,
+      "hint": "Repo-Kontext-Reduktion ist abgeschlossen; dauerhaftes Agent-Memory bleibt trotzdem an V119.1 und V117-Governance gebunden",
       "attributes": {
         "dependsPhase": "116.99",
         "rawToken": "V116.99",
