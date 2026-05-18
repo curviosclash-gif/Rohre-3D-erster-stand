@@ -18,6 +18,9 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - `analyse-planung` bindet den Wissensgraphen jetzt als Pflichtpruefung ein, sobald Testbefunde Scope-Dateien, `VXX`-Bloecke, Dependencies, Coverage oder Desktop-vs-Demo-Wirkung beruehren.
 - Das Analyse-Reportformat klassifiziert Findings einheitlich nach `P0`-`P3`, `blocker`/`follow-up`/`doc-only`/`test-gap`, Graph-Status und Graph-Confidence.
 - `abschluss-analyse` wurde spiegelnd geschaerft: Default bleibt Chat-Ausgabe oder optionaler `tmp/abschluss-analyse-VXX.md`-Report, Findings nutzen dieselben Kategorien wie die Testanalyse.
+- Nachschaerfung: `AGENTS.md` nennt Testanalyse/Regressionsauswertung jetzt explizit als eigenen Workflow; beide Analyse-Workflows grenzen sich gegen Abschlussclaim-Analyse und Freshness-Checks ab.
+- Nachschaerfung: `analyse-planung` enthaelt eine Graph-Query-Matrix fuer Testfail-Dateien, `VXX`-Bezug, Scope-Kollisionen, Coverage-, Runtime- und Event-Flow-Befunde.
+- Nachschaerfung: Beide Analyse-Workflows beschreiben den Finding-Lifecycle fuer `blocker`, `follow-up`, `doc-only`, `test-gap` und `graph-low`; Reports muessen bewusst nicht gepruefte Pfade nennen.
 
 ## Stand-Snapshot 2026-05-18 (Subphase `V116 116.6`)
 

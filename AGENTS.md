@@ -28,6 +28,7 @@ Policy-Details werden nicht in AGENTS.md wiederholt. Bei Konflikt gewinnt die Ru
 | Feature-Umsetzung (Blockscope) | `.agents/workflows/code.md` |
 | Kleiner Scope, 1-2 Dateien | `.agents/workflows/quick.md` |
 | Bugfix | `.agents/workflows/bugfix.md` |
+| Testanalyse / Regressionsauswertung | `.agents/workflows/analyse-planung.md` |
 | Phasenausfuehrung aus Master | `.agents/workflows/fix-planung.md` |
 | Bot-Training | `.agents/workflows/bot-training-plan.md` |
 | Freshness-Check/Sync | `.agents/workflows/aktualitaet-check.md` / `aktualitaet-sync.md` |

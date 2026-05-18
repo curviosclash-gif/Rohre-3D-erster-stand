@@ -15,6 +15,7 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 - Wenn ein Findings-Fix vorgeschlagen wird, erst am Ende als Option klassifizieren: `no-op`, `read-only evidence`, `optional`, `edit required`.
 - Findings zusaetzlich als `blocker`, `follow-up`, `doc-only` oder `test-gap` markieren, damit Abschlussanalyse und Testanalyse gleich sortierbar bleiben.
 - Fremde uncommittete Aenderungen nur als Worktree-Risiko nennen; nicht stashen, nicht revertieren, nicht in die Analyse hineincommitten.
+- Abgrenzung: Dieser Workflow prueft abgeschlossene Planclaims. Testresultat- und Regressionsauswertung ohne Abschlussclaim gehoert in `.agents/workflows/analyse-planung.md`; reine Docs-/Workflow-/Rule-Frische in `.agents/workflows/aktualitaet-check.md`.
 
 ## 1. Kandidat bestimmen
 
@@ -109,6 +110,7 @@ Graph-Findings erhalten dieselben Schweregrade wie Code-/Plan-Findings. Zusaetzl
 - `graph-high`: Graph frisch, Query passend, Ergebnis durch Git/Plan bestaetigt.
 - `graph-medium`: Graph frisch, aber Query nur indirekt oder Ergebnis teilweise unklar.
 - `graph-low`: Graph stale, Query unpassend, fehlende Knoten oder Widerspruch zu Git/Plan.
+- Bei `graph-low` keine harte Abschlusskorrektur allein aus dem Graph ableiten; Git-, Plan-, Test- oder Code-Evidence muss die Aussage tragen.
 
 ## 5. Vollstaendigkeitspruefung
 
@@ -195,6 +197,14 @@ Jeder Vorschlag braucht:
 
 Keine neue aktive Planarbeit erfinden. Wenn ein Follow-up noetig ist, bevorzugt einen Intake-Vorschlag unter `docs/plaene/neu/` nur nach User-Gate; im Analysebericht reicht eine konkrete Draft-Empfehlung.
 
+Finding-Lifecycle:
+
+- `P0`/`P1` + `blocker`: als Bugfix-, Blocker-Report- oder dedizierten Plan-Intake vorschlagen; keine stillen Abschlusskorrekturen.
+- `P2` + `follow-up`: als Intake- oder Zielblock-Vorschlag mit Evidence-Pfad, kleinstem Gate und Risiko dokumentieren.
+- `doc-only`: als Doku-/Governance-Slice klassifizieren; keine produktive Codearbeit daraus ableiten.
+- `test-gap`: passende `.agents/test_mapping.md`-Kategorie oder Zieltest nennen; nicht gelaufene Tests bleiben `not-checked`.
+- `graph-low`: erst frisches Graph-Signal oder nicht-Graph-Evidence verlangen, bevor das Finding als harte Abschlussluecke gilt.
+
 ## 8. Verifikation
 
 Read-only Abschluss:
@@ -206,6 +216,7 @@ Read-only Abschluss:
 
 Wenn ein Report unter `tmp/` geschrieben wurde, im Final den Pfad nennen. Wenn keine Datei geschrieben wurde, Findings direkt im Chat ausgeben.
 Default ist Chat-Ausgabe ohne neue Datei; ein Report unter `tmp/abschluss-analyse-VXX.md` ist nur noetig, wenn der User eine Datei will oder die Findings fuer einen Folge-Task persistiert werden sollen.
+Report enthaelt immer `Not-checked:` oder eine gleichwertige Begrenzung.
 
 ## 9. Reportformat
 
@@ -245,9 +256,13 @@ Codepruefung:
 
 Verbesserungsvorschlaege:
 - <Vorschlag> (Klasse: <...>, Gate: <...>, Risiko wenn offen: <...>)
+- Lifecycle: <bugfix|blocker-report|intake|doc-slice|testmapping|none>
 
 Offene Annahmen:
 - <nur echte Unsicherheiten>
+
+Not-checked:
+- <bewusst nicht gepruefte Tests/Pfade und Restrisiko>
 
 Ausgefuehrte Checks:
 - <command> -> PASS|FAIL|BLOCKED
