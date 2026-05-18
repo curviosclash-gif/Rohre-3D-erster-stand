@@ -19761,8 +19761,8 @@
     {
       "id": "V90.3.1",
       "type": "subphase",
-      "title": "Vite/esbuild/Rollup-Upgradepfad isoliert planen, inklusive Dev-Server-, Preview- und Electron-App-Build.",
-      "status": "open",
+      "title": "Vite/esbuild/Rollup-Upgradepfad isoliert planen, inklusive Dev-Server-, Preview- und Electron-App-Build. (abgeschlossen: 2026-05-18; evidence: `npm audit --audit-level=low --json`, `npm outdated --json`, `npm ls vite esbuild rollup postcss --depth=3`, `npm view vite@6.4.2 version engines dependencies peerDependencies --json`, `npm view vite@7.3.3 version engines dependencies peerDependencies --json`, `npm view vite@8.0.13 version engines dependencies peerDependencies optionalDependencies --json`, `npm view rolldown-vite@latest version engines dependencies peerDependencies --json`, `npm view vite dist-tags --json`, `npm view rollup@latest version engines optionalDependencies --json`, `npm view esbuild@latest version engines optionalDependencies --json`, `node -v`, `npm -v`, `rg -n \"rollupOptions|optimizeDeps|esbuild|build\\\\.target|target:|configureServer|configurePreviewServer|transformIndexHtml|splitVendorChunk|import\\\\.meta\\\\.hot\\\\.accept|manualChunks\" vite.config.js dev src scripts tests electron .github package.json` -> Matrix unten: kleinster Security-Sprung ist `vite@6.4.2`; Vite 7/8 erfordern Node `20.19+`/`22.12+`, Vite 8 wechselt auf Rolldown/Oxc und braucht separaten Dev-/Preview-/Electron-Gate)",
+      "status": "done",
       "attributes": {
         "blockId": "V90",
         "phaseCode": "90.3",
