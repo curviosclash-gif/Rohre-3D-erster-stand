@@ -9,6 +9,10 @@ import {
     parseTrainingSeeds,
     resolveNpmCommand,
 } from '../dev/training/trainingSpawnArgs.js';
+import {
+    TRAINING_DASHBOARD_API_PLUGIN_NAME,
+    createTrainingDashboardApiPlugin,
+} from '../dev/vite/plugins/trainingDashboardApiPlugin.js';
 
 test('buildTrainingCliArgs allowlists supported fields', () => {
     assert.deepEqual(buildTrainingCliArgs({
@@ -60,4 +64,12 @@ test('buildTrainingSpawnCommand resolves npm without shell', () => {
         args: ['run', 'training:e2e', '--', '--episodes', '1'],
         shell: false,
     });
+});
+
+test('training dashboard api plugin is exported as a focused vite plugin', () => {
+    const plugin = createTrainingDashboardApiPlugin({ rootDir: process.cwd(), env: {} });
+
+    assert.equal(plugin.name, TRAINING_DASHBOARD_API_PLUGIN_NAME);
+    assert.equal(typeof plugin.configureServer, 'function');
+    assert.equal(typeof plugin.configurePreviewServer, 'function');
 });

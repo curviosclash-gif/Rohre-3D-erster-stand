@@ -167,11 +167,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1970,
-    "rawCoveredFileCount": 1270,
+    "trackedFileCount": 1971,
+    "rawCoveredFileCount": 1271,
     "rawCoveragePercent": 64.5,
-    "adjustedTrackedFileCount": 1398,
-    "adjustedCoveredFileCount": 1053,
+    "adjustedTrackedFileCount": 1399,
+    "adjustedCoveredFileCount": 1054,
     "adjustedCoveragePercent": 75.3,
     "uncoveredFileCount": 700,
     "uncoveredActiveFileCount": 345,
@@ -203,8 +203,8 @@
       {
         "classification": "dev-tooling",
         "excludedFromCoverage": false,
-        "count": 24,
-        "coveredCount": 17
+        "count": 25,
+        "coveredCount": 18
       },
       {
         "classification": "governance-tooling",
@@ -7885,6 +7885,23 @@
     },
     {
       "path": "dev/training/trainingSpawnArgs.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V126"
+      ],
+      "surfaces": [],
+      "classification": "dev-tooling",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "dev/vite/plugins/trainingDashboardApiPlugin.js",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

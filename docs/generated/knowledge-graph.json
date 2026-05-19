@@ -1781,7 +1781,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 9,
+          "concreteCount": 10,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -5033,7 +5033,7 @@
       "id": "V126.5",
       "type": "phase",
       "title": "Erste `vite.config.js`-Entflechtung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.5"
@@ -13769,8 +13769,8 @@
     {
       "id": "V126.5.1",
       "type": "subphase",
-      "title": "Auslagerungskandidat waehlen:",
-      "status": "open",
+      "title": "Auslagerungskandidat waehlen: bevorzugt Training-Dashboard, alternativ Editor-Disk-Save. (abgeschlossen: 2026-05-20; evidence: Training-Dashboard gewaehlt, weil es bereits eigene Spawn-/Ringbuffer-Helper hat und keine Editor-/Map-/Vehicle-Verantwortung mitziehen muss.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.5",
@@ -13780,8 +13780,8 @@
     {
       "id": "V126.5.2",
       "type": "subphase",
-      "title": "Zielmodul anlegen, z. B.",
-      "status": "open",
+      "title": "Zielmodul anlegen, z. B. `dev/vite/plugins/trainingDashboardApiPlugin.js` plus `dev/training/trainingSpawnArgs.js`. (abgeschlossen: 2026-05-20; evidence: `dev/vite/plugins/trainingDashboardApiPlugin.js` exportiert `createTrainingDashboardApiPlugin`; vorhandene Helper bleiben unter `dev/training/`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.5",
@@ -13791,8 +13791,8 @@
     {
       "id": "V126.5.3",
       "type": "subphase",
-      "title": "`vite.config.js` nur noch importieren und Plugin konfigurieren",
-      "status": "open",
+      "title": "`vite.config.js` nur noch importieren und Plugin konfigurieren lassen. (abgeschlossen: 2026-05-20; evidence: `vite.config.js` entfernt die lokale `trainingDashboardApiPlugin()`-Implementierung und ruft nur noch `createTrainingDashboardApiPlugin({ rootDir: __dirname })` in der Plugin-Liste auf.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.5",
@@ -13802,8 +13802,8 @@
     {
       "id": "V126.5.4",
       "type": "subphase",
-      "title": "Kein gleichzeitiger Umbau von Maps, Vehicles, Video-Save und",
-      "status": "open",
+      "title": "Kein gleichzeitiger Umbau von Maps, Vehicles, Video-Save und Checkpoint-API, ausser eine direkte Hilfsfunktion muss mitwandern. (abgeschlossen: 2026-05-20; evidence: Editor-Disk-Save, Latest-Checkpoint, Map-/Vehicle- und Video-Save-Pfade bleiben unveraendert.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.5",
@@ -13813,8 +13813,8 @@
     {
       "id": "V126.5.5",
       "type": "subphase",
-      "title": "Test- und Importpfade so schneiden, dass Folgeauslagerungen in",
-      "status": "open",
+      "title": "Test- und Importpfade so schneiden, dass Folgeauslagerungen in kleinen Slices moeglich bleiben. (abgeschlossen: 2026-05-20; evidence: `tests/training-dashboard-spawn.contract.test.mjs` prueft zusaetzlich den Plugin-Factory-Export; Preview- und Ringbuffer-Contracts bleiben getrennt.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.5",
@@ -26302,6 +26302,21 @@
     },
     {
       "id": "dev/training/trainingSpawnArgs.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V126"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "dev/vite/plugins/trainingDashboardApiPlugin.js",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -72433,6 +72448,15 @@
     {
       "from": "V126",
       "to": "dev/training/trainingSpawnArgs.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "dev/vite/plugins/trainingDashboardApiPlugin.js",
       "type": "scope",
       "hint": null,
       "attributes": {
