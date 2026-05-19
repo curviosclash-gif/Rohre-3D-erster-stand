@@ -1,0 +1,145 @@
+{
+  "contract": "knowledge-graph.mapping.v1",
+  "schema_version": 1,
+  "mapping_id": "plan-map-tooling",
+  "description": "Read-only tooling surface for the interactive implementation Plan Map.",
+  "nodes": [
+    {
+      "id": "runtime:plan-map-export",
+      "type": "runtime",
+      "title": "Plan Map export",
+      "file": "scripts/export-plan-map.mjs",
+      "attributes": {
+        "domain": "plan-map",
+        "tooling": "read-only-plan-dashboard"
+      }
+    },
+    {
+      "id": "runtime:plan-map-viewer",
+      "type": "runtime",
+      "title": "Plan Map viewer",
+      "file": "tools/plan-map/viewer.js",
+      "attributes": {
+        "domain": "plan-map",
+        "tooling": "read-only-plan-dashboard"
+      }
+    },
+    {
+      "id": "runtime:plan-map-launcher",
+      "type": "runtime",
+      "title": "Plan Map launcher",
+      "file": "start-plan-map.ps1",
+      "attributes": {
+        "domain": "plan-map",
+        "tooling": "local-startup"
+      }
+    },
+    {
+      "id": "state:plan-map-readonly-dataset",
+      "type": "state",
+      "title": "Read-only Plan Map JSON dataset",
+      "attributes": {
+        "domain": "plan-map",
+        "path": "tmp/plan-map/plan-map.json",
+        "ephemeral": true
+      }
+    },
+    {
+      "id": "config:plan-map-viewer-shell",
+      "type": "config",
+      "title": "Plan Map HTML shell",
+      "file": "tools/plan-map/index.html",
+      "attributes": {
+        "domain": "plan-map"
+      }
+    },
+    {
+      "id": "config:plan-map-viewer-style",
+      "type": "config",
+      "title": "Plan Map visual layout",
+      "file": "tools/plan-map/viewer.css",
+      "attributes": {
+        "domain": "plan-map"
+      }
+    },
+    {
+      "id": "config:plan-map-docs",
+      "type": "config",
+      "title": "Plan Map documentation",
+      "file": "tools/plan-map/README.md",
+      "attributes": {
+        "domain": "plan-map"
+      }
+    },
+    {
+      "id": "config:plan-map-graph-anchor",
+      "type": "config",
+      "title": "Plan Map knowledge graph mapping",
+      "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+      "attributes": {
+        "domain": "plan-map"
+      }
+    },
+    {
+      "id": "test:plan-map-export-contract",
+      "type": "test",
+      "title": "Plan Map export contract",
+      "file": "tests/plan-map-export.contract.test.mjs",
+      "attributes": {
+        "domain": "plan-map"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "runtime:plan-map-export",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:plan-map-export",
+      "to": "test:plan-map-export-contract",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:plan-map-export",
+      "to": "config:plan-map-graph-anchor",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:plan-map-viewer",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "reads_state"
+    },
+    {
+      "from": "runtime:plan-map-viewer",
+      "to": "config:plan-map-viewer-shell",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:plan-map-viewer",
+      "to": "config:plan-map-viewer-style",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:plan-map-viewer",
+      "to": "config:plan-map-docs",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:plan-map-launcher",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "reads_state"
+    },
+    {
+      "from": "runtime:plan-map-launcher",
+      "to": "config:plan-map-viewer-shell",
+      "type": "reads_config"
+    },
+    {
+      "from": "config:plan-map-docs",
+      "to": "config:plan-map-graph-anchor",
+      "type": "reads_config"
+    }
+  ]
+}
