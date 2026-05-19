@@ -11,6 +11,7 @@ import {
     invalidateMultiplayerReadyIfHostChangedSettings,
 } from './MenuRuntimeMultiplayerService.js';
 import { orchestrateRuntimeSettingsChanged } from './RuntimeSettingsChangeOrchestrator.js';
+import { filterKnownSettingsChangeKeys } from './RuntimeSettingsChangeKeys.js';
 
 export class GameRuntimeSettingsHandler {
     constructor({ facade = null } = {}) {
@@ -89,10 +90,10 @@ export class GameRuntimeSettingsHandler {
                 changedKeys: surfaceChangedKeys,
             }
         );
-        const changedKeys = Array.from(new Set([
+        const changedKeys = filterKnownSettingsChangeKeys([
             ...surfaceChangedKeys,
             ...(Array.isArray(compatibilityResult?.changedKeys) ? compatibilityResult.changedKeys : []),
-        ]));
+        ]);
 
         this._facade?.applySettingsToRuntime?.({ schedulePrewarm: false });
         this._facade?._syncMultiplayerRuntimeContext?.(changedKeys);

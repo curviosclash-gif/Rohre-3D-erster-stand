@@ -9,12 +9,7 @@ import {
 } from '../../composition/core-ui/CoreUiMenuPorts.js';
 import { createSurfacePolicyPort } from '../../shared/runtime/SurfacePolicyPort.js';
 import { PLATFORM_PRODUCT_SURFACE_IDS } from '../../shared/contracts/PlatformCapabilityRegistry.js';
-
-function resolveMutationChangedKeys(result, fallbackKeys = []) {
-    return Array.isArray(result?.changedKeys) && result.changedKeys.length > 0
-        ? result.changedKeys.slice()
-        : [...fallbackKeys];
-}
+import { resolveMutationChangedKeys } from './RuntimeSettingsChangeKeys.js';
 
 function resolvePresetFailureMessage(result, fallbackMessage) {
     switch (result?.reason) {

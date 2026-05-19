@@ -2,11 +2,7 @@
 // MenuRuntimeDeveloperModeService.js - developer-panel mode/theme/visibility actions
 // ============================================
 
-function resolveMutationChangedKeys(result, fallbackKeys = []) {
-    return Array.isArray(result?.changedKeys) && result.changedKeys.length > 0
-        ? result.changedKeys.slice()
-        : [...fallbackKeys];
-}
+import { resolveMutationChangedKeys } from './RuntimeSettingsChangeKeys.js';
 
 function resolveDeveloperFailureMessage(result, fallbackMessage) {
     switch (result?.reason) {

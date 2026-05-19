@@ -25,6 +25,10 @@ import {
 } from '../../shared/contracts/RuntimeSessionContract.js';
 import { hasConfiguredOnlineSignalingUrl } from '../../shared/contracts/OnlineSignalingConfig.js';
 import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
+import {
+    appendMutationChangedKeys,
+    resolveMutationChangedKeys,
+} from './RuntimeSettingsChangeKeys.js';
 
 const MODE_PATH_TO_PRESET_ID = Object.freeze({
     arcade: 'arcade',
@@ -65,16 +69,6 @@ const SESSION_SWITCH_CHANGED_KEYS = Object.freeze([
 ]);
 
 export { SESSION_SWITCH_CHANGED_KEYS, MODE_PATH_TO_PRESET_ID };
-
-function resolveMutationChangedKeys(result, fallbackKeys = []) {
-    return Array.isArray(result?.changedKeys) && result.changedKeys.length > 0
-        ? result.changedKeys.slice()
-        : [...fallbackKeys];
-}
-
-function appendMutationChangedKeys(target, result, fallbackKeys = []) {
-    target.push(...resolveMutationChangedKeys(result, fallbackKeys));
-}
 
 function resolvePresetFailureMessage(result, fallbackMessage) {
     switch (result?.reason) {

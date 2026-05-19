@@ -779,3 +779,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `dev/training/trainingSpawnArgs.js` ist jetzt im Training-Dashboard-Pfad verdrahtet: `vite.config.js` startet `npm run training:e2e` ohne `shell: true` und nutzt den Windows-Command-Resolver.
 - Preview-Mutationen fuer Editor-Disk-POSTs und Training-Start/Stop/Schedule werden ohne `ENABLE_LOCAL_MUTATION_APIS=1` mit `403 preview-local-mutation-disabled` blockiert.
 - V126 bleibt offen fuer die read-only Artefakt-Entscheidung, den Log-Ringbuffer und die erste groessere `vite.config.js`-Entflechtung.
+
+## SettingsManager Nachhaltigkeitsfix 2026-05-19
+
+- `SettingsManager` reicht den injizierten Storage-Pfad jetzt auch an Preset-, Draft-, Text-Override- und Menu-Telemetry-Stores weiter; Sidecar-Persistenz nutzt damit dieselbe Plattformgrenze wie `SettingsStore`.
+- Runtime-Services nutzen einen zentralen Changed-Key-Helfer; der Runtime-Orchestrator filtert bekannte Keys frueh und faellt bei unbekannten Keys bewusst auf `syncAll` zurueck.
+- Die Diagnostics-API ist als explizite Manager-Fassade verdrahtet statt Methoden nachtraeglich an die Instanz zu haengen.

@@ -224,6 +224,37 @@ test('V103 SettingsManager exposes text overrides through a narrow read port', (
     });
 });
 
+test('V103 SettingsManager routes sidecar stores through the injected storage platform', () => {
+    const storagePlatform = createMemoryStoragePlatform();
+    const manager = new SettingsManager({
+        storagePlatform,
+        telemetryHistoryStore: {
+            getSummary() { return {}; },
+        },
+    });
+    const settings = manager.createDefaultSettings();
+    const accessContext = createOwnerAccessContext();
+    const textId = Object.keys(MENU_TEXT_CATALOG)[0];
+
+    const presetResult = manager.saveMenuPreset(settings, {
+        kind: 'open',
+        id: 'injected-store-preset',
+        name: 'Injected Store Preset',
+    }, accessContext);
+    const draftResult = manager.saveSessionDraft(settings, 'single');
+    const textResult = manager.setMenuTextOverride(textId, 'Injected text');
+    const telemetrySnapshot = manager.recordMenuTelemetry(settings, 'quickstart', { mapKey: 'standard' });
+
+    assert.equal(presetResult.success, true);
+    assert.equal(draftResult.success, true);
+    assert.equal(textResult.success, true);
+    assert.equal(typeof telemetrySnapshot.quickStartCount, 'number');
+    assert.equal(storagePlatform.getRecord(STORAGE_KEYS.menuPresets)?.schemaVersion, 'menu-preset-store.v1');
+    assert.equal(storagePlatform.getRecord(STORAGE_KEYS.menuDrafts)?.schemaVersion, 'menu-draft-store.v1');
+    assert.equal(storagePlatform.getRecord(STORAGE_KEYS.menuTextOverrides)?.schemaVersion, 'menu-text-overrides.v1');
+    assert.equal(storagePlatform.getRecord(STORAGE_KEYS.menuTelemetry)?.schemaVersion, 'menu-telemetry.v1');
+});
+
 test('V103 SettingsManager diffSettings reports changed paths and known change keys', () => {
     const manager = new SettingsManager({ storagePlatform: createMemoryStoragePlatform() });
     const before = manager.createDefaultSettings();
@@ -248,6 +279,7 @@ test('V103 SettingsManager diffSettings reports changed paths and known change k
         change.path === 'gameplay.speed'
         && change.changeKey === SETTINGS_CHANGE_KEYS.GAMEPLAY_SPEED
     )));
+    assert.equal(Object.isFrozen(manager.diagnosticsFacade), true);
 });
 
 test('V103 SettingsManager diffSettings uses central path contracts and leaves unknown paths unmapped', () => {

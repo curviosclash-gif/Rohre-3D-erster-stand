@@ -2,6 +2,11 @@
 // RuntimeSettingsChangeOrchestrator.js - centralized menu settings-change flow
 // ============================================
 
+import {
+    filterKnownSettingsChangeKeys,
+    hasInvalidSettingsChangeKeys,
+} from './RuntimeSettingsChangeKeys.js';
+
 export function orchestrateRuntimeSettingsChanged({
     game,
     event = null,
@@ -13,11 +18,13 @@ export function orchestrateRuntimeSettingsChanged({
     scheduleMatchPrewarm,
 }) {
     if (!game) return null;
-    const incomingChangedKeys = Array.isArray(event?.changedKeys) ? event.changedKeys : [];
+    const rawIncomingChangedKeys = Array.isArray(event?.changedKeys) ? event.changedKeys : [];
+    const hasInvalidIncomingKeys = hasInvalidSettingsChangeKeys(rawIncomingChangedKeys);
+    const incomingChangedKeys = filterKnownSettingsChangeKeys(rawIncomingChangedKeys);
     if (incomingChangedKeys.some((key) => startValidationRelevantKeySet?.has(key))) {
         game.uiManager?.clearStartValidationError?.();
     }
-    const shouldApplyCompatibilityRules = event?.forceCompatibility === true || incomingChangedKeys.length > 0;
+    const shouldApplyCompatibilityRules = event?.forceCompatibility === true || rawIncomingChangedKeys.length > 0;
     const compatibilityResult = shouldApplyCompatibilityRules
         ? game.settingsManager?.applyMenuCompatibilityRules?.(
             game.settings,
@@ -27,14 +34,18 @@ export function orchestrateRuntimeSettingsChanged({
             }
         )
         : null;
-    const compatibilityKeys = Array.isArray(compatibilityResult?.changedKeys)
+    const rawCompatibilityKeys = Array.isArray(compatibilityResult?.changedKeys)
         ? compatibilityResult.changedKeys
         : [];
-    const mergedChangedKeys = Array.from(new Set([
+    const hasInvalidCompatibilityKeys = hasInvalidSettingsChangeKeys(rawCompatibilityKeys);
+    const compatibilityKeys = filterKnownSettingsChangeKeys(rawCompatibilityKeys);
+    const mergedChangedKeys = filterKnownSettingsChangeKeys([
         ...incomingChangedKeys,
         ...compatibilityKeys,
-    ]));
-    const changedKeys = mergedChangedKeys.length > 0 ? mergedChangedKeys : null;
+    ]);
+    const changedKeys = hasInvalidIncomingKeys || hasInvalidCompatibilityKeys
+        ? null
+        : (mergedChangedKeys.length > 0 ? mergedChangedKeys : null);
 
     markSettingsDirty?.(true);
     game.renderer?.setShadowQuality?.(game.settings?.localSettings?.shadowQuality);

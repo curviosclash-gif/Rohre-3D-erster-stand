@@ -12,6 +12,7 @@ import {
 } from '../src/shared/contracts/RuntimeMapCatalogContract.js';
 import { registerSessionMenuEventHandlers } from '../src/core/runtime/menu-handlers/SessionMenuEventHandlers.js';
 import { createRuntimeConfigSnapshot } from '../src/core/RuntimeConfig.js';
+import { orchestrateRuntimeSettingsChanged } from '../src/core/runtime/RuntimeSettingsChangeOrchestrator.js';
 import { createEntityRuntimeConfig } from '../src/shared/contracts/EntityRuntimeConfig.js';
 import { createDefaultSettingsSnapshotForRuntime } from '../src/core/settings/SettingsDefaultsFacade.js';
 import {
@@ -20,6 +21,7 @@ import {
 } from '../src/core/settings/SettingsOverrideContract.js';
 import { EntityManager } from '../src/entities/EntityManager.js';
 import { MENU_CONTROLLER_EVENT_TYPES } from '../src/shared/contracts/MenuControllerContract.js';
+import { SETTINGS_CHANGE_KEYS } from '../src/composition/core-ui/CoreUiMenuPorts.js';
 
 function createEntityRuntimeConfigFixture(overrides = {}) {
     return {
@@ -346,6 +348,77 @@ test('Arcade ghost duel mode stays enabled for all single mode paths', () => {
 
     const entityRuntimeConfig = createEntityRuntimeConfig(normalSnapshot);
     assert.equal(entityRuntimeConfig.TRAIL.GHOST_COLLISION_ENABLED, true);
+});
+
+test('Runtime settings orchestrator full-syncs when change keys are unknown', () => {
+    const calls = [];
+    const game = {
+        settings: {},
+        renderer: {},
+        mediaRecorderSystem: {},
+        uiManager: {
+            clearStartValidationError() {
+                calls.push(['clearStartValidationError']);
+            },
+            syncByChangeKeys(changedKeys) {
+                calls.push(['syncByChangeKeys', changedKeys]);
+            },
+            syncAll() {
+                calls.push(['syncAll']);
+            },
+            updateContext() {
+                calls.push(['updateContext']);
+            },
+        },
+        settingsManager: {
+            applyMenuCompatibilityRules(_settings, options) {
+                calls.push(['compatibility', options.changedKeys]);
+                return { changedKeys: [SETTINGS_CHANGE_KEYS.MAP_KEY] };
+            },
+        },
+        keybindEditorController: {
+            renderEditor() {
+                calls.push(['renderEditor']);
+            },
+        },
+        _syncProfileControls() {
+            calls.push(['syncProfileControls']);
+        },
+    };
+    let dirtyState = null;
+    let saveButtonUpdated = false;
+    let prewarmScheduled = false;
+
+    const changedKeys = orchestrateRuntimeSettingsChanged({
+        game,
+        event: {
+            changedKeys: [
+                SETTINGS_CHANGE_KEYS.GAMEPLAY_SPEED,
+                'unknown.settings.key',
+            ],
+        },
+        startValidationRelevantKeySet: new Set([SETTINGS_CHANGE_KEYS.GAMEPLAY_SPEED]),
+        markSettingsDirty(isDirty) {
+            dirtyState = isDirty;
+        },
+        updateSaveButtonState() {
+            saveButtonUpdated = true;
+        },
+        scheduleMatchPrewarm() {
+            prewarmScheduled = true;
+        },
+    });
+
+    assert.equal(changedKeys, null);
+    assert.equal(dirtyState, true);
+    assert.equal(saveButtonUpdated, true);
+    assert.equal(prewarmScheduled, true);
+    assert.deepEqual(calls.find((entry) => entry[0] === 'compatibility')?.[1], [
+        SETTINGS_CHANGE_KEYS.GAMEPLAY_SPEED,
+    ]);
+    assert.equal(calls.some((entry) => entry[0] === 'clearStartValidationError'), true);
+    assert.equal(calls.some((entry) => entry[0] === 'syncAll'), true);
+    assert.equal(calls.some((entry) => entry[0] === 'syncByChangeKeys'), false);
 });
 
 test('Arcade mission assignment uses active sector template id from encounter sequence', () => {

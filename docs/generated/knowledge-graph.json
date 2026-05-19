@@ -27,7 +27,7 @@
           "src/state/Match*"
         ],
         "scopeResolution": {
-          "concreteCount": 59,
+          "concreteCount": 60,
           "plannedCount": 0
         }
       }
@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 211,
+          "concreteCount": 212,
           "plannedCount": 0
         }
       }
@@ -742,7 +742,7 @@
           "tsconfig.architecture.json"
         ],
         "scopeResolution": {
-          "concreteCount": 249,
+          "concreteCount": 250,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1970,7 +1970,7 @@
           "src/ui/MenuController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 67,
+          "concreteCount": 71,
           "plannedCount": 4
         }
       }
@@ -2394,7 +2394,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 138,
+          "concreteCount": 139,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2512,7 +2512,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 325,
+          "concreteCount": 327,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2912,7 +2912,7 @@
           "tests/training-automation.spec.js"
         ],
         "scopeResolution": {
-          "concreteCount": 88,
+          "concreteCount": 93,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -3252,7 +3252,7 @@
           "src/state/RoundStateTickSystem.js"
         ],
         "scopeResolution": {
-          "concreteCount": 123,
+          "concreteCount": 124,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -28571,6 +28571,21 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_Repo_Map_Wissensgraph_Verankerung_V127.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
       "type": "file",
       "title": null,
@@ -29616,6 +29631,70 @@
           "V77",
           "V81",
           "V83",
+          "V89"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "electron/map-tools/launch.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V60",
+          "V89"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "electron/map-tools/main.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V60",
+          "V89"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "electron/map-tools/README.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V60",
+          "V89"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "electron/map-tools/server.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V60",
           "V89"
         ],
         "exists": true
@@ -34181,6 +34260,27 @@
           "V89",
           "V96",
           "V99"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/core/runtime/RuntimeSettingsChangeKeys.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B01",
+          "V105",
+          "V74",
+          "V77",
+          "V89",
+          "V96"
         ],
         "exists": true
       }
@@ -43547,6 +43647,21 @@
       }
     },
     {
+      "id": "tests/map-tools-electron.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/match-start-validation-connectivity.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -45762,6 +45877,15 @@
     {
       "from": "B01",
       "to": "src/core/runtime/RuntimeSessionLifecycleService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B01",
+      "to": "src/core/runtime/RuntimeSettingsChangeKeys.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -50873,6 +50997,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/map-tools-electron.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/match-start-validation-connectivity.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -55542,6 +55675,15 @@
     {
       "from": "V105",
       "to": "src/core/runtime/RuntimeSessionLifecycleService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
+      "to": "src/core/runtime/RuntimeSettingsChangeKeys.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -72084,6 +72226,42 @@
     },
     {
       "from": "V60",
+      "to": "electron/map-tools/launch.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "archive-summary"
+      }
+    },
+    {
+      "from": "V60",
+      "to": "electron/map-tools/main.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "archive-summary"
+      }
+    },
+    {
+      "from": "V60",
+      "to": "electron/map-tools/README.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "archive-summary"
+      }
+    },
+    {
+      "from": "V60",
+      "to": "electron/map-tools/server.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "archive-summary"
+      }
+    },
+    {
+      "from": "V60",
       "to": "electron/package-lock.json",
       "type": "scope",
       "hint": null,
@@ -77992,6 +78170,15 @@
     },
     {
       "from": "V74",
+      "to": "src/core/runtime/RuntimeSettingsChangeKeys.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
       "to": "src/core/runtime/RuntimeSettingsChangeOrchestrator.js",
       "type": "scope",
       "hint": null,
@@ -82114,6 +82301,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/neu/Feature_Repo_Map_Wissensgraph_Verankerung_V127.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/neu/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
       "type": "scope",
       "hint": null,
@@ -82772,6 +82968,15 @@
     {
       "from": "V77",
       "to": "src/core/runtime/RuntimeSessionLifecycleService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "src/core/runtime/RuntimeSettingsChangeKeys.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -92104,6 +92309,42 @@
     },
     {
       "from": "V89",
+      "to": "electron/map-tools/launch.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V89",
+      "to": "electron/map-tools/main.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V89",
+      "to": "electron/map-tools/README.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V89",
+      "to": "electron/map-tools/server.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V89",
       "to": "electron/package-lock.json",
       "type": "scope",
       "hint": null,
@@ -92681,6 +92922,15 @@
     {
       "from": "V89",
       "to": "src/core/runtime/RuntimeSessionLifecycleService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V89",
+      "to": "src/core/runtime/RuntimeSettingsChangeKeys.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -98441,6 +98691,15 @@
     {
       "from": "V96",
       "to": "src/core/runtime/RuntimeSessionLifecycleService.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V96",
+      "to": "src/core/runtime/RuntimeSettingsChangeKeys.js",
       "type": "scope",
       "hint": null,
       "attributes": {

@@ -27,25 +27,30 @@ import { createSettingsDeveloperFacade } from './settings/SettingsDeveloperFacad
 import { createSettingsTextOverrideFacade } from './settings/SettingsTextOverrideFacade.js';
 import { createSettingsTelemetryFacade } from './settings/SettingsTelemetryFacade.js';
 import { createSettingsBotPolicyFacade } from './settings/SettingsBotPolicyFacade.js';
-import { attachSettingsDiagnosticsFacade } from './settings/SettingsDiagnosticsFacade.js';
+import { createSettingsDiagnosticsFacade } from './settings/SettingsDiagnosticsFacade.js';
 
 export class SettingsManager {
     constructor(options = {}) {
         this.runtimeGlobal = options.runtimeGlobal || globalThis;
-        this.settingsStore = new SettingsStore({
+        const storeOptions = {
             storagePlatform: options.storagePlatform,
             storage: options.storage,
             onQuotaExceeded: options.onQuotaExceeded,
+            onMigrationResult: options.onMigrationResult,
+        };
+        this.settingsStore = new SettingsStore({
+            ...storeOptions,
             sanitizeSettings: (settings) => this.sanitizeSettings(settings),
             createDefaultSettings: () => this.createDefaultSettings(),
         });
         this.menuPresetStore = new MenuPresetStore({
+            ...storeOptions,
             fixedCatalog: getFixedMenuPresetCatalog(),
         });
-        this.menuDraftStore = new MenuDraftStore();
-        this.menuTextOverrideStore = new MenuTextOverrideStore();
-        this.menuTelemetryStore = new MenuTelemetryStore();
-        this.telemetryHistoryStore = new TelemetryHistoryStore();
+        this.menuDraftStore = new MenuDraftStore(storeOptions);
+        this.menuTextOverrideStore = new MenuTextOverrideStore(storeOptions);
+        this.menuTelemetryStore = new MenuTelemetryStore(storeOptions);
+        this.telemetryHistoryStore = options.telemetryHistoryStore || new TelemetryHistoryStore();
 
         this.sessionDraftFacade = createSettingsSessionDraftFacade({
             menuDraftStore: this.menuDraftStore,
@@ -80,7 +85,7 @@ export class SettingsManager {
             listOverrides: () => this.textOverrideFacade.listMenuTextOverrides(),
             getOverride: (textId) => this.menuTextOverrideStore.getOverride(textId),
         });
-        attachSettingsDiagnosticsFacade(this);
+        this.diagnosticsFacade = createSettingsDiagnosticsFacade(this);
     }
 
     createDefaultSettings() {
@@ -195,6 +200,18 @@ export class SettingsManager {
 
     createRuntimeConfig(settings) {
         return createRuntimeConfigSnapshot(settings, { baseConfig: CONFIG });
+    }
+
+    diffSettings(before, after) {
+        return this.diagnosticsFacade.diffSettings(before, after);
+    }
+
+    previewMenuConfigImport(settings, inputValue, accessContext = null) {
+        return this.diagnosticsFacade.previewMenuConfigImport(settings, inputValue, accessContext);
+    }
+
+    getSettingsHealthSnapshot(settings = null) {
+        return this.diagnosticsFacade.getSettingsHealthSnapshot(settings);
     }
 
     getProfileStorePort() {
