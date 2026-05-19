@@ -61,4 +61,9 @@ Fotos-*.zip
 .last_auto_backup
 .auto_backup_enabled
 Tools/
+# Windows ignorecase can make the local-only Tools/ rule match tracked lowercase
+# tool sources; keep the Map Tools Android source bundle visible to Git.
+!tools/
+!tools/map-tools-android/
+!tools/map-tools-android/**
 logs/

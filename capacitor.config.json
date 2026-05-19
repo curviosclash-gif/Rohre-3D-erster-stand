@@ -1,0 +1,11 @@
+{
+  "appId": "de.curviosclash.maps",
+  "appName": "Curvios Map Tools",
+  "webDir": "dist/map-tools-android",
+  "backgroundColor": "#f4f0e8",
+  "zoomEnabled": true,
+  "android": {
+    "path": "android-map-tools",
+    "zoomEnabled": true
+  }
+}

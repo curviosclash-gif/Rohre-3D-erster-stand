@@ -41,6 +41,11 @@
     "app:settings:start": "npm --prefix electron run start:settings",
     "app:maps:start": "npm --prefix electron run start:maps",
     "app:maps:smoke": "node --test tests/map-tools-electron-smoke.test.mjs",
+    "app:maps:android:build": "node scripts/build-map-tools-android.mjs",
+    "app:maps:android:check": "node --test tests/map-tools-android.contract.test.mjs",
+    "app:maps:android:sync": "npm run app:maps:android:build && npx cap sync android",
+    "app:maps:android:open": "npm run app:maps:android:sync && npx cap open android",
+    "app:maps:android:apk": "npm run app:maps:android:sync && npx cap build android --androidreleasetype APK",
     "app:start:build": "npm run app:start",
     "app:package": "npm run build:app && npm --prefix electron run build",
     "lint:architecture": "eslint src --max-warnings 29",
@@ -130,10 +135,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@capacitor/android": "8.3.4",
+    "@capacitor/core": "8.3.4",
     "mp4-muxer": "^5.2.2",
     "three": "^0.160.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.3.4",
     "@commitlint/cli": "^20.4.4",
     "@commitlint/config-conventional": "^20.4.4",
     "@playwright/test": "^1.58.2",

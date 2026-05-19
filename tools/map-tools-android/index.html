@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Curvios Map Tools</title>
+    <link rel="stylesheet" href="./map-tools-android.css">
+  </head>
+  <body>
+    <main class="map-tools-app" data-testid="map-tools-android-shell">
+      <header class="app-bar">
+        <div class="brand">
+          <span class="eyebrow">CurviosClash</span>
+          <h1>Map Tools</h1>
+        </div>
+        <div class="view-switch" role="tablist" aria-label="Karte waehlen">
+          <button type="button" role="tab" data-view-id="plan" aria-selected="true">Plan</button>
+          <button type="button" role="tab" data-view-id="repo" aria-selected="false">Repo</button>
+        </div>
+      </header>
+
+      <section class="status-strip" aria-live="polite">
+        <span id="activeLabel">Plan Map</span>
+        <span id="buildMeta">read-only Android snapshot</span>
+      </section>
+
+      <iframe
+        id="mapFrame"
+        class="map-frame"
+        title="Curvios Map Tools Viewer"
+        src="./tools/plan-map/index.html"
+      ></iframe>
+    </main>
+
+    <script type="module" src="./map-tools-android.js"></script>
+  </body>
+</html>

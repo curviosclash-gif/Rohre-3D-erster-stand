@@ -1,0 +1,215 @@
+{
+  "contract": "knowledge-graph.mapping.v1",
+  "schema_version": 1,
+  "mapping_id": "map-tools-android",
+  "description": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+  "nodes": [
+    {
+      "id": "runtime:map-tools-android-build",
+      "type": "runtime",
+      "title": "Map Tools Android static bundle build",
+      "file": "scripts/build-map-tools-android.mjs",
+      "attributes": {
+        "domain": "map-tools",
+        "tooling": "android-static-bundle",
+        "surface": "android-tool"
+      }
+    },
+    {
+      "id": "runtime:map-tools-android-shell",
+      "type": "runtime",
+      "title": "Map Tools Android web shell",
+      "file": "tools/map-tools-android/map-tools-android.js",
+      "attributes": {
+        "domain": "map-tools",
+        "tooling": "android-webview-shell",
+        "surface": "android-tool"
+      }
+    },
+    {
+      "id": "runtime:map-tools-android-native-shell",
+      "type": "runtime",
+      "title": "Map Tools Android native shell",
+      "file": "android-map-tools/app/src/main/java/de/curviosclash/maps/MainActivity.java",
+      "attributes": {
+        "domain": "map-tools",
+        "tooling": "capacitor-native-shell",
+        "surface": "android-tool"
+      }
+    },
+    {
+      "id": "state:map-tools-android-static-bundle",
+      "type": "state",
+      "title": "Map Tools Android static web bundle",
+      "attributes": {
+        "domain": "map-tools",
+        "path": "dist/map-tools-android",
+        "ephemeral": true
+      }
+    },
+    {
+      "id": "config:map-tools-android-capacitor",
+      "type": "config",
+      "title": "Map Tools Android Capacitor config",
+      "file": "capacitor.config.json",
+      "attributes": {
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-html",
+      "type": "config",
+      "title": "Map Tools Android HTML shell",
+      "file": "tools/map-tools-android/index.html",
+      "attributes": {
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-style",
+      "type": "config",
+      "title": "Map Tools Android visual layout",
+      "file": "tools/map-tools-android/map-tools-android.css",
+      "attributes": {
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-docs",
+      "type": "config",
+      "title": "Map Tools Android documentation",
+      "file": "tools/map-tools-android/README.md",
+      "attributes": {
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-manifest",
+      "type": "config",
+      "title": "Map Tools Android manifest",
+      "file": "android-map-tools/app/src/main/AndroidManifest.xml",
+      "attributes": {
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-gradle",
+      "type": "config",
+      "title": "Map Tools Android Gradle config",
+      "file": "android-map-tools/app/build.gradle",
+      "attributes": {
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-graph-anchor",
+      "type": "config",
+      "title": "Map Tools Android knowledge graph mapping",
+      "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+      "attributes": {
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "test:map-tools-android-contract",
+      "type": "test",
+      "title": "Map Tools Android contract",
+      "file": "tests/map-tools-android.contract.test.mjs",
+      "attributes": {
+        "domain": "map-tools"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "config:map-tools-android-capacitor",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "config:map-tools-android-html",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "config:map-tools-android-style",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "config:plan-map-viewer-shell",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "config:repo-map-viewer-shell",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "state:map-tools-android-static-bundle",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "test:map-tools-android-contract",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "config:map-tools-android-html",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "config:map-tools-android-style",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "reads_state"
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "state:repo-map-readonly-dataset",
+      "type": "reads_state"
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "test:map-tools-android-contract",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:map-tools-android-native-shell",
+      "to": "config:map-tools-android-capacitor",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-native-shell",
+      "to": "config:map-tools-android-manifest",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-native-shell",
+      "to": "config:map-tools-android-gradle",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-native-shell",
+      "to": "state:map-tools-android-static-bundle",
+      "type": "reads_state"
+    },
+    {
+      "from": "runtime:map-tools-android-native-shell",
+      "to": "test:map-tools-android-contract",
+      "type": "validated_by"
+    },
+    {
+      "from": "config:map-tools-android-docs",
+      "to": "config:map-tools-android-graph-anchor",
+      "type": "reads_config"
+    }
+  ]
+}
