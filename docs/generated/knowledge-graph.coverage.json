@@ -167,11 +167,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1968,
-    "rawCoveredFileCount": 1268,
-    "rawCoveragePercent": 64.4,
-    "adjustedTrackedFileCount": 1396,
-    "adjustedCoveredFileCount": 1051,
+    "trackedFileCount": 1970,
+    "rawCoveredFileCount": 1270,
+    "rawCoveragePercent": 64.5,
+    "adjustedTrackedFileCount": 1398,
+    "adjustedCoveredFileCount": 1053,
     "adjustedCoveragePercent": 75.3,
     "uncoveredFileCount": 700,
     "uncoveredActiveFileCount": 345,
@@ -203,8 +203,8 @@
       {
         "classification": "dev-tooling",
         "excludedFromCoverage": false,
-        "count": 23,
-        "coveredCount": 16
+        "count": 24,
+        "coveredCount": 17
       },
       {
         "classification": "governance-tooling",
@@ -227,8 +227,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 968,
-        "coveredCount": 845
+        "count": 969,
+        "coveredCount": 846
       },
       {
         "classification": "product-docs",
@@ -7861,6 +7861,23 @@
       "covered": false,
       "coverageSources": [],
       "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "dev-tooling",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "dev/training/trainingLogBuffer.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V126"
+      ],
       "surfaces": [],
       "classification": "dev-tooling",
       "excludedFromCoverage": false,
@@ -33351,6 +33368,25 @@
       ],
       "scopeBlocks": [
         "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/training-dashboard-log-buffer.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V126"
       ],
       "surfaces": [],
       "classification": "product-code",

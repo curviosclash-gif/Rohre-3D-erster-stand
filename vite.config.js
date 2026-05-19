@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'node:child_process';
 import { WebSocketServer } from 'ws';
+import { createTrainingLogBuffer } from './dev/training/trainingLogBuffer.js';
 import { buildTrainingSpawnCommand } from './dev/training/trainingSpawnArgs.js';
 import {
     createPreviewLocalArtifactDisabledResponse,
@@ -713,7 +714,6 @@ function trainingDashboardApiPlugin() {
     const TRAINING_RUNS_DIR = path.resolve(__dirname, 'data', 'training', 'runs');
     const TRAINING_MODELS_DIR = path.resolve(__dirname, 'data', 'training', 'models');
     const SCHEDULE_CONFIG_PATH = path.resolve(__dirname, 'data', 'training', 'schedule.json');
-    const MAX_OUTPUT_LINES = 500;
 
     let trainingProcess = null;
     let wsClients = new Set();
@@ -729,15 +729,9 @@ function trainingDashboardApiPlugin() {
 
     function appendOutputLine(source, text) {
         if (!trainingProcess) return;
-        const lines = String(text).split(/\r?\n/);
-        for (const line of lines) {
-            if (!line) continue;
-            const entry = { i: trainingProcess.outputLines.length, t: Date.now(), s: source, text: line };
-            trainingProcess.outputLines.push(entry);
+        const entries = trainingProcess.outputBuffer.append(source, text);
+        for (const entry of entries) {
             broadcast({ type: 'line', ...entry });
-        }
-        if (trainingProcess.outputLines.length > MAX_OUTPUT_LINES) {
-            trainingProcess.outputLines = trainingProcess.outputLines.slice(-MAX_OUTPUT_LINES);
         }
     }
 
@@ -794,7 +788,7 @@ function trainingDashboardApiPlugin() {
 
     function startSingle(config) {
         trainingProcess = {
-            child: null, startedAt: Date.now(), outputLines: [], exitCode: null,
+            child: null, startedAt: Date.now(), outputBuffer: createTrainingLogBuffer(), exitCode: null,
             pid: null, mode: 'single', config, shouldContinue: true, loopIteration: 0,
             curriculumStage: null, curriculumIndex: 0, curriculumTotal: 0,
         };
@@ -808,7 +802,7 @@ function trainingDashboardApiPlugin() {
 
     function startLoop(config) {
         trainingProcess = {
-            child: null, startedAt: Date.now(), outputLines: [], exitCode: null,
+            child: null, startedAt: Date.now(), outputBuffer: createTrainingLogBuffer(), exitCode: null,
             pid: null, mode: 'loop', config, shouldContinue: true, loopIteration: 1,
             curriculumStage: null, curriculumIndex: 0, curriculumTotal: 0,
         };
@@ -839,7 +833,7 @@ function trainingDashboardApiPlugin() {
 
     function startCurriculum(stages) {
         trainingProcess = {
-            child: null, startedAt: Date.now(), outputLines: [], exitCode: null,
+            child: null, startedAt: Date.now(), outputBuffer: createTrainingLogBuffer(), exitCode: null,
             pid: null, mode: 'curriculum', config: {}, shouldContinue: true, loopIteration: 0,
             curriculumStage: null, curriculumIndex: 0, curriculumTotal: stages.length,
         };
@@ -1057,12 +1051,13 @@ function trainingDashboardApiPlugin() {
 
             if (req.method === 'GET' && reqPath === '/api/training/progress') {
                 const since = parseInt(urlParams.get('since') || '0', 10) || 0;
-                const lines = trainingProcess ? trainingProcess.outputLines.filter(l => l.i >= since) : [];
+                const lines = trainingProcess ? trainingProcess.outputBuffer.getLinesSince(since) : [];
                 createJsonResponse(res, 200, {
                     ok: true,
                     ...getTrainingState(),
                     lines,
-                    totalLines: trainingProcess ? trainingProcess.outputLines.length : 0,
+                    totalLines: trainingProcess ? trainingProcess.outputBuffer.totalLines : 0,
+                    retainedLines: trainingProcess ? trainingProcess.outputBuffer.retainedLines : 0,
                 });
                 return;
             }

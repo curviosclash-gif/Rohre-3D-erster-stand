@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 215,
+          "concreteCount": 216,
           "plannedCount": 0
         }
       }
@@ -1781,8 +1781,8 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 7,
-          "plannedCount": 1
+          "concreteCount": 9,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
           "V112",
@@ -5023,7 +5023,7 @@
       "id": "V126.4",
       "type": "phase",
       "title": "Training-Output-Ringbuffer",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.4"
@@ -13725,8 +13725,8 @@
     {
       "id": "V126.4.1",
       "type": "subphase",
-      "title": "Ringbuffer-Helper mit Kapazitaet, monotonem Line-Index und",
-      "status": "open",
+      "title": "Ringbuffer-Helper mit Kapazitaet, monotonem Line-Index und `since`-Filter definieren. (abgeschlossen: 2026-05-19; evidence: `dev/training/trainingLogBuffer.js` exportiert `createTrainingLogBuffer`; Ringbuffer-Contracttest -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.4",
@@ -13736,8 +13736,8 @@
     {
       "id": "V126.4.2",
       "type": "subphase",
-      "title": "Bestehende `/api/training/progress?since=`-Semantik erhalten oder",
-      "status": "open",
+      "title": "Bestehende `/api/training/progress?since=`-Semantik erhalten oder bewusst migrieren. (abgeschlossen: 2026-05-19; evidence: `vite.config.js` nutzt `outputBuffer.getLinesSince(since)`, `totalLines` ist jetzt monoton und `retainedLines` nennt den gehaltenen Ausschnitt; Contracttest -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.4",
@@ -13747,8 +13747,8 @@
     {
       "id": "V126.4.3",
       "type": "subphase",
-      "title": "Test fuer 1.000+ Zeilen: nur letzte 500 abrufbar, Indizes bleiben",
-      "status": "open",
+      "title": "Test fuer 1.000+ Zeilen: nur letzte 500 abrufbar, Indizes bleiben monoton, WebSocket-Line-Events bleiben unveraendert. (abgeschlossen: 2026-05-19; evidence: `tests/training-dashboard-log-buffer.contract.test.mjs` deckt 1.000 Zeilen, Wraparound und emit-kompatible Line-Entries ab; PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.4",
@@ -13758,8 +13758,8 @@
     {
       "id": "V126.4.4",
       "type": "subphase",
-      "title": "Keine UI-Aenderung, solange die aktuelle Dashboard-Anzeige",
-      "status": "open",
+      "title": "Keine UI-Aenderung, solange die aktuelle Dashboard-Anzeige denselben Vertrag konsumiert. (abgeschlossen: 2026-05-19; evidence: keine UI-Dateien geaendert; `vite.config.js` liefert weiter `lines` und `totalLines`, ergaenzt nur `retainedLines`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.4",
@@ -26281,6 +26281,21 @@
         "scopeBlocks": [
           "B13",
           "V115"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "dev/training/trainingLogBuffer.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V126"
         ],
         "exists": true
       }
@@ -45585,12 +45600,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V126"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -52628,6 +52645,15 @@
     {
       "from": "B13",
       "to": "tests/training-benchmark-artifacts.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/training-dashboard-log-buffer.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -72389,6 +72415,15 @@
     {
       "from": "V126",
       "to": ".nvmrc",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V126",
+      "to": "dev/training/trainingLogBuffer.js",
       "type": "scope",
       "hint": null,
       "attributes": {
