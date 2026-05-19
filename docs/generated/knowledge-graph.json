@@ -1758,7 +1758,7 @@
       "id": "V126",
       "type": "block",
       "title": "Local Dev-API, Preview- und Delivery-Hardening",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -1766,7 +1766,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "126.1",
+        "currentPhase": "126.99",
         "planFile": "docs/plaene/aktiv/V126.md",
         "scopeDeclarations": [
           ".nvmrc",
@@ -5043,7 +5043,7 @@
       "id": "V126.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.99"
@@ -13824,8 +13824,8 @@
     {
       "id": "V126.99.1",
       "type": "subphase",
-      "title": "Alle frueheren Phasen sind abgeschlossen oder blockerfest mit",
-      "status": "open",
+      "title": "Alle frueheren Phasen sind abgeschlossen oder blockerfest mit Nachfolgeentscheidung dokumentiert. (abgeschlossen: 2026-05-20; evidence: `126.1` bis `126.5` stehen auf `done`, DoD.1 bis DoD.8 sind abgehakt, keine Blocker offen.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.99",
@@ -13835,8 +13835,8 @@
     {
       "id": "V126.99.2",
       "type": "subphase",
-      "title": "Gezielte Contracttests fuer Spawn, Preview-Gating und Ringbuffer",
-      "status": "open",
+      "title": "Gezielte Contracttests fuer Spawn, Preview-Gating und Ringbuffer sind gruen. (abgeschlossen: 2026-05-20; evidence: `node --test tests/training-dashboard-spawn.contract.test.mjs tests/vite-preview-local-api.contract.test.mjs tests/training-dashboard-log-buffer.contract.test.mjs` -> PASS, 18 Tests.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.99",
@@ -13846,8 +13846,8 @@
     {
       "id": "V126.99.3",
       "type": "subphase",
-      "title": "`npm run build` oder ein kleineres begruendetes Build-Signal ist",
-      "status": "open",
+      "title": "`npm run build` oder ein kleineres begruendetes Build-Signal ist gruen. (abgeschlossen: 2026-05-20; evidence: `npm --ignore-scripts run build` -> PASS; direktes Vite-Build-Signal gruen, bestehende Chunk-/Dynamic-Import-Warnungen bleiben nicht-blockierend.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.99",
@@ -13857,8 +13857,8 @@
     {
       "id": "V126.99.4",
       "type": "subphase",
-      "title": "`npm run plan:check` ist gruen.",
-      "status": "open",
+      "title": "`npm run plan:check` ist gruen. (abgeschlossen: 2026-05-20; evidence: `npm run plan:check` -> PASS; `npm run gates:pre-commit` -> PASS inklusive `plan:check`, `check:plan-evidence-claims`, `graph:check`, `docs:sync` und `docs:check`.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.99",
@@ -13868,8 +13868,8 @@
     {
       "id": "V126.99.5",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt Folgeblocks `V127`, `V128`, `V129` und",
-      "status": "open",
+      "title": "Abschlussnotiz nennt Folgeblocks `V127`, `V128`, `V129` und welche Punkte bewusst nicht in `V126` umgesetzt wurden. (abgeschlossen: 2026-05-20; evidence: diese Abschlussnotiz und `docs/plaene/CHANGELOG.md` nennen Handoff und Not-checked.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.99",
@@ -45883,7 +45883,7 @@
         "scopeBlocks": [
           "V116"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {

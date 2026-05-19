@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-18. Aktiver Lock: `-`; Startanker: `V90 90.99 abgeschlossen` -> `V126 126.1` ohne Package-/Lockfile-Scope.
+Stand: 2026-05-20. Aktiver Lock: `-`; Startanker: `V126 126.99 abgeschlossen`; V126-Folgepfade bleiben `V127`/`V128`/`V129` im Handoff.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -61,7 +61,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V119 | Planabschluss-Evidence-Remediation und Git-Historienabgleich | planned | P1 | frei | V117.99 | 119.1 | `docs/plaene/aktiv/V119.md` |
 | V123 | AI-optimierter Plan-Index und Source-of-Truth-Migration | planned | P1 | frei | V116.4,V119.1 | 123.1 | `docs/plaene/aktiv/V123.md` |
 | V125 | Architektur-Compliance fuer Folgearbeit | planned | P1 | frei | V91.99,V104.99,V117.99 | 125.1 | `docs/plaene/aktiv/V125.md` |
-| V126 | Local Dev-API, Preview- und Delivery-Hardening | planned | P1 | frei | V102.99,V105.99 | 126.1 | `docs/plaene/aktiv/V126.md` |
+| V126 | Local Dev-API, Preview- und Delivery-Hardening | done | P1 | frei | V102.99,V105.99 | 126.99 | `docs/plaene/aktiv/V126.md` |
 | V120 | Graph-RAG mit lokalem Context-Adapter | planned | P1 | frei | V107.99,V110.99,V111.99 | 120.1 | `docs/plaene/aktiv/V120.md` |
 | V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.1 | `docs/plaene/aktiv/V121.md` |
 | V122 | Repo-natives Agent-Memory und externe Ruflo-Orchestrierung | planned | P2 | frei | V116.99,V117.99,V119.1 | 122.1 | `docs/plaene/aktiv/V122.md` |
@@ -159,7 +159,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V119 | - | frei | Geplant |
 | - | V123 | - | frei | Geplant |
 | - | V125 | - | frei | Geplant |
-| - | V126 | - | frei | Geplant |
+| - | V126 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Dev-API-/Preview-Hardening gruen, Handoff an V127/V128/V129 |
 | - | V120 | - | frei | Geplant |
 | - | V121 | - | frei | Geplant |
 | - | V122 | - | frei | Geplant |
@@ -174,7 +174,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 ## Empfohlene Reihenfolge
 
-1. `V126` (Local Dev-API, Preview- und Delivery-Hardening) als naechsten produktnahen P1-Schnitt starten, wenn der Slice keine Package-/Lockfile-/CI-Upgrades enthaelt: Training-Spawn, Preview-Mutationsgrenze, lokale API-Matrix und erste `vite.config.js`-Entflechtung; keine Dependency-Upgrades, keine Hook-/Gate-Policy ohne V90/V125-Koordination.
+1. `V126` ist abgeschlossen: Training-Spawn, Preview-Mutationsgrenze, lokale API-Matrix, Ringbuffer und erste `vite.config.js`-Entflechtung sind gruen; Folgepfade bleiben `V127`, `V128` und `V129`.
 2. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster danach oder bei Gameplay-Prioritaet parallel mit disjunktem Scope starten.
 3. `V125` (Architektur-Compliance fuer Folgearbeit) als Architektur-Schutz nachziehen, besonders staged Architecture Guard und Workflow-Eskalation fuer neue Boundary-/Legacy-Surfaces.
 4. `V119` (Planabschluss-Evidence-Remediation und Git-Historienabgleich) vollstaendig abschliessen, bevor historische Plan-Evidence als Grundlage fuer neue Automatisierung, RAG oder Source-of-Truth-Migration verwendet wird.

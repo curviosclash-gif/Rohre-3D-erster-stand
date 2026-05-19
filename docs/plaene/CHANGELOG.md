@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Abschluss-Snapshot 2026-05-20 (Block `V126 126.99`)
+
+- `V126` ist geschlossen: lokale Dev-/Preview-APIs sind klassifiziert und gegated, Training-Spawn laeuft ohne Shell-Zwischenschicht, CLI-Argumente sind allowlisted, Trainingslogs nutzen einen Ringbuffer und die Training-Dashboard-API ist als erste fokussierte Vite-Plugin-Familie ausgelagert.
+- Abschluss-Evidence: `node --test tests/training-dashboard-spawn.contract.test.mjs tests/vite-preview-local-api.contract.test.mjs tests/training-dashboard-log-buffer.contract.test.mjs` -> PASS, `npm --ignore-scripts run build` -> PASS, `npm run plan:check` -> PASS, `npm run check:plan-evidence-claims` -> PASS und `npm run gates:pre-commit` -> PASS; die gemeldeten `graph:check` Domain-Drift-Warnungen bleiben nicht-blockierend.
+- Not-checked: keine Playwright-/Gameplay-Vollsuite, kein `npm run training:e2e`, kein Bot-Training-Langlauf, keine Dependency-/Electron-/Lockfile-Upgrades und keine CI-/Hook-Policy-Aenderungen; das ist bewusst, weil V126 keine Trainingsalgorithmen, Rewards, Produktions-Gameplay-Pfade, Dependency-Versionen oder globale Gates geaendert hat.
+- Folgeblock-Handoff: `V127` fuer repo-weite Tooling-Gates/DX, `V128` fuer Release- und Asset-Compliance, `V129` fuer Generated-Content-Manifest-Migration.
+
 ## Plan-Notiz 2026-05-19 (Draft `V127`)
 
 - `V127` wurde als gekoppelter Map-Navigationslayer geschaerft: Repo Map bleibt die Datei-/Tool-/Graph-Sicht, Plan Map bleibt die Block-/Phasen-/Dependency-Sicht.
