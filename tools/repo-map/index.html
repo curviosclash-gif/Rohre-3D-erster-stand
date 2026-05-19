@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Curvios Repo Map</title>
+    <link rel="stylesheet" href="./viewer.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <h1>Repo Map</h1>
+          <span id="sourceMeta" class="source-meta">read-only</span>
+        </div>
+        <div class="top-actions">
+          <label class="file-control">
+            <span>JSON</span>
+            <input id="fileInput" type="file" accept="application/json,.json">
+          </label>
+          <div class="segmented" aria-label="Ansicht">
+            <button type="button" data-view="topology" class="is-active">Topologie</button>
+            <button type="button" data-view="coverage">Coverage</button>
+            <button type="button" data-view="plans">Plan</button>
+            <button type="button" data-view="flows">Flows</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar" aria-label="Filter und Ordner">
+          <div class="filter-stack">
+            <label>
+              <span>Suche</span>
+              <input id="searchInput" type="search" autocomplete="off" placeholder="SettingsManager, src/ui, V125">
+            </label>
+            <label>
+              <span>Bereich</span>
+              <select id="folderFilter">
+                <option value="all">Alle</option>
+              </select>
+            </label>
+            <label>
+              <span>Klasse</span>
+              <select id="classificationFilter">
+                <option value="all">Alle</option>
+              </select>
+            </label>
+            <label>
+              <span>Coverage</span>
+              <select id="coverageFilter">
+                <option value="all">Alle</option>
+                <option value="uncovered">Aktiv offen</option>
+                <option value="covered">Covered</option>
+                <option value="excluded">Excluded</option>
+                <option value="unknown">Unbekannt</option>
+              </select>
+            </label>
+          </div>
+          <div id="folderList" class="folder-list"></div>
+        </aside>
+
+        <section class="main-stage" aria-label="Repo-Karte">
+          <div id="metrics" class="metrics-strip"></div>
+
+          <section id="topologyView" class="view-panel is-active">
+            <svg id="repoSvg" class="repo-svg" role="img" aria-label="Repo-Topologie"></svg>
+            <div id="topologyTables" class="split-grid"></div>
+          </section>
+
+          <section id="coverageView" class="view-panel">
+            <div id="coveragePanel" class="data-panel"></div>
+          </section>
+
+          <section id="plansView" class="view-panel">
+            <div id="plansPanel" class="data-panel"></div>
+          </section>
+
+          <section id="flowsView" class="view-panel">
+            <div id="flowsPanel" class="data-panel"></div>
+          </section>
+
+          <div id="sourcesFootnote" class="sources-footnote"></div>
+        </section>
+
+        <aside class="detail-panel" aria-label="Details">
+          <div id="detailPanel" class="detail-content"></div>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="./viewer.js"></script>
+  </body>
+</html>
