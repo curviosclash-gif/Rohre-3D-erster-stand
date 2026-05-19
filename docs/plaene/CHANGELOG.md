@@ -13,6 +13,13 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - Not-checked: keine Playwright-/Gameplay-Vollsuite, kein `npm run training:e2e`, kein Bot-Training-Langlauf, keine Dependency-/Electron-/Lockfile-Upgrades und keine CI-/Hook-Policy-Aenderungen; das ist bewusst, weil V126 keine Trainingsalgorithmen, Rewards, Produktions-Gameplay-Pfade, Dependency-Versionen oder globale Gates geaendert hat.
 - Folgeblock-Handoff: `V127` fuer repo-weite Tooling-Gates/DX, `V128` fuer Release- und Asset-Compliance, `V129` fuer Generated-Content-Manifest-Migration.
 
+## Plan-Notiz 2026-05-20 (Block `V121`)
+
+- `V121` plant jetzt zusaetzlich ein `Ask Repo`-Chat-Panel als read-only Evidence-Oberflaeche ueber den V120-Graph-RAG-Contracts.
+- Der Chat ist bewusst kein autonomer Repo-Agent: keine Schreibbuttons, keine Modellinstallation aus dem Viewer, keine persistente Prompt-/Antwort-History und keine Wahrheitsschicht neben Graph, Plaenen und Evidence-Paketen.
+- Neu im Scope: `scripts/graph-rag-chat.mjs`, `graph-rag.chat-response.v1`, Chat-Fixture, Chat-Contract-Test, Fallback-Regeln ohne lokale LLM-Runtime und spaetere Links zu Repo Map/Plan Map.
+- Nachschaerfung: Chat wird evidence-first geplant mit Antwortmodi, Replay-Befehl, `Explain this answer`-Trace, Prompt-Injection-Schutz, Evidence-only Cache-Policy und mindestens acht Referenzfragen.
+
 ## Plan-Notiz 2026-05-19 (Draft `V127`)
 
 - `V127` wurde als gekoppelter Map-Navigationslayer geschaerft: Repo Map bleibt die Datei-/Tool-/Graph-Sicht, Plan Map bleibt die Block-/Phasen-/Dependency-Sicht.

@@ -1530,19 +1530,24 @@
         "currentPhase": "121.1",
         "planFile": "docs/plaene/aktiv/V121.md",
         "scopeDeclarations": [
+          "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
+          "data/contracts/knowledge-graph/graph-rag-chat-response.v1.json",
           "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
           "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
           "docs/plaene/aktiv/V121.md",
+          "scripts/graph-rag-chat.mjs",
           "scripts/graph-rag-viewer-export.mjs",
+          "tests/graph-rag-chat.contract.test.mjs",
           "tests/graph-rag-viewer-export.contract.test.mjs",
           "tests/graph-rag-viewer-ui.contract.test.mjs",
           "tools/graph-rag-viewer/index.html",
+          "tools/graph-rag-viewer/README.md",
           "tools/graph-rag-viewer/viewer.css",
           "tools/graph-rag-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 1,
-          "plannedCount": 8
+          "concreteCount": 2,
+          "plannedCount": 12
         },
         "scopeOverlapAllowedWith": [
           "V120",
@@ -4662,7 +4667,7 @@
     {
       "id": "V121.5",
       "type": "phase",
-      "title": "Tests und lokale Verifikation",
+      "title": "Ask-Repo-Chat-Panel",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -4672,11 +4677,21 @@
     {
       "id": "V121.6",
       "type": "phase",
-      "title": "Dokumentation und Rollout",
+      "title": "Tests und lokale Verifikation",
       "status": "open",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.6"
+      }
+    },
+    {
+      "id": "V121.7",
+      "type": "phase",
+      "title": "Dokumentation und Rollout",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.7"
       }
     },
     {
@@ -11864,6 +11879,17 @@
       }
     },
     {
+      "id": "V121.3.5",
+      "type": "subphase",
+      "title": "`Ask Repo` als eigener Tab oder Panel-Slot reservieren, aber Chat-Logik erst nach dem Antwortvertrag aus 121.5 aktivieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3",
+        "subphaseCode": "121.3.5"
+      }
+    },
+    {
       "id": "V121.4.1",
       "type": "subphase",
       "title": "Redaction-Badge und Unsafe-Raw-Warnung anzeigen; Unsafe-Raw darf nur explizit als lokaler Auditmodus erscheinen.",
@@ -11910,7 +11936,7 @@
     {
       "id": "V121.5.1",
       "type": "subphase",
-      "title": "Export-Contract-Test fuer Fixture und realen redigierten Export ergaenzen.",
+      "title": "`graph-rag.chat-response.v1` definieren: Modus, Status, Frage, Kontext, Kurzantwort, Evidence, Queries, Replay, Trace, Links, Safety, Follow-ups, Cache-Policy, Runtime/Fallback.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -11921,7 +11947,7 @@
     {
       "id": "V121.5.2",
       "type": "subphase",
-      "title": "UI-Smoke-Test mit Fixture: Dashboard laedt, Critical Paths sichtbar, Evidence sichtbar, Safety sichtbar, LLM-Fallback sichtbar.",
+      "title": "`scripts/graph-rag-chat.mjs` planen/implementieren: Chat-Frage plus optionaler `file`/`block`/`view`-Kontext -> V120-Query -> Chat-Response.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -11932,7 +11958,7 @@
     {
       "id": "V121.5.3",
       "type": "subphase",
-      "title": "Negativtests: invalides Contract-Feld, fehlende Evidence-Liste, unsafe-raw Input, historical-only Quellen.",
+      "title": "Antwortmodi implementieren oder als Fixture-Vertrag pruefen: `graph-only`, `evidence`, `rag-summary`, `explain`, `plan-next`.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -11943,7 +11969,7 @@
     {
       "id": "V121.5.4",
       "type": "subphase",
-      "title": "Sicherstellen, dass keine Schreibpfade in Graph/Plans/Contracts/Cache aus dem Viewer existieren.",
+      "title": "Chat-Fixture und Contract-Test ergaenzen fuer Datei-Frage, Block-Dependency-Frage, Scope-/Collision-Frage, Critical-Path-Frage, historische Quelle und `insufficient_context`.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -11952,9 +11978,53 @@
       }
     },
     {
+      "id": "V121.5.5",
+      "type": "subphase",
+      "title": "Replay- und Trace-Pfad pruefen: jede Fixture-Antwort enthaelt reproduzierbaren CLI-Befehl und `Explain this answer`-Daten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.5"
+      }
+    },
+    {
+      "id": "V121.5.6",
+      "type": "subphase",
+      "title": "Viewer-Panel umsetzen: Modus-Schalter, Kurzantwort, Quellenkarten, Graph-Query-Liste, Confidence, Unsicherheiten, Trace und Links zu Repo Map/Plan Map.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.6"
+      }
+    },
+    {
+      "id": "V121.5.7",
+      "type": "subphase",
+      "title": "Fallback pruefen: Ohne Ollama/llama.cpp liefert der Chat fuer Graph-/Export-nahe Fragen regelbasierte Antworten oder klar `insufficient_context`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.7"
+      }
+    },
+    {
+      "id": "V121.5.8",
+      "type": "subphase",
+      "title": "Safety pruefen: keine Persistenz von Prompt-/Antworttext, keine Schreibbuttons, keine Modellinstallation aus dem Viewer, Quellenanweisungen bleiben Daten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.8"
+      }
+    },
+    {
       "id": "V121.6.1",
       "type": "subphase",
-      "title": "`tools/graph-rag-viewer/README.md` dokumentiert Nutzung, Input-Dateien, Safety-Modi, Fallback und Nicht-Ziele.",
+      "title": "Export-Contract-Test fuer Fixture und realen redigierten Export ergaenzen.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -11965,7 +12035,7 @@
     {
       "id": "V121.6.2",
       "type": "subphase",
-      "title": "Referenz-/Plan-Kontext dokumentiert: Viewer ist Consumer von V120-Outputs und nicht Steuerquelle.",
+      "title": "Chat-Contract-Test fuer Fixture, Modi, Replay, Trace, Fallback, Prompt-Injection-Signal und insufficient-context-Fall ergaenzen.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -11976,7 +12046,7 @@
     {
       "id": "V121.6.3",
       "type": "subphase",
-      "title": "Historische V107/V111-Viewer-Reste im Abschlusskontext erklaeren: ersetzt oder bewusst nicht fortgefuehrt.",
+      "title": "UI-Smoke-Test mit Fixture: Dashboard laedt, Critical Paths sichtbar, Evidence sichtbar, Ask Repo sichtbar, Safety sichtbar, LLM-Fallback sichtbar.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -11987,12 +12057,67 @@
     {
       "id": "V121.6.4",
       "type": "subphase",
-      "title": "Abschluss-Evidence im aktiven Block und/oder `docs/plaene/CHANGELOG.md` hinterlegen.",
+      "title": "Negativtests: invalides Contract-Feld, fehlende Evidence-Liste, unsafe-raw Input, historical-only Quellen.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.6",
         "subphaseCode": "121.6.4"
+      }
+    },
+    {
+      "id": "V121.6.5",
+      "type": "subphase",
+      "title": "Sicherstellen, dass keine Schreibpfade in Graph/Plans/Contracts/Cache aus Viewer oder Chat existieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.5"
+      }
+    },
+    {
+      "id": "V121.7.1",
+      "type": "subphase",
+      "title": "`tools/graph-rag-viewer/README.md` dokumentiert Nutzung, Input-Dateien, Safety-Modi, Chat-Fallback und Nicht-Ziele.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.7",
+        "subphaseCode": "121.7.1"
+      }
+    },
+    {
+      "id": "V121.7.2",
+      "type": "subphase",
+      "title": "Referenz-/Plan-Kontext dokumentiert: Viewer und Chat sind Consumer von V120-Outputs und nicht Steuerquelle.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.7",
+        "subphaseCode": "121.7.2"
+      }
+    },
+    {
+      "id": "V121.7.3",
+      "type": "subphase",
+      "title": "Historische V107/V111-Viewer-Reste im Abschlusskontext erklaeren: ersetzt oder bewusst nicht fortgefuehrt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.7",
+        "subphaseCode": "121.7.3"
+      }
+    },
+    {
+      "id": "V121.7.4",
+      "type": "subphase",
+      "title": "Abschluss-Evidence im aktiven Block und/oder `docs/plaene/CHANGELOG.md` hinterlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.7",
+        "subphaseCode": "121.7.4"
       }
     },
     {
@@ -12009,7 +12134,7 @@
     {
       "id": "V121.99.2",
       "type": "subphase",
-      "title": "UI-Smoke mit Fixture -> pass.",
+      "title": "Relevante Chat-Contract-Tests -> pass.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -12020,7 +12145,7 @@
     {
       "id": "V121.99.3",
       "type": "subphase",
-      "title": "`node scripts/check-knowledge-graph.mjs` -> pass.",
+      "title": "UI-Smoke mit Fixture -> pass.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -12031,7 +12156,7 @@
     {
       "id": "V121.99.4",
       "type": "subphase",
-      "title": "`npm run plan:check` -> pass.",
+      "title": "`node scripts/check-knowledge-graph.mjs` -> pass.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -12042,7 +12167,7 @@
     {
       "id": "V121.99.5",
       "type": "subphase",
-      "title": "Bei aktiver Uebernahme: `npm run docs:sync && npm run docs:check` nach Governance-Regel pruefen.",
+      "title": "`npm run plan:check` -> pass.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
@@ -12053,12 +12178,23 @@
     {
       "id": "V121.99.6",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt read-only Grenze, Safety-Status, V120-Dependency, historische Viewer-Reste und verbleibende Nicht-Ziele.",
+      "title": "Bei aktiver Uebernahme: `npm run docs:sync && npm run docs:check` nach Governance-Regel pruefen.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99",
         "subphaseCode": "121.99.6"
+      }
+    },
+    {
+      "id": "V121.99.7",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt read-only Grenze, Safety-Status, Chat-Fallback, V120-Dependency, historische Viewer-Reste und verbleibende Nicht-Ziele.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.7"
       }
     },
     {
@@ -25818,6 +25954,36 @@
       }
     },
     {
+      "id": "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/graph-rag-chat-response.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
       "type": "file",
       "title": null,
@@ -31392,7 +31558,8 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V116"
+          "V116",
+          "V121"
         ],
         "exists": true
       }
@@ -32251,6 +32418,21 @@
           "V94"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "scripts/graph-rag-chat.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
       }
     },
     {
@@ -44270,6 +44452,21 @@
       }
     },
     {
+      "id": "tests/graph-rag-chat.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V121"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "tests/graph-rag-context-adapter.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -45883,7 +46080,7 @@
         "scopeBlocks": [
           "V116"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -69295,6 +69492,24 @@
     },
     {
       "from": "V121",
+      "to": "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "data/contracts/knowledge-graph/graph-rag-chat-response.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
       "to": "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
       "type": "scope",
       "hint": null,
@@ -69322,7 +69537,34 @@
     },
     {
       "from": "V121",
+      "to": "README.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "scripts/graph-rag-chat.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
       "to": "scripts/graph-rag-viewer-export.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "tests/graph-rag-chat.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -69508,6 +69750,16 @@
     },
     {
       "from": "V121",
+      "to": "V121.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.7"
+      }
+    },
+    {
+      "from": "V121",
       "to": "V121.99",
       "type": "contains_phase",
       "hint": null,
@@ -69649,6 +69901,17 @@
       }
     },
     {
+      "from": "V121.3",
+      "to": "V121.3.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.3",
+        "subphaseCode": "121.3.5"
+      }
+    },
+    {
       "from": "V121.4",
       "to": "V121.4.1",
       "type": "contains_subphase",
@@ -69737,6 +70000,50 @@
       }
     },
     {
+      "from": "V121.5",
+      "to": "V121.5.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.5"
+      }
+    },
+    {
+      "from": "V121.5",
+      "to": "V121.5.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.6"
+      }
+    },
+    {
+      "from": "V121.5",
+      "to": "V121.5.7",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.7"
+      }
+    },
+    {
+      "from": "V121.5",
+      "to": "V121.5.8",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.5",
+        "subphaseCode": "121.5.8"
+      }
+    },
+    {
       "from": "V121.6",
       "to": "V121.6.1",
       "type": "contains_subphase",
@@ -69778,6 +70085,61 @@
         "blockId": "V121",
         "phaseCode": "121.6",
         "subphaseCode": "121.6.4"
+      }
+    },
+    {
+      "from": "V121.6",
+      "to": "V121.6.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.5"
+      }
+    },
+    {
+      "from": "V121.7",
+      "to": "V121.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.7",
+        "subphaseCode": "121.7.1"
+      }
+    },
+    {
+      "from": "V121.7",
+      "to": "V121.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.7",
+        "subphaseCode": "121.7.2"
+      }
+    },
+    {
+      "from": "V121.7",
+      "to": "V121.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.7",
+        "subphaseCode": "121.7.3"
+      }
+    },
+    {
+      "from": "V121.7",
+      "to": "V121.7.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.7",
+        "subphaseCode": "121.7.4"
       }
     },
     {
@@ -69844,6 +70206,17 @@
         "blockId": "V121",
         "phaseCode": "121.99",
         "subphaseCode": "121.99.6"
+      }
+    },
+    {
+      "from": "V121.99",
+      "to": "V121.99.7",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.7"
       }
     },
     {
