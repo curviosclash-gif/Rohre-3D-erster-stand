@@ -6,7 +6,9 @@ import { spawn } from 'node:child_process';
 import { WebSocketServer } from 'ws';
 import { buildTrainingSpawnCommand } from './dev/training/trainingSpawnArgs.js';
 import {
+    createPreviewLocalArtifactDisabledResponse,
     createPreviewLocalMutationDisabledResponse,
+    shouldBlockPreviewLocalArtifactRead,
     shouldBlockPreviewLocalMutation,
 } from './dev/vite/previewLocalApiGuard.js';
 import {
@@ -85,6 +87,13 @@ function createJsonResponse(res, statusCode, payload) {
 function maybeBlockPreviewLocalMutation({ isPreviewServer = false, reqPath = '', res } = {}) {
     if (!shouldBlockPreviewLocalMutation({ isPreviewServer })) return false;
     const response = createPreviewLocalMutationDisabledResponse({ route: reqPath });
+    createJsonResponse(res, response.statusCode, response.payload);
+    return true;
+}
+
+function maybeBlockPreviewLocalArtifactRead({ isPreviewServer = false, method = 'GET', reqPath = '', res } = {}) {
+    if (!shouldBlockPreviewLocalArtifactRead({ isPreviewServer, method, route: reqPath })) return false;
+    const response = createPreviewLocalArtifactDisabledResponse({ route: reqPath });
     createJsonResponse(res, response.statusCode, response.payload);
     return true;
 }
@@ -670,11 +679,14 @@ function latestCheckpointApiPlugin() {
         return null;
     }
 
-    const registerMiddleware = (middlewares) => {
+    const registerMiddleware = (middlewares, { isPreviewServer = false } = {}) => {
         middlewares.use((req, res, next) => {
             const reqPath = String(req.url || '').split('?')[0];
             if (req.method !== 'GET' || reqPath !== CHECKPOINT_API_PATH) {
                 next();
+                return;
+            }
+            if (maybeBlockPreviewLocalArtifactRead({ isPreviewServer, method: req.method, reqPath, res })) {
                 return;
             }
             const checkpoint = resolveCheckpointFromIndex();
@@ -692,7 +704,7 @@ function latestCheckpointApiPlugin() {
             registerMiddleware(server.middlewares);
         },
         configurePreviewServer(server) {
-            registerMiddleware(server.middlewares);
+            registerMiddleware(server.middlewares, { isPreviewServer: true });
         },
     };
 }
@@ -1022,8 +1034,13 @@ function trainingDashboardApiPlugin() {
             const urlParams = new URL(req.url || '', 'http://localhost').searchParams;
             const isTrainingMutation = req.method === 'POST'
                 && ['/api/training/start', '/api/training/stop', '/api/training/schedule'].includes(reqPath);
+            const isTrainingReadOnly = req.method === 'GET'
+                && ['/api/training/status', '/api/training/history', '/api/training/progress'].includes(reqPath);
 
             if (isTrainingMutation && maybeBlockPreviewLocalMutation({ isPreviewServer, reqPath, res })) {
+                return;
+            }
+            if (isTrainingReadOnly && maybeBlockPreviewLocalArtifactRead({ isPreviewServer, method: req.method, reqPath, res })) {
                 return;
             }
 

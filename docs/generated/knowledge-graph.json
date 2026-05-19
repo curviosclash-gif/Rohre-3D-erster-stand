@@ -4993,7 +4993,7 @@
       "id": "V126.1",
       "type": "phase",
       "title": "Local-API- und Preview-Matrix",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.1"
@@ -5013,7 +5013,7 @@
       "id": "V126.3",
       "type": "phase",
       "title": "Preview Read-only",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.3"
@@ -13571,8 +13571,8 @@
     {
       "id": "V126.1.1",
       "type": "subphase",
-      "title": "`vite.config.js` nach lokalen API-Routen, Middleware,",
-      "status": "open",
+      "title": "`vite.config.js` nach lokalen API-Routen, Middleware, WebSocket-Upgrades, Disk-I/O, Process-Spawn und Artifact-Reads inventarisieren. (abgeschlossen: 2026-05-19; evidence: `LOCAL_API_ROUTE_DECISIONS` deckt Health, Editor-Disk-I/O, Latest-Checkpoint, Training-HTTP und Training-WebSocket ab; `node --test tests/vite-preview-local-api.contract.test.mjs` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.1",
@@ -13582,8 +13582,8 @@
     {
       "id": "V126.1.2",
       "type": "subphase",
-      "title": "Jede Route klassifizieren:",
-      "status": "open",
+      "title": "Jede Route klassifizieren: `read-only`, `local-mutation`, `process-control`, `disk-write`, `artifact-exposure`, `test-health`. (abgeschlossen: 2026-05-19; evidence: Route-Matrix nutzt `artifact-read`, `disk-write`, `local-mutation`, `process-control`, `test-health` und `training-process`; Contracttest -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.1",
@@ -13593,8 +13593,8 @@
     {
       "id": "V126.1.3",
       "type": "subphase",
-      "title": "Preview-Verhalten je Route entscheiden: aktiv, blockiert,",
-      "status": "open",
+      "title": "Preview-Verhalten je Route entscheiden: aktiv, blockiert, read-only erlaubt, nur mit Flag. (abgeschlossen: 2026-05-19; evidence: `preview-active` fuer Health und begrenzte Editor-Vehicle-Reads, `preview-local-mutation-flag` fuer Editor-/Training-Mutationen, `preview-local-artifact-flag` fuer Trainingsartefakt-Reads, `preview-inactive` fuer `/ws/training` im Preview.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.1",
@@ -13604,8 +13604,8 @@
     {
       "id": "V126.1.4",
       "type": "subphase",
-      "title": "Kollisionen mit `V90`, `V112`, `V125` und Bot-Training-Scope",
-      "status": "open",
+      "title": "Kollisionen mit `V90`, `V112`, `V125` und Bot-Training-Scope dokumentieren. (abgeschlossen: 2026-05-19; evidence: Slice beruehrt keine Package-/Lockfile-/CI-/Hook-Gates, keine produktiven Gameplay-Pfade und keinen Bot-Training-Master; `npm run plan:check` bleibt Closure-Gate.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.1",
@@ -13692,8 +13692,8 @@
     {
       "id": "V126.3.3",
       "type": "subphase",
-      "title": "Read-only-Routen explizit entscheiden:",
-      "status": "open",
+      "title": "Read-only-Routen explizit entscheiden: Health bleibt aktiv; Listen-/Get-Routen nur wenn sie keine sensiblen lokalen Artefakte freilegen. (abgeschlossen: 2026-05-19; evidence: `LOCAL_API_ROUTE_DECISIONS` laesst Health und begrenzte Editor-Vehicle-Reads im Preview aktiv, blockiert Latest-Checkpoint und Training-Status/-History/-Progress ohne `ENABLE_LOCAL_ARTIFACT_APIS=1`; `node --test tests/vite-preview-local-api.contract.test.mjs` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.3",
