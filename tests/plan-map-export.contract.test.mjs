@@ -17,6 +17,9 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.equal(v126.priority, 'P1');
   assert.ok(v126.phaseProgress.total > 0);
   assert.ok(v126.scopeFiles.includes('vite.config.js'));
+  assert.ok(v126.readiness);
+  assert.ok(['ready', 'ready-with-risk', 'blocked', 'locked', 'done'].includes(v126.readiness.status));
+  assert.ok(v126.impact.scopeFileCount > 0);
 
   const v121OpenDependency = data.dependencies.find((edge) => (
     edge.from === 'V121'
@@ -29,4 +32,6 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.ok(data.graph.nodeCount > 0);
   assert.ok(data.scorecard.metrics.criticalPathTotalCount >= 4);
   assert.ok(Array.isArray(data.scopeCollisions));
+  assert.ok(data.summary.byReadiness);
+  assert.ok(data.fileIndex.some((entry) => entry.path === 'vite.config.js'));
 });

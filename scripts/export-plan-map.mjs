@@ -543,14 +543,193 @@ function summarizeLocks(lockRegistry, masterLockRows) {
   };
 }
 
+function isGovernanceFile(filePath) {
+  return /^(AGENTS\.md|\.agents\/|docs\/Umsetzungsplan\.md|docs\/plaene\/aktiv\/|docs\/plaene\/CHANGELOG\.md)/.test(filePath);
+}
+
+function summarizeFileImpact(scopeFiles, collisions) {
+  const concreteScopeFiles = scopeFiles.filter((filePath) => !filePath.includes('*'));
+  const sharedFiles = new Set(collisions.flatMap((collision) => collision.sharedFiles || []));
+  const packageFileCount = scopeFiles.filter((filePath) => /(^|\/)(package-lock\.json|package\.json|pnpm-lock\.yaml|yarn\.lock)$/.test(filePath)).length;
+  const governanceFileCount = scopeFiles.filter(isGovernanceFile).length;
+  const sourceFileCount = scopeFiles.filter((filePath) => /^(src|dev|scripts|electron)\//.test(filePath)).length;
+  const testFileCount = scopeFiles.filter((filePath) => /^(tests|playwright|test)\//.test(filePath)).length;
+  const docsFileCount = scopeFiles.filter((filePath) => /^docs\//.test(filePath)).length;
+  const wildcardCount = scopeFiles.length - concreteScopeFiles.length;
+  const score = scopeFiles.length
+    + sharedFiles.size
+    + packageFileCount * 5
+    + governanceFileCount * 4
+    + wildcardCount * 2;
+
+  return {
+    score,
+    level: score >= 40 ? 'high' : score >= 16 ? 'medium' : 'low',
+    scopeFileCount: scopeFiles.length,
+    concreteScopeFileCount: concreteScopeFiles.length,
+    wildcardCount,
+    sharedFileCount: sharedFiles.size,
+    packageFileCount,
+    governanceFileCount,
+    sourceFileCount,
+    testFileCount,
+    docsFileCount,
+  };
+}
+
+function buildBlockInsights(blocks, dependencies, collisions, locks, recommendedOrder) {
+  const activeLockByBlock = new Map(locks.active.map((lock) => [lock.blockId, lock]));
+  const dependenciesByBlock = new Map();
+  const consumersByBlock = new Map();
+  const collisionsByBlock = new Map();
+  const orderByBlock = new Map(recommendedOrder.map((entry) => [entry.blockId, entry]));
+
+  for (const dependency of dependencies) {
+    if (!dependenciesByBlock.has(dependency.from)) {
+      dependenciesByBlock.set(dependency.from, []);
+    }
+    dependenciesByBlock.get(dependency.from).push(dependency);
+
+    if (!consumersByBlock.has(dependency.to)) {
+      consumersByBlock.set(dependency.to, []);
+    }
+    consumersByBlock.get(dependency.to).push(dependency);
+  }
+
+  for (const collision of collisions) {
+    for (const blockId of [collision.leftBlock, collision.rightBlock]) {
+      if (!collisionsByBlock.has(blockId)) {
+        collisionsByBlock.set(blockId, []);
+      }
+      collisionsByBlock.get(blockId).push(collision);
+    }
+  }
+
+  return blocks.map((block) => {
+    const blockDependencies = dependenciesByBlock.get(block.id) || [];
+    const blockConsumers = consumersByBlock.get(block.id) || [];
+    const blockCollisions = collisionsByBlock.get(block.id) || [];
+    const activeLock = activeLockByBlock.get(block.id) || null;
+    const openDependencies = blockDependencies.filter((dependency) => dependency.fulfilled === false);
+    const openHardDependencies = openDependencies.filter((dependency) => dependency.kind === 'hard');
+    const openSoftDependencies = openDependencies.filter((dependency) => dependency.kind === 'soft');
+    const openUnknownDependencies = openDependencies.filter((dependency) => dependency.kind !== 'hard' && dependency.kind !== 'soft');
+    const order = orderByBlock.get(block.id) || null;
+
+    let readiness = {
+      status: 'done',
+      label: 'abgeschlossen',
+      reason: 'Block ist laut Master abgeschlossen.',
+    };
+
+    if (block.status !== 'done') {
+      if (activeLock) {
+        readiness = {
+          status: 'locked',
+          label: 'in Arbeit',
+          reason: `Aktiver Lock auf ${activeLock.phase || block.id}.`,
+        };
+      } else if (openHardDependencies.length > 0) {
+        readiness = {
+          status: 'blocked',
+          label: 'blockiert',
+          reason: `${openHardDependencies.length} harte Dependency offen.`,
+        };
+      } else if (openSoftDependencies.length > 0 || openUnknownDependencies.length > 0) {
+        readiness = {
+          status: 'ready-with-risk',
+          label: 'startklar mit Risiko',
+          reason: `${openSoftDependencies.length + openUnknownDependencies.length} Soft/unklare Gates offen.`,
+        };
+      } else {
+        readiness = {
+          status: 'ready',
+          label: 'startklar',
+          reason: 'Keine offenen harten Dependencies gefunden.',
+        };
+      }
+    }
+
+    return {
+      ...block,
+      readiness: {
+        ...readiness,
+        openDependencyCount: openDependencies.length,
+        openHardDependencyCount: openHardDependencies.length,
+        openSoftDependencyCount: openSoftDependencies.length,
+        openUnknownDependencyCount: openUnknownDependencies.length,
+        dependencyCount: blockDependencies.length,
+        consumerCount: blockConsumers.length,
+        collisionCount: blockCollisions.length,
+        activeLock: activeLock ? {
+          person: activeLock.person,
+          phase: activeLock.phase,
+          status: activeLock.status,
+          startDate: activeLock.startDate,
+        } : null,
+        recommendedRank: order?.rank || null,
+        recommendedText: order?.text || '',
+      },
+      impact: summarizeFileImpact(block.scopeFiles || [], blockCollisions),
+    };
+  });
+}
+
+function buildFileIndex(blocks, collisions) {
+  const entries = new Map();
+
+  function ensureEntry(filePath) {
+    if (!entries.has(filePath)) {
+      entries.set(filePath, {
+        path: filePath,
+        blocks: new Set(),
+        collisionBlocks: new Set(),
+        collisionCount: 0,
+      });
+    }
+    return entries.get(filePath);
+  }
+
+  for (const block of blocks) {
+    for (const filePath of block.scopeFiles || []) {
+      ensureEntry(filePath).blocks.add(block.id);
+    }
+  }
+
+  for (const collision of collisions) {
+    for (const filePath of collision.sharedFiles || []) {
+      const entry = ensureEntry(filePath);
+      entry.collisionBlocks.add(collision.leftBlock);
+      entry.collisionBlocks.add(collision.rightBlock);
+      entry.collisionCount += 1;
+    }
+  }
+
+  return [...entries.values()]
+    .map((entry) => ({
+      path: entry.path,
+      blocks: [...entry.blocks].sort((left, right) => left.localeCompare(right, 'en', { numeric: true })),
+      collisionBlocks: [...entry.collisionBlocks].sort((left, right) => left.localeCompare(right, 'en', { numeric: true })),
+      collisionCount: entry.collisionCount,
+      isGovernance: isGovernanceFile(entry.path),
+    }))
+    .sort((left, right) => (
+      right.collisionCount - left.collisionCount
+      || left.path.localeCompare(right.path)
+    ));
+}
+
 function buildSummary(blocks, dependencies, collisions, locks) {
   const byStatus = {};
   const byPriority = {};
   const byGroup = {};
+  const byReadiness = {};
   for (const block of blocks) {
     byStatus[block.status] = (byStatus[block.status] || 0) + 1;
     byPriority[block.priority] = (byPriority[block.priority] || 0) + 1;
     byGroup[block.group] = (byGroup[block.group] || 0) + 1;
+    const readiness = block.readiness?.status || 'unknown';
+    byReadiness[readiness] = (byReadiness[readiness] || 0) + 1;
   }
 
   return {
@@ -561,6 +740,7 @@ function buildSummary(blocks, dependencies, collisions, locks) {
     byStatus,
     byPriority,
     byGroup,
+    byReadiness,
   };
 }
 
@@ -585,11 +765,13 @@ export async function buildPlanMapData(options = {}) {
     readJsonIfExists(rootDir, LOCK_REGISTRY_PATH),
   ]);
 
-  const blocks = await parseMasterBlocks(rootDir, masterPlan);
-  const dependencies = parseDependencyEdges(masterPlan, blocks);
+  const parsedBlocks = await parseMasterBlocks(rootDir, masterPlan);
+  const dependencies = parseDependencyEdges(masterPlan, parsedBlocks);
   const recommendedOrder = parseRecommendedOrder(masterPlan);
   const locks = summarizeLocks(lockRegistry, parseMasterLockRows(masterPlan));
-  const scopeCollisions = await readCuratedScopeCollisions(rootDir) ?? buildScopeCollisions(graph, blocks);
+  const scopeCollisions = await readCuratedScopeCollisions(rootDir) ?? buildScopeCollisions(graph, parsedBlocks);
+  const blocks = buildBlockInsights(parsedBlocks, dependencies, scopeCollisions, locks, recommendedOrder);
+  const fileIndex = buildFileIndex(blocks, scopeCollisions);
 
   return {
     schema_version: 1,
@@ -610,6 +792,7 @@ export async function buildPlanMapData(options = {}) {
     recommendedOrder,
     locks,
     scopeCollisions,
+    fileIndex,
     openFindings: parseOpenFindings(openFindingsText),
     graph: summarizeKnowledgeGraph(graph),
     coverage: summarizeCoverage(coverage),

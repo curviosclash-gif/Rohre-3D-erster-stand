@@ -23,3 +23,9 @@ The viewer reads existing sources only:
 - `docs/prozess/Open_Findings.md`
 
 It does not write plan status, locks, graph files, or governance sources.
+
+## Views
+
+- Map: dependency graph with focus mode, readiness badges, edge tooltips, and block details.
+- Kollisionen: clickable scope-collision matrix; file clicks focus the map on affected blocks.
+- Health: graph score, coverage, active locks, and open findings.

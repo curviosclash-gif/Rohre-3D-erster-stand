@@ -23,6 +23,9 @@
             <button type="button" data-view="collisions">Kollisionen</button>
             <button type="button" data-view="health">Health</button>
           </div>
+          <button id="focusToggle" type="button" class="icon-button is-active" title="Fokus auf Auswahl und direkte Risiken">
+            Fokus
+          </button>
         </div>
       </header>
 
@@ -45,14 +48,22 @@
                 <option value="all">Alle</option>
               </select>
             </label>
+            <label>
+              <span>Startbarkeit</span>
+              <select id="readinessFilter">
+                <option value="all">Alle</option>
+              </select>
+            </label>
           </div>
           <div id="blockList" class="block-list"></div>
         </aside>
 
         <section class="main-stage" aria-label="Plan-Karte">
           <div id="metrics" class="metrics-strip"></div>
+          <div id="decisionBar" class="decision-bar"></div>
           <section id="mapView" class="view-panel is-active">
             <svg id="planSvg" class="plan-svg" role="img" aria-label="Dependency-Karte"></svg>
+            <div id="edgeTooltip" class="edge-tooltip" hidden></div>
           </section>
           <section id="collisionsView" class="view-panel">
             <div id="collisionsTable" class="data-table"></div>

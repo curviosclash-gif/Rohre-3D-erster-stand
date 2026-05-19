@@ -11,6 +11,9 @@ const state = {
   search: '',
   status: 'all',
   priority: 'all',
+  readiness: 'all',
+  focusMode: true,
+  fileFocus: '',
 };
 
 const elements = {
@@ -19,9 +22,13 @@ const elements = {
   searchInput: document.querySelector('#searchInput'),
   statusFilter: document.querySelector('#statusFilter'),
   priorityFilter: document.querySelector('#priorityFilter'),
+  readinessFilter: document.querySelector('#readinessFilter'),
+  focusToggle: document.querySelector('#focusToggle'),
   blockList: document.querySelector('#blockList'),
   metrics: document.querySelector('#metrics'),
+  decisionBar: document.querySelector('#decisionBar'),
   planSvg: document.querySelector('#planSvg'),
+  edgeTooltip: document.querySelector('#edgeTooltip'),
   detailPanel: document.querySelector('#detailPanel'),
   collisionsTable: document.querySelector('#collisionsTable'),
   healthPanel: document.querySelector('#healthPanel'),
@@ -53,12 +60,41 @@ function blockSortValue(block) {
   return Number.isFinite(numeric) ? 1000 + numeric : 9999;
 }
 
+function readinessRank(block) {
+  const ranks = {
+    ready: 0,
+    'ready-with-risk': 1,
+    locked: 2,
+    blocked: 3,
+    done: 4,
+  };
+  return ranks[block.readiness?.status] ?? 5;
+}
+
+function blockHasFile(block, filePath) {
+  if (!filePath) {
+    return true;
+  }
+
+  const directScope = (block.scopeFiles || []).some((entry) => entry === filePath || entry.includes(filePath) || filePath.includes(entry.replace('/**', '')));
+  if (directScope) {
+    return true;
+  }
+
+  return (state.data?.scopeCollisions || []).some((collision) => (
+    (collision.leftBlock === block.id || collision.rightBlock === block.id)
+    && (collision.sharedFiles || []).includes(filePath)
+  ));
+}
+
 function blockMatchesFilters(block) {
   const haystack = [
     block.id,
     block.title,
     block.affectedArea,
     block.currentPhase,
+    block.readiness?.label,
+    block.readiness?.reason,
     block.scopeFiles?.join(' '),
   ].join(' ').toLowerCase();
 
@@ -74,6 +110,14 @@ function blockMatchesFilters(block) {
     return false;
   }
 
+  if (state.readiness !== 'all' && block.readiness?.status !== state.readiness) {
+    return false;
+  }
+
+  if (state.fileFocus && !blockHasFile(block, state.fileFocus)) {
+    return false;
+  }
+
   return true;
 }
 
@@ -81,7 +125,8 @@ function visibleBlocks() {
   return (state.data?.blocks || [])
     .filter(blockMatchesFilters)
     .sort((left, right) => (
-      blockSortValue(left) - blockSortValue(right)
+      readinessRank(left) - readinessRank(right)
+      || blockSortValue(left) - blockSortValue(right)
       || left.id.localeCompare(right.id, 'en', { numeric: true })
     ));
 }
@@ -94,11 +139,26 @@ function updateFilterOptions() {
   const blocks = state.data?.blocks || [];
   const statuses = [...new Set(blocks.map((block) => block.status).filter(Boolean))].sort();
   const priorities = [...new Set(blocks.map((block) => block.priority).filter(Boolean))].sort();
+  const readinesses = [...new Set(blocks.map((block) => block.readiness?.status).filter(Boolean))]
+    .sort((left, right) => (readinessRank({ readiness: { status: left } }) - readinessRank({ readiness: { status: right } })));
 
   elements.statusFilter.innerHTML = '<option value="all">Alle</option>'
     + statuses.map((status) => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`).join('');
   elements.priorityFilter.innerHTML = '<option value="all">Alle</option>'
     + priorities.map((priority) => `<option value="${escapeHtml(priority)}">${escapeHtml(priority)}</option>`).join('');
+  elements.readinessFilter.innerHTML = '<option value="all">Alle</option>'
+    + readinesses.map((readiness) => `<option value="${escapeHtml(readiness)}">${escapeHtml(readinessLabel(readiness))}</option>`).join('');
+}
+
+function readinessLabel(value) {
+  const labels = {
+    ready: 'startklar',
+    'ready-with-risk': 'mit Risiko',
+    locked: 'in Arbeit',
+    blocked: 'blockiert',
+    done: 'abgeschlossen',
+  };
+  return labels[value] || value || '-';
 }
 
 function renderMetrics() {
@@ -109,10 +169,13 @@ function renderMetrics() {
     ?? null;
   const openDeps = (state.data?.dependencies || []).filter((edge) => edge.fulfilled === false).length;
   const activeLocks = state.data?.locks?.active?.length || 0;
+  const startable = (summary.byReadiness?.ready || 0) + (summary.byReadiness?.['ready-with-risk'] || 0);
+  const blocked = (summary.byReadiness?.blocked || 0) + (summary.byReadiness?.locked || 0);
 
   const metrics = [
     { value: summary.blockCount ?? 0, label: 'Bloecke' },
-    { value: summary.dependencyCount ?? 0, label: 'Dependencies' },
+    { value: startable, label: 'Startbar' },
+    { value: blocked, label: 'Blockiert/in Arbeit' },
     { value: summary.collisionCount ?? 0, label: 'Scope-Kollisionen' },
     { value: score == null ? '-' : score, label: 'Graph Score' },
     { value: coverage == null ? `${activeLocks}` : `${coverage}%`, label: coverage == null ? 'Aktive Locks' : 'Coverage' },
@@ -133,10 +196,60 @@ function renderMetrics() {
     elements.metrics.insertAdjacentHTML('beforeend', `
       <div class="metric">
         <span class="metric-value">${openDeps}</span>
-        <span class="metric-label">Offene harte/soft Gates</span>
+      <span class="metric-label">Offene harte/soft Gates</span>
       </div>
     `);
   }
+}
+
+function getNextStartableBlock() {
+  return (state.data?.blocks || [])
+    .filter((block) => block.status !== 'done')
+    .filter((block) => block.readiness?.status === 'ready' || block.readiness?.status === 'ready-with-risk')
+    .sort((left, right) => (
+      (left.readiness?.recommendedRank || 999) - (right.readiness?.recommendedRank || 999)
+      || readinessRank(left) - readinessRank(right)
+      || blockSortValue(left) - blockSortValue(right)
+    ))[0] || null;
+}
+
+function renderDecisionBar() {
+  const selected = selectedBlock();
+  const next = getNextStartableBlock();
+  if (!state.data || !selected) {
+    elements.decisionBar.innerHTML = '';
+    return;
+  }
+
+  const fileFocus = state.fileFocus
+    ? `<button type="button" class="pill-button is-active" data-clear-file>${escapeHtml(state.fileFocus)} entfernen</button>`
+    : '<span class="decision-muted">kein Datei-Fokus</span>';
+  const selectedReadiness = selected.readiness || {};
+  const nextAction = next
+    ? `<button type="button" class="pill-button" data-select-block="${escapeHtml(next.id)}">${escapeHtml(next.id)} als naechster Start</button>`
+    : '<span class="decision-muted">kein startklarer geplanter Block</span>';
+
+  elements.decisionBar.innerHTML = `
+    <div class="decision-item">
+      <strong>${escapeHtml(selected.id)}</strong>
+      <span class="chip readiness-${escapeHtml(selectedReadiness.status || 'unknown')}">${escapeHtml(selectedReadiness.label || '-')}</span>
+      <span>${escapeHtml(selectedReadiness.reason || '')}</span>
+    </div>
+    <div class="decision-item">${nextAction}</div>
+    <div class="decision-item">${fileFocus}</div>
+  `;
+
+  elements.decisionBar.querySelectorAll('[data-select-block]').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.selectedId = button.dataset.selectBlock;
+      state.view = 'map';
+      render();
+    });
+  });
+  elements.decisionBar.querySelector('[data-clear-file]')?.addEventListener('click', () => {
+    state.fileFocus = '';
+    render();
+  });
 }
 
 function renderBlockList() {
@@ -144,11 +257,16 @@ function renderBlockList() {
   elements.blockList.innerHTML = blocks.map((block) => {
     const activeLock = (state.data?.locks?.active || []).some((lock) => lock.blockId === block.id);
     const isActive = block.id === state.selectedId ? ' is-active' : '';
+    const readiness = block.readiness?.status || 'unknown';
+    const collisionMarker = block.readiness?.collisionCount > 0 ? `<span class="mini-count">${escapeHtml(block.readiness.collisionCount)}</span>` : '';
     return `
       <button type="button" class="block-row${isActive}" data-block-id="${escapeHtml(block.id)}">
         <span class="block-id">${escapeHtml(block.id)}</span>
         <span class="block-title">${escapeHtml(block.title)}</span>
-        <span class="chip ${escapeHtml(block.status)}">${activeLock ? 'lock' : escapeHtml(block.priority)}</span>
+        <span class="block-badges">
+          ${collisionMarker}
+          <span class="chip readiness-${escapeHtml(readiness)}">${activeLock ? 'lock' : escapeHtml(readinessLabel(readiness))}</span>
+        </span>
       </button>
     `;
   }).join('');
@@ -228,6 +346,12 @@ function renderMap() {
       relatedIds.add(edge.from);
     }
   }
+  if (selected && state.focusMode) {
+    for (const collision of collisionsForBlock(selected.id)) {
+      relatedIds.add(collision.leftBlock);
+      relatedIds.add(collision.rightBlock);
+    }
+  }
 
   elements.planSvg.innerHTML = '';
   elements.planSvg.setAttribute('viewBox', `0 0 ${width} ${height}`);
@@ -261,6 +385,11 @@ function renderMap() {
       d: `M ${from.x + 72} ${from.y} C ${(from.x + to.x) / 2} ${from.y}, ${(from.x + to.x) / 2} ${to.y}, ${to.x - 72} ${to.y}`,
       'marker-end': 'url(#arrow)',
     });
+    const title = svgElement('title');
+    title.textContent = edgeTooltipText(edge);
+    path.appendChild(title);
+    path.addEventListener('mousemove', (event) => showEdgeTooltip(edge, event));
+    path.addEventListener('mouseleave', hideEdgeTooltip);
     edgeLayer.appendChild(path);
   }
   elements.planSvg.appendChild(edgeLayer);
@@ -272,7 +401,7 @@ function renderMap() {
       continue;
     }
     const group = svgElement('g', {
-      class: `node-group${block.id === state.selectedId ? ' is-selected' : ''}${selected && !relatedIds.has(block.id) ? ' is-dimmed' : ''}`,
+      class: `node-group${block.id === state.selectedId ? ' is-selected' : ''}${state.focusMode && selected && !relatedIds.has(block.id) ? ' is-dimmed' : ''}`,
       transform: `translate(${position.x - 74} ${position.y - 31})`,
       tabindex: '0',
       role: 'button',
@@ -281,6 +410,7 @@ function renderMap() {
 
     group.appendChild(svgElement('rect', { class: 'node-card', width: '148', height: '62' }));
     group.appendChild(svgElement('circle', { class: statusClass(block), cx: '126', cy: '16', r: '5' }));
+    group.appendChild(svgElement('circle', { class: `readiness-dot readiness-${block.readiness?.status || 'unknown'}`, cx: '136', cy: '16', r: '4' }));
 
     const idText = svgElement('text', { class: 'node-id', x: '12', y: '20' });
     idText.textContent = block.id;
@@ -317,6 +447,28 @@ function renderMap() {
   elements.planSvg.appendChild(nodeLayer);
 }
 
+function edgeTooltipText(edge) {
+  const status = edge.fulfilled === false ? 'offen' : edge.fulfilled === true ? 'erfuellt' : 'unbekannt';
+  return `${edge.from} braucht ${edge.to}${edge.phase ? ` (${edge.phase})` : ''}\n${edge.kind}, ${status}${edge.hint ? `\n${edge.hint}` : ''}`;
+}
+
+function showEdgeTooltip(edge, event) {
+  elements.edgeTooltip.hidden = false;
+  elements.edgeTooltip.innerHTML = `
+    <strong>${escapeHtml(edge.from)} -> ${escapeHtml(edge.to)}</strong>
+    <span>${escapeHtml(edge.kind)} / ${escapeHtml(edge.fulfilled === false ? 'offen' : edge.fulfilled === true ? 'erfuellt' : 'unbekannt')}</span>
+    ${edge.phase ? `<span>${escapeHtml(edge.phase)}</span>` : ''}
+    ${edge.hint ? `<span>${escapeHtml(edge.hint)}</span>` : ''}
+  `;
+  const rect = elements.planSvg.getBoundingClientRect();
+  elements.edgeTooltip.style.left = `${event.clientX - rect.left + 14}px`;
+  elements.edgeTooltip.style.top = `${event.clientY - rect.top + 14}px`;
+}
+
+function hideEdgeTooltip() {
+  elements.edgeTooltip.hidden = true;
+}
+
 function formatDependency(edge) {
   const status = edge.fulfilled === false ? 'offen' : edge.fulfilled === true ? 'erfuellt' : 'unbekannt';
   return `${edge.to}${edge.phase ? ` (${edge.phase})` : ''} - ${edge.kind}, ${status}`;
@@ -326,6 +478,28 @@ function collisionsForBlock(blockId) {
   return (state.data?.scopeCollisions || []).filter((collision) => (
     collision.leftBlock === blockId || collision.rightBlock === blockId
   ));
+}
+
+function fileButton(filePath) {
+  return `<button type="button" class="text-button" data-file-focus="${escapeHtml(filePath)}">${escapeHtml(filePath)}</button>`;
+}
+
+function bindInlineActions(root) {
+  root.querySelectorAll('[data-select-block]').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.selectedId = button.dataset.selectBlock;
+      state.view = 'map';
+      render();
+    });
+  });
+  root.querySelectorAll('[data-file-focus]').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.fileFocus = button.dataset.fileFocus;
+      state.search = '';
+      elements.searchInput.value = '';
+      render();
+    });
+  });
 }
 
 function renderDetail() {
@@ -340,13 +514,29 @@ function renderDetail() {
   const incomingDeps = (state.data?.dependencies || []).filter((edge) => edge.to === block.id);
   const collisions = collisionsForBlock(block.id);
   const progress = block.phaseProgress || { total: 0, done: 0, percent: 0 };
+  const readiness = block.readiness || {};
+  const impact = block.impact || {};
 
   elements.detailPanel.innerHTML = `
     <h2 class="detail-title">${escapeHtml(block.id)} ${escapeHtml(block.title)}</h2>
     <div class="detail-kicker">
       <span class="chip ${escapeHtml(block.status)}">${escapeHtml(block.status)}</span>
       <span class="chip priority">${escapeHtml(block.priority || '-')}</span>
+      <span class="chip readiness-${escapeHtml(readiness.status || 'unknown')}">${escapeHtml(readiness.label || '-')}</span>
+      <span class="chip impact-${escapeHtml(impact.level || 'low')}">Impact ${escapeHtml(impact.level || 'low')}</span>
       ${activeLock ? '<span class="chip locked">lock</span>' : ''}
+    </div>
+
+    <div class="detail-section">
+      <h3>Startentscheidung</h3>
+      <dl class="key-value">
+        <dt>Status</dt><dd>${escapeHtml(readiness.label || '-')}</dd>
+        <dt>Warum</dt><dd>${escapeHtml(readiness.reason || '-')}</dd>
+        <dt>Offen hart</dt><dd>${escapeHtml(readiness.openHardDependencyCount || 0)}</dd>
+        <dt>Soft/unklar</dt><dd>${escapeHtml((readiness.openSoftDependencyCount || 0) + (readiness.openUnknownDependencyCount || 0))}</dd>
+        <dt>Reihenfolge</dt><dd>${readiness.recommendedRank ? `#${escapeHtml(readiness.recommendedRank)} ${escapeHtml(readiness.recommendedText || '')}` : '-'}</dd>
+        <dt>Impact</dt><dd>${escapeHtml(impact.score || 0)} Punkte, ${escapeHtml(impact.scopeFileCount || 0)} Scope-Dateien</dd>
+      </dl>
     </div>
 
     <div class="detail-section">
@@ -380,7 +570,7 @@ function renderDetail() {
       <ul class="plain-list">
         ${collisions.length ? collisions.slice(0, 8).map((collision) => {
           const other = collision.leftBlock === block.id ? collision.rightBlock : collision.leftBlock;
-          return `<li>${escapeHtml(other)} - ${escapeHtml(collision.sharedFileCount)} Datei(en)</li>`;
+          return `<li><button type="button" class="text-button" data-select-block="${escapeHtml(other)}">${escapeHtml(other)}</button> - ${escapeHtml(collision.sharedFileCount)} Datei(en): ${collision.sharedFiles.slice(0, 2).map(fileButton).join(' ')}</li>`;
         }).join('') : '<li class="muted">keine</li>'}
       </ul>
     </div>
@@ -399,10 +589,12 @@ function renderDetail() {
     <div class="detail-section">
       <h3>Scope Files</h3>
       <ul class="plain-list">
-        ${(block.scopeFiles || []).slice(0, 14).map((file) => `<li>${escapeHtml(file)}</li>`).join('') || '<li class="muted">keine</li>'}
+        ${(block.scopeFiles || []).slice(0, 14).map((file) => `<li>${fileButton(file)}</li>`).join('') || '<li class="muted">keine</li>'}
       </ul>
     </div>
   `;
+
+  bindInlineActions(elements.detailPanel);
 }
 
 function renderCollisionView() {
@@ -420,15 +612,16 @@ function renderCollisionView() {
       <tbody>
         ${rows.map((collision) => `
           <tr>
-            <td>${escapeHtml(collision.leftBlock)}</td>
-            <td>${escapeHtml(collision.rightBlock)}</td>
+            <td><button type="button" class="text-button" data-select-block="${escapeHtml(collision.leftBlock)}">${escapeHtml(collision.leftBlock)}</button></td>
+            <td><button type="button" class="text-button" data-select-block="${escapeHtml(collision.rightBlock)}">${escapeHtml(collision.rightBlock)}</button></td>
             <td>${escapeHtml(collision.sharedFileCount)}</td>
-            <td>${escapeHtml(collision.sharedFiles.slice(0, 5).join(', '))}${collision.sharedFiles.length > 5 ? ' ...' : ''}</td>
+            <td>${collision.sharedFiles.slice(0, 5).map(fileButton).join(' ')}${collision.sharedFiles.length > 5 ? ' ...' : ''}</td>
           </tr>
         `).join('')}
       </tbody>
     </table>
   `;
+  bindInlineActions(elements.collisionsTable);
 }
 
 function renderHealthView() {
@@ -482,6 +675,7 @@ function updateViewPanels() {
 
 function renderEmpty() {
   elements.metrics.innerHTML = '';
+  elements.decisionBar.innerHTML = '';
   elements.blockList.innerHTML = '';
   elements.planSvg.innerHTML = '';
   elements.detailPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
@@ -501,6 +695,7 @@ function render() {
   }
 
   renderMetrics();
+  renderDecisionBar();
   renderBlockList();
   renderMap();
   renderDetail();
@@ -550,6 +745,15 @@ function bindEvents() {
   });
   elements.priorityFilter.addEventListener('change', () => {
     state.priority = elements.priorityFilter.value;
+    render();
+  });
+  elements.readinessFilter.addEventListener('change', () => {
+    state.readiness = elements.readinessFilter.value;
+    render();
+  });
+  elements.focusToggle.addEventListener('click', () => {
+    state.focusMode = !state.focusMode;
+    elements.focusToggle.classList.toggle('is-active', state.focusMode);
     render();
   });
 

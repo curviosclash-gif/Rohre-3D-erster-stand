@@ -136,6 +136,47 @@ h1 {
   color: #fffdf9;
 }
 
+.icon-button,
+.pill-button,
+.text-button {
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.icon-button {
+  height: 34px;
+  padding: 0 12px;
+}
+
+.icon-button.is-active,
+.pill-button.is-active {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+  color: var(--teal);
+}
+
+.pill-button {
+  min-height: 28px;
+  padding: 3px 9px;
+}
+
+.text-button {
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--teal);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.text-button:hover {
+  text-decoration: underline;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: 292px minmax(460px, 1fr) 360px;
@@ -180,6 +221,26 @@ h1 {
   padding: 0 10px;
   background: #fff;
   color: var(--ink);
+}
+
+.block-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mini-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: var(--coral);
+  background: var(--coral-soft);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .block-list {
@@ -263,11 +324,56 @@ h1 {
   background: var(--teal-soft);
 }
 
+.chip.readiness-ready,
+.readiness-dot.readiness-ready {
+  color: var(--green);
+  background: var(--green-soft);
+  fill: var(--green);
+}
+
+.chip.readiness-ready-with-risk,
+.readiness-dot.readiness-ready-with-risk {
+  color: var(--gold);
+  background: var(--gold-soft);
+  fill: var(--gold);
+}
+
+.chip.readiness-blocked,
+.chip.readiness-locked,
+.readiness-dot.readiness-blocked,
+.readiness-dot.readiness-locked {
+  color: var(--coral);
+  background: var(--coral-soft);
+  fill: var(--coral);
+}
+
+.chip.readiness-done,
+.readiness-dot.readiness-done {
+  color: var(--muted);
+  background: #ece8df;
+  fill: var(--line-strong);
+}
+
+.chip.impact-high {
+  color: var(--coral);
+  background: var(--coral-soft);
+}
+
+.chip.impact-medium {
+  color: var(--gold);
+  background: var(--gold-soft);
+}
+
+.chip.impact-low {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
 .main-stage {
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   background: var(--bg);
 }
 
@@ -299,6 +405,34 @@ h1 {
   font-size: 12px;
 }
 
+.decision-bar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.3fr) minmax(180px, 0.8fr) minmax(180px, 0.9fr);
+  gap: 1px;
+  border-bottom: 1px solid var(--line);
+  background: var(--line);
+}
+
+.decision-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px 14px;
+  background: #fffdf9;
+  font-size: 13px;
+  min-width: 0;
+}
+
+.decision-item span:not(.chip),
+.decision-muted {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
 .view-panel {
   display: none;
   min-height: 0;
@@ -309,10 +443,14 @@ h1 {
   display: block;
 }
 
+#mapView {
+  position: relative;
+}
+
 .plan-svg {
   display: block;
   width: 100%;
-  height: calc(100vh - 141px);
+  height: calc(100vh - 184px);
   min-height: 620px;
   background:
     linear-gradient(90deg, rgba(31, 39, 35, 0.04) 1px, transparent 1px),
@@ -336,6 +474,30 @@ h1 {
 .edge.is-soft {
   stroke: var(--gold);
   stroke-dasharray: 3 5;
+}
+
+.edge:hover {
+  stroke-width: 2.4;
+  opacity: 1;
+}
+
+.edge-tooltip {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  gap: 4px;
+  max-width: 320px;
+  padding: 9px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fffdf9;
+  box-shadow: var(--shadow);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.edge-tooltip[hidden] {
+  display: none;
 }
 
 .node-group {
@@ -387,6 +549,11 @@ h1 {
 
 .node-status-other {
   fill: var(--indigo);
+}
+
+.readiness-dot {
+  stroke: #fffdf9;
+  stroke-width: 1;
 }
 
 .detail-content {
@@ -462,6 +629,10 @@ h1 {
 .plain-list li {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.plain-list li .text-button + .text-button {
+  margin-left: 6px;
 }
 
 .phase-row {
@@ -544,5 +715,9 @@ th {
 
   .metrics-strip {
     grid-template-columns: repeat(3, minmax(112px, 1fr));
+  }
+
+  .decision-bar {
+    grid-template-columns: 1fr;
   }
 }
