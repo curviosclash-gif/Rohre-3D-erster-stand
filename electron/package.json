@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node launch.cjs",
     "start:settings": "node settings-studio/launch.cjs",
+    "start:maps": "node map-tools/launch.cjs",
     "build": "electron-builder"
   },
   "build": {
@@ -20,6 +21,7 @@
       "tuning-ipc.cjs",
       "tuning-preload.cjs",
       "tuning-console/**/*",
+      "map-tools/**/*",
       "recording-video-export-job.cjs",
       "static-server.cjs",
       "node_modules/ffmpeg-static/**/*",
