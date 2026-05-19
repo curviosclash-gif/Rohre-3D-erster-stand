@@ -8,6 +8,12 @@ Start from the repository root:
 npm run app:maps:start
 ```
 
+On Windows, double-click the root launcher instead:
+
+```powershell
+start_map_tools.bat
+```
+
 The app refreshes both map exports on startup:
 
 - `scripts/export-plan-map.mjs` -> `tmp/plan-map/plan-map.json`
