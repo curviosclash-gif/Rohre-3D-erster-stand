@@ -6,6 +6,12 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Plan-Notiz 2026-05-19 (Draft `V127`)
+
+- `V127` wurde als gekoppelter Map-Navigationslayer geschaerft: Repo Map bleibt die Datei-/Tool-/Graph-Sicht, Plan Map bleibt die Block-/Phasen-/Dependency-Sicht.
+- Neu im Draft: Datei-Steckbriefe, mehrstufige Datei-Fokuskarte, Plan-Map-Dependency-Fokus (`Upstream -> Fokusblock -> Downstream`), Edge-Inspector und read-only Crosslinks zwischen Datei- und Blocksicht.
+- Governance-Grenze bleibt unveraendert: beide Viewer sind Navigation, nicht Wahrheitsschicht; Schreibpfade in Graph, Plaene, Locks, Contracts oder Source-Dateien bleiben Nicht-Ziel.
+
 ## Abschluss-Snapshot 2026-05-18 (Block `V90 90.99`)
 
 - `V90` ist geschlossen: non-force Fixes (`fast-uri`, `ip-address`, lockfile-kompatibler `@tootallnate/once`-Pfad) sind erledigt, Major-Upgrades bleiben getrennte Folge-Slices statt stiller `--force`-Sprung.
