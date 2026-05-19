@@ -89,7 +89,7 @@ const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
     },
     {
         classification: 'repo-ops',
-        prefixes: ['.github/', '.husky/'],
+        prefixes: ['.github/', '.husky/', 'start_', 'start-', 'tools/'],
         excludedFromCoverage: true,
         reason: 'Repository automation scaffolding is tracked separately from product/code coverage.',
     },

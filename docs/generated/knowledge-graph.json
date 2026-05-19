@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 207,
+          "concreteCount": 211,
           "plannedCount": 0
         }
       }
@@ -30996,6 +30996,36 @@
       }
     },
     {
+      "id": "scripts/export-plan-map.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/export-repo-map.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "scripts/find-unused-files.mjs",
       "type": "file",
       "title": null,
@@ -43671,6 +43701,21 @@
       }
     },
     {
+      "id": "tests/plan-map-export.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/platform-capabilities.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -43825,6 +43870,21 @@
           "B13",
           "V88",
           "V89"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/repo-map-export.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
         ],
         "exists": true
       }
@@ -49805,6 +49865,24 @@
     },
     {
       "from": "B13",
+      "to": "scripts/export-plan-map.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/export-repo-map.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/find-unused-files.mjs",
       "type": "scope",
       "hint": null,
@@ -50705,6 +50783,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/plan-map-export.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/platform-capabilities.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -50778,6 +50865,15 @@
     {
       "from": "B13",
       "to": "tests/recording.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/repo-map-export.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {

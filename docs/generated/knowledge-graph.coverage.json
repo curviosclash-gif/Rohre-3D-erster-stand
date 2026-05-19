@@ -97,7 +97,10 @@
       "classification": "repo-ops",
       "prefixes": [
         ".github/",
-        ".husky/"
+        ".husky/",
+        "start_",
+        "start-",
+        "tools/"
       ],
       "excludedFromCoverage": true,
       "reason": "Repository automation scaffolding is tracked separately from product/code coverage."
@@ -156,14 +159,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1878,
-    "rawCoveredFileCount": 1230,
-    "rawCoveragePercent": 65.5,
-    "adjustedTrackedFileCount": 1383,
-    "adjustedCoveredFileCount": 1030,
-    "adjustedCoveragePercent": 74.5,
-    "uncoveredFileCount": 648,
-    "uncoveredActiveFileCount": 353,
+    "trackedFileCount": 1892,
+    "rawCoveredFileCount": 1234,
+    "rawCoveragePercent": 65.2,
+    "adjustedTrackedFileCount": 1378,
+    "adjustedCoveredFileCount": 1033,
+    "adjustedCoveragePercent": 75,
+    "uncoveredFileCount": 658,
+    "uncoveredActiveFileCount": 345,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -204,14 +207,14 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 52,
-        "coveredCount": 27
+        "count": 43,
+        "coveredCount": 26
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 948,
-        "coveredCount": 825
+        "count": 952,
+        "coveredCount": 829
       },
       {
         "classification": "product-docs",
@@ -228,8 +231,8 @@
       {
         "classification": "repo-ops",
         "excludedFromCoverage": true,
-        "count": 5,
-        "coveredCount": 2
+        "count": 24,
+        "coveredCount": 3
       },
       {
         "classification": "temp",
@@ -17605,6 +17608,40 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/export-plan-map.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/export-repo-map.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/find-unused-files.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -30260,9 +30297,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "other",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "start_editor_local.bat",
@@ -30273,9 +30310,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "other",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "start_editor.bat",
@@ -30286,9 +30323,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "other",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "start_electron.bat",
@@ -30299,9 +30336,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "other",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "start_game.bat",
@@ -30312,9 +30349,22 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "other",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "start_repo_map.bat",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "start_settings.bat",
@@ -30329,9 +30379,9 @@
         "V95"
       ],
       "surfaces": [],
-      "classification": "other",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "start_trainer_and_training.bat",
@@ -30342,9 +30392,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "other",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "start_trainer_server.bat",
@@ -30355,9 +30405,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "other",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "start_training_bridge.bat",
@@ -30368,9 +30418,22 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "other",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "start-plan-map.ps1",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "style.css",
@@ -31585,6 +31648,23 @@
       "excludeReason": null
     },
     {
+      "path": "tests/plan-map-export.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "tests/platform-capabilities.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -31755,6 +31835,23 @@
         "B13",
         "V88",
         "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/repo-map-export.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32466,6 +32563,110 @@
       "classification": "other",
       "excludedFromCoverage": false,
       "excludeReason": null
+    },
+    {
+      "path": "tools/plan-map/index.html",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/plan-map/README.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/plan-map/viewer.css",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/plan-map/viewer.js",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/repo-map/index.html",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/repo-map/README.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/repo-map/viewer.css",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/repo-map/viewer.js",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "trainer/artifacts/TrainerArtifactStore.mjs",
