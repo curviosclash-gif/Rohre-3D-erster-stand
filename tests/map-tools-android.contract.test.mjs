@@ -38,6 +38,38 @@ test('Map Tools Android shell embeds Plan Map and Repo Map viewers', async () =>
   assert.equal(packageJson.scripts['app:maps:android:sync'], 'npm run app:maps:android:build && npx cap sync android');
 });
 
+test('Map Tools Android shell keeps phone viewports inside the app frame', async () => {
+  const [shellCss, planCss, repoCss] = await Promise.all([
+    readText('tools/map-tools-android/map-tools-android.css'),
+    readText('tools/plan-map/viewer.css'),
+    readText('tools/repo-map/viewer.css'),
+  ]);
+
+  assert.match(shellCss, /@media \(max-width: 640px\)/);
+  assert.match(planCss, /@media \(max-width: 760px\)/);
+  assert.match(planCss, /overflow-x: hidden/);
+  assert.match(planCss, /grid-template-columns: minmax\(0, 1fr\)/);
+  assert.match(planCss, /#mapView\s*\{[\s\S]*overflow: auto/);
+  assert.match(repoCss, /@media \(max-width: 640px\)/);
+});
+
+test('Map Tools Android launcher icon uses map-specific adaptive assets', async () => {
+  const [icon, roundIcon, foreground, background] = await Promise.all([
+    readText('android-map-tools/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml'),
+    readText('android-map-tools/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml'),
+    readText('android-map-tools/app/src/main/res/drawable-v24/ic_launcher_foreground.xml'),
+    readText('android-map-tools/app/src/main/res/drawable/ic_launcher_background.xml'),
+  ]);
+
+  assert.match(icon, /@drawable\/ic_launcher_background/);
+  assert.match(icon, /@drawable\/ic_launcher_foreground/);
+  assert.match(roundIcon, /@drawable\/ic_launcher_background/);
+  assert.match(roundIcon, /@drawable\/ic_launcher_foreground/);
+  assert.match(foreground, /#176B63/);
+  assert.match(foreground, /#B94C45/);
+  assert.match(background, /#0B4C47/);
+});
+
 test('Map Tools Android build script exports static map datasets', async () => {
   const script = await readText('scripts/build-map-tools-android.mjs');
 

@@ -513,3 +513,71 @@ tr:last-child td {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 640px) {
+  .topbar {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .brand-block {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .source-meta {
+    font-size: 12px;
+  }
+
+  .file-control {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .file-control input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .segmented {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .segmented button {
+    min-width: 0;
+    padding: 0 6px;
+  }
+
+  .main-stage {
+    padding: 10px;
+  }
+
+  .metrics-strip {
+    gap: 8px;
+  }
+
+  .metric {
+    min-height: 58px;
+    padding: 9px 10px;
+  }
+
+  .metric strong {
+    margin-top: 6px;
+    font-size: 20px;
+  }
+
+  .repo-svg {
+    height: 360px;
+  }
+
+  .detail-section dl {
+    grid-template-columns: 1fr;
+  }
+}
