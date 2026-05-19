@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, dialog, shell } = require('electron');
+const { app, BrowserWindow, Menu, dialog, ipcMain, shell } = require('electron');
 const { execFile } = require('node:child_process');
 const path = require('node:path');
 const { promisify } = require('node:util');
@@ -12,70 +12,132 @@ const execFileAsync = promisify(execFile);
 
 const SHARED_USER_DATA_DIR_NAME = 'curviosclash-app';
 const MAP_TOOLS_SESSION_DATA_DIR_NAME = 'session-map-tools';
+const MAP_TOOLS_IPC_CONTRACT_VERSION = 'map-tools-ipc.v1';
+const SOURCE_REPO_ROOT = path.resolve(__dirname, '..', '..');
+const NODE_EXECUTABLE = process.env.CURVIOS_NODE_EXECUTABLE || process.execPath;
+
+const IPC_CHANNELS = Object.freeze({
+    getState: 'map-tools:get-state',
+    refresh: 'map-tools:refresh',
+    setView: 'map-tools:set-view',
+    openPath: 'map-tools:open-path',
+    viewRequested: 'map-tools:view-requested',
+    refreshRequested: 'map-tools:refresh-requested',
+});
+
 const MAP_TOOL_VIEWS = Object.freeze({
-    plan: {
+    plan: Object.freeze({
         id: 'plan',
         label: 'Plan Map',
         exportScript: 'scripts/export-plan-map.mjs',
         viewPath: '/tools/plan-map/index.html',
         readmePath: 'tools/plan-map/README.md',
-    },
-    repo: {
+    }),
+    repo: Object.freeze({
         id: 'repo',
         label: 'Repo Map',
         exportScript: 'scripts/export-repo-map.mjs',
         viewPath: '/tools/repo-map/index.html',
         readmePath: 'tools/repo-map/README.md',
-    },
+    }),
 });
 
-const SOURCE_REPO_ROOT = path.resolve(__dirname, '..', '..');
-const NODE_EXECUTABLE = process.env.CURVIOS_NODE_EXECUTABLE || process.execPath;
+const PATH_TARGETS = Object.freeze({
+    repoRoot: '',
+    planReadme: MAP_TOOL_VIEWS.plan.readmePath,
+    repoReadme: MAP_TOOL_VIEWS.repo.readmePath,
+});
+
 let markSessionExitClean = () => {};
 let mainWindow = null;
 let mapServer = null;
 let currentViewId = 'plan';
 let refreshPromise = null;
+let ipcRegistered = false;
+const lastRefreshByView = new Map();
 
 function resolveRepoRoot() {
     return path.resolve(process.env.CURVIOS_MAP_TOOLS_REPO_ROOT || SOURCE_REPO_ROOT);
 }
 
-function getCurrentView() {
-    return MAP_TOOL_VIEWS[currentViewId] || MAP_TOOL_VIEWS.plan;
+function normalizeViewId(viewId) {
+    const normalized = String(viewId || '').trim();
+    return Object.prototype.hasOwnProperty.call(MAP_TOOL_VIEWS, normalized) ? normalized : 'plan';
 }
 
-function createExportError(error, view) {
-    const detail = error?.stderr || error?.stdout || error?.message || String(error || 'export_failed');
-    return new Error(`${view.label} Export fehlgeschlagen.\n\n${detail}`);
+function getCurrentView() {
+    return MAP_TOOL_VIEWS[normalizeViewId(currentViewId)];
+}
+
+function toViewList() {
+    return Object.values(MAP_TOOL_VIEWS).map((view) => ({
+        id: view.id,
+        label: view.label,
+        viewPath: view.viewPath,
+        readmePath: view.readmePath,
+    }));
+}
+
+function serializeError(error) {
+    return {
+        message: error instanceof Error ? error.message : String(error || 'Unbekannter Fehler'),
+        stderr: String(error?.stderr || '').trim(),
+        stdout: String(error?.stdout || '').trim(),
+    };
+}
+
+function createRefreshResult(view, ok, extra = {}) {
+    return {
+        viewId: view.id,
+        label: view.label,
+        exportScript: view.exportScript,
+        ok,
+        refreshedAt: new Date().toISOString(),
+        error: null,
+        ...extra,
+    };
 }
 
 async function runMapExport(view) {
-    const repoRoot = resolveRepoRoot();
     try {
         await execFileAsync(NODE_EXECUTABLE, [view.exportScript], {
-            cwd: repoRoot,
+            cwd: resolveRepoRoot(),
             windowsHide: true,
             timeout: 60_000,
             maxBuffer: 4 * 1024 * 1024,
         });
+        return createRefreshResult(view, true);
     } catch (error) {
-        throw createExportError(error, view);
+        return createRefreshResult(view, false, {
+            error: serializeError(error),
+        });
     }
 }
 
-async function refreshExports(viewIds = Object.keys(MAP_TOOL_VIEWS)) {
+function resolveRefreshViewIds(targetViewId = 'all') {
+    if (targetViewId === 'all') {
+        return Object.keys(MAP_TOOL_VIEWS);
+    }
+    return [normalizeViewId(targetViewId)];
+}
+
+async function refreshExports(targetViewId = 'all') {
     if (refreshPromise) {
         return refreshPromise;
     }
 
     refreshPromise = (async () => {
-        for (const viewId of viewIds) {
+        const results = [];
+        for (const viewId of resolveRefreshViewIds(targetViewId)) {
             const view = MAP_TOOL_VIEWS[viewId];
-            if (view) {
-                await runMapExport(view);
-            }
+            const result = await runMapExport(view);
+            lastRefreshByView.set(view.id, result);
+            results.push(result);
         }
+        return {
+            ok: results.every((result) => result.ok),
+            results,
+        };
     })();
 
     try {
@@ -102,6 +164,17 @@ async function stopServer() {
     await server.close();
 }
 
+function createStateSnapshot() {
+    return {
+        contractVersion: MAP_TOOLS_IPC_CONTRACT_VERSION,
+        activeViewId: currentViewId,
+        serverUrl: mapServer?.url || '',
+        repoRoot: resolveRepoRoot(),
+        views: toViewList(),
+        refreshes: Object.fromEntries(lastRefreshByView.entries()),
+    };
+}
+
 function updateWindowTitle() {
     if (!mainWindow || mainWindow.isDestroyed()) {
         return;
@@ -109,44 +182,80 @@ function updateWindowTitle() {
     mainWindow.setTitle(`CurviosClash Map Tools - ${getCurrentView().label}`);
 }
 
-async function loadMapView(viewId, options = {}) {
-    const view = MAP_TOOL_VIEWS[viewId] || MAP_TOOL_VIEWS.plan;
-    currentViewId = view.id;
-    updateWindowTitle();
-    try {
-        if (options.refresh !== false) {
-            await refreshExports([view.id]);
-        }
-        const server = await startServer();
-        if (mainWindow && !mainWindow.isDestroyed()) {
-            await mainWindow.loadURL(`${server.url}${view.viewPath}`);
-            updateWindowTitle();
-        }
-    } catch (error) {
-        const message = error instanceof Error ? error.message : String(error || 'Unbekannter Fehler');
-        dialog.showErrorBox('CurviosClash Map Tools', message);
+function sendRendererEvent(channel, payload) {
+    if (!mainWindow || mainWindow.isDestroyed()) {
+        return false;
     }
+    mainWindow.webContents.send(channel, payload);
+    return true;
 }
 
-async function refreshCurrentView() {
-    await loadMapView(currentViewId, { refresh: true });
+async function openRepoPath(targetId) {
+    const targetRelativePath = PATH_TARGETS[String(targetId || '')] ?? PATH_TARGETS.repoRoot;
+    const targetPath = path.join(resolveRepoRoot(), targetRelativePath);
+    const message = await shell.openPath(targetPath);
+    return {
+        ok: !message,
+        targetPath,
+        message,
+    };
 }
 
-async function refreshAllAndReloadCurrent() {
-    try {
-        await refreshExports();
-        await loadMapView(currentViewId, { refresh: false });
-    } catch (error) {
-        const message = error instanceof Error ? error.message : String(error || 'Unbekannter Fehler');
-        dialog.showErrorBox('CurviosClash Map Tools', message);
+function registerIpc() {
+    if (ipcRegistered) {
+        return;
     }
-}
+    ipcRegistered = true;
 
-function openRepoPath(relativePath) {
-    const targetPath = path.join(resolveRepoRoot(), relativePath || '');
-    shell.openPath(targetPath).catch((error) => {
-        dialog.showErrorBox('CurviosClash Map Tools', error instanceof Error ? error.message : String(error));
+    ipcMain.handle(IPC_CHANNELS.getState, async () => {
+        await startServer();
+        return createStateSnapshot();
     });
+    ipcMain.handle(IPC_CHANNELS.setView, async (_event, viewId) => {
+        currentViewId = normalizeViewId(viewId);
+        updateWindowTitle();
+        return createStateSnapshot();
+    });
+    ipcMain.handle(IPC_CHANNELS.refresh, async (_event, payload = null) => {
+        const targetViewId = payload && typeof payload === 'object'
+            ? String(payload.viewId || 'all')
+            : 'all';
+        const refresh = await refreshExports(targetViewId);
+        return {
+            ...createStateSnapshot(),
+            refresh,
+        };
+    });
+    ipcMain.handle(IPC_CHANNELS.openPath, async (_event, targetId) => (
+        openRepoPath(targetId)
+    ));
+}
+
+function unregisterIpc() {
+    if (!ipcRegistered) {
+        return;
+    }
+    for (const channel of [
+        IPC_CHANNELS.getState,
+        IPC_CHANNELS.setView,
+        IPC_CHANNELS.refresh,
+        IPC_CHANNELS.openPath,
+    ]) {
+        ipcMain.removeHandler(channel);
+    }
+    ipcRegistered = false;
+}
+
+function requestRendererView(viewId) {
+    currentViewId = normalizeViewId(viewId);
+    updateWindowTitle();
+    sendRendererEvent(IPC_CHANNELS.viewRequested, { viewId: currentViewId });
+}
+
+function requestRendererRefresh(viewId) {
+    if (!sendRendererEvent(IPC_CHANNELS.refreshRequested, { viewId })) {
+        void refreshExports(viewId);
+    }
 }
 
 function buildApplicationMenu() {
@@ -157,17 +266,17 @@ function buildApplicationMenu() {
                 {
                     label: 'Exporte aktualisieren',
                     accelerator: 'CmdOrCtrl+R',
-                    click: () => { void refreshAllAndReloadCurrent(); },
+                    click: () => requestRendererRefresh('all'),
                 },
                 {
                     label: 'Aktuelle Karte aktualisieren',
                     accelerator: 'F5',
-                    click: () => { void refreshCurrentView(); },
+                    click: () => requestRendererRefresh(currentViewId),
                 },
                 { type: 'separator' },
                 {
                     label: 'Repo-Ordner oeffnen',
-                    click: () => openRepoPath(''),
+                    click: () => { void openRepoPath('repoRoot'); },
                 },
                 { type: 'separator' },
                 { role: 'quit', label: 'Beenden' },
@@ -179,12 +288,12 @@ function buildApplicationMenu() {
                 {
                     label: 'Plan Map',
                     accelerator: 'CmdOrCtrl+1',
-                    click: () => { void loadMapView('plan'); },
+                    click: () => requestRendererView('plan'),
                 },
                 {
                     label: 'Repo Map',
                     accelerator: 'CmdOrCtrl+2',
-                    click: () => { void loadMapView('repo'); },
+                    click: () => requestRendererView('repo'),
                 },
             ],
         },
@@ -204,11 +313,11 @@ function buildApplicationMenu() {
             submenu: [
                 {
                     label: 'Plan Map README',
-                    click: () => openRepoPath(MAP_TOOL_VIEWS.plan.readmePath),
+                    click: () => { void openRepoPath('planReadme'); },
                 },
                 {
                     label: 'Repo Map README',
-                    click: () => openRepoPath(MAP_TOOL_VIEWS.repo.readmePath),
+                    click: () => { void openRepoPath('repoReadme'); },
                 },
             ],
         },
@@ -230,6 +339,7 @@ async function createWindow() {
         title: 'CurviosClash Map Tools',
         show: shouldShowWindow,
         webPreferences: {
+            preload: path.resolve(__dirname, 'preload.cjs'),
             contextIsolation: true,
             nodeIntegration: false,
             backgroundThrottling: false,
@@ -239,17 +349,20 @@ async function createWindow() {
         mainWindow = null;
     });
     Menu.setApplicationMenu(buildApplicationMenu());
-    await loadMapView(currentViewId, { refresh: false });
+    await mainWindow.loadFile(path.resolve(__dirname, 'ui', 'map-tools.html'));
+    updateWindowTitle();
     return mainWindow;
 }
 
 async function startMapTools() {
-    await refreshExports();
+    registerIpc();
     await startServer();
+    await refreshExports();
     await createWindow();
 }
 
 async function shutdownMapTools() {
+    unregisterIpc();
     await stopServer();
 }
 

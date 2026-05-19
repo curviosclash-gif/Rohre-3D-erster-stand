@@ -40,6 +40,7 @@
     "app:start:raw": "npm --prefix electron run start",
     "app:settings:start": "npm --prefix electron run start:settings",
     "app:maps:start": "npm --prefix electron run start:maps",
+    "app:maps:smoke": "node --test tests/map-tools-electron-smoke.test.mjs",
     "app:start:build": "npm run app:start",
     "app:package": "npm run build:app && npm --prefix electron run build",
     "lint:architecture": "eslint src --max-warnings 29",
