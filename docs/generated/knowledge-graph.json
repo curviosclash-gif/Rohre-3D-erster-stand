@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 213,
+          "concreteCount": 215,
           "plannedCount": 0
         }
       }
@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 25,
+          "concreteCount": 26,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1000,7 +1000,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 41,
+          "concreteCount": 42,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1058,7 +1058,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 27,
+          "concreteCount": 28,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -21809,6 +21809,75 @@
       }
     },
     {
+      "id": "runtime:map-tools-android-build",
+      "type": "runtime",
+      "title": "Map Tools Android static bundle build",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 8,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "scripts/build-map-tools-android.mjs",
+        "domain": "map-tools",
+        "tooling": "android-static-bundle",
+        "surface": "android-tool"
+      }
+    },
+    {
+      "id": "runtime:map-tools-android-native-shell",
+      "type": "runtime",
+      "title": "Map Tools Android native shell",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 30,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "android-map-tools/app/src/main/java/de/curviosclash/maps/MainActivity.java",
+        "domain": "map-tools",
+        "tooling": "capacitor-native-shell",
+        "surface": "android-tool"
+      }
+    },
+    {
+      "id": "runtime:map-tools-android-shell",
+      "type": "runtime",
+      "title": "Map Tools Android web shell",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 19,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "tools/map-tools-android/map-tools-android.js",
+        "domain": "map-tools",
+        "tooling": "android-webview-shell",
+        "surface": "android-tool"
+      }
+    },
+    {
       "id": "runtime:map-tools-electron-shell",
       "type": "runtime",
       "title": "Map Tools Electron shell",
@@ -22346,6 +22415,28 @@
       }
     },
     {
+      "id": "state:map-tools-android-static-bundle",
+      "type": "state",
+      "title": "Map Tools Android static web bundle",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 41,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "domain": "map-tools",
+        "path": "dist/map-tools-android",
+        "ephemeral": true
+      }
+    },
+    {
       "id": "state:plan-map-readonly-dataset",
       "type": "state",
       "title": "Read-only Plan Map JSON dataset",
@@ -22564,6 +22655,153 @@
           "round-end"
         ],
         "domain": "settings"
+      }
+    },
+    {
+      "id": "config:map-tools-android-capacitor",
+      "type": "config",
+      "title": "Map Tools Android Capacitor config",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 51,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "capacitor.config.json",
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-docs",
+      "type": "config",
+      "title": "Map Tools Android documentation",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 78,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "tools/map-tools-android/README.md",
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-gradle",
+      "type": "config",
+      "title": "Map Tools Android Gradle config",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 96,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "android-map-tools/app/build.gradle",
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-graph-anchor",
+      "type": "config",
+      "title": "Map Tools Android knowledge graph mapping",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 105,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-html",
+      "type": "config",
+      "title": "Map Tools Android HTML shell",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 60,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "tools/map-tools-android/index.html",
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-manifest",
+      "type": "config",
+      "title": "Map Tools Android manifest",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 87,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "android-map-tools/app/src/main/AndroidManifest.xml",
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-android-style",
+      "type": "config",
+      "title": "Map Tools Android visual layout",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 69,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "tools/map-tools-android/map-tools-android.css",
+        "domain": "map-tools"
       }
     },
     {
@@ -22883,6 +23121,27 @@
         "file": "src/core/settings/SettingsRuntimeLimits.js",
         "criticalPath": "settings",
         "domain": "settings"
+      }
+    },
+    {
+      "id": "test:map-tools-android-contract",
+      "type": "test",
+      "title": "Map Tools Android contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 114,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "file": "tests/map-tools-android.contract.test.mjs",
+        "domain": "map-tools"
       }
     },
     {
@@ -23599,6 +23858,51 @@
           "V123",
           "V125",
           "V93"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "android-map-tools/app/build.gradle",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:map-tools-android-gradle"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "android-map-tools/app/src/main/AndroidManifest.xml",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:map-tools-android-manifest"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "android-map-tools/app/src/main/java/de/curviosclash/maps/MainActivity.java",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "runtime:map-tools-android-native-shell"
         ],
         "exists": true
       }
@@ -25419,6 +25723,21 @@
       }
     },
     {
+      "id": "capacitor.config.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:map-tools-android-capacitor"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "CLAUDE.md",
       "type": "file",
       "title": null,
@@ -25541,6 +25860,27 @@
           "V120"
         ],
         "exists": false
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
+        ],
+        "mappedNodes": [
+          "config:map-tools-android-graph-anchor"
+        ],
+        "exists": true
       }
     },
     {
@@ -31293,6 +31633,25 @@
           "V120",
           "V123",
           "V94"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/build-map-tools-android.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "knowledge-graph-mapping"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "mappedNodes": [
+          "runtime:map-tools-android-build"
         ],
         "exists": true
       }
@@ -44155,6 +44514,25 @@
       }
     },
     {
+      "id": "tests/map-tools-android.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "knowledge-graph-mapping"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "mappedNodes": [
+          "test:map-tools-android-contract"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/map-tools-electron-smoke.test.mjs",
       "type": "file",
       "title": null,
@@ -45570,6 +45948,66 @@
       }
     },
     {
+      "id": "tools/map-tools-android/index.html",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:map-tools-android-html"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/map-tools-android/map-tools-android.css",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:map-tools-android-style"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/map-tools-android/map-tools-android.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "runtime:map-tools-android-shell"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/map-tools-android/README.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:map-tools-android-docs"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tools/plan-map/index.html",
       "type": "file",
       "title": null,
@@ -46028,6 +46466,54 @@
     }
   ],
   "edges": [
+    {
+      "from": "android-map-tools/app/build.gradle",
+      "to": "config:map-tools-android-gradle",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 96,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "android-map-tools/app/src/main/AndroidManifest.xml",
+      "to": "config:map-tools-android-manifest",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 87,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "android-map-tools/app/src/main/java/de/curviosclash/maps/MainActivity.java",
+      "to": "runtime:map-tools-android-native-shell",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 30,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "runtime"
+      }
+    },
     {
       "from": "B01",
       "to": "docs/qa/Spielaudit_2026-04-28/B01_Runtime_Lifecycle_und_Session_Orchestrierung_Findings.md",
@@ -50638,6 +51124,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/build-map-tools-android.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/check-agent-commit-message.mjs",
       "type": "scope",
       "hint": null,
@@ -51592,6 +52087,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/map-tools-android.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/map-tools-electron-smoke.test.mjs",
       "type": "scope",
       "hint": null,
@@ -52284,6 +52788,38 @@
       }
     },
     {
+      "from": "capacitor.config.json",
+      "to": "config:map-tools-android-capacitor",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 51,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "config:map-tools-android-docs",
+      "to": "config:map-tools-android-graph-anchor",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 210,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
       "from": "config:map-tools-docs",
       "to": "config:map-tools-graph-anchor",
       "type": "reads_config",
@@ -52377,6 +52913,22 @@
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
         },
         "relationLayer": "config"
+      }
+    },
+    {
+      "from": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+      "to": "config:map-tools-android-graph-anchor",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 105,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "runtime"
       }
     },
     {
@@ -52658,6 +53210,278 @@
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 334,
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "config:map-tools-android-capacitor",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 125,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "config:map-tools-android-html",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 125,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "config:map-tools-android-style",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 125,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "config:plan-map-viewer-shell",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 130,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "config:repo-map-viewer-shell",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 135,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "state:map-tools-android-static-bundle",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 145,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-build",
+      "to": "test:map-tools-android-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 150,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-native-shell",
+      "to": "config:map-tools-android-capacitor",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 185,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-native-shell",
+      "to": "config:map-tools-android-gradle",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 185,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-native-shell",
+      "to": "config:map-tools-android-manifest",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 185,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-native-shell",
+      "to": "state:map-tools-android-static-bundle",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 195,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-native-shell",
+      "to": "test:map-tools-android-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 200,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "config:map-tools-android-html",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 160,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "config:map-tools-android-style",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 160,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 165,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "state:repo-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 165,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "test:map-tools-android-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 175,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
         },
         "relationLayer": "test"
       }
@@ -53518,6 +54342,22 @@
       }
     },
     {
+      "from": "scripts/build-map-tools-android.mjs",
+      "to": "runtime:map-tools-android-build",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 8,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "scripts/export-plan-map.mjs",
       "to": "runtime:plan-map-export",
       "type": "implements",
@@ -53993,6 +54833,22 @@
       }
     },
     {
+      "from": "tests/map-tools-android.contract.test.mjs",
+      "to": "test:map-tools-android-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 114,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "tests/map-tools-electron-smoke.test.mjs",
       "to": "test:map-tools-electron-smoke",
       "type": "implements",
@@ -54132,6 +54988,70 @@
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 262,
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/map-tools-android/index.html",
+      "to": "config:map-tools-android-html",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 60,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/map-tools-android/map-tools-android.css",
+      "to": "config:map-tools-android-style",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 69,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/map-tools-android/map-tools-android.js",
+      "to": "runtime:map-tools-android-shell",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 19,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/map-tools-android/README.md",
+      "to": "config:map-tools-android-docs",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 78,
+          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
         },
         "relationLayer": "runtime"
       }
@@ -60509,6 +61429,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
       "type": "scope",
       "hint": null,
@@ -61851,6 +62780,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
       "type": "scope",
       "hint": null,
@@ -62421,6 +63359,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/map-tools-android.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {

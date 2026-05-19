@@ -94,6 +94,12 @@ const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
         reason: 'Repository automation scaffolding is tracked separately from product/code coverage.',
     },
     {
+        classification: 'native-wrapper',
+        prefixes: ['android-map-tools/'],
+        excludedFromCoverage: true,
+        reason: 'Generated Capacitor native wrapper files are validated by app-specific contracts.',
+    },
+    {
         classification: 'agent-workflow',
         prefixes: ['.agents/workflows/'],
         excludedFromCoverage: true,

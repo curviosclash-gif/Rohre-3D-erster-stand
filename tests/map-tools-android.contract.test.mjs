@@ -3,7 +3,10 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 
-import { buildKnowledgeGraph } from '../scripts/build-knowledge-graph.mjs';
+import {
+  buildKnowledgeGraph,
+  classifyCoveragePath,
+} from '../scripts/build-knowledge-graph.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 
@@ -70,4 +73,12 @@ test('Map Tools Android is represented in the knowledge graph mapping source', a
   assert.ok(edges.has('runtime:map-tools-android-build->state:map-tools-android-static-bundle:writes_state'));
   assert.ok(edges.has('runtime:map-tools-android-shell->state:plan-map-readonly-dataset:reads_state'));
   assert.ok(edges.has('runtime:map-tools-android-native-shell->test:map-tools-android-contract:validated_by'));
+});
+
+test('Map Tools Android native project is excluded from JS coverage KPI', () => {
+  const coverage = classifyCoveragePath('android-map-tools/app/src/main/res/drawable/splash.png');
+
+  assert.equal(coverage.classification, 'native-wrapper');
+  assert.equal(coverage.excludedFromCoverage, true);
+  assert.match(coverage.excludeReason, /Capacitor native wrapper/);
 });

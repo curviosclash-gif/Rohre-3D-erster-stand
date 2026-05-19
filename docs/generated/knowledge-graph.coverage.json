@@ -106,6 +106,14 @@
       "reason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
+      "classification": "native-wrapper",
+      "prefixes": [
+        "android-map-tools/"
+      ],
+      "excludedFromCoverage": true,
+      "reason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
       "classification": "agent-workflow",
       "prefixes": [
         ".agents/workflows/"
@@ -159,13 +167,13 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1906,
-    "rawCoveredFileCount": 1257,
-    "rawCoveragePercent": 65.9,
-    "adjustedTrackedFileCount": 1392,
-    "adjustedCoveredFileCount": 1047,
-    "adjustedCoveragePercent": 75.2,
-    "uncoveredFileCount": 649,
+    "trackedFileCount": 1968,
+    "rawCoveredFileCount": 1268,
+    "rawCoveragePercent": 64.4,
+    "adjustedTrackedFileCount": 1396,
+    "adjustedCoveredFileCount": 1051,
+    "adjustedCoveragePercent": 75.3,
+    "uncoveredFileCount": 700,
     "uncoveredActiveFileCount": 345,
     "classifications": [
       {
@@ -205,16 +213,22 @@
         "coveredCount": 0
       },
       {
+        "classification": "native-wrapper",
+        "excludedFromCoverage": true,
+        "count": 53,
+        "coveredCount": 3
+      },
+      {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 43,
-        "coveredCount": 26
+        "count": 44,
+        "coveredCount": 27
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 965,
-        "coveredCount": 842
+        "count": 968,
+        "coveredCount": 845
       },
       {
         "classification": "product-docs",
@@ -231,8 +245,8 @@
       {
         "classification": "repo-ops",
         "excludedFromCoverage": true,
-        "count": 24,
-        "coveredCount": 12
+        "count": 29,
+        "coveredCount": 16
       },
       {
         "classification": "temp",
@@ -1129,6 +1143,701 @@
       "classification": "other",
       "excludedFromCoverage": false,
       "excludeReason": null
+    },
+    {
+      "path": "android-map-tools/.gitignore",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/.gitignore",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/build.gradle",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/capacitor.build.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/proguard-rules.pro",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/androidTest/java/de/curviosclash/maps/ExampleInstrumentedTest.java",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/AndroidManifest.xml",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/java/de/curviosclash/maps/MainActivity.java",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-land-hdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-land-mdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-land-xhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-land-xxhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-land-xxxhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-port-hdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-port-mdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-port-xhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-port-xxhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-port-xxxhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable-v24/ic_launcher_foreground.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable/ic_launcher_background.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/drawable/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/layout/activity_main.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/values/ic_launcher_background.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/values/strings.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/values/styles.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/main/res/xml/file_paths.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/app/src/test/java/de/curviosclash/maps/ExampleUnitTest.java",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/build.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/capacitor.settings.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/gradle.properties",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/gradle/wrapper/gradle-wrapper.jar",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/gradle/wrapper/gradle-wrapper.properties",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/gradlew",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/gradlew.bat",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/settings.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-map-tools/variables.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
     },
     {
       "path": "app-shell.css",
@@ -4293,6 +5002,21 @@
       "excludeReason": null
     },
     {
+      "path": "capacitor.config.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "CLAUDE.md",
       "tracked": true,
       "coveredInCore": true,
@@ -4379,6 +5103,26 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -17307,6 +18051,24 @@
         "V120",
         "V123",
         "V94"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/build-map-tools-android.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [
+        "B13"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -30588,6 +31350,19 @@
       "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
+      "path": "start_map_tools.bat",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
       "path": "start_repo_map.bat",
       "tracked": true,
       "coveredInCore": false,
@@ -31447,6 +32222,24 @@
       "covered": true,
       "coverageSources": [
         "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/map-tools-android.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "knowledge-graph-mapping"
       ],
       "scopeBlocks": [
         "B13"
@@ -32837,6 +33630,66 @@
       "classification": "other",
       "excludedFromCoverage": false,
       "excludeReason": null
+    },
+    {
+      "path": "tools/map-tools-android/index.html",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/map-tools-android/map-tools-android.css",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/map-tools-android/map-tools-android.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/map-tools-android/README.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "tools/plan-map/index.html",
