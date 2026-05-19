@@ -808,7 +808,7 @@ h1 {
 
 .detail-tabs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0 0 10px;
   border: 1px solid var(--line-strong);
   border-radius: 6px;
@@ -882,6 +882,75 @@ h1 {
   font-size: 13px;
   line-height: 1.45;
   overflow-wrap: anywhere;
+}
+
+.detail-note + .detail-note {
+  margin-top: 10px;
+}
+
+.detail-note-secondary {
+  padding-top: 10px;
+  border-top: 1px solid #eee9df;
+}
+
+.explain-meter {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.explain-meter span {
+  min-height: 34px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 680;
+}
+
+.explain-list {
+  gap: 9px;
+}
+
+.explain-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 8px;
+}
+
+.explain-item strong {
+  color: var(--teal);
+}
+
+.explain-item span {
+  min-width: 0;
+}
+
+.explain-item small {
+  grid-column: 2;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.section-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.section-pills span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .detail-progress {

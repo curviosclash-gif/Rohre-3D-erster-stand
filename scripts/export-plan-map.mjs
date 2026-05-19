@@ -193,6 +193,164 @@ function parseDodProgress(markdown) {
   };
 }
 
+function stripMarkdown(value) {
+  return cleanCell(String(value || '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/^\s*[-*]\s+/, '')
+    .replace(/\s+/g, ' '));
+}
+
+function truncateText(value, maxLength = 260) {
+  const text = stripMarkdown(value);
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.slice(0, maxLength - 1).trimEnd()}...`;
+}
+
+function sectionBody(markdown, heading) {
+  const section = getSection(String(markdown || ''), heading, /\n##\s+/g);
+  if (!section) {
+    return '';
+  }
+  return section
+    .split(/\r?\n/)
+    .slice(1)
+    .join('\n')
+    .trim();
+}
+
+function compactSectionText(markdown, heading, maxLength = 520) {
+  const body = sectionBody(markdown, heading);
+  if (!body) {
+    return '';
+  }
+
+  const paragraphs = body
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph
+      .split(/\r?\n/)
+      .filter((line) => line.trim() && !line.trim().startsWith('|') && !line.trim().startsWith('```'))
+      .map(stripMarkdown)
+      .filter(Boolean)
+      .join(' '))
+    .filter(Boolean);
+
+  return truncateText(paragraphs.slice(0, 2).join(' '), maxLength);
+}
+
+function sectionListItems(markdown, heading, limit = 6) {
+  const body = sectionBody(markdown, heading);
+  if (!body) {
+    return [];
+  }
+
+  const bulletItems = body
+    .split(/\r?\n/)
+    .map((line) => line.match(/^\s*[-*]\s+(.+)$/)?.[1])
+    .filter(Boolean)
+    .map((item) => truncateText(item, 240))
+    .filter(Boolean);
+
+  if (bulletItems.length > 0) {
+    return bulletItems.slice(0, limit);
+  }
+
+  return compactSectionText(markdown, heading, 360)
+    .split(/(?<=\.)\s+/)
+    .map((item) => truncateText(item, 240))
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+function parseChecklistItems(markdown, prefixPattern = '') {
+  return String(markdown || '')
+    .split(/\r?\n/)
+    .map((line) => {
+      const match = line.match(/^- \[([ xX])\]\s+(.+)$/);
+      if (!match) {
+        return null;
+      }
+
+      const text = stripMarkdown(match[2]);
+      if (prefixPattern && !new RegExp(prefixPattern).test(text)) {
+        return null;
+      }
+
+      const labelMatch = text.match(/^([A-Za-z]*[0-9]+(?:\.[0-9]+)*|DoD(?:\.[0-9]+)?)\s+(.+)$/);
+      const label = labelMatch ? labelMatch[1] : '';
+      const body = labelMatch ? labelMatch[2] : text;
+      const evidenceMatch = body.match(/\((?:abgeschlossen|evidence|Evidence):\s*([^)]+)\)/i);
+      const withoutEvidence = body.replace(/\s*\((?:abgeschlossen|evidence|Evidence):[^)]*\)\s*/gi, ' ').trim();
+
+      return {
+        status: match[1].toLowerCase() === 'x' ? 'done' : 'open',
+        label,
+        text: truncateText(withoutEvidence || body, 260),
+        evidence: evidenceMatch ? truncateText(evidenceMatch[1], 220) : '',
+      };
+    })
+    .filter(Boolean);
+}
+
+function parseDodItems(markdown) {
+  return parseChecklistItems(getSection(String(markdown || ''), '## Definition of Done', /\n##\s+/g), '^DoD');
+}
+
+function parsePhaseChecklistItems(markdown, blockId) {
+  const numericId = String(blockId || '').replace(/^[A-Z]+/, '');
+  return parseChecklistItems(markdown, numericId ? `^${numericId}\\.` : '');
+}
+
+function parsePlanExplanation(markdown, blockId) {
+  const dodItems = parseDodItems(markdown);
+  const phaseItems = parsePhaseChecklistItems(markdown, blockId);
+  const doneDod = dodItems.filter((item) => item.status === 'done');
+  const donePhaseItems = phaseItems.filter((item) => item.status === 'done');
+  const openPhaseItems = phaseItems.filter((item) => item.status === 'open');
+  const openDodItems = dodItems.filter((item) => item.status === 'open');
+  const sourceSections = [
+    ['Kurzfassung', compactSectionText(markdown, '## Kurzfassung')],
+    ['Ziel', sectionListItems(markdown, '## Ziel', 6)],
+    ['Nicht-Ziel', sectionListItems(markdown, '## Nicht-Ziel', 5)],
+    ['Ausgangslage', compactSectionText(markdown, '## Ausgangslage')],
+  ].filter(([, value]) => (Array.isArray(value) ? value.length > 0 : Boolean(value)))
+    .map(([name]) => name);
+
+  return {
+    brief: compactSectionText(markdown, '## Kurzfassung')
+      || compactSectionText(markdown, '## Ziel')
+      || '',
+    goal: sectionListItems(markdown, '## Ziel', 6),
+    nonGoals: sectionListItems(markdown, '## Nicht-Ziel', 5),
+    background: compactSectionText(markdown, '## Ausgangslage')
+      || compactSectionText(markdown, '## Kontext')
+      || '',
+    implementedHighlights: [...doneDod, ...donePhaseItems]
+      .slice(0, 10)
+      .map((item) => ({
+        label: item.label,
+        text: item.text,
+        evidence: item.evidence,
+      })),
+    openNextSteps: [...openPhaseItems, ...openDodItems]
+      .slice(0, 10)
+      .map((item) => ({
+        label: item.label,
+        text: item.text,
+      })),
+    completionCounts: {
+      dodDone: doneDod.length,
+      dodTotal: dodItems.length,
+      phaseDone: donePhaseItems.length,
+      phaseTotal: phaseItems.length,
+    },
+    sourceSections,
+  };
+}
+
 function parsePhases(markdown) {
   const text = String(markdown || '');
   const matches = [...text.matchAll(/^###\s+([0-9]+\.[0-9]+(?:\.[0-9]+)?)\s+(.+)$/gm)];
@@ -250,6 +408,7 @@ async function enrichBlock(rootDir, row) {
     phaseProgress,
     dodProgress,
     phases: planText ? parsePhases(planText) : [],
+    explanation: planText ? parsePlanExplanation(planText, row.id) : null,
     hasPlanFile: Boolean(planText),
   };
 }

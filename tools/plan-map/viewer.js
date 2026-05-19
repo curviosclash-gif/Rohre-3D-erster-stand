@@ -54,6 +54,7 @@ const elements = {
 
 const DETAIL_TABS = [
   { id: 'overview', label: 'Ueberblick' },
+  { id: 'explain', label: 'Erklaerung' },
   { id: 'start', label: 'Start' },
   { id: 'scope', label: 'Scope' },
   { id: 'phases', label: 'Phasen' },
@@ -175,6 +176,7 @@ function blockHasFile(block, filePath) {
 }
 
 function blockMatchesFilters(block) {
+  const explanation = block.explanation || {};
   const haystack = [
     block.id,
     block.title,
@@ -182,6 +184,10 @@ function blockMatchesFilters(block) {
     block.currentPhase,
     block.readiness?.label,
     block.readiness?.reason,
+    explanation.brief,
+    explanation.background,
+    explanation.goal?.join(' '),
+    explanation.implementedHighlights?.map((item) => item.text).join(' '),
     block.scopeFiles?.join(' '),
   ].join(' ').toLowerCase();
 
@@ -680,6 +686,19 @@ function textItems(items, sectionName, limit) {
     : '<li class="muted">keine</li>';
 }
 
+function explanationItems(items, sectionName, limit, emptyText = 'keine') {
+  const visible = limitedItems(sectionName, items || [], limit);
+  return visible.length
+    ? visible.map((item) => `
+      <li class="explain-item">
+        ${item.label ? `<strong>${escapeHtml(item.label)}</strong>` : ''}
+        <span>${escapeHtml(item.text || item)}</span>
+        ${item.evidence ? `<small>${escapeHtml(item.evidence)}</small>` : ''}
+      </li>
+    `).join('')
+    : `<li class="muted">${escapeHtml(emptyText)}</li>`;
+}
+
 function phaseRows(block, sectionName, limit) {
   const phases = block.phases || [];
   const visible = limitedItems(sectionName, phases, limit);
@@ -788,6 +807,11 @@ function renderDetail() {
   const sourceFindings = block.sourceFindings || [];
   const followups = block.relatedFollowupBlocks || [];
   const referenceFiles = block.scopeReferenceFiles || [];
+  const explanation = block.explanation || {};
+  const implemented = explanation.implementedHighlights || [];
+  const openNextSteps = explanation.openNextSteps || [];
+  const sourceSections = explanation.sourceSections || [];
+  const completionCounts = explanation.completionCounts || {};
   let tabContent = '';
 
   if (state.detailTab === 'overview') {
@@ -809,9 +833,57 @@ function renderDetail() {
           <dt>Gruppe</dt><dd>${escapeHtml(block.groupLabel || block.group || '-')}</dd>
         </dl>
       </div>
+      ${explanation.brief ? `
+        <div class="detail-section">
+          <h3>Kurz erklaert</h3>
+          <p class="detail-note">${escapeHtml(explanation.brief)}</p>
+        </div>
+      ` : ''}
       <div class="detail-section">
         <h3>Naechster sinnvoller Blick</h3>
         <p class="detail-note">${escapeHtml(readiness.recommendedText || readiness.reason || 'Keine Empfehlung im Export.')}</p>
+      </div>
+    `;
+  }
+
+  if (state.detailTab === 'explain') {
+    tabContent = `
+      <div class="detail-section">
+        <h3>Worum geht es?</h3>
+        <p class="detail-note">${escapeHtml(explanation.brief || 'Keine Kurzfassung im Plan gefunden.')}</p>
+        ${explanation.background ? `<p class="detail-note detail-note-secondary">${escapeHtml(explanation.background)}</p>` : ''}
+      </div>
+      <div class="detail-section">
+        <h3>Warum wichtig?</h3>
+        <ul class="plain-list explain-list">${textItems(explanation.goal || [], 'explainGoals', 5)}</ul>
+        ${showMoreButton('explainGoals', (explanation.goal || []).length, 5)}
+      </div>
+      <div class="detail-section">
+        <h3>Was wurde umgesetzt?</h3>
+        <div class="explain-meter">
+          <span>${escapeHtml(completionCounts.dodDone ?? 0)} / ${escapeHtml(completionCounts.dodTotal ?? 0)} DoD</span>
+          <span>${escapeHtml(completionCounts.phaseDone ?? 0)} / ${escapeHtml(completionCounts.phaseTotal ?? 0)} Phasenpunkte</span>
+        </div>
+        <ul class="plain-list explain-list">
+          ${explanationItems(implemented, 'implementedHighlights', 5, block.status === 'done' ? 'keine Umsetzungspunkte gelesen' : 'noch nichts als umgesetzt markiert')}
+        </ul>
+        ${showMoreButton('implementedHighlights', implemented.length, 5)}
+      </div>
+      <div class="detail-section">
+        <h3>Noch offen</h3>
+        <ul class="plain-list explain-list">${explanationItems(openNextSteps, 'openNextSteps', 5, 'keine offenen Schritte gelesen')}</ul>
+        ${showMoreButton('openNextSteps', openNextSteps.length, 5)}
+      </div>
+      <div class="detail-section">
+        <h3>Grenzen</h3>
+        <ul class="plain-list explain-list">${textItems(explanation.nonGoals || [], 'nonGoals', 4)}</ul>
+        ${showMoreButton('nonGoals', (explanation.nonGoals || []).length, 4)}
+      </div>
+      <div class="detail-section">
+        <h3>Quellabschnitte</h3>
+        <div class="section-pills">
+          ${sourceSections.length ? sourceSections.map((section) => `<span>${escapeHtml(section)}</span>`).join('') : '<span>keine</span>'}
+        </div>
       </div>
     `;
   }

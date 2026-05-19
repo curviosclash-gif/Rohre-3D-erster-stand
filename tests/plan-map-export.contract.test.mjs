@@ -20,6 +20,11 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.ok(v126.readiness);
   assert.ok(['ready', 'ready-with-risk', 'blocked', 'locked', 'done'].includes(v126.readiness.status));
   assert.ok(v126.impact.scopeFileCount > 0);
+  assert.ok(v126.explanation);
+  assert.ok(typeof v126.explanation.brief === 'string');
+  assert.ok(Array.isArray(v126.explanation.goal));
+  assert.ok(Array.isArray(v126.explanation.implementedHighlights));
+  assert.ok(v126.explanation.completionCounts.phaseTotal > 0);
 
   const v121OpenDependency = data.dependencies.find((edge) => (
     edge.from === 'V121'

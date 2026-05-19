@@ -35,6 +35,7 @@ It does not write plan status, locks, graph files, or governance sources.
 The right panel keeps dense data behind tabs:
 
 - Ueberblick: start signal, progress, collisions, impact, source path.
+- Erklaerung: short narrative, goals, implemented highlights, open next steps, and non-goals.
 - Start: dependency/consumer context and the compact "Warum?" explanation.
 - Scope: impact breakdown, shared files, scope files, and references.
 - Phasen: current phase progress and phase list.
