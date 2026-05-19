@@ -159,13 +159,13 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1892,
-    "rawCoveredFileCount": 1234,
-    "rawCoveragePercent": 65.2,
-    "adjustedTrackedFileCount": 1378,
-    "adjustedCoveredFileCount": 1033,
+    "trackedFileCount": 1893,
+    "rawCoveredFileCount": 1240,
+    "rawCoveragePercent": 65.5,
+    "adjustedTrackedFileCount": 1379,
+    "adjustedCoveredFileCount": 1034,
     "adjustedCoveragePercent": 75,
-    "uncoveredFileCount": 658,
+    "uncoveredFileCount": 653,
     "uncoveredActiveFileCount": 345,
     "classifications": [
       {
@@ -213,8 +213,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 952,
-        "coveredCount": 829
+        "count": 953,
+        "coveredCount": 830
       },
       {
         "classification": "product-docs",
@@ -232,7 +232,7 @@
         "classification": "repo-ops",
         "excludedFromCoverage": true,
         "count": 24,
-        "coveredCount": 3
+        "coveredCount": 8
       },
       {
         "classification": "temp",
@@ -4379,6 +4379,26 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -17614,7 +17634,8 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "knowledge-graph-mapping"
       ],
       "scopeBlocks": [
         "B13"
@@ -30425,10 +30446,12 @@
     {
       "path": "start-plan-map.ps1",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",
@@ -31654,7 +31677,8 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "knowledge-graph-mapping"
       ],
       "scopeBlocks": [
         "B13"
@@ -32567,10 +32591,12 @@
     {
       "path": "tools/plan-map/index.html",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",
@@ -32580,10 +32606,12 @@
     {
       "path": "tools/plan-map/README.md",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",
@@ -32593,10 +32621,12 @@
     {
       "path": "tools/plan-map/viewer.css",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",
@@ -32606,10 +32636,12 @@
     {
       "path": "tools/plan-map/viewer.js",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",

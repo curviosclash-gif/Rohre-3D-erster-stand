@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 23,
+          "concreteCount": 24,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1000,7 +1000,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 39,
+          "concreteCount": 40,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1058,7 +1058,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 25,
+          "concreteCount": 26,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -21844,6 +21844,72 @@
       }
     },
     {
+      "id": "runtime:plan-map-export",
+      "type": "runtime",
+      "title": "Plan Map export",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 8,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
+        "file": "scripts/export-plan-map.mjs",
+        "domain": "plan-map",
+        "tooling": "read-only-plan-dashboard"
+      }
+    },
+    {
+      "id": "runtime:plan-map-launcher",
+      "type": "runtime",
+      "title": "Plan Map launcher",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 28,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
+        "file": "start-plan-map.ps1",
+        "domain": "plan-map",
+        "tooling": "local-startup"
+      }
+    },
+    {
+      "id": "runtime:plan-map-viewer",
+      "type": "runtime",
+      "title": "Plan Map viewer",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 18,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
+        "file": "tools/plan-map/viewer.js",
+        "domain": "plan-map",
+        "tooling": "read-only-plan-dashboard"
+      }
+    },
+    {
       "id": "runtime:projectile-hit-resolver",
       "type": "runtime",
       "title": "ProjectileHitResolver",
@@ -22125,6 +22191,28 @@
       }
     },
     {
+      "id": "state:plan-map-readonly-dataset",
+      "type": "state",
+      "title": "Read-only Plan Map JSON dataset",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 38,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
+        "domain": "plan-map",
+        "path": "tmp/plan-map/plan-map.json",
+        "ephemeral": true
+      }
+    },
+    {
       "id": "state:round-end-overlay",
       "type": "state",
       "title": "Round end UI overlay state",
@@ -22302,6 +22390,90 @@
       }
     },
     {
+      "id": "config:plan-map-docs",
+      "type": "config",
+      "title": "Plan Map documentation",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 66,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
+        "file": "tools/plan-map/README.md",
+        "domain": "plan-map"
+      }
+    },
+    {
+      "id": "config:plan-map-graph-anchor",
+      "type": "config",
+      "title": "Plan Map knowledge graph mapping",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 75,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
+        "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "domain": "plan-map"
+      }
+    },
+    {
+      "id": "config:plan-map-viewer-shell",
+      "type": "config",
+      "title": "Plan Map HTML shell",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 48,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
+        "file": "tools/plan-map/index.html",
+        "domain": "plan-map"
+      }
+    },
+    {
+      "id": "config:plan-map-viewer-style",
+      "type": "config",
+      "title": "Plan Map visual layout",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 57,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
+        "file": "tools/plan-map/viewer.css",
+        "domain": "plan-map"
+      }
+    },
+    {
       "id": "config:runtime-config-builder",
       "type": "config",
       "title": "Runtime config snapshot builder",
@@ -22431,6 +22603,27 @@
         "file": "tests/physics-hunt.spec.js",
         "criticalPath": "combat-hit",
         "testLayer": "desktop-e2e"
+      }
+    },
+    {
+      "id": "test:plan-map-export-contract",
+      "type": "test",
+      "title": "Plan Map export contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 84,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
+        "file": "tests/plan-map-export.contract.test.mjs",
+        "domain": "plan-map"
       }
     },
     {
@@ -24961,6 +25154,27 @@
           "V120"
         ],
         "exists": false
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
+        ],
+        "mappedNodes": [
+          "config:plan-map-graph-anchor"
+        ],
+        "exists": true
       }
     },
     {
@@ -31002,10 +31216,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "knowledge-graph-mapping"
         ],
         "scopeBlocks": [
           "B13"
+        ],
+        "mappedNodes": [
+          "runtime:plan-map-export"
         ],
         "exists": true
       }
@@ -42461,6 +42679,21 @@
       }
     },
     {
+      "id": "start-plan-map.ps1",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "runtime:plan-map-launcher"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "style.css",
       "type": "file",
       "title": null,
@@ -43707,10 +43940,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "knowledge-graph-mapping"
         ],
         "scopeBlocks": [
           "B13"
+        ],
+        "mappedNodes": [
+          "test:plan-map-export-contract"
         ],
         "exists": true
       }
@@ -44680,6 +44917,66 @@
           "V111"
         ],
         "exists": false
+      }
+    },
+    {
+      "id": "tools/plan-map/index.html",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:plan-map-viewer-shell"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/plan-map/README.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:plan-map-docs"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/plan-map/viewer.css",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:plan-map-viewer-style"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/plan-map/viewer.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "runtime:plan-map-viewer"
+        ],
+        "exists": true
       }
     },
     {
@@ -51250,6 +51547,22 @@
       }
     },
     {
+      "from": "config:plan-map-docs",
+      "to": "config:plan-map-graph-anchor",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 140,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
       "from": "config:runtime-config-builder",
       "to": "config:base-game-config",
       "type": "reads_config",
@@ -51311,6 +51624,22 @@
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
         },
         "relationLayer": "config"
+      }
+    },
+    {
+      "from": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+      "to": "config:plan-map-graph-anchor",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 75,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "runtime"
       }
     },
     {
@@ -51482,6 +51811,150 @@
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
         },
         "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:plan-map-export",
+      "to": "config:plan-map-graph-anchor",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 100,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:plan-map-export",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 95,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:plan-map-export",
+      "to": "test:plan-map-export-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 95,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:plan-map-launcher",
+      "to": "config:plan-map-viewer-shell",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 130,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:plan-map-launcher",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 130,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:plan-map-viewer",
+      "to": "config:plan-map-docs",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 115,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:plan-map-viewer",
+      "to": "config:plan-map-viewer-shell",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 110,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:plan-map-viewer",
+      "to": "config:plan-map-viewer-style",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 110,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:plan-map-viewer",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 110,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "state"
       }
     },
     {
@@ -51825,6 +52298,22 @@
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
         },
         "relationLayer": "test"
+      }
+    },
+    {
+      "from": "scripts/export-plan-map.mjs",
+      "to": "runtime:plan-map-export",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 8,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "runtime"
       }
     },
     {
@@ -52255,6 +52744,22 @@
       }
     },
     {
+      "from": "start-plan-map.ps1",
+      "to": "runtime:plan-map-launcher",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 28,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "tests/physics-core.spec.js",
       "to": "test:physics-core-spawn",
       "type": "implements",
@@ -52282,6 +52787,22 @@
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 232,
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tests/plan-map-export.contract.test.mjs",
+      "to": "test:plan-map-export-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 84,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
         },
         "relationLayer": "runtime"
       }
@@ -52330,6 +52851,70 @@
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 262,
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/plan-map/index.html",
+      "to": "config:plan-map-viewer-shell",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 48,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/plan-map/README.md",
+      "to": "config:plan-map-docs",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 66,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/plan-map/viewer.css",
+      "to": "config:plan-map-viewer-style",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 57,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/plan-map/viewer.js",
+      "to": "runtime:plan-map-viewer",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "plan-map-tooling",
+        "mappingFile": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+          "line": 18,
+          "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
         },
         "relationLayer": "runtime"
       }
@@ -58570,6 +59155,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/predicate-constraints.v1.json",
       "type": "scope",
       "hint": null,
@@ -59894,6 +60488,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/predicate-constraints.v1.json",
       "type": "scope",
       "hint": null,
@@ -60446,6 +61049,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {
