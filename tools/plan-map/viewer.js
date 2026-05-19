@@ -61,6 +61,11 @@ const DETAIL_TABS = [
   { id: 'risks', label: 'Risiken' },
 ];
 
+const MAP_NODE_HEIGHT = 62;
+const MAP_NODE_GAP = 76;
+const MAP_TOP_PADDING = 72;
+const MAP_BOTTOM_PADDING = 96;
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -371,11 +376,37 @@ function renderBlockList() {
 }
 
 function measureSvg() {
+  const containerRect = elements.planSvg.parentElement?.getBoundingClientRect();
   const rect = elements.planSvg.getBoundingClientRect();
   return {
-    width: Math.max(rect.width || 960, 760),
-    height: Math.max(rect.height || 640, 620),
+    width: Math.max(containerRect?.width || rect.width || 960, 760),
+    height: Math.max(containerRect?.height || rect.height || 640, 520),
   };
+}
+
+function mapColumnKey(block) {
+  if (block.status === 'done') {
+    return 'done';
+  }
+  return block.priority === 'P1' ? 'planned-p1' : 'planned-p2';
+}
+
+function requiredMapHeight(blocks, viewportHeight) {
+  const groupCounts = new Map([
+    ['done', 0],
+    ['planned-p1', 0],
+    ['planned-p2', 0],
+  ]);
+  for (const block of blocks) {
+    groupCounts.set(mapColumnKey(block), (groupCounts.get(mapColumnKey(block)) || 0) + 1);
+  }
+
+  const maxColumnCount = Math.max(1, ...groupCounts.values());
+  const contentHeight = MAP_TOP_PADDING
+    + ((maxColumnCount - 1) * MAP_NODE_GAP)
+    + MAP_NODE_HEIGHT
+    + MAP_BOTTOM_PADDING;
+  return Math.max(viewportHeight, contentHeight);
 }
 
 function computeLayout(blocks, width, height) {
@@ -387,23 +418,17 @@ function computeLayout(blocks, width, height) {
 
   const groups = new Map(columns.map((column) => [column.key, []]));
   for (const block of blocks) {
-    if (block.status === 'done') {
-      groups.get('done').push(block);
-    } else if (block.priority === 'P1') {
-      groups.get('planned-p1').push(block);
-    } else {
-      groups.get('planned-p2').push(block);
-    }
+    groups.get(mapColumnKey(block)).push(block);
   }
 
   const positions = new Map();
   for (const column of columns) {
     const groupBlocks = groups.get(column.key).sort((left, right) => blockSortValue(left) - blockSortValue(right));
-    const gap = Math.max(76, (height - 120) / Math.max(groupBlocks.length, 1));
+    const gap = Math.max(MAP_NODE_GAP, (height - MAP_TOP_PADDING - MAP_BOTTOM_PADDING) / Math.max(groupBlocks.length, 1));
     groupBlocks.forEach((block, index) => {
       positions.set(block.id, {
         x: column.x,
-        y: 72 + index * gap,
+        y: MAP_TOP_PADDING + index * gap,
       });
     });
   }
@@ -423,7 +448,9 @@ function statusClass(block) {
 
 function renderMap() {
   const blocks = visibleBlocks();
-  const { width, height } = measureSvg();
+  const viewport = measureSvg();
+  const width = viewport.width;
+  const height = requiredMapHeight(blocks, viewport.height);
   const positions = computeLayout(blocks, width, height);
   const visibleIds = new Set(blocks.map((block) => block.id));
   const selected = selectedBlock();
@@ -445,6 +472,7 @@ function renderMap() {
   }
 
   elements.planSvg.innerHTML = '';
+  elements.planSvg.style.height = `${height}px`;
   elements.planSvg.setAttribute('viewBox', `0 0 ${width} ${height}`);
 
   const defs = svgElement('defs');

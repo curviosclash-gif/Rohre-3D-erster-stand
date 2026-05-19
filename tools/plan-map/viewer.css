@@ -29,6 +29,7 @@ body {
   margin: 0;
   min-width: 980px;
   min-height: 100vh;
+  overflow: hidden;
   background: var(--bg);
   color: var(--ink);
 }
@@ -40,6 +41,7 @@ select {
 }
 
 .app-shell {
+  height: 100vh;
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto auto auto minmax(0, 1fr);
