@@ -785,3 +785,8 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `SettingsManager` reicht den injizierten Storage-Pfad jetzt auch an Preset-, Draft-, Text-Override- und Menu-Telemetry-Stores weiter; Sidecar-Persistenz nutzt damit dieselbe Plattformgrenze wie `SettingsStore`.
 - Runtime-Services nutzen einen zentralen Changed-Key-Helfer; der Runtime-Orchestrator filtert bekannte Keys frueh und faellt bei unbekannten Keys bewusst auf `syncAll` zurueck.
 - Die Diagnostics-API ist als explizite Manager-Fassade verdrahtet statt Methoden nachtraeglich an die Instanz zu haengen.
+
+## Bugfix-Notiz 2026-05-19 (Map Tools Electron Viewer-Hoehe)
+
+- Ursache: Der Electron-Shell-Viewer wurde bei verborgenem Fehlerpanel automatisch in die `auto`-Grid-Zeile einsortiert; dadurch fiel das iframe auf seine Default-Hoehe zurueck und liess unter der Repo Map eine grosse dunkle Flaeche.
+- Fixpfad: `electron/map-tools/ui/map-tools.css` bindet Header, Status, Fehlerpanel und Viewer per Grid-Areas an feste Zeilen, waehrend der Viewer die `minmax(0, 1fr)`-Zeile fuellt. Der Electron-Smoke prueft die Viewer-Hoehe fuer Plan Map und Repo Map.

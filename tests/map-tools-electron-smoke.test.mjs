@@ -33,6 +33,16 @@ test('map tools Electron shell loads Plan Map and switches to Repo Map', async (
     activeLabel: document.querySelector('#activeViewLabel')?.textContent,
     frameSrc: document.querySelector('#mapFrame')?.getAttribute('src'),
     errorVisible: !document.querySelector('#errorPanel')?.hidden,
+    layout: (() => {
+      const shell = document.querySelector('[data-testid="map-tools-shell"]')?.getBoundingClientRect();
+      const stage = document.querySelector('.viewer-stage')?.getBoundingClientRect();
+      const frame = document.querySelector('#mapFrame')?.getBoundingClientRect();
+      return {
+        shellHeight: shell?.height || 0,
+        stageHeight: stage?.height || 0,
+        frameHeight: frame?.height || 0,
+      };
+    })(),
   }));
 
   assert.equal(initialState.hasApi, true);
@@ -40,6 +50,14 @@ test('map tools Electron shell loads Plan Map and switches to Repo Map', async (
   assert.equal(initialState.activeLabel, 'Plan Map');
   assert.match(initialState.frameSrc || '', /\/tools\/plan-map\/index\.html/);
   assert.equal(initialState.errorVisible, false);
+  assert.ok(
+    initialState.layout.stageHeight > 500,
+    `viewer stage collapsed: ${JSON.stringify(initialState.layout)}`,
+  );
+  assert.ok(
+    Math.abs(initialState.layout.stageHeight - initialState.layout.frameHeight) <= 2,
+    `iframe does not fill viewer stage: ${JSON.stringify(initialState.layout)}`,
+  );
 
   await page.locator('[data-view-id="repo"]').click();
   await page.waitForFunction(() => (
@@ -51,9 +69,25 @@ test('map tools Electron shell loads Plan Map and switches to Repo Map', async (
     activeLabel: document.querySelector('#activeViewLabel')?.textContent,
     frameSrc: document.querySelector('#mapFrame')?.getAttribute('src'),
     status: document.querySelector('#refreshStatus')?.textContent,
+    layout: (() => {
+      const stage = document.querySelector('.viewer-stage')?.getBoundingClientRect();
+      const frame = document.querySelector('#mapFrame')?.getBoundingClientRect();
+      return {
+        stageHeight: stage?.height || 0,
+        frameHeight: frame?.height || 0,
+      };
+    })(),
   }));
 
   assert.equal(repoState.activeLabel, 'Repo Map');
   assert.match(repoState.frameSrc || '', /\/tools\/repo-map\/index\.html/);
   assert.ok(String(repoState.status || '').length > 0);
+  assert.ok(
+    repoState.layout.stageHeight > 500,
+    `repo viewer stage collapsed: ${JSON.stringify(repoState.layout)}`,
+  );
+  assert.ok(
+    Math.abs(repoState.layout.stageHeight - repoState.layout.frameHeight) <= 2,
+    `repo iframe does not fill viewer stage: ${JSON.stringify(repoState.layout)}`,
+  );
 });
