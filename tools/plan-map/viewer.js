@@ -14,11 +14,28 @@ const state = {
   readiness: 'all',
   focusMode: true,
   fileFocus: '',
+  detailTab: 'overview',
+  expandedSections: new Set(),
+  overlays: {
+    dependencies: true,
+    collisions: true,
+    impact: true,
+    progress: true,
+  },
+  whyOpen: false,
+  lastSelectedId: null,
 };
 
 const elements = {
   sourceMeta: document.querySelector('#sourceMeta'),
   fileInput: document.querySelector('#fileInput'),
+  legendToggle: document.querySelector('#legendToggle'),
+  legendPanel: document.querySelector('#legendPanel'),
+  legendSources: document.querySelector('#legendSources'),
+  showDependencies: document.querySelector('#showDependencies'),
+  showCollisions: document.querySelector('#showCollisions'),
+  showImpact: document.querySelector('#showImpact'),
+  showProgress: document.querySelector('#showProgress'),
   searchInput: document.querySelector('#searchInput'),
   statusFilter: document.querySelector('#statusFilter'),
   priorityFilter: document.querySelector('#priorityFilter'),
@@ -32,7 +49,16 @@ const elements = {
   detailPanel: document.querySelector('#detailPanel'),
   collisionsTable: document.querySelector('#collisionsTable'),
   healthPanel: document.querySelector('#healthPanel'),
+  sourcesFootnote: document.querySelector('#sourcesFootnote'),
 };
+
+const DETAIL_TABS = [
+  { id: 'overview', label: 'Ueberblick' },
+  { id: 'start', label: 'Start' },
+  { id: 'scope', label: 'Scope' },
+  { id: 'phases', label: 'Phasen' },
+  { id: 'risks', label: 'Risiken' },
+];
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -41,6 +67,67 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function sourceLabel(key) {
+  const labels = {
+    masterPlan: 'Master',
+    changelog: 'Changelog',
+    openFindings: 'Findings',
+    knowledgeGraph: 'Graph',
+    knowledgeGraphCoverage: 'Coverage',
+    knowledgeGraphScorecard: 'Scorecard',
+    lockRegistry: 'Locks',
+  };
+  return labels[key] || key;
+}
+
+function sourceEntries() {
+  return Object.entries(state.data?.sources || {}).filter(([, value]) => value);
+}
+
+function renderSources() {
+  const entries = sourceEntries();
+  const items = entries.map(([key, value]) => `
+    <li><strong>${escapeHtml(sourceLabel(key))}</strong><span>${escapeHtml(value)}</span></li>
+  `).join('');
+
+  elements.legendSources.innerHTML = items || '<li><span>Export noch nicht geladen</span></li>';
+  elements.sourcesFootnote.innerHTML = entries.length
+    ? `Quellen: ${entries.map(([key, value]) => `${sourceLabel(key)}=${value}`).map(escapeHtml).join(' | ')}`
+    : '';
+}
+
+function selectBlock(blockId) {
+  if (state.selectedId !== blockId) {
+    state.selectedId = blockId;
+    state.whyOpen = false;
+  }
+  render();
+}
+
+function sectionKey(name) {
+  return `${state.selectedId || 'none'}:${state.detailTab}:${name}`;
+}
+
+function sectionExpanded(name) {
+  return state.expandedSections.has(sectionKey(name));
+}
+
+function limitedItems(name, items, limit) {
+  return sectionExpanded(name) ? items : items.slice(0, limit);
+}
+
+function showMoreButton(name, total, limit) {
+  if (total <= limit) {
+    return '';
+  }
+  const expanded = sectionExpanded(name);
+  return `
+    <button type="button" class="show-more" data-toggle-section="${escapeHtml(name)}">
+      ${expanded ? 'Weniger anzeigen' : `Mehr anzeigen (${escapeHtml(total - limit)})`}
+    </button>
+  `;
 }
 
 function svgElement(name, attrs = {}) {
@@ -241,9 +328,8 @@ function renderDecisionBar() {
 
   elements.decisionBar.querySelectorAll('[data-select-block]').forEach((button) => {
     button.addEventListener('click', () => {
-      state.selectedId = button.dataset.selectBlock;
       state.view = 'map';
-      render();
+      selectBlock(button.dataset.selectBlock);
     });
   });
   elements.decisionBar.querySelector('[data-clear-file]')?.addEventListener('click', () => {
@@ -273,8 +359,7 @@ function renderBlockList() {
 
   elements.blockList.querySelectorAll('[data-block-id]').forEach((button) => {
     button.addEventListener('click', () => {
-      state.selectedId = button.dataset.blockId;
-      render();
+      selectBlock(button.dataset.blockId);
     });
   });
 }
@@ -371,26 +456,54 @@ function renderMap() {
   elements.planSvg.appendChild(defs);
 
   const edgeLayer = svgElement('g');
-  for (const edge of state.data?.dependencies || []) {
-    if (!visibleIds.has(edge.from) || !visibleIds.has(edge.to)) {
-      continue;
+  if (state.overlays.dependencies) {
+    for (const edge of state.data?.dependencies || []) {
+      if (!visibleIds.has(edge.from) || !visibleIds.has(edge.to)) {
+        continue;
+      }
+      const from = positions.get(edge.to);
+      const to = positions.get(edge.from);
+      if (!from || !to) {
+        continue;
+      }
+      const path = svgElement('path', {
+        class: `edge${edge.fulfilled === false ? ' is-open' : ''}${edge.kind === 'soft' ? ' is-soft' : ''}`,
+        d: `M ${from.x + 72} ${from.y} C ${(from.x + to.x) / 2} ${from.y}, ${(from.x + to.x) / 2} ${to.y}, ${to.x - 72} ${to.y}`,
+        'marker-end': 'url(#arrow)',
+      });
+      const title = svgElement('title');
+      title.textContent = edgeTooltipText(edge);
+      path.appendChild(title);
+      path.addEventListener('mousemove', (event) => showEdgeTooltip(edge, event));
+      path.addEventListener('mouseleave', hideEdgeTooltip);
+      edgeLayer.appendChild(path);
     }
-    const from = positions.get(edge.to);
-    const to = positions.get(edge.from);
-    if (!from || !to) {
-      continue;
+  }
+
+  if (state.overlays.collisions) {
+    for (const collision of state.data?.scopeCollisions || []) {
+      if (!visibleIds.has(collision.leftBlock) || !visibleIds.has(collision.rightBlock)) {
+        continue;
+      }
+      if (state.focusMode && selected && collision.leftBlock !== selected.id && collision.rightBlock !== selected.id) {
+        continue;
+      }
+      const left = positions.get(collision.leftBlock);
+      const right = positions.get(collision.rightBlock);
+      if (!left || !right) {
+        continue;
+      }
+      const path = svgElement('path', {
+        class: 'collision-edge',
+        d: `M ${left.x} ${left.y + 30} C ${(left.x + right.x) / 2} ${left.y + 64}, ${(left.x + right.x) / 2} ${right.y + 64}, ${right.x} ${right.y + 30}`,
+      });
+      const title = svgElement('title');
+      title.textContent = collisionTooltipText(collision);
+      path.appendChild(title);
+      path.addEventListener('mousemove', (event) => showCollisionTooltip(collision, event));
+      path.addEventListener('mouseleave', hideEdgeTooltip);
+      edgeLayer.appendChild(path);
     }
-    const path = svgElement('path', {
-      class: `edge${edge.fulfilled === false ? ' is-open' : ''}${edge.kind === 'soft' ? ' is-soft' : ''}`,
-      d: `M ${from.x + 72} ${from.y} C ${(from.x + to.x) / 2} ${from.y}, ${(from.x + to.x) / 2} ${to.y}, ${to.x - 72} ${to.y}`,
-      'marker-end': 'url(#arrow)',
-    });
-    const title = svgElement('title');
-    title.textContent = edgeTooltipText(edge);
-    path.appendChild(title);
-    path.addEventListener('mousemove', (event) => showEdgeTooltip(edge, event));
-    path.addEventListener('mouseleave', hideEdgeTooltip);
-    edgeLayer.appendChild(path);
   }
   elements.planSvg.appendChild(edgeLayer);
 
@@ -408,9 +521,29 @@ function renderMap() {
     });
     group.dataset.blockId = block.id;
 
-    group.appendChild(svgElement('rect', { class: 'node-card', width: '148', height: '62' }));
+    group.appendChild(svgElement('rect', {
+      class: `node-card${state.overlays.impact ? ` impact-${block.impact?.level || 'low'}` : ''}`,
+      width: '148',
+      height: '62',
+    }));
+    if (state.overlays.impact) {
+      group.appendChild(svgElement('rect', {
+        class: `node-impact impact-${block.impact?.level || 'low'}`,
+        x: '0',
+        y: '0',
+        width: '5',
+        height: '62',
+        rx: '3',
+      }));
+    }
     group.appendChild(svgElement('circle', { class: statusClass(block), cx: '126', cy: '16', r: '5' }));
     group.appendChild(svgElement('circle', { class: `readiness-dot readiness-${block.readiness?.status || 'unknown'}`, cx: '136', cy: '16', r: '4' }));
+    if (state.overlays.collisions && block.readiness?.collisionCount > 0) {
+      group.appendChild(svgElement('circle', { class: 'node-collision-badge', cx: '128', cy: '43', r: '9' }));
+      const collisionText = svgElement('text', { class: 'node-collision-text', x: '128', y: '47' });
+      collisionText.textContent = String(Math.min(block.readiness.collisionCount, 9));
+      group.appendChild(collisionText);
+    }
 
     const idText = svgElement('text', { class: 'node-id', x: '12', y: '20' });
     idText.textContent = block.id;
@@ -420,25 +553,25 @@ function renderMap() {
     titleText.textContent = String(block.title || '').slice(0, 22);
     group.appendChild(titleText);
 
-    group.appendChild(svgElement('rect', { class: 'node-progress-bg', x: '12', y: '50', width: '124', height: '5', rx: '3' }));
-    group.appendChild(svgElement('rect', {
-      class: 'node-progress',
-      x: '12',
-      y: '50',
-      width: String(Math.max(0, Math.min(124, (block.phaseProgress?.percent || 0) * 1.24))),
-      height: '5',
-      rx: '3',
-    }));
+    if (state.overlays.progress) {
+      group.appendChild(svgElement('rect', { class: 'node-progress-bg', x: '12', y: '50', width: '124', height: '5', rx: '3' }));
+      group.appendChild(svgElement('rect', {
+        class: 'node-progress',
+        x: '12',
+        y: '50',
+        width: String(Math.max(0, Math.min(124, (block.phaseProgress?.percent || 0) * 1.24))),
+        height: '5',
+        rx: '3',
+      }));
+    }
 
     group.addEventListener('click', () => {
-      state.selectedId = block.id;
-      render();
+      selectBlock(block.id);
     });
     group.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        state.selectedId = block.id;
-        render();
+        selectBlock(block.id);
       }
     });
 
@@ -450,6 +583,11 @@ function renderMap() {
 function edgeTooltipText(edge) {
   const status = edge.fulfilled === false ? 'offen' : edge.fulfilled === true ? 'erfuellt' : 'unbekannt';
   return `${edge.from} braucht ${edge.to}${edge.phase ? ` (${edge.phase})` : ''}\n${edge.kind}, ${status}${edge.hint ? `\n${edge.hint}` : ''}`;
+}
+
+function collisionTooltipText(collision) {
+  const files = (collision.sharedFiles || []).slice(0, 3).join(', ');
+  return `${collision.leftBlock} <-> ${collision.rightBlock}\n${collision.sharedFileCount} gemeinsame Datei(en)${files ? `\n${files}` : ''}`;
 }
 
 function showEdgeTooltip(edge, event) {
@@ -465,6 +603,18 @@ function showEdgeTooltip(edge, event) {
   elements.edgeTooltip.style.top = `${event.clientY - rect.top + 14}px`;
 }
 
+function showCollisionTooltip(collision, event) {
+  elements.edgeTooltip.hidden = false;
+  elements.edgeTooltip.innerHTML = `
+    <strong>${escapeHtml(collision.leftBlock)} &lt;-&gt; ${escapeHtml(collision.rightBlock)}</strong>
+    <span>${escapeHtml(collision.sharedFileCount)} gemeinsame Datei(en)</span>
+    ${(collision.sharedFiles || []).slice(0, 3).map((file) => `<span>${escapeHtml(file)}</span>`).join('')}
+  `;
+  const rect = elements.planSvg.getBoundingClientRect();
+  elements.edgeTooltip.style.left = `${event.clientX - rect.left + 14}px`;
+  elements.edgeTooltip.style.top = `${event.clientY - rect.top + 14}px`;
+}
+
 function hideEdgeTooltip() {
   elements.edgeTooltip.hidden = true;
 }
@@ -472,6 +622,99 @@ function hideEdgeTooltip() {
 function formatDependency(edge) {
   const status = edge.fulfilled === false ? 'offen' : edge.fulfilled === true ? 'erfuellt' : 'unbekannt';
   return `${edge.to}${edge.phase ? ` (${edge.phase})` : ''} - ${edge.kind}, ${status}`;
+}
+
+function progressWidth(progress) {
+  return Math.max(0, Math.min(100, Number(progress?.percent) || 0));
+}
+
+function detailTabsMarkup() {
+  return `
+    <div class="detail-tabs" role="tablist" aria-label="Detailbereiche">
+      ${DETAIL_TABS.map((tab) => `
+        <button
+          type="button"
+          class="detail-tab${state.detailTab === tab.id ? ' is-active' : ''}"
+          data-detail-tab="${escapeHtml(tab.id)}"
+          role="tab"
+          aria-selected="${state.detailTab === tab.id ? 'true' : 'false'}"
+        >${escapeHtml(tab.label)}</button>
+      `).join('')}
+    </div>
+  `;
+}
+
+function dependencyItems(edges) {
+  return edges.length
+    ? edges.map((edge) => `<li>${escapeHtml(formatDependency(edge))}</li>`).join('')
+    : '<li class="muted">keine</li>';
+}
+
+function consumerItems(edges, blockId) {
+  return edges.length
+    ? edges.map((edge) => `<li><button type="button" class="text-button" data-select-block="${escapeHtml(edge.from)}">${escapeHtml(edge.from)}</button> braucht ${escapeHtml(edge.phase || blockId)}</li>`).join('')
+    : '<li class="muted">keine</li>';
+}
+
+function collisionItems(blockId, collisions, sectionName, limit) {
+  const visible = limitedItems(sectionName, collisions, limit);
+  return visible.length
+    ? visible.map((collision) => {
+      const other = collision.leftBlock === blockId ? collision.rightBlock : collision.leftBlock;
+      return `<li><button type="button" class="text-button" data-select-block="${escapeHtml(other)}">${escapeHtml(other)}</button> - ${escapeHtml(collision.sharedFileCount)} Datei(en): ${collision.sharedFiles.slice(0, 3).map(fileButton).join(' ')}</li>`;
+    }).join('')
+    : '<li class="muted">keine</li>';
+}
+
+function fileItems(files, sectionName, limit) {
+  const visible = limitedItems(sectionName, files || [], limit);
+  return visible.length
+    ? visible.map((file) => `<li>${fileButton(file)}</li>`).join('')
+    : '<li class="muted">keine</li>';
+}
+
+function textItems(items, sectionName, limit) {
+  const visible = limitedItems(sectionName, items || [], limit);
+  return visible.length
+    ? visible.map((item) => `<li>${escapeHtml(item)}</li>`).join('')
+    : '<li class="muted">keine</li>';
+}
+
+function phaseRows(block, sectionName, limit) {
+  const phases = block.phases || [];
+  const visible = limitedItems(sectionName, phases, limit);
+  return visible.length
+    ? visible.map((phase) => `
+      <div class="phase-row">
+        <strong>${escapeHtml(phase.id)}</strong>
+        <span>${escapeHtml(phase.title)}</span>
+        <span class="muted">${escapeHtml(phase.progress?.done ?? 0)} / ${escapeHtml(phase.progress?.total ?? 0)}</span>
+      </div>
+    `).join('')
+    : '<p class="muted">keine Phasen gelesen</p>';
+}
+
+function riskHints(block, readiness, impact, collisions) {
+  const hints = [];
+  if ((readiness.openHardDependencyCount || 0) > 0) {
+    hints.push(`${readiness.openHardDependencyCount} harte Dependency noch offen.`);
+  }
+  if ((readiness.openSoftDependencyCount || 0) + (readiness.openUnknownDependencyCount || 0) > 0) {
+    hints.push('Soft-Gates oder unklare Dependencies vor Start pruefen.');
+  }
+  if (collisions.length > 0) {
+    hints.push(`${collisions.length} Scope-Kollision(en) mit anderen Bloecken.`);
+  }
+  if ((impact.governanceFileCount || 0) > 0) {
+    hints.push(`${impact.governanceFileCount} Governance-nahe Datei(en) im Scope.`);
+  }
+  if ((impact.packageFileCount || 0) > 0) {
+    hints.push(`${impact.packageFileCount} Package-/Lockfile-nahe Datei(en) im Scope.`);
+  }
+  if ((block.blockedBy || []).length > 0) {
+    hints.push(`Blocked-by: ${(block.blockedBy || []).join(', ')}`);
+  }
+  return hints;
 }
 
 function collisionsForBlock(blockId) {
@@ -487,9 +730,8 @@ function fileButton(filePath) {
 function bindInlineActions(root) {
   root.querySelectorAll('[data-select-block]').forEach((button) => {
     button.addEventListener('click', () => {
-      state.selectedId = button.dataset.selectBlock;
       state.view = 'map';
-      render();
+      selectBlock(button.dataset.selectBlock);
     });
   });
   root.querySelectorAll('[data-file-focus]').forEach((button) => {
@@ -500,6 +742,28 @@ function bindInlineActions(root) {
       render();
     });
   });
+  root.querySelectorAll('[data-detail-tab]').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.detailTab = button.dataset.detailTab;
+      state.whyOpen = false;
+      render();
+    });
+  });
+  root.querySelectorAll('[data-toggle-section]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const key = sectionKey(button.dataset.toggleSection);
+      if (state.expandedSections.has(key)) {
+        state.expandedSections.delete(key);
+      } else {
+        state.expandedSections.add(key);
+      }
+      render();
+    });
+  });
+  root.querySelector('[data-toggle-why]')?.addEventListener('click', () => {
+    state.whyOpen = !state.whyOpen;
+    render();
+  });
 }
 
 function renderDetail() {
@@ -507,6 +771,9 @@ function renderDetail() {
   if (!block) {
     elements.detailPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
     return;
+  }
+  if (!DETAIL_TABS.some((tab) => tab.id === state.detailTab)) {
+    state.detailTab = 'overview';
   }
 
   const activeLock = (state.data?.locks?.active || []).find((lock) => lock.blockId === block.id);
@@ -516,6 +783,155 @@ function renderDetail() {
   const progress = block.phaseProgress || { total: 0, done: 0, percent: 0 };
   const readiness = block.readiness || {};
   const impact = block.impact || {};
+  const hints = riskHints(block, readiness, impact, collisions);
+  const verification = block.verification || [];
+  const sourceFindings = block.sourceFindings || [];
+  const followups = block.relatedFollowupBlocks || [];
+  const referenceFiles = block.scopeReferenceFiles || [];
+  let tabContent = '';
+
+  if (state.detailTab === 'overview') {
+    tabContent = `
+      <div class="detail-section">
+        <h3>Schnellbild</h3>
+        <div class="summary-grid">
+          <div class="summary-card"><span>${escapeHtml(readiness.label || '-')}</span><strong>Start</strong></div>
+          <div class="summary-card"><span>${escapeHtml(progress.done)} / ${escapeHtml(progress.total)}</span><strong>Phasen</strong></div>
+          <div class="summary-card"><span>${escapeHtml(collisions.length)}</span><strong>Kollisionen</strong></div>
+          <div class="summary-card"><span>${escapeHtml(impact.score || 0)}</span><strong>Impact</strong></div>
+        </div>
+        <div class="progress-track detail-progress"><div class="progress-fill" style="width:${progressWidth(progress)}%"></div></div>
+        <dl class="key-value">
+          <dt>Phase</dt><dd>${escapeHtml(block.currentPhase || '-')}</dd>
+          <dt>DoD</dt><dd>${escapeHtml(block.dodProgress?.done || 0)} / ${escapeHtml(block.dodProgress?.total || 0)}</dd>
+          <dt>Area</dt><dd>${escapeHtml(block.affectedArea || '-')}</dd>
+          <dt>Plan</dt><dd>${escapeHtml(block.planFile || '-')}</dd>
+          <dt>Gruppe</dt><dd>${escapeHtml(block.groupLabel || block.group || '-')}</dd>
+        </dl>
+      </div>
+      <div class="detail-section">
+        <h3>Naechster sinnvoller Blick</h3>
+        <p class="detail-note">${escapeHtml(readiness.recommendedText || readiness.reason || 'Keine Empfehlung im Export.')}</p>
+      </div>
+    `;
+  }
+
+  if (state.detailTab === 'start') {
+    tabContent = `
+      <div class="detail-section">
+        <h3>Startentscheidung</h3>
+        <div class="why-row">
+          <button type="button" class="pill-button" data-toggle-why aria-expanded="${state.whyOpen ? 'true' : 'false'}">Warum?</button>
+          <span>${escapeHtml(readiness.reason || '-')}</span>
+        </div>
+        ${state.whyOpen ? `
+          <div class="why-popover">
+            <strong>${escapeHtml(readiness.label || '-')}</strong>
+            <dl class="key-value">
+              <dt>Harte Gates</dt><dd>${escapeHtml(readiness.openHardDependencyCount || 0)} offen</dd>
+              <dt>Soft/unklar</dt><dd>${escapeHtml((readiness.openSoftDependencyCount || 0) + (readiness.openUnknownDependencyCount || 0))} offen</dd>
+              <dt>Dependencies</dt><dd>${escapeHtml(readiness.dependencyCount || 0)}</dd>
+              <dt>Consumer</dt><dd>${escapeHtml(readiness.consumerCount || 0)}</dd>
+              <dt>Rank</dt><dd>${readiness.recommendedRank ? `#${escapeHtml(readiness.recommendedRank)}` : '-'}</dd>
+            </dl>
+          </div>
+        ` : ''}
+        <dl class="key-value">
+          <dt>Status</dt><dd>${escapeHtml(readiness.label || '-')}</dd>
+          <dt>Lock</dt><dd>${activeLock ? `${escapeHtml(activeLock.phase || '')} ${escapeHtml(activeLock.status || '')}` : 'keiner'}</dd>
+          <dt>Reihenfolge</dt><dd>${readiness.recommendedRank ? `#${escapeHtml(readiness.recommendedRank)}` : '-'}</dd>
+          <dt>Begruendung</dt><dd>${escapeHtml(readiness.recommendedText || readiness.reason || '-')}</dd>
+        </dl>
+      </div>
+      <div class="detail-section">
+        <h3>Dependencies</h3>
+        <ul class="plain-list">${dependencyItems(limitedItems('dependencies', outgoingDeps, 8))}</ul>
+        ${showMoreButton('dependencies', outgoingDeps.length, 8)}
+      </div>
+      <div class="detail-section">
+        <h3>Consumer</h3>
+        <ul class="plain-list">${consumerItems(limitedItems('consumers', incomingDeps, 8), block.id)}</ul>
+        ${showMoreButton('consumers', incomingDeps.length, 8)}
+      </div>
+    `;
+  }
+
+  if (state.detailTab === 'scope') {
+    tabContent = `
+      <div class="detail-section">
+        <h3>Impact</h3>
+        <dl class="key-value">
+          <dt>Level</dt><dd>${escapeHtml(impact.level || 'low')} (${escapeHtml(impact.score || 0)} Punkte)</dd>
+          <dt>Scope</dt><dd>${escapeHtml(impact.scopeFileCount || 0)} Dateien, ${escapeHtml(impact.sharedFileCount || 0)} geteilt</dd>
+          <dt>Governance</dt><dd>${escapeHtml(impact.governanceFileCount || 0)}</dd>
+          <dt>Source/Test</dt><dd>${escapeHtml(impact.sourceFileCount || 0)} / ${escapeHtml(impact.testFileCount || 0)}</dd>
+          <dt>Docs</dt><dd>${escapeHtml(impact.docsFileCount || 0)}</dd>
+        </dl>
+      </div>
+      <div class="detail-section">
+        <h3>Scope-Kollisionen</h3>
+        <ul class="plain-list">${collisionItems(block.id, collisions, 'collisions', 7)}</ul>
+        ${showMoreButton('collisions', collisions.length, 7)}
+      </div>
+      <div class="detail-section">
+        <h3>Scope Files</h3>
+        <ul class="plain-list">${fileItems(block.scopeFiles, 'scopeFiles', 12)}</ul>
+        ${showMoreButton('scopeFiles', (block.scopeFiles || []).length, 12)}
+      </div>
+      <div class="detail-section">
+        <h3>Referenzen</h3>
+        <ul class="plain-list">${fileItems(referenceFiles, 'referenceFiles', 8)}</ul>
+        ${showMoreButton('referenceFiles', referenceFiles.length, 8)}
+      </div>
+    `;
+  }
+
+  if (state.detailTab === 'phases') {
+    tabContent = `
+      <div class="detail-section">
+        <h3>Fortschritt</h3>
+        <div class="progress-track detail-progress"><div class="progress-fill" style="width:${progressWidth(progress)}%"></div></div>
+        <dl class="key-value">
+          <dt>Phase</dt><dd>${escapeHtml(block.currentPhase || '-')}</dd>
+          <dt>Phasenpunkte</dt><dd>${escapeHtml(progress.done)} / ${escapeHtml(progress.total)}</dd>
+          <dt>DoD</dt><dd>${escapeHtml(block.dodProgress?.done || 0)} / ${escapeHtml(block.dodProgress?.total || 0)}</dd>
+        </dl>
+      </div>
+      <div class="detail-section">
+        <h3>Phasen</h3>
+        ${phaseRows(block, 'phases', 9)}
+        ${showMoreButton('phases', (block.phases || []).length, 9)}
+      </div>
+    `;
+  }
+
+  if (state.detailTab === 'risks') {
+    tabContent = `
+      <div class="detail-section">
+        <h3>Risikohinweise</h3>
+        <ul class="plain-list">
+          ${hints.length ? hints.map((hint) => `<li>${escapeHtml(hint)}</li>`).join('') : '<li class="muted">keine verdichteten Hinweise</li>'}
+        </ul>
+      </div>
+      <div class="detail-section">
+        <h3>Verification</h3>
+        <ul class="plain-list">${textItems(verification, 'verification', 8)}</ul>
+        ${showMoreButton('verification', verification.length, 8)}
+      </div>
+      <div class="detail-section">
+        <h3>Findings</h3>
+        <ul class="plain-list">
+          ${limitedItems('findings', sourceFindings, 6).length ? limitedItems('findings', sourceFindings, 6).map((finding) => `<li>${escapeHtml(finding.id || '')} ${escapeHtml(finding.severity || '')} ${escapeHtml(finding.finding || finding.title || finding)}</li>`).join('') : '<li class="muted">keine blocknahen Findings</li>'}
+        </ul>
+        ${showMoreButton('findings', sourceFindings.length, 6)}
+      </div>
+      <div class="detail-section">
+        <h3>Follow-ups</h3>
+        <ul class="plain-list">${followups.length ? limitedItems('followups', followups, 8).map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li class="muted">keine</li>'}</ul>
+        ${showMoreButton('followups', followups.length, 8)}
+      </div>
+    `;
+  }
 
   elements.detailPanel.innerHTML = `
     <h2 class="detail-title">${escapeHtml(block.id)} ${escapeHtml(block.title)}</h2>
@@ -526,72 +942,8 @@ function renderDetail() {
       <span class="chip impact-${escapeHtml(impact.level || 'low')}">Impact ${escapeHtml(impact.level || 'low')}</span>
       ${activeLock ? '<span class="chip locked">lock</span>' : ''}
     </div>
-
-    <div class="detail-section">
-      <h3>Startentscheidung</h3>
-      <dl class="key-value">
-        <dt>Status</dt><dd>${escapeHtml(readiness.label || '-')}</dd>
-        <dt>Warum</dt><dd>${escapeHtml(readiness.reason || '-')}</dd>
-        <dt>Offen hart</dt><dd>${escapeHtml(readiness.openHardDependencyCount || 0)}</dd>
-        <dt>Soft/unklar</dt><dd>${escapeHtml((readiness.openSoftDependencyCount || 0) + (readiness.openUnknownDependencyCount || 0))}</dd>
-        <dt>Reihenfolge</dt><dd>${readiness.recommendedRank ? `#${escapeHtml(readiness.recommendedRank)} ${escapeHtml(readiness.recommendedText || '')}` : '-'}</dd>
-        <dt>Impact</dt><dd>${escapeHtml(impact.score || 0)} Punkte, ${escapeHtml(impact.scopeFileCount || 0)} Scope-Dateien</dd>
-      </dl>
-    </div>
-
-    <div class="detail-section">
-      <h3>Fortschritt</h3>
-      <div class="progress-track"><div class="progress-fill" style="width:${progress.percent || 0}%"></div></div>
-      <dl class="key-value" style="margin-top:12px">
-        <dt>Phase</dt><dd>${escapeHtml(block.currentPhase || '-')}</dd>
-        <dt>Phasenpunkte</dt><dd>${escapeHtml(progress.done)} / ${escapeHtml(progress.total)}</dd>
-        <dt>DoD</dt><dd>${escapeHtml(block.dodProgress?.done || 0)} / ${escapeHtml(block.dodProgress?.total || 0)}</dd>
-        <dt>Area</dt><dd>${escapeHtml(block.affectedArea || '-')}</dd>
-        <dt>Plan</dt><dd>${escapeHtml(block.planFile || '-')}</dd>
-      </dl>
-    </div>
-
-    <div class="detail-section">
-      <h3>Dependencies</h3>
-      <ul class="plain-list">
-        ${outgoingDeps.length ? outgoingDeps.map((edge) => `<li>${escapeHtml(formatDependency(edge))}</li>`).join('') : '<li class="muted">keine</li>'}
-      </ul>
-    </div>
-
-    <div class="detail-section">
-      <h3>Consumer</h3>
-      <ul class="plain-list">
-        ${incomingDeps.length ? incomingDeps.map((edge) => `<li>${escapeHtml(edge.from)} braucht ${escapeHtml(edge.phase || block.id)}</li>`).join('') : '<li class="muted">keine</li>'}
-      </ul>
-    </div>
-
-    <div class="detail-section">
-      <h3>Scope-Kollisionen</h3>
-      <ul class="plain-list">
-        ${collisions.length ? collisions.slice(0, 8).map((collision) => {
-          const other = collision.leftBlock === block.id ? collision.rightBlock : collision.leftBlock;
-          return `<li><button type="button" class="text-button" data-select-block="${escapeHtml(other)}">${escapeHtml(other)}</button> - ${escapeHtml(collision.sharedFileCount)} Datei(en): ${collision.sharedFiles.slice(0, 2).map(fileButton).join(' ')}</li>`;
-        }).join('') : '<li class="muted">keine</li>'}
-      </ul>
-    </div>
-
-    <div class="detail-section">
-      <h3>Phasen</h3>
-      ${block.phases?.slice(0, 10).map((phase) => `
-        <div class="phase-row">
-          <strong>${escapeHtml(phase.id)}</strong>
-          <span>${escapeHtml(phase.title)}</span>
-          <span class="muted">${escapeHtml(phase.progress.done)} / ${escapeHtml(phase.progress.total)}</span>
-        </div>
-      `).join('') || '<p class="muted">keine Phasen gelesen</p>'}
-    </div>
-
-    <div class="detail-section">
-      <h3>Scope Files</h3>
-      <ul class="plain-list">
-        ${(block.scopeFiles || []).slice(0, 14).map((file) => `<li>${fileButton(file)}</li>`).join('') || '<li class="muted">keine</li>'}
-      </ul>
-    </div>
+    ${detailTabsMarkup()}
+    <div class="detail-tab-panel">${tabContent}</div>
   `;
 
   bindInlineActions(elements.detailPanel);
@@ -681,10 +1033,12 @@ function renderEmpty() {
   elements.detailPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
   elements.collisionsTable.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
   elements.healthPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
+  renderSources();
 }
 
 function render() {
   updateViewPanels();
+  renderSources();
   if (!state.data) {
     renderEmpty();
     return;
@@ -692,6 +1046,10 @@ function render() {
 
   if (!state.selectedId || !visibleBlocks().some((block) => block.id === state.selectedId)) {
     state.selectedId = visibleBlocks()[0]?.id || null;
+  }
+  if (state.lastSelectedId !== state.selectedId) {
+    state.whyOpen = false;
+    state.lastSelectedId = state.selectedId;
   }
 
   renderMetrics();
@@ -728,6 +1086,25 @@ async function loadDefaultData() {
 }
 
 function bindEvents() {
+  elements.legendToggle.addEventListener('click', () => {
+    const isOpen = elements.legendPanel.hidden;
+    elements.legendPanel.hidden = !isOpen;
+    elements.legendToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    elements.legendToggle.classList.toggle('is-active', isOpen);
+  });
+
+  [
+    [elements.showDependencies, 'dependencies'],
+    [elements.showCollisions, 'collisions'],
+    [elements.showImpact, 'impact'],
+    [elements.showProgress, 'progress'],
+  ].forEach(([checkbox, key]) => {
+    checkbox.addEventListener('change', () => {
+      state.overlays[key] = checkbox.checked;
+      renderMap();
+    });
+  });
+
   document.querySelectorAll('[data-view]').forEach((button) => {
     button.addEventListener('click', () => {
       state.view = button.dataset.view;

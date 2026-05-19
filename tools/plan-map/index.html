@@ -29,6 +29,70 @@
         </div>
       </header>
 
+      <section class="legend-strip" aria-label="Legende und Karten-Layer">
+        <div class="legend-inline">
+          <span class="legend-item"><span class="legend-dot readiness-ready"></span>startklar</span>
+          <span class="legend-item"><span class="legend-dot readiness-ready-with-risk"></span>mit Risiko</span>
+          <span class="legend-item"><span class="legend-dot readiness-blocked"></span>blockiert</span>
+          <span class="legend-item"><span class="legend-line dependency"></span>Dependency</span>
+          <span class="legend-item"><span class="legend-line collision"></span>Kollision</span>
+          <span class="legend-item"><span class="legend-impact high"></span>Impact</span>
+        </div>
+        <div class="legend-actions">
+          <div class="overlay-toggles" aria-label="Karten-Layer">
+            <label><input id="showDependencies" type="checkbox" checked>Deps</label>
+            <label><input id="showCollisions" type="checkbox" checked>Kollisionen</label>
+            <label><input id="showImpact" type="checkbox" checked>Impact</label>
+            <label><input id="showProgress" type="checkbox" checked>Fortschritt</label>
+          </div>
+          <button id="legendToggle" type="button" class="icon-button" aria-expanded="false" aria-controls="legendPanel">
+            Legende
+          </button>
+        </div>
+      </section>
+
+      <section id="legendPanel" class="legend-panel" aria-label="Ausfuehrliche Legende" hidden>
+        <div class="legend-grid">
+          <section>
+            <h2>Status</h2>
+            <dl class="legend-list">
+              <dt><span class="legend-dot readiness-ready"></span>startklar</dt>
+              <dd>Alle harten Startbedingungen sind erfuellt.</dd>
+              <dt><span class="legend-dot readiness-ready-with-risk"></span>mit Risiko</dt>
+              <dd>Start ist moeglich, aber Soft-Gates oder Scope-Risiken sind sichtbar.</dd>
+              <dt><span class="legend-dot readiness-blocked"></span>blockiert</dt>
+              <dd>Harte Dependency, Lock oder offener Vorblock verhindert Start.</dd>
+            </dl>
+          </section>
+          <section>
+            <h2>Kanten</h2>
+            <dl class="legend-list">
+              <dt><span class="legend-line dependency"></span>Dependency</dt>
+              <dd>Block braucht einen anderen Block oder eine Phase.</dd>
+              <dt><span class="legend-line open"></span>offen</dt>
+              <dd>Gestrichelte Kante markiert ein unerfuelltes Gate.</dd>
+              <dt><span class="legend-line collision"></span>Kollision</dt>
+              <dd>Zwei Bloecke teilen Scope-Dateien.</dd>
+            </dl>
+          </section>
+          <section>
+            <h2>Begriffe</h2>
+            <dl class="legend-list">
+              <dt>Impact</dt>
+              <dd>Gewicht aus Scope-Groesse, Governance-Naehe und geteilten Dateien.</dd>
+              <dt>Consumer</dt>
+              <dd>Bloecke, die vom ausgewaehlten Block abhaengen.</dd>
+              <dt>Fokus</dt>
+              <dd>Auswahl, direkte Dependencies und Scope-Kollisionen bleiben prominent.</dd>
+            </dl>
+          </section>
+          <section>
+            <h2>Quellen</h2>
+            <ul id="legendSources" class="source-list"></ul>
+          </section>
+        </div>
+      </section>
+
       <main class="workspace">
         <aside class="sidebar" aria-label="Filter und Bloecke">
           <div class="filter-stack">
@@ -71,6 +135,7 @@
           <section id="healthView" class="view-panel">
             <div id="healthPanel" class="health-grid"></div>
           </section>
+          <div id="sourcesFootnote" class="sources-footnote"></div>
         </section>
 
         <aside class="detail-panel" aria-label="Blockdetails">
