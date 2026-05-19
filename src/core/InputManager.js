@@ -60,11 +60,22 @@ export class InputManager {
         this._playerSources = new Map();
 
         this._rebuildPreventDefaultCodes();
+        this._document = window.document;
         this._onKeyDown = (e) => this._handleKeyDown(e);
         this._onKeyUp = (e) => this._handleKeyUp(e);
+        this._onWindowBlur = () => this.clearInputState('window-blur');
+        this._onWindowFocus = () => this.clearInputState('window-focus');
+        this._onVisibilityChange = () => {
+            if (this._document?.hidden === true) {
+                this.clearInputState('visibility-hidden');
+            }
+        };
 
         window.addEventListener('keydown', this._onKeyDown);
         window.addEventListener('keyup', this._onKeyUp);
+        window.addEventListener('blur', this._onWindowBlur);
+        window.addEventListener('focus', this._onWindowFocus);
+        this._document?.addEventListener?.('visibilitychange', this._onVisibilityChange);
     }
 
     _handleKeyDown(e) {
@@ -79,8 +90,10 @@ export class InputManager {
     }
 
     _handleKeyUp(e) {
-        if (this._isTextInputFocused()) return;
+        const textInputFocused = this._isTextInputFocused();
         this.keys[e.code] = false;
+        delete this.justPressed[e.code];
+        if (textInputFocused) return;
         if (this._shouldPreventDefault(e.code)) {
             e.preventDefault();
         }
@@ -173,6 +186,11 @@ export class InputManager {
     }
 
     clearJustPressed() {
+        this.justPressed = {};
+    }
+
+    clearInputState(_reason = 'manual') {
+        this.keys = {};
         this.justPressed = {};
     }
 
@@ -301,6 +319,19 @@ export class InputManager {
             window.removeEventListener('keyup', this._onKeyUp);
             this._onKeyUp = null;
         }
+        if (this._onWindowBlur) {
+            window.removeEventListener('blur', this._onWindowBlur);
+            this._onWindowBlur = null;
+        }
+        if (this._onWindowFocus) {
+            window.removeEventListener('focus', this._onWindowFocus);
+            this._onWindowFocus = null;
+        }
+        if (this._onVisibilityChange) {
+            this._document?.removeEventListener?.('visibilitychange', this._onVisibilityChange);
+            this._onVisibilityChange = null;
+        }
+        this._document = null;
         this.keys = {};
         this.justPressed = {};
     }

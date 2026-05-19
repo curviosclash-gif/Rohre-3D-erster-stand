@@ -1648,6 +1648,80 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         expect(errors).toHaveLength(0);
     });
 
+    test('T20al: InputManager loest Sticky-Input bei Textfokus und Fokusverlust', async ({ page }) => {
+        const errors = collectErrors(page);
+        await loadGame(page);
+        const result = await page.evaluate(() => {
+            const input = window.GAME_INSTANCE?.input;
+            const upCode = String(input?.bindings?.PLAYER_1?.UP || 'KeyW');
+            if (!input) {
+                return { error: 'missing-input-manager' };
+            }
+
+            const textInput = document.createElement('input');
+            textInput.type = 'text';
+            document.body.appendChild(textInput);
+
+            const dispatchKey = (type) => {
+                window.dispatchEvent(new KeyboardEvent(type, {
+                    code: upCode,
+                    key: 'w',
+                    bubbles: true,
+                    cancelable: true,
+                }));
+            };
+            const readPitchUp = () => input.getKeyboardInput(0, { includeSecondaryBindings: true })?.pitchUp === true;
+
+            try {
+                dispatchKey('keydown');
+                const downBeforeTextFocus = input.keys?.[upCode] === true && readPitchUp();
+                textInput.focus();
+                dispatchKey('keyup');
+                const releasedWhileTextFocused = input.keys?.[upCode] !== true && !readPitchUp();
+
+                textInput.blur();
+                dispatchKey('keydown');
+                const downBeforeWindowBlur = input.keys?.[upCode] === true && readPitchUp();
+                window.dispatchEvent(new Event('blur'));
+                const clearedAfterWindowBlur = input.keys?.[upCode] !== true && !readPitchUp();
+
+                dispatchKey('keydown');
+                const hiddenDescriptor = Object.getOwnPropertyDescriptor(document, 'hidden');
+                Object.defineProperty(document, 'hidden', {
+                    configurable: true,
+                    value: true,
+                });
+                document.dispatchEvent(new Event('visibilitychange'));
+                const clearedAfterHidden = input.keys?.[upCode] !== true && !readPitchUp();
+                if (hiddenDescriptor) {
+                    Object.defineProperty(document, 'hidden', hiddenDescriptor);
+                } else {
+                    delete document.hidden;
+                }
+
+                return {
+                    error: null,
+                    downBeforeTextFocus,
+                    releasedWhileTextFocused,
+                    downBeforeWindowBlur,
+                    clearedAfterWindowBlur,
+                    clearedAfterHidden,
+                };
+            } finally {
+                textInput.remove();
+                input.clearInputState?.('test-cleanup');
+            }
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.downBeforeTextFocus).toBeTruthy();
+        expect(result.releasedWhileTextFocused).toBeTruthy();
+        expect(result.downBeforeWindowBlur).toBeTruthy();
+        expect(result.clearedAfterWindowBlur).toBeTruthy();
+        expect(result.clearedAfterHidden).toBeTruthy();
+        expect(errors).toHaveLength(0);
+    });
+
     test('T20ae1: PauseOverlayController setup/dispose bleibt idempotent ohne doppelte Handler', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {

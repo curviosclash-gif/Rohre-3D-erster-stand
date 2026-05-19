@@ -4108,7 +4108,7 @@
       "id": "V112.1",
       "type": "phase",
       "title": "Input- und Lifecycle-Stabilisierung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.1"
@@ -9417,8 +9417,8 @@
     {
       "id": "V112.1.1",
       "type": "subphase",
-      "title": "`InputManager` fuer `keyup`/Reset bei Fokuswechseln und Textinputs haerten.",
-      "status": "open",
+      "title": "`InputManager` fuer `keyup`/Reset bei Fokuswechseln und Textinputs haerten. (abgeschlossen: 2026-05-20; evidence: `src/core/InputManager.js` verarbeitet `keyup` auch bei Textfokus und leert Input-State bei Window-Blur/-Focus sowie `visibilitychange`; `T20al` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.1",
@@ -9428,8 +9428,8 @@
     {
       "id": "V112.1.2",
       "type": "subphase",
-      "title": "Match-/Menu-Lifecycle auf Sticky-Input-Randfaelle absichern.",
-      "status": "open",
+      "title": "Match-/Menu-Lifecycle auf Sticky-Input-Randfaelle absichern. (abgeschlossen: 2026-05-20; evidence: `T20al` prueft geladenen Runtime-Input gegen Textfokus, Fenster-Blur und Hidden-Visibility; `npm run plan:check` -> PASS; `npm run lock:validate` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.1",
