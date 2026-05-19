@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Curvios Plan Map</title>
+    <link rel="stylesheet" href="./viewer.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <h1>Umsetzungsplan Karte</h1>
+          <span id="sourceMeta" class="source-meta">read-only</span>
+        </div>
+        <div class="top-actions">
+          <label class="file-control">
+            <span>JSON</span>
+            <input id="fileInput" type="file" accept="application/json,.json">
+          </label>
+          <div class="segmented" aria-label="Ansicht">
+            <button type="button" data-view="map" class="is-active">Map</button>
+            <button type="button" data-view="collisions">Kollisionen</button>
+            <button type="button" data-view="health">Health</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar" aria-label="Filter und Bloecke">
+          <div class="filter-stack">
+            <label>
+              <span>Suche</span>
+              <input id="searchInput" type="search" autocomplete="off" placeholder="V126, Graph, Preview">
+            </label>
+            <label>
+              <span>Status</span>
+              <select id="statusFilter">
+                <option value="all">Alle</option>
+              </select>
+            </label>
+            <label>
+              <span>Prio</span>
+              <select id="priorityFilter">
+                <option value="all">Alle</option>
+              </select>
+            </label>
+          </div>
+          <div id="blockList" class="block-list"></div>
+        </aside>
+
+        <section class="main-stage" aria-label="Plan-Karte">
+          <div id="metrics" class="metrics-strip"></div>
+          <section id="mapView" class="view-panel is-active">
+            <svg id="planSvg" class="plan-svg" role="img" aria-label="Dependency-Karte"></svg>
+          </section>
+          <section id="collisionsView" class="view-panel">
+            <div id="collisionsTable" class="data-table"></div>
+          </section>
+          <section id="healthView" class="view-panel">
+            <div id="healthPanel" class="health-grid"></div>
+          </section>
+        </section>
+
+        <aside class="detail-panel" aria-label="Blockdetails">
+          <div id="detailPanel" class="detail-content"></div>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="./viewer.js"></script>
+  </body>
+</html>
