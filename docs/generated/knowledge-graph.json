@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 212,
+          "concreteCount": 213,
           "plannedCount": 0
         }
       }
@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 24,
+          "concreteCount": 25,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1000,7 +1000,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 40,
+          "concreteCount": 41,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1058,7 +1058,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 26,
+          "concreteCount": 27,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1970,7 +1970,7 @@
           "src/ui/MenuController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 71,
+          "concreteCount": 75,
           "plannedCount": 4
         }
       }
@@ -2912,7 +2912,7 @@
           "tests/training-automation.spec.js"
         ],
         "scopeResolution": {
-          "concreteCount": 93,
+          "concreteCount": 97,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -21809,6 +21809,117 @@
       }
     },
     {
+      "id": "runtime:map-tools-electron-shell",
+      "type": "runtime",
+      "title": "Map Tools Electron shell",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 8,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "electron/map-tools/main.cjs",
+        "domain": "map-tools",
+        "tooling": "read-only-map-dashboard",
+        "surface": "desktop-tool"
+      }
+    },
+    {
+      "id": "runtime:map-tools-launcher",
+      "type": "runtime",
+      "title": "Map Tools launcher",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 49,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "electron/map-tools/launch.cjs",
+        "domain": "map-tools",
+        "tooling": "local-startup"
+      }
+    },
+    {
+      "id": "runtime:map-tools-preload",
+      "type": "runtime",
+      "title": "Map Tools preload bridge",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 19,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "electron/map-tools/preload.cjs",
+        "domain": "map-tools",
+        "tooling": "desktop-ipc-bridge"
+      }
+    },
+    {
+      "id": "runtime:map-tools-renderer",
+      "type": "runtime",
+      "title": "Map Tools renderer shell",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 29,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "electron/map-tools/ui/map-tools-renderer.js",
+        "domain": "map-tools",
+        "tooling": "status-and-navigation-shell"
+      }
+    },
+    {
+      "id": "runtime:map-tools-static-server",
+      "type": "runtime",
+      "title": "Map Tools whitelisted static server",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 39,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "electron/map-tools/server.cjs",
+        "domain": "map-tools",
+        "tooling": "local-viewer-server"
+      }
+    },
+    {
       "id": "runtime:mg-hit-resolver",
       "type": "runtime",
       "title": "MGHitResolver",
@@ -21942,6 +22053,50 @@
             "damage-event-emitter"
           ]
         }
+      }
+    },
+    {
+      "id": "runtime:repo-map-export",
+      "type": "runtime",
+      "title": "Repo Map export",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 59,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "scripts/export-repo-map.mjs",
+        "domain": "repo-map",
+        "tooling": "read-only-repo-dashboard"
+      }
+    },
+    {
+      "id": "runtime:repo-map-viewer",
+      "type": "runtime",
+      "title": "Repo Map viewer",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 69,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "tools/repo-map/viewer.js",
+        "domain": "repo-map",
+        "tooling": "read-only-repo-dashboard"
       }
     },
     {
@@ -22213,6 +22368,28 @@
       }
     },
     {
+      "id": "state:repo-map-readonly-dataset",
+      "type": "state",
+      "title": "Read-only Repo Map JSON dataset",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 79,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "domain": "repo-map",
+        "path": "tmp/repo-map/repo-map.json",
+        "ephemeral": true
+      }
+    },
+    {
       "id": "state:round-end-overlay",
       "type": "state",
       "title": "Round end UI overlay state",
@@ -22390,6 +22567,90 @@
       }
     },
     {
+      "id": "config:map-tools-docs",
+      "type": "config",
+      "title": "Map Tools documentation",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 107,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "electron/map-tools/README.md",
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-graph-anchor",
+      "type": "config",
+      "title": "Map Tools knowledge graph mapping",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 116,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-shell-html",
+      "type": "config",
+      "title": "Map Tools HTML shell",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 89,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "electron/map-tools/ui/map-tools.html",
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "config:map-tools-shell-style",
+      "type": "config",
+      "title": "Map Tools visual layout",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 98,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "electron/map-tools/ui/map-tools.css",
+        "domain": "map-tools"
+      }
+    },
+    {
       "id": "config:plan-map-docs",
       "type": "config",
       "title": "Plan Map documentation",
@@ -22471,6 +22732,69 @@
         "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
         "file": "tools/plan-map/viewer.css",
         "domain": "plan-map"
+      }
+    },
+    {
+      "id": "config:repo-map-docs",
+      "type": "config",
+      "title": "Repo Map documentation",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 143,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "tools/repo-map/README.md",
+        "domain": "repo-map"
+      }
+    },
+    {
+      "id": "config:repo-map-viewer-shell",
+      "type": "config",
+      "title": "Repo Map HTML shell",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 125,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "tools/repo-map/index.html",
+        "domain": "repo-map"
+      }
+    },
+    {
+      "id": "config:repo-map-viewer-style",
+      "type": "config",
+      "title": "Repo Map visual layout",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 134,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "tools/repo-map/viewer.css",
+        "domain": "repo-map"
       }
     },
     {
@@ -22562,6 +22886,48 @@
       }
     },
     {
+      "id": "test:map-tools-electron-contract",
+      "type": "test",
+      "title": "Map Tools Electron contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 152,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "tests/map-tools-electron.contract.test.mjs",
+        "domain": "map-tools"
+      }
+    },
+    {
+      "id": "test:map-tools-electron-smoke",
+      "type": "test",
+      "title": "Map Tools Electron smoke",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 161,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "tests/map-tools-electron-smoke.test.mjs",
+        "domain": "map-tools"
+      }
+    },
+    {
       "id": "test:physics-core-spawn",
       "type": "test",
       "title": "Physics core authored spawn coverage",
@@ -22624,6 +22990,27 @@
         "mappingDescription": "Read-only tooling surface for the interactive implementation Plan Map.",
         "file": "tests/plan-map-export.contract.test.mjs",
         "domain": "plan-map"
+      }
+    },
+    {
+      "id": "test:repo-map-export-contract",
+      "type": "test",
+      "title": "Repo Map export contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 170,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "file": "tests/repo-map-export.contract.test.mjs",
+        "domain": "repo-map"
       }
     },
     {
@@ -25154,6 +25541,27 @@
           "V120"
         ],
         "exists": false
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
+        ],
+        "mappedNodes": [
+          "config:map-tools-graph-anchor"
+        ],
+        "exists": true
       }
     },
     {
@@ -29643,11 +30051,15 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V60",
           "V89"
+        ],
+        "mappedNodes": [
+          "runtime:map-tools-launcher"
         ],
         "exists": true
       }
@@ -29659,11 +30071,35 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V60",
           "V89"
+        ],
+        "mappedNodes": [
+          "runtime:map-tools-electron-shell"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "electron/map-tools/preload.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V60",
+          "V89"
+        ],
+        "mappedNodes": [
+          "runtime:map-tools-preload"
         ],
         "exists": true
       }
@@ -29675,11 +30111,15 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V60",
           "V89"
+        ],
+        "mappedNodes": [
+          "config:map-tools-docs"
         ],
         "exists": true
       }
@@ -29691,11 +30131,75 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V60",
           "V89"
+        ],
+        "mappedNodes": [
+          "runtime:map-tools-static-server"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "electron/map-tools/ui/map-tools-renderer.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V60",
+          "V89"
+        ],
+        "mappedNodes": [
+          "runtime:map-tools-renderer"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "electron/map-tools/ui/map-tools.css",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V60",
+          "V89"
+        ],
+        "mappedNodes": [
+          "config:map-tools-shell-style"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "electron/map-tools/ui/map-tools.html",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V60",
+          "V89"
+        ],
+        "mappedNodes": [
+          "config:map-tools-shell-html"
         ],
         "exists": true
       }
@@ -31314,10 +31818,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "knowledge-graph-mapping"
         ],
         "scopeBlocks": [
           "B13"
+        ],
+        "mappedNodes": [
+          "runtime:repo-map-export"
         ],
         "exists": true
       }
@@ -43647,16 +44155,39 @@
       }
     },
     {
+      "id": "tests/map-tools-electron-smoke.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "knowledge-graph-mapping"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "mappedNodes": [
+          "test:map-tools-electron-smoke"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/map-tools-electron.contract.test.mjs",
       "type": "file",
       "title": null,
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "knowledge-graph-mapping"
         ],
         "scopeBlocks": [
           "B13"
+        ],
+        "mappedNodes": [
+          "test:map-tools-electron-contract"
         ],
         "exists": true
       }
@@ -44233,10 +44764,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "knowledge-graph-mapping"
         ],
         "scopeBlocks": [
           "B13"
+        ],
+        "mappedNodes": [
+          "test:repo-map-export-contract"
         ],
         "exists": true
       }
@@ -45090,6 +45625,66 @@
         ],
         "mappedNodes": [
           "runtime:plan-map-viewer"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/repo-map/index.html",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:repo-map-viewer-shell"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/repo-map/README.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:repo-map-docs"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/repo-map/viewer.css",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:repo-map-viewer-style"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/repo-map/viewer.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "runtime:repo-map-viewer"
         ],
         "exists": true
       }
@@ -50997,6 +51592,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/map-tools-electron-smoke.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/map-tools-electron.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -51680,6 +52284,22 @@
       }
     },
     {
+      "from": "config:map-tools-docs",
+      "to": "config:map-tools-graph-anchor",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 281,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
       "from": "config:plan-map-docs",
       "to": "config:plan-map-graph-anchor",
       "type": "reads_config",
@@ -51760,6 +52380,22 @@
       }
     },
     {
+      "from": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+      "to": "config:map-tools-graph-anchor",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 116,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
       "to": "config:plan-map-graph-anchor",
       "type": "implements",
@@ -51771,6 +52407,134 @@
           "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
           "line": 75,
           "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "electron/map-tools/launch.cjs",
+      "to": "runtime:map-tools-launcher",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 49,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "electron/map-tools/main.cjs",
+      "to": "runtime:map-tools-electron-shell",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 8,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "electron/map-tools/preload.cjs",
+      "to": "runtime:map-tools-preload",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 19,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "electron/map-tools/README.md",
+      "to": "config:map-tools-docs",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 107,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "electron/map-tools/server.cjs",
+      "to": "runtime:map-tools-static-server",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 39,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "electron/map-tools/ui/map-tools-renderer.js",
+      "to": "runtime:map-tools-renderer",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 29,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "electron/map-tools/ui/map-tools.css",
+      "to": "config:map-tools-shell-style",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 98,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "electron/map-tools/ui/map-tools.html",
+      "to": "config:map-tools-shell-html",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 89,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
         },
         "relationLayer": "runtime"
       }
@@ -51896,6 +52660,230 @@
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
         },
         "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:map-tools-electron-shell",
+      "to": "config:map-tools-docs",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 181,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-electron-shell",
+      "to": "config:map-tools-shell-html",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 181,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-electron-shell",
+      "to": "test:map-tools-electron-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 186,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:map-tools-electron-shell",
+      "to": "test:map-tools-electron-smoke",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 186,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:map-tools-launcher",
+      "to": "test:map-tools-electron-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 201,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:map-tools-preload",
+      "to": "test:map-tools-electron-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 206,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:map-tools-renderer",
+      "to": "config:map-tools-shell-html",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 211,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-renderer",
+      "to": "config:map-tools-shell-style",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 211,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-renderer",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 216,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:map-tools-renderer",
+      "to": "state:repo-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 216,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:map-tools-static-server",
+      "to": "config:plan-map-viewer-shell",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 231,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-static-server",
+      "to": "config:repo-map-viewer-shell",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 231,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-static-server",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 236,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:map-tools-static-server",
+      "to": "state:repo-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 236,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "state"
       }
     },
     {
@@ -52136,6 +53124,102 @@
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
         },
         "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:repo-map-export",
+      "to": "state:repo-map-readonly-dataset",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 251,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:repo-map-export",
+      "to": "test:repo-map-export-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 251,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:repo-map-viewer",
+      "to": "config:repo-map-docs",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 266,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:repo-map-viewer",
+      "to": "config:repo-map-viewer-shell",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 261,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:repo-map-viewer",
+      "to": "config:repo-map-viewer-style",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 261,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:repo-map-viewer",
+      "to": "state:repo-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 261,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "state"
       }
     },
     {
@@ -52445,6 +53529,22 @@
           "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
           "line": 8,
           "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "scripts/export-repo-map.mjs",
+      "to": "runtime:repo-map-export",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 59,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
         },
         "relationLayer": "runtime"
       }
@@ -52893,6 +53993,38 @@
       }
     },
     {
+      "from": "tests/map-tools-electron-smoke.test.mjs",
+      "to": "test:map-tools-electron-smoke",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 161,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tests/map-tools-electron.contract.test.mjs",
+      "to": "test:map-tools-electron-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 152,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "tests/physics-core.spec.js",
       "to": "test:physics-core-spawn",
       "type": "implements",
@@ -52936,6 +54068,22 @@
           "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
           "line": 84,
           "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tests/repo-map-export.contract.test.mjs",
+      "to": "test:repo-map-export-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 170,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
         },
         "relationLayer": "runtime"
       }
@@ -53048,6 +54196,70 @@
           "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
           "line": 18,
           "commit": "8e978d6822c8b70c89f7c816a54ccdc608e0de39"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/repo-map/index.html",
+      "to": "config:repo-map-viewer-shell",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 125,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/repo-map/README.md",
+      "to": "config:repo-map-docs",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 143,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/repo-map/viewer.css",
+      "to": "config:repo-map-viewer-style",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 134,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/repo-map/viewer.js",
+      "to": "runtime:repo-map-viewer",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 69,
+          "commit": "144919f395971b88532df454f665141bac3c3332"
         },
         "relationLayer": "runtime"
       }
@@ -59297,6 +60509,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
       "type": "scope",
       "hint": null,
@@ -60630,6 +61851,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
       "type": "scope",
       "hint": null,
@@ -61191,6 +62421,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -72244,6 +73483,15 @@
     },
     {
       "from": "V60",
+      "to": "electron/map-tools/preload.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "archive-summary"
+      }
+    },
+    {
+      "from": "V60",
       "to": "electron/map-tools/README.md",
       "type": "scope",
       "hint": null,
@@ -72254,6 +73502,33 @@
     {
       "from": "V60",
       "to": "electron/map-tools/server.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "archive-summary"
+      }
+    },
+    {
+      "from": "V60",
+      "to": "electron/map-tools/ui/map-tools-renderer.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "archive-summary"
+      }
+    },
+    {
+      "from": "V60",
+      "to": "electron/map-tools/ui/map-tools.css",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "archive-summary"
+      }
+    },
+    {
+      "from": "V60",
+      "to": "electron/map-tools/ui/map-tools.html",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -92327,6 +93602,15 @@
     },
     {
       "from": "V89",
+      "to": "electron/map-tools/preload.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V89",
       "to": "electron/map-tools/README.md",
       "type": "scope",
       "hint": null,
@@ -92337,6 +93621,33 @@
     {
       "from": "V89",
       "to": "electron/map-tools/server.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V89",
+      "to": "electron/map-tools/ui/map-tools-renderer.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V89",
+      "to": "electron/map-tools/ui/map-tools.css",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V89",
+      "to": "electron/map-tools/ui/map-tools.html",
       "type": "scope",
       "hint": null,
       "attributes": {

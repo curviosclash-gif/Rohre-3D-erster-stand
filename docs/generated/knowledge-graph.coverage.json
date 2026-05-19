@@ -159,13 +159,13 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1900,
-    "rawCoveredFileCount": 1247,
-    "rawCoveragePercent": 65.6,
-    "adjustedTrackedFileCount": 1386,
-    "adjustedCoveredFileCount": 1041,
-    "adjustedCoveragePercent": 75.1,
-    "uncoveredFileCount": 653,
+    "trackedFileCount": 1906,
+    "rawCoveredFileCount": 1257,
+    "rawCoveragePercent": 65.9,
+    "adjustedTrackedFileCount": 1392,
+    "adjustedCoveredFileCount": 1047,
+    "adjustedCoveragePercent": 75.2,
+    "uncoveredFileCount": 649,
     "uncoveredActiveFileCount": 345,
     "classifications": [
       {
@@ -213,8 +213,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 959,
-        "coveredCount": 836
+        "count": 965,
+        "coveredCount": 842
       },
       {
         "classification": "product-docs",
@@ -232,7 +232,7 @@
         "classification": "repo-ops",
         "excludedFromCoverage": true,
         "count": 24,
-        "coveredCount": 8
+        "coveredCount": 12
       },
       {
         "classification": "temp",
@@ -4379,6 +4379,26 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -14165,6 +14185,7 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -14183,6 +14204,26 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V60",
+        "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "electron/map-tools/preload.cjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -14201,6 +14242,7 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -14219,6 +14261,64 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V60",
+        "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "electron/map-tools/ui/map-tools-renderer.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V60",
+        "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "electron/map-tools/ui/map-tools.css",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V60",
+        "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "electron/map-tools/ui/map-tools.html",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -17741,7 +17841,8 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "knowledge-graph-mapping"
       ],
       "scopeBlocks": [
         "B13"
@@ -31356,13 +31457,32 @@
       "excludeReason": null
     },
     {
+      "path": "tests/map-tools-electron-smoke.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "tests/map-tools-electron.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "knowledge-graph-mapping"
       ],
       "scopeBlocks": [
         "B13"
@@ -32001,7 +32121,8 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "knowledge-graph-mapping"
       ],
       "scopeBlocks": [
         "B13"
@@ -32780,10 +32901,12 @@
     {
       "path": "tools/repo-map/index.html",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",
@@ -32793,10 +32916,12 @@
     {
       "path": "tools/repo-map/README.md",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",
@@ -32806,10 +32931,12 @@
     {
       "path": "tools/repo-map/viewer.css",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",
@@ -32819,10 +32946,12 @@
     {
       "path": "tools/repo-map/viewer.js",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",

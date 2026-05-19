@@ -11,16 +11,16 @@
     "score": 91.3,
     "status": "pass",
     "metrics": {
-      "adjustedCoveragePercent": 75.1,
+      "adjustedCoveragePercent": 75.2,
       "coverageGateStatus": "pass",
       "criticalPathOkPercent": 100,
       "criticalPathOkCount": 4,
       "criticalPathTotalCount": 4,
-      "mappedNodeCount": 38,
-      "mappedEdgeCount": 72,
-      "validationEdgeCount": 10,
+      "mappedNodeCount": 56,
+      "mappedEdgeCount": 110,
+      "validationEdgeCount": 15,
       "negativeEdgeCount": 3,
-      "mappedNodeValidationRatio": 0.263
+      "mappedNodeValidationRatio": 0.268
     }
   },
   "trend": {
@@ -130,16 +130,16 @@
       "score": 91.3,
       "status": "pass",
       "metrics": {
-        "adjustedCoveragePercent": 75.1,
+        "adjustedCoveragePercent": 75.2,
         "coverageGateStatus": "pass",
         "criticalPathOkPercent": 100,
         "criticalPathOkCount": 4,
         "criticalPathTotalCount": 4,
-        "mappedNodeCount": 38,
-        "mappedEdgeCount": 72,
-        "validationEdgeCount": 10,
+        "mappedNodeCount": 56,
+        "mappedEdgeCount": 110,
+        "validationEdgeCount": 15,
         "negativeEdgeCount": 3,
-        "mappedNodeValidationRatio": 0.263
+        "mappedNodeValidationRatio": 0.268
       }
     }
   ]
