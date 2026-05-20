@@ -29,11 +29,11 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | Arbeitsstrom | Master-Bloecke | Hinweis |
 | --- | --- | --- |
 | Hauptspiel | `V76`, `V99`, `V108`, `V112`, `V113`, `V115` | Gameplay, Multiplayer, Hangar, Playtest- und produktnahe Spielqualitaet. |
-| Map Content, Map Tools & Settings | `V103`, `V106`, `V114` | Map-/GLB-Content, SettingsManager, SurfacePolicy und spaetere Map-/Settings-Tools. |
+| Map Content, Map Tools & Settings | `V103`, `V106`, `V114`, `V130` | Map-/GLB-Content, SettingsManager, SurfacePolicy und kuratierte Parcours-Map-Varianz. |
 | Android / Mobile | `V132` | Android Arcade-Parcours als erster aktiver Mobile-Spielmodus-Folgeblock; weitere Mobile-/Android-Intakes bleiben bis zur Uebernahme unter `docs/plaene/neu/`. |
 | Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface und Architektur-Gates. |
 | Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126` | Governance, Planpflege, Toolchain, Evidence, Cleanup und Delivery-/Dev-Gates. |
-| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation und AI-Kontext. |
+| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V133` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation, Changelog-Erklaerung und AI-Kontext. |
 
 ## Aktive Bloecke
 
@@ -77,12 +77,14 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V126 | Local Dev-API, Preview- und Delivery-Hardening | done | P1 | frei | V102.99,V105.99 | 126.99 | `docs/plaene/aktiv/V126.md` |
 | V120 | Graph-RAG mit lokalem Context-Adapter | planned | P1 | frei | V107.99,V110.99,V111.99 | 120.1 | `docs/plaene/aktiv/V120.md` |
 | V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.1 | `docs/plaene/aktiv/V121.md` |
+| V133 | Fachbegriffe-Wiki fuer die Changelog-Visualisierung | planned | P2 | frei | V107.99,V110.99,V117.99 | 133.1 | `docs/plaene/aktiv/V133.md` |
 | V122 | Repo-natives Agent-Memory und externe Ruflo-Orchestrierung | planned | P2 | frei | V116.99,V117.99,V119.1 | 122.1 | `docs/plaene/aktiv/V122.md` |
 | V124 | Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet | planned | P2 | frei | V107.99,V110.99,V111.99 | 124.1 | `docs/plaene/aktiv/V124.md` |
 | V112 | Spielaudit- und Playtest-Improvement-Paket | done | P1 | frei | V102.99,V105.99 | 112.99 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
 | V113 | Hangar Shell Productivierung und Rules Panel | planned | P2 | frei | V76.99,V103.99 | 113.1 | `docs/plaene/aktiv/V113.md` |
+| V130 | Kreatives Parcours Map Pack und Arcade-Routenvarianz | done | P2 | frei | V82.99,V108.99,V115.99 | 130.99 | `docs/plaene/aktiv/V130.md` |
 | V132 | Android Arcade-Parcours Integration | planned | P2 | frei | V82.99,V108.99,V130.99 | 132.1 | `docs/plaene/aktiv/V132.md` |
 
 ## Abhaengigkeiten
@@ -138,6 +140,10 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V121 | V107.99 | hard | ja | Core-Graph und Export-/Viewer-Historie bilden die technische Basis |
 | V121 | V110.99 | hard | ja | Graph-Ops-, Guard- und SLO-Basis bleibt Voraussetzung fuer sichere Viewer-Exports |
 | V121 | V111.99 | hard | ja | Safety-/Redaction- und adaptive Query-Grundlagen sind Basis fuer Evidence-Dashboard-Ausgaben |
+| V133 | V107.99 | hard | ja | Plan-Map und Wissensgraph-Tooling sind technische Basis fuer die Changelog-Erklaerschicht |
+| V133 | V110.99 | hard | ja | Graph-Ops- und Tooling-Haertung begrenzt die Viewer-Erweiterung als read-only Consumer |
+| V133 | V117.99 | hard | ja | AI Decision Framework und Gate-Begriffe liefern die kanonische Governance-Sprache |
+| V133 | V121,V123,V125 | soft | nein | Glossar-Sprache sollte mit Viewer-/Plan-Index-/Architektur-Folgearbeit konsistent bleiben, blockiert den MVP aber nicht |
 | V122 | V116.99 | hard | ja | Repo-Kontext-Reduktion ist abgeschlossen; dauerhaftes Agent-Memory bleibt trotzdem an V119.1 und V117-Governance gebunden |
 | V122 | V117.99 | hard | ja | Decision-Klassen, D3/D4-Gates und Zweckklassen begrenzen Memory-/Ruflo-Scope |
 | V122 | V119.1 | hard | nein | Evidence-Baseline muss geklaert sein, bevor dauerhafte Memory-Hinweise verifiziert werden |
@@ -145,9 +151,13 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V124 | V110.99 | hard | ja | Graph-Ops-, Guard- und SLO-Basis begrenzen Semantik-Ratchet und Coverage-Ausbau |
 | V124 | V111.99 | hard | ja | Ownership, Stability, Scorecard und Test-Priorisierung sind Grundlage fuer Produktsemantik-Nutzwert |
 | V124 | V112.99,V96.99,V106.99,V113.99 | soft | nein | Produktbloecke liefern wertvolle Harvest-Quellen, sind aber keine Startblocker fuer Baseline und Taxonomie |
+| V130 | V82.99 | hard | ja | Arcade-Parcours-/Checkpoint-/Reward-Basis ist abgeschlossen |
+| V130 | V108.99 | hard | ja | Ghost-Selbstduell und stabile Route-Persistenz sind abgeschlossen |
+| V130 | V115.99 | hard | ja | Playability- und Audit-Follow-up-Erkenntnisse sind abgeschlossen und in Map-Tuning eingeflossen |
+| V130 | V106.99,V113.99,V128.99,V129.99 | soft | nein | GLB-/Preview-/Asset-/Manifest-Folgearbeit bleibt bewusst ausserhalb des abgeschlossenen JS-authored Map-Pack-Slices |
 | V132 | V82.99 | hard | ja | Arcade-Parcours-Progression, XP, Leaderboard, Splits, Minimap, Penalty und Ghost-Recorder sind technische Basis |
 | V132 | V108.99 | hard | ja | Ghost-Selbstduell und stabile Route-Persistenz sind Basis fuer den Android-Wiederholungsreiz |
-| V132 | V130.99 | hard | nein | Kuratierte Parcours-Map-Varianz soll vor Android-Pool-Freigabe kanonisch abgeschlossen sein |
+| V132 | V130.99 | hard | ja | Kuratierte Parcours-Map-Varianz ist kanonisch abgeschlossen |
 | V132 | V125.99,V96.99 | soft | nein | Architektur-Compliance und Application-Boundary-Folgearbeit helfen, blockieren den ersten Android-Parcours-Slice aber nicht |
 
 ## Lock-Status
@@ -180,6 +190,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V126 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Dev-API-/Preview-Hardening gruen, Handoff an V127/V128/V129 |
 | - | V120 | - | frei | Geplant |
 | - | V121 | - | frei | Geplant |
+| - | V133 | - | frei | Geplant; read-only Fachbegriffe-Wiki fuer Plan-Map-Changelog |
 | - | V122 | - | frei | Geplant |
 | - | V124 | - | frei | Geplant |
 | - | V96 | - | frei | Geplant |
@@ -189,6 +200,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V111 | 2026-05-09 | closed | Abgeschlossen 2026-05-10 |
 | - | V112 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Spielaudit-/Playtest-Hardening gruen, T20ba-Seitenfund dokumentiert |
 | - | V113 | - | frei | Geplant |
+| - | V130 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; sechs Parcours-Maps, gestaffelter Arcade-Pool und targeted Map-Pack-Smokes gruen |
 | - | V132 | - | frei | Geplant; Android Arcade-Parcours nach V82/V108 und kanonischem V130-Abschluss |
 
 ## Empfohlene Reihenfolge
@@ -200,12 +212,14 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 5. `V123` (AI-optimierter Plan-Index und Source-of-Truth-Migration) erst nach V119-Baseline als Plan-Index-Pilot starten; `docs/Umsetzungsplan.md` bleibt bis zur expliziten Migration kanonisch.
 6. `V120` (Graph-RAG mit lokalem Context-Adapter) erst nach frischem Graph-/SLO-Signal als Graph-RAG-Kontexthebel starten.
 7. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) erst nach `V120.99` oder einem expliziten V120-`fixture-ready`-Gate als read-only Consumer starten.
-8. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) nach V119; vor `V120.99` nur als kleines CLI-only Memory-MVP, Graph-RAG-/Ruflo-Kontext erst danach.
-9. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) nach Graph-Frische und ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113 einordnen.
-10. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
-11. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Hardening- und Produktqualitaets-Schnitten einplanen.
-12. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
-13. `V132` (Android Arcade-Parcours Integration) nach kanonischem V130-Abschluss und idealerweise nach V131-Steuerungsbaseline einordnen; erster Slice bleibt kuratierter Android-Parcours statt vollstaendiger Desktop-Modusparitaet.
+8. `V133` (Fachbegriffe-Wiki fuer die Changelog-Visualisierung) kann als kleiner Plan-Map-Read-only-Slice starten; bei Export-/Contract-Ausbau vorher mit V121/V123/V125-Sprache abgleichen.
+9. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) nach V119; vor `V120.99` nur als kleines CLI-only Memory-MVP, Graph-RAG-/Ruflo-Kontext erst danach.
+10. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) nach Graph-Frische und ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113 einordnen.
+11. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
+12. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Hardening- und Produktqualitaets-Schnitten einplanen.
+13. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
+14. `V130` ist kanonisch abgeschlossen: sechs neue Parcours-Maps, gestaffelte Arcade-Pool-Erweiterung und targeted Contract-/Start-Smokes sind gruen; Browser-Demo, GLB-/Asset-Setdressing und Preview-Scope bleiben bewusst unveraendert.
+15. `V132` (Android Arcade-Parcours Integration) kann nach kanonischem V130-Abschluss und idealerweise nach V131-Steuerungsbaseline eingeordnet werden; erster Slice bleibt kuratierter Android-Parcours statt vollstaendiger Desktop-Modusparitaet.
 
 ## Conflict-Log
 

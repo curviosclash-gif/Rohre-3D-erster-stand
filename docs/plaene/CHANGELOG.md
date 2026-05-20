@@ -844,3 +844,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Ursache: Die Android-/Mobile-Classic-Neigungssteuerung hatte eine zu grosse Default-Deadzone, starke Glaettung und separate Press-/Release-Richtungsschwellen; leichte Neigung blieb dadurch wirkungslos und mittlere Neigung fuehlte sich eher binaer als analog an.
 - Fixpfad: `src/ui/TouchInputSource.js` senkt Deadzone und Release-Schwelle, reduziert die Glaettung und leitet die Richtungsflags direkt aus der geglaetteten Analogachse ab. `tests/mobile-classic-app.contract.test.mjs` prueft jetzt leichte, mittlere und starke Neigung als monotone Analogwerte sowie die erste Tilt-Auswertung.
 - Evidence: `node --test tests/mobile-classic-app.contract.test.mjs` -> PASS; `npm run plan:check` -> PASS.
+
+## Plan-Intake 2026-05-21 (Block `V130`)
+
+- `V130` ist nach expliziter User-Anforderung als abgeschlossener aktiver Block kanonisiert: der Draft liegt in `docs/plaene/alt/Feature_Parcours_Map_Pack_V130.md`, die Source of Truth in `docs/plaene/aktiv/V130.md`.
+- Der bereits gelieferte Code-Slice aus `309ef8a9` bleibt fachlich die Umsetzung: sechs JS-authored Parcours-Maps, stabile `*_v1`-Route-IDs, gestaffelte Arcade-Pool-Erweiterung und targeted Contract-/Playwright-Smokes.
+- Der Intake loest die V132-Hard-Dependency `V130.99`; bewusst unveraendert bleiben Browser-Demo-Allowlist, `MenuPreviewCatalog.js`, GLB-/CC0-Assets, bewegliche Hazards, echte Loops und Editor-/Authoring-Pfade.

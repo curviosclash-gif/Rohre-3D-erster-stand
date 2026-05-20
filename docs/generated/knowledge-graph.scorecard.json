@@ -8,11 +8,11 @@
     "source": "build",
     "graphPath": "docs/generated/knowledge-graph.json",
     "coveragePath": "docs/generated/knowledge-graph.coverage.json",
-    "score": 91.5,
-    "status": "pass",
+    "score": 81.5,
+    "status": "review",
     "metrics": {
       "adjustedCoveragePercent": 75.6,
-      "coverageGateStatus": "pass",
+      "coverageGateStatus": "fail",
       "criticalPathOkPercent": 100,
       "criticalPathOkCount": 4,
       "criticalPathTotalCount": 4,
@@ -25,7 +25,7 @@
   },
   "trend": {
     "previousId": "V111.3.1",
-    "scoreDelta": -3.7,
+    "scoreDelta": -13.7,
     "direction": "down"
   },
   "criticalPaths": [
@@ -127,11 +127,11 @@
       "source": "build",
       "graphPath": "docs/generated/knowledge-graph.json",
       "coveragePath": "docs/generated/knowledge-graph.coverage.json",
-      "score": 91.5,
-      "status": "pass",
+      "score": 81.5,
+      "status": "review",
       "metrics": {
         "adjustedCoveragePercent": 75.6,
-        "coverageGateStatus": "pass",
+        "coverageGateStatus": "fail",
         "criticalPathOkPercent": 100,
         "criticalPathOkCount": 4,
         "criticalPathTotalCount": 4,

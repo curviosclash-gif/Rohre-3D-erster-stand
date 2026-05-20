@@ -1821,16 +1821,39 @@
     {
       "id": "V130",
       "type": "block",
-      "title": null,
-      "status": "unknown",
+      "title": "Kreatives Parcours Map Pack und Arcade-Routenvarianz",
+      "status": "done",
       "attributes": {
         "source": [
-          "dependency-target"
+          "block-plan",
+          "dependency-target",
+          "legacy-plan",
+          "master-index"
         ],
-        "priority": null,
-        "owner": null,
-        "currentPhase": null,
-        "planFile": null
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "130.99",
+        "planFile": "docs/plaene/aktiv/V130.md",
+        "scopeDeclarations": [
+          "docs/plaene/aktiv/V130.md",
+          "docs/plaene/CHANGELOG.md",
+          "src/core/config/maps/MapPresetCatalog.js",
+          "src/core/config/maps/MapPresetsBase.js",
+          "src/core/config/maps/presets/parcours_pack_v130.js",
+          "src/entities/directors/ArcadeEncounterCatalog.js",
+          "src/state/arcade/ArcadeMapProgression.js",
+          "tests/parcours-map-pack-start.spec.js",
+          "tests/parcours-map-pack.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 9,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": [
+          "created_at",
+          "soft_depends_on"
+        ]
       }
     },
     {
@@ -1869,6 +1892,21 @@
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V133",
+      "type": "block",
+      "title": "Fachbegriffe-Wiki fuer die Changelog-Visualisierung",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "133.1",
+        "planFile": "docs/plaene/aktiv/V133.md"
       }
     },
     {
@@ -2584,7 +2622,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 331,
+          "concreteCount": 333,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5129,6 +5167,86 @@
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.99"
+      }
+    },
+    {
+      "id": "V130.1",
+      "type": "phase",
+      "title": "Content-Baseline und Routenmatrix festziehen",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.1"
+      }
+    },
+    {
+      "id": "V130.2",
+      "type": "phase",
+      "title": "Contract- und Validierungsrahmen fuer Map-Pack",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.2"
+      }
+    },
+    {
+      "id": "V130.3",
+      "type": "phase",
+      "title": "Erste Map-Welle: kurz, mirror, speed",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.3"
+      }
+    },
+    {
+      "id": "V130.4",
+      "type": "phase",
+      "title": "Zweite Map-Welle: Branching, Vertikal, Endurance",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.4"
+      }
+    },
+    {
+      "id": "V130.5",
+      "type": "phase",
+      "title": "UI-, Preview- und Surface-Abgleich",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.5"
+      }
+    },
+    {
+      "id": "V130.6",
+      "type": "phase",
+      "title": "Playability, Balancing und Regression",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.6"
+      }
+    },
+    {
+      "id": "V130.7",
+      "type": "phase",
+      "title": "Dokumentation und Handoff",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.7"
+      }
+    },
+    {
+      "id": "V130.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99"
       }
     },
     {
@@ -14157,6 +14275,369 @@
         "blockId": "V126",
         "phaseCode": "126.99",
         "subphaseCode": "126.99.5"
+      }
+    },
+    {
+      "id": "V130.1.1",
+      "type": "subphase",
+      "title": "Bestehende Parcours-Presets inventarisieren: Map-Key, Route-ID, Checkpoint-Anzahl, Branches, Zielzeit, Reset-Regeln, Ghost-Policy. (abgeschlossen: 2026-05-20; evidence: `docs/plaene/aktiv/V130.md` Ausgangslage -> `commit 309ef8a9`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.1",
+        "subphaseCode": "130.1.1"
+      }
+    },
+    {
+      "id": "V130.1.2",
+      "type": "subphase",
+      "title": "MVP-Auswahl bestaetigen: `micro_maw`, `mirror_docks`, `glass_serpent`, `storm_switchyard`, `wind_cathedral`, `chrono_spillway`. (abgeschlossen: 2026-05-20; evidence: `src/core/config/maps/presets/parcours_pack_v130.js` -> `commit 309ef8a9`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.1",
+        "subphaseCode": "130.1.2"
+      }
+    },
+    {
+      "id": "V130.1.3",
+      "type": "subphase",
+      "title": "Arcade-Pool-Regel festlegen: kurze Maps frueh, mittlere Maps normal, lange Maps spaeter oder expert-only. (abgeschlossen: 2026-05-20; evidence: `tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.1",
+        "subphaseCode": "130.1.3"
+      }
+    },
+    {
+      "id": "V130.1.4",
+      "type": "subphase",
+      "title": "Demo-Grenze dokumentieren: keine Browser-Demo-Erweiterung ohne explizite Freigabe. (abgeschlossen: 2026-05-20; evidence: `git show --name-only 309ef8a9` -> kein Demo-Allowlist-Diff)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.1",
+        "subphaseCode": "130.1.4"
+      }
+    },
+    {
+      "id": "V130.2.1",
+      "type": "subphase",
+      "title": "`tests/parcours-map-pack.contract.test.mjs` planen oder anlegen: prueft neue Keys im Catalog, `buildRouteFromParcours`, Branch-Merges, Finish und Route-IDs. (abgeschlossen: 2026-05-20; evidence: `node --test tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.2",
+        "subphaseCode": "130.2.1"
+      }
+    },
+    {
+      "id": "V130.2.2",
+      "type": "subphase",
+      "title": "Plausibilitaetsregeln definieren: minimale/maximale Checkpoint-Abstaende, Radius-Untergrenzen, keine identischen Spawnpunkte, keine leeren Bot-Spawns. (abgeschlossen: 2026-05-20; evidence: `node --test tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.2",
+        "subphaseCode": "130.2.2"
+      }
+    },
+    {
+      "id": "V130.2.3",
+      "type": "subphase",
+      "title": "Ghost-/Leaderboard-Probe vorbereiten: Jede neue Route erzeugt eindeutigen Keyspace fuer lokale Ghosts. (abgeschlossen: 2026-05-20; evidence: `node --test tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.2",
+        "subphaseCode": "130.2.3"
+      }
+    },
+    {
+      "id": "V130.2.4",
+      "type": "subphase",
+      "title": "Falls vorhandenes `npm run parcours:check -- --strict` genutzt wird, neue Maps dort explizit aufnehmen oder dokumentieren, warum targeted Contract reicht. (abgeschlossen: 2026-05-20; evidence: `npm run parcours:check -- --strict` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.2",
+        "subphaseCode": "130.2.4"
+      }
+    },
+    {
+      "id": "V130.3.1",
+      "type": "subphase",
+      "title": "`micro_maw` implementieren: kurze Tutorialroute, kein Portal-Pflichtpfad, geringe Penalty, sicherer Finish. (abgeschlossen: 2026-05-20; evidence: `node scripts/run-playwright-smoke.mjs tests/parcours-map-pack-start.spec.js --timeout=180000` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.3",
+        "subphaseCode": "130.3.1"
+      }
+    },
+    {
+      "id": "V130.3.2",
+      "type": "subphase",
+      "title": "`mirror_docks` implementieren: Branch-Merge sauber mit `nextIds`, gespiegelte Linien und faire Item-Verteilung. (abgeschlossen: 2026-05-20; evidence: `node scripts/run-playwright-smoke.mjs tests/parcours-map-pack-start.spec.js --timeout=180000` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.3",
+        "subphaseCode": "130.3.2"
+      }
+    },
+    {
+      "id": "V130.3.3",
+      "type": "subphase",
+      "title": "`glass_serpent` implementieren: S-Kurve, Tube-Shortcut, konservative Boost-Impulse, Recovery-Portal. (abgeschlossen: 2026-05-20; evidence: `npm run parcours:check -- --strict` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.3",
+        "subphaseCode": "130.3.3"
+      }
+    },
+    {
+      "id": "V130.3.4",
+      "type": "subphase",
+      "title": "Erste Welle in Catalog/Base einhaengen, aber Arcade-Pool nur konservativ erweitern. (abgeschlossen: 2026-05-20; evidence: `node --test tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.3",
+        "subphaseCode": "130.3.4"
+      }
+    },
+    {
+      "id": "V130.4.1",
+      "type": "subphase",
+      "title": "`storm_switchyard` implementieren: Weichen-Branch mit High/Low-Linie, klare Merge-Logik, Recovery-Portale. (abgeschlossen: 2026-05-20; evidence: `npm run parcours:check -- --strict` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.4",
+        "subphaseCode": "130.4.1"
+      }
+    },
+    {
+      "id": "V130.4.2",
+      "type": "subphase",
+      "title": "`wind_cathedral` implementieren: Slingshot-Kette, Hoehenlesbarkeit, sichere Foam-Rettungsfelder. (abgeschlossen: 2026-05-20; evidence: `npm run parcours:check -- --strict` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.4",
+        "subphaseCode": "130.4.2"
+      }
+    },
+    {
+      "id": "V130.4.3",
+      "type": "subphase",
+      "title": "`chrono_spillway` implementieren: lange Segmentroute, Risk-Sluice-Branch, Ghost-/Split-Fokus. (abgeschlossen: 2026-05-20; evidence: `node scripts/run-playwright-smoke.mjs tests/parcours-map-pack-start.spec.js --timeout=180000` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.4",
+        "subphaseCode": "130.4.3"
+      }
+    },
+    {
+      "id": "V130.4.4",
+      "type": "subphase",
+      "title": "Langrouten im Arcade-Pool erst spaet oder expert-nah aktivieren. (abgeschlossen: 2026-05-20; evidence: `node --test tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.4",
+        "subphaseCode": "130.4.4"
+      }
+    },
+    {
+      "id": "V130.5.1",
+      "type": "subphase",
+      "title": "Map-Auswahl und Mode-Eligibility pruefen: Arcade darf neue Parcours-Maps sehen, normale Modi nur wenn bestehende Regeln es erlauben. (abgeschlossen: 2026-05-20; evidence: `node --test tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.5",
+        "subphaseCode": "130.5.1"
+      }
+    },
+    {
+      "id": "V130.5.2",
+      "type": "subphase",
+      "title": "Preview-Labels/Badges nur dann anfassen, wenn V113-Scope frei ist; sonst Fallback-Preview akzeptieren. (abgeschlossen: 2026-05-20; evidence: `git show --name-only 309ef8a9` -> kein `src/ui/menu/MenuPreviewCatalog.js`-Diff)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.5",
+        "subphaseCode": "130.5.2"
+      }
+    },
+    {
+      "id": "V130.5.3",
+      "type": "subphase",
+      "title": "Browser-Demo-Allowlist unveraendert lassen oder mit User-Gate bewusst erweitern. (abgeschlossen: 2026-05-20; evidence: `git show --name-only 309ef8a9` -> kein Demo-Allowlist-Diff)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.5",
+        "subphaseCode": "130.5.3"
+      }
+    },
+    {
+      "id": "V130.5.4",
+      "type": "subphase",
+      "title": "Favoriten-/Recent-/Random-Map-Pfade auf nicht kuratierte Demo-Auswahl pruefen. (abgeschlossen: 2026-05-20; evidence: `node --test tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.5",
+        "subphaseCode": "130.5.4"
+      }
+    },
+    {
+      "id": "V130.6.1",
+      "type": "subphase",
+      "title": "Contract-Gates fuer alle neuen Routen ausfuehren. (abgeschlossen: 2026-05-20; evidence: `node --test tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.6",
+        "subphaseCode": "130.6.1"
+      }
+    },
+    {
+      "id": "V130.6.2",
+      "type": "subphase",
+      "title": "Mindestens `micro_maw`, `mirror_docks` und eine Langroute per Playwright/desktop-start smoke pruefen. (abgeschlossen: 2026-05-20; evidence: `node scripts/run-playwright-smoke.mjs tests/parcours-map-pack-start.spec.js --timeout=180000` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.6",
+        "subphaseCode": "130.6.2"
+      }
+    },
+    {
+      "id": "V130.6.3",
+      "type": "subphase",
+      "title": "Schwierigkeit staffeln: Tutorial, Flow, Branch, Vertikal, Endurance duerfen nicht alle gleich hart sein. (abgeschlossen: 2026-05-20; evidence: `docs/plaene/aktiv/V130.md` MVP-Pack -> `commit 309ef8a9`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.6",
+        "subphaseCode": "130.6.3"
+      }
+    },
+    {
+      "id": "V130.6.4",
+      "type": "subphase",
+      "title": "Ghost-/Split-Verhalten exemplarisch pruefen: Route-ID, Finish-Event, Segment-Splits und Penalty bleiben plausibel. (abgeschlossen: 2026-05-20; evidence: `node --test tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.6",
+        "subphaseCode": "130.6.4"
+      }
+    },
+    {
+      "id": "V130.7.1",
+      "type": "subphase",
+      "title": "Pro shipping Map eine kompakte Designnotiz pflegen: Skill-Rolle, Zielzeit, Risiken, Tuning-Hypothese. (abgeschlossen: 2026-05-20; evidence: `docs/plaene/aktiv/V130.md` Detailentwuerfe -> `commit 309ef8a9`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.7",
+        "subphaseCode": "130.7.1"
+      }
+    },
+    {
+      "id": "V130.7.2",
+      "type": "subphase",
+      "title": "Backlog-Ideen klassifizieren: sofort umsetzbar, GLB/Asset-abhaengig, Preview/UI-abhaengig, Expert-only. (abgeschlossen: 2026-05-20; evidence: `docs/plaene/aktiv/V130.md` Backlog-Ideen -> `commit 309ef8a9`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.7",
+        "subphaseCode": "130.7.2"
+      }
+    },
+    {
+      "id": "V130.7.3",
+      "type": "subphase",
+      "title": "Handoff an V106/V128/V129 dokumentieren, falls GLB- oder Asset-Setdressing spaeter relevant wird. (abgeschlossen: 2026-05-20; evidence: `docs/plaene/aktiv/V130.md` Abhaengigkeiten -> `commit 309ef8a9`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.7",
+        "subphaseCode": "130.7.3"
+      }
+    },
+    {
+      "id": "V130.7.4",
+      "type": "subphase",
+      "title": "Bekannte Limitierungen dokumentieren: keine beweglichen Hazards, keine echten Loops, keine Demo-Erweiterung. (abgeschlossen: 2026-05-20; evidence: `docs/plaene/aktiv/V130.md` Nicht-Ziel -> `commit 309ef8a9`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.7",
+        "subphaseCode": "130.7.4"
+      }
+    },
+    {
+      "id": "V130.99.1",
+      "type": "subphase",
+      "title": "`npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-20; evidence: `commit 309ef8a9` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99",
+        "subphaseCode": "130.99.1"
+      }
+    },
+    {
+      "id": "V130.99.2",
+      "type": "subphase",
+      "title": "Map-Pack-Contract-Checks sind gruen oder ein Blocker ist in `docs/Fehlerberichte/` dokumentiert. (abgeschlossen: 2026-05-20; evidence: `node --test tests/parcours-map-pack.contract.test.mjs` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99",
+        "subphaseCode": "130.99.2"
+      }
+    },
+    {
+      "id": "V130.99.3",
+      "type": "subphase",
+      "title": "Playability-Smoke ist fuer die vereinbarte Auswahl gruen. (abgeschlossen: 2026-05-20; evidence: `node scripts/run-playwright-smoke.mjs tests/parcours-map-pack-start.spec.js --timeout=180000` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99",
+        "subphaseCode": "130.99.3"
+      }
+    },
+    {
+      "id": "V130.99.4",
+      "type": "subphase",
+      "title": "`scope-collisions` nennt keine ungeklaerte Kollision mit V113/V106/V128/V129 fuer die tatsaechlich geaenderten Dateien. (abgeschlossen: 2026-05-20; evidence: `node scripts/query-knowledge-graph.mjs scope-collisions --json` -> PASS)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99",
+        "subphaseCode": "130.99.4"
+      }
+    },
+    {
+      "id": "V130.99.5",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt, welche Backlog-Maps bewusst nicht gebaut wurden. (abgeschlossen: 2026-05-20; evidence: `docs/plaene/aktiv/V130.md` Bewusst nicht gebaut -> `commit 309ef8a9`)",
+      "status": "done",
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99",
+        "subphaseCode": "130.99.5"
       }
     },
     {
@@ -27760,6 +28241,22 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V130.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V130",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V132.md",
       "type": "file",
       "title": null,
@@ -28610,6 +29107,21 @@
       }
     },
     {
+      "id": "docs/plaene/alt/Feature_Parcours_Map_Pack_V130.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/alt/Feature_Parcours_Pflichtmap_Verifikation_V51.md",
       "type": "file",
       "title": null,
@@ -29280,6 +29792,7 @@
           "V120",
           "V123",
           "V125",
+          "V130",
           "V77",
           "V93"
         ],
@@ -30063,7 +30576,7 @@
         "scopeBlocks": [
           "V77"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -34299,6 +34812,7 @@
         ],
         "scopeBlocks": [
           "V106",
+          "V130",
           "V51",
           "V85",
           "V86"
@@ -34369,6 +34883,7 @@
         ],
         "scopeBlocks": [
           "V106",
+          "V130",
           "V85",
           "V86"
         ],
@@ -34575,6 +35090,7 @@
         ],
         "scopeBlocks": [
           "V106",
+          "V130",
           "V85",
           "V86"
         ],
@@ -37636,6 +38152,7 @@
         ],
         "scopeBlocks": [
           "B03",
+          "V130",
           "V84"
         ],
         "exists": true
@@ -41329,6 +41846,7 @@
         ],
         "scopeBlocks": [
           "B04",
+          "V130",
           "V84",
           "V85",
           "V91"
@@ -45779,10 +46297,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V130"
         ],
         "exists": true
       }
@@ -45794,10 +46314,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V130"
         ],
         "exists": true
       }
@@ -46909,7 +47431,7 @@
         "scopeBlocks": [
           "V116"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -74395,6 +74917,584 @@
       }
     },
     {
+      "from": "V130",
+      "to": "docs/plaene/aktiv/V130.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "src/core/config/maps/MapPresetCatalog.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "src/core/config/maps/MapPresetsBase.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "src/core/config/maps/presets/parcours_pack_v130.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "src/entities/directors/ArcadeEncounterCatalog.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "src/state/arcade/ArcadeMapProgression.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "tests/parcours-map-pack-start.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "tests/parcours-map-pack.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V108",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Ghost-Selbstduell und stabile Route-Persistenz sind abgeschlossen",
+      "attributes": {
+        "dependsPhase": "108.99",
+        "rawToken": "V108.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V115",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Playability- und Audit-Follow-up-Erkenntnisse sind abgeschlossen und in Map-Tuning eingeflossen",
+      "attributes": {
+        "dependsPhase": "115.99",
+        "rawToken": "V115.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V130.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.1"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V130.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.2"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V130.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.3"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V130.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.4"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V130.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.5"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V130.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.6"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V130.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.7"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V130.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99"
+      }
+    },
+    {
+      "from": "V130",
+      "to": "V82",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Arcade-Parcours-/Checkpoint-/Reward-Basis ist abgeschlossen",
+      "attributes": {
+        "dependsPhase": "82.99",
+        "rawToken": "V82.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V130.1",
+      "to": "V130.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.1",
+        "subphaseCode": "130.1.1"
+      }
+    },
+    {
+      "from": "V130.1",
+      "to": "V130.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.1",
+        "subphaseCode": "130.1.2"
+      }
+    },
+    {
+      "from": "V130.1",
+      "to": "V130.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.1",
+        "subphaseCode": "130.1.3"
+      }
+    },
+    {
+      "from": "V130.1",
+      "to": "V130.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.1",
+        "subphaseCode": "130.1.4"
+      }
+    },
+    {
+      "from": "V130.2",
+      "to": "V130.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.2",
+        "subphaseCode": "130.2.1"
+      }
+    },
+    {
+      "from": "V130.2",
+      "to": "V130.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.2",
+        "subphaseCode": "130.2.2"
+      }
+    },
+    {
+      "from": "V130.2",
+      "to": "V130.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.2",
+        "subphaseCode": "130.2.3"
+      }
+    },
+    {
+      "from": "V130.2",
+      "to": "V130.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.2",
+        "subphaseCode": "130.2.4"
+      }
+    },
+    {
+      "from": "V130.3",
+      "to": "V130.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.3",
+        "subphaseCode": "130.3.1"
+      }
+    },
+    {
+      "from": "V130.3",
+      "to": "V130.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.3",
+        "subphaseCode": "130.3.2"
+      }
+    },
+    {
+      "from": "V130.3",
+      "to": "V130.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.3",
+        "subphaseCode": "130.3.3"
+      }
+    },
+    {
+      "from": "V130.3",
+      "to": "V130.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.3",
+        "subphaseCode": "130.3.4"
+      }
+    },
+    {
+      "from": "V130.4",
+      "to": "V130.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.4",
+        "subphaseCode": "130.4.1"
+      }
+    },
+    {
+      "from": "V130.4",
+      "to": "V130.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.4",
+        "subphaseCode": "130.4.2"
+      }
+    },
+    {
+      "from": "V130.4",
+      "to": "V130.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.4",
+        "subphaseCode": "130.4.3"
+      }
+    },
+    {
+      "from": "V130.4",
+      "to": "V130.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.4",
+        "subphaseCode": "130.4.4"
+      }
+    },
+    {
+      "from": "V130.5",
+      "to": "V130.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.5",
+        "subphaseCode": "130.5.1"
+      }
+    },
+    {
+      "from": "V130.5",
+      "to": "V130.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.5",
+        "subphaseCode": "130.5.2"
+      }
+    },
+    {
+      "from": "V130.5",
+      "to": "V130.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.5",
+        "subphaseCode": "130.5.3"
+      }
+    },
+    {
+      "from": "V130.5",
+      "to": "V130.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.5",
+        "subphaseCode": "130.5.4"
+      }
+    },
+    {
+      "from": "V130.6",
+      "to": "V130.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.6",
+        "subphaseCode": "130.6.1"
+      }
+    },
+    {
+      "from": "V130.6",
+      "to": "V130.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.6",
+        "subphaseCode": "130.6.2"
+      }
+    },
+    {
+      "from": "V130.6",
+      "to": "V130.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.6",
+        "subphaseCode": "130.6.3"
+      }
+    },
+    {
+      "from": "V130.6",
+      "to": "V130.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.6",
+        "subphaseCode": "130.6.4"
+      }
+    },
+    {
+      "from": "V130.7",
+      "to": "V130.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.7",
+        "subphaseCode": "130.7.1"
+      }
+    },
+    {
+      "from": "V130.7",
+      "to": "V130.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.7",
+        "subphaseCode": "130.7.2"
+      }
+    },
+    {
+      "from": "V130.7",
+      "to": "V130.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.7",
+        "subphaseCode": "130.7.3"
+      }
+    },
+    {
+      "from": "V130.7",
+      "to": "V130.7.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.7",
+        "subphaseCode": "130.7.4"
+      }
+    },
+    {
+      "from": "V130.99",
+      "to": "V130.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99",
+        "subphaseCode": "130.99.1"
+      }
+    },
+    {
+      "from": "V130.99",
+      "to": "V130.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99",
+        "subphaseCode": "130.99.2"
+      }
+    },
+    {
+      "from": "V130.99",
+      "to": "V130.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99",
+        "subphaseCode": "130.99.3"
+      }
+    },
+    {
+      "from": "V130.99",
+      "to": "V130.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99",
+        "subphaseCode": "130.99.4"
+      }
+    },
+    {
+      "from": "V130.99",
+      "to": "V130.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V130",
+        "phaseCode": "130.99",
+        "subphaseCode": "130.99.5"
+      }
+    },
+    {
       "from": "V132",
       "to": "scripts/build-mobile-classic-app.mjs",
       "type": "scope",
@@ -74535,8 +75635,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "Kuratierte Parcours-Map-Varianz soll vor Android-Pool-Freigabe kanonisch abgeschlossen sein",
+      "fulfilled": true,
+      "hint": "Kuratierte Parcours-Map-Varianz ist kanonisch abgeschlossen",
       "attributes": {
         "dependsPhase": "130.99",
         "rawToken": "V130.99",
@@ -75017,6 +76117,57 @@
         "blockId": "V132",
         "phaseCode": "132.99",
         "subphaseCode": "132.99.6"
+      }
+    },
+    {
+      "from": "V133",
+      "to": "V107",
+      "type": "depends_on",
+      "source": "master-table",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Plan-Map und Wissensgraph-Tooling sind technische Basis fuer die Changelog-Erklaerschicht",
+      "attributes": {
+        "dependsPhase": "107.99",
+        "rawToken": "V107.99",
+        "sourceBreakdown": [
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V133",
+      "to": "V110",
+      "type": "depends_on",
+      "source": "master-table",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Graph-Ops- und Tooling-Haertung begrenzt die Viewer-Erweiterung als read-only Consumer",
+      "attributes": {
+        "dependsPhase": "110.99",
+        "rawToken": "V110.99",
+        "sourceBreakdown": [
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V133",
+      "to": "V117",
+      "type": "depends_on",
+      "source": "master-table",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "AI Decision Framework und Gate-Begriffe liefern die kanonische Governance-Sprache",
+      "attributes": {
+        "dependsPhase": "117.99",
+        "rawToken": "V117.99",
+        "sourceBreakdown": [
+          "master-table"
+        ],
+        "canonicalToken": true
       }
     },
     {
@@ -85323,6 +86474,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V130.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V132.md",
       "type": "scope",
       "hint": null,
@@ -85810,6 +86970,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/alt/Feature_Menu_UX_Followup_V26_3c.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/Feature_Parcours_Map_Pack_V130.md",
       "type": "scope",
       "hint": null,
       "attributes": {

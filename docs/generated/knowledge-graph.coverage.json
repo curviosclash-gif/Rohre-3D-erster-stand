@@ -176,14 +176,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2043,
-    "rawCoveredFileCount": 1287,
+    "trackedFileCount": 2045,
+    "rawCoveredFileCount": 1288,
     "rawCoveragePercent": 63,
-    "adjustedTrackedFileCount": 1412,
-    "adjustedCoveredFileCount": 1068,
+    "adjustedTrackedFileCount": 1414,
+    "adjustedCoveredFileCount": 1069,
     "adjustedCoveragePercent": 75.6,
-    "uncoveredFileCount": 756,
-    "uncoveredActiveFileCount": 344,
+    "uncoveredFileCount": 757,
+    "uncoveredActiveFileCount": 345,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -248,8 +248,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 359,
-        "coveredCount": 168
+        "count": 361,
+        "coveredCount": 169
       },
       {
         "classification": "prototype",
@@ -273,7 +273,7 @@
   },
   "gate": {
     "contract": "knowledge-graph.coverage.gate.v1",
-    "status": "pass",
+    "status": "fail",
     "baseline": {
       "ref": "HEAD",
       "path": "docs/generated/knowledge-graph.coverage.json",
@@ -283,10 +283,21 @@
       {
         "id": "no-new-active-uncovered-files",
         "severity": "error",
-        "status": "pass",
+        "status": "fail",
         "description": "Active repo files may not become newly uncovered; add them to a graph scope/mapping or classify them as excluded.",
-        "violationCount": 0,
-        "files": []
+        "violationCount": 1,
+        "files": [
+          {
+            "path": "docs/plaene/neu/Feature_Parcours_Map_Pack_V130.md",
+            "classification": "product-docs",
+            "baselineState": "covered",
+            "coveredInCore": false,
+            "coveredByOverlay": false,
+            "scopeBlocks": [
+              "V77"
+            ]
+          }
+        ]
       }
     ]
   },
@@ -11727,6 +11738,24 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V130.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V130",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V132.md",
       "tracked": true,
       "coveredInCore": true,
@@ -12687,6 +12716,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/alt/Feature_Parcours_Map_Pack_V130.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/alt/Feature_Parcours_Pflichtmap_Verifikation_V51.md",
       "tracked": true,
       "coveredInCore": true,
@@ -13441,6 +13487,7 @@
         "V120",
         "V123",
         "V125",
+        "V130",
         "V77",
         "V93"
       ],
@@ -14319,9 +14366,9 @@
     {
       "path": "docs/plaene/neu/Feature_Parcours_Map_Pack_V130.md",
       "tracked": true,
-      "coveredInCore": true,
+      "coveredInCore": false,
       "coveredByOverlay": false,
-      "covered": true,
+      "covered": false,
       "coverageSources": [
         "scope-files"
       ],
@@ -20857,6 +20904,7 @@
       ],
       "scopeBlocks": [
         "V106",
+        "V130",
         "V51",
         "V85",
         "V86"
@@ -20935,6 +20983,7 @@
       ],
       "scopeBlocks": [
         "V106",
+        "V130",
         "V85",
         "V86"
       ],
@@ -21165,6 +21214,7 @@
       ],
       "scopeBlocks": [
         "V106",
+        "V130",
         "V85",
         "V86"
       ],
@@ -24713,6 +24763,7 @@
       ],
       "scopeBlocks": [
         "B03",
+        "V130",
         "V84"
       ],
       "surfaces": [],
@@ -28685,6 +28736,7 @@
       ],
       "scopeBlocks": [
         "B04",
+        "V130",
         "V84",
         "V85",
         "V91"
@@ -33488,10 +33540,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V130"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33505,10 +33559,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V130"
       ],
       "surfaces": [],
       "classification": "product-code",
