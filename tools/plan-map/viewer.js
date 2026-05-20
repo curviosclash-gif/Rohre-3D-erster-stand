@@ -20,6 +20,7 @@ const state = {
   fileFocus: '',
   detailTab: 'overview',
   expandedSections: new Set(),
+  activeHelpTerm: '',
   overlays: {
     dependencies: true,
     collisions: true,
@@ -28,6 +29,7 @@ const state = {
   },
   whyOpen: false,
   lastSelectedId: null,
+  helpVisible: true,
 };
 
 const elements = {
@@ -74,6 +76,69 @@ const MAP_NODE_GAP = 76;
 const MAP_TOP_PADDING = 72;
 const MAP_BOTTOM_PADDING = 96;
 
+const HELP_TERMS = {
+  'readiness-ready': {
+    title: 'startklar',
+    body: 'Alle harten Startbedingungen sind erfuellt. Der Block kann grundsaetzlich begonnen werden.',
+  },
+  'readiness-risk': {
+    title: 'mit Risiko',
+    body: 'Der Start ist moeglich, aber Soft-Gates, unklare Abhaengigkeiten oder Scope-Risiken sollten vorher kurz geprueft werden.',
+  },
+  'readiness-blocked': {
+    title: 'blockiert',
+    body: 'Ein harter Vorblock, ein Lock oder eine offene Dependency verhindert den sauberen Start.',
+  },
+  readiness: {
+    title: 'Startbarkeit',
+    body: 'Verdichtete Einschaetzung, ob ein Planblock jetzt sinnvoll gestartet werden kann.',
+  },
+  dependency: {
+    title: 'Dependency',
+    body: 'Ein anderer Block, eine Phase oder ein Gate, das fuer diesen Block relevant ist.',
+  },
+  'deps-layer': {
+    title: 'Deps',
+    body: 'Blendet die Dependency-Kanten der Karte ein oder aus. Die Richtung zeigt, welcher Block von welchem Vorlauf abhaengt.',
+  },
+  collision: {
+    title: 'Scope-Kollision',
+    body: 'Zwei Bloecke nennen dieselben Dateien. Das ist kein Fehler, aber parallele Arbeit braucht Lock- und Scope-Abgleich.',
+  },
+  impact: {
+    title: 'Impact',
+    body: 'Gewicht aus Scope-Groesse, geteilten Dateien, Governance-Naehe und betroffenen Code-/Testbereichen.',
+  },
+  progress: {
+    title: 'Fortschritt',
+    body: 'Zeigt den gelesenen Stand aus Phasenpunkten und DoD. Es ist ein Plan-Signal, kein Live-Testlauf.',
+  },
+  evidence: {
+    title: 'Evidence',
+    body: 'Nachvollziehbare Belege wie Tests, Checks, Dateipfade oder Planhinweise, auf denen eine Aussage basiert.',
+  },
+  'changelog-type': {
+    title: 'Changelog-Typ',
+    body: 'Filtert Historieneintraege nach ihrer Art, zum Beispiel Umsetzung, Gate, Sync oder Abschluss.',
+  },
+  consumer: {
+    title: 'Consumer',
+    body: 'Bloecke, die vom aktuell ausgewaehlten Block abhaengen oder dessen Ergebnis spaeter nutzen.',
+  },
+  scope: {
+    title: 'Scope',
+    body: 'Die Dateien und Bereiche, die ein Block planmaessig beruehren darf oder besonders im Blick behalten muss.',
+  },
+  health: {
+    title: 'Health',
+    body: 'Zusammenfassung von Graph-, Coverage- und Scorecard-Signalen zur Qualitaet der Plan- und Repo-Daten.',
+  },
+  rank: {
+    title: 'Rank',
+    body: 'Empfohlene Reihenfolge aus der Plananalyse. Niedrigere Zahl bedeutet: frueher sinnvoll ansehen.',
+  },
+};
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -81,6 +146,75 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function helpButton(term) {
+  const help = HELP_TERMS[term];
+  if (!help) return '';
+  return `<button type="button" class="help-button" data-help-term="${escapeHtml(term)}" aria-label="${escapeHtml(help.title)} erklaeren">i</button>`;
+}
+
+function ensureHelpPopover() {
+  let popover = document.querySelector('#helpPopover');
+  if (!popover) {
+    popover = document.createElement('div');
+    popover.id = 'helpPopover';
+    popover.className = 'help-popover';
+    popover.hidden = true;
+    popover.setAttribute('role', 'dialog');
+    popover.setAttribute('aria-live', 'polite');
+    document.body.appendChild(popover);
+  }
+  return popover;
+}
+
+function closeHelpPopover() {
+  state.activeHelpTerm = '';
+  document.querySelectorAll('.help-button.is-active').forEach((button) => button.classList.remove('is-active'));
+  ensureHelpPopover().hidden = true;
+}
+
+function setHelpVisible(isVisible) {
+  state.helpVisible = isVisible !== false;
+  document.body.classList.toggle('help-hidden', !state.helpVisible);
+  if (!state.helpVisible) {
+    closeHelpPopover();
+  }
+}
+
+function openHelpPopover(term, button) {
+  const help = HELP_TERMS[term];
+  if (!help) return;
+  const popover = ensureHelpPopover();
+  document.querySelectorAll('.help-button.is-active').forEach((node) => node.classList.remove('is-active'));
+  button.classList.add('is-active');
+  state.activeHelpTerm = term;
+  popover.innerHTML = `<strong>${escapeHtml(help.title)}</strong><span>${escapeHtml(help.body)}</span>`;
+  popover.hidden = false;
+
+  const buttonRect = button.getBoundingClientRect();
+  const popoverRect = popover.getBoundingClientRect();
+  const left = Math.min(window.innerWidth - popoverRect.width - 12, Math.max(12, buttonRect.left));
+  const top = Math.min(window.innerHeight - popoverRect.height - 12, buttonRect.bottom + 8);
+  popover.style.left = `${left}px`;
+  popover.style.top = `${top}px`;
+}
+
+function bindHelpButtons(root = document) {
+  root.querySelectorAll('[data-help-term]').forEach((button) => {
+    if (button.dataset.helpBound === 'true') return;
+    button.dataset.helpBound = 'true';
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const term = button.dataset.helpTerm;
+      if (state.activeHelpTerm === term) {
+        closeHelpPopover();
+      } else {
+        openHelpPopover(term, button);
+      }
+    });
+  });
 }
 
 function sourceLabel(key) {
@@ -1101,7 +1235,7 @@ function renderDetail() {
   if (state.detailTab === 'start') {
     tabContent = `
       <div class="detail-section">
-        <h3>Startentscheidung</h3>
+        <h3>Startentscheidung ${helpButton('readiness')}</h3>
         <div class="why-row">
           <button type="button" class="pill-button" data-toggle-why aria-expanded="${state.whyOpen ? 'true' : 'false'}">Warum?</button>
           <span>${escapeHtml(readiness.reason || '-')}</span>
@@ -1112,9 +1246,9 @@ function renderDetail() {
             <dl class="key-value">
               <dt>Harte Gates</dt><dd>${escapeHtml(readiness.openHardDependencyCount || 0)} offen</dd>
               <dt>Soft/unklar</dt><dd>${escapeHtml((readiness.openSoftDependencyCount || 0) + (readiness.openUnknownDependencyCount || 0))} offen</dd>
-              <dt>Dependencies</dt><dd>${escapeHtml(readiness.dependencyCount || 0)}</dd>
-              <dt>Consumer</dt><dd>${escapeHtml(readiness.consumerCount || 0)}</dd>
-              <dt>Rank</dt><dd>${readiness.recommendedRank ? `#${escapeHtml(readiness.recommendedRank)}` : '-'}</dd>
+              <dt>Dependencies ${helpButton('dependency')}</dt><dd>${escapeHtml(readiness.dependencyCount || 0)}</dd>
+              <dt>Consumer ${helpButton('consumer')}</dt><dd>${escapeHtml(readiness.consumerCount || 0)}</dd>
+              <dt>Rank ${helpButton('rank')}</dt><dd>${readiness.recommendedRank ? `#${escapeHtml(readiness.recommendedRank)}` : '-'}</dd>
             </dl>
           </div>
         ` : ''}
@@ -1126,12 +1260,12 @@ function renderDetail() {
         </dl>
       </div>
       <div class="detail-section">
-        <h3>Dependencies</h3>
+        <h3>Dependencies ${helpButton('dependency')}</h3>
         <ul class="plain-list">${dependencyItems(limitedItems('dependencies', outgoingDeps, 8))}</ul>
         ${showMoreButton('dependencies', outgoingDeps.length, 8)}
       </div>
       <div class="detail-section">
-        <h3>Consumer</h3>
+        <h3>Consumer ${helpButton('consumer')}</h3>
         <ul class="plain-list">${consumerItems(limitedItems('consumers', incomingDeps, 8), block.id)}</ul>
         ${showMoreButton('consumers', incomingDeps.length, 8)}
       </div>
@@ -1141,22 +1275,22 @@ function renderDetail() {
   if (state.detailTab === 'scope') {
     tabContent = `
       <div class="detail-section">
-        <h3>Impact</h3>
+        <h3>Impact ${helpButton('impact')}</h3>
         <dl class="key-value">
           <dt>Level</dt><dd>${escapeHtml(impact.level || 'low')} (${escapeHtml(impact.score || 0)} Punkte)</dd>
-          <dt>Scope</dt><dd>${escapeHtml(impact.scopeFileCount || 0)} Dateien, ${escapeHtml(impact.sharedFileCount || 0)} geteilt</dd>
+          <dt>Scope ${helpButton('scope')}</dt><dd>${escapeHtml(impact.scopeFileCount || 0)} Dateien, ${escapeHtml(impact.sharedFileCount || 0)} geteilt</dd>
           <dt>Governance</dt><dd>${escapeHtml(impact.governanceFileCount || 0)}</dd>
           <dt>Source/Test</dt><dd>${escapeHtml(impact.sourceFileCount || 0)} / ${escapeHtml(impact.testFileCount || 0)}</dd>
           <dt>Docs</dt><dd>${escapeHtml(impact.docsFileCount || 0)}</dd>
         </dl>
       </div>
       <div class="detail-section">
-        <h3>Scope-Kollisionen</h3>
+        <h3>Scope-Kollisionen ${helpButton('collision')}</h3>
         <ul class="plain-list">${collisionItems(block.id, collisions, 'collisions', 7)}</ul>
         ${showMoreButton('collisions', collisions.length, 7)}
       </div>
       <div class="detail-section">
-        <h3>Scope Files</h3>
+        <h3>Scope Files ${helpButton('scope')}</h3>
         <ul class="plain-list">${fileItems(block.scopeFiles, 'scopeFiles', 12)}</ul>
         ${showMoreButton('scopeFiles', (block.scopeFiles || []).length, 12)}
       </div>
@@ -1171,7 +1305,7 @@ function renderDetail() {
   if (state.detailTab === 'phases') {
     tabContent = `
       <div class="detail-section">
-        <h3>Fortschritt</h3>
+        <h3>Fortschritt ${helpButton('progress')}</h3>
         <div class="progress-track detail-progress"><div class="progress-fill" style="width:${progressWidth(progress)}%"></div></div>
         <dl class="key-value">
           <dt>Phase</dt><dd>${escapeHtml(block.currentPhase || '-')}</dd>
@@ -1194,7 +1328,7 @@ function renderDetail() {
         ${riskHintMarkup(hints)}
       </div>
       <div class="detail-section">
-        <h3>Verification</h3>
+        <h3>Verification ${helpButton('evidence')}</h3>
         <ul class="plain-list">${textItems(verification, 'verification', 8)}</ul>
         ${showMoreButton('verification', verification.length, 8)}
       </div>
@@ -1324,7 +1458,7 @@ function renderHealthView() {
 
   elements.healthPanel.innerHTML = `
     <section class="health-panel">
-      <h2>Graph</h2>
+      <h2>Graph ${helpButton('health')}</h2>
       <dl class="key-value">
         <dt>Score</dt><dd>${escapeHtml(scorecard.score ?? '-')}</dd>
         <dt>Status</dt><dd>${escapeHtml(scorecard.status || '-')}</dd>
@@ -1333,7 +1467,7 @@ function renderHealthView() {
       </dl>
     </section>
     <section class="health-panel">
-      <h2>Coverage</h2>
+      <h2>Coverage ${helpButton('evidence')}</h2>
       <dl class="key-value">
         <dt>Adjusted</dt><dd>${escapeHtml(coverage.summary?.adjustedCoveragePercent ?? scorecard.metrics?.adjustedCoveragePercent ?? '-')}</dd>
         <dt>Gate</dt><dd>${escapeHtml(coverage.gate?.status || scorecard.metrics?.coverageGateStatus || '-')}</dd>
@@ -1401,6 +1535,7 @@ function render() {
   renderDetail();
   renderCollisionView();
   renderHealthView();
+  bindHelpButtons(document);
 }
 
 async function loadDataFromUrl(url) {
@@ -1508,13 +1643,30 @@ function bindEvents() {
   });
 
   window.addEventListener('resize', () => {
+    closeHelpPopover();
     if (state.view === 'map') {
       renderMap();
     }
   });
 
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.help-button') && !event.target.closest('.help-popover')) {
+      closeHelpPopover();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeHelpPopover();
+    }
+  });
+
   window.addEventListener('message', (event) => {
     const message = event.data || {};
+    if (message.type === 'curvios.map-tools:set-help-visible') {
+      setHelpVisible(message.visible !== false);
+      return;
+    }
     if (message.type !== 'curvios.plan-map:set-filter') {
       return;
     }
@@ -1530,4 +1682,5 @@ function bindEvents() {
 }
 
 bindEvents();
+bindHelpButtons(document);
 loadDefaultData();

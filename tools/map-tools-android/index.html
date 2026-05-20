@@ -42,8 +42,10 @@
             <option value="ai-graph-tools">AI/Graph</option>
           </select>
         </label>
-        <button type="button" id="planChangelog" data-testid="map-tools-android-changelog">Historie</button>
+        <button type="button" id="infoToggle" class="is-active" aria-pressed="true" data-testid="map-tools-android-info-toggle">Info</button>
       </section>
+
+      <div id="helpPopover" class="help-popover" role="dialog" aria-live="polite" hidden></div>
 
       <iframe
         id="mapFrame"

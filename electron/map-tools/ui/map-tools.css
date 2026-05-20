@@ -44,6 +44,82 @@ button:hover {
   background: #27333c;
 }
 
+.help-button,
+.button-help {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #18212a;
+  color: var(--accent-strong);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.help-button {
+  min-height: 18px;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.button-help {
+  cursor: help;
+}
+
+.help-button:hover,
+.help-button:focus-visible,
+button:hover .button-help,
+button:focus-visible .button-help,
+.help-button.is-active {
+  border-color: var(--accent);
+  background: rgba(76, 182, 166, 0.18);
+  outline: 0;
+}
+
+.help-popover {
+  position: fixed;
+  z-index: 30;
+  display: grid;
+  gap: 5px;
+  width: min(310px, calc(100vw - 24px));
+  padding: 10px 11px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #202832;
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.help-popover[hidden] {
+  display: none;
+}
+
+.help-popover strong {
+  color: var(--accent-strong);
+  font-size: 13px;
+}
+
+.help-popover span {
+  color: var(--muted);
+}
+
+.map-tools-shell.info-hidden .help-button,
+.map-tools-shell.info-hidden .button-help {
+  display: none;
+}
+
+#infoToggle.is-active {
+  border-color: rgba(76, 182, 166, 0.36);
+  background: rgba(76, 182, 166, 0.18);
+  color: var(--accent-strong);
+}
+
 button:disabled {
   cursor: wait;
   color: #78838f;

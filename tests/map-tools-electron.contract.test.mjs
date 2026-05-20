@@ -63,6 +63,8 @@ test('map tools app is wired as a separate Electron entry with native menu actio
     const electronPackage = JSON.parse(await fs.readFile(new URL('../electron/package.json', import.meta.url), 'utf8'));
     const mainSource = await fs.readFile(new URL('../electron/map-tools/main.cjs', import.meta.url), 'utf8');
     const preloadSource = await fs.readFile(new URL('../electron/map-tools/preload.cjs', import.meta.url), 'utf8');
+    const shellHtml = await fs.readFile(new URL('../electron/map-tools/ui/map-tools.html', import.meta.url), 'utf8');
+    const shellCss = await fs.readFile(new URL('../electron/map-tools/ui/map-tools.css', import.meta.url), 'utf8');
     const rendererSource = await fs.readFile(new URL('../electron/map-tools/ui/map-tools-renderer.js', import.meta.url), 'utf8');
 
     assert.equal(rootPackage.scripts['app:maps:start'], 'npm --prefix electron run start:maps');
@@ -79,6 +81,11 @@ test('map tools app is wired as a separate Electron entry with native menu actio
     assert.match(preloadSource, /map-tools-preload\.v1/);
     assert.match(rendererSource, /#errorPanel/);
     assert.match(rendererSource, /mapFrame/);
+    assert.match(shellHtml, /id="infoToggle"/);
+    assert.match(shellHtml, /id="helpPopover"/);
+    assert.match(shellCss, /\.map-tools-shell\.info-hidden/);
+    assert.match(rendererSource, /function setInfoVisible/);
+    assert.match(rendererSource, /curvios\.map-tools:set-help-visible/);
 });
 
 test('map tools and repo map are represented in the knowledge graph mapping source', async () => {

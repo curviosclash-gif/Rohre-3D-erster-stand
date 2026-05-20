@@ -13,6 +13,8 @@ const state = {
   folder: 'all',
   classification: 'all',
   coverage: 'all',
+  activeHelpTerm: '',
+  helpVisible: true,
 };
 
 const elements = {
@@ -33,6 +35,57 @@ const elements = {
   sourcesFootnote: document.querySelector('#sourcesFootnote'),
 };
 
+const HELP_TERMS = {
+  topology: {
+    title: 'Topologie',
+    body: 'Ordner- und Bereichskarte des Repos. Sie zeigt, wo viele offene Dateien, Architekturflags oder kritische Pfade liegen.',
+  },
+  coverage: {
+    title: 'Coverage',
+    body: 'Zeigt, ob Dateien von den Knowledge-Graph- und Plan-Abdeckungsdaten erfasst sind. Open bedeutet: aktiv relevant, aber noch nicht abgedeckt.',
+  },
+  classification: {
+    title: 'Klasse',
+    body: 'Technische Einordnung einer Datei, zum Beispiel Source, Test, Docs, Governance oder Tooling.',
+  },
+  graph: {
+    title: 'Graph',
+    body: 'Ob die Datei im Knowledge Graph vorkommt. Der Graph ist die maschinenlesbare Repo-Karte fuer Abhaengigkeiten und Quellen.',
+  },
+  sources: {
+    title: 'Sources',
+    body: 'Welche Exporte oder Analysequellen die Aussage zu einer Datei geliefert haben.',
+  },
+  blocks: {
+    title: 'Blocks',
+    body: 'Planbloecke, deren Scope diese Datei nennt. Mehrere Blocks bedeuten moegliche Koordinationspflicht.',
+  },
+  flows: {
+    title: 'Flows',
+    body: 'Kritische Laufzeit- oder Workflow-Pfade, in denen diese Datei laut Repo-Map eine Rolle spielt.',
+  },
+  surfaces: {
+    title: 'Surfaces',
+    body: 'Produktoberflaechen oder Ausfuehrungsbereiche, die von der Datei betroffen sein koennen.',
+  },
+  critical: {
+    title: 'Critical',
+    body: 'Signal fuer Dateien oder Pfade mit hoeherer Bedeutung fuer Architektur, Runtime oder Release-Sicherheit.',
+  },
+  'adjusted-coverage': {
+    title: 'Adjusted Coverage',
+    body: 'Bereinigte Abdeckungsquote. Ausnahmen und bewusst ausgeschlossene Dateien werden anders gewichtet als aktive offene Dateien.',
+  },
+  'architecture-flags': {
+    title: 'Architekturflags',
+    body: 'Hinweise aus Architekturchecks, die auf Boundary-, Legacy- oder Governance-Risiken deuten koennen.',
+  },
+  collision: {
+    title: 'Scope-Kollision',
+    body: 'Mehrere Planbloecke nennen dieselben Dateien. Das ist kein Fehler, aber ein Signal fuer Abstimmung vor paralleler Arbeit.',
+  },
+};
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -40,6 +93,75 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function helpButton(term) {
+  const help = HELP_TERMS[term];
+  if (!help) return '';
+  return `<button type="button" class="help-button" data-help-term="${escapeHtml(term)}" aria-label="${escapeHtml(help.title)} erklaeren">i</button>`;
+}
+
+function ensureHelpPopover() {
+  let popover = document.querySelector('#helpPopover');
+  if (!popover) {
+    popover = document.createElement('div');
+    popover.id = 'helpPopover';
+    popover.className = 'help-popover';
+    popover.hidden = true;
+    popover.setAttribute('role', 'dialog');
+    popover.setAttribute('aria-live', 'polite');
+    document.body.appendChild(popover);
+  }
+  return popover;
+}
+
+function closeHelpPopover() {
+  state.activeHelpTerm = '';
+  document.querySelectorAll('.help-button.is-active').forEach((button) => button.classList.remove('is-active'));
+  ensureHelpPopover().hidden = true;
+}
+
+function setHelpVisible(isVisible) {
+  state.helpVisible = isVisible !== false;
+  document.body.classList.toggle('help-hidden', !state.helpVisible);
+  if (!state.helpVisible) {
+    closeHelpPopover();
+  }
+}
+
+function openHelpPopover(term, button) {
+  const help = HELP_TERMS[term];
+  if (!help) return;
+  const popover = ensureHelpPopover();
+  document.querySelectorAll('.help-button.is-active').forEach((node) => node.classList.remove('is-active'));
+  button.classList.add('is-active');
+  state.activeHelpTerm = term;
+  popover.innerHTML = `<strong>${escapeHtml(help.title)}</strong><span>${escapeHtml(help.body)}</span>`;
+  popover.hidden = false;
+
+  const buttonRect = button.getBoundingClientRect();
+  const popoverRect = popover.getBoundingClientRect();
+  const left = Math.min(window.innerWidth - popoverRect.width - 12, Math.max(12, buttonRect.left));
+  const top = Math.min(window.innerHeight - popoverRect.height - 12, buttonRect.bottom + 8);
+  popover.style.left = `${left}px`;
+  popover.style.top = `${top}px`;
+}
+
+function bindHelpButtons(root = document) {
+  root.querySelectorAll('[data-help-term]').forEach((button) => {
+    if (button.dataset.helpBound === 'true') return;
+    button.dataset.helpBound = 'true';
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const term = button.dataset.helpTerm;
+      if (state.activeHelpTerm === term) {
+        closeHelpPopover();
+      } else {
+        openHelpPopover(term, button);
+      }
+    });
+  });
 }
 
 function number(value) {
@@ -146,15 +268,15 @@ function renderMetrics() {
   const scorecard = summary.scorecard || {};
   const metrics = [
     ['Files', number(summary.fileCount)],
-    ['Adjusted Coverage', percent(coverage.adjustedCoveragePercent)],
+    [`Adjusted Coverage ${helpButton('adjusted-coverage')}`, percent(coverage.adjustedCoveragePercent)],
     ['Aktiv offen', number(summary.activeUncoveredFileCount)],
     ['Graph Score', scorecard.score == null ? '-' : String(scorecard.score)],
-    ['Critical Paths', number(summary.criticalPathCount)],
-    ['Architekturflags', number(summary.architectureFlaggedFileCount)],
+    [`Critical Paths ${helpButton('critical')}`, number(summary.criticalPathCount)],
+    [`Architekturflags ${helpButton('architecture-flags')}`, number(summary.architectureFlaggedFileCount)],
   ];
   elements.metrics.innerHTML = metrics.map(([label, value]) => `
     <section class="metric">
-      <span>${escapeHtml(label)}</span>
+      <span>${label}</span>
       <strong>${escapeHtml(value)}</strong>
     </section>
   `).join('');
@@ -250,7 +372,7 @@ function renderFileRows(files, limit = 12) {
 
   return `
     <table>
-      <thead><tr><th>Datei</th><th>Coverage</th><th>Blocks</th><th>Flows</th></tr></thead>
+      <thead><tr><th>Datei</th><th>Coverage ${helpButton('coverage')}</th><th>Blocks ${helpButton('blocks')}</th><th>Flows ${helpButton('flows')}</th></tr></thead>
       <tbody>${rows || '<tr><td colspan="4" class="muted">Keine Treffer</td></tr>'}</tbody>
     </table>
   `;
@@ -297,7 +419,7 @@ function renderCoverageView() {
     <section class="table-section">
       <h2>Bereiche</h2>
       <table>
-        <thead><tr><th>Bereich</th><th>Coverage-Files</th><th>Covered</th><th>Offen</th><th>Excluded</th></tr></thead>
+        <thead><tr><th>Bereich</th><th>Coverage-Files ${helpButton('coverage')}</th><th>Covered</th><th>Offen</th><th>Excluded</th></tr></thead>
         <tbody>${folders}</tbody>
       </table>
     </section>
@@ -340,7 +462,7 @@ function renderPlansView() {
       </table>
     </section>
     <section class="table-section">
-      <h2>Scope-Kollisionen</h2>
+      <h2>Scope-Kollisionen ${helpButton('collision')}</h2>
       <table>
         <thead><tr><th>Links</th><th>Rechts</th><th>Dateien</th><th>Beispiele</th></tr></thead>
         <tbody>${collisions}</tbody>
@@ -390,17 +512,17 @@ function renderDetail() {
         <h2>Datei</h2>
         <dl>
           <dt>Bereich</dt><dd>${escapeHtml(file.topLevel)}</dd>
-          <dt>Graph</dt><dd>${escapeHtml(file.existsInGraph ? 'yes' : 'no')}</dd>
-          <dt>Sources</dt><dd>${escapeHtml(file.graphSources.join(', ') || '-')}</dd>
-          <dt>Coverage</dt><dd>${escapeHtml(file.coverageSources.join(', ') || '-')}</dd>
+          <dt>Graph ${helpButton('graph')}</dt><dd>${escapeHtml(file.existsInGraph ? 'yes' : 'no')}</dd>
+          <dt>Sources ${helpButton('sources')}</dt><dd>${escapeHtml(file.graphSources.join(', ') || '-')}</dd>
+          <dt>Coverage ${helpButton('coverage')}</dt><dd>${escapeHtml(file.coverageSources.join(', ') || '-')}</dd>
         </dl>
       </section>
       <section class="detail-section">
         <h2>Bezug</h2>
         <dl>
-          <dt>Blocks</dt><dd>${escapeHtml(file.scopeBlocks.join(', ') || '-')}</dd>
-          <dt>Flows</dt><dd>${escapeHtml(file.criticalPaths.join(', ') || '-')}</dd>
-          <dt>Surfaces</dt><dd>${escapeHtml(file.surfaces.join(', ') || '-')}</dd>
+          <dt>Blocks ${helpButton('blocks')}</dt><dd>${escapeHtml(file.scopeBlocks.join(', ') || '-')}</dd>
+          <dt>Flows ${helpButton('flows')}</dt><dd>${escapeHtml(file.criticalPaths.join(', ') || '-')}</dd>
+          <dt>Surfaces ${helpButton('surfaces')}</dt><dd>${escapeHtml(file.surfaces.join(', ') || '-')}</dd>
         </dl>
       </section>
       <section class="detail-section">
@@ -425,9 +547,9 @@ function renderDetail() {
       <section class="detail-section">
         <h2>Bereich</h2>
         <dl>
-          <dt>Coverage</dt><dd>${percent(folder.coveragePercent)}</dd>
+          <dt>Coverage ${helpButton('coverage')}</dt><dd>${percent(folder.coveragePercent)}</dd>
           <dt>Graph-Files</dt><dd>${number(folder.graphFileCount)}</dd>
-          <dt>Critical</dt><dd>${number(folder.criticalFileCount)}</dd>
+          <dt>Critical ${helpButton('critical')}</dt><dd>${number(folder.criticalFileCount)}</dd>
           <dt>Unbekannt</dt><dd>${number(folder.unknownCoverageCount)}</dd>
         </dl>
       </section>
@@ -488,6 +610,7 @@ function render() {
   renderCurrentView();
   renderDetail();
   renderSources();
+  bindHelpButtons(document);
 }
 
 function hydrateData(data, sourceName) {
@@ -555,6 +678,10 @@ elements.fileInput.addEventListener('change', async () => {
 });
 
 document.addEventListener('click', (event) => {
+  if (!event.target.closest('.help-button') && !event.target.closest('.help-popover')) {
+    closeHelpPopover();
+  }
+
   const folderButton = event.target.closest('[data-select-folder]');
   if (folderButton) {
     selectFolder(folderButton.dataset.selectFolder);
@@ -567,4 +694,20 @@ document.addEventListener('click', (event) => {
   }
 });
 
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeHelpPopover();
+  }
+});
+
+window.addEventListener('resize', closeHelpPopover);
+
+window.addEventListener('message', (event) => {
+  const message = event.data || {};
+  if (message.type === 'curvios.map-tools:set-help-visible') {
+    setHelpVisible(message.visible !== false);
+  }
+});
+
+bindHelpButtons(document);
 loadDefaultData();

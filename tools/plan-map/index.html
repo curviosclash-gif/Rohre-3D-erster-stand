@@ -32,19 +32,19 @@
 
       <section class="legend-strip" aria-label="Legende und Karten-Layer">
         <div class="legend-inline">
-          <span class="legend-item"><span class="legend-dot readiness-ready"></span>startklar</span>
-          <span class="legend-item"><span class="legend-dot readiness-ready-with-risk"></span>mit Risiko</span>
-          <span class="legend-item"><span class="legend-dot readiness-blocked"></span>blockiert</span>
-          <span class="legend-item"><span class="legend-line dependency"></span>Dependency</span>
-          <span class="legend-item"><span class="legend-line collision"></span>Kollision</span>
-          <span class="legend-item"><span class="legend-impact high"></span>Impact</span>
+          <span class="legend-item"><span class="legend-dot readiness-ready"></span>startklar <button type="button" class="help-button" data-help-term="readiness-ready" aria-label="startklar erklaeren">i</button></span>
+          <span class="legend-item"><span class="legend-dot readiness-ready-with-risk"></span>mit Risiko <button type="button" class="help-button" data-help-term="readiness-risk" aria-label="mit Risiko erklaeren">i</button></span>
+          <span class="legend-item"><span class="legend-dot readiness-blocked"></span>blockiert <button type="button" class="help-button" data-help-term="readiness-blocked" aria-label="blockiert erklaeren">i</button></span>
+          <span class="legend-item"><span class="legend-line dependency"></span>Dependency <button type="button" class="help-button" data-help-term="dependency" aria-label="Dependency erklaeren">i</button></span>
+          <span class="legend-item"><span class="legend-line collision"></span>Kollision <button type="button" class="help-button" data-help-term="collision" aria-label="Kollision erklaeren">i</button></span>
+          <span class="legend-item"><span class="legend-impact high"></span>Impact <button type="button" class="help-button" data-help-term="impact" aria-label="Impact erklaeren">i</button></span>
         </div>
         <div class="legend-actions">
           <div class="overlay-toggles" aria-label="Karten-Layer">
-            <label><input id="showDependencies" type="checkbox" checked>Deps</label>
-            <label><input id="showCollisions" type="checkbox" checked>Kollisionen</label>
-            <label><input id="showImpact" type="checkbox" checked>Impact</label>
-            <label><input id="showProgress" type="checkbox" checked>Fortschritt</label>
+            <label><input id="showDependencies" type="checkbox" checked>Deps <button type="button" class="help-button" data-help-term="deps-layer" aria-label="Deps-Layer erklaeren">i</button></label>
+            <label><input id="showCollisions" type="checkbox" checked>Kollisionen <button type="button" class="help-button" data-help-term="collision" aria-label="Kollisionen erklaeren">i</button></label>
+            <label><input id="showImpact" type="checkbox" checked>Impact <button type="button" class="help-button" data-help-term="impact" aria-label="Impact erklaeren">i</button></label>
+            <label><input id="showProgress" type="checkbox" checked>Fortschritt <button type="button" class="help-button" data-help-term="progress" aria-label="Fortschritt erklaeren">i</button></label>
           </div>
           <button id="legendToggle" type="button" class="icon-button" aria-expanded="false" aria-controls="legendPanel">
             Legende
@@ -120,19 +120,19 @@
               </select>
             </label>
             <label>
-              <span>Startbarkeit</span>
+              <span>Startbarkeit <button type="button" class="help-button" data-help-term="readiness" aria-label="Startbarkeit erklaeren">i</button></span>
               <select id="readinessFilter">
                 <option value="all">Alle</option>
               </select>
             </label>
             <label>
-              <span>Changelog-Typ</span>
+              <span>Changelog-Typ <button type="button" class="help-button" data-help-term="changelog-type" aria-label="Changelog-Typ erklaeren">i</button></span>
               <select id="changelogTypeFilter">
                 <option value="all">Alle</option>
               </select>
             </label>
             <label>
-              <span>Evidence</span>
+              <span>Evidence <button type="button" class="help-button" data-help-term="evidence" aria-label="Evidence erklaeren">i</button></span>
               <select id="changelogEvidenceFilter">
                 <option value="all">Alle</option>
                 <option value="with-evidence">Mit Evidence</option>

@@ -37,6 +37,64 @@ select {
   font: inherit;
 }
 
+.help-button {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-left: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+body.help-hidden .help-button,
+.app-shell.help-hidden .help-button {
+  display: none;
+}
+
+.help-button:hover,
+.help-button:focus-visible,
+.help-button.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  outline: 0;
+}
+
+.help-popover {
+  position: fixed;
+  z-index: 20;
+  display: grid;
+  gap: 5px;
+  width: min(310px, calc(100vw - 24px));
+  padding: 10px 11px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.help-popover[hidden] {
+  display: none;
+}
+
+.help-popover strong {
+  font-size: 13px;
+}
+
+.help-popover span {
+  color: var(--muted);
+}
+
 .app-shell {
   min-height: 100vh;
   display: flex;

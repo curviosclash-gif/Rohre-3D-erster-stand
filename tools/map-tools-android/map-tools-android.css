@@ -33,6 +33,51 @@ button {
   font: inherit;
 }
 
+.help-button {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 4px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.help-popover {
+  position: fixed;
+  z-index: 30;
+  display: grid;
+  gap: 5px;
+  width: min(300px, calc(100vw - 20px));
+  padding: 10px 11px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  box-shadow: 0 14px 34px rgba(42, 31, 18, 0.16);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.help-popover[hidden],
+.map-tools-app.info-hidden .help-button {
+  display: none;
+}
+
+.help-popover strong {
+  color: var(--accent-strong);
+}
+
+.help-popover span {
+  color: var(--muted);
+}
+
 .map-tools-app {
   display: grid;
   grid-template-rows: auto auto auto minmax(0, 1fr);
@@ -145,6 +190,11 @@ h1 {
   white-space: nowrap;
 }
 
+#updateStatus .help-button,
+#buildMeta .help-button {
+  vertical-align: middle;
+}
+
 .plan-filter-strip {
   display: flex;
   align-items: center;
@@ -196,6 +246,16 @@ h1 {
   color: white;
   font: inherit;
   font-weight: 800;
+}
+
+.plan-filter-strip button.is-active {
+  background: var(--accent);
+  color: white;
+}
+
+.plan-filter-strip button:not(.is-active) {
+  background: var(--panel);
+  color: var(--accent-strong);
 }
 
 .map-frame {

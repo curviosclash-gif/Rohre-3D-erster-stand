@@ -7,6 +7,8 @@ const state = {
   views: [],
   refreshes: {},
   busy: false,
+  activeHelpTerm: '',
+  infoVisible: true,
 };
 
 const elements = {
@@ -15,6 +17,7 @@ const elements = {
   viewTabs: document.querySelector('#viewTabs'),
   refreshCurrent: document.querySelector('#refreshCurrent'),
   refreshAll: document.querySelector('#refreshAll'),
+  infoToggle: document.querySelector('#infoToggle'),
   activeViewLabel: document.querySelector('#activeViewLabel'),
   refreshStatus: document.querySelector('#refreshStatus'),
   lastRefresh: document.querySelector('#lastRefresh'),
@@ -23,10 +26,109 @@ const elements = {
   errorDetail: document.querySelector('#errorDetail'),
   retryRefresh: document.querySelector('#retryRefresh'),
   mapFrame: document.querySelector('#mapFrame'),
+  helpPopover: document.querySelector('#helpPopover'),
+};
+
+const HELP_TERMS = {
+  'refresh-current': {
+    title: 'Aktualisieren',
+    body: 'Erzeugt den Export fuer die aktuell sichtbare Karte neu und laedt den Viewer danach erneut.',
+  },
+  'refresh-all': {
+    title: 'Alle Exporte',
+    body: 'Erzeugt Plan Map und Repo Map neu. Sinnvoll, wenn Plan- oder Repo-Daten gerade geaendert wurden.',
+  },
+  'active-view': {
+    title: 'Aktive Karte',
+    body: 'Zeigt, ob gerade die Plan Map oder die Repo Map im Viewer geladen ist.',
+  },
+  plan: {
+    title: 'Plan Map',
+    body: 'Zeigt Planbloecke, Dependencies, Scope-Kollisionen, Changelog und Health-Signale.',
+  },
+  repo: {
+    title: 'Repo Map',
+    body: 'Zeigt Repo-Bereiche, Datei-Coverage, kritische Pfade und Planbezuege.',
+  },
 };
 
 function activeView() {
   return state.views.find((view) => view.id === state.activeViewId) || state.views[0] || null;
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function closeHelpPopover() {
+  state.activeHelpTerm = '';
+  document.querySelectorAll('.help-button.is-active').forEach((button) => button.classList.remove('is-active'));
+  elements.helpPopover.hidden = true;
+}
+
+function syncFrameInfoVisibility() {
+  try {
+    elements.mapFrame.contentWindow?.postMessage({
+      type: 'curvios.map-tools:set-help-visible',
+      visible: state.infoVisible,
+    }, '*');
+  } catch {
+    // The embedded viewers receive the next message after their iframe finishes loading.
+  }
+}
+
+function setInfoVisible(isVisible) {
+  state.infoVisible = isVisible !== false;
+  elements.root.classList.toggle('info-hidden', !state.infoVisible);
+  elements.infoToggle.classList.toggle('is-active', state.infoVisible);
+  elements.infoToggle.setAttribute('aria-pressed', state.infoVisible ? 'true' : 'false');
+  if (!state.infoVisible) {
+    closeHelpPopover();
+  }
+  syncFrameInfoVisibility();
+}
+
+function openHelpPopover(term, anchor) {
+  const help = HELP_TERMS[term];
+  if (!help) return;
+  document.querySelectorAll('.help-button.is-active').forEach((button) => button.classList.remove('is-active'));
+  if (anchor.classList.contains('help-button')) {
+    anchor.classList.add('is-active');
+  }
+  state.activeHelpTerm = term;
+  elements.helpPopover.innerHTML = `<strong>${escapeHtml(help.title)}</strong><span>${escapeHtml(help.body)}</span>`;
+  elements.helpPopover.hidden = false;
+  const anchorRect = anchor.getBoundingClientRect();
+  const popoverRect = elements.helpPopover.getBoundingClientRect();
+  const left = Math.min(window.innerWidth - popoverRect.width - 12, Math.max(12, anchorRect.left));
+  const top = Math.min(window.innerHeight - popoverRect.height - 12, anchorRect.bottom + 8);
+  elements.helpPopover.style.left = `${left}px`;
+  elements.helpPopover.style.top = `${top}px`;
+}
+
+function bindHelpButtons(root = document) {
+  root.querySelectorAll('[data-help-term]').forEach((node) => {
+    if (node.dataset.helpBound === 'true') return;
+    node.dataset.helpBound = 'true';
+    const anchor = node.closest('button') || node;
+    anchor.addEventListener('click', (event) => {
+      if (!node.classList.contains('button-help') && event.target !== node) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      event.stopPropagation();
+      const term = node.dataset.helpTerm;
+      if (state.activeHelpTerm === term) {
+        closeHelpPopover();
+      } else {
+        openHelpPopover(term, anchor);
+      }
+    });
+  });
 }
 
 function formatTimestamp(value) {
@@ -108,7 +210,7 @@ function renderTabs() {
     const button = document.createElement('button');
     button.type = 'button';
     button.dataset.viewId = view.id;
-    button.textContent = view.label;
+    button.innerHTML = `${escapeHtml(view.label)} <span class="button-help" data-help-term="${escapeHtml(view.id)}" aria-label="${escapeHtml(view.label)} erklaeren">i</span>`;
     button.classList.toggle('is-active', view.id === state.activeViewId);
     button.addEventListener('click', () => {
       void selectView(view.id, { refresh: true });
@@ -134,6 +236,8 @@ function render(forceFrameReload = false) {
   renderTabs();
   renderStatus();
   updateFrame(forceFrameReload);
+  bindHelpButtons(document);
+  setInfoVisible(state.infoVisible);
 }
 
 async function selectView(viewId, options = {}) {
@@ -177,9 +281,24 @@ function bindEvents() {
   elements.refreshAll.addEventListener('click', () => {
     void refreshMaps('all');
   });
+  elements.infoToggle.addEventListener('click', () => {
+    setInfoVisible(!state.infoVisible);
+  });
   elements.retryRefresh.addEventListener('click', () => {
     void refreshMaps(state.activeViewId);
   });
+  elements.mapFrame.addEventListener('load', syncFrameInfoVisibility);
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('[data-help-term]') && !event.target.closest('.help-popover')) {
+      closeHelpPopover();
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeHelpPopover();
+    }
+  });
+  window.addEventListener('resize', closeHelpPopover);
   api.onViewRequested((payload) => {
     void selectView(payload?.viewId || 'plan', { refresh: true });
   });

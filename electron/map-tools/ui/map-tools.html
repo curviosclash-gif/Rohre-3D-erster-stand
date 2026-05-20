@@ -22,14 +22,16 @@
         </div>
         <nav id="viewTabs" class="view-tabs" aria-label="Karten"></nav>
         <div class="actions">
-          <button id="refreshCurrent" type="button">Aktualisieren</button>
-          <button id="refreshAll" type="button">Alle Exporte</button>
+          <button id="refreshCurrent" type="button">Aktualisieren <span class="button-help" data-help-term="refresh-current" aria-label="Aktualisieren erklaeren">i</span></button>
+          <button id="refreshAll" type="button">Alle Exporte <span class="button-help" data-help-term="refresh-all" aria-label="Alle Exporte erklaeren">i</span></button>
+          <button id="infoToggle" type="button" class="is-active" aria-pressed="true">Info</button>
         </div>
       </header>
 
       <section class="status-bar" aria-live="polite">
         <div>
           <strong id="activeViewLabel">Plan Map</strong>
+          <button type="button" class="help-button" data-help-term="active-view" aria-label="Aktive Karte erklaeren">i</button>
           <span id="refreshStatus">bereit</span>
         </div>
         <div id="lastRefresh" class="last-refresh">noch kein Refresh</div>
@@ -42,6 +44,8 @@
         </div>
         <button id="retryRefresh" type="button">Erneut versuchen</button>
       </section>
+
+      <div id="helpPopover" class="help-popover" role="dialog" aria-live="polite" hidden></div>
 
       <main class="viewer-stage">
         <iframe id="mapFrame" title="Curvios Map Viewer"></iframe>
