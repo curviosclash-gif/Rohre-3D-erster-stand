@@ -8,10 +8,12 @@ import {
   createRendererBuildDefines,
   createRendererShellBuildConfig,
 } from '../dev/vite/rendererShellConfig.js';
+import { pruneMobileClassicHtml } from '../scripts/build-mobile-classic-app.mjs';
 import {
   applyMobileClassicSettings,
   isMobileClassicTargetValue,
 } from '../src/mobile-classic/MobileClassicApp.js';
+import { createPreferredMatchInputSource } from '../src/ui/MatchInputSourceResolver.js';
 import {
   createMobileClassicGithubUpdateConfig,
   MOBILE_CLASSIC_FALLBACK_GITHUB_REPOSITORY,
@@ -20,7 +22,9 @@ import {
 } from '../src/mobile-classic/MobileClassicUpdateConfig.js';
 import {
   deriveTiltSteeringState,
+  resolveTouchButtonDefinitions,
   resolveTiltCalibrationNeutral,
+  TouchInputSource,
   TOUCH_CONTROL_MODES,
 } from '../src/ui/TouchInputSource.js';
 import { PlayerController } from '../src/entities/player/PlayerController.js';
@@ -33,6 +37,24 @@ async function readJson(relativePath) {
 
 async function readText(relativePath) {
   return fs.readFile(path.join(root, relativePath), 'utf8');
+}
+
+function withGlobalValue(name, value, fn) {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, name);
+  Object.defineProperty(globalThis, name, {
+    configurable: true,
+    writable: true,
+    value,
+  });
+  try {
+    return fn();
+  } finally {
+    if (descriptor) {
+      Object.defineProperty(globalThis, name, descriptor);
+    } else {
+      delete globalThis[name];
+    }
+  }
 }
 
 test('Mobile Classic Capacitor wrapper is separate from Map Tools Android', async () => {
@@ -247,10 +269,75 @@ test('Mobile Classic tilt calibration treats the current hand posture as neutral
   assert.equal(turnRight.yawRight, true);
 });
 
+test('Mobile Classic tilt touch controls expose all classic match actions', () => {
+  const tiltButtons = resolveTouchButtonDefinitions(TOUCH_CONTROL_MODES.TILT).map((button) => button.id);
+  assert.deepEqual(tiltButtons, ['fire', 'useItem', 'nextItem', 'boost']);
+  assert.equal(tiltButtons.includes('shootMG'), false);
+});
+
+test('Mobile Classic input resolver prefers a connected gamepad over touch fallback', () => {
+  const gamepad = {
+    axes: [0, 0, 0],
+    buttons: Array.from({ length: 8 }, () => ({ pressed: false })),
+  };
+
+  withGlobalValue('window', { ontouchstart: null }, () => {
+    withGlobalValue('navigator', { getGamepads: () => [gamepad] }, () => {
+      const source = createPreferredMatchInputSource({
+        inputManager: { getKeyboardInput: () => null },
+        playerIndex: 0,
+        localHumanCount: 1,
+        game: { _mobileClassicAppTarget: true },
+      });
+      assert.equal(source.type, 'gamepad');
+      source.dispose();
+    });
+  });
+});
+
+test('Mobile Classic touch availability accepts touch-point devices without ontouchstart', () => {
+  withGlobalValue('window', { matchMedia: () => ({ matches: false }) }, () => {
+    withGlobalValue('navigator', { maxTouchPoints: 5, getGamepads: () => [] }, () => {
+      assert.equal(TouchInputSource.isAvailable(), true);
+    });
+  });
+});
+
+test('Mobile Classic build prunes developer DOM and inactive preloads', () => {
+  const html = `<!doctype html>
+<html>
+<head>
+  <link rel="modulepreload" crossorigin href="/assets/training-a.js">
+  <link rel="modulepreload" crossorigin href="/assets/recorder-a.js">
+  <link rel="modulepreload" crossorigin href="/assets/developer-ui-a.js">
+  <link rel="modulepreload" crossorigin href="/assets/three-core-a.js">
+  <link rel="modulepreload" crossorigin href="/assets/validation-a.js">
+  <link rel="modulepreload" crossorigin href="/assets/map-presets-a.js">
+</head>
+<body>
+  <button type="button" id="btn-open-developer">Developer oeffnen</button>
+  <!-- ======= SUBMENU: DEVELOPER ======= -->
+  <div id="submenu-developer" class="submenu-panel hidden">
+    <div><button>Nested developer action</button></div>
+  </div>
+  <!-- ======= SUBMENU: DEBUG / INFO ======= -->
+  <div id="submenu-debug"></div>
+</body>
+</html>`;
+  const prunedHtml = pruneMobileClassicHtml(html);
+
+  assert.doesNotMatch(prunedHtml, /training-a\.js|recorder-a\.js|developer-ui-a\.js/);
+  assert.doesNotMatch(prunedHtml, /validation-a\.js|map-presets-a\.js/);
+  assert.match(prunedHtml, /three-core-a\.js/);
+  assert.doesNotMatch(prunedHtml, /btn-open-developer|submenu-developer|Nested developer action/);
+  assert.match(prunedHtml, /submenu-debug/);
+});
+
 test('Mobile Classic scripts build, wrap, and validate the phone app path', async () => {
   const packageJson = await readJson('package.json');
   const buildScript = await readText('scripts/build-mobile-classic-app.mjs');
   const capacitorScript = await readText('scripts/capacitor-mobile-classic.mjs');
+  const gradleFile = await readText('android-classic/app/build.gradle');
   const updateScript = await readText('scripts/update-mobile-classic-from-github.mjs');
   const mobileClassicApp = await readText('src/mobile-classic/MobileClassicApp.js');
   const matchInputResolver = await readText('src/ui/MatchInputSourceResolver.js');
@@ -260,19 +347,26 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.equal(packageJson.scripts['app:classic:android:build'], 'node scripts/build-mobile-classic-app.mjs');
   assert.equal(packageJson.scripts['app:classic:android:check'], 'node --test tests/mobile-classic-app.contract.test.mjs');
   assert.equal(packageJson.scripts['app:classic:android:sync'], 'node scripts/capacitor-mobile-classic.mjs sync');
+  assert.equal(packageJson.scripts['app:classic:android:assets:check'], 'node scripts/capacitor-mobile-classic.mjs check-assets');
   assert.equal(packageJson.scripts['app:classic:android:install'], 'node scripts/capacitor-mobile-classic.mjs install');
   assert.equal(packageJson.scripts['app:classic:android:update:github'], 'node scripts/update-mobile-classic-from-github.mjs');
   assert.match(buildScript, /VITE_APP_TARGET = 'mobile-classic'/);
   assert.match(buildScript, /mobile-classic\.manifest\.json/);
   assert.match(buildScript, /CURVIOS_CLASSIC_APP_GITHUB_REPOSITORY/);
   assert.match(buildScript, /updates: createMobileClassicGithubUpdateConfig/);
+  assert.match(buildScript, /pruneMobileClassicHtml/);
   assert.match(capacitorScript, /tools', 'mobile-classic-app'/);
   assert.match(capacitorScript, /@capacitor', 'cli', 'bin', 'capacitor'/);
+  assert.match(capacitorScript, /check-assets/);
+  assert.match(capacitorScript, /verifyAndroidAssetsFresh/);
   assert.match(capacitorScript, /ANDROID_HOME/);
   assert.match(capacitorScript, /cmd\.exe/);
   assert.match(capacitorScript, /assembleDebug/);
   assert.match(capacitorScript, /de\.curviosclash\.classic/);
   assert.match(capacitorScript, /error\.stderr/);
+  assert.match(gradleFile, /JsonSlurper/);
+  assert.match(gradleFile, /versionCode mobileClassicVersionCode/);
+  assert.match(gradleFile, /versionName mobileClassicVersionName/);
   assert.match(updateScript, /merge', '--ff-only'/);
   assert.match(updateScript, /ensureCleanWorkingTree/);
   assert.match(updateScript, /capacitor-mobile-classic\.mjs/);
@@ -280,9 +374,15 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.match(mobileClassicApp, /mobile-classic-update-check/);
   assert.match(mobileClassicApp, /checkMobileClassicGithubRelease/);
   assert.match(mobileClassicApp, /mobile-classic\.manifest\.json/);
+  assert.match(mobileClassicApp, /Classic starten/);
+  assert.match(mobileClassicApp, /Update pruefen/);
   assert.match(touchInputSource, /TILT SANFT/);
   assert.match(touchInputSource, /KALIBRIERE/);
   assert.match(touchInputSource, /resolveTiltCalibrationNeutral/);
+  assert.match(touchInputSource, /resolveTouchButtonDefinitions/);
+  assert.match(touchInputSource, /maxTouchPoints/);
+  assert.match(touchInputSource, /aria-hidden/);
+  assert.match(readme, /app:classic:android:assets:check/);
   assert.match(readme, /app:classic:android:update:github/);
   assert.equal(TOUCH_CONTROL_MODES.TILT, 'tilt');
   assert.match(matchInputResolver, /pitchAxis/);

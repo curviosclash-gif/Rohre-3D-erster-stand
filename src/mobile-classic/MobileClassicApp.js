@@ -91,7 +91,7 @@ function ensureMobileClassicUpdateUi(doc = document) {
     checkButton.type = 'button';
     checkButton.id = MOBILE_CLASSIC_UPDATE_CHECK_ID;
     checkButton.className = 'secondary-btn mobile-classic-update-btn';
-    checkButton.textContent = 'Update';
+    checkButton.textContent = 'Update pruefen';
 
     const openButton = doc.createElement('button');
     openButton.type = 'button';
@@ -310,10 +310,10 @@ body.mobile-classic-app .mobile-classic-update-actions {
 
 body.mobile-classic-app .mobile-classic-update-btn {
     width: auto;
-    min-width: 72px;
-    padding: 9px 10px;
+    min-width: 0;
+    padding: 7px 9px;
     border-radius: 8px;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     line-height: 1;
 }
 
@@ -416,6 +416,27 @@ body.mobile-classic-app .touch-button-boost {
     right: calc(max(14px, env(safe-area-inset-right)) + 34px) !important;
     bottom: calc(max(22px, env(safe-area-inset-bottom)) + 154px) !important;
 }
+
+body.mobile-classic-app #touch-controls[data-touch-control-mode="tilt"] .touch-button-useItem {
+    right: calc(max(18px, env(safe-area-inset-right)) + 124px) !important;
+    bottom: max(28px, env(safe-area-inset-bottom)) !important;
+    width: 58px !important;
+    height: 58px !important;
+}
+
+body.mobile-classic-app #touch-controls[data-touch-control-mode="tilt"] .touch-button-nextItem {
+    right: calc(max(18px, env(safe-area-inset-right)) + 190px) !important;
+    bottom: max(28px, env(safe-area-inset-bottom)) !important;
+    width: 52px !important;
+    height: 52px !important;
+}
+
+body.mobile-classic-app #touch-controls[data-touch-control-mode="tilt"] .touch-button-boost {
+    right: max(18px, env(safe-area-inset-right)) !important;
+    bottom: calc(max(28px, env(safe-area-inset-bottom)) + 108px) !important;
+    width: 62px !important;
+    height: 62px !important;
+}
 `;
     doc.head.appendChild(style);
 }
@@ -461,7 +482,7 @@ export function applyMobileClassicUiLocks(game = null) {
             const sessionType = normalizeTarget(button?.dataset?.sessionType);
             setButtonLocked(button, sessionType && sessionType !== MENU_SESSION_TYPES.SINGLE);
             if (sessionType === MENU_SESSION_TYPES.SINGLE) {
-                setButtonLabel(button, 'Classic');
+                setButtonLabel(button, 'Classic starten');
             }
         });
     }

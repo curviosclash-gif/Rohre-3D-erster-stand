@@ -13,6 +13,7 @@ import {
 const execFile = promisify(execFileCallback);
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const webDir = path.join(repoRoot, 'dist', 'mobile-classic');
+const currentScriptPath = fileURLToPath(import.meta.url);
 
 process.env.VITE_APP_MODE = 'app';
 process.env.VITE_APP_TARGET = 'mobile-classic';
@@ -59,14 +60,46 @@ async function writeManifest() {
   );
 }
 
+export function isMobileClassicPreloadPruned(href = '') {
+  return /\/assets\/(?:training|recorder|developer-ui|validation|map-presets)-[^/"']+\.js(?:\?.*)?$/.test(String(href));
+}
+
+export function pruneMobileClassicHtml(html = '') {
+  return String(html)
+    .replace(
+      /^[ \t]*<link\b(?=[^>]*\brel=["']modulepreload["'])(?=[^>]*\bhref=["']([^"']+)["'])[^>]*>\r?\n?/gm,
+      (match, href) => (isMobileClassicPreloadPruned(href) ? '' : match),
+    )
+    .replace(
+      /\r?\n[ \t]*<button\b[^>]*\bid=["']btn-open-developer["'][\s\S]*?<\/button>[ \t]*/g,
+      '',
+    )
+    .replace(
+      /\r?\n[ \t]*<!-- ======= SUBMENU: DEVELOPER ======= -->\s*<div\b[^>]*\bid=["']submenu-developer["'][\s\S]*?(?=\r?\n[ \t]*<!-- ======= SUBMENU: DEBUG \/ INFO ======= -->)/,
+      '\n',
+    );
+}
+
+async function pruneBuiltHtml() {
+  const htmlPath = path.join(webDir, 'index.html');
+  const html = await fs.readFile(htmlPath, 'utf8');
+  const prunedHtml = pruneMobileClassicHtml(html);
+  if (prunedHtml !== html) {
+    await fs.writeFile(htmlPath, prunedHtml, 'utf8');
+  }
+}
+
 async function main() {
   const { build } = await import('vite');
   await build({ mode: 'app' });
+  await pruneBuiltHtml();
   await writeManifest();
   process.stdout.write(`mobile-classic-app: wrote ${path.relative(repoRoot, webDir)}\n`);
 }
 
-main().catch((error) => {
-  process.stderr.write(`mobile-classic-app: ${error.stack || error.message}\n`);
-  process.exitCode = 1;
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === currentScriptPath) {
+  main().catch((error) => {
+    process.stderr.write(`mobile-classic-app: ${error.stack || error.message}\n`);
+    process.exitCode = 1;
+  });
+}

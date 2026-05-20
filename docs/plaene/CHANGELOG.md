@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Produkt-Notiz 2026-05-20 (Mobile Classic Android)
+
+- Mobile Classic Android wurde als scoped D2-Slice gehaertet: Touch-Controls werden im Match explizit sichtbar geschaltet, Tilt bietet jetzt Classic-Aktionen fuer Schuss, Item, naechstes Item und Boost, Gamepads gewinnen vor Touch-Fallbacks, und Touch-Erkennung akzeptiert auch `maxTouchPoints`/coarse pointer.
+- Release-Pfad: Der Mobile-Classic-Build entfernt inaktive Developer-/Training-/Recorder-/Map-Preloads und Developer-DOM aus dem ausgelieferten HTML; Capacitor hat ein Asset-Freshness-Gate, und Android `versionCode`/`versionName` werden aus dem Root-`package.json` abgeleitet.
+- Evidence: `npm run app:classic:android:check` -> PASS, `npm run plan:check` -> PASS.
+- Not-checked: kein APK-/Device-Install, kein Android-Studio-Gradle-Build; der erneute `npm run app:classic:android:build`/Preview-Smoke nach dem letzten Touch-Detection-Fix wurde wegen parallel laufender Playwright/Vite-Prozesse im Workspace abgebrochen.
+
 ## Abschluss-Snapshot 2026-05-20 (Block `V112 112.99`)
 
 - `V112` ist geschlossen: Sticky-Input, deterministischer Bounce, Arcade-Seed-/Sudden-Death-Lifecycle, Start-Setup-/Arcade-Overlay-Injection-Pfade, Desktop-CSP-/Font-Boot und produktnahe Helper-/Contract-Gates sind abgearbeitet.

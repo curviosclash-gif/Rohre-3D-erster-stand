@@ -1,4 +1,28 @@
+import groovy.json.JsonSlurper
+
 apply plugin: 'com.android.application'
+
+def readRootPackageVersion = {
+    def packageJsonFile = file('../../package.json')
+    if (!packageJsonFile.exists()) {
+        return '0.1.0'
+    }
+    def packageJson = new JsonSlurper().parse(packageJsonFile)
+    def version = packageJson.version?.toString()
+    return version ? version : '0.1.0'
+}
+
+def deriveVersionCode = { String versionName ->
+    def numericVersion = versionName.split(/[+-]/)[0]
+    def parts = numericVersion.tokenize('.')
+    def major = parts.size() > 0 && parts[0] ==~ /\d+/ ? parts[0].toInteger() : 0
+    def minor = parts.size() > 1 && parts[1] ==~ /\d+/ ? parts[1].toInteger() : 0
+    def patch = parts.size() > 2 && parts[2] ==~ /\d+/ ? parts[2].toInteger() : 0
+    return Math.max(1, (major * 10000) + (minor * 100) + patch)
+}
+
+def mobileClassicVersionName = readRootPackageVersion()
+def mobileClassicVersionCode = deriveVersionCode(mobileClassicVersionName)
 
 android {
     namespace = "de.curviosclash.classic"
@@ -7,8 +31,8 @@ android {
         applicationId "de.curviosclash.classic"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode mobileClassicVersionCode
+        versionName mobileClassicVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

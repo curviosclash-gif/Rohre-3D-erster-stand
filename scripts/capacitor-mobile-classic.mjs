@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+import crypto from 'node:crypto';
 import { execFile as execFileCallback } from 'node:child_process';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
@@ -8,9 +10,12 @@ const execFile = promisify(execFileCallback);
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const appRoot = path.join(repoRoot, 'tools', 'mobile-classic-app');
 const androidRoot = path.join(repoRoot, 'android-classic');
+const webDir = path.join(repoRoot, 'dist', 'mobile-classic');
+const androidPublicDir = path.join(androidRoot, 'app', 'src', 'main', 'assets', 'public');
 const capacitorCli = path.join(repoRoot, 'node_modules', '@capacitor', 'cli', 'bin', 'capacitor');
 const appId = 'de.curviosclash.classic';
 const debugApkPath = path.join(androidRoot, 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk');
+const androidGeneratedAssets = new Set(['cordova.js', 'cordova_plugins.js']);
 
 const action = String(process.argv[2] || 'sync').trim().toLowerCase();
 const defaultAndroidSdk = process.env.LOCALAPPDATA
@@ -70,8 +75,65 @@ async function runAdb(args, timeout = 180_000) {
   });
 }
 
+async function listFiles(rootDir) {
+  const files = [];
+  async function walk(currentDir) {
+    const entries = await fs.readdir(currentDir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        await walk(fullPath);
+      } else if (entry.isFile()) {
+        files.push(path.relative(rootDir, fullPath).split(path.sep).join('/'));
+      }
+    }
+  }
+  await walk(rootDir);
+  return files.sort();
+}
+
+async function hashFile(filePath) {
+  const content = await fs.readFile(filePath);
+  return crypto.createHash('sha256').update(content).digest('hex');
+}
+
+async function verifyAndroidAssetsFresh() {
+  const [webFiles, androidFiles] = await Promise.all([
+    listFiles(webDir),
+    listFiles(androidPublicDir),
+  ]);
+  const webFileSet = new Set(webFiles);
+  const androidFileSet = new Set(androidFiles);
+  const missing = webFiles.filter((file) => !androidFileSet.has(file));
+  const extra = androidFiles.filter((file) => !webFileSet.has(file) && !androidGeneratedAssets.has(file));
+  const mismatched = [];
+
+  for (const file of webFiles) {
+    if (!androidFileSet.has(file)) {
+      continue;
+    }
+    const [webHash, androidHash] = await Promise.all([
+      hashFile(path.join(webDir, file)),
+      hashFile(path.join(androidPublicDir, file)),
+    ]);
+    if (webHash !== androidHash) {
+      mismatched.push(file);
+    }
+  }
+
+  if (missing.length > 0 || extra.length > 0 || mismatched.length > 0) {
+    const parts = [];
+    if (missing.length > 0) parts.push(`missing=${missing.slice(0, 8).join(', ')}`);
+    if (extra.length > 0) parts.push(`extra=${extra.slice(0, 8).join(', ')}`);
+    if (mismatched.length > 0) parts.push(`mismatched=${mismatched.slice(0, 8).join(', ')}`);
+    throw new Error(`Android assets out of sync with dist/mobile-classic (${parts.join('; ')})`);
+  }
+
+  process.stdout.write(`mobile-classic-capacitor: assets fresh (${webFiles.length} files)\n`);
+}
+
 async function main() {
-  if (!['add', 'sync', 'copy', 'open', 'apk', 'install', 'doctor'].includes(action)) {
+  if (!['add', 'sync', 'copy', 'open', 'apk', 'install', 'doctor', 'check-assets'].includes(action)) {
     throw new Error(`Unsupported action: ${action}`);
   }
 
@@ -86,6 +148,8 @@ async function main() {
 
   if (action === 'add') {
     await runCapacitor(['add', 'android'], 240_000);
+  } else if (action === 'check-assets') {
+    await verifyAndroidAssetsFresh();
   } else if (action === 'copy') {
     await runCapacitor(['copy', 'android']);
   } else if (action === 'sync') {

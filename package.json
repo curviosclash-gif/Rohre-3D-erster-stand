@@ -51,6 +51,7 @@
     "app:classic:android:add": "node scripts/capacitor-mobile-classic.mjs add",
     "app:classic:android:sync": "node scripts/capacitor-mobile-classic.mjs sync",
     "app:classic:android:copy": "node scripts/capacitor-mobile-classic.mjs copy",
+    "app:classic:android:assets:check": "node scripts/capacitor-mobile-classic.mjs check-assets",
     "app:classic:android:open": "node scripts/capacitor-mobile-classic.mjs open",
     "app:classic:android:apk": "node scripts/capacitor-mobile-classic.mjs apk",
     "app:classic:android:install": "node scripts/capacitor-mobile-classic.mjs install",

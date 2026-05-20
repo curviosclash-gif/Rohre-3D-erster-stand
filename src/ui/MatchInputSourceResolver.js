@@ -124,6 +124,12 @@ export function createPreferredMatchInputSource({
 }) {
     if (!inputManager) return null;
 
+    const gamepadSource = createGamepadInputSource(playerIndex);
+    if (gamepadSource.isConnected()) {
+        return gamepadSource;
+    }
+    gamepadSource.dispose();
+
     if (playerIndex === 0 && TouchInputSource.isAvailable()) {
         const mobileClassic = isMobileClassicTarget(game);
         const touchSource = new TouchInputSource({
@@ -136,12 +142,6 @@ export function createPreferredMatchInputSource({
         touchSource.onMatchStart();
         return touchSource;
     }
-
-    const gamepadSource = createGamepadInputSource(playerIndex);
-    if (gamepadSource.isConnected()) {
-        return gamepadSource;
-    }
-    gamepadSource.dispose();
 
     return createKeyboardInputSource(inputManager, playerIndex === 0 && localHumanCount === 1);
 }

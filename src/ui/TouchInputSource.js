@@ -21,6 +21,21 @@ const TILT_CALIBRATION_MIN_SAMPLES = 8;
 const TILT_CALIBRATION_SAMPLE_MS = 520;
 const TILT_CALIBRATION_MAX_MS = 1100;
 
+const JOYSTICK_BUTTON_DEFINITIONS = Object.freeze([
+    Object.freeze({ id: 'fire', label: 'FIRE', bottom: '36%', right: '5%', size: 62 }),
+    Object.freeze({ id: 'useItem', label: 'USE', bottom: '20%', right: '5%', size: 62 }),
+    Object.freeze({ id: 'shootMG', label: 'MG', bottom: '36%', right: '20%', size: 54 }),
+    Object.freeze({ id: 'nextItem', label: 'NEXT', bottom: '20%', right: '20%', size: 54 }),
+    Object.freeze({ id: 'boost', label: 'BOOST', bottom: '52%', right: '12%', size: 54 }),
+]);
+
+const TILT_BUTTON_DEFINITIONS = Object.freeze([
+    Object.freeze({ id: 'fire', label: 'SCHUSS', bottom: '9%', right: '6%', size: 86 }),
+    Object.freeze({ id: 'useItem', label: 'ITEM', bottom: '9%', right: '35%', size: 58 }),
+    Object.freeze({ id: 'nextItem', label: 'NXT', bottom: '9%', right: '52%', size: 52 }),
+    Object.freeze({ id: 'boost', label: 'BOOST', bottom: '24%', right: '24%', size: 56 }),
+]);
+
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
@@ -135,6 +150,13 @@ function resolveScreenOrientationAngle() {
     return Number.isFinite(legacyAngle) ? legacyAngle : 0;
 }
 
+export function resolveTouchButtonDefinitions(controlMode = TOUCH_CONTROL_MODES.JOYSTICK) {
+    const definitions = controlMode === TOUCH_CONTROL_MODES.TILT
+        ? TILT_BUTTON_DEFINITIONS
+        : JOYSTICK_BUTTON_DEFINITIONS;
+    return definitions.map((definition) => ({ ...definition }));
+}
+
 /**
  * Virtual joystick + touch buttons for tablet/mobile play.
  * Layout:
@@ -239,7 +261,12 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     static isAvailable() {
-        return typeof window !== 'undefined' && 'ontouchstart' in window;
+        const hasTouchEvent = typeof window !== 'undefined' && 'ontouchstart' in window;
+        const hasTouchPoints = typeof navigator !== 'undefined' && Number(navigator.maxTouchPoints) > 0;
+        const hasCoarsePointer = typeof window !== 'undefined'
+            && typeof window.matchMedia === 'function'
+            && window.matchMedia('(pointer: coarse)').matches === true;
+        return hasTouchEvent || hasTouchPoints || hasCoarsePointer;
     }
 
     bind(playerIndex) {
@@ -304,19 +331,7 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     _resolveButtonDefinitions() {
-        if (this._controlMode === TOUCH_CONTROL_MODES.TILT) {
-            return [
-                { id: 'fire', label: 'SCHUSS', bottom: '9%', right: '6%', size: 86 },
-            ];
-        }
-
-        return [
-            { id: 'fire', label: 'FIRE', bottom: '36%', right: '5%', size: 62 },
-            { id: 'useItem', label: 'USE', bottom: '20%', right: '5%', size: 62 },
-            { id: 'shootMG', label: 'MG', bottom: '36%', right: '20%', size: 54 },
-            { id: 'nextItem', label: 'NEXT', bottom: '20%', right: '20%', size: 54 },
-            { id: 'boost', label: 'BOOST', bottom: '52%', right: '12%', size: 54 },
-        ];
+        return resolveTouchButtonDefinitions(this._controlMode);
     }
 
     _createTiltControlUI() {
@@ -371,7 +386,7 @@ export class TouchInputSource extends PlayerInputSource {
 
     _setUIVisibility(visible) {
         this._uiVisible = visible;
-        const display = visible ? '' : 'none';
+        const display = visible ? 'block' : 'none';
 
         if (this._joystickEl) {
             this._joystickEl.style.display = visible && this._shouldShowJoystickFallback() ? '' : 'none';
@@ -384,6 +399,7 @@ export class TouchInputSource extends PlayerInputSource {
 
         if (this._containerEl?.id === 'touch-controls') {
             this._containerEl.style.display = display;
+            this._containerEl.setAttribute('aria-hidden', visible ? 'false' : 'true');
         }
         this._updateTiltUi();
     }
