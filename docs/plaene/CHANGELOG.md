@@ -20,6 +20,12 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - Befund-Abgleich: `Open_Findings.md` und die Spielaudit-Dateien markieren B02-F01, B03-F04, B04-F1/F3, B05-F03 und P42 als V112-erledigt; B02-F02/F03, B03-F01/F02/F03, B04-F2/F4/F5/F6 und weitere Delta-Reste bleiben bewusst offen.
 - Residual Risk: Der breite Playwright-Grep `-g "T20b"` traf auch `T20ba`; der dabei sichtbare Ghost-Replay-`entryCount`-Seitenfund ist dokumentiert, aber nicht Teil des V112-Scope.
 
+## Bugfix-Notiz 2026-05-20 (Block `V112 112.99`)
+
+- V112-Evidence-Reruns nutzen historische `-g`-Playwright-Beispiele; `scripts/playwright-run-profile.mjs` normalisiert `-g`/`-g=...` jetzt auf `--grep` und reicht Spec-Pfade mit `/` weiter, damit die dokumentierten Windows-Kommandos gegen die aktuelle Playwright-CLI wieder reproduzierbar sind.
+- Der neue Runner-Contract-Test ist im V112-Scope verankert. Das Graph-Coverage-Gate ist nachgezogen: `android-classic/` bleibt `native-wrapper`, `src/mobile-classic/` ist als app-spezifischer `mobile-wrapper` ausserhalb des Desktop-Architektur-KPI klassifiziert.
+- Evidence: `node --test tests/playwright-run-profile.contract.test.mjs` -> PASS, `node --test tests/mobile-classic-app.contract.test.mjs` -> PASS, `npm run plan:check` -> PASS, `npm run check:plan-evidence-claims` -> PASS, `npm run graph:check` -> PASS mit bekannten Domain-Drift-Warnungen, `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-runtime.spec.js -g T20al --timeout=180000` -> PASS.
+
 ## Abschluss-Snapshot 2026-05-20 (Block `V126 126.99`)
 
 - `V126` ist geschlossen: lokale Dev-/Preview-APIs sind klassifiziert und gegated, Training-Spawn laeuft ohne Shell-Zwischenschicht, CLI-Argumente sind allowlisted, Trainingslogs nutzen einen Ringbuffer und die Training-Dashboard-API ist als erste fokussierte Vite-Plugin-Familie ausgelagert.

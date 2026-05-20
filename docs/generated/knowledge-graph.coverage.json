@@ -108,10 +108,19 @@
     {
       "classification": "native-wrapper",
       "prefixes": [
-        "android-map-tools/"
+        "android-map-tools/",
+        "android-classic/"
       ],
       "excludedFromCoverage": true,
       "reason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "classification": "mobile-wrapper",
+      "prefixes": [
+        "src/mobile-classic/"
+      ],
+      "excludedFromCoverage": true,
+      "reason": "Mobile Classic app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
     },
     {
       "classification": "agent-workflow",
@@ -167,14 +176,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 1971,
-    "rawCoveredFileCount": 1271,
-    "rawCoveragePercent": 64.5,
-    "adjustedTrackedFileCount": 1399,
-    "adjustedCoveredFileCount": 1054,
-    "adjustedCoveragePercent": 75.3,
-    "uncoveredFileCount": 700,
-    "uncoveredActiveFileCount": 345,
+    "trackedFileCount": 2036,
+    "rawCoveredFileCount": 1278,
+    "rawCoveragePercent": 62.8,
+    "adjustedTrackedFileCount": 1405,
+    "adjustedCoveredFileCount": 1061,
+    "adjustedCoveragePercent": 75.5,
+    "uncoveredFileCount": 758,
+    "uncoveredActiveFileCount": 344,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -213,9 +222,15 @@
         "coveredCount": 0
       },
       {
+        "classification": "mobile-wrapper",
+        "excludedFromCoverage": true,
+        "count": 2,
+        "coveredCount": 0
+      },
+      {
         "classification": "native-wrapper",
         "excludedFromCoverage": true,
-        "count": 53,
+        "count": 106,
         "coveredCount": 3
       },
       {
@@ -227,14 +242,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 969,
-        "coveredCount": 846
+        "count": 974,
+        "coveredCount": 851
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 355,
-        "coveredCount": 163
+        "count": 356,
+        "coveredCount": 165
       },
       {
         "classification": "prototype",
@@ -245,7 +260,7 @@
       {
         "classification": "repo-ops",
         "excludedFromCoverage": true,
-        "count": 29,
+        "count": 33,
         "coveredCount": 16
       },
       {
@@ -1143,6 +1158,695 @@
       "classification": "other",
       "excludedFromCoverage": false,
       "excludeReason": null
+    },
+    {
+      "path": "android-classic/.gitignore",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/.gitignore",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/build.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/capacitor.build.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/proguard-rules.pro",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/AndroidManifest.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/java/de/curviosclash/classic/MainActivity.java",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-land-hdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-land-mdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-land-xhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-land-xxhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-land-xxxhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-port-hdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-port-mdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-port-xhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-port-xxhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-port-xxxhdpi/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable-v24/ic_launcher_foreground.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable/ic_launcher_background.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/drawable/splash.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/layout/activity_main.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-mdpi/ic_launcher_round.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/values/ic_launcher_background.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/values/strings.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/values/styles.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/main/res/xml/file_paths.xml",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/app/src/test/java/com/getcapacitor/myapp/ExampleUnitTest.java",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/build.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/capacitor.settings.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/gradle.properties",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/gradle/wrapper/gradle-wrapper.jar",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/gradle/wrapper/gradle-wrapper.properties",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/gradlew",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/gradlew.bat",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/settings.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
+    },
+    {
+      "path": "android-classic/variables.gradle",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "native-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Generated Capacitor native wrapper files are validated by app-specific contracts."
     },
     {
       "path": "android-map-tools/.gitignore",
@@ -10759,6 +11463,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V112",
         "V116",
         "V77"
       ],
@@ -12694,6 +13399,7 @@
         "V109",
         "V110",
         "V111",
+        "V112",
         "V115",
         "V116",
         "V117",
@@ -13560,6 +14266,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/Feature_Parcours_Map_Pack_V130.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/Feature_Repo_Agent_Memory_und_Ruflo_Orchestrierung_V122.md",
       "tracked": true,
       "coveredInCore": true,
@@ -13790,6 +14513,7 @@
       "scopeBlocks": [
         "V109",
         "V110",
+        "V112",
         "V115",
         "V90"
       ],
@@ -13844,11 +14568,15 @@
     {
       "path": "docs/qa/Spielaudit_2026-04-28/Audit_Umsetzungsplan_B01-B13.md",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V112"
+      ],
       "surfaces": [],
       "classification": "product-docs",
       "excludedFromCoverage": false,
@@ -13878,10 +14606,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B02"
+        "B02",
+        "V112"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -13895,10 +14625,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B03"
+        "B03",
+        "V112"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -13912,10 +14644,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B04"
+        "B04",
+        "V112"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -13929,10 +14663,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B05"
+        "B05",
+        "V112"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -13946,10 +14682,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B06"
+        "B06",
+        "V112"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -14381,6 +15119,7 @@
       "scopeBlocks": [
         "V109",
         "V110",
+        "V112",
         "V116",
         "V117",
         "V119",
@@ -18111,6 +18850,40 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/build-mobile-classic-app.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/capacitor-mobile-classic.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/check-agent-commit-message.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -18856,10 +19629,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V112"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -19249,6 +20024,23 @@
     },
     {
       "path": "scripts/training-smoke.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/update-mobile-classic-from-github.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -25435,6 +26227,32 @@
       "excludeReason": null
     },
     {
+      "path": "src/mobile-classic/MobileClassicApp.js",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "mobile-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Mobile Classic app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
+    },
+    {
+      "path": "src/mobile-classic/MobileClassicUpdateConfig.js",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "mobile-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Mobile Classic app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
+    },
+    {
       "path": "src/modes/ArcadeModeStrategy.js",
       "tracked": true,
       "coveredInCore": true,
@@ -26946,6 +27764,7 @@
       "scopeBlocks": [
         "B11",
         "V105",
+        "V112",
         "V74",
         "V83",
         "V84",
@@ -32431,6 +33250,23 @@
       "excludeReason": null
     },
     {
+      "path": "tests/mobile-classic-app.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "tests/multiplayer-lifecycle-and-signaling.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -32824,6 +33660,25 @@
         "B13",
         "V88",
         "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/playwright-run-profile.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V112"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33739,6 +34594,58 @@
       "coverageSources": [
         "knowledge-graph-mapping"
       ],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/mobile-classic-app/assets/icon-source.png",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/mobile-classic-app/capacitor.config.json",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/mobile-classic-app/package.json",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/mobile-classic-app/README.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",

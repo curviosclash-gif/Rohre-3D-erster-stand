@@ -34,27 +34,23 @@ export const PLAYWRIGHT_RUN_PROFILES = Object.freeze({
     }),
 });
 
-function escapeRegex(value) {
-    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function toCrossPlatformTestFilter(value) {
     const stringValue = String(value || '');
     if (!/^[A-Za-z0-9_.\-\\/]+\.spec\.[cm]?[jt]sx?$/.test(stringValue)) {
         return stringValue;
     }
-    const normalizedSegments = stringValue
-        .split(/[\\/]+/)
-        .filter(Boolean)
-        .map((segment) => escapeRegex(segment));
-    if (normalizedSegments.length === 0) {
-        return stringValue;
-    }
-    return `${normalizedSegments.join('[\\\\/]')}$`;
+    return stringValue.split(/[\\/]+/).filter(Boolean).join('/');
 }
 
-function resolvePlaywrightCommand(argv) {
-    const testArgs = ['test', ...argv];
+function normalizePlaywrightCliArg(value) {
+    const stringValue = String(value || '');
+    if (stringValue === '-g') return '--grep';
+    if (stringValue.startsWith('-g=')) return `--grep=${stringValue.slice(3)}`;
+    return stringValue;
+}
+
+export function resolvePlaywrightCommand(argv) {
+    const testArgs = ['test', ...argv.map((value) => normalizePlaywrightCliArg(value))];
     for (let index = 1; index < testArgs.length; index += 1) {
         const value = String(testArgs[index] || '');
         if (value.startsWith('-')) break;
@@ -75,7 +71,7 @@ function hasExplicitBrowserContractSelection(argv) {
         if ((value === '-g' || value === '--grep' || value === '--grep-invert') && String(argv[index + 1] || '').trim()) {
             return true;
         }
-        if (value.startsWith('--grep=') || value.startsWith('--grep-invert=')) {
+        if (value.startsWith('-g=') || value.startsWith('--grep=') || value.startsWith('--grep-invert=')) {
             return value.includes('=')
                 && value.slice(value.indexOf('=') + 1).trim().length > 0;
         }

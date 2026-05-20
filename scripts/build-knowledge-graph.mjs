@@ -95,9 +95,15 @@ const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
     },
     {
         classification: 'native-wrapper',
-        prefixes: ['android-map-tools/'],
+        prefixes: ['android-map-tools/', 'android-classic/'],
         excludedFromCoverage: true,
         reason: 'Generated Capacitor native wrapper files are validated by app-specific contracts.',
+    },
+    {
+        classification: 'mobile-wrapper',
+        prefixes: ['src/mobile-classic/'],
+        excludedFromCoverage: true,
+        reason: 'Mobile Classic app adapter files are validated by app-specific contracts outside the desktop architecture KPI.',
     },
     {
         classification: 'agent-workflow',

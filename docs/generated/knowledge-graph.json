@@ -181,7 +181,7 @@
       "id": "B06",
       "type": "block",
       "title": "Ingame-HUD, Matchflow und Overlays",
-      "status": "active",
+      "status": "done",
       "attributes": {
         "source": [
           "audit-plan"
@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 216,
+          "concreteCount": 221,
           "plannedCount": 0
         }
       }
@@ -1080,7 +1080,7 @@
       "id": "V112",
       "type": "block",
       "title": "Spielaudit- und Playtest-Improvement-Paket",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -1088,17 +1088,29 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "112.1",
+        "currentPhase": "112.99",
         "planFile": "docs/plaene/aktiv/V112.md",
         "scopeDeclarations": [
           ".agents/test_mapping.md",
+          "docs/plaene/aktiv/V112.md",
+          "docs/plaene/CHANGELOG.md",
+          "docs/prozess/Open_Findings.md",
+          "docs/qa/Spielaudit_2026-04-28/Audit_Umsetzungsplan_B01-B13.md",
+          "docs/qa/Spielaudit_2026-04-28/B02_Render_Loop_Input_Audio_und_Diagnostics_Findings.md",
+          "docs/qa/Spielaudit_2026-04-28/B03_Kernsimulation_Arena_und_Entity_Systems_Findings.md",
+          "docs/qa/Spielaudit_2026-04-28/B04_Modi_Hunt_und_Arcade_Fortschritt_Findings.md",
+          "docs/qa/Spielaudit_2026-04-28/B05_Menue_Start_Setup_und_UI_Orchestrierung_Findings.md",
+          "docs/qa/Spielaudit_2026-04-28/B06_Ingame_HUD_Matchflow_und_Overlays_Findings.md",
+          "docs/Umsetzungsplan.md",
           "electron/static-server.cjs",
           "package.json",
+          "scripts/playwright-run-profile.mjs",
           "src/core/arcade/ArcadeRunRuntime.js",
           "src/core/InputManager.js",
           "src/entities/systems/CollisionResponseSystem.js",
           "src/entities/systems/lifecycle/PlayerCollisionPhase.js",
           "src/modes/ArcadeModeStrategy.js",
+          "src/shared/contracts/PlatformCapabilityRegistrySourceResolution.js",
           "src/ui/MatchFlowArcadeOverlayController.js",
           "src/ui/start-setup/StartSetupUiOps.js",
           "style.css",
@@ -1106,10 +1118,11 @@
           "tests/core-targeted-runtime.spec.js",
           "tests/core-targeted-surface.spec.js",
           "tests/core.spec.js",
-          "tests/helpers.js"
+          "tests/helpers.js",
+          "tests/playwright-run-profile.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 16,
+          "concreteCount": 29,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2517,7 +2530,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 327,
+          "concreteCount": 328,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -4118,7 +4131,7 @@
       "id": "V112.2",
       "type": "phase",
       "title": "Determinismus und Arcade-Run-Konsistenz",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.2"
@@ -4128,7 +4141,7 @@
       "id": "V112.3",
       "type": "phase",
       "title": "UI-Sicherheits- und Overlay-Hardening",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.3"
@@ -4138,7 +4151,7 @@
       "id": "V112.4",
       "type": "phase",
       "title": "Desktop-Surface- und CSP-Bereinigung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.4"
@@ -4148,7 +4161,7 @@
       "id": "V112.5",
       "type": "phase",
       "title": "Gezielte Verifikation und Befund-Abgleich",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.5"
@@ -4158,7 +4171,7 @@
       "id": "V112.6",
       "type": "phase",
       "title": "Test-Gate- und Harness-Logik-Hardening",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.6"
@@ -4168,7 +4181,7 @@
       "id": "V112.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.99"
@@ -9439,8 +9452,8 @@
     {
       "id": "V112.2.1",
       "type": "subphase",
-      "title": "Kollisions-Bounce von unseeded Zufall auf deterministischen/replay-vertraeglichen Pfad umstellen.",
-      "status": "open",
+      "title": "Kollisions-Bounce von unseeded Zufall auf deterministischen/replay-vertraeglichen Pfad umstellen. (abgeschlossen: 2026-05-20; evidence: `CollisionResponseSystem.bounceBot()` nutzt `owner.runtimeRng.next`/explizites `options.random` statt `Math.random`; `T20am` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.2",
@@ -9450,8 +9463,8 @@
     {
       "id": "V112.2.2",
       "type": "subphase",
-      "title": "Arcade-Seed-Ableitung (Map/Mission) auf aktive Run-Seed-Quelle vereinheitlichen.",
-      "status": "open",
+      "title": "Arcade-Seed-Ableitung (Map/Mission) auf aktive Run-Seed-Quelle vereinheitlichen. (abgeschlossen: 2026-05-20; evidence: `ArcadeRunRuntime._resolveActiveRunSeed()` speist Map- und Missionsableitung; `node --test tests/runtime-settings-live-apply.contract.test.mjs` -> PASS; `T20am1` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.2",
@@ -9461,8 +9474,8 @@
     {
       "id": "V112.2.3",
       "type": "subphase",
-      "title": "Sudden-Death-Status pro Run korrekt resetten.",
-      "status": "open",
+      "title": "Sudden-Death-Status pro Run korrekt resetten. (abgeschlossen: 2026-05-20; evidence: `ArcadeModeStrategy` resettert Sudden-Death, Modifier, Sector und Upgrades im Strategy-Lifecycle; `T20am2` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.2",
@@ -9472,8 +9485,8 @@
     {
       "id": "V112.3.1",
       "type": "subphase",
-      "title": "`StartSetupUiOps` auf sichere DOM-Erzeugung oder gleichwertiges Escaping umstellen.",
-      "status": "open",
+      "title": "`StartSetupUiOps` auf sichere DOM-Erzeugung oder gleichwertiges Escaping umstellen. (abgeschlossen: 2026-05-20; evidence: `StartSetupUiOps` rendert Quicklists, Summary und Preview ueber DOM-Knoten/`textContent`; `T20an` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.3",
@@ -9483,8 +9496,8 @@
     {
       "id": "V112.3.2",
       "type": "subphase",
-      "title": "`MatchFlowArcadeOverlayController` analog haerten.",
-      "status": "open",
+      "title": "`MatchFlowArcadeOverlayController` analog haerten. (abgeschlossen: 2026-05-20; evidence: Arcade-Intermission und Post-Run-Panel rendern Labels/IDs via DOM-Knoten, `textContent` und `setAttribute`; `T20an` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.3",
@@ -9494,8 +9507,8 @@
     {
       "id": "V112.3.3",
       "type": "subphase",
-      "title": "Negativfall-Test fuer Escape/Injection im Surface-Pfad ergaenzen.",
-      "status": "open",
+      "title": "Negativfall-Test fuer Escape/Injection im Surface-Pfad ergaenzen. (abgeschlossen: 2026-05-20; evidence: `tests/core-targeted-surface.spec.js` enthaelt `T20an`; `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-surface.spec.js -g \"T20an\" --timeout=180000` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.3",
@@ -9505,8 +9518,8 @@
     {
       "id": "V112.4.1",
       "type": "subphase",
-      "title": "Externe Font-Imports gegen Desktop-CSP harmonisieren.",
-      "status": "open",
+      "title": "Externe Font-Imports gegen Desktop-CSP harmonisieren. (abgeschlossen: 2026-05-20; evidence: `style.css` ersetzt Orbitron/Inter-Verwendungen durch lokale/systemische Theme-Font-Variablen; Desktop-Smoke prueft keine `fonts.googleapis.com`/`fonts.gstatic.com`-Ressourcen und keine Orbitron/Inter-Buildinfo-Fontfamilie; `npm run test:desktop:smoke` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.4",
@@ -9516,8 +9529,8 @@
     {
       "id": "V112.4.2",
       "type": "subphase",
-      "title": "Surface-Policy-/Contract-Nebenpfad im Boot-Kontext auf fehlertraechtige Zugriffe minimieren.",
-      "status": "open",
+      "title": "Surface-Policy-/Contract-Nebenpfad im Boot-Kontext auf fehlertraechtige Zugriffe minimieren. (abgeschlossen: 2026-05-20; evidence: `PlatformCapabilityRegistrySourceResolution.js` liest Browser-Demo-Build-Artefakte nur ueber explizit uebergebenes `runtimeGlobal.fetch`/`runtimeGlobal.XMLHttpRequest` und faellt nicht mehr auf implizites `globalThis.fetch` zurueck; `node --test tests/runtime-access-seams.contract.test.mjs` -> PASS; `node --test tests/platform-capabilities.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.4",
@@ -9527,8 +9540,8 @@
     {
       "id": "V112.5.1",
       "type": "subphase",
-      "title": "Targeted Desktop-Smoke plus relevante Surface/Runtime-Tests fuer geaenderte Komponenten fahren.",
-      "status": "open",
+      "title": "Targeted Desktop-Smoke plus relevante Surface/Runtime-Tests fuer geaenderte Komponenten fahren. (abgeschlossen: 2026-05-20; evidence: `npm run test:desktop:smoke` -> PASS; exakt `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-platform.spec.js -g \"T20b:\" --timeout=180000` -> PASS; `node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted.mjs tests/core-targeted-surface.spec.js -g \"T20n:\" --timeout=180000` -> SKIP mit Sunset-Kriterium)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.5",
@@ -9538,8 +9551,8 @@
     {
       "id": "V112.5.2",
       "type": "subphase",
-      "title": "B02/B03/B04/B05/B06-Status und `docs/prozess/Open_Findings.md` abgleichen.",
-      "status": "open",
+      "title": "B02/B03/B04/B05/B06-Status und `docs/prozess/Open_Findings.md` abgleichen. (abgeschlossen: 2026-05-20; evidence: `Open_Findings.md` verweist auf die V112-erledigten Delta-Funde; Spielaudit-Dateien markieren B02-F01, B03-F04, B04-F1/F3, B05-F03 und P42 als erledigt in V112; nicht geloeste Restbefunde bleiben offen)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.5",
@@ -9549,8 +9562,8 @@
     {
       "id": "V112.6.1",
       "type": "subphase",
-      "title": "`test:contract` auf vollstaendige `*.contract.test.mjs`-Abdeckung ausrichten (inkl. Abgleich zu `.agents/test_mapping.md`).",
-      "status": "open",
+      "title": "`test:contract` auf vollstaendige `*.contract.test.mjs`-Abdeckung ausrichten (inkl. Abgleich zu `.agents/test_mapping.md`). (abgeschlossen: 2026-05-20; evidence: `package.json` nutzt den Node-Test-Glob; `.agents/test_mapping.md` dokumentiert die Abdeckung und explizite Nicht-Contract-Zusatzchecks; `npm run test:contract` -> PASS, 585 Tests)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.6",
@@ -9560,8 +9573,8 @@
     {
       "id": "V112.6.2",
       "type": "subphase",
-      "title": "`tests/helpers.js` fuer Match-/Mode-Start auf UI-first-Verhalten haerten; Runtime-Fallback nur explizit zuschaltbar und als Recovery klassifiziert.",
-      "status": "open",
+      "title": "`tests/helpers.js` fuer Match-/Mode-Start auf UI-first-Verhalten haerten; Runtime-Fallback nur explizit zuschaltbar und als Recovery klassifiziert. (abgeschlossen: 2026-05-20; evidence: `triggerMatchStart()` und `ensureModePathSelected()` werfen ohne UI-Erfolg, ausser der Call setzt `allowRuntimeFallback`; Recovery-Kommentare begrenzen direkte Runtime-Mutationen)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.6",
@@ -9571,8 +9584,8 @@
     {
       "id": "V112.6.3",
       "type": "subphase",
-      "title": "`core-targeted-{runtime,surface,platform}` auf harte `skip`-/Sleep-Hotspots pruefen und priorisierte Ersatzpfade mit zustandsbasierten Waits planen.",
-      "status": "open",
+      "title": "`core-targeted-{runtime,surface,platform}` auf harte `skip`-/Sleep-Hotspots pruefen und priorisierte Ersatzpfade mit zustandsbasierten Waits planen. (abgeschlossen: 2026-05-20; evidence: `T20b` ersetzt feste Wartezeiten durch Lifecycle-Event-Waits; `openCustomSetupStep()`/`returnToMenu()` warten zustandsbasiert; verbleibende harte Ausnahmen sind in `T10g`/`T20n` dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.6",
@@ -9582,8 +9595,8 @@
     {
       "id": "V112.6.4",
       "type": "subphase",
-      "title": "Verbleibende Ausnahmen (z. B. env- oder runtime-abhaengige Skips) mit Sunset-Kriterium und Nachweispfad dokumentieren.",
-      "status": "open",
+      "title": "Verbleibende Ausnahmen (z. B. env- oder runtime-abhaengige Skips) mit Sunset-Kriterium und Nachweispfad dokumentieren. (abgeschlossen: 2026-05-20; evidence: `T10g` nennt Editor-Disk-Map-Seeding als Sunset; `T20n` nennt MediaRecorder-Capability-Fixture bzw. eventbasiertes Export-Ready-Signal)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.6",
@@ -9593,8 +9606,8 @@
     {
       "id": "V112.99.1",
       "type": "subphase",
-      "title": "Relevante targeted Verifikationssignale sind gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "Relevante targeted Verifikationssignale sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-20; evidence: `npm run test:contract` -> PASS; `npm run test:desktop:smoke` -> PASS; exakt `T20b:` -> PASS; `T20n:` -> SKIP mit Sunset-Kriterium; `T20ba`-Seitenfund ist blockerfest dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.99",
@@ -9604,8 +9617,8 @@
     {
       "id": "V112.99.2",
       "type": "subphase",
-      "title": "`npm run plan:check` ist gruen.",
-      "status": "open",
+      "title": "`npm run plan:check` ist gruen. (abgeschlossen: 2026-05-20; evidence: `npm run plan:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.99",
@@ -9615,8 +9628,8 @@
     {
       "id": "V112.99.3",
       "type": "subphase",
-      "title": "Falls Docs-/Governance-Scope geaendert wurde: `npm run docs:sync` und `npm run docs:check` sind gruen.",
-      "status": "open",
+      "title": "Falls Docs-/Governance-Scope geaendert wurde: `npm run docs:sync` und `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-20; evidence: `npm run docs:sync` -> PASS; `npm run docs:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V112",
         "phaseCode": "112.99",
@@ -27005,6 +27018,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V112",
           "V116",
           "V77"
         ],
@@ -28720,6 +28734,7 @@
           "V109",
           "V110",
           "V111",
+          "V112",
           "V115",
           "V116",
           "V117",
@@ -29484,6 +29499,21 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_Parcours_Map_Pack_V130.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Repo_Agent_Memory_und_Ruflo_Orchestrierung_V122.md",
       "type": "file",
       "title": null,
@@ -29681,6 +29711,7 @@
         "scopeBlocks": [
           "V109",
           "V110",
+          "V112",
           "V115",
           "V90"
         ],
@@ -29698,6 +29729,21 @@
         ],
         "scopeBlocks": [
           "V69"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/qa/Spielaudit_2026-04-28/Audit_Umsetzungsplan_B01-B13.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V112"
         ],
         "exists": true
       }
@@ -29724,10 +29770,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B02"
+          "B02",
+          "V112"
         ],
         "exists": true
       }
@@ -29739,10 +29787,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B03"
+          "B03",
+          "V112"
         ],
         "exists": true
       }
@@ -29754,10 +29804,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B04"
+          "B04",
+          "V112"
         ],
         "exists": true
       }
@@ -29769,10 +29821,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B05"
+          "B05",
+          "V112"
         ],
         "exists": true
       }
@@ -29784,10 +29838,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B06"
+          "B06",
+          "V112"
         ],
         "exists": true
       }
@@ -30048,6 +30104,7 @@
         "scopeBlocks": [
           "V109",
           "V110",
+          "V112",
           "V116",
           "V117",
           "V119",
@@ -31854,6 +31911,21 @@
       }
     },
     {
+      "id": "scripts/build-mobile-classic-app.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "scripts/build-plan-index.mjs",
       "type": "file",
       "title": null,
@@ -31866,6 +31938,21 @@
           "V123"
         ],
         "exists": false
+      }
+    },
+    {
+      "id": "scripts/capacitor-mobile-classic.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
       }
     },
     {
@@ -32661,10 +32748,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V112"
         ],
         "exists": true
       }
@@ -33010,6 +33099,21 @@
     },
     {
       "id": "scripts/training-smoke.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/update-mobile-classic-from-github.mjs",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -39841,6 +39945,7 @@
         "scopeBlocks": [
           "B11",
           "V105",
+          "V112",
           "V74",
           "V83",
           "V84",
@@ -44896,6 +45001,21 @@
       }
     },
     {
+      "id": "tests/mobile-classic-app.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/multiplayer-lifecycle-and-signaling.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -45258,6 +45378,23 @@
           "B13",
           "V88",
           "V89"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/playwright-run-profile.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "V112"
         ],
         "exists": true
       }
@@ -51362,6 +51499,24 @@
     },
     {
       "from": "B13",
+      "to": "scripts/build-mobile-classic-app.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/capacitor-mobile-classic.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/check-agent-commit-message.mjs",
       "type": "scope",
       "hint": null,
@@ -51929,6 +52084,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/update-mobile-classic-from-github.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/validate-umsetzungsplan.mjs",
       "type": "scope",
       "hint": null,
@@ -52397,6 +52561,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/mobile-classic-app.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/multiplayer-lifecycle-and-signaling.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -52578,6 +52751,15 @@
     {
       "from": "B13",
       "to": "tests/playwright-readiness.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/playwright-run-profile.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -64084,6 +64266,96 @@
     },
     {
       "from": "V112",
+      "to": "docs/plaene/aktiv/V112.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "docs/prozess/Open_Findings.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "docs/qa/Spielaudit_2026-04-28/Audit_Umsetzungsplan_B01-B13.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "docs/qa/Spielaudit_2026-04-28/B02_Render_Loop_Input_Audio_und_Diagnostics_Findings.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "docs/qa/Spielaudit_2026-04-28/B03_Kernsimulation_Arena_und_Entity_Systems_Findings.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "docs/qa/Spielaudit_2026-04-28/B04_Modi_Hunt_und_Arcade_Fortschritt_Findings.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "docs/qa/Spielaudit_2026-04-28/B05_Menue_Start_Setup_und_UI_Orchestrierung_Findings.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "docs/qa/Spielaudit_2026-04-28/B06_Ingame_HUD_Matchflow_und_Overlays_Findings.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "docs/Umsetzungsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
       "to": "electron/static-server.cjs",
       "type": "scope",
       "hint": null,
@@ -64094,6 +64366,15 @@
     {
       "from": "V112",
       "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "scripts/playwright-run-profile.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -64139,6 +64420,15 @@
     {
       "from": "V112",
       "to": "src/modes/ArcadeModeStrategy.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "src/shared/contracts/PlatformCapabilityRegistrySourceResolution.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -64211,6 +64501,15 @@
     {
       "from": "V112",
       "to": "tests/helpers.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V112",
+      "to": "tests/playwright-run-profile.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -84929,6 +85228,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Parcours_Map_Pack_V130.md",
       "type": "scope",
       "hint": null,
       "attributes": {

@@ -5,6 +5,9 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import {
+  classifyCoveragePath,
+} from '../scripts/build-knowledge-graph.mjs';
+import {
   createRendererBuildDefines,
   createRendererShellBuildConfig,
 } from '../dev/vite/rendererShellConfig.js';
@@ -390,4 +393,17 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.match(matchInputResolver, /pitchAxis/);
   assert.match(matchInputResolver, /TOUCH_CONTROL_MODES\.TILT/);
   assert.match(matchInputResolver, /_mobileClassicAppTarget/);
+});
+
+test('Mobile Classic wrapper files stay outside the desktop graph KPI', () => {
+  const nativeCoverage = classifyCoveragePath('android-classic/app/src/main/res/drawable/splash.png');
+  const adapterCoverage = classifyCoveragePath('src/mobile-classic/MobileClassicApp.js');
+
+  assert.equal(nativeCoverage.classification, 'native-wrapper');
+  assert.equal(nativeCoverage.excludedFromCoverage, true);
+  assert.match(nativeCoverage.excludeReason, /Capacitor native wrapper/);
+
+  assert.equal(adapterCoverage.classification, 'mobile-wrapper');
+  assert.equal(adapterCoverage.excludedFromCoverage, true);
+  assert.match(adapterCoverage.excludeReason, /Mobile Classic app adapter/);
 });
