@@ -1,0 +1,157 @@
+# Feature Mobile Classic Steuerung Hardening V131
+
+Status: Draft fuer User-Intake.
+Ziel-Masterplan: `docs/Umsetzungsplan.md`.
+Vorgeschlagene Block-ID: `V131`.
+Geplante aktive Detaildatei nach Intake: `docs/plaene/aktiv/V131.md`.
+Zweckklasse: `plan`.
+Decision-Klasse dieses Drafts: `D2` (neuer Plan-Draft unter `docs/plaene/neu/`, keine Master-/Aktivplan-/Governance-Aenderung).
+
+## Ziel
+
+Mobile Classic Android soll in der bestehenden phone-first Classic-App robuster und spielbarer steuerbar werden, ohne neue Layout-Personalisierung einzufuehren. Der Block plant die Befunde 1, 2, 3 und 5 aus der Steuerungsanalyse:
+
+- Touch-Aktionen als saubere Press-Events statt frameweise gehaltene Aktionen.
+- Android-tauglicher Pause-/Zurueck-Pfad inklusive Touch-Overlay-Zustand.
+- Gefuehrter Neigungsstart mit klarerer Kalibrierung.
+- Bewusst festgelegte Orientation-Policy fuer Match und Menue.
+
+## Nicht-Ziele
+
+- Punkt 4 aus der Analyse bleibt ausdruecklich ausserhalb dieses Blocks: keine frei konfigurierbaren Button-Layouts, keine Links-/Rechtshand-Profile, keine Button-Skalierung/Transparenz-Settings.
+- Keine Desktop-Steuerungsumstellung und keine Aenderung an Keyboard-/Gamepad-Bindings ausser notwendigen Regressionstests.
+- Keine Multiplayer-, Hunt-, Arcade- oder Map-Tool-Erweiterung.
+- Keine Masterplan-, Aktivplan-, Rule- oder Workflow-Aenderung ohne User-Intake.
+
+## Scope Files
+
+Geplanter produktiver Scope:
+
+- `src/ui/TouchInputSource.js`
+- `src/mobile-classic/MobileClassicApp.js`
+- `src/ui/MatchInputSourceResolver.js` (nur falls der Pause-/Orientation-Pfad eine Source-Option braucht)
+- `src/core/main.js` oder ein kleiner Runtime-Port-Pfad (nur falls Android Back/Pause nicht sauber ueber bestehende UI-Controller erreichbar ist)
+- `android-classic/app/src/main/AndroidManifest.xml`
+- `android-classic/app/src/main/java/de/curviosclash/classic/MainActivity.java`
+- `tools/mobile-classic-app/capacitor.config.json`
+- `tests/mobile-classic-app.contract.test.mjs`
+- gezielter Playwright-/Runtime-Test nur bei nachweisbarer Luecke, bevorzugt bestehende `tests/core-targeted-*.spec.js`
+
+Dokumentations-/Evidence-Scope nach Umsetzung:
+
+- `docs/plaene/aktiv/V131.md` nach User-Intake
+- `docs/plaene/CHANGELOG.md` fuer Abschlussnotiz
+
+## Ausgangslage
+
+- `TouchInputSource` erzeugt fuer Touch-Buttons gehaltene Button-Zustaende und reicht `useItem`, `shootItem` und `nextItem` direkt weiter. `PlayerActionPhase` konsumiert `nextItem`/`useItem`/`shootItem` frameweise; lange Touches koennen dadurch mehr Aktion ausloesen als beabsichtigt.
+- Mobile Classic aktiviert Tilt automatisch im Match und nutzt Joystick-Fallback, wenn Tilt nicht frisch ist. Das ist robust, aber beim Matchstart kann die erste Kalibrierung aus einer unbequemen Handhaltung entstehen.
+- Android Classic nutzt eine Capacitor `BridgeActivity` ohne eigene Back-Button-/Pause-Integration. Pause laeuft aktuell primaer ueber `Escape`; Touch liefert kein Pause-Intent.
+- `#touch-controls` liegt in Mobile Classic mit hohem `z-index` ueber HUD/Overlay-Flaechen. Pause-/Message-Overlays muessen gegen aktive Touch-Flächen abgesichert werden.
+- Die Activity verarbeitet Orientation-Changes, legt aber keine bewusste Android-Orientation-Policy fest.
+
+## Dependencies und Abgrenzung
+
+Hard dependencies:
+
+- V112/V126 Mobile-Classic-Haertung ist vorhanden; aktuelle Mobile-Classic-Contracts bilden die technische Baseline.
+- V72 Action-Availability-Vertrag bleibt Quelle fuer Touch-Button-Verfuegbarkeit.
+
+Soft dependencies:
+
+- V125 Architektur-Compliance ist hilfreich, aber kein Startblocker, solange der V131-Scope keine neuen Boundary-/Governance-Regeln einfuehrt.
+- V96 Application-Boundaries kann spaeter UI-/Runtime-Port-Zuschnitt vertiefen; V131 darf nur minimal in Runtime-Ports greifen.
+
+Graph-/Scope-Signal:
+
+- `scope-collisions --json` meldet keine direkte Kollision fuer die geplanten Mobile-Classic-Dateien.
+- `impact-for-file src/ui/TouchInputSource.js --json`: produktiver Code, Scope-Historie V72/V91/V105, keine Core-Graph-Kritikalitaet.
+- `impact-for-file src/mobile-classic/MobileClassicApp.js --json`: `mobile-wrapper`, ausserhalb Desktop-Graph-KPI, app-spezifisch per Mobile-Classic-Contracts zu pruefen.
+
+## Risiken
+
+| Risiko | Stufe | Gegenmassnahme |
+| --- | --- | --- |
+| Touch-Edge-Fix veraendert Item-/Schuss-Gefuehl | mittel | Contract-Test fuer Press-vs-Hold, kurzer manueller Android-Smoke |
+| Pause-Overlay blockiert oder wird von Touch-Fläche ueberdeckt | mittel | CSS-/DOM-State-Test plus manueller Pause/Resume-Smoke |
+| Android Back-Integration greift in Browser/Desktop unerwartet | mittel | Capacitor-/Android-Pfad isolieren, Browser-Fallback unveraendert lassen |
+| Orientation-Lock bricht Tilt-Achsenannahmen | mittel | Orientation-Policy zuerst festlegen, Tilt-Mapping-Contracts fuer Zielorientierung erweitern |
+| MainActivity-Aenderung wird native-wrapper-only zu wenig getestet | mittel | `app:classic:android:check`, `app:classic:android:assets:check`, optional Device-Smoke |
+
+## AI-Ausfuehrungsmatrix
+
+| Arbeit | Decision | Gate |
+| --- | --- | --- |
+| Analyse, Graph-Queries, Plan-Draft | D0/D2 | AUTO |
+| `TouchInputSource` Press-Event-Haertung und Contracts | D2 | REVIEW |
+| Mobile-Classic CSS/DOM-State fuer Pause/Tilt-Onboarding | D2 | REVIEW |
+| Android native Back-/Orientation-Aenderung | D2/D4 | REVIEW; D4 falls destructive, Rebuild- oder breite Native-Policy noetig wird |
+| Masterplan-/Aktivplan-Intake | D3 | USER-GATE |
+| Layout-Personalisierung aus Punkt 4 | no-op | Nicht-Ziel |
+
+## Phasen
+
+### 131.1 Touch-Aktionen entprellen
+
+- [ ] 131.1.1 Aktuelle Button-Semantik fuer `fire`, `useItem`, `nextItem`, `boost` und `shootMG` gegen `PlayerInputSystem`/`PlayerActionPhase` abgleichen.
+- [ ] 131.1.2 In `TouchInputSource` Edge-State fuer einmalige Aktionen planen/umsetzen: `shootItem`, `useItem`, `nextItem`; `boost` bleibt held + `boostPressed`.
+- [ ] 131.1.3 Contract-Test ergaenzen: langer Touch darf `nextItem`/`useItem`/`shootItem` nur einmal pro Touch-Down ausloesen.
+
+### 131.2 Pause- und Zurueck-Pfad fuer Android
+
+- [ ] 131.2.1 Minimalen Pause-Intent bestimmen: In-App-Pause-Button, Android-Back-Handler oder beides; Desktop-Escape bleibt unveraendert.
+- [ ] 131.2.2 Touch-Control-Visibility mit Match-/Pause-/Message-State absichern, sodass `#touch-controls` keine Pause-Buttons ueberlagert.
+- [ ] 131.2.3 Contract-/Runtime-Test fuer Pause-Overlay + Touch-Controls ergaenzen; Device-Smoke als manuelles Gate dokumentieren.
+
+### 131.3 Gefuehrte Tilt-Kalibrierung
+
+- [ ] 131.3.1 Tilt-Aktivierung am Matchstart als klaren Zustand modellieren: `calibrating`, `active`, `fallback`, `denied/unsupported`.
+- [ ] 131.3.2 UI-Texte/Status so anpassen, dass der Spieler beim Start kurz neutral halten kann und Re-Kalibrierung verstaendlich bleibt.
+- [ ] 131.3.3 Tests fuer Kalibrierungszustand, frische Sensorwerte, Joystick-Fallback und Re-Kalibrierung bei Orientation-Change erweitern.
+
+### 131.4 Orientation-Policy
+
+- [ ] 131.4.1 Produktentscheidung fuer Mobile Classic festhalten: bevorzugt Match-orientiert stabil, Menue nicht durch Rotation im Kampf verschieben.
+- [ ] 131.4.2 Android-Manifest/MainActivity/Capacitor-Pfad so klein wie moeglich anpassen; keine breite Native-Rebuild-Strategie.
+- [ ] 131.4.3 Tilt-Mapping-Tests fuer die gewaehlte Zielorientierung nachziehen und bestehende Landscape-/Portrait-Annahmen dokumentieren.
+
+### 131.5 Gates und Handoff
+
+- [ ] 131.5.1 Gezielte Checks: `node --test tests/mobile-classic-app.contract.test.mjs`.
+- [ ] 131.5.2 Wenn native Android-Dateien geaendert wurden: `npm run app:classic:android:assets:check` und, falls Device verfuegbar, manueller `app:classic:android:install`-Smoke.
+- [ ] 131.5.3 Abschlussnotiz in `docs/plaene/CHANGELOG.md` mit Wirkung, Risiko und nicht geprueften Device-Punkten.
+- [ ] 131.99 Abschluss-Gate: alle 131.1-131.5 Unterpunkte erledigt, Evidence pro Teilphase im aktiven V131-Plan verlinkt, keine Punkt-4-Personalisierung in Scope geraten.
+
+## DoD
+
+- Long-press auf Touch-Buttons loest keine ungewollten Mehrfachaktionen fuer einmalige Actions aus.
+- Android-Spieler haben einen erreichbaren Pause-/Zurueck-Pfad ohne externe Tastatur.
+- Pause-/Message-Overlays sind nicht durch aktive Touch-Control-Flächen blockiert.
+- Tilt-Start ist nachvollziehbar kalibriert und faellt bei fehlenden Sensorwerten sichtbar auf Joystick zurueck.
+- Orientation-Verhalten ist bewusst gesetzt und getestet oder als manuelles Device-Gate dokumentiert.
+
+## Verifikationsplan
+
+Kleinste sinnvolle Gates:
+
+- `node --test tests/mobile-classic-app.contract.test.mjs`
+- `npm run app:classic:android:assets:check` bei Android-Bundle-/Native-Pfaden
+- optional gezielter Playwright-Smoke fuer Pause-/Overlay-State, falls der Contract-Test DOM-Interaktion nicht ausreichend abbildet
+- manueller Android-Smoke: Starten, neutral halten, steuern, feuern, Item wechseln/nutzen, Pause/Resume, Rotation pruefen
+
+Not-checked im Draft:
+
+- Kein Device-Smoke ausgefuehrt.
+- Keine Performance-/GPU-/Playwright-Vollsuite geplant.
+- Punkt 4 Layout-Personalisierung bleibt bewusst nicht geprueft und nicht umgesetzt.
+
+## Intake-Hinweis
+
+Manuelle Uebernahme erforderlich:
+
+- Ziel-Masterplan: `docs/Umsetzungsplan.md`
+- Vorgeschlagene Block-ID: `V131`
+- Aktive Detaildatei nach Intake: `docs/plaene/aktiv/V131.md`
+- Hard dependencies: Mobile-Classic-Baseline aus V112/V126, V72 Action-Availability-Vertrag
+- Soft dependencies: V125/V96 nur beobachten
+- Empfohlene Prioritaet: P2 produktnaher Mobile-Classic-Follow-up
