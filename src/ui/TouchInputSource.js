@@ -17,6 +17,9 @@ const TILT_DEFAULT_SMOOTHING = 0.58;
 const TILT_DEFAULT_PRESS_THRESHOLD = 0.14;
 const TILT_DEFAULT_RELEASE_THRESHOLD = 0.06;
 const TILT_EVENT_STALE_MS = 1600;
+const TILT_CALIBRATION_MIN_SAMPLES = 8;
+const TILT_CALIBRATION_SAMPLE_MS = 520;
+const TILT_CALIBRATION_MAX_MS = 1100;
 
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -32,6 +35,35 @@ function normalizeTiltDelta(rawValue = 0, neutralValue = 0) {
     while (delta > 180) delta -= 360;
     while (delta < -180) delta += 360;
     return delta;
+}
+
+function isFiniteNumber(value) {
+    return Number.isFinite(Number(value));
+}
+
+export function resolveTiltCalibrationNeutral(samples = [], fallback = {}) {
+    const validSamples = Array.isArray(samples)
+        ? samples.filter((sample) => isFiniteNumber(sample?.beta) && isFiniteNumber(sample?.gamma))
+        : [];
+    if (validSamples.length === 0) {
+        return {
+            neutralBeta: Number(fallback.neutralBeta) || 0,
+            neutralGamma: Number(fallback.neutralGamma) || 0,
+            neutralOrientationAngle: normalizeOrientationAngle(fallback.neutralOrientationAngle),
+        };
+    }
+
+    const totals = validSamples.reduce((acc, sample) => {
+        acc.beta += Number(sample.beta);
+        acc.gamma += Number(sample.gamma);
+        return acc;
+    }, { beta: 0, gamma: 0 });
+    const lastSample = validSamples[validSamples.length - 1];
+    return {
+        neutralBeta: totals.beta / validSamples.length,
+        neutralGamma: totals.gamma / validSamples.length,
+        neutralOrientationAngle: normalizeOrientationAngle(lastSample.orientationAngle),
+    };
 }
 
 function applyTiltResponseCurve(axis, deadzoneAxis, curveExponent) {
@@ -154,6 +186,7 @@ export class TouchInputSource extends PlayerInputSource {
             gamma: 0,
             neutralBeta: 0,
             neutralGamma: 0,
+            neutralOrientationAngle: 0,
             hasNeutral: false,
             pendingCalibration: false,
             lastEventAt: 0,
@@ -163,6 +196,12 @@ export class TouchInputSource extends PlayerInputSource {
             pitchAxis: 0,
             yawDirection: 0,
             pitchDirection: 0,
+        };
+        this._tiltCalibration = {
+            active: false,
+            samples: [],
+            startedAt: 0,
+            reason: 'none',
         };
 
         this._buttons = {
@@ -554,8 +593,8 @@ export class TouchInputSource extends PlayerInputSource {
             this._tiltState.listening = true;
         }
         this._tiltState.enabled = true;
-        this._tiltState.pendingCalibration = true;
         this._tiltState.permission = auto ? 'auto' : 'granted';
+        this._beginTiltCalibration(auto ? 'match-start' : 'manual');
         this._updateTiltUi();
         return true;
     }
@@ -588,20 +627,62 @@ export class TouchInputSource extends PlayerInputSource {
         if (!Number.isFinite(beta) || !Number.isFinite(gamma)) {
             return;
         }
+        const orientationAngle = resolveScreenOrientationAngle();
         this._tiltState.beta = beta;
         this._tiltState.gamma = gamma;
         this._tiltState.lastEventAt = Date.now();
-        if (this._tiltState.pendingCalibration || !this._tiltState.hasNeutral) {
-            this._tiltState.neutralBeta = beta;
-            this._tiltState.neutralGamma = gamma;
-            this._tiltState.hasNeutral = true;
-            this._tiltState.pendingCalibration = false;
-            this._tiltResolved.yawAxis = 0;
-            this._tiltResolved.pitchAxis = 0;
-            this._tiltResolved.yawDirection = 0;
-            this._tiltResolved.pitchDirection = 0;
+        if (
+            this._tiltState.hasNeutral
+            && normalizeOrientationAngle(this._tiltState.neutralOrientationAngle) !== orientationAngle
+            && !this._tiltCalibration.active
+        ) {
+            this._beginTiltCalibration('orientation-change');
+        }
+        if (this._tiltState.pendingCalibration || !this._tiltState.hasNeutral || this._tiltCalibration.active) {
+            this._captureTiltCalibrationSample(beta, gamma, orientationAngle);
         }
         this._updateTiltUi();
+    }
+
+    _beginTiltCalibration(reason = 'manual') {
+        this._tiltCalibration.active = true;
+        this._tiltCalibration.samples = [];
+        this._tiltCalibration.startedAt = Date.now();
+        this._tiltCalibration.reason = reason;
+        this._tiltState.pendingCalibration = true;
+        this._tiltResolved.yawAxis = 0;
+        this._tiltResolved.pitchAxis = 0;
+        this._tiltResolved.yawDirection = 0;
+        this._tiltResolved.pitchDirection = 0;
+    }
+
+    _captureTiltCalibrationSample(beta, gamma, orientationAngle) {
+        if (!this._tiltCalibration.active) {
+            this._beginTiltCalibration('sample');
+        }
+        this._tiltCalibration.samples.push({ beta, gamma, orientationAngle });
+        const elapsedMs = Date.now() - this._tiltCalibration.startedAt;
+        const enoughSamples = this._tiltCalibration.samples.length >= TILT_CALIBRATION_MIN_SAMPLES;
+        const enoughTime = elapsedMs >= TILT_CALIBRATION_SAMPLE_MS;
+        const timedOut = elapsedMs >= TILT_CALIBRATION_MAX_MS;
+        if ((enoughSamples && enoughTime) || timedOut) {
+            this._finishTiltCalibration();
+        }
+    }
+
+    _finishTiltCalibration() {
+        const neutral = resolveTiltCalibrationNeutral(this._tiltCalibration.samples, this._tiltState);
+        this._tiltState.neutralBeta = neutral.neutralBeta;
+        this._tiltState.neutralGamma = neutral.neutralGamma;
+        this._tiltState.neutralOrientationAngle = neutral.neutralOrientationAngle;
+        this._tiltState.hasNeutral = true;
+        this._tiltState.pendingCalibration = false;
+        this._tiltCalibration.active = false;
+        this._tiltCalibration.samples = [];
+        this._tiltResolved.yawAxis = 0;
+        this._tiltResolved.pitchAxis = 0;
+        this._tiltResolved.yawDirection = 0;
+        this._tiltResolved.pitchDirection = 0;
     }
 
     _resolveTiltSteeringInput() {
@@ -611,6 +692,9 @@ export class TouchInputSource extends PlayerInputSource {
             this._tiltResolved.pitchAxis = 0;
             this._tiltResolved.yawDirection = 0;
             this._tiltResolved.pitchDirection = 0;
+            return null;
+        }
+        if (this._tiltCalibration.active || this._tiltState.pendingCalibration) {
             return null;
         }
         const next = deriveTiltSteeringState({
@@ -681,9 +765,14 @@ export class TouchInputSource extends PlayerInputSource {
         }
         if (this._tiltButtonEl) {
             this._tiltButtonEl.dataset.active = this._isTiltFresh() ? '1' : '0';
+            this._tiltButtonEl.textContent = this._tiltCalibration.active
+                ? 'HALTEN'
+                : (this._tiltState.hasNeutral && this._isTiltFresh() ? 'NEU' : 'NEIGUNG');
         }
         if (this._tiltStatusEl) {
-            this._tiltStatusEl.textContent = this._isTiltFresh() ? 'TILT SANFT' : 'TILT';
+            this._tiltStatusEl.textContent = this._tiltCalibration.active
+                ? 'KALIBRIERE'
+                : (this._isTiltFresh() ? 'TILT SANFT' : 'TILT');
         }
         if (this._uiVisible && this._joystickEl) {
             this._joystickEl.style.display = this._shouldShowJoystickFallback() ? '' : 'none';

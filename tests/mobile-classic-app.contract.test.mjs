@@ -20,6 +20,7 @@ import {
 } from '../src/mobile-classic/MobileClassicUpdateConfig.js';
 import {
   deriveTiltSteeringState,
+  resolveTiltCalibrationNeutral,
   TOUCH_CONTROL_MODES,
 } from '../src/ui/TouchInputSource.js';
 import { PlayerController } from '../src/entities/player/PlayerController.js';
@@ -217,6 +218,35 @@ test('Mobile Classic tilt steering uses soft analog axes for phone control', () 
   assert.equal(control.rollInput, 0.2);
 });
 
+test('Mobile Classic tilt calibration treats the current hand posture as neutral', () => {
+  const neutral = resolveTiltCalibrationNeutral([
+    { beta: 63, gamma: 4, orientationAngle: 0 },
+    { beta: 65, gamma: 5, orientationAngle: 0 },
+    { beta: 64, gamma: 3, orientationAngle: 0 },
+  ]);
+  assert.ok(neutral.neutralBeta > 63);
+  assert.ok(neutral.neutralBeta < 65);
+  assert.ok(neutral.neutralGamma > 3);
+  assert.ok(neutral.neutralGamma < 5);
+
+  const steady = deriveTiltSteeringState({
+    neutralBeta: neutral.neutralBeta,
+    neutralGamma: neutral.neutralGamma,
+    beta: neutral.neutralBeta + 2,
+    gamma: neutral.neutralGamma + 2,
+  });
+  assert.equal(steady.pitchAxis, 0);
+  assert.equal(steady.yawAxis, 0);
+
+  const turnRight = deriveTiltSteeringState({
+    neutralBeta: neutral.neutralBeta,
+    neutralGamma: neutral.neutralGamma,
+    beta: neutral.neutralBeta,
+    gamma: neutral.neutralGamma + 18,
+  });
+  assert.equal(turnRight.yawRight, true);
+});
+
 test('Mobile Classic scripts build, wrap, and validate the phone app path', async () => {
   const packageJson = await readJson('package.json');
   const buildScript = await readText('scripts/build-mobile-classic-app.mjs');
@@ -251,6 +281,8 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.match(mobileClassicApp, /checkMobileClassicGithubRelease/);
   assert.match(mobileClassicApp, /mobile-classic\.manifest\.json/);
   assert.match(touchInputSource, /TILT SANFT/);
+  assert.match(touchInputSource, /KALIBRIERE/);
+  assert.match(touchInputSource, /resolveTiltCalibrationNeutral/);
   assert.match(readme, /app:classic:android:update:github/);
   assert.equal(TOUCH_CONTROL_MODES.TILT, 'tilt');
   assert.match(matchInputResolver, /pitchAxis/);
