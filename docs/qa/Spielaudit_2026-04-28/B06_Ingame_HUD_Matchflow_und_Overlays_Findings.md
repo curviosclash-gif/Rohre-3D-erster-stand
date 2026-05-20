@@ -1,7 +1,7 @@
 # B06 Ingame-HUD, Matchflow und Overlays - Findings
 
 Stand: 2026-04-29
-Status: in Arbeit
+Status: abgeschlossen
 Planquelle: [README.md](./README.md)
 
 ## Scope
@@ -28,7 +28,7 @@ Sichtung und Recheck 2026-04-29:
 
 | ID | Schwere | Titel | Dateien | Evidenz | Empfehlung | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| P42 | hoch | Arcade-Overlay rendert laufzeitnahe Labels und IDs per `innerHTML` | `src/ui/MatchFlowArcadeOverlayController.js` | `_renderArcadeIntermissionPanel()` interpoliert `mapLabel`, `modifierLabel`, `modifierEffect`, Reward-Labels und `entry.id` direkt in Button-/Panel-Markup (`114-175`); `_renderArcadePostRunPanel()` rendert `scorePerSector.mapKey` ebenfalls ungeescaped in HTML (`185-244`) | Overlay ausschliesslich ueber `createElement`/`textContent` und strikt normalisierte `data-*`-Attribute aufbauen; negativen Escape-/Injection-Fall mit eigenem Surface-Test absichern | offen |
+| P42 | hoch | Arcade-Overlay rendert laufzeitnahe Labels und IDs per `innerHTML` | `src/ui/MatchFlowArcadeOverlayController.js` | `_renderArcadeIntermissionPanel()` interpoliert `mapLabel`, `modifierLabel`, `modifierEffect`, Reward-Labels und `entry.id` direkt in Button-/Panel-Markup (`114-175`); `_renderArcadePostRunPanel()` rendert `scorePerSector.mapKey` ebenfalls ungeescaped in HTML (`185-244`) | Overlay ausschliesslich ueber `createElement`/`textContent` und strikt normalisierte `data-*`-Attribute aufbauen; negativen Escape-/Injection-Fall mit eigenem Surface-Test absichern | erledigt in V112 (2026-05-20; `T20an` PASS) |
 
 ## Offene Fragen
 
@@ -37,12 +37,12 @@ Sichtung und Recheck 2026-04-29:
 
 ## Folgearbeit
 
-- Fuer `P42` den vorhandenen Happy-Path-Test in `tests/core-targeted-surface.spec.js` um einen negativen Escape-/Injection-Fall erweitern, damit Overlay-Markup nicht nur funktional, sondern auch sicher gehaertet wird.
+- `P42` ist in V112 erledigt; der negative Escape-/Injection-Fall ist mit `T20an` abgedeckt.
 - Bei Bedarf B06/B08 gemeinsam auf eine einheitliche DOM-Haertungslinie ziehen, damit `innerHTML` fuer UI-Struktur nur noch auf statische, nicht datengetriebene Fragmente begrenzt bleibt.
 
 ## Detailnotizen
 
-### P42 - `innerHTML` im Arcade-Overlay bleibt ein offener UI-Sicherheitsfund
+### P42 - `innerHTML` im Arcade-Overlay ist in V112 erledigt
 
 - Problem: B06 interpoliert laufzeitnahe Arcade-Daten direkt in HTML-Strings statt sie ueber DOM-Knoten und `textContent` zu schreiben.
 - Risiko: Schon ein manipuliertes Map-/Reward-/Preview-Label oder eine ungehaertete ID kann Markup injizieren und den Overlay-Pfad im Round-End-/Match-End-Screen kompromittieren.

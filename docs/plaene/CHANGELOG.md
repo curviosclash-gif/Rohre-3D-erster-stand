@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Abschluss-Snapshot 2026-05-20 (Block `V112 112.99`)
+
+- `V112` ist geschlossen: Sticky-Input, deterministischer Bounce, Arcade-Seed-/Sudden-Death-Lifecycle, Start-Setup-/Arcade-Overlay-Injection-Pfade, Desktop-CSP-/Font-Boot und produktnahe Helper-/Contract-Gates sind abgearbeitet.
+- Abschluss-Evidence: `npm run test:contract` -> PASS, `npm run test:desktop:smoke` -> PASS, exakt `T20b:` -> PASS, `T20n:` -> SKIP mit Sunset-Kriterium; `npm run plan:check`, `npm run check:plan-evidence-claims`, `npm run docs:sync` und `npm run docs:check` -> PASS. `npm run gates:pre-commit` stoppte bei `graph:check` wegen bereits vorhandener nicht-V112-Map-Tools-/Plan-Map-Graph-Drift.
+- Befund-Abgleich: `Open_Findings.md` und die Spielaudit-Dateien markieren B02-F01, B03-F04, B04-F1/F3, B05-F03 und P42 als V112-erledigt; B02-F02/F03, B03-F01/F02/F03, B04-F2/F4/F5/F6 und weitere Delta-Reste bleiben bewusst offen.
+- Residual Risk: Der breite Playwright-Grep `-g "T20b"` traf auch `T20ba`; der dabei sichtbare Ghost-Replay-`entryCount`-Seitenfund ist dokumentiert, aber nicht Teil des V112-Scope.
+
 ## Abschluss-Snapshot 2026-05-20 (Block `V126 126.99`)
 
 - `V126` ist geschlossen: lokale Dev-/Preview-APIs sind klassifiziert und gegated, Training-Spawn laeuft ohne Shell-Zwischenschicht, CLI-Argumente sind allowlisted, Trainingslogs nutzen einen Ringbuffer und die Training-Dashboard-API ist als erste fokussierte Vite-Plugin-Familie ausgelagert.

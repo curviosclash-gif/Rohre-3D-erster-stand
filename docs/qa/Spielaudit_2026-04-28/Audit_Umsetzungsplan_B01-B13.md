@@ -15,17 +15,22 @@ Nicht Teil dieses Delta-Plans:
 - UI-God-Object-/Ownership-Port-Schnitt -> `V104`
 - Guard-/Typecheck-Recovery -> `V105`
 
-## 2. Delta-Findings (verbleibend)
+## 2. Delta-Findings
 
-## 2.1 Runtime/Simulation/Determinismus
+## 2.0 Erledigt durch V112
 
 - `B02-F01` Sticky Input bei Fokuswechsel (`src/core/InputManager.js`)
-- `B02-F02` Capture-Renderer-Leak im Fehlerpfad (`src/core/renderer/RecordingCapturePipeline.js`)
-- `B02-F03` Hotkey-Repeat-Toggles (`src/core/RuntimeDiagnosticsSystem.js`, `src/core/Audio.js`)
-- `B03-F03` `safeDt` nicht durchgaengig in Simulationssysteme (`src/entities/runtime/EntityTickPipeline.js`)
 - `B03-F04` unseeded `Math.random` im Bounce-Resolve (`src/entities/systems/CollisionResponseSystem.js`)
 - `B04-F1` Seed-Drift Arcade-Run (`src/core/arcade/ArcadeRunRuntime.js`)
 - `B04-F3` Sudden-Death-State run-uebergreifend (`src/modes/ArcadeModeStrategy.js`)
+- `B05-F03` Start-Setup-Renderer bauen HTML direkt aus Laufzeitdaten (`src/ui/start-setup/StartSetupUiOps.js`)
+- `P42` Arcade-Overlay rendert laufzeitnahe Labels und IDs per `innerHTML` (`src/ui/MatchFlowArcadeOverlayController.js`)
+
+## 2.1 Runtime/Simulation/Determinismus
+
+- `B02-F02` Capture-Renderer-Leak im Fehlerpfad (`src/core/renderer/RecordingCapturePipeline.js`)
+- `B02-F03` Hotkey-Repeat-Toggles (`src/core/RuntimeDiagnosticsSystem.js`, `src/core/Audio.js`)
+- `B03-F03` `safeDt` nicht durchgaengig in Simulationssysteme (`src/entities/runtime/EntityTickPipeline.js`)
 - `B04-F4` Missionen ignorieren Map-/Sector-Kontext (`ArcadeRunRuntime` + `ArcadeMissionState`)
 - `B04-F5` Hunt-Pickups ohne deterministische RNG-Injektion (`HuntModeStrategy`)
 - `B04-F6` Retreat-Fallback laeuft gegen Gegner (`HuntBotPolicy`)

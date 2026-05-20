@@ -66,7 +66,7 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 | V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.1 | `docs/plaene/aktiv/V121.md` |
 | V122 | Repo-natives Agent-Memory und externe Ruflo-Orchestrierung | planned | P2 | frei | V116.99,V117.99,V119.1 | 122.1 | `docs/plaene/aktiv/V122.md` |
 | V124 | Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet | planned | P2 | frei | V107.99,V110.99,V111.99 | 124.1 | `docs/plaene/aktiv/V124.md` |
-| V112 | Spielaudit- und Playtest-Improvement-Paket | planned | P1 | frei | V102.99,V105.99 | 112.1 | `docs/plaene/aktiv/V112.md` |
+| V112 | Spielaudit- und Playtest-Improvement-Paket | done | P1 | frei | V102.99,V105.99 | 112.99 | `docs/plaene/aktiv/V112.md` |
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
 | V113 | Hangar Shell Productivierung und Rules Panel | planned | P2 | frei | V76.99,V103.99 | 113.1 | `docs/plaene/aktiv/V113.md` |
@@ -169,13 +169,13 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V107 | 2026-05-07 | closed | Abgeschlossen 2026-05-08 |
 | - | V110 | 2026-05-08 | closed | Abgeschlossen 2026-05-09 |
 | - | V111 | 2026-05-09 | closed | Abgeschlossen 2026-05-10 |
-| - | V112 | - | frei | Geplant |
+| - | V112 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Spielaudit-/Playtest-Hardening gruen, T20ba-Seitenfund dokumentiert |
 | - | V113 | - | frei | Geplant |
 
 ## Empfohlene Reihenfolge
 
 1. `V126` ist abgeschlossen: Training-Spawn, Preview-Mutationsgrenze, lokale API-Matrix, Ringbuffer und erste `vite.config.js`-Entflechtung sind gruen; Folgepfade bleiben `V127`, `V128` und `V129`.
-2. `V112` (Spielaudit- und Playtest-Improvement-Paket) als produktnahes Qualitaetsfenster danach oder bei Gameplay-Prioritaet parallel mit disjunktem Scope starten.
+2. `V112` ist abgeschlossen; der dokumentierte `T20ba`-Seitenfund bleibt ausserhalb dieses Blocks als separater Ghost-Replay-Hinweis.
 3. `V125` (Architektur-Compliance fuer Folgearbeit) als Architektur-Schutz nachziehen, besonders staged Architecture Guard und Workflow-Eskalation fuer neue Boundary-/Legacy-Surfaces.
 4. `V119` (Planabschluss-Evidence-Remediation und Git-Historienabgleich) vollstaendig abschliessen, bevor historische Plan-Evidence als Grundlage fuer neue Automatisierung, RAG oder Source-of-Truth-Migration verwendet wird.
 5. `V123` (AI-optimierter Plan-Index und Source-of-Truth-Migration) erst nach V119-Baseline als Plan-Index-Pilot starten; `docs/Umsetzungsplan.md` bleibt bis zur expliziten Migration kanonisch.
