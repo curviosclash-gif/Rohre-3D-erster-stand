@@ -7,15 +7,29 @@ import { promisify } from 'node:util';
 const execFile = promisify(execFileCallback);
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const appRoot = path.join(repoRoot, 'tools', 'mobile-classic-app');
+const androidRoot = path.join(repoRoot, 'android-classic');
 const capacitorCli = path.join(repoRoot, 'node_modules', '@capacitor', 'cli', 'bin', 'capacitor');
+const appId = 'de.curviosclash.classic';
+const debugApkPath = path.join(androidRoot, 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk');
 
 const action = String(process.argv[2] || 'sync').trim().toLowerCase();
+const defaultAndroidSdk = process.env.LOCALAPPDATA
+  ? path.join(process.env.LOCALAPPDATA, 'Android', 'Sdk')
+  : '';
+const androidSdk = process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT || defaultAndroidSdk;
+const platformTools = androidSdk ? path.join(androidSdk, 'platform-tools') : '';
+const commandEnv = {
+  ...process.env,
+  ...(androidSdk ? { ANDROID_HOME: androidSdk, ANDROID_SDK_ROOT: androidSdk } : {}),
+  PATH: platformTools ? `${platformTools}${path.delimiter}${process.env.PATH || ''}` : process.env.PATH,
+};
 
 async function runNodeScript(scriptRelativePath) {
   await execFile(process.execPath, [path.join(repoRoot, scriptRelativePath)], {
     cwd: repoRoot,
+    env: commandEnv,
     windowsHide: true,
-    timeout: 180_000,
+    timeout: 600_000,
     maxBuffer: 8 * 1024 * 1024,
   });
 }
@@ -23,14 +37,38 @@ async function runNodeScript(scriptRelativePath) {
 async function runCapacitor(args, timeout = 180_000) {
   await execFile(process.execPath, [capacitorCli, ...args], {
     cwd: appRoot,
+    env: commandEnv,
     windowsHide: true,
     timeout,
     maxBuffer: 16 * 1024 * 1024,
   });
 }
 
+async function runGradle(args, timeout = 900_000) {
+  const gradleCommand = process.platform === 'win32' ? 'gradlew.bat' : './gradlew';
+  await execFile(path.join(androidRoot, gradleCommand), args, {
+    cwd: androidRoot,
+    env: commandEnv,
+    windowsHide: true,
+    timeout,
+    maxBuffer: 32 * 1024 * 1024,
+  });
+}
+
+async function runAdb(args, timeout = 180_000) {
+  const adbCommand = process.platform === 'win32' ? 'adb.exe' : 'adb';
+  const adbPath = platformTools ? path.join(platformTools, adbCommand) : adbCommand;
+  await execFile(adbPath, args, {
+    cwd: repoRoot,
+    env: commandEnv,
+    windowsHide: true,
+    timeout,
+    maxBuffer: 8 * 1024 * 1024,
+  });
+}
+
 async function main() {
-  if (!['add', 'sync', 'copy', 'open', 'apk', 'doctor'].includes(action)) {
+  if (!['add', 'sync', 'copy', 'open', 'apk', 'install', 'doctor'].includes(action)) {
     throw new Error(`Unsupported action: ${action}`);
   }
 
@@ -53,11 +91,22 @@ async function main() {
     await runCapacitor(['open', 'android']);
   } else if (action === 'apk') {
     await runCapacitor(['sync', 'android'], 240_000);
-    await runCapacitor(['build', 'android', '--androidreleasetype', 'APK'], 600_000);
+    await runGradle(['assembleDebug', '--no-problems-report']);
+  } else if (action === 'install') {
+    await runCapacitor(['sync', 'android'], 240_000);
+    await runGradle(['assembleDebug', '--no-problems-report']);
+    await runAdb(['install', '-r', debugApkPath]);
+    await runAdb(['shell', 'monkey', '-p', appId, '-c', 'android.intent.category.LAUNCHER', '1']);
   }
 }
 
 main().catch((error) => {
+  if (error.stdout) {
+    process.stderr.write(`${error.stdout}\n`);
+  }
+  if (error.stderr) {
+    process.stderr.write(`${error.stderr}\n`);
+  }
   process.stderr.write(`mobile-classic-capacitor: ${error.stack || error.message}\n`);
   process.exitCode = 1;
 });

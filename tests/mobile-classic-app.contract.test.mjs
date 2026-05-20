@@ -25,11 +25,15 @@ async function readText(relativePath) {
 
 test('Mobile Classic Capacitor wrapper is separate from Map Tools Android', async () => {
   const config = await readJson('tools/mobile-classic-app/capacitor.config.json');
+  const subprojectPackage = await readJson('tools/mobile-classic-app/package.json');
 
   assert.equal(config.appId, 'de.curviosclash.classic');
   assert.equal(config.appName, 'Curvios Clash Classic');
   assert.equal(config.webDir, '../../dist/mobile-classic');
   assert.equal(config.android.path, '../../android-classic');
+  assert.equal(subprojectPackage.private, true);
+  assert.equal(subprojectPackage.dependencies['@capacitor/android'], '8.3.4');
+  assert.equal(subprojectPackage.dependencies['@capacitor/core'], '8.3.4');
 
   const mapToolsConfig = await readJson('capacitor.config.json');
   assert.equal(mapToolsConfig.appId, 'de.curviosclash.maps');
@@ -100,8 +104,13 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.equal(packageJson.scripts['app:classic:android:build'], 'node scripts/build-mobile-classic-app.mjs');
   assert.equal(packageJson.scripts['app:classic:android:check'], 'node --test tests/mobile-classic-app.contract.test.mjs');
   assert.equal(packageJson.scripts['app:classic:android:sync'], 'node scripts/capacitor-mobile-classic.mjs sync');
+  assert.equal(packageJson.scripts['app:classic:android:install'], 'node scripts/capacitor-mobile-classic.mjs install');
   assert.match(buildScript, /VITE_APP_TARGET = 'mobile-classic'/);
   assert.match(buildScript, /mobile-classic\.manifest\.json/);
   assert.match(capacitorScript, /tools', 'mobile-classic-app'/);
   assert.match(capacitorScript, /@capacitor', 'cli', 'bin', 'capacitor'/);
+  assert.match(capacitorScript, /ANDROID_HOME/);
+  assert.match(capacitorScript, /assembleDebug/);
+  assert.match(capacitorScript, /de\.curviosclash\.classic/);
+  assert.match(capacitorScript, /error\.stderr/);
 });

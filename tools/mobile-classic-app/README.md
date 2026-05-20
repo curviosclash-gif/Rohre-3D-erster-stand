@@ -23,5 +23,11 @@ npm run app:classic:android:sync
 npm run app:classic:android:open
 ```
 
+Build and install a debug APK on the connected Android device:
+
+```bash
+npm run app:classic:android:install
+```
+
 The native project lives in `android-classic`; the shipped web bundle is
-`dist/mobile-classic`.
+`dist/mobile-classic`. The app icon source is `tools/mobile-classic-app/assets/icon-source.png`.
