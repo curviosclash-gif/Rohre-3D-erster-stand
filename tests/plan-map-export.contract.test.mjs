@@ -20,6 +20,8 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.ok(v126.readiness);
   assert.ok(['ready', 'ready-with-risk', 'blocked', 'locked', 'done'].includes(v126.readiness.status));
   assert.ok(v126.impact.scopeFileCount > 0);
+  assert.equal(v126.workstream, 'repo-governance');
+  assert.equal(v126.workstreamLabel, 'Repo-Pflege & Governance');
   assert.ok(v126.explanation);
   assert.ok(typeof v126.explanation.brief === 'string');
   assert.ok(Array.isArray(v126.explanation.goal));
@@ -38,5 +40,15 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.ok(data.scorecard.metrics.criticalPathTotalCount >= 4);
   assert.ok(Array.isArray(data.scopeCollisions));
   assert.ok(data.summary.byReadiness);
+  assert.ok(data.summary.byWorkstream['repo-governance'] > 0);
+  assert.ok(data.workstreams.some((entry) => entry.id === 'map-tools-settings'));
+  assert.ok(data.workstreams.some((entry) => entry.id === 'android-mobile'));
   assert.ok(data.fileIndex.some((entry) => entry.path === 'vite.config.js'));
+  assert.ok(data.summary.changelogCount > 20);
+  assert.ok(data.summary.changelogWithEvidenceCount > 0);
+  assert.ok(data.changelog.some((entry) => (
+    entry.blockIds.includes('V112')
+    && entry.evidence.commands.some((command) => command.result === 'PASS')
+  )));
+  assert.ok(data.changelog.every((entry) => entry.source === 'docs/plaene/CHANGELOG.md'));
 });

@@ -8,6 +8,7 @@ import { promisify } from 'node:util';
 const execFile = promisify(execFileCallback);
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const webDir = path.join(repoRoot, 'dist', 'map-tools-android');
+const fallbackGithubRepository = 'curviosclash-gif/Rohre-3D-erster-stand';
 
 const copyEntries = [
   ['tools/plan-map/index.html', 'tools/plan-map/index.html'],
@@ -37,7 +38,45 @@ async function runNode(script, outputPath) {
   });
 }
 
+function normalizeGithubRepository(value) {
+  const repository = String(value || '').trim()
+    .replace(/^https:\/\/github\.com\//, '')
+    .replace(/^git@github\.com:/, '')
+    .replace(/\.git$/, '')
+    .replace(/^\/+|\/+$/g, '');
+  return /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository)
+    ? repository
+    : fallbackGithubRepository;
+}
+
+async function detectGithubRepository() {
+  if (process.env.CURVIOS_MAP_TOOLS_GITHUB_REPOSITORY) {
+    return normalizeGithubRepository(process.env.CURVIOS_MAP_TOOLS_GITHUB_REPOSITORY);
+  }
+  try {
+    const { stdout } = await execFile('git', ['config', '--get', 'remote.origin.url'], {
+      cwd: repoRoot,
+      windowsHide: true,
+      timeout: 10_000,
+      maxBuffer: 64 * 1024,
+    });
+    return normalizeGithubRepository(stdout);
+  } catch {
+    return fallbackGithubRepository;
+  }
+}
+
+function createGithubUpdateConfig(repository) {
+  return {
+    provider: 'github-releases',
+    repository,
+    apiUrl: `https://api.github.com/repos/${repository}/releases/latest`,
+    latestReleaseUrl: `https://github.com/${repository}/releases/latest`,
+  };
+}
+
 async function writeManifest() {
+  const githubRepository = await detectGithubRepository();
   const manifest = {
     contract: 'curvios.map-tools-android.v1',
     generatedAt: new Date().toISOString(),
@@ -60,6 +99,7 @@ async function writeManifest() {
         data: './tmp/repo-map/repo-map.json',
       },
     ],
+    updates: createGithubUpdateConfig(githubRepository),
   };
   await fs.writeFile(
     path.join(webDir, 'map-tools-android.manifest.json'),

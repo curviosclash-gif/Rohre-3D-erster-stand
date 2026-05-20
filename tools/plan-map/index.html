@@ -20,6 +20,7 @@
           </label>
           <div class="segmented" aria-label="Ansicht">
             <button type="button" data-view="map" class="is-active">Map</button>
+            <button type="button" data-view="changelog">Changelog</button>
             <button type="button" data-view="collisions">Kollisionen</button>
             <button type="button" data-view="health">Health</button>
           </div>
@@ -113,9 +114,29 @@
               </select>
             </label>
             <label>
+              <span>Arbeitsstrom</span>
+              <select id="workstreamFilter">
+                <option value="all">Alle</option>
+              </select>
+            </label>
+            <label>
               <span>Startbarkeit</span>
               <select id="readinessFilter">
                 <option value="all">Alle</option>
+              </select>
+            </label>
+            <label>
+              <span>Changelog-Typ</span>
+              <select id="changelogTypeFilter">
+                <option value="all">Alle</option>
+              </select>
+            </label>
+            <label>
+              <span>Evidence</span>
+              <select id="changelogEvidenceFilter">
+                <option value="all">Alle</option>
+                <option value="with-evidence">Mit Evidence</option>
+                <option value="not-checked">Not checked</option>
               </select>
             </label>
           </div>
@@ -128,6 +149,9 @@
           <section id="mapView" class="view-panel is-active">
             <svg id="planSvg" class="plan-svg" role="img" aria-label="Dependency-Karte"></svg>
             <div id="edgeTooltip" class="edge-tooltip" hidden></div>
+          </section>
+          <section id="changelogView" class="view-panel">
+            <div id="changelogPanel" class="changelog-panel"></div>
           </section>
           <section id="collisionsView" class="view-panel">
             <div id="collisionsTable" class="data-table"></div>

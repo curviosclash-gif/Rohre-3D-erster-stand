@@ -115,6 +115,11 @@ The right panel keeps dense data behind tabs:
 - Phasen: current phase progress and phase list.
 - Risiken: dependency, governance, package, finding, and verification hints.
 
+Risk hints are rendered as compact dropdowns. The collapsed row keeps the risk
+list scan-friendly; opening a row explains why the signal matters and which
+gate or scope decision it normally affects. The same viewer is embedded by the
+Electron Map Tools shell and by the Android wrapper.
+
 ## UI-Schichten
 
 The map keeps dense information in layers so the first view remains readable:

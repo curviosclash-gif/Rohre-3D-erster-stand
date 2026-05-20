@@ -32,10 +32,44 @@ test('Map Tools Android shell embeds Plan Map and Repo Map viewers', async () =>
 
   assert.match(html, /data-testid="map-tools-android-shell"/);
   assert.match(html, /src="\.\/tools\/plan-map\/index\.html"/);
+  assert.match(html, /id="updateCheck"/);
+  assert.match(html, /id="updateOpen"/);
+  assert.match(html, /id="planWorkstream"/);
+  assert.match(html, /id="planChangelog"/);
+  assert.match(html, /data-testid="map-tools-android-workstream"/);
+  assert.match(html, /data-testid="map-tools-android-changelog"/);
   assert.match(script, /'\.\/tools\/plan-map\/index\.html'/);
   assert.match(script, /'\.\/tools\/repo-map\/index\.html'/);
+  assert.match(script, /planWorkstream/);
+  assert.match(script, /workstreamFilter/);
+  assert.match(script, /function applyPlanWorkstreamFilter/);
+  assert.match(script, /function openPlanChangelog/);
+  assert.match(script, /curvios\.plan-map:set-filter/);
+  assert.match(script, /api\.github\.com\/repos/);
+  assert.match(script, /releases\/latest/);
   assert.equal(packageJson.scripts['app:maps:android:build'], 'node scripts/build-map-tools-android.mjs');
   assert.equal(packageJson.scripts['app:maps:android:sync'], 'npm run app:maps:android:build && npx cap sync android');
+});
+
+test('Plan Map risk hints are compact dropdown explanations in shared viewers', async () => {
+  const [html, script, css] = await Promise.all([
+    readText('tools/plan-map/index.html'),
+    readText('tools/plan-map/viewer.js'),
+    readText('tools/plan-map/viewer.css'),
+  ]);
+
+  assert.match(html, /data-view="changelog"/);
+  assert.match(html, /id="changelogView"/);
+  assert.match(html, /id="changelogTypeFilter"/);
+  assert.match(script, /function riskHintItems/);
+  assert.match(script, /function renderChangelogView/);
+  assert.match(script, /selectedChangelogId/);
+  assert.match(script, /<details class="risk-disclosure">/);
+  assert.match(script, /<summary>/);
+  assert.match(script, /Harte Dependencies sind Start- oder Abschlussbedingungen/);
+  assert.match(css, /\.risk-disclosure summary/);
+  assert.match(css, /\.changelog-timeline/);
+  assert.match(css, /\.changelog-card/);
 });
 
 test('Map Tools Android shell keeps phone viewports inside the app frame', async () => {
@@ -46,6 +80,8 @@ test('Map Tools Android shell keeps phone viewports inside the app frame', async
   ]);
 
   assert.match(shellCss, /@media \(max-width: 640px\)/);
+  assert.match(shellCss, /\.plan-filter-strip/);
+  assert.match(shellCss, /\.plan-filter-strip\[hidden\]/);
   assert.match(planCss, /@media \(max-width: 760px\)/);
   assert.match(planCss, /overflow-x: hidden/);
   assert.match(planCss, /grid-template-columns: minmax\(0, 1fr\)/);
@@ -78,6 +114,9 @@ test('Map Tools Android build script exports static map datasets', async () => {
   assert.match(script, /dist\/map-tools-android\/tmp\/plan-map\/plan-map\.json/);
   assert.match(script, /dist\/map-tools-android\/tmp\/repo-map\/repo-map\.json/);
   assert.match(script, /map-tools-android\.manifest\.json/);
+  assert.match(script, /github-releases/);
+  assert.match(script, /CURVIOS_MAP_TOOLS_GITHUB_REPOSITORY/);
+  assert.match(script, /https:\/\/api\.github\.com\/repos\/\$\{repository\}\/releases\/latest/);
 });
 
 test('Map Tools Android is represented in the knowledge graph mapping source', async () => {

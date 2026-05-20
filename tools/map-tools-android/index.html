@@ -17,11 +17,32 @@
           <button type="button" role="tab" data-view-id="plan" aria-selected="true">Plan</button>
           <button type="button" role="tab" data-view-id="repo" aria-selected="false">Repo</button>
         </div>
+        <div class="update-actions" aria-label="GitHub Update">
+          <button type="button" id="updateCheck">Update</button>
+          <button type="button" id="updateOpen" hidden>GitHub</button>
+        </div>
       </header>
 
       <section class="status-strip" aria-live="polite">
         <span id="activeLabel">Plan Map</span>
         <span id="buildMeta">read-only Android snapshot</span>
+        <span id="updateStatus">GitHub Releases</span>
+      </section>
+
+      <section id="planFilterStrip" class="plan-filter-strip" aria-label="Plan Map Arbeitsstrom">
+        <label>
+          <span>Arbeitsstrom</span>
+          <select id="planWorkstream" data-testid="map-tools-android-workstream">
+            <option value="all">Alle</option>
+            <option value="main-game">Hauptspiel</option>
+            <option value="map-tools-settings">Map/Settings</option>
+            <option value="android-mobile">Android</option>
+            <option value="architecture-runtime">Architektur</option>
+            <option value="repo-governance">Repo</option>
+            <option value="ai-graph-tools">AI/Graph</option>
+          </select>
+        </label>
+        <button type="button" id="planChangelog" data-testid="map-tools-android-changelog">Historie</button>
       </section>
 
       <iframe

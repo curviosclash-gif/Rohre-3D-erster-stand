@@ -33,6 +33,84 @@ const MASTER_BLOCK_SECTIONS = [
   },
 ];
 
+const WORKSTREAMS = [
+  { id: 'main-game', label: 'Hauptspiel' },
+  { id: 'map-tools-settings', label: 'Map Content, Map Tools & Settings' },
+  { id: 'android-mobile', label: 'Android / Mobile' },
+  { id: 'architecture-runtime', label: 'Architektur & Runtime' },
+  { id: 'repo-governance', label: 'Repo-Pflege & Governance' },
+  { id: 'ai-graph-tools', label: 'AI / Graph / Agenten-Werkzeuge' },
+];
+
+const WORKSTREAM_BY_ID = new Map([
+  ['V76', 'main-game'],
+  ['V99', 'main-game'],
+  ['V108', 'main-game'],
+  ['V112', 'main-game'],
+  ['V113', 'main-game'],
+  ['V115', 'main-game'],
+  ['V103', 'map-tools-settings'],
+  ['V106', 'map-tools-settings'],
+  ['V114', 'map-tools-settings'],
+  ['V129', 'map-tools-settings'],
+  ['V130', 'map-tools-settings'],
+  ['V131', 'android-mobile'],
+  ['V91', 'architecture-runtime'],
+  ['V92', 'architecture-runtime'],
+  ['V96', 'architecture-runtime'],
+  ['V100', 'architecture-runtime'],
+  ['V101', 'architecture-runtime'],
+  ['V102', 'architecture-runtime'],
+  ['V104', 'architecture-runtime'],
+  ['V105', 'architecture-runtime'],
+  ['V125', 'architecture-runtime'],
+  ['V90', 'repo-governance'],
+  ['V109', 'repo-governance'],
+  ['V116', 'repo-governance'],
+  ['V117', 'repo-governance'],
+  ['V119', 'repo-governance'],
+  ['V123', 'repo-governance'],
+  ['V126', 'repo-governance'],
+  ['V128', 'repo-governance'],
+  ['V107', 'ai-graph-tools'],
+  ['V110', 'ai-graph-tools'],
+  ['V111', 'ai-graph-tools'],
+  ['V120', 'ai-graph-tools'],
+  ['V121', 'ai-graph-tools'],
+  ['V122', 'ai-graph-tools'],
+  ['V124', 'ai-graph-tools'],
+  ['V127', 'ai-graph-tools'],
+]);
+
+const WORKSTREAM_BY_AREA_PATTERN = [
+  [/android|mobile/i, 'android-mobile'],
+  [/map|glb|settings|surface-policy|editor-authoring|data-contracts/i, 'map-tools-settings'],
+  [/graph|rag|agent-memory|repo-map|plan-map|knowledge/i, 'ai-graph-tools'],
+  [/architecture|runtime|contract|typecheck|boundary|legacy|application/i, 'architecture-runtime'],
+  [/governance|plan|toolchain|cleanup|security|delivery|dev-api|release/i, 'repo-governance'],
+  [/gameplay|hangar|arcade|multiplayer|playtest|ghost|parcours/i, 'main-game'],
+];
+
+const WORKSTREAM_LABEL_BY_ID = new Map(WORKSTREAMS.map((entry) => [entry.id, entry.label]));
+
+function inferWorkstream({ id, title, affectedArea }) {
+  const explicit = WORKSTREAM_BY_ID.get(id);
+  if (explicit) {
+    return {
+      id: explicit,
+      label: WORKSTREAM_LABEL_BY_ID.get(explicit) || explicit,
+    };
+  }
+
+  const haystack = `${affectedArea || ''} ${title || ''}`;
+  const matched = WORKSTREAM_BY_AREA_PATTERN.find(([pattern]) => pattern.test(haystack));
+  const workstreamId = matched?.[1] || 'repo-governance';
+  return {
+    id: workstreamId,
+    label: WORKSTREAM_LABEL_BY_ID.get(workstreamId) || workstreamId,
+  };
+}
+
 function cleanCell(value) {
   return String(value || '')
     .trim()
@@ -208,6 +286,91 @@ function truncateText(value, maxLength = 260) {
     return text;
   }
   return `${text.slice(0, maxLength - 1).trimEnd()}...`;
+}
+
+function parseChangelogType(title) {
+  const normalized = stripMarkdown(title).replace(/\s+[0-9]{4}-[0-9]{2}-[0-9]{2}.*$/, '').trim();
+  const type = normalized || 'Notiz';
+  const typeId = type.toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'note';
+  return { id: typeId, label: type };
+}
+
+function parseChangelogEvidence(bullets) {
+  const evidenceLines = bullets.filter((bullet) => /evidence|gate|pass|fail|skip|not-checked|gruen|rot/i.test(bullet));
+  const commandPattern = /`([^`]+)`(?:\s*(?:->|\(|ist|lief|laeuft|sind|und)?\s*(PASS|FAIL|SKIP|WARN|gruen|rot))?/gi;
+  const commands = [];
+
+  for (const line of evidenceLines) {
+    for (const match of line.matchAll(commandPattern)) {
+      commands.push({
+        command: stripMarkdown(match[1]),
+        result: match[2] ? match[2].toUpperCase().replace('GRUEN', 'PASS').replace('ROT', 'FAIL') : 'MENTIONED',
+      });
+    }
+  }
+
+  return {
+    lines: evidenceLines.map((line) => truncateText(line, 320)),
+    commands,
+    hasEvidence: evidenceLines.length > 0 || commands.length > 0,
+    hasNotChecked: bullets.some((bullet) => /not-checked/i.test(bullet)),
+  };
+}
+
+function parseChangelogEntries(markdown) {
+  const text = String(markdown || '');
+  const headings = [...text.matchAll(/^##\s+(.+)$/gm)];
+
+  return headings
+    .map((heading, index) => {
+      const title = cleanCell(heading[1]);
+      if (!title || /^Abgleich-Historie/i.test(title)) {
+        return null;
+      }
+
+      const start = (heading.index || 0) + heading[0].length;
+      const end = index + 1 < headings.length ? headings[index + 1].index || text.length : text.length;
+      const body = text.slice(start, end).trim();
+      const bullets = body
+        .split(/\r?\n/)
+        .map((line) => line.match(/^\s*-\s+(.+)$/)?.[1])
+        .filter(Boolean);
+      const date = title.match(/\b(20[0-9]{2}-[0-9]{2}-[0-9]{2})\b/)?.[1] || null;
+      const blockIds = [...new Set([
+        ...title.matchAll(/\b(V[0-9]+)\b/g),
+        ...body.matchAll(/\b(V[0-9]+)\b/g),
+      ].map((match) => match[1]))];
+      const phaseIds = [...new Set([...`${title}\n${body}`.matchAll(/\b(V[0-9]+\s+[0-9]+(?:\.[0-9]+)+|[0-9]+(?:\.[0-9]+)+)\b/g)]
+        .map((match) => stripMarkdown(match[1].replace(/\s+/, '.'))))];
+      const type = parseChangelogType(title);
+      const evidence = parseChangelogEvidence(bullets);
+      const firstBlock = blockIds[0] || null;
+      const workstream = inferWorkstream({
+        id: firstBlock,
+        title,
+        affectedArea: bullets.join(' '),
+      });
+
+      return {
+        id: `changelog-${date || 'undated'}-${index + 1}`,
+        title: stripMarkdown(title),
+        date,
+        type: type.id,
+        typeLabel: type.label,
+        blockIds,
+        phaseIds,
+        workstream: workstream.id,
+        workstreamLabel: workstream.label,
+        summary: truncateText(bullets[0] || body, 260),
+        bullets: bullets.map((bullet) => truncateText(bullet, 420)),
+        evidence,
+        source: CHANGELOG_PATH,
+        order: index + 1,
+      };
+    })
+    .filter(Boolean);
 }
 
 function sectionBody(markdown, heading) {
@@ -386,6 +549,8 @@ async function enrichBlock(rootDir, row) {
   const frontmatter = planText ? parseFrontmatter(planText) : {};
   const phaseProgress = planText ? parsePhaseProgress(planText, row.id) : { total: 0, done: 0, open: 0, percent: 0 };
   const dodProgress = planText ? parseDodProgress(planText) : { total: 0, done: 0, open: 0, percent: 0 };
+  const affectedArea = frontmatter.affected_area || null;
+  const workstream = inferWorkstream({ id: row.id, title: row.title, affectedArea });
 
   return {
     id: row.id,
@@ -398,7 +563,9 @@ async function enrichBlock(rootDir, row) {
     group: row.group,
     groupLabel: row.groupLabel,
     dependsOn: normalizeList(row.dependsOn).map(normalizeDependency).filter(Boolean),
-    affectedArea: frontmatter.affected_area || null,
+    affectedArea,
+    workstream: workstream.id,
+    workstreamLabel: workstream.label,
     scopeFiles: normalizeList(frontmatter.scope_files),
     scopeReferenceFiles: normalizeList(frontmatter.scope_reference_files),
     verification: normalizeList(frontmatter.verification),
@@ -882,11 +1049,13 @@ function buildSummary(blocks, dependencies, collisions, locks) {
   const byStatus = {};
   const byPriority = {};
   const byGroup = {};
+  const byWorkstream = {};
   const byReadiness = {};
   for (const block of blocks) {
     byStatus[block.status] = (byStatus[block.status] || 0) + 1;
     byPriority[block.priority] = (byPriority[block.priority] || 0) + 1;
     byGroup[block.group] = (byGroup[block.group] || 0) + 1;
+    byWorkstream[block.workstream] = (byWorkstream[block.workstream] || 0) + 1;
     const readiness = block.readiness?.status || 'unknown';
     byReadiness[readiness] = (byReadiness[readiness] || 0) + 1;
   }
@@ -899,6 +1068,7 @@ function buildSummary(blocks, dependencies, collisions, locks) {
     byStatus,
     byPriority,
     byGroup,
+    byWorkstream,
     byReadiness,
   };
 }
@@ -912,12 +1082,14 @@ export async function buildPlanMapData(options = {}) {
 
   const [
     openFindingsText,
+    changelogText,
     graph,
     coverage,
     scorecard,
     lockRegistry,
   ] = await Promise.all([
     readTextIfExists(rootDir, OPEN_FINDINGS_PATH),
+    readTextIfExists(rootDir, CHANGELOG_PATH),
     readJsonIfExists(rootDir, KNOWLEDGE_GRAPH_PATH),
     readJsonIfExists(rootDir, KNOWLEDGE_GRAPH_COVERAGE_PATH),
     readJsonIfExists(rootDir, KNOWLEDGE_GRAPH_SCORECARD_PATH),
@@ -931,6 +1103,7 @@ export async function buildPlanMapData(options = {}) {
   const scopeCollisions = await readCuratedScopeCollisions(rootDir) ?? buildScopeCollisions(graph, parsedBlocks);
   const blocks = buildBlockInsights(parsedBlocks, dependencies, scopeCollisions, locks, recommendedOrder);
   const fileIndex = buildFileIndex(blocks, scopeCollisions);
+  const changelog = parseChangelogEntries(changelogText);
 
   return {
     schema_version: 1,
@@ -946,17 +1119,24 @@ export async function buildPlanMapData(options = {}) {
       knowledgeGraphScorecard: scorecard ? KNOWLEDGE_GRAPH_SCORECARD_PATH : null,
       lockRegistry: lockRegistry ? LOCK_REGISTRY_PATH : null,
     },
+    workstreams: WORKSTREAMS,
     blocks,
     dependencies,
     recommendedOrder,
     locks,
     scopeCollisions,
     fileIndex,
+    changelog,
     openFindings: parseOpenFindings(openFindingsText),
     graph: summarizeKnowledgeGraph(graph),
     coverage: summarizeCoverage(coverage),
     scorecard: summarizeScorecard(scorecard),
-    summary: buildSummary(blocks, dependencies, scopeCollisions, locks),
+    summary: {
+      ...buildSummary(blocks, dependencies, scopeCollisions, locks),
+      changelogCount: changelog.length,
+      changelogWithEvidenceCount: changelog.filter((entry) => entry.evidence?.hasEvidence).length,
+      changelogNotCheckedCount: changelog.filter((entry) => entry.evidence?.hasNotChecked).length,
+    },
   };
 }
 

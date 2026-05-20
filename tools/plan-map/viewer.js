@@ -11,7 +11,11 @@ const state = {
   search: '',
   status: 'all',
   priority: 'all',
+  workstream: 'all',
   readiness: 'all',
+  changelogType: 'all',
+  changelogEvidence: 'all',
+  selectedChangelogId: null,
   focusMode: true,
   fileFocus: '',
   detailTab: 'overview',
@@ -39,13 +43,17 @@ const elements = {
   searchInput: document.querySelector('#searchInput'),
   statusFilter: document.querySelector('#statusFilter'),
   priorityFilter: document.querySelector('#priorityFilter'),
+  workstreamFilter: document.querySelector('#workstreamFilter'),
   readinessFilter: document.querySelector('#readinessFilter'),
+  changelogTypeFilter: document.querySelector('#changelogTypeFilter'),
+  changelogEvidenceFilter: document.querySelector('#changelogEvidenceFilter'),
   focusToggle: document.querySelector('#focusToggle'),
   blockList: document.querySelector('#blockList'),
   metrics: document.querySelector('#metrics'),
   decisionBar: document.querySelector('#decisionBar'),
   planSvg: document.querySelector('#planSvg'),
   edgeTooltip: document.querySelector('#edgeTooltip'),
+  changelogPanel: document.querySelector('#changelogPanel'),
   detailPanel: document.querySelector('#detailPanel'),
   collisionsTable: document.querySelector('#collisionsTable'),
   healthPanel: document.querySelector('#healthPanel'),
@@ -113,7 +121,8 @@ function selectBlock(blockId) {
 }
 
 function sectionKey(name) {
-  return `${state.selectedId || 'none'}:${state.detailTab}:${name}`;
+  const selection = state.view === 'changelog' ? state.selectedChangelogId : state.selectedId;
+  return `${selection || 'none'}:${state.detailTab}:${name}`;
 }
 
 function sectionExpanded(name) {
@@ -186,6 +195,8 @@ function blockMatchesFilters(block) {
     block.id,
     block.title,
     block.affectedArea,
+    block.workstream,
+    block.workstreamLabel,
     block.currentPhase,
     block.readiness?.label,
     block.readiness?.reason,
@@ -205,6 +216,10 @@ function blockMatchesFilters(block) {
   }
 
   if (state.priority !== 'all' && block.priority !== state.priority) {
+    return false;
+  }
+
+  if (state.workstream !== 'all' && block.workstream !== state.workstream) {
     return false;
   }
 
@@ -229,23 +244,88 @@ function visibleBlocks() {
     ));
 }
 
+function changelogMatchesFilters(entry) {
+  const haystack = [
+    entry.title,
+    entry.summary,
+    entry.typeLabel,
+    entry.workstream,
+    entry.workstreamLabel,
+    entry.blockIds?.join(' '),
+    entry.phaseIds?.join(' '),
+    entry.bullets?.join(' '),
+    entry.evidence?.commands?.map((command) => command.command).join(' '),
+  ].join(' ').toLowerCase();
+
+  if (state.search && !haystack.includes(state.search.toLowerCase())) {
+    return false;
+  }
+
+  if (state.workstream !== 'all' && entry.workstream !== state.workstream) {
+    return false;
+  }
+
+  if (state.changelogType !== 'all' && entry.type !== state.changelogType) {
+    return false;
+  }
+
+  if (state.changelogEvidence === 'with-evidence' && !entry.evidence?.hasEvidence) {
+    return false;
+  }
+
+  if (state.changelogEvidence === 'not-checked' && !entry.evidence?.hasNotChecked) {
+    return false;
+  }
+
+  return true;
+}
+
+function visibleChangelogEntries() {
+  return (state.data?.changelog || [])
+    .filter(changelogMatchesFilters)
+    .sort((left, right) => (
+      String(right.date || '').localeCompare(String(left.date || ''))
+      || (left.order || 0) - (right.order || 0)
+    ));
+}
+
 function selectedBlock() {
   return (state.data?.blocks || []).find((block) => block.id === state.selectedId) || visibleBlocks()[0] || null;
+}
+
+function selectedChangelogEntry() {
+  return (state.data?.changelog || []).find((entry) => entry.id === state.selectedChangelogId)
+    || visibleChangelogEntries()[0]
+    || null;
 }
 
 function updateFilterOptions() {
   const blocks = state.data?.blocks || [];
   const statuses = [...new Set(blocks.map((block) => block.status).filter(Boolean))].sort();
   const priorities = [...new Set(blocks.map((block) => block.priority).filter(Boolean))].sort();
+  const exportedWorkstreams = state.data?.workstreams || [];
+  const fallbackWorkstreams = [...new Map(blocks
+    .filter((block) => block.workstream)
+    .map((block) => [block.workstream, { id: block.workstream, label: block.workstreamLabel || block.workstream }])).values()]
+    .sort((left, right) => left.label.localeCompare(right.label, 'de'));
+  const workstreams = exportedWorkstreams.length ? exportedWorkstreams : fallbackWorkstreams;
   const readinesses = [...new Set(blocks.map((block) => block.readiness?.status).filter(Boolean))]
     .sort((left, right) => (readinessRank({ readiness: { status: left } }) - readinessRank({ readiness: { status: right } })));
+  const changelogTypes = [...new Map((state.data?.changelog || [])
+    .filter((entry) => entry.type)
+    .map((entry) => [entry.type, { id: entry.type, label: entry.typeLabel || entry.type }])).values()]
+    .sort((left, right) => left.label.localeCompare(right.label, 'de'));
 
   elements.statusFilter.innerHTML = '<option value="all">Alle</option>'
     + statuses.map((status) => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`).join('');
   elements.priorityFilter.innerHTML = '<option value="all">Alle</option>'
     + priorities.map((priority) => `<option value="${escapeHtml(priority)}">${escapeHtml(priority)}</option>`).join('');
+  elements.workstreamFilter.innerHTML = '<option value="all">Alle</option>'
+    + workstreams.map((entry) => `<option value="${escapeHtml(entry.id)}">${escapeHtml(entry.label)}</option>`).join('');
   elements.readinessFilter.innerHTML = '<option value="all">Alle</option>'
     + readinesses.map((readiness) => `<option value="${escapeHtml(readiness)}">${escapeHtml(readinessLabel(readiness))}</option>`).join('');
+  elements.changelogTypeFilter.innerHTML = '<option value="all">Alle</option>'
+    + changelogTypes.map((type) => `<option value="${escapeHtml(type.id)}">${escapeHtml(type.label)}</option>`).join('');
 }
 
 function readinessLabel(value) {
@@ -257,6 +337,18 @@ function readinessLabel(value) {
     done: 'abgeschlossen',
   };
   return labels[value] || value || '-';
+}
+
+function shortWorkstreamLabel(block) {
+  const labels = {
+    'main-game': 'Hauptspiel',
+    'map-tools-settings': 'Map/Settings',
+    'android-mobile': 'Android',
+    'architecture-runtime': 'Architektur',
+    'repo-governance': 'Repo',
+    'ai-graph-tools': 'AI/Graph',
+  };
+  return labels[block.workstream] || block.workstreamLabel || block.workstream || '-';
 }
 
 function renderMetrics() {
@@ -275,7 +367,7 @@ function renderMetrics() {
     { value: startable, label: 'Startbar' },
     { value: blocked, label: 'Blockiert/in Arbeit' },
     { value: summary.collisionCount ?? 0, label: 'Scope-Kollisionen' },
-    { value: score == null ? '-' : score, label: 'Graph Score' },
+    { value: summary.changelogCount ?? 0, label: 'Changelog' },
     { value: coverage == null ? `${activeLocks}` : `${coverage}%`, label: coverage == null ? 'Aktive Locks' : 'Coverage' },
   ];
 
@@ -362,6 +454,7 @@ function renderBlockList() {
         <span class="block-title">${escapeHtml(block.title)}</span>
         <span class="block-badges">
           ${collisionMarker}
+          <span class="chip priority" title="${escapeHtml(block.workstreamLabel || '')}">${escapeHtml(shortWorkstreamLabel(block))}</span>
           <span class="chip readiness-${escapeHtml(readiness)}">${activeLock ? 'lock' : escapeHtml(readinessLabel(readiness))}</span>
         </span>
       </button>
@@ -741,27 +834,71 @@ function phaseRows(block, sectionName, limit) {
     : '<p class="muted">keine Phasen gelesen</p>';
 }
 
-function riskHints(block, readiness, impact, collisions) {
+function riskHintItems(block, readiness, impact, collisions) {
   const hints = [];
   if ((readiness.openHardDependencyCount || 0) > 0) {
-    hints.push(`${readiness.openHardDependencyCount} harte Dependency noch offen.`);
+    hints.push({
+      title: `${readiness.openHardDependencyCount} harte Dependency noch offen.`,
+      kind: 'Gate',
+      detail: 'Harte Dependencies sind Start- oder Abschlussbedingungen. Der Block sollte erst weiterlaufen, wenn diese Vorbedingung erfuellt oder bewusst neu bewertet wurde.',
+    });
   }
   if ((readiness.openSoftDependencyCount || 0) + (readiness.openUnknownDependencyCount || 0) > 0) {
-    hints.push('Soft-Gates oder unklare Dependencies vor Start pruefen.');
+    hints.push({
+      title: 'Soft-Gates oder unklare Dependencies vor Start pruefen.',
+      kind: 'Unsicherheit',
+      detail: 'Soft- oder Unknown-Kanten blockieren nicht automatisch, koennen aber Scope, Reihenfolge oder Verifikation veraendern. Vor Umsetzung kurz abgleichen, ob daraus ein echter Blocker geworden ist.',
+    });
   }
   if (collisions.length > 0) {
-    hints.push(`${collisions.length} Scope-Kollision(en) mit anderen Bloecken.`);
+    hints.push({
+      title: `${collisions.length} Scope-Kollision(en) mit anderen Bloecken.`,
+      kind: 'Scope',
+      detail: 'Andere Bloecke nennen dieselben Dateien. Das ist kein Fehler, aber parallele Arbeit braucht Lock-/Scope-Abgleich, damit sich Aenderungen nicht gegenseitig ueberdecken.',
+    });
   }
   if ((impact.governanceFileCount || 0) > 0) {
-    hints.push(`${impact.governanceFileCount} Governance-nahe Datei(en) im Scope.`);
+    hints.push({
+      title: `${impact.governanceFileCount} Governance-nahe Datei(en) im Scope.`,
+      kind: 'Governance',
+      detail: 'Governance-nahe Dateien koennen Regeln, Workflows oder Planwahrheiten beeinflussen. Solche Aenderungen brauchen strengere Gates und duerfen nicht nebenbei mitlaufen.',
+    });
   }
   if ((impact.packageFileCount || 0) > 0) {
-    hints.push(`${impact.packageFileCount} Package-/Lockfile-nahe Datei(en) im Scope.`);
+    hints.push({
+      title: `${impact.packageFileCount} Package-/Lockfile-nahe Datei(en) im Scope.`,
+      kind: 'Dependency',
+      detail: 'Package- und Lockfile-Aenderungen koennen Build, Tests und GitHub-Actions beeinflussen. Nach solchen Aenderungen ist mindestens ein gezieltes Install-/Build- oder Contract-Signal sinnvoll.',
+    });
   }
   if ((block.blockedBy || []).length > 0) {
-    hints.push(`Blocked-by: ${(block.blockedBy || []).join(', ')}`);
+    hints.push({
+      title: `Blocked-by: ${(block.blockedBy || []).join(', ')}`,
+      kind: 'Blocker',
+      detail: 'Der Plan nennt konkrete Vorbedingungen. Vor Abschluss sollte klar sein, ob sie erledigt, entfallen oder in einen eigenen Follow-up verschoben wurden.',
+    });
   }
   return hints;
+}
+
+function riskHintMarkup(hints) {
+  if (!hints.length) {
+    return '<p class="muted">keine verdichteten Hinweise</p>';
+  }
+
+  return `
+    <div class="risk-list">
+      ${hints.map((hint) => `
+        <details class="risk-disclosure">
+          <summary>
+            <span>${escapeHtml(hint.title)}</span>
+            <span class="risk-kind">${escapeHtml(hint.kind)}</span>
+          </summary>
+          <p>${escapeHtml(hint.detail)}</p>
+        </details>
+      `).join('')}
+    </div>
+  `;
 }
 
 function collisionsForBlock(blockId) {
@@ -814,6 +951,50 @@ function bindInlineActions(root) {
 }
 
 function renderDetail() {
+  if (state.view === 'changelog') {
+    const entry = selectedChangelogEntry();
+    if (!entry) {
+      elements.detailPanel.innerHTML = '<div class="empty-state">Kein Changelog-Eintrag</div>';
+      return;
+    }
+
+    elements.detailPanel.innerHTML = `
+      <h2 class="detail-title">${escapeHtml(entry.title)}</h2>
+      <div class="detail-kicker">
+        <span class="chip priority">${escapeHtml(entry.date || '-')}</span>
+        <span class="chip priority">${escapeHtml(entry.typeLabel || '-')}</span>
+        <span class="chip priority">${escapeHtml(entry.workstreamLabel || '-')}</span>
+        ${entry.evidence?.hasEvidence ? '<span class="chip readiness-ready">Evidence</span>' : ''}
+        ${entry.evidence?.hasNotChecked ? '<span class="chip open-risk">Not checked</span>' : ''}
+      </div>
+      <div class="detail-section">
+        <h3>Kurzfazit</h3>
+        <p class="detail-note">${escapeHtml(entry.summary || '-')}</p>
+      </div>
+      <div class="detail-section">
+        <h3>Bloecke und Phasen</h3>
+        <dl class="key-value">
+          <dt>Bloecke</dt><dd>${entry.blockIds?.length ? entry.blockIds.map((blockId) => `<button type="button" class="text-button" data-select-block="${escapeHtml(blockId)}">${escapeHtml(blockId)}</button>`).join(' ') : '-'}</dd>
+          <dt>Phasen</dt><dd>${entry.phaseIds?.length ? escapeHtml(entry.phaseIds.join(', ')) : '-'}</dd>
+          <dt>Quelle</dt><dd>${escapeHtml(entry.source || '-')}</dd>
+        </dl>
+      </div>
+      <div class="detail-section">
+        <h3>Eintrag</h3>
+        <ul class="plain-list">${textItems(entry.bullets || [], 'changelogBullets', 12)}</ul>
+        ${showMoreButton('changelogBullets', (entry.bullets || []).length, 12)}
+      </div>
+      <div class="detail-section">
+        <h3>Evidence</h3>
+        <div class="evidence-badges">${evidenceBadges(entry, 12) || '<span class="muted">keine Evidence-Badges</span>'}</div>
+        <ul class="plain-list">${textItems(entry.evidence?.lines || [], 'changelogEvidenceLines', 8)}</ul>
+        ${showMoreButton('changelogEvidenceLines', (entry.evidence?.lines || []).length, 8)}
+      </div>
+    `;
+    bindInlineActions(elements.detailPanel);
+    return;
+  }
+
   const block = selectedBlock();
   if (!block) {
     elements.detailPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
@@ -830,7 +1011,7 @@ function renderDetail() {
   const progress = block.phaseProgress || { total: 0, done: 0, percent: 0 };
   const readiness = block.readiness || {};
   const impact = block.impact || {};
-  const hints = riskHints(block, readiness, impact, collisions);
+  const hints = riskHintItems(block, readiness, impact, collisions);
   const verification = block.verification || [];
   const sourceFindings = block.sourceFindings || [];
   const followups = block.relatedFollowupBlocks || [];
@@ -856,6 +1037,7 @@ function renderDetail() {
         <dl class="key-value">
           <dt>Phase</dt><dd>${escapeHtml(block.currentPhase || '-')}</dd>
           <dt>DoD</dt><dd>${escapeHtml(block.dodProgress?.done || 0)} / ${escapeHtml(block.dodProgress?.total || 0)}</dd>
+          <dt>Arbeitsstrom</dt><dd>${escapeHtml(block.workstreamLabel || shortWorkstreamLabel(block))}</dd>
           <dt>Area</dt><dd>${escapeHtml(block.affectedArea || '-')}</dd>
           <dt>Plan</dt><dd>${escapeHtml(block.planFile || '-')}</dd>
           <dt>Gruppe</dt><dd>${escapeHtml(block.groupLabel || block.group || '-')}</dd>
@@ -1009,9 +1191,7 @@ function renderDetail() {
     tabContent = `
       <div class="detail-section">
         <h3>Risikohinweise</h3>
-        <ul class="plain-list">
-          ${hints.length ? hints.map((hint) => `<li>${escapeHtml(hint)}</li>`).join('') : '<li class="muted">keine verdichteten Hinweise</li>'}
-        </ul>
+        ${riskHintMarkup(hints)}
       </div>
       <div class="detail-section">
         <h3>Verification</h3>
@@ -1038,6 +1218,7 @@ function renderDetail() {
     <div class="detail-kicker">
       <span class="chip ${escapeHtml(block.status)}">${escapeHtml(block.status)}</span>
       <span class="chip priority">${escapeHtml(block.priority || '-')}</span>
+      <span class="chip priority" title="${escapeHtml(block.workstreamLabel || '')}">${escapeHtml(shortWorkstreamLabel(block))}</span>
       <span class="chip readiness-${escapeHtml(readiness.status || 'unknown')}">${escapeHtml(readiness.label || '-')}</span>
       <span class="chip impact-${escapeHtml(impact.level || 'low')}">Impact ${escapeHtml(impact.level || 'low')}</span>
       ${activeLock ? '<span class="chip locked">lock</span>' : ''}
@@ -1074,6 +1255,64 @@ function renderCollisionView() {
     </table>
   `;
   bindInlineActions(elements.collisionsTable);
+}
+
+function evidenceBadges(entry, limit = 4) {
+  const commands = entry.evidence?.commands || [];
+  const badges = commands.slice(0, limit).map((command) => {
+    const result = String(command.result || 'mentioned').toLowerCase();
+    return `<span class="evidence-badge ${escapeHtml(result)}">${escapeHtml(command.result || 'MENTIONED')}</span>`;
+  });
+
+  if (entry.evidence?.hasNotChecked) {
+    badges.push('<span class="evidence-badge not-checked">NOT CHECKED</span>');
+  }
+  if (!badges.length && entry.evidence?.hasEvidence) {
+    badges.push('<span class="evidence-badge mentioned">EVIDENCE</span>');
+  }
+  return badges.join('');
+}
+
+function renderChangelogView() {
+  const entries = visibleChangelogEntries();
+  if (!state.selectedChangelogId || !entries.some((entry) => entry.id === state.selectedChangelogId)) {
+    state.selectedChangelogId = entries[0]?.id || null;
+  }
+
+  const activeId = state.selectedChangelogId;
+  elements.changelogPanel.innerHTML = `
+    <aside class="changelog-timeline" aria-label="Changelog Timeline">
+      ${entries.map((entry) => `
+        <button type="button" class="timeline-dot${entry.id === activeId ? ' is-active' : ''}" data-changelog-id="${escapeHtml(entry.id)}">
+          <span class="timeline-date">${escapeHtml(entry.date || 'ohne Datum')}</span>
+          <span class="timeline-label">${escapeHtml(entry.blockIds?.[0] || entry.typeLabel || 'Notiz')}</span>
+        </button>
+      `).join('') || '<p class="muted">keine Eintraege</p>'}
+    </aside>
+    <div class="changelog-cards">
+      ${entries.map((entry) => `
+        <button type="button" class="changelog-card${entry.id === activeId ? ' is-active' : ''}" data-changelog-id="${escapeHtml(entry.id)}">
+          <span class="changelog-card-meta">
+            <span class="chip priority">${escapeHtml(entry.date || '-')}</span>
+            <span class="chip priority">${escapeHtml(entry.typeLabel || '-')}</span>
+            <span class="chip priority">${escapeHtml(entry.workstreamLabel || '-')}</span>
+            ${(entry.blockIds || []).slice(0, 4).map((blockId) => `<span class="chip">${escapeHtml(blockId)}</span>`).join('')}
+          </span>
+          <h2 class="changelog-card-title">${escapeHtml(entry.title)}</h2>
+          <p class="changelog-card-summary">${escapeHtml(entry.summary || 'Keine Zusammenfassung gelesen.')}</p>
+          <span class="evidence-badges">${evidenceBadges(entry)}</span>
+        </button>
+      `).join('') || '<div class="empty-state">Keine Changelog-Eintraege fuer diese Filter</div>'}
+    </div>
+  `;
+
+  elements.changelogPanel.querySelectorAll('[data-changelog-id]').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.selectedChangelogId = button.dataset.changelogId;
+      state.view = 'changelog';
+      render();
+    });
+  });
 }
 
 function renderHealthView() {
@@ -1121,6 +1360,7 @@ function updateViewPanels() {
     button.classList.toggle('is-active', button.dataset.view === state.view);
   });
   document.querySelector('#mapView').classList.toggle('is-active', state.view === 'map');
+  document.querySelector('#changelogView').classList.toggle('is-active', state.view === 'changelog');
   document.querySelector('#collisionsView').classList.toggle('is-active', state.view === 'collisions');
   document.querySelector('#healthView').classList.toggle('is-active', state.view === 'health');
 }
@@ -1130,6 +1370,7 @@ function renderEmpty() {
   elements.decisionBar.innerHTML = '';
   elements.blockList.innerHTML = '';
   elements.planSvg.innerHTML = '';
+  elements.changelogPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
   elements.detailPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
   elements.collisionsTable.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
   elements.healthPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
@@ -1156,6 +1397,7 @@ function render() {
   renderDecisionBar();
   renderBlockList();
   renderMap();
+  renderChangelogView();
   renderDetail();
   renderCollisionView();
   renderHealthView();
@@ -1224,8 +1466,22 @@ function bindEvents() {
     state.priority = elements.priorityFilter.value;
     render();
   });
+  elements.workstreamFilter.addEventListener('change', () => {
+    state.workstream = elements.workstreamFilter.value;
+    render();
+  });
   elements.readinessFilter.addEventListener('change', () => {
     state.readiness = elements.readinessFilter.value;
+    render();
+  });
+  elements.changelogTypeFilter.addEventListener('change', () => {
+    state.changelogType = elements.changelogTypeFilter.value;
+    state.view = 'changelog';
+    render();
+  });
+  elements.changelogEvidenceFilter.addEventListener('change', () => {
+    state.changelogEvidence = elements.changelogEvidenceFilter.value;
+    state.view = 'changelog';
     render();
   });
   elements.focusToggle.addEventListener('click', () => {
@@ -1242,6 +1498,10 @@ function bindEvents() {
     const data = JSON.parse(await file.text());
     state.data = data;
     state.selectedId = null;
+    state.workstream = 'all';
+    state.changelogType = 'all';
+    state.changelogEvidence = 'all';
+    state.selectedChangelogId = null;
     elements.sourceMeta.textContent = `${data.contract || 'plan-map'} - ${file.name}`;
     updateFilterOptions();
     render();
@@ -1251,6 +1511,21 @@ function bindEvents() {
     if (state.view === 'map') {
       renderMap();
     }
+  });
+
+  window.addEventListener('message', (event) => {
+    const message = event.data || {};
+    if (message.type !== 'curvios.plan-map:set-filter') {
+      return;
+    }
+    if (message.view) {
+      state.view = message.view;
+    }
+    if (message.workstream) {
+      state.workstream = message.workstream;
+      elements.workstreamFilter.value = message.workstream;
+    }
+    render();
   });
 }
 

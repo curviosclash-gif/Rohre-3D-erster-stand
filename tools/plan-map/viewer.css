@@ -985,6 +985,76 @@ h1 {
   box-shadow: var(--shadow);
 }
 
+.risk-list {
+  display: grid;
+  gap: 8px;
+}
+
+.risk-disclosure {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fffdf9;
+}
+
+.risk-disclosure summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 40px;
+  padding: 9px 10px;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+
+.risk-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.risk-disclosure summary::after {
+  content: "+";
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--teal);
+  font-weight: 800;
+}
+
+.risk-disclosure[open] summary::after {
+  content: "-";
+}
+
+.risk-disclosure summary span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.risk-kind {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.risk-disclosure p {
+  margin: 0;
+  padding: 0 10px 11px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .show-more {
   display: inline-flex;
   align-items: center;
@@ -1102,6 +1172,137 @@ th {
   padding: 20px;
 }
 
+.changelog-panel {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px;
+}
+
+.changelog-timeline {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+  display: grid;
+  gap: 8px;
+  max-height: calc(100vh - 290px);
+  overflow: auto;
+  padding-left: 12px;
+  border-left: 2px solid var(--line);
+}
+
+.timeline-dot {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+}
+
+.timeline-dot.is-active,
+.timeline-dot:hover {
+  border-left-color: var(--teal);
+  background: #fffdf9;
+  color: var(--ink);
+}
+
+.timeline-date {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.timeline-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.changelog-cards {
+  display: grid;
+  gap: 12px;
+}
+
+.changelog-card {
+  display: grid;
+  gap: 9px;
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fffdf9;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.changelog-card.is-active,
+.changelog-card:hover {
+  border-left-color: var(--teal);
+  box-shadow: var(--shadow);
+}
+
+.changelog-card-header,
+.changelog-card-meta,
+.evidence-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-width: 0;
+}
+
+.changelog-card-title {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.changelog-card-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.42;
+  overflow-wrap: anywhere;
+}
+
+.evidence-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.evidence-badge.pass {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.evidence-badge.skip,
+.evidence-badge.mentioned {
+  color: var(--gold);
+  background: var(--gold-soft);
+}
+
+.evidence-badge.fail,
+.evidence-badge.not-checked {
+  color: var(--coral);
+  background: var(--coral-soft);
+}
+
 .health-panel {
   min-height: 140px;
   padding: 16px;
@@ -1209,7 +1410,7 @@ th {
 
   .segmented {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .segmented button {
@@ -1254,9 +1455,29 @@ th {
   .legend-grid,
   .workspace,
   .health-grid,
+  .changelog-panel,
   .summary-grid,
   .explain-meter {
     grid-template-columns: 1fr;
+  }
+
+  .changelog-panel {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .changelog-timeline {
+    position: static;
+    display: flex;
+    max-height: none;
+    overflow-x: auto;
+    padding: 0 0 8px;
+    border-left: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .timeline-dot {
+    min-width: 128px;
   }
 
   .workspace {
