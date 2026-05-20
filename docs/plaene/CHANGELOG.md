@@ -6,6 +6,14 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Plan-Notiz 2026-05-21 (Master-Index / Plan-Map)
+
+- `docs/Umsetzungsplan.md` fuehrt jetzt einen kompakten Arbeitsstrom-Index als Navigationshilfe fuer Hauptspiel, Map Content/Map Tools/Settings, Android/Mobile, Architektur/Runtime, Repo-Pflege/Governance und AI/Graph/Agenten-Werkzeuge.
+- Die kanonische Master-Wahrheit bleibt unveraendert in den bestehenden Blocktabellen; Dependencies, Locks, Reihenfolge und Conflict-Log bleiben global.
+- Die Plan-Map exportiert dieselben Arbeitsstroeme als `workstream`/`workstreamLabel`, zeigt sie im Blockdetail und bietet einen Filter, ohne daraus eine zweite Planquelle zu machen.
+- Die Android-Map-Tools-Shell fuehrt denselben Arbeitsstrom-Filter ueber der eingebetteten Plan-Map; Android/Mobile bleibt sichtbar, auch solange noch kein aktiver Android-Masterblock existiert.
+- Evidence: `node --test tests/plan-map-export.contract.test.mjs` -> PASS, `npm run app:maps:android:check` -> PASS, `npm run app:maps:android:build` -> PASS, Browser-Smoke auf `dist/map-tools-android` -> PASS, `npm run docs:check` -> PASS. `npm run gates:pre-commit` stoppt weiterhin bei `graph:check` wegen bestehendem Knowledge-Graph-Diff/Map-Tools-Domain-Drift.
+
 ## Produkt-Notiz 2026-05-20 (Mobile Classic Android)
 
 - Mobile Classic Android wurde als scoped D2-Slice gehaertet: Touch-Controls werden im Match explizit sichtbar geschaltet, Tilt bietet jetzt Classic-Aktionen fuer Schuss, Item, naechstes Item und Boost, Gamepads gewinnen vor Touch-Fallbacks, und Touch-Erkennung akzeptiert auch `maxTouchPoints`/coarse pointer.

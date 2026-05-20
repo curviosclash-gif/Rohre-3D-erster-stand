@@ -22,6 +22,19 @@ Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 4. `docs/plaene/CHANGELOG.md` fuer Verlauf und Abschluss-Snapshots.
 5. `docs/prozess/Open_Findings.md` fuer offene Findings-/Audit-Reste ausserhalb des kompakten Master-Index.
 
+## Arbeitsstrom-Index
+
+Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Map. Die kanonischen Zeilen bleiben die Tabellen unter `## Aktive Bloecke`; Abhaengigkeiten, Locks und Reihenfolge bleiben global.
+
+| Arbeitsstrom | Master-Bloecke | Hinweis |
+| --- | --- | --- |
+| Hauptspiel | `V76`, `V99`, `V108`, `V112`, `V113`, `V115` | Gameplay, Multiplayer, Hangar, Playtest- und produktnahe Spielqualitaet. |
+| Map Content, Map Tools & Settings | `V103`, `V106`, `V114` | Map-/GLB-Content, SettingsManager, SurfacePolicy und spaetere Map-/Settings-Tools. |
+| Android / Mobile | - | Noch kein eigener aktiver Masterblock; Mobile-/Android-Intake bleibt bis zur Uebernahme unter `docs/plaene/neu/`. |
+| Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface und Architektur-Gates. |
+| Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126` | Governance, Planpflege, Toolchain, Evidence, Cleanup und Delivery-/Dev-Gates. |
+| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation und AI-Kontext. |
+
 ## Aktive Bloecke
 
 ### Abgeschlossene Bloecke (aktuell referenziert)
