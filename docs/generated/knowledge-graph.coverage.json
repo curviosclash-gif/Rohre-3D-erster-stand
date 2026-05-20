@@ -176,13 +176,13 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2036,
-    "rawCoveredFileCount": 1278,
-    "rawCoveragePercent": 62.8,
-    "adjustedTrackedFileCount": 1405,
-    "adjustedCoveredFileCount": 1061,
-    "adjustedCoveragePercent": 75.5,
-    "uncoveredFileCount": 758,
+    "trackedFileCount": 2043,
+    "rawCoveredFileCount": 1287,
+    "rawCoveragePercent": 63,
+    "adjustedTrackedFileCount": 1412,
+    "adjustedCoveredFileCount": 1068,
+    "adjustedCoveragePercent": 75.6,
+    "uncoveredFileCount": 756,
     "uncoveredActiveFileCount": 344,
     "classifications": [
       {
@@ -225,7 +225,7 @@
         "classification": "mobile-wrapper",
         "excludedFromCoverage": true,
         "count": 2,
-        "coveredCount": 0
+        "coveredCount": 1
       },
       {
         "classification": "native-wrapper",
@@ -242,14 +242,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 974,
-        "coveredCount": 851
+        "count": 978,
+        "coveredCount": 855
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 356,
-        "coveredCount": 165
+        "count": 359,
+        "coveredCount": 168
       },
       {
         "classification": "prototype",
@@ -261,7 +261,7 @@
         "classification": "repo-ops",
         "excludedFromCoverage": true,
         "count": 33,
-        "coveredCount": 16
+        "coveredCount": 17
       },
       {
         "classification": "temp",
@@ -11727,6 +11727,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V132.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V64.md",
       "tracked": true,
       "coveredInCore": true,
@@ -12141,6 +12158,23 @@
     },
     {
       "path": "docs/plaene/alt/Feature_AI_Decision_Framework.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/alt/Feature_Android_Arcade_Parcours_V132.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -14250,6 +14284,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -18856,10 +18907,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V132"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -21093,6 +21146,25 @@
         "V106",
         "V51",
         "V82",
+        "V85",
+        "V86"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/core/config/maps/presets/parcours_pack_v130.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V106",
         "V85",
         "V86"
       ],
@@ -26229,11 +26301,15 @@
     {
       "path": "src/mobile-classic/MobileClassicApp.js",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V132"
+      ],
       "surfaces": [],
       "classification": "mobile-wrapper",
       "excludedFromCoverage": true,
@@ -27542,6 +27618,31 @@
     },
     {
       "path": "src/shared/contracts/MenuControllerContract.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B11",
+        "V105",
+        "V74",
+        "V83",
+        "V84",
+        "V85",
+        "V91",
+        "V96"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/shared/contracts/MobileClassicControlsContract.js",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -29606,6 +29707,7 @@
       "scopeBlocks": [
         "B04",
         "V105",
+        "V132",
         "V76",
         "V91"
       ],
@@ -29627,6 +29729,7 @@
       "scopeBlocks": [
         "B04",
         "V105",
+        "V132",
         "V76",
         "V91"
       ],
@@ -30098,6 +30201,7 @@
       "scopeBlocks": [
         "B06",
         "V105",
+        "V132",
         "V51",
         "V72",
         "V82",
@@ -30342,6 +30446,7 @@
       "scopeBlocks": [
         "V104",
         "V105",
+        "V132",
         "V60",
         "V91"
       ],
@@ -32025,6 +32130,7 @@
       ],
       "scopeBlocks": [
         "V105",
+        "V132",
         "V72",
         "V91"
       ],
@@ -33256,10 +33362,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V132"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33358,6 +33466,40 @@
     },
     {
       "path": "tests/parcours-ghost.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/parcours-map-pack-start.spec.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/parcours-map-pack.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -34616,11 +34758,15 @@
     {
       "path": "tools/mobile-classic-app/capacitor.config.json",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V132"
+      ],
       "surfaces": [],
       "classification": "repo-ops",
       "excludedFromCoverage": true,

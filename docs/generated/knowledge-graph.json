@@ -388,7 +388,7 @@
           "src/shared/runtime/**"
         ],
         "scopeResolution": {
-          "concreteCount": 76,
+          "concreteCount": 77,
           "plannedCount": 0
         }
       }
@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 221,
+          "concreteCount": 223,
           "plannedCount": 0
         }
       }
@@ -742,7 +742,7 @@
           "tsconfig.architecture.json"
         ],
         "scopeResolution": {
-          "concreteCount": 250,
+          "concreteCount": 251,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -789,7 +789,7 @@
           "tests/physics-core.spec.js"
         ],
         "scopeResolution": {
-          "concreteCount": 155,
+          "concreteCount": 156,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -870,6 +870,7 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P2",
@@ -1818,6 +1819,59 @@
       }
     },
     {
+      "id": "V130",
+      "type": "block",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "dependency-target"
+        ],
+        "priority": null,
+        "owner": null,
+        "currentPhase": null,
+        "planFile": null
+      }
+    },
+    {
+      "id": "V132",
+      "type": "block",
+      "title": "Android Arcade-Parcours Integration",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "132.1",
+        "planFile": "docs/plaene/aktiv/V132.md",
+        "scopeDeclarations": [
+          "android-arcade/",
+          "android-classic/app/src/main/AndroidManifest.xml",
+          "scripts/build-mobile-classic-app.mjs",
+          "src/mobile-arcade/MobileArcadeApp.js",
+          "src/mobile-classic/MobileClassicApp.js",
+          "src/ui/arcade/ParcoursMinimapRenderer.js",
+          "src/ui/arcade/ParcoursOverlayController.js",
+          "src/ui/HudRuntimeSystem.js",
+          "src/ui/MatchInputSourceResolver.js",
+          "src/ui/TouchInputSource.js",
+          "tests/mobile-arcade-app.contract.test.mjs",
+          "tests/mobile-classic-app.contract.test.mjs",
+          "tools/mobile-arcade-app/capacitor.config.json",
+          "tools/mobile-classic-app/capacitor.config.json"
+        ],
+        "scopeResolution": {
+          "concreteCount": 9,
+          "plannedCount": 4
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": []
+      }
+    },
+    {
       "id": "V43",
       "type": "block",
       "title": "Projektstruktur Spiel Dev Ordner",
@@ -2412,7 +2466,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 139,
+          "concreteCount": 140,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2530,7 +2584,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 328,
+          "concreteCount": 331,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2657,7 +2711,7 @@
           "src/ui/PauseOverlayController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 86,
+          "concreteCount": 87,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2691,7 +2745,7 @@
           "src/state/**"
         ],
         "scopeResolution": {
-          "concreteCount": 263,
+          "concreteCount": 264,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2731,7 +2785,7 @@
           "tests/persistence-version-migration.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 184,
+          "concreteCount": 186,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -2766,7 +2820,7 @@
           "src/entities/MapSchema.js"
         ],
         "scopeResolution": {
-          "concreteCount": 33,
+          "concreteCount": 34,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3037,7 +3091,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 263,
+          "concreteCount": 264,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3270,7 +3324,7 @@
           "src/state/RoundStateTickSystem.js"
         ],
         "scopeResolution": {
-          "concreteCount": 124,
+          "concreteCount": 125,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -5075,6 +5129,86 @@
       "attributes": {
         "blockId": "V126",
         "phaseCode": "126.99"
+      }
+    },
+    {
+      "id": "V132.1",
+      "type": "phase",
+      "title": "Zielpfad und App-Target festziehen",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.1"
+      }
+    },
+    {
+      "id": "V132.2",
+      "type": "phase",
+      "title": "Android-Arcade-Modusvertrag und Route-Allowlist",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.2"
+      }
+    },
+    {
+      "id": "V132.3",
+      "type": "phase",
+      "title": "Touch-/Tilt-Steuerung fuer Parcours",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.3"
+      }
+    },
+    {
+      "id": "V132.4",
+      "type": "phase",
+      "title": "Mobile HUD, Minimap und Safe-Area",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.4"
+      }
+    },
+    {
+      "id": "V132.5",
+      "type": "phase",
+      "title": "Android Build-, Asset- und Device-Pfad",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.5"
+      }
+    },
+    {
+      "id": "V132.6",
+      "type": "phase",
+      "title": "Performance, Speicher und Regression",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.6"
+      }
+    },
+    {
+      "id": "V132.7",
+      "type": "phase",
+      "title": "Dokumentation und Handoff",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.7"
+      }
+    },
+    {
+      "id": "V132.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99"
       }
     },
     {
@@ -14023,6 +14157,380 @@
         "blockId": "V126",
         "phaseCode": "126.99",
         "subphaseCode": "126.99.5"
+      }
+    },
+    {
+      "id": "V132.1.1",
+      "type": "subphase",
+      "title": "Bestehende Mobile-Classic-Locks inventarisieren: `gameMode`, `modePath`, versteckte Menuepfade, Touch-/Tilt-Defaults, Android-Manifest.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.1",
+        "subphaseCode": "132.1.1"
+      }
+    },
+    {
+      "id": "V132.1.2",
+      "type": "subphase",
+      "title": "Produktentscheidung dokumentieren: separater `mobile-arcade` Target vs. gated Arcade-Parcours-Schalter im bestehenden Android-Bundle.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.1",
+        "subphaseCode": "132.1.2"
+      }
+    },
+    {
+      "id": "V132.1.3",
+      "type": "subphase",
+      "title": "Android-Parcours-Startzustand definieren: Singleplayer, `modePath=arcade`, kuratierter Parcours-Pool, Ghost-Selbstduell default `off` oder `self_longest_ghost`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.1",
+        "subphaseCode": "132.1.3"
+      }
+    },
+    {
+      "id": "V132.1.4",
+      "type": "subphase",
+      "title": "Classic-Regression-Grenze festhalten: bestehender Classic-Start bleibt ohne Arcade-Nebenwirkung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.1",
+        "subphaseCode": "132.1.4"
+      }
+    },
+    {
+      "id": "V132.2.1",
+      "type": "subphase",
+      "title": "Mobile-Arcade-Settings normalisieren: Session single, Arcade-Parcours aktiv, Desktop-only Optionen ausgeblendet.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.2",
+        "subphaseCode": "132.2.1"
+      }
+    },
+    {
+      "id": "V132.2.2",
+      "type": "subphase",
+      "title": "Android-Route-Allowlist definieren: Start mit `parcours_rift_sprint`, `micro_maw`, `mirror_docks`, optional `glass_serpent`; Langrouten erst spaeter.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.2",
+        "subphaseCode": "132.2.2"
+      }
+    },
+    {
+      "id": "V132.2.3",
+      "type": "subphase",
+      "title": "Ghost-/Leaderboard-Keyspace pruefen: Android nutzt gleiche `routeId`s, keine mobile Sondermigration.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.2",
+        "subphaseCode": "132.2.3"
+      }
+    },
+    {
+      "id": "V132.2.4",
+      "type": "subphase",
+      "title": "Contract-Test fuer Settings-Normalisierung, Allowlist und Classic-Unveraendertheit ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.2",
+        "subphaseCode": "132.2.4"
+      }
+    },
+    {
+      "id": "V132.3.1",
+      "type": "subphase",
+      "title": "V131-Ergebnis uebernehmen oder, falls V131 noch offen ist, V132-Input-Scope hart begrenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.3",
+        "subphaseCode": "132.3.1"
+      }
+    },
+    {
+      "id": "V132.3.2",
+      "type": "subphase",
+      "title": "Parcours-relevante Aktionen pruefen: Boost, Fire, Item-Wechsel/Nutzung, Pause, Re-Kalibrierung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.3",
+        "subphaseCode": "132.3.2"
+      }
+    },
+    {
+      "id": "V132.3.3",
+      "type": "subphase",
+      "title": "Tilt-/Joystick-Default fuer Arcade-Parcours festlegen; Failover sichtbar halten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.3",
+        "subphaseCode": "132.3.3"
+      }
+    },
+    {
+      "id": "V132.3.4",
+      "type": "subphase",
+      "title": "Contract- oder DOM-Test: langer Touch loest keine unbeabsichtigten Mehrfachaktionen aus, Pause bleibt erreichbar.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.3",
+        "subphaseCode": "132.3.4"
+      }
+    },
+    {
+      "id": "V132.4.1",
+      "type": "subphase",
+      "title": "Parcours-HUD-Elemente gegen Touch-Controls und Safe-Areas pruefen: Minimap, Split-Delta, XP-Banner, Penalty, Stats-Flash.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.4",
+        "subphaseCode": "132.4.1"
+      }
+    },
+    {
+      "id": "V132.4.2",
+      "type": "subphase",
+      "title": "Mobile-HUD-Kompaktmodus planen/umsetzen: kleinere Minimap, begrenzte Banner-Dauer, keine Touch-Blockade.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.4",
+        "subphaseCode": "132.4.2"
+      }
+    },
+    {
+      "id": "V132.4.3",
+      "type": "subphase",
+      "title": "Ghost-Selbstduell-Status mobil anzeigen, ohne neues Desktop-Menue zu erzwingen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.4",
+        "subphaseCode": "132.4.3"
+      }
+    },
+    {
+      "id": "V132.4.4",
+      "type": "subphase",
+      "title": "Playwright-/DOM-Smoke fuer Android-App-Target: HUD sichtbar, Touch-Flaechen klickbar, keine Ueberlagerung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.4",
+        "subphaseCode": "132.4.4"
+      }
+    },
+    {
+      "id": "V132.5.1",
+      "type": "subphase",
+      "title": "Build-Script entscheiden: bestehendes `app:classic:android:*` erweitern oder neues `app:arcade:android:*` anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.5",
+        "subphaseCode": "132.5.1"
+      }
+    },
+    {
+      "id": "V132.5.2",
+      "type": "subphase",
+      "title": "Capacitor-/Manifest-Konfiguration fuer Ziel-App pruefen: App-ID, Name, Orientation, Safe-Area, Back/Pause.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.5",
+        "subphaseCode": "132.5.2"
+      }
+    },
+    {
+      "id": "V132.5.3",
+      "type": "subphase",
+      "title": "Asset-Check ergaenzen: Android-Bundle enthaelt mobile Arcade Target-Dateien und kein veraltetes `dist`-Artefakt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.5",
+        "subphaseCode": "132.5.3"
+      }
+    },
+    {
+      "id": "V132.5.4",
+      "type": "subphase",
+      "title": "Manueller Device-Smoke als Gate vorbereiten: installieren, starten, Parcours starten, 1 Route finishen, Ghost beim zweiten Lauf pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.5",
+        "subphaseCode": "132.5.4"
+      }
+    },
+    {
+      "id": "V132.6.1",
+      "type": "subphase",
+      "title": "Targeted Contract-Tests fuer Mobile-Arcade-Settings, Route-Allowlist und Ghost-/Leaderboard-Roundtrip ausfuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.6",
+        "subphaseCode": "132.6.1"
+      }
+    },
+    {
+      "id": "V132.6.2",
+      "type": "subphase",
+      "title": "Android-targeted Playwright-Smoke fuer Parcours-Start mit mindestens zwei Routen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.6",
+        "subphaseCode": "132.6.2"
+      }
+    },
+    {
+      "id": "V132.6.3",
+      "type": "subphase",
+      "title": "Classic-Regression: bestehender Mobile-Classic-Contract bleibt gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.6",
+        "subphaseCode": "132.6.3"
+      }
+    },
+    {
+      "id": "V132.6.4",
+      "type": "subphase",
+      "title": "Speicher-/Performance-Notiz: Ghost-Clip-Groesse, Minimap/Particles, mindestens ein 30-60s Device- oder Browser-Mobile-Smoke.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.6",
+        "subphaseCode": "132.6.4"
+      }
+    },
+    {
+      "id": "V132.7.1",
+      "type": "subphase",
+      "title": "Aktiven V132-Plan nach Intake mit Evidence pro Teilphase pflegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.7",
+        "subphaseCode": "132.7.1"
+      }
+    },
+    {
+      "id": "V132.7.2",
+      "type": "subphase",
+      "title": "README/Runbook fuer Android Arcade nur ergaenzen, wenn ein neuer Build-/Install-Pfad entsteht.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.7",
+        "subphaseCode": "132.7.2"
+      }
+    },
+    {
+      "id": "V132.7.3",
+      "type": "subphase",
+      "title": "Bekannte Limitierungen dokumentieren: keine Online-Ghosts, keine Langrouten im MVP, keine Desktop-Menueparitaet.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.7",
+        "subphaseCode": "132.7.3"
+      }
+    },
+    {
+      "id": "V132.7.4",
+      "type": "subphase",
+      "title": "Folgeideen sammeln: mobile Route-Tuning, Touch-Layout-Personalisierung, optionaler separater Arcade-APK-Name.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.7",
+        "subphaseCode": "132.7.4"
+      }
+    },
+    {
+      "id": "V132.99.1",
+      "type": "subphase",
+      "title": "Alle 132.1-132.7 Unterpunkte erledigt oder bewusst als Nicht-Ziel/Folgearbeit dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.1"
+      }
+    },
+    {
+      "id": "V132.99.2",
+      "type": "subphase",
+      "title": "`npm run plan:check`, `npm run docs:sync`, `npm run docs:check` gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.2"
+      }
+    },
+    {
+      "id": "V132.99.3",
+      "type": "subphase",
+      "title": "Mobile-Arcade-Contract-/Playwright-Smokes gruen oder Blocker in `docs/Fehlerberichte/` dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.3"
+      }
+    },
+    {
+      "id": "V132.99.4",
+      "type": "subphase",
+      "title": "Android Asset-/Build-Check fuer den gewaehleten Zielpfad gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.4"
+      }
+    },
+    {
+      "id": "V132.99.5",
+      "type": "subphase",
+      "title": "Mindestens ein Android-Device-Smoke oder klarer Not-checked-Vermerk: Start, Route finishen, XP/Leaderboard, zweiter Lauf mit Ghost.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.5"
+      }
+    },
+    {
+      "id": "V132.99.6",
+      "type": "subphase",
+      "title": "Classic-Android bleibt regressionsfrei im bestehenden Contract.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.6"
       }
     },
     {
@@ -27252,6 +27760,21 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V132.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V64.md",
       "type": "file",
       "title": null,
@@ -27620,6 +28143,21 @@
     },
     {
       "id": "docs/plaene/alt/Feature_AI_Decision_Framework.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/Feature_Android_Arcade_Parcours_V132.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -29485,6 +30023,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -31917,10 +32470,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V132"
         ],
         "exists": true
       }
@@ -34003,6 +34558,23 @@
           "V106",
           "V51",
           "V82",
+          "V85",
+          "V86"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/core/config/maps/presets/parcours_pack_v130.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V106",
           "V85",
           "V86"
         ],
@@ -38519,6 +39091,51 @@
       }
     },
     {
+      "id": "src/main/AndroidManifest.xml",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V132"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "src/mobile-arcade/MobileArcadeApp.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V132"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "src/mobile-classic/MobileClassicApp.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V132"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "src/modes/ArcadeModeStrategy.js",
       "type": "file",
       "title": null,
@@ -39739,6 +40356,29 @@
     },
     {
       "id": "src/shared/contracts/MenuControllerContract.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B11",
+          "V105",
+          "V74",
+          "V83",
+          "V84",
+          "V85",
+          "V91",
+          "V96"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/shared/contracts/MobileClassicControlsContract.js",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -41620,6 +42260,7 @@
         "scopeBlocks": [
           "B04",
           "V105",
+          "V132",
           "V76",
           "V91"
         ],
@@ -41639,6 +42280,7 @@
         "scopeBlocks": [
           "B04",
           "V105",
+          "V132",
           "V76",
           "V91"
         ],
@@ -42096,6 +42738,7 @@
         "scopeBlocks": [
           "B06",
           "V105",
+          "V132",
           "V51",
           "V72",
           "V82",
@@ -42316,6 +42959,7 @@
         "scopeBlocks": [
           "V104",
           "V105",
+          "V132",
           "V60",
           "V91"
         ],
@@ -43857,6 +44501,7 @@
         ],
         "scopeBlocks": [
           "V105",
+          "V132",
           "V72",
           "V91"
         ],
@@ -45001,16 +45646,33 @@
       }
     },
     {
+      "id": "tests/mobile-arcade-app.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V132"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "tests/mobile-classic-app.contract.test.mjs",
       "type": "file",
       "title": null,
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V132"
         ],
         "exists": true
       }
@@ -45097,6 +45759,36 @@
     },
     {
       "id": "tests/parcours-ghost.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/parcours-map-pack-start.spec.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/parcours-map-pack.contract.test.mjs",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -46369,6 +47061,36 @@
         ],
         "mappedNodes": [
           "config:map-tools-android-docs"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/mobile-arcade-app/capacitor.config.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V132"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "tools/mobile-classic-app/capacitor.config.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V132"
         ],
         "exists": true
       }
@@ -50599,6 +51321,15 @@
     },
     {
       "from": "B11",
+      "to": "src/shared/contracts/MobileClassicControlsContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B11",
       "to": "src/shared/contracts/MultiplayerSessionContract.js",
       "type": "scope",
       "hint": null,
@@ -52616,6 +53347,24 @@
     {
       "from": "B13",
       "to": "tests/parcours-ghost.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/parcours-map-pack-start.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/parcours-map-pack.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -58667,6 +59416,15 @@
     },
     {
       "from": "V105",
+      "to": "src/shared/contracts/MobileClassicControlsContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
       "to": "src/shared/contracts/MultiplayerSessionContract.js",
       "type": "scope",
       "hint": null,
@@ -61490,6 +62248,15 @@
     {
       "from": "V106",
       "to": "src/core/config/maps/presets/parcours_maps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V106",
+      "to": "src/core/config/maps/presets/parcours_pack_v130.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -73628,6 +74395,631 @@
       }
     },
     {
+      "from": "V132",
+      "to": "scripts/build-mobile-classic-app.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "src/main/AndroidManifest.xml",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "src/mobile-arcade/MobileArcadeApp.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "src/mobile-classic/MobileClassicApp.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "src/ui/arcade/ParcoursMinimapRenderer.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "src/ui/arcade/ParcoursOverlayController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "src/ui/HudRuntimeSystem.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "src/ui/MatchInputSourceResolver.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "src/ui/TouchInputSource.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "tests/mobile-arcade-app.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "tests/mobile-classic-app.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "tools/mobile-arcade-app/capacitor.config.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "tools/mobile-classic-app/capacitor.config.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V108",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Ghost-Selbstduell und stabile Route-Persistenz sind Basis fuer den Android-Wiederholungsreiz",
+      "attributes": {
+        "dependsPhase": "108.99",
+        "rawToken": "V108.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V130",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Kuratierte Parcours-Map-Varianz soll vor Android-Pool-Freigabe kanonisch abgeschlossen sein",
+      "attributes": {
+        "dependsPhase": "130.99",
+        "rawToken": "V130.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V132.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.1"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V132.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.2"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V132.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.3"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V132.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.4"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V132.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.5"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V132.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.6"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V132.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.7"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V132.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99"
+      }
+    },
+    {
+      "from": "V132",
+      "to": "V82",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Arcade-Parcours-Progression, XP, Leaderboard, Splits, Minimap, Penalty und Ghost-Recorder sind technische Basis",
+      "attributes": {
+        "dependsPhase": "82.99",
+        "rawToken": "V82.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V132.1",
+      "to": "V132.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.1",
+        "subphaseCode": "132.1.1"
+      }
+    },
+    {
+      "from": "V132.1",
+      "to": "V132.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.1",
+        "subphaseCode": "132.1.2"
+      }
+    },
+    {
+      "from": "V132.1",
+      "to": "V132.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.1",
+        "subphaseCode": "132.1.3"
+      }
+    },
+    {
+      "from": "V132.1",
+      "to": "V132.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.1",
+        "subphaseCode": "132.1.4"
+      }
+    },
+    {
+      "from": "V132.2",
+      "to": "V132.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.2",
+        "subphaseCode": "132.2.1"
+      }
+    },
+    {
+      "from": "V132.2",
+      "to": "V132.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.2",
+        "subphaseCode": "132.2.2"
+      }
+    },
+    {
+      "from": "V132.2",
+      "to": "V132.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.2",
+        "subphaseCode": "132.2.3"
+      }
+    },
+    {
+      "from": "V132.2",
+      "to": "V132.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.2",
+        "subphaseCode": "132.2.4"
+      }
+    },
+    {
+      "from": "V132.3",
+      "to": "V132.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.3",
+        "subphaseCode": "132.3.1"
+      }
+    },
+    {
+      "from": "V132.3",
+      "to": "V132.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.3",
+        "subphaseCode": "132.3.2"
+      }
+    },
+    {
+      "from": "V132.3",
+      "to": "V132.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.3",
+        "subphaseCode": "132.3.3"
+      }
+    },
+    {
+      "from": "V132.3",
+      "to": "V132.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.3",
+        "subphaseCode": "132.3.4"
+      }
+    },
+    {
+      "from": "V132.4",
+      "to": "V132.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.4",
+        "subphaseCode": "132.4.1"
+      }
+    },
+    {
+      "from": "V132.4",
+      "to": "V132.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.4",
+        "subphaseCode": "132.4.2"
+      }
+    },
+    {
+      "from": "V132.4",
+      "to": "V132.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.4",
+        "subphaseCode": "132.4.3"
+      }
+    },
+    {
+      "from": "V132.4",
+      "to": "V132.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.4",
+        "subphaseCode": "132.4.4"
+      }
+    },
+    {
+      "from": "V132.5",
+      "to": "V132.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.5",
+        "subphaseCode": "132.5.1"
+      }
+    },
+    {
+      "from": "V132.5",
+      "to": "V132.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.5",
+        "subphaseCode": "132.5.2"
+      }
+    },
+    {
+      "from": "V132.5",
+      "to": "V132.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.5",
+        "subphaseCode": "132.5.3"
+      }
+    },
+    {
+      "from": "V132.5",
+      "to": "V132.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.5",
+        "subphaseCode": "132.5.4"
+      }
+    },
+    {
+      "from": "V132.6",
+      "to": "V132.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.6",
+        "subphaseCode": "132.6.1"
+      }
+    },
+    {
+      "from": "V132.6",
+      "to": "V132.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.6",
+        "subphaseCode": "132.6.2"
+      }
+    },
+    {
+      "from": "V132.6",
+      "to": "V132.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.6",
+        "subphaseCode": "132.6.3"
+      }
+    },
+    {
+      "from": "V132.6",
+      "to": "V132.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.6",
+        "subphaseCode": "132.6.4"
+      }
+    },
+    {
+      "from": "V132.7",
+      "to": "V132.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.7",
+        "subphaseCode": "132.7.1"
+      }
+    },
+    {
+      "from": "V132.7",
+      "to": "V132.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.7",
+        "subphaseCode": "132.7.2"
+      }
+    },
+    {
+      "from": "V132.7",
+      "to": "V132.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.7",
+        "subphaseCode": "132.7.3"
+      }
+    },
+    {
+      "from": "V132.7",
+      "to": "V132.7.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.7",
+        "subphaseCode": "132.7.4"
+      }
+    },
+    {
+      "from": "V132.99",
+      "to": "V132.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.1"
+      }
+    },
+    {
+      "from": "V132.99",
+      "to": "V132.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.2"
+      }
+    },
+    {
+      "from": "V132.99",
+      "to": "V132.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.3"
+      }
+    },
+    {
+      "from": "V132.99",
+      "to": "V132.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.4"
+      }
+    },
+    {
+      "from": "V132.99",
+      "to": "V132.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.5"
+      }
+    },
+    {
+      "from": "V132.99",
+      "to": "V132.99.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V132",
+        "phaseCode": "132.99",
+        "subphaseCode": "132.99.6"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -81735,6 +83127,15 @@
     },
     {
       "from": "V74",
+      "to": "src/shared/contracts/MobileClassicControlsContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V74",
       "to": "src/shared/contracts/MultiplayerSessionContract.js",
       "type": "scope",
       "hint": null,
@@ -83922,6 +85323,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V132.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V64.md",
       "type": "scope",
       "hint": null,
@@ -84130,6 +85540,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/alt/Feature_AI_Decision_Framework.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/Feature_Android_Arcade_Parcours_V132.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -85228,6 +86647,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88758,6 +90186,15 @@
     },
     {
       "from": "V83",
+      "to": "src/shared/contracts/MobileClassicControlsContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V83",
       "to": "src/shared/contracts/MultiplayerSessionContract.js",
       "type": "scope",
       "hint": null,
@@ -90975,6 +92412,15 @@
     },
     {
       "from": "V84",
+      "to": "src/shared/contracts/MobileClassicControlsContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V84",
       "to": "src/shared/contracts/MultiplayerSessionContract.js",
       "type": "scope",
       "hint": null,
@@ -92057,6 +93503,15 @@
     },
     {
       "from": "V85",
+      "to": "src/core/config/maps/presets/parcours_pack_v130.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
       "to": "src/core/config/maps/presets/showcase_maps.js",
       "type": "scope",
       "hint": null,
@@ -92634,6 +94089,15 @@
     {
       "from": "V85",
       "to": "src/shared/contracts/MenuControllerContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V85",
+      "to": "src/shared/contracts/MobileClassicControlsContract.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -93959,6 +95423,15 @@
     {
       "from": "V86",
       "to": "src/core/config/maps/presets/parcours_maps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V86",
+      "to": "src/core/config/maps/presets/parcours_pack_v130.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -97232,6 +98705,15 @@
     {
       "from": "V91",
       "to": "src/shared/contracts/MenuControllerContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/shared/contracts/MobileClassicControlsContract.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -102040,6 +103522,15 @@
     {
       "from": "V96",
       "to": "src/shared/contracts/MenuControllerContract.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V96",
+      "to": "src/shared/contracts/MobileClassicControlsContract.js",
       "type": "scope",
       "hint": null,
       "attributes": {

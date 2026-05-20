@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-20. Aktiver Lock: `-`; Startanker: `V126 126.99 abgeschlossen`; V126-Folgepfade bleiben `V127`/`V128`/`V129` im Handoff.
+Stand: 2026-05-21. Aktiver Lock: `-`; Startanker: `V126 126.99 abgeschlossen`; V126-Folgepfade bleiben `V127`/`V128`/`V129` im Handoff.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -30,7 +30,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | --- | --- | --- |
 | Hauptspiel | `V76`, `V99`, `V108`, `V112`, `V113`, `V115` | Gameplay, Multiplayer, Hangar, Playtest- und produktnahe Spielqualitaet. |
 | Map Content, Map Tools & Settings | `V103`, `V106`, `V114` | Map-/GLB-Content, SettingsManager, SurfacePolicy und spaetere Map-/Settings-Tools. |
-| Android / Mobile | - | Noch kein eigener aktiver Masterblock; Mobile-/Android-Intake bleibt bis zur Uebernahme unter `docs/plaene/neu/`. |
+| Android / Mobile | `V132` | Android Arcade-Parcours als erster aktiver Mobile-Spielmodus-Folgeblock; weitere Mobile-/Android-Intakes bleiben bis zur Uebernahme unter `docs/plaene/neu/`. |
 | Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface und Architektur-Gates. |
 | Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126` | Governance, Planpflege, Toolchain, Evidence, Cleanup und Delivery-/Dev-Gates. |
 | AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation und AI-Kontext. |
@@ -83,6 +83,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V96 | Application Boundaries und Legacy-Surface-Reduktion | planned | P2 | frei | V92.99,V64.99 | 96.1 | `docs/plaene/aktiv/V96.md` |
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
 | V113 | Hangar Shell Productivierung und Rules Panel | planned | P2 | frei | V76.99,V103.99 | 113.1 | `docs/plaene/aktiv/V113.md` |
+| V132 | Android Arcade-Parcours Integration | planned | P2 | frei | V82.99,V108.99,V130.99 | 132.1 | `docs/plaene/aktiv/V132.md` |
 
 ## Abhaengigkeiten
 
@@ -144,6 +145,10 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V124 | V110.99 | hard | ja | Graph-Ops-, Guard- und SLO-Basis begrenzen Semantik-Ratchet und Coverage-Ausbau |
 | V124 | V111.99 | hard | ja | Ownership, Stability, Scorecard und Test-Priorisierung sind Grundlage fuer Produktsemantik-Nutzwert |
 | V124 | V112.99,V96.99,V106.99,V113.99 | soft | nein | Produktbloecke liefern wertvolle Harvest-Quellen, sind aber keine Startblocker fuer Baseline und Taxonomie |
+| V132 | V82.99 | hard | ja | Arcade-Parcours-Progression, XP, Leaderboard, Splits, Minimap, Penalty und Ghost-Recorder sind technische Basis |
+| V132 | V108.99 | hard | ja | Ghost-Selbstduell und stabile Route-Persistenz sind Basis fuer den Android-Wiederholungsreiz |
+| V132 | V130.99 | hard | nein | Kuratierte Parcours-Map-Varianz soll vor Android-Pool-Freigabe kanonisch abgeschlossen sein |
+| V132 | V125.99,V96.99 | soft | nein | Architektur-Compliance und Application-Boundary-Folgearbeit helfen, blockieren den ersten Android-Parcours-Slice aber nicht |
 
 ## Lock-Status
 
@@ -184,6 +189,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V111 | 2026-05-09 | closed | Abgeschlossen 2026-05-10 |
 | - | V112 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Spielaudit-/Playtest-Hardening gruen, T20ba-Seitenfund dokumentiert |
 | - | V113 | - | frei | Geplant |
+| - | V132 | - | frei | Geplant; Android Arcade-Parcours nach V82/V108 und kanonischem V130-Abschluss |
 
 ## Empfohlene Reihenfolge
 
@@ -199,6 +205,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 10. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
 11. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Hardening- und Produktqualitaets-Schnitten einplanen.
 12. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
+13. `V132` (Android Arcade-Parcours Integration) nach kanonischem V130-Abschluss und idealerweise nach V131-Steuerungsbaseline einordnen; erster Slice bleibt kuratierter Android-Parcours statt vollstaendiger Desktop-Modusparitaet.
 
 ## Conflict-Log
 
