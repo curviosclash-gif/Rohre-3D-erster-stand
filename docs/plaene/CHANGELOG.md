@@ -830,3 +830,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 
 - Ursache: Der Electron-Shell-Viewer wurde bei verborgenem Fehlerpanel automatisch in die `auto`-Grid-Zeile einsortiert; dadurch fiel das iframe auf seine Default-Hoehe zurueck und liess unter der Repo Map eine grosse dunkle Flaeche.
 - Fixpfad: `electron/map-tools/ui/map-tools.css` bindet Header, Status, Fehlerpanel und Viewer per Grid-Areas an feste Zeilen, waehrend der Viewer die `minmax(0, 1fr)`-Zeile fuellt. Der Electron-Smoke prueft die Viewer-Hoehe fuer Plan Map und Repo Map.
+
+## Bugfix-Notiz 2026-05-21 (Mobile Classic Tilt-Steuerung)
+
+- Ursache: Die Android-/Mobile-Classic-Neigungssteuerung hatte eine zu grosse Default-Deadzone, starke Glaettung und separate Press-/Release-Richtungsschwellen; leichte Neigung blieb dadurch wirkungslos und mittlere Neigung fuehlte sich eher binaer als analog an.
+- Fixpfad: `src/ui/TouchInputSource.js` senkt Deadzone und Release-Schwelle, reduziert die Glaettung und leitet die Richtungsflags direkt aus der geglaetteten Analogachse ab. `tests/mobile-classic-app.contract.test.mjs` prueft jetzt leichte, mittlere und starke Neigung als monotone Analogwerte sowie die erste Tilt-Auswertung.
+- Evidence: `node --test tests/mobile-classic-app.contract.test.mjs` -> PASS; `npm run plan:check` -> PASS.

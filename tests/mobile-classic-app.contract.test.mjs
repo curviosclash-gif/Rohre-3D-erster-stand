@@ -209,21 +209,49 @@ test('Mobile Classic tilt steering uses soft analog axes for phone control', () 
   const centered = deriveTiltSteeringState({
     neutralBeta: 20,
     neutralGamma: 0,
-    beta: 23,
-    gamma: 4,
+    beta: 21,
+    gamma: 1,
   });
   assert.equal(centered.pitchAxis, 0);
   assert.equal(centered.yawAxis, 0);
 
+  const slightRight = deriveTiltSteeringState({
+    neutralBeta: 20,
+    neutralGamma: 0,
+    beta: 20,
+    gamma: 5,
+  });
+  const mediumRight = deriveTiltSteeringState({
+    neutralBeta: 20,
+    neutralGamma: 0,
+    beta: 20,
+    gamma: 12,
+  });
   const softRight = deriveTiltSteeringState({
     neutralBeta: 20,
     neutralGamma: 0,
     beta: 20,
-    gamma: 18,
+    gamma: 24,
   });
+  assert.equal(slightRight.yawRight, true);
+  assert.ok(slightRight.yawAxis > 0);
+  assert.ok(slightRight.yawAxis < mediumRight.yawAxis);
+  assert.ok(mediumRight.yawAxis < softRight.yawAxis);
   assert.equal(softRight.yawRight, true);
-  assert.ok(softRight.yawAxis > 0);
-  assert.ok(softRight.yawAxis < 0.35);
+  assert.ok(softRight.yawAxis < 1);
+
+  const tiltSource = new TouchInputSource({ controlMode: TOUCH_CONTROL_MODES.TILT });
+  tiltSource._tiltState.enabled = true;
+  tiltSource._tiltState.hasNeutral = true;
+  tiltSource._tiltState.lastEventAt = Date.now();
+  tiltSource._tiltState.neutralBeta = 20;
+  tiltSource._tiltState.neutralGamma = 0;
+  tiltSource._tiltState.beta = 20;
+  tiltSource._tiltState.gamma = 5;
+  const firstResolved = tiltSource._resolveTiltSteeringInput();
+  assert.equal(firstResolved.yawRight, true);
+  assert.ok(firstResolved.yawAxis > 0.04);
+  assert.ok(firstResolved.yawAxis < 0.12);
 
   const controller = new PlayerController();
   const control = controller.resolveControlState(
