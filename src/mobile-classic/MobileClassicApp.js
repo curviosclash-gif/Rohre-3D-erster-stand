@@ -128,10 +128,44 @@ body.mobile-classic-app .touch-joystick {
     background: rgba(2, 14, 24, 0.42) !important;
 }
 
+body.mobile-classic-app #touch-controls[data-touch-control-mode="tilt"] .touch-joystick {
+    opacity: 0.58;
+}
+
+body.mobile-classic-app #touch-controls[data-tilt-active="1"] .touch-joystick {
+    display: none !important;
+}
+
 body.mobile-classic-app .touch-button {
     border-color: rgba(255, 210, 118, 0.7) !important;
     background: rgba(6, 16, 24, 0.52) !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32) !important;
+    letter-spacing: 0 !important;
+}
+
+body.mobile-classic-app #touch-controls[data-touch-control-mode="tilt"] .touch-button-fire {
+    right: max(18px, env(safe-area-inset-right)) !important;
+    bottom: max(26px, env(safe-area-inset-bottom)) !important;
+    width: 96px !important;
+    height: 96px !important;
+    border-width: 3px !important;
+    border-color: rgba(255, 214, 118, 0.95) !important;
+    background: radial-gradient(circle at 35% 30%, rgba(255, 234, 166, 0.95), rgba(242, 126, 45, 0.88) 56%, rgba(70, 18, 8, 0.72)) !important;
+    color: #10151b !important;
+    font-size: 14px !important;
+    font-weight: 900 !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38), 0 0 24px rgba(255, 178, 82, 0.42) !important;
+}
+
+body.mobile-classic-app .touch-tilt-button {
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3);
+}
+
+body.mobile-classic-app .touch-tilt-button[data-active="1"] {
+    border-color: rgba(136, 255, 189, 0.92) !important;
+    background: rgba(4, 32, 26, 0.72) !important;
+    color: #dfffee !important;
 }
 
 body.mobile-classic-app .touch-button-fire,

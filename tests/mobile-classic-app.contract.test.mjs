@@ -12,6 +12,10 @@ import {
   applyMobileClassicSettings,
   isMobileClassicTargetValue,
 } from '../src/mobile-classic/MobileClassicApp.js';
+import {
+  deriveTiltSteeringState,
+  TOUCH_CONTROL_MODES,
+} from '../src/ui/TouchInputSource.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -96,10 +100,54 @@ test('Mobile Classic runtime guard forces single-player classic settings', () =>
   assert.equal(settings.hunt.respawnEnabled, false);
 });
 
+test('Mobile Classic tilt steering maps calibrated device orientation', () => {
+  const neutral = {
+    neutralBeta: 24,
+    neutralGamma: -2,
+    deadzoneDeg: 6,
+    rangeDeg: 24,
+  };
+
+  const steady = deriveTiltSteeringState({
+    ...neutral,
+    beta: 26,
+    gamma: 0,
+  });
+  assert.equal(steady.yawLeft, false);
+  assert.equal(steady.yawRight, false);
+  assert.equal(steady.pitchUp, false);
+  assert.equal(steady.pitchDown, false);
+
+  const right = deriveTiltSteeringState({
+    ...neutral,
+    beta: 24,
+    gamma: 13,
+  });
+  assert.equal(right.yawRight, true);
+  assert.equal(right.yawLeft, false);
+
+  const left = deriveTiltSteeringState({
+    ...neutral,
+    beta: 24,
+    gamma: -18,
+  });
+  assert.equal(left.yawLeft, true);
+  assert.equal(left.yawRight, false);
+
+  const landscapeRight = deriveTiltSteeringState({
+    ...neutral,
+    beta: 40,
+    gamma: -2,
+    orientationAngle: 90,
+  });
+  assert.equal(landscapeRight.yawRight, true);
+});
+
 test('Mobile Classic scripts build, wrap, and validate the phone app path', async () => {
   const packageJson = await readJson('package.json');
   const buildScript = await readText('scripts/build-mobile-classic-app.mjs');
   const capacitorScript = await readText('scripts/capacitor-mobile-classic.mjs');
+  const matchInputResolver = await readText('src/ui/MatchInputSourceResolver.js');
 
   assert.equal(packageJson.scripts['app:classic:android:build'], 'node scripts/build-mobile-classic-app.mjs');
   assert.equal(packageJson.scripts['app:classic:android:check'], 'node --test tests/mobile-classic-app.contract.test.mjs');
@@ -113,4 +161,7 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.match(capacitorScript, /assembleDebug/);
   assert.match(capacitorScript, /de\.curviosclash\.classic/);
   assert.match(capacitorScript, /error\.stderr/);
+  assert.equal(TOUCH_CONTROL_MODES.TILT, 'tilt');
+  assert.match(matchInputResolver, /TOUCH_CONTROL_MODES\.TILT/);
+  assert.match(matchInputResolver, /_mobileClassicAppTarget/);
 });

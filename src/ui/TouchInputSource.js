@@ -5,6 +5,86 @@
 import { PlayerInputSource } from './PlayerInputSource.js';
 import { resolveInventoryActionAvailability } from '../shared/contracts/GameplayActionAvailabilityContract.js';
 
+export const TOUCH_CONTROL_MODES = Object.freeze({
+    JOYSTICK: 'joystick',
+    TILT: 'tilt',
+});
+
+const TILT_DEFAULT_DEADZONE_DEG = 6;
+const TILT_DEFAULT_RANGE_DEG = 24;
+const TILT_EVENT_STALE_MS = 1600;
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
+function normalizeOrientationAngle(value = 0) {
+    const normalized = Math.round(Number(value) || 0) % 360;
+    return normalized < 0 ? normalized + 360 : normalized;
+}
+
+function normalizeTiltDelta(rawValue = 0, neutralValue = 0) {
+    let delta = (Number(rawValue) || 0) - (Number(neutralValue) || 0);
+    while (delta > 180) delta -= 360;
+    while (delta < -180) delta += 360;
+    return delta;
+}
+
+export function deriveTiltSteeringState({
+    beta = 0,
+    gamma = 0,
+    neutralBeta = 0,
+    neutralGamma = 0,
+    orientationAngle = 0,
+    deadzoneDeg = TILT_DEFAULT_DEADZONE_DEG,
+    rangeDeg = TILT_DEFAULT_RANGE_DEG,
+} = {}) {
+    const betaDelta = normalizeTiltDelta(beta, neutralBeta);
+    const gammaDelta = normalizeTiltDelta(gamma, neutralGamma);
+    const angle = normalizeOrientationAngle(orientationAngle);
+    let yawDeg = gammaDelta;
+    let pitchDeg = betaDelta;
+
+    if (angle === 90) {
+        yawDeg = betaDelta;
+        pitchDeg = -gammaDelta;
+    } else if (angle === 270) {
+        yawDeg = -betaDelta;
+        pitchDeg = gammaDelta;
+    } else if (angle === 180) {
+        yawDeg = -gammaDelta;
+        pitchDeg = -betaDelta;
+    }
+
+    const safeRange = Math.max(1, Number(rangeDeg) || TILT_DEFAULT_RANGE_DEG);
+    const deadzoneAxis = clamp(Math.max(0, Number(deadzoneDeg) || 0) / safeRange, 0, 0.95);
+    const yawAxis = clamp(yawDeg / safeRange, -1, 1);
+    const pitchAxis = clamp(pitchDeg / safeRange, -1, 1);
+
+    return {
+        yawAxis,
+        pitchAxis,
+        pitchUp: pitchAxis < -deadzoneAxis,
+        pitchDown: pitchAxis > deadzoneAxis,
+        yawLeft: yawAxis < -deadzoneAxis,
+        yawRight: yawAxis > deadzoneAxis,
+    };
+}
+
+function hasDeviceOrientationSupport() {
+    return typeof window !== 'undefined' && 'DeviceOrientationEvent' in window;
+}
+
+function resolveScreenOrientationAngle() {
+    if (typeof window === 'undefined') return 0;
+    const screenAngle = Number(window.screen?.orientation?.angle);
+    if (Number.isFinite(screenAngle)) {
+        return screenAngle;
+    }
+    const legacyAngle = Number(window.orientation);
+    return Number.isFinite(legacyAngle) ? legacyAngle : 0;
+}
+
 /**
  * Virtual joystick + touch buttons for tablet/mobile play.
  * Layout:
@@ -25,11 +105,29 @@ export class TouchInputSource extends PlayerInputSource {
             : null;
         this._playerIndex = Number.isInteger(options.playerIndex) ? options.playerIndex : 0;
         this._joystickRadius = options.joystickRadius || 60;
+        this._controlMode = options.controlMode === TOUCH_CONTROL_MODES.TILT
+            ? TOUCH_CONTROL_MODES.TILT
+            : TOUCH_CONTROL_MODES.JOYSTICK;
+        this._tiltDeadzoneDeg = Math.max(1, Number(options.tiltDeadzoneDeg) || TILT_DEFAULT_DEADZONE_DEG);
+        this._tiltRangeDeg = Math.max(this._tiltDeadzoneDeg + 1, Number(options.tiltRangeDeg) || TILT_DEFAULT_RANGE_DEG);
         this._joystickCenter = null;
         this._joystickDelta = { x: 0, y: 0 };
         this._joystickActive = false;
         this._joystickTouchId = null;
         this._buttonTouches = new Map();
+        this._tiltState = {
+            supported: hasDeviceOrientationSupport(),
+            enabled: false,
+            listening: false,
+            permission: 'idle',
+            beta: 0,
+            gamma: 0,
+            neutralBeta: 0,
+            neutralGamma: 0,
+            hasNeutral: false,
+            pendingCalibration: false,
+            lastEventAt: 0,
+        };
 
         this._buttons = {
             fire: false,
@@ -45,6 +143,8 @@ export class TouchInputSource extends PlayerInputSource {
         this._containerEl = null;
         this._joystickEl = null;
         this._joystickKnobEl = null;
+        this._tiltButtonEl = null;
+        this._tiltStatusEl = null;
         this._buttonEls = {};
 
         this._uiVisible = false;
@@ -53,6 +153,14 @@ export class TouchInputSource extends PlayerInputSource {
         this._touchStartHandler = (e) => this._onTouchStart(e);
         this._touchMoveHandler = (e) => this._onTouchMove(e);
         this._touchEndHandler = (e) => this._onTouchEnd(e);
+        this._orientationHandler = (e) => this._onDeviceOrientation(e);
+        this._tiltActivateHandler = (e) => {
+            e.preventDefault();
+            this.requestTiltControl().catch(() => {
+                this._tiltState.permission = 'denied';
+                this._updateTiltUi();
+            });
+        };
     }
 
     static isAvailable() {
@@ -66,6 +174,7 @@ export class TouchInputSource extends PlayerInputSource {
 
     createUI(container) {
         this._containerEl = container || document.getElementById('touch-controls') || document.body;
+        this._containerEl.dataset.touchControlMode = this._controlMode;
 
         this._joystickEl = document.createElement('div');
         this._joystickEl.className = 'touch-joystick';
@@ -85,13 +194,7 @@ export class TouchInputSource extends PlayerInputSource {
         this._joystickEl.appendChild(this._joystickKnobEl);
         this._containerEl.appendChild(this._joystickEl);
 
-        const buttonDefs = [
-            { id: 'fire', label: 'FIRE', bottom: '36%', right: '5%', size: 62 },
-            { id: 'useItem', label: 'USE', bottom: '20%', right: '5%', size: 62 },
-            { id: 'shootMG', label: 'MG', bottom: '36%', right: '20%', size: 54 },
-            { id: 'nextItem', label: 'NEXT', bottom: '20%', right: '20%', size: 54 },
-            { id: 'boost', label: 'BOOST', bottom: '52%', right: '12%', size: 54 },
-        ];
+        const buttonDefs = this._resolveButtonDefinitions();
 
         for (const def of buttonDefs) {
             const size = Number(def.size) || 60;
@@ -113,12 +216,61 @@ export class TouchInputSource extends PlayerInputSource {
             this._buttonEls[def.id] = btn;
         }
 
+        if (this._controlMode === TOUCH_CONTROL_MODES.TILT) {
+            this._createTiltControlUI();
+        }
+
         this._containerEl.addEventListener('touchstart', this._touchStartHandler, { passive: false });
         this._containerEl.addEventListener('touchmove', this._touchMoveHandler, { passive: false });
         this._containerEl.addEventListener('touchend', this._touchEndHandler, { passive: false });
         this._containerEl.addEventListener('touchcancel', this._touchEndHandler, { passive: false });
 
         this._setUIVisibility(false);
+    }
+
+    _resolveButtonDefinitions() {
+        if (this._controlMode === TOUCH_CONTROL_MODES.TILT) {
+            return [
+                { id: 'fire', label: 'SCHUSS', bottom: '9%', right: '6%', size: 86 },
+            ];
+        }
+
+        return [
+            { id: 'fire', label: 'FIRE', bottom: '36%', right: '5%', size: 62 },
+            { id: 'useItem', label: 'USE', bottom: '20%', right: '5%', size: 62 },
+            { id: 'shootMG', label: 'MG', bottom: '36%', right: '20%', size: 54 },
+            { id: 'nextItem', label: 'NEXT', bottom: '20%', right: '20%', size: 54 },
+            { id: 'boost', label: 'BOOST', bottom: '52%', right: '12%', size: 54 },
+        ];
+    }
+
+    _createTiltControlUI() {
+        this._tiltButtonEl = document.createElement('button');
+        this._tiltButtonEl.type = 'button';
+        this._tiltButtonEl.className = 'touch-tilt-button';
+        this._tiltButtonEl.dataset.tiltAction = 'calibrate';
+        this._tiltButtonEl.textContent = 'NEIGUNG';
+        this._tiltButtonEl.style.cssText = `
+            position: fixed; top: max(14px, env(safe-area-inset-top)); left: max(14px, env(safe-area-inset-left));
+            min-width: 96px; min-height: 42px; border-radius: 999px;
+            border: 1px solid rgba(132,226,255,0.72); background: rgba(4,12,20,0.66);
+            color: white; font-size: 12px; font-weight: 800; letter-spacing: 0;
+            touch-action: manipulation; user-select: none; z-index: 1001;
+        `;
+        this._tiltButtonEl.addEventListener('click', this._tiltActivateHandler);
+        this._containerEl.appendChild(this._tiltButtonEl);
+
+        this._tiltStatusEl = document.createElement('div');
+        this._tiltStatusEl.className = 'touch-tilt-status';
+        this._tiltStatusEl.textContent = 'TILT';
+        this._tiltStatusEl.style.cssText = `
+            position: fixed; top: max(60px, calc(env(safe-area-inset-top) + 58px)); left: max(16px, env(safe-area-inset-left));
+            color: rgba(210,245,255,0.82); font-size: 11px; font-weight: 700;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.7); z-index: 1001;
+            pointer-events: none; user-select: none;
+        `;
+        this._containerEl.appendChild(this._tiltStatusEl);
+        this._updateTiltUi();
     }
 
     autoDetectAndShow() {
@@ -131,6 +283,9 @@ export class TouchInputSource extends PlayerInputSource {
 
     onMatchStart() {
         this._inMatch = true;
+        if (this._controlMode === TOUCH_CONTROL_MODES.TILT) {
+            this._startTiltListening({ auto: true });
+        }
         this.autoDetectAndShow();
     }
 
@@ -143,14 +298,19 @@ export class TouchInputSource extends PlayerInputSource {
         this._uiVisible = visible;
         const display = visible ? '' : 'none';
 
-        if (this._joystickEl) this._joystickEl.style.display = display;
+        if (this._joystickEl) {
+            this._joystickEl.style.display = visible && this._shouldShowJoystickFallback() ? '' : 'none';
+        }
         for (const el of Object.values(this._buttonEls)) {
             if (el) el.style.display = visible ? 'flex' : 'none';
         }
+        if (this._tiltButtonEl) this._tiltButtonEl.style.display = visible ? 'flex' : 'none';
+        if (this._tiltStatusEl) this._tiltStatusEl.style.display = visible ? 'block' : 'none';
 
         if (this._containerEl?.id === 'touch-controls') {
             this._containerEl.style.display = display;
         }
+        this._updateTiltUi();
     }
 
     get isUIVisible() {
@@ -174,6 +334,11 @@ export class TouchInputSource extends PlayerInputSource {
         e.preventDefault();
         for (const touch of e.changedTouches) {
             const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            const tiltTarget = target?.closest?.('[data-tilt-action]');
+            if (tiltTarget && this._tiltButtonEl?.contains(tiltTarget)) {
+                this._tiltActivateHandler(e);
+                continue;
+            }
             if (target === this._joystickEl || target === this._joystickKnobEl || this._joystickEl?.contains(target)) {
                 this._joystickTouchId = touch.identifier;
                 const rect = this._joystickEl.getBoundingClientRect();
@@ -181,7 +346,8 @@ export class TouchInputSource extends PlayerInputSource {
                 this._joystickActive = true;
                 this._updateJoystick(touch.clientX, touch.clientY);
             } else {
-                const action = target?.dataset?.action;
+                const actionTarget = target?.closest?.('[data-action]') || target;
+                const action = actionTarget?.dataset?.action;
                 if (action && action in this._buttons) {
                     this._buttons[action] = true;
                     this._buttonTouches.set(touch.identifier, action);
@@ -301,6 +467,7 @@ export class TouchInputSource extends PlayerInputSource {
         const deadzone = 0.15;
         const jx = Math.abs(this._joystickDelta.x) > deadzone ? this._joystickDelta.x : 0;
         const jy = Math.abs(this._joystickDelta.y) > deadzone ? this._joystickDelta.y : 0;
+        const tiltInput = this._resolveTiltSteeringInput();
         const actionState = this._resolveActionState();
         this._syncActionButtons(actionState);
 
@@ -309,10 +476,10 @@ export class TouchInputSource extends PlayerInputSource {
         this._prevBoost = boostDown;
 
         return {
-            pitchUp: jy < -deadzone,
-            pitchDown: jy > deadzone,
-            yawLeft: jx < -deadzone,
-            yawRight: jx > deadzone,
+            pitchUp: tiltInput ? tiltInput.pitchUp : jy < -deadzone,
+            pitchDown: tiltInput ? tiltInput.pitchDown : jy > deadzone,
+            yawLeft: tiltInput ? tiltInput.yawLeft : jx < -deadzone,
+            yawRight: tiltInput ? tiltInput.yawRight : jx > deadzone,
             rollLeft: false,
             rollRight: false,
             boost: boostDown,
@@ -326,6 +493,115 @@ export class TouchInputSource extends PlayerInputSource {
         };
     }
 
+    _isTiltFresh() {
+        return this._tiltState.lastEventAt > 0
+            && Date.now() - this._tiltState.lastEventAt < TILT_EVENT_STALE_MS;
+    }
+
+    _shouldShowJoystickFallback() {
+        return this._controlMode !== TOUCH_CONTROL_MODES.TILT || !this._isTiltFresh();
+    }
+
+    _startTiltListening({ auto = false } = {}) {
+        if (this._controlMode !== TOUCH_CONTROL_MODES.TILT) return false;
+        this._tiltState.supported = hasDeviceOrientationSupport();
+        if (!this._tiltState.supported) {
+            this._tiltState.permission = 'unsupported';
+            this._updateTiltUi();
+            return false;
+        }
+        if (!this._tiltState.listening) {
+            window.addEventListener('deviceorientation', this._orientationHandler, { passive: true });
+            this._tiltState.listening = true;
+        }
+        this._tiltState.enabled = true;
+        this._tiltState.pendingCalibration = true;
+        this._tiltState.permission = auto ? 'auto' : 'granted';
+        this._updateTiltUi();
+        return true;
+    }
+
+    async requestTiltControl() {
+        if (this._controlMode !== TOUCH_CONTROL_MODES.TILT) return false;
+        this._tiltState.supported = hasDeviceOrientationSupport();
+        if (!this._tiltState.supported) {
+            this._tiltState.permission = 'unsupported';
+            this._updateTiltUi();
+            return false;
+        }
+
+        const requestPermission = window.DeviceOrientationEvent?.requestPermission;
+        if (typeof requestPermission === 'function') {
+            const permission = await requestPermission.call(window.DeviceOrientationEvent);
+            this._tiltState.permission = permission === 'granted' ? 'granted' : 'denied';
+            if (permission !== 'granted') {
+                this._updateTiltUi();
+                return false;
+            }
+        }
+
+        return this._startTiltListening({ auto: false });
+    }
+
+    _onDeviceOrientation(event) {
+        const beta = Number(event?.beta);
+        const gamma = Number(event?.gamma);
+        if (!Number.isFinite(beta) || !Number.isFinite(gamma)) {
+            return;
+        }
+        this._tiltState.beta = beta;
+        this._tiltState.gamma = gamma;
+        this._tiltState.lastEventAt = Date.now();
+        if (this._tiltState.pendingCalibration || !this._tiltState.hasNeutral) {
+            this._tiltState.neutralBeta = beta;
+            this._tiltState.neutralGamma = gamma;
+            this._tiltState.hasNeutral = true;
+            this._tiltState.pendingCalibration = false;
+        }
+        this._updateTiltUi();
+    }
+
+    _resolveTiltSteeringInput() {
+        if (this._controlMode !== TOUCH_CONTROL_MODES.TILT) return null;
+        if (!this._tiltState.enabled || !this._tiltState.hasNeutral || !this._isTiltFresh()) {
+            return null;
+        }
+        return deriveTiltSteeringState({
+            beta: this._tiltState.beta,
+            gamma: this._tiltState.gamma,
+            neutralBeta: this._tiltState.neutralBeta,
+            neutralGamma: this._tiltState.neutralGamma,
+            orientationAngle: resolveScreenOrientationAngle(),
+            deadzoneDeg: this._tiltDeadzoneDeg,
+            rangeDeg: this._tiltRangeDeg,
+        });
+    }
+
+    _stopTiltListening() {
+        if (this._tiltState.listening && typeof window !== 'undefined') {
+            window.removeEventListener('deviceorientation', this._orientationHandler);
+        }
+        this._tiltState.listening = false;
+        this._tiltState.enabled = false;
+        this._tiltState.lastEventAt = 0;
+    }
+
+    _updateTiltUi() {
+        if (this._containerEl) {
+            this._containerEl.dataset.tiltActive = this._isTiltFresh() ? '1' : '0';
+            this._containerEl.dataset.tiltPermission = this._tiltState.permission;
+        }
+        if (this._tiltButtonEl) {
+            this._tiltButtonEl.dataset.active = this._isTiltFresh() ? '1' : '0';
+        }
+        if (this._tiltStatusEl) {
+            this._tiltStatusEl.textContent = this._isTiltFresh() ? 'TILT AKTIV' : 'TILT';
+        }
+        if (this._uiVisible && this._joystickEl) {
+            this._joystickEl.style.display = this._shouldShowJoystickFallback() ? '' : 'none';
+        }
+    }
+
     removeUI() {
         if (this._containerEl) {
             this._containerEl.removeEventListener('touchstart', this._touchStartHandler);
@@ -333,14 +609,22 @@ export class TouchInputSource extends PlayerInputSource {
             this._containerEl.removeEventListener('touchend', this._touchEndHandler);
             this._containerEl.removeEventListener('touchcancel', this._touchEndHandler);
         }
+        if (this._tiltButtonEl) {
+            this._tiltButtonEl.removeEventListener('click', this._tiltActivateHandler);
+        }
+        this._stopTiltListening();
         if (this._joystickEl?.parentNode) this._joystickEl.parentNode.removeChild(this._joystickEl);
         for (const el of Object.values(this._buttonEls)) {
             if (el?.parentNode) el.parentNode.removeChild(el);
         }
+        if (this._tiltButtonEl?.parentNode) this._tiltButtonEl.parentNode.removeChild(this._tiltButtonEl);
+        if (this._tiltStatusEl?.parentNode) this._tiltStatusEl.parentNode.removeChild(this._tiltStatusEl);
         this._buttonEls = {};
         this._buttonTouches.clear();
         this._joystickEl = null;
         this._joystickKnobEl = null;
+        this._tiltButtonEl = null;
+        this._tiltStatusEl = null;
     }
 
     dispose() {

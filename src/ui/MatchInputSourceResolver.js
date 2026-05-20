@@ -1,4 +1,4 @@
-import { TouchInputSource } from './TouchInputSource.js';
+import { TOUCH_CONTROL_MODES, TouchInputSource } from './TouchInputSource.js';
 
 const GAMEPAD_DEADZONE = 0.15;
 const GAMEPAD_MAPPING = Object.freeze({
@@ -12,6 +12,12 @@ const GAMEPAD_MAPPING = Object.freeze({
     useItemButton: 2,
     cameraButton: 1,
 });
+
+function isMobileClassicTarget(game = null) {
+    const doc = typeof document !== 'undefined' ? document : null;
+    return game?._mobileClassicAppTarget === true
+        || doc?.documentElement?.dataset?.appTarget === 'mobile-classic';
+}
 
 function createKeyboardInputSource(inputManager, includeSecondaryBindings = false) {
     return {
@@ -116,10 +122,12 @@ export function createPreferredMatchInputSource({
     if (!inputManager) return null;
 
     if (playerIndex === 0 && TouchInputSource.isAvailable()) {
+        const mobileClassic = isMobileClassicTarget(game);
         const touchSource = new TouchInputSource({
             game,
             playerIndex,
             getMatchRuntimeProjection,
+            controlMode: mobileClassic ? TOUCH_CONTROL_MODES.TILT : TOUCH_CONTROL_MODES.JOYSTICK,
         });
         touchSource.createUI();
         touchSource.onMatchStart();
