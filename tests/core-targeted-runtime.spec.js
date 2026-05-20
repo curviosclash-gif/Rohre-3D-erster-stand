@@ -2724,7 +2724,7 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         expect(probe.snapshots[0].hasMultiplayerSessionState).toBeTruthy();
     });
 
-    test.skip('T10g: Editor-Disk-Maps erscheinen im Runtime-Menue und laden im Match', async ({ page }) => {
+    test.skip('T10g: Editor-Disk-Maps erscheinen im Runtime-Menue und laden im Match (Sunset: aktivieren, sobald der desktop-e2e-Harness Editor-Disk-Map-Seeding stabil bereitstellt)', async ({ page }) => {
         await loadGameWithRetry(page);
         await openGameSubmenu(page);
 
@@ -2741,7 +2741,7 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         });
 
         if (!selectionState.matching) {
-            test.skip();
+            test.skip(true, 'Sunset: Skip entfernen, sobald der Harness deterministisch mindestens eine editor_ Runtime-Map seedet.');
             return;
         }
 

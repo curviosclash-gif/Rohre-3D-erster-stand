@@ -19,6 +19,11 @@ test.describe('Desktop Smoke', () => {
             hasGameInstance: !!window.GAME_INSTANCE,
             preloadBridgeReady: globalThis.__CURVIOS_APP__ === true && globalThis.curviosApp?.isApp === true,
             runtimeKind: window.curviosApp?.capabilities?.runtimeKind || null,
+            productSurfaceId: window.GAME_INSTANCE?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId || null,
+            externalFontResources: performance.getEntriesByType('resource')
+                .map((entry) => String(entry.name || ''))
+                .filter((url) => /fonts\.(googleapis|gstatic)\.com/i.test(url)),
+            buildInfoFontFamily: window.getComputedStyle(document.querySelector('.build-info')).fontFamily,
         }));
 
         expect(runtimeState.mainMenuVisible).toBeTruthy();
@@ -26,6 +31,9 @@ test.describe('Desktop Smoke', () => {
         expect(runtimeState.hasGameInstance).toBeTruthy();
         expect(runtimeState.preloadBridgeReady).toBeTruthy();
         expect(runtimeState.runtimeKind).toBe('electron');
+        expect(runtimeState.productSurfaceId).toBe('desktop-app');
+        expect(runtimeState.externalFontResources).toEqual([]);
+        expect(runtimeState.buildInfoFontFamily).not.toMatch(/Orbitron|Inter/i);
         expect(errors).toHaveLength(0);
         expect(desktopHarness.diagnosticsPath.endsWith('desktop-startup-diagnostics.json')).toBeTruthy();
         expect(desktopHarness.artifacts.mainProcessLogPath.endsWith('desktop-main-process.log')).toBeTruthy();

@@ -40,7 +40,9 @@ const CSP_HEADER = [
     "img-src 'self' data: blob:",
     "connect-src 'self' ws: wss:",
     "media-src 'self' blob:",
-    "font-src 'self'",
+    "font-src 'self' data:",
+    "object-src 'none'",
+    "base-uri 'self'",
 ].join('; ');
 
 function createStaticRequestHandler(rootDir) {

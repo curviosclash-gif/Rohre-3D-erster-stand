@@ -135,7 +135,10 @@ test.describe('T1-20: Core & Infrastruktur - Plattform, Lifecycle & Multiplayer'
 
     test('T20b: Lifecycle-Events markieren Match Start/Ende und Menue-Oeffnung', async ({ page }) => {
         await startGame(page);
-        await page.waitForTimeout(100);
+        await page.waitForFunction(() => (
+            window.GAME_INSTANCE?.mediaRecorderSystem?.getLifecycleEvents?.()
+                .some((entry) => entry.type === 'match_started') === true
+        ), null, { timeout: 4000 });
 
         let eventTypes = await page.evaluate(() => (
             window.GAME_INSTANCE?.mediaRecorderSystem?.getLifecycleEvents?.().map((entry) => entry.type) || []
@@ -143,7 +146,11 @@ test.describe('T1-20: Core & Infrastruktur - Plattform, Lifecycle & Multiplayer'
         expect(eventTypes.includes('match_started')).toBeTruthy();
 
         await returnToMenu(page);
-        await page.waitForTimeout(100);
+        await page.waitForFunction(() => {
+            const events = window.GAME_INSTANCE?.mediaRecorderSystem?.getLifecycleEvents?.() || [];
+            return events.some((entry) => entry.type === 'match_ended')
+                && events.some((entry) => entry.type === 'menu_opened');
+        }, null, { timeout: 4000 });
 
         eventTypes = await page.evaluate(() => (
             window.GAME_INSTANCE?.mediaRecorderSystem?.getLifecycleEvents?.().map((entry) => entry.type) || []

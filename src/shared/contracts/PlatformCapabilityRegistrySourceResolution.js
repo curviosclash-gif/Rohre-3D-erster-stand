@@ -74,6 +74,30 @@ function readBrowserDemoPolicyExportDataUrl(runtimeGlobal) {
         : decodeURIComponent(payload);
 }
 
+function readBrowserDemoPolicyExportWithXmlHttpRequest(runtimeGlobal, processResponse) {
+    const XmlHttpRequestCtor = typeof runtimeGlobal?.XMLHttpRequest === 'function'
+        ? runtimeGlobal.XMLHttpRequest
+        : null;
+    if (!XmlHttpRequestCtor) return null;
+
+    try {
+        const request = new XmlHttpRequestCtor();
+        // Keep this fallback bound to the explicit runtime input; implicit globals would make desktop boot probe browser-demo artifacts.
+        request.open('GET', BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL, false);
+        request.send();
+        return processResponse(Number(request.status) || 0, String(request.responseText || ''));
+    } catch (error) {
+        const readFailed = createBrowserDemoOverrideDraftResolution({
+            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
+            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.READ_FAILED,
+            reason: error instanceof Error ? error.message : String(error || 'build_artifact_read_failed'),
+            source: BROWSER_DEMO_OVERRIDE_SOURCE_BUILD_ARTIFACT,
+        });
+        BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, readFailed);
+        return readFailed;
+    }
+}
+
 function sanitizeDiagnosticsCodeArray(values) {
     return sanitizeUniqueStringArray(values, normalizeString);
 }
@@ -284,7 +308,7 @@ function resolveBrowserDemoSurfacePolicyOverrideDraftFromBuildArtifact(runtimeGl
 
             const fetchFn = typeof runtimeGlobal.fetch === 'function'
                 ? runtimeGlobal.fetch.bind(runtimeGlobal)
-                : (typeof globalThis.fetch === 'function' ? globalThis.fetch.bind(globalThis) : null);
+                : null;
 
             if (fetchFn) {
                 fetchFn(BROWSER_DEMO_POLICY_EXPORT_ARTIFACT_URL)
@@ -304,6 +328,10 @@ function resolveBrowserDemoSurfacePolicyOverrideDraftFromBuildArtifact(runtimeGl
                         BROWSER_DEMO_BUILD_ARTIFACT_RESOLUTION_CACHE.set(runtimeGlobal, readFailed);
                     });
             } else {
+                const xmlHttpRequestResolution = readBrowserDemoPolicyExportWithXmlHttpRequest(runtimeGlobal, processResponse);
+                if (xmlHttpRequestResolution) {
+                    return xmlHttpRequestResolution;
+                }
                 const unavailable = createBrowserDemoOverrideDraftResolution({
                     status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
                     reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SOURCE_UNAVAILABLE,

@@ -1028,7 +1028,7 @@ test.describe('T1-20: Core & Infrastruktur - Vehicle, Surface & UX', () => {
             };
         });
         if (!recordingState.canRecord || !recordingState.isRecording) {
-            test.skip(true, 'MediaRecorder-Exportpfad im Runtime nicht aktiv.');
+            test.skip(true, 'MediaRecorder-Exportpfad im Runtime nicht aktiv. Sunset: durch Capability-Fixture ersetzen, sobald der Desktop-Recording-Harness deterministisch ist.');
         }
 
         await returnToMenu(page);
@@ -1057,7 +1057,7 @@ test.describe('T1-20: Core & Infrastruktur - Vehicle, Surface & UX', () => {
         });
 
         if (!recorderState.canRecord || !recorderState.exportMeta) {
-            test.skip(true, 'MediaRecorder-Export im Runtime nicht deterministisch verfuegbar.');
+            test.skip(true, 'MediaRecorder-Export im Runtime nicht deterministisch verfuegbar. Sunset: durch eventbasiertes Export-Ready-Signal ersetzen.');
         }
         expect(recorderState.exportMeta).toBeTruthy();
         expect(String(recorderState.exportMeta.fileName || '')).toMatch(/\.(webm|mp4|video)$/);

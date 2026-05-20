@@ -446,14 +446,20 @@ function isBenignErrorMessage(message) {
     return BENIGN_ERROR_PATTERNS.some((pattern) => pattern.test(message));
 }
 
-async function triggerMatchStart(page) {
-    const startResult = await page.evaluate(() => {
+async function triggerMatchStart(page, options = {}) {
+    const allowRuntimeFallback = options.allowRuntimeFallback === true;
+    const startResult = await page.evaluate((allowFallback) => {
         const startButton = document.querySelector('#submenu-game:not(.hidden) #btn-start');
         if (startButton instanceof HTMLButtonElement && !startButton.disabled) {
             startButton.click();
             return { ok: true, method: 'button' };
         }
 
+        if (!allowFallback) {
+            return { ok: false, reason: 'start-button-unavailable' };
+        }
+
+        // Recovery path: tests must opt in explicitly so product-near runs stay UI-first.
         const game = window.GAME_INSTANCE;
         if (game?.startMatch && typeof game.startMatch === 'function') {
             try {
@@ -471,7 +477,7 @@ async function triggerMatchStart(page) {
         }
 
         return { ok: false, reason: 'start-trigger-unavailable' };
-    });
+    }, allowRuntimeFallback);
 
     if (!startResult?.ok) {
         throw new Error(`Start-Trigger nicht verfuegbar (${startResult?.reason || 'unknown'}).`);
@@ -489,7 +495,10 @@ async function openCustomSetupStep(page) {
         const button = page.locator(selector).first();
         if (await button.count()) {
             await button.click({ force: true });
-            await page.waitForTimeout(100);
+            await page.waitForFunction(() => (
+                !!document.querySelector('#submenu-custom:not(.hidden) [data-mode-path]:not([disabled])')
+                || !!document.querySelector('#submenu-game:not(.hidden)')
+            ), null, { timeout: 4000 }).catch(() => {});
             return true;
         }
     }
@@ -613,7 +622,7 @@ async function applyModePathRuntimeFallback(page, modePath) {
     }, modePath);
 }
 
-async function ensureModePathSelected(page, modePath) {
+async function ensureModePathSelected(page, modePath, options = {}) {
     const expectedModePath = String(modePath || '').trim().toLowerCase();
     const expectedGameMode = expectedModePath === 'fight' ? 'HUNT' : 'CLASSIC';
     const before = await readMatchStartSnapshot(page);
@@ -621,6 +630,14 @@ async function ensureModePathSelected(page, modePath) {
         return;
     }
 
+    if (options.allowRuntimeFallback !== true) {
+        throw new Error(
+            `Mode-Pfad nicht via UI stabil gesetzt: erwartet ${expectedModePath}/${expectedGameMode}, ` +
+            `ist ${before.modePath || 'n/a'}/${before.gameMode || 'n/a'}`
+        );
+    }
+
+    // Recovery path: this mutates runtime state and must be explicitly enabled by the caller.
     const fallbackResult = await applyModePathRuntimeFallback(page, expectedModePath);
     if (!fallbackResult?.ok) {
         throw new Error(`Mode-Pfad Fallback fehlgeschlagen (${fallbackResult?.reason || 'unknown'})`);
@@ -658,10 +675,10 @@ async function waitForHuntRuntimeReady(page, minimumPlayers = 1, timeoutMs = 600
     }
 }
 
-export async function startGameFromMenu(page) {
+export async function startGameFromMenu(page, options = {}) {
     await waitForLoadedGame(page);
     await openGameSubmenu(page);
-    await triggerMatchStart(page);
+    await triggerMatchStart(page, options);
     await page.waitForFunction(() => {
         const hud = document.getElementById('hud');
         const g = window.GAME_INSTANCE;
@@ -673,13 +690,13 @@ export async function startGameFromMenu(page) {
 }
 
 // Start game with default configuration.
-export async function startGame(page) {
+export async function startGame(page, options = {}) {
     await loadGame(page);
-    await startGameFromMenu(page);
+    await startGameFromMenu(page, options);
 }
 
 // Start game with N bots.
-export async function startGameWithBots(page, botCount = 1) {
+export async function startGameWithBots(page, botCount = 1, options = {}) {
     await loadGame(page);
     await openGameSubmenu(page);
     await page.evaluate((count) => {
@@ -687,7 +704,7 @@ export async function startGameWithBots(page, botCount = 1) {
         slider.value = String(count);
         slider.dispatchEvent(new Event('input', { bubbles: true }));
     }, botCount);
-    await triggerMatchStart(page);
+    await triggerMatchStart(page, options);
     await page.waitForFunction(() => {
         const hud = document.getElementById('hud');
         const g = window.GAME_INSTANCE;
@@ -699,29 +716,29 @@ export async function startGameWithBots(page, botCount = 1) {
 }
 
 // Start hunt mode with default bot count.
-export async function startHuntGame(page) {
+export async function startHuntGame(page, options = {}) {
     await loadGame(page);
     await openCustomSubmenu(page);
     await trySelectModePath(page, 'fight');
-    await ensureModePathSelected(page, 'fight');
+    await ensureModePathSelected(page, 'fight', options);
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
-    await triggerMatchStart(page);
+    await triggerMatchStart(page, options);
     await waitForHuntRuntimeReady(page, 1, 60000);
 }
 
 // Start hunt mode with configurable bot count.
-export async function startHuntGameWithBots(page, botCount = 1) {
+export async function startHuntGameWithBots(page, botCount = 1, options = {}) {
     await loadGame(page);
     await openCustomSubmenu(page);
     await trySelectModePath(page, 'fight');
-    await ensureModePathSelected(page, 'fight');
+    await ensureModePathSelected(page, 'fight', options);
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
     await page.evaluate((count) => {
         const slider = document.getElementById('bot-count');
         slider.value = String(count);
         slider.dispatchEvent(new Event('input', { bubbles: true }));
     }, botCount);
-    await triggerMatchStart(page);
+    await triggerMatchStart(page, options);
     await waitForHuntRuntimeReady(page, 2, 60000);
 }
 
@@ -748,7 +765,13 @@ export async function returnToMenu(page) {
     if (await isMainNavVisible()) return;
 
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(120);
+    await page.waitForFunction(() => {
+        const mainMenu = document.getElementById('main-menu');
+        const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+        if (!(mainMenu instanceof HTMLElement) || mainMenu.classList.contains('hidden')) return false;
+        const style = window.getComputedStyle(mainMenu);
+        return style.display !== 'none' && style.visibility !== 'hidden' && !(visiblePanel instanceof HTMLElement);
+    }, null, { timeout: 1000 }).catch(() => {});
 
     if (await isMainNavVisible()) return;
 

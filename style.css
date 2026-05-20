@@ -15,6 +15,7 @@
     --menu-theme-title-gradient-end: #ff6600;
     --menu-theme-ui-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --menu-theme-heading-font: 'Segoe UI', system-ui, sans-serif;
+    --menu-theme-display-font: 'Segoe UI', Consolas, 'Liberation Mono', monospace;
 }
 
 * {
@@ -188,7 +189,7 @@
 
 .build-info {
     text-align: center;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 0.68em;
     color: var(--menu-theme-muted);
     margin-bottom: 10px;
@@ -300,7 +301,7 @@
     border: 1px solid rgba(255, 255, 255, 0.24);
     background: rgba(0, 0, 0, 0.28);
     color: #ccf3ff;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 0.76rem;
 }
 
@@ -423,7 +424,7 @@
 }
 
 .build-info-detail {
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 0.78em;
     color: #667;
     line-height: 1.6;
@@ -477,7 +478,7 @@
 .developer-telemetry-label,
 .developer-telemetry-value {
     margin: 0;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 0.76em;
 }
 
@@ -518,7 +519,7 @@
     display: inline-block;
     padding: 2px 7px;
     font-size: 0.9em;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 5px;
@@ -812,7 +813,7 @@ input[type="range"]::-webkit-slider-thumb {
     color: #ecf3ff;
     cursor: pointer;
     text-align: left;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--menu-theme-ui-font);
     font-size: 0.86rem;
 }
 
@@ -1539,7 +1540,7 @@ input[type="range"]::-webkit-slider-thumb {
     inset: 0;
     pointer-events: none;
     color: #8dff9f;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     text-shadow: 0 0 8px rgba(20, 255, 120, 0.5);
     z-index: 12;
 }
@@ -1740,7 +1741,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .player-name {
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 0.8em;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -1756,7 +1757,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .player-score {
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 2.5em;
     font-weight: 900;
 }
@@ -1815,7 +1816,7 @@ input[type="range"]::-webkit-slider-thumb {
     position: absolute;
     left: 4px;
     bottom: 3px;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 0.46rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -1863,7 +1864,7 @@ input[type="range"]::-webkit-slider-thumb {
     backdrop-filter: blur(3px);
     z-index: 21;
     text-align: center;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
 }
 
 .parcours-route {
@@ -2018,7 +2019,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 #message-text {
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 900;
     background: linear-gradient(135deg, #00aaff, #ff6600);
@@ -2052,7 +2053,7 @@ input[type="range"]::-webkit-slider-thumb {
 
 .message-stats-title {
     margin: 0 0 10px;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 0.95rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -2137,7 +2138,7 @@ input[type="range"]::-webkit-slider-thumb {
     border: 1px solid rgba(150, 228, 255, 0.58);
     background: rgba(10, 26, 40, 0.86);
     color: #d8f5ff;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -2158,7 +2159,7 @@ input[type="range"]::-webkit-slider-thumb {
     background: rgba(46, 8, 8, 0.9);
     color: #ff7f7f;
     text-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 0.88rem;
     font-weight: 800;
     letter-spacing: 0.08em;
@@ -2187,7 +2188,7 @@ input[type="range"]::-webkit-slider-thumb {
 
 .arcade-overlay-header h3 {
     margin: 0;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 1.05rem;
     letter-spacing: 0.04em;
     color: #ffdca2;
@@ -2340,7 +2341,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 #pause-title {
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 900;
     background: linear-gradient(135deg, #00aaff, #ff6600);
@@ -2378,7 +2379,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .pause-settings-title {
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 1rem;
     font-weight: 700;
     color: #88bbff;
@@ -2403,7 +2404,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .pause-settings-subtitle {
-    font-family: 'Orbitron', monospace;
+    font-family: var(--menu-theme-display-font);
     font-size: 0.85rem;
     font-weight: 600;
     color: #88bbff;
