@@ -30,6 +30,11 @@ import {
   TouchInputSource,
   TOUCH_CONTROL_MODES,
 } from '../src/ui/TouchInputSource.js';
+import {
+  MOBILE_CLASSIC_TILT_ASSIST_MODES,
+  MOBILE_CLASSIC_TILT_PITCH_MODES,
+  normalizeMobileClassicControlSettings,
+} from '../src/shared/contracts/MobileClassicControlsContract.js';
 import { PlayerController } from '../src/entities/player/PlayerController.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -111,6 +116,13 @@ test('Mobile Classic runtime guard forces single-player classic settings', () =>
     localSettings: {
       sessionType: 'multiplayer',
       modePath: 'fight',
+      mobileControls: {
+        tiltSensitivity: 9,
+        tiltPitchMode: 'bad',
+        tiltAssistMode: 'arcade',
+        tiltDebugVisible: true,
+        tiltSensorHzVisible: true,
+      },
     },
     gameplay: {
       planarMode: true,
@@ -129,6 +141,11 @@ test('Mobile Classic runtime guard forces single-player classic settings', () =>
   assert.equal(settings.gameMode, 'CLASSIC');
   assert.equal(settings.localSettings.sessionType, 'single');
   assert.equal(settings.localSettings.modePath, 'normal');
+  assert.equal(settings.localSettings.mobileControls.tiltSensitivity, 1.8);
+  assert.equal(settings.localSettings.mobileControls.tiltPitchMode, MOBILE_CLASSIC_TILT_PITCH_MODES.TILT);
+  assert.equal(settings.localSettings.mobileControls.tiltAssistMode, MOBILE_CLASSIC_TILT_ASSIST_MODES.ARCADE);
+  assert.equal(settings.localSettings.mobileControls.tiltDebugVisible, true);
+  assert.equal(settings.localSettings.mobileControls.tiltSensorHzVisible, true);
   assert.equal(settings.gameplay.planarMode, false);
   assert.equal(settings.hunt.respawnEnabled, false);
 });
@@ -269,6 +286,62 @@ test('Mobile Classic tilt steering uses soft analog axes for phone control', () 
   assert.equal(control.pitchInput, 0.35);
   assert.equal(control.yawInput, -0.5);
   assert.equal(control.rollInput, 0.2);
+});
+
+test('Mobile Classic tilt menu options shape steering and diagnostics', () => {
+  const baseRight = deriveTiltSteeringState({
+    neutralBeta: 20,
+    neutralGamma: 0,
+    beta: 20,
+    gamma: 10,
+    sensitivity: 1,
+    assistMode: MOBILE_CLASSIC_TILT_ASSIST_MODES.OFF,
+  });
+  const sensitiveRight = deriveTiltSteeringState({
+    neutralBeta: 20,
+    neutralGamma: 0,
+    beta: 20,
+    gamma: 10,
+    sensitivity: 1.5,
+    assistMode: MOBILE_CLASSIC_TILT_ASSIST_MODES.OFF,
+  });
+  const arcadeRight = deriveTiltSteeringState({
+    neutralBeta: 20,
+    neutralGamma: 0,
+    beta: 20,
+    gamma: 10,
+    sensitivity: 1,
+    assistMode: MOBILE_CLASSIC_TILT_ASSIST_MODES.ARCADE,
+  });
+  assert.ok(sensitiveRight.yawAxis > baseRight.yawAxis);
+  assert.ok(arcadeRight.yawAxis > baseRight.yawAxis);
+
+  const controls = normalizeMobileClassicControlSettings({
+    tiltSensitivity: 1.45,
+    tiltPitchMode: MOBILE_CLASSIC_TILT_PITCH_MODES.TOUCH,
+    tiltAssistMode: MOBILE_CLASSIC_TILT_ASSIST_MODES.SOFT,
+    tiltDebugVisible: true,
+    tiltSensorHzVisible: true,
+  });
+  const tiltSource = new TouchInputSource({
+    controlMode: TOUCH_CONTROL_MODES.TILT,
+    mobileControls: controls,
+  });
+  tiltSource._tiltState.enabled = true;
+  tiltSource._tiltState.hasNeutral = true;
+  tiltSource._tiltState.lastEventAt = Date.now();
+  tiltSource._tiltState.neutralBeta = 20;
+  tiltSource._tiltState.neutralGamma = 0;
+  tiltSource._tiltState.beta = 20;
+  tiltSource._tiltState.gamma = 10;
+  tiltSource._tiltState.sensorHz = 58;
+  tiltSource._joystickDelta = { x: 0, y: -0.5 };
+  const polled = tiltSource.poll();
+  assert.equal(polled.pitchUp, true);
+  assert.equal(polled.pitchAxis, 0.5);
+  assert.equal(polled.yawRight, true);
+  assert.match(tiltSource._resolveTiltStatusText(), /Y \+/);
+  assert.match(tiltSource._resolveTiltStatusText(), /58Hz/);
 });
 
 test('Mobile Classic tilt calibration treats the current hand posture as neutral', () => {

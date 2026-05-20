@@ -441,6 +441,7 @@ export class UINavigationLifecycleController {
         const activeSection = this._resolveLevel4Section(settings?.localSettings?.toolsState?.activeSection);
         const activeSectionLabel = {
             [LEVEL4_SECTION_IDS.CONTROLS]: 'Steuerung',
+            [LEVEL4_SECTION_IDS.MOBILE_CONTROLS]: 'Mobile',
             [LEVEL4_SECTION_IDS.GAMEPLAY]: 'Gameplay',
             [LEVEL4_SECTION_IDS.ADVANCED_MAP]: 'Map-Details',
             [LEVEL4_SECTION_IDS.TOOLS]: 'Profile',

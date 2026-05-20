@@ -334,6 +334,9 @@
                                 <button type="button" id="level4-tab-controls" class="level4-section-tab"
                                     data-level4-section-target="controls" role="tab" aria-controls="level4-section-controls"
                                     aria-selected="true">Steuerung</button>
+                                <button type="button" id="level4-tab-mobile-controls" class="level4-section-tab"
+                                    data-level4-section-target="mobile_controls" role="tab" aria-controls="level4-section-mobile-controls"
+                                    aria-selected="false">Mobile</button>
                                 <button type="button" id="level4-tab-gameplay" class="level4-section-tab"
                                     data-level4-section-target="gameplay" role="tab" aria-controls="level4-section-gameplay"
                                     aria-selected="false">Gameplay</button>
@@ -365,6 +368,34 @@
                                 data-menu-action="reset-keys" data-menu-text-id="menu.level4.controls.reset_keys.label">
                                 Standard-Tasten wiederherstellen
                             </button>
+                        </div>
+                        </section>
+
+                        <section id="level4-section-mobile-controls" class="level4-section-panel" data-level4-section="mobile_controls"
+                            role="tabpanel" aria-labelledby="level4-tab-mobile-controls" aria-hidden="true">
+                        <div class="menu-section">
+                            <h2 class="section-title">Mobile-Feineinstellung</h2>
+                            <label for="mobile-tilt-sensitivity-slider">Neigungs-Empfindlichkeit: <span id="mobile-tilt-sensitivity-label">100%</span></label>
+                            <input type="range" id="mobile-tilt-sensitivity-slider" min="60" max="180" step="5" value="100">
+                            <label for="mobile-tilt-assist-select">Arcade Assist</label>
+                            <select id="mobile-tilt-assist-select">
+                                <option value="off" selected>Aus</option>
+                                <option value="soft">Sanft</option>
+                                <option value="arcade">Direkt</option>
+                            </select>
+                            <label for="mobile-tilt-pitch-mode-select">Hoehensteuerung</label>
+                            <select id="mobile-tilt-pitch-mode-select">
+                                <option value="tilt" selected>Neigung</option>
+                                <option value="touch">Touch-Regler</option>
+                            </select>
+                            <label class="toggle-row secondary-btn-spaced">
+                                <input type="checkbox" id="mobile-tilt-debug-toggle">
+                                <span>Live-Neigungsanzeige</span>
+                            </label>
+                            <label class="toggle-row secondary-btn-spaced">
+                                <input type="checkbox" id="mobile-tilt-sensor-hz-toggle">
+                                <span>Sensor-Hz anzeigen</span>
+                            </label>
                         </div>
                         </section>
 

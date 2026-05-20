@@ -1,4 +1,5 @@
 import { TOUCH_CONTROL_MODES, TouchInputSource } from './TouchInputSource.js';
+import { normalizeMobileClassicControlSettings } from '../shared/contracts/MobileClassicControlsContract.js';
 
 const GAMEPAD_DEADZONE = 0.15;
 const GAMEPAD_MAPPING = Object.freeze({
@@ -137,6 +138,7 @@ export function createPreferredMatchInputSource({
             playerIndex,
             getMatchRuntimeProjection,
             controlMode: mobileClassic ? TOUCH_CONTROL_MODES.TILT : TOUCH_CONTROL_MODES.JOYSTICK,
+            mobileControls: normalizeMobileClassicControlSettings(game?.settings?.localSettings?.mobileControls),
         });
         touchSource.createUI();
         touchSource.onMatchStart();

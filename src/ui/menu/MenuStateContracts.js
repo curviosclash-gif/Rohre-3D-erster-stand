@@ -6,6 +6,7 @@ import {
     normalizeArcadeGhostDuelMode,
     normalizeArcadeGhostTrailCollisionEnabled,
 } from '../../shared/contracts/ArcadeGhostDuelContract.js';
+import { normalizeMobileClassicControlSettings } from '../../shared/contracts/MobileClassicControlsContract.js';
 import {
     createMenuEventPlaylistStateDefaults,
     createMenuLocalSettingsDefaults,
@@ -59,6 +60,7 @@ const VALID_MODE_PATH_SET = new Set(Object.values(MENU_MODE_PATHS));
 const VALID_MULTIPLAYER_TRANSPORT_SET = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
 export const LEVEL4_SECTION_IDS = Object.freeze({
     CONTROLS: 'controls',
+    MOBILE_CONTROLS: 'mobile_controls',
     GAMEPLAY: 'gameplay',
     ADVANCED_MAP: 'advanced_map',
     TOOLS: 'tools',
@@ -178,6 +180,7 @@ function normalizeLocalSettingsState(localSettings = null) {
     const modePath = normalizeModePath(source.modePath, defaults.modePath);
     const startSetup = normalizeStartSetupState(source.startSetup);
     const toolsState = cloneObject(source.toolsState, createMenuToolsStateDefaults());
+    const mobileControls = normalizeMobileClassicControlSettings(source.mobileControls);
     toolsState.activeSection = VALID_LEVEL4_SECTION_SET.has(String(toolsState.activeSection || '').trim())
         ? String(toolsState.activeSection || '').trim()
         : LEVEL4_SECTION_IDS.CONTROLS;
@@ -202,6 +205,7 @@ function normalizeLocalSettingsState(localSettings = null) {
         shadowQuality: normalizeShadowQuality(source.shadowQuality, defaults.shadowQuality || DEFAULT_SHADOW_QUALITY),
         startSetup,
         toolsState,
+        mobileControls,
         draftStateBySessionType,
         telemetryState,
         eventPlaylistState,

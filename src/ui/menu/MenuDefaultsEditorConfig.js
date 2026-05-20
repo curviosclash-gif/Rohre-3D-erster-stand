@@ -2,6 +2,7 @@ import { HUNT_CONFIG } from '../../hunt/HuntConfig.js';
 import { DEFAULT_SHADOW_QUALITY } from '../../shared/contracts/ShadowQualityContract.js';
 import { createDefaultRecordingCaptureSettings } from '../../shared/contracts/RecordingCaptureContract.js';
 import { createDefaultCameraPerspectiveSettings } from '../../shared/contracts/CameraPerspectiveContract.js';
+import { DEFAULT_MOBILE_CLASSIC_CONTROLS } from '../../shared/contracts/MobileClassicControlsContract.js';
 
 export const MENU_DEFAULT_EDITOR_SCHEMA_VERSION = 'menu-default-editor.v1';
 export const MENU_DEFAULT_EVENT_PLAYLIST_ID = 'fun_rotation';
@@ -107,6 +108,7 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             level4Open: false,
             activeSection: 'controls',
         },
+        mobileControls: { ...DEFAULT_MOBILE_CLASSIC_CONTROLS },
         draftStateBySessionType: {},
         telemetryState: {
             abortCount: 0,

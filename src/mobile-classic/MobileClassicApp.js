@@ -7,6 +7,7 @@ import {
     createMobileClassicGithubUpdateConfig,
     normalizeMobileClassicUpdateConfig,
 } from './MobileClassicUpdateConfig.js';
+import { normalizeMobileClassicControlSettings } from '../shared/contracts/MobileClassicControlsContract.js';
 
 export const MOBILE_CLASSIC_APP_TARGET = 'mobile-classic';
 
@@ -52,6 +53,7 @@ export function applyMobileClassicSettings(settings = null) {
     settings.gameMode = GAME_MODE_TYPES.CLASSIC;
     settings.localSettings.sessionType = MENU_SESSION_TYPES.SINGLE;
     settings.localSettings.modePath = 'normal';
+    settings.localSettings.mobileControls = normalizeMobileClassicControlSettings(settings.localSettings.mobileControls);
     settings.gameplay.planarMode = false;
     settings.hunt.respawnEnabled = false;
 

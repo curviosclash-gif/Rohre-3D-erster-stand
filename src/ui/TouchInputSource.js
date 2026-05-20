@@ -4,6 +4,12 @@
 
 import { PlayerInputSource } from './PlayerInputSource.js';
 import { resolveInventoryActionAvailability } from '../shared/contracts/GameplayActionAvailabilityContract.js';
+import {
+    MOBILE_CLASSIC_TILT_ASSIST_MODES,
+    MOBILE_CLASSIC_TILT_PITCH_MODES,
+    normalizeMobileClassicControlSettings,
+    normalizeMobileClassicTiltSensitivity,
+} from '../shared/contracts/MobileClassicControlsContract.js';
 
 export const TOUCH_CONTROL_MODES = Object.freeze({
     JOYSTICK: 'joystick',
@@ -89,6 +95,38 @@ function applyTiltResponseCurve(axis, deadzoneAxis, curveExponent) {
     return Math.sign(axis) * curved;
 }
 
+function applyTiltSensitivity(axis, sensitivity) {
+    const scaled = axis * normalizeMobileClassicTiltSensitivity(sensitivity);
+    return clamp(scaled, -1, 1);
+}
+
+function applyTiltAssist(axis, assistMode) {
+    const magnitude = Math.abs(axis);
+    if (magnitude <= 0) return 0;
+    const mode = assistMode === MOBILE_CLASSIC_TILT_ASSIST_MODES.ARCADE
+        ? MOBILE_CLASSIC_TILT_ASSIST_MODES.ARCADE
+        : (assistMode === MOBILE_CLASSIC_TILT_ASSIST_MODES.SOFT
+            ? MOBILE_CLASSIC_TILT_ASSIST_MODES.SOFT
+            : MOBILE_CLASSIC_TILT_ASSIST_MODES.OFF);
+    if (mode === MOBILE_CLASSIC_TILT_ASSIST_MODES.OFF) return axis;
+
+    const exponent = mode === MOBILE_CLASSIC_TILT_ASSIST_MODES.ARCADE ? 0.55 : 0.72;
+    const blend = mode === MOBILE_CLASSIC_TILT_ASSIST_MODES.ARCADE ? 0.42 : 0.24;
+    const assistedMagnitude = (magnitude * (1 - blend)) + (Math.pow(magnitude, exponent) * blend);
+    return Math.sign(axis) * clamp(assistedMagnitude, 0, 1);
+}
+
+function formatAxisValue(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || Math.abs(numeric) < 0.005) return '0.00';
+    return `${numeric > 0 ? '+' : ''}${numeric.toFixed(2)}`;
+}
+
+function formatSensorHz(value) {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) && numeric > 0 ? `${numeric.toFixed(0)}Hz` : '--Hz';
+}
+
 export function deriveTiltSteeringState({
     beta = 0,
     gamma = 0,
@@ -98,6 +136,8 @@ export function deriveTiltSteeringState({
     deadzoneDeg = TILT_DEFAULT_DEADZONE_DEG,
     rangeDeg = TILT_DEFAULT_RANGE_DEG,
     curveExponent = TILT_DEFAULT_CURVE_EXPONENT,
+    sensitivity = 1,
+    assistMode = MOBILE_CLASSIC_TILT_ASSIST_MODES.OFF,
 } = {}) {
     const betaDelta = normalizeTiltDelta(beta, neutralBeta);
     const gammaDelta = normalizeTiltDelta(gamma, neutralGamma);
@@ -120,8 +160,14 @@ export function deriveTiltSteeringState({
     const deadzoneAxis = clamp(Math.max(0, Number(deadzoneDeg) || 0) / safeRange, 0, 0.95);
     const rawYawAxis = clamp(yawDeg / safeRange, -1, 1);
     const rawPitchAxis = clamp(pitchDeg / safeRange, -1, 1);
-    const yawAxis = applyTiltResponseCurve(rawYawAxis, deadzoneAxis, curveExponent);
-    const pitchAxis = applyTiltResponseCurve(rawPitchAxis, deadzoneAxis, curveExponent);
+    const yawAxis = applyTiltAssist(
+        applyTiltSensitivity(applyTiltResponseCurve(rawYawAxis, deadzoneAxis, curveExponent), sensitivity),
+        assistMode
+    );
+    const pitchAxis = applyTiltAssist(
+        applyTiltSensitivity(applyTiltResponseCurve(rawPitchAxis, deadzoneAxis, curveExponent), sensitivity),
+        assistMode
+    );
 
     return {
         yawAxis,
@@ -179,6 +225,14 @@ export class TouchInputSource extends PlayerInputSource {
         this._controlMode = options.controlMode === TOUCH_CONTROL_MODES.TILT
             ? TOUCH_CONTROL_MODES.TILT
             : TOUCH_CONTROL_MODES.JOYSTICK;
+        this._mobileControlSettings = normalizeMobileClassicControlSettings(options.mobileControls);
+        this._tiltSensitivity = normalizeMobileClassicTiltSensitivity(
+            options.tiltSensitivity ?? this._mobileControlSettings.tiltSensitivity
+        );
+        this._tiltPitchMode = this._mobileControlSettings.tiltPitchMode;
+        this._tiltAssistMode = this._mobileControlSettings.tiltAssistMode;
+        this._tiltDebugVisible = this._mobileControlSettings.tiltDebugVisible;
+        this._tiltSensorHzVisible = this._mobileControlSettings.tiltSensorHzVisible;
         this._tiltDeadzoneDeg = Math.max(1, Number(options.tiltDeadzoneDeg) || TILT_DEFAULT_DEADZONE_DEG);
         this._tiltRangeDeg = Math.max(this._tiltDeadzoneDeg + 1, Number(options.tiltRangeDeg) || TILT_DEFAULT_RANGE_DEG);
         this._tiltCurveExponent = Math.max(1, Number(options.tiltCurveExponent) || TILT_DEFAULT_CURVE_EXPONENT);
@@ -206,6 +260,8 @@ export class TouchInputSource extends PlayerInputSource {
             hasNeutral: false,
             pendingCalibration: false,
             lastEventAt: 0,
+            eventIntervalMs: 0,
+            sensorHz: 0,
         };
         this._tiltResolved = {
             yawAxis: 0,
@@ -546,11 +602,24 @@ export class TouchInputSource extends PlayerInputSource {
         if (!actionState?.showMg) this._buttons.shootMG = false;
     }
 
+    _syncMobileControlSettings() {
+        this._mobileControlSettings = normalizeMobileClassicControlSettings(
+            this._game?.settings?.localSettings?.mobileControls || this._mobileControlSettings
+        );
+        this._tiltSensitivity = this._mobileControlSettings.tiltSensitivity;
+        this._tiltPitchMode = this._mobileControlSettings.tiltPitchMode;
+        this._tiltAssistMode = this._mobileControlSettings.tiltAssistMode;
+        this._tiltDebugVisible = this._mobileControlSettings.tiltDebugVisible;
+        this._tiltSensorHzVisible = this._mobileControlSettings.tiltSensorHzVisible;
+    }
+
     poll() {
+        this._syncMobileControlSettings();
         const deadzone = 0.15;
         const jx = Math.abs(this._joystickDelta.x) > deadzone ? this._joystickDelta.x : 0;
         const jy = Math.abs(this._joystickDelta.y) > deadzone ? this._joystickDelta.y : 0;
         const tiltInput = this._resolveTiltSteeringInput();
+        const touchPitchActive = !!tiltInput && this._tiltPitchMode === MOBILE_CLASSIC_TILT_PITCH_MODES.TOUCH;
         const actionState = this._resolveActionState();
         this._syncActionButtons(actionState);
 
@@ -559,13 +628,13 @@ export class TouchInputSource extends PlayerInputSource {
         this._prevBoost = boostDown;
 
         return {
-            pitchUp: tiltInput ? tiltInput.pitchUp : jy < -deadzone,
-            pitchDown: tiltInput ? tiltInput.pitchDown : jy > deadzone,
+            pitchUp: touchPitchActive ? jy < -deadzone : (tiltInput ? tiltInput.pitchUp : jy < -deadzone),
+            pitchDown: touchPitchActive ? jy > deadzone : (tiltInput ? tiltInput.pitchDown : jy > deadzone),
             yawLeft: tiltInput ? tiltInput.yawLeft : jx < -deadzone,
             yawRight: tiltInput ? tiltInput.yawRight : jx > deadzone,
             rollLeft: false,
             rollRight: false,
-            pitchAxis: tiltInput ? -tiltInput.pitchAxis : -jy,
+            pitchAxis: touchPitchActive ? -jy : (tiltInput ? -tiltInput.pitchAxis : -jy),
             yawAxis: tiltInput ? -tiltInput.yawAxis : -jx,
             rollAxis: 0,
             boost: boostDown,
@@ -585,7 +654,10 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     _shouldShowJoystickFallback() {
-        return this._controlMode !== TOUCH_CONTROL_MODES.TILT || !this._isTiltFresh();
+        this._syncMobileControlSettings();
+        return this._controlMode !== TOUCH_CONTROL_MODES.TILT
+            || this._tiltPitchMode === MOBILE_CLASSIC_TILT_PITCH_MODES.TOUCH
+            || !this._isTiltFresh();
     }
 
     _startTiltListening({ auto = false } = {}) {
@@ -636,9 +708,20 @@ export class TouchInputSource extends PlayerInputSource {
             return;
         }
         const orientationAngle = resolveScreenOrientationAngle();
+        const now = Date.now();
+        const previousEventAt = this._tiltState.lastEventAt;
+        if (previousEventAt > 0 && now > previousEventAt) {
+            const intervalMs = now - previousEventAt;
+            this._tiltState.eventIntervalMs = this._tiltState.eventIntervalMs > 0
+                ? (this._tiltState.eventIntervalMs * 0.82) + (intervalMs * 0.18)
+                : intervalMs;
+            this._tiltState.sensorHz = this._tiltState.eventIntervalMs > 0
+                ? 1000 / this._tiltState.eventIntervalMs
+                : 0;
+        }
         this._tiltState.beta = beta;
         this._tiltState.gamma = gamma;
-        this._tiltState.lastEventAt = Date.now();
+        this._tiltState.lastEventAt = now;
         if (
             this._tiltState.hasNeutral
             && normalizeOrientationAngle(this._tiltState.neutralOrientationAngle) !== orientationAngle
@@ -708,6 +791,8 @@ export class TouchInputSource extends PlayerInputSource {
             deadzoneDeg: this._tiltDeadzoneDeg,
             rangeDeg: this._tiltRangeDeg,
             curveExponent: this._tiltCurveExponent,
+            sensitivity: this._tiltSensitivity,
+            assistMode: this._tiltAssistMode,
         });
         const blend = 1 - this._tiltSmoothing;
         this._tiltResolved.yawAxis += (next.yawAxis - this._tiltResolved.yawAxis) * blend;
@@ -738,9 +823,26 @@ export class TouchInputSource extends PlayerInputSource {
         this._tiltState.listening = false;
         this._tiltState.enabled = false;
         this._tiltState.lastEventAt = 0;
+        this._tiltState.eventIntervalMs = 0;
+        this._tiltState.sensorHz = 0;
+    }
+
+    _resolveTiltStatusText() {
+        if (this._tiltCalibration.active) return 'KALIBRIERE';
+        if (!this._isTiltFresh()) return this._tiltSensorHzVisible ? `TILT ${formatSensorHz(0)}` : 'TILT';
+        const parts = [];
+        if (this._tiltDebugVisible) {
+            parts.push(`Y ${formatAxisValue(this._tiltResolved.yawAxis)}`);
+            parts.push(`P ${formatAxisValue(this._tiltResolved.pitchAxis)}`);
+        }
+        if (this._tiltSensorHzVisible) {
+            parts.push(formatSensorHz(this._tiltState.sensorHz));
+        }
+        return parts.length > 0 ? parts.join(' ') : 'TILT SANFT';
     }
 
     _updateTiltUi() {
+        this._syncMobileControlSettings();
         if (this._containerEl) {
             this._containerEl.dataset.tiltActive = this._isTiltFresh() ? '1' : '0';
             this._containerEl.dataset.tiltPermission = this._tiltState.permission;
@@ -752,9 +854,7 @@ export class TouchInputSource extends PlayerInputSource {
                 : (this._tiltState.hasNeutral && this._isTiltFresh() ? 'NEU' : 'NEIGUNG');
         }
         if (this._tiltStatusEl) {
-            this._tiltStatusEl.textContent = this._tiltCalibration.active
-                ? 'KALIBRIERE'
-                : (this._isTiltFresh() ? 'TILT SANFT' : 'TILT');
+            this._tiltStatusEl.textContent = this._resolveTiltStatusText();
         }
         if (this._uiVisible && this._joystickEl) {
             this._joystickEl.style.display = this._shouldShowJoystickFallback() ? '' : 'none';

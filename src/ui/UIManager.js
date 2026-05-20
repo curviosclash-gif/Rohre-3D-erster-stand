@@ -33,6 +33,7 @@ import { UIStartSyncController } from './UIStartSyncController.js';
 import { UINavigationLifecycleController } from './UINavigationLifecycleController.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 import { createRuntimeSettingsLimitsForRuntime } from '../shared/contracts/SettingsRuntimeLimitsContract.js';
+import { normalizeMobileClassicControlSettings } from '../shared/contracts/MobileClassicControlsContract.js';
 function applyRangeInputLimits(input, limits) {
     if (!input || !limits || typeof limits !== 'object') return;
     if (Number.isFinite(Number(limits.min))) input.min = String(limits.min);
@@ -427,6 +428,17 @@ export class UIManager {
         const gp = settings.gameplay;
         const runtimeConfig = this._getGameplayConfig();
         const runtimeLimits = this._runtimeSettingLimits;
+        const mobileControls = normalizeMobileClassicControlSettings(settings?.localSettings?.mobileControls);
+        if (ui.mobileTiltSensitivitySlider) {
+            ui.mobileTiltSensitivitySlider.value = String(Math.round(mobileControls.tiltSensitivity * 100));
+        }
+        if (ui.mobileTiltSensitivityLabel) {
+            ui.mobileTiltSensitivityLabel.textContent = `${Math.round(mobileControls.tiltSensitivity * 100)}%`;
+        }
+        if (ui.mobileTiltAssistSelect) ui.mobileTiltAssistSelect.value = mobileControls.tiltAssistMode;
+        if (ui.mobileTiltPitchModeSelect) ui.mobileTiltPitchModeSelect.value = mobileControls.tiltPitchMode;
+        if (ui.mobileTiltDebugToggle) ui.mobileTiltDebugToggle.checked = !!mobileControls.tiltDebugVisible;
+        if (ui.mobileTiltSensorHzToggle) ui.mobileTiltSensorHzToggle.checked = !!mobileControls.tiltSensorHzVisible;
         syncRangeInput(ui.speedSlider, gp.speed, runtimeLimits.gameplay.speed, gp.speed);
         ui.speedLabel.textContent = `${gp.speed} m/s`;
         syncRangeInput(ui.turnSlider, gp.turnSensitivity, runtimeLimits.gameplay.turnSensitivity, gp.turnSensitivity);

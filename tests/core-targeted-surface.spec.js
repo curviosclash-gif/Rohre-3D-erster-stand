@@ -2576,7 +2576,7 @@ test('T20x3: Ghost-Selbstduell spielt in Single-Normal und Single-Arcade und per
             };
         });
 
-        expect(level4State.tabCount).toBe(4);
+        expect(level4State.tabCount).toBe(5);
         expect(level4State.activeSection).toBe('tools');
         expect(level4State.drawerOverflow).toBeLessThanOrEqual(4);
         expect(level4State.stackOverflow).toBeLessThanOrEqual(4);
