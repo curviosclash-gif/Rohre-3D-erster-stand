@@ -54,6 +54,7 @@
     "app:classic:android:open": "node scripts/capacitor-mobile-classic.mjs open",
     "app:classic:android:apk": "node scripts/capacitor-mobile-classic.mjs apk",
     "app:classic:android:install": "node scripts/capacitor-mobile-classic.mjs install",
+    "app:classic:android:update:github": "node scripts/update-mobile-classic-from-github.mjs",
     "app:start:build": "npm run app:start",
     "app:package": "npm run build:app && npm --prefix electron run build",
     "lint:architecture": "eslint src --max-warnings 29",

@@ -45,8 +45,11 @@ async function runCapacitor(args, timeout = 180_000) {
 }
 
 async function runGradle(args, timeout = 900_000) {
-  const gradleCommand = process.platform === 'win32' ? 'gradlew.bat' : './gradlew';
-  await execFile(path.join(androidRoot, gradleCommand), args, {
+  const command = process.platform === 'win32' ? 'cmd.exe' : path.join(androidRoot, './gradlew');
+  const commandArgs = process.platform === 'win32'
+    ? ['/d', '/s', '/c', 'gradlew.bat', ...args]
+    : args;
+  await execFile(command, commandArgs, {
     cwd: androidRoot,
     env: commandEnv,
     windowsHide: true,

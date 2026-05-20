@@ -29,5 +29,18 @@ Build and install a debug APK on the connected Android device:
 npm run app:classic:android:install
 ```
 
+Update the connected phone from the configured GitHub remote:
+
+```bash
+npm run app:classic:android:update:github
+```
+
+The updater accepts `--remote <name>` and `--branch <name>`. It only fast-forwards
+from a GitHub remote and refuses to pull when the working tree has uncommitted
+changes, then rebuilds, installs, and launches `de.curviosclash.classic`.
+
 The native project lives in `android-classic`; the shipped web bundle is
 `dist/mobile-classic`. The app icon source is `tools/mobile-classic-app/assets/icon-source.png`.
+The mobile menu also reads `mobile-classic.manifest.json` and offers a compact
+GitHub release check. Set `CURVIOS_CLASSIC_APP_GITHUB_REPOSITORY` when building
+from a fork.
