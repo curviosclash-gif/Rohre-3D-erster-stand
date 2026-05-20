@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-20T01:01:22.131Z",
+  "timestamp": "2026-05-20T11:18:40.967Z",
   "locks": [
     {
       "block_id": "V103",
@@ -557,10 +557,36 @@
       "target_completion": "2026-05-18",
       "status": "completed",
       "notes": ""
+    },
+    {
+      "block_id": "V112",
+      "phase": "112.3",
+      "scope_files": [
+        "src/core/InputManager.js",
+        "src/entities/systems/CollisionResponseSystem.js",
+        "src/entities/systems/lifecycle/PlayerCollisionPhase.js",
+        "src/core/arcade/ArcadeRunRuntime.js",
+        "src/modes/ArcadeModeStrategy.js",
+        "src/ui/start-setup/StartSetupUiOps.js",
+        "src/ui/MatchFlowArcadeOverlayController.js",
+        "style.css",
+        "electron/static-server.cjs",
+        "package.json",
+        ".agents/test_mapping.md",
+        "tests/core.spec.js",
+        "tests/core-targeted-surface.spec.js",
+        "tests/core-targeted-runtime.spec.js",
+        "tests/core-targeted-platform.spec.js",
+        "tests/helpers.js"
+      ],
+      "start_date": "2026-05-20",
+      "target_completion": "2026-05-20",
+      "status": "in-progress",
+      "notes": ""
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "112.2",
+    "phase_id": "112.3",
     "completed_items": [],
     "last_commit": ""
   }

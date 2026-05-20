@@ -2313,6 +2313,216 @@ test('T20x3: Ghost-Selbstduell spielt in Single-Normal und Single-Arcade und per
         await returnToMenu(page);
     });
 
+    test('T20an: Start-Setup und Arcade-Overlay behandeln datennahe Markup-Werte als Text', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page);
+
+        const result = await page.evaluate(() => {
+            const payload = '<img src=x onerror="window.__v112Injected=true"><script>window.__v112Script=true</script>';
+            window.__v112Injected = false;
+            window.__v112Script = false;
+
+            const game = window.GAME_INSTANCE;
+            const startSync = game?.uiManager?._startSync;
+            const settings = game?.settings;
+            if (!game || !startSync || !settings?.localSettings) {
+                return { missingRuntime: true };
+            }
+
+            settings.mapKey = payload;
+            settings.vehicles = {
+                ...(settings.vehicles || {}),
+                PLAYER_1: payload,
+                PLAYER_2: payload,
+            };
+            settings.localSettings.startSetup = {
+                ...(settings.localSettings.startSetup || {}),
+                favoriteMaps: [payload],
+                recentMaps: [payload],
+                favoriteVehicles: [payload],
+                recentVehicles: [payload],
+                mapSearch: '',
+                mapFilter: 'all',
+                vehicleSearch: '',
+                vehicleFilter: 'all',
+                arcadeGhostDuelMode: 'off',
+                arcadeGhostTrailCollisionEnabled: false,
+                modeSelections: {
+                    normal: {
+                        mapKey: payload,
+                        vehicles: {
+                            PLAYER_1: payload,
+                            PLAYER_2: payload,
+                        },
+                    },
+                },
+            };
+            startSync._getRuntimeMaps = () => ({
+                [payload]: {
+                    name: payload,
+                    size: [80, 30, 80],
+                    obstacles: [],
+                    portals: [],
+                    gates: [],
+                    items: [],
+                    aircraft: [],
+                },
+            });
+            startSync._mapPreviewEntries = [{
+                key: payload,
+                name: payload,
+                sizeText: payload,
+                obstacleCount: 0,
+                portalCount: 0,
+                gateCount: 0,
+                tunnelCount: 0,
+                spawnCount: 0,
+                itemAnchorCount: 0,
+                aircraftCount: 0,
+                portalLevelCount: 0,
+                category: payload,
+                hasGlbModel: false,
+                usesFallbackColliders: false,
+                renderMode: payload,
+            }];
+            startSync._vehiclePreviewEntries = [{
+                id: payload,
+                label: payload,
+                hitboxRadius: 1.1,
+                category: payload,
+            }];
+            game.uiManager.syncStartSetupState(settings, {
+                surfacePolicy: { productSurfaceId: 'desktop-app' },
+                surfaceMenuState: {
+                    sessionType: 'single',
+                    modePath: 'normal',
+                    mapKey: payload,
+                },
+                multiplayerSessionState: {
+                    joined: false,
+                    connected: false,
+                    readyCount: 0,
+                    memberCount: 0,
+                },
+            });
+
+            const controller = game?.matchFlowUiController?.arcadeOverlayController;
+            if (!controller || typeof controller._renderArcadeIntermissionPanel !== 'function') {
+                return { missingOverlayController: true };
+            }
+
+            controller._renderArcadeIntermissionPanel({
+                intermission: {
+                    nextSectorIndex: 2,
+                    lastSectorPoints: 1300,
+                    lastSectorXp: 240,
+                    missionsCompleted: 1,
+                    missionsTotal: 3,
+                    selectedChoiceId: payload,
+                    selectedRewardId: payload,
+                    nextSectorPreview: {
+                        mapLabel: payload,
+                        modifierLabel: payload,
+                        modifierEffect: payload,
+                    },
+                    choices: [{
+                        id: payload,
+                        mapLabel: payload,
+                        modifierLabel: payload,
+                        modifierEffect: payload,
+                    }],
+                    rewardChoices: [{
+                        id: payload,
+                        label: payload,
+                        effectText: payload,
+                    }],
+                },
+            });
+            const overlayRoot = document.getElementById('arcade-overlay-panel');
+            const intermissionText = overlayRoot.textContent || '';
+            const intermissionHtml = overlayRoot.innerHTML || '';
+
+            controller._renderArcadePostRunPanel({
+                postRunSummary: {
+                    score: 1800,
+                    bestCombo: 5,
+                    missionCompletionRate: 0.5,
+                    xpEarned: 120,
+                    peakMultiplier: 2,
+                    xpAnimation: { durationMs: 260 },
+                    scorePerSector: [{
+                        sectorIndex: 1,
+                        mapKey: payload,
+                        awardedPoints: 900,
+                    }],
+                },
+                replay: {
+                    playbackAvailable: false,
+                    payloadAvailable: true,
+                },
+            });
+            const postRunText = overlayRoot.textContent || '';
+            const postRunHtml = overlayRoot.innerHTML || '';
+
+            const startRoots = [
+                document.getElementById('menu-selection-summary'),
+                document.getElementById('map-preview'),
+                document.getElementById('vehicle-preview-p1'),
+                document.getElementById('vehicle-preview-p2'),
+                document.getElementById('map-favorites-list'),
+                document.getElementById('map-recent-list'),
+                document.getElementById('vehicle-favorites-list'),
+                document.getElementById('vehicle-recent-list'),
+            ].filter(Boolean);
+            const dangerousSelector = 'img,script,svg,iframe,object';
+            const renderedNodes = [
+                ...startRoots.flatMap((root) => Array.from(root.querySelectorAll('*'))),
+                ...Array.from(overlayRoot.querySelectorAll('*')),
+            ];
+            const eventHandlerAttributeCount = renderedNodes.reduce((count, node) => {
+                return count + Array.from(node.attributes || [])
+                    .filter((attribute) => /^on/i.test(attribute.name))
+                    .length;
+            }, 0);
+            const quickButton = document.querySelector('#map-favorites-list button');
+            const startText = startRoots.map((root) => root.textContent || '').join('\n');
+            const startHtml = startRoots.map((root) => root.innerHTML || '').join('\n');
+
+            const evidence = {
+                dangerousNodeCount:
+                    startRoots.reduce((count, root) => count + root.querySelectorAll(dangerousSelector).length, 0)
+                    + overlayRoot.querySelectorAll(dangerousSelector).length,
+                eventHandlerAttributeCount,
+                startTextIncludesPayload: startText.includes(payload),
+                intermissionTextIncludesPayload: intermissionText.includes(payload),
+                postRunTextIncludesPayload: postRunText.includes(payload),
+                startHtmlEscaped: startHtml.includes('&lt;img'),
+                intermissionHtmlEscaped: intermissionHtml.includes('&lt;img'),
+                postRunHtmlEscaped: postRunHtml.includes('&lt;img'),
+                quickDatasetPreserved: quickButton?.dataset?.mapKey === payload,
+                scriptExecuted: window.__v112Injected === true || window.__v112Script === true,
+            };
+
+            controller.dispose();
+            delete window.__v112Injected;
+            delete window.__v112Script;
+            return evidence;
+        });
+
+        expect(result.missingRuntime).toBeFalsy();
+        expect(result.missingOverlayController).toBeFalsy();
+        expect(result.dangerousNodeCount).toBe(0);
+        expect(result.eventHandlerAttributeCount).toBe(0);
+        expect(result.startTextIncludesPayload).toBeTruthy();
+        expect(result.intermissionTextIncludesPayload).toBeTruthy();
+        expect(result.postRunTextIncludesPayload).toBeTruthy();
+        expect(result.startHtmlEscaped).toBeTruthy();
+        expect(result.intermissionHtmlEscaped).toBeTruthy();
+        expect(result.postRunHtmlEscaped).toBeTruthy();
+        expect(result.quickDatasetPreserved).toBeTruthy();
+        expect(result.scriptExecuted).toBeFalsy();
+    });
+
     test('T20y: Sticky Startleiste bleibt sichtbar und nutzt strukturierte Summary-Bloecke', async ({ page }) => {
         await loadGame(page);
         await openGameSubmenu(page);

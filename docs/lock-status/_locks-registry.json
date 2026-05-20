@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T01:01:45.001Z",
+  "generated_at": "2026-05-20T11:18:57.216Z",
   "locks": [
     {
       "person": "codex",
@@ -574,6 +574,33 @@
       "start_date": "2026-05-18",
       "target_completion": "2026-05-18",
       "status": "completed",
+      "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V112",
+      "phase": "112.3",
+      "scope_files": [
+        "src/core/InputManager.js",
+        "src/entities/systems/CollisionResponseSystem.js",
+        "src/entities/systems/lifecycle/PlayerCollisionPhase.js",
+        "src/core/arcade/ArcadeRunRuntime.js",
+        "src/modes/ArcadeModeStrategy.js",
+        "src/ui/start-setup/StartSetupUiOps.js",
+        "src/ui/MatchFlowArcadeOverlayController.js",
+        "style.css",
+        "electron/static-server.cjs",
+        "package.json",
+        ".agents/test_mapping.md",
+        "tests/core.spec.js",
+        "tests/core-targeted-surface.spec.js",
+        "tests/core-targeted-runtime.spec.js",
+        "tests/core-targeted-platform.spec.js",
+        "tests/helpers.js"
+      ],
+      "start_date": "2026-05-20",
+      "target_completion": "2026-05-20",
+      "status": "in-progress",
       "notes": ""
     }
   ],
