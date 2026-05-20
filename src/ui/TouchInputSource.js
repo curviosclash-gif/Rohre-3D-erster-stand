@@ -10,8 +10,12 @@ export const TOUCH_CONTROL_MODES = Object.freeze({
     TILT: 'tilt',
 });
 
-const TILT_DEFAULT_DEADZONE_DEG = 6;
-const TILT_DEFAULT_RANGE_DEG = 24;
+const TILT_DEFAULT_DEADZONE_DEG = 8;
+const TILT_DEFAULT_RANGE_DEG = 34;
+const TILT_DEFAULT_CURVE_EXPONENT = 1.35;
+const TILT_DEFAULT_SMOOTHING = 0.58;
+const TILT_DEFAULT_PRESS_THRESHOLD = 0.14;
+const TILT_DEFAULT_RELEASE_THRESHOLD = 0.06;
 const TILT_EVENT_STALE_MS = 1600;
 
 function clamp(value, min, max) {
@@ -30,6 +34,15 @@ function normalizeTiltDelta(rawValue = 0, neutralValue = 0) {
     return delta;
 }
 
+function applyTiltResponseCurve(axis, deadzoneAxis, curveExponent) {
+    const absAxis = Math.abs(axis);
+    if (absAxis <= deadzoneAxis) return 0;
+    const safeRange = Math.max(0.0001, 1 - deadzoneAxis);
+    const normalized = clamp((absAxis - deadzoneAxis) / safeRange, 0, 1);
+    const curved = Math.pow(normalized, Math.max(1, Number(curveExponent) || TILT_DEFAULT_CURVE_EXPONENT));
+    return Math.sign(axis) * curved;
+}
+
 export function deriveTiltSteeringState({
     beta = 0,
     gamma = 0,
@@ -38,6 +51,7 @@ export function deriveTiltSteeringState({
     orientationAngle = 0,
     deadzoneDeg = TILT_DEFAULT_DEADZONE_DEG,
     rangeDeg = TILT_DEFAULT_RANGE_DEG,
+    curveExponent = TILT_DEFAULT_CURVE_EXPONENT,
 } = {}) {
     const betaDelta = normalizeTiltDelta(beta, neutralBeta);
     const gammaDelta = normalizeTiltDelta(gamma, neutralGamma);
@@ -58,16 +72,20 @@ export function deriveTiltSteeringState({
 
     const safeRange = Math.max(1, Number(rangeDeg) || TILT_DEFAULT_RANGE_DEG);
     const deadzoneAxis = clamp(Math.max(0, Number(deadzoneDeg) || 0) / safeRange, 0, 0.95);
-    const yawAxis = clamp(yawDeg / safeRange, -1, 1);
-    const pitchAxis = clamp(pitchDeg / safeRange, -1, 1);
+    const rawYawAxis = clamp(yawDeg / safeRange, -1, 1);
+    const rawPitchAxis = clamp(pitchDeg / safeRange, -1, 1);
+    const yawAxis = applyTiltResponseCurve(rawYawAxis, deadzoneAxis, curveExponent);
+    const pitchAxis = applyTiltResponseCurve(rawPitchAxis, deadzoneAxis, curveExponent);
 
     return {
         yawAxis,
         pitchAxis,
-        pitchUp: pitchAxis < -deadzoneAxis,
-        pitchDown: pitchAxis > deadzoneAxis,
-        yawLeft: yawAxis < -deadzoneAxis,
-        yawRight: yawAxis > deadzoneAxis,
+        rawYawAxis,
+        rawPitchAxis,
+        pitchUp: pitchAxis < 0,
+        pitchDown: pitchAxis > 0,
+        yawLeft: yawAxis < 0,
+        yawRight: yawAxis > 0,
     };
 }
 
@@ -110,6 +128,18 @@ export class TouchInputSource extends PlayerInputSource {
             : TOUCH_CONTROL_MODES.JOYSTICK;
         this._tiltDeadzoneDeg = Math.max(1, Number(options.tiltDeadzoneDeg) || TILT_DEFAULT_DEADZONE_DEG);
         this._tiltRangeDeg = Math.max(this._tiltDeadzoneDeg + 1, Number(options.tiltRangeDeg) || TILT_DEFAULT_RANGE_DEG);
+        this._tiltCurveExponent = Math.max(1, Number(options.tiltCurveExponent) || TILT_DEFAULT_CURVE_EXPONENT);
+        this._tiltSmoothing = clamp(Number(options.tiltSmoothing) || TILT_DEFAULT_SMOOTHING, 0, 0.95);
+        this._tiltPressThreshold = clamp(
+            Number(options.tiltPressThreshold) || TILT_DEFAULT_PRESS_THRESHOLD,
+            0.01,
+            0.95
+        );
+        this._tiltReleaseThreshold = clamp(
+            Number(options.tiltReleaseThreshold) || TILT_DEFAULT_RELEASE_THRESHOLD,
+            0,
+            this._tiltPressThreshold
+        );
         this._joystickCenter = null;
         this._joystickDelta = { x: 0, y: 0 };
         this._joystickActive = false;
@@ -127,6 +157,12 @@ export class TouchInputSource extends PlayerInputSource {
             hasNeutral: false,
             pendingCalibration: false,
             lastEventAt: 0,
+        };
+        this._tiltResolved = {
+            yawAxis: 0,
+            pitchAxis: 0,
+            yawDirection: 0,
+            pitchDirection: 0,
         };
 
         this._buttons = {
@@ -482,6 +518,9 @@ export class TouchInputSource extends PlayerInputSource {
             yawRight: tiltInput ? tiltInput.yawRight : jx > deadzone,
             rollLeft: false,
             rollRight: false,
+            pitchAxis: tiltInput ? -tiltInput.pitchAxis : -jy,
+            yawAxis: tiltInput ? -tiltInput.yawAxis : -jx,
+            rollAxis: 0,
             boost: boostDown,
             boostPressed,
             cameraSwitch: false,
@@ -557,6 +596,10 @@ export class TouchInputSource extends PlayerInputSource {
             this._tiltState.neutralGamma = gamma;
             this._tiltState.hasNeutral = true;
             this._tiltState.pendingCalibration = false;
+            this._tiltResolved.yawAxis = 0;
+            this._tiltResolved.pitchAxis = 0;
+            this._tiltResolved.yawDirection = 0;
+            this._tiltResolved.pitchDirection = 0;
         }
         this._updateTiltUi();
     }
@@ -564,9 +607,13 @@ export class TouchInputSource extends PlayerInputSource {
     _resolveTiltSteeringInput() {
         if (this._controlMode !== TOUCH_CONTROL_MODES.TILT) return null;
         if (!this._tiltState.enabled || !this._tiltState.hasNeutral || !this._isTiltFresh()) {
+            this._tiltResolved.yawAxis = 0;
+            this._tiltResolved.pitchAxis = 0;
+            this._tiltResolved.yawDirection = 0;
+            this._tiltResolved.pitchDirection = 0;
             return null;
         }
-        return deriveTiltSteeringState({
+        const next = deriveTiltSteeringState({
             beta: this._tiltState.beta,
             gamma: this._tiltState.gamma,
             neutralBeta: this._tiltState.neutralBeta,
@@ -574,7 +621,48 @@ export class TouchInputSource extends PlayerInputSource {
             orientationAngle: resolveScreenOrientationAngle(),
             deadzoneDeg: this._tiltDeadzoneDeg,
             rangeDeg: this._tiltRangeDeg,
+            curveExponent: this._tiltCurveExponent,
         });
+        const blend = 1 - this._tiltSmoothing;
+        this._tiltResolved.yawAxis += (next.yawAxis - this._tiltResolved.yawAxis) * blend;
+        this._tiltResolved.pitchAxis += (next.pitchAxis - this._tiltResolved.pitchAxis) * blend;
+
+        this._tiltResolved.yawDirection = this._resolveTiltDirection(
+            this._tiltResolved.yawAxis,
+            this._tiltResolved.yawDirection
+        );
+        this._tiltResolved.pitchDirection = this._resolveTiltDirection(
+            this._tiltResolved.pitchAxis,
+            this._tiltResolved.pitchDirection
+        );
+
+        const yawAxis = Math.abs(this._tiltResolved.yawAxis) <= this._tiltReleaseThreshold
+            ? 0
+            : this._tiltResolved.yawAxis;
+        const pitchAxis = Math.abs(this._tiltResolved.pitchAxis) <= this._tiltReleaseThreshold
+            ? 0
+            : this._tiltResolved.pitchAxis;
+
+        return {
+            ...next,
+            yawAxis,
+            pitchAxis,
+            yawLeft: this._tiltResolved.yawDirection < 0,
+            yawRight: this._tiltResolved.yawDirection > 0,
+            pitchUp: this._tiltResolved.pitchDirection < 0,
+            pitchDown: this._tiltResolved.pitchDirection > 0,
+        };
+    }
+
+    _resolveTiltDirection(axis, previousDirection) {
+        const magnitude = Math.abs(axis);
+        if (magnitude >= this._tiltPressThreshold) {
+            return Math.sign(axis);
+        }
+        if (magnitude <= this._tiltReleaseThreshold) {
+            return 0;
+        }
+        return previousDirection;
     }
 
     _stopTiltListening() {
@@ -595,7 +683,7 @@ export class TouchInputSource extends PlayerInputSource {
             this._tiltButtonEl.dataset.active = this._isTiltFresh() ? '1' : '0';
         }
         if (this._tiltStatusEl) {
-            this._tiltStatusEl.textContent = this._isTiltFresh() ? 'TILT AKTIV' : 'TILT';
+            this._tiltStatusEl.textContent = this._isTiltFresh() ? 'TILT SANFT' : 'TILT';
         }
         if (this._uiVisible && this._joystickEl) {
             this._joystickEl.style.display = this._shouldShowJoystickFallback() ? '' : 'none';

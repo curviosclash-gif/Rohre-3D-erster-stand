@@ -22,6 +22,7 @@ import {
   deriveTiltSteeringState,
   TOUCH_CONTROL_MODES,
 } from '../src/ui/TouchInputSource.js';
+import { PlayerController } from '../src/entities/player/PlayerController.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -178,6 +179,44 @@ test('Mobile Classic tilt steering maps calibrated device orientation', () => {
   assert.equal(landscapeRight.yawRight, true);
 });
 
+test('Mobile Classic tilt steering uses soft analog axes for phone control', () => {
+  const centered = deriveTiltSteeringState({
+    neutralBeta: 20,
+    neutralGamma: 0,
+    beta: 23,
+    gamma: 4,
+  });
+  assert.equal(centered.pitchAxis, 0);
+  assert.equal(centered.yawAxis, 0);
+
+  const softRight = deriveTiltSteeringState({
+    neutralBeta: 20,
+    neutralGamma: 0,
+    beta: 20,
+    gamma: 18,
+  });
+  assert.equal(softRight.yawRight, true);
+  assert.ok(softRight.yawAxis > 0);
+  assert.ok(softRight.yawAxis < 0.35);
+
+  const controller = new PlayerController();
+  const control = controller.resolveControlState(
+    { controlRampEnabled: false },
+    {
+      pitchAxis: 0.35,
+      yawAxis: -0.5,
+      rollAxis: 0.2,
+      boost: false,
+      boostPressed: false,
+    },
+    false,
+    1 / 60,
+  );
+  assert.equal(control.pitchInput, 0.35);
+  assert.equal(control.yawInput, -0.5);
+  assert.equal(control.rollInput, 0.2);
+});
+
 test('Mobile Classic scripts build, wrap, and validate the phone app path', async () => {
   const packageJson = await readJson('package.json');
   const buildScript = await readText('scripts/build-mobile-classic-app.mjs');
@@ -185,6 +224,7 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   const updateScript = await readText('scripts/update-mobile-classic-from-github.mjs');
   const mobileClassicApp = await readText('src/mobile-classic/MobileClassicApp.js');
   const matchInputResolver = await readText('src/ui/MatchInputSourceResolver.js');
+  const touchInputSource = await readText('src/ui/TouchInputSource.js');
   const readme = await readText('tools/mobile-classic-app/README.md');
 
   assert.equal(packageJson.scripts['app:classic:android:build'], 'node scripts/build-mobile-classic-app.mjs');
@@ -210,8 +250,10 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.match(mobileClassicApp, /mobile-classic-update-check/);
   assert.match(mobileClassicApp, /checkMobileClassicGithubRelease/);
   assert.match(mobileClassicApp, /mobile-classic\.manifest\.json/);
+  assert.match(touchInputSource, /TILT SANFT/);
   assert.match(readme, /app:classic:android:update:github/);
   assert.equal(TOUCH_CONTROL_MODES.TILT, 'tilt');
+  assert.match(matchInputResolver, /pitchAxis/);
   assert.match(matchInputResolver, /TOUCH_CONTROL_MODES\.TILT/);
   assert.match(matchInputResolver, /_mobileClassicAppTarget/);
 });

@@ -4,6 +4,13 @@ function axisInput(positive, negative) {
     return (positive ? 1 : 0) - (negative ? 1 : 0);
 }
 
+function resolveInputAxis(input, axisKey, positiveKey, negativeKey) {
+    const axisValue = Number(input?.[axisKey]);
+    return Number.isFinite(axisValue)
+        ? axisValue
+        : axisInput(input?.[positiveKey], input?.[negativeKey]);
+}
+
 function clampAxis(value) {
     if (!Number.isFinite(value)) return 0;
     if (value > 1) return 1;
@@ -91,9 +98,9 @@ export class PlayerController {
 
         const hasDirectInput = !!input && steeringLocked !== true;
         if (hasDirectInput) {
-            pitchTarget = axisInput(input.pitchUp, input.pitchDown);
-            yawTarget = axisInput(input.yawLeft, input.yawRight);
-            rollTarget = axisInput(input.rollLeft, input.rollRight);
+            pitchTarget = resolveInputAxis(input, 'pitchAxis', 'pitchUp', 'pitchDown');
+            yawTarget = resolveInputAxis(input, 'yawAxis', 'yawLeft', 'yawRight');
+            rollTarget = resolveInputAxis(input, 'rollAxis', 'rollLeft', 'rollRight');
             boostHeld = !!input.boost;
             boostPressed = !!input.boostPressed;
 
