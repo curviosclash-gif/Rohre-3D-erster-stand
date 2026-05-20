@@ -23,8 +23,8 @@ npm run app:classic:android:sync
 npm run app:classic:android:open
 ```
 
-Check that the Android public assets still match the latest `dist/mobile-classic`
-bundle:
+Refresh and check that the Android public assets match the latest
+`dist/mobile-classic` bundle:
 
 ```bash
 npm run app:classic:android:assets:check

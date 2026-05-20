@@ -358,6 +358,8 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.match(capacitorScript, /tools', 'mobile-classic-app'/);
   assert.match(capacitorScript, /@capacitor', 'cli', 'bin', 'capacitor'/);
   assert.match(capacitorScript, /check-assets/);
+  assert.match(capacitorScript, /cleanAndroidPublicAssets/);
+  assert.match(capacitorScript, /copy', 'android'/);
   assert.match(capacitorScript, /verifyAndroidAssetsFresh/);
   assert.match(capacitorScript, /ANDROID_HOME/);
   assert.match(capacitorScript, /cmd\.exe/);

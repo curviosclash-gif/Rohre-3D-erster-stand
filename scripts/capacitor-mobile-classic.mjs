@@ -16,6 +16,7 @@ const capacitorCli = path.join(repoRoot, 'node_modules', '@capacitor', 'cli', 'b
 const appId = 'de.curviosclash.classic';
 const debugApkPath = path.join(androidRoot, 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk');
 const androidGeneratedAssets = new Set(['cordova.js', 'cordova_plugins.js']);
+const androidCopyActions = new Set(['copy', 'sync', 'apk', 'install', 'check-assets']);
 
 const action = String(process.argv[2] || 'sync').trim().toLowerCase();
 const defaultAndroidSdk = process.env.LOCALAPPDATA
@@ -75,6 +76,15 @@ async function runAdb(args, timeout = 180_000) {
   });
 }
 
+async function pathExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function listFiles(rootDir) {
   const files = [];
   async function walk(currentDir) {
@@ -90,6 +100,16 @@ async function listFiles(rootDir) {
   }
   await walk(rootDir);
   return files.sort();
+}
+
+async function cleanAndroidPublicAssets() {
+  if (!await pathExists(androidPublicDir)) {
+    return;
+  }
+  const files = await listFiles(androidPublicDir);
+  await Promise.all(files
+    .filter((file) => !androidGeneratedAssets.has(file))
+    .map((file) => fs.rm(path.join(androidPublicDir, file), { force: true })));
 }
 
 async function hashFile(filePath) {
@@ -146,9 +166,14 @@ async function main() {
     await runNodeScript('scripts/build-mobile-classic-app.mjs');
   }
 
+  if (androidCopyActions.has(action)) {
+    await cleanAndroidPublicAssets();
+  }
+
   if (action === 'add') {
     await runCapacitor(['add', 'android'], 240_000);
   } else if (action === 'check-assets') {
+    await runCapacitor(['copy', 'android']);
     await verifyAndroidAssetsFresh();
   } else if (action === 'copy') {
     await runCapacitor(['copy', 'android']);
