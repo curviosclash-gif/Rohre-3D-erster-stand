@@ -406,6 +406,13 @@ export class ArcadeRunRuntime {
         try { strategy.applyVehicleUpgrades?.(null); } catch { /* no-op */ }
     }
 
+    _resolveActiveRunSeed(config = null) {
+        return Math.max(0, toSafeInt(
+            config?.seed ?? this._state?.config?.seed ?? this._config?.seed,
+            0
+        ));
+    }
+
     setActiveVehicle(vehicleId) {
         this._activeVehicleId = String(vehicleId || 'ship1');
     }
@@ -884,6 +891,7 @@ export class ArcadeRunRuntime {
         const runConfig = options.seed != null
             ? { ...this._config, seed: toSafeNumber(options.seed, this._config.seed) }
             : this._config;
+        const activeRunSeed = this._resolveActiveRunSeed(runConfig);
         this._state = createArcadeRunState({
             config: runConfig,
             records: this._records,
@@ -914,7 +922,7 @@ export class ArcadeRunRuntime {
         // Resolve map sequence from encounter plan if available
         if (options.encounterPlan) {
             const runtimeMapCatalog = getRuntimeMapCatalog();
-            const mapSequence = resolveMapSequence(options.encounterPlan, runConfig.seed, runtimeMapCatalog);
+            const mapSequence = resolveMapSequence(options.encounterPlan, activeRunSeed, runtimeMapCatalog);
             this._state.mapSequence = mapSequence;
             if (mapSequence.length > 0) {
                 this._state.currentMapKey = mapSequence[0];
@@ -1045,7 +1053,7 @@ export class ArcadeRunRuntime {
         const mapMissions = Array.isArray(mapDefinition?.missions) && mapDefinition.missions.length > 0
             ? mapDefinition.missions
             : null;
-        const seedSource = this._state?.config?.seed ?? this._config?.seed ?? 0;
+        const seedSource = this._resolveActiveRunSeed();
         const missions = assignSectorMissions(
             planEntry,
             mapMissions,

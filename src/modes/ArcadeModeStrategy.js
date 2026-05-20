@@ -69,11 +69,19 @@ export class ArcadeModeStrategy extends GameModeContract {
 
     // --- Lifecycle (V84 / 84.3.2) ---
     bootstrap(_context) {
-        this._roundScores = {};
+        this._resetRunTransientState();
     }
 
     cleanup(_context) {
+        this._resetRunTransientState();
+    }
+
+    _resetRunTransientState() {
         this._roundScores = {};
+        this.exitSuddenDeath();
+        this.setActiveModifier(null);
+        this.setSectorType(null);
+        this.applyVehicleUpgrades(null);
     }
 
     /**

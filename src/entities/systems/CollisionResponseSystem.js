@@ -22,6 +22,18 @@ const DEFAULT_FOAM_BOUNCE_OPTIONS = Object.freeze({
     spawnProtection: 0.16,
 });
 
+function readBounceRandom(owner, options = {}) {
+    const random = typeof options.random === 'function'
+        ? options.random
+        : owner?.runtimeRng?.next;
+    if (typeof random !== 'function') return 0.5;
+    const value = Number(random());
+    if (!Number.isFinite(value)) return 0.5;
+    if (value <= 0) return 0;
+    if (value >= 1) return 0.999999999;
+    return value;
+}
+
 export class CollisionResponseSystem {
     constructor(owner, spawnPlacementSystem = null) {
         this.owner = owner || null;
@@ -83,9 +95,11 @@ export class CollisionResponseSystem {
         const randomScale = Number.isFinite(options.randomScale)
             ? options.randomScale
             : (source === 'TRAIL' ? 0.35 : 0.24);
-        owner._tmpDir.x += (Math.random() - 0.5) * randomScale;
-        owner._tmpDir.y += (Math.random() - 0.5) * randomScale;
-        owner._tmpDir.z += (Math.random() - 0.5) * randomScale;
+        if (randomScale > 0) {
+            owner._tmpDir.x += (readBounceRandom(owner, options) - 0.5) * randomScale;
+            owner._tmpDir.y += (readBounceRandom(owner, options) - 0.5) * randomScale;
+            owner._tmpDir.z += (readBounceRandom(owner, options) - 0.5) * randomScale;
+        }
         if (resolveGameplayConfig(owner).GAMEPLAY.PLANAR_MODE) owner._tmpDir.y = 0;
 
         owner._tmpDir.normalize();
