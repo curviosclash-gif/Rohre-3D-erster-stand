@@ -548,105 +548,133 @@ Route-IDs duerfen nach ersten produktiven Ghosts nur noch mit Migration geaender
 
 ## Definition of Done
 
-- [ ] DoD.1 Mindestens sechs neue Parcours-Presets sind im Desktop-Runtime-Katalog vorhanden und haben stabile Map-Keys, Namen, `parcours.enabled`, `routeId`, Regeln, Checkpoints, Finish, Player-Spawn, Bot-Spawns und Item-Anchor.
-- [ ] DoD.2 Jede MVP-Map hat eine eigene Skill-Rolle; reine Varianten derselben Geometrie zaehlen nicht als erledigte Map-Varianz.
-- [ ] DoD.3 Jede neue Route ist per Contract-Smoke validiert: acyclische Checkpoint-Reihenfolge, gueltige Branch-Merges, keine leeren Checkpoint-Listen, Finish vorhanden, Radius-/Segmentwerte plausibel.
-- [ ] DoD.4 Ghost-/Leaderboard-Vertraege bleiben stabil: Jede Route nutzt eindeutige `routeId`, und Ghost-Selbstduell kann pro Route unterscheiden.
-- [ ] DoD.5 Arcade-Sektorpool wird bewusst erweitert, ohne Langrouten frueh oder zu haeufig zu ziehen.
-- [ ] DoD.6 Browser-Demo-Surface bleibt unveraendert oder eine Aenderung ist explizit user-gated dokumentiert.
-- [ ] DoD.7 Mindestens ein Playability-Signal prueft neue Maps auf Startbarkeit und grobe Finishbarkeit; Langrouten duerfen bei Flakiness nicht still als fertig gelten.
-- [ ] DoD.8 Dokumentation nennt fuer jede Map Zielzeit, Skill-Rolle, Risiken und Tuning-Hypothese.
+- [x] DoD.1 Mindestens sechs neue Parcours-Presets sind im Desktop-Runtime-Katalog vorhanden und haben stabile Map-Keys, Namen, `parcours.enabled`, `routeId`, Regeln, Checkpoints, Finish, Player-Spawn, Bot-Spawns und Item-Anchor.
+- [x] DoD.2 Jede MVP-Map hat eine eigene Skill-Rolle; reine Varianten derselben Geometrie zaehlen nicht als erledigte Map-Varianz.
+- [x] DoD.3 Jede neue Route ist per Contract-Smoke validiert: acyclische Checkpoint-Reihenfolge, gueltige Branch-Merges, keine leeren Checkpoint-Listen, Finish vorhanden, Radius-/Segmentwerte plausibel.
+- [x] DoD.4 Ghost-/Leaderboard-Vertraege bleiben stabil: Jede Route nutzt eindeutige `routeId`, und Ghost-Selbstduell kann pro Route unterscheiden.
+- [x] DoD.5 Arcade-Sektorpool wird bewusst erweitert, ohne Langrouten frueh oder zu haeufig zu ziehen.
+- [x] DoD.6 Browser-Demo-Surface bleibt unveraendert oder eine Aenderung ist explizit user-gated dokumentiert.
+- [x] DoD.7 Mindestens ein Playability-Signal prueft neue Maps auf Startbarkeit und grobe Finishbarkeit; Langrouten duerfen bei Flakiness nicht still als fertig gelten.
+- [x] DoD.8 Dokumentation nennt fuer jede Map Zielzeit, Skill-Rolle, Risiken und Tuning-Hypothese.
 
 ## Phasen
 
 ### 130.1 Content-Baseline und Routenmatrix festziehen
-status: open
+status: done
 mode: [AUTO]
 goal: Bestehende Parcours-Maps, neue Ideen und technische Grenzen auf eine klare Matrix bringen
 output: finalisierte MVP-Auswahl, Skill-Achsen, Route-ID-Liste, Testbedarf
 
-- [ ] 130.1.1 Bestehende Parcours-Presets inventarisieren: Map-Key, Route-ID, Checkpoint-Anzahl, Branches, Zielzeit, Reset-Regeln, Ghost-Policy.
-- [ ] 130.1.2 MVP-Auswahl bestaetigen: `micro_maw`, `mirror_docks`, `glass_serpent`, `storm_switchyard`, `wind_cathedral`, `chrono_spillway`.
-- [ ] 130.1.3 Arcade-Pool-Regel festlegen: kurze Maps frueh, mittlere Maps normal, lange Maps spaeter oder expert-only.
-- [ ] 130.1.4 Demo-Grenze dokumentieren: keine Browser-Demo-Erweiterung ohne explizite Freigabe.
+- [x] 130.1.1 Bestehende Parcours-Presets inventarisieren: Map-Key, Route-ID, Checkpoint-Anzahl, Branches, Zielzeit, Reset-Regeln, Ghost-Policy.
+- [x] 130.1.2 MVP-Auswahl bestaetigen: `micro_maw`, `mirror_docks`, `glass_serpent`, `storm_switchyard`, `wind_cathedral`, `chrono_spillway`.
+- [x] 130.1.3 Arcade-Pool-Regel festlegen: kurze Maps frueh, mittlere Maps normal, lange Maps spaeter oder expert-only.
+- [x] 130.1.4 Demo-Grenze dokumentieren: keine Browser-Demo-Erweiterung ohne explizite Freigabe.
 
 ### 130.2 Contract- und Validierungsrahmen fuer Map-Pack
-status: open
+status: done
 mode: [REVIEW]
 goal: Neue Maps nicht nur optisch, sondern vertraglich stabil authoren
 output: gezielte Map-Pack-Contract-Checks
 
-- [ ] 130.2.1 `tests/parcours-map-pack.contract.test.mjs` planen oder anlegen: prueft neue Keys im Catalog, `buildRouteFromParcours`, Branch-Merges, Finish und Route-IDs.
-- [ ] 130.2.2 Plausibilitaetsregeln definieren: minimale/maximale Checkpoint-Abstaende, Radius-Untergrenzen, keine identischen Spawnpunkte, keine leeren Bot-Spawns.
-- [ ] 130.2.3 Ghost-/Leaderboard-Probe vorbereiten: Jede neue Route erzeugt eindeutigen Keyspace fuer lokale Ghosts.
-- [ ] 130.2.4 Falls vorhandenes `npm run parcours:check -- --strict` genutzt wird, neue Maps dort explizit aufnehmen oder dokumentieren, warum targeted Contract reicht.
+- [x] 130.2.1 `tests/parcours-map-pack.contract.test.mjs` planen oder anlegen: prueft neue Keys im Catalog, `buildRouteFromParcours`, Branch-Merges, Finish und Route-IDs.
+- [x] 130.2.2 Plausibilitaetsregeln definieren: minimale/maximale Checkpoint-Abstaende, Radius-Untergrenzen, keine identischen Spawnpunkte, keine leeren Bot-Spawns.
+- [x] 130.2.3 Ghost-/Leaderboard-Probe vorbereiten: Jede neue Route erzeugt eindeutigen Keyspace fuer lokale Ghosts.
+- [x] 130.2.4 Falls vorhandenes `npm run parcours:check -- --strict` genutzt wird, neue Maps dort explizit aufnehmen oder dokumentieren, warum targeted Contract reicht.
 
 ### 130.3 Erste Map-Welle: kurz, mirror, speed
-status: open
+status: done
 mode: [REVIEW]
 goal: Drei Maps mit geringem bis mittlerem Risiko shipping-faehig machen
 output: `micro_maw`, `mirror_docks`, `glass_serpent`
 
-- [ ] 130.3.1 `micro_maw` implementieren: kurze Tutorialroute, kein Portal-Pflichtpfad, geringe Penalty, sicherer Finish.
-- [ ] 130.3.2 `mirror_docks` implementieren: Branch-Merge sauber mit `nextIds`, gespiegelte Linien und faire Item-Verteilung.
-- [ ] 130.3.3 `glass_serpent` implementieren: S-Kurve, Tube-Shortcut, konservative Boost-Impulse, Recovery-Portal.
-- [ ] 130.3.4 Erste Welle in Catalog/Base einhaengen, aber Arcade-Pool nur konservativ erweitern.
+- [x] 130.3.1 `micro_maw` implementieren: kurze Tutorialroute, kein Portal-Pflichtpfad, geringe Penalty, sicherer Finish.
+- [x] 130.3.2 `mirror_docks` implementieren: Branch-Merge sauber mit `nextIds`, gespiegelte Linien und faire Item-Verteilung.
+- [x] 130.3.3 `glass_serpent` implementieren: S-Kurve, Tube-Shortcut, konservative Boost-Impulse, Recovery-Portal.
+- [x] 130.3.4 Erste Welle in Catalog/Base einhaengen, aber Arcade-Pool nur konservativ erweitern.
 
 ### 130.4 Zweite Map-Welle: Branching, Vertikal, Endurance
-status: open
+status: done
 mode: [REVIEW]
 goal: Drei staerkere Charakter-Maps ergaenzen
 output: `storm_switchyard`, `wind_cathedral`, `chrono_spillway`
 
-- [ ] 130.4.1 `storm_switchyard` implementieren: Weichen-Branch mit High/Low-Linie, klare Merge-Logik, Recovery-Portale.
-- [ ] 130.4.2 `wind_cathedral` implementieren: Slingshot-Kette, Hoehenlesbarkeit, sichere Foam-Rettungsfelder.
-- [ ] 130.4.3 `chrono_spillway` implementieren: lange Segmentroute, Risk-Sluice-Branch, Ghost-/Split-Fokus.
-- [ ] 130.4.4 Langrouten im Arcade-Pool erst spaet oder expert-nah aktivieren.
+- [x] 130.4.1 `storm_switchyard` implementieren: Weichen-Branch mit High/Low-Linie, klare Merge-Logik, Recovery-Portale.
+- [x] 130.4.2 `wind_cathedral` implementieren: Slingshot-Kette, Hoehenlesbarkeit, sichere Foam-Rettungsfelder.
+- [x] 130.4.3 `chrono_spillway` implementieren: lange Segmentroute, Risk-Sluice-Branch, Ghost-/Split-Fokus.
+- [x] 130.4.4 Langrouten im Arcade-Pool erst spaet oder expert-nah aktivieren.
 
 ### 130.5 UI-, Preview- und Surface-Abgleich
-status: open
+status: done
 mode: [REVIEW]
 goal: Spielauswahl zeigt neue Maps korrekt, ohne V113 oder Demo-Policy zu stoeren
 output: Menue- und Surface-Vertrag bleiben konsistent
 
-- [ ] 130.5.1 Map-Auswahl und Mode-Eligibility pruefen: Arcade darf neue Parcours-Maps sehen, normale Modi nur wenn bestehende Regeln es erlauben.
-- [ ] 130.5.2 Preview-Labels/Badges nur dann anfassen, wenn V113-Scope frei ist; sonst Fallback-Preview akzeptieren.
-- [ ] 130.5.3 Browser-Demo-Allowlist unveraendert lassen oder mit User-Gate bewusst erweitern.
-- [ ] 130.5.4 Favoriten-/Recent-/Random-Map-Pfade auf nicht kuratierte Demo-Auswahl pruefen.
+- [x] 130.5.1 Map-Auswahl und Mode-Eligibility pruefen: Arcade darf neue Parcours-Maps sehen, normale Modi nur wenn bestehende Regeln es erlauben.
+- [x] 130.5.2 Preview-Labels/Badges nur dann anfassen, wenn V113-Scope frei ist; sonst Fallback-Preview akzeptieren.
+- [x] 130.5.3 Browser-Demo-Allowlist unveraendert lassen oder mit User-Gate bewusst erweitern.
+- [x] 130.5.4 Favoriten-/Recent-/Random-Map-Pfade auf nicht kuratierte Demo-Auswahl pruefen.
 
 ### 130.6 Playability, Balancing und Regression
-status: open
+status: done
 mode: [REVIEW]
 goal: Neue Maps fuehlen sich spielbar an und brechen bestehende Parcours-Systeme nicht
 output: gruenes targeted Signal plus dokumentierte Tuning-Entscheide
 
-- [ ] 130.6.1 Contract-Gates fuer alle neuen Routen ausfuehren.
-- [ ] 130.6.2 Mindestens `micro_maw`, `mirror_docks` und eine Langroute per Playwright/desktop-start smoke pruefen.
-- [ ] 130.6.3 Schwierigkeit staffeln: Tutorial, Flow, Branch, Vertikal, Endurance duerfen nicht alle gleich hart sein.
-- [ ] 130.6.4 Ghost-/Split-Verhalten exemplarisch pruefen: Route-ID, Finish-Event, Segment-Splits und Penalty bleiben plausibel.
+- [x] 130.6.1 Contract-Gates fuer alle neuen Routen ausfuehren.
+- [x] 130.6.2 Mindestens `micro_maw`, `mirror_docks` und eine Langroute per Playwright/desktop-start smoke pruefen.
+- [x] 130.6.3 Schwierigkeit staffeln: Tutorial, Flow, Branch, Vertikal, Endurance duerfen nicht alle gleich hart sein.
+- [x] 130.6.4 Ghost-/Split-Verhalten exemplarisch pruefen: Route-ID, Finish-Event, Segment-Splits und Penalty bleiben plausibel.
 
 ### 130.7 Dokumentation und Handoff
-status: open
+status: done
 mode: [REVIEW]
 goal: Content-Entscheide fuer spaetere Map-Arbeit nachvollziehbar machen
 output: Map-Pack-Doku, Risiken, Backlog-Status
 
-- [ ] 130.7.1 Pro shipping Map eine kompakte Designnotiz pflegen: Skill-Rolle, Zielzeit, Risiken, Tuning-Hypothese.
-- [ ] 130.7.2 Backlog-Ideen klassifizieren: sofort umsetzbar, GLB/Asset-abhaengig, Preview/UI-abhaengig, Expert-only.
-- [ ] 130.7.3 Handoff an V106/V128/V129 dokumentieren, falls GLB- oder Asset-Setdressing spaeter relevant wird.
-- [ ] 130.7.4 Bekannte Limitierungen dokumentieren: keine beweglichen Hazards, keine echten Loops, keine Demo-Erweiterung.
+- [x] 130.7.1 Pro shipping Map eine kompakte Designnotiz pflegen: Skill-Rolle, Zielzeit, Risiken, Tuning-Hypothese.
+- [x] 130.7.2 Backlog-Ideen klassifizieren: sofort umsetzbar, GLB/Asset-abhaengig, Preview/UI-abhaengig, Expert-only.
+- [x] 130.7.3 Handoff an V106/V128/V129 dokumentieren, falls GLB- oder Asset-Setdressing spaeter relevant wird.
+- [x] 130.7.4 Bekannte Limitierungen dokumentieren: keine beweglichen Hazards, keine echten Loops, keine Demo-Erweiterung.
 
 ### 130.99 Abschluss-Gate
-status: open
+status: done
 mode: [REVIEW]
 goal: Map-Pack reproduzierbar abschliessen
 output: gruene Gates, klare Evidence, keine versteckte Surface-Ausweitung
 
-- [ ] 130.99.1 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen.
-- [ ] 130.99.2 Map-Pack-Contract-Checks sind gruen oder ein Blocker ist in `docs/Fehlerberichte/` dokumentiert.
-- [ ] 130.99.3 Playability-Smoke ist fuer die vereinbarte Auswahl gruen.
-- [ ] 130.99.4 `scope-collisions` nennt keine ungeklaerte Kollision mit V113/V106/V128/V129 fuer die tatsaechlich geaenderten Dateien.
-- [ ] 130.99.5 Abschlussnotiz nennt, welche Backlog-Maps bewusst nicht gebaut wurden.
+- [x] 130.99.1 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen.
+- [x] 130.99.2 Map-Pack-Contract-Checks sind gruen oder ein Blocker ist in `docs/Fehlerberichte/` dokumentiert.
+- [x] 130.99.3 Playability-Smoke ist fuer die vereinbarte Auswahl gruen.
+- [x] 130.99.4 `scope-collisions` nennt keine ungeklaerte Kollision mit V113/V106/V128/V129 fuer die tatsaechlich geaenderten Dateien.
+- [x] 130.99.5 Abschlussnotiz nennt, welche Backlog-Maps bewusst nicht gebaut wurden.
+
+## Umsetzungsevidence 2026-05-20
+
+Status: D2-Code-/Test-Scope aus diesem Draft umgesetzt. D3-Intake in `docs/Umsetzungsplan.md` und `docs/plaene/aktiv/V130.md` bleibt bewusst unberuehrt; dieser Draft bleibt die dokumentierte externe Planquelle.
+
+Umgesetzter Scope:
+
+- `src/core/config/maps/presets/parcours_pack_v130.js` fuegt `micro_maw`, `mirror_docks`, `glass_serpent`, `storm_switchyard`, `wind_cathedral` und `chrono_spillway` mit stabilen `*_v1`-Route-IDs hinzu.
+- `src/core/config/maps/MapPresetCatalog.js` und `src/core/config/maps/MapPresetsBase.js` haengen die sechs Presets in Desktop-Katalog und Vollkatalog ein.
+- `src/state/arcade/ArcadeMapProgression.js` und `src/entities/directors/ArcadeEncounterCatalog.js` erweitern den Parcours-Pool gestaffelt: Rift-Basis zuerst, danach kurze/mittlere V130-Routen, danach lange/haertere Routen.
+- `tests/parcours-map-pack.contract.test.mjs` prueft Catalog/Base-Registrierung, Route-IDs, Ghost-/Finish-Vertrag, Branch-Merges, Spawn-/Radius-/Distanz-Plausibilitaet und Pool-Reihenfolge.
+- `tests/parcours-map-pack-start.spec.js` startet `micro_maw`, `mirror_docks` und `chrono_spillway` in Arcade und triggert die authored Route bis zum Finish.
+
+Evidence:
+
+- `node --test tests\parcours-map-pack.contract.test.mjs` -> PASS, 5 Tests.
+- `npm run parcours:check -- --strict` -> PASS, 15 Parcours-Maps, 0 Errors, 0 Warnings.
+- `node scripts\run-playwright-smoke.mjs tests\parcours-map-pack-start.spec.js --timeout=180000` -> PASS, 3 Tests.
+- `node scripts/query-knowledge-graph.mjs scope-collisions --json` -> PASS; tatsaechlich geaenderte V130-Dateien vermeiden `src/ui/menu/MenuPreviewCatalog.js` und damit die bekannte V106/V113-Kollision.
+
+Bewusst nicht gebaut:
+
+- `gravity_orchard`, `pulse_foundry`, `blackbox_ballet`, `lumen_quarry`, `ember_viaduct` und `comet_yards` bleiben Backlog.
+- Browser-Demo-Allowlist, `MenuPreviewCatalog.js`, GLB-/CC0-Assets, bewegliche Hazards, echte Loops und Editor-/Authoring-Pfade bleiben unveraendert.
+
+Not-checked:
+
+- Keine volle Playwright-/Desktop-E2E-Suite; V130 nutzt targeted Contract-, Strict-Parcours- und drei Map-Start-Smokes.
 
 ## Risiken
 
