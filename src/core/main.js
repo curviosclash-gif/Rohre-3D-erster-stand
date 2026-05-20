@@ -23,6 +23,12 @@ import { RECORDING_HUD_MODE } from '../shared/contracts/RecordingCaptureContract
 import { ensureInteractiveMatchRuntime } from './InteractiveMatchRuntimeGuard.js';
 import { GameRuntimeCoordinator } from './runtime/GameRuntimeCoordinator.js';
 import { isPersistenceSuccess } from './settings/SettingsDomainUtils.js';
+import {
+    applyMobileClassicDocumentState,
+    applyMobileClassicSettings,
+    applyMobileClassicUiLocks,
+    isMobileClassicAppTarget,
+} from '../mobile-classic/MobileClassicApp.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -37,6 +43,11 @@ export class Game {
         this.profileDataOps = this.profileManager.getProfileDataOps();
 
         this.settings = this._loadSettings();
+        this._mobileClassicAppTarget = isMobileClassicAppTarget();
+        if (this._mobileClassicAppTarget) {
+            applyMobileClassicDocumentState(document);
+            applyMobileClassicSettings(this.settings);
+        }
         this.settingsDirty = false;
         this.menuLifecycleContractVersion = MATCH_LIFECYCLE_CONTRACT_VERSION;
         this.menuLifecycleEvents = [];
@@ -106,6 +117,9 @@ export class Game {
         this._syncProfileControls();
         this._markSettingsDirty(false);
         this.runtimeCoordinator.finishStartup();
+        if (this._mobileClassicAppTarget) {
+            applyMobileClassicUiLocks(this);
+        }
 
         window.addEventListener('keydown', this._boundKeyCaptureHandler, true);
 
@@ -345,6 +359,10 @@ export class Game {
     }
 
     startMatch() {
+        if (this._mobileClassicAppTarget) {
+            applyMobileClassicSettings(this.settings);
+            applyMobileClassicUiLocks(this);
+        }
         this.runtimeCoordinator.startMatch();
     }
 

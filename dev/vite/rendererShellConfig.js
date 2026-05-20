@@ -12,6 +12,22 @@ const RENDERER_INPUT_FILES = {
     editorMap3d: 'editor/map-editor-3d.html',
 };
 
+const RENDERER_APP_TARGETS = Object.freeze({
+    MOBILE_CLASSIC: 'mobile-classic',
+});
+
+function resolveRendererAppTarget(env = process.env) {
+    return String(env?.VITE_APP_TARGET || '').trim().toLowerCase();
+}
+
+function resolveRendererInputFiles(env = process.env) {
+    const appTarget = resolveRendererAppTarget(env);
+    if (appTarget === RENDERER_APP_TARGETS.MOBILE_CLASSIC) {
+        return { app: RENDERER_INPUT_FILES.app };
+    }
+    return RENDERER_INPUT_FILES;
+}
+
 function resolvePlaywrightWarmupClientFiles(env = process.env) {
     if (!env?.PW_RUN_TAG) return [];
     const explicit = String(env?.PW_VITE_WARMUP || '').trim();
@@ -75,6 +91,10 @@ export function createRendererShellServerConfig(env = process.env) {
 }
 
 function resolveRendererBuildOutDir(env = process.env) {
+    const appTarget = resolveRendererAppTarget(env);
+    if (appTarget === RENDERER_APP_TARGETS.MOBILE_CLASSIC) {
+        return 'dist/mobile-classic';
+    }
     const appMode = String(env?.VITE_APP_MODE || '').trim().toLowerCase();
     if (appMode === 'app') {
         return 'dist-app';
@@ -88,7 +108,7 @@ export function createRendererShellBuildConfig({ rootDir, chunkSizeWarningLimit,
         chunkSizeWarningLimit,
         rollupOptions: {
             input: Object.fromEntries(
-                Object.entries(RENDERER_INPUT_FILES).map(([entryName, relativePath]) => [
+                Object.entries(resolveRendererInputFiles(env)).map(([entryName, relativePath]) => [
                     entryName,
                     path.resolve(rootDir, relativePath),
                 ])
@@ -108,6 +128,7 @@ export function createRendererBuildDefines({ pkgVersion, buildTime, buildId, env
         __BUILD_ID__: JSON.stringify(buildId),
         __CURVIOS_E2E__: JSON.stringify(isPlaywright),
         __APP_MODE__: JSON.stringify(env?.VITE_APP_MODE || 'web'),
+        __APP_TARGET__: JSON.stringify(resolveRendererAppTarget(env) || 'default'),
         __SIGNALING_URL__: JSON.stringify(env?.VITE_SIGNALING_URL || ''),
         __TURN_URL__: JSON.stringify(env?.VITE_TURN_URL || ''),
         __TURN_USERNAME__: JSON.stringify(env?.VITE_TURN_USER || env?.VITE_TURN_USERNAME || ''),
