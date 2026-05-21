@@ -6,6 +6,12 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Produkt-Notiz 2026-05-21 (Map Tools Android)
+
+- Die Android-Map-Tools-Update-Aktion wurde als kleiner D2-Slice vom reinen Release-Link zum Release-APK-Download erweitert: Die Shell nutzt weiter GitHub Releases, bevorzugt aber ein `.apk`-Asset aus dem neuesten Release und faellt bei fehlendem Asset oder Offline-Fehlern auf die Release-Seite zurueck.
+- Nicht-Ziel: kein nativer Silent-Installer und keine Android-Package-Installer-Permission; der ausgelieferte Map-Snapshot bleibt bis zur Installation einer neueren APK der Offline-Fallback.
+- Evidence: `npm run app:maps:android:check` -> PASS, `npm run plan:check` -> PASS.
+
 ## Rollback-Notiz 2026-05-21 (Plan-Map-Glossar / V133)
 
 - Ruecknahme auf User-Wunsch: `f902e7351581df4ee7c4f6e379c08b0445f0e73e` und `2590117c04a607aac6ddfe1bfe3bd5b1ffe0e451` wurden per Revert zurueckgenommen; die aus `bfa5df96e89ac0c853d8757eeac5084a7baacad4` stammenden V133-Master-/Graph-Anker wurden gezielt entfernt.

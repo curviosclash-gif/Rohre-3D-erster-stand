@@ -35,6 +35,10 @@ const helpTerms = {
     title: 'GitHub',
     body: 'Oeffnet die Release-Seite, falls du die App oder den Snapshot manuell aktualisieren willst.',
   },
+  apk: {
+    title: 'APK',
+    body: 'Oeffnet das APK-Asset des neuesten Releases, wenn GitHub eines bereitstellt.',
+  },
   snapshot: {
     title: 'Snapshot',
     body: 'Die Android-App zeigt eine ausgelieferte, read-only Momentaufnahme der Map Tools.',
@@ -208,6 +212,33 @@ function setUpdateStatus(text) {
   bindHelpButtons(updateStatus);
 }
 
+function setUpdateOpenLabel(label, helpTerm = 'github') {
+  updateOpen.innerHTML = `${escapeHtml(label)} ${helpButton(helpTerm)}`;
+  bindHelpButtons(updateOpen);
+}
+
+function resolveReleaseUpdateTarget(release) {
+  const assets = Array.isArray(release?.assets) ? release.assets : [];
+  const apkAsset = assets.find((asset) => {
+    const name = String(asset?.name || '');
+    const contentType = String(asset?.content_type || '');
+    return name.toLowerCase().endsWith('.apk')
+      || contentType === 'application/vnd.android.package-archive';
+  });
+  if (apkAsset?.browser_download_url) {
+    return {
+      url: apkAsset.browser_download_url,
+      label: 'APK laden',
+      helpTerm: 'apk',
+    };
+  }
+  return {
+    url: release?.html_url || state.updateConfig.latestReleaseUrl,
+    label: 'GitHub',
+    helpTerm: 'github',
+  };
+}
+
 function openUpdateTarget() {
   const url = state.updateTargetUrl || state.updateConfig.latestReleaseUrl;
   const opened = window.open(url, '_blank', 'noopener');
@@ -229,11 +260,14 @@ async function checkGithubRelease() {
       throw new Error(`${response.status} ${response.statusText}`);
     }
     const release = await response.json();
-    state.updateTargetUrl = release.html_url || state.updateConfig.latestReleaseUrl;
+    const target = resolveReleaseUpdateTarget(release);
+    state.updateTargetUrl = target.url;
+    setUpdateOpenLabel(target.label, target.helpTerm);
     updateOpen.hidden = false;
     setUpdateStatus(`GitHub ${release.tag_name || release.name || 'Release'}`);
   } catch {
     state.updateTargetUrl = state.updateConfig.latestReleaseUrl;
+    setUpdateOpenLabel('GitHub');
     updateOpen.hidden = false;
     setUpdateStatus('GitHub Releases');
   } finally {
@@ -265,7 +299,7 @@ async function hydrateBuildMeta() {
 
 function hydrateStaticHelp() {
   updateCheck.insertAdjacentHTML('beforeend', ` ${helpButton('update')}`);
-  updateOpen.insertAdjacentHTML('beforeend', ` ${helpButton('github')}`);
+  setUpdateOpenLabel('GitHub');
   updateStatus.innerHTML = `${escapeHtml(updateStatus.textContent || 'GitHub Releases')} ${helpButton('releases')}`;
   planFilterStrip.querySelector('span').insertAdjacentHTML('beforeend', ` ${helpButton('workstream')}`);
   infoToggle.insertAdjacentHTML('beforeend', ` ${helpButton('info')}`);

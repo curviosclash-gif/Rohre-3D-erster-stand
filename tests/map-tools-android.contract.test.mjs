@@ -48,6 +48,11 @@ test('Map Tools Android shell embeds Plan Map and Repo Map viewers', async () =>
   assert.match(script, /curvios\.map-tools:set-help-visible/);
   assert.match(script, /api\.github\.com\/repos/);
   assert.match(script, /releases\/latest/);
+  assert.match(script, /function resolveReleaseUpdateTarget/);
+  assert.match(script, /\.endsWith\('\.apk'\)/);
+  assert.match(script, /application\/vnd\.android\.package-archive/);
+  assert.match(script, /browser_download_url/);
+  assert.match(script, /APK laden/);
   assert.equal(packageJson.scripts['app:maps:android:build'], 'node scripts/build-map-tools-android.mjs');
   assert.equal(packageJson.scripts['app:maps:android:sync'], 'npm run app:maps:android:build && npx cap sync android');
 });
