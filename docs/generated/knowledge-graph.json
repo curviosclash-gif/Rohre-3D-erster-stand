@@ -1895,21 +1895,6 @@
       }
     },
     {
-      "id": "V133",
-      "type": "block",
-      "title": "Fachbegriffe-Wiki fuer die Changelog-Visualisierung",
-      "status": "planned",
-      "attributes": {
-        "source": [
-          "master-index"
-        ],
-        "priority": "P2",
-        "owner": "frei",
-        "currentPhase": "133.1",
-        "planFile": "docs/plaene/aktiv/V133.md"
-      }
-    },
-    {
       "id": "V43",
       "type": "block",
       "title": "Projektstruktur Spiel Dev Ordner",
@@ -76117,57 +76102,6 @@
         "blockId": "V132",
         "phaseCode": "132.99",
         "subphaseCode": "132.99.6"
-      }
-    },
-    {
-      "from": "V133",
-      "to": "V107",
-      "type": "depends_on",
-      "source": "master-table",
-      "hard": true,
-      "fulfilled": true,
-      "hint": "Plan-Map und Wissensgraph-Tooling sind technische Basis fuer die Changelog-Erklaerschicht",
-      "attributes": {
-        "dependsPhase": "107.99",
-        "rawToken": "V107.99",
-        "sourceBreakdown": [
-          "master-table"
-        ],
-        "canonicalToken": true
-      }
-    },
-    {
-      "from": "V133",
-      "to": "V110",
-      "type": "depends_on",
-      "source": "master-table",
-      "hard": true,
-      "fulfilled": true,
-      "hint": "Graph-Ops- und Tooling-Haertung begrenzt die Viewer-Erweiterung als read-only Consumer",
-      "attributes": {
-        "dependsPhase": "110.99",
-        "rawToken": "V110.99",
-        "sourceBreakdown": [
-          "master-table"
-        ],
-        "canonicalToken": true
-      }
-    },
-    {
-      "from": "V133",
-      "to": "V117",
-      "type": "depends_on",
-      "source": "master-table",
-      "hard": true,
-      "fulfilled": true,
-      "hint": "AI Decision Framework und Gate-Begriffe liefern die kanonische Governance-Sprache",
-      "attributes": {
-        "dependsPhase": "117.99",
-        "rawToken": "V117.99",
-        "sourceBreakdown": [
-          "master-table"
-        ],
-        "canonicalToken": true
       }
     },
     {
