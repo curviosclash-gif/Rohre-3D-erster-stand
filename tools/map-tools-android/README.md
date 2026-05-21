@@ -1,6 +1,6 @@
 # Curvios Map Tools Android
 
-Capacitor wrapper for the read-only Plan Map and Repo Map viewers.
+Capacitor wrapper for the read-only Plan Map, Repo Map and Agent Map viewers.
 
 Build the web assets and sync the Android project from the repository root:
 

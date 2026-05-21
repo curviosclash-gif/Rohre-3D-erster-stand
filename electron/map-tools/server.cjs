@@ -16,8 +16,10 @@ const MIME_TYPES = Object.freeze({
 const ALLOWED_PREFIXES = Object.freeze([
     'tools/repo-map/',
     'tools/plan-map/',
+    'tools/agent-map/',
     'tmp/repo-map/',
     'tmp/plan-map/',
+    'tmp/agent-map/',
 ]);
 
 const CSP_HEADER = [
@@ -119,6 +121,9 @@ async function startMapToolsServer({ rootDir, host = '127.0.0.1', port = 0 }) {
     }
     if (!existsSync(path.join(resolvedRoot, 'tools', 'plan-map', 'index.html'))) {
         throw new Error(`Plan-Map-Viewer fehlt: ${path.join(resolvedRoot, 'tools', 'plan-map', 'index.html')}`);
+    }
+    if (!existsSync(path.join(resolvedRoot, 'tools', 'agent-map', 'index.html'))) {
+        throw new Error(`Agent-Map-Viewer fehlt: ${path.join(resolvedRoot, 'tools', 'agent-map', 'index.html')}`);
     }
 
     const server = http.createServer(createMapToolsRequestHandler(resolvedRoot));

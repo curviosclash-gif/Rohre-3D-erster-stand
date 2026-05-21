@@ -17,6 +17,9 @@ const copyEntries = [
   ['tools/repo-map/index.html', 'tools/repo-map/index.html'],
   ['tools/repo-map/viewer.css', 'tools/repo-map/viewer.css'],
   ['tools/repo-map/viewer.js', 'tools/repo-map/viewer.js'],
+  ['tools/agent-map/index.html', 'tools/agent-map/index.html'],
+  ['tools/agent-map/viewer.css', 'tools/agent-map/viewer.css'],
+  ['tools/agent-map/viewer.js', 'tools/agent-map/viewer.js'],
   ['tools/map-tools-android/index.html', 'index.html'],
   ['tools/map-tools-android/map-tools-android.css', 'map-tools-android.css'],
   ['tools/map-tools-android/map-tools-android.js', 'map-tools-android.js'],
@@ -98,6 +101,12 @@ async function writeManifest() {
         path: './tools/repo-map/index.html',
         data: './tmp/repo-map/repo-map.json',
       },
+      {
+        id: 'agent',
+        label: 'Agent Map',
+        path: './tools/agent-map/index.html',
+        data: './tmp/agent-map/agent-map.json',
+      },
     ],
     updates: createGithubUpdateConfig(githubRepository),
   };
@@ -115,6 +124,7 @@ async function main() {
   await Promise.all(copyEntries.map(([source, target]) => copyFile(source, target)));
   await runNode('scripts/export-plan-map.mjs', 'dist/map-tools-android/tmp/plan-map/plan-map.json');
   await runNode('scripts/export-repo-map.mjs', 'dist/map-tools-android/tmp/repo-map/repo-map.json');
+  await runNode('scripts/export-agent-map.mjs', 'dist/map-tools-android/tmp/agent-map/agent-map.json');
   await writeManifest();
 
   process.stdout.write(`map-tools-android: wrote ${path.relative(repoRoot, webDir)}\n`);

@@ -117,7 +117,7 @@ h1 {
 
 .view-switch {
   display: inline-grid;
-  grid-template-columns: repeat(2, minmax(62px, 1fr));
+  grid-template-columns: repeat(3, minmax(58px, 1fr));
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--line);
@@ -293,7 +293,7 @@ h1 {
   }
 
   .view-switch {
-    grid-template-columns: repeat(2, minmax(52px, 1fr));
+    grid-template-columns: repeat(3, minmax(48px, 1fr));
     gap: 3px;
     padding: 3px;
     width: auto;

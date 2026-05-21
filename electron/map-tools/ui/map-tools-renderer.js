@@ -36,11 +36,11 @@ const HELP_TERMS = {
   },
   'refresh-all': {
     title: 'Alle Exporte',
-    body: 'Erzeugt Plan Map und Repo Map neu. Sinnvoll, wenn Plan- oder Repo-Daten gerade geaendert wurden.',
+    body: 'Erzeugt Plan Map, Repo Map und Agent Map neu. Sinnvoll, wenn Plan-, Repo- oder Governance-Daten gerade geaendert wurden.',
   },
   'active-view': {
     title: 'Aktive Karte',
-    body: 'Zeigt, ob gerade die Plan Map oder die Repo Map im Viewer geladen ist.',
+    body: 'Zeigt, welche read-only Karte im Viewer geladen ist.',
   },
   plan: {
     title: 'Plan Map',
@@ -49,6 +49,10 @@ const HELP_TERMS = {
   repo: {
     title: 'Repo Map',
     body: 'Zeigt Repo-Bereiche, Datei-Coverage, kritische Pfade und Planbezuege.',
+  },
+  agent: {
+    title: 'Agent Map',
+    body: 'Zeigt den Arbeitsweg von Aufgabentypen zu Workflows, Rules, Skills und Checks.',
   },
 };
 

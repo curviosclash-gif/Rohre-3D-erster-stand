@@ -40,12 +40,20 @@ const MAP_TOOL_VIEWS = Object.freeze({
         viewPath: '/tools/repo-map/index.html',
         readmePath: 'tools/repo-map/README.md',
     }),
+    agent: Object.freeze({
+        id: 'agent',
+        label: 'Agent Map',
+        exportScript: 'scripts/export-agent-map.mjs',
+        viewPath: '/tools/agent-map/index.html',
+        readmePath: 'tools/agent-map/README.md',
+    }),
 });
 
 const PATH_TARGETS = Object.freeze({
     repoRoot: '',
     planReadme: MAP_TOOL_VIEWS.plan.readmePath,
     repoReadme: MAP_TOOL_VIEWS.repo.readmePath,
+    agentReadme: MAP_TOOL_VIEWS.agent.readmePath,
 });
 
 let markSessionExitClean = () => {};
@@ -295,6 +303,11 @@ function buildApplicationMenu() {
                     accelerator: 'CmdOrCtrl+2',
                     click: () => requestRendererView('repo'),
                 },
+                {
+                    label: 'Agent Map',
+                    accelerator: 'CmdOrCtrl+3',
+                    click: () => requestRendererView('agent'),
+                },
             ],
         },
         {
@@ -318,6 +331,10 @@ function buildApplicationMenu() {
                 {
                     label: 'Repo Map README',
                     click: () => { void openRepoPath('repoReadme'); },
+                },
+                {
+                    label: 'Agent Map README',
+                    click: () => { void openRepoPath('agentReadme'); },
                 },
             ],
         },

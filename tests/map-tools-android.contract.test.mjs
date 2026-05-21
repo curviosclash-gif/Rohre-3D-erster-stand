@@ -32,6 +32,7 @@ test('Map Tools Android shell embeds Plan Map and Repo Map viewers', async () =>
 
   assert.match(html, /data-testid="map-tools-android-shell"/);
   assert.match(html, /src="\.\/tools\/plan-map\/index\.html"/);
+  assert.match(html, /data-view-id="agent"/);
   assert.match(html, /id="updateCheck"/);
   assert.match(html, /id="updateOpen"/);
   assert.match(html, /id="planWorkstream"/);
@@ -41,6 +42,7 @@ test('Map Tools Android shell embeds Plan Map and Repo Map viewers', async () =>
   assert.match(html, /data-testid="map-tools-android-info-toggle"/);
   assert.match(script, /'\.\/tools\/plan-map\/index\.html'/);
   assert.match(script, /'\.\/tools\/repo-map\/index\.html'/);
+  assert.match(script, /'\.\/tools\/agent-map\/index\.html'/);
   assert.match(script, /planWorkstream/);
   assert.match(script, /workstreamFilter/);
   assert.match(script, /function applyPlanWorkstreamFilter/);
@@ -94,6 +96,22 @@ test('Plan Map risk hints are compact dropdown explanations in shared viewers', 
   assert.match(css, /\.changelog-card/);
 });
 
+test('Agent Map viewer is packaged with shared map tools', async () => {
+  const [html, script, css] = await Promise.all([
+    readText('tools/agent-map/index.html'),
+    readText('tools/agent-map/viewer.js'),
+    readText('tools/agent-map/viewer.css'),
+  ]);
+
+  assert.match(html, /Agent Map/);
+  assert.match(html, /data-view="path"/);
+  assert.match(script, /curvios\.agent-map\.v1/);
+  assert.match(script, /curvios\.map-tools:set-help-visible/);
+  assert.match(script, /workflowFilter/);
+  assert.match(css, /\.agent-svg/);
+  assert.match(css, /@media \(max-width: 760px\)/);
+});
+
 test('Map Tools Android shell keeps phone viewports inside the app frame', async () => {
   const [shellCss, planCss, repoCss] = await Promise.all([
     readText('tools/map-tools-android/map-tools-android.css'),
@@ -102,6 +120,7 @@ test('Map Tools Android shell keeps phone viewports inside the app frame', async
   ]);
 
   assert.match(shellCss, /@media \(max-width: 640px\)/);
+  assert.match(shellCss, /grid-template-columns: repeat\(3, minmax\(58px, 1fr\)\)/);
   assert.match(shellCss, /\.plan-filter-strip/);
   assert.match(shellCss, /\.plan-filter-strip\[hidden\]/);
   assert.match(planCss, /@media \(max-width: 760px\)/);
@@ -134,8 +153,10 @@ test('Map Tools Android build script exports static map datasets', async () => {
 
   assert.match(script, /export-plan-map\.mjs/);
   assert.match(script, /export-repo-map\.mjs/);
+  assert.match(script, /export-agent-map\.mjs/);
   assert.match(script, /dist\/map-tools-android\/tmp\/plan-map\/plan-map\.json/);
   assert.match(script, /dist\/map-tools-android\/tmp\/repo-map\/repo-map\.json/);
+  assert.match(script, /dist\/map-tools-android\/tmp\/agent-map\/agent-map\.json/);
   assert.match(script, /map-tools-android\.manifest\.json/);
   assert.match(script, /github-releases/);
   assert.match(script, /CURVIOS_MAP_TOOLS_GITHUB_REPOSITORY/);
@@ -158,6 +179,7 @@ test('Map Tools Android is represented in the knowledge graph mapping source', a
     'runtime:map-tools-android-shell',
     'runtime:map-tools-android-native-shell',
     'state:map-tools-android-static-bundle',
+    'state:agent-map-readonly-dataset',
     'test:map-tools-android-contract',
   ]) {
     assert.ok(nodes.has(nodeId), `${nodeId} missing`);
@@ -166,6 +188,7 @@ test('Map Tools Android is represented in the knowledge graph mapping source', a
   assert.equal(nodes.get('runtime:map-tools-android-shell').attributes.mappingId, 'map-tools-android');
   assert.ok(edges.has('runtime:map-tools-android-build->state:map-tools-android-static-bundle:writes_state'));
   assert.ok(edges.has('runtime:map-tools-android-shell->state:plan-map-readonly-dataset:reads_state'));
+  assert.ok(edges.has('runtime:map-tools-android-shell->state:agent-map-readonly-dataset:reads_state'));
   assert.ok(edges.has('runtime:map-tools-android-native-shell->test:map-tools-android-contract:validated_by'));
 });
 

@@ -23,8 +23,10 @@ test('map tools server serves only map viewers and generated map datasets', asyn
     const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'curvios-map-tools-'));
     await writeFixtureFile(rootDir, 'tools/plan-map/index.html', '<!doctype html><title>Plan</title>');
     await writeFixtureFile(rootDir, 'tools/repo-map/index.html', '<!doctype html><title>Repo</title>');
+    await writeFixtureFile(rootDir, 'tools/agent-map/index.html', '<!doctype html><title>Agent</title>');
     await writeFixtureFile(rootDir, 'tools/plan-map/viewer.js', 'export {};');
     await writeFixtureFile(rootDir, 'tmp/plan-map/plan-map.json', '{"contract":"curvios.plan-map.v1"}');
+    await writeFixtureFile(rootDir, 'tmp/agent-map/agent-map.json', '{"contract":"curvios.agent-map.v1"}');
     await writeFixtureFile(rootDir, 'secret.txt', 'nope');
 
     const server = await startMapToolsServer({ rootDir, port: 0 });
@@ -40,6 +42,10 @@ test('map tools server serves only map viewers and generated map datasets', asyn
     const jsonResponse = await fetch(`${server.url}/tmp/plan-map/plan-map.json`);
     assert.equal(jsonResponse.status, 200);
     assert.match(await jsonResponse.text(), /curvios\.plan-map\.v1/);
+
+    const agentJsonResponse = await fetch(`${server.url}/tmp/agent-map/agent-map.json`);
+    assert.equal(agentJsonResponse.status, 200);
+    assert.match(await agentJsonResponse.text(), /curvios\.agent-map\.v1/);
 
     const blockedResponse = await fetch(`${server.url}/secret.txt`);
     assert.equal(blockedResponse.status, 403);
@@ -79,6 +85,7 @@ test('map tools app is wired as a separate Electron entry with native menu actio
     assert.match(mainSource, /CURVIOS_NODE_EXECUTABLE/);
     assert.match(mainSource, /scripts\/export-plan-map\.mjs/);
     assert.match(mainSource, /scripts\/export-repo-map\.mjs/);
+    assert.match(mainSource, /scripts\/export-agent-map\.mjs/);
     assert.match(preloadSource, /mapToolsApi/);
     assert.match(preloadSource, /map-tools-preload\.v1/);
     assert.match(rendererSource, /#errorPanel/);
@@ -88,6 +95,7 @@ test('map tools app is wired as a separate Electron entry with native menu actio
     assert.match(shellCss, /\.map-tools-shell\.info-hidden/);
     assert.match(rendererSource, /function setInfoVisible/);
     assert.match(rendererSource, /curvios\.map-tools:set-help-visible/);
+    assert.match(rendererSource, /Agent Map/);
     assert.match(planMapHtml, /data-view="intake"/);
     assert.match(planMapHtml, /id="intakeClassificationFilter"/);
     assert.match(planMapSource, /function renderIntakeView/);
@@ -112,6 +120,7 @@ test('map tools and repo map are represented in the knowledge graph mapping sour
         'runtime:repo-map-export',
         'runtime:repo-map-viewer',
         'state:repo-map-readonly-dataset',
+        'state:agent-map-readonly-dataset',
         'test:map-tools-electron-smoke',
     ]) {
         assert.ok(nodes.has(nodeId), `${nodeId} missing`);
@@ -120,5 +129,6 @@ test('map tools and repo map are represented in the knowledge graph mapping sour
     assert.equal(nodes.get('runtime:map-tools-electron-shell').attributes.mappingId, 'map-tools-electron');
     assert.ok(edges.has('runtime:repo-map-export->state:repo-map-readonly-dataset:writes_state'));
     assert.ok(edges.has('runtime:map-tools-renderer->state:plan-map-readonly-dataset:reads_state'));
+    assert.ok(edges.has('runtime:map-tools-renderer->state:agent-map-readonly-dataset:reads_state'));
     assert.ok(edges.has('runtime:map-tools-electron-shell->test:map-tools-electron-smoke:validated_by'));
 });

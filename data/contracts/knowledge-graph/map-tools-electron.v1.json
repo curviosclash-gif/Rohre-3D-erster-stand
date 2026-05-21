@@ -2,7 +2,7 @@
   "contract": "knowledge-graph.mapping.v1",
   "schema_version": 1,
   "mapping_id": "map-tools-electron",
-  "description": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+  "description": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
   "nodes": [
     {
       "id": "runtime:map-tools-electron-shell",
@@ -228,6 +228,11 @@
       "type": "reads_state"
     },
     {
+      "from": "runtime:map-tools-renderer",
+      "to": "state:agent-map-readonly-dataset",
+      "type": "reads_state"
+    },
+    {
       "from": "runtime:map-tools-static-server",
       "to": "config:plan-map-viewer-shell",
       "type": "reads_config"
@@ -239,12 +244,22 @@
     },
     {
       "from": "runtime:map-tools-static-server",
+      "to": "config:agent-map-viewer-shell",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-static-server",
       "to": "state:plan-map-readonly-dataset",
       "type": "reads_state"
     },
     {
       "from": "runtime:map-tools-static-server",
       "to": "state:repo-map-readonly-dataset",
+      "type": "reads_state"
+    },
+    {
+      "from": "runtime:map-tools-static-server",
+      "to": "state:agent-map-readonly-dataset",
       "type": "reads_state"
     },
     {

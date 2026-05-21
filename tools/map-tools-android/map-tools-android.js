@@ -9,6 +9,11 @@ const views = {
     label: 'Repo Map',
     path: './tools/repo-map/index.html',
   },
+  agent: {
+    id: 'agent',
+    label: 'Agent Map',
+    path: './tools/agent-map/index.html',
+  },
 };
 
 const defaultUpdateConfig = {

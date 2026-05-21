@@ -7,7 +7,7 @@ import { _electron as electron } from '@playwright/test';
 const require = createRequire(import.meta.url);
 const ELECTRON_EXECUTABLE = require('../electron/node_modules/electron');
 
-test('map tools Electron shell loads Plan Map and switches to Repo Map', async (t) => {
+test('map tools Electron shell loads Plan Map and switches between Repo Map and Agent Map', async (t) => {
   const app = await electron.launch({
     executablePath: ELECTRON_EXECUTABLE,
     args: [path.resolve('electron/map-tools/main.cjs')],
@@ -89,5 +89,35 @@ test('map tools Electron shell loads Plan Map and switches to Repo Map', async (
   assert.ok(
     Math.abs(repoState.layout.stageHeight - repoState.layout.frameHeight) <= 2,
     `repo iframe does not fill viewer stage: ${JSON.stringify(repoState.layout)}`,
+  );
+
+  await page.locator('[data-view-id="agent"]').click();
+  await page.waitForFunction(() => (
+    document.querySelector('#activeViewLabel')?.textContent === 'Agent Map'
+    && /\/tools\/agent-map\/index\.html/.test(document.querySelector('#mapFrame')?.getAttribute('src') || '')
+  ), null, { timeout: 60_000 });
+
+  const agentState = await page.evaluate(() => ({
+    activeLabel: document.querySelector('#activeViewLabel')?.textContent,
+    frameSrc: document.querySelector('#mapFrame')?.getAttribute('src'),
+    layout: (() => {
+      const stage = document.querySelector('.viewer-stage')?.getBoundingClientRect();
+      const frame = document.querySelector('#mapFrame')?.getBoundingClientRect();
+      return {
+        stageHeight: stage?.height || 0,
+        frameHeight: frame?.height || 0,
+      };
+    })(),
+  }));
+
+  assert.equal(agentState.activeLabel, 'Agent Map');
+  assert.match(agentState.frameSrc || '', /\/tools\/agent-map\/index\.html/);
+  assert.ok(
+    agentState.layout.stageHeight > 500,
+    `agent viewer stage collapsed: ${JSON.stringify(agentState.layout)}`,
+  );
+  assert.ok(
+    Math.abs(agentState.layout.stageHeight - agentState.layout.frameHeight) <= 2,
+    `agent iframe does not fill viewer stage: ${JSON.stringify(agentState.layout)}`,
   );
 });

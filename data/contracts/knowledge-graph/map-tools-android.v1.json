@@ -2,7 +2,7 @@
   "contract": "knowledge-graph.mapping.v1",
   "schema_version": 1,
   "mapping_id": "map-tools-android",
-  "description": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+  "description": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
   "nodes": [
     {
       "id": "runtime:map-tools-android-build",
@@ -148,6 +148,11 @@
     },
     {
       "from": "runtime:map-tools-android-build",
+      "to": "config:agent-map-viewer-shell",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:map-tools-android-build",
       "to": "state:map-tools-android-static-bundle",
       "type": "writes_state"
     },
@@ -174,6 +179,11 @@
     {
       "from": "runtime:map-tools-android-shell",
       "to": "state:repo-map-readonly-dataset",
+      "type": "reads_state"
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "state:agent-map-readonly-dataset",
       "type": "reads_state"
     },
     {

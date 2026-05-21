@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Curvios Agent Map</title>
+    <link rel="stylesheet" href="./viewer.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <h1>Agent Map</h1>
+          <span id="sourceMeta" class="source-meta">read-only</span>
+        </div>
+        <div class="top-actions">
+          <label class="file-control">
+            <span>JSON</span>
+            <input id="fileInput" type="file" accept="application/json,.json">
+          </label>
+          <div class="segmented" aria-label="Ansicht">
+            <button type="button" data-view="path" class="is-active">Pfad</button>
+            <button type="button" data-view="workflows">Workflows</button>
+            <button type="button" data-view="skills">Skills</button>
+            <button type="button" data-view="checks">Checks</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar" aria-label="Filter">
+          <div class="filter-stack">
+            <label>
+              <span>Suche</span>
+              <input id="searchInput" type="search" autocomplete="off" placeholder="bugfix, graph, commit">
+            </label>
+            <label>
+              <span>Workflow</span>
+              <select id="workflowFilter">
+                <option value="all">Alle</option>
+              </select>
+            </label>
+            <label>
+              <span>Layer</span>
+              <select id="layerFilter">
+                <option value="all">Alle</option>
+                <option value="task">Tasks</option>
+                <option value="workflow">Workflows</option>
+                <option value="rule">Rules</option>
+                <option value="skill">Skills</option>
+                <option value="check">Checks</option>
+              </select>
+            </label>
+          </div>
+          <div id="taskList" class="task-list"></div>
+        </aside>
+
+        <section class="main-stage" aria-label="Agent-Karte">
+          <div id="metrics" class="metrics-strip"></div>
+
+          <section id="pathView" class="view-panel is-active">
+            <div class="map-card">
+              <svg id="agentSvg" class="agent-svg" role="img" aria-label="Agent Governance Map"></svg>
+            </div>
+            <div id="pathTables" class="split-grid"></div>
+          </section>
+
+          <section id="workflowsView" class="view-panel">
+            <div id="workflowPanel" class="data-panel"></div>
+          </section>
+
+          <section id="skillsView" class="view-panel">
+            <div id="skillsPanel" class="data-panel"></div>
+          </section>
+
+          <section id="checksView" class="view-panel">
+            <div id="checksPanel" class="data-panel"></div>
+          </section>
+
+          <div id="sourcesFootnote" class="sources-footnote"></div>
+        </section>
+
+        <aside class="detail-panel" aria-label="Details">
+          <div id="detailPanel" class="detail-content"></div>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="./viewer.js"></script>
+  </body>
+</html>

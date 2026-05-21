@@ -1,6 +1,7 @@
 # CurviosClash Map Tools
 
-Separate Electron shell for the read-only Plan Map and Repo Map viewers.
+Separate Electron shell for the read-only Plan Map, Repo Map and Agent Map
+viewers.
 
 Start from the repository root:
 
@@ -14,16 +15,17 @@ On Windows, double-click the root launcher instead:
 start_map_tools.bat
 ```
 
-The app refreshes both map exports on startup:
+The app refreshes map exports on startup:
 
 - `scripts/export-plan-map.mjs` -> `tmp/plan-map/plan-map.json`
 - `scripts/export-repo-map.mjs` -> `tmp/repo-map/repo-map.json`
+- `scripts/export-agent-map.mjs` -> `tmp/agent-map/agent-map.json`
 
-The native menu and the visible shell bar switch between Plan Map and Repo Map,
-refresh exports, open the repository folder, and link the existing viewer
-READMEs. The local server is whitelisted to `tools/*-map/` and `tmp/*-map/` so
-the shell can reuse the static viewers without exposing the whole repository
-over HTTP.
+The native menu and the visible shell bar switch between Plan Map, Repo Map and
+Agent Map, refresh exports, open the repository folder, and link the existing
+viewer READMEs. The local server is whitelisted to `tools/*-map/` and
+`tmp/*-map/` so the shell can reuse the static viewers without exposing the
+whole repository over HTTP.
 
 The shell UI lives under `electron/map-tools/ui/` and loads the map viewers in a
 local iframe. Export failures stay in the window as a retryable error panel, so a
