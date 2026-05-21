@@ -26,6 +26,9 @@ const MOBILE_CLASSIC_UPDATE_CHECK_ID = 'mobile-classic-update-check';
 const MOBILE_CLASSIC_UPDATE_OPEN_ID = 'mobile-classic-update-open';
 const MOBILE_CLASSIC_UPDATE_STATUS_ID = 'mobile-classic-update-status';
 const MOBILE_ANDROID_GHOST_STATUS_ID = 'mobile-arcade-ghost-status';
+const MOBILE_ANDROID_ENTRY_PANEL_ID = 'mobile-android-entry-panel';
+const MOBILE_ANDROID_ENTRY_CLASSIC_ID = 'mobile-android-entry-classic';
+const MOBILE_ANDROID_ENTRY_ARCADE_ID = 'mobile-android-entry-arcade';
 const MOBILE_ANDROID_MODE_PATHS = Object.freeze([
     MENU_MODE_PATHS.NORMAL,
     MENU_MODE_PATHS.ARCADE,
@@ -150,7 +153,7 @@ function ensureMobileClassicUpdateUi(doc = document) {
     checkButton.type = 'button';
     checkButton.id = MOBILE_CLASSIC_UPDATE_CHECK_ID;
     checkButton.className = 'secondary-btn mobile-classic-update-btn';
-    checkButton.textContent = 'Update pruefen';
+    checkButton.textContent = 'Update';
 
     const openButton = doc.createElement('button');
     openButton.type = 'button';
@@ -173,6 +176,51 @@ function ensureMobileClassicUpdateUi(doc = document) {
         || doc.getElementById('main-menu')
         || doc.body;
     host?.appendChild(panel);
+    return panel;
+}
+
+function createMobileAndroidEntryButton(doc, { id, modePath, label }) {
+    const button = doc.createElement('button');
+    button.type = 'button';
+    button.id = id;
+    button.className = 'nav-btn mobile-android-entry-btn';
+    button.dataset.mobileModeEntry = modePath;
+    button.textContent = label;
+    button.title = '';
+    return button;
+}
+
+function ensureMobileAndroidEntryUi(doc = document) {
+    if (!doc?.createElement) {
+        return null;
+    }
+    const existing = doc.getElementById(MOBILE_ANDROID_ENTRY_PANEL_ID);
+    if (existing) {
+        return existing;
+    }
+    const panel = doc.createElement('div');
+    panel.id = MOBILE_ANDROID_ENTRY_PANEL_ID;
+    panel.className = 'mobile-android-entry-panel';
+    panel.setAttribute('aria-label', 'Android Spielstil');
+    panel.append(
+        createMobileAndroidEntryButton(doc, {
+            id: MOBILE_ANDROID_ENTRY_CLASSIC_ID,
+            modePath: MENU_MODE_PATHS.NORMAL,
+            label: 'Classic',
+        }),
+        createMobileAndroidEntryButton(doc, {
+            id: MOBILE_ANDROID_ENTRY_ARCADE_ID,
+            modePath: MENU_MODE_PATHS.ARCADE,
+            label: 'Parcours',
+        }),
+    );
+    const menuNav = doc.getElementById('menu-nav');
+    const host = doc.querySelector('.menu-shell') || doc.getElementById('main-menu') || doc.body;
+    if (menuNav?.parentNode) {
+        menuNav.parentNode.insertBefore(panel, menuNav);
+    } else {
+        host?.appendChild(panel);
+    }
     return panel;
 }
 
@@ -340,6 +388,26 @@ body.mobile-classic-app #menu-nav {
     grid-template-columns: minmax(0, 1fr);
 }
 
+body.mobile-classic-app #mobile-android-entry-panel {
+    display: none;
+}
+
+body.mobile-classic-app #main-menu[data-menu-depth="1"] #mobile-android-entry-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+}
+
+body.mobile-classic-app #main-menu[data-menu-depth="1"] #menu-nav {
+    display: none !important;
+}
+
+body.mobile-classic-app .mobile-android-entry-btn {
+    min-height: 82px;
+    border-radius: 8px;
+    letter-spacing: 0 !important;
+}
+
 body.mobile-classic-app #game-container {
     min-height: 100dvh;
 }
@@ -369,10 +437,12 @@ body.mobile-classic-app .mobile-classic-update-actions {
 body.mobile-classic-app .mobile-classic-update-btn {
     width: auto;
     min-width: 0;
+    min-height: 34px;
     padding: 7px 9px;
     border-radius: 8px;
     font-size: 0.72rem;
     line-height: 1;
+    opacity: 0.84;
 }
 
 body.mobile-classic-app #mobile-classic-update-open[hidden] {
@@ -392,6 +462,11 @@ body.mobile-classic-app .mobile-classic-update-status {
 body.mobile-classic-app #menu-selection-summary {
     font-size: 13px;
     line-height: 1.35;
+}
+
+body.mobile-classic-app .arcade-inline-surface,
+body.mobile-classic-app .start-section-card[data-start-section="presets"] {
+    display: none !important;
 }
 
 body.mobile-classic-app #touch-controls {
@@ -626,7 +701,7 @@ body.mobile-classic-app #mobile-arcade-ghost-status {
     z-index: 1001;
 }
 
-body.mobile-classic-app[data-mobile-mode-path="arcade"] #mobile-arcade-ghost-status {
+body.mobile-classic-app[data-mobile-mode-path="arcade"][data-mobile-menu-visible="0"] #mobile-arcade-ghost-status {
     display: block;
 }
 `;
@@ -644,6 +719,41 @@ function ensureMobileAndroidStatusUi(doc = document) {
     doc.body.appendChild(status);
 }
 
+function syncMobileAndroidMenuCopy(doc = document) {
+    const customTitle = doc?.getElementById?.('submenu-custom-title');
+    if (customTitle) {
+        customTitle.textContent = 'Spielstil waehlen';
+    }
+    const gameTitle = doc?.getElementById?.('submenu-game-title');
+    if (gameTitle) {
+        gameTitle.textContent = 'Start vorbereiten';
+    }
+}
+
+function updateMobileAndroidMenuVisibility(doc = document) {
+    if (!doc?.body) {
+        return;
+    }
+    const mainMenu = doc.getElementById?.('main-menu');
+    const menuVisible = !!mainMenu && !mainMenu.classList.contains('hidden');
+    doc.body.dataset.mobileMenuVisible = menuVisible ? '1' : '0';
+    if (doc.documentElement?.dataset) {
+        doc.documentElement.dataset.mobileMenuVisible = menuVisible ? '1' : '0';
+    }
+}
+
+function ensureMobileAndroidMenuVisibilityObserver(doc = document) {
+    const mainMenu = doc?.getElementById?.('main-menu');
+    const ownerWindow = resolveWindow(doc);
+    updateMobileAndroidMenuVisibility(doc);
+    if (!mainMenu || !ownerWindow?.MutationObserver || mainMenu.dataset.mobileAndroidMenuObserverBound === '1') {
+        return;
+    }
+    const observer = new ownerWindow.MutationObserver(() => updateMobileAndroidMenuVisibility(doc));
+    observer.observe(mainMenu, { attributes: true, attributeFilter: ['class'] });
+    mainMenu.dataset.mobileAndroidMenuObserverBound = '1';
+}
+
 export function applyMobileClassicDocumentState(doc = document) {
     if (!doc?.documentElement || !doc.body) {
         return;
@@ -654,7 +764,10 @@ export function applyMobileClassicDocumentState(doc = document) {
     doc.body.dataset.appTarget = MOBILE_CLASSIC_APP_TARGET;
     ensureViewportFit(doc);
     ensureMobileClassicStyles(doc);
+    ensureMobileAndroidEntryUi(doc);
     ensureMobileAndroidStatusUi(doc);
+    syncMobileAndroidMenuCopy(doc);
+    ensureMobileAndroidMenuVisibilityObserver(doc);
     setupMobileClassicUpdateUi(doc);
 }
 
@@ -684,6 +797,7 @@ function updateMobileAndroidDocumentMode(modePath, doc = (typeof document !== 'u
     if (doc?.body?.dataset) {
         doc.body.dataset.mobileModePath = normalizedModePath;
     }
+    updateMobileAndroidMenuVisibility(doc);
 }
 
 function resolveCurrentMobileModePath(game = null) {
@@ -692,7 +806,7 @@ function resolveCurrentMobileModePath(game = null) {
 
 function pruneMapSelectToArcadeAllowlist(select) {
     if (!select?.options) {
-        return;
+        return '';
     }
     const options = Array.from(select.options);
     for (let i = options.length - 1; i >= 0; i -= 1) {
@@ -708,6 +822,7 @@ function pruneMapSelectToArcadeAllowlist(select) {
     } else if (select.options.length > 0) {
         select.value = select.options[0].value;
     }
+    return String(select.value || '');
 }
 
 function bindMobileModeResync(game, button) {
@@ -721,13 +836,89 @@ function bindMobileModeResync(game, button) {
     });
 }
 
+function syncMobileAndroidQuickStarts(ui = null) {
+    const quickStartSection = ui?.quickStartLastButton?.closest?.('.menu-section')
+        || ui?.quickStartEventPlaylistButton?.closest?.('.menu-section')
+        || ui?.quickStartRandomButton?.closest?.('.menu-section')
+        || null;
+    if (!quickStartSection) {
+        return;
+    }
+    quickStartSection.classList.add('hidden');
+    quickStartSection.setAttribute('aria-hidden', 'true');
+}
+
+function syncMobileAndroidEntryButtons(doc, modePath) {
+    const panel = doc?.getElementById?.(MOBILE_ANDROID_ENTRY_PANEL_ID);
+    if (!panel) {
+        return;
+    }
+    panel.querySelectorAll?.('[data-mobile-mode-entry]')?.forEach((button) => {
+        const buttonModePath = normalizeTarget(button?.dataset?.mobileModeEntry);
+        const active = buttonModePath === modePath;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+    });
+}
+
+function bindMobileAndroidEntryUi(game = null, doc = document) {
+    const panel = doc?.getElementById?.(MOBILE_ANDROID_ENTRY_PANEL_ID);
+    if (!panel || panel.dataset.mobileAndroidEntryBound === '1') {
+        return;
+    }
+    const ownerWindow = resolveWindow(doc);
+    panel.querySelectorAll?.('[data-mobile-mode-entry]')?.forEach((button) => {
+        button.addEventListener?.('click', () => {
+            const modePath = resolveMobileAndroidModePath({
+                localSettings: {
+                    modePath: button?.dataset?.mobileModeEntry,
+                },
+            });
+            const ui = game?.runtimeCoordinator?.getRuntimeHandle?.('ui') || game?.ui || null;
+            const modeButton = Array.isArray(ui?.modePathButtons)
+                ? ui.modePathButtons.find((entry) => normalizeTarget(entry?.dataset?.modePath) === modePath)
+                : null;
+            if (modeButton && !modeButton.disabled) {
+                modeButton.click();
+            } else if (game?.settings) {
+                if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
+                    game.settings.localSettings = {};
+                }
+                game.settings.localSettings.modePath = modePath;
+                applyMobileClassicSettings(game.settings);
+                game.uiManager?.menuNavigationRuntime?.showPanel?.('submenu-game', {
+                    trigger: 'mobile_android_entry',
+                    modePath,
+                });
+            }
+            ownerWindow?.setTimeout?.(() => {
+                if (game?.settings) {
+                    applyMobileClassicSettings(game.settings);
+                    game.uiManager?.syncStartSetupState?.(game.settings);
+                }
+                applyMobileClassicUiLocks(game);
+            }, 0);
+        });
+    });
+    panel.dataset.mobileAndroidEntryBound = '1';
+}
+
 export function applyMobileClassicUiLocks(game = null) {
+    if (game?.settings) {
+        applyMobileClassicSettings(game.settings);
+        game.uiManager?.syncStartSetupState?.(game.settings);
+    }
     const ui = game?.runtimeCoordinator?.getRuntimeHandle?.('ui') || game?.ui || null;
     if (!ui) {
         return;
     }
     const modePath = resolveCurrentMobileModePath(game);
-    updateMobileAndroidDocumentMode(modePath);
+    const doc = ui.mainMenu?.ownerDocument || (typeof document !== 'undefined' ? document : null);
+    updateMobileAndroidDocumentMode(modePath, doc);
+    syncMobileAndroidMenuCopy(doc);
+    bindMobileAndroidEntryUi(game, doc);
+    syncMobileAndroidEntryButtons(doc, modePath);
+    syncMobileAndroidQuickStarts(ui);
     if (Array.isArray(ui.sessionButtons)) {
         ui.sessionButtons.forEach((button) => {
             const sessionType = normalizeTarget(button?.dataset?.sessionType);
@@ -752,7 +943,12 @@ export function applyMobileClassicUiLocks(game = null) {
         });
     }
     if (modePath === MENU_MODE_PATHS.ARCADE) {
-        pruneMapSelectToArcadeAllowlist(ui.mapSelect);
+        const selectedMapKey = pruneMapSelectToArcadeAllowlist(ui.mapSelect);
+        if (selectedMapKey && game?.settings) {
+            const startSetup = ensureStartSetup(game.settings);
+            game.settings.mapKey = selectedMapKey;
+            startSetup.modeSelections.arcade.mapKey = selectedMapKey;
+        }
     }
     if (ui.startButton) {
         ui.startButton.textContent = modePath === MENU_MODE_PATHS.ARCADE

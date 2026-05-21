@@ -196,13 +196,14 @@ test('Unified Mobile Android UI exposes Classic and Arcade-Parcours in one app s
   const mapSelect = createMapSelect(['standard', 'micro_maw', 'storm_switchyard', 'mirror_docks'], 'storm_switchyard');
   const startButton = createButton();
   const menuContext = { textContent: '' };
+  const gameSettings = {
+    localSettings: {
+      modePath: 'arcade',
+    },
+  };
 
   applyMobileClassicUiLocks({
-    settings: {
-      localSettings: {
-        modePath: 'arcade',
-      },
-    },
+    settings: gameSettings,
     ui: {
       sessionButtons: [singleButton, multiButton],
       modePathButtons: [normalButton, arcadeButton, fightButton],
@@ -221,6 +222,10 @@ test('Unified Mobile Android UI exposes Classic and Arcade-Parcours in one app s
   assert.equal(arcadeButton.textContent, 'Parcours');
   assert.equal(fightButton.disabled, true);
   assert.deepEqual(mapSelect.options.map((option) => option.value), ['micro_maw', 'mirror_docks']);
+  assert.equal(mapSelect.value, 'micro_maw');
+  assert.equal(gameSettings.mapKey, 'micro_maw');
+  assert.equal(gameSettings.localSettings.startSetup.modeSelections.arcade.mapKey, 'micro_maw');
+  assert.equal(gameSettings.localSettings.startSetup.arcadeGhostDuelMode, 'self_longest_ghost');
   assert.equal(startButton.textContent, 'Parcours starten');
   assert.equal(menuContext.textContent, 'Arcade-Parcours');
 });
@@ -569,7 +574,7 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   assert.match(mobileClassicApp, /Classic starten/);
   assert.match(mobileClassicApp, /Parcours starten/);
   assert.match(mobileClassicApp, /Solo spielen/);
-  assert.match(mobileClassicApp, /Update pruefen/);
+  assert.match(mobileClassicApp, /Update/);
   assert.match(touchInputSource, /TILT SANFT/);
   assert.match(touchInputSource, /KALIBRIERE/);
   assert.match(touchInputSource, /resolveTiltCalibrationNeutral/);

@@ -159,6 +159,10 @@ test('Unified Mobile Android shell carries Arcade HUD, Ghost, and pause affordan
 
   assert.match(mobileClassicApp, /modePath === MENU_MODE_PATHS\.ARCADE/);
   assert.match(mobileClassicApp, /touch-button-pause/);
+  assert.match(mobileClassicApp, /mobile-android-entry-panel/);
+  assert.match(mobileClassicApp, /mobileModeEntry/);
+  assert.match(mobileClassicApp, /Spielstil waehlen/);
+  assert.match(mobileClassicApp, /Start vorbereiten/);
   assert.match(mobileClassicApp, /#parcours-hud/);
   assert.match(mobileClassicApp, /#parcours-minimap/);
   assert.match(mobileClassicApp, /mobile-arcade-ghost-status/);
