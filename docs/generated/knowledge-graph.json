@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 225,
+          "concreteCount": 227,
           "plannedCount": 0
         }
       }
@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 26,
+          "concreteCount": 27,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1001,7 +1001,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 42,
+          "concreteCount": 43,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1059,7 +1059,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 28,
+          "concreteCount": 29,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -22860,6 +22860,72 @@
       }
     },
     {
+      "id": "runtime:agent-map-export",
+      "type": "runtime",
+      "title": "Agent Map export",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 8,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": "scripts/export-agent-map.mjs",
+        "domain": "agent-governance",
+        "tooling": "read-only-agent-dashboard"
+      }
+    },
+    {
+      "id": "runtime:agent-map-viewer",
+      "type": "runtime",
+      "title": "Agent Map viewer",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 18,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": "tools/agent-map/viewer.js",
+        "domain": "agent-governance",
+        "tooling": "read-only-agent-dashboard"
+      }
+    },
+    {
+      "id": "runtime:agent-preflight",
+      "type": "runtime",
+      "title": "Agent preflight",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 28,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": "scripts/agent-preflight.mjs",
+        "domain": "agent-governance",
+        "tooling": "governance-check"
+      }
+    },
+    {
       "id": "runtime:entity-spawn-ops",
       "type": "runtime",
       "title": "EntitySpawnOps",
@@ -22951,9 +23017,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 8,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "scripts/build-map-tools-android.mjs",
         "domain": "map-tools",
         "tooling": "android-static-bundle",
@@ -22974,9 +23040,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 30,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "android-map-tools/app/src/main/java/de/curviosclash/maps/MainActivity.java",
         "domain": "map-tools",
         "tooling": "capacitor-native-shell",
@@ -22997,9 +23063,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 19,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tools/map-tools-android/map-tools-android.js",
         "domain": "map-tools",
         "tooling": "android-webview-shell",
@@ -23020,9 +23086,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 8,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "electron/map-tools/main.cjs",
         "domain": "map-tools",
         "tooling": "read-only-map-dashboard",
@@ -23043,9 +23109,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 49,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "electron/map-tools/launch.cjs",
         "domain": "map-tools",
         "tooling": "local-startup"
@@ -23065,9 +23131,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 19,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "electron/map-tools/preload.cjs",
         "domain": "map-tools",
         "tooling": "desktop-ipc-bridge"
@@ -23087,9 +23153,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 29,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "electron/map-tools/ui/map-tools-renderer.js",
         "domain": "map-tools",
         "tooling": "status-and-navigation-shell"
@@ -23109,9 +23175,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 39,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "electron/map-tools/server.cjs",
         "domain": "map-tools",
         "tooling": "local-viewer-server"
@@ -23289,9 +23355,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 59,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "scripts/export-repo-map.mjs",
         "domain": "repo-map",
         "tooling": "read-only-repo-dashboard"
@@ -23311,9 +23377,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 69,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tools/repo-map/viewer.js",
         "domain": "repo-map",
         "tooling": "read-only-repo-dashboard"
@@ -23545,6 +23611,28 @@
       }
     },
     {
+      "id": "state:agent-map-readonly-dataset",
+      "type": "state",
+      "title": "Read-only Agent Map JSON dataset",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 38,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "domain": "agent-governance",
+        "path": "tmp/agent-map/agent-map.json",
+        "ephemeral": true
+      }
+    },
+    {
       "id": "state:hunt-combat-lock-on",
       "type": "state",
       "title": "Hunt combat targeting and lock-on cache",
@@ -23579,9 +23667,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 41,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "domain": "map-tools",
         "path": "dist/map-tools-android",
         "ephemeral": true
@@ -23623,9 +23711,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 79,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "domain": "repo-map",
         "path": "tmp/repo-map/repo-map.json",
         "ephemeral": true
@@ -23737,6 +23825,398 @@
       }
     },
     {
+      "id": "config:agent-governance-entrypoint",
+      "type": "config",
+      "title": "AGENTS entrypoint",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 75,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": "AGENTS.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-governance-graph-anchor",
+      "type": "config",
+      "title": "Agent governance knowledge graph mapping",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 215,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "domain": "agent-governance"
+      }
+    },
+    {
+      "id": "config:agent-map-docs",
+      "type": "config",
+      "title": "Agent Map documentation",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 66,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": "tools/agent-map/README.md",
+        "domain": "agent-governance"
+      }
+    },
+    {
+      "id": "config:agent-map-viewer-shell",
+      "type": "config",
+      "title": "Agent Map HTML shell",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 48,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": "tools/agent-map/index.html",
+        "domain": "agent-governance"
+      }
+    },
+    {
+      "id": "config:agent-map-viewer-style",
+      "type": "config",
+      "title": "Agent Map visual layout",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 57,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": "tools/agent-map/viewer.css",
+        "domain": "agent-governance"
+      }
+    },
+    {
+      "id": "config:agent-rule-code-quality-and-debugging",
+      "type": "config",
+      "title": "Code quality and debugging rule",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 105,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/rules/code_quality_and_debugging.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-rule-git-and-commits",
+      "type": "config",
+      "title": "Git and commits rule",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 95,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/rules/git_and_commits.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-rule-planning-and-governance",
+      "type": "config",
+      "title": "Planning and governance rule",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 85,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/rules/planning_and_governance.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-rule-product-focus",
+      "type": "config",
+      "title": "Product focus rule",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 125,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/rules/product_focus.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-rule-token-efficiency-and-tools",
+      "type": "config",
+      "title": "Token efficiency and tools rule",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 115,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/rules/token_efficiency_and_tools.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-skill-curvios-agent-governance",
+      "type": "config",
+      "title": "Curvios Agent Governance skill",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 195,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "domain": "agent-governance",
+        "externalSkillId": "curvios-agent-governance",
+        "pathHint": "$CODEX_HOME/skills/curvios-agent-governance/SKILL.md"
+      }
+    },
+    {
+      "id": "config:agent-skill-curvios-graph-navigation",
+      "type": "config",
+      "title": "Curvios Graph Navigation skill",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 205,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "domain": "agent-governance",
+        "externalSkillId": "curvios-graph-navigation",
+        "pathHint": "$CODEX_HOME/skills/curvios-graph-navigation/SKILL.md"
+      }
+    },
+    {
+      "id": "config:agent-workflow-bugfix",
+      "type": "config",
+      "title": "Bugfix workflow",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 165,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/workflows/bugfix.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-workflow-code",
+      "type": "config",
+      "title": "Code workflow",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 145,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/workflows/code.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-workflow-fix-planung",
+      "type": "config",
+      "title": "Fix-planung workflow",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 185,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/workflows/fix-planung.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-workflow-plan",
+      "type": "config",
+      "title": "Plan workflow",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 135,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/workflows/plan.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-workflow-quick",
+      "type": "config",
+      "title": "Quick workflow",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 155,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/workflows/quick.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
+      "id": "config:agent-workflow-status",
+      "type": "config",
+      "title": "Status workflow",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 175,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".agents/workflows/status.md",
+        "domain": "agent-governance",
+        "sourceOfTruth": true
+      }
+    },
+    {
       "id": "config:base-game-config",
       "type": "config",
       "title": "Base game config proxy",
@@ -23822,9 +24302,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 51,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "capacitor.config.json",
         "domain": "map-tools"
       }
@@ -23843,9 +24323,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 78,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tools/map-tools-android/README.md",
         "domain": "map-tools"
       }
@@ -23864,9 +24344,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 96,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "android-map-tools/app/build.gradle",
         "domain": "map-tools"
       }
@@ -23885,9 +24365,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 105,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "domain": "map-tools"
       }
@@ -23906,9 +24386,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 60,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tools/map-tools-android/index.html",
         "domain": "map-tools"
       }
@@ -23927,9 +24407,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 87,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "android-map-tools/app/src/main/AndroidManifest.xml",
         "domain": "map-tools"
       }
@@ -23948,9 +24428,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 69,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tools/map-tools-android/map-tools-android.css",
         "domain": "map-tools"
       }
@@ -23969,9 +24449,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 107,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "electron/map-tools/README.md",
         "domain": "map-tools"
       }
@@ -23990,9 +24470,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 116,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "domain": "map-tools"
       }
@@ -24011,9 +24491,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 89,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "electron/map-tools/ui/map-tools.html",
         "domain": "map-tools"
       }
@@ -24032,9 +24512,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 98,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "electron/map-tools/ui/map-tools.css",
         "domain": "map-tools"
       }
@@ -24137,9 +24617,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 143,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tools/repo-map/README.md",
         "domain": "repo-map"
       }
@@ -24158,9 +24638,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 125,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tools/repo-map/index.html",
         "domain": "repo-map"
       }
@@ -24179,9 +24659,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 134,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tools/repo-map/viewer.css",
         "domain": "repo-map"
       }
@@ -24275,6 +24755,27 @@
       }
     },
     {
+      "id": "test:agent-map-export-contract",
+      "type": "test",
+      "title": "Agent Map export contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 224,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": "tests/agent-map-export.contract.test.mjs",
+        "domain": "agent-governance"
+      }
+    },
+    {
       "id": "test:map-tools-android-contract",
       "type": "test",
       "title": "Map Tools Android contract",
@@ -24288,9 +24789,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 114,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Capacitor Android wrapper for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Capacitor Android wrapper for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tests/map-tools-android.contract.test.mjs",
         "domain": "map-tools"
       }
@@ -24309,9 +24810,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 152,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tests/map-tools-electron.contract.test.mjs",
         "domain": "map-tools"
       }
@@ -24330,9 +24831,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 161,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tests/map-tools-electron-smoke.test.mjs",
         "domain": "map-tools"
       }
@@ -24416,9 +24917,9 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 170,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Repo Map and Plan Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
         "file": "tests/repo-map-export.contract.test.mjs",
         "domain": "repo-map"
       }
@@ -24511,12 +25012,16 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V117",
           "V125",
           "V93"
+        ],
+        "mappedNodes": [
+          "config:agent-rule-code-quality-and-debugging"
         ],
         "exists": true
       }
@@ -24528,12 +25033,16 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V109",
           "V117",
           "V93"
+        ],
+        "mappedNodes": [
+          "config:agent-rule-git-and-commits"
         ],
         "exists": true
       }
@@ -24545,6 +25054,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -24556,6 +25066,9 @@
           "V93",
           "V94"
         ],
+        "mappedNodes": [
+          "config:agent-rule-planning-and-governance"
+        ],
         "exists": true
       }
     },
@@ -24566,10 +25079,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "V93"
+        ],
+        "mappedNodes": [
+          "config:agent-rule-product-focus"
         ],
         "exists": true
       }
@@ -24581,6 +25098,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -24592,6 +25110,9 @@
           "V123",
           "V93",
           "V94"
+        ],
+        "mappedNodes": [
+          "config:agent-rule-token-efficiency-and-tools"
         ],
         "exists": true
       }
@@ -24642,6 +25163,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -24649,6 +25171,9 @@
           "V117",
           "V125",
           "V93"
+        ],
+        "mappedNodes": [
+          "config:agent-workflow-bugfix"
         ],
         "exists": true
       }
@@ -24675,6 +25200,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -24686,6 +25212,9 @@
           "V93",
           "V94"
         ],
+        "mappedNodes": [
+          "config:agent-workflow-code"
+        ],
         "exists": true
       }
     },
@@ -24696,6 +25225,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -24703,6 +25233,9 @@
           "V116",
           "V125",
           "V93"
+        ],
+        "mappedNodes": [
+          "config:agent-workflow-fix-planung"
         ],
         "exists": true
       }
@@ -24729,6 +25262,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -24740,6 +25274,9 @@
           "V93",
           "V94"
         ],
+        "mappedNodes": [
+          "config:agent-workflow-plan"
+        ],
         "exists": true
       }
     },
@@ -24750,6 +25287,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -24757,6 +25295,9 @@
           "V117",
           "V125",
           "V93"
+        ],
+        "mappedNodes": [
+          "config:agent-workflow-quick"
         ],
         "exists": true
       }
@@ -24783,6 +25324,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -24792,6 +25334,9 @@
           "V111",
           "V93",
           "V94"
+        ],
+        "mappedNodes": [
+          "config:agent-workflow-status"
         ],
         "exists": true
       }
@@ -25001,6 +25546,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -25009,6 +25555,9 @@
           "V123",
           "V125",
           "V93"
+        ],
+        "mappedNodes": [
+          "config:agent-governance-entrypoint"
         ],
         "exists": true
       }
@@ -26930,6 +27479,27 @@
         ],
         "scopeBlocks": [
           "V114"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "data/contracts/knowledge-graph/agent-governance.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111"
+        ],
+        "mappedNodes": [
+          "config:agent-governance-graph-anchor"
         ],
         "exists": true
       }
@@ -32755,10 +33325,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "knowledge-graph-mapping"
         ],
         "scopeBlocks": [
           "B13"
+        ],
+        "mappedNodes": [
+          "runtime:agent-preflight"
         ],
         "exists": true
       }
@@ -33484,6 +34058,25 @@
         ],
         "scopeBlocks": [
           "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/export-agent-map.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "knowledge-graph-mapping"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "mappedNodes": [
+          "runtime:agent-map-export"
         ],
         "exists": true
       }
@@ -45226,6 +45819,25 @@
       }
     },
     {
+      "id": "tests/agent-map-export.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "knowledge-graph-mapping"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "mappedNodes": [
+          "test:agent-map-export-contract"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/agent-memory.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -47469,7 +48081,67 @@
         "scopeBlocks": [
           "V116"
         ],
-        "exists": false
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/agent-map/index.html",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:agent-map-viewer-shell"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/agent-map/README.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:agent-map-docs"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/agent-map/viewer.css",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:agent-map-viewer-style"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tools/agent-map/viewer.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "runtime:agent-map-viewer"
+        ],
+        "exists": true
       }
     },
     {
@@ -48100,6 +48772,198 @@
   ],
   "edges": [
     {
+      "from": ".agents/rules/code_quality_and_debugging.md",
+      "to": "config:agent-rule-code-quality-and-debugging",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 105,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".agents/rules/git_and_commits.md",
+      "to": "config:agent-rule-git-and-commits",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 95,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".agents/rules/planning_and_governance.md",
+      "to": "config:agent-rule-planning-and-governance",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 85,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".agents/rules/product_focus.md",
+      "to": "config:agent-rule-product-focus",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 125,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".agents/rules/token_efficiency_and_tools.md",
+      "to": "config:agent-rule-token-efficiency-and-tools",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 115,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".agents/workflows/bugfix.md",
+      "to": "config:agent-workflow-bugfix",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 165,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".agents/workflows/code.md",
+      "to": "config:agent-workflow-code",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 145,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".agents/workflows/fix-planung.md",
+      "to": "config:agent-workflow-fix-planung",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 185,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".agents/workflows/plan.md",
+      "to": "config:agent-workflow-plan",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 135,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".agents/workflows/quick.md",
+      "to": "config:agent-workflow-quick",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 155,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".agents/workflows/status.md",
+      "to": "config:agent-workflow-status",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 175,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "config:agent-governance-entrypoint",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 75,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "android-map-tools/app/build.gradle",
       "to": "config:map-tools-android-gradle",
       "type": "implements",
@@ -48110,7 +48974,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 96,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -48126,7 +48990,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 87,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -48142,7 +49006,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 30,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -53027,6 +53891,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/export-agent-map.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/export-game-only-repo.mjs",
       "type": "scope",
       "hint": null,
@@ -53415,6 +54288,15 @@
     {
       "from": "B13",
       "to": "tests/agent-governance.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/agent-map-export.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -54530,9 +55412,201 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 51,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "config:agent-governance-entrypoint",
+      "to": "config:agent-rule-code-quality-and-debugging",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 280,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-governance-entrypoint",
+      "to": "config:agent-rule-git-and-commits",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 280,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-governance-entrypoint",
+      "to": "config:agent-rule-planning-and-governance",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 280,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-governance-entrypoint",
+      "to": "config:agent-rule-product-focus",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 290,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-governance-entrypoint",
+      "to": "config:agent-rule-token-efficiency-and-tools",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 285,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-map-docs",
+      "to": "config:agent-governance-graph-anchor",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 335,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-skill-curvios-agent-governance",
+      "to": "config:agent-governance-entrypoint",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 325,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-skill-curvios-graph-navigation",
+      "to": "config:agent-governance-entrypoint",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 330,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-workflow-code",
+      "to": "config:agent-rule-code-quality-and-debugging",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 305,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-workflow-code",
+      "to": "config:agent-rule-git-and-commits",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 305,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-workflow-code",
+      "to": "config:agent-rule-planning-and-governance",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 305,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "config:agent-workflow-code",
+      "to": "config:agent-rule-token-efficiency-and-tools",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 310,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
       }
     },
     {
@@ -54545,8 +55619,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 210,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 220,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -54561,8 +55635,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 281,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 296,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -54648,6 +55722,22 @@
       }
     },
     {
+      "from": "data/contracts/knowledge-graph/agent-governance.v1.json",
+      "to": "config:agent-governance-graph-anchor",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 215,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "data/contracts/knowledge-graph/map-tools-android.v1.json",
       "to": "config:map-tools-android-graph-anchor",
       "type": "implements",
@@ -54658,7 +55748,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 105,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -54674,7 +55764,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 116,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -54706,7 +55796,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 49,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -54722,7 +55812,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 8,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -54738,7 +55828,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 19,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -54754,7 +55844,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 107,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -54770,7 +55860,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 39,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -54786,7 +55876,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 29,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -54802,7 +55892,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 98,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -54818,7 +55908,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 89,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -54832,6 +55922,150 @@
         "roles": [
           "allowedAdapter"
         ]
+      }
+    },
+    {
+      "from": "runtime:agent-map-export",
+      "to": "config:agent-governance-entrypoint",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 235,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:agent-map-export",
+      "to": "config:agent-governance-graph-anchor",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 235,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:agent-map-export",
+      "to": "state:agent-map-readonly-dataset",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 235,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:agent-map-export",
+      "to": "test:agent-map-export-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 245,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:agent-map-viewer",
+      "to": "config:agent-map-docs",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 260,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:agent-map-viewer",
+      "to": "config:agent-map-viewer-shell",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 255,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:agent-map-viewer",
+      "to": "config:agent-map-viewer-style",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 255,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:agent-map-viewer",
+      "to": "state:agent-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 255,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:agent-preflight",
+      "to": "config:agent-workflow-code",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 275,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
       }
     },
     {
@@ -54948,6 +56182,22 @@
     },
     {
       "from": "runtime:map-tools-android-build",
+      "to": "config:agent-map-viewer-shell",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 140,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-build",
       "to": "config:map-tools-android-capacitor",
       "type": "reads_config",
       "hint": null,
@@ -54957,7 +56207,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 125,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -54973,7 +56223,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 125,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -54989,7 +56239,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 125,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55005,7 +56255,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 130,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55021,7 +56271,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 135,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55036,8 +56286,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 145,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 150,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
       }
@@ -55052,8 +56302,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 150,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 155,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
       }
@@ -55068,8 +56318,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 185,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 195,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55084,8 +56334,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 185,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 195,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55100,8 +56350,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 185,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 195,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55116,8 +56366,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 195,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 205,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
       }
@@ -55132,8 +56382,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 200,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 210,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
       }
@@ -55148,8 +56398,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 160,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 165,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55164,10 +56414,26 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 160,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 165,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-android-shell",
+      "to": "state:agent-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-android",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
+          "line": 175,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "state"
       }
     },
     {
@@ -55180,8 +56446,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 165,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 170,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
       }
@@ -55196,8 +56462,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 165,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 170,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
       }
@@ -55212,8 +56478,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-android.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
-          "line": 175,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "line": 185,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
       }
@@ -55229,7 +56495,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 181,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55245,7 +56511,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 181,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55261,7 +56527,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 186,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
       }
@@ -55277,7 +56543,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 186,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
       }
@@ -55293,7 +56559,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 201,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
       }
@@ -55309,7 +56575,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 206,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
       }
@@ -55325,7 +56591,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 211,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55341,9 +56607,25 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 211,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-renderer",
+      "to": "state:agent-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 221,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "state"
       }
     },
     {
@@ -55357,7 +56639,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 216,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
       }
@@ -55373,9 +56655,25 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 216,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:map-tools-static-server",
+      "to": "config:agent-map-viewer-shell",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 236,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
       }
     },
     {
@@ -55388,8 +56686,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 231,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 236,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55404,10 +56702,26 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 231,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 236,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:map-tools-static-server",
+      "to": "state:agent-map-readonly-dataset",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 251,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "state"
       }
     },
     {
@@ -55420,8 +56734,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 236,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 246,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
       }
@@ -55436,8 +56750,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 236,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 246,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
       }
@@ -55724,8 +57038,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 251,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 266,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
       }
@@ -55740,8 +57054,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 251,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 266,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
       }
@@ -55756,8 +57070,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 266,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 281,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55772,8 +57086,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 261,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 276,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55788,8 +57102,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 261,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 276,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
       }
@@ -55804,8 +57118,8 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 261,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "line": 276,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
       }
@@ -56106,6 +57420,22 @@
       }
     },
     {
+      "from": "scripts/agent-preflight.mjs",
+      "to": "runtime:agent-preflight",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 28,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "scripts/build-map-tools-android.mjs",
       "to": "runtime:map-tools-android-build",
       "type": "implements",
@@ -56116,7 +57446,23 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 8,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "scripts/export-agent-map.mjs",
+      "to": "runtime:agent-map-export",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 8,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56148,7 +57494,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 59,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56613,6 +57959,22 @@
       }
     },
     {
+      "from": "tests/agent-map-export.contract.test.mjs",
+      "to": "test:agent-map-export-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 224,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "tests/map-tools-android.contract.test.mjs",
       "to": "test:map-tools-android-contract",
       "type": "implements",
@@ -56623,7 +57985,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 114,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56639,7 +58001,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 161,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56655,7 +58017,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 152,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56719,7 +58081,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 170,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56773,6 +58135,70 @@
       }
     },
     {
+      "from": "tools/agent-map/index.html",
+      "to": "config:agent-map-viewer-shell",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 48,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/agent-map/README.md",
+      "to": "config:agent-map-docs",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 66,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/agent-map/viewer.css",
+      "to": "config:agent-map-viewer-style",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 57,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tools/agent-map/viewer.js",
+      "to": "runtime:agent-map-viewer",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 18,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "tools/map-tools-android/index.html",
       "to": "config:map-tools-android-html",
       "type": "implements",
@@ -56783,7 +58209,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 60,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56799,7 +58225,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 69,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56815,7 +58241,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 19,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56831,7 +58257,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-android.v1.json",
           "line": 78,
-          "commit": "f6331d13e5583cbea5c53252f9411b049460c964"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56911,7 +58337,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 125,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56927,7 +58353,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 143,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56943,7 +58369,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 134,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -56959,7 +58385,7 @@
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
           "line": 69,
-          "commit": "144919f395971b88532df454f665141bac3c3332"
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
       }
@@ -63209,6 +64635,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/agent-governance.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/contradictions.v1.json",
       "type": "scope",
       "hint": null,
@@ -64560,6 +65995,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/agent-governance.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/contradictions.v1.json",
       "type": "scope",
       "hint": null,
@@ -65139,6 +66583,15 @@
     {
       "from": "V111",
       "to": ".agents/workflows/status.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/agent-governance.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {
