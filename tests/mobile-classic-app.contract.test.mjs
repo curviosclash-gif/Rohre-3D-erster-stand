@@ -14,6 +14,7 @@ import {
 import { pruneMobileClassicHtml } from '../scripts/build-mobile-classic-app.mjs';
 import {
   applyMobileClassicSettings,
+  applyMobileClassicUiLocks,
   isMobileClassicTargetValue,
 } from '../src/mobile-classic/MobileClassicApp.js';
 import { createPreferredMatchInputSource } from '../src/ui/MatchInputSourceResolver.js';
@@ -65,12 +66,48 @@ function withGlobalValue(name, value, fn) {
   }
 }
 
-test('Mobile Classic Capacitor wrapper is separate from Map Tools Android', async () => {
+function createButton(dataset = {}) {
+  return {
+    dataset,
+    disabled: false,
+    textContent: '',
+    title: 'old',
+    tabIndex: 0,
+    attributes: {},
+    listeners: {},
+    setAttribute(name, value) {
+      this.attributes[name] = value;
+    },
+    addEventListener(type, handler) {
+      this.listeners[type] = handler;
+    },
+    querySelector() {
+      return null;
+    },
+  };
+}
+
+function createMapSelect(values = [], selectedValue = '') {
+  const select = {
+    value: selectedValue,
+    options: [],
+  };
+  select.options = values.map((value) => ({
+    value,
+    remove() {
+      const index = select.options.indexOf(this);
+      if (index >= 0) select.options.splice(index, 1);
+    },
+  }));
+  return select;
+}
+
+test('Unified Mobile Android Capacitor wrapper is separate from Map Tools Android', async () => {
   const config = await readJson('tools/mobile-classic-app/capacitor.config.json');
   const subprojectPackage = await readJson('tools/mobile-classic-app/package.json');
 
   assert.equal(config.appId, 'de.curviosclash.classic');
-  assert.equal(config.appName, 'Curvios Clash Classic');
+  assert.equal(config.appName, 'Curvios Clash');
   assert.equal(config.webDir, '../../dist/mobile-classic');
   assert.equal(config.android.path, '../../android-classic');
   assert.equal(subprojectPackage.private, true);
@@ -109,7 +146,7 @@ test('Mobile Classic build target emits only the game shell into its own dist pa
   assert.equal(defines.__APP_TARGET__, '"mobile-classic"');
 });
 
-test('Mobile Classic runtime guard forces single-player classic settings', () => {
+test('Unified Mobile Android runtime guard defaults invalid modes to single-player Classic', () => {
   const settings = {
     mode: '2p',
     gameMode: 'HUNT',
@@ -148,6 +185,44 @@ test('Mobile Classic runtime guard forces single-player classic settings', () =>
   assert.equal(settings.localSettings.mobileControls.tiltSensorHzVisible, true);
   assert.equal(settings.gameplay.planarMode, false);
   assert.equal(settings.hunt.respawnEnabled, false);
+});
+
+test('Unified Mobile Android UI exposes Classic and Arcade-Parcours in one app shell', () => {
+  const singleButton = createButton({ sessionType: 'single' });
+  const multiButton = createButton({ sessionType: 'multiplayer' });
+  const normalButton = createButton({ modePath: 'normal' });
+  const arcadeButton = createButton({ modePath: 'arcade' });
+  const fightButton = createButton({ modePath: 'fight' });
+  const mapSelect = createMapSelect(['standard', 'micro_maw', 'storm_switchyard', 'mirror_docks'], 'storm_switchyard');
+  const startButton = createButton();
+  const menuContext = { textContent: '' };
+
+  applyMobileClassicUiLocks({
+    settings: {
+      localSettings: {
+        modePath: 'arcade',
+      },
+    },
+    ui: {
+      sessionButtons: [singleButton, multiButton],
+      modePathButtons: [normalButton, arcadeButton, fightButton],
+      mapSelect,
+      startButton,
+      menuContext,
+    },
+  });
+
+  assert.equal(singleButton.disabled, false);
+  assert.equal(singleButton.textContent, 'Solo spielen');
+  assert.equal(multiButton.disabled, true);
+  assert.equal(normalButton.disabled, false);
+  assert.equal(normalButton.textContent, 'Classic');
+  assert.equal(arcadeButton.disabled, false);
+  assert.equal(arcadeButton.textContent, 'Parcours');
+  assert.equal(fightButton.disabled, true);
+  assert.deepEqual(mapSelect.options.map((option) => option.value), ['micro_maw', 'mirror_docks']);
+  assert.equal(startButton.textContent, 'Parcours starten');
+  assert.equal(menuContext.textContent, 'Arcade-Parcours');
 });
 
 test('Mobile Classic GitHub update config resolves repository metadata', () => {
@@ -437,7 +512,7 @@ test('Mobile Classic build prunes developer DOM and inactive preloads', () => {
   assert.match(prunedHtml, /submenu-debug/);
 });
 
-test('Mobile Classic scripts build, wrap, and validate the phone app path', async () => {
+test('Unified Mobile Android scripts build, wrap, and validate the phone app path', async () => {
   const packageJson = await readJson('package.json');
   const buildScript = await readText('scripts/build-mobile-classic-app.mjs');
   const capacitorScript = await readText('scripts/capacitor-mobile-classic.mjs');
@@ -448,6 +523,11 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   const touchInputSource = await readText('src/ui/TouchInputSource.js');
   const readme = await readText('tools/mobile-classic-app/README.md');
 
+  assert.equal(packageJson.scripts['app:android:build'], 'node scripts/build-mobile-classic-app.mjs');
+  assert.equal(packageJson.scripts['app:android:check'], 'node --test tests/mobile-classic-app.contract.test.mjs tests/mobile-arcade-app.contract.test.mjs');
+  assert.equal(packageJson.scripts['app:android:sync'], 'node scripts/capacitor-mobile-classic.mjs sync');
+  assert.equal(packageJson.scripts['app:android:assets:check'], 'node scripts/capacitor-mobile-classic.mjs check-assets');
+  assert.equal(packageJson.scripts['app:android:install'], 'node scripts/capacitor-mobile-classic.mjs install');
   assert.equal(packageJson.scripts['app:classic:android:build'], 'node scripts/build-mobile-classic-app.mjs');
   assert.equal(packageJson.scripts['app:classic:android:check'], 'node --test tests/mobile-classic-app.contract.test.mjs');
   assert.equal(packageJson.scripts['app:classic:android:sync'], 'node scripts/capacitor-mobile-classic.mjs sync');
@@ -456,6 +536,9 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.equal(packageJson.scripts['app:classic:android:update:github'], 'node scripts/update-mobile-classic-from-github.mjs');
   assert.match(buildScript, /VITE_APP_TARGET = 'mobile-classic'/);
   assert.match(buildScript, /mobile-classic\.manifest\.json/);
+  assert.match(buildScript, /curvios\.mobile-android-app\.v1/);
+  assert.match(buildScript, /modePaths: \['normal', 'arcade'\]/);
+  assert.match(buildScript, /listMobileArcadeRouteAllowlist/);
   assert.match(buildScript, /CURVIOS_CLASSIC_APP_GITHUB_REPOSITORY/);
   assert.match(buildScript, /updates: createMobileClassicGithubUpdateConfig/);
   assert.match(buildScript, /pruneMobileClassicHtml/);
@@ -471,6 +554,9 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.match(capacitorScript, /de\.curviosclash\.classic/);
   assert.match(capacitorScript, /error\.stderr/);
   assert.match(gradleFile, /JsonSlurper/);
+  assert.match(gradleFile, /mobileAndroidApplicationId = 'de\.curviosclash\.classic'/);
+  assert.match(gradleFile, /mobileAndroidAppName = 'Curvios Clash'/);
+  assert.doesNotMatch(gradleFile, /mobileAndroidIsArcade|de\.curviosclash\.arcade/);
   assert.match(gradleFile, /versionCode mobileClassicVersionCode/);
   assert.match(gradleFile, /versionName mobileClassicVersionName/);
   assert.match(updateScript, /merge', '--ff-only'/);
@@ -481,6 +567,8 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.match(mobileClassicApp, /checkMobileClassicGithubRelease/);
   assert.match(mobileClassicApp, /mobile-classic\.manifest\.json/);
   assert.match(mobileClassicApp, /Classic starten/);
+  assert.match(mobileClassicApp, /Parcours starten/);
+  assert.match(mobileClassicApp, /Solo spielen/);
   assert.match(mobileClassicApp, /Update pruefen/);
   assert.match(touchInputSource, /TILT SANFT/);
   assert.match(touchInputSource, /KALIBRIERE/);
@@ -488,6 +576,8 @@ test('Mobile Classic scripts build, wrap, and validate the phone app path', asyn
   assert.match(touchInputSource, /resolveTouchButtonDefinitions/);
   assert.match(touchInputSource, /maxTouchPoints/);
   assert.match(touchInputSource, /aria-hidden/);
+  assert.match(readme, /Classic and\s+Arcade-Parcours/);
+  assert.match(readme, /app:android:assets:check/);
   assert.match(readme, /app:classic:android:assets:check/);
   assert.match(readme, /app:classic:android:update:github/);
   assert.equal(TOUCH_CONTROL_MODES.TILT, 'tilt');
@@ -506,5 +596,5 @@ test('Mobile Classic wrapper files stay outside the desktop graph KPI', () => {
 
   assert.equal(adapterCoverage.classification, 'mobile-wrapper');
   assert.equal(adapterCoverage.excludedFromCoverage, true);
-  assert.match(adapterCoverage.excludeReason, /Mobile Classic app adapter/);
+  assert.match(adapterCoverage.excludeReason, /Mobile app adapter/);
 });

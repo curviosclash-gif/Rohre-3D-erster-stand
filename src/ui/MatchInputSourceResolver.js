@@ -20,6 +20,19 @@ function isMobileClassicTarget(game = null) {
         || doc?.documentElement?.dataset?.appTarget === 'mobile-classic';
 }
 
+function isMobileArcadeTarget(game = null) {
+    const doc = typeof document !== 'undefined' ? document : null;
+    return game?._mobileArcadeAppTarget === true
+        || doc?.documentElement?.dataset?.appTarget === 'mobile-arcade';
+}
+
+function isMobileArcadeMode(game = null) {
+    const modePath = String(game?.settings?.localSettings?.modePath || '').trim().toLowerCase();
+    const doc = typeof document !== 'undefined' ? document : null;
+    return modePath === 'arcade'
+        || doc?.documentElement?.dataset?.mobileModePath === 'arcade';
+}
+
 function createKeyboardInputSource(inputManager, includeSecondaryBindings = false) {
     return {
         type: 'keyboard',
@@ -133,11 +146,14 @@ export function createPreferredMatchInputSource({
 
     if (playerIndex === 0 && TouchInputSource.isAvailable()) {
         const mobileClassic = isMobileClassicTarget(game);
+        const mobileArcade = isMobileArcadeTarget(game);
+        const mobileArcadeMode = mobileArcade || (mobileClassic && isMobileArcadeMode(game));
         const touchSource = new TouchInputSource({
             game,
             playerIndex,
             getMatchRuntimeProjection,
-            controlMode: mobileClassic ? TOUCH_CONTROL_MODES.TILT : TOUCH_CONTROL_MODES.JOYSTICK,
+            controlMode: (mobileClassic || mobileArcade) ? TOUCH_CONTROL_MODES.TILT : TOUCH_CONTROL_MODES.JOYSTICK,
+            includePauseButton: mobileArcadeMode,
             mobileControls: normalizeMobileClassicControlSettings(game?.settings?.localSettings?.mobileControls),
         });
         touchSource.createUI();

@@ -41,6 +41,14 @@ const TILT_BUTTON_DEFINITIONS = Object.freeze([
     Object.freeze({ id: 'boost', label: 'BOOST', bottom: '24%', right: '24%', size: 56 }),
 ]);
 
+const MOBILE_ARCADE_PAUSE_BUTTON_DEFINITION = Object.freeze({
+    id: 'pause',
+    label: 'PAUSE',
+    top: 'max(14px, env(safe-area-inset-top))',
+    right: 'max(14px, env(safe-area-inset-right))',
+    size: 58,
+});
+
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
@@ -195,11 +203,15 @@ function resolveScreenOrientationAngle() {
     return Number.isFinite(legacyAngle) ? legacyAngle : 0;
 }
 
-export function resolveTouchButtonDefinitions(controlMode = TOUCH_CONTROL_MODES.JOYSTICK) {
+export function resolveTouchButtonDefinitions(controlMode = TOUCH_CONTROL_MODES.JOYSTICK, options = {}) {
     const definitions = controlMode === TOUCH_CONTROL_MODES.TILT
         ? TILT_BUTTON_DEFINITIONS
         : JOYSTICK_BUTTON_DEFINITIONS;
-    return definitions.map((definition) => ({ ...definition }));
+    const resolved = definitions.map((definition) => ({ ...definition }));
+    if (options?.includePauseButton === true) {
+        resolved.push({ ...MOBILE_ARCADE_PAUSE_BUTTON_DEFINITION });
+    }
+    return resolved;
 }
 
 /**
@@ -225,6 +237,7 @@ export class TouchInputSource extends PlayerInputSource {
         this._controlMode = options.controlMode === TOUCH_CONTROL_MODES.TILT
             ? TOUCH_CONTROL_MODES.TILT
             : TOUCH_CONTROL_MODES.JOYSTICK;
+        this._includePauseButton = options.includePauseButton === true;
         this._mobileControlSettings = normalizeMobileClassicControlSettings(options.mobileControls);
         this._tiltSensitivity = normalizeMobileClassicTiltSensitivity(
             options.tiltSensitivity ?? this._mobileControlSettings.tiltSensitivity
@@ -284,6 +297,12 @@ export class TouchInputSource extends PlayerInputSource {
             shootMG: false,
         };
         this._prevBoost = false;
+        this._prevDiscreteButtons = {
+            fire: false,
+            useItem: false,
+            nextItem: false,
+        };
+        this._lastPauseRequestAt = 0;
 
         this._containerEl = null;
         this._joystickEl = null;
@@ -348,13 +367,19 @@ export class TouchInputSource extends PlayerInputSource {
 
         for (const def of buttonDefs) {
             const size = Number(def.size) || 60;
+            const verticalPosition = def.top
+                ? `top: ${def.top};`
+                : `bottom: ${def.bottom};`;
+            const horizontalPosition = def.left
+                ? `left: ${def.left};`
+                : `right: ${def.right};`;
             const btn = document.createElement('div');
             btn.className = `touch-button touch-button-${def.id}`;
             btn.dataset.action = def.id;
             btn.dataset.baseLabel = def.label;
             btn.textContent = def.label;
             btn.style.cssText = `
-                position: fixed; bottom: ${def.bottom}; right: ${def.right};
+                position: fixed; ${verticalPosition} ${horizontalPosition}
                 width: ${size}px; height: ${size}px; border-radius: 50%;
                 border: 2px solid rgba(255,255,255,0.4); background: rgba(0,0,0,0.3);
                 color: white; display: flex; align-items: center; justify-content: center;
@@ -379,7 +404,9 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     _resolveButtonDefinitions() {
-        return resolveTouchButtonDefinitions(this._controlMode);
+        return resolveTouchButtonDefinitions(this._controlMode, {
+            includePauseButton: this._includePauseButton,
+        });
     }
 
     _createTiltControlUI() {
@@ -487,6 +514,11 @@ export class TouchInputSource extends PlayerInputSource {
             } else {
                 const actionTarget = target?.closest?.('[data-action]') || target;
                 const action = actionTarget?.dataset?.action;
+                if (action === 'pause') {
+                    this._requestPause();
+                    this._buttonTouches.set(touch.identifier, action);
+                    continue;
+                }
                 if (action && action in this._buttons) {
                     this._buttons[action] = true;
                     this._buttonTouches.set(touch.identifier, action);
@@ -519,6 +551,9 @@ export class TouchInputSource extends PlayerInputSource {
             const action = this._buttonTouches.get(touch.identifier);
             if (action && action in this._buttons) {
                 this._buttons[action] = false;
+                if (action in this._prevDiscreteButtons) {
+                    this._prevDiscreteButtons[action] = false;
+                }
             }
             this._buttonTouches.delete(touch.identifier);
         }
@@ -567,6 +602,16 @@ export class TouchInputSource extends PlayerInputSource {
         button.style.transform = enabled ? 'scale(1)' : 'scale(0.96)';
         button.style.borderColor = enabled ? 'rgba(132,226,255,0.85)' : 'rgba(255,255,255,0.18)';
         button.style.boxShadow = enabled ? '0 0 14px rgba(0,170,255,0.18)' : 'none';
+    }
+
+    _requestPause() {
+        const nowMs = Date.now();
+        if (nowMs - this._lastPauseRequestAt < 350) {
+            return false;
+        }
+        this._lastPauseRequestAt = nowMs;
+        this._game?.matchFlowUiController?.pause?.();
+        return true;
     }
 
     _syncActionButtons(actionState) {
@@ -626,6 +671,12 @@ export class TouchInputSource extends PlayerInputSource {
         const boostDown = this._buttons.boost;
         const boostPressed = boostDown && !this._prevBoost;
         this._prevBoost = boostDown;
+        const firePressed = this._buttons.fire && !this._prevDiscreteButtons.fire;
+        const useItemPressed = this._buttons.useItem && !this._prevDiscreteButtons.useItem;
+        const nextItemPressed = this._buttons.nextItem && !this._prevDiscreteButtons.nextItem;
+        this._prevDiscreteButtons.fire = this._buttons.fire;
+        this._prevDiscreteButtons.useItem = this._buttons.useItem;
+        this._prevDiscreteButtons.nextItem = this._buttons.nextItem;
 
         return {
             pitchUp: touchPitchActive ? jy < -deadzone : (tiltInput ? tiltInput.pitchUp : jy < -deadzone),
@@ -641,10 +692,10 @@ export class TouchInputSource extends PlayerInputSource {
             boostPressed,
             cameraSwitch: false,
             dropItem: false,
-            useItem: this._buttons.useItem && !!actionState?.canUseNow,
-            shootItem: this._buttons.fire && !!actionState?.canShootNow,
+            useItem: useItemPressed && !!actionState?.canUseNow,
+            shootItem: firePressed && !!actionState?.canShootNow,
             shootMG: this._buttons.shootMG && !!actionState?.showMg,
-            nextItem: this._buttons.nextItem,
+            nextItem: nextItemPressed && !!actionState?.canCycle,
         };
     }
 

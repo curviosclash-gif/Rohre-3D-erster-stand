@@ -328,6 +328,13 @@ export class HudRuntimeSystem {
         }
 
         this._setParcoursHudVisible(true);
+        this._ensureParcoursOverlay().tickMinimap(
+            game?.entityManager,
+            { ...projection, parcours: hudState },
+            this._isNetworkSession(projection)
+                ? Math.max(0, this._getLocalPlayerIndex(projection))
+                : 0
+        );
         const routeLabel = String(hudState.routeId || 'parcours').replace(/_/g, ' ');
         if (ui.parcoursRoute) ui.parcoursRoute.textContent = routeLabel;
 

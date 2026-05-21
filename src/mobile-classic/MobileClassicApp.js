@@ -3,11 +3,20 @@
 
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { MENU_SESSION_TYPES } from '../composition/core-ui/CoreSettingsPorts.js';
+import { MENU_MODE_PATHS } from '../ui/menu/MenuStateContracts.js';
+import {
+    ARCADE_GHOST_DUEL_MODES,
+} from '../shared/contracts/ArcadeGhostDuelContract.js';
 import {
     createMobileClassicGithubUpdateConfig,
     normalizeMobileClassicUpdateConfig,
 } from './MobileClassicUpdateConfig.js';
 import { normalizeMobileClassicControlSettings } from '../shared/contracts/MobileClassicControlsContract.js';
+import {
+    MOBILE_ARCADE_DEFAULT_MAP_KEY,
+    isMobileArcadeRouteAllowed,
+    resolveMobileArcadeMapKey,
+} from '../mobile-arcade/MobileArcadeApp.js';
 
 export const MOBILE_CLASSIC_APP_TARGET = 'mobile-classic';
 
@@ -16,6 +25,11 @@ const MOBILE_CLASSIC_UPDATE_PANEL_ID = 'mobile-classic-update-panel';
 const MOBILE_CLASSIC_UPDATE_CHECK_ID = 'mobile-classic-update-check';
 const MOBILE_CLASSIC_UPDATE_OPEN_ID = 'mobile-classic-update-open';
 const MOBILE_CLASSIC_UPDATE_STATUS_ID = 'mobile-classic-update-status';
+const MOBILE_ANDROID_GHOST_STATUS_ID = 'mobile-arcade-ghost-status';
+const MOBILE_ANDROID_MODE_PATHS = Object.freeze([
+    MENU_MODE_PATHS.NORMAL,
+    MENU_MODE_PATHS.ARCADE,
+]);
 const DEFAULT_MOBILE_CLASSIC_UPDATE_CONFIG = createMobileClassicGithubUpdateConfig();
 const mobileClassicUpdateState = {
     updateConfig: { ...DEFAULT_MOBILE_CLASSIC_UPDATE_CONFIG },
@@ -35,6 +49,45 @@ export function isMobileClassicAppTarget() {
     return typeof __APP_TARGET__ !== 'undefined' && isMobileClassicTargetValue(__APP_TARGET__);
 }
 
+function resolveMobileAndroidModePath(settings = null) {
+    const requestedModePath = normalizeTarget(settings?.localSettings?.modePath);
+    return MOBILE_ANDROID_MODE_PATHS.includes(requestedModePath)
+        ? requestedModePath
+        : MENU_MODE_PATHS.NORMAL;
+}
+
+function ensureStartSetup(settings) {
+    if (!settings.localSettings || typeof settings.localSettings !== 'object') {
+        settings.localSettings = {};
+    }
+    if (!settings.localSettings.startSetup || typeof settings.localSettings.startSetup !== 'object') {
+        settings.localSettings.startSetup = {};
+    }
+    const startSetup = settings.localSettings.startSetup;
+    if (!startSetup.modeSelections || typeof startSetup.modeSelections !== 'object') {
+        startSetup.modeSelections = {};
+    }
+    if (!startSetup.modeSelections.arcade || typeof startSetup.modeSelections.arcade !== 'object') {
+        startSetup.modeSelections.arcade = {};
+    }
+    return startSetup;
+}
+
+function resolveExistingArcadeMapKey(settings) {
+    return settings?.localSettings?.startSetup?.modeSelections?.arcade?.mapKey
+        || settings?.mapKey
+        || MOBILE_ARCADE_DEFAULT_MAP_KEY;
+}
+
+function applyMobileAndroidArcadeSettings(settings) {
+    const startSetup = ensureStartSetup(settings);
+    const mapKey = resolveMobileArcadeMapKey(resolveExistingArcadeMapKey(settings));
+    settings.mapKey = mapKey;
+    startSetup.modeSelections.arcade.mapKey = mapKey;
+    startSetup.arcadeGhostDuelMode = ARCADE_GHOST_DUEL_MODES.SELF_LONGEST_GHOST;
+    startSetup.arcadeGhostTrailCollisionEnabled = false;
+}
+
 export function applyMobileClassicSettings(settings = null) {
     if (!settings || typeof settings !== 'object') {
         return settings;
@@ -49,13 +102,17 @@ export function applyMobileClassicSettings(settings = null) {
         settings.hunt = {};
     }
 
+    const modePath = resolveMobileAndroidModePath(settings);
     settings.mode = '1p';
     settings.gameMode = GAME_MODE_TYPES.CLASSIC;
     settings.localSettings.sessionType = MENU_SESSION_TYPES.SINGLE;
-    settings.localSettings.modePath = 'normal';
+    settings.localSettings.modePath = modePath;
     settings.localSettings.mobileControls = normalizeMobileClassicControlSettings(settings.localSettings.mobileControls);
     settings.gameplay.planarMode = false;
     settings.hunt.respawnEnabled = false;
+    if (modePath === MENU_MODE_PATHS.ARCADE) {
+        applyMobileAndroidArcadeSettings(settings);
+    }
 
     return settings;
 }
@@ -264,7 +321,6 @@ body.mobile-classic-app {
 
 body.mobile-classic-app .nav-btn[data-session-type="multiplayer"],
 body.mobile-classic-app .nav-btn[data-session-type="splitscreen"],
-body.mobile-classic-app .mode-path-btn[data-mode-path="arcade"],
 body.mobile-classic-app .mode-path-btn[data-mode-path="fight"],
 body.mobile-classic-app #submenu-multiplayer,
 body.mobile-classic-app #multiplayer-inline-stub,
@@ -439,8 +495,153 @@ body.mobile-classic-app #touch-controls[data-touch-control-mode="tilt"] .touch-b
     width: 62px !important;
     height: 62px !important;
 }
+
+body.mobile-classic-app .touch-button-pause {
+    top: max(14px, env(safe-area-inset-top)) !important;
+    right: max(14px, env(safe-area-inset-right)) !important;
+    bottom: auto !important;
+    width: 58px !important;
+    height: 42px !important;
+    border-radius: 8px !important;
+    font-size: 11px !important;
+    z-index: 1002 !important;
+}
+
+body.mobile-classic-app #parcours-hud {
+    top: max(12px, env(safe-area-inset-top)) !important;
+    left: 50% !important;
+    min-width: 150px !important;
+    max-width: min(44vw, 230px) !important;
+    padding: 7px 9px !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+    pointer-events: none !important;
+    z-index: 912 !important;
+}
+
+body.mobile-classic-app #parcours-route {
+    font-size: 0.58rem !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.mobile-classic-app #parcours-progress {
+    font-size: 0.92rem !important;
+}
+
+body.mobile-classic-app #parcours-timer,
+body.mobile-classic-app #parcours-status {
+    font-size: 0.68rem !important;
+}
+
+body.mobile-classic-app #parcours-minimap {
+    top: max(68px, calc(env(safe-area-inset-top) + 66px)) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
+    width: 118px !important;
+    height: 118px !important;
+    opacity: 0.92;
+    z-index: 909 !important;
+}
+
+body.mobile-classic-app #arcade-score-hud {
+    top: max(68px, calc(env(safe-area-inset-top) + 66px)) !important;
+    left: max(10px, env(safe-area-inset-left)) !important;
+    min-width: 154px !important;
+    max-width: 178px !important;
+    padding: 7px 8px !important;
+    gap: 5px !important;
+    font-size: 10px !important;
+}
+
+body.mobile-classic-app #arcade-score-hud .arcade-score-hud-breakdown,
+body.mobile-classic-app #arcade-score-hud .arcade-score-hud-modifier {
+    display: none !important;
+}
+
+body.mobile-classic-app #arcade-mission-hud {
+    top: max(190px, calc(env(safe-area-inset-top) + 188px)) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
+    max-width: 150px !important;
+    font-size: 10px !important;
+}
+
+body.mobile-classic-app #arcade-mission-hud .arcade-mission-card {
+    min-width: 128px !important;
+    padding: 4px 7px !important;
+}
+
+body.mobile-classic-app #parcours-xp-notification,
+body.mobile-classic-app #parcours-split-delta,
+body.mobile-classic-app #arcade-stats-flash,
+body.mobile-classic-app #parcours-penalty-notification {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: min(70vw, 280px);
+    padding: 6px 9px;
+    border-radius: 8px;
+    background: rgba(7, 17, 27, 0.88);
+    border: 1px solid rgba(255, 210, 118, 0.48);
+    color: #f8f4df;
+    font-size: 0.74rem;
+    font-weight: 800;
+    text-align: center;
+    pointer-events: none;
+    z-index: 913;
+}
+
+body.mobile-classic-app #parcours-xp-notification,
+body.mobile-classic-app #arcade-stats-flash {
+    top: max(132px, calc(env(safe-area-inset-top) + 130px));
+}
+
+body.mobile-classic-app #parcours-split-delta,
+body.mobile-classic-app #parcours-penalty-notification {
+    top: max(168px, calc(env(safe-area-inset-top) + 166px));
+}
+
+body.mobile-classic-app #parcours-split-delta.split-better {
+    color: #a8ffbf;
+    border-color: rgba(126, 255, 170, 0.58);
+}
+
+body.mobile-classic-app #parcours-split-delta.split-worse,
+body.mobile-classic-app #parcours-penalty-notification {
+    color: #ffb2a2;
+    border-color: rgba(255, 132, 112, 0.62);
+}
+
+body.mobile-classic-app #mobile-arcade-ghost-status {
+    position: fixed;
+    left: max(14px, env(safe-area-inset-left));
+    bottom: calc(max(22px, env(safe-area-inset-bottom)) + 126px);
+    display: none;
+    max-width: 118px;
+    color: rgba(210, 245, 255, 0.82);
+    font-size: 10px;
+    font-weight: 800;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    z-index: 1001;
+}
+
+body.mobile-classic-app[data-mobile-mode-path="arcade"] #mobile-arcade-ghost-status {
+    display: block;
+}
 `;
     doc.head.appendChild(style);
+}
+
+function ensureMobileAndroidStatusUi(doc = document) {
+    if (!doc?.createElement || typeof doc.body?.appendChild !== 'function'
+        || doc.getElementById?.(MOBILE_ANDROID_GHOST_STATUS_ID)) {
+        return;
+    }
+    const status = doc.createElement('div');
+    status.id = MOBILE_ANDROID_GHOST_STATUS_ID;
+    status.textContent = 'Ghost: Selbstduell';
+    doc.body.appendChild(status);
 }
 
 export function applyMobileClassicDocumentState(doc = document) {
@@ -453,6 +654,7 @@ export function applyMobileClassicDocumentState(doc = document) {
     doc.body.dataset.appTarget = MOBILE_CLASSIC_APP_TARGET;
     ensureViewportFit(doc);
     ensureMobileClassicStyles(doc);
+    ensureMobileAndroidStatusUi(doc);
     setupMobileClassicUpdateUi(doc);
 }
 
@@ -474,31 +676,93 @@ function setButtonLabel(button, label) {
     button.title = '';
 }
 
+function updateMobileAndroidDocumentMode(modePath, doc = (typeof document !== 'undefined' ? document : null)) {
+    const normalizedModePath = resolveMobileAndroidModePath({ localSettings: { modePath } });
+    if (doc?.documentElement?.dataset) {
+        doc.documentElement.dataset.mobileModePath = normalizedModePath;
+    }
+    if (doc?.body?.dataset) {
+        doc.body.dataset.mobileModePath = normalizedModePath;
+    }
+}
+
+function resolveCurrentMobileModePath(game = null) {
+    return resolveMobileAndroidModePath(game?.settings || null);
+}
+
+function pruneMapSelectToArcadeAllowlist(select) {
+    if (!select?.options) {
+        return;
+    }
+    const options = Array.from(select.options);
+    for (let i = options.length - 1; i >= 0; i -= 1) {
+        const option = options[i];
+        if (!isMobileArcadeRouteAllowed(option?.value)) {
+            option.remove?.();
+        }
+    }
+    const selectedValue = resolveMobileArcadeMapKey(select.value);
+    const hasSelectedOption = Array.from(select.options).some((option) => option.value === selectedValue);
+    if (hasSelectedOption) {
+        select.value = selectedValue;
+    } else if (select.options.length > 0) {
+        select.value = select.options[0].value;
+    }
+}
+
+function bindMobileModeResync(game, button) {
+    if (!button?.dataset || button.dataset.mobileAndroidModeBound === '1') {
+        return;
+    }
+    button.dataset.mobileAndroidModeBound = '1';
+    button.addEventListener?.('click', () => {
+        const ownerWindow = button.ownerDocument?.defaultView || (typeof window !== 'undefined' ? window : null);
+        ownerWindow?.setTimeout?.(() => applyMobileClassicUiLocks(game), 0);
+    });
+}
+
 export function applyMobileClassicUiLocks(game = null) {
     const ui = game?.runtimeCoordinator?.getRuntimeHandle?.('ui') || game?.ui || null;
     if (!ui) {
         return;
     }
+    const modePath = resolveCurrentMobileModePath(game);
+    updateMobileAndroidDocumentMode(modePath);
     if (Array.isArray(ui.sessionButtons)) {
         ui.sessionButtons.forEach((button) => {
             const sessionType = normalizeTarget(button?.dataset?.sessionType);
             setButtonLocked(button, sessionType && sessionType !== MENU_SESSION_TYPES.SINGLE);
             if (sessionType === MENU_SESSION_TYPES.SINGLE) {
-                setButtonLabel(button, 'Classic starten');
+                setButtonLabel(button, 'Solo spielen');
             }
         });
     }
     if (Array.isArray(ui.modePathButtons)) {
         ui.modePathButtons.forEach((button) => {
             const modePath = normalizeTarget(button?.dataset?.modePath);
-            setButtonLocked(button, modePath && modePath !== 'normal');
+            const allowed = modePath === MENU_MODE_PATHS.NORMAL || modePath === MENU_MODE_PATHS.ARCADE;
+            setButtonLocked(button, modePath && !allowed);
+            if (modePath === MENU_MODE_PATHS.NORMAL) {
+                setButtonLabel(button, 'Classic');
+                bindMobileModeResync(game, button);
+            } else if (modePath === MENU_MODE_PATHS.ARCADE) {
+                setButtonLabel(button, 'Parcours');
+                bindMobileModeResync(game, button);
+            }
         });
     }
+    if (modePath === MENU_MODE_PATHS.ARCADE) {
+        pruneMapSelectToArcadeAllowlist(ui.mapSelect);
+    }
     if (ui.startButton) {
-        ui.startButton.textContent = 'Classic starten';
+        ui.startButton.textContent = modePath === MENU_MODE_PATHS.ARCADE
+            ? 'Parcours starten'
+            : 'Classic starten';
         ui.startButton.title = '';
     }
     if (ui.menuContext) {
-        ui.menuContext.textContent = 'Classic';
+        ui.menuContext.textContent = modePath === MENU_MODE_PATHS.ARCADE
+            ? 'Arcade-Parcours'
+            : 'Classic';
     }
 }

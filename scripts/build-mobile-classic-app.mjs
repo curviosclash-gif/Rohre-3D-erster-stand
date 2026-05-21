@@ -9,6 +9,13 @@ import {
   createMobileClassicGithubUpdateConfig,
   normalizeMobileClassicGithubRepository,
 } from '../src/mobile-classic/MobileClassicUpdateConfig.js';
+import {
+  ARCADE_GHOST_DUEL_MODES,
+} from '../src/shared/contracts/ArcadeGhostDuelContract.js';
+import {
+  listMobileArcadeRouteAllowlist,
+  MOBILE_ARCADE_DEFAULT_MAP_KEY,
+} from '../src/mobile-arcade/MobileArcadeApp.js';
 
 const execFile = promisify(execFileCallback);
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -37,18 +44,26 @@ async function detectGithubRepository() {
 
 async function writeManifest() {
   const githubRepository = await detectGithubRepository();
+  const routeAllowlist = listMobileArcadeRouteAllowlist();
   const manifest = {
-    contract: 'curvios.mobile-classic-app.v1',
+    contract: 'curvios.mobile-android-app.v1',
     generatedAt: new Date().toISOString(),
     app: {
       id: 'de.curviosclash.classic',
-      name: 'Curvios Clash Classic',
+      name: 'Curvios Clash',
       target: 'mobile-classic',
     },
     modeScope: {
       sessionType: 'single',
-      modePath: 'normal',
+      modePaths: ['normal', 'arcade'],
+      defaultModePath: 'normal',
       gameMode: 'CLASSIC',
+      arcade: {
+        defaultMapKey: MOBILE_ARCADE_DEFAULT_MAP_KEY,
+        routeAllowlist,
+        ghostDuelMode: ARCADE_GHOST_DUEL_MODES.SELF_LONGEST_GHOST,
+        ghostTrailCollisionEnabled: false,
+      },
     },
     updates: createMobileClassicGithubUpdateConfig(githubRepository),
     webDir: 'dist/mobile-classic',

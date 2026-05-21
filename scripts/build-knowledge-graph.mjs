@@ -101,9 +101,9 @@ const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
     },
     {
         classification: 'mobile-wrapper',
-        prefixes: ['src/mobile-classic/'],
+        prefixes: ['src/mobile-classic/', 'src/mobile-arcade/'],
         excludedFromCoverage: true,
-        reason: 'Mobile Classic app adapter files are validated by app-specific contracts outside the desktop architecture KPI.',
+        reason: 'Mobile app adapter files are validated by app-specific contracts outside the desktop architecture KPI.',
     },
     {
         classification: 'agent-workflow',
