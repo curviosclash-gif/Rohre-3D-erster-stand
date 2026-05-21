@@ -20,6 +20,7 @@
           </label>
           <div class="segmented" aria-label="Ansicht">
             <button type="button" data-view="map" class="is-active">Map</button>
+            <button type="button" data-view="intake">Intake</button>
             <button type="button" data-view="changelog">Changelog</button>
             <button type="button" data-view="collisions">Kollisionen</button>
             <button type="button" data-view="health">Health</button>
@@ -139,6 +140,12 @@
                 <option value="not-checked">Not checked</option>
               </select>
             </label>
+            <label>
+              <span>Intake <button type="button" class="help-button" data-help-term="intake" aria-label="Intake erklaeren">i</button></span>
+              <select id="intakeClassificationFilter">
+                <option value="all">Alle</option>
+              </select>
+            </label>
           </div>
           <div id="blockList" class="block-list"></div>
         </aside>
@@ -147,11 +154,20 @@
           <div id="metrics" class="metrics-strip"></div>
           <div id="decisionBar" class="decision-bar"></div>
           <section id="mapView" class="view-panel is-active">
+            <div class="map-zoom-controls" aria-label="Karten-Zoom">
+              <button id="mapZoomOut" type="button" aria-label="Karte verkleinern">-</button>
+              <button id="mapZoomFit" type="button">Fit</button>
+              <button id="mapZoomIn" type="button" aria-label="Karte vergroessern">+</button>
+              <span id="mapZoomLabel" aria-live="polite">100%</span>
+            </div>
             <svg id="planSvg" class="plan-svg" role="img" aria-label="Dependency-Karte"></svg>
             <div id="edgeTooltip" class="edge-tooltip" hidden></div>
           </section>
           <section id="changelogView" class="view-panel">
             <div id="changelogPanel" class="changelog-panel"></div>
+          </section>
+          <section id="intakeView" class="view-panel">
+            <div id="intakePanel" class="intake-panel"></div>
           </section>
           <section id="collisionsView" class="view-panel">
             <div id="collisionsTable" class="data-table"></div>

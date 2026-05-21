@@ -258,6 +258,11 @@ test('classifyCoveragePath marks excluded and active buckets', () => {
         excludedFromCoverage: true,
         excludeReason: 'Static asset inventory is tracked separately from code-surface coverage.',
     });
+    assert.deepEqual(classifyCoveragePath('docs/Fehlerberichte/2026-05-21_example.md'), {
+        classification: 'blocker-report',
+        excludedFromCoverage: true,
+        excludeReason: 'Task-specific blocker reports are evidence artifacts, not architecture coverage targets.',
+    });
     assert.deepEqual(classifyCoveragePath('src/core/AppInitializer.js'), {
         classification: 'product-code',
         excludedFromCoverage: false,

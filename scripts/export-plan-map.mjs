@@ -5,6 +5,11 @@ import { fileURLToPath } from 'node:url';
 import { execFile as execFileCallback } from 'node:child_process';
 import { promisify } from 'node:util';
 
+import {
+  collectIntakePlans,
+  parsePlanMapMaster,
+} from './planning/PlanIntakeOps.mjs';
+
 const DEFAULT_OUTPUT = 'tmp/plan-map/plan-map.json';
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
 const CHANGELOG_PATH = 'docs/plaene/CHANGELOG.md';
@@ -193,6 +198,23 @@ function parseMarkdownTable(section) {
     });
     return row;
   });
+}
+
+function summarizeIntakePlans(intakePlans) {
+  const byClassification = {};
+  const byWorkstream = {};
+  for (const plan of intakePlans || []) {
+    byClassification[plan.classification] = (byClassification[plan.classification] || 0) + 1;
+    if (plan.workstream) {
+      byWorkstream[plan.workstream] = (byWorkstream[plan.workstream] || 0) + 1;
+    }
+  }
+
+  return {
+    intakePlanCount: intakePlans?.length || 0,
+    byIntakeClassification: byClassification,
+    byIntakeWorkstream: byWorkstream,
+  };
 }
 
 function parseFrontmatter(markdown) {
@@ -1097,6 +1119,12 @@ export async function buildPlanMapData(options = {}) {
   ]);
 
   const parsedBlocks = await parseMasterBlocks(rootDir, masterPlan);
+  const masterIndex = parsePlanMapMaster(masterPlan);
+  const intakePlans = await collectIntakePlans({
+    rootDir,
+    master: masterIndex,
+    inferWorkstream,
+  });
   const dependencies = parseDependencyEdges(masterPlan, parsedBlocks);
   const recommendedOrder = parseRecommendedOrder(masterPlan);
   const locks = summarizeLocks(lockRegistry, parseMasterLockRows(masterPlan));
@@ -1118,6 +1146,7 @@ export async function buildPlanMapData(options = {}) {
       knowledgeGraphCoverage: coverage ? KNOWLEDGE_GRAPH_COVERAGE_PATH : null,
       knowledgeGraphScorecard: scorecard ? KNOWLEDGE_GRAPH_SCORECARD_PATH : null,
       lockRegistry: lockRegistry ? LOCK_REGISTRY_PATH : null,
+      intakePlans: 'docs/plaene/neu',
     },
     workstreams: WORKSTREAMS,
     blocks,
@@ -1126,6 +1155,7 @@ export async function buildPlanMapData(options = {}) {
     locks,
     scopeCollisions,
     fileIndex,
+    intakePlans,
     changelog,
     openFindings: parseOpenFindings(openFindingsText),
     graph: summarizeKnowledgeGraph(graph),
@@ -1133,6 +1163,7 @@ export async function buildPlanMapData(options = {}) {
     scorecard: summarizeScorecard(scorecard),
     summary: {
       ...buildSummary(blocks, dependencies, scopeCollisions, locks),
+      ...summarizeIntakePlans(intakePlans),
       changelogCount: changelog.length,
       changelogWithEvidenceCount: changelog.filter((entry) => entry.evidence?.hasEvidence).length,
       changelogNotCheckedCount: changelog.filter((entry) => entry.evidence?.hasNotChecked).length,

@@ -15,7 +15,9 @@ const state = {
   readiness: 'all',
   changelogType: 'all',
   changelogEvidence: 'all',
+  intakeClassification: 'all',
   selectedChangelogId: null,
+  selectedIntakePath: null,
   focusMode: true,
   fileFocus: '',
   detailTab: 'overview',
@@ -30,6 +32,10 @@ const state = {
   whyOpen: false,
   lastSelectedId: null,
   helpVisible: true,
+  mapZoom: 1,
+  mapZoomTouched: false,
+  mapWorld: { width: 0, height: 0 },
+  mapPinch: null,
 };
 
 const elements = {
@@ -49,13 +55,19 @@ const elements = {
   readinessFilter: document.querySelector('#readinessFilter'),
   changelogTypeFilter: document.querySelector('#changelogTypeFilter'),
   changelogEvidenceFilter: document.querySelector('#changelogEvidenceFilter'),
+  intakeClassificationFilter: document.querySelector('#intakeClassificationFilter'),
   focusToggle: document.querySelector('#focusToggle'),
   blockList: document.querySelector('#blockList'),
   metrics: document.querySelector('#metrics'),
   decisionBar: document.querySelector('#decisionBar'),
   planSvg: document.querySelector('#planSvg'),
+  mapZoomOut: document.querySelector('#mapZoomOut'),
+  mapZoomFit: document.querySelector('#mapZoomFit'),
+  mapZoomIn: document.querySelector('#mapZoomIn'),
+  mapZoomLabel: document.querySelector('#mapZoomLabel'),
   edgeTooltip: document.querySelector('#edgeTooltip'),
   changelogPanel: document.querySelector('#changelogPanel'),
+  intakePanel: document.querySelector('#intakePanel'),
   detailPanel: document.querySelector('#detailPanel'),
   collisionsTable: document.querySelector('#collisionsTable'),
   healthPanel: document.querySelector('#healthPanel'),
@@ -75,6 +87,9 @@ const MAP_NODE_HEIGHT = 62;
 const MAP_NODE_GAP = 76;
 const MAP_TOP_PADDING = 72;
 const MAP_BOTTOM_PADDING = 96;
+const MAP_MIN_ZOOM = 0.45;
+const MAP_MAX_ZOOM = 3;
+const MAP_ZOOM_STEP = 1.22;
 
 const HELP_TERMS = {
   'readiness-ready': {
@@ -120,6 +135,10 @@ const HELP_TERMS = {
   'changelog-type': {
     title: 'Changelog-Typ',
     body: 'Filtert Historieneintraege nach ihrer Art, zum Beispiel Umsetzung, Gate, Sync oder Abschluss.',
+  },
+  intake: {
+    title: 'Intake',
+    body: 'Zeigt Entwurfsplaene aus docs/plaene/neu als eigene Ebene. Sie sind nicht automatisch kanonische Master-Bloecke.',
   },
   consumer: {
     title: 'Consumer',
@@ -255,7 +274,9 @@ function selectBlock(blockId) {
 }
 
 function sectionKey(name) {
-  const selection = state.view === 'changelog' ? state.selectedChangelogId : state.selectedId;
+  const selection = state.view === 'changelog'
+    ? state.selectedChangelogId
+    : (state.view === 'intake' ? state.selectedIntakePath : state.selectedId);
   return `${selection || 'none'}:${state.detailTab}:${name}`;
 }
 
@@ -285,6 +306,10 @@ function svgElement(name, attrs = {}) {
     node.setAttribute(key, value);
   }
   return node;
+}
+
+function clampNumber(value, min, max) {
+  return Math.max(min, Math.min(max, Number(value) || min));
 }
 
 function blockSortValue(block) {
@@ -423,6 +448,62 @@ function visibleChangelogEntries() {
     ));
 }
 
+function intakeClassificationLabel(value) {
+  const labels = {
+    'intake-review': 'Review',
+    'adopted-by-open-master-block': 'Offen uebernommen',
+    'adopted-by-done-master-block': 'Erledigt uebernommen',
+    'protected-bot-training-intake': 'Bot-Training',
+    'protected-readme': 'README',
+  };
+  return labels[value] || value || '-';
+}
+
+function intakeMatchesFilters(plan) {
+  const haystack = [
+    plan.path,
+    plan.title,
+    plan.classification,
+    plan.workstream,
+    plan.workstreamLabel,
+    plan.targetPlanFile,
+    plan.plannedBlockIds?.join(' '),
+    plan.referencedBlockIds?.join(' '),
+    plan.scopeFiles?.join(' '),
+    plan.reasons?.join(' '),
+  ].join(' ').toLowerCase();
+
+  if (state.search && !haystack.includes(state.search.toLowerCase())) {
+    return false;
+  }
+
+  if (state.workstream !== 'all' && plan.workstream !== state.workstream) {
+    return false;
+  }
+
+  if (state.intakeClassification !== 'all' && plan.classification !== state.intakeClassification) {
+    return false;
+  }
+
+  if (state.fileFocus && !(plan.scopeFiles || []).some((filePath) => (
+    filePath === state.fileFocus || filePath.includes(state.fileFocus) || state.fileFocus.includes(filePath.replace('/**', ''))
+  ))) {
+    return false;
+  }
+
+  return true;
+}
+
+function visibleIntakePlans() {
+  return (state.data?.intakePlans || [])
+    .filter(intakeMatchesFilters)
+    .sort((left, right) => (
+      String(left.workstreamLabel || '').localeCompare(String(right.workstreamLabel || ''), 'de')
+      || String(left.classification || '').localeCompare(String(right.classification || ''))
+      || left.path.localeCompare(right.path)
+    ));
+}
+
 function selectedBlock() {
   return (state.data?.blocks || []).find((block) => block.id === state.selectedId) || visibleBlocks()[0] || null;
 }
@@ -430,6 +511,12 @@ function selectedBlock() {
 function selectedChangelogEntry() {
   return (state.data?.changelog || []).find((entry) => entry.id === state.selectedChangelogId)
     || visibleChangelogEntries()[0]
+    || null;
+}
+
+function selectedIntakePlan() {
+  return (state.data?.intakePlans || []).find((plan) => plan.path === state.selectedIntakePath)
+    || visibleIntakePlans()[0]
     || null;
 }
 
@@ -449,6 +536,10 @@ function updateFilterOptions() {
     .filter((entry) => entry.type)
     .map((entry) => [entry.type, { id: entry.type, label: entry.typeLabel || entry.type }])).values()]
     .sort((left, right) => left.label.localeCompare(right.label, 'de'));
+  const intakeClassifications = [...new Set((state.data?.intakePlans || [])
+    .map((plan) => plan.classification)
+    .filter(Boolean))]
+    .sort((left, right) => intakeClassificationLabel(left).localeCompare(intakeClassificationLabel(right), 'de'));
 
   elements.statusFilter.innerHTML = '<option value="all">Alle</option>'
     + statuses.map((status) => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`).join('');
@@ -460,6 +551,8 @@ function updateFilterOptions() {
     + readinesses.map((readiness) => `<option value="${escapeHtml(readiness)}">${escapeHtml(readinessLabel(readiness))}</option>`).join('');
   elements.changelogTypeFilter.innerHTML = '<option value="all">Alle</option>'
     + changelogTypes.map((type) => `<option value="${escapeHtml(type.id)}">${escapeHtml(type.label)}</option>`).join('');
+  elements.intakeClassificationFilter.innerHTML = '<option value="all">Alle</option>'
+    + intakeClassifications.map((classification) => `<option value="${escapeHtml(classification)}">${escapeHtml(intakeClassificationLabel(classification))}</option>`).join('');
 }
 
 function readinessLabel(value) {
@@ -498,6 +591,7 @@ function renderMetrics() {
 
   const metrics = [
     { value: summary.blockCount ?? 0, label: 'Bloecke' },
+    { value: summary.intakePlanCount ?? 0, label: 'Intake' },
     { value: startable, label: 'Startbar' },
     { value: blocked, label: 'Blockiert/in Arbeit' },
     { value: summary.collisionCount ?? 0, label: 'Scope-Kollisionen' },
@@ -506,7 +600,7 @@ function renderMetrics() {
   ];
 
   if (coverage != null && activeLocks > 0) {
-    metrics[4].label = `Coverage, ${activeLocks} Lock`;
+    metrics[6].label = `Coverage, ${activeLocks} Lock`;
   }
 
   elements.metrics.innerHTML = metrics.map((metric) => `
@@ -604,11 +698,88 @@ function renderBlockList() {
 
 function measureSvg() {
   const containerRect = elements.planSvg.parentElement?.getBoundingClientRect();
-  const rect = elements.planSvg.getBoundingClientRect();
   return {
-    width: Math.max(containerRect?.width || rect.width || 960, 760),
-    height: Math.max(containerRect?.height || rect.height || 640, 520),
+    width: Math.max(containerRect?.width || 960, 760),
+    height: Math.max(containerRect?.height || 640, 520),
   };
+}
+
+function mapViewport() {
+  return elements.planSvg.parentElement;
+}
+
+function mapFitZoom() {
+  const viewport = mapViewport();
+  const worldWidth = state.mapWorld.width || 760;
+  const viewportWidth = Math.max(1, viewport?.clientWidth || worldWidth);
+  return clampNumber(Math.min(1, viewportWidth / worldWidth), MAP_MIN_ZOOM, 1);
+}
+
+function minMapZoom() {
+  return Math.min(mapFitZoom(), 1);
+}
+
+function mapViewportCenter() {
+  const viewport = mapViewport();
+  return {
+    x: Math.max(0, (viewport?.clientWidth || 0) / 2),
+    y: Math.max(0, (viewport?.clientHeight || 0) / 2),
+  };
+}
+
+function updateMapZoomControls() {
+  const minZoom = minMapZoom();
+  const maxZoom = MAP_MAX_ZOOM;
+  if (elements.mapZoomLabel) {
+    elements.mapZoomLabel.textContent = `${Math.round((state.mapZoom || 1) * 100)}%`;
+  }
+  if (elements.mapZoomOut) {
+    elements.mapZoomOut.disabled = (state.mapZoom || 1) <= minZoom + 0.01;
+  }
+  if (elements.mapZoomIn) {
+    elements.mapZoomIn.disabled = (state.mapZoom || 1) >= maxZoom - 0.01;
+  }
+}
+
+function applyMapZoom() {
+  const width = Math.max(1, state.mapWorld.width || 760);
+  const height = Math.max(1, state.mapWorld.height || 520);
+  const zoom = clampNumber(state.mapZoom || mapFitZoom(), minMapZoom(), MAP_MAX_ZOOM);
+  state.mapZoom = zoom;
+  elements.planSvg.style.width = `${Math.round(width * zoom)}px`;
+  elements.planSvg.style.height = `${Math.round(height * zoom)}px`;
+  elements.planSvg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  updateMapZoomControls();
+}
+
+function setMapZoom(nextZoom, anchor = mapViewportCenter(), markTouched = true) {
+  const viewport = mapViewport();
+  if (!viewport || !state.mapWorld.width || !state.mapWorld.height) {
+    return;
+  }
+
+  const oldZoom = state.mapZoom || mapFitZoom();
+  const next = clampNumber(nextZoom, minMapZoom(), MAP_MAX_ZOOM);
+  const localAnchor = anchor || mapViewportCenter();
+  const worldX = (viewport.scrollLeft + localAnchor.x) / oldZoom;
+  const worldY = (viewport.scrollTop + localAnchor.y) / oldZoom;
+  state.mapZoom = next;
+  state.mapZoomTouched = state.mapZoomTouched || markTouched;
+  applyMapZoom();
+  viewport.scrollLeft = Math.max(0, worldX * next - localAnchor.x);
+  viewport.scrollTop = Math.max(0, worldY * next - localAnchor.y);
+}
+
+function resetMapZoom(markTouched = true) {
+  setMapZoom(mapFitZoom(), mapViewportCenter(), markTouched);
+}
+
+function ensureMapZoomForWorld() {
+  if (!state.mapZoomTouched) {
+    state.mapZoom = mapFitZoom();
+  } else {
+    state.mapZoom = clampNumber(state.mapZoom, minMapZoom(), MAP_MAX_ZOOM);
+  }
 }
 
 function mapColumnKey(block) {
@@ -699,8 +870,9 @@ function renderMap() {
   }
 
   elements.planSvg.innerHTML = '';
-  elements.planSvg.style.height = `${height}px`;
-  elements.planSvg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  state.mapWorld = { width, height };
+  ensureMapZoomForWorld();
+  applyMapZoom();
 
   const defs = svgElement('defs');
   const marker = svgElement('marker', {
@@ -878,6 +1050,87 @@ function showCollisionTooltip(collision, event) {
 
 function hideEdgeTooltip() {
   elements.edgeTooltip.hidden = true;
+}
+
+function isMapZoomControlTarget(target) {
+  return target instanceof Element && Boolean(target.closest('.map-zoom-controls'));
+}
+
+function mapTouchDistance(touches) {
+  if (touches.length < 2) {
+    return 0;
+  }
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.hypot(dx, dy);
+}
+
+function mapTouchCenter(touches) {
+  const viewport = mapViewport();
+  const rect = viewport?.getBoundingClientRect();
+  if (!rect || touches.length < 2) {
+    return mapViewportCenter();
+  }
+  return {
+    x: ((touches[0].clientX + touches[1].clientX) / 2) - rect.left,
+    y: ((touches[0].clientY + touches[1].clientY) / 2) - rect.top,
+  };
+}
+
+function handleMapTouchStart(event) {
+  if (isMapZoomControlTarget(event.target) || event.touches.length < 2) {
+    return;
+  }
+  event.preventDefault();
+  state.mapPinch = {
+    distance: mapTouchDistance(event.touches),
+    zoom: state.mapZoom || mapFitZoom(),
+  };
+}
+
+function handleMapTouchMove(event) {
+  if (isMapZoomControlTarget(event.target) || event.touches.length < 2) {
+    return;
+  }
+  event.preventDefault();
+  if (!state.mapPinch?.distance) {
+    handleMapTouchStart(event);
+    return;
+  }
+  const ratio = mapTouchDistance(event.touches) / state.mapPinch.distance;
+  setMapZoom(state.mapPinch.zoom * ratio, mapTouchCenter(event.touches), true);
+}
+
+function handleMapTouchEnd(event) {
+  if (event.touches.length < 2) {
+    state.mapPinch = null;
+  }
+}
+
+function handleMapWheel(event) {
+  if ((!event.ctrlKey && !event.metaKey) || isMapZoomControlTarget(event.target)) {
+    return;
+  }
+  event.preventDefault();
+  const viewport = mapViewport();
+  const rect = viewport?.getBoundingClientRect();
+  const anchor = rect
+    ? { x: event.clientX - rect.left, y: event.clientY - rect.top }
+    : mapViewportCenter();
+  const direction = event.deltaY < 0 ? MAP_ZOOM_STEP : 1 / MAP_ZOOM_STEP;
+  setMapZoom((state.mapZoom || mapFitZoom()) * direction, anchor, true);
+}
+
+function bindMapZoomEvents() {
+  const viewport = mapViewport();
+  if (!viewport) {
+    return;
+  }
+  viewport.addEventListener('touchstart', handleMapTouchStart, { passive: false });
+  viewport.addEventListener('touchmove', handleMapTouchMove, { passive: false });
+  viewport.addEventListener('touchend', handleMapTouchEnd);
+  viewport.addEventListener('touchcancel', handleMapTouchEnd);
+  viewport.addEventListener('wheel', handleMapWheel, { passive: false });
 }
 
 function formatDependency(edge) {
@@ -1085,6 +1338,44 @@ function bindInlineActions(root) {
 }
 
 function renderDetail() {
+  if (state.view === 'intake') {
+    const plan = selectedIntakePlan();
+    if (!plan) {
+      elements.detailPanel.innerHTML = '<div class="empty-state">Kein Intake-Plan</div>';
+      return;
+    }
+
+    elements.detailPanel.innerHTML = `
+      <h2 class="detail-title">${escapeHtml(plan.title || plan.path)}</h2>
+      <div class="detail-kicker">
+        <span class="chip priority">${escapeHtml(intakeClassificationLabel(plan.classification))}</span>
+        ${plan.workstreamLabel ? `<span class="chip priority">${escapeHtml(plan.workstreamLabel)}</span>` : ''}
+        ${(plan.plannedBlockIds || []).map((blockId) => `<span class="chip">${escapeHtml(blockId)}</span>`).join('')}
+      </div>
+      <div class="detail-section">
+        <h3>Intake-Status ${helpButton('intake')}</h3>
+        <dl class="key-value">
+          <dt>Pfad</dt><dd>${escapeHtml(plan.path || '-')}</dd>
+          <dt>Zielplan</dt><dd>${escapeHtml(plan.targetPlanFile || '-')}</dd>
+          <dt>Geplante Bloecke</dt><dd>${escapeHtml((plan.plannedBlockIds || []).join(', ') || '-')}</dd>
+          <dt>Erwaehnte Bloecke</dt><dd>${escapeHtml((plan.referencedBlockIds || []).join(', ') || '-')}</dd>
+        </dl>
+      </div>
+      <div class="detail-section">
+        <h3>Gruende</h3>
+        <ul class="plain-list">${textItems(plan.reasons || [], 'intakeReasons', 6)}</ul>
+        ${showMoreButton('intakeReasons', (plan.reasons || []).length, 6)}
+      </div>
+      <div class="detail-section">
+        <h3>Scope ${helpButton('scope')}</h3>
+        <ul class="plain-list">${(plan.scopeFiles || []).length ? limitedItems('intakeScope', plan.scopeFiles || [], 10).map((filePath) => `<li>${fileButton(filePath)}</li>`).join('') : '<li class="muted">keine scope_files im Draft gelesen</li>'}</ul>
+        ${showMoreButton('intakeScope', (plan.scopeFiles || []).length, 10)}
+      </div>
+    `;
+    bindInlineActions(elements.detailPanel);
+    return;
+  }
+
   if (state.view === 'changelog') {
     const entry = selectedChangelogEntry();
     if (!entry) {
@@ -1364,6 +1655,44 @@ function renderDetail() {
   bindInlineActions(elements.detailPanel);
 }
 
+function renderIntakeView() {
+  const plans = visibleIntakePlans();
+  if (!state.selectedIntakePath || !plans.some((plan) => plan.path === state.selectedIntakePath)) {
+    state.selectedIntakePath = plans[0]?.path || null;
+  }
+  const activePath = state.selectedIntakePath;
+
+  elements.intakePanel.innerHTML = `
+    <div class="intake-summary">
+      <span>${escapeHtml(plans.length)} sichtbare Drafts</span>
+      <span>${escapeHtml(state.data?.summary?.intakePlanCount ?? 0)} insgesamt</span>
+      <span>${escapeHtml(Object.keys(state.data?.summary?.byIntakeClassification || {}).length)} Klassen</span>
+    </div>
+    <div class="intake-grid">
+      ${plans.map((plan) => `
+        <button type="button" class="intake-card${plan.path === activePath ? ' is-active' : ''}" data-intake-path="${escapeHtml(plan.path)}">
+          <span class="changelog-card-meta">
+            <span class="chip priority">${escapeHtml(intakeClassificationLabel(plan.classification))}</span>
+            ${plan.workstreamLabel ? `<span class="chip priority">${escapeHtml(plan.workstreamLabel)}</span>` : ''}
+            ${(plan.plannedBlockIds || []).slice(0, 3).map((blockId) => `<span class="chip">${escapeHtml(blockId)}</span>`).join('')}
+          </span>
+          <h2 class="changelog-card-title">${escapeHtml(plan.title || plan.path)}</h2>
+          <p class="changelog-card-summary">${escapeHtml((plan.reasons || [])[0] || 'Kein direkter Master-Abgleich.')}</p>
+          <span class="muted">${escapeHtml(plan.path)}</span>
+        </button>
+      `).join('') || '<div class="empty-state">Keine Intake-Plaene fuer diese Filter</div>'}
+    </div>
+  `;
+
+  elements.intakePanel.querySelectorAll('[data-intake-path]').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.selectedIntakePath = button.dataset.intakePath;
+      state.view = 'intake';
+      render();
+    });
+  });
+}
+
 function renderCollisionView() {
   const rows = (state.data?.scopeCollisions || []).slice(0, 80);
   elements.collisionsTable.innerHTML = `
@@ -1495,6 +1824,7 @@ function updateViewPanels() {
   });
   document.querySelector('#mapView').classList.toggle('is-active', state.view === 'map');
   document.querySelector('#changelogView').classList.toggle('is-active', state.view === 'changelog');
+  document.querySelector('#intakeView').classList.toggle('is-active', state.view === 'intake');
   document.querySelector('#collisionsView').classList.toggle('is-active', state.view === 'collisions');
   document.querySelector('#healthView').classList.toggle('is-active', state.view === 'health');
 }
@@ -1505,6 +1835,7 @@ function renderEmpty() {
   elements.blockList.innerHTML = '';
   elements.planSvg.innerHTML = '';
   elements.changelogPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
+  elements.intakePanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
   elements.detailPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
   elements.collisionsTable.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
   elements.healthPanel.innerHTML = '<div class="empty-state">Kein Export geladen</div>';
@@ -1532,6 +1863,7 @@ function render() {
   renderBlockList();
   renderMap();
   renderChangelogView();
+  renderIntakeView();
   renderDetail();
   renderCollisionView();
   renderHealthView();
@@ -1619,11 +1951,26 @@ function bindEvents() {
     state.view = 'changelog';
     render();
   });
+  elements.intakeClassificationFilter.addEventListener('change', () => {
+    state.intakeClassification = elements.intakeClassificationFilter.value;
+    state.view = 'intake';
+    render();
+  });
   elements.focusToggle.addEventListener('click', () => {
     state.focusMode = !state.focusMode;
     elements.focusToggle.classList.toggle('is-active', state.focusMode);
     render();
   });
+  elements.mapZoomOut?.addEventListener('click', () => {
+    setMapZoom((state.mapZoom || mapFitZoom()) / MAP_ZOOM_STEP);
+  });
+  elements.mapZoomFit?.addEventListener('click', () => {
+    resetMapZoom(true);
+  });
+  elements.mapZoomIn?.addEventListener('click', () => {
+    setMapZoom((state.mapZoom || mapFitZoom()) * MAP_ZOOM_STEP);
+  });
+  bindMapZoomEvents();
 
   elements.fileInput.addEventListener('change', async () => {
     const file = elements.fileInput.files?.[0];
@@ -1636,7 +1983,12 @@ function bindEvents() {
     state.workstream = 'all';
     state.changelogType = 'all';
     state.changelogEvidence = 'all';
+    state.intakeClassification = 'all';
     state.selectedChangelogId = null;
+    state.selectedIntakePath = null;
+    state.mapZoom = 1;
+    state.mapZoomTouched = false;
+    state.mapPinch = null;
     elements.sourceMeta.textContent = `${data.contract || 'plan-map'} - ${file.name}`;
     updateFilterOptions();
     render();
@@ -1676,6 +2028,10 @@ function bindEvents() {
     if (message.workstream) {
       state.workstream = message.workstream;
       elements.workstreamFilter.value = message.workstream;
+    }
+    if (message.intakeClassification) {
+      state.intakeClassification = message.intakeClassification;
+      elements.intakeClassificationFilter.value = message.intakeClassification;
     }
     render();
   });

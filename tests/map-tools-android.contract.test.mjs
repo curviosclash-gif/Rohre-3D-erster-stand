@@ -60,11 +60,27 @@ test('Plan Map risk hints are compact dropdown explanations in shared viewers', 
   ]);
 
   assert.match(html, /data-view="changelog"/);
+  assert.match(html, /data-view="intake"/);
   assert.match(html, /id="changelogView"/);
+  assert.match(html, /id="intakeView"/);
+  assert.match(html, /id="intakeClassificationFilter"/);
+  assert.match(html, /id="mapZoomOut"/);
+  assert.match(html, /id="mapZoomFit"/);
+  assert.match(html, /id="mapZoomIn"/);
+  assert.match(html, /id="mapZoomLabel"/);
   assert.match(html, /id="changelogTypeFilter"/);
   assert.match(script, /function riskHintItems/);
+  assert.match(script, /function renderIntakeView/);
+  assert.match(script, /intakePlans/);
+  assert.match(script, /selectedIntakePath/);
+  assert.match(script, /function setMapZoom/);
+  assert.match(script, /function handleMapTouchMove/);
+  assert.match(script, /function bindMapZoomEvents/);
   assert.match(script, /function renderChangelogView/);
   assert.match(script, /selectedChangelogId/);
+  assert.match(css, /\.intake-card/);
+  assert.match(css, /\.intake-panel/);
+  assert.match(css, /\.map-zoom-controls/);
   assert.match(script, /<details class="risk-disclosure">/);
   assert.match(script, /<summary>/);
   assert.match(script, /Harte Dependencies sind Start- oder Abschlussbedingungen/);
@@ -87,6 +103,7 @@ test('Map Tools Android shell keeps phone viewports inside the app frame', async
   assert.match(planCss, /overflow-x: hidden/);
   assert.match(planCss, /grid-template-columns: minmax\(0, 1fr\)/);
   assert.match(planCss, /#mapView\s*\{[\s\S]*overflow: auto/);
+  assert.match(planCss, /\.plan-svg\s*\{[\s\S]*min-width: 0/);
   assert.match(repoCss, /@media \(max-width: 640px\)/);
 });
 

@@ -25,6 +25,16 @@
       }
     },
     {
+      "id": "runtime:plan-intake-ops",
+      "type": "runtime",
+      "title": "Plan intake classification ops",
+      "file": "scripts/planning/PlanIntakeOps.mjs",
+      "attributes": {
+        "domain": "plan-map",
+        "tooling": "read-only-plan-dashboard"
+      }
+    },
+    {
       "id": "runtime:plan-map-launcher",
       "type": "runtime",
       "title": "Plan Map launcher",
@@ -105,6 +115,16 @@
       "from": "runtime:plan-map-export",
       "to": "config:plan-map-graph-anchor",
       "type": "reads_config"
+    },
+    {
+      "from": "runtime:plan-intake-ops",
+      "to": "state:plan-map-readonly-dataset",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:plan-intake-ops",
+      "to": "test:plan-map-export-contract",
+      "type": "validated_by"
     },
     {
       "from": "runtime:plan-map-viewer",

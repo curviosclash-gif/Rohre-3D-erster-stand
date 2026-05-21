@@ -112,6 +112,12 @@ const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
         reason: 'Agent workflow documents are governance references, not product/code coverage targets.',
     },
     {
+        classification: 'blocker-report',
+        prefixes: ['docs/Fehlerberichte/'],
+        excludedFromCoverage: true,
+        reason: 'Task-specific blocker reports are evidence artifacts, not architecture coverage targets.',
+    },
+    {
         classification: 'governance-tooling',
         prefixes: ['.agents/scripts/'],
         excludedFromCoverage: false,

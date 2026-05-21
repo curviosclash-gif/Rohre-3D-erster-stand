@@ -117,10 +117,11 @@
     {
       "classification": "mobile-wrapper",
       "prefixes": [
-        "src/mobile-classic/"
+        "src/mobile-classic/",
+        "src/mobile-arcade/"
       ],
       "excludedFromCoverage": true,
-      "reason": "Mobile Classic app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
+      "reason": "Mobile app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
     },
     {
       "classification": "agent-workflow",
@@ -129,6 +130,14 @@
       ],
       "excludedFromCoverage": true,
       "reason": "Agent workflow documents are governance references, not product/code coverage targets."
+    },
+    {
+      "classification": "blocker-report",
+      "prefixes": [
+        "docs/Fehlerberichte/"
+      ],
+      "excludedFromCoverage": true,
+      "reason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "classification": "governance-tooling",
@@ -176,14 +185,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2045,
-    "rawCoveredFileCount": 1288,
-    "rawCoveragePercent": 63,
-    "adjustedTrackedFileCount": 1414,
+    "trackedFileCount": 2048,
+    "rawCoveredFileCount": 1292,
+    "rawCoveragePercent": 63.1,
+    "adjustedTrackedFileCount": 1376,
     "adjustedCoveredFileCount": 1069,
-    "adjustedCoveragePercent": 75.6,
-    "uncoveredFileCount": 757,
-    "uncoveredActiveFileCount": 345,
+    "adjustedCoveragePercent": 77.7,
+    "uncoveredFileCount": 756,
+    "uncoveredActiveFileCount": 307,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -202,6 +211,12 @@
         "excludedFromCoverage": true,
         "count": 197,
         "coveredCount": 120
+      },
+      {
+        "classification": "blocker-report",
+        "excludedFromCoverage": true,
+        "count": 40,
+        "coveredCount": 2
       },
       {
         "classification": "bot-training",
@@ -224,14 +239,14 @@
       {
         "classification": "mobile-wrapper",
         "excludedFromCoverage": true,
-        "count": 2,
-        "coveredCount": 1
+        "count": 3,
+        "coveredCount": 2
       },
       {
         "classification": "native-wrapper",
         "excludedFromCoverage": true,
         "count": 106,
-        "coveredCount": 3
+        "coveredCount": 4
       },
       {
         "classification": "other",
@@ -242,14 +257,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 978,
-        "coveredCount": 855
+        "count": 980,
+        "coveredCount": 857
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 361,
-        "coveredCount": 169
+        "count": 321,
+        "coveredCount": 167
       },
       {
         "classification": "prototype",
@@ -273,7 +288,7 @@
   },
   "gate": {
     "contract": "knowledge-graph.coverage.gate.v1",
-    "status": "fail",
+    "status": "pass",
     "baseline": {
       "ref": "HEAD",
       "path": "docs/generated/knowledge-graph.coverage.json",
@@ -283,21 +298,10 @@
       {
         "id": "no-new-active-uncovered-files",
         "severity": "error",
-        "status": "fail",
+        "status": "pass",
         "description": "Active repo files may not become newly uncovered; add them to a graph scope/mapping or classify them as excluded.",
-        "violationCount": 1,
-        "files": [
-          {
-            "path": "docs/plaene/neu/Feature_Parcours_Map_Pack_V130.md",
-            "classification": "product-docs",
-            "baselineState": "covered",
-            "coveredInCore": false,
-            "coveredByOverlay": false,
-            "scopeBlocks": [
-              "V77"
-            ]
-          }
-        ]
+        "violationCount": 0,
+        "files": []
       }
     ]
   },
@@ -1199,11 +1203,15 @@
     {
       "path": "android-classic/app/build.gradle",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V132"
+      ],
       "surfaces": [],
       "classification": "native-wrapper",
       "excludedFromCoverage": true,
@@ -10499,9 +10507,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-03-28_v60-playwright-suite-lock.md",
@@ -10512,9 +10520,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-03-28_v65-editor-playwright-dev-server-timeout.md",
@@ -10525,9 +10533,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-03-30_dev-logging-build-gate-failure.md",
@@ -10538,9 +10546,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-03-30_workspace-cleanup-verification-blockers.md",
@@ -10551,9 +10559,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-03-31_v74-playwright-browser-prewarm-timeout.md",
@@ -10564,9 +10572,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-01_arcade-vehicle-manager-build-blocker.md",
@@ -10577,9 +10585,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-01_playing-runtime-null-update-crash.md",
@@ -10590,9 +10598,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-02_bt80a-build-blocked-by-checkpointring-boundary.md",
@@ -10603,9 +10611,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-02_bt80c-candidate-run-validation-blockers.md",
@@ -10616,9 +10624,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-02_bt80c-plan-docs-check-blocked-by-v81-v82-plan-ownership.md",
@@ -10629,9 +10637,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-02_v74-runtime-coordinator-verification-blockers.md",
@@ -10642,9 +10650,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-04_v84-plan-docs-check-blocked-by-v74-v83-plan-file-validation.md",
@@ -10655,9 +10663,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-07_v87-runtime-hardening-87.99-playwright-blockers.md",
@@ -10672,9 +10680,9 @@
         "V88"
       ],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-10_v88-88.99.1-spawn-eperm-gate-blocker.md",
@@ -10685,9 +10693,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-12_v89-89.99.1-node-contract-core-gate-blocker.md",
@@ -10698,9 +10706,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-13_v72-build-vite-spawn-eperm.md",
@@ -10711,9 +10719,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-14_git-index-lock-acl-deny.md",
@@ -10724,9 +10732,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-14_v91-agents-test-mapping-acl-deny.md",
@@ -10737,9 +10745,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-14_v91-build-vite-spawn-eperm.md",
@@ -10750,9 +10758,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-14_v91-runtime-regressions-node-test-spawn-eperm.md",
@@ -10763,9 +10771,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-15_v92-92.4.1-build-touched-strict-gameruntimefacade.md",
@@ -10776,9 +10784,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-22_v76-99-build-max-lines-out-of-scope.md",
@@ -10789,9 +10797,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-24_v101-plan-commit-index-lock-acl-blocker.md",
@@ -10802,9 +10810,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-25_bt93e-gate-refresh-diagnose-blocked.md",
@@ -10815,9 +10823,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-25_bt93f-gate-refresh-diagnose-blocked.md",
@@ -10828,9 +10836,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-25_bt93g-gate-refresh-diagnose-blocked.md",
@@ -10841,9 +10849,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-25_bt93h-gate-refresh-diagnose-blocked.md",
@@ -10854,9 +10862,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-25_bt93i-gate-refresh-diagnose-blocked.md",
@@ -10867,9 +10875,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-26_v103-103.2.2-store-port-scope-blocker.md",
@@ -10880,9 +10888,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-27_user-owned-4env-longrun-ended-without-final-report.md",
@@ -10893,9 +10901,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-27_v81-81.99.2-build-touched-strict-mediarecorder.md",
@@ -10906,9 +10914,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-29_v104-v107-graph-check-orphan-dependency.md",
@@ -10919,9 +10927,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-29_v90-90.2.2-build-architecture-boundary-blocked.md",
@@ -10932,9 +10940,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-04-29_v90-90.2.2-build-typecheck-architecture-blocked.md",
@@ -10945,9 +10953,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-05-05_v104-rest-hardening-resolved-issues.md",
@@ -10958,9 +10966,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/2026-05-16_main-push-blocked-by-downloadservice-max-lines.md",
@@ -10975,9 +10983,22 @@
         "V115"
       ],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
+    },
+    {
+      "path": "docs/Fehlerberichte/2026-05-21_v132-commit-blocked-by-foreign-graph-state.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/FEHLERBERICHT_TEMPLATE.md",
@@ -10988,9 +11009,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/Fehlerberichte/README.md",
@@ -11001,9 +11022,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
       "path": "docs/generated/knowledge-graph.coverage.json",
@@ -14352,23 +14373,6 @@
       "coveredInCore": true,
       "coveredByOverlay": false,
       "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Parcours_Map_Pack_V130.md",
-      "tracked": true,
-      "coveredInCore": false,
-      "coveredByOverlay": false,
-      "covered": false,
       "coverageSources": [
         "scope-files"
       ],
@@ -18671,7 +18675,8 @@
       ],
       "scopeBlocks": [
         "V116",
-        "V121"
+        "V121",
+        "V132"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -19678,6 +19683,24 @@
         "B13",
         "V116",
         "V123"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/planning/PlanIntakeOps.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [
+        "B13"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -26350,6 +26373,23 @@
       "excludeReason": null
     },
     {
+      "path": "src/mobile-arcade/MobileArcadeApp.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V132"
+      ],
+      "surfaces": [],
+      "classification": "mobile-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Mobile app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
+    },
+    {
       "path": "src/mobile-classic/MobileClassicApp.js",
       "tracked": true,
       "coveredInCore": true,
@@ -26364,7 +26404,7 @@
       "surfaces": [],
       "classification": "mobile-wrapper",
       "excludedFromCoverage": true,
-      "excludeReason": "Mobile Classic app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
+      "excludeReason": "Mobile app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
     },
     {
       "path": "src/mobile-classic/MobileClassicUpdateConfig.js",
@@ -26377,7 +26417,7 @@
       "surfaces": [],
       "classification": "mobile-wrapper",
       "excludedFromCoverage": true,
-      "excludeReason": "Mobile Classic app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
+      "excludeReason": "Mobile app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
     },
     {
       "path": "src/modes/ArcadeModeStrategy.js",
@@ -33401,6 +33441,25 @@
       "scopeBlocks": [
         "B13",
         "V114"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/mobile-arcade-app.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V132"
       ],
       "surfaces": [],
       "classification": "product-code",

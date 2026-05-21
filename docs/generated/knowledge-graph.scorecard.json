@@ -8,24 +8,24 @@
     "source": "build",
     "graphPath": "docs/generated/knowledge-graph.json",
     "coveragePath": "docs/generated/knowledge-graph.coverage.json",
-    "score": 81.5,
-    "status": "review",
+    "score": 92.2,
+    "status": "pass",
     "metrics": {
-      "adjustedCoveragePercent": 75.6,
-      "coverageGateStatus": "fail",
+      "adjustedCoveragePercent": 77.7,
+      "coverageGateStatus": "pass",
       "criticalPathOkPercent": 100,
       "criticalPathOkCount": 4,
       "criticalPathTotalCount": 4,
-      "mappedNodeCount": 68,
-      "mappedEdgeCount": 139,
-      "validationEdgeCount": 18,
+      "mappedNodeCount": 69,
+      "mappedEdgeCount": 142,
+      "validationEdgeCount": 19,
       "negativeEdgeCount": 3,
-      "mappedNodeValidationRatio": 0.265
+      "mappedNodeValidationRatio": 0.275
     }
   },
   "trend": {
     "previousId": "V111.3.1",
-    "scoreDelta": -13.7,
+    "scoreDelta": -3,
     "direction": "down"
   },
   "criticalPaths": [
@@ -127,19 +127,19 @@
       "source": "build",
       "graphPath": "docs/generated/knowledge-graph.json",
       "coveragePath": "docs/generated/knowledge-graph.coverage.json",
-      "score": 81.5,
-      "status": "review",
+      "score": 92.2,
+      "status": "pass",
       "metrics": {
-        "adjustedCoveragePercent": 75.6,
-        "coverageGateStatus": "fail",
+        "adjustedCoveragePercent": 77.7,
+        "coverageGateStatus": "pass",
         "criticalPathOkPercent": 100,
         "criticalPathOkCount": 4,
         "criticalPathTotalCount": 4,
-        "mappedNodeCount": 68,
-        "mappedEdgeCount": 139,
-        "validationEdgeCount": 18,
+        "mappedNodeCount": 69,
+        "mappedEdgeCount": 142,
+        "validationEdgeCount": 19,
         "negativeEdgeCount": 3,
-        "mappedNodeValidationRatio": 0.265
+        "mappedNodeValidationRatio": 0.275
       }
     }
   ]

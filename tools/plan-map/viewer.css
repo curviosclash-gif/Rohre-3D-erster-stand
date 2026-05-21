@@ -676,6 +676,55 @@ h1 {
   position: relative;
 }
 
+.map-zoom-controls {
+  position: absolute;
+  z-index: 6;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: rgba(255, 253, 249, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.map-zoom-controls button {
+  min-width: 34px;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 760;
+  cursor: pointer;
+}
+
+.map-zoom-controls button:hover,
+.map-zoom-controls button:focus-visible {
+  border-color: var(--teal);
+  color: var(--teal);
+  outline: 0;
+}
+
+.map-zoom-controls button:disabled {
+  color: var(--muted);
+  cursor: default;
+  opacity: 0.55;
+}
+
+.map-zoom-controls span {
+  min-width: 44px;
+  padding: 0 5px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+  text-align: center;
+}
+
 .plan-svg {
   display: block;
   width: 100%;
@@ -1332,6 +1381,56 @@ th {
   overflow-wrap: anywhere;
 }
 
+.intake-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px;
+}
+
+.intake-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.intake-summary span {
+  min-height: 24px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fffdf9;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.intake-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+  align-content: start;
+}
+
+.intake-card {
+  display: grid;
+  gap: 8px;
+  min-height: 150px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fffdf9;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.intake-card.is-active,
+.intake-card:hover {
+  border-left-color: var(--teal);
+  box-shadow: var(--shadow);
+}
+
 .evidence-badge {
   display: inline-flex;
   align-items: center;
@@ -1514,12 +1613,14 @@ th {
   .workspace,
   .health-grid,
   .changelog-panel,
+  .intake-grid,
   .summary-grid,
   .explain-meter {
     grid-template-columns: 1fr;
   }
 
-  .changelog-panel {
+  .changelog-panel,
+  .intake-panel {
     gap: 12px;
     padding: 12px;
   }
@@ -1635,10 +1736,14 @@ th {
     -webkit-overflow-scrolling: touch;
   }
 
+  .map-zoom-controls {
+    top: 8px;
+    right: 8px;
+  }
+
   .plan-svg {
-    width: 720px;
     max-width: none;
-    min-width: 720px;
+    min-width: 0;
     height: 62dvh;
     min-height: 420px;
   }

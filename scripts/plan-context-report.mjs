@@ -3,6 +3,11 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
+import {
+    classifyIntakeDraft as classifySharedIntakeDraft,
+    parsePlanMapMaster,
+} from './planning/PlanIntakeOps.mjs';
+
 const ROOT = process.cwd();
 const args = new Set(process.argv.slice(2));
 const checkMode = args.has('--check');
@@ -96,30 +101,7 @@ function parseFrontmatter(content) {
 }
 
 function parseMasterPlan(content) {
-    const planFileMatches = [...content.matchAll(/`(docs\/plaene\/aktiv\/V\d+\.md)`/g)]
-        .map((match) => normalizePath(match[1]));
-    const rows = content
-        .split(/\r?\n/)
-        .map((line) => line.match(/^\|\s*(V\d+)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]*?)\s*\|\s*([^|]+?)\s*\|\s*`(docs\/plaene\/aktiv\/V\d+\.md)`\s*\|$/))
-        .filter(Boolean)
-        .map((match) => ({
-            blockId: match[1],
-            title: match[2].trim(),
-            status: match[3].trim(),
-            priority: match[4].trim(),
-            owner: match[5].trim(),
-            dependsOn: match[6].trim(),
-            phase: match[7].trim(),
-            planFile: normalizePath(match[8]),
-        }));
-    const dependencyIds = [...content.matchAll(/\b(V\d+)(?:\.\d+)?\b/g)].map((match) => match[1]);
-
-    return {
-        referencedPlanFiles: unique(planFileMatches),
-        referencedBlockIds: unique(planFileMatches.map((file) => path.basename(file, '.md'))),
-        dependencyIds: unique(dependencyIds),
-        rows,
-    };
+    return parsePlanMapMaster(content);
 }
 
 function masterRowFor(master, blockId) {
@@ -211,57 +193,7 @@ function classifyActivePlan({ planFile, frontmatter, master, graphNodes, openFin
 }
 
 function classifyIntakeDraft({ file, content, master }) {
-    const basename = path.basename(file);
-    const reasons = [];
-    let classification = 'intake-review';
-
-    if (basename.toLowerCase() === 'readme.md') {
-        return {
-            classification: 'protected-readme',
-            reasons: ['README der Intake-Zone.'],
-            referencedBlockIds: [],
-        };
-    }
-
-    const frontmatter = parseFrontmatter(content);
-    const referencedBlockIds = unique([...content.matchAll(/\bV\d+\b/g)].map((match) => match[0]));
-    const plannedBlockIds = unique([
-        String(frontmatter.planned_block_id || '').trim(),
-        ...[...basename.matchAll(/(?:^|[_-])(V\d+)(?:[_\-.]|$)/g)].map((match) => match[1]),
-    ]);
-
-    if (/^BT/i.test(basename) || /Bot/i.test(basename) || file.includes('/BT')) {
-        classification = 'protected-bot-training-intake';
-        reasons.push('Bot-Training-Draft gehoert nicht in den normalen Master-Intake.');
-    }
-
-    const masterHits = plannedBlockIds.filter((blockId) => master.referencedBlockIds.includes(blockId));
-    if (masterHits.length > 0 && classification !== 'protected-bot-training-intake') {
-        const openMasterHits = masterHits.filter((blockId) => !COMPLETED_PLAN_STATUSES.has(masterStatusFor(master, blockId)));
-        classification = openMasterHits.length > 0
-            ? 'adopted-by-open-master-block'
-            : 'adopted-by-done-master-block';
-        const hitDetails = masterHits.map((blockId) => `${blockId}:${masterStatusFor(master, blockId) || 'unknown'}`);
-        reasons.push(`Geplante Block-ID oder Dateiname ist bereits im Master referenziert: ${hitDetails.join(', ')}.`);
-    }
-
-    if (masterHits.length > 0 && classification === 'protected-bot-training-intake') {
-        reasons.push(`Geplante Block-ID oder Dateiname passt zu Master-Bloecken, bleibt aber Bot-Training-Sonderfall: ${masterHits.join(', ')}.`);
-    }
-
-    const contextualMasterHits = referencedBlockIds.filter((blockId) => (
-        master.referencedBlockIds.includes(blockId)
-        && !masterHits.includes(blockId)
-    ));
-    if (contextualMasterHits.length > 0 && classification === 'intake-review') {
-        reasons.push(`Erwaehnt Master-Bloecke nur als Kontext: ${contextualMasterHits.join(', ')}.`);
-    }
-
-    if (classification === 'intake-review') {
-        reasons.push('Kein direkter Master-Abgleich; User-Intake-Entscheidung noetig.');
-    }
-
-    return { classification, reasons, referencedBlockIds, plannedBlockIds };
+    return classifySharedIntakeDraft({ file, content, master });
 }
 
 function summarize(items) {

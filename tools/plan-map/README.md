@@ -46,6 +46,7 @@ Input sources:
   health, and file relations.
 - `docs/lock-status/_locks-registry.json`: current lock/readiness hints.
 - `docs/prozess/Open_Findings.md`: open governance and verification findings.
+- `docs/plaene/neu/`: intake drafts as a separate non-canonical layer.
 
 The generated dataset is intentionally temporary:
 
@@ -93,6 +94,9 @@ The viewer expects a single JSON document with these conceptual groups:
 - `graph`: knowledge-graph impact and health signals.
 - `locks`: current lock/readiness information.
 - `findings`: open findings relevant to plan execution.
+- `intakePlans`: draft plans from `docs/plaene/neu/`, including
+  classification, workstream hints, planned block IDs, target plan file, and
+  `scope_files` where present.
 - `meta`: export timestamp, source paths, and version hints.
 
 The UI treats missing optional fields as "unknown" and keeps the block visible.
@@ -101,6 +105,9 @@ Required contract changes belong in the export test before changing the viewer.
 ## Views
 
 - Map: dependency graph with focus mode, legend, layer toggles, readiness badges, edge tooltips, and block details.
+- Intake: draft-plan layer from `docs/plaene/neu/`, separated from canonical
+  master blocks and filterable by classification, workstream, search, and file
+  focus.
 - Kollisionen: clickable scope-collision matrix; file clicks focus the map on affected blocks.
 - Health: graph score, coverage, active locks, and open findings.
 

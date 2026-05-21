@@ -855,3 +855,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `V130` ist nach expliziter User-Anforderung als abgeschlossener aktiver Block kanonisiert: der Draft liegt in `docs/plaene/alt/Feature_Parcours_Map_Pack_V130.md`, die Source of Truth in `docs/plaene/aktiv/V130.md`.
 - Der bereits gelieferte Code-Slice aus `309ef8a9` bleibt fachlich die Umsetzung: sechs JS-authored Parcours-Maps, stabile `*_v1`-Route-IDs, gestaffelte Arcade-Pool-Erweiterung und targeted Contract-/Playwright-Smokes.
 - Der Intake loest die V132-Hard-Dependency `V130.99`; bewusst unveraendert bleiben Browser-Demo-Allowlist, `MenuPreviewCatalog.js`, GLB-/CC0-Assets, bewegliche Hazards, echte Loops und Editor-/Authoring-Pfade.
+
+## Tooling-Notiz 2026-05-21 (Plan Map Intake-Layer)
+
+- `export-plan-map` exportiert Intake-Drafts aus `docs/plaene/neu/` jetzt als eigene `intakePlans`-Ebene statt sie mit kanonischen Master-Bloecken zu vermischen.
+- Electron- und Android-Map-Tools konsumieren denselben Plan-Map-Viewer; der neue Intake-Tab zeigt Klassifikation, Arbeitsstrom, Zielplan, Gruende und `scope_files`.
+- Evidence: `node --test tests/plan-map-export.contract.test.mjs tests/map-tools-android.contract.test.mjs tests/map-tools-electron.contract.test.mjs` -> PASS; `node --test tests/knowledge-graph-build.contract.test.mjs` -> PASS; `npm run plan:context:check` -> PASS; `npm run plan:check` -> PASS; `npm run graph:check` -> PASS mit bekannten Map-Tools-Domain-Drift-Warnungen.

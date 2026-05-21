@@ -66,6 +66,8 @@ test('map tools app is wired as a separate Electron entry with native menu actio
     const shellHtml = await fs.readFile(new URL('../electron/map-tools/ui/map-tools.html', import.meta.url), 'utf8');
     const shellCss = await fs.readFile(new URL('../electron/map-tools/ui/map-tools.css', import.meta.url), 'utf8');
     const rendererSource = await fs.readFile(new URL('../electron/map-tools/ui/map-tools-renderer.js', import.meta.url), 'utf8');
+    const planMapHtml = await fs.readFile(new URL('../tools/plan-map/index.html', import.meta.url), 'utf8');
+    const planMapSource = await fs.readFile(new URL('../tools/plan-map/viewer.js', import.meta.url), 'utf8');
 
     assert.equal(rootPackage.scripts['app:maps:start'], 'npm --prefix electron run start:maps');
     assert.equal(rootPackage.scripts['app:maps:smoke'], 'node --test tests/map-tools-electron-smoke.test.mjs');
@@ -86,6 +88,10 @@ test('map tools app is wired as a separate Electron entry with native menu actio
     assert.match(shellCss, /\.map-tools-shell\.info-hidden/);
     assert.match(rendererSource, /function setInfoVisible/);
     assert.match(rendererSource, /curvios\.map-tools:set-help-visible/);
+    assert.match(planMapHtml, /data-view="intake"/);
+    assert.match(planMapHtml, /id="intakeClassificationFilter"/);
+    assert.match(planMapSource, /function renderIntakeView/);
+    assert.match(planMapSource, /intakePlans/);
 });
 
 test('map tools and repo map are represented in the knowledge graph mapping source', async () => {

@@ -41,6 +41,18 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.ok(Array.isArray(data.scopeCollisions));
   assert.ok(data.summary.byReadiness);
   assert.ok(data.summary.byWorkstream['repo-governance'] > 0);
+  assert.ok(data.summary.intakePlanCount > 0);
+  assert.ok(data.summary.byIntakeClassification['intake-review'] > 0);
+  assert.ok(data.sources.intakePlans.endsWith('docs/plaene/neu'));
+  assert.ok(data.intakePlans.some((plan) => (
+    plan.path === 'docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md'
+    && plan.workstream === 'android-mobile'
+  )));
+  assert.ok(data.intakePlans.some((plan) => (
+    plan.path === 'docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md'
+    && plan.workstream === 'repo-governance'
+    && plan.classification === 'intake-review'
+  )));
   assert.ok(data.workstreams.some((entry) => entry.id === 'map-tools-settings'));
   assert.ok(data.workstreams.some((entry) => entry.id === 'android-mobile'));
   assert.ok(data.fileIndex.some((entry) => entry.path === 'vite.config.js'));
