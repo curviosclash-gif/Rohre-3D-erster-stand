@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Abschluss-Snapshot 2026-05-21 (Block `V133 133.99`)
+
+- `V133` ist geschlossen: Die Plan-Map-Changelog-Ansicht hat ein UI-lokales, read-only Fachbegriffe-Wiki mit Wikipedia-aehnlichen `#wiki-...` Links, Begriffschips, Inline-Begriffslinks und Wiki-Detailseiten im rechten Panel.
+- Das Glossar umfasst 17 Plan-/Changelog-/Governance-Begriffe. Jede Definition nennt einen kanonischen Quellpfad; der Exportvertrag bleibt unveraendert, weil noch kein separater Daten-Consumer fuer `glossaryTerms` existiert.
+- Evidence: `node --check tools/plan-map/viewer.js` -> PASS, `node --test tests/plan-map-export.contract.test.mjs` -> PASS, `npm run plan:check` -> PASS, Playwright-Smoke fuer `#wiki-evidence` auf 1440px und 1000px -> PASS.
+- Not-checked: kein Volltext-Wiki, keine externe Suche, keine Schreibfunktion und keine Migration historischer Begriffe aus Archivplaenen.
+
 ## Plan-Notiz 2026-05-21 (Master-Index / Plan-Map)
 
 - `docs/Umsetzungsplan.md` fuehrt jetzt einen kompakten Arbeitsstrom-Index als Navigationshilfe fuer Hauptspiel, Map Content/Map Tools/Settings, Android/Mobile, Architektur/Runtime, Repo-Pflege/Governance und AI/Graph/Agenten-Werkzeuge.
