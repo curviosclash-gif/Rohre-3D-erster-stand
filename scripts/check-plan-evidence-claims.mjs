@@ -78,6 +78,19 @@ export const ASSERTIONS = [
   },
 ];
 
+export const ARCHITECTURE_RELEVANT_SCOPE_PATTERNS = [
+  /^src\//i,
+  /^electron\//i,
+  /^server\//i,
+  /^src\/shared\/contracts\//i,
+  /^src\/application\//i,
+  /^src\/platform\//i,
+];
+
+const ARCHITECTURE_ACCEPTANCE_SECTION = /^##\s+Architecture Acceptance\b/im;
+const ARCHITECTURE_CLAIM_PATTERN = /\b(Architecture Acceptance|Architecture|Architektur|Boundary|Boundaries|Legacy-Surface|Runtime-Surface|Application-Kante|Application-Kanten|Ratchet|Architektur-Gate)\b/i;
+const ARCHITECTURE_EVIDENCE_PATTERN = /\b(check:architecture(?::[\w-]+)?|architecture:guard|architecture:report|typecheck:architecture|check:runtime:determinism|check:root:runtime|metrics|ratchet|boundaries|touched-strict|test:contract|node --test|contract\.test)\b/i;
+
 function normalizePath(value) {
   return value.replace(/\\/g, '/');
 }
@@ -106,6 +119,117 @@ async function listActivePlanFiles(root) {
 
 function findLineNumber(text, index) {
   return text.slice(0, index).split(/\r?\n/).length;
+}
+
+function parseFrontmatter(text) {
+  const lines = text.split(/\r?\n/);
+  if (lines[0]?.trim() !== '---') {
+    return {};
+  }
+
+  const data = {};
+  let currentKey = null;
+
+  for (let index = 1; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line.trim() === '---') {
+      break;
+    }
+
+    const keyValue = line.match(/^([A-Za-z0-9_]+):\s*(.*)$/);
+    if (keyValue) {
+      const [, key, rawValue] = keyValue;
+      currentKey = key;
+      if (rawValue === '') {
+        data[key] = [];
+      } else if (rawValue.trim() === '[]') {
+        data[key] = [];
+        currentKey = null;
+      } else {
+        data[key] = rawValue.trim();
+        currentKey = null;
+      }
+      continue;
+    }
+
+    const listItem = line.match(/^\s*-\s*(.+)\s*$/);
+    if (listItem && currentKey) {
+      if (!Array.isArray(data[currentKey])) data[currentKey] = [];
+      data[currentKey].push(listItem[1].trim());
+    }
+  }
+
+  return data;
+}
+
+function isArchitectureRelevantPlan(text) {
+  const frontmatter = parseFrontmatter(text);
+  if (frontmatter.status === 'done') return false;
+
+  const scopeFiles = Array.isArray(frontmatter.scope_files) ? frontmatter.scope_files : [];
+  return scopeFiles
+    .map(normalizePath)
+    .some((scopeFile) => ARCHITECTURE_RELEVANT_SCOPE_PATTERNS.some((pattern) => pattern.test(scopeFile)));
+}
+
+async function validateArchitectureAcceptanceCoverage(root, activePlanFiles) {
+  const warnings = [];
+
+  for (const planFile of activePlanFiles) {
+    let text = '';
+    try {
+      text = await readText(root, planFile);
+    } catch {
+      continue;
+    }
+
+    if (!isArchitectureRelevantPlan(text)) continue;
+    if (ARCHITECTURE_ACCEPTANCE_SECTION.test(text)) continue;
+
+    warnings.push({
+      id: 'architecture-acceptance.missing',
+      file: normalizePath(planFile),
+      line: 1,
+      message: 'Aktiver Code-/Runtime-Plan ohne `## Architecture Acceptance`; bei naechster Planpflege Zielpfade, verbotene Surfaces, Guard und Ratchet-Auswirkung ergaenzen.',
+    });
+  }
+
+  return warnings;
+}
+
+async function validateArchitectureClosureEvidence(root, activePlanFiles) {
+  const warnings = [];
+  const completedItemPattern = /^\s*-\s*\[x\]\s*(.+)$/i;
+
+  for (const planFile of activePlanFiles) {
+    let text = '';
+    try {
+      text = await readText(root, planFile);
+    } catch {
+      continue;
+    }
+
+    if (!isArchitectureRelevantPlan(text)) continue;
+
+    const lines = text.split(/\r?\n/);
+    for (let index = 0; index < lines.length; index += 1) {
+      const match = lines[index].match(completedItemPattern);
+      if (!match) continue;
+
+      const itemText = match[1];
+      if (!ARCHITECTURE_CLAIM_PATTERN.test(itemText)) continue;
+      if (ARCHITECTURE_EVIDENCE_PATTERN.test(itemText)) continue;
+
+      warnings.push({
+        id: 'architecture-claim.weak-evidence',
+        file: normalizePath(planFile),
+        line: index + 1,
+        message: 'Architektur-Abschlussclaim ohne konkrete Guard-, Metrics-, Ratchet- oder Contract-Evidence.',
+      });
+    }
+  }
+
+  return warnings;
 }
 
 function assertionCoversClaim(assertion, planFile, patternId) {
@@ -154,6 +278,7 @@ export async function runPlanEvidenceClaimCheck({
   activePlanFiles = null,
 } = {}) {
   const violations = [];
+  const warnings = [];
 
   for (const assertion of assertions) {
     for (const relPath of assertion.files) {
@@ -194,18 +319,25 @@ export async function runPlanEvidenceClaimCheck({
 
   const planFiles = activePlanFiles ?? await listActivePlanFiles(root);
   violations.push(...await validatePlanClaimCoverage(root, assertions, planFiles));
+  warnings.push(...await validateArchitectureAcceptanceCoverage(root, planFiles));
+  warnings.push(...await validateArchitectureClosureEvidence(root, planFiles));
 
-  return { assertions: assertions.length, activePlanFiles: planFiles.length, violations };
+  return { assertions: assertions.length, activePlanFiles: planFiles.length, warnings, violations };
 }
 
 async function main() {
   const report = await runPlanEvidenceClaimCheck();
+  for (const warning of report.warnings) {
+    const location = warning.line ? `${warning.file}:${warning.line}` : warning.file;
+    console.log(`- ${location} [${warning.id}] ${warning.message}`);
+  }
+
   if (report.violations.length === 0) {
-    console.log(`[plan-evidence-claims] passed assertions=${report.assertions} activePlans=${report.activePlanFiles}`);
+    console.log(`[plan-evidence-claims] passed assertions=${report.assertions} activePlans=${report.activePlanFiles} warnings=${report.warnings.length}`);
     return;
   }
 
-  console.error(`[plan-evidence-claims] failed assertions=${report.assertions} activePlans=${report.activePlanFiles} violations=${report.violations.length}`);
+  console.error(`[plan-evidence-claims] failed assertions=${report.assertions} activePlans=${report.activePlanFiles} warnings=${report.warnings.length} violations=${report.violations.length}`);
   for (const violation of report.violations) {
     const location = violation.line ? `${violation.file}:${violation.line}` : violation.file;
     console.error(`- ${location} [${violation.id}] ${violation.message}`);

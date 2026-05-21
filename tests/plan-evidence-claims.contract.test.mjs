@@ -98,6 +98,63 @@ test('flags broad rule, scope and repo-wide claims without matching assertions',
   assert(ids.includes('claim-coverage.repo-wide-consistency-claim'));
 });
 
+test('reports active code plans without architecture acceptance', async () => {
+  const root = await createFixture({
+    'docs/plaene/aktiv/V202.md': [
+      '---',
+      'id: V202',
+      'status: planned',
+      'scope_files:',
+      '  - src/core/main.js',
+      '---',
+      '',
+      '# V202',
+    ].join('\n'),
+  });
+
+  const report = await runPlanEvidenceClaimCheck({
+    root,
+    assertions: [],
+    activePlanFiles: ['docs/plaene/aktiv/V202.md'],
+  });
+
+  assert.deepEqual(report.violations, []);
+  assert.equal(report.warnings.length, 1);
+  assert.equal(report.warnings[0].id, 'architecture-acceptance.missing');
+});
+
+test('reports architecture closure claims without concrete guard evidence', async () => {
+  const root = await createFixture({
+    'docs/plaene/aktiv/V203.md': [
+      '---',
+      'id: V203',
+      'status: planned',
+      'scope_files:',
+      '  - src/application/session-runtime/Foo.js',
+      '---',
+      '',
+      '# V203',
+      '',
+      '## Architecture Acceptance',
+      '',
+      '- Betroffene Schichten: application',
+      '',
+      '- [x] DoD.1 Boundary ist geschlossen. (abgeschlossen: 2026-05-21; evidence: npm run plan:check -> PASS)',
+      '- [x] DoD.2 Ratchet ist belegt. (abgeschlossen: 2026-05-21; evidence: npm run check:architecture:ratchet -> PASS)',
+    ].join('\n'),
+  });
+
+  const report = await runPlanEvidenceClaimCheck({
+    root,
+    assertions: [],
+    activePlanFiles: ['docs/plaene/aktiv/V203.md'],
+  });
+
+  assert.deepEqual(report.violations, []);
+  assert.equal(report.warnings.length, 1);
+  assert.equal(report.warnings[0].id, 'architecture-claim.weak-evidence');
+});
+
 test('default assertions cover the real V117 workflow evidence claim', async () => {
   const report = await runPlanEvidenceClaimCheck();
 
