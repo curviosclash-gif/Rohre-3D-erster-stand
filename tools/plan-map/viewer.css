@@ -1299,24 +1299,13 @@ th {
   background: #fffdf9;
   color: var(--ink);
   text-align: left;
+  cursor: pointer;
 }
 
 .changelog-card.is-active,
 .changelog-card:hover {
   border-left-color: var(--teal);
   box-shadow: var(--shadow);
-}
-
-.changelog-card-main {
-  display: grid;
-  gap: 9px;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
 }
 
 .changelog-card-header,
@@ -1340,100 +1329,6 @@ th {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.42;
-  overflow-wrap: anywhere;
-}
-
-.wiki-index {
-  display: grid;
-  gap: 10px;
-  padding: 13px 14px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--panel-soft);
-}
-
-.wiki-index h2 {
-  margin: 0 0 3px;
-  font-size: 14px;
-  line-height: 1.25;
-}
-
-.wiki-index p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.35;
-}
-
-.wiki-term-row,
-.wiki-term-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  min-width: 0;
-}
-
-.wiki-term-chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 22px;
-  padding: 2px 7px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: #fffdf9;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 780;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.wiki-term-link,
-.wiki-link,
-.wiki-popover-link {
-  color: var(--teal);
-  text-decoration: none;
-}
-
-.wiki-term-link:hover,
-.wiki-term-link:focus-visible,
-.wiki-link:hover,
-.wiki-link:focus-visible,
-.wiki-popover-link:hover,
-.wiki-popover-link:focus-visible {
-  border-color: var(--teal);
-  background: var(--teal-soft);
-  outline: 0;
-  text-decoration: underline;
-}
-
-.wiki-link {
-  font-weight: 740;
-}
-
-.wiki-popover-link {
-  justify-self: start;
-  font-size: 12px;
-  font-weight: 740;
-}
-
-.wiki-page {
-  scroll-margin-top: 12px;
-}
-
-.wiki-page-nav {
-  margin-bottom: 10px;
-}
-
-.wiki-source {
-  margin: 0;
-  padding: 8px 9px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--panel-soft);
-  color: var(--muted);
-  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-  font-size: 12px;
   overflow-wrap: anywhere;
 }
 
@@ -1510,65 +1405,12 @@ th {
     display: none;
   }
 
-  body[data-view="changelog"] .workspace {
-    grid-template-columns: 220px minmax(320px, 1fr) 300px;
-  }
-
-  body[data-view="changelog"] .detail-panel {
-    display: block;
-  }
-
   .metrics-strip {
     grid-template-columns: repeat(3, minmax(112px, 1fr));
   }
 
   .decision-bar {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 1050px) {
-  body[data-view="changelog"] {
-    min-width: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  body[data-view="changelog"] .topbar,
-  body[data-view="changelog"] .legend-strip,
-  body[data-view="changelog"] .workspace {
-    width: 100%;
-    max-width: 100vw;
-  }
-
-  body[data-view="changelog"] .topbar {
-    align-items: stretch;
-    flex-wrap: wrap;
-  }
-
-  body[data-view="changelog"] .top-actions {
-    flex-wrap: wrap;
-  }
-
-  body[data-view="changelog"] .app-shell {
-    height: auto;
-    min-height: 100dvh;
-  }
-
-  body[data-view="changelog"] .workspace {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto auto;
-  }
-
-  body[data-view="changelog"] .sidebar {
-    max-height: 34dvh;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  body[data-view="changelog"] .detail-panel {
-    border-top: 1px solid var(--line);
-    border-left: 0;
   }
 }
 

@@ -101,22 +101,8 @@ Required contract changes belong in the export test before changing the viewer.
 ## Views
 
 - Map: dependency graph with focus mode, legend, layer toggles, readiness badges, edge tooltips, and block details.
-- Changelog: timeline, evidence badges, and a read-only Fachbegriffe-Wiki. Glossary chips and inline term links use `#wiki-...` anchors so terms can be opened like small wiki pages in the detail panel.
 - Kollisionen: clickable scope-collision matrix; file clicks focus the map on affected blocks.
 - Health: graph score, coverage, active locks, and open findings.
-
-## Fachbegriffe-Wiki
-
-The Changelog view includes a UI-local glossary for common plan, evidence, and
-governance terms. Clicking a glossary chip or linked term opens the matching
-wiki page in the right panel and updates the URL hash, for example
-`#wiki-evidence`.
-
-Glossary pages show a short definition, aliases, related terms, the canonical
-source path, and matching Changelog entries. They are intentionally read-only:
-the glossary explains terms and points to sources, but it does not replace
-`AGENTS.md`, `.agents/rules/`, `.agents/workflows/`, active plan files, or the
-Changelog as source of truth.
 
 ## Detail Model
 

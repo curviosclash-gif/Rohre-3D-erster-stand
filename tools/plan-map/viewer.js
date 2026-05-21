@@ -21,7 +21,6 @@ const state = {
   detailTab: 'overview',
   expandedSections: new Set(),
   activeHelpTerm: '',
-  selectedGlossaryTerm: '',
   overlays: {
     dependencies: true,
     collisions: true,
@@ -93,12 +92,10 @@ const HELP_TERMS = {
   readiness: {
     title: 'Startbarkeit',
     body: 'Verdichtete Einschaetzung, ob ein Planblock jetzt sinnvoll gestartet werden kann.',
-    glossaryId: 'startbarkeit',
   },
   dependency: {
     title: 'Dependency',
     body: 'Ein anderer Block, eine Phase oder ein Gate, das fuer diesen Block relevant ist.',
-    glossaryId: 'dependency',
   },
   'deps-layer': {
     title: 'Deps',
@@ -107,7 +104,6 @@ const HELP_TERMS = {
   collision: {
     title: 'Scope-Kollision',
     body: 'Zwei Bloecke nennen dieselben Dateien. Das ist kein Fehler, aber parallele Arbeit braucht Lock- und Scope-Abgleich.',
-    glossaryId: 'scope-kollision',
   },
   impact: {
     title: 'Impact',
@@ -120,7 +116,6 @@ const HELP_TERMS = {
   evidence: {
     title: 'Evidence',
     body: 'Nachvollziehbare Belege wie Tests, Checks, Dateipfade oder Planhinweise, auf denen eine Aussage basiert.',
-    glossaryId: 'evidence',
   },
   'changelog-type': {
     title: 'Changelog-Typ',
@@ -129,12 +124,10 @@ const HELP_TERMS = {
   consumer: {
     title: 'Consumer',
     body: 'Bloecke, die vom aktuell ausgewaehlten Block abhaengen oder dessen Ergebnis spaeter nutzen.',
-    glossaryId: 'consumer',
   },
   scope: {
     title: 'Scope',
     body: 'Die Dateien und Bereiche, die ein Block planmaessig beruehren darf oder besonders im Blick behalten muss.',
-    glossaryId: 'scope',
   },
   health: {
     title: 'Health',
@@ -146,145 +139,6 @@ const HELP_TERMS = {
   },
 };
 
-const GLOSSARY_TERMS = [
-  {
-    id: 'evidence',
-    label: 'Evidence',
-    aliases: ['evidence', 'beleg', 'belege'],
-    short: 'Pruefbarer Beleg fuer Plan-, Gate- oder Abschlussaussagen.',
-    source: '.agents/rules/planning_and_governance.md',
-    related: ['gate', 'not-checked', 'fixture'],
-  },
-  {
-    id: 'gate',
-    label: 'Gate',
-    aliases: ['gate', 'abschluss-gate', 'start-gate'],
-    short: 'Start- oder Abschlussbedingung, oft mit einem konkreten Check-Signal verbunden.',
-    source: '.agents/rules/planning_and_governance.md',
-    related: ['evidence', 'user-gate', 'startbarkeit'],
-  },
-  {
-    id: 'not-checked',
-    label: 'Not checked',
-    aliases: ['not checked', 'not-checked'],
-    short: 'Bewusst nicht verifiziertes Signal; die Aussage bleibt sichtbar begrenzt.',
-    source: '.agents/rules/planning_and_governance.md',
-    related: ['evidence', 'gate'],
-  },
-  {
-    id: 'scope',
-    label: 'Scope',
-    aliases: ['scope', 'scope_files', 'scope files'],
-    short: 'Geplanter Datei- oder Bereichsrahmen eines Blocks.',
-    source: 'docs/plaene/aktiv/VXX.md',
-    related: ['scope-kollision', 'dependency'],
-  },
-  {
-    id: 'scope-kollision',
-    label: 'Scope-Kollision',
-    aliases: ['scope-kollision', 'scope collision', 'kollision', 'scope-risiko'],
-    short: 'Zwei oder mehr Bloecke nennen dieselben Dateien oder Bereiche.',
-    source: 'docs/Umsetzungsplan.md',
-    related: ['scope', 'lock', 'impact'],
-  },
-  {
-    id: 'startbarkeit',
-    label: 'Startbarkeit',
-    aliases: ['startbarkeit', 'startklar', 'blockiert', 'ready-with-risk'],
-    short: 'Verdichtetes Plan-Map-Signal, ob ein Block jetzt sinnvoll begonnen werden kann.',
-    source: 'tools/plan-map/viewer.js',
-    related: ['dependency', 'gate', 'lock'],
-  },
-  {
-    id: 'dependency',
-    label: 'Dependency',
-    aliases: ['dependency', 'dependencies', 'abhaengigkeit', 'depends_on'],
-    short: 'Block, Phase oder Gate, von dem ein anderer Block abhaengt.',
-    source: 'docs/Umsetzungsplan.md',
-    related: ['consumer', 'gate', 'startbarkeit'],
-  },
-  {
-    id: 'consumer',
-    label: 'Consumer',
-    aliases: ['consumer', 'consumers', 'folgeblock'],
-    short: 'Folgeblock oder Pfad, der ein Ergebnis eines anderen Blocks nutzt.',
-    source: 'tools/plan-map/viewer.js',
-    related: ['dependency', 'scope'],
-  },
-  {
-    id: 'decision-class',
-    label: 'D2 / D3 / D4',
-    aliases: ['d2', 'd3', 'd4', 'decision', 'decision-klasse', 'decision class'],
-    short: 'Risikoklasse fuer Agenten-Aenderungen von reversibel bis governance- oder blast-radius-relevant.',
-    source: '.agents/rules/planning_and_governance.md',
-    related: ['user-gate', 'gate', 'evidence'],
-  },
-  {
-    id: 'user-gate',
-    label: 'USER-GATE',
-    aliases: ['user-gate', 'review', 'auto'],
-    short: 'Ausfuehrungsmodus, bei dem Aenderungen erst nach expliziter User-Freigabe passieren duerfen.',
-    source: '.agents/rules/planning_and_governance.md',
-    related: ['decision-class', 'gate'],
-  },
-  {
-    id: 'read-only',
-    label: 'read-only',
-    aliases: ['read-only', 'readonly', 'nur lesen'],
-    short: 'Der Viewer zeigt Repo-Daten, schreibt aber keine Plan-, Lock- oder Governance-Quelle.',
-    source: 'tools/plan-map/README.md',
-    related: ['historical', 'source-of-truth'],
-  },
-  {
-    id: 'historical',
-    label: 'historical',
-    aliases: ['historical', 'historisch', 'historie'],
-    short: 'Quelle oder Signal dient der Einordnung alter Staende, nicht der aktiven Steuerung.',
-    source: 'docs/plaene/CHANGELOG.md',
-    related: ['read-only', 'source-of-truth'],
-  },
-  {
-    id: 'fixture',
-    label: 'Fixture',
-    aliases: ['fixture', 'fixtures', 'testdaten'],
-    short: 'Kleines Testdatenpaket fuer reproduzierbare Viewer-, Export- oder Contract-Pruefung.',
-    source: 'tests/plan-map-export.contract.test.mjs',
-    related: ['evidence', 'fallback'],
-  },
-  {
-    id: 'fallback',
-    label: 'Fallback',
-    aliases: ['fallback', 'fallback-pfad', 'fallback path'],
-    short: 'Ersatzpfad, wenn ein optionales Signal, Tool oder Datenfeld fehlt.',
-    source: 'tools/plan-map/viewer.js',
-    related: ['fixture', 'not-checked'],
-  },
-  {
-    id: 'source-of-truth',
-    label: 'Source of Truth',
-    aliases: ['source of truth', 'source-of-truth', 'kanonisch', 'kanonische quelle'],
-    short: 'Kanonische Quelle fuer Regeln oder Planstatus; das Wiki verweist nur darauf.',
-    source: 'AGENTS.md',
-    related: ['read-only', 'historical'],
-  },
-  {
-    id: 'impact',
-    label: 'Impact',
-    aliases: ['impact', 'impact-score', 'gewicht'],
-    short: 'Gewicht aus Scope-Groesse, geteilten Dateien, Governance-Naehe und betroffenen Bereichen.',
-    source: 'tools/plan-map/viewer.js',
-    related: ['scope', 'scope-kollision'],
-  },
-  {
-    id: 'lock',
-    label: 'Lock',
-    aliases: ['lock', 'locks', 'sperre'],
-    short: 'Signal, dass parallele Arbeit oder Startbarkeit fuer einen Scope abgestimmt werden muss.',
-    source: 'docs/lock-status/_locks-registry.json',
-    related: ['scope-kollision', 'startbarkeit'],
-  },
-];
-
 function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -292,116 +146,6 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-function escapeRegExp(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function glossaryTerm(id) {
-  return GLOSSARY_TERMS.find((term) => term.id === id) || null;
-}
-
-function glossaryHaystack(value) {
-  return String(value ?? '').toLowerCase();
-}
-
-function glossaryTermMatchesText(term, text) {
-  const haystack = glossaryHaystack(text);
-  return [term.label, ...(term.aliases || [])].some((alias) => {
-    const needle = glossaryHaystack(alias);
-    if (!needle) return false;
-    if (/^[a-z0-9-]+$/i.test(needle)) {
-      return new RegExp(`(^|[^a-z0-9-])${escapeRegExp(needle)}([^a-z0-9-]|$)`, 'i').test(haystack);
-    }
-    return haystack.includes(needle);
-  });
-}
-
-function changelogText(entry) {
-  return [
-    entry.title,
-    entry.summary,
-    entry.typeLabel,
-    entry.workstreamLabel,
-    entry.blockIds?.join(' '),
-    entry.phaseIds?.join(' '),
-    entry.bullets?.join(' '),
-    entry.evidence?.lines?.join(' '),
-    entry.evidence?.commands?.map((command) => command.command).join(' '),
-  ].join(' ');
-}
-
-function glossaryTermsForEntry(entry) {
-  const text = changelogText(entry);
-  return GLOSSARY_TERMS
-    .filter((term) => glossaryTermMatchesText(term, text))
-    .slice(0, 8);
-}
-
-function glossaryLink(term, label = term.label, className = 'wiki-link') {
-  return `<a class="${escapeHtml(className)}" href="#wiki-${escapeHtml(term.id)}" data-glossary-term="${escapeHtml(term.id)}">${escapeHtml(label)}</a>`;
-}
-
-function linkGlossaryTerms(text) {
-  const raw = String(text ?? '');
-  if (!raw) return '';
-  const candidates = GLOSSARY_TERMS
-    .flatMap((term) => [term.label, ...(term.aliases || [])].map((alias) => ({ term, alias })))
-    .filter((entry) => entry.alias)
-    .sort((left, right) => right.alias.length - left.alias.length);
-  let cursor = 0;
-  let html = '';
-
-  while (cursor < raw.length) {
-    const rest = raw.slice(cursor);
-    const match = candidates.find(({ alias }) => {
-      if (!rest.toLowerCase().startsWith(alias.toLowerCase())) return false;
-      const before = cursor > 0 ? raw[cursor - 1] : ' ';
-      const after = raw[cursor + alias.length] || ' ';
-      if (/^[a-z0-9-]+$/i.test(alias)) {
-        return !/[a-z0-9-]/i.test(before) && !/[a-z0-9-]/i.test(after);
-      }
-      return true;
-    });
-
-    if (match) {
-      html += glossaryLink(match.term, raw.slice(cursor, cursor + match.alias.length));
-      cursor += match.alias.length;
-    } else {
-      html += escapeHtml(raw[cursor]);
-      cursor += 1;
-    }
-  }
-
-  return html;
-}
-
-function setGlossaryTerm(termId, pushHash = true) {
-  if (!glossaryTerm(termId)) return;
-  state.view = 'changelog';
-  state.selectedGlossaryTerm = termId;
-  closeHelpPopover();
-  if (pushHash && window.location.hash !== `#wiki-${termId}`) {
-    history.pushState(null, '', `#wiki-${termId}`);
-  }
-  render();
-}
-
-function clearGlossaryTerm() {
-  state.selectedGlossaryTerm = '';
-  if (window.location.hash.startsWith('#wiki-')) {
-    history.pushState(null, '', window.location.pathname + window.location.search);
-  }
-  render();
-}
-
-function applyHashRoute() {
-  const match = window.location.hash.match(/^#wiki-([a-z0-9-]+)$/i);
-  if (match && glossaryTerm(match[1])) {
-    state.view = 'changelog';
-    state.selectedGlossaryTerm = match[1];
-  }
 }
 
 function helpButton(term) {
@@ -445,12 +189,8 @@ function openHelpPopover(term, button) {
   document.querySelectorAll('.help-button.is-active').forEach((node) => node.classList.remove('is-active'));
   button.classList.add('is-active');
   state.activeHelpTerm = term;
-  const wikiLink = help.glossaryId && glossaryTerm(help.glossaryId)
-    ? `<a class="wiki-popover-link" href="#wiki-${escapeHtml(help.glossaryId)}" data-glossary-term="${escapeHtml(help.glossaryId)}">Wiki-Seite oeffnen</a>`
-    : '';
-  popover.innerHTML = `<strong>${escapeHtml(help.title)}</strong><span>${escapeHtml(help.body)}</span>${wikiLink}`;
+  popover.innerHTML = `<strong>${escapeHtml(help.title)}</strong><span>${escapeHtml(help.body)}</span>`;
   popover.hidden = false;
-  bindGlossaryLinks(popover);
 
   const buttonRect = button.getBoundingClientRect();
   const popoverRect = popover.getBoundingClientRect();
@@ -458,18 +198,6 @@ function openHelpPopover(term, button) {
   const top = Math.min(window.innerHeight - popoverRect.height - 12, buttonRect.bottom + 8);
   popover.style.left = `${left}px`;
   popover.style.top = `${top}px`;
-}
-
-function bindGlossaryLinks(root = document) {
-  root.querySelectorAll('[data-glossary-term]').forEach((link) => {
-    if (link.dataset.glossaryBound === 'true') return;
-    link.dataset.glossaryBound = 'true';
-    link.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setGlossaryTerm(link.dataset.glossaryTerm);
-    });
-  });
 }
 
 function bindHelpButtons(root = document) {
@@ -1213,13 +941,6 @@ function textItems(items, sectionName, limit) {
     : '<li class="muted">keine</li>';
 }
 
-function changelogTextItems(items, sectionName, limit) {
-  const visible = limitedItems(sectionName, items || [], limit);
-  return visible.length
-    ? visible.map((item) => `<li>${linkGlossaryTerms(item)}</li>`).join('')
-    : '<li class="muted">keine</li>';
-}
-
 function explanationItems(items, sectionName, limit, emptyText = 'keine') {
   const visible = limitedItems(sectionName, items || [], limit);
   return visible.length
@@ -1325,14 +1046,9 @@ function fileButton(filePath) {
 }
 
 function bindInlineActions(root) {
-  bindGlossaryLinks(root);
-  root.querySelector('[data-clear-glossary]')?.addEventListener('click', () => {
-    clearGlossaryTerm();
-  });
   root.querySelectorAll('[data-select-block]').forEach((button) => {
     button.addEventListener('click', () => {
       state.view = 'map';
-      state.selectedGlossaryTerm = '';
       selectBlock(button.dataset.selectBlock);
     });
   });
@@ -1368,72 +1084,8 @@ function bindInlineActions(root) {
   });
 }
 
-function renderGlossaryDetail(term) {
-  const relatedTerms = (term.related || []).map(glossaryTerm).filter(Boolean);
-  const matchingEntries = (state.data?.changelog || [])
-    .filter((entry) => glossaryTermsForEntry(entry).some((match) => match.id === term.id))
-    .slice(0, 8);
-
-  elements.detailPanel.innerHTML = `
-    <div class="wiki-page" id="wiki-${escapeHtml(term.id)}">
-      <div class="wiki-page-nav">
-        <button type="button" class="text-button" data-clear-glossary>Zurueck zum Changelog-Eintrag</button>
-      </div>
-      <h2 class="detail-title">${escapeHtml(term.label)}</h2>
-      <div class="detail-kicker">
-        <span class="chip readiness-ready">Wiki</span>
-        <span class="chip priority">read-only</span>
-      </div>
-      <div class="detail-section">
-        <h3>Definition</h3>
-        <p class="detail-note">${escapeHtml(term.short)}</p>
-      </div>
-      <div class="detail-section">
-        <h3>Kanonische Quelle</h3>
-        <p class="wiki-source">${escapeHtml(term.source)}</p>
-      </div>
-      <div class="detail-section">
-        <h3>Aliases</h3>
-        <div class="wiki-term-list">
-          ${(term.aliases || []).map((alias) => `<span class="wiki-term-chip">${escapeHtml(alias)}</span>`).join('') || '<span class="muted">keine</span>'}
-        </div>
-      </div>
-      <div class="detail-section">
-        <h3>Verwandte Begriffe</h3>
-        <div class="wiki-term-list">
-          ${relatedTerms.map((related) => glossaryLink(related, related.label, 'wiki-term-chip wiki-term-link')).join('') || '<span class="muted">keine</span>'}
-        </div>
-      </div>
-      <div class="detail-section">
-        <h3>Im Changelog gefunden</h3>
-        <ul class="plain-list">
-          ${matchingEntries.length ? matchingEntries.map((entry) => `
-            <li>
-              <button type="button" class="text-button" data-changelog-id="${escapeHtml(entry.id)}">${escapeHtml(entry.date || '-')} - ${escapeHtml(entry.title)}</button>
-            </li>
-          `).join('') : '<li class="muted">keine Treffer im aktuellen Export</li>'}
-        </ul>
-      </div>
-    </div>
-  `;
-  bindInlineActions(elements.detailPanel);
-  elements.detailPanel.querySelectorAll('[data-changelog-id]').forEach((button) => {
-    button.addEventListener('click', () => {
-      state.selectedChangelogId = button.dataset.changelogId;
-      state.selectedGlossaryTerm = '';
-      render();
-    });
-  });
-}
-
 function renderDetail() {
   if (state.view === 'changelog') {
-    const activeTerm = glossaryTerm(state.selectedGlossaryTerm);
-    if (activeTerm) {
-      renderGlossaryDetail(activeTerm);
-      return;
-    }
-
     const entry = selectedChangelogEntry();
     if (!entry) {
       elements.detailPanel.innerHTML = '<div class="empty-state">Kein Changelog-Eintrag</div>';
@@ -1451,7 +1103,7 @@ function renderDetail() {
       </div>
       <div class="detail-section">
         <h3>Kurzfazit</h3>
-        <p class="detail-note">${linkGlossaryTerms(entry.summary || '-')}</p>
+        <p class="detail-note">${escapeHtml(entry.summary || '-')}</p>
       </div>
       <div class="detail-section">
         <h3>Bloecke und Phasen</h3>
@@ -1463,13 +1115,13 @@ function renderDetail() {
       </div>
       <div class="detail-section">
         <h3>Eintrag</h3>
-        <ul class="plain-list">${changelogTextItems(entry.bullets || [], 'changelogBullets', 12)}</ul>
+        <ul class="plain-list">${textItems(entry.bullets || [], 'changelogBullets', 12)}</ul>
         ${showMoreButton('changelogBullets', (entry.bullets || []).length, 12)}
       </div>
       <div class="detail-section">
         <h3>Evidence</h3>
         <div class="evidence-badges">${evidenceBadges(entry, 12) || '<span class="muted">keine Evidence-Badges</span>'}</div>
-        <ul class="plain-list">${changelogTextItems(entry.evidence?.lines || [], 'changelogEvidenceLines', 8)}</ul>
+        <ul class="plain-list">${textItems(entry.evidence?.lines || [], 'changelogEvidenceLines', 8)}</ul>
         ${showMoreButton('changelogEvidenceLines', (entry.evidence?.lines || []).length, 8)}
       </div>
     `;
@@ -1772,37 +1424,22 @@ function renderChangelogView() {
       `).join('') || '<p class="muted">keine Eintraege</p>'}
     </aside>
     <div class="changelog-cards">
-      <section class="wiki-index" aria-label="Fachbegriffe-Wiki">
-        <div>
-          <h2>Fachbegriffe-Wiki</h2>
-          <p>Begriffe im Changelog sind klickbar und oeffnen rechts ihre Wiki-Seite.</p>
-        </div>
-        <div class="wiki-term-list">
-          ${GLOSSARY_TERMS.map((term) => glossaryLink(term, term.label, 'wiki-term-chip wiki-term-link')).join('')}
-        </div>
-      </section>
       ${entries.map((entry) => `
-        <article class="changelog-card${entry.id === activeId ? ' is-active' : ''}">
-          <button type="button" class="changelog-card-main" data-changelog-id="${escapeHtml(entry.id)}">
-            <span class="changelog-card-meta">
-              <span class="chip priority">${escapeHtml(entry.date || '-')}</span>
-              <span class="chip priority">${escapeHtml(entry.typeLabel || '-')}</span>
-              <span class="chip priority">${escapeHtml(entry.workstreamLabel || '-')}</span>
-              ${(entry.blockIds || []).slice(0, 4).map((blockId) => `<span class="chip">${escapeHtml(blockId)}</span>`).join('')}
-            </span>
-            <h2 class="changelog-card-title">${escapeHtml(entry.title)}</h2>
-            <p class="changelog-card-summary">${escapeHtml(entry.summary || 'Keine Zusammenfassung gelesen.')}</p>
-            <span class="evidence-badges">${evidenceBadges(entry)}</span>
-          </button>
-          <div class="wiki-term-row">
-            ${glossaryTermsForEntry(entry).map((term) => glossaryLink(term, term.label, 'wiki-term-chip wiki-term-link')).join('')}
-          </div>
-        </article>
+        <button type="button" class="changelog-card${entry.id === activeId ? ' is-active' : ''}" data-changelog-id="${escapeHtml(entry.id)}">
+          <span class="changelog-card-meta">
+            <span class="chip priority">${escapeHtml(entry.date || '-')}</span>
+            <span class="chip priority">${escapeHtml(entry.typeLabel || '-')}</span>
+            <span class="chip priority">${escapeHtml(entry.workstreamLabel || '-')}</span>
+            ${(entry.blockIds || []).slice(0, 4).map((blockId) => `<span class="chip">${escapeHtml(blockId)}</span>`).join('')}
+          </span>
+          <h2 class="changelog-card-title">${escapeHtml(entry.title)}</h2>
+          <p class="changelog-card-summary">${escapeHtml(entry.summary || 'Keine Zusammenfassung gelesen.')}</p>
+          <span class="evidence-badges">${evidenceBadges(entry)}</span>
+        </button>
       `).join('') || '<div class="empty-state">Keine Changelog-Eintraege fuer diese Filter</div>'}
     </div>
   `;
 
-  bindGlossaryLinks(elements.changelogPanel);
   elements.changelogPanel.querySelectorAll('[data-changelog-id]').forEach((button) => {
     button.addEventListener('click', () => {
       state.selectedChangelogId = button.dataset.changelogId;
@@ -1853,7 +1490,6 @@ function renderHealthView() {
 }
 
 function updateViewPanels() {
-  document.body.dataset.view = state.view;
   document.querySelectorAll('[data-view]').forEach((button) => {
     button.classList.toggle('is-active', button.dataset.view === state.view);
   });
@@ -1917,7 +1553,6 @@ async function loadDefaultData() {
       state.data = data;
       elements.sourceMeta.textContent = `${data.contract || 'plan-map'} - ${data.generatedAt || url}`;
       updateFilterOptions();
-      applyHashRoute();
       render();
       return;
     } catch {
@@ -2004,7 +1639,6 @@ function bindEvents() {
     state.selectedChangelogId = null;
     elements.sourceMeta.textContent = `${data.contract || 'plan-map'} - ${file.name}`;
     updateFilterOptions();
-    applyHashRoute();
     render();
   });
 
@@ -2012,15 +1646,6 @@ function bindEvents() {
     closeHelpPopover();
     if (state.view === 'map') {
       renderMap();
-    }
-  });
-
-  window.addEventListener('hashchange', () => {
-    const previousTerm = state.selectedGlossaryTerm;
-    state.selectedGlossaryTerm = '';
-    applyHashRoute();
-    if (previousTerm !== state.selectedGlossaryTerm) {
-      render();
     }
   });
 
