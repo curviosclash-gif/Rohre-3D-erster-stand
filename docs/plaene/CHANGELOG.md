@@ -874,3 +874,10 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `bugfix.md`, `refactor.md`, `performance.md` und `fix-planung.md` verlangen denselben Mindestcheck mit kleinstem Guard bzw. verbieten stille Boundary-/Legacy-/Runtime-Abkuerzungen.
 - Evidence: `npm run plan:check` -> PASS; `npm run check:plan-evidence-claims` -> PASS; `npm run graph:build` -> PASS; `npm run gates:pre-commit` -> PASS mit bekannten Map-Tools-Domain-Drift-Warnungen.
 - Not-checked: kein produktiver Runtime-/UI-Code, keine Hook-/Package-Aenderung, keine ArchitectureAnalysis-/Ratchet-Aenderung und keine Vollsuite; diese bleiben V125.3 bis V125.99.
+
+## Stand-Snapshot 2026-05-21 (Subphase `V125 125.2`)
+
+- `125.2` ist als D3/User-Gate-Slice geschlossen: `plan.md` verlangt fuer neue oder groesser ueberarbeitete Code-/Runtime-Featureplaene eine `## Architecture Acceptance`-Sektion mit Schichten, Zielpfaden, verbotenen Legacy-Surfaces, Dependency-Kanten, Contract-/Port-/Snapshot-Bezug, Guard und Ratchet-Auswirkung.
+- `check-plan-evidence-claims.mjs` bleibt fuer diesen Slice warnend statt blockierend: aktive Code-/Runtime-Plaene ohne Acceptance melden `architecture-acceptance.missing`, und abgeschlossene Architekturclaims ohne konkrete Guard-/Metrics-/Ratchet-/Contract-Evidence melden `architecture-claim.weak-evidence`.
+- Kandidatenklassifikation ohne Autoumschreibung: V96, V106 und V113 sind `edit required` bei naechster Planpflege, V112 bleibt wegen Abschluss `no-op`, V124 bleibt `optional`/Handoff-Kandidat fuer spaetere Code-/Runtime-Erweiterungen. Evidence: `node --test tests/plan-evidence-claims.contract.test.mjs tests/validate-umsetzungsplan.test.mjs` -> PASS; `npm run check:plan-evidence-claims` -> PASS mit Warnungen fuer V96, V106 und V113; `npm run plan:check` -> PASS; `npm run graph:build` -> PASS; sauberer Temp-Worktree `npm run gates:pre-commit` -> PASS mit bekannten Map-Tools-Domain-Drift-Warnungen.
+- Not-checked: kein produktiver Runtime-/UI-Code, keine Hook-/Package-Aenderung, keine ArchitectureAnalysis-/Ratchet-Aenderung und keine Vollsuite; staged Guard und harte Architektur-Ratchets bleiben V125.3 bis V125.5.

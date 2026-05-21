@@ -1719,7 +1719,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "125.2",
+        "currentPhase": "125.3",
         "planFile": "docs/plaene/aktiv/V125.md",
         "scopeDeclarations": [
           ".agents/rules/code_quality_and_debugging.md",
@@ -1754,10 +1754,11 @@
           "scripts/check-plan-evidence-claims.mjs",
           "scripts/validate-umsetzungsplan.mjs",
           "tests/agent-governance.contract.test.mjs",
-          "tests/architecture-governance.contract.test.mjs"
+          "tests/architecture-governance.contract.test.mjs",
+          "tests/plan-evidence-claims.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 31,
+          "concreteCount": 32,
           "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [
@@ -5053,7 +5054,7 @@
       "id": "V125.2",
       "type": "phase",
       "title": "Plan-Acceptance und Evidence-Regeln",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.2"
@@ -13742,8 +13743,8 @@
     {
       "id": "V125.2.1",
       "type": "subphase",
-      "title": "`plan.md` um die Architecture-Acceptance-Sektion fuer Code-/Runtime-Scope ergaenzen.",
-      "status": "open",
+      "title": "`plan.md` um die Architecture-Acceptance-Sektion fuer Code-/Runtime-Scope ergaenzen. (abgeschlossen: 2026-05-21; evidence: `plan.md` verlangt fuer Code-/Runtime-Scope die Felder Betroffene Schichten, Zielpfade, verbotene Surfaces, Dependency-Kanten, Contract/Port/Snapshot, Guard und Ratchet; `node --test tests/plan-evidence-claims.contract.test.mjs tests/validate-umsetzungsplan.test.mjs` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.2",
@@ -13753,8 +13754,8 @@
     {
       "id": "V125.2.2",
       "type": "subphase",
-      "title": "`validate-umsetzungsplan.mjs` oder `check-plan-evidence-claims.mjs` als Warn-/Report-Signal vorbereiten, wenn aktive Code-Plaene keine Acceptance-Sektion haben.",
-      "status": "open",
+      "title": "`validate-umsetzungsplan.mjs` oder `check-plan-evidence-claims.mjs` als Warn-/Report-Signal vorbereiten, wenn aktive Code-Plaene keine Acceptance-Sektion haben. (abgeschlossen: 2026-05-21; evidence: `check-plan-evidence-claims.mjs` meldet `architecture-acceptance.missing` fuer aktive Code-/Runtime-Plaene; `node --test tests/plan-evidence-claims.contract.test.mjs tests/validate-umsetzungsplan.test.mjs` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.2",
@@ -13764,8 +13765,8 @@
     {
       "id": "V125.2.3",
       "type": "subphase",
-      "title": "Abschlussclaims zu Architektur nur mit konkreter Guard-, Metrics-, Ratchet- oder Contract-Evidence erlauben.",
-      "status": "open",
+      "title": "Abschlussclaims zu Architektur nur mit konkreter Guard-, Metrics-, Ratchet- oder Contract-Evidence erlauben. (abgeschlossen: 2026-05-21; evidence: `check-plan-evidence-claims.mjs` meldet `architecture-claim.weak-evidence`, wenn abgeschlossene Architekturclaims nur allgemeine Plan-Evidence tragen; `node --test tests/plan-evidence-claims.contract.test.mjs tests/validate-umsetzungsplan.test.mjs` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.2",
@@ -13775,8 +13776,8 @@
     {
       "id": "V125.2.4",
       "type": "subphase",
-      "title": "Bestehende offene Bloecke wie V96, V112, V113 und V124 als Kandidaten fuer spaetere Acceptance-Nachschaerfung klassifizieren, aber nicht automatisch umschreiben.",
-      "status": "open",
+      "title": "Bestehende offene Bloecke wie V96, V112, V113 und V124 als Kandidaten fuer spaetere Acceptance-Nachschaerfung klassifizieren, aber nicht automatisch umschreiben. (abgeschlossen: 2026-05-21; evidence: Kandidatenklassifikation unten dokumentiert, keine Plan-Autoumschreibung ausser V125; `npm run check:plan-evidence-claims` -> PASS mit Warnungen fuer V96, V106 und V113; `npm run plan:check` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.2",
@@ -46549,7 +46550,8 @@
         "scopeBlocks": [
           "B13",
           "V117",
-          "V119"
+          "V119",
+          "V125"
         ],
         "exists": true
       }
@@ -47467,7 +47469,7 @@
         "scopeBlocks": [
           "V116"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -74109,6 +74111,15 @@
     {
       "from": "V125",
       "to": "tests/architecture-governance.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "tests/plan-evidence-claims.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
