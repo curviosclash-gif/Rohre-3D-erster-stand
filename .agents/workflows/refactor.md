@@ -5,6 +5,7 @@ description: Restructure code without changing behavior.
 ## 0. Scope
 
 - Identify module and refactor objective. Confirm no behavior change.
+- Bei architekturrelevantem Refactor die Architecture Capsule aus `.agents/rules/code_quality_and_debugging.md` benennen; neue Dependency-Kanten, Legacy-Surfaces, Runtime-/Global-Surfaces oder Application/UI/Core-Grenzen brauchen den `code.md`-Pfad und passenden Guard.
 
 ## 1. Baseline
 

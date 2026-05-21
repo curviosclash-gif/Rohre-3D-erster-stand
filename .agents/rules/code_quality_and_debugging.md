@@ -10,8 +10,9 @@ description: Code quality, debugging, performance, and lifecycle (consolidated)
 - Prioritize clean, maintainable, self-documenting code.
 - Adhere to architectural patterns (source: `docs/referenz/ai_architecture_context.md`).
 - For architecture-relevant feature paths, use the active entry in `docs/referenz/architektur_ausfuehrlich.md` and prefer existing Contracts, Commands/Events, Snapshots, Ports, or Capabilities before adding a new direct path.
+- The shared Architecture Capsule (Architektur-Capsule) for such scopes is: `Layers`, `Dependency delta`, `Contract/Port/Command/Snapshot`, `Legacy surface`, `Guard`, `Not checked`. Workflows may reference this capsule instead of repeating a separate checklist.
 - Do not introduce new productive consumers for broad Runtime-/Global-Surfaces such as `game.*`, `runtimeBundle`, `runtimeFacade`, `window.GAME_RUNTIME`, `curviosApp`/`__CURVIOS_APP__`, or `getActiveRuntimeConfig` unless the change names an explicit transition adapter with owner, successor, and sunset criterion.
-- If no suitable Contract, Port, Command/Event, Snapshot, or Capability exists, name the Architecture Capsule before implementation instead of silently adding a new Runtime-/Global-Surface.
+- If no suitable Contract, Port, Command/Event, Snapshot, or Capability exists, name the gap in the Architecture Capsule before implementation instead of silently adding a new Runtime-/Global-Surface.
 - Before modifying complex functions, consider splitting into smaller testable units.
 - Validate edge cases and potential null values proactively.
 - Prefer explicit naming over comments. Comments explain *why*, not *what*.

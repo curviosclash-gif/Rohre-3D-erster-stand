@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T12:05:45.153Z",
+  "generated_at": "2026-05-21T12:17:32.838Z",
   "locks": [
     {
       "person": "codex",
@@ -574,6 +574,50 @@
       "start_date": "2026-05-18",
       "target_completion": "2026-05-18",
       "status": "completed",
+      "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V125",
+      "phase": "125.1",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V125.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "AGENTS.md",
+        ".agents/rules/code_quality_and_debugging.md",
+        ".agents/rules/planning_and_governance.md",
+        ".agents/workflows/plan.md",
+        ".agents/workflows/code.md",
+        ".agents/workflows/quick.md",
+        ".agents/workflows/bugfix.md",
+        ".agents/workflows/refactor.md",
+        ".agents/workflows/performance.md",
+        ".agents/workflows/fix-planung.md",
+        ".agents/test_mapping.md",
+        ".husky/pre-commit",
+        "package.json",
+        "scripts/architecture/ArchitectureAnalysis.mjs",
+        "scripts/architecture/ArchitectureConfig.mjs",
+        "scripts/architecture/architecture-budget-ratchet.json",
+        "scripts/check-architecture-staged.mjs",
+        "scripts/check-architecture-boundaries.mjs",
+        "scripts/check-architecture-metrics.mjs",
+        "scripts/check-architecture-ratchet.mjs",
+        "scripts/check-architecture-touched-strict.mjs",
+        "scripts/validate-umsetzungsplan.mjs",
+        "scripts/check-plan-evidence-claims.mjs",
+        "tests/architecture-governance.contract.test.mjs",
+        "tests/agent-governance.contract.test.mjs",
+        "docs/referenz/architektur_ausfuehrlich.md",
+        "docs/referenz/ai_project_onboarding.md",
+        "docs/referenz/ai_architecture_context.md"
+      ],
+      "start_date": "2026-05-21",
+      "target_completion": "2026-05-21",
+      "status": "in-progress",
       "notes": ""
     }
   ],

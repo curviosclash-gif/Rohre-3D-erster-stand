@@ -867,3 +867,10 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `export-plan-map` exportiert Intake-Drafts aus `docs/plaene/neu/` jetzt als eigene `intakePlans`-Ebene statt sie mit kanonischen Master-Bloecken zu vermischen.
 - Electron- und Android-Map-Tools konsumieren denselben Plan-Map-Viewer; der neue Intake-Tab zeigt Klassifikation, Arbeitsstrom, Zielplan, Gruende und `scope_files`.
 - Evidence: `node --test tests/plan-map-export.contract.test.mjs tests/map-tools-android.contract.test.mjs tests/map-tools-electron.contract.test.mjs` -> PASS; `node --test tests/knowledge-graph-build.contract.test.mjs` -> PASS; `npm run plan:context:check` -> PASS; `npm run plan:check` -> PASS; `npm run graph:check` -> PASS mit bekannten Map-Tools-Domain-Drift-Warnungen.
+
+## Stand-Snapshot 2026-05-21 (Subphase `V125 125.1`)
+
+- `125.1` ist als D3/User-Gate-Slice geschlossen: `code_quality_and_debugging.md` definiert die gemeinsame Architecture Capsule, `code.md` nutzt sie ueber den bestehenden Architektur-Startcheck, und `quick.md` eskaliert neue Dependency-, Legacy-, Runtime-/Global-Surface- sowie Application/UI/Core-Grenzen aus dem Quick-Path.
+- `bugfix.md`, `refactor.md`, `performance.md` und `fix-planung.md` verlangen denselben Mindestcheck mit kleinstem Guard bzw. verbieten stille Boundary-/Legacy-/Runtime-Abkuerzungen.
+- Evidence: `npm run plan:check` -> PASS; `npm run check:plan-evidence-claims` -> PASS; `npm run graph:build` -> PASS; `npm run gates:pre-commit` -> PASS mit bekannten Map-Tools-Domain-Drift-Warnungen.
+- Not-checked: kein produktiver Runtime-/UI-Code, keine Hook-/Package-Aenderung, keine ArchitectureAnalysis-/Ratchet-Aenderung und keine Vollsuite; diese bleiben V125.3 bis V125.99.

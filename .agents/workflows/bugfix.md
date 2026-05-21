@@ -21,6 +21,7 @@ Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/p
 - Fehlerpattern lokalisieren mit `Grep` (ripgrep-basiert).
 - Ursache mit minimaler Reproduktion bestaetigen.
 - Betroffene Dateien und Seiteneffekte notieren.
+- Bei architekturrelevantem Bugfix die Architecture Capsule aus `.agents/rules/code_quality_and_debugging.md` benennen und den kleinsten Guard festlegen; der Fix darf keine neuen Runtime-/Global-Surface-Consumer still einfuehren.
 
 ## 3. Fix
 

@@ -34,6 +34,7 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 - Identify first open phase (`[ ]`) in claimed block.
 - List open sub-phases and affected files.
 - Check `scope_files` in the linked block file for conflicts.
+- Bei architekturrelevantem Blockscope vor `/code` die Architecture Capsule aus `.agents/rules/code_quality_and_debugging.md` benennen und den kleinsten Guard festlegen.
 - For `[REVIEW]` or `[USER-GATE]` phases, classify affected files/surfaces before asking or using a User-Gate: `no-op`, `read-only evidence`, `optional`, `edit required`. Continue only with the `edit required` scope that is covered by the gate.
 - If the phase touches suspected dead code or legacy paths, require candidate classification plus successor/delete criteria before execution.
 - If phase has no sub-phases: create/update an external plan in `docs/plaene/neu/` and wait for manual intake by the user.

@@ -21,7 +21,7 @@ Optional (nur bei Bedarf):
 ## 1. Scope
 
 - Zielpfade und erwartetes Verhalten festlegen.
-- Bei architekturrelevantem Code-Scope den Startcheck aus `docs/referenz/architektur_ausfuehrlich.md` anwenden: betroffene Schichten, neue Dependency-Kanten, Legacy-Surface-Nutzung, vorhandene Contracts/Ports/Commands/Snapshots und kleinstes Guard-Signal benennen. `docs/referenz/ai_architecture_context.md` nur gezielt fuer den betroffenen Scope nachladen.
+- Bei architekturrelevantem Code-Scope die gemeinsame Architecture Capsule aus `.agents/rules/code_quality_and_debugging.md` ueber den Startcheck in `docs/referenz/architektur_ausfuehrlich.md` anwenden. `docs/referenz/ai_architecture_context.md` nur gezielt fuer den betroffenen Scope nachladen.
 - Vor Implementierung kleinstes sinnvolles Verifikationssignal und bewusst nicht gepruefte Bereiche benennen; diese Entscheidung spaeter fuer Evidence und `Not-checked:` wiederverwenden.
 - Desktop-App-Ergebnis priorisieren; Online/Browser-Parity nur explizit auf Wunsch oder bei geringem Aufwand.
 - Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; `D3`/`D4`-Source-of-truth-, Planstruktur-, Archivierungs-, Move-/Delete- oder High-Blast-Radius-Aenderungen brauchen User-Gate.

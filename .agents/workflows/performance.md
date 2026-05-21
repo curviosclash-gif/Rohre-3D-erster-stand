@@ -6,6 +6,7 @@ description: Measure baseline, optimize bottlenecks, and verify impact.
 
 // turbo
 - Read `docs/Umsetzungsplan.md` and recent commits. Confirm slow scenario.
+- Bei architekturrelevantem Performance-Scope die Architecture Capsule aus `.agents/rules/code_quality_and_debugging.md` benennen; Optimierungen duerfen keine neuen Boundary-, Legacy- oder Runtime-/Global-Surface-Pfade als Abkuerzung einfuehren.
 
 ## 1. Baseline
 
