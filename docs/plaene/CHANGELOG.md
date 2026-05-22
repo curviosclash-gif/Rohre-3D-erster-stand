@@ -6,6 +6,12 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Plan-Map-Notiz 2026-05-22 (Archivkontext ohne Intake-Rauschen)
+
+- Die Plan Map exportiert `archiveReferences` aus `docs/plaene/alt/`, inklusive superseded Intake-Index und direkten archivierten `VXX.md`-Blockdateien, als read-only Historienlayer statt als normale Intake- oder Master-Map-Karten.
+- Der Viewer zeigt Archivbezug nur als `Historie / Archiv` im Blockdetail und per optionalem `Archiv anzeigen`-Toggle in `Ideen / Intake`; Archivverweise zaehlen nicht in Readiness, Scope-Kollisionen, Startempfehlung oder normale Intake-Entscheidungen.
+- Evidence: `node --test tests/plan-map-export.contract.test.mjs` -> PASS; `node --check scripts/export-plan-map.mjs` -> PASS; `node --check tools/plan-map/viewer.js` -> PASS; `npm run plan:context:check` -> PASS; `npm run plan:check` -> PASS; `npm run gates:pre-commit` -> PASS.
+
 ## Governance-Notiz 2026-05-22 (Commit-/Hook-Tooling)
 
 - Der Lock-Registry-Merger schreibt `_locks-registry.json` nur noch bei semantischen Lock-/Metadaten-Aenderungen; reine `generated_at`-Abweichungen bleiben unveraendert, damit `pre-commit` und `lock:validate` keine Timestamp-Diffs erzeugen.

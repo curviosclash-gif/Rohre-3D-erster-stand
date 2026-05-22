@@ -18,6 +18,8 @@ const KNOWLEDGE_GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const KNOWLEDGE_GRAPH_COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
 const KNOWLEDGE_GRAPH_SCORECARD_PATH = 'docs/generated/knowledge-graph.scorecard.json';
 const LOCK_REGISTRY_PATH = 'docs/lock-status/_locks-registry.json';
+const ARCHIVE_REFERENCES_ROOT = 'docs/plaene/alt';
+const SUPERSEDED_INTAKE_ARCHIVE_INDEX_PATH = 'docs/plaene/alt/superseded-intakes-2026-05/README.md';
 const execFile = promisify(execFileCallback);
 
 const MASTER_BLOCK_SECTIONS = [
@@ -225,6 +227,25 @@ function summarizeIntakePlans(intakePlans) {
   };
 }
 
+function summarizeArchiveReferences(archiveReferences) {
+  const byType = {};
+  const byWorkstream = {};
+  for (const reference of archiveReferences || []) {
+    byType[reference.archiveType] = (byType[reference.archiveType] || 0) + 1;
+    if (reference.workstream) {
+      byWorkstream[reference.workstream] = (byWorkstream[reference.workstream] || 0) + 1;
+    }
+  }
+
+  return {
+    archiveReferenceCount: archiveReferences?.length || 0,
+    byArchiveType: byType,
+    archivedBlockReferenceCount: byType['archived-block'] || 0,
+    supersededIntakeArchiveReferenceCount: byType['superseded-intake'] || 0,
+    byArchiveWorkstream: byWorkstream,
+  };
+}
+
 function parseFrontmatter(markdown) {
   const normalized = String(markdown || '').replace(/^\uFEFF/, '');
   const match = normalized.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -272,6 +293,23 @@ async function readJsonIfExists(rootDir, relativePath) {
   return text ? JSON.parse(text) : null;
 }
 
+async function listDirectMarkdownFiles(rootDir, relativeDir) {
+  let entries = [];
+  try {
+    entries = await fs.readdir(path.join(rootDir, relativeDir), { withFileTypes: true });
+  } catch (error) {
+    if (error && error.code === 'ENOENT') {
+      return [];
+    }
+    throw error;
+  }
+
+  return entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
+    .map((entry) => path.join(relativeDir, entry.name).replace(/\\/g, '/'))
+    .sort((left, right) => left.localeCompare(right, 'en', { numeric: true }));
+}
+
 function parsePhaseProgress(markdown, blockId) {
   const numericId = String(blockId || '').replace(/^[A-Z]+/, '');
   if (!numericId) {
@@ -316,6 +354,111 @@ function truncateText(value, maxLength = 260) {
     return text;
   }
   return `${text.slice(0, maxLength - 1).trimEnd()}...`;
+}
+
+function titleFromArchivePath(archivePath) {
+  return path.basename(archivePath, '.md')
+    .replace(/^Feature_/, '')
+    .replace(/_/g, ' ')
+    .trim();
+}
+
+function markdownTitle(markdown, fallback) {
+  return stripMarkdown(String(markdown || '').match(/^#\s+(.+)$/m)?.[1] || fallback || '');
+}
+
+function readRuleFromArchiveIndex(markdown) {
+  const match = String(markdown || '').match(/Read-Regel:\s*(.+)$/im);
+  return match ? stripMarkdown(match[1]) : 'nur bei Historien-, Evidence-, Dependency- oder Abgleichsauftrag lesen';
+}
+
+function archiveReferenceBase({ archiveType, archivePath, canonicalBlockId, title, reason, sourceIndex, readRule }) {
+  const workstream = inferWorkstream({
+    id: canonicalBlockId,
+    title,
+    affectedArea: `${archiveType} ${reason || ''}`,
+  });
+
+  return {
+    id: `${archiveType}:${archivePath}`,
+    archiveType,
+    path: archivePath,
+    archivePath,
+    title: title || titleFromArchivePath(archivePath),
+    canonicalBlockId: canonicalBlockId || null,
+    reason: reason || 'Historischer Planbezug',
+    sourceIndex: sourceIndex || null,
+    readRule,
+    isReadOnly: true,
+    workstream: workstream.id,
+    workstreamLabel: workstream.label,
+  };
+}
+
+function parseSupersededIntakeArchiveReferences(markdown) {
+  const readRule = readRuleFromArchiveIndex(markdown);
+  const archiveDir = path.dirname(SUPERSEDED_INTAKE_ARCHIVE_INDEX_PATH).replace(/\\/g, '/');
+  return parseMarkdownTable(markdown)
+    .map((row) => {
+      const fileName = cleanCell(row['Archivierte Datei']);
+      if (!fileName || fileName === '-') {
+        return null;
+      }
+
+      const canonicalPlanFile = cleanCell(row['Kanonische Quelle']);
+      const canonicalBlockId = normalizeBlockId(canonicalPlanFile);
+      const archivePath = `${archiveDir}/${fileName}`;
+      return {
+        ...archiveReferenceBase({
+          archiveType: 'superseded-intake',
+          archivePath,
+          canonicalBlockId,
+          title: titleFromArchivePath(fileName),
+          reason: cleanCell(row.Grund) || 'Intake in erledigten Block uebernommen',
+          sourceIndex: SUPERSEDED_INTAKE_ARCHIVE_INDEX_PATH,
+          readRule,
+        }),
+        canonicalPlanFile: canonicalPlanFile || (canonicalBlockId ? `docs/plaene/aktiv/${canonicalBlockId}.md` : null),
+      };
+    })
+    .filter(Boolean);
+}
+
+async function collectArchivedBlockReferences(rootDir) {
+  const files = (await listDirectMarkdownFiles(rootDir, ARCHIVE_REFERENCES_ROOT))
+    .filter((file) => /^docs\/plaene\/alt\/V\d+\.md$/.test(file));
+
+  return Promise.all(files.map(async (archivePath) => {
+    const markdown = await readTextIfExists(rootDir, archivePath);
+    const frontmatter = parseFrontmatter(markdown || '');
+    const canonicalBlockId = normalizeBlockId(frontmatter.id) || normalizeBlockId(archivePath);
+    return archiveReferenceBase({
+      archiveType: 'archived-block',
+      archivePath,
+      canonicalBlockId,
+      title: frontmatter.title || markdownTitle(markdown, titleFromArchivePath(archivePath)),
+      reason: 'Archivierte kanonische Blockdetaildatei; nicht Teil des normalen Master-Arbeitsgraphen',
+      sourceIndex: ARCHIVE_REFERENCES_ROOT,
+      readRule: 'nur bei Historien-, Evidence-, Dependency- oder Abgleichsauftrag lesen',
+    });
+  }));
+}
+
+async function collectArchiveReferences(rootDir) {
+  const [supersededIndexText, archivedBlockReferences] = await Promise.all([
+    readTextIfExists(rootDir, SUPERSEDED_INTAKE_ARCHIVE_INDEX_PATH),
+    collectArchivedBlockReferences(rootDir),
+  ]);
+  const supersededReferences = supersededIndexText
+    ? parseSupersededIntakeArchiveReferences(supersededIndexText)
+    : [];
+  const byPath = new Map([...supersededReferences, ...archivedBlockReferences]
+    .map((reference) => [reference.path, reference]));
+  return [...byPath.values()].sort((left, right) => (
+    String(left.canonicalBlockId || '').localeCompare(String(right.canonicalBlockId || ''), 'en', { numeric: true })
+    || left.archiveType.localeCompare(right.archiveType)
+    || left.path.localeCompare(right.path)
+  ));
 }
 
 function parseChangelogType(title) {
@@ -1133,6 +1276,7 @@ export async function buildPlanMapData(options = {}) {
     master: masterIndex,
     inferWorkstream,
   });
+  const archiveReferences = await collectArchiveReferences(rootDir);
   const dependencies = parseDependencyEdges(masterPlan, parsedBlocks);
   const recommendedOrder = parseRecommendedOrder(masterPlan);
   const locks = summarizeLocks(lockRegistry, parseMasterLockRows(masterPlan));
@@ -1155,6 +1299,7 @@ export async function buildPlanMapData(options = {}) {
       knowledgeGraphScorecard: scorecard ? KNOWLEDGE_GRAPH_SCORECARD_PATH : null,
       lockRegistry: lockRegistry ? LOCK_REGISTRY_PATH : null,
       intakePlans: 'docs/plaene/neu',
+      archiveReferences: ARCHIVE_REFERENCES_ROOT,
     },
     workstreams: WORKSTREAMS,
     blocks,
@@ -1164,6 +1309,7 @@ export async function buildPlanMapData(options = {}) {
     scopeCollisions,
     fileIndex,
     intakePlans,
+    archiveReferences,
     changelog,
     openFindings: parseOpenFindings(openFindingsText),
     graph: summarizeKnowledgeGraph(graph),
@@ -1172,6 +1318,7 @@ export async function buildPlanMapData(options = {}) {
     summary: {
       ...buildSummary(blocks, dependencies, scopeCollisions, locks),
       ...summarizeIntakePlans(intakePlans),
+      ...summarizeArchiveReferences(archiveReferences),
       changelogCount: changelog.length,
       changelogWithEvidenceCount: changelog.filter((entry) => entry.evidence?.hasEvidence).length,
       changelogNotCheckedCount: changelog.filter((entry) => entry.evidence?.hasNotChecked).length,

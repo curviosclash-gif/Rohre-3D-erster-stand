@@ -37,7 +37,7 @@ const INTAKE_LANES = [
   },
 ];
 const DEFAULT_INTAKE_FILTER = 'decision';
-const DECISION_INTAKE_LANES = new Set(['candidate', 'adopted-open', 'adopted-done']);
+const DECISION_INTAKE_LANES = new Set(['candidate', 'adopted-open']);
 
 const state = {
   data: null,
@@ -53,6 +53,7 @@ const state = {
   intakeClassification: DEFAULT_INTAKE_FILTER,
   selectedChangelogId: null,
   selectedIntakePath: null,
+  showArchiveReferences: false,
   focusMode: true,
   fileFocus: '',
   detailTab: 'overview',
@@ -280,6 +281,7 @@ function sourceLabel(key) {
     knowledgeGraphCoverage: 'Coverage',
     knowledgeGraphScorecard: 'Scorecard',
     lockRegistry: 'Locks',
+    archiveReferences: 'Archiv',
   };
   return labels[key] || key;
 }
@@ -603,6 +605,66 @@ function selectedIntakePlan() {
   return (state.data?.intakePlans || []).find((plan) => plan.path === state.selectedIntakePath)
     || visibleIntakePlans()[0]
     || null;
+}
+
+function archiveTypeLabel(value) {
+  const labels = {
+    'superseded-intake': 'Archivierter Intake',
+    'archived-block': 'Historischer Block',
+  };
+  return labels[value] || value || 'Archiv';
+}
+
+function archiveReferencesForBlock(blockId) {
+  if (!blockId) {
+    return [];
+  }
+  return (state.data?.archiveReferences || [])
+    .filter((reference) => reference.canonicalBlockId === blockId)
+    .sort((left, right) => (
+      String(left.archiveType || '').localeCompare(String(right.archiveType || ''))
+      || left.path.localeCompare(right.path)
+    ));
+}
+
+function archiveReferenceMatchesFilters(reference) {
+  const haystack = [
+    reference.path,
+    reference.title,
+    reference.archiveType,
+    reference.reason,
+    reference.canonicalBlockId,
+    reference.canonicalPlanFile,
+    reference.sourceIndex,
+    reference.readRule,
+    reference.workstream,
+    reference.workstreamLabel,
+  ].join(' ').toLowerCase();
+
+  if (state.search && !haystack.includes(state.search.toLowerCase())) {
+    return false;
+  }
+
+  if (state.workstream !== 'all' && reference.workstream !== state.workstream) {
+    return false;
+  }
+
+  if (state.fileFocus && !String(reference.path || '').includes(state.fileFocus)) {
+    return false;
+  }
+
+  return true;
+}
+
+function visibleArchiveReferences() {
+  return (state.data?.archiveReferences || [])
+    .filter(archiveReferenceMatchesFilters)
+    .sort((left, right) => (
+      String(left.workstreamLabel || '').localeCompare(String(right.workstreamLabel || ''), 'de')
+      || String(left.canonicalBlockId || '').localeCompare(String(right.canonicalBlockId || ''), 'en', { numeric: true })
+      || String(left.archiveType || '').localeCompare(String(right.archiveType || ''))
+      || left.path.localeCompare(right.path)
+    ));
 }
 
 function updateFilterOptions() {
@@ -1430,6 +1492,58 @@ function intakeOriginMarkup(blockId) {
   `;
 }
 
+function archiveOriginMarkup(blockId) {
+  const references = archiveReferencesForBlock(blockId);
+  if (!references.length) {
+    return '';
+  }
+  return `
+    <div class="detail-section archive-history">
+      <h3>Historie / Archiv <span class="archive-count-badge">${escapeHtml(references.length)}</span></h3>
+      <div class="archive-reference-list">
+        ${references.slice(0, 6).map((reference) => `
+          <details class="archive-disclosure">
+            <summary>
+              <span>${escapeHtml(reference.title || reference.path)}</span>
+              <span class="risk-kind">${escapeHtml(archiveTypeLabel(reference.archiveType))}</span>
+            </summary>
+            <dl class="key-value">
+              <dt>Archivpfad</dt><dd>${escapeHtml(reference.archivePath || reference.path || '-')}</dd>
+              <dt>Grund</dt><dd>${escapeHtml(reference.reason || '-')}</dd>
+              <dt>Quelle</dt><dd>${escapeHtml(reference.sourceIndex || '-')}</dd>
+              <dt>Leseregel</dt><dd>${escapeHtml(reference.readRule || '-')}</dd>
+            </dl>
+          </details>
+        `).join('')}
+      </div>
+      ${references.length > 6 ? `<p class="muted">${escapeHtml(references.length - 6)} weitere Archivverweise</p>` : ''}
+    </div>
+  `;
+}
+
+function archiveReferenceCard(reference) {
+  const blockExists = (state.data?.blocks || []).some((block) => block.id === reference.canonicalBlockId);
+  const blockAction = blockExists
+    ? `<button type="button" class="pill-button" data-select-block="${escapeHtml(reference.canonicalBlockId)}">Block ${escapeHtml(reference.canonicalBlockId)}</button>`
+    : '';
+  return `
+    <article class="archive-card">
+      <span class="changelog-card-meta">
+        <span class="chip priority">${escapeHtml(archiveTypeLabel(reference.archiveType))}</span>
+        ${reference.canonicalBlockId ? `<span class="chip">${escapeHtml(reference.canonicalBlockId)}</span>` : ''}
+        ${reference.workstreamLabel ? `<span class="chip priority">${escapeHtml(reference.workstreamLabel)}</span>` : ''}
+      </span>
+      <h3 class="changelog-card-title">${escapeHtml(reference.title || reference.path)}</h3>
+      <p class="changelog-card-summary">${escapeHtml(reference.reason || 'Historischer Archivverweis.')}</p>
+      <dl class="key-value archive-card-meta">
+        <dt>Archiv</dt><dd>${escapeHtml(reference.archivePath || reference.path || '-')}</dd>
+        <dt>Leseregel</dt><dd>${escapeHtml(reference.readRule || '-')}</dd>
+      </dl>
+      ${blockAction ? `<div class="intake-card-actions">${blockAction}</div>` : ''}
+    </article>
+  `;
+}
+
 function fileButton(filePath) {
   return `<button type="button" class="text-button" data-file-focus="${escapeHtml(filePath)}">${escapeHtml(filePath)}</button>`;
 }
@@ -1626,6 +1740,7 @@ function renderDetail() {
         </dl>
       </div>
       ${intakeOriginMarkup(block.id)}
+      ${archiveOriginMarkup(block.id)}
       ${explanation.brief ? `
         <div class="detail-section">
           <h3>Kurz erklaert</h3>
@@ -1815,12 +1930,14 @@ function renderDetail() {
 
 function renderIntakeView() {
   const plans = visibleIntakePlans();
+  const archiveReferences = visibleArchiveReferences();
   if (!state.selectedIntakePath || !plans.some((plan) => plan.path === state.selectedIntakePath)) {
     state.selectedIntakePath = plans[0]?.path || null;
   }
   const activePath = state.selectedIntakePath;
   const summary = state.data?.summary || {};
   const laneCounts = summary.byIntakeLane || {};
+  const archiveCount = summary.archiveReferenceCount ?? (state.data?.archiveReferences || []).length;
   const visibleByLane = new Map(INTAKE_LANES.map((lane) => [lane.id, []]));
   for (const plan of plans) {
     const lane = intakeLaneForPlan(plan);
@@ -1844,6 +1961,10 @@ function renderIntakeView() {
       <span>${escapeHtml(summary.intakeAdoptedDoneCount ?? laneCounts['adopted-done'] ?? 0)} Archiv</span>
       <span>${escapeHtml(summary.intakeBotTrainingCount ?? laneCounts['bot-training'] ?? 0)} Bot-Training</span>
       <span>${escapeHtml(summary.intakeMetaCount ?? laneCounts.meta ?? 0)} Meta</span>
+      <span>${escapeHtml(archiveCount)} Archiv-Historie</span>
+      <button type="button" class="pill-button archive-toggle${state.showArchiveReferences ? ' is-active' : ''}" data-toggle-archive aria-pressed="${state.showArchiveReferences ? 'true' : 'false'}">
+        ${state.showArchiveReferences ? 'Archiv ausblenden' : 'Archiv anzeigen'}
+      </button>
     </div>
     <div class="intake-lanes">
       ${laneSections.map((lane) => {
@@ -1887,9 +2008,27 @@ function renderIntakeView() {
           </section>
         `;
       }).join('') || '<div class="empty-state">Keine Intake-Plaene fuer diese Filter</div>'}
+      ${state.showArchiveReferences ? `
+        <section class="intake-lane archive-reference-lane">
+          <header class="intake-lane-header">
+            <div>
+              <h2>Archiviert</h2>
+              <p>Read-only Historie aus docs/plaene/alt; nicht Teil von Readiness, Kollisionen oder Startempfehlung.</p>
+            </div>
+            <span>${escapeHtml(archiveReferences.length)} / ${escapeHtml(archiveCount)}</span>
+          </header>
+          <div class="archive-reference-grid">
+            ${archiveReferences.map(archiveReferenceCard).join('') || '<div class="empty-state">Keine Archivverweise fuer diese Filter</div>'}
+          </div>
+        </section>
+      ` : ''}
     </div>
   `;
 
+  elements.intakePanel.querySelector('[data-toggle-archive]')?.addEventListener('click', () => {
+    state.showArchiveReferences = !state.showArchiveReferences;
+    render();
+  });
   elements.intakePanel.querySelectorAll('[data-intake-path]').forEach((button) => {
     button.addEventListener('click', () => {
       state.selectedIntakePath = button.dataset.intakePath;
@@ -2113,6 +2252,10 @@ function applyInitialUrlState() {
     state.intakeClassification = lane;
   }
 
+  if (params.get('archive') === '1') {
+    state.showArchiveReferences = true;
+  }
+
   const block = params.get('block');
   if (block) {
     state.selectedId = block;
@@ -2217,6 +2360,7 @@ function bindEvents() {
     state.intakeClassification = DEFAULT_INTAKE_FILTER;
     state.selectedChangelogId = null;
     state.selectedIntakePath = null;
+    state.showArchiveReferences = false;
     state.mapZoom = 1;
     state.mapZoomTouched = false;
     state.mapPinch = null;

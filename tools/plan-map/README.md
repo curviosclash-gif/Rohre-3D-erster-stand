@@ -47,6 +47,7 @@ Input sources:
 - `docs/lock-status/_locks-registry.json`: current lock/readiness hints.
 - `docs/prozess/Open_Findings.md`: open governance and verification findings.
 - `docs/plaene/neu/`: intake drafts as a separate non-canonical layer.
+- `docs/plaene/alt/`: read-only archive references and superseded intake index.
 
 The generated dataset is intentionally temporary:
 
@@ -98,6 +99,9 @@ The viewer expects a single JSON document with these conceptual groups:
   classification, lane/action hints, primary and canonical block IDs,
   workstream hints, planned block IDs, target plan file, and `scope_files`
   where present.
+- `archiveReferences`: lightweight read-only references from `docs/plaene/alt/`,
+  including superseded intake drafts and archived VXX block files. These entries
+  are historical context, not runnable plan nodes.
 - `meta`: export timestamp, source paths, and version hints.
  
 The UI treats missing optional fields as "unknown" and keeps the block visible.
@@ -123,6 +127,24 @@ the full raw intake layer.
 Summary metrics split the intake count into `Ideen`, `Bereits geplant`,
 `Archivkandidaten`, `Bot-Training`, and `Meta`. The older
 `byIntakeClassification` field remains available for compatibility.
+
+## Archiv-Kontext
+
+Archive context stays out of the default decision view. Superseded intake drafts
+from `docs/plaene/alt/superseded-intakes-2026-05/README.md` and direct archived
+block files such as `docs/plaene/alt/V74.md` are exported as `archiveReferences`
+with `archiveType`, `canonicalBlockId`, `archivePath`, `reason`, `sourceIndex`,
+`readRule`, and workstream hints.
+
+The viewer uses that layer in two quiet places:
+
+- Canonical block details show a `Historie / Archiv` badge and expandable
+  archive references when a historical entry points at the selected block.
+- `Ideen / Intake` keeps the archive hidden by default. The `Archiv anzeigen`
+  toggle reveals a separate read-only archive section for search and trace work.
+
+Archive references do not contribute to readiness, dependency edges, scope
+collisions, start recommendations, or normal intake counts.
 
 ## Views
 

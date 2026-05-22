@@ -45,7 +45,7 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.ok(data.summary.byIntakeClassification['intake-review'] > 0);
   assert.ok(data.summary.byIntakeLane.candidate > 0);
   assert.ok(data.summary.byIntakeLane['adopted-open'] > 0);
-  assert.ok(data.summary.byIntakeLane['adopted-done'] > 0);
+  assert.ok(Number.isInteger(data.summary.intakeAdoptedDoneCount));
   assert.ok(data.summary.byIntakeLane['bot-training'] > 0);
   assert.ok(data.summary.byIntakeLane.meta > 0);
   assert.equal(data.summary.intakeCandidateCount, data.summary.byIntakeLane.candidate);
@@ -54,6 +54,12 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.equal(data.summary.intakeBotTrainingCount, data.summary.byIntakeLane['bot-training']);
   assert.equal(data.summary.intakeMetaCount, data.summary.byIntakeLane.meta);
   assert.ok(data.sources.intakePlans.endsWith('docs/plaene/neu'));
+  assert.ok(data.sources.archiveReferences.endsWith('docs/plaene/alt'));
+  assert.ok(Array.isArray(data.archiveReferences));
+  assert.ok(data.summary.archiveReferenceCount > 0);
+  assert.equal(data.summary.archiveReferenceCount, data.archiveReferences.length);
+  assert.ok(data.summary.byArchiveType['superseded-intake'] > 0);
+  assert.ok(data.summary.byArchiveType['archived-block'] > 0);
   const mobileIntake = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md');
   assert.ok(mobileIntake);
   assert.equal(mobileIntake.workstream, 'android-mobile');
@@ -65,13 +71,6 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.equal(mobileIntake.requiresUserIntake, true);
   assert.equal(mobileIntake.targetPlanFile, 'docs/plaene/aktiv/V131.md');
 
-  const toolchainIntake = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md');
-  assert.ok(toolchainIntake);
-  assert.equal(toolchainIntake.workstream, 'repo-governance');
-  assert.equal(toolchainIntake.classification, 'adopted-by-done-master-block');
-  assert.equal(toolchainIntake.intakeLane, 'adopted-done');
-  assert.equal(toolchainIntake.canonicalBlockId, 'V90');
-
   const adoptedOpen = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Graph_RAG_Viewer_Evidence_Dashboard_V121.md');
   assert.ok(adoptedOpen);
   assert.equal(adoptedOpen.intakeLane, 'adopted-open');
@@ -79,11 +78,19 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.equal(adoptedOpen.canonicalBlockId, 'V121');
   assert.equal(adoptedOpen.requiresUserIntake, false);
 
-  const adoptedDone = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Repo_Context_Cleanup.md');
-  assert.ok(adoptedDone);
-  assert.equal(adoptedDone.intakeLane, 'adopted-done');
-  assert.equal(adoptedDone.intakeAction, 'archive-candidate-after-gate');
-  assert.equal(adoptedDone.canonicalBlockId, 'V116');
+  const archivedIntake = data.archiveReferences.find((reference) => (
+    reference.path === 'docs/plaene/alt/superseded-intakes-2026-05/Feature_Legacy_Runtime_Surface_Sunset_V91.md'
+  ));
+  assert.ok(archivedIntake);
+  assert.equal(archivedIntake.archiveType, 'superseded-intake');
+  assert.equal(archivedIntake.canonicalBlockId, 'V91');
+  assert.equal(archivedIntake.isReadOnly, true);
+  assert.ok(archivedIntake.readRule.includes('Historien'));
+
+  const archivedBlock = data.archiveReferences.find((reference) => reference.path === 'docs/plaene/alt/V74.md');
+  assert.ok(archivedBlock);
+  assert.equal(archivedBlock.archiveType, 'archived-block');
+  assert.equal(archivedBlock.canonicalBlockId, 'V74');
 
   assert.ok(data.intakePlans.some((plan) => plan.intakeLane === 'bot-training' && plan.intakeAction === 'use-bot-training-governance'));
   assert.ok(data.intakePlans.some((plan) => plan.intakeLane === 'meta' && plan.intakeAction === 'reference-only'));
