@@ -41,6 +41,50 @@ const legacyUiToStateImportEntries = [
 /** @type {[string, string][]} */
 const legacyCoreToUiImportEntries = [];
 
+/** @type {[string, string][]} */
+const legacyApplicationToUiImportEntries = [
+    pair(
+        createEdgeKey('src/application/session-runtime/NetworkLobbyService.js', 'src/ui/menu/MenuStateContracts.js'),
+        'Session-runtime lobby service still builds menu lifecycle payloads while V96 moves UI projections behind application snapshots.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/NetworkLobbyService.js', 'src/ui/menu/multiplayer/MenuMultiplayerBridgeRuntime.js'),
+        'Network lobby service still resolves the multiplayer bridge runtime until the menu bridge becomes an application port.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/NetworkLobbyService.js', 'src/ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js'),
+        'LAN discovery still reuses the menu discovery port until V96 extracts a platform/application discovery contract.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/OnlineLobbyService.js', 'src/ui/menu/multiplayer/MenuMultiplayerBridgeRuntime.js'),
+        'Online lobby service still resolves the menu bridge global while signaling URL ownership is moved behind an application port.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/StorageLobbyService.js', 'src/ui/menu/MenuStateContracts.js'),
+        'Storage lobby service still emits menu lifecycle payloads while the application projection contract is pending.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/StorageLobbyService.js', 'src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js'),
+        'Storage lobby persistence still reuses menu mutation helpers until session runtime owns the write model.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/StorageLobbyService.js', 'src/ui/menu/multiplayer/MenuMultiplayerBridgeRuntime.js'),
+        'Storage lobby persistence still resolves the menu bridge runtime pending a session runtime storage port.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/StorageLobbyService.js', 'src/ui/menu/multiplayer/MenuMultiplayerPresence.js'),
+        'Storage lobby persistence still normalizes menu presence data until presence normalization moves to a shared contract.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/StorageLobbyService.js', 'src/ui/menu/multiplayer/MenuMultiplayerBridgeCas.js'),
+        'Storage lobby persistence still reuses the menu CAS helper until the application storage port owns compare-and-swap.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/StorageLobbyServiceSupport.js', 'src/ui/menu/multiplayer/MenuMultiplayerPresence.js'),
+        'Storage lobby support still shares menu member normalization pending a shared lobby presence contract.'
+    ),
+];
+
 export const LEGACY_CONSTRUCTOR_GAME_ALLOWLIST = new Map([]);
 
 export const LEGACY_DOM_ACCESS_ALLOWLIST = new Map([
@@ -76,6 +120,22 @@ const legacyStateToCoreImportEntries = [];
 /** @type {[string, string][]} */
 const legacySharedContractsToCoreImportEntries = [];
 
+/** @type {[string, string][]} */
+const legacyApplicationToCoreImportEntries = [
+    pair(
+        createEdgeKey('src/application/session-runtime/SessionRuntimeCommandUseCases.js', 'src/core/runtime/MenuRuntimeMultiplayerService.js'),
+        'Session runtime command use cases still delegate to core menu runtime multiplayer handlers until V96 extracts command ports.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/SessionRuntimeCommandUseCases.js', 'src/core/runtime/MatchFinalizeFlowService.js'),
+        'Session runtime command use cases still finalize through the core flow service pending application-owned finalization commands.'
+    ),
+    pair(
+        createEdgeKey('src/application/session-runtime/SessionRuntimeCommandUseCases.js', 'src/core/runtime/RuntimeCommandSettingsService.js'),
+        'Session runtime command use cases still apply settings through the core runtime service until settings commands move behind a port.'
+    ),
+];
+
 export const LEGACY_UI_TO_CORE_IMPORTS = new Map(legacyUiToCoreImportEntries);
 export const LEGACY_CORE_TO_UI_IMPORTS = new Map(legacyCoreToUiImportEntries);
 export const LEGACY_UI_TO_STATE_IMPORTS = new Map(legacyUiToStateImportEntries);
@@ -84,6 +144,8 @@ export const LEGACY_STATE_TO_UI_IMPORTS = new Map(legacyStateToUiImportEntries);
 export const LEGACY_ENTITIES_TO_CORE_IMPORTS = new Map(legacyEntitiesToCoreImportEntries);
 export const LEGACY_STATE_TO_CORE_IMPORTS = new Map(legacyStateToCoreImportEntries);
 export const LEGACY_SHARED_CONTRACTS_TO_CORE_IMPORTS = new Map(legacySharedContractsToCoreImportEntries);
+export const LEGACY_APPLICATION_TO_UI_IMPORTS = new Map(legacyApplicationToUiImportEntries);
+export const LEGACY_APPLICATION_TO_CORE_IMPORTS = new Map(legacyApplicationToCoreImportEntries);
 
 export const ARCHITECTURE_SCORECARD_TARGETS = Object.freeze({
     configWrites: 0,
@@ -96,6 +158,8 @@ export const ARCHITECTURE_SCORECARD_TARGETS = Object.freeze({
     disallowedEntitiesToCoreImports: 0,
     disallowedStateToCoreImports: 0,
     disallowedSharedContractsToCoreImports: 0,
+    disallowedApplicationToUiImports: 0,
+    disallowedApplicationToCoreImports: 0,
 });
 
 export const ARCHITECTURE_SCORECARD_BUDGETS = Object.freeze({
@@ -108,4 +172,6 @@ export const ARCHITECTURE_SCORECARD_BUDGETS = Object.freeze({
     entitiesToCoreImportEdges: LEGACY_ENTITIES_TO_CORE_IMPORTS.size,
     stateToCoreImportEdges: LEGACY_STATE_TO_CORE_IMPORTS.size,
     sharedContractsToCoreImportEdges: LEGACY_SHARED_CONTRACTS_TO_CORE_IMPORTS.size,
+    applicationToUiImportEdges: LEGACY_APPLICATION_TO_UI_IMPORTS.size,
+    applicationToCoreImportEdges: LEGACY_APPLICATION_TO_CORE_IMPORTS.size,
 });

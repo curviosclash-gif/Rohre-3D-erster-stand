@@ -71,6 +71,20 @@ const violations = [
             location: `${entry.from}:${entry.line}`,
             detail: `${entry.from} -> ${entry.to}`,
         })),
+    ...report.findings.applicationToUiImports
+        .filter((entry) => !entry.allowed)
+        .map((entry) => ({
+            category: 'application -> ui import',
+            location: `${entry.from}:${entry.line}`,
+            detail: `${entry.from} -> ${entry.to}`,
+        })),
+    ...report.findings.applicationToCoreImports
+        .filter((entry) => !entry.allowed)
+        .map((entry) => ({
+            category: 'application -> core import',
+            location: `${entry.from}:${entry.line}`,
+            detail: `${entry.from} -> ${entry.to}`,
+        })),
     ...(report.findings.legacySurfaceReads || [])
         .filter((entry) => !entry.allowed)
         .map((entry) => ({
@@ -92,6 +106,11 @@ if (violations.length === 0) {
     console.log(`entities -> core disallowed imports: ${report.scorecard.entitiesToCoreImports.disallowedEdges}`);
     console.log(`state -> core disallowed imports: ${report.scorecard.stateToCoreImports.disallowedEdges}`);
     console.log(`shared/contracts -> core disallowed imports: ${report.scorecard.sharedContractsToCoreImports.disallowedEdges}`);
+    console.log(`application -> ui disallowed imports: ${report.scorecard.applicationToUiImports.disallowedEdges}`);
+    console.log(`application -> core disallowed imports: ${report.scorecard.applicationToCoreImports.disallowedEdges}`);
+    console.log(`electron preload exposures: ${report.scorecard.electronPreloadExposures.totalOccurrences} across ${report.scorecard.electronPreloadExposures.totalFiles} files`);
+    console.log(`electron ipcRenderer channels: ${report.scorecard.electronIpcRendererChannels.totalOccurrences} across ${report.scorecard.electronIpcRendererChannels.totalFiles} files`);
+    console.log(`electron ipcMain channels: ${report.scorecard.electronIpcMainChannels.totalOccurrences} across ${report.scorecard.electronIpcMainChannels.totalFiles} files`);
     if (report.scorecard.legacySurfaces) {
         for (const [surfaceId, data] of Object.entries(report.scorecard.legacySurfaces)) {
             console.log(`legacy-surface ${surfaceId}: ${data.totalFiles} files (${data.disallowedFiles} disallowed)`);

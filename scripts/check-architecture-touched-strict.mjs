@@ -53,6 +53,14 @@ for (const entry of report.findings.sharedContractsToCoreImports) {
     pushViolation('shared/contracts -> core import', entry, entry.from, entry.line, `${entry.from} -> ${entry.to}`);
 }
 
+for (const entry of report.findings.applicationToUiImports) {
+    pushViolation('application -> ui import', entry, entry.from, entry.line, `${entry.from} -> ${entry.to}`);
+}
+
+for (const entry of report.findings.applicationToCoreImports) {
+    pushViolation('application -> core import', entry, entry.from, entry.line, `${entry.from} -> ${entry.to}`);
+}
+
 for (const entry of (report.findings.legacySurfaceReads || [])) {
     if (!touchedFiles.has(entry.file)) continue;
     if (entry.allowed !== false) continue;

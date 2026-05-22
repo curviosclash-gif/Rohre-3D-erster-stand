@@ -10,6 +10,8 @@
     "entitiesToCoreImportEdges": 3,
     "stateToCoreImportEdges": 0,
     "sharedContractsToCoreImportEdges": 0,
+    "applicationToUiImportEdges": 10,
+    "applicationToCoreImportEdges": 3,
     "legacySurface_game_runtimeBundle_totalFiles": 0,
     "legacySurface_game_runtimeFacade_totalFiles": 2,
     "legacySurface_window_GAME_INSTANCE_totalFiles": 2,

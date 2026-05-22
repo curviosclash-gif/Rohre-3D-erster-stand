@@ -117,11 +117,11 @@ export function selectArchitectureChecks(stagedFiles) {
   if (hasElectronOrPlatformFiles) {
     addCheck(checksById, CHECKS.boundaries);
     addCheck(checksById, CHECKS.metrics);
-    notes.push('electron/platform staged: dedicated Electron/Preload surface categories remain V125.4 scope.');
+    notes.push('electron/platform staged: Electron/Preload surface categories are reported by boundaries/metrics.');
   }
 
   if (hasApplicationBoundaryFiles) {
-    notes.push('src/application staged: dedicated application -> ui/core categories remain V125.4 scope.');
+    notes.push('src/application staged: application -> ui/core categories are checked by boundaries/metrics/ratchet.');
   }
 
   return {

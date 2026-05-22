@@ -5164,7 +5164,7 @@
       "id": "V125.4",
       "type": "phase",
       "title": "ArchitectureAnalysis Boundary-Ausbau",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.4"
@@ -14081,8 +14081,8 @@
     {
       "id": "V125.4.1",
       "type": "subphase",
-      "title": "`ArchitectureAnalysis.mjs` um `electron/**` als Source-Root oder gesonderten Scan erweitern.",
-      "status": "open",
+      "title": "`ArchitectureAnalysis.mjs` um `electron/**` als Source-Root oder gesonderten Scan erweitern. (abgeschlossen: 2026-05-22; evidence: `ArchitectureAnalysis` scannt `src`, `server` und `electron` mit `.js`/`.mjs`/`.cjs`; `npm run check:architecture:metrics` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.4",
@@ -14092,8 +14092,8 @@
     {
       "id": "V125.4.2",
       "type": "subphase",
-      "title": "`application -> ui` und `application -> core` als eigene Findings und Scorecard-Felder erfassen.",
-      "status": "open",
+      "title": "`application -> ui` und `application -> core` als eigene Findings und Scorecard-Felder erfassen. (abgeschlossen: 2026-05-22; evidence: Scorecard meldet `application -> ui imports: 10 edges (0 disallowed)` und `application -> core imports: 3 edges (0 disallowed)`; `npm run check:architecture:boundaries` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.4",
@@ -14103,8 +14103,8 @@
     {
       "id": "V125.4.3",
       "type": "subphase",
-      "title": "`ArchitectureConfig.mjs` um erlaubte Restkanten mit Begruendung erweitern, ohne neue Ausnahmen generisch zu erlauben.",
-      "status": "open",
+      "title": "`ArchitectureConfig.mjs` um erlaubte Restkanten mit Begruendung erweitern, ohne neue Ausnahmen generisch zu erlauben. (abgeschlossen: 2026-05-22; evidence: `LEGACY_APPLICATION_TO_UI_IMPORTS` und `LEGACY_APPLICATION_TO_CORE_IMPORTS` listen die 10/3 Restkanten file-by-file mit V96-Nachfolgegruenden; `npm run check:architecture:ratchet` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.4",
@@ -14114,8 +14114,8 @@
     {
       "id": "V125.4.4",
       "type": "subphase",
-      "title": "`check:architecture:boundaries`, `metrics`, `ratchet` und `touched-strict` um die neuen Kategorien spiegeln.",
-      "status": "open",
+      "title": "`check:architecture:boundaries`, `metrics`, `ratchet` und `touched-strict` um die neuen Kategorien spiegeln. (abgeschlossen: 2026-05-22; evidence: `npm run check:architecture:boundaries`, `npm run check:architecture:metrics`, `npm run check:architecture:ratchet` und `npm run check:architecture:staged -- --dry-run` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.4",

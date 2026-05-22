@@ -3,6 +3,8 @@ import path from 'node:path';
 import {
     ARCHITECTURE_SCORECARD_BUDGETS,
     ARCHITECTURE_SCORECARD_TARGETS,
+    LEGACY_APPLICATION_TO_CORE_IMPORTS,
+    LEGACY_APPLICATION_TO_UI_IMPORTS,
     LEGACY_CORE_TO_UI_IMPORTS,
     LEGACY_CONSTRUCTOR_GAME_ALLOWLIST,
     LEGACY_DOM_ACCESS_ALLOWLIST,
@@ -40,7 +42,7 @@ function collectLegacySurfaceFindings(filesByRelativePath, guardMatrix) {
             .join('|');
         const pattern = new RegExp(combinedPattern, 'g');
         for (const [relativePath, text] of filesByRelativePath.entries()) {
-            if (!relativePath.startsWith('src/')) continue;
+            if (!relativePath.startsWith('src/') && !relativePath.startsWith('electron/')) continue;
             const matches = [...text.matchAll(pattern)];
             if (matches.length === 0) continue;
             const allowed = allowedSet.has(relativePath);
@@ -82,17 +84,25 @@ function summarizeLegacySurfaceScorecard(findings, guardMatrix) {
 
 const LOCAL_IMPORT_PATTERN = /import\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/g;
 const DYNAMIC_IMPORT_PATTERN = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+const COMMONJS_REQUIRE_PATTERN = /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 const CONSTRUCTOR_GAME_PATTERN = /constructor\s*\(\s*game(?:\s*=|\s*[),])/g;
 const THIS_GAME_EQUALS_GAME_PATTERN = /\bthis\.game\s*=\s*game\b/g;
 const CONFIG_WRITE_PATTERN = /\bCONFIG(?:\.[A-Za-z_$][\w$]*|\[[^\]]+\])+\s*=/g;
 const DOCUMENT_ACCESS_PATTERN = /\bdocument\.(?:body|hidden|readyState|createElement|getElementById|querySelector(?:All)?|addEventListener|removeEventListener|execCommand)\b/g;
+const ELECTRON_CONTEXT_BRIDGE_EXPOSURE_PATTERN = /contextBridge\.exposeInMainWorld\(\s*['"]([^'"]+)['"]/g;
+const ELECTRON_IPC_RENDERER_CHANNEL_PATTERN = /ipcRenderer\.(invoke|send|sendSync|on|once|removeListener|removeAllListeners)\(\s*['"]([^'"]+)['"]/g;
+const ELECTRON_IPC_MAIN_CHANNEL_PATTERN = /ipcMain\.(handle|handleOnce|on|once|removeHandler|removeAllListeners)\(\s*['"]([^'"]+)['"]/g;
 
 function normalizePath(filePath) {
     return filePath.replace(/\\/g, '/');
 }
 
+function isScannableSourceFile(fileName) {
+    return /\.(?:cjs|mjs|js)$/i.test(fileName);
+}
+
 function getSourceFiles(rootDir) {
-    const sourceRoots = ['src', 'server']
+    const sourceRoots = ['src', 'server', 'electron']
         .map((relativePath) => path.join(rootDir, relativePath))
         .filter((absolutePath) => existsSync(absolutePath));
     const files = [];
@@ -105,7 +115,7 @@ function getSourceFiles(rootDir) {
                 walk(absolutePath);
                 continue;
             }
-            if (entry.isFile() && (entry.name.endsWith('.js') || entry.name.endsWith('.mjs'))) {
+            if (entry.isFile() && isScannableSourceFile(entry.name)) {
                 files.push(absolutePath);
             }
         }
@@ -135,7 +145,11 @@ function resolveImportTarget(rootDir, fromFile, specifier) {
     const candidatePaths = [
         resolvedBase,
         `${resolvedBase}.js`,
+        `${resolvedBase}.mjs`,
+        `${resolvedBase}.cjs`,
         path.join(resolvedBase, 'index.js'),
+        path.join(resolvedBase, 'index.mjs'),
+        path.join(resolvedBase, 'index.cjs'),
     ];
     const resolvedPath = candidatePaths.find((candidate) => existsSync(candidate)) || resolvedBase;
     return normalizePath(path.relative(rootDir, resolvedPath));
@@ -143,6 +157,12 @@ function resolveImportTarget(rootDir, fromFile, specifier) {
 
 function resolveLayer(relativePath) {
     if (relativePath.startsWith('server/')) return 'server';
+    if (relativePath.startsWith('electron/')) {
+        const baseName = path.basename(relativePath).toLowerCase();
+        if (baseName.includes('preload')) return 'electron-preload';
+        if (relativePath.includes('/ui/') || relativePath.includes('/tuning-console/')) return 'electron-renderer';
+        return 'electron-main';
+    }
     if (!relativePath.startsWith('src/')) return 'external';
     const [, layer = 'other'] = relativePath.split('/');
     return layer;
@@ -184,13 +204,37 @@ function collectImportEdges(rootDir, filesByRelativePath) {
                 toLayer: resolveLayer(target),
             });
         }
+        for (const match of text.matchAll(COMMONJS_REQUIRE_PATTERN)) {
+            const specifier = String(match[1] || '');
+            if (!specifier.startsWith('.')) continue;
+            const target = resolveImportTarget(rootDir, absolutePath, specifier);
+            const line = countLineNumber(text, match.index || 0);
+            edges.push({
+                from: relativePath,
+                to: target,
+                specifier,
+                line,
+                kind: 'require',
+                isDynamic: false,
+                fromLayer: resolveLayer(relativePath),
+                toLayer: resolveLayer(target),
+            });
+        }
     }
     return edges;
 }
 
-function collectPatternMatches({ filesByRelativePath, pattern, matcherName, allowFileMap = null, uiOnly = false }) {
+function collectPatternMatches({
+    filesByRelativePath,
+    pattern,
+    matcherName,
+    allowFileMap = null,
+    uiOnly = false,
+    includeFile = null,
+}) {
     const matches = [];
     for (const [relativePath, text] of filesByRelativePath.entries()) {
+        if (includeFile && !includeFile(relativePath)) continue;
         if (uiOnly && relativePath.startsWith('src/ui/')) continue;
         for (const match of text.matchAll(pattern)) {
             const line = countLineNumber(text, match.index || 0);
@@ -243,7 +287,57 @@ function collectDomAccesses(filesByRelativePath) {
         matcherName: 'document access',
         allowFileMap: LEGACY_DOM_ACCESS_ALLOWLIST,
         uiOnly: true,
+        includeFile: (relativePath) => relativePath.startsWith('src/'),
     });
+}
+
+function collectElectronSurfaceMatches(filesByRelativePath) {
+    const preloadExposures = [];
+    const ipcRendererChannels = [];
+    const ipcMainChannels = [];
+
+    for (const [relativePath, text] of filesByRelativePath.entries()) {
+        if (!relativePath.startsWith('electron/')) continue;
+
+        for (const match of text.matchAll(ELECTRON_CONTEXT_BRIDGE_EXPOSURE_PATTERN)) {
+            const line = countLineNumber(text, match.index || 0);
+            preloadExposures.push({
+                file: relativePath,
+                line,
+                kind: 'contextBridge.exposeInMainWorld',
+                exposedName: String(match[1] || ''),
+                snippet: readLineAt(text, line),
+            });
+        }
+
+        for (const match of text.matchAll(ELECTRON_IPC_RENDERER_CHANNEL_PATTERN)) {
+            const line = countLineNumber(text, match.index || 0);
+            ipcRendererChannels.push({
+                file: relativePath,
+                line,
+                kind: `ipcRenderer.${String(match[1] || '')}`,
+                channel: String(match[2] || ''),
+                snippet: readLineAt(text, line),
+            });
+        }
+
+        for (const match of text.matchAll(ELECTRON_IPC_MAIN_CHANNEL_PATTERN)) {
+            const line = countLineNumber(text, match.index || 0);
+            ipcMainChannels.push({
+                file: relativePath,
+                line,
+                kind: `ipcMain.${String(match[1] || '')}`,
+                channel: String(match[2] || ''),
+                snippet: readLineAt(text, line),
+            });
+        }
+    }
+
+    return {
+        preloadExposures,
+        ipcRendererChannels,
+        ipcMainChannels,
+    };
 }
 
 function classifyEdgeViolations(edges) {
@@ -254,6 +348,8 @@ function classifyEdgeViolations(edges) {
     const entitiesToCoreImports = [];
     const stateToCoreImports = [];
     const sharedContractsToCoreImports = [];
+    const applicationToUiImports = [];
+    const applicationToCoreImports = [];
 
     for (const edge of edges) {
         if (edge.from.startsWith('src/core/') && edge.to.startsWith('src/ui/')) {
@@ -312,6 +408,22 @@ function classifyEdgeViolations(edges) {
                 reason,
             });
         }
+        if (edge.from.startsWith('src/application/') && edge.to.startsWith('src/ui/')) {
+            const reason = LEGACY_APPLICATION_TO_UI_IMPORTS.get(createEdgeKey(edge.from, edge.to)) || null;
+            applicationToUiImports.push({
+                ...edge,
+                allowed: !!reason,
+                reason,
+            });
+        }
+        if (edge.from.startsWith('src/application/') && edge.to.startsWith('src/core/')) {
+            const reason = LEGACY_APPLICATION_TO_CORE_IMPORTS.get(createEdgeKey(edge.from, edge.to)) || null;
+            applicationToCoreImports.push({
+                ...edge,
+                allowed: !!reason,
+                reason,
+            });
+        }
     }
 
     return {
@@ -322,6 +434,8 @@ function classifyEdgeViolations(edges) {
         entitiesToCoreImports,
         stateToCoreImports,
         sharedContractsToCoreImports,
+        applicationToUiImports,
+        applicationToCoreImports,
     };
 }
 
@@ -344,6 +458,10 @@ function summarizeFiles(entries) {
 
 function summarizeEdges(entries) {
     return [...new Set(entries.map((entry) => createEdgeKey(entry.from, entry.to)))].sort((left, right) => left.localeCompare(right, 'en'));
+}
+
+function summarizeValues(entries, key) {
+    return [...new Set(entries.map((entry) => entry[key]).filter(Boolean))].sort((left, right) => left.localeCompare(right, 'en'));
 }
 
 function buildLayerEdgeSummary(edges) {
@@ -373,10 +491,13 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
         entitiesToCoreImports,
         stateToCoreImports,
         sharedContractsToCoreImports,
+        applicationToUiImports,
+        applicationToCoreImports,
     } = classifyEdgeViolations(importEdges);
     const constructorGameMatches = collectConstructorGameMatches(filesByRelativePath);
     const configWrites = collectConfigWrites(filesByRelativePath);
     const domAccessesOutsideUi = collectDomAccesses(filesByRelativePath);
+    const electronSurfaces = collectElectronSurfaceMatches(filesByRelativePath);
     const fileSizes = collectFileSizes(filesByRelativePath);
     const guardMatrix = loadGuardMatrix(rootDir);
     const legacySurfaceReads = collectLegacySurfaceFindings(filesByRelativePath, guardMatrix);
@@ -397,7 +518,12 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
             entitiesToCoreImports,
             stateToCoreImports,
             sharedContractsToCoreImports,
+            applicationToUiImports,
+            applicationToCoreImports,
             legacySurfaceReads,
+            electronPreloadExposures: electronSurfaces.preloadExposures,
+            electronIpcRendererChannels: electronSurfaces.ipcRendererChannels,
+            electronIpcMainChannels: electronSurfaces.ipcMainChannels,
         },
         importGraph: {
             localEdgeCount: importEdges.length,
@@ -462,6 +588,31 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
             disallowedEdges: sharedContractsToCoreImports.filter((entry) => !entry.allowed).length,
             legacyEdges: summarizeEdges(sharedContractsToCoreImports.filter((entry) => entry.allowed)),
         },
+        applicationToUiImports: {
+            totalEdges: applicationToUiImports.length,
+            disallowedEdges: applicationToUiImports.filter((entry) => !entry.allowed).length,
+            legacyEdges: summarizeEdges(applicationToUiImports.filter((entry) => entry.allowed)),
+        },
+        applicationToCoreImports: {
+            totalEdges: applicationToCoreImports.length,
+            disallowedEdges: applicationToCoreImports.filter((entry) => !entry.allowed).length,
+            legacyEdges: summarizeEdges(applicationToCoreImports.filter((entry) => entry.allowed)),
+        },
+        electronPreloadExposures: {
+            totalOccurrences: electronSurfaces.preloadExposures.length,
+            totalFiles: summarizeFiles(electronSurfaces.preloadExposures).length,
+            exposedNames: summarizeValues(electronSurfaces.preloadExposures, 'exposedName'),
+        },
+        electronIpcRendererChannels: {
+            totalOccurrences: electronSurfaces.ipcRendererChannels.length,
+            totalFiles: summarizeFiles(electronSurfaces.ipcRendererChannels).length,
+            channels: summarizeValues(electronSurfaces.ipcRendererChannels, 'channel'),
+        },
+        electronIpcMainChannels: {
+            totalOccurrences: electronSurfaces.ipcMainChannels.length,
+            totalFiles: summarizeFiles(electronSurfaces.ipcMainChannels).length,
+            channels: summarizeValues(electronSurfaces.ipcMainChannels, 'channel'),
+        },
         legacySurfaces: summarizeLegacySurfaceScorecard(legacySurfaceReads, guardMatrix),
     };
 
@@ -489,6 +640,11 @@ export function formatArchitectureReport(report) {
     lines.push(`entities -> core imports: ${report.scorecard.entitiesToCoreImports.totalEdges} edges (${report.scorecard.entitiesToCoreImports.disallowedEdges} disallowed)`);
     lines.push(`state -> core imports: ${report.scorecard.stateToCoreImports.totalEdges} edges (${report.scorecard.stateToCoreImports.disallowedEdges} disallowed)`);
     lines.push(`shared/contracts -> core imports: ${report.scorecard.sharedContractsToCoreImports.totalEdges} edges (${report.scorecard.sharedContractsToCoreImports.disallowedEdges} disallowed)`);
+    lines.push(`application -> ui imports: ${report.scorecard.applicationToUiImports.totalEdges} edges (${report.scorecard.applicationToUiImports.disallowedEdges} disallowed)`);
+    lines.push(`application -> core imports: ${report.scorecard.applicationToCoreImports.totalEdges} edges (${report.scorecard.applicationToCoreImports.disallowedEdges} disallowed)`);
+    lines.push(`electron preload exposures: ${report.scorecard.electronPreloadExposures.totalOccurrences} across ${report.scorecard.electronPreloadExposures.totalFiles} files`);
+    lines.push(`electron ipcRenderer channels: ${report.scorecard.electronIpcRendererChannels.totalOccurrences} across ${report.scorecard.electronIpcRendererChannels.totalFiles} files`);
+    lines.push(`electron ipcMain channels: ${report.scorecard.electronIpcMainChannels.totalOccurrences} across ${report.scorecard.electronIpcMainChannels.totalFiles} files`);
     if (report.scorecard.legacySurfaces && Object.keys(report.scorecard.legacySurfaces).length > 0) {
         lines.push('');
         lines.push('Legacy-surface usage (guard-matrix, forbiddenForNewWork):');
@@ -498,7 +654,7 @@ export function formatArchitectureReport(report) {
         }
     }
     lines.push('');
-    lines.push('Largest src files:');
+    lines.push('Largest scanned files:');
     lines.push(formatList(report.fileSizes.largestFiles.slice(0, 8), (entry) => `${entry.file} (${entry.lines} lines)`));
     lines.push('');
     lines.push('Top local layer edges:');

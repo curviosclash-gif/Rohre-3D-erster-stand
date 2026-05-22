@@ -73,7 +73,32 @@ const checks = [
         actual: report.scorecard.sharedContractsToCoreImports.totalEdges,
         max: report.budgets.sharedContractsToCoreImportEdges,
     },
+    {
+        label: 'application -> ui legacy edge budget',
+        actual: report.scorecard.applicationToUiImports.totalEdges,
+        max: report.budgets.applicationToUiImportEdges,
+    },
+    {
+        label: 'application -> core legacy edge budget',
+        actual: report.scorecard.applicationToCoreImports.totalEdges,
+        max: report.budgets.applicationToCoreImportEdges,
+    },
     ...legacySurfaceChecks,
+];
+
+const observedChecks = [
+    {
+        label: 'electron preload exposures',
+        actual: report.scorecard.electronPreloadExposures.totalOccurrences,
+    },
+    {
+        label: 'electron ipcRenderer channels',
+        actual: report.scorecard.electronIpcRendererChannels.totalOccurrences,
+    },
+    {
+        label: 'electron ipcMain channels',
+        actual: report.scorecard.electronIpcMainChannels.totalOccurrences,
+    },
 ];
 
 const failures = checks.filter((check) => check.actual > check.max);
@@ -84,6 +109,11 @@ console.log('Architecture metric budgets:');
 for (const check of checks) {
     const status = check.actual <= check.max ? 'OK' : 'FAIL';
     console.log(`- ${status}: ${check.label} = ${check.actual} (budget ${check.max})`);
+}
+console.log('');
+console.log('Architecture observed surfaces:');
+for (const check of observedChecks) {
+    console.log(`- OBSERVED: ${check.label} = ${check.actual}`);
 }
 
 if (failures.length > 0) {
