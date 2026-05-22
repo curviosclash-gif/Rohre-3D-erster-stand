@@ -6,6 +6,14 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V119 119.3 P2-Evidence-Remediation 2026-05-22
+
+- Nach User-Gate `setze plan 119 fort` wurde der D3-Doku-Slice fuer `V119 119.3` umgesetzt: `guard:main`, `plan:check`, `lock:validate`, `agent:preflight`, targeted Node-Contract-Nachbeleg (`88` PASS), `graph:check` und `gates:pre-commit` waren gruen.
+- `V93` referenziert seine Top-Level-DoDs nun auf konkrete `93.x`-/`93.99`-Evidence und Commits; `V102` und `V105` ersetzen generische `test -> pass`-/`verified`-Abschlussclaims durch Commit-, Command- und Contract-Nachweise und spiegeln danach die gedeckten Top-Level-DoDs.
+- `V114` ersetzt die bisherigen `verified`-Eintraege durch den `SurfacePolicyPort`-Commit, den targeted Contract-Run und einen Scan, der direkte produktive `isSurface*Allowed`-Imports auf `SurfacePolicyPort.js` begrenzt; die Master-Zeile zeigt wieder `114.99`.
+- Archivfaelle: `V56` erhaelt konkrete DoD-Evidence aus `4a3b6a84` und `56.99`, `V54` ersetzt den Sammelclaim `all mandatory checks PASS` durch konkrete Architektur-/Build-/Test-Gates. `V52` war bereits hinreichend konkret und blieb unveraendert.
+- V119 bleibt offen fuer `119.4`: Praeventions-Check und Contract-Regel gegen kuenftige schwache Abschlussclaims sind noch ausstehend; keine Runtime-, Test- oder Feature-Dateien wurden veraendert. `npm run graph:build` hat den Knowledge-Graph fuer die Plan-Doku-Aenderungen aktualisiert.
+
 ## V119 119.2 P1-Remediation 2026-05-22
 
 - Nach User-Gate wurde der D3-Doku-Slice fuer `V119 119.2` umgesetzt: `npm run guard:main`, `npm run plan:check`, `npm run lock:validate` und `agent:preflight` waren gruen.

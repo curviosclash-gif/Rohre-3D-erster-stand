@@ -1205,7 +1205,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "114.1",
+        "currentPhase": "114.99",
         "planFile": "docs/plaene/aktiv/V114.md",
         "scopeDeclarations": [
           "data/contracts/browser-demo-surface-policy.export.v1.json",
@@ -1438,7 +1438,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "119.1",
+        "currentPhase": "119.4",
         "planFile": "docs/plaene/aktiv/V119.md",
         "scopeDeclarations": [
           "docs/generated/knowledge-graph.coverage.json",
@@ -4706,7 +4706,7 @@
       "id": "V119.3",
       "type": "phase",
       "title": "P2-Remediation: schwache oder fehlende Evidence",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.3"
@@ -8451,7 +8451,7 @@
     {
       "id": "V102.1.1",
       "type": "subphase",
-      "title": "`vite.config.js` Video-Save-Endpoint auf erlaubte Root begrenzen (`safeName`, canonical path guard, reject ausserhalb root). (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "title": "`vite.config.js` Video-Save-Endpoint auf erlaubte Root begrenzen (`safeName`, canonical path guard, reject ausserhalb root). (abgeschlossen: 2026-05-12; evidence: commit `058ae684` -> `vite.config.js` hardened video-save path; V119-Nachbeleg 2026-05-22: `npm run plan:check` -> PASS)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8462,7 +8462,7 @@
     {
       "id": "V102.1.2",
       "type": "subphase",
-      "title": "`StartSetupUiOps` und `MatchFlowArcadeOverlayController` von untrusted `innerHTML` auf sichere DOM-Updates umstellen; der LAN-Discovery-Pfad bleibt bei `V99`. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "title": "`StartSetupUiOps` und `MatchFlowArcadeOverlayController` von untrusted `innerHTML` auf sichere DOM-Updates umstellen; der LAN-Discovery-Pfad bleibt bei `V99`. (abgeschlossen: 2026-05-12; evidence: commit `058ae684` -> UI render hardening; targeted node contract run aus `102.99.1` -> 88 PASS im V119-Nachbeleg)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8473,7 +8473,7 @@
     {
       "id": "V102.2.1",
       "type": "subphase",
-      "title": "`PlatformCapabilityRegistry` Build-Artefakt-Lesepfad ohne synchrones XHR aufloesen (lazy async cache oder bootstrap-injizierter Snapshot). (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "title": "`PlatformCapabilityRegistry` Build-Artefakt-Lesepfad ohne synchrones XHR aufloesen (lazy async cache oder bootstrap-injizierter Snapshot). (abgeschlossen: 2026-05-12; evidence: commit `058ae684` -> `PlatformCapabilityRegistrySourceResolution`; targeted node contract run aus `102.99.1` -> 88 PASS im V119-Nachbeleg)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8484,7 +8484,7 @@
     {
       "id": "V102.2.2",
       "type": "subphase",
-      "title": "`preload`/Settings-Defaults-Read so umstellen, dass kein `sendSync` im rendererseitigen Verbrauchspfad notwendig ist. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "title": "`preload`/Settings-Defaults-Read so umstellen, dass kein `sendSync` im rendererseitigen Verbrauchspfad notwendig ist. (abgeschlossen: 2026-05-12; evidence: commits `058ae684`, `414c7962` -> `electron/preload.cjs` async Runtime-Limits-/Settings-Vertrag)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8495,7 +8495,7 @@
     {
       "id": "V102.3.1",
       "type": "subphase",
-      "title": "`server/lan-signaling.js` Request-Body-Limits und parse-feste Fehlerpfade einfuehren. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "title": "`server/lan-signaling.js` Request-Body-Limits und parse-feste Fehlerpfade einfuehren. (abgeschlossen: 2026-05-12; evidence: commit `058ae684` -> `server/lan-signaling.js` Request-Limits und Fehlerpfade)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8506,7 +8506,7 @@
     {
       "id": "V102.3.2",
       "type": "subphase",
-      "title": "Endpoint-Rollen-/Mutationsschutz mit bestehendem `V99`-Scope abgleichen, ohne parallelen Vertragszweig zu bauen. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "title": "Endpoint-Rollen-/Mutationsschutz mit bestehendem `V99`-Scope abgleichen, ohne parallelen Vertragszweig zu bauen. (abgeschlossen: 2026-05-12; evidence: commit `058ae684` -> LAN-Signaling-Hardening innerhalb bestehender V99/V102-Grenze; V119 119.2/119.3 dokumentieren keine Parallelvertrags-Erweiterung)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8517,7 +8517,7 @@
     {
       "id": "V102.4.1",
       "type": "subphase",
-      "title": "`eslint`/Architektur-Checks fuer Security-/Hotspot-Regressionen schaerfen (z. B. no-untrusted-innerhtml-Regelpfad oder gleichwertiger Guard). (abgeschlossen: 2026-05-12; evidence: lint -> pass)",
+      "title": "`eslint`/Architektur-Checks fuer Security-/Hotspot-Regressionen schaerfen (z. B. no-untrusted-innerhtml-Regelpfad oder gleichwertiger Guard). (abgeschlossen: 2026-05-12; evidence: commit `85551c0c` -> `eslint.config.js` boundaries plugin/guardrail; commit `414c7962` -> follow-up lint config)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8528,7 +8528,7 @@
     {
       "id": "V102.4.2",
       "type": "subphase",
-      "title": "Repo-Hygiene-Follow-up (`tmp`-/Archiv-Bloat) als klaren Retention-/Enttracking-Plan dokumentieren und in bestehende Cleanup-Streams einhaengen. (abgeschlossen: 2026-05-12; evidence: manual -> updated)",
+      "title": "Repo-Hygiene-Follow-up (`tmp`-/Archiv-Bloat) als klaren Retention-/Enttracking-Plan dokumentieren und in bestehende Cleanup-Streams einhaengen. (abgeschlossen: 2026-05-12; evidence: commit `fa879b01` -> V102 Abschlussnotiz und Changelog-Handoff an Cleanup-/Planpflege-Streams)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8539,7 +8539,7 @@
     {
       "id": "V102.99.1",
       "type": "subphase",
-      "title": "Relevante Contract-/Targeted-Tests fuer Security-/Contract-Pfade sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "title": "Relevante Contract-/Targeted-Tests fuer Security-/Contract-Pfade sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-12; evidence: V119-Nachbeleg 2026-05-22 `node --test tests/platform-capabilities.contract.test.mjs tests/menu-runtime-session-service.contract.test.mjs tests/menu-runtime-preset-config-service.contract.test.mjs tests/runtime-regressions.contract.test.mjs tests/recording-video-export.contract.test.mjs` -> 88 PASS; commit `058ae684`)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8550,7 +8550,7 @@
     {
       "id": "V102.99.2",
       "type": "subphase",
-      "title": "`npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "title": "`npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-12; evidence: commit `fa879b01` -> V102 closure; V119-Nachbeleg 2026-05-22 `npm run plan:check` -> PASS)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8561,7 +8561,7 @@
     {
       "id": "V102.99.3",
       "type": "subphase",
-      "title": "Keine neuen disallowed architecture edges oder Legacy-Surface-Budgetausweitungen im geaenderten Scope. (abgeschlossen: 2026-05-12; evidence: test -> pass)",
+      "title": "Keine neuen disallowed architecture edges oder Legacy-Surface-Budgetausweitungen im geaenderten Scope. (abgeschlossen: 2026-05-12; evidence: commits `85551c0c`, `414c7962`, `fa879b01` -> architecture/lint guardrails and closure without V91/V92 budget expansion)",
       "status": "done",
       "attributes": {
         "blockId": "V102",
@@ -8946,7 +8946,7 @@
     {
       "id": "V105.3.1",
       "type": "subphase",
-      "title": "`MediaRecorderSystem`, `RecordingCapturePipeline`, `CameraRigSystem` und angrenzende Recorder-Engines auf konsistente Engine-/Profile-/Mode-/Mime-Literale heben; unabsichtliche `'none'`-, `'classic'`- oder `'clean'`-Verengungen verschwinden. (abgeschlossen: 2026-05-13; evidence: npm run typecheck:architecture shows no literal mismatches anymore)",
+      "title": "`MediaRecorderSystem`, `RecordingCapturePipeline`, `CameraRigSystem` und angrenzende Recorder-Engines auf konsistente Engine-/Profile-/Mode-/Mime-Literale heben; unabsichtliche `'none'`-, `'classic'`- oder `'clean'`-Verengungen verschwinden. (abgeschlossen: 2026-05-13; evidence: `npm run typecheck:architecture` -> PASS ohne Literal-Mismatches; commit `9738f658` -> recording/capture typing fixes)",
       "status": "done",
       "attributes": {
         "blockId": "V105",
@@ -8957,7 +8957,7 @@
     {
       "id": "V105.3.2",
       "type": "subphase",
-      "title": "`MediaRecorderExportFinalizeOps`, `RecordingVideoExportContract` und `WebCodecsRecorderEngine` auf explizite Result-Shapes und Muxer-/Codec-Vertraege heben, sodass Runtime, Export und Tests dieselben Felder und Containerannahmen teilen. (abgeschlossen: 2026-05-13; evidence: npm run typecheck:architecture shows no result shape errors anymore)",
+      "title": "`MediaRecorderExportFinalizeOps`, `RecordingVideoExportContract` und `WebCodecsRecorderEngine` auf explizite Result-Shapes und Muxer-/Codec-Vertraege heben, sodass Runtime, Export und Tests dieselben Felder und Containerannahmen teilen. (abgeschlossen: 2026-05-13; evidence: `npm run typecheck:architecture` -> PASS ohne Result-Shape-Fehler; commits `9738f658`, `9294d476`)",
       "status": "done",
       "attributes": {
         "blockId": "V105",
@@ -9001,7 +9001,7 @@
     {
       "id": "V105.5.2",
       "type": "subphase",
-      "title": "Architekturkontext und relevante Test-Mapping-Hinweise auf denselben Leseweg spiegeln: keine neuen `core -> ui`-Hilfsimporte, keine impliziten Build-Flags, keine still erweiterbaren Recorder-Resultate. (abgeschlossen: 2026-05-13; evidence: architecture guard passed)",
+      "title": "Architekturkontext und relevante Test-Mapping-Hinweise auf denselben Leseweg spiegeln: keine neuen `core -> ui`-Hilfsimporte, keine impliziten Build-Flags, keine still erweiterbaren Recorder-Resultate. (abgeschlossen: 2026-05-13; evidence: `npm run check:architecture:boundaries` -> PASS; `docs/referenz/ai_architecture_context.md` updated in V105 closure)",
       "status": "done",
       "attributes": {
         "blockId": "V105",
@@ -9012,7 +9012,7 @@
     {
       "id": "V105.99.1",
       "type": "subphase",
-      "title": "`npm run check:architecture:boundaries`, `npm run check:architecture:metrics`, `npm run check:architecture:ratchet`, `npm run typecheck:architecture`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-13; evidence: verified)",
+      "title": "`npm run check:architecture:boundaries`, `npm run check:architecture:metrics`, `npm run check:architecture:ratchet`, `npm run typecheck:architecture`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen. (abgeschlossen: 2026-05-13; evidence: `105.2.1`, `105.3.*`, `105.4.*` -> architecture/typecheck commands PASS; commits `a96d517d`, `15b984c6`)",
       "status": "done",
       "attributes": {
         "blockId": "V105",
@@ -9023,7 +9023,7 @@
     {
       "id": "V105.99.2",
       "type": "subphase",
-      "title": "Relevante targeted-/contract-Tests fuer den geaenderten Scope sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-13; evidence: npm run test:core passed)",
+      "title": "Relevante targeted-/contract-Tests fuer den geaenderten Scope sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-13; evidence: `npm run test:core` -> PASS; V119-Nachbeleg 2026-05-22 `node --test tests/runtime-regressions.contract.test.mjs tests/recording-video-export.contract.test.mjs` als Teil des targeted contract runs -> 88 PASS)",
       "status": "done",
       "attributes": {
         "blockId": "V105",
@@ -10574,7 +10574,7 @@
     {
       "id": "V114.1.1",
       "type": "subphase",
-      "title": "Direkte produktive Surface-Gate-Aufrufe inventarisieren und nach UI-Sync, Runtime-Action, Startvalidierung, Feature-Launch und Contract-only trennen. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "Direkte produktive Surface-Gate-Aufrufe inventarisieren und nach UI-Sync, Runtime-Action, Startvalidierung, Feature-Launch und Contract-only trennen. (abgeschlossen: 2026-05-12; evidence: commit `9487ab76` -> runtime/menu/UIStartSync Surface-Gate-Consumer im Diff)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -10585,7 +10585,7 @@
     {
       "id": "V114.1.2",
       "type": "subphase",
-      "title": "Produktmatrix fuer Desktop-App vs Browser-Demo definieren: erlaubt/verboten/fallback fuer Session, Mode, Map, Preset, Quickstart, Host/Join und Tooling. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "Produktmatrix fuer Desktop-App vs Browser-Demo definieren: erlaubt/verboten/fallback fuer Session, Mode, Map, Preset, Quickstart, Host/Join und Tooling. (abgeschlossen: 2026-05-12; evidence: `tests/platform-capabilities.contract.test.mjs` + V119 targeted node contract run -> 88 PASS)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -10596,7 +10596,7 @@
     {
       "id": "V114.2.1",
       "type": "subphase",
-      "title": "`SurfacePolicyPort` in Shared-/Runtime-Port-Schicht einfuehren und aus bestehendem `surfacePolicy`-/`productSurfaceId`-Snapshot speisen. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "`SurfacePolicyPort` in Shared-/Runtime-Port-Schicht einfuehren und aus bestehendem `surfacePolicy`-/`productSurfaceId`-Snapshot speisen. (abgeschlossen: 2026-05-12; evidence: commit `9487ab76` -> `src/shared/runtime/SurfacePolicyPort.js` und `UiControllerRuntimePorts.js`)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -10607,7 +10607,7 @@
     {
       "id": "V114.2.2",
       "type": "subphase",
-      "title": "Menu-/Runtime-Actions auf den Port umstellen; direkte Resolver-Aufrufe bleiben nur in `PlatformSurfacePolicyOps`, Contract-Tests oder klar markierten Adapterstellen. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "Menu-/Runtime-Actions auf den Port umstellen; direkte Resolver-Aufrufe bleiben nur in `PlatformSurfacePolicyOps`, Contract-Tests oder klar markierten Adapterstellen. (abgeschlossen: 2026-05-12; evidence: commit `9487ab76` -> `MenuRuntimeSessionService`, `MenuRuntimePresetConfigService`, `MatchStartValidationService`, `GameRuntimeSettingsHandler`, `UIStartSyncController`)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -10618,7 +10618,7 @@
     {
       "id": "V114.3.1",
       "type": "subphase",
-      "title": "SettingsManager-/Facade-Pfade pruefen, die Session-Drafts, Presets oder Config-Import mutieren; Produktgrenzen muessen beim Apply/Start ueber SurfacePolicyPort gelten. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "SettingsManager-/Facade-Pfade pruefen, die Session-Drafts, Presets oder Config-Import mutieren; Produktgrenzen muessen beim Apply/Start ueber SurfacePolicyPort gelten. (abgeschlossen: 2026-05-12; evidence: commit `9487ab76` -> session/preset/config consumers route through `SurfacePolicyPort`)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -10629,7 +10629,7 @@
     {
       "id": "V114.3.2",
       "type": "subphase",
-      "title": "Architekturkontext nachziehen: `SettingsManager` speichert Nutzerwunsch, SurfacePolicyPort entscheidet Produktgrenze, V98-Settings-Studio exportiert nur Demo-Policy. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "Architekturkontext nachziehen: `SettingsManager` speichert Nutzerwunsch, SurfacePolicyPort entscheidet Produktgrenze, V98-Settings-Studio exportiert nur Demo-Policy. (abgeschlossen: 2026-05-12; evidence: commit `9487ab76` -> `docs/referenz/ai_architecture_context.md`)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -10640,7 +10640,7 @@
     {
       "id": "V114.4.1",
       "type": "subphase",
-      "title": "Contract-Tests fuer Desktop-Default-Full und Browser-Demo-Default-Deny ueber echte Actions statt nur Resolver erweitern. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "Contract-Tests fuer Desktop-Default-Full und Browser-Demo-Default-Deny ueber echte Actions statt nur Resolver erweitern. (abgeschlossen: 2026-05-12; evidence: V119-Nachbeleg 2026-05-22 targeted node contract run -> 88 PASS)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -10651,7 +10651,7 @@
     {
       "id": "V114.4.2",
       "type": "subphase",
-      "title": "Lightweight-Guard oder Contract-Scan fuer produktive Dateien einfuehren: keine neuen `isSurface*Allowed(...)`-/Fallback-Aufrufe ohne Port oder expliziten Kontext. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "Lightweight-Guard oder Contract-Scan fuer produktive Dateien einfuehren: keine neuen `isSurface*Allowed(...)`-/Fallback-Aufrufe ohne Port oder expliziten Kontext. (abgeschlossen: 2026-05-12; evidence: V119-Nachbeleg 2026-05-22 `rg -n \"isSurface(SessionType|ModePath|MapKey|Preset|QuickStart).*Allowed|resolveSurfaceFallback\" src/core src/ui src/shared/runtime -S` -> direkte `isSurface*Allowed`-Imports nur in `SurfacePolicyPort.js`)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -10662,7 +10662,7 @@
     {
       "id": "V114.99.1",
       "type": "subphase",
-      "title": "Gezielte Surface-Policy-Port- und Produktmatrix-Tests sind gruen. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "Gezielte Surface-Policy-Port- und Produktmatrix-Tests sind gruen. (abgeschlossen: 2026-05-12; evidence: V119-Nachbeleg 2026-05-22 `node --test tests/platform-capabilities.contract.test.mjs tests/menu-runtime-session-service.contract.test.mjs tests/menu-runtime-preset-config-service.contract.test.mjs tests/runtime-regressions.contract.test.mjs tests/recording-video-export.contract.test.mjs` -> 88 PASS)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -10673,7 +10673,7 @@
     {
       "id": "V114.99.2",
       "type": "subphase",
-      "title": "`npm run plan:check` und relevante Architektur-/Docs-Gates sind gruen. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "`npm run plan:check` und relevante Architektur-/Docs-Gates sind gruen. (abgeschlossen: 2026-05-12; evidence: `npm run plan:check` -> PASS im V119-Nachbeleg 2026-05-22; commit `fa879b01` -> V114 closure row)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -10684,7 +10684,7 @@
     {
       "id": "V114.99.3",
       "type": "subphase",
-      "title": "Nachscan zeigt keine produktiven kontextlosen Surface-Gate-Aufrufe im migrierten Scope. (abgeschlossen: 2026-05-12; evidence: verified)",
+      "title": "Nachscan zeigt keine produktiven kontextlosen Surface-Gate-Aufrufe im migrierten Scope. (abgeschlossen: 2026-05-12; evidence: V119-Nachbeleg 2026-05-22 `rg -n \"isSurface(SessionType|ModePath|MapKey|Preset|QuickStart).*Allowed|resolveSurfaceFallback\" src/core src/ui src/shared/runtime -S` -> direkte `isSurface*Allowed`-Imports nur in `SurfacePolicyPort.js`)",
       "status": "done",
       "attributes": {
         "blockId": "V114",
@@ -11795,8 +11795,8 @@
     {
       "id": "V119.3.1",
       "type": "subphase",
-      "title": "`V93` DoDs mit konkreter Evidence nachtragen oder auf bestehende `93.99.*`-Evidence referenzieren, wenn der Nachweis inhaltlich deckungsgleich ist.",
-      "status": "open",
+      "title": "`V93` DoDs mit konkreter Evidence nachtragen oder auf bestehende `93.99.*`-Evidence referenzieren, wenn der Nachweis inhaltlich deckungsgleich ist. (abgeschlossen: 2026-05-22; evidence: `docs/plaene/aktiv/V93.md` DoD.1-DoD.9 -> 93.x/93.99-Evidence und Commits referenziert; `npm run gates:pre-commit` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.3",
@@ -11806,8 +11806,8 @@
     {
       "id": "V119.3.2",
       "type": "subphase",
-      "title": "`V102`, `V105`, `V114` generische Evidence (`verified`, `test -> pass`) gegen konkrete Commands, Commits oder Testreports nachschaerfen.",
-      "status": "open",
+      "title": "`V102`, `V105`, `V114` generische Evidence (`verified`, `test -> pass`) gegen konkrete Commands, Commits oder Testreports nachschaerfen. (abgeschlossen: 2026-05-22; evidence: `docs/plaene/aktiv/V102.md`, `V105.md`, `V114.md` -> generische Evidence ersetzt; targeted node contract run -> 88 PASS; `npm run gates:pre-commit` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.3",
@@ -11817,8 +11817,8 @@
     {
       "id": "V119.3.3",
       "type": "subphase",
-      "title": "Archivierte Sammelfaelle `V52/V56` und `V54` bewerten; pauschale Evidence entweder konkretisieren oder als historische Minimal-Evidence belassen und markieren.",
-      "status": "open",
+      "title": "Archivierte Sammelfaelle `V52/V56` und `V54` bewerten; pauschale Evidence entweder konkretisieren oder als historische Minimal-Evidence belassen und markieren. (abgeschlossen: 2026-05-22; evidence: `docs/plaene/alt/Umsetzungsplan_Bloecke_V52-V57_Architektur-Haertung-bis-Arcade_2026-03-27.md` -> V56-DoDs konkretisiert; `docs/plaene/alt/Feature_Gesamtfix_Architektur_Qualitaet_V54.md` -> 54.99 Sammelclaim ersetzt; `npm run gates:pre-commit` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.3",

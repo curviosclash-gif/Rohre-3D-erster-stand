@@ -78,7 +78,7 @@ Abgeschlossene Punkte dokumentieren mit:
   - [x] 54.7.1 Relevante Regressionstests fuer Menu/Runtime/Physics aktualisieren (`test:core`, `test:physics`, ggf. `test:fast`) (abgeschlossen: 2026-03-24; evidence: `TEST_PORT=5412 PW_RUN_TAG=v54-final-fast-pass PW_OUTPUT_DIR=test-results/v54-final-fast-pass npm run test:fast` -> 128 passed, 1 flaky, 1 skipped)
   - [x] 54.7.2 `architecture:guard`, Build und betroffene Smokes als Pflicht-Gate pro Teilphase gruen halten (abgeschlossen: 2026-03-24; evidence: `npm run architecture:guard && npm run build` -> PASS)
 
-- [x] 54.99 Integrations- und Abschluss-Gate (abgeschlossen: 2026-03-24; evidence: all mandatory checks PASS)
+- [x] 54.99 Integrations- und Abschluss-Gate (abgeschlossen: 2026-03-24; evidence: `npm run architecture:guard && npm run build` -> PASS; `TEST_PORT=5412 PW_RUN_TAG=v54-final-fast-pass PW_OUTPUT_DIR=test-results/v54-final-fast-pass npm run test:fast` -> 128 passed, 1 flaky, 1 skipped; `TEST_PORT=5413 PW_RUN_TAG=v54-final-core-pass PW_OUTPUT_DIR=test-results/v54-final-core-pass npm run test:core` -> 102 passed, 1 skipped)
   - [x] 54.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen (abgeschlossen: 2026-03-24; evidence: `npm run architecture:guard && npm run build` -> PASS; `test-results/v54-final-fast-pass`, `test-results/v54-final-core-pass`)
   - [x] 54.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Conflict-Log und Lock-Bereinigung sind abgeschlossen (abgeschlossen: 2026-03-24; evidence: `npm run plan:check && npm run docs:sync && npm run docs:check` -> PASS)
 

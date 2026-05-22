@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-22. Aktiver Lock: `-`; Startanker: `V125 125.99 abgeschlossen`; naechster empfohlener P1-Schritt ist `V119 119.1`.
+Stand: 2026-05-22. Aktiver Lock: `-`; Startanker: `V119 119.3 abgeschlossen`; naechster empfohlener P1-Schritt ist `V119 119.4`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -66,12 +66,12 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V90 | Toolchain-Security und Dependency-Upgrade | done | P1 | frei | - | 90.99 | `docs/plaene/aktiv/V90.md` |
 | V102 | Security-, Runtime- und Contract-Hardening | done | P1 | frei | V99.99,V100.99 | 102.99 | `docs/plaene/aktiv/V102.md` |
-| V114 | SurfacePolicyPort fuer Demo- und Vollversionsgrenze | done | P1 | frei | V98.99,V103.99,V104.99 | 114.1 | `docs/plaene/aktiv/V114.md` |
+| V114 | SurfacePolicyPort fuer Demo- und Vollversionsgrenze | done | P1 | frei | V98.99,V103.99,V104.99 | 114.99 | `docs/plaene/aktiv/V114.md` |
 | V115 | Product & Infra Follow-up (Gameplay, Leaks & Test-Recovery) | done | P2 | frei | - | 115.99 | `docs/plaene/aktiv/V115.md` |
 | V105 | Architecture-Guard- und Typecheck-Regression-Recovery | done | P1 | frei | V99.99,V102.99,V104.99 | 105.99 | `docs/plaene/aktiv/V105.md` |
 | V117 | AI Decision Framework und Autonomie-Gates | done | P1 | frei | V109.99 | 117.99 | `docs/plaene/aktiv/V117.md` |
 | V116 | Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung | done | P1 | frei | V109.99,V117.99,V115.99 | 116.99 | `docs/plaene/aktiv/V116.md` |
-| V119 | Planabschluss-Evidence-Remediation und Git-Historienabgleich | planned | P1 | frei | V117.99 | 119.1 | `docs/plaene/aktiv/V119.md` |
+| V119 | Planabschluss-Evidence-Remediation und Git-Historienabgleich | planned | P1 | frei | V117.99 | 119.4 | `docs/plaene/aktiv/V119.md` |
 | V123 | AI-optimierter Plan-Index und Source-of-Truth-Migration | planned | P1 | frei | V116.4,V119.1 | 123.1 | `docs/plaene/aktiv/V123.md` |
 | V125 | Architektur-Compliance fuer Folgearbeit | done | P1 | frei | V91.99,V104.99,V117.99 | 125.99 | `docs/plaene/aktiv/V125.md` |
 | V126 | Local Dev-API, Preview- und Delivery-Hardening | done | P1 | frei | V102.99,V105.99 | 126.99 | `docs/plaene/aktiv/V126.md` |
@@ -181,12 +181,12 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V100 | 2026-05-05 | closed | Abgeschlossen 2026-05-06 |
 | - | V108 | - | closed | Abgeschlossen 2026-05-01 |
 | - | V102 | 2026-05-12 | closed | Abgeschlossen 2026-05-12 |
-| - | V114 | - | frei | Geplant |
+| - | V114 | 2026-05-12 | closed | Abgeschlossen 2026-05-12; V119 119.3 hat schwache `verified`-Evidence konkret nachbelegt |
 | - | V115 | - | closed | Abgeschlossen 2026-05-14 |
 | - | V105 | 2026-05-13 | closed | Abgeschlossen 2026-05-13 |
 | - | V117 | 2026-05-14 | closed | Abgeschlossen 2026-05-14 |
 | - | V116 | 2026-05-18 | closed | Abgeschlossen 2026-05-18 |
-| - | V119 | - | frei | Geplant |
+| - | V119 | - | frei | 119.3 abgeschlossen; naechster Schritt 119.4 Praeventions-Gate |
 | - | V123 | - | frei | Geplant |
 | - | V125 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Architektur-Capsule, staged Guard, Boundary-/Ratchet-/Contract-Evidence und Abschluss-Gates gruen |
 | - | V126 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Dev-API-/Preview-Hardening gruen, Handoff an V127/V128/V129 |

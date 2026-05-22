@@ -296,10 +296,10 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [x] DoD.1 Alle Phasen 56.1 bis 56.4 sowie 56.99 sind abgeschlossen und dokumentiert. (abgeschlossen: 2026-03-25)
-- [x] DoD.2 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS. (abgeschlossen: 2026-03-25)
-- [x] DoD.3 Neue Regressionstests fuer die behandelten Edge-Cases existieren in `tests/core.spec.js` oder `tests/physics-core.spec.js`. (abgeschlossen: 2026-03-25)
-- [x] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-Pflege sind abgeschlossen. (abgeschlossen: 2026-03-25)
+- [x] DoD.1 Alle Phasen 56.1 bis 56.4 sowie 56.99 sind abgeschlossen und dokumentiert. (abgeschlossen: 2026-03-25; evidence: 56.1.1-56.5.3 und 56.99.* abgehakt; commit `4a3b6a84`)
+- [x] DoD.2 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS. (abgeschlossen: 2026-03-25; evidence: 56.99.1 -> build OK, architecture:guard OK, test:fast 27 passed / 1 flaky T1 startup, test:core 106 passed / 1 flaky T1 startup)
+- [x] DoD.3 Neue Regressionstests fuer die behandelten Edge-Cases existieren in `tests/core.spec.js` oder `tests/physics-core.spec.js`. (abgeschlossen: 2026-03-25; evidence: commit `4a3b6a84` -> `tests/core.spec.js` fuer Session-ID guard und TouchInputSource double-dispose)
+- [x] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-Pflege sind abgeschlossen. (abgeschlossen: 2026-03-25; evidence: 56.99.2 -> plan/docs gates PASS und Lock-Status COMPLETE)
 
 ### 56.1 Async Race Condition in MatchLifecycleSessionOrchestrator
 
