@@ -1441,6 +1441,8 @@
         "currentPhase": "119.1",
         "planFile": "docs/plaene/aktiv/V119.md",
         "scopeDeclarations": [
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
           "docs/plaene/aktiv/V102.md",
           "docs/plaene/aktiv/V105.md",
           "docs/plaene/aktiv/V114.md",
@@ -1463,7 +1465,7 @@
           "tests/plan-evidence-claims.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 18,
+          "concreteCount": 20,
           "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [
@@ -4684,7 +4686,7 @@
       "id": "V119.1",
       "type": "phase",
       "title": "Audit-Baseline und Befundliste",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.1"
@@ -11727,8 +11729,8 @@
     {
       "id": "V119.1.1",
       "type": "subphase",
-      "title": "Read-only Audit-Script oder dokumentierten Shell-Abgleich fuer erledigte/done-ish Plaene aus `docs/plaene/aktiv` und `docs/plaene/alt` ausfuehren.",
-      "status": "open",
+      "title": "Read-only Audit-Script oder dokumentierten Shell-Abgleich fuer erledigte/done-ish Plaene aus `docs/plaene/aktiv` und `docs/plaene/alt` ausfuehren. (abgeschlossen: 2026-05-22; evidence: `tmp/v119-audit-baseline.md` und `tmp/v119-audit-baseline.json` -> 15 Zielplaene gescannt; `npm run check:plan-evidence-claims` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.1",
@@ -11738,8 +11740,8 @@
     {
       "id": "V119.1.2",
       "type": "subphase",
-      "title": "Befunde pro Plan klassifizieren: `OPEN_DOD`, `OPEN_99`, `CHECKED_WITHOUT_EVIDENCE`, `WEAK_EVIDENCE`, `TRACEABILITY_ONLY`, `FALSE_POSITIVE`.",
-      "status": "open",
+      "title": "Befunde pro Plan klassifizieren: `OPEN_DOD`, `OPEN_99`, `CHECKED_WITHOUT_EVIDENCE`, `WEAK_EVIDENCE`, `TRACEABILITY_ONLY`, `FALSE_POSITIVE`. (abgeschlossen: 2026-05-22; evidence: `tmp/v119-audit-baseline.json` -> 10 Plaene mit `OPEN_DOD`, 3 mit `OPEN_99`, 2 mit `CHECKED_WITHOUT_EVIDENCE`, 4 mit `WEAK_EVIDENCE`; Abschnitt `119.1 Audit-Baseline 2026-05-22` -> kanonische Klassifikation)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.1",
@@ -11749,8 +11751,8 @@
     {
       "id": "V119.1.3",
       "type": "subphase",
-      "title": "Kanonische Remediation-Liste im Plan oder Changelog dokumentieren, ohne alte Plaene bereits zu aendern.",
-      "status": "open",
+      "title": "Kanonische Remediation-Liste im Plan oder Changelog dokumentieren, ohne alte Plaene bereits zu aendern. (abgeschlossen: 2026-05-22; evidence: `docs/plaene/aktiv/V119.md` Abschnitt `119.1 Audit-Baseline 2026-05-22` -> Remediation-Liste dokumentiert; keine Alt-/Aktivplaene ausser V119 geaendert)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.1",
@@ -29367,6 +29369,7 @@
           "V111",
           "V115",
           "V116",
+          "V119",
           "V120",
           "V125",
           "V90"
@@ -29390,6 +29393,7 @@
           "V111",
           "V115",
           "V116",
+          "V119",
           "V120",
           "V125",
           "V90",
@@ -72864,6 +72868,24 @@
         "blockId": "V117",
         "phaseCode": "117.99",
         "subphaseCode": "117.99.4"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
       }
     },
     {

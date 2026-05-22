@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T12:39:07.553Z",
+  "generated_at": "2026-05-22T14:25:45.986Z",
   "locks": [
     {
       "person": "codex",
@@ -574,6 +574,39 @@
       "start_date": "2026-05-18",
       "target_completion": "2026-05-18",
       "status": "completed",
+      "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V119",
+      "phase": "119.1",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.json",
+        "docs/plaene/aktiv/V119.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/plaene/aktiv/V75.md",
+        "docs/plaene/aktiv/V76.md",
+        "docs/plaene/aktiv/V81.md",
+        "docs/plaene/aktiv/V93.md",
+        "docs/plaene/aktiv/V94.md",
+        "docs/plaene/aktiv/V102.md",
+        "docs/plaene/aktiv/V105.md",
+        "docs/plaene/aktiv/V114.md",
+        "docs/plaene/alt/Umsetzungsplan_Block_V41_Multiplayer_Rest-Gate_2026-03-23.md",
+        "docs/plaene/alt/Feature_Fight_Modus_Qualitaet_V48.md",
+        "docs/plaene/alt/Feature_Architektur_Runtime_Entkopplung_V74.md",
+        "docs/plaene/alt/V83.md",
+        "docs/plaene/alt/V84.md",
+        "docs/plaene/alt/Umsetzungsplan_Bloecke_V52-V57_Architektur-Haertung-bis-Arcade_2026-03-27.md",
+        "docs/plaene/alt/Feature_Gesamtfix_Architektur_Qualitaet_V54.md",
+        "scripts/check-plan-evidence-claims.mjs",
+        "tests/plan-evidence-claims.contract.test.mjs"
+      ],
+      "start_date": "2026-05-22",
+      "target_completion": "2026-05-22",
+      "status": "in-progress",
       "notes": ""
     }
   ],
