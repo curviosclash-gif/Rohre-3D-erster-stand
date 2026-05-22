@@ -15,6 +15,7 @@ import { normalizeMobileClassicControlSettings } from '../shared/contracts/Mobil
 import {
     MOBILE_ARCADE_DEFAULT_MAP_KEY,
     isMobileArcadeRouteAllowed,
+    listMobileArcadeRouteAllowlist,
     resolveMobileArcadeMapKey,
 } from '../mobile-arcade/MobileArcadeApp.js';
 
@@ -29,6 +30,9 @@ const MOBILE_ANDROID_GHOST_STATUS_ID = 'mobile-arcade-ghost-status';
 const MOBILE_ANDROID_ENTRY_PANEL_ID = 'mobile-android-entry-panel';
 const MOBILE_ANDROID_ENTRY_CLASSIC_ID = 'mobile-android-entry-classic';
 const MOBILE_ANDROID_ENTRY_ARCADE_ID = 'mobile-android-entry-arcade';
+const MOBILE_ANDROID_ROUTE_PANEL_ID = 'mobile-android-route-panel';
+const MOBILE_ANDROID_ROUTE_LIST_ID = 'mobile-android-route-list';
+const MOBILE_ANDROID_ROUTE_EMPTY_ID = 'mobile-android-route-empty';
 const MOBILE_ANDROID_MODE_PATHS = Object.freeze([
     MENU_MODE_PATHS.NORMAL,
     MENU_MODE_PATHS.ARCADE,
@@ -179,14 +183,20 @@ function ensureMobileClassicUpdateUi(doc = document) {
     return panel;
 }
 
-function createMobileAndroidEntryButton(doc, { id, modePath, label }) {
+function createMobileAndroidEntryButton(doc, { id, modePath, label, copy }) {
     const button = doc.createElement('button');
     button.type = 'button';
     button.id = id;
     button.className = 'nav-btn mobile-android-entry-btn';
     button.dataset.mobileModeEntry = modePath;
-    button.textContent = label;
     button.title = '';
+    const labelNode = doc.createElement('span');
+    labelNode.className = 'mobile-android-entry-title';
+    labelNode.textContent = label;
+    const copyNode = doc.createElement('span');
+    copyNode.className = 'mobile-android-entry-copy';
+    copyNode.textContent = copy;
+    button.append(labelNode, copyNode);
     return button;
 }
 
@@ -207,11 +217,13 @@ function ensureMobileAndroidEntryUi(doc = document) {
             id: MOBILE_ANDROID_ENTRY_CLASSIC_ID,
             modePath: MENU_MODE_PATHS.NORMAL,
             label: 'Classic',
+            copy: 'Freier Flug fuer den schnellen Start',
         }),
         createMobileAndroidEntryButton(doc, {
             id: MOBILE_ANDROID_ENTRY_ARCADE_ID,
             modePath: MENU_MODE_PATHS.ARCADE,
             label: 'Parcours',
+            copy: 'Zeitroute mit Ghost-Selbstduell',
         }),
     );
     const menuNav = doc.getElementById('menu-nav');
@@ -220,6 +232,44 @@ function ensureMobileAndroidEntryUi(doc = document) {
         menuNav.parentNode.insertBefore(panel, menuNav);
     } else {
         host?.appendChild(panel);
+    }
+    return panel;
+}
+
+function ensureMobileAndroidRouteUi(doc = document) {
+    if (!doc?.createElement) {
+        return null;
+    }
+    const existing = doc.getElementById(MOBILE_ANDROID_ROUTE_PANEL_ID);
+    if (existing) {
+        return existing;
+    }
+
+    const panel = doc.createElement('section');
+    panel.id = MOBILE_ANDROID_ROUTE_PANEL_ID;
+    panel.className = 'mobile-android-route-panel';
+    panel.setAttribute('aria-label', 'Parcours Route');
+
+    const title = doc.createElement('h3');
+    title.className = 'mobile-android-route-title';
+    title.textContent = 'Route waehlen';
+
+    const list = doc.createElement('div');
+    list.id = MOBILE_ANDROID_ROUTE_LIST_ID;
+    list.className = 'mobile-android-route-list';
+
+    const empty = doc.createElement('p');
+    empty.id = MOBILE_ANDROID_ROUTE_EMPTY_ID;
+    empty.className = 'mobile-android-route-empty';
+    empty.textContent = 'Keine mobile Route verfuegbar.';
+
+    panel.append(title, list, empty);
+
+    const startRail = doc.querySelector('#submenu-game .start-rail');
+    if (startRail?.parentNode) {
+        startRail.parentNode.insertBefore(panel, startRail.nextSibling);
+    } else {
+        doc.getElementById('submenu-game')?.appendChild(panel);
     }
     return panel;
 }
@@ -403,9 +453,29 @@ body.mobile-classic-app #main-menu[data-menu-depth="1"] #menu-nav {
 }
 
 body.mobile-classic-app .mobile-android-entry-btn {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 6px;
     min-height: 82px;
     border-radius: 8px;
     letter-spacing: 0 !important;
+    text-align: center;
+}
+
+body.mobile-classic-app .mobile-android-entry-title {
+    color: #f4fbff;
+    font-size: 1.08rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+body.mobile-classic-app .mobile-android-entry-copy {
+    max-width: 22ch;
+    color: #9fc3da;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.25;
 }
 
 body.mobile-classic-app #game-container {
@@ -417,6 +487,19 @@ body.mobile-classic-app #main-menu {
     max-height: calc(100dvh - max(18px, env(safe-area-inset-top)) - max(18px, env(safe-area-inset-bottom)));
     margin: max(10px, env(safe-area-inset-top)) auto max(10px, env(safe-area-inset-bottom));
     border-color: rgba(126, 218, 255, 0.32);
+}
+
+body.mobile-classic-app #main-menu[data-menu-depth="3"] .menu-hero-shell,
+body.mobile-classic-app #main-menu[data-menu-depth="4"] .menu-hero-shell,
+body.mobile-classic-app #main-menu[data-menu-depth="5"] .menu-hero-shell {
+    margin-bottom: 6px;
+    align-items: center;
+}
+
+body.mobile-classic-app #main-menu[data-menu-depth="3"] .menu-brand-copy,
+body.mobile-classic-app #main-menu[data-menu-depth="4"] .menu-brand-copy,
+body.mobile-classic-app #main-menu[data-menu-depth="5"] .menu-brand-copy {
+    display: none;
 }
 
 body.mobile-classic-app #mobile-classic-update-panel {
@@ -464,9 +547,218 @@ body.mobile-classic-app #menu-selection-summary {
     line-height: 1.35;
 }
 
+body.mobile-classic-app #submenu-game .submenu-header {
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+body.mobile-classic-app #submenu-game .submenu-title {
+    font-size: 1rem;
+    line-height: 1.15;
+}
+
+body.mobile-classic-app #submenu-game .back-btn {
+    min-height: 34px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+}
+
+body.mobile-classic-app #submenu-game .level3-body {
+    gap: 8px;
+}
+
+body.mobile-classic-app #submenu-game .start-rail {
+    top: 6px;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+body.mobile-classic-app #submenu-game .start-rail-copy {
+    gap: 6px;
+}
+
+body.mobile-classic-app #submenu-game .start-rail-copy .section-title {
+    display: none;
+}
+
+body.mobile-classic-app #submenu-game .start-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+}
+
+body.mobile-classic-app #submenu-game .start-summary-block {
+    min-width: 0;
+    padding: 7px 8px;
+    border-radius: 8px;
+}
+
+body.mobile-classic-app #submenu-game .start-summary-block[data-summary-label="session"],
+body.mobile-classic-app #submenu-game .start-summary-block[data-summary-label="ghost_kollision"],
+body.mobile-classic-app #submenu-game .start-summary-block[data-summary-label="ansicht"] {
+    display: none;
+}
+
+body.mobile-classic-app #submenu-game .start-summary-label {
+    font-size: 0.58rem;
+    letter-spacing: 0;
+}
+
+body.mobile-classic-app #submenu-game .start-summary-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.78rem;
+}
+
+body.mobile-classic-app #submenu-game .start-rail-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+}
+
+body.mobile-classic-app #submenu-game .start-rail-actions .start-btn {
+    grid-column: 1 / -1;
+    order: -1;
+    min-height: 44px;
+    border-radius: 8px;
+}
+
+body.mobile-classic-app #submenu-game .start-rail-actions .secondary-btn {
+    min-height: 34px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    font-size: 0.68rem;
+}
+
+body.mobile-classic-app .mobile-android-route-panel {
+    display: none;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid rgba(255, 210, 118, 0.34);
+    border-radius: 8px;
+    background: linear-gradient(160deg, rgba(36, 24, 10, 0.88), rgba(13, 24, 32, 0.82));
+}
+
+body.mobile-classic-app[data-mobile-mode-path="arcade"] .mobile-android-route-panel {
+    display: grid;
+}
+
+body.mobile-classic-app .mobile-android-route-title {
+    margin: 0;
+    color: #ffe2ad;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+body.mobile-classic-app .mobile-android-route-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+}
+
+body.mobile-classic-app .mobile-android-route-btn {
+    min-width: 0;
+    min-height: 42px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 220, 150, 0.3);
+    background: rgba(255, 210, 118, 0.08);
+    color: #f8f0dc;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+body.mobile-classic-app .mobile-android-route-btn.active {
+    border-color: rgba(255, 229, 170, 0.78);
+    background: rgba(255, 210, 118, 0.2);
+    color: #fff8e8;
+}
+
+body.mobile-classic-app .mobile-android-route-empty {
+    display: none;
+    margin: 0;
+    color: #c9af88;
+    font-size: 0.72rem;
+}
+
+body.mobile-classic-app .mobile-android-route-panel[data-route-empty="true"] .mobile-android-route-empty {
+    display: block;
+}
+
 body.mobile-classic-app .arcade-inline-surface,
 body.mobile-classic-app .start-section-card[data-start-section="presets"] {
     display: none !important;
+}
+
+body.mobile-classic-app #submenu-game .start-section-card {
+    border-radius: 8px;
+}
+
+body.mobile-classic-app #submenu-game .menu-accordion-summary {
+    padding: 10px 12px;
+}
+
+body.mobile-classic-app #submenu-game .menu-accordion-body {
+    gap: 8px;
+    padding: 0 12px 12px;
+}
+
+body.mobile-classic-app #submenu-game .menu-preview-card,
+body.mobile-classic-app #submenu-game .setup-chip-grid {
+    display: none;
+}
+
+@media (max-height: 520px) {
+    body.mobile-classic-app #main-menu {
+        max-width: min(760px, calc(100vw - 12px));
+        max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom)));
+        margin: max(4px, env(safe-area-inset-top)) auto max(4px, env(safe-area-inset-bottom));
+    }
+
+    body.mobile-classic-app .menu-content {
+        padding: 8px;
+    }
+
+    body.mobile-classic-app #main-menu[data-menu-depth="3"] .menu-hero-shell,
+    body.mobile-classic-app #main-menu[data-menu-depth="4"] .menu-hero-shell,
+    body.mobile-classic-app #main-menu[data-menu-depth="5"] .menu-hero-shell {
+        display: none;
+    }
+
+    body.mobile-classic-app #submenu-game .submenu-header {
+        margin-bottom: 5px;
+    }
+
+    body.mobile-classic-app #submenu-game .start-rail {
+        position: static;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: stretch;
+        padding: 8px;
+    }
+
+    body.mobile-classic-app #submenu-game .start-rail-actions {
+        min-width: 210px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.mobile-classic-app #submenu-game .start-summary-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    body.mobile-classic-app .mobile-android-route-list {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    body.mobile-classic-app #submenu-game .start-section-card[data-start-section="map"] {
+        display: none;
+    }
 }
 
 body.mobile-classic-app #touch-controls {
@@ -765,6 +1057,8 @@ export function applyMobileClassicDocumentState(doc = document) {
     ensureViewportFit(doc);
     ensureMobileClassicStyles(doc);
     ensureMobileAndroidEntryUi(doc);
+    ensureMobileAndroidRouteUi(doc);
+    collapseMobileAndroidStartSections(doc);
     ensureMobileAndroidStatusUi(doc);
     syncMobileAndroidMenuCopy(doc);
     ensureMobileAndroidMenuVisibilityObserver(doc);
@@ -848,6 +1142,82 @@ function syncMobileAndroidQuickStarts(ui = null) {
     quickStartSection.setAttribute('aria-hidden', 'true');
 }
 
+function collapseMobileAndroidStartSections(doc = document) {
+    const mainMenu = doc?.getElementById?.('main-menu');
+    if (!mainMenu || mainMenu.dataset.mobileAndroidStartSectionsCompacted === '1') {
+        return;
+    }
+    doc.querySelectorAll?.('#submenu-game details.start-section-card')?.forEach((section) => {
+        section.open = false;
+    });
+    mainMenu.dataset.mobileAndroidStartSectionsCompacted = '1';
+}
+
+function formatMobileRouteLabel(mapKey, option = null) {
+    const optionText = String(option?.textContent || '').replace(/\s+/g, ' ').trim();
+    if (optionText) {
+        return optionText.replace(/\s*\([^)]*\)\s*$/, '');
+    }
+    return String(mapKey || '')
+        .replace(/[_-]+/g, ' ')
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function dispatchMapSelectChange(mapSelect, doc) {
+    const eventFactory = doc?.defaultView?.Event || (typeof Event !== 'undefined' ? Event : null);
+    if (eventFactory) {
+        mapSelect.dispatchEvent(new eventFactory('change', { bubbles: true }));
+    } else {
+        mapSelect.dispatchEvent?.({ type: 'change', bubbles: true, target: mapSelect });
+    }
+}
+
+function syncMobileAndroidRouteChoices(game = null, ui = null, modePath = MENU_MODE_PATHS.NORMAL, doc = document) {
+    const panel = ensureMobileAndroidRouteUi(doc);
+    const list = doc?.getElementById?.(MOBILE_ANDROID_ROUTE_LIST_ID);
+    const mapSelect = ui?.mapSelect || doc?.getElementById?.('map-select') || null;
+    if (!panel || !list) {
+        return;
+    }
+
+    while (list.firstChild) {
+        list.removeChild(list.firstChild);
+    }
+
+    const selectableOptions = new Map(
+        Array.from(mapSelect?.options || [])
+            .filter((option) => isMobileArcadeRouteAllowed(option?.value))
+            .map((option) => [String(option.value || ''), option])
+    );
+    const routeKeys = modePath === MENU_MODE_PATHS.ARCADE
+        ? listMobileArcadeRouteAllowlist().filter((mapKey) => selectableOptions.has(mapKey))
+        : [];
+    panel.dataset.routeEmpty = routeKeys.length > 0 ? 'false' : 'true';
+
+    routeKeys.forEach((mapKey) => {
+        const button = doc.createElement('button');
+        button.type = 'button';
+        button.className = 'mobile-android-route-btn';
+        button.dataset.mobileRouteKey = mapKey;
+        button.textContent = formatMobileRouteLabel(mapKey, selectableOptions.get(mapKey));
+        button.setAttribute('aria-pressed', String(mapSelect?.value === mapKey));
+        button.classList.toggle('active', mapSelect?.value === mapKey);
+        button.addEventListener?.('click', () => {
+            if (!mapSelect) return;
+            mapSelect.value = mapKey;
+            if (game?.settings) {
+                const startSetup = ensureStartSetup(game.settings);
+                game.settings.mapKey = mapKey;
+                startSetup.modeSelections.arcade.mapKey = mapKey;
+            }
+            dispatchMapSelectChange(mapSelect, doc);
+            game?.uiManager?.syncStartSetupState?.(game.settings);
+            syncMobileAndroidRouteChoices(game, ui, modePath, doc);
+        });
+        list.appendChild(button);
+    });
+}
+
 function syncMobileAndroidEntryButtons(doc, modePath) {
     const panel = doc?.getElementById?.(MOBILE_ANDROID_ENTRY_PANEL_ID);
     if (!panel) {
@@ -918,6 +1288,7 @@ export function applyMobileClassicUiLocks(game = null) {
     syncMobileAndroidMenuCopy(doc);
     bindMobileAndroidEntryUi(game, doc);
     syncMobileAndroidEntryButtons(doc, modePath);
+    collapseMobileAndroidStartSections(doc);
     syncMobileAndroidQuickStarts(ui);
     if (Array.isArray(ui.sessionButtons)) {
         ui.sessionButtons.forEach((button) => {
@@ -950,6 +1321,7 @@ export function applyMobileClassicUiLocks(game = null) {
             startSetup.modeSelections.arcade.mapKey = selectedMapKey;
         }
     }
+    syncMobileAndroidRouteChoices(game, ui, modePath, doc);
     if (ui.startButton) {
         ui.startButton.textContent = modePath === MENU_MODE_PATHS.ARCADE
             ? 'Parcours starten'

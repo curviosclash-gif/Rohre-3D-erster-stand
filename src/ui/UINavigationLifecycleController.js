@@ -16,6 +16,15 @@ import { resolveDeveloperReleaseState } from './menu/MenuUiSyncContext.js';
 import { applyMenuChromeState } from './menu/MenuChromeStateOps.js';
 import { showStatusToast } from './menu/StatusToastOps.js';
 
+function focusWithoutScroll(element) {
+    if (!element || typeof element.focus !== 'function') return;
+    try {
+        element.focus({ preventScroll: true });
+    } catch {
+        element.focus();
+    }
+}
+
 export class UINavigationLifecycleController {
     /**
      * @param {{ ui: object, manager: object, port?: object }} options
@@ -145,7 +154,7 @@ export class UINavigationLifecycleController {
             const activePanel = panels.find((panel) => this._resolveLevel4Section(panel?.dataset?.level4Section, '') === resolvedSectionId);
             const focusTarget = activePanel?.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])')
                 || tabs.find((button) => this._resolveLevel4Section(button?.dataset?.level4SectionTarget, '') === resolvedSectionId);
-            focusTarget?.focus?.();
+            focusWithoutScroll(focusTarget);
         }
     }
 
@@ -177,6 +186,7 @@ export class UINavigationLifecycleController {
         const drawer = this.ui.level4Drawer;
         if (!drawer) return;
         const open = !!isOpen;
+        const wasOpen = !drawer.classList.contains('hidden') && drawer.getAttribute('aria-hidden') !== 'true';
         if (open) {
             this.ensureLevel4SectionControlsSetup();
         }
@@ -198,9 +208,9 @@ export class UINavigationLifecycleController {
                 : null;
             const firstFocusable = activePanel?.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])')
                 || drawer.querySelector('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
-            firstFocusable?.focus();
-        } else if (this._getActiveSubmenu() === 'submenu-game') {
-            this.ui.openLevel4Button?.focus?.();
+            focusWithoutScroll(firstFocusable);
+        } else if (wasOpen && this._getActiveSubmenu() === 'submenu-game') {
+            focusWithoutScroll(this.ui.openLevel4Button);
         }
         this.manager.updateContext();
     }

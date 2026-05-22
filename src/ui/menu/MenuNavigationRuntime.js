@@ -16,6 +16,51 @@ function getFocusableElements(container) {
     ));
 }
 
+function focusWithoutScroll(element) {
+    if (!element || typeof element.focus !== 'function') return;
+    try {
+        element.focus({ preventScroll: true });
+    } catch {
+        element.focus();
+    }
+}
+
+function isMobileMenuDocument(doc) {
+    return doc?.body?.classList?.contains?.('mobile-classic-app')
+        || doc?.body?.classList?.contains?.('mobile-arcade-app');
+}
+
+function resetMobileMenuScroll(targetPanel) {
+    const doc = targetPanel?.ownerDocument || (typeof document !== 'undefined' ? document : null);
+    if (!isMobileMenuDocument(doc)) return;
+    const scrollContainer = targetPanel?.closest?.('.menu-content')
+        || doc?.querySelector?.('.menu-content')
+        || null;
+    if (!scrollContainer) return;
+    const targetTop = Number.isFinite(targetPanel?.offsetTop)
+        ? Math.max(0, targetPanel.offsetTop - 8)
+        : 0;
+    if (typeof scrollContainer.scrollTo === 'function') {
+        scrollContainer.scrollTo({ top: targetTop, behavior: 'auto' });
+    } else {
+        scrollContainer.scrollTop = targetTop;
+    }
+}
+
+function resetMobileMainNavScroll(menuRoot) {
+    const doc = menuRoot?.ownerDocument || (typeof document !== 'undefined' ? document : null);
+    if (!isMobileMenuDocument(doc)) return;
+    const scrollContainer = menuRoot?.querySelector?.('.menu-content')
+        || doc?.querySelector?.('.menu-content')
+        || null;
+    if (!scrollContainer) return;
+    if (typeof scrollContainer.scrollTo === 'function') {
+        scrollContainer.scrollTo({ top: 0, behavior: 'auto' });
+    } else {
+        scrollContainer.scrollTop = 0;
+    }
+}
+
 export class MenuNavigationRuntime {
     constructor(options = {}) {
         this.ui = options.ui || {};
@@ -220,8 +265,9 @@ export class MenuNavigationRuntime {
 
         const focusables = getFocusableElements(targetPanel);
         if (focusables.length > 0) {
-            focusables[0].focus();
+            focusWithoutScroll(focusables[0]);
         }
+        resetMobileMenuScroll(targetPanel);
         return true;
     }
 
@@ -246,7 +292,8 @@ export class MenuNavigationRuntime {
         this.onMenuStateChanged?.(transition);
 
         const firstVisibleButton = this._navButtons.find((button) => !button.classList.contains('hidden'));
-        firstVisibleButton?.focus();
+        focusWithoutScroll(firstVisibleButton);
+        resetMobileMainNavScroll(this.ui.mainMenu || document.getElementById('main-menu'));
     }
 
     _handleMenuKeyDown(event) {

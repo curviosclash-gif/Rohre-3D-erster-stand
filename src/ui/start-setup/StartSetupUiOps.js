@@ -98,6 +98,7 @@ export function renderSummaryBlocks(container, blocks) {
 
         const blockDiv = document.createElement('div');
         blockDiv.className = 'start-summary-block';
+        blockDiv.dataset.summaryLabel = label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 
         const labelSpan = document.createElement('span');
         labelSpan.className = 'start-summary-label';

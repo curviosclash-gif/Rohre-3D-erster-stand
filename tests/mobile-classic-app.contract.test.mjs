@@ -17,6 +17,7 @@ import {
   applyMobileClassicUiLocks,
   isMobileClassicTargetValue,
 } from '../src/mobile-classic/MobileClassicApp.js';
+import { MenuNavigationRuntime } from '../src/ui/menu/MenuNavigationRuntime.js';
 import { createPreferredMatchInputSource } from '../src/ui/MatchInputSourceResolver.js';
 import {
   createMobileClassicGithubUpdateConfig,
@@ -102,6 +103,27 @@ function createMapSelect(values = [], selectedValue = '') {
   return select;
 }
 
+function createClassList(initial = []) {
+  const entries = new Set(initial);
+  return {
+    add(value) {
+      entries.add(value);
+    },
+    remove(value) {
+      entries.delete(value);
+    },
+    contains(value) {
+      return entries.has(value);
+    },
+    toggle(value, force) {
+      const enabled = force === undefined ? !entries.has(value) : !!force;
+      if (enabled) entries.add(value);
+      else entries.delete(value);
+      return enabled;
+    },
+  };
+}
+
 test('Unified Mobile Android Capacitor wrapper is separate from Map Tools Android', async () => {
   const config = await readJson('tools/mobile-classic-app/capacitor.config.json');
   const subprojectPackage = await readJson('tools/mobile-classic-app/package.json');
@@ -117,6 +139,69 @@ test('Unified Mobile Android Capacitor wrapper is separate from Map Tools Androi
   const mapToolsConfig = await readJson('capacitor.config.json');
   assert.equal(mapToolsConfig.appId, 'de.curviosclash.maps');
   assert.equal(mapToolsConfig.webDir, 'dist/map-tools-android');
+});
+
+test('Mobile menu panel focus does not scroll past the submenu header', () => {
+  const scrollContainer = {
+    scrollTop: 569,
+    scrollTo({ top }) {
+      this.scrollTop = top;
+    },
+  };
+  let focusOptions = null;
+  const focusTarget = {
+    focus(options) {
+      focusOptions = options || null;
+      if (!options?.preventScroll) {
+        scrollContainer.scrollTop = 569;
+      }
+    },
+  };
+  const doc = {
+    body: {
+      classList: createClassList(['mobile-classic-app']),
+    },
+    querySelector() {
+      return scrollContainer;
+    },
+  };
+  const panel = {
+    id: 'submenu-game',
+    ownerDocument: doc,
+    offsetTop: 48,
+    classList: createClassList(['hidden']),
+    setAttribute() {},
+    querySelectorAll() {
+      return [focusTarget];
+    },
+    closest(selector) {
+      return selector === '.menu-content' ? scrollContainer : null;
+    },
+  };
+  const navButton = {
+    dataset: {
+      submenu: 'submenu-game',
+    },
+    classList: createClassList(),
+    setAttribute() {},
+  };
+  const runtime = new MenuNavigationRuntime({
+    ui: {
+      mainMenu: {
+        ownerDocument: doc,
+        querySelector() {
+          return scrollContainer;
+        },
+      },
+    },
+  });
+  runtime._panelById.set('submenu-game', panel);
+  runtime._submenuPanels = [panel];
+  runtime._navButtons = [navButton];
+
+  assert.equal(runtime.showPanel('submenu-game'), true);
+  assert.equal(focusOptions?.preventScroll, true);
+  assert.equal(scrollContainer.scrollTop, 40);
 });
 
 test('Mobile Classic build target emits only the game shell into its own dist path', () => {
@@ -524,6 +609,7 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   const gradleFile = await readText('android-classic/app/build.gradle');
   const updateScript = await readText('scripts/update-mobile-classic-from-github.mjs');
   const mobileClassicApp = await readText('src/mobile-classic/MobileClassicApp.js');
+  const startSetupUiOps = await readText('src/ui/start-setup/StartSetupUiOps.js');
   const matchInputResolver = await readText('src/ui/MatchInputSourceResolver.js');
   const touchInputSource = await readText('src/ui/TouchInputSource.js');
   const readme = await readText('tools/mobile-classic-app/README.md');
@@ -571,6 +657,13 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   assert.match(mobileClassicApp, /mobile-classic-update-check/);
   assert.match(mobileClassicApp, /checkMobileClassicGithubRelease/);
   assert.match(mobileClassicApp, /mobile-classic\.manifest\.json/);
+  assert.match(mobileClassicApp, /Freier Flug fuer den schnellen Start/);
+  assert.match(mobileClassicApp, /Zeitroute mit Ghost-Selbstduell/);
+  assert.match(mobileClassicApp, /mobile-android-route-panel/);
+  assert.match(mobileClassicApp, /mobileRouteKey/);
+  assert.match(mobileClassicApp, /dispatchMapSelectChange/);
+  assert.match(mobileClassicApp, /start-summary-block\[data-summary-label="ghost_kollision"\]/);
+  assert.match(startSetupUiOps, /dataset\.summaryLabel/);
   assert.match(mobileClassicApp, /Classic starten/);
   assert.match(mobileClassicApp, /Parcours starten/);
   assert.match(mobileClassicApp, /Solo spielen/);
