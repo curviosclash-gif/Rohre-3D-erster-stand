@@ -6,6 +6,16 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Abschluss-Snapshot 2026-05-22 (Block `V134 134.99`)
+
+- `V134` ist geschlossen: Plan Map exportiert fuer Intake-Drafts additive Lanes und Aktionen (`candidate`, `adopted-open`, `adopted-done`, `bot-training`, `meta`) plus `primaryBlockId`, `canonicalBlockId`, Ambiguitaetsmarker und User-Intake-Hinweis.
+- Der Viewer zeigt `Ideen / Intake` als Lane-Ansicht mit Default `Ideen + Handoff`; Bot-Training und Meta bleiben aus der normalen Entscheidungssicht herausgefiltert, adoptierte Drafts verlinken zum kanonischen Masterblock, und Master-Details zeigen passende `Draft-Herkunft`.
+- Dokumentation: `docs/plaene/neu/README.md` beschreibt empfohlene Frontmatter-Felder, `tools/plan-map/README.md` dokumentiert Lane-Modell, Summary-Split und die read-only Source-of-Truth-Grenze.
+- Strukturentscheid: keine physische Ordnertrennung, keine Draft-Moves, keine Archivierungs- oder Schreibfunktion. Ein Ordnerumbau bleibt separater D3/D4-User-Gate-Scope mit Recovery-Pfad.
+- Evidence: `node --test tests/plan-map-export.contract.test.mjs` -> PASS; `node --test tests/map-tools-android.contract.test.mjs tests/map-tools-electron.contract.test.mjs` -> PASS; `node --check tools/plan-map/viewer.js` -> PASS; `npm run plan:context:check` -> PASS; `npm run plan:check` -> PASS vor fremdem V135-Diff; `npm run docs:check` -> PASS vor fremdem V135-Diff; `npm run check:plan-evidence-claims` -> PASS mit bekannten Architektur-Acceptance-Warnungen fuer V96/V106/V113.
+- Blocked: aktueller `npm run plan:check`/`npm run docs:check`/`npm run gates:pre-commit` stoppt an ungestagten, nicht-V134-bezogenen `docs/plaene/aktiv/V135.md`-Abschlussmarkierungen ohne Evidence-Format; siehe `docs/Fehlerberichte/2026-05-22_v134-gates-blocked-by-v135-plan-evidence.md`.
+- Not-checked: lokaler Browser-Smoke, weil Browser Use `localhost`/`file://` fuer diesen Viewer in der Session blockiert hat; keine produktiven Spiel-/Runtime-Pfade, kein Plan-Index-Source-of-Truth-Umbau, keine Repo-Map-/Graph-RAG-Folgearbeit und keine physischen Moves in `docs/plaene/neu/`.
+
 ## Plan-Intake 2026-05-22 (Block `V134`)
 
 - `V134` ist nach expliziter User-Anforderung als geplanter P2-Block im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V134.md`.

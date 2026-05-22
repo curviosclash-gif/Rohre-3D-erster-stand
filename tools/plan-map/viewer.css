@@ -1404,6 +1404,49 @@ th {
   font-size: 12px;
 }
 
+.intake-lanes {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.intake-lane {
+  display: grid;
+  gap: 10px;
+}
+
+.intake-lane-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 2px;
+}
+
+.intake-lane-header h2 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.intake-lane-header p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.intake-lane-header span {
+  flex: 0 0 auto;
+  min-height: 24px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .intake-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1415,20 +1458,85 @@ th {
   display: grid;
   gap: 8px;
   min-height: 150px;
-  padding: 12px;
+  padding: 0;
   border: 1px solid var(--line);
   border-left: 4px solid var(--line-strong);
   border-radius: 6px;
   background: #fffdf9;
   color: inherit;
-  text-align: left;
-  cursor: pointer;
+  overflow: hidden;
 }
 
 .intake-card.is-active,
 .intake-card:hover {
   border-left-color: var(--teal);
   box-shadow: var(--shadow);
+}
+
+.intake-card-main {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.intake-card-actions,
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.intake-card-actions {
+  padding: 0 12px 12px;
+}
+
+.chip.intake-lane-candidate,
+.intake-card.intake-lane-candidate {
+  border-color: var(--teal);
+}
+
+.chip.intake-lane-candidate {
+  color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.chip.intake-lane-adopted-open,
+.intake-card.intake-lane-adopted-open {
+  border-color: var(--indigo);
+}
+
+.chip.intake-lane-adopted-open {
+  color: var(--indigo);
+  background: var(--indigo-soft);
+}
+
+.chip.intake-lane-adopted-done,
+.intake-card.intake-lane-adopted-done {
+  border-color: var(--gold);
+}
+
+.chip.intake-lane-adopted-done {
+  color: var(--gold);
+  background: var(--gold-soft);
+}
+
+.chip.intake-lane-bot-training,
+.intake-card.intake-lane-bot-training,
+.chip.intake-lane-meta,
+.intake-card.intake-lane-meta {
+  border-color: var(--line-strong);
+}
+
+.chip.intake-lane-bot-training,
+.chip.intake-lane-meta {
+  color: var(--muted);
+  background: #ece8df;
 }
 
 .evidence-badge {

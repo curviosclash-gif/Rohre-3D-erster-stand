@@ -4,6 +4,41 @@ const DEFAULT_DATA_URLS = [
   './plan-map.generated.json',
 ];
 
+const INTAKE_LANES = [
+  {
+    id: 'candidate',
+    label: 'Neue Ideen',
+    shortLabel: 'Ideen',
+    description: 'Drafts ohne direkten Master-Abgleich; User-Intake entscheidet ueber Uebernahme.',
+  },
+  {
+    id: 'adopted-open',
+    label: 'Bereits geplant',
+    shortLabel: 'Geplant',
+    description: 'Drafts, deren Zielblock bereits offen oder geplant im Master steht.',
+  },
+  {
+    id: 'adopted-done',
+    label: 'Erledigt / Archiv',
+    shortLabel: 'Archiv',
+    description: 'Drafts zu erledigten Master-Bloecken; Archivierung bleibt ein eigener Gate-Scope.',
+  },
+  {
+    id: 'bot-training',
+    label: 'Bot-Training',
+    shortLabel: 'Bot',
+    description: 'Geschuetzte Sonderzone ausserhalb des normalen VXX-Intakes.',
+  },
+  {
+    id: 'meta',
+    label: 'Meta',
+    shortLabel: 'Meta',
+    description: 'README- und Strukturhinweise, keine neue Planidee.',
+  },
+];
+const DEFAULT_INTAKE_FILTER = 'decision';
+const DECISION_INTAKE_LANES = new Set(['candidate', 'adopted-open', 'adopted-done']);
+
 const state = {
   data: null,
   view: 'map',
@@ -15,7 +50,7 @@ const state = {
   readiness: 'all',
   changelogType: 'all',
   changelogEvidence: 'all',
-  intakeClassification: 'all',
+  intakeClassification: DEFAULT_INTAKE_FILTER,
   selectedChangelogId: null,
   selectedIntakePath: null,
   focusMode: true,
@@ -137,8 +172,8 @@ const HELP_TERMS = {
     body: 'Filtert Historieneintraege nach ihrer Art, zum Beispiel Umsetzung, Gate, Sync oder Abschluss.',
   },
   intake: {
-    title: 'Intake',
-    body: 'Zeigt Entwurfsplaene aus docs/plaene/neu als eigene Ebene. Sie sind nicht automatisch kanonische Master-Bloecke.',
+    title: 'Intake-Lane',
+    body: 'Trennt neue Ideen, bereits geplante Drafts, Archivkandidaten, Bot-Training und Meta-Hinweise aus docs/plaene/neu.',
   },
   consumer: {
     title: 'Consumer',
@@ -459,13 +494,62 @@ function intakeClassificationLabel(value) {
   return labels[value] || value || '-';
 }
 
+function intakeLaneForPlan(plan) {
+  const byClassification = {
+    'intake-review': 'candidate',
+    'adopted-by-open-master-block': 'adopted-open',
+    'adopted-by-done-master-block': 'adopted-done',
+    'protected-bot-training-intake': 'bot-training',
+    'protected-readme': 'meta',
+  };
+  return plan?.intakeLane || byClassification[plan?.classification] || 'candidate';
+}
+
+function intakeLaneConfig(laneId) {
+  return INTAKE_LANES.find((lane) => lane.id === laneId) || INTAKE_LANES[0];
+}
+
+function intakeLaneLabel(value) {
+  return intakeLaneConfig(value).label || value || '-';
+}
+
+function intakeActionLabel(value) {
+  const labels = {
+    'review-for-master-intake': 'User-Intake pruefen',
+    'open-canonical-block': 'Zum kanonischen Block',
+    'archive-candidate-after-gate': 'Archivkandidat nach Gate',
+    'use-bot-training-governance': 'Bot-Training-Governance',
+    'reference-only': 'Nur Referenz',
+  };
+  return labels[value] || value || '-';
+}
+
+function intakeFilterMatches(plan) {
+  const filter = state.intakeClassification || DEFAULT_INTAKE_FILTER;
+  const lane = intakeLaneForPlan(plan);
+  if (filter === 'all') {
+    return true;
+  }
+  if (filter === DEFAULT_INTAKE_FILTER) {
+    return DECISION_INTAKE_LANES.has(lane);
+  }
+  if (INTAKE_LANES.some((entry) => entry.id === filter)) {
+    return lane === filter;
+  }
+  return plan.classification === filter;
+}
+
 function intakeMatchesFilters(plan) {
   const haystack = [
     plan.path,
     plan.title,
     plan.classification,
+    plan.intakeLane,
+    plan.intakeAction,
     plan.workstream,
     plan.workstreamLabel,
+    plan.primaryBlockId,
+    plan.canonicalBlockId,
     plan.targetPlanFile,
     plan.plannedBlockIds?.join(' '),
     plan.referencedBlockIds?.join(' '),
@@ -481,7 +565,7 @@ function intakeMatchesFilters(plan) {
     return false;
   }
 
-  if (state.intakeClassification !== 'all' && plan.classification !== state.intakeClassification) {
+  if (!intakeFilterMatches(plan)) {
     return false;
   }
 
@@ -498,7 +582,8 @@ function visibleIntakePlans() {
   return (state.data?.intakePlans || [])
     .filter(intakeMatchesFilters)
     .sort((left, right) => (
-      String(left.workstreamLabel || '').localeCompare(String(right.workstreamLabel || ''), 'de')
+      INTAKE_LANES.findIndex((lane) => lane.id === intakeLaneForPlan(left)) - INTAKE_LANES.findIndex((lane) => lane.id === intakeLaneForPlan(right))
+      || String(left.workstreamLabel || '').localeCompare(String(right.workstreamLabel || ''), 'de')
       || String(left.classification || '').localeCompare(String(right.classification || ''))
       || left.path.localeCompare(right.path)
     ));
@@ -540,6 +625,15 @@ function updateFilterOptions() {
     .map((plan) => plan.classification)
     .filter(Boolean))]
     .sort((left, right) => intakeClassificationLabel(left).localeCompare(intakeClassificationLabel(right), 'de'));
+  const intakeOptions = [
+    { id: DEFAULT_INTAKE_FILTER, label: 'Ideen + Handoff' },
+    { id: 'all', label: 'Alle Lanes' },
+    ...INTAKE_LANES.map((lane) => ({ id: lane.id, label: lane.label })),
+    ...intakeClassifications.map((classification) => ({
+      id: classification,
+      label: `Alt: ${intakeClassificationLabel(classification)}`,
+    })),
+  ];
 
   elements.statusFilter.innerHTML = '<option value="all">Alle</option>'
     + statuses.map((status) => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`).join('');
@@ -551,8 +645,13 @@ function updateFilterOptions() {
     + readinesses.map((readiness) => `<option value="${escapeHtml(readiness)}">${escapeHtml(readinessLabel(readiness))}</option>`).join('');
   elements.changelogTypeFilter.innerHTML = '<option value="all">Alle</option>'
     + changelogTypes.map((type) => `<option value="${escapeHtml(type.id)}">${escapeHtml(type.label)}</option>`).join('');
-  elements.intakeClassificationFilter.innerHTML = '<option value="all">Alle</option>'
-    + intakeClassifications.map((classification) => `<option value="${escapeHtml(classification)}">${escapeHtml(intakeClassificationLabel(classification))}</option>`).join('');
+  elements.intakeClassificationFilter.innerHTML = intakeOptions
+    .map((option) => `<option value="${escapeHtml(option.id)}">${escapeHtml(option.label)}</option>`)
+    .join('');
+  if (!intakeOptions.some((option) => option.id === state.intakeClassification)) {
+    state.intakeClassification = DEFAULT_INTAKE_FILTER;
+  }
+  elements.intakeClassificationFilter.value = state.intakeClassification;
 }
 
 function readinessLabel(value) {
@@ -591,7 +690,11 @@ function renderMetrics() {
 
   const metrics = [
     { value: summary.blockCount ?? 0, label: 'Bloecke' },
-    { value: summary.intakePlanCount ?? 0, label: 'Intake' },
+    { value: summary.intakeCandidateCount ?? summary.byIntakeLane?.candidate ?? 0, label: 'Ideen' },
+    { value: summary.intakeAdoptedOpenCount ?? summary.byIntakeLane?.['adopted-open'] ?? 0, label: 'Bereits geplant' },
+    { value: summary.intakeAdoptedDoneCount ?? summary.byIntakeLane?.['adopted-done'] ?? 0, label: 'Archivkandidaten' },
+    { value: summary.intakeBotTrainingCount ?? summary.byIntakeLane?.['bot-training'] ?? 0, label: 'Bot-Training' },
+    { value: summary.intakeMetaCount ?? summary.byIntakeLane?.meta ?? 0, label: 'Meta' },
     { value: startable, label: 'Startbar' },
     { value: blocked, label: 'Blockiert/in Arbeit' },
     { value: summary.collisionCount ?? 0, label: 'Scope-Kollisionen' },
@@ -600,7 +703,7 @@ function renderMetrics() {
   ];
 
   if (coverage != null && activeLocks > 0) {
-    metrics[6].label = `Coverage, ${activeLocks} Lock`;
+    metrics[metrics.length - 1].label = `Coverage, ${activeLocks} Lock`;
   }
 
   elements.metrics.innerHTML = metrics.map((metric) => `
@@ -1294,6 +1397,39 @@ function collisionsForBlock(blockId) {
   ));
 }
 
+function intakeDraftsForBlock(blockId) {
+  if (!blockId) {
+    return [];
+  }
+  return (state.data?.intakePlans || [])
+    .filter((plan) => plan.canonicalBlockId === blockId)
+    .sort((left, right) => (
+      INTAKE_LANES.findIndex((lane) => lane.id === intakeLaneForPlan(left)) - INTAKE_LANES.findIndex((lane) => lane.id === intakeLaneForPlan(right))
+      || left.path.localeCompare(right.path)
+    ));
+}
+
+function intakeOriginMarkup(blockId) {
+  const drafts = intakeDraftsForBlock(blockId);
+  if (!drafts.length) {
+    return '';
+  }
+  return `
+    <div class="detail-section">
+      <h3>Draft-Herkunft</h3>
+      <ul class="plain-list">
+        ${drafts.slice(0, 5).map((plan) => `
+          <li>
+            <button type="button" class="text-button" data-select-intake="${escapeHtml(plan.path)}">${escapeHtml(plan.title || plan.path)}</button>
+            <span class="muted"> ${escapeHtml(intakeLaneLabel(intakeLaneForPlan(plan)))} - ${escapeHtml(plan.path)}</span>
+          </li>
+        `).join('')}
+      </ul>
+      ${drafts.length > 5 ? `<p class="muted">${escapeHtml(drafts.length - 5)} weitere Drafts im Export</p>` : ''}
+    </div>
+  `;
+}
+
 function fileButton(filePath) {
   return `<button type="button" class="text-button" data-file-focus="${escapeHtml(filePath)}">${escapeHtml(filePath)}</button>`;
 }
@@ -1303,6 +1439,13 @@ function bindInlineActions(root) {
     button.addEventListener('click', () => {
       state.view = 'map';
       selectBlock(button.dataset.selectBlock);
+    });
+  });
+  root.querySelectorAll('[data-select-intake]').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.selectedIntakePath = button.dataset.selectIntake;
+      state.view = 'intake';
+      render();
     });
   });
   root.querySelectorAll('[data-file-focus]').forEach((button) => {
@@ -1345,9 +1488,15 @@ function renderDetail() {
       return;
     }
 
+    const lane = intakeLaneForPlan(plan);
+    const canonicalBlockAction = plan.canonicalBlockId
+      ? `<button type="button" class="pill-button" data-select-block="${escapeHtml(plan.canonicalBlockId)}">Zum Block ${escapeHtml(plan.canonicalBlockId)}</button>`
+      : '';
+
     elements.detailPanel.innerHTML = `
       <h2 class="detail-title">${escapeHtml(plan.title || plan.path)}</h2>
       <div class="detail-kicker">
+        <span class="chip intake-lane-${escapeHtml(lane)}">${escapeHtml(intakeLaneLabel(lane))}</span>
         <span class="chip priority">${escapeHtml(intakeClassificationLabel(plan.classification))}</span>
         ${plan.workstreamLabel ? `<span class="chip priority">${escapeHtml(plan.workstreamLabel)}</span>` : ''}
         ${(plan.plannedBlockIds || []).map((blockId) => `<span class="chip">${escapeHtml(blockId)}</span>`).join('')}
@@ -1356,10 +1505,18 @@ function renderDetail() {
         <h3>Intake-Status ${helpButton('intake')}</h3>
         <dl class="key-value">
           <dt>Pfad</dt><dd>${escapeHtml(plan.path || '-')}</dd>
+          <dt>Lane</dt><dd>${escapeHtml(intakeLaneLabel(lane))}</dd>
+          <dt>Aktion</dt><dd>${escapeHtml(intakeActionLabel(plan.intakeAction))}</dd>
+          <dt>Primary Block</dt><dd>${escapeHtml(plan.primaryBlockId || '-')}</dd>
+          <dt>Kanonisch</dt><dd>${plan.canonicalBlockId ? `<button type="button" class="text-button" data-select-block="${escapeHtml(plan.canonicalBlockId)}">${escapeHtml(plan.canonicalBlockId)}</button>` : '-'}</dd>
+          <dt>User-Intake</dt><dd>${plan.requiresUserIntake ? 'erforderlich' : 'nicht als neue Aufgabe'}</dd>
           <dt>Zielplan</dt><dd>${escapeHtml(plan.targetPlanFile || '-')}</dd>
+          <dt>Ziel-Master</dt><dd>${escapeHtml(plan.targetMaster || '-')}</dd>
           <dt>Geplante Bloecke</dt><dd>${escapeHtml((plan.plannedBlockIds || []).join(', ') || '-')}</dd>
           <dt>Erwaehnte Bloecke</dt><dd>${escapeHtml((plan.referencedBlockIds || []).join(', ') || '-')}</dd>
+          <dt>Mehrdeutig</dt><dd>${plan.blockIdAmbiguous ? escapeHtml((plan.ambiguousBlockIds || []).join(', ') || 'ja') : 'nein'}</dd>
         </dl>
+        ${canonicalBlockAction ? `<div class="detail-actions">${canonicalBlockAction}</div>` : ''}
       </div>
       <div class="detail-section">
         <h3>Gruende</h3>
@@ -1468,6 +1625,7 @@ function renderDetail() {
           <dt>Gruppe</dt><dd>${escapeHtml(block.groupLabel || block.group || '-')}</dd>
         </dl>
       </div>
+      ${intakeOriginMarkup(block.id)}
       ${explanation.brief ? `
         <div class="detail-section">
           <h3>Kurz erklaert</h3>
@@ -1661,26 +1819,74 @@ function renderIntakeView() {
     state.selectedIntakePath = plans[0]?.path || null;
   }
   const activePath = state.selectedIntakePath;
+  const summary = state.data?.summary || {};
+  const laneCounts = summary.byIntakeLane || {};
+  const visibleByLane = new Map(INTAKE_LANES.map((lane) => [lane.id, []]));
+  for (const plan of plans) {
+    const lane = intakeLaneForPlan(plan);
+    if (!visibleByLane.has(lane)) {
+      visibleByLane.set(lane, []);
+    }
+    visibleByLane.get(lane).push(plan);
+  }
+  const laneSections = INTAKE_LANES.filter((lane) => (
+    visibleByLane.get(lane.id)?.length
+    || (state.intakeClassification === lane.id && lane.id === 'candidate')
+    || (state.intakeClassification === DEFAULT_INTAKE_FILTER && lane.id === 'candidate')
+  ));
 
   elements.intakePanel.innerHTML = `
     <div class="intake-summary">
-      <span>${escapeHtml(plans.length)} sichtbare Drafts</span>
-      <span>${escapeHtml(state.data?.summary?.intakePlanCount ?? 0)} insgesamt</span>
-      <span>${escapeHtml(Object.keys(state.data?.summary?.byIntakeClassification || {}).length)} Klassen</span>
+      <span>${escapeHtml(plans.length)} sichtbar</span>
+      <span>${escapeHtml(summary.intakePlanCount ?? 0)} insgesamt</span>
+      <span>${escapeHtml(summary.intakeCandidateCount ?? laneCounts.candidate ?? 0)} Ideen</span>
+      <span>${escapeHtml(summary.intakeAdoptedOpenCount ?? laneCounts['adopted-open'] ?? 0)} bereits geplant</span>
+      <span>${escapeHtml(summary.intakeAdoptedDoneCount ?? laneCounts['adopted-done'] ?? 0)} Archiv</span>
+      <span>${escapeHtml(summary.intakeBotTrainingCount ?? laneCounts['bot-training'] ?? 0)} Bot-Training</span>
+      <span>${escapeHtml(summary.intakeMetaCount ?? laneCounts.meta ?? 0)} Meta</span>
     </div>
-    <div class="intake-grid">
-      ${plans.map((plan) => `
-        <button type="button" class="intake-card${plan.path === activePath ? ' is-active' : ''}" data-intake-path="${escapeHtml(plan.path)}">
-          <span class="changelog-card-meta">
-            <span class="chip priority">${escapeHtml(intakeClassificationLabel(plan.classification))}</span>
-            ${plan.workstreamLabel ? `<span class="chip priority">${escapeHtml(plan.workstreamLabel)}</span>` : ''}
-            ${(plan.plannedBlockIds || []).slice(0, 3).map((blockId) => `<span class="chip">${escapeHtml(blockId)}</span>`).join('')}
-          </span>
-          <h2 class="changelog-card-title">${escapeHtml(plan.title || plan.path)}</h2>
-          <p class="changelog-card-summary">${escapeHtml((plan.reasons || [])[0] || 'Kein direkter Master-Abgleich.')}</p>
-          <span class="muted">${escapeHtml(plan.path)}</span>
-        </button>
-      `).join('') || '<div class="empty-state">Keine Intake-Plaene fuer diese Filter</div>'}
+    <div class="intake-lanes">
+      ${laneSections.map((lane) => {
+        const lanePlans = visibleByLane.get(lane.id) || [];
+        return `
+          <section class="intake-lane intake-lane-${escapeHtml(lane.id)}">
+            <header class="intake-lane-header">
+              <div>
+                <h2>${escapeHtml(lane.label)}</h2>
+                <p>${escapeHtml(lane.description)}</p>
+              </div>
+              <span>${escapeHtml(lanePlans.length)} / ${escapeHtml(laneCounts[lane.id] || 0)}</span>
+            </header>
+            <div class="intake-grid">
+              ${lanePlans.map((plan) => {
+                const planLane = intakeLaneForPlan(plan);
+                const canonicalAction = plan.canonicalBlockId
+                  ? `<button type="button" class="pill-button" data-select-block="${escapeHtml(plan.canonicalBlockId)}">Block ${escapeHtml(plan.canonicalBlockId)}</button>`
+                  : '';
+                return `
+                  <article class="intake-card intake-lane-${escapeHtml(planLane)}${plan.path === activePath ? ' is-active' : ''}">
+                    <button type="button" class="intake-card-main" data-intake-path="${escapeHtml(plan.path)}">
+                      <span class="changelog-card-meta">
+                        <span class="chip intake-lane-${escapeHtml(planLane)}">${escapeHtml(intakeLaneLabel(planLane))}</span>
+                        <span class="chip priority">${escapeHtml(intakeActionLabel(plan.intakeAction))}</span>
+                        ${plan.workstreamLabel ? `<span class="chip priority">${escapeHtml(plan.workstreamLabel)}</span>` : ''}
+                        ${(plan.plannedBlockIds || []).slice(0, 3).map((blockId) => `<span class="chip">${escapeHtml(blockId)}</span>`).join('')}
+                      </span>
+                      <h3 class="changelog-card-title">${escapeHtml(plan.title || plan.path)}</h3>
+                      <p class="changelog-card-summary">${escapeHtml((plan.reasons || [])[0] || 'Kein direkter Master-Abgleich.')}</p>
+                      <span class="muted">${escapeHtml(plan.path)}</span>
+                    </button>
+                    <div class="intake-card-actions">
+                      ${canonicalAction}
+                      ${plan.scopeFiles?.[0] ? fileButton(plan.scopeFiles[0]) : ''}
+                    </div>
+                  </article>
+                `;
+              }).join('') || '<div class="empty-state">Keine Drafts in dieser Lane</div>'}
+            </div>
+          </section>
+        `;
+      }).join('') || '<div class="empty-state">Keine Intake-Plaene fuer diese Filter</div>'}
     </div>
   `;
 
@@ -1691,6 +1897,7 @@ function renderIntakeView() {
       render();
     });
   });
+  bindInlineActions(elements.intakePanel);
 }
 
 function renderCollisionView() {
@@ -1894,6 +2101,30 @@ async function loadDefaultData() {
   render();
 }
 
+function applyInitialUrlState() {
+  const params = new URLSearchParams(window.location.search);
+  const view = params.get('view');
+  if (['map', 'intake', 'changelog', 'collisions', 'health'].includes(view)) {
+    state.view = view;
+  }
+
+  const lane = params.get('lane');
+  if (lane) {
+    state.intakeClassification = lane;
+  }
+
+  const block = params.get('block');
+  if (block) {
+    state.selectedId = block;
+  }
+
+  const query = params.get('q');
+  if (query) {
+    state.search = query;
+    elements.searchInput.value = query;
+  }
+}
+
 function bindEvents() {
   elements.legendToggle.addEventListener('click', () => {
     const isOpen = elements.legendPanel.hidden;
@@ -1983,7 +2214,7 @@ function bindEvents() {
     state.workstream = 'all';
     state.changelogType = 'all';
     state.changelogEvidence = 'all';
-    state.intakeClassification = 'all';
+    state.intakeClassification = DEFAULT_INTAKE_FILTER;
     state.selectedChangelogId = null;
     state.selectedIntakePath = null;
     state.mapZoom = 1;
@@ -2037,6 +2268,7 @@ function bindEvents() {
   });
 }
 
+applyInitialUrlState();
 bindEvents();
 bindHelpButtons(document);
 loadDefaultData();

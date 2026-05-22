@@ -43,16 +43,57 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.ok(data.summary.byWorkstream['repo-governance'] > 0);
   assert.ok(data.summary.intakePlanCount > 0);
   assert.ok(data.summary.byIntakeClassification['intake-review'] > 0);
+  assert.ok(data.summary.byIntakeLane.candidate > 0);
+  assert.ok(data.summary.byIntakeLane['adopted-open'] > 0);
+  assert.ok(data.summary.byIntakeLane['adopted-done'] > 0);
+  assert.ok(data.summary.byIntakeLane['bot-training'] > 0);
+  assert.ok(data.summary.byIntakeLane.meta > 0);
+  assert.equal(data.summary.intakeCandidateCount, data.summary.byIntakeLane.candidate);
+  assert.equal(data.summary.intakeAdoptedOpenCount, data.summary.byIntakeLane['adopted-open']);
+  assert.equal(data.summary.intakeAdoptedDoneCount, data.summary.byIntakeLane['adopted-done']);
+  assert.equal(data.summary.intakeBotTrainingCount, data.summary.byIntakeLane['bot-training']);
+  assert.equal(data.summary.intakeMetaCount, data.summary.byIntakeLane.meta);
   assert.ok(data.sources.intakePlans.endsWith('docs/plaene/neu'));
-  assert.ok(data.intakePlans.some((plan) => (
-    plan.path === 'docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md'
-    && plan.workstream === 'android-mobile'
-  )));
-  assert.ok(data.intakePlans.some((plan) => (
-    plan.path === 'docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md'
-    && plan.workstream === 'repo-governance'
-    && plan.classification === 'intake-review'
-  )));
+  const mobileIntake = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md');
+  assert.ok(mobileIntake);
+  assert.equal(mobileIntake.workstream, 'android-mobile');
+  assert.equal(mobileIntake.classification, 'intake-review');
+  assert.equal(mobileIntake.intakeLane, 'candidate');
+  assert.equal(mobileIntake.intakeAction, 'review-for-master-intake');
+  assert.equal(mobileIntake.primaryBlockId, 'V131');
+  assert.equal(mobileIntake.canonicalBlockId, null);
+  assert.equal(mobileIntake.requiresUserIntake, true);
+  assert.equal(mobileIntake.targetPlanFile, 'docs/plaene/aktiv/V131.md');
+
+  const toolchainIntake = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md');
+  assert.ok(toolchainIntake);
+  assert.equal(toolchainIntake.workstream, 'repo-governance');
+  assert.equal(toolchainIntake.classification, 'adopted-by-done-master-block');
+  assert.equal(toolchainIntake.intakeLane, 'adopted-done');
+  assert.equal(toolchainIntake.canonicalBlockId, 'V90');
+
+  const adoptedOpen = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Graph_RAG_Viewer_Evidence_Dashboard_V121.md');
+  assert.ok(adoptedOpen);
+  assert.equal(adoptedOpen.intakeLane, 'adopted-open');
+  assert.equal(adoptedOpen.intakeAction, 'open-canonical-block');
+  assert.equal(adoptedOpen.canonicalBlockId, 'V121');
+  assert.equal(adoptedOpen.requiresUserIntake, false);
+
+  const adoptedDone = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Repo_Context_Cleanup.md');
+  assert.ok(adoptedDone);
+  assert.equal(adoptedDone.intakeLane, 'adopted-done');
+  assert.equal(adoptedDone.intakeAction, 'archive-candidate-after-gate');
+  assert.equal(adoptedDone.canonicalBlockId, 'V116');
+
+  assert.ok(data.intakePlans.some((plan) => plan.intakeLane === 'bot-training' && plan.intakeAction === 'use-bot-training-governance'));
+  assert.ok(data.intakePlans.some((plan) => plan.intakeLane === 'meta' && plan.intakeAction === 'reference-only'));
+
+  const glbFollowup = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Audit_Followup_V11_GLB_Map_Varianz_V106.md');
+  assert.ok(glbFollowup);
+  assert.equal(glbFollowup.primaryBlockId, 'V106');
+  assert.equal(glbFollowup.canonicalBlockId, 'V106');
+  assert.equal(glbFollowup.blockIdAmbiguous, true);
+  assert.ok(glbFollowup.ambiguousBlockIds.includes('V11'));
   assert.ok(data.workstreams.some((entry) => entry.id === 'map-tools-settings'));
   assert.ok(data.workstreams.some((entry) => entry.id === 'android-mobile'));
   assert.ok(data.fileIndex.some((entry) => entry.path === 'vite.config.js'));

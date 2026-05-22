@@ -95,19 +95,41 @@ The viewer expects a single JSON document with these conceptual groups:
 - `locks`: current lock/readiness information.
 - `findings`: open findings relevant to plan execution.
 - `intakePlans`: draft plans from `docs/plaene/neu/`, including
-  classification, workstream hints, planned block IDs, target plan file, and
-  `scope_files` where present.
+  classification, lane/action hints, primary and canonical block IDs,
+  workstream hints, planned block IDs, target plan file, and `scope_files`
+  where present.
 - `meta`: export timestamp, source paths, and version hints.
-
+ 
 The UI treats missing optional fields as "unknown" and keeps the block visible.
 Required contract changes belong in the export test before changing the viewer.
+
+## Intake-Lanes
+
+The intake layer is navigation only. It never writes to the master index, active
+plans, locks, graph files, or draft files.
+
+Plan Map groups `docs/plaene/neu/` into five lanes:
+
+- `candidate` / Neue Ideen: no direct master match; default User-Intake review.
+- `adopted-open` / Bereits geplant: the target block is already open or planned in the master; cards link to that canonical block.
+- `adopted-done` / Erledigt / Archiv: the target block is already done; cards are archive candidates, but no move is automatic.
+- `bot-training` / Bot-Training: protected special zone governed by `docs/bot-training/Bot_Trainingsplan.md`.
+- `meta` / Meta: README or structure notes, not plan candidates.
+
+The sidebar default is `Ideen + Handoff`, which shows new ideas plus adopted
+handoff lanes and hides Bot-Training/Meta noise. Choosing `Alle Lanes` shows
+the full raw intake layer.
+
+Summary metrics split the intake count into `Ideen`, `Bereits geplant`,
+`Archivkandidaten`, `Bot-Training`, and `Meta`. The older
+`byIntakeClassification` field remains available for compatibility.
 
 ## Views
 
 - Map: dependency graph with focus mode, legend, layer toggles, readiness badges, edge tooltips, and block details.
-- Intake: draft-plan layer from `docs/plaene/neu/`, separated from canonical
-  master blocks and filterable by classification, workstream, search, and file
-  focus.
+- Ideen / Intake: draft-plan layer from `docs/plaene/neu/`, separated from
+  canonical master blocks and filterable by lane/classification, workstream,
+  search, and file focus.
 - Kollisionen: clickable scope-collision matrix; file clicks focus the map on affected blocks.
 - Health: graph score, coverage, active locks, and open findings.
 

@@ -202,9 +202,11 @@ function parseMarkdownTable(section) {
 
 function summarizeIntakePlans(intakePlans) {
   const byClassification = {};
+  const byLane = {};
   const byWorkstream = {};
   for (const plan of intakePlans || []) {
     byClassification[plan.classification] = (byClassification[plan.classification] || 0) + 1;
+    byLane[plan.intakeLane || 'candidate'] = (byLane[plan.intakeLane || 'candidate'] || 0) + 1;
     if (plan.workstream) {
       byWorkstream[plan.workstream] = (byWorkstream[plan.workstream] || 0) + 1;
     }
@@ -213,6 +215,12 @@ function summarizeIntakePlans(intakePlans) {
   return {
     intakePlanCount: intakePlans?.length || 0,
     byIntakeClassification: byClassification,
+    byIntakeLane: byLane,
+    intakeCandidateCount: byLane.candidate || 0,
+    intakeAdoptedOpenCount: byLane['adopted-open'] || 0,
+    intakeAdoptedDoneCount: byLane['adopted-done'] || 0,
+    intakeBotTrainingCount: byLane['bot-training'] || 0,
+    intakeMetaCount: byLane.meta || 0,
     byIntakeWorkstream: byWorkstream,
   };
 }

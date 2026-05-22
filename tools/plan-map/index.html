@@ -10,7 +10,7 @@
     <div class="app-shell">
       <header class="topbar">
         <div class="brand-block">
-          <h1>Umsetzungsplan Karte</h1>
+          <h1>Plan Map</h1>
           <span id="sourceMeta" class="source-meta">read-only</span>
         </div>
         <div class="top-actions">
@@ -19,8 +19,8 @@
             <input id="fileInput" type="file" accept="application/json,.json">
           </label>
           <div class="segmented" aria-label="Ansicht">
-            <button type="button" data-view="map" class="is-active">Map</button>
-            <button type="button" data-view="intake">Intake</button>
+            <button type="button" data-view="map" class="is-active">Master</button>
+            <button type="button" data-view="intake">Ideen / Intake</button>
             <button type="button" data-view="changelog">Changelog</button>
             <button type="button" data-view="collisions">Kollisionen</button>
             <button type="button" data-view="health">Health</button>
@@ -141,7 +141,7 @@
               </select>
             </label>
             <label>
-              <span>Intake <button type="button" class="help-button" data-help-term="intake" aria-label="Intake erklaeren">i</button></span>
+              <span>Intake-Lane <button type="button" class="help-button" data-help-term="intake" aria-label="Intake-Lane erklaeren">i</button></span>
               <select id="intakeClassificationFilter">
                 <option value="all">Alle</option>
               </select>
