@@ -11,13 +11,18 @@ try {
     // ratchet file optional for metrics display
 }
 
+function resolveBudget(key, fallback) {
+    const ratchetBaseline = Number(ratchetBaselines[key]);
+    return Number.isFinite(ratchetBaseline) ? ratchetBaseline : fallback;
+}
+
 const legacySurfaceChecks = Object.entries(report.scorecard.legacySurfaces || {}).map(
     ([surfaceId, data]) => {
         const key = `legacySurface_${surfaceId.replace(/[^a-zA-Z0-9]/g, '_')}_totalFiles`;
         return {
             label: `legacy-surface ${surfaceId} total files`,
             actual: data.totalFiles,
-            max: Number.isFinite(ratchetBaselines[key]) ? ratchetBaselines[key] : data.totalFiles,
+            max: resolveBudget(key, data.totalFiles),
         };
     }
 );
@@ -31,57 +36,57 @@ const checks = [
     {
         label: 'constructor(game) legacy file budget',
         actual: report.scorecard.constructorGame.totalFiles,
-        max: report.budgets.constructorGameFiles,
+        max: resolveBudget('constructorGameFiles', report.budgets.constructorGameFiles),
     },
     {
         label: 'DOM outside src/ui legacy file budget',
         actual: report.scorecard.domAccessOutsideUi.totalFiles,
-        max: report.budgets.domAccessFiles,
+        max: resolveBudget('domAccessFiles', report.budgets.domAccessFiles),
     },
     {
         label: 'core -> ui legacy edge budget',
         actual: report.scorecard.coreToUiImports.totalEdges,
-        max: report.budgets.coreToUiImportEdges,
+        max: resolveBudget('coreToUiImportEdges', report.budgets.coreToUiImportEdges),
     },
     {
         label: 'ui -> core legacy edge budget',
         actual: report.scorecard.uiToCoreImports.totalEdges,
-        max: report.budgets.uiToCoreImportEdges,
+        max: resolveBudget('uiToCoreImportEdges', report.budgets.uiToCoreImportEdges),
     },
     {
         label: 'ui -> state legacy edge budget',
         actual: report.scorecard.uiToStateImports.totalEdges,
-        max: report.budgets.uiToStateImportEdges,
+        max: resolveBudget('uiToStateImportEdges', report.budgets.uiToStateImportEdges),
     },
     {
         label: 'state -> ui legacy edge budget',
         actual: report.scorecard.stateToUiImports.totalEdges,
-        max: report.budgets.stateToUiImportEdges,
+        max: resolveBudget('stateToUiImportEdges', report.budgets.stateToUiImportEdges),
     },
     {
         label: 'entities -> core legacy edge budget',
         actual: report.scorecard.entitiesToCoreImports.totalEdges,
-        max: report.budgets.entitiesToCoreImportEdges,
+        max: resolveBudget('entitiesToCoreImportEdges', report.budgets.entitiesToCoreImportEdges),
     },
     {
         label: 'state -> core legacy edge budget',
         actual: report.scorecard.stateToCoreImports.totalEdges,
-        max: report.budgets.stateToCoreImportEdges,
+        max: resolveBudget('stateToCoreImportEdges', report.budgets.stateToCoreImportEdges),
     },
     {
         label: 'shared/contracts -> core legacy edge budget',
         actual: report.scorecard.sharedContractsToCoreImports.totalEdges,
-        max: report.budgets.sharedContractsToCoreImportEdges,
+        max: resolveBudget('sharedContractsToCoreImportEdges', report.budgets.sharedContractsToCoreImportEdges),
     },
     {
         label: 'application -> ui legacy edge budget',
         actual: report.scorecard.applicationToUiImports.totalEdges,
-        max: report.budgets.applicationToUiImportEdges,
+        max: resolveBudget('applicationToUiImportEdges', report.budgets.applicationToUiImportEdges),
     },
     {
         label: 'application -> core legacy edge budget',
         actual: report.scorecard.applicationToCoreImports.totalEdges,
-        max: report.budgets.applicationToCoreImportEdges,
+        max: resolveBudget('applicationToCoreImportEdges', report.budgets.applicationToCoreImportEdges),
     },
     ...legacySurfaceChecks,
 ];
