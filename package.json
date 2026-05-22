@@ -74,6 +74,7 @@
     "docs:check": "node scripts/docs-freshness.mjs --check && npm run plan:check && npm run check:gemini",
     "docs:sync": "node scripts/docs-freshness.mjs --write",
     "gates:pre-commit": "node scripts/gates-pre-commit.mjs",
+    "agent:commit": "node scripts/agent-commit-wrapper.mjs",
     "agent:preflight": "node scripts/agent-preflight.mjs",
     "git:acl:heal": "node scripts/heal-git-acl-windows.mjs",
     "guard:main": "npm run git:acl:heal && node scripts/ensure-main-branch.mjs",

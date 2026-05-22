@@ -48,7 +48,7 @@ function loadAllLockFiles() {
   if (!existsSync(LOCK_DIR)) {
     return allLocks;
   }
-  for (const file of readdirSync(LOCK_DIR)) {
+  for (const file of readdirSync(LOCK_DIR).sort((a, b) => a.localeCompare(b))) {
     if (!file.endsWith('.json')) continue;
     if (file.startsWith('_')) continue;
     if (file.includes('.example.')) continue;
@@ -64,9 +64,9 @@ function loadAllLockFiles() {
 }
 
 /**
- * Merge all lock files into the registry.
+ * Build the generated registry object from all lock files.
  */
-function mergeRegistry(allLockFiles) {
+function buildRegistry(allLockFiles, generatedAt = new Date().toISOString()) {
   const locks = [];
   for (const { person, data } of allLockFiles) {
     if (!data.locks) continue;
@@ -83,16 +83,63 @@ function mergeRegistry(allLockFiles) {
       });
     }
   }
-  const registry = {
-    generated_at: new Date().toISOString(),
+  return {
+    generated_at: generatedAt,
     locks,
     metadata: {
       format_version: '1.0',
       expected_lock_files: allLockFiles.map(f => f.file),
     },
   };
-  writeFileSync(REGISTRY_FILE, JSON.stringify(registry, null, 2) + '\n', 'utf8');
-  return registry;
+}
+
+function readExistingRegistry() {
+  if (!existsSync(REGISTRY_FILE)) {
+    return null;
+  }
+  try {
+    return JSON.parse(readFileSync(REGISTRY_FILE, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function semanticRegistry(registry) {
+  return {
+    locks: Array.isArray(registry?.locks) ? registry.locks : [],
+    metadata: registry?.metadata || {},
+  };
+}
+
+function registryContent(registry) {
+  return JSON.stringify(registry, null, 2) + '\n';
+}
+
+function hasSameSemanticContent(left, right) {
+  return JSON.stringify(semanticRegistry(left)) === JSON.stringify(semanticRegistry(right));
+}
+
+/**
+ * Merge all lock files into the registry.
+ */
+function mergeRegistry(allLockFiles) {
+  const existing = readExistingRegistry();
+  const generatedAt = new Date().toISOString();
+  const candidate = buildRegistry(allLockFiles, existing?.generated_at || generatedAt);
+
+  if (existing && hasSameSemanticContent(existing, candidate)) {
+    return { registry: existing, written: false, reason: 'semantic-unchanged' };
+  }
+
+  candidate.generated_at = generatedAt;
+  const nextContent = registryContent(candidate);
+  const previousContent = existsSync(REGISTRY_FILE) ? readFileSync(REGISTRY_FILE, 'utf8') : '';
+  if (previousContent !== nextContent) {
+    writeFileSync(REGISTRY_FILE, nextContent, 'utf8');
+    return { registry: candidate, written: true, reason: 'semantic-changed' };
+  }
+
+  return { registry: candidate, written: false, reason: 'content-unchanged' };
 }
 
 /**
@@ -182,7 +229,8 @@ async function main() {
   const allLockFiles = loadAllLockFiles();
 
   // Always merge into registry
-  const registry = mergeRegistry(allLockFiles);
+  const mergeResult = mergeRegistry(allLockFiles);
+  const registry = mergeResult.registry;
 
   if (status) {
     console.log('\nLock-Status aller Personen:');
@@ -214,7 +262,11 @@ async function main() {
 
   if (!status && !validate) {
     // Default: just merge and report
-    console.log(`  Registry aktualisiert: ${registry.locks.length} Lock(s) in ${REGISTRY_FILE.replace(ROOT, '.')}`);
+    if (mergeResult.written) {
+      console.log(`  Registry aktualisiert: ${registry.locks.length} Lock(s) in ${REGISTRY_FILE.replace(ROOT, '.')}`);
+    } else {
+      console.log(`  Registry aktuell: ${registry.locks.length} Lock(s) in ${REGISTRY_FILE.replace(ROOT, '.')} (${mergeResult.reason})`);
+    }
   }
 
   process.exit(0);

@@ -191,6 +191,33 @@ test('commit message validator blocks scope mismatch and unnamed uncommitted fil
   assert(ids.includes('scope-missing-staged-files'));
   assert(ids.includes('scope-has-unstaged-files'));
   assert(ids.includes('known-uncommitted-missing-files'));
+  assert(result.violations.some((violation) => violation.message.includes('Known-uncommitted: docs/user-note.md')));
+});
+
+test('commit message validator explains known generated timestamp churn', async () => {
+  const root = await createFixture();
+  const result = await validateAgentCommitMessage({
+    root,
+    messageText: [
+      'fix: tiny fix',
+      '',
+      'Workflow: quick',
+      'Decision: D2',
+      'Evidence: npm run plan:check -> PASS',
+      'Scope: scripts/check-agent-commit-message.mjs',
+      'Known-uncommitted: none',
+    ].join('\n'),
+    changes: [{ status: 'M', file: 'scripts/check-agent-commit-message.mjs' }],
+    uncommittedFiles: [
+      'scripts/check-agent-commit-message.mjs',
+      'docs/lock-status/_locks-registry.json',
+    ],
+  });
+  const violation = result.violations.find((entry) => entry.id === 'known-uncommitted-missing-files');
+
+  assert(violation);
+  assert(violation.message.includes('Known-uncommitted: docs/lock-status/_locks-registry.json'));
+  assert(violation.message.includes('Hook-/Timestamp-Churn'));
 });
 
 test('commit message validator requires D3 residual risk and not checked fields', async () => {

@@ -25,6 +25,9 @@ const D3_SURFACE_PATTERNS = [
 
 const KNOWLEDGE_GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const NONE_VALUES = new Set(['none', 'keine', 'n/a', '-']);
+const KNOWN_GENERATED_CHURN_FILES = new Set([
+  'docs/lock-status/_locks-registry.json',
+]);
 const BROAD_CLAIM_PATTERN = /\b(alles geprueft|vollstaendig verifiziert|repo-weit konsistent|alle workflows|alle rules|alle regeln|alle scope_files|vollstaendige scope_files|all workflows|all rules|entire repo|whole repo)\b/i;
 
 function normalizePath(value) {
@@ -130,6 +133,18 @@ function isPresent(value) {
 function listDifference(left, right) {
   const rightSet = new Set(right);
   return left.filter((item) => !rightSet.has(item));
+}
+
+function formatKnownUncommittedSuggestion(files) {
+  if (files.length === 0) {
+    return '';
+  }
+  const suggestion = ` Vorschlag: \`Known-uncommitted: ${files.join(', ')}\`.`;
+  const onlyKnownGeneratedChurn = files.every((file) => KNOWN_GENERATED_CHURN_FILES.has(file));
+  if (!onlyKnownGeneratedChurn) {
+    return suggestion;
+  }
+  return `${suggestion} Nur bekannte generierte Hook-/Timestamp-Churn-Datei(en) betroffen; trotzdem bewusst benennen oder den Generator-Diff vor dem Commit bereinigen.`;
 }
 
 async function readKnowledgeGraph(root) {
@@ -282,7 +297,7 @@ export async function validateAgentEnvelope({
       addViolation(
         violations,
         'known-uncommitted-missing-files',
-        '`Known-uncommitted:` nennt nicht alle ungestagten/untracked Dateien.',
+        `\`Known-uncommitted:\` nennt nicht alle ungestagten/untracked Dateien.${formatKnownUncommittedSuggestion(missingKnown)}`,
         missingKnown
       );
     }

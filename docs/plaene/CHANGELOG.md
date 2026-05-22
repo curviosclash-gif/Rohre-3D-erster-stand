@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Governance-Notiz 2026-05-22 (Commit-/Hook-Tooling)
+
+- Der Lock-Registry-Merger schreibt `_locks-registry.json` nur noch bei semantischen Lock-/Metadaten-Aenderungen; reine `generated_at`-Abweichungen bleiben unveraendert, damit `pre-commit` und `lock:validate` keine Timestamp-Diffs erzeugen.
+- `agent:preflight`/`commit-msg` geben bei fehlenden Restdiffs eine direkt nutzbare `Known-uncommitted:`-Zeile aus und markieren bekannte generierte Hook-/Timestamp-Churn-Dateien explizit.
+- `npm run agent:commit` ist ein read-only Wrapper fuer typische Abschlusscommits: staged Scope lesen, Code/Test- vs. Plan/Graph/Doku-Slice anzeigen, Masterindex+Code-Split blockieren und die passende `Known-uncommitted:`-Zeile ausgeben.
+- Laufzeitbefund: `lock:validate`, `plan:check` und `check:architecture:staged` lagen lokal jeweils bei rund 4.6-4.8s; der eigentliche Timeout-Risikopfad ist damit eher die Summe aus Hook plus Commit-Msg/Preflight als ein einzelner Lock-Check. Schwere Gates bleiben in `gates:pre-commit` statt doppelt im normalen `pre-commit`.
+
 ## Abschluss-Snapshot 2026-05-22 (Block `V134 134.99`)
 
 - `V134` ist geschlossen: Plan Map exportiert fuer Intake-Drafts additive Lanes und Aktionen (`candidate`, `adopted-open`, `adopted-done`, `bot-training`, `meta`) plus `primaryBlockId`, `canonicalBlockId`, Ambiguitaetsmarker und User-Intake-Hinweis.
