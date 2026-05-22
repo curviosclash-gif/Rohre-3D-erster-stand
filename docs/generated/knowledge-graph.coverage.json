@@ -185,12 +185,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2063,
-    "rawCoveredFileCount": 1306,
+    "trackedFileCount": 2064,
+    "rawCoveredFileCount": 1307,
     "rawCoveragePercent": 63.3,
-    "adjustedTrackedFileCount": 1386,
-    "adjustedCoveredFileCount": 1079,
-    "adjustedCoveragePercent": 77.8,
+    "adjustedTrackedFileCount": 1387,
+    "adjustedCoveredFileCount": 1080,
+    "adjustedCoveragePercent": 77.9,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
     "classifications": [
@@ -263,8 +263,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 324,
-        "coveredCount": 170
+        "count": 325,
+        "coveredCount": 171
       },
       {
         "classification": "prototype",
@@ -14468,6 +14468,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Plan_Map_Intake_Uebersicht_V134.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Portabler_Knowledge_Core_Memory_RAG_V136.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

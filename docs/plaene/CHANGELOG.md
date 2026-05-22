@@ -913,3 +913,11 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Routing: `src/**` nutzt weiter touched-strict mit gestagten Dateien via `ARCH_TOUCHED_FILES`; Architektur-Tooling nutzt boundaries/metrics/ratchet; Application-, Runtime-, Contract- und Server-Scope bekommen die breitere Baseline; Electron-/Platform-Scope wird erkannt und mit Boundary-/Metrics-Baseline gefuehrt.
 - Evidence: `npm run check:architecture:staged -- --dry-run` -> PASS mit Routing auf boundaries/metrics/ratchet fuer `scripts/check-architecture-staged.mjs`; `npm run check:architecture:staged` -> PASS; `npm run plan:check` -> PASS.
 - Not-checked: keine produktiven Runtime-/UI-Aenderungen, keine neuen `ArchitectureAnalysis`-Findings fuer Electron-/Preload oder `application -> ui/core`, keine Ratchet-Senkung und keine Vollsuite. `curviosApp` bleibt als unterbotenes Budget (`2` bei Baseline `3`) bewusst offen fuer 125.5.
+
+## Abschluss-Snapshot 2026-05-22 (Block `V125 125.99`)
+
+- `V125` ist geschlossen: Architektur-Capsule, Workflow-Eskalation, Architecture Acceptance, staged Architecture Guard, Electron-/Preload- und `application -> ui/core`-Scorecard sowie Ratchet-/Contracttest-Evidence sind als Folgearbeits-Guard verankert.
+- Effekt: neue architekturrelevante Feature-, Bugfix-, Refactor- und Performance-Slices muessen Contract/Port/Command/Snapshot/Capability, Legacy-Surface, Dependency-Delta, Guard und Not-checked kompakt benennen; kleine Workflows koennen Boundary-/Legacy-/Runtime-Surface-Arbeit nicht mehr still am Architektur-Startcheck vorbeifuehren.
+- Evidence: `npm run plan:check` -> PASS; `npm run check:architecture:boundaries` -> PASS; `npm run check:architecture:metrics` -> PASS; `npm run check:architecture:ratchet` -> PASS; `npm run check:architecture:staged` -> PASS/skipped bei 0 staged Architekturdateien; `node --test tests/architecture-governance.contract.test.mjs tests/agent-governance.contract.test.mjs` -> PASS; `npm run gates:pre-commit` -> PASS.
+- Restrisiko: `npm run gates:pre-commit` meldet weiterhin bekannte, nicht-blockierende Map-Tools-Domain-Drift-Warnungen im Graph.
+- Not-checked: keine Vollsuite, keine produktiven Runtime-/UI-/Multiplayer-/Recording-/Physik-/Bot-Training-Aenderungen, keine V96-Boundary-Migration, keine Electron-IPC-Ratchetpflicht und kein Browser-/Android-E2E.

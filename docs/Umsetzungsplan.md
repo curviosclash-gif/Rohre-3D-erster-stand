@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-22. Aktiver Lock: `-`; Startanker: `V125 125.5 abgeschlossen`; naechster V125-Schritt ist `125.99`.
+Stand: 2026-05-22. Aktiver Lock: `-`; Startanker: `V125 125.99 abgeschlossen`; naechster empfohlener P1-Schritt ist `V119 119.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -73,7 +73,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V116 | Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung | done | P1 | frei | V109.99,V117.99,V115.99 | 116.99 | `docs/plaene/aktiv/V116.md` |
 | V119 | Planabschluss-Evidence-Remediation und Git-Historienabgleich | planned | P1 | frei | V117.99 | 119.1 | `docs/plaene/aktiv/V119.md` |
 | V123 | AI-optimierter Plan-Index und Source-of-Truth-Migration | planned | P1 | frei | V116.4,V119.1 | 123.1 | `docs/plaene/aktiv/V123.md` |
-| V125 | Architektur-Compliance fuer Folgearbeit | planned | P1 | frei | V91.99,V104.99,V117.99 | 125.99 | `docs/plaene/aktiv/V125.md` |
+| V125 | Architektur-Compliance fuer Folgearbeit | done | P1 | frei | V91.99,V104.99,V117.99 | 125.99 | `docs/plaene/aktiv/V125.md` |
 | V126 | Local Dev-API, Preview- und Delivery-Hardening | done | P1 | frei | V102.99,V105.99 | 126.99 | `docs/plaene/aktiv/V126.md` |
 | V120 | Graph-RAG mit lokalem Context-Adapter | planned | P1 | frei | V107.99,V110.99,V111.99 | 120.1 | `docs/plaene/aktiv/V120.md` |
 | V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.1 | `docs/plaene/aktiv/V121.md` |
@@ -136,7 +136,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V126 | V102.99 | hard | ja | Security-/Runtime-Hardening ist Baseline fuer lokale API- und Preview-Grenzen |
 | V126 | V105.99 | hard | ja | Guard-/Typecheck-Recovery ist Baseline fuer gezielte Tooling- und Preview-Verifikation |
 | V126 | V90.2 | soft | ja | Dependency-/Version-/Lockfile-Scope ist mit dokumentierten Security-Ausnahmen geschlossen; V126 darf starten, solange Package-/Lockfile-/CI-Upgrades nicht Teil des Slices sind |
-| V126 | V125.3 | soft | nein | Neue Pflicht-Gates, Hooks oder Pre-Commit-Policy brauchen V125-Koordination; V126 darf ohne Hook-/Gate-Umbau starten |
+| V126 | V125.3 | soft | ja | Neue Pflicht-Gates, Hooks oder Pre-Commit-Policy sind durch den V125-staged-Guard-Pfad koordiniert; V126 bleibt ohne weiteren Hook-Umbau abgeschlossen |
 | V121 | V120.99 | hard | nein | Viewer bleibt Consumer von stabilen Graph-RAG-Evidence-Paketen oder einem explizit dokumentierten V120-`fixture-ready`-Gate |
 | V121 | V107.99 | hard | ja | Core-Graph und Export-/Viewer-Historie bilden die technische Basis |
 | V121 | V110.99 | hard | ja | Graph-Ops-, Guard- und SLO-Basis bleibt Voraussetzung fuer sichere Viewer-Exports |
@@ -155,9 +155,9 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V132 | V82.99 | hard | ja | Arcade-Parcours-Progression, XP, Leaderboard, Splits, Minimap, Penalty und Ghost-Recorder sind technische Basis |
 | V132 | V108.99 | hard | ja | Ghost-Selbstduell und stabile Route-Persistenz sind Basis fuer den Android-Wiederholungsreiz |
 | V132 | V130.99 | hard | ja | Kuratierte Parcours-Map-Varianz ist kanonisch abgeschlossen |
-| V132 | V125.99,V96.99 | soft | nein | Architektur-Compliance und Application-Boundary-Folgearbeit helfen, blockieren den ersten Android-Parcours-Slice aber nicht |
+| V132 | V125.99,V96.99 | soft | nein | V125.99 ist erledigt; V96.99 bleibt offener Boundary-Folgeblock und blockiert den ersten Android-Parcours-Slice nicht |
 | V135 | V132.99 | hard | ja | Gemeinsame Android-App, Classic/Parcours-Einstieg, Route-Allowlist und Mobile-HUD-Baseline sind Grundlage fuer den Menue-UX-Folgeblock |
-| V135 | V131.99,V125.99,V96.99 | soft | nein | Steuerungs-, Architektur- und Boundary-Folgearbeit helfen, blockieren Fokus-, Chrome- und Start-Setup-UX aber nicht |
+| V135 | V131.99,V125.99,V96.99 | soft | nein | V125.99 ist erledigt; Steuerungs- und V96-Boundary-Folgearbeit bleiben hilfreich, blockieren Fokus-, Chrome- und Start-Setup-UX aber nicht |
 | V134 | V116.99 | hard | ja | Plan-Kontext-Reduktion, Intake-/Archivklassifikation und `plan:context:check` sind Baseline |
 | V134 | V117.99 | hard | ja | D3/D4-Gates und User-owned Intake-Governance sind Baseline |
 | V134 | V123.1,V127 | soft | nein | V123 kann spaeter strukturierte Plan-Daten liefern; V127 bleibt verwandter Repo-/Plan-Map-Crosslink-Scope, aber kein Startblocker |
@@ -188,7 +188,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V116 | 2026-05-18 | closed | Abgeschlossen 2026-05-18 |
 | - | V119 | - | frei | Geplant |
 | - | V123 | - | frei | Geplant |
-| - | V125 | - | frei | Geplant |
+| - | V125 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Architektur-Capsule, staged Guard, Boundary-/Ratchet-/Contract-Evidence und Abschluss-Gates gruen |
 | - | V126 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Dev-API-/Preview-Hardening gruen, Handoff an V127/V128/V129 |
 | - | V120 | - | frei | Geplant |
 | - | V121 | - | frei | Geplant |
@@ -210,7 +210,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 1. `V126` ist abgeschlossen: Training-Spawn, Preview-Mutationsgrenze, lokale API-Matrix, Ringbuffer und erste `vite.config.js`-Entflechtung sind gruen; Folgepfade bleiben `V127`, `V128` und `V129`.
 2. `V112` ist abgeschlossen; der dokumentierte `T20ba`-Seitenfund bleibt ausserhalb dieses Blocks als separater Ghost-Replay-Hinweis.
-3. `V125` (Architektur-Compliance fuer Folgearbeit) als Architektur-Schutz nachziehen, besonders staged Architecture Guard und Workflow-Eskalation fuer neue Boundary-/Legacy-Surfaces.
+3. `V125` ist abgeschlossen: Architektur-Capsule, staged Architecture Guard, Workflow-Eskalation, Application-/Electron-Scorecard und Ratchet-/Contracttest-Evidence sind gruen.
 4. `V119` (Planabschluss-Evidence-Remediation und Git-Historienabgleich) vollstaendig abschliessen, bevor historische Plan-Evidence als Grundlage fuer neue Automatisierung, RAG oder Source-of-Truth-Migration verwendet wird.
 5. `V123` (AI-optimierter Plan-Index und Source-of-Truth-Migration) erst nach V119-Baseline als Plan-Index-Pilot starten; `docs/Umsetzungsplan.md` bleibt bis zur expliziten Migration kanonisch.
 6. `V120` (Graph-RAG mit lokalem Context-Adapter) erst nach frischem Graph-/SLO-Signal als Graph-RAG-Kontexthebel starten.

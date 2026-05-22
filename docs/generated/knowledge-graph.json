@@ -1712,7 +1712,7 @@
       "id": "V125",
       "type": "block",
       "title": "Architektur-Compliance fuer Folgearbeit",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2703,7 +2703,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 335,
+          "concreteCount": 336,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5184,7 +5184,7 @@
       "id": "V125.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.99"
@@ -14169,8 +14169,8 @@
     {
       "id": "V125.99.1",
       "type": "subphase",
-      "title": "`npm run plan:check`, relevante `check:architecture:*`-Gates und `check:architecture:staged` sind gruen.",
-      "status": "open",
+      "title": "`npm run plan:check`, relevante `check:architecture:*`-Gates und `check:architecture:staged` sind gruen. (abgeschlossen: 2026-05-22; evidence: `npm run plan:check`, `npm run check:architecture:boundaries`, `npm run check:architecture:metrics`, `npm run check:architecture:ratchet` und `npm run check:architecture:staged` -> PASS; staged Guard ueberspringt korrekt bei 0 staged Architekturdateien.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.99",
@@ -14180,8 +14180,8 @@
     {
       "id": "V125.99.2",
       "type": "subphase",
-      "title": "Relevante Governance-/Architecture-Contracttests sind gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "Relevante Governance-/Architecture-Contracttests sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-22; evidence: `node --test tests/architecture-governance.contract.test.mjs tests/agent-governance.contract.test.mjs` -> PASS mit 17 Tests.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.99",
@@ -14191,8 +14191,8 @@
     {
       "id": "V125.99.3",
       "type": "subphase",
-      "title": "`npm run gates:pre-commit` ist gruen oder Graph-/Fremddiff-Restrisiko ist explizit als nicht eigener Blocker dokumentiert.",
-      "status": "open",
+      "title": "`npm run gates:pre-commit` ist gruen oder Graph-/Fremddiff-Restrisiko ist explizit als nicht eigener Blocker dokumentiert. (abgeschlossen: 2026-05-22; evidence: `npm run gates:pre-commit` -> PASS; bekannte nicht-blockierende Warnungen: Map-Tools-Domain-Drift im Graph.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.99",
@@ -14202,8 +14202,8 @@
     {
       "id": "V125.99.4",
       "type": "subphase",
-      "title": "Master, Blockfile und passende Abschlussnotiz nennen Purpose, Effekt, Not-checked und verbleibende Risiken.",
-      "status": "open",
+      "title": "Master, Blockfile und passende Abschlussnotiz nennen Purpose, Effekt, Not-checked und verbleibende Risiken. (abgeschlossen: 2026-05-22; evidence: `docs/Umsetzungsplan.md`, dieser Block und `docs/plaene/CHANGELOG.md` dokumentieren Abschluss, Wirkung, Not-checked und Restrisiko.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.99",
@@ -32272,6 +32272,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Plan_Map_Intake_Uebersicht_V134.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Portabler_Knowledge_Core_Memory_RAG_V136.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -77322,8 +77337,8 @@
       "type": "depends_on",
       "source": "frontmatter",
       "hard": false,
-      "fulfilled": false,
-      "hint": "Neue Pflicht-Gates, Hooks oder Pre-Commit-Policy brauchen V125-Koordination; V126 darf ohne Hook-/Gate-Umbau starten",
+      "fulfilled": true,
+      "hint": "Neue Pflicht-Gates, Hooks oder Pre-Commit-Policy sind durch den V125-staged-Guard-Pfad koordiniert; V126 bleibt ohne weiteren Hook-Umbau abgeschlossen",
       "attributes": {
         "dependsPhase": "125.3",
         "rawToken": "V125.3",
@@ -91840,6 +91855,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Plan_Map_Intake_Uebersicht_V134.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Portabler_Knowledge_Core_Memory_RAG_V136.md",
       "type": "scope",
       "hint": null,
       "attributes": {
