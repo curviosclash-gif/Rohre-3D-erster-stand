@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 228,
+          "concreteCount": 231,
           "plannedCount": 0
         }
       }
@@ -1721,7 +1721,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "125.4",
+        "currentPhase": "125.99",
         "planFile": "docs/plaene/aktiv/V125.md",
         "scopeDeclarations": [
           ".agents/rules/code_quality_and_debugging.md",
@@ -1762,8 +1762,8 @@
           "tests/plan-evidence-claims.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 35,
-          "plannedCount": 1
+          "concreteCount": 36,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
           "V112",
@@ -5174,7 +5174,7 @@
       "id": "V125.5",
       "type": "phase",
       "title": "Ratchet- und Test-Haertung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.5"
@@ -14125,8 +14125,8 @@
     {
       "id": "V125.5.1",
       "type": "subphase",
-      "title": "`curviosApp`-Budget von 3 auf aktuellen Iststand senken oder bewusst als offenes Drift-Fenster dokumentieren.",
-      "status": "open",
+      "title": "`curviosApp`-Budget von 3 auf aktuellen Iststand senken oder bewusst als offenes Drift-Fenster dokumentieren. (abgeschlossen: 2026-05-22; evidence: `npm run check:architecture:metrics` und `npm run check:architecture:ratchet` -> PASS, `curviosApp` ist nach Electron-Scan bei Iststand/Baseline 3; keine offene Unterbietung und keine Budgetsenkung.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.5",
@@ -14136,8 +14136,8 @@
     {
       "id": "V125.5.2",
       "type": "subphase",
-      "title": "DOM- und Metrics-/Ratchet-Budgetquellen abgleichen, sodass Reports nicht unterschiedliche Budgets zeigen.",
-      "status": "open",
+      "title": "DOM- und Metrics-/Ratchet-Budgetquellen abgleichen, sodass Reports nicht unterschiedliche Budgets zeigen. (abgeschlossen: 2026-05-22; evidence: `scripts/check-architecture-metrics.mjs` liest Ratchet-Baselines; `npm run check:architecture:metrics` -> PASS mit DOM `budget 8`; `npm run check:architecture:ratchet` -> PASS mit DOM Baseline 8.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.5",
@@ -14147,8 +14147,8 @@
     {
       "id": "V125.5.3",
       "type": "subphase",
-      "title": "`tests/architecture-governance.contract.test.mjs` fuer staged Guard Routing und Application-Kanten anlegen.",
-      "status": "open",
+      "title": "`tests/architecture-governance.contract.test.mjs` fuer staged Guard Routing und Application-Kanten anlegen. (abgeschlossen: 2026-05-22; evidence: Contracttest prueft staged Routing fuer `src`, `scripts/architecture`, `src/application` und `electron` sowie Application-Boundary-Baselines; `node --test tests/architecture-governance.contract.test.mjs tests/agent-governance.contract.test.mjs` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.5",
@@ -14158,8 +14158,8 @@
     {
       "id": "V125.5.4",
       "type": "subphase",
-      "title": "`tests/agent-governance.contract.test.mjs` oder passenden Test erweitern: Workflows muessen Architektur-Capsule/Eskalationsregeln enthalten.",
-      "status": "open",
+      "title": "`tests/agent-governance.contract.test.mjs` oder passenden Test erweitern: Workflows muessen Architektur-Capsule/Eskalationsregeln enthalten. (abgeschlossen: 2026-05-22; evidence: `tests/architecture-governance.contract.test.mjs` prueft Rule-Capsule und Workflow-Eskalationsanker fuer `code`, `quick`, `bugfix`, `refactor`, `performance` und `fix-planung`; `node --test tests/architecture-governance.contract.test.mjs tests/agent-governance.contract.test.mjs` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.5",
@@ -34399,6 +34399,21 @@
       }
     },
     {
+      "id": "scripts/agent-commit-wrapper.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "scripts/agent-memory-mcp.mjs",
       "type": "file",
       "title": null,
@@ -47080,12 +47095,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V125"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -47776,6 +47793,21 @@
         "scopeBlocks": [
           "B13",
           "V92"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/lock-registry-merger.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
         ],
         "exists": true
       }
@@ -54669,6 +54701,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/agent-commit-wrapper.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/agent-preflight.mjs",
       "type": "scope",
       "hint": null,
@@ -55506,6 +55547,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/architecture-governance.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/audio.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -55795,6 +55845,15 @@
     {
       "from": "B13",
       "to": "tests/lifecycle-capability.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/lock-registry-merger.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {

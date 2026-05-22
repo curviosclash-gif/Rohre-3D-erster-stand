@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2060,
-    "rawCoveredFileCount": 1303,
+    "trackedFileCount": 2063,
+    "rawCoveredFileCount": 1306,
     "rawCoveragePercent": 63.3,
-    "adjustedTrackedFileCount": 1383,
-    "adjustedCoveredFileCount": 1076,
+    "adjustedTrackedFileCount": 1386,
+    "adjustedCoveredFileCount": 1079,
     "adjustedCoveragePercent": 77.8,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 984,
-        "coveredCount": 861
+        "count": 987,
+        "coveredCount": 864
       },
       {
         "classification": "product-docs",
@@ -18787,6 +18787,23 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/agent-commit-wrapper.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/agent-preflight.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -32801,6 +32818,25 @@
       "excludeReason": null
     },
     {
+      "path": "tests/architecture-governance.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V125"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "tests/audio.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -33432,6 +33468,23 @@
       "scopeBlocks": [
         "B13",
         "V92"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/lock-registry-merger.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
       ],
       "surfaces": [],
       "classification": "product-code",
