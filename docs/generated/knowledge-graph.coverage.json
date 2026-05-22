@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2058,
-    "rawCoveredFileCount": 1302,
+    "trackedFileCount": 2059,
+    "rawCoveredFileCount": 1303,
     "rawCoveragePercent": 63.3,
-    "adjustedTrackedFileCount": 1382,
-    "adjustedCoveredFileCount": 1075,
+    "adjustedTrackedFileCount": 1383,
+    "adjustedCoveredFileCount": 1076,
     "adjustedCoveragePercent": 77.8,
     "uncoveredFileCount": 756,
     "uncoveredActiveFileCount": 307,
@@ -263,8 +263,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 323,
-        "coveredCount": 169
+        "count": 324,
+        "coveredCount": 170
       },
       {
         "classification": "prototype",
@@ -11846,6 +11846,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V135.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V64.md",
       "tracked": true,
       "coveredInCore": true,
@@ -16646,6 +16663,7 @@
       ],
       "scopeBlocks": [
         "V108",
+        "V135",
         "V74"
       ],
       "surfaces": [],
@@ -26496,7 +26514,8 @@
         "scope-files"
       ],
       "scopeBlocks": [
-        "V132"
+        "V132",
+        "V135"
       ],
       "surfaces": [],
       "classification": "mobile-wrapper",
@@ -26513,7 +26532,8 @@
         "scope-files"
       ],
       "scopeBlocks": [
-        "V132"
+        "V132",
+        "V135"
       ],
       "surfaces": [],
       "classification": "mobile-wrapper",
@@ -30796,6 +30816,7 @@
         "B05",
         "V105",
         "V113",
+        "V135",
         "V64",
         "V77",
         "V85",
@@ -31221,6 +31242,7 @@
         "B05",
         "V105",
         "V113",
+        "V135",
         "V64",
         "V77",
         "V85",
@@ -32247,6 +32269,7 @@
         "B05",
         "V105",
         "V113",
+        "V135",
         "V76",
         "V77",
         "V91"
@@ -32273,6 +32296,7 @@
         "V108",
         "V112",
         "V113",
+        "V135",
         "V76",
         "V77",
         "V91"
@@ -32383,6 +32407,7 @@
         "B05",
         "V104",
         "V105",
+        "V135",
         "V91"
       ],
       "surfaces": [],
@@ -32428,6 +32453,7 @@
         "V105",
         "V108",
         "V114",
+        "V135",
         "V64",
         "V66",
         "V91"
@@ -32623,6 +32649,7 @@
       ],
       "scopeBlocks": [
         "V112",
+        "V135",
         "V74"
       ],
       "surfaces": [],
@@ -33591,7 +33618,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V132"
+        "V132",
+        "V135"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33610,7 +33638,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V132"
+        "V132",
+        "V135"
       ],
       "surfaces": [],
       "classification": "product-code",

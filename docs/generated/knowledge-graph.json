@@ -1186,6 +1186,7 @@
           "V112",
           "V114",
           "V115",
+          "V135",
           "V90",
           "V96"
         ],
@@ -1871,6 +1872,8 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
+          "legacy-plan",
           "master-index"
         ],
         "priority": "P2",
@@ -1899,7 +1902,8 @@
         },
         "scopeOverlapAllowedWith": [
           "V121",
-          "V134"
+          "V134",
+          "V135"
         ],
         "unknownFrontmatterFields": []
       }
@@ -1942,6 +1946,48 @@
         "unknownFrontmatterFields": [
           "scope_reference_files"
         ]
+      }
+    },
+    {
+      "id": "V135",
+      "type": "block",
+      "title": "Mobile Menue UX-Hardening und Start-Setup-Kompaktmodus",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "135.1",
+        "planFile": "docs/plaene/aktiv/V135.md",
+        "scopeDeclarations": [
+          "index.html",
+          "src/mobile-arcade/MobileArcadeApp.js",
+          "src/mobile-classic/MobileClassicApp.js",
+          "src/ui/menu/MenuChromeStateOps.js",
+          "src/ui/menu/MenuNavigationRuntime.js",
+          "src/ui/start-setup/StartSetupControlBindings.js",
+          "src/ui/start-setup/StartSetupUiOps.js",
+          "src/ui/UINavigationLifecycleController.js",
+          "src/ui/UIStartSyncController.js",
+          "style.css",
+          "tests/mobile-arcade-app.contract.test.mjs",
+          "tests/mobile-classic-app.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 12,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [
+          "V113",
+          "V125",
+          "V131",
+          "V132",
+          "V96"
+        ],
+        "unknownFrontmatterFields": []
       }
     },
     {
@@ -2657,7 +2703,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 334,
+          "concreteCount": 335,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5442,6 +5488,86 @@
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.99"
+      }
+    },
+    {
+      "id": "V135.1",
+      "type": "phase",
+      "title": "Baseline und UX-Zielbild",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.1"
+      }
+    },
+    {
+      "id": "V135.2",
+      "type": "phase",
+      "title": "Fokus- und Scrollsprung beheben",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.2"
+      }
+    },
+    {
+      "id": "V135.3",
+      "type": "phase",
+      "title": "Start-Setup kompakt machen",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3"
+      }
+    },
+    {
+      "id": "V135.4",
+      "type": "phase",
+      "title": "Menue-Chrome und Startscreen schaerfen",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.4"
+      }
+    },
+    {
+      "id": "V135.5",
+      "type": "phase",
+      "title": "Parcours-Route mobil auswaehlen",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.5"
+      }
+    },
+    {
+      "id": "V135.6",
+      "type": "phase",
+      "title": "Kleine und quer gehaltene Viewports absichern",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.6"
+      }
+    },
+    {
+      "id": "V135.7",
+      "type": "phase",
+      "title": "Verifikation, Doku und Handoff",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7"
+      }
+    },
+    {
+      "id": "V135.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99"
       }
     },
     {
@@ -15556,6 +15682,402 @@
         "blockId": "V134",
         "phaseCode": "134.99",
         "subphaseCode": "134.99.6"
+      }
+    },
+    {
+      "id": "V135.1.1",
+      "type": "subphase",
+      "title": "Screenshot-/DOM-Baseline fuer 393x852, 360x640 und 852x393 aus `dist/mobile-classic` aktualisieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.1",
+        "subphaseCode": "135.1.1"
+      }
+    },
+    {
+      "id": "V135.1.2",
+      "type": "subphase",
+      "title": "Akzeptanzkriterien festlegen: kein Scrollsprung, Start-CTA im ersten Viewport, keine Header-Ueberdeckung, keine horizontale Ueberlaenge.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.1",
+        "subphaseCode": "135.1.2"
+      }
+    },
+    {
+      "id": "V135.1.3",
+      "type": "subphase",
+      "title": "Startscreen-Hierarchie entscheiden: Hauptaktionen vor Update, kurze Labels fuer Classic/Parcours.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.1",
+        "subphaseCode": "135.1.3"
+      }
+    },
+    {
+      "id": "V135.1.4",
+      "type": "subphase",
+      "title": "Scope gegen V131 abgrenzen: keine Touch-/Tilt-/Pause-Semantik in V135.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.1",
+        "subphaseCode": "135.1.4"
+      }
+    },
+    {
+      "id": "V135.2.1",
+      "type": "subphase",
+      "title": "`MenuNavigationRuntime.showPanel()` und `UINavigationLifecycleController.setLevel4Open(false)` auf scrollende Fokusaufrufe pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.2",
+        "subphaseCode": "135.2.1"
+      }
+    },
+    {
+      "id": "V135.2.2",
+      "type": "subphase",
+      "title": "Fokusaufrufe auf `preventScroll` oder Mobile-spezifische Focus-Targets umstellen, ohne Keyboard-/Gamepad-Navigation zu verlieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.2",
+        "subphaseCode": "135.2.2"
+      }
+    },
+    {
+      "id": "V135.2.3",
+      "type": "subphase",
+      "title": "Beim Wechsel in `submenu-game` den richtigen Scrollcontainer (`.menu-content`) kontrolliert auf Panelanfang setzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.2",
+        "subphaseCode": "135.2.3"
+      }
+    },
+    {
+      "id": "V135.2.4",
+      "type": "subphase",
+      "title": "Regressionstest oder DOM-Smoke: nach Tap auf `Parcours` ist `scrollTop` klein und `Zurueck`/Titel liegen sichtbar im Viewport.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.2",
+        "subphaseCode": "135.2.4"
+      }
+    },
+    {
+      "id": "V135.3.1",
+      "type": "subphase",
+      "title": "Mobile Summary auf Kernwerte reduzieren: Spielstil, Route/Map, Fahrzeug, Ghost-Status.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3",
+        "subphaseCode": "135.3.1"
+      }
+    },
+    {
+      "id": "V135.3.2",
+      "type": "subphase",
+      "title": "`Reset`, `Feineinstellungen`, Ghost-Kollision und Ansicht hinter Details/sekundaere Aktion legen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3",
+        "subphaseCode": "135.3.2"
+      }
+    },
+    {
+      "id": "V135.3.3",
+      "type": "subphase",
+      "title": "`Parcours starten` als sticky oder immer frueh sichtbaren Mobile-CTA planen/umsetzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3",
+        "subphaseCode": "135.3.3"
+      }
+    },
+    {
+      "id": "V135.3.4",
+      "type": "subphase",
+      "title": "Start-CTA darf Map-/Route-Auswahl nicht ueberdecken und muss Safe-Area beachten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3",
+        "subphaseCode": "135.3.4"
+      }
+    },
+    {
+      "id": "V135.3.5",
+      "type": "subphase",
+      "title": "Desktop-Start-Setup bleibt unveraendert oder explizit regressionsgetestet.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3",
+        "subphaseCode": "135.3.5"
+      }
+    },
+    {
+      "id": "V135.4.1",
+      "type": "subphase",
+      "title": "`Update` aus dem Hauptaktionsbereich herausnehmen oder als kleine Utility im Footer/Info-Bereich fuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.4",
+        "subphaseCode": "135.4.1"
+      }
+    },
+    {
+      "id": "V135.4.2",
+      "type": "subphase",
+      "title": "`Classic` und `Parcours` mit kurzer Unterzeile versehen, z. B. freier Flug vs. Zeitroute/Ghost.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.4",
+        "subphaseCode": "135.4.2"
+      }
+    },
+    {
+      "id": "V135.4.3",
+      "type": "subphase",
+      "title": "Ab `data-menu-depth=\"3\"` Header/Brand/Utility auf Mobile reduzieren, damit Start-Setup nicht nach unten gedrueckt wird.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.4",
+        "subphaseCode": "135.4.3"
+      }
+    },
+    {
+      "id": "V135.4.4",
+      "type": "subphase",
+      "title": "Zurueck-Aktion und Kontext bleiben sichtbar, aber nicht als grosse Desktop-Kopfzeile.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.4",
+        "subphaseCode": "135.4.4"
+      }
+    },
+    {
+      "id": "V135.5.1",
+      "type": "subphase",
+      "title": "Mobile-Route-Allowlist aus V132 als sichtbare Kurzliste oder Karten darstellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.5",
+        "subphaseCode": "135.5.1"
+      }
+    },
+    {
+      "id": "V135.5.2",
+      "type": "subphase",
+      "title": "Route-Karten steuern weiter `mapSelect` und vorhandene StartSetup-Bindings; kein zweiter Settings-Pfad.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.5",
+        "subphaseCode": "135.5.2"
+      }
+    },
+    {
+      "id": "V135.5.3",
+      "type": "subphase",
+      "title": "Preview-/Favoriten-/Recent-Details im Mobile-Parcours-Modus einklappen oder nach unten verschieben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.5",
+        "subphaseCode": "135.5.3"
+      }
+    },
+    {
+      "id": "V135.5.4",
+      "type": "subphase",
+      "title": "Leere/Fallback-Zustaende fuer unbekannte Route oder fehlende Allowlist definieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.5",
+        "subphaseCode": "135.5.4"
+      }
+    },
+    {
+      "id": "V135.6.1",
+      "type": "subphase",
+      "title": "Breakpoint fuer kleine Portrait-Hoehe: Header kompakter, Summary einspaltig, Start-CTA sichtbar.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.6",
+        "subphaseCode": "135.6.1"
+      }
+    },
+    {
+      "id": "V135.6.2",
+      "type": "subphase",
+      "title": "Breakpoint fuer `max-height: 520px` oder Landscape: Header stark reduzieren, Startleiste kompakt, Details nach unten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.6",
+        "subphaseCode": "135.6.2"
+      }
+    },
+    {
+      "id": "V135.6.3",
+      "type": "subphase",
+      "title": "Font- und Buttongroessen so begrenzen, dass Labels wie `Feineinstellungen` nicht ueberlaufen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.6",
+        "subphaseCode": "135.6.3"
+      }
+    },
+    {
+      "id": "V135.6.4",
+      "type": "subphase",
+      "title": "Screenshot-Smoke fuer 393x852, 360x640 und 852x393 mit sichtbarem Start-CTA.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.6",
+        "subphaseCode": "135.6.4"
+      }
+    },
+    {
+      "id": "V135.7.1",
+      "type": "subphase",
+      "title": "`node --test tests/mobile-classic-app.contract.test.mjs` ausfuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7",
+        "subphaseCode": "135.7.1"
+      }
+    },
+    {
+      "id": "V135.7.2",
+      "type": "subphase",
+      "title": "`node --test tests/mobile-arcade-app.contract.test.mjs` ausfuehren, falls Route-/Parcours-Locks beruehrt wurden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7",
+        "subphaseCode": "135.7.2"
+      }
+    },
+    {
+      "id": "V135.7.3",
+      "type": "subphase",
+      "title": "`npm run app:android:assets:check` ausfuehren, wenn Mobile-Build-Artefakte oder App-Target-Copy betroffen sind.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7",
+        "subphaseCode": "135.7.3"
+      }
+    },
+    {
+      "id": "V135.7.4",
+      "type": "subphase",
+      "title": "`npm run plan:check` und `npm run docs:check` ausfuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7",
+        "subphaseCode": "135.7.4"
+      }
+    },
+    {
+      "id": "V135.7.5",
+      "type": "subphase",
+      "title": "Abschlussnotiz in `docs/plaene/CHANGELOG.md`: Wirkung, nicht gepruefte Device-Punkte, offene Follow-ups.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7",
+        "subphaseCode": "135.7.5"
+      }
+    },
+    {
+      "id": "V135.99.1",
+      "type": "subphase",
+      "title": "Alle frueheren Phasen sind erledigt oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.1"
+      }
+    },
+    {
+      "id": "V135.99.2",
+      "type": "subphase",
+      "title": "Tap auf `Classic` und `Parcours` fuehrt ohne Scrollsprung in einen sichtbaren, verstaendlichen Startzustand.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.2"
+      }
+    },
+    {
+      "id": "V135.99.3",
+      "type": "subphase",
+      "title": "`Parcours starten` ist auf 393x852, 360x640 und 852x393 ohne manuelles Suchen erreichbar oder bewusst als sticky CTA sichtbar.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.3"
+      }
+    },
+    {
+      "id": "V135.99.4",
+      "type": "subphase",
+      "title": "Startscreen priorisiert Spielstart vor Update/Utility.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.4"
+      }
+    },
+    {
+      "id": "V135.99.5",
+      "type": "subphase",
+      "title": "Route-Auswahl wirkt mobil und bleibt technisch an den vorhandenen StartSetup-/MapSelect-Pfad gekoppelt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.5"
+      }
+    },
+    {
+      "id": "V135.99.6",
+      "type": "subphase",
+      "title": "Gezielt gewaehlte Contract-/Android-/Plan-/Doku-Gates sind gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.6"
       }
     },
     {
@@ -29441,6 +29963,21 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V135.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V64.md",
       "type": "file",
       "title": null,
@@ -33593,6 +34130,7 @@
         ],
         "scopeBlocks": [
           "V108",
+          "V135",
           "V74"
         ],
         "exists": true
@@ -40853,7 +41391,8 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V132"
+          "V132",
+          "V135"
         ],
         "exists": true
       }
@@ -40868,7 +41407,8 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V132"
+          "V132",
+          "V135"
         ],
         "exists": true
       }
@@ -44830,6 +45370,7 @@
           "B05",
           "V105",
           "V113",
+          "V135",
           "V64",
           "V77",
           "V85",
@@ -45221,6 +45762,7 @@
           "B05",
           "V105",
           "V113",
+          "V135",
           "V64",
           "V77",
           "V85",
@@ -46159,6 +46701,7 @@
           "B05",
           "V105",
           "V113",
+          "V135",
           "V76",
           "V77",
           "V91"
@@ -46183,6 +46726,7 @@
           "V108",
           "V112",
           "V113",
+          "V135",
           "V76",
           "V77",
           "V91"
@@ -46283,6 +46827,7 @@
           "B05",
           "V104",
           "V105",
+          "V135",
           "V91"
         ],
         "exists": true
@@ -46324,6 +46869,7 @@
           "V105",
           "V108",
           "V114",
+          "V135",
           "V64",
           "V66",
           "V91"
@@ -46372,6 +46918,7 @@
         ],
         "scopeBlocks": [
           "V112",
+          "V135",
           "V74"
         ],
         "exists": true
@@ -47415,7 +47962,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V132"
+          "V132",
+          "V135"
         ],
         "exists": true
       }
@@ -47432,7 +47980,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V132"
+          "V132",
+          "V135"
         ],
         "exists": true
       }
@@ -78949,6 +79498,608 @@
       }
     },
     {
+      "from": "V135",
+      "to": "index.html",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "src/mobile-arcade/MobileArcadeApp.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "src/mobile-classic/MobileClassicApp.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "src/ui/menu/MenuChromeStateOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "src/ui/menu/MenuNavigationRuntime.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "src/ui/start-setup/StartSetupControlBindings.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "src/ui/start-setup/StartSetupUiOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "src/ui/UINavigationLifecycleController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "src/ui/UIStartSyncController.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "style.css",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "tests/mobile-arcade-app.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "tests/mobile-classic-app.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "V132",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Gemeinsame Android-App, Classic/Parcours-Einstieg, Route-Allowlist und Mobile-HUD-Baseline sind Grundlage fuer den Menue-UX-Folgeblock",
+      "attributes": {
+        "dependsPhase": "132.99",
+        "rawToken": "V132.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V135",
+      "to": "V135.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.1"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "V135.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.2"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "V135.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "V135.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.4"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "V135.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.5"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "V135.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.6"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "V135.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7"
+      }
+    },
+    {
+      "from": "V135",
+      "to": "V135.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99"
+      }
+    },
+    {
+      "from": "V135.1",
+      "to": "V135.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.1",
+        "subphaseCode": "135.1.1"
+      }
+    },
+    {
+      "from": "V135.1",
+      "to": "V135.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.1",
+        "subphaseCode": "135.1.2"
+      }
+    },
+    {
+      "from": "V135.1",
+      "to": "V135.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.1",
+        "subphaseCode": "135.1.3"
+      }
+    },
+    {
+      "from": "V135.1",
+      "to": "V135.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.1",
+        "subphaseCode": "135.1.4"
+      }
+    },
+    {
+      "from": "V135.2",
+      "to": "V135.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.2",
+        "subphaseCode": "135.2.1"
+      }
+    },
+    {
+      "from": "V135.2",
+      "to": "V135.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.2",
+        "subphaseCode": "135.2.2"
+      }
+    },
+    {
+      "from": "V135.2",
+      "to": "V135.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.2",
+        "subphaseCode": "135.2.3"
+      }
+    },
+    {
+      "from": "V135.2",
+      "to": "V135.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.2",
+        "subphaseCode": "135.2.4"
+      }
+    },
+    {
+      "from": "V135.3",
+      "to": "V135.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3",
+        "subphaseCode": "135.3.1"
+      }
+    },
+    {
+      "from": "V135.3",
+      "to": "V135.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3",
+        "subphaseCode": "135.3.2"
+      }
+    },
+    {
+      "from": "V135.3",
+      "to": "V135.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3",
+        "subphaseCode": "135.3.3"
+      }
+    },
+    {
+      "from": "V135.3",
+      "to": "V135.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3",
+        "subphaseCode": "135.3.4"
+      }
+    },
+    {
+      "from": "V135.3",
+      "to": "V135.3.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.3",
+        "subphaseCode": "135.3.5"
+      }
+    },
+    {
+      "from": "V135.4",
+      "to": "V135.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.4",
+        "subphaseCode": "135.4.1"
+      }
+    },
+    {
+      "from": "V135.4",
+      "to": "V135.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.4",
+        "subphaseCode": "135.4.2"
+      }
+    },
+    {
+      "from": "V135.4",
+      "to": "V135.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.4",
+        "subphaseCode": "135.4.3"
+      }
+    },
+    {
+      "from": "V135.4",
+      "to": "V135.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.4",
+        "subphaseCode": "135.4.4"
+      }
+    },
+    {
+      "from": "V135.5",
+      "to": "V135.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.5",
+        "subphaseCode": "135.5.1"
+      }
+    },
+    {
+      "from": "V135.5",
+      "to": "V135.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.5",
+        "subphaseCode": "135.5.2"
+      }
+    },
+    {
+      "from": "V135.5",
+      "to": "V135.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.5",
+        "subphaseCode": "135.5.3"
+      }
+    },
+    {
+      "from": "V135.5",
+      "to": "V135.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.5",
+        "subphaseCode": "135.5.4"
+      }
+    },
+    {
+      "from": "V135.6",
+      "to": "V135.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.6",
+        "subphaseCode": "135.6.1"
+      }
+    },
+    {
+      "from": "V135.6",
+      "to": "V135.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.6",
+        "subphaseCode": "135.6.2"
+      }
+    },
+    {
+      "from": "V135.6",
+      "to": "V135.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.6",
+        "subphaseCode": "135.6.3"
+      }
+    },
+    {
+      "from": "V135.6",
+      "to": "V135.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.6",
+        "subphaseCode": "135.6.4"
+      }
+    },
+    {
+      "from": "V135.7",
+      "to": "V135.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7",
+        "subphaseCode": "135.7.1"
+      }
+    },
+    {
+      "from": "V135.7",
+      "to": "V135.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7",
+        "subphaseCode": "135.7.2"
+      }
+    },
+    {
+      "from": "V135.7",
+      "to": "V135.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7",
+        "subphaseCode": "135.7.3"
+      }
+    },
+    {
+      "from": "V135.7",
+      "to": "V135.7.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7",
+        "subphaseCode": "135.7.4"
+      }
+    },
+    {
+      "from": "V135.7",
+      "to": "V135.7.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.7",
+        "subphaseCode": "135.7.5"
+      }
+    },
+    {
+      "from": "V135.99",
+      "to": "V135.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.1"
+      }
+    },
+    {
+      "from": "V135.99",
+      "to": "V135.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.2"
+      }
+    },
+    {
+      "from": "V135.99",
+      "to": "V135.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.3"
+      }
+    },
+    {
+      "from": "V135.99",
+      "to": "V135.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.4"
+      }
+    },
+    {
+      "from": "V135.99",
+      "to": "V135.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.5"
+      }
+    },
+    {
+      "from": "V135.99",
+      "to": "V135.99.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V135",
+        "phaseCode": "135.99",
+        "subphaseCode": "135.99.6"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -89271,6 +90422,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/aktiv/V134.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V135.md",
       "type": "scope",
       "hint": null,
       "attributes": {

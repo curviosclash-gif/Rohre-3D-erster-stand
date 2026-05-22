@@ -30,7 +30,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | --- | --- | --- |
 | Hauptspiel | `V76`, `V99`, `V108`, `V112`, `V113`, `V115` | Gameplay, Multiplayer, Hangar, Playtest- und produktnahe Spielqualitaet. |
 | Map Content, Map Tools & Settings | `V103`, `V106`, `V114`, `V130` | Map-/GLB-Content, SettingsManager, SurfacePolicy und kuratierte Parcours-Map-Varianz. |
-| Android / Mobile | `V132` | Android Arcade-Parcours als erster aktiver Mobile-Spielmodus-Folgeblock; weitere Mobile-/Android-Intakes bleiben bis zur Uebernahme unter `docs/plaene/neu/`. |
+| Android / Mobile | `V132`, `V135` | Android Arcade-Parcours als erster aktiver Mobile-Spielmodus-Folgeblock; V135 fuehrt die Mobile-Menue-/Start-Setup-UX als Folgeblock. Weitere Mobile-/Android-Intakes bleiben bis zur Uebernahme unter `docs/plaene/neu/`. |
 | Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface und Architektur-Gates. |
 | Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126` | Governance, Planpflege, Toolchain, Evidence, Cleanup und Delivery-/Dev-Gates. |
 | AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V134` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation und AI-Kontext. |
@@ -86,6 +86,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V113 | Hangar Shell Productivierung und Rules Panel | planned | P2 | frei | V76.99,V103.99 | 113.1 | `docs/plaene/aktiv/V113.md` |
 | V130 | Kreatives Parcours Map Pack und Arcade-Routenvarianz | done | P2 | frei | V82.99,V108.99,V115.99 | 130.99 | `docs/plaene/aktiv/V130.md` |
 | V132 | Android Arcade-Parcours Integration | planned | P2 | frei | V82.99,V108.99,V130.99 | 132.1 | `docs/plaene/aktiv/V132.md` |
+| V135 | Mobile Menue UX-Hardening und Start-Setup-Kompaktmodus | planned | P2 | frei | V132.99 | 135.1 | `docs/plaene/aktiv/V135.md` |
 
 ## Abhaengigkeiten
 
@@ -155,6 +156,8 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V132 | V108.99 | hard | ja | Ghost-Selbstduell und stabile Route-Persistenz sind Basis fuer den Android-Wiederholungsreiz |
 | V132 | V130.99 | hard | ja | Kuratierte Parcours-Map-Varianz ist kanonisch abgeschlossen |
 | V132 | V125.99,V96.99 | soft | nein | Architektur-Compliance und Application-Boundary-Folgearbeit helfen, blockieren den ersten Android-Parcours-Slice aber nicht |
+| V135 | V132.99 | hard | ja | Gemeinsame Android-App, Classic/Parcours-Einstieg, Route-Allowlist und Mobile-HUD-Baseline sind Grundlage fuer den Menue-UX-Folgeblock |
+| V135 | V131.99,V125.99,V96.99 | soft | nein | Steuerungs-, Architektur- und Boundary-Folgearbeit helfen, blockieren Fokus-, Chrome- und Start-Setup-UX aber nicht |
 | V134 | V116.99 | hard | ja | Plan-Kontext-Reduktion, Intake-/Archivklassifikation und `plan:context:check` sind Baseline |
 | V134 | V117.99 | hard | ja | D3/D4-Gates und User-owned Intake-Governance sind Baseline |
 | V134 | V123.1,V127 | soft | nein | V123 kann spaeter strukturierte Plan-Daten liefern; V127 bleibt verwandter Repo-/Plan-Map-Crosslink-Scope, aber kein Startblocker |
@@ -201,6 +204,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V113 | - | frei | Geplant |
 | - | V130 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; sechs Parcours-Maps, gestaffelter Arcade-Pool und targeted Map-Pack-Smokes gruen |
 | - | V132 | - | frei | Geplant; Android Arcade-Parcours nach V82/V108 und kanonischem V130-Abschluss |
+| - | V135 | - | frei | Geplant; Mobile-Menue-Review 2026-05-22 in Start-Setup-/Chrome-/Fokus-Folgeblock uebernommen |
 
 ## Empfohlene Reihenfolge
 
@@ -219,6 +223,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 13. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
 14. `V130` ist kanonisch abgeschlossen: sechs neue Parcours-Maps, gestaffelte Arcade-Pool-Erweiterung und targeted Contract-/Start-Smokes sind gruen; Browser-Demo, GLB-/Asset-Setdressing und Preview-Scope bleiben bewusst unveraendert.
 15. `V132` (Android Arcade-Parcours Integration) kann nach kanonischem V130-Abschluss und idealerweise nach V131-Steuerungsbaseline eingeordnet werden; erster Slice bleibt kuratierter Android-Parcours statt vollstaendiger Desktop-Modusparitaet.
+16. `V135` (Mobile Menue UX-Hardening und Start-Setup-Kompaktmodus) kann als Folgeblock nach V132 starten: Fokus-/Scrollsprung, Mobile-Chrome, kompakte Startleiste, Route-Kurzpfad und Landscape-/Small-Viewport-Regeln verbessern, ohne V131-Steuerungsscope oder Desktop-Menueparitaet vorzuziehen.
 
 ## Conflict-Log
 
