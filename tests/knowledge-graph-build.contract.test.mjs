@@ -640,6 +640,132 @@ test('contradiction rules split critical failures from non-critical warnings', (
     ]);
 });
 
+test('domain drift allowlist only suppresses explicit read-only dataset reads', () => {
+    const rules = {
+        contract: 'knowledge-graph.contradictions.v1',
+        schema_version: 1,
+        rules: [
+            {
+                id: 'domain-drift',
+                type: 'domain_drift',
+                severity: 'warning',
+                relation_types: ['reads_state', 'writes_state'],
+                allowed_domain_drifts: [
+                    {
+                        id: 'map-tools-readonly-dashboard-datasets',
+                        relation_types: ['reads_state'],
+                        from_domains: ['map-tools'],
+                        to_domains: ['plan-map', 'repo-map', 'agent-governance'],
+                        to_nodes: [
+                            'state:plan-map-readonly-dataset',
+                            'state:repo-map-readonly-dataset',
+                            'state:agent-map-readonly-dataset',
+                        ],
+                    },
+                ],
+            },
+        ],
+    };
+    const graph = {
+        nodes: [
+            {
+                id: 'runtime:map-tools-renderer',
+                type: 'runtime',
+                attributes: {
+                    mappingId: 'map-tools-electron',
+                    domain: 'map-tools',
+                },
+            },
+            {
+                id: 'state:plan-map-readonly-dataset',
+                type: 'state',
+                attributes: {
+                    mappingId: 'plan-map-tooling',
+                    domain: 'plan-map',
+                },
+            },
+            {
+                id: 'state:repo-map-readonly-dataset',
+                type: 'state',
+                attributes: {
+                    mappingId: 'map-tools-electron',
+                    domain: 'repo-map',
+                },
+            },
+            {
+                id: 'state:agent-map-readonly-dataset',
+                type: 'state',
+                attributes: {
+                    mappingId: 'agent-governance',
+                    domain: 'agent-governance',
+                },
+            },
+            {
+                id: 'state:plan-map-runtime-state',
+                type: 'state',
+                attributes: {
+                    mappingId: 'plan-map-tooling',
+                    domain: 'plan-map',
+                },
+            },
+        ],
+        edges: [
+            {
+                from: 'runtime:map-tools-renderer',
+                to: 'state:plan-map-readonly-dataset',
+                type: 'reads_state',
+                attributes: {
+                    mappingId: 'map-tools-electron',
+                },
+            },
+            {
+                from: 'runtime:map-tools-renderer',
+                to: 'state:repo-map-readonly-dataset',
+                type: 'reads_state',
+                attributes: {
+                    mappingId: 'map-tools-electron',
+                },
+            },
+            {
+                from: 'runtime:map-tools-renderer',
+                to: 'state:agent-map-readonly-dataset',
+                type: 'reads_state',
+                attributes: {
+                    mappingId: 'map-tools-electron',
+                },
+            },
+            {
+                from: 'runtime:map-tools-renderer',
+                to: 'state:plan-map-runtime-state',
+                type: 'reads_state',
+                attributes: {
+                    mappingId: 'map-tools-electron',
+                },
+            },
+            {
+                from: 'runtime:map-tools-renderer',
+                to: 'state:plan-map-readonly-dataset',
+                type: 'writes_state',
+                attributes: {
+                    mappingId: 'map-tools-electron',
+                },
+            },
+        ],
+    };
+
+    const violations = [];
+    const warnings = [];
+    validateGraphContradictions(graph, rules, violations, warnings);
+    const warningMessages = warnings.map((warning) => warning.message);
+
+    assert.deepEqual(violations, []);
+    assert.equal(warnings.length, 2);
+    assert.ok(warningMessages.some((message) => message.includes('reads_state runtime:map-tools-renderer (map-tools) -> state:plan-map-runtime-state (plan-map)')));
+    assert.ok(warningMessages.some((message) => message.includes('writes_state runtime:map-tools-renderer (map-tools) -> state:plan-map-readonly-dataset (plan-map)')));
+    assert.ok(!warningMessages.some((message) => message.includes('state:repo-map-readonly-dataset')));
+    assert.ok(!warningMessages.some((message) => message.includes('state:agent-map-readonly-dataset')));
+});
+
 test('runtime telemetry replay fixtures report graph drift', () => {
     const replay = {
         contract: 'knowledge-graph.runtime-telemetry-replay.v1',

@@ -217,6 +217,14 @@ function normalizeRelationTypeList(value) {
         : [];
 }
 
+function normalizeStringList(value) {
+    if (Array.isArray(value)) {
+        return value.map((entry) => String(entry || '').trim()).filter(Boolean);
+    }
+    const normalized = String(value || '').trim();
+    return normalized ? [normalized] : [];
+}
+
 function hasSource(node, sourceTag) {
     return Array.isArray(node?.attributes?.source) && node.attributes.source.includes(sourceTag);
 }
@@ -503,6 +511,28 @@ function validateRuntimeEventDirectionConflictRule(rule, graph, violations, warn
     }
 }
 
+function isAllowedDomainDrift(rule, edge, fromDomain, toDomain) {
+    const allowances = Array.isArray(rule.allowed_domain_drifts) ? rule.allowed_domain_drifts : [];
+    return allowances.some((allowance) => {
+        const relationTypes = new Set(normalizeStringList(allowance?.relation_types));
+        if (relationTypes.size === 0 || !relationTypes.has(edge.type)) return false;
+
+        const fromDomains = new Set(normalizeStringList(allowance?.from_domains));
+        const toDomains = new Set(normalizeStringList(allowance?.to_domains));
+        const fromNodes = new Set(normalizeStringList(allowance?.from_nodes));
+        const toNodes = new Set(normalizeStringList(allowance?.to_nodes));
+
+        const hasFromGuard = fromDomains.size > 0 || fromNodes.size > 0;
+        const hasToGuard = toDomains.size > 0 || toNodes.size > 0;
+        if (!hasFromGuard || !hasToGuard) return false;
+        if (fromDomains.size > 0 && !fromDomains.has(fromDomain)) return false;
+        if (toDomains.size > 0 && !toDomains.has(toDomain)) return false;
+        if (fromNodes.size > 0 && !fromNodes.has(edge.from)) return false;
+        if (toNodes.size > 0 && !toNodes.has(edge.to)) return false;
+        return true;
+    });
+}
+
 function validateDomainDriftRule(rule, graph, nodeById, violations, warnings) {
     const relationTypes = new Set(normalizeRelationTypeList(rule.relation_types));
     if (relationTypes.size === 0) {
@@ -520,6 +550,8 @@ function validateDomainDriftRule(rule, graph, nodeById, violations, warnings) {
         const fromDomain = String(fromNode?.attributes?.domain || '').trim();
         const toDomain = String(toNode?.attributes?.domain || '').trim();
         if (!fromDomain || !toDomain || fromDomain === toDomain) continue;
+        // Keep domain ownership truthful; only explicitly modeled read-only dashboard reads are exempt.
+        if (isAllowedDomainDrift(rule, edge, fromDomain, toDomain)) continue;
         addContradictionFinding(
             rule,
             violations,

@@ -921,3 +921,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Evidence: `npm run plan:check` -> PASS; `npm run check:architecture:boundaries` -> PASS; `npm run check:architecture:metrics` -> PASS; `npm run check:architecture:ratchet` -> PASS; `npm run check:architecture:staged` -> PASS/skipped bei 0 staged Architekturdateien; `node --test tests/architecture-governance.contract.test.mjs tests/agent-governance.contract.test.mjs` -> PASS; `npm run gates:pre-commit` -> PASS.
 - Restrisiko: `npm run gates:pre-commit` meldet weiterhin bekannte, nicht-blockierende Map-Tools-Domain-Drift-Warnungen im Graph.
 - Not-checked: keine Vollsuite, keine produktiven Runtime-/UI-/Multiplayer-/Recording-/Physik-/Bot-Training-Aenderungen, keine V96-Boundary-Migration, keine Electron-IPC-Ratchetpflicht und kein Browser-/Android-E2E.
+
+## Graph-Contract-Notiz 2026-05-22 (Map Tools Domain-Drift)
+
+- Der Domain-Drift-Checker hat jetzt eine enge Allowlist fuer `map-tools` read-only Dashboard-Kanten auf die drei Dataset-Knoten `state:plan-map-readonly-dataset`, `state:repo-map-readonly-dataset` und `state:agent-map-readonly-dataset`.
+- Domains bleiben Ownership-Signal: `plan-map`, `repo-map` und `agent-governance` werden nicht auf `map-tools` umetikettiert; `writes_state` oder Reads auf andere fremde States melden weiter `KG_CONTRADICTION_DOMAIN_DRIFT`.
+- Evidence: `node --test tests/knowledge-graph-build.contract.test.mjs` -> PASS; `npm run graph:check` -> PASS; `npm run plan:check` -> PASS.

@@ -33,6 +33,28 @@
         "reads_state",
         "writes_state"
       ],
+      "allowed_domain_drifts": [
+        {
+          "id": "map-tools-readonly-dashboard-datasets",
+          "relation_types": [
+            "reads_state"
+          ],
+          "from_domains": [
+            "map-tools"
+          ],
+          "to_domains": [
+            "plan-map",
+            "repo-map",
+            "agent-governance"
+          ],
+          "to_nodes": [
+            "state:plan-map-readonly-dataset",
+            "state:repo-map-readonly-dataset",
+            "state:agent-map-readonly-dataset"
+          ],
+          "description": "Map Tools aggregiert read-only Dashboard-Datasets, besitzt oder mutiert sie aber nicht."
+        }
+      ],
       "description": "Unterschiedliche optionale Domaenen an verbundenen Runtime/Event/State-Knoten werden als Drift-Warnung reportet."
     }
   ]
