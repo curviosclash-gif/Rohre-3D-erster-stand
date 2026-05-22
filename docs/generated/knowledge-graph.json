@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 227,
+          "concreteCount": 228,
           "plannedCount": 0
         }
       }
@@ -1736,8 +1736,10 @@
           "AGENTS.md",
           "docs/generated/knowledge-graph.coverage.json",
           "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.scorecard.json",
           "docs/plaene/aktiv/V125.md",
           "docs/plaene/CHANGELOG.md",
+          "docs/prozess/Dokumentationsstatus.md",
           "docs/referenz/ai_architecture_context.md",
           "docs/referenz/ai_project_onboarding.md",
           "docs/referenz/architektur_ausfuehrlich.md",
@@ -1758,8 +1760,8 @@
           "tests/plan-evidence-claims.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 32,
-          "plannedCount": 2
+          "concreteCount": 35,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [
           "V112",
@@ -5064,7 +5066,7 @@
       "id": "V125.3",
       "type": "phase",
       "title": "Staged Architecture Guard",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.3"
@@ -13787,8 +13789,8 @@
     {
       "id": "V125.3.1",
       "type": "subphase",
-      "title": "`scripts/check-architecture-staged.mjs` anlegen: staged files klassifizieren und passende Checks auswaehlen.",
-      "status": "open",
+      "title": "`scripts/check-architecture-staged.mjs` anlegen: staged files klassifizieren und passende Checks auswaehlen. (abgeschlossen: 2026-05-22; evidence: neues Script liest `git diff --cached --name-only`, normalisiert staged paths und waehlt je Kategorie die kleinsten Architekturchecks; `npm run check:architecture:staged -- --dry-run` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.3",
@@ -13798,8 +13800,8 @@
     {
       "id": "V125.3.2",
       "type": "subphase",
-      "title": "`package.json` um `check:architecture:staged` ergaenzen.",
-      "status": "open",
+      "title": "`package.json` um `check:architecture:staged` ergaenzen. (abgeschlossen: 2026-05-22; evidence: `check:architecture:staged` ruft `node scripts/check-architecture-staged.mjs` auf; `npm run check:architecture:staged` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.3",
@@ -13809,8 +13811,8 @@
     {
       "id": "V125.3.3",
       "type": "subphase",
-      "title": "`.husky/pre-commit` fuer Architektur-Scope auf den staged Guard umstellen.",
-      "status": "open",
+      "title": "`.husky/pre-commit` fuer Architektur-Scope auf den staged Guard umstellen. (abgeschlossen: 2026-05-22; evidence: Hook ruft fuer staged `src/`, `server/`, `electron/`, `scripts/architecture/` und `scripts/check-architecture-*` den neuen staged Guard auf; `npm run check:architecture:staged` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.3",
@@ -13820,8 +13822,8 @@
     {
       "id": "V125.3.4",
       "type": "subphase",
-      "title": "Guard-Routing dokumentieren: `src` -> touched-strict, `scripts/architecture` -> boundaries/metrics/ratchet, `application` -> Application-Boundary, `electron/platform` -> Capability-/Global-Surface-Scan.",
-      "status": "open",
+      "title": "Guard-Routing dokumentieren: `src` -> touched-strict, `scripts/architecture` -> boundaries/metrics/ratchet, `application` -> Application-Boundary, `electron/platform` -> Capability-/Global-Surface-Scan. (abgeschlossen: 2026-05-22; evidence: Routing ist im Script als Kategorien verankert: `src/**` -> touched-strict, Architektur-Tooling -> boundaries/metrics/ratchet, `src/application/**`/Contracts/Runtime/Server -> breitere Boundary-/Metrics-/Ratchet-Baseline, `electron/**`/`src/platform/**` -> Boundary-/Metrics-Baseline mit V125.4-Hinweis; `npm run check:architecture:staged -- --dry-run` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V125",
         "phaseCode": "125.3",
@@ -28355,6 +28357,7 @@
           "V111",
           "V116",
           "V120",
+          "V125",
           "V90"
         ],
         "exists": true
@@ -31345,6 +31348,7 @@
           "V109",
           "V110",
           "V111",
+          "V125",
           "V90"
         ],
         "exists": true
@@ -33731,12 +33735,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V125"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -53703,6 +53709,15 @@
     {
       "from": "B13",
       "to": "scripts/check-architecture-ratchet.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/check-architecture-staged.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -75401,6 +75416,15 @@
     },
     {
       "from": "V125",
+      "to": "docs/generated/knowledge-graph.scorecard.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
       "to": "docs/plaene/aktiv/V125.md",
       "type": "scope",
       "hint": null,
@@ -75411,6 +75435,15 @@
     {
       "from": "V125",
       "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V125",
+      "to": "docs/prozess/Dokumentationsstatus.md",
       "type": "scope",
       "hint": null,
       "attributes": {

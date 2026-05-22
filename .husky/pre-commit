@@ -36,8 +36,8 @@ if [ -n "$BOT_MODE" ]; then
   node dev/scripts/verify-lock.mjs
 fi
 
-# Architecture guard for touched runtime/source files.
-if git diff --cached --name-only | grep -Eq "^(src/|scripts/architecture/|scripts/check-architecture-)"; then
-  echo "Running architecture touched-file strict guard..."
-  npm run check:architecture:touched-strict
+# Architecture guard for staged runtime/source/tooling files.
+if git diff --cached --name-only | grep -Eq "^(src/|server/|electron/|scripts/architecture/|scripts/check-architecture-)"; then
+  echo "Running staged architecture guard..."
+  npm run check:architecture:staged
 fi

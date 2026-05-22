@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-21T13:20:46.123Z",
+  "timestamp": "2026-05-22T00:55:40.213Z",
   "locks": [
     {
       "block_id": "V103",
@@ -557,10 +557,56 @@
       "target_completion": "2026-05-18",
       "status": "completed",
       "notes": ""
+    },
+    {
+      "block_id": "V125",
+      "phase": "125.3",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V125.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.scorecard.json",
+        "docs/prozess/Dokumentationsstatus.md",
+        "AGENTS.md",
+        ".agents/rules/code_quality_and_debugging.md",
+        ".agents/rules/planning_and_governance.md",
+        ".agents/workflows/plan.md",
+        ".agents/workflows/code.md",
+        ".agents/workflows/quick.md",
+        ".agents/workflows/bugfix.md",
+        ".agents/workflows/refactor.md",
+        ".agents/workflows/performance.md",
+        ".agents/workflows/fix-planung.md",
+        ".agents/test_mapping.md",
+        ".husky/pre-commit",
+        "package.json",
+        "scripts/architecture/ArchitectureAnalysis.mjs",
+        "scripts/architecture/ArchitectureConfig.mjs",
+        "scripts/architecture/architecture-budget-ratchet.json",
+        "scripts/check-architecture-staged.mjs",
+        "scripts/check-architecture-boundaries.mjs",
+        "scripts/check-architecture-metrics.mjs",
+        "scripts/check-architecture-ratchet.mjs",
+        "scripts/check-architecture-touched-strict.mjs",
+        "scripts/validate-umsetzungsplan.mjs",
+        "scripts/check-plan-evidence-claims.mjs",
+        "tests/plan-evidence-claims.contract.test.mjs",
+        "tests/architecture-governance.contract.test.mjs",
+        "tests/agent-governance.contract.test.mjs",
+        "docs/referenz/architektur_ausfuehrlich.md",
+        "docs/referenz/ai_project_onboarding.md",
+        "docs/referenz/ai_architecture_context.md"
+      ],
+      "start_date": "2026-05-22",
+      "target_completion": "2026-05-22",
+      "status": "in-progress",
+      "notes": ""
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "125.2",
+    "phase_id": "125.3",
     "completed_items": [],
     "last_commit": ""
   }

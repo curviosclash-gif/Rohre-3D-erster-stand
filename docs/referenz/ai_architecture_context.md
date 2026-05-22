@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-05-21
+Stand: 2026-05-22
 
 ## 1. Architekturparadigma
 

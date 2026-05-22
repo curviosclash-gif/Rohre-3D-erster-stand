@@ -185,12 +185,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2055,
-    "rawCoveredFileCount": 1299,
+    "trackedFileCount": 2056,
+    "rawCoveredFileCount": 1300,
     "rawCoveragePercent": 63.2,
-    "adjustedTrackedFileCount": 1379,
-    "adjustedCoveredFileCount": 1072,
-    "adjustedCoveragePercent": 77.7,
+    "adjustedTrackedFileCount": 1380,
+    "adjustedCoveredFileCount": 1073,
+    "adjustedCoveragePercent": 77.8,
     "uncoveredFileCount": 756,
     "uncoveredActiveFileCount": 307,
     "classifications": [
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 983,
-        "coveredCount": 860
+        "count": 984,
+        "coveredCount": 861
       },
       {
         "classification": "product-docs",
@@ -11143,6 +11143,7 @@
         "V111",
         "V116",
         "V120",
+        "V125",
         "V90"
       ],
       "surfaces": [],
@@ -14617,6 +14618,7 @@
         "V109",
         "V110",
         "V111",
+        "V125",
         "V90"
       ],
       "surfaces": [],
@@ -19140,6 +19142,25 @@
         "V91",
         "V92",
         "V96"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/check-architecture-staged.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V125"
       ],
       "surfaces": [],
       "classification": "product-code",
