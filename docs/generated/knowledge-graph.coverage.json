@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2056,
-    "rawCoveredFileCount": 1300,
-    "rawCoveragePercent": 63.2,
-    "adjustedTrackedFileCount": 1380,
-    "adjustedCoveredFileCount": 1073,
+    "trackedFileCount": 2058,
+    "rawCoveredFileCount": 1302,
+    "rawCoveragePercent": 63.3,
+    "adjustedTrackedFileCount": 1382,
+    "adjustedCoveredFileCount": 1075,
     "adjustedCoveragePercent": 77.8,
     "uncoveredFileCount": 756,
     "uncoveredActiveFileCount": 307,
@@ -263,8 +263,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 321,
-        "coveredCount": 167
+        "count": 323,
+        "coveredCount": 169
       },
       {
         "classification": "prototype",
@@ -11829,6 +11829,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V134.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V64.md",
       "tracked": true,
       "coveredInCore": true,
@@ -14420,6 +14437,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/Feature_Plan_Map_Intake_Uebersicht_V134.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/Feature_Repo_Agent_Memory_und_Ruflo_Orchestrierung_V122.md",
       "tracked": true,
       "coveredInCore": true,
@@ -14567,6 +14601,7 @@
       ],
       "scopeBlocks": [
         "V116",
+        "V134",
         "V77"
       ],
       "surfaces": [],
@@ -18712,7 +18747,8 @@
       "scopeBlocks": [
         "V116",
         "V121",
-        "V132"
+        "V132",
+        "V134"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -19573,10 +19609,12 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "knowledge-graph-mapping"
+        "knowledge-graph-mapping",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V134"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -19771,10 +19809,12 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "knowledge-graph-mapping"
+        "knowledge-graph-mapping",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V134"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33941,10 +33981,12 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "knowledge-graph-mapping"
+        "knowledge-graph-mapping",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V134"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -35073,9 +35115,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "knowledge-graph-mapping"
+        "knowledge-graph-mapping",
+        "scope-files"
       ],
-      "scopeBlocks": [],
+      "scopeBlocks": [
+        "V134"
+      ],
       "surfaces": [],
       "classification": "repo-ops",
       "excludedFromCoverage": true,
@@ -35103,9 +35148,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "knowledge-graph-mapping"
+        "knowledge-graph-mapping",
+        "scope-files"
       ],
-      "scopeBlocks": [],
+      "scopeBlocks": [
+        "V134"
+      ],
       "surfaces": [],
       "classification": "repo-ops",
       "excludedFromCoverage": true,
@@ -35118,9 +35166,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "knowledge-graph-mapping"
+        "knowledge-graph-mapping",
+        "scope-files"
       ],
-      "scopeBlocks": [],
+      "scopeBlocks": [
+        "V134"
+      ],
       "surfaces": [],
       "classification": "repo-ops",
       "excludedFromCoverage": true,

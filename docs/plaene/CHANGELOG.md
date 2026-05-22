@@ -6,6 +6,14 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Plan-Intake 2026-05-22 (Block `V134`)
+
+- `V134` ist nach expliziter User-Anforderung als geplanter P2-Block im Master-Index aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V134.md`.
+- Zweck: Die Plan Map soll echte neue Intake-Ideen, bereits von offenen Master-Bloecken adoptierte Drafts, erledigt adoptierte Archivkandidaten, Bot-Training-Sonderfaelle und Meta-Dateien sichtbar trennen.
+- Der Draft `docs/plaene/neu/Feature_Plan_Map_Intake_Uebersicht_V134.md` bleibt vorerst als Source-History liegen; Draft-Move oder Archivierung ist bewusst kein Teil dieses D3-Intake-Slices.
+- Nicht-Ziel: keine neue Plan-Source-of-Truth, keine Viewer-Schreibpfade, keine automatische Intake-Uebernahme und kein Wiederaufleben des zurueckgenommenen V133-Glossar-/Wiki-Scope.
+- Evidence: `npm run plan:check`, `npm run plan:context:check`, `node --test tests/plan-map-export.contract.test.mjs`, `npm run docs:check`, `npm run check:plan-evidence-claims`, `npm run graph:check` und `npm run gates:pre-commit` fuer diesen Intake-Slice.
+
 ## Produkt-Notiz 2026-05-21 (Map Tools Android)
 
 - Die Android-Map-Tools-Update-Aktion wurde als kleiner D2-Slice vom reinen Release-Link zum Release-APK-Download erweitert: Die Shell nutzt weiter GitHub Releases, bevorzugt aber ein `.apk`-Asset aus dem neuesten Release und faellt bei fehlendem Asset oder Offline-Fehlern auf die Release-Seite zurueck.

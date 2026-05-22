@@ -1566,7 +1566,8 @@
         "scopeOverlapAllowedWith": [
           "V120",
           "V123",
-          "V132"
+          "V132",
+          "V134"
         ],
         "unknownFrontmatterFields": [
           "scope_reference_files"
@@ -1897,9 +1898,50 @@
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [
-          "V121"
+          "V121",
+          "V134"
         ],
         "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V134",
+      "type": "block",
+      "title": "Plan Map Intake-Uebersicht und Kandidaten-Trennung",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "134.1",
+        "planFile": "docs/plaene/aktiv/V134.md",
+        "scopeDeclarations": [
+          "docs/plaene/neu/README.md",
+          "scripts/export-plan-map.mjs",
+          "scripts/planning/PlanIntakeOps.mjs",
+          "tests/plan-map-export.contract.test.mjs",
+          "tools/plan-map/index.html",
+          "tools/plan-map/README.md",
+          "tools/plan-map/viewer.css",
+          "tools/plan-map/viewer.js"
+        ],
+        "scopeResolution": {
+          "concreteCount": 8,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [
+          "V116",
+          "V121",
+          "V123",
+          "V127",
+          "V132"
+        ],
+        "unknownFrontmatterFields": [
+          "scope_reference_files"
+        ]
       }
     },
     {
@@ -2615,7 +2657,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 332,
+          "concreteCount": 334,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5320,6 +5362,86 @@
       "attributes": {
         "blockId": "V132",
         "phaseCode": "132.99"
+      }
+    },
+    {
+      "id": "V134.1",
+      "type": "phase",
+      "title": "Baseline und Zielklassifikation",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.1"
+      }
+    },
+    {
+      "id": "V134.2",
+      "type": "phase",
+      "title": "Intake-Klassifikation und Exportvertrag",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2"
+      }
+    },
+    {
+      "id": "V134.3",
+      "type": "phase",
+      "title": "Intake-UI als Lanes statt Mischliste",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3"
+      }
+    },
+    {
+      "id": "V134.4",
+      "type": "phase",
+      "title": "Master-/Intake-Navigation verbinden",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4"
+      }
+    },
+    {
+      "id": "V134.5",
+      "type": "phase",
+      "title": "Begriffe, Frontmatter und Dokumentation",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.5"
+      }
+    },
+    {
+      "id": "V134.6",
+      "type": "phase",
+      "title": "Optionaler Struktur- und Archivierungsentscheid",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.6"
+      }
+    },
+    {
+      "id": "V134.7",
+      "type": "phase",
+      "title": "Verifikation und Shell-Abgleich",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7"
+      }
+    },
+    {
+      "id": "V134.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99"
       }
     },
     {
@@ -15005,6 +15127,435 @@
         "blockId": "V132",
         "phaseCode": "132.99",
         "subphaseCode": "132.99.6"
+      }
+    },
+    {
+      "id": "V134.1.1",
+      "type": "subphase",
+      "title": "Aktuelle Counts aus `npm run plan:context:check` und `node scripts/export-plan-map.mjs` erfassen: Master-Bloecke, Intake-Klassen, echte Kandidaten, Bot-Training, adoptierte Drafts.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.1",
+        "subphaseCode": "134.1.1"
+      }
+    },
+    {
+      "id": "V134.1.2",
+      "type": "subphase",
+      "title": "Lane-Modell festlegen: `candidate`, `adopted-open`, `adopted-done`, `bot-training`, `meta`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.1",
+        "subphaseCode": "134.1.2"
+      }
+    },
+    {
+      "id": "V134.1.3",
+      "type": "subphase",
+      "title": "V134 als eigenstaendigen Plan-Map-Intake-Scope gegen V127/V123 abgrenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.1",
+        "subphaseCode": "134.1.3"
+      }
+    },
+    {
+      "id": "V134.1.4",
+      "type": "subphase",
+      "title": "Bestehende `V133`-Rollback-Historie als No-go fuer Wiederverwendung der Block-ID bestaetigen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.1",
+        "subphaseCode": "134.1.4"
+      }
+    },
+    {
+      "id": "V134.2.1",
+      "type": "subphase",
+      "title": "`PlanIntakeOps` um `intakeLane`, `intakeAction`, `primaryBlockId`, `canonicalBlockId` und `requiresUserIntake` erweitern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2",
+        "subphaseCode": "134.2.1"
+      }
+    },
+    {
+      "id": "V134.2.2",
+      "type": "subphase",
+      "title": "Fallback-Erkennung fuer Fliesstext ergaenzen: \"Vorgeschlagene Block-ID\", \"Geplante aktive Detaildatei\", \"Ziel-Masterplan\", \"Manuelle Uebernahme erforderlich\".",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2",
+        "subphaseCode": "134.2.2"
+      }
+    },
+    {
+      "id": "V134.2.3",
+      "type": "subphase",
+      "title": "Mehrdeutige Block-IDs sauber markieren: Dateinamen mit altem Kontextblock plus Zielblock duerfen nicht still falschen Primary-Block erzeugen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2",
+        "subphaseCode": "134.2.3"
+      }
+    },
+    {
+      "id": "V134.2.4",
+      "type": "subphase",
+      "title": "`scripts/export-plan-map.mjs` summary-Metriken splitten: echte Kandidaten, offene adoptierte Drafts, erledigte adoptierte Drafts, Bot-Training, Meta.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2",
+        "subphaseCode": "134.2.4"
+      }
+    },
+    {
+      "id": "V134.2.5",
+      "type": "subphase",
+      "title": "Contract-Test fuer Exportfelder und Summary-Counts nachziehen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2",
+        "subphaseCode": "134.2.5"
+      }
+    },
+    {
+      "id": "V134.3.1",
+      "type": "subphase",
+      "title": "Intake-View standardmaessig auf echte Kandidaten/Ideen fokussieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.1"
+      }
+    },
+    {
+      "id": "V134.3.2",
+      "type": "subphase",
+      "title": "Lanes rendern: `Neue Ideen`, `Bereits geplant`, `Erledigt / Archiv`, `Bot-Training`, `Meta`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.2"
+      }
+    },
+    {
+      "id": "V134.3.3",
+      "type": "subphase",
+      "title": "Bot-Training und Meta standardmaessig einklappen oder per Filter ausblenden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.3"
+      }
+    },
+    {
+      "id": "V134.3.4",
+      "type": "subphase",
+      "title": "`adopted-open`-Karten als Handoff-Karten zeigen: kanonischer Block, Status, Sprung zum Blockdetail, Draft nur als Source-History.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.4"
+      }
+    },
+    {
+      "id": "V134.3.5",
+      "type": "subphase",
+      "title": "`adopted-done`-Karten als Archivkandidaten zeigen, ohne automatische Move-Aktion.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.5"
+      }
+    },
+    {
+      "id": "V134.3.6",
+      "type": "subphase",
+      "title": "Leere Zustaende formulieren: keine echten Kandidaten, aber uebernommene Drafts vorhanden; keine Bot-Training-Anzeige im normalen VXX-Intake.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.6"
+      }
+    },
+    {
+      "id": "V134.4.1",
+      "type": "subphase",
+      "title": "Im Detailpanel fuer Master-Bloecke \"Draft-Herkunft\" anzeigen, wenn passende `adopted-open`- oder `adopted-done`-Drafts existieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4",
+        "subphaseCode": "134.4.1"
+      }
+    },
+    {
+      "id": "V134.4.2",
+      "type": "subphase",
+      "title": "Intake-Karten mit `canonicalBlockId` bekommen einen Button/Link zum Block.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4",
+        "subphaseCode": "134.4.2"
+      }
+    },
+    {
+      "id": "V134.4.3",
+      "type": "subphase",
+      "title": "Suche und Workstream-Filter behalten sowohl Master- als auch Intake-Treffer, zeigen aber die Quelle klar an.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4",
+        "subphaseCode": "134.4.3"
+      }
+    },
+    {
+      "id": "V134.4.4",
+      "type": "subphase",
+      "title": "Datei-Fokus nutzt `scope_files` aus Drafts weiterhin, markiert aber ob der Treffer Kandidat oder bereits geplant ist.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4",
+        "subphaseCode": "134.4.4"
+      }
+    },
+    {
+      "id": "V134.4.5",
+      "type": "subphase",
+      "title": "URL-State optional vorbereiten (`?view=intake&lane=candidate`, `?block=V120`), ohne ihn als Contract-Pflicht einzufuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4",
+        "subphaseCode": "134.4.5"
+      }
+    },
+    {
+      "id": "V134.5.1",
+      "type": "subphase",
+      "title": "`docs/plaene/neu/README.md` um empfohlene Frontmatter-Felder ergaenzen: `planned_block_id`, `plan_file`, `target_master`, `intake_status`, `decision_class`, `scope_files`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.5",
+        "subphaseCode": "134.5.1"
+      }
+    },
+    {
+      "id": "V134.5.2",
+      "type": "subphase",
+      "title": "`tools/plan-map/README.md` mit Lane-Modell, Default-Filter und Source-of-Truth-Grenze nachziehen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.5",
+        "subphaseCode": "134.5.2"
+      }
+    },
+    {
+      "id": "V134.5.3",
+      "type": "subphase",
+      "title": "UI-Begriffe schaerfen: `Map` optional zu `Master`/`Geplant`, `Intake` optional zu `Ideen / Intake`; Entscheidung vor Umsetzung treffen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.5",
+        "subphaseCode": "134.5.3"
+      }
+    },
+    {
+      "id": "V134.5.4",
+      "type": "subphase",
+      "title": "Changelog-Notiz fuer den Umsetzungsslice vorbereiten: keine neue Wahrheit, nur bessere Navigation.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.5",
+        "subphaseCode": "134.5.4"
+      }
+    },
+    {
+      "id": "V134.6.1",
+      "type": "subphase",
+      "title": "Pruefen, ob UI-/Export-Lanes reichen; Default ist kein Ordnerumbau.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.6",
+        "subphaseCode": "134.6.1"
+      }
+    },
+    {
+      "id": "V134.6.2",
+      "type": "subphase",
+      "title": "Falls weiterhin unuebersichtlich: Vorschlag fuer `docs/plaene/neu/kandidaten/`, `docs/plaene/neu/adoptiert-offen/`, `docs/plaene/neu/meta/` als D3/D4-Option ausarbeiten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.6",
+        "subphaseCode": "134.6.2"
+      }
+    },
+    {
+      "id": "V134.6.3",
+      "type": "subphase",
+      "title": "Bot-Training-Sonderzone separat bewerten; kein normaler VXX-Move ohne Bot-Training-Governance.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.6",
+        "subphaseCode": "134.6.3"
+      }
+    },
+    {
+      "id": "V134.6.4",
+      "type": "subphase",
+      "title": "Move-/Archivierungsplan nur als Dry-Run/Report liefern; jede echte Verschiebung braucht User-Gate, Recovery-Pfad und planbezogene Changelog-Notiz.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.6",
+        "subphaseCode": "134.6.4"
+      }
+    },
+    {
+      "id": "V134.7.1",
+      "type": "subphase",
+      "title": "`node --test tests/plan-map-export.contract.test.mjs` fuer den Exportvertrag ausfuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7",
+        "subphaseCode": "134.7.1"
+      }
+    },
+    {
+      "id": "V134.7.2",
+      "type": "subphase",
+      "title": "`npm run plan:context:check` gegen `PlanIntakeOps`-Klassifikation spiegeln.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7",
+        "subphaseCode": "134.7.2"
+      }
+    },
+    {
+      "id": "V134.7.3",
+      "type": "subphase",
+      "title": "`npm run plan:check` und `npm run docs:check` ausfuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7",
+        "subphaseCode": "134.7.3"
+      }
+    },
+    {
+      "id": "V134.7.4",
+      "type": "subphase",
+      "title": "Bei Viewer-Aenderungen `.\\start-plan-map.ps1` oder lokalen statischen Viewer starten und Desktop/narrow Layout pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7",
+        "subphaseCode": "134.7.4"
+      }
+    },
+    {
+      "id": "V134.7.5",
+      "type": "subphase",
+      "title": "Bei Map-Tools-Shell-Auswirkung gezielte Electron-/Android-Map-Tools-Contracts oder vorhandene App-Checks laufen lassen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7",
+        "subphaseCode": "134.7.5"
+      }
+    },
+    {
+      "id": "V134.99.1",
+      "type": "subphase",
+      "title": "Alle frueheren Phasen sind erledigt oder blockerfest mit Nachfolgeentscheidung dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.1"
+      }
+    },
+    {
+      "id": "V134.99.2",
+      "type": "subphase",
+      "title": "Plan Map zeigt echte Kandidaten getrennt von uebernommenen, erledigten, Bot-Training- und Meta-Drafts.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.2"
+      }
+    },
+    {
+      "id": "V134.99.3",
+      "type": "subphase",
+      "title": "Summary-Metriken unterscheiden `Ideen`, `Bereits geplant`, `Archivkandidaten`, `Bot-Training` und `Meta`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.3"
+      }
+    },
+    {
+      "id": "V134.99.4",
+      "type": "subphase",
+      "title": "Kein Viewer-Pfad schreibt Master, aktive Plaene, Locks, Graph oder Draft-Dateien.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.4"
+      }
+    },
+    {
+      "id": "V134.99.5",
+      "type": "subphase",
+      "title": "Contract-, Plan- und Doku-Gates sind gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.5"
+      }
+    },
+    {
+      "id": "V134.99.6",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt, ob physische Ordnertrennung verworfen, vertagt oder als separater User-Gate-Scope vorbereitet wurde.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.6"
       }
     },
     {
@@ -28875,6 +29426,21 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V134.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V64.md",
       "type": "file",
       "title": null,
@@ -31168,6 +31734,21 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_Plan_Map_Intake_Uebersicht_V134.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Repo_Agent_Memory_und_Ruflo_Orchestrierung_V122.md",
       "type": "file",
       "title": null,
@@ -31299,6 +31880,7 @@
         ],
         "scopeBlocks": [
           "V116",
+          "V134",
           "V77"
         ],
         "exists": true
@@ -33272,7 +33854,8 @@
         "scopeBlocks": [
           "V116",
           "V121",
-          "V132"
+          "V132",
+          "V134"
         ],
         "exists": true
       }
@@ -34126,10 +34709,12 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "knowledge-graph-mapping"
+          "knowledge-graph-mapping",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V134"
         ],
         "mappedNodes": [
           "runtime:plan-map-export"
@@ -34398,10 +34983,12 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "knowledge-graph-mapping"
+          "knowledge-graph-mapping",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V134"
         ],
         "mappedNodes": [
           "runtime:plan-intake-ops"
@@ -47182,10 +47769,12 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "knowledge-graph-mapping"
+          "knowledge-graph-mapping",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V134"
         ],
         "mappedNodes": [
           "test:plan-map-export-contract"
@@ -48325,7 +48914,11 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "knowledge-graph-mapping"
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V134"
         ],
         "mappedNodes": [
           "config:plan-map-viewer-shell"
@@ -48355,7 +48948,11 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "knowledge-graph-mapping"
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V134"
         ],
         "mappedNodes": [
           "config:plan-map-viewer-style"
@@ -48370,7 +48967,11 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "knowledge-graph-mapping"
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V134"
         ],
         "mappedNodes": [
           "runtime:plan-map-viewer"
@@ -77731,6 +78332,623 @@
       }
     },
     {
+      "from": "V134",
+      "to": "docs/plaene/neu/README.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "README.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "scripts/export-plan-map.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "scripts/planning/PlanIntakeOps.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "tests/plan-map-export.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "tools/plan-map/index.html",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "tools/plan-map/viewer.css",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "tools/plan-map/viewer.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "V116",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Plan-Kontext-Reduktion, Intake-/Archivklassifikation und `plan:context:check` sind Baseline",
+      "attributes": {
+        "dependsPhase": "116.99",
+        "rawToken": "V116.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V134",
+      "to": "V117",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "D3/D4-Gates und User-owned Intake-Governance sind Baseline",
+      "attributes": {
+        "dependsPhase": "117.99",
+        "rawToken": "V117.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V134",
+      "to": "V134.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.1"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "V134.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "V134.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "V134.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "V134.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.5"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "V134.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.6"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "V134.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7"
+      }
+    },
+    {
+      "from": "V134",
+      "to": "V134.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99"
+      }
+    },
+    {
+      "from": "V134.1",
+      "to": "V134.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.1",
+        "subphaseCode": "134.1.1"
+      }
+    },
+    {
+      "from": "V134.1",
+      "to": "V134.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.1",
+        "subphaseCode": "134.1.2"
+      }
+    },
+    {
+      "from": "V134.1",
+      "to": "V134.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.1",
+        "subphaseCode": "134.1.3"
+      }
+    },
+    {
+      "from": "V134.1",
+      "to": "V134.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.1",
+        "subphaseCode": "134.1.4"
+      }
+    },
+    {
+      "from": "V134.2",
+      "to": "V134.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2",
+        "subphaseCode": "134.2.1"
+      }
+    },
+    {
+      "from": "V134.2",
+      "to": "V134.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2",
+        "subphaseCode": "134.2.2"
+      }
+    },
+    {
+      "from": "V134.2",
+      "to": "V134.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2",
+        "subphaseCode": "134.2.3"
+      }
+    },
+    {
+      "from": "V134.2",
+      "to": "V134.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2",
+        "subphaseCode": "134.2.4"
+      }
+    },
+    {
+      "from": "V134.2",
+      "to": "V134.2.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.2",
+        "subphaseCode": "134.2.5"
+      }
+    },
+    {
+      "from": "V134.3",
+      "to": "V134.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.1"
+      }
+    },
+    {
+      "from": "V134.3",
+      "to": "V134.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.2"
+      }
+    },
+    {
+      "from": "V134.3",
+      "to": "V134.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.3"
+      }
+    },
+    {
+      "from": "V134.3",
+      "to": "V134.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.4"
+      }
+    },
+    {
+      "from": "V134.3",
+      "to": "V134.3.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.5"
+      }
+    },
+    {
+      "from": "V134.3",
+      "to": "V134.3.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.3",
+        "subphaseCode": "134.3.6"
+      }
+    },
+    {
+      "from": "V134.4",
+      "to": "V134.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4",
+        "subphaseCode": "134.4.1"
+      }
+    },
+    {
+      "from": "V134.4",
+      "to": "V134.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4",
+        "subphaseCode": "134.4.2"
+      }
+    },
+    {
+      "from": "V134.4",
+      "to": "V134.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4",
+        "subphaseCode": "134.4.3"
+      }
+    },
+    {
+      "from": "V134.4",
+      "to": "V134.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4",
+        "subphaseCode": "134.4.4"
+      }
+    },
+    {
+      "from": "V134.4",
+      "to": "V134.4.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.4",
+        "subphaseCode": "134.4.5"
+      }
+    },
+    {
+      "from": "V134.5",
+      "to": "V134.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.5",
+        "subphaseCode": "134.5.1"
+      }
+    },
+    {
+      "from": "V134.5",
+      "to": "V134.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.5",
+        "subphaseCode": "134.5.2"
+      }
+    },
+    {
+      "from": "V134.5",
+      "to": "V134.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.5",
+        "subphaseCode": "134.5.3"
+      }
+    },
+    {
+      "from": "V134.5",
+      "to": "V134.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.5",
+        "subphaseCode": "134.5.4"
+      }
+    },
+    {
+      "from": "V134.6",
+      "to": "V134.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.6",
+        "subphaseCode": "134.6.1"
+      }
+    },
+    {
+      "from": "V134.6",
+      "to": "V134.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.6",
+        "subphaseCode": "134.6.2"
+      }
+    },
+    {
+      "from": "V134.6",
+      "to": "V134.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.6",
+        "subphaseCode": "134.6.3"
+      }
+    },
+    {
+      "from": "V134.6",
+      "to": "V134.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.6",
+        "subphaseCode": "134.6.4"
+      }
+    },
+    {
+      "from": "V134.7",
+      "to": "V134.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7",
+        "subphaseCode": "134.7.1"
+      }
+    },
+    {
+      "from": "V134.7",
+      "to": "V134.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7",
+        "subphaseCode": "134.7.2"
+      }
+    },
+    {
+      "from": "V134.7",
+      "to": "V134.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7",
+        "subphaseCode": "134.7.3"
+      }
+    },
+    {
+      "from": "V134.7",
+      "to": "V134.7.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7",
+        "subphaseCode": "134.7.4"
+      }
+    },
+    {
+      "from": "V134.7",
+      "to": "V134.7.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.7",
+        "subphaseCode": "134.7.5"
+      }
+    },
+    {
+      "from": "V134.99",
+      "to": "V134.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.1"
+      }
+    },
+    {
+      "from": "V134.99",
+      "to": "V134.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.2"
+      }
+    },
+    {
+      "from": "V134.99",
+      "to": "V134.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.3"
+      }
+    },
+    {
+      "from": "V134.99",
+      "to": "V134.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.4"
+      }
+    },
+    {
+      "from": "V134.99",
+      "to": "V134.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.5"
+      }
+    },
+    {
+      "from": "V134.99",
+      "to": "V134.99.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V134",
+        "phaseCode": "134.99",
+        "subphaseCode": "134.99.6"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -88052,6 +89270,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V134.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V64.md",
       "type": "scope",
       "hint": null,
@@ -89385,6 +90612,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Plan_Map_Intake_Uebersicht_V134.md",
       "type": "scope",
       "hint": null,
       "attributes": {
