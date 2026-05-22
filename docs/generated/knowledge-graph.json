@@ -1912,7 +1912,7 @@
       "id": "V134",
       "type": "block",
       "title": "Plan Map Intake-Uebersicht und Kandidaten-Trennung",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -1920,7 +1920,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "134.1",
+        "currentPhase": "134.99",
         "planFile": "docs/plaene/aktiv/V134.md",
         "scopeDeclarations": [
           "docs/plaene/neu/README.md",
@@ -1952,7 +1952,7 @@
       "id": "V135",
       "type": "block",
       "title": "Mobile Menue UX-Hardening und Start-Setup-Kompaktmodus",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -1960,7 +1960,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "135.1",
+        "currentPhase": "135.99",
         "planFile": "docs/plaene/aktiv/V135.md",
         "scopeDeclarations": [
           "index.html",
@@ -5414,7 +5414,7 @@
       "id": "V134.1",
       "type": "phase",
       "title": "Baseline und Zielklassifikation",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.1"
@@ -5424,7 +5424,7 @@
       "id": "V134.2",
       "type": "phase",
       "title": "Intake-Klassifikation und Exportvertrag",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.2"
@@ -5434,7 +5434,7 @@
       "id": "V134.3",
       "type": "phase",
       "title": "Intake-UI als Lanes statt Mischliste",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.3"
@@ -5444,7 +5444,7 @@
       "id": "V134.4",
       "type": "phase",
       "title": "Master-/Intake-Navigation verbinden",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.4"
@@ -5454,7 +5454,7 @@
       "id": "V134.5",
       "type": "phase",
       "title": "Begriffe, Frontmatter und Dokumentation",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.5"
@@ -5464,7 +5464,7 @@
       "id": "V134.6",
       "type": "phase",
       "title": "Optionaler Struktur- und Archivierungsentscheid",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.6"
@@ -5474,7 +5474,7 @@
       "id": "V134.7",
       "type": "phase",
       "title": "Verifikation und Shell-Abgleich",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.7"
@@ -5484,7 +5484,7 @@
       "id": "V134.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.99"
@@ -5494,7 +5494,7 @@
       "id": "V135.1",
       "type": "phase",
       "title": "Baseline und UX-Zielbild",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.1"
@@ -5504,7 +5504,7 @@
       "id": "V135.2",
       "type": "phase",
       "title": "Fokus- und Scrollsprung beheben",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.2"
@@ -5514,7 +5514,7 @@
       "id": "V135.3",
       "type": "phase",
       "title": "Start-Setup kompakt machen",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.3"
@@ -5524,7 +5524,7 @@
       "id": "V135.4",
       "type": "phase",
       "title": "Menue-Chrome und Startscreen schaerfen",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.4"
@@ -5534,7 +5534,7 @@
       "id": "V135.5",
       "type": "phase",
       "title": "Parcours-Route mobil auswaehlen",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.5"
@@ -5544,7 +5544,7 @@
       "id": "V135.6",
       "type": "phase",
       "title": "Kleine und quer gehaltene Viewports absichern",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.6"
@@ -5554,7 +5554,7 @@
       "id": "V135.7",
       "type": "phase",
       "title": "Verifikation, Doku und Handoff",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.7"
@@ -5564,7 +5564,7 @@
       "id": "V135.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.99"
@@ -15258,8 +15258,8 @@
     {
       "id": "V134.1.1",
       "type": "subphase",
-      "title": "Aktuelle Counts aus `npm run plan:context:check` und `node scripts/export-plan-map.mjs` erfassen: Master-Bloecke, Intake-Klassen, echte Kandidaten, Bot-Training, adoptierte Drafts.",
-      "status": "open",
+      "title": "Aktuelle Counts aus `npm run plan:context:check` und `node scripts/export-plan-map.mjs` erfassen: Master-Bloecke, Intake-Klassen, echte Kandidaten, Bot-Training, adoptierte Drafts. (abgeschlossen: 2026-05-22; evidence: Phase 134.1 plan:context/export counts und Lane-Matrix dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.1",
@@ -15269,8 +15269,8 @@
     {
       "id": "V134.1.2",
       "type": "subphase",
-      "title": "Lane-Modell festlegen: `candidate`, `adopted-open`, `adopted-done`, `bot-training`, `meta`.",
-      "status": "open",
+      "title": "Lane-Modell festlegen: `candidate`, `adopted-open`, `adopted-done`, `bot-training`, `meta`. (abgeschlossen: 2026-05-22; evidence: Phase 134.1 plan:context/export counts und Lane-Matrix dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.1",
@@ -15280,8 +15280,8 @@
     {
       "id": "V134.1.3",
       "type": "subphase",
-      "title": "V134 als eigenstaendigen Plan-Map-Intake-Scope gegen V127/V123 abgrenzen.",
-      "status": "open",
+      "title": "V134 als eigenstaendigen Plan-Map-Intake-Scope gegen V127/V123 abgrenzen. (abgeschlossen: 2026-05-22; evidence: Phase 134.1 plan:context/export counts und Lane-Matrix dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.1",
@@ -15291,8 +15291,8 @@
     {
       "id": "V134.1.4",
       "type": "subphase",
-      "title": "Bestehende `V133`-Rollback-Historie als No-go fuer Wiederverwendung der Block-ID bestaetigen.",
-      "status": "open",
+      "title": "Bestehende `V133`-Rollback-Historie als No-go fuer Wiederverwendung der Block-ID bestaetigen. (abgeschlossen: 2026-05-22; evidence: Phase 134.1 plan:context/export counts und Lane-Matrix dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.1",
@@ -15302,8 +15302,8 @@
     {
       "id": "V134.2.1",
       "type": "subphase",
-      "title": "`PlanIntakeOps` um `intakeLane`, `intakeAction`, `primaryBlockId`, `canonicalBlockId` und `requiresUserIntake` erweitern.",
-      "status": "open",
+      "title": "`PlanIntakeOps` um `intakeLane`, `intakeAction`, `primaryBlockId`, `canonicalBlockId` und `requiresUserIntake` erweitern. (abgeschlossen: 2026-05-22; evidence: PlanIntakeOps/export-plan-map und Contract-Test decken additive Lane-Felder ab)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.2",
@@ -15313,8 +15313,8 @@
     {
       "id": "V134.2.2",
       "type": "subphase",
-      "title": "Fallback-Erkennung fuer Fliesstext ergaenzen: \"Vorgeschlagene Block-ID\", \"Geplante aktive Detaildatei\", \"Ziel-Masterplan\", \"Manuelle Uebernahme erforderlich\".",
-      "status": "open",
+      "title": "Fallback-Erkennung fuer Fliesstext ergaenzen: \"Vorgeschlagene Block-ID\", \"Geplante aktive Detaildatei\", \"Ziel-Masterplan\", \"Manuelle Uebernahme erforderlich\". (abgeschlossen: 2026-05-22; evidence: PlanIntakeOps/export-plan-map und Contract-Test decken additive Lane-Felder ab)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.2",
@@ -15324,8 +15324,8 @@
     {
       "id": "V134.2.3",
       "type": "subphase",
-      "title": "Mehrdeutige Block-IDs sauber markieren: Dateinamen mit altem Kontextblock plus Zielblock duerfen nicht still falschen Primary-Block erzeugen.",
-      "status": "open",
+      "title": "Mehrdeutige Block-IDs sauber markieren: Dateinamen mit altem Kontextblock plus Zielblock duerfen nicht still falschen Primary-Block erzeugen. (abgeschlossen: 2026-05-22; evidence: PlanIntakeOps/export-plan-map und Contract-Test decken additive Lane-Felder ab)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.2",
@@ -15335,8 +15335,8 @@
     {
       "id": "V134.2.4",
       "type": "subphase",
-      "title": "`scripts/export-plan-map.mjs` summary-Metriken splitten: echte Kandidaten, offene adoptierte Drafts, erledigte adoptierte Drafts, Bot-Training, Meta.",
-      "status": "open",
+      "title": "`scripts/export-plan-map.mjs` summary-Metriken splitten: echte Kandidaten, offene adoptierte Drafts, erledigte adoptierte Drafts, Bot-Training, Meta. (abgeschlossen: 2026-05-22; evidence: PlanIntakeOps/export-plan-map und Contract-Test decken additive Lane-Felder ab)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.2",
@@ -15346,8 +15346,8 @@
     {
       "id": "V134.2.5",
       "type": "subphase",
-      "title": "Contract-Test fuer Exportfelder und Summary-Counts nachziehen.",
-      "status": "open",
+      "title": "Contract-Test fuer Exportfelder und Summary-Counts nachziehen. (abgeschlossen: 2026-05-22; evidence: PlanIntakeOps/export-plan-map und Contract-Test decken additive Lane-Felder ab)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.2",
@@ -15357,8 +15357,8 @@
     {
       "id": "V134.3.1",
       "type": "subphase",
-      "title": "Intake-View standardmaessig auf echte Kandidaten/Ideen fokussieren.",
-      "status": "open",
+      "title": "Intake-View standardmaessig auf echte Kandidaten/Ideen fokussieren. (abgeschlossen: 2026-05-22; evidence: viewer.js/viewer.css rendern Intake-Lanes mit Default-Ideen-Handoff)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.3",
@@ -15368,8 +15368,8 @@
     {
       "id": "V134.3.2",
       "type": "subphase",
-      "title": "Lanes rendern: `Neue Ideen`, `Bereits geplant`, `Erledigt / Archiv`, `Bot-Training`, `Meta`.",
-      "status": "open",
+      "title": "Lanes rendern: `Neue Ideen`, `Bereits geplant`, `Erledigt / Archiv`, `Bot-Training`, `Meta`. (abgeschlossen: 2026-05-22; evidence: viewer.js/viewer.css rendern Intake-Lanes mit Default-Ideen-Handoff)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.3",
@@ -15379,8 +15379,8 @@
     {
       "id": "V134.3.3",
       "type": "subphase",
-      "title": "Bot-Training und Meta standardmaessig einklappen oder per Filter ausblenden.",
-      "status": "open",
+      "title": "Bot-Training und Meta standardmaessig einklappen oder per Filter ausblenden. (abgeschlossen: 2026-05-22; evidence: viewer.js/viewer.css rendern Intake-Lanes mit Default-Ideen-Handoff)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.3",
@@ -15390,8 +15390,8 @@
     {
       "id": "V134.3.4",
       "type": "subphase",
-      "title": "`adopted-open`-Karten als Handoff-Karten zeigen: kanonischer Block, Status, Sprung zum Blockdetail, Draft nur als Source-History.",
-      "status": "open",
+      "title": "`adopted-open`-Karten als Handoff-Karten zeigen: kanonischer Block, Status, Sprung zum Blockdetail, Draft nur als Source-History. (abgeschlossen: 2026-05-22; evidence: viewer.js/viewer.css rendern Intake-Lanes mit Default-Ideen-Handoff)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.3",
@@ -15401,8 +15401,8 @@
     {
       "id": "V134.3.5",
       "type": "subphase",
-      "title": "`adopted-done`-Karten als Archivkandidaten zeigen, ohne automatische Move-Aktion.",
-      "status": "open",
+      "title": "`adopted-done`-Karten als Archivkandidaten zeigen, ohne automatische Move-Aktion. (abgeschlossen: 2026-05-22; evidence: viewer.js/viewer.css rendern Intake-Lanes mit Default-Ideen-Handoff)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.3",
@@ -15412,8 +15412,8 @@
     {
       "id": "V134.3.6",
       "type": "subphase",
-      "title": "Leere Zustaende formulieren: keine echten Kandidaten, aber uebernommene Drafts vorhanden; keine Bot-Training-Anzeige im normalen VXX-Intake.",
-      "status": "open",
+      "title": "Leere Zustaende formulieren: keine echten Kandidaten, aber uebernommene Drafts vorhanden; keine Bot-Training-Anzeige im normalen VXX-Intake. (abgeschlossen: 2026-05-22; evidence: viewer.js/viewer.css rendern Intake-Lanes mit Default-Ideen-Handoff)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.3",
@@ -15423,8 +15423,8 @@
     {
       "id": "V134.4.1",
       "type": "subphase",
-      "title": "Im Detailpanel fuer Master-Bloecke \"Draft-Herkunft\" anzeigen, wenn passende `adopted-open`- oder `adopted-done`-Drafts existieren.",
-      "status": "open",
+      "title": "Im Detailpanel fuer Master-Bloecke \"Draft-Herkunft\" anzeigen, wenn passende `adopted-open`- oder `adopted-done`-Drafts existieren. (abgeschlossen: 2026-05-22; evidence: viewer.js verbindet canonicalBlockId, Draft-Herkunft, Filter und URL-State)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.4",
@@ -15434,8 +15434,8 @@
     {
       "id": "V134.4.2",
       "type": "subphase",
-      "title": "Intake-Karten mit `canonicalBlockId` bekommen einen Button/Link zum Block.",
-      "status": "open",
+      "title": "Intake-Karten mit `canonicalBlockId` bekommen einen Button/Link zum Block. (abgeschlossen: 2026-05-22; evidence: viewer.js verbindet canonicalBlockId, Draft-Herkunft, Filter und URL-State)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.4",
@@ -15445,8 +15445,8 @@
     {
       "id": "V134.4.3",
       "type": "subphase",
-      "title": "Suche und Workstream-Filter behalten sowohl Master- als auch Intake-Treffer, zeigen aber die Quelle klar an.",
-      "status": "open",
+      "title": "Suche und Workstream-Filter behalten sowohl Master- als auch Intake-Treffer, zeigen aber die Quelle klar an. (abgeschlossen: 2026-05-22; evidence: viewer.js verbindet canonicalBlockId, Draft-Herkunft, Filter und URL-State)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.4",
@@ -15456,8 +15456,8 @@
     {
       "id": "V134.4.4",
       "type": "subphase",
-      "title": "Datei-Fokus nutzt `scope_files` aus Drafts weiterhin, markiert aber ob der Treffer Kandidat oder bereits geplant ist.",
-      "status": "open",
+      "title": "Datei-Fokus nutzt `scope_files` aus Drafts weiterhin, markiert aber ob der Treffer Kandidat oder bereits geplant ist. (abgeschlossen: 2026-05-22; evidence: viewer.js verbindet canonicalBlockId, Draft-Herkunft, Filter und URL-State)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.4",
@@ -15467,8 +15467,8 @@
     {
       "id": "V134.4.5",
       "type": "subphase",
-      "title": "URL-State optional vorbereiten (`?view=intake&lane=candidate`, `?block=V120`), ohne ihn als Contract-Pflicht einzufuehren.",
-      "status": "open",
+      "title": "URL-State optional vorbereiten (`?view=intake&lane=candidate`, `?block=V120`), ohne ihn als Contract-Pflicht einzufuehren. (abgeschlossen: 2026-05-22; evidence: viewer.js verbindet canonicalBlockId, Draft-Herkunft, Filter und URL-State)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.4",
@@ -15478,8 +15478,8 @@
     {
       "id": "V134.5.1",
       "type": "subphase",
-      "title": "`docs/plaene/neu/README.md` um empfohlene Frontmatter-Felder ergaenzen: `planned_block_id`, `plan_file`, `target_master`, `intake_status`, `decision_class`, `scope_files`.",
-      "status": "open",
+      "title": "`docs/plaene/neu/README.md` um empfohlene Frontmatter-Felder ergaenzen: `planned_block_id`, `plan_file`, `target_master`, `intake_status`, `decision_class`, `scope_files`. (abgeschlossen: 2026-05-22; evidence: docs/plaene/neu/README.md, tools/plan-map/README.md und UI-Begriffe aktualisiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.5",
@@ -15489,8 +15489,8 @@
     {
       "id": "V134.5.2",
       "type": "subphase",
-      "title": "`tools/plan-map/README.md` mit Lane-Modell, Default-Filter und Source-of-Truth-Grenze nachziehen.",
-      "status": "open",
+      "title": "`tools/plan-map/README.md` mit Lane-Modell, Default-Filter und Source-of-Truth-Grenze nachziehen. (abgeschlossen: 2026-05-22; evidence: docs/plaene/neu/README.md, tools/plan-map/README.md und UI-Begriffe aktualisiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.5",
@@ -15500,8 +15500,8 @@
     {
       "id": "V134.5.3",
       "type": "subphase",
-      "title": "UI-Begriffe schaerfen: `Map` optional zu `Master`/`Geplant`, `Intake` optional zu `Ideen / Intake`; Entscheidung vor Umsetzung treffen.",
-      "status": "open",
+      "title": "UI-Begriffe schaerfen: `Map` optional zu `Master`/`Geplant`, `Intake` optional zu `Ideen / Intake`; Entscheidung vor Umsetzung treffen. (abgeschlossen: 2026-05-22; evidence: docs/plaene/neu/README.md, tools/plan-map/README.md und UI-Begriffe aktualisiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.5",
@@ -15511,8 +15511,8 @@
     {
       "id": "V134.5.4",
       "type": "subphase",
-      "title": "Changelog-Notiz fuer den Umsetzungsslice vorbereiten: keine neue Wahrheit, nur bessere Navigation.",
-      "status": "open",
+      "title": "Changelog-Notiz fuer den Umsetzungsslice vorbereiten: keine neue Wahrheit, nur bessere Navigation. (abgeschlossen: 2026-05-22; evidence: docs/plaene/neu/README.md, tools/plan-map/README.md und UI-Begriffe aktualisiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.5",
@@ -15522,8 +15522,8 @@
     {
       "id": "V134.6.1",
       "type": "subphase",
-      "title": "Pruefen, ob UI-/Export-Lanes reichen; Default ist kein Ordnerumbau.",
-      "status": "open",
+      "title": "Pruefen, ob UI-/Export-Lanes reichen; Default ist kein Ordnerumbau. (abgeschlossen: 2026-05-22; evidence: kein Ordnerumbau, keine Moves, Bot-Training bleibt separater Governance-Pfad)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.6",
@@ -15533,8 +15533,8 @@
     {
       "id": "V134.6.2",
       "type": "subphase",
-      "title": "Falls weiterhin unuebersichtlich: Vorschlag fuer `docs/plaene/neu/kandidaten/`, `docs/plaene/neu/adoptiert-offen/`, `docs/plaene/neu/meta/` als D3/D4-Option ausarbeiten.",
-      "status": "open",
+      "title": "Falls weiterhin unuebersichtlich: Vorschlag fuer `docs/plaene/neu/kandidaten/`, `docs/plaene/neu/adoptiert-offen/`, `docs/plaene/neu/meta/` als D3/D4-Option ausarbeiten. (abgeschlossen: 2026-05-22; evidence: kein Ordnerumbau, keine Moves, Bot-Training bleibt separater Governance-Pfad)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.6",
@@ -15544,8 +15544,8 @@
     {
       "id": "V134.6.3",
       "type": "subphase",
-      "title": "Bot-Training-Sonderzone separat bewerten; kein normaler VXX-Move ohne Bot-Training-Governance.",
-      "status": "open",
+      "title": "Bot-Training-Sonderzone separat bewerten; kein normaler VXX-Move ohne Bot-Training-Governance. (abgeschlossen: 2026-05-22; evidence: kein Ordnerumbau, keine Moves, Bot-Training bleibt separater Governance-Pfad)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.6",
@@ -15555,8 +15555,8 @@
     {
       "id": "V134.6.4",
       "type": "subphase",
-      "title": "Move-/Archivierungsplan nur als Dry-Run/Report liefern; jede echte Verschiebung braucht User-Gate, Recovery-Pfad und planbezogene Changelog-Notiz.",
-      "status": "open",
+      "title": "Move-/Archivierungsplan nur als Dry-Run/Report liefern; jede echte Verschiebung braucht User-Gate, Recovery-Pfad und planbezogene Changelog-Notiz. (abgeschlossen: 2026-05-22; evidence: kein Ordnerumbau, keine Moves, Bot-Training bleibt separater Governance-Pfad)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.6",
@@ -15566,8 +15566,8 @@
     {
       "id": "V134.7.1",
       "type": "subphase",
-      "title": "`node --test tests/plan-map-export.contract.test.mjs` fuer den Exportvertrag ausfuehren.",
-      "status": "open",
+      "title": "`node --test tests/plan-map-export.contract.test.mjs` fuer den Exportvertrag ausfuehren. (abgeschlossen: 2026-05-22; evidence: plan-map-export contract PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.7",
@@ -15577,8 +15577,8 @@
     {
       "id": "V134.7.2",
       "type": "subphase",
-      "title": "`npm run plan:context:check` gegen `PlanIntakeOps`-Klassifikation spiegeln.",
-      "status": "open",
+      "title": "`npm run plan:context:check` gegen `PlanIntakeOps`-Klassifikation spiegeln. (abgeschlossen: 2026-05-22; evidence: plan:context check PASS mit 4 candidate, 8 adopted-open, 5 adopted-done)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.7",
@@ -15588,8 +15588,8 @@
     {
       "id": "V134.7.3",
       "type": "subphase",
-      "title": "`npm run plan:check` und `npm run docs:check` ausfuehren.",
-      "status": "open",
+      "title": "`npm run plan:check` und `npm run docs:check` ausfuehren. (abgeschlossen: 2026-05-22; evidence: plan:check und docs:check PASS vor fremdem V135-Diff, aktueller Rerun V135-blocked)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.7",
@@ -15599,8 +15599,8 @@
     {
       "id": "V134.7.4",
       "type": "subphase",
-      "title": "Bei Viewer-Aenderungen `.\\start-plan-map.ps1` oder lokalen statischen Viewer starten und Desktop/narrow Layout pruefen.",
-      "status": "open",
+      "title": "Bei Viewer-Aenderungen `.\\start-plan-map.ps1` oder lokalen statischen Viewer starten und Desktop/narrow Layout pruefen. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke blockerfest not-checked durch Browser-URL-Policy, viewer.js node --check PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.7",
@@ -15610,8 +15610,8 @@
     {
       "id": "V134.7.5",
       "type": "subphase",
-      "title": "Bei Map-Tools-Shell-Auswirkung gezielte Electron-/Android-Map-Tools-Contracts oder vorhandene App-Checks laufen lassen.",
-      "status": "open",
+      "title": "Bei Map-Tools-Shell-Auswirkung gezielte Electron-/Android-Map-Tools-Contracts oder vorhandene App-Checks laufen lassen. (abgeschlossen: 2026-05-22; evidence: map-tools android/electron contracts PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.7",
@@ -15621,8 +15621,8 @@
     {
       "id": "V134.99.1",
       "type": "subphase",
-      "title": "Alle frueheren Phasen sind erledigt oder blockerfest mit Nachfolgeentscheidung dokumentiert.",
-      "status": "open",
+      "title": "Alle frueheren Phasen sind erledigt oder blockerfest mit Nachfolgeentscheidung dokumentiert. (abgeschlossen: 2026-05-22; evidence: Abschluss-Snapshot und Gates fuer V134.99 dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.99",
@@ -15632,8 +15632,8 @@
     {
       "id": "V134.99.2",
       "type": "subphase",
-      "title": "Plan Map zeigt echte Kandidaten getrennt von uebernommenen, erledigten, Bot-Training- und Meta-Drafts.",
-      "status": "open",
+      "title": "Plan Map zeigt echte Kandidaten getrennt von uebernommenen, erledigten, Bot-Training- und Meta-Drafts. (abgeschlossen: 2026-05-22; evidence: Abschluss-Snapshot und Gates fuer V134.99 dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.99",
@@ -15643,8 +15643,8 @@
     {
       "id": "V134.99.3",
       "type": "subphase",
-      "title": "Summary-Metriken unterscheiden `Ideen`, `Bereits geplant`, `Archivkandidaten`, `Bot-Training` und `Meta`.",
-      "status": "open",
+      "title": "Summary-Metriken unterscheiden `Ideen`, `Bereits geplant`, `Archivkandidaten`, `Bot-Training` und `Meta`. (abgeschlossen: 2026-05-22; evidence: Abschluss-Snapshot und Gates fuer V134.99 dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.99",
@@ -15654,8 +15654,8 @@
     {
       "id": "V134.99.4",
       "type": "subphase",
-      "title": "Kein Viewer-Pfad schreibt Master, aktive Plaene, Locks, Graph oder Draft-Dateien.",
-      "status": "open",
+      "title": "Kein Viewer-Pfad schreibt Master, aktive Plaene, Locks, Graph oder Draft-Dateien. (abgeschlossen: 2026-05-22; evidence: Abschluss-Snapshot und Gates fuer V134.99 dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.99",
@@ -15665,8 +15665,8 @@
     {
       "id": "V134.99.5",
       "type": "subphase",
-      "title": "Contract-, Plan- und Doku-Gates sind gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "Contract-, Plan- und Doku-Gates sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-22; evidence: Abschluss-Snapshot und Gates fuer V134.99 dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.99",
@@ -15676,8 +15676,8 @@
     {
       "id": "V134.99.6",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt, ob physische Ordnertrennung verworfen, vertagt oder als separater User-Gate-Scope vorbereitet wurde.",
-      "status": "open",
+      "title": "Abschlussnotiz nennt, ob physische Ordnertrennung verworfen, vertagt oder als separater User-Gate-Scope vorbereitet wurde. (abgeschlossen: 2026-05-22; evidence: Abschluss-Snapshot und Gates fuer V134.99 dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V134",
         "phaseCode": "134.99",
@@ -15687,8 +15687,8 @@
     {
       "id": "V135.1.1",
       "type": "subphase",
-      "title": "Screenshot-/DOM-Baseline fuer 393x852, 360x640 und 852x393 aus `dist/mobile-classic` aktualisieren.",
-      "status": "open",
+      "title": "Screenshot-/DOM-Baseline fuer 393x852, 360x640 und 852x393 aus `dist/mobile-classic` aktualisieren. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke `tmp/v135-mobile-smoke/*.png`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.1",
@@ -15698,8 +15698,8 @@
     {
       "id": "V135.1.2",
       "type": "subphase",
-      "title": "Akzeptanzkriterien festlegen: kein Scrollsprung, Start-CTA im ersten Viewport, keine Header-Ueberdeckung, keine horizontale Ueberlaenge.",
-      "status": "open",
+      "title": "Akzeptanzkriterien festlegen: kein Scrollsprung, Start-CTA im ersten Viewport, keine Header-Ueberdeckung, keine horizontale Ueberlaenge. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke 393x852/360x640/852x393 -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.1",
@@ -15709,8 +15709,8 @@
     {
       "id": "V135.1.3",
       "type": "subphase",
-      "title": "Startscreen-Hierarchie entscheiden: Hauptaktionen vor Update, kurze Labels fuer Classic/Parcours.",
-      "status": "open",
+      "title": "Startscreen-Hierarchie entscheiden: Hauptaktionen vor Update, kurze Labels fuer Classic/Parcours. (abgeschlossen: 2026-05-22; evidence: `src/mobile-classic/MobileClassicApp.js`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.1",
@@ -15720,8 +15720,8 @@
     {
       "id": "V135.1.4",
       "type": "subphase",
-      "title": "Scope gegen V131 abgrenzen: keine Touch-/Tilt-/Pause-Semantik in V135.",
-      "status": "open",
+      "title": "Scope gegen V131 abgrenzen: keine Touch-/Tilt-/Pause-Semantik in V135. (abgeschlossen: 2026-05-22; evidence: V135 Diff ohne Touch-/Tilt-/Pause-Semantik)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.1",
@@ -15731,8 +15731,8 @@
     {
       "id": "V135.2.1",
       "type": "subphase",
-      "title": "`MenuNavigationRuntime.showPanel()` und `UINavigationLifecycleController.setLevel4Open(false)` auf scrollende Fokusaufrufe pruefen.",
-      "status": "open",
+      "title": "`MenuNavigationRuntime.showPanel()` und `UINavigationLifecycleController.setLevel4Open(false)` auf scrollende Fokusaufrufe pruefen. (abgeschlossen: 2026-05-22; evidence: `src/ui/menu/MenuNavigationRuntime.js`, `src/ui/UINavigationLifecycleController.js`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.2",
@@ -15742,8 +15742,8 @@
     {
       "id": "V135.2.2",
       "type": "subphase",
-      "title": "Fokusaufrufe auf `preventScroll` oder Mobile-spezifische Focus-Targets umstellen, ohne Keyboard-/Gamepad-Navigation zu verlieren.",
-      "status": "open",
+      "title": "Fokusaufrufe auf `preventScroll` oder Mobile-spezifische Focus-Targets umstellen, ohne Keyboard-/Gamepad-Navigation zu verlieren. (abgeschlossen: 2026-05-22; evidence: `node --test tests/mobile-classic-app.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.2",
@@ -15753,8 +15753,8 @@
     {
       "id": "V135.2.3",
       "type": "subphase",
-      "title": "Beim Wechsel in `submenu-game` den richtigen Scrollcontainer (`.menu-content`) kontrolliert auf Panelanfang setzen.",
-      "status": "open",
+      "title": "Beim Wechsel in `submenu-game` den richtigen Scrollcontainer (`.menu-content`) kontrolliert auf Panelanfang setzen. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke ScrollTop 0/26/5 -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.2",
@@ -15764,8 +15764,8 @@
     {
       "id": "V135.2.4",
       "type": "subphase",
-      "title": "Regressionstest oder DOM-Smoke: nach Tap auf `Parcours` ist `scrollTop` klein und `Zurueck`/Titel liegen sichtbar im Viewport.",
-      "status": "open",
+      "title": "Regressionstest oder DOM-Smoke: nach Tap auf `Parcours` ist `scrollTop` klein und `Zurueck`/Titel liegen sichtbar im Viewport. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke 393x852/360x640/852x393 -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.2",
@@ -15775,8 +15775,8 @@
     {
       "id": "V135.3.1",
       "type": "subphase",
-      "title": "Mobile Summary auf Kernwerte reduzieren: Spielstil, Route/Map, Fahrzeug, Ghost-Status.",
-      "status": "open",
+      "title": "Mobile Summary auf Kernwerte reduzieren: Spielstil, Route/Map, Fahrzeug, Ghost-Status. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke summaryBlocks `spielstil,map,p1,ghost`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.3",
@@ -15786,8 +15786,8 @@
     {
       "id": "V135.3.2",
       "type": "subphase",
-      "title": "`Reset`, `Feineinstellungen`, Ghost-Kollision und Ansicht hinter Details/sekundaere Aktion legen.",
-      "status": "open",
+      "title": "`Reset`, `Feineinstellungen`, Ghost-Kollision und Ansicht hinter Details/sekundaere Aktion legen. (abgeschlossen: 2026-05-22; evidence: mobile CSS in `src/mobile-classic/MobileClassicApp.js`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.3",
@@ -15797,8 +15797,8 @@
     {
       "id": "V135.3.3",
       "type": "subphase",
-      "title": "`Parcours starten` als sticky oder immer frueh sichtbaren Mobile-CTA planen/umsetzen.",
-      "status": "open",
+      "title": "`Parcours starten` als sticky oder immer frueh sichtbaren Mobile-CTA planen/umsetzen. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke startButtonVisible=true)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.3",
@@ -15808,8 +15808,8 @@
     {
       "id": "V135.3.4",
       "type": "subphase",
-      "title": "Start-CTA darf Map-/Route-Auswahl nicht ueberdecken und muss Safe-Area beachten.",
-      "status": "open",
+      "title": "Start-CTA darf Map-/Route-Auswahl nicht ueberdecken und muss Safe-Area beachten. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke routePanel/startButton rects -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.3",
@@ -15819,8 +15819,8 @@
     {
       "id": "V135.3.5",
       "type": "subphase",
-      "title": "Desktop-Start-Setup bleibt unveraendert oder explizit regressionsgetestet.",
-      "status": "open",
+      "title": "Desktop-Start-Setup bleibt unveraendert oder explizit regressionsgetestet. (abgeschlossen: 2026-05-22; evidence: mobile Regeln unter `body.mobile-classic-app`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.3",
@@ -15830,8 +15830,8 @@
     {
       "id": "V135.4.1",
       "type": "subphase",
-      "title": "`Update` aus dem Hauptaktionsbereich herausnehmen oder als kleine Utility im Footer/Info-Bereich fuehren.",
-      "status": "open",
+      "title": "`Update` aus dem Hauptaktionsbereich herausnehmen oder als kleine Utility im Footer/Info-Bereich fuehren. (abgeschlossen: 2026-05-22; evidence: mobile Utility-Styling in `src/mobile-classic/MobileClassicApp.js`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.4",
@@ -15841,8 +15841,8 @@
     {
       "id": "V135.4.2",
       "type": "subphase",
-      "title": "`Classic` und `Parcours` mit kurzer Unterzeile versehen, z. B. freier Flug vs. Zeitroute/Ghost.",
-      "status": "open",
+      "title": "`Classic` und `Parcours` mit kurzer Unterzeile versehen, z. B. freier Flug vs. Zeitroute/Ghost. (abgeschlossen: 2026-05-22; evidence: `tests/mobile-classic-app.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.4",
@@ -15852,8 +15852,8 @@
     {
       "id": "V135.4.3",
       "type": "subphase",
-      "title": "Ab `data-menu-depth=\"3\"` Header/Brand/Utility auf Mobile reduzieren, damit Start-Setup nicht nach unten gedrueckt wird.",
-      "status": "open",
+      "title": "Ab `data-menu-depth=\"3\"` Header/Brand/Utility auf Mobile reduzieren, damit Start-Setup nicht nach unten gedrueckt wird. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke menuDepth=3 -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.4",
@@ -15863,8 +15863,8 @@
     {
       "id": "V135.4.4",
       "type": "subphase",
-      "title": "Zurueck-Aktion und Kontext bleiben sichtbar, aber nicht als grosse Desktop-Kopfzeile.",
-      "status": "open",
+      "title": "Zurueck-Aktion und Kontext bleiben sichtbar, aber nicht als grosse Desktop-Kopfzeile. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke headerVisible=true)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.4",
@@ -15874,8 +15874,8 @@
     {
       "id": "V135.5.1",
       "type": "subphase",
-      "title": "Mobile-Route-Allowlist aus V132 als sichtbare Kurzliste oder Karten darstellen.",
-      "status": "open",
+      "title": "Mobile-Route-Allowlist aus V132 als sichtbare Kurzliste oder Karten darstellen. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke routeButtonCount=4)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.5",
@@ -15885,8 +15885,8 @@
     {
       "id": "V135.5.2",
       "type": "subphase",
-      "title": "Route-Karten steuern weiter `mapSelect` und vorhandene StartSetup-Bindings; kein zweiter Settings-Pfad.",
-      "status": "open",
+      "title": "Route-Karten steuern weiter `mapSelect` und vorhandene StartSetup-Bindings; kein zweiter Settings-Pfad. (abgeschlossen: 2026-05-22; evidence: `dispatchMapSelectChange` in `src/mobile-classic/MobileClassicApp.js`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.5",
@@ -15896,8 +15896,8 @@
     {
       "id": "V135.5.3",
       "type": "subphase",
-      "title": "Preview-/Favoriten-/Recent-Details im Mobile-Parcours-Modus einklappen oder nach unten verschieben.",
-      "status": "open",
+      "title": "Preview-/Favoriten-/Recent-Details im Mobile-Parcours-Modus einklappen oder nach unten verschieben. (abgeschlossen: 2026-05-22; evidence: mobile CSS hides preview/chip details)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.5",
@@ -15907,8 +15907,8 @@
     {
       "id": "V135.5.4",
       "type": "subphase",
-      "title": "Leere/Fallback-Zustaende fuer unbekannte Route oder fehlende Allowlist definieren.",
-      "status": "open",
+      "title": "Leere/Fallback-Zustaende fuer unbekannte Route oder fehlende Allowlist definieren. (abgeschlossen: 2026-05-22; evidence: `data-route-empty` fallback in `src/mobile-classic/MobileClassicApp.js`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.5",
@@ -15918,8 +15918,8 @@
     {
       "id": "V135.6.1",
       "type": "subphase",
-      "title": "Breakpoint fuer kleine Portrait-Hoehe: Header kompakter, Summary einspaltig, Start-CTA sichtbar.",
-      "status": "open",
+      "title": "Breakpoint fuer kleine Portrait-Hoehe: Header kompakter, Summary einspaltig, Start-CTA sichtbar. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke 360x640 -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.6",
@@ -15929,8 +15929,8 @@
     {
       "id": "V135.6.2",
       "type": "subphase",
-      "title": "Breakpoint fuer `max-height: 520px` oder Landscape: Header stark reduzieren, Startleiste kompakt, Details nach unten.",
-      "status": "open",
+      "title": "Breakpoint fuer `max-height: 520px` oder Landscape: Header stark reduzieren, Startleiste kompakt, Details nach unten. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke 852x393 -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.6",
@@ -15940,8 +15940,8 @@
     {
       "id": "V135.6.3",
       "type": "subphase",
-      "title": "Font- und Buttongroessen so begrenzen, dass Labels wie `Feineinstellungen` nicht ueberlaufen.",
-      "status": "open",
+      "title": "Font- und Buttongroessen so begrenzen, dass Labels wie `Feineinstellungen` nicht ueberlaufen. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke horizontalOverflow=0)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.6",
@@ -15951,8 +15951,8 @@
     {
       "id": "V135.6.4",
       "type": "subphase",
-      "title": "Screenshot-Smoke fuer 393x852, 360x640 und 852x393 mit sichtbarem Start-CTA.",
-      "status": "open",
+      "title": "Screenshot-Smoke fuer 393x852, 360x640 und 852x393 mit sichtbarem Start-CTA. (abgeschlossen: 2026-05-22; evidence: `tmp/v135-mobile-smoke/*.png`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.6",
@@ -15962,8 +15962,8 @@
     {
       "id": "V135.7.1",
       "type": "subphase",
-      "title": "`node --test tests/mobile-classic-app.contract.test.mjs` ausfuehren.",
-      "status": "open",
+      "title": "`node --test tests/mobile-classic-app.contract.test.mjs` ausfuehren. (abgeschlossen: 2026-05-22; evidence: `node --test tests/mobile-classic-app.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.7",
@@ -15973,8 +15973,8 @@
     {
       "id": "V135.7.2",
       "type": "subphase",
-      "title": "`node --test tests/mobile-arcade-app.contract.test.mjs` ausfuehren, falls Route-/Parcours-Locks beruehrt wurden.",
-      "status": "open",
+      "title": "`node --test tests/mobile-arcade-app.contract.test.mjs` ausfuehren, falls Route-/Parcours-Locks beruehrt wurden. (abgeschlossen: 2026-05-22; evidence: `node --test tests/mobile-arcade-app.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.7",
@@ -15984,8 +15984,8 @@
     {
       "id": "V135.7.3",
       "type": "subphase",
-      "title": "`npm run app:android:assets:check` ausfuehren, wenn Mobile-Build-Artefakte oder App-Target-Copy betroffen sind.",
-      "status": "open",
+      "title": "`npm run app:android:assets:check` ausfuehren, wenn Mobile-Build-Artefakte oder App-Target-Copy betroffen sind. (abgeschlossen: 2026-05-22; evidence: `npm run app:android:assets:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.7",
@@ -15995,8 +15995,8 @@
     {
       "id": "V135.7.4",
       "type": "subphase",
-      "title": "`npm run plan:check` und `npm run docs:check` ausfuehren.",
-      "status": "open",
+      "title": "`npm run plan:check` und `npm run docs:check` ausfuehren. (abgeschlossen: 2026-05-22; evidence: `npm run plan:check`/`npm run docs:check` nach Evidence-Format-Fix)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.7",
@@ -16006,8 +16006,8 @@
     {
       "id": "V135.7.5",
       "type": "subphase",
-      "title": "Abschlussnotiz in `docs/plaene/CHANGELOG.md`: Wirkung, nicht gepruefte Device-Punkte, offene Follow-ups.",
-      "status": "open",
+      "title": "Abschlussnotiz in `docs/plaene/CHANGELOG.md`: Wirkung, nicht gepruefte Device-Punkte, offene Follow-ups. (abgeschlossen: 2026-05-22; evidence: `docs/plaene/CHANGELOG.md`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.7",
@@ -16017,8 +16017,8 @@
     {
       "id": "V135.99.1",
       "type": "subphase",
-      "title": "Alle frueheren Phasen sind erledigt oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "Alle frueheren Phasen sind erledigt oder blockerfest dokumentiert. (abgeschlossen: 2026-05-22; evidence: V135 135.1-135.7 checked)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.99",
@@ -16028,8 +16028,8 @@
     {
       "id": "V135.99.2",
       "type": "subphase",
-      "title": "Tap auf `Classic` und `Parcours` fuehrt ohne Scrollsprung in einen sichtbaren, verstaendlichen Startzustand.",
-      "status": "open",
+      "title": "Tap auf `Classic` und `Parcours` fuehrt ohne Scrollsprung in einen sichtbaren, verstaendlichen Startzustand. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke ScrollTop 0/26/5 -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.99",
@@ -16039,8 +16039,8 @@
     {
       "id": "V135.99.3",
       "type": "subphase",
-      "title": "`Parcours starten` ist auf 393x852, 360x640 und 852x393 ohne manuelles Suchen erreichbar oder bewusst als sticky CTA sichtbar.",
-      "status": "open",
+      "title": "`Parcours starten` ist auf 393x852, 360x640 und 852x393 ohne manuelles Suchen erreichbar oder bewusst als sticky CTA sichtbar. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke startButtonVisible=true)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.99",
@@ -16050,8 +16050,8 @@
     {
       "id": "V135.99.4",
       "type": "subphase",
-      "title": "Startscreen priorisiert Spielstart vor Update/Utility.",
-      "status": "open",
+      "title": "Startscreen priorisiert Spielstart vor Update/Utility. (abgeschlossen: 2026-05-22; evidence: mobile Entry-/Update-Styling in `src/mobile-classic/MobileClassicApp.js`)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.99",
@@ -16061,8 +16061,8 @@
     {
       "id": "V135.99.5",
       "type": "subphase",
-      "title": "Route-Auswahl wirkt mobil und bleibt technisch an den vorhandenen StartSetup-/MapSelect-Pfad gekoppelt.",
-      "status": "open",
+      "title": "Route-Auswahl wirkt mobil und bleibt technisch an den vorhandenen StartSetup-/MapSelect-Pfad gekoppelt. (abgeschlossen: 2026-05-22; evidence: Browser-Smoke routeButtonCount=4 and `mapSelect` binding)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.99",
@@ -16072,8 +16072,8 @@
     {
       "id": "V135.99.6",
       "type": "subphase",
-      "title": "Gezielt gewaehlte Contract-/Android-/Plan-/Doku-Gates sind gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "Gezielt gewaehlte Contract-/Android-/Plan-/Doku-Gates sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-22; evidence: V135 Evidence 2026-05-22)",
+      "status": "done",
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.99",
