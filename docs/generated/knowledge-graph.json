@@ -1719,7 +1719,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "125.3",
+        "currentPhase": "125.4",
         "planFile": "docs/plaene/aktiv/V125.md",
         "scopeDeclarations": [
           ".agents/rules/code_quality_and_debugging.md",
