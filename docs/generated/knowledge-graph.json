@@ -4696,7 +4696,7 @@
       "id": "V119.2",
       "type": "phase",
       "title": "P1-Remediation: formale Abschlusswidersprueche",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.2"
@@ -11762,8 +11762,8 @@
     {
       "id": "V119.2.1",
       "type": "subphase",
-      "title": "`V48` und `V74` gegen Git-Historie und Gates pruefen; offene `*.99`-Punkte entweder nachbelegen oder als historisch offen dokumentieren.",
-      "status": "open",
+      "title": "`V48` und `V74` gegen Git-Historie und Gates pruefen; offene `*.99`-Punkte entweder nachbelegen oder als historisch offen dokumentieren. (abgeschlossen: 2026-05-22; evidence: Abschnitt `119.2 P1-Remediation 2026-05-22` -> `V48` bleibt historisch offen; `docs/plaene/alt/V74.md` ist neuere geschlossene Refresh-Quelle; `npm run plan:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.2",
@@ -11773,8 +11773,8 @@
     {
       "id": "V119.2.2",
       "type": "subphase",
-      "title": "`V75`, `V76`, `V81`, `V94`, `V102`, `V105` pruefen: Top-Level-DoDs nur dann spiegeln, wenn die jeweilige `*.99`-Evidence die DoD-Inhalte konkret deckt.",
-      "status": "open",
+      "title": "`V75`, `V76`, `V81`, `V94`, `V102`, `V105` pruefen: Top-Level-DoDs nur dann spiegeln, wenn die jeweilige `*.99`-Evidence die DoD-Inhalte konkret deckt. (abgeschlossen: 2026-05-22; evidence: `docs/plaene/aktiv/V76.md` -> DoD.1-DoD.4/DoD.6 gespiegelt, DoD.5 offen; `docs/plaene/aktiv/V94.md` -> DoD.1-DoD.13 gespiegelt; `V102`/`V105` bleiben fuer 119.3 wegen schwacher Evidence)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.2",
@@ -11784,8 +11784,8 @@
     {
       "id": "V119.2.3",
       "type": "subphase",
-      "title": "Archivfaelle `V41`, `V83`, `V84` pruefen und entscheiden, ob historische Abschlussnotiz reicht oder ein expliziter Restwiderspruch im Changelog bleibt.",
-      "status": "open",
+      "title": "Archivfaelle `V41`, `V83`, `V84` pruefen und entscheiden, ob historische Abschlussnotiz reicht oder ein expliziter Restwiderspruch im Changelog bleibt. (abgeschlossen: 2026-05-22; evidence: Abschnitt `119.2 P1-Remediation 2026-05-22` und `docs/plaene/CHANGELOG.md` -> Archivplaene nicht umgeschrieben, Restwiderspruch dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.2",

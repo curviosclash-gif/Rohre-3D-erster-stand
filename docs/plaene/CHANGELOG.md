@@ -6,6 +6,14 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V119 119.2 P1-Remediation 2026-05-22
+
+- Nach User-Gate wurde der D3-Doku-Slice fuer `V119 119.2` umgesetzt: `npm run guard:main`, `npm run plan:check`, `npm run lock:validate` und `agent:preflight` waren gruen.
+- `V94` ist top-level konsistent nachgezogen: DoD.1-DoD.13 spiegeln jetzt die bereits vorhandene `94.1`-bis-`94.99`-Evidence fuer Builder, Schema, Validator, Workflows, Query-CLI und Gate-Kette.
+- `V76` wurde nur teilweise gespiegelt: DoD.1-DoD.4 und DoD.6 sind durch `76.99.1/76.99.2` plus Subphasen-Evidence gedeckt; DoD.5 bleibt offen, weil Undo/Redo/Vergleich/Statusleiste nicht vollstaendig durch V76-Abschluss-Evidence belegt sind.
+- Archivierte oder ueberholte Faelle wurden bewusst nicht umgeschrieben: `V41`, `V48`, `V75`, `V81`, `V83` und `V84` behalten historische offene Top-Level-DoDs bzw. Gates als Restwiderspruch; bei `V74` gilt die neuere geschlossene Refresh-Akte `docs/plaene/alt/V74.md` statt des aelteren offenen Archivtexts.
+- `V102` und `V105` bleiben fuer `119.3`, weil dort die vorhandene generische Evidence (`test -> pass`, `verified`) erst konkretisiert werden muss, bevor weitere DoD-Spiegelungen belastbar sind.
+
 ## Planarchiv-Notiz 2026-05-22 (Planrauschen reduziert)
 
 - Nach User-Gate wurden die aktiven Archivkandidaten `V75`, `V81`, `V85`, `V86` und `V89` aus `docs/plaene/aktiv/` nach `docs/plaene/alt/VXX.md` verschoben; sie sind abgeschlossen, nicht Master-referenziert und verlieren aktive Steuerautoritaet.
