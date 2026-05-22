@@ -17,9 +17,14 @@ Zweck: Dieser Ordner archiviert Intake-Drafts, deren geplante Block-ID bereits i
 | `Feature_Governance_Workflow_Masterplan_Entschlackung_V109.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V109.md` |
 | `Feature_Kompletter_Spielwissensgraph_V107.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V107.md` |
 | `Feature_Legacy_Runtime_Surface_Sunset_V91.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V91.md` |
+| `Feature_Plan_Map_Intake_Uebersicht_V134.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V134.md` |
+| `Feature_Repo_Context_Cleanup.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V116.md` |
+| `Feature_Repro_Struktur_Qualitaet_Hardening_V112.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V112.md` |
 | `Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V100.md` |
 | `Feature_Security_Runtime_Contract_Hardening_V102.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V102.md` |
 | `Feature_Settings_Domain_Nachhaltigkeit_Erweiterungspfad_V103.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V103.md` |
+| `Feature_Spielaudit_Playtest_Improvement_Paket_V112.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V112.md` |
+| `Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V90.md` |
 | `Feature_Wissensgraph_Adaptive_Intelligence_Ausbau_V111.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V111.md` |
 | `Feature_Wissensgraph_Ops_Guards_Haertung_V110.md` | Intake in erledigten Block uebernommen | `docs/plaene/aktiv/V110.md` |
 

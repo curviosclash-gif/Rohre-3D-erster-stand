@@ -6,6 +6,14 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Planarchiv-Notiz 2026-05-22 (Planrauschen reduziert)
+
+- Nach User-Gate wurden die aktiven Archivkandidaten `V75`, `V81`, `V85`, `V86` und `V89` aus `docs/plaene/aktiv/` nach `docs/plaene/alt/VXX.md` verschoben; sie sind abgeschlossen, nicht Master-referenziert und verlieren aktive Steuerautoritaet.
+- Ebenfalls archiviert wurden die 5 erledigt-adoptierten Intake-Drafts zu `V90`, `V112`, `V116` und `V134` unter `docs/plaene/alt/superseded-intakes-2026-05/`; der Archivindex nennt weiter Klassifikation, kanonische Quelle und Read-Regel.
+- Bewusst nicht verschoben: 8 offen adoptierte Intake-Drafts, 5 echte Intake-Review-Drafts, Bot-Training-Sonderfaelle und Meta-Dateien.
+- Recovery: `git revert <commit>` stellt die Plan-Dateimoves und README-/Changelog-Notizen wieder her.
+- Evidence: `npm run graph:build` -> PASS; `npm run plan:context:check` -> PASS; `npm run plan:check` -> PASS; `node --test tests/plan-map-export.contract.test.mjs` -> PASS; `node --check scripts/export-plan-map.mjs` -> PASS; `node --check tools/plan-map/viewer.js` -> PASS; `npm run gates:pre-commit` -> PASS.
+
 ## Plan-Map-Notiz 2026-05-22 (Archivkontext ohne Intake-Rauschen)
 
 - Die Plan Map exportiert `archiveReferences` aus `docs/plaene/alt/`, inklusive superseded Intake-Index und direkten archivierten `VXX.md`-Blockdateien, als read-only Historienlayer statt als normale Intake- oder Master-Map-Karten.

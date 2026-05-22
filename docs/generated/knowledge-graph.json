@@ -1363,7 +1363,7 @@
           "tmp/workspace-cleanup-report.json"
         ],
         "scopeResolution": {
-          "concreteCount": 54,
+          "concreteCount": 59,
           "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [
@@ -1418,8 +1418,8 @@
           "tests/plan-evidence-claims.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 20,
-          "plannedCount": 0
+          "concreteCount": 19,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": []
@@ -1463,8 +1463,8 @@
           "tests/plan-evidence-claims.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 20,
-          "plannedCount": 0
+          "concreteCount": 18,
+          "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [
           "V116",
@@ -2604,7 +2604,7 @@
         ],
         "priority": "P3",
         "owner": "frei",
-        "planFile": "docs/plaene/aktiv/V75.md",
+        "planFile": "docs/plaene/alt/V75.md",
         "scopeDeclarations": [
           "electron/main.cjs",
           "electron/package.json",
@@ -2721,7 +2721,7 @@
         ],
         "priority": "P3",
         "owner": "frei",
-        "planFile": "docs/plaene/aktiv/V81.md",
+        "planFile": "docs/plaene/alt/V81.md",
         "scopeDeclarations": [
           "electron/main.cjs",
           "electron/preload.cjs",
@@ -2882,7 +2882,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "planFile": "docs/plaene/aktiv/V85.md",
+        "planFile": "docs/plaene/alt/V85.md",
         "scopeDeclarations": [
           "docs/referenz/ai_architecture_context.md",
           "editor/js/EditorMapSerializer.js",
@@ -2922,7 +2922,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "planFile": "docs/plaene/aktiv/V86.md",
+        "planFile": "docs/plaene/alt/V86.md",
         "scopeDeclarations": [
           "docs/referenz/gameplay_powerups_portale_gates.md",
           "editor/js/EditorMapManager.js",
@@ -3068,7 +3068,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "planFile": "docs/plaene/aktiv/V89.md",
+        "planFile": "docs/plaene/alt/V89.md",
         "scopeDeclarations": [
           ".agents/test_mapping.md",
           "docs/qa/Teststrategie_Testpyramide.md",
@@ -3348,8 +3348,8 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 22,
-          "plannedCount": 0
+          "concreteCount": 20,
+          "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": [],
@@ -3443,8 +3443,8 @@
           "src/state/RoundStateTickSystem.js"
         ],
         "scopeResolution": {
-          "concreteCount": 125,
-          "plannedCount": 0
+          "concreteCount": 123,
+          "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [
           "V102",
@@ -30034,10 +30034,9 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V119",
-          "V77"
+          "V119"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -30082,11 +30081,10 @@
         ],
         "scopeBlocks": [
           "V119",
-          "V77",
           "V94",
           "V96"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -30107,21 +30105,6 @@
       }
     },
     {
-      "id": "docs/plaene/aktiv/V85.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V77"
-        ],
-        "exists": true
-      }
-    },
-    {
       "id": "docs/plaene/aktiv/V86.md",
       "type": "file",
       "title": null,
@@ -30131,11 +30114,10 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V77",
           "V94",
           "V96"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -30155,21 +30137,6 @@
     },
     {
       "id": "docs/plaene/aktiv/V88.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V77"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "docs/plaene/aktiv/V89.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -31226,6 +31193,54 @@
       }
     },
     {
+      "id": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Plan_Map_Intake_Uebersicht_V134.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V116",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Repo_Context_Cleanup.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V116",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V116",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md",
       "type": "file",
       "title": null,
@@ -31259,6 +31274,38 @@
     },
     {
       "id": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Settings_Domain_Nachhaltigkeit_Erweiterungspfad_V103.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V116",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Spielaudit_Playtest_Improvement_Paket_V112.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V116",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -31429,6 +31476,36 @@
       }
     },
     {
+      "id": "docs/plaene/alt/V75.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/V81.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/alt/V83.md",
       "type": "file",
       "title": null,
@@ -31455,6 +31532,51 @@
         ],
         "scopeBlocks": [
           "V119",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/V85.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/V86.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/V89.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
           "V77"
         ],
         "exists": true
@@ -32271,21 +32393,6 @@
       }
     },
     {
-      "id": "docs/plaene/neu/Feature_Plan_Map_Intake_Uebersicht_V134.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V77"
-        ],
-        "exists": true
-      }
-    },
-    {
       "id": "docs/plaene/neu/Feature_Portabler_Knowledge_Core_Memory_RAG_V136.md",
       "type": "file",
       "title": null,
@@ -32325,10 +32432,9 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V117",
-          "V77"
+          "V117"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -32347,52 +32453,7 @@
       }
     },
     {
-      "id": "docs/plaene/neu/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V77"
-        ],
-        "exists": true
-      }
-    },
-    {
       "id": "docs/plaene/neu/Feature_Runtime_UI_Entflechtung_Slice_1.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V77"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "docs/plaene/neu/Feature_Spielaudit_Playtest_Improvement_Paket_V112.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V77"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -71345,6 +71406,33 @@
     },
     {
       "from": "V116",
+      "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Plan_Map_Intake_Uebersicht_V134.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V116",
+      "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Repo_Context_Cleanup.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V116",
+      "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V116",
       "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md",
       "type": "scope",
       "hint": null,
@@ -71364,6 +71452,24 @@
     {
       "from": "V116",
       "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Settings_Domain_Nachhaltigkeit_Erweiterungspfad_V103.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V116",
+      "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Spielaudit_Playtest_Improvement_Paket_V112.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V116",
+      "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -90540,15 +90646,6 @@
     },
     {
       "from": "V77",
-      "to": "docs/plaene/aktiv/V75.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
       "to": "docs/plaene/aktiv/V76.md",
       "type": "scope",
       "hint": null,
@@ -90567,34 +90664,7 @@
     },
     {
       "from": "V77",
-      "to": "docs/plaene/aktiv/V81.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
       "to": "docs/plaene/aktiv/V82.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
-      "to": "docs/plaene/aktiv/V85.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
-      "to": "docs/plaene/aktiv/V86.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -90613,15 +90683,6 @@
     {
       "from": "V77",
       "to": "docs/plaene/aktiv/V88.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
-      "to": "docs/plaene/aktiv/V89.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91242,6 +91303,33 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Plan_Map_Intake_Uebersicht_V134.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Repo_Context_Cleanup.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md",
       "type": "scope",
       "hint": null,
@@ -91261,6 +91349,24 @@
     {
       "from": "V77",
       "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Settings_Domain_Nachhaltigkeit_Erweiterungspfad_V103.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Spielaudit_Playtest_Improvement_Paket_V112.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/superseded-intakes-2026-05/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91359,6 +91465,24 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/alt/V75.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/V81.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/alt/V83.md",
       "type": "scope",
       "hint": null,
@@ -91369,6 +91493,33 @@
     {
       "from": "V77",
       "to": "docs/plaene/alt/V84.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/V85.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/V86.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/V89.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91854,15 +92005,6 @@
     },
     {
       "from": "V77",
-      "to": "docs/plaene/neu/Feature_Plan_Map_Intake_Uebersicht_V134.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
       "to": "docs/plaene/neu/Feature_Portabler_Knowledge_Core_Memory_RAG_V136.md",
       "type": "scope",
       "hint": null,
@@ -91881,15 +92023,6 @@
     },
     {
       "from": "V77",
-      "to": "docs/plaene/neu/Feature_Repo_Context_Cleanup.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
       "to": "docs/plaene/neu/Feature_Repo_Map_Wissensgraph_Verankerung_V127.md",
       "type": "scope",
       "hint": null,
@@ -91899,34 +92032,7 @@
     },
     {
       "from": "V77",
-      "to": "docs/plaene/neu/Feature_Repro_Struktur_Qualitaet_Hardening_V112.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
       "to": "docs/plaene/neu/Feature_Runtime_UI_Entflechtung_Slice_1.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
-      "to": "docs/plaene/neu/Feature_Spielaudit_Playtest_Improvement_Paket_V112.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
-      "to": "docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md",
       "type": "scope",
       "hint": null,
       "attributes": {

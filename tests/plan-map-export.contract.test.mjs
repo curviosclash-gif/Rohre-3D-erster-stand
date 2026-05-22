@@ -50,7 +50,7 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.ok(data.summary.byIntakeLane.meta > 0);
   assert.equal(data.summary.intakeCandidateCount, data.summary.byIntakeLane.candidate);
   assert.equal(data.summary.intakeAdoptedOpenCount, data.summary.byIntakeLane['adopted-open']);
-  assert.equal(data.summary.intakeAdoptedDoneCount, data.summary.byIntakeLane['adopted-done']);
+  assert.equal(data.summary.intakeAdoptedDoneCount, data.summary.byIntakeLane['adopted-done'] ?? 0);
   assert.equal(data.summary.intakeBotTrainingCount, data.summary.byIntakeLane['bot-training']);
   assert.equal(data.summary.intakeMetaCount, data.summary.byIntakeLane.meta);
   assert.ok(data.sources.intakePlans.endsWith('docs/plaene/neu'));
