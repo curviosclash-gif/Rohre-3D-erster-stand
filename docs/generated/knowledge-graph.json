@@ -1438,7 +1438,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "119.4",
+        "currentPhase": "119.99",
         "planFile": "docs/plaene/aktiv/V119.md",
         "scopeDeclarations": [
           "docs/generated/knowledge-graph.coverage.json",
@@ -1460,12 +1460,16 @@
           "docs/plaene/alt/V83.md",
           "docs/plaene/alt/V84.md",
           "docs/plaene/CHANGELOG.md",
+          "docs/prozess/Dokumentationsstatus.md",
+          "docs/referenz/ai_architecture_context.md",
+          "docs/referenz/ai_project_onboarding.md",
+          "docs/referenz/architektur_ausfuehrlich.md",
           "docs/Umsetzungsplan.md",
           "scripts/check-plan-evidence-claims.mjs",
           "tests/plan-evidence-claims.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 20,
+          "concreteCount": 24,
           "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [
@@ -4716,7 +4720,7 @@
       "id": "V119.4",
       "type": "phase",
       "title": "Praevention fuer kuenftige Plaene",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.4"
@@ -11828,8 +11832,8 @@
     {
       "id": "V119.4.1",
       "type": "subphase",
-      "title": "Pruefen, ob `scripts/check-plan-evidence-claims.mjs` offene Top-Level-DoDs bei `status: done` und schwache Evidence-Muster stabil erkennen kann, ohne Altbestand sofort hart zu blockieren.",
-      "status": "open",
+      "title": "Pruefen, ob `scripts/check-plan-evidence-claims.mjs` offene Top-Level-DoDs bei `status: done` und schwache Evidence-Muster stabil erkennen kann, ohne Altbestand sofort hart zu blockieren. (abgeschlossen: 2026-05-23; evidence: `npm run check:plan-evidence-claims` -> PASS mit `warnings=1` fuer den bekannten historischen V76-DoD.5-Restwiderspruch; Findings bleiben Warnungen, keine Violations)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.4",
@@ -11839,8 +11843,8 @@
     {
       "id": "V119.4.2",
       "type": "subphase",
-      "title": "Contract-Test fuer neue/aktive Plaene ergaenzen: `status: done` plus offene Top-Level-DoDs oder offenes `*.99` muss mindestens als Report-Finding erscheinen.",
-      "status": "open",
+      "title": "Contract-Test fuer neue/aktive Plaene ergaenzen: `status: done` plus offene Top-Level-DoDs oder offenes `*.99` muss mindestens als Report-Finding erscheinen. (abgeschlossen: 2026-05-23; evidence: `node --test tests/plan-evidence-claims.contract.test.mjs` -> PASS (`10` Tests), inklusive Fixtures fuer offene DoDs, offene `*.99` und schwache Evidence)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.4",
@@ -11850,8 +11854,8 @@
     {
       "id": "V119.4.3",
       "type": "subphase",
-      "title": "Workflow-Hinweis schaerfen: Abschlussclaims muessen DoD, `*.99`, Git-Historie und Evidence-Qualitaet zusammen pruefen.",
-      "status": "open",
+      "title": "Workflow-Hinweis schaerfen: Abschlussclaims muessen DoD, `*.99`, Git-Historie und Evidence-Qualitaet zusammen pruefen. (abgeschlossen: 2026-05-23; evidence: `.agents/workflows/fix-planung.md` Close-Phase-Hinweis ergaenzt; `npm run plan:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.4",
@@ -32547,6 +32551,7 @@
           "V109",
           "V110",
           "V111",
+          "V119",
           "V125",
           "V90"
         ],
@@ -32870,6 +32875,7 @@
           "V110",
           "V111",
           "V114",
+          "V119",
           "V125",
           "V74",
           "V77",
@@ -32905,6 +32911,7 @@
           "V111",
           "V116",
           "V117",
+          "V119",
           "V125",
           "V89",
           "V91"
@@ -32925,6 +32932,7 @@
           "V107",
           "V110",
           "V111",
+          "V119",
           "V125"
         ],
         "exists": true
@@ -73035,6 +73043,42 @@
     {
       "from": "V119",
       "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/prozess/Dokumentationsstatus.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/referenz/ai_project_onboarding.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V119",
+      "to": "docs/referenz/architektur_ausfuehrlich.md",
       "type": "scope",
       "hint": null,
       "attributes": {
