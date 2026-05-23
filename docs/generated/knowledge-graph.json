@@ -1429,7 +1429,7 @@
       "id": "V119",
       "type": "block",
       "title": "Planabschluss-Evidence-Remediation und Git-Historienabgleich",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -4730,7 +4730,7 @@
       "id": "V119.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.99"
@@ -11865,8 +11865,8 @@
     {
       "id": "V119.99.1",
       "type": "subphase",
-      "title": "Alle P1-Befunde sind je Plan geloest oder bewusst als historischer Restwiderspruch dokumentiert.",
-      "status": "open",
+      "title": "Alle P1-Befunde sind je Plan geloest oder bewusst als historischer Restwiderspruch dokumentiert. (abgeschlossen: 2026-05-23; evidence: Abschnitt `119.2 P1-Remediation 2026-05-22`, `docs/plaene/CHANGELOG.md` und `npm run check:plan-evidence-claims` -> PASS mit erwarteter V76-DoD.5-Warnung)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.99",
@@ -11876,8 +11876,8 @@
     {
       "id": "V119.99.2",
       "type": "subphase",
-      "title": "P2-Befunde sind nachgeschaerft oder als historische Minimal-Evidence begruendet.",
-      "status": "open",
+      "title": "P2-Befunde sind nachgeschaerft oder als historische Minimal-Evidence begruendet. (abgeschlossen: 2026-05-23; evidence: Abschnitt `119.3 P2-Remediation 2026-05-22` -> V93, V102, V105, V114, V52/V56 und V54 konkretisiert oder historisch begruendet)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.99",
@@ -11887,8 +11887,8 @@
     {
       "id": "V119.99.3",
       "type": "subphase",
-      "title": "Praeventions-Check oder bewusst dokumentierte Nicht-Automatisierung ist vorhanden.",
-      "status": "open",
+      "title": "Praeventions-Check oder bewusst dokumentierte Nicht-Automatisierung ist vorhanden. (abgeschlossen: 2026-05-23; evidence: Abschnitt `119.4 Praeventions-Gate 2026-05-23`, `scripts/check-plan-evidence-claims.mjs`, `tests/plan-evidence-claims.contract.test.mjs` und `npm run check:plan-evidence-claims` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.99",
@@ -11898,8 +11898,8 @@
     {
       "id": "V119.99.4",
       "type": "subphase",
-      "title": "`npm run plan:check`, `npm run check:plan-evidence-claims`, `npm run graph:check`, `npm run docs:check` sind gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "`npm run plan:check`, `npm run check:plan-evidence-claims`, `npm run graph:check`, `npm run docs:check` sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-23; evidence: `npm run plan:check`, `npm run check:plan-evidence-claims`, `npm run graph:build`, `npm run graph:check`, `npm run docs:sync`, `npm run docs:check`, `npm run gates:pre-commit` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V119",
         "phaseCode": "119.99",
@@ -74919,8 +74919,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "Evidence-Baseline muss geklaert sein, bevor dauerhafte Memory-Hinweise verifiziert werden",
+      "fulfilled": true,
+      "hint": "Evidence-Baseline ist durch V119 geklaert, bevor dauerhafte Memory-Hinweise verifiziert werden",
       "attributes": {
         "dependsPhase": "119.1",
         "rawToken": "V119.1",
@@ -75685,8 +75685,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "Evidence-/Abschluss-Baseline soll historische Drift vor Source-of-Truth-Entscheidungen sichtbar machen",
+      "fulfilled": true,
+      "hint": "Evidence-/Abschluss-Baseline ist durch V119 geklaert, bevor Source-of-Truth-Entscheidungen starten",
       "attributes": {
         "dependsPhase": "119.1",
         "rawToken": "V119.1",

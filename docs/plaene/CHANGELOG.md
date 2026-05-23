@@ -6,6 +6,14 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V119 119.99 Abschluss-Gate 2026-05-23
+
+- Nach User-Gate `beende plan 119` wurde V119 als D3-Doku-/Governance-Slice geschlossen: aktive Planakte, Master-Index und Lock-Status zeigen `done`/`119.99`/closed, ohne historische Altplaene rueckwirkend schoenzuschreiben.
+- Abschlussbild: P1-Befunde sind geloest oder als historischer Restwiderspruch dokumentiert; P2-Befunde sind nachgeschaerft oder als historische Minimal-Evidence begruendet; der Praeventions-Check meldet kuenftige offene DoDs, offene `*.99` und schwache Evidence-Muster reproduzierbar als Warnsignal.
+- Bekannter Residual-risk bleibt `docs/plaene/aktiv/V76.md` DoD.5: Undo/Redo, Vergleich und Statusleiste sind in der historischen V76-Evidence nicht vollstaendig gedeckt und bleiben bewusst sichtbarer Restwiderspruch.
+- Evidence: `npm run plan:check`, `npm run check:plan-evidence-claims`, `npm run graph:build`, `npm run graph:check`, `npm run docs:sync`, `npm run docs:check` und `npm run gates:pre-commit` -> PASS; `check:plan-evidence-claims` meldet weiterhin die erwartete V76-Warnung.
+- Not-checked: keine Vollsuite und keine produktiven Runtime-/UI-/Multiplayer-/Recording-/Physik-/Bot-Training-Pfade; V119 war ein Plan-/Evidence-/Governance-Slice.
+
 ## V119 119.4 Praeventions-Gate 2026-05-23
 
 - Nach User-Gate `ssetze plan 119 fort` wurde der D3-Slice fuer `V119 119.4` umgesetzt: `scripts/check-plan-evidence-claims.mjs` meldet offene Top-Level-DoDs bei `status: done`, offene `*.99`-Gates und schwache Evidence-Muster jetzt als Warn-Findings statt als harte Verletzung.
