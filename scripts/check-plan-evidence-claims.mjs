@@ -90,6 +90,27 @@ export const ARCHITECTURE_RELEVANT_SCOPE_PATTERNS = [
 const ARCHITECTURE_ACCEPTANCE_SECTION = /^##\s+Architecture Acceptance\b/im;
 const ARCHITECTURE_CLAIM_PATTERN = /\b(Architecture Acceptance|Architecture|Architektur|Boundary|Boundaries|Legacy-Surface|Runtime-Surface|Application-Kante|Application-Kanten|Ratchet|Architektur-Gate)\b/i;
 const ARCHITECTURE_EVIDENCE_PATTERN = /\b(check:architecture(?::[\w-]+)?|architecture:guard|architecture:report|typecheck:architecture|check:runtime:determinism|check:root:runtime|metrics|ratchet|boundaries|touched-strict|test:contract|node --test|contract\.test)\b/i;
+const OPEN_TOP_LEVEL_DOD_PATTERN = /^\s*-\s*\[\s\]\s*DoD\.\d+\b/i;
+const OPEN_FINAL_GATE_PATTERN = /^\s*-\s*\[\s\]\s*(?:V?\d+[A-Z]?)\.99(?:\.\d+)?\b/i;
+const COMPLETED_ITEM_PATTERN = /^\s*-\s*\[x\]\s*(.+)$/i;
+const WEAK_EVIDENCE_PATTERNS = [
+  {
+    id: 'verified-only',
+    pattern: /\bevidence:\s*`?verified`?\s*(?:[).;]|$)/i,
+  },
+  {
+    id: 'generic-test-pass',
+    pattern: /\bevidence:\s*`?test`?\s*->\s*pass\b/i,
+  },
+  {
+    id: 'generic-lint-pass',
+    pattern: /\bevidence:\s*`?lint`?\s*->\s*pass\b/i,
+  },
+  {
+    id: 'mandatory-checks-pass',
+    pattern: /\ball mandatory checks PASS\b/i,
+  },
+];
 
 function normalizePath(value) {
   return value.replace(/\\/g, '/');
@@ -172,6 +193,10 @@ function isArchitectureRelevantPlan(text) {
     .some((scopeFile) => ARCHITECTURE_RELEVANT_SCOPE_PATTERNS.some((pattern) => pattern.test(scopeFile)));
 }
 
+function normalizeFrontmatterValue(value) {
+  return String(value || '').trim().replace(/^['"]|['"]$/g, '');
+}
+
 async function validateArchitectureAcceptanceCoverage(root, activePlanFiles) {
   const warnings = [];
 
@@ -199,7 +224,6 @@ async function validateArchitectureAcceptanceCoverage(root, activePlanFiles) {
 
 async function validateArchitectureClosureEvidence(root, activePlanFiles) {
   const warnings = [];
-  const completedItemPattern = /^\s*-\s*\[x\]\s*(.+)$/i;
 
   for (const planFile of activePlanFiles) {
     let text = '';
@@ -213,7 +237,7 @@ async function validateArchitectureClosureEvidence(root, activePlanFiles) {
 
     const lines = text.split(/\r?\n/);
     for (let index = 0; index < lines.length; index += 1) {
-      const match = lines[index].match(completedItemPattern);
+      const match = lines[index].match(COMPLETED_ITEM_PATTERN);
       if (!match) continue;
 
       const itemText = match[1];
@@ -225,6 +249,65 @@ async function validateArchitectureClosureEvidence(root, activePlanFiles) {
         file: normalizePath(planFile),
         line: index + 1,
         message: 'Architektur-Abschlussclaim ohne konkrete Guard-, Metrics-, Ratchet- oder Contract-Evidence.',
+      });
+    }
+  }
+
+  return warnings;
+}
+
+async function validateClosureEvidenceFindings(root, activePlanFiles) {
+  const warnings = [];
+
+  for (const planFile of activePlanFiles) {
+    let text = '';
+    try {
+      text = await readText(root, planFile);
+    } catch {
+      continue;
+    }
+
+    const frontmatter = parseFrontmatter(text);
+    const status = normalizeFrontmatterValue(frontmatter.status);
+    const isDonePlan = status.toLowerCase() === 'done';
+    const lines = text.split(/\r?\n/);
+
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index];
+
+      if (isDonePlan && OPEN_TOP_LEVEL_DOD_PATTERN.test(line)) {
+        warnings.push({
+          id: 'closure.open-top-level-dod',
+          file: normalizePath(planFile),
+          line: index + 1,
+          message: '`status: done` mit offenem Top-Level-DoD; Abschlussclaim braucht Nachbeleg oder dokumentierten Restwiderspruch.',
+        });
+      }
+
+      if (isDonePlan && OPEN_FINAL_GATE_PATTERN.test(line)) {
+        warnings.push({
+          id: 'closure.open-final-gate',
+          file: normalizePath(planFile),
+          line: index + 1,
+          message: '`status: done` mit offenem `*.99`-Gate; Abschlussclaim braucht Nachbeleg oder dokumentierten Restwiderspruch.',
+        });
+      }
+
+      const completedMatch = line.match(COMPLETED_ITEM_PATTERN);
+      if (!completedMatch || !/\bevidence\s*:/i.test(line)) {
+        continue;
+      }
+
+      const weakPattern = WEAK_EVIDENCE_PATTERNS.find((entry) => entry.pattern.test(line));
+      if (!weakPattern) {
+        continue;
+      }
+
+      warnings.push({
+        id: 'closure.weak-evidence',
+        file: normalizePath(planFile),
+        line: index + 1,
+        message: `Abschluss-Evidence nutzt schwaches Muster \`${weakPattern.id}\`; konkrete Commands, Commits, Testreports oder Plan-/Changelog-Belege bevorzugen.`,
       });
     }
   }
@@ -321,6 +404,7 @@ export async function runPlanEvidenceClaimCheck({
   violations.push(...await validatePlanClaimCoverage(root, assertions, planFiles));
   warnings.push(...await validateArchitectureAcceptanceCoverage(root, planFiles));
   warnings.push(...await validateArchitectureClosureEvidence(root, planFiles));
+  warnings.push(...await validateClosureEvidenceFindings(root, planFiles));
 
   return { assertions: assertions.length, activePlanFiles: planFiles.length, warnings, violations };
 }

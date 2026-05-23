@@ -56,6 +56,7 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 - Keep gate invariant intact (`*.99` only when prior phases are `[x]`).
 - For non-`*.99` phases, record pending block-end verification scope when full suite execution is deferred.
 - If the phase handled dead code or legacy paths, record replacement proof or explicit retention reason in the block evidence before closing.
+- Vor Abschlussclaims DoD-Status, `*.99`-Gate, Git-/Gate-Historie und Evidence-Qualitaet zusammen pruefen; schwache Sammelclaims muessen als Restwiderspruch oder mit konkreter Evidence dokumentiert werden.
 - Abgeschlossene Phasenarbeit mit Repo-Aenderungen nicht uncommitted lassen: nach Gate/Evidence folgt ein scoped Commit im selben Turn.
 - Erklaerende Commit-Notizen sind Pflicht: kurz festhalten, warum der Slice noetig war und welcher beobachtbare Effekt erreicht wurde.
 - Gate-Strategie:

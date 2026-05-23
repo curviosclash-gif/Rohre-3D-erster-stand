@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V119 119.4 Praeventions-Gate 2026-05-23
+
+- Nach User-Gate `ssetze plan 119 fort` wurde der D3-Slice fuer `V119 119.4` umgesetzt: `scripts/check-plan-evidence-claims.mjs` meldet offene Top-Level-DoDs bei `status: done`, offene `*.99`-Gates und schwache Evidence-Muster jetzt als Warn-Findings statt als harte Verletzung.
+- `tests/plan-evidence-claims.contract.test.mjs` deckt die neuen Praeventionssignale ab: done-Plan plus offener DoD, done-Plan plus offenem `*.99` und `evidence: verified` werden jeweils reported; der fokussierte Node-Contract-Run ist gruen.
+- Der Real-Repo-Check bleibt bewusst nicht blockierend: `npm run check:plan-evidence-claims` ist PASS und meldet aktuell `warnings=1` fuer den in `119.2` dokumentierten historischen V76-DoD.5-Restwiderspruch.
+- `.agents/workflows/fix-planung.md` fordert fuer kuenftige Abschlussclaims den gemeinsamen Abgleich von DoD-Status, `*.99`-Gate, Git-/Gate-Historie und Evidence-Qualitaet. V119 steht danach auf `119.99` fuer das Abschluss-Gate.
+
 ## V119 119.3 P2-Evidence-Remediation 2026-05-22
 
 - Nach User-Gate `setze plan 119 fort` wurde der D3-Doku-Slice fuer `V119 119.3` umgesetzt: `guard:main`, `plan:check`, `lock:validate`, `agent:preflight`, targeted Node-Contract-Nachbeleg (`88` PASS), `graph:check` und `gates:pre-commit` waren gruen.

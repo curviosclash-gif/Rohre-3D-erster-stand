@@ -155,6 +155,85 @@ test('reports architecture closure claims without concrete guard evidence', asyn
   assert.equal(report.warnings[0].id, 'architecture-claim.weak-evidence');
 });
 
+test('reports done active plans with open top-level DoDs', async () => {
+  const root = await createFixture({
+    'docs/plaene/aktiv/V204.md': [
+      '---',
+      'id: V204',
+      'status: done',
+      '---',
+      '',
+      '# V204',
+      '',
+      '## Definition of Done',
+      '',
+      '- [ ] DoD.1 Abschluss ist formal offen.',
+    ].join('\n'),
+  });
+
+  const report = await runPlanEvidenceClaimCheck({
+    root,
+    assertions: [],
+    activePlanFiles: ['docs/plaene/aktiv/V204.md'],
+  });
+
+  assert.deepEqual(report.violations, []);
+  assert.equal(report.warnings.length, 1);
+  assert.equal(report.warnings[0].id, 'closure.open-top-level-dod');
+});
+
+test('reports done active plans with open final gates', async () => {
+  const root = await createFixture({
+    'docs/plaene/aktiv/V205.md': [
+      '---',
+      'id: V205',
+      'status: done',
+      '---',
+      '',
+      '# V205',
+      '',
+      '### 205.99 Abschluss-Gate',
+      '',
+      '- [ ] 205.99.1 Abschlussgate ist offen.',
+    ].join('\n'),
+  });
+
+  const report = await runPlanEvidenceClaimCheck({
+    root,
+    assertions: [],
+    activePlanFiles: ['docs/plaene/aktiv/V205.md'],
+  });
+
+  assert.deepEqual(report.violations, []);
+  assert.equal(report.warnings.length, 1);
+  assert.equal(report.warnings[0].id, 'closure.open-final-gate');
+});
+
+test('reports weak completed evidence claims as warnings', async () => {
+  const root = await createFixture({
+    'docs/plaene/aktiv/V206.md': [
+      '---',
+      'id: V206',
+      'status: planned',
+      '---',
+      '',
+      '# V206',
+      '',
+      '- [x] 206.1.1 Abschlussclaim. (abgeschlossen: 2026-05-23; evidence: verified)',
+    ].join('\n'),
+  });
+
+  const report = await runPlanEvidenceClaimCheck({
+    root,
+    assertions: [],
+    activePlanFiles: ['docs/plaene/aktiv/V206.md'],
+  });
+
+  assert.deepEqual(report.violations, []);
+  assert.equal(report.warnings.length, 1);
+  assert.equal(report.warnings[0].id, 'closure.weak-evidence');
+});
+
 test('default assertions cover the real V117 workflow evidence claim', async () => {
   const report = await runPlanEvidenceClaimCheck();
 
