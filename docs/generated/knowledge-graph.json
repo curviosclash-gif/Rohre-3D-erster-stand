@@ -13218,7 +13218,7 @@
     {
       "id": "V123.1.1",
       "type": "subphase",
-      "title": "Feldliste fuer den MVP finalisieren: `schema_version`, `updated`, `active_lock`, `next_free_p1_start`, `sources`, `blocks`.",
+      "title": "Feldliste fuer den MVP finalisieren: `schema_version`, `updated`, `active_lock`, `next_free_p1_start`, `sources`, `workstreams`, `blocks`.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13229,7 +13229,7 @@
     {
       "id": "V123.1.2",
       "type": "subphase",
-      "title": "Alle Master-Tabellenfelder aus `docs/Umsetzungsplan.md` in das Schema abbilden: `id`, `title`, `status`, `priority`, `owner`, `depends_on`, `current_phase`, `plan_file`.",
+      "title": "Alle Master-Tabellenfelder aus `docs/Umsetzungsplan.md` in das Schema abbilden: `id`, `title`, `status`, `priority`, `owner`, `workstream`, `depends_on`, `current_phase`, `plan_file`.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13260,9 +13260,20 @@
       }
     },
     {
+      "id": "V123.1.5",
+      "type": "subphase",
+      "title": "Workstream-Regel fixieren: genau ein primaerer `workstream` pro Block, keine Vermischung mit `intakeLane`, keine Ableitung von Prioritaet oder Reihenfolge.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.5"
+      }
+    },
+    {
       "id": "V123.2.1",
       "type": "subphase",
-      "title": "`scripts/validate-plan-index.mjs` entwerfen oder erstellen: YAML/JSON lesen, Master-Zeilen vergleichen, Feldmismatches berichten.",
+      "title": "`scripts/validate-plan-index.mjs` entwerfen oder erstellen: YAML/JSON lesen, Master-Zeilen und Arbeitsstrom-Index vergleichen, Feldmismatches berichten.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13273,7 +13284,7 @@
     {
       "id": "V123.2.2",
       "type": "subphase",
-      "title": "Fehlertypen stabilisieren: `missing-in-index`, `missing-in-master`, `duplicate-id`, `field-mismatch`, `invalid-plan-file`, `unknown-dependency`.",
+      "title": "Fehlertypen stabilisieren: `missing-in-index`, `missing-in-master`, `duplicate-id`, `field-mismatch`, `invalid-plan-file`, `unknown-dependency`, `unknown-workstream`, `workstream-mismatch`.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13348,6 +13359,17 @@
       }
     },
     {
+      "id": "V123.3.5",
+      "type": "subphase",
+      "title": "`workstream` als Einstiegshilfe fuer Kontextwahl dokumentieren: erst Lane/Block finden, dann Dependencies/Locks pruefen, dann genau eine VXX-Detaildatei lesen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3",
+        "subphaseCode": "123.3.5"
+      }
+    },
+    {
       "id": "V123.4.1",
       "type": "subphase",
       "title": "`plan-context-report` optional an `docs/plan-index.yaml` anbinden; wenn Datei fehlt, bleibt alter Markdown-Pfad aktiv.",
@@ -13361,7 +13383,7 @@
     {
       "id": "V123.4.2",
       "type": "subphase",
-      "title": "Report-Felder trennen: `masterSource`, `structuredIndexSource`, `driftStatus`, `missingInYaml`, `missingInMaster`, `fieldMismatches`.",
+      "title": "Report-Felder trennen: `masterSource`, `structuredIndexSource`, `driftStatus`, `missingInYaml`, `missingInMaster`, `fieldMismatches`, `workstreamMismatches`.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13389,6 +13411,17 @@
         "blockId": "V123",
         "phaseCode": "123.4",
         "subphaseCode": "123.4.4"
+      }
+    },
+    {
+      "id": "V123.4.5",
+      "type": "subphase",
+      "title": "Plan Map darf `workstream` aus dem strukturierten Index optional konsumieren, muss aber bis zur Migration mit der bestehenden Inferenz aus Master/Plan-Map-Export kompatibel bleiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4",
+        "subphaseCode": "123.4.5"
       }
     },
     {
@@ -13460,7 +13493,7 @@
     {
       "id": "V123.6.3",
       "type": "subphase",
-      "title": "Dashboard-Funktionen begrenzen: Filter nach Status/Prioritaet, Links zu VXX-Dateien, Lock-Status, Dependency-Sicht.",
+      "title": "Dashboard-Funktionen begrenzen: Filter nach Status/Prioritaet/Workstream, Links zu VXX-Dateien, Lock-Status, Dependency-Sicht.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -75812,6 +75845,17 @@
       }
     },
     {
+      "from": "V123.1",
+      "to": "V123.1.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.5"
+      }
+    },
+    {
       "from": "V123.2",
       "to": "V123.2.1",
       "type": "contains_subphase",
@@ -75900,6 +75944,17 @@
       }
     },
     {
+      "from": "V123.3",
+      "to": "V123.3.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.3",
+        "subphaseCode": "123.3.5"
+      }
+    },
+    {
       "from": "V123.4",
       "to": "V123.4.1",
       "type": "contains_subphase",
@@ -75941,6 +75996,17 @@
         "blockId": "V123",
         "phaseCode": "123.4",
         "subphaseCode": "123.4.4"
+      }
+    },
+    {
+      "from": "V123.4",
+      "to": "V123.4.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.4",
+        "subphaseCode": "123.4.5"
       }
     },
     {
