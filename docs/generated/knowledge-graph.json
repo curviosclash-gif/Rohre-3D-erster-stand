@@ -1645,9 +1645,9 @@
           ".agents/workflows/code.md",
           ".agents/workflows/plan.md",
           "AGENTS.md",
+          "docs/generated/plan-index.json",
           "docs/plaene/aktiv/V123.md",
           "docs/plaene/CHANGELOG.md",
-          "docs/plan-index.yaml",
           "docs/Umsetzungsplan.md",
           "package.json",
           "scripts/build-knowledge-graph.mjs",
@@ -13218,7 +13218,7 @@
     {
       "id": "V123.1.1",
       "type": "subphase",
-      "title": "Feldliste fuer den MVP finalisieren: `schema_version`, `updated`, `active_lock`, `next_free_p1_start`, `sources`, `workstreams`, `blocks`.",
+      "title": "Feldliste fuer den MVP finalisieren: `schema_version`, `updated`, `start_anchor`, `next_recommended_start`, `sources`, `workstreams`, `blocks`, `lock`.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13240,7 +13240,7 @@
     {
       "id": "V123.1.3",
       "type": "subphase",
-      "title": "Sonderfaelle dokumentieren: `-` fuer keine Dependencies, freie Owner, blockierte Bloecke, erledigte aber noch referenzierte Bloecke.",
+      "title": "Sonderfaelle dokumentieren: `-` fuer keine Dependencies, freie Owner, blockierte Bloecke, erledigte aber noch referenzierte Bloecke, fehlende oder geschlossene Locks.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13262,7 +13262,7 @@
     {
       "id": "V123.1.5",
       "type": "subphase",
-      "title": "Workstream-Regel fixieren: genau ein primaerer `workstream` pro Block, keine Vermischung mit `intakeLane`, keine Ableitung von Prioritaet oder Reihenfolge.",
+      "title": "Workstream-Regel fixieren: genau ein primaerer `workstream` pro Block, Master-Arbeitsstrom als Pilot-Wahrheit, keine Vermischung mit `intakeLane`, keine Ableitung von Prioritaet oder Reihenfolge.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13271,9 +13271,20 @@
       }
     },
     {
+      "id": "V123.1.6",
+      "type": "subphase",
+      "title": "Format-/Ablageregel fixieren: `docs/generated/plan-index.json` wird generiert, nicht manuell editiert, und enthaelt Startanker plus Empfehlung statt eines mehrdeutigen `next_free_p1_start`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.6"
+      }
+    },
+    {
       "id": "V123.2.1",
       "type": "subphase",
-      "title": "`scripts/validate-plan-index.mjs` entwerfen oder erstellen: YAML/JSON lesen, Master-Zeilen und Arbeitsstrom-Index vergleichen, Feldmismatches berichten.",
+      "title": "`scripts/validate-plan-index.mjs` entwerfen oder erstellen: JSON lesen, Master-Zeilen, Arbeitsstrom-Index und Lock-Projektion vergleichen, Feldmismatches berichten.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13284,7 +13295,7 @@
     {
       "id": "V123.2.2",
       "type": "subphase",
-      "title": "Fehlertypen stabilisieren: `missing-in-index`, `missing-in-master`, `duplicate-id`, `field-mismatch`, `invalid-plan-file`, `unknown-dependency`, `unknown-workstream`, `workstream-mismatch`.",
+      "title": "Fehlertypen stabilisieren: `missing-in-index`, `missing-in-master`, `duplicate-id`, `field-mismatch`, `invalid-plan-file`, `unknown-dependency`, `unknown-workstream`, `workstream-mismatch`, `lock-mismatch`, `manual-generated-edit`.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13306,7 +13317,7 @@
     {
       "id": "V123.2.4",
       "type": "subphase",
-      "title": "Optional `scripts/build-plan-index.mjs` vorbereiten, aber nur als expliziten Generator, nicht als verdeckte Auto-Korrektur.",
+      "title": "`scripts/build-plan-index.mjs` als expliziten Generator vorbereiten; keine verdeckte Auto-Korrektur in Checks.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13315,9 +13326,20 @@
       }
     },
     {
+      "id": "V123.2.5",
+      "type": "subphase",
+      "title": "Contract-Tests fuer Parser/Generator/Validator planen oder ergaenzen: stabiler JSON-Output, Drift bei Master-Feldabweichung, Workstream-Abweichung, Lock-Abweichung und fehlendem Planfile.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2",
+        "subphaseCode": "123.2.5"
+      }
+    },
+    {
       "id": "V123.3.1",
       "type": "subphase",
-      "title": "Leseweg fuer Pilotphase definieren: `AGENTS.md`, passende Rule/Workflow, `docs/plan-index.yaml` fuer Blockstatus, genau eine VXX-Datei fuer Details.",
+      "title": "Leseweg fuer Pilotphase definieren: `AGENTS.md`, passende Rule/Workflow, `docs/generated/plan-index.json` fuer Blockstatus/Workstream/Lock-Einstieg, genau eine VXX-Datei fuer Details.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13328,7 +13350,7 @@
     {
       "id": "V123.3.2",
       "type": "subphase",
-      "title": "Konfliktregel dokumentieren: Bei Abweichung zwischen YAML und Markdown gewinnt bis zur Migration `docs/Umsetzungsplan.md`.",
+      "title": "Konfliktregel dokumentieren: Bei Abweichung zwischen JSON und Markdown gewinnt bis zur Migration `docs/Umsetzungsplan.md`.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13339,7 +13361,7 @@
     {
       "id": "V123.3.3",
       "type": "subphase",
-      "title": "Token-Effizienz-Regel ergaenzen: Agents duerfen nicht standardmaessig YAML, Markdown, Changelog und Reports alle zugleich lesen.",
+      "title": "Token-Effizienz-Regel ergaenzen: Agents duerfen nicht standardmaessig JSON, Markdown, Changelog und Reports alle zugleich lesen.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13372,7 +13394,7 @@
     {
       "id": "V123.4.1",
       "type": "subphase",
-      "title": "`plan-context-report` optional an `docs/plan-index.yaml` anbinden; wenn Datei fehlt, bleibt alter Markdown-Pfad aktiv.",
+      "title": "`plan-context-report` optional an `docs/generated/plan-index.json` anbinden; wenn Datei fehlt, bleibt alter Markdown-Pfad aktiv.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13383,7 +13405,7 @@
     {
       "id": "V123.4.2",
       "type": "subphase",
-      "title": "Report-Felder trennen: `masterSource`, `structuredIndexSource`, `driftStatus`, `missingInYaml`, `missingInMaster`, `fieldMismatches`, `workstreamMismatches`.",
+      "title": "Report-Felder trennen: `masterSource`, `structuredIndexSource`, `driftStatus`, `missingInIndex`, `missingInMaster`, `fieldMismatches`, `workstreamMismatches`, `lockMismatches`.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13405,7 +13427,7 @@
     {
       "id": "V123.4.4",
       "type": "subphase",
-      "title": "Graph-Build/Check nur dann umstellen, wenn der Index stabil ist und keine aktuelle Graph-Quelle stillschweigend verdrangt wird.",
+      "title": "Graph-Build/Check nur dann umstellen, wenn der Index stabil ist, V120-Scope nicht parallel dieselben Dateien beansprucht und keine aktuelle Graph-Quelle stillschweigend verdrangt wird.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13416,7 +13438,7 @@
     {
       "id": "V123.4.5",
       "type": "subphase",
-      "title": "Plan Map darf `workstream` aus dem strukturierten Index optional konsumieren, muss aber bis zur Migration mit der bestehenden Inferenz aus Master/Plan-Map-Export kompatibel bleiben.",
+      "title": "Plan Map darf `workstream` aus dem strukturierten Index optional konsumieren, muss aber bis zur Migration mit der bestehenden Inferenz aus Master/Plan-Map-Export kompatibel bleiben und Drift gegen die Master-Arbeitsstrom-Sicht melden.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13427,7 +13449,7 @@
     {
       "id": "V123.5.1",
       "type": "subphase",
-      "title": "Option A bewerten: Markdown bleibt Wahrheit, YAML bleibt Spiegel.",
+      "title": "Option A bewerten: Markdown bleibt Wahrheit, JSON bleibt generierter Spiegel.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13438,7 +13460,7 @@
     {
       "id": "V123.5.2",
       "type": "subphase",
-      "title": "Option B bewerten: YAML wird Wahrheit, Markdown wird generierte Menschenansicht.",
+      "title": "Option B bewerten: JSON wird Wahrheit, Markdown wird generierte Menschenansicht.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13449,7 +13471,7 @@
     {
       "id": "V123.5.3",
       "type": "subphase",
-      "title": "Blast-Radius fuer Option B dokumentieren: Master, Validatoren, Graph, Workflows, Rules, Changelog, Agenten-Leseweg.",
+      "title": "Blast-Radius fuer Option B dokumentieren: Master, Validatoren, Graph, Workflows, Rules, Changelog, Agenten-Leseweg, Plan-Map und Lock-Projektion.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13460,7 +13482,7 @@
     {
       "id": "V123.5.4",
       "type": "subphase",
-      "title": "User-Gate einholen, bevor eine Autoritaetsverschiebung umgesetzt wird.",
+      "title": "Promotion-Kriterien definieren: `plan:index:check`, `plan:check`, `plan:context:check` und relevante Graph-/Docs-Gates bleiben nach mindestens einem echten Planpflege-Slice gruen; keine manuelle Nachkorrektur an generierten Master-/Index-Daten.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13469,9 +13491,31 @@
       }
     },
     {
+      "id": "V123.5.5",
+      "type": "subphase",
+      "title": "Entscheidungstest einfuehren oder dokumentieren: Generator-Determinismus, Drift-Erkennung, Roundtrip/Readback fuer Master-Felder, Workstream und Lock-Projektion.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.5"
+      }
+    },
+    {
+      "id": "V123.5.6",
+      "type": "subphase",
+      "title": "User-Gate einholen, bevor eine Autoritaetsverschiebung umgesetzt wird.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.6"
+      }
+    },
+    {
       "id": "V123.6.1",
       "type": "subphase",
-      "title": "Falls YAML kanonisch wird, `docs/Umsetzungsplan.md` als generierte Ansicht markieren und gegen manuelle Drift schuetzen.",
+      "title": "Falls JSON kanonisch wird, `docs/Umsetzungsplan.md` als generierte Ansicht markieren und gegen manuelle Drift schuetzen.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -13570,7 +13614,7 @@
     {
       "id": "V123.99.6",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt: Pilot/Quelle, Konfliktregel, Drift-Check, Agenten-Leseweg, Restrisiko und Entscheidung zum Source-of-Truth-Wechsel.",
+      "title": "Abschlussnotiz nennt: Pilot/Quelle, Konfliktregel, Drift-Check, Agenten-Leseweg, Tests/Promotion-Kriterien, Restrisiko und Entscheidung zum Source-of-Truth-Wechsel.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
@@ -29478,6 +29522,21 @@
       }
     },
     {
+      "id": "docs/generated/plan-index.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V123"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "docs/lock-status/README.md",
       "type": "file",
       "title": null,
@@ -32553,21 +32612,6 @@
           "V77"
         ],
         "exists": true
-      }
-    },
-    {
-      "id": "docs/plan-index.yaml",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V123"
-        ],
-        "exists": false
       }
     },
     {
@@ -75597,6 +75641,15 @@
     },
     {
       "from": "V123",
+      "to": "docs/generated/plan-index.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
       "to": "docs/plaene/aktiv/V123.md",
       "type": "scope",
       "hint": null,
@@ -75607,15 +75660,6 @@
     {
       "from": "V123",
       "to": "docs/plaene/CHANGELOG.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V123",
-      "to": "docs/plan-index.yaml",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -75856,6 +75900,17 @@
       }
     },
     {
+      "from": "V123.1",
+      "to": "V123.1.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.1",
+        "subphaseCode": "123.1.6"
+      }
+    },
+    {
       "from": "V123.2",
       "to": "V123.2.1",
       "type": "contains_subphase",
@@ -75897,6 +75952,17 @@
         "blockId": "V123",
         "phaseCode": "123.2",
         "subphaseCode": "123.2.4"
+      }
+    },
+    {
+      "from": "V123.2",
+      "to": "V123.2.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.2",
+        "subphaseCode": "123.2.5"
       }
     },
     {
@@ -76051,6 +76117,28 @@
         "blockId": "V123",
         "phaseCode": "123.5",
         "subphaseCode": "123.5.4"
+      }
+    },
+    {
+      "from": "V123.5",
+      "to": "V123.5.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.5"
+      }
+    },
+    {
+      "from": "V123.5",
+      "to": "V123.5.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.6"
       }
     },
     {
