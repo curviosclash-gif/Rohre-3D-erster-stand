@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
 
 import { buildPlanMapData } from '../scripts/export-plan-map.mjs';
 
@@ -11,6 +12,23 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.ok(data.summary.blockCount >= 30);
   assert.ok(data.summary.dependencyCount > 0);
   assert.ok(data.sources.masterPlan.endsWith('docs/Umsetzungsplan.md'));
+  assert.equal(data.sources.structuredPlanIndex, 'docs/generated/plan-index.json');
+
+  const planIndex = JSON.parse(await fs.readFile('docs/generated/plan-index.json', 'utf8'));
+  const indexWorkstreamByBlock = new Map(planIndex.blocks.map((block) => [block.id, block.workstream]));
+  for (const block of data.blocks) {
+    if (indexWorkstreamByBlock.has(block.id)) {
+      assert.equal(block.workstream, indexWorkstreamByBlock.get(block.id));
+      assert.equal(block.workstreamSource, 'docs/generated/plan-index.json');
+    }
+  }
+  assert.equal(
+    data.summary.planIndexWorkstreamMismatchCount,
+    data.planIndexWorkstreamMismatches.length,
+  );
+  assert.ok(data.planIndexWorkstreamMismatches.every((entry) => (
+    entry.structuredIndexWorkstream && entry.inferredWorkstream
+  )));
 
   const v126 = data.blocks.find((block) => block.id === 'V126');
   assert.ok(v126, 'V126 is present');

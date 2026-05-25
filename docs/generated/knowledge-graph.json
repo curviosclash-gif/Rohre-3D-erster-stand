@@ -1657,14 +1657,16 @@
           "scripts/build-knowledge-graph.mjs",
           "scripts/build-plan-index.mjs",
           "scripts/check-knowledge-graph.mjs",
+          "scripts/export-plan-map.mjs",
           "scripts/plan-context-report.mjs",
           "scripts/validate-plan-index.mjs",
           "scripts/validate-umsetzungsplan.mjs",
           "tests/plan-context-report.contract.test.mjs",
-          "tests/plan-index.contract.test.mjs"
+          "tests/plan-index.contract.test.mjs",
+          "tests/plan-map-export.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 22,
+          "concreteCount": 24,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -5016,7 +5018,7 @@
       "id": "V123.4",
       "type": "phase",
       "title": "Tool-Integration",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.4"
@@ -13433,8 +13435,8 @@
     {
       "id": "V123.4.4",
       "type": "subphase",
-      "title": "Graph-Build/Check nur dann umstellen, wenn der Index stabil ist, V120-Scope nicht parallel dieselben Dateien beansprucht und keine aktuelle Graph-Quelle stillschweigend verdrangt wird.",
-      "status": "open",
+      "title": "Graph-Build/Check nur dann umstellen, wenn der Index stabil ist, V120-Scope nicht parallel dieselben Dateien beansprucht und keine aktuelle Graph-Quelle stillschweigend verdrangt wird. (abgeschlossen: 2026-05-25; evidence: `node scripts/query-knowledge-graph.mjs scope-collisions --json` zeigt weiterhin V120/V123-Overlap auf `docs/generated/knowledge-graph*.json`, `docs/Umsetzungsplan.md`, `docs/plaene/CHANGELOG.md` und `scripts/build-knowledge-graph.mjs`; daher kein Graph-Source-Switch in diesem Slice)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.4",
@@ -13444,8 +13446,8 @@
     {
       "id": "V123.4.5",
       "type": "subphase",
-      "title": "Plan Map darf `workstream` aus dem strukturierten Index optional konsumieren, muss aber bis zur Migration mit der bestehenden Inferenz aus Master/Plan-Map-Export kompatibel bleiben und Drift gegen die Master-Arbeitsstrom-Sicht melden.",
-      "status": "open",
+      "title": "Plan Map darf `workstream` aus dem strukturierten Index optional konsumieren, muss aber bis zur Migration mit der bestehenden Inferenz aus Master/Plan-Map-Export kompatibel bleiben und Drift gegen die Master-Arbeitsstrom-Sicht melden. (abgeschlossen: 2026-05-25; evidence: `node --test tests/plan-map-export.contract.test.mjs` -> PASS; Plan Map nutzt `docs/generated/plan-index.json` fuer Master-Block-Workstreams und meldet `planIndexWorkstreamMismatches`)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.4",
@@ -35455,6 +35457,7 @@
         ],
         "scopeBlocks": [
           "B13",
+          "V123",
           "V134"
         ],
         "mappedNodes": [
@@ -48579,6 +48582,7 @@
         ],
         "scopeBlocks": [
           "B13",
+          "V123",
           "V134"
         ],
         "mappedNodes": [
@@ -75844,6 +75848,15 @@
     },
     {
       "from": "V123",
+      "to": "scripts/export-plan-map.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
       "to": "scripts/plan-context-report.mjs",
       "type": "scope",
       "hint": null,
@@ -75881,6 +75894,15 @@
     {
       "from": "V123",
       "to": "tests/plan-index.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "tests/plan-map-export.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {

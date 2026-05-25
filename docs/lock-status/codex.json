@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-25T13:40:29.583Z",
+  "timestamp": "2026-05-25T13:52:55.773Z",
   "locks": [
     {
       "block_id": "V103",
@@ -643,16 +643,18 @@
         "scripts/plan-context-report.mjs",
         "scripts/validate-plan-index.mjs",
         "scripts/build-plan-index.mjs",
+        "scripts/export-plan-map.mjs",
         "scripts/build-knowledge-graph.mjs",
         "scripts/check-knowledge-graph.mjs",
         "tests/plan-context-report.contract.test.mjs",
         "tests/plan-index.contract.test.mjs",
+        "tests/plan-map-export.contract.test.mjs",
         "package.json"
       ],
       "start_date": "2026-05-25",
       "target_completion": "2026-05-25",
       "status": "in-progress",
-      "notes": "V123.4 plan-context report index drift slice"
+      "notes": "V123.4 plan map index workstream slice"
     }
   ],
   "current_phase_evidence": {

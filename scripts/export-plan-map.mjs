@@ -12,6 +12,7 @@ import {
 
 const DEFAULT_OUTPUT = 'tmp/plan-map/plan-map.json';
 const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
+const STRUCTURED_PLAN_INDEX_PATH = 'docs/generated/plan-index.json';
 const CHANGELOG_PATH = 'docs/plaene/CHANGELOG.md';
 const OPEN_FINDINGS_PATH = 'docs/prozess/Open_Findings.md';
 const KNOWLEDGE_GRAPH_PATH = 'docs/generated/knowledge-graph.json';
@@ -115,6 +116,66 @@ function inferWorkstream({ id, title, affectedArea }) {
   return {
     id: workstreamId,
     label: WORKSTREAM_LABEL_BY_ID.get(workstreamId) || workstreamId,
+  };
+}
+
+function createStructuredIndexContext(structuredPlanIndex) {
+  const indexWorkstreams = Array.isArray(structuredPlanIndex?.workstreams)
+    ? structuredPlanIndex.workstreams
+      .filter((entry) => entry?.id && entry?.label)
+      .map((entry) => ({
+        id: entry.id,
+        label: entry.label,
+        source: entry.source || STRUCTURED_PLAN_INDEX_PATH,
+      }))
+    : [];
+  const workstreams = indexWorkstreams.length > 0 ? indexWorkstreams : WORKSTREAMS;
+  const workstreamLabelById = new Map(workstreams.map((entry) => [entry.id, entry.label]));
+  const blockById = new Map(
+    Array.isArray(structuredPlanIndex?.blocks)
+      ? structuredPlanIndex.blocks
+        .filter((block) => block?.id)
+        .map((block) => [block.id, block])
+      : [],
+  );
+
+  return {
+    source: structuredPlanIndex ? STRUCTURED_PLAN_INDEX_PATH : null,
+    workstreams,
+    workstreamLabelById,
+    blockById,
+  };
+}
+
+function resolveBlockWorkstream({ row, frontmatter, structuredIndexContext }) {
+  const affectedArea = frontmatter.affected_area || null;
+  const inferred = inferWorkstream({ id: row.id, title: row.title, affectedArea });
+  const indexedWorkstream = structuredIndexContext?.blockById?.get(row.id)?.workstream || null;
+  if (!indexedWorkstream) {
+    return {
+      id: inferred.id,
+      label: inferred.label,
+      source: 'plan-map-inference',
+      inferred,
+      mismatch: null,
+    };
+  }
+
+  const label = structuredIndexContext.workstreamLabelById.get(indexedWorkstream) || indexedWorkstream;
+  return {
+    id: indexedWorkstream,
+    label,
+    source: STRUCTURED_PLAN_INDEX_PATH,
+    inferred,
+    mismatch: inferred.id === indexedWorkstream ? null : {
+      blockId: row.id,
+      title: row.title,
+      structuredIndexWorkstream: indexedWorkstream,
+      structuredIndexWorkstreamLabel: label,
+      inferredWorkstream: inferred.id,
+      inferredWorkstreamLabel: inferred.label,
+      source: STRUCTURED_PLAN_INDEX_PATH,
+    },
   };
 }
 
@@ -716,14 +777,14 @@ function parsePhases(markdown) {
   });
 }
 
-async function enrichBlock(rootDir, row) {
+async function enrichBlock(rootDir, row, structuredIndexContext) {
   const planFile = row.plan_file || null;
   const planText = planFile ? await readTextIfExists(rootDir, planFile) : null;
   const frontmatter = planText ? parseFrontmatter(planText) : {};
   const phaseProgress = planText ? parsePhaseProgress(planText, row.id) : { total: 0, done: 0, open: 0, percent: 0 };
   const dodProgress = planText ? parseDodProgress(planText) : { total: 0, done: 0, open: 0, percent: 0 };
   const affectedArea = frontmatter.affected_area || null;
-  const workstream = inferWorkstream({ id: row.id, title: row.title, affectedArea });
+  const workstream = resolveBlockWorkstream({ row, frontmatter, structuredIndexContext });
 
   return {
     id: row.id,
@@ -739,6 +800,10 @@ async function enrichBlock(rootDir, row) {
     affectedArea,
     workstream: workstream.id,
     workstreamLabel: workstream.label,
+    workstreamSource: workstream.source,
+    inferredWorkstream: workstream.inferred.id,
+    inferredWorkstreamLabel: workstream.inferred.label,
+    workstreamMismatch: workstream.mismatch,
     scopeFiles: normalizeList(frontmatter.scope_files),
     scopeReferenceFiles: normalizeList(frontmatter.scope_reference_files),
     verification: normalizeList(frontmatter.verification),
@@ -753,7 +818,7 @@ async function enrichBlock(rootDir, row) {
   };
 }
 
-async function parseMasterBlocks(rootDir, markdown) {
+async function parseMasterBlocks(rootDir, markdown, structuredIndexContext) {
   const blocks = [];
 
   for (const sectionConfig of MASTER_BLOCK_SECTIONS) {
@@ -776,11 +841,18 @@ async function parseMasterBlocks(rootDir, markdown) {
         plan_file: cleanCell(row.plan_file),
         group: sectionConfig.group,
         groupLabel: sectionConfig.label,
-      }));
+      }, structuredIndexContext));
     }
   }
 
   return blocks;
+}
+
+function buildPlanIndexWorkstreamMismatches(blocks) {
+  return blocks
+    .map((block) => block.workstreamMismatch)
+    .filter(Boolean)
+    .sort((left, right) => left.blockId.localeCompare(right.blockId, 'en', { numeric: true }));
 }
 
 function dependencyEdgeId(from, to, phase, kind, source) {
@@ -1260,6 +1332,7 @@ export async function buildPlanMapData(options = {}) {
     coverage,
     scorecard,
     lockRegistry,
+    structuredPlanIndex,
   ] = await Promise.all([
     readTextIfExists(rootDir, OPEN_FINDINGS_PATH),
     readTextIfExists(rootDir, CHANGELOG_PATH),
@@ -1267,9 +1340,11 @@ export async function buildPlanMapData(options = {}) {
     readJsonIfExists(rootDir, KNOWLEDGE_GRAPH_COVERAGE_PATH),
     readJsonIfExists(rootDir, KNOWLEDGE_GRAPH_SCORECARD_PATH),
     readJsonIfExists(rootDir, LOCK_REGISTRY_PATH),
+    readJsonIfExists(rootDir, STRUCTURED_PLAN_INDEX_PATH),
   ]);
 
-  const parsedBlocks = await parseMasterBlocks(rootDir, masterPlan);
+  const structuredIndexContext = createStructuredIndexContext(structuredPlanIndex);
+  const parsedBlocks = await parseMasterBlocks(rootDir, masterPlan, structuredIndexContext);
   const masterIndex = parsePlanMapMaster(masterPlan);
   const intakePlans = await collectIntakePlans({
     rootDir,
@@ -1282,6 +1357,7 @@ export async function buildPlanMapData(options = {}) {
   const locks = summarizeLocks(lockRegistry, parseMasterLockRows(masterPlan));
   const scopeCollisions = await readCuratedScopeCollisions(rootDir) ?? buildScopeCollisions(graph, parsedBlocks);
   const blocks = buildBlockInsights(parsedBlocks, dependencies, scopeCollisions, locks, recommendedOrder);
+  const planIndexWorkstreamMismatches = buildPlanIndexWorkstreamMismatches(blocks);
   const fileIndex = buildFileIndex(blocks, scopeCollisions);
   const changelog = parseChangelogEntries(changelogText);
 
@@ -1292,6 +1368,7 @@ export async function buildPlanMapData(options = {}) {
     readOnly: true,
     sources: {
       masterPlan: MASTER_PLAN_PATH,
+      structuredPlanIndex: structuredPlanIndex ? STRUCTURED_PLAN_INDEX_PATH : null,
       changelog: CHANGELOG_PATH,
       openFindings: OPEN_FINDINGS_PATH,
       knowledgeGraph: graph ? KNOWLEDGE_GRAPH_PATH : null,
@@ -1301,12 +1378,13 @@ export async function buildPlanMapData(options = {}) {
       intakePlans: 'docs/plaene/neu',
       archiveReferences: ARCHIVE_REFERENCES_ROOT,
     },
-    workstreams: WORKSTREAMS,
+    workstreams: structuredIndexContext.workstreams,
     blocks,
     dependencies,
     recommendedOrder,
     locks,
     scopeCollisions,
+    planIndexWorkstreamMismatches,
     fileIndex,
     intakePlans,
     archiveReferences,
@@ -1317,6 +1395,7 @@ export async function buildPlanMapData(options = {}) {
     scorecard: summarizeScorecard(scorecard),
     summary: {
       ...buildSummary(blocks, dependencies, scopeCollisions, locks),
+      planIndexWorkstreamMismatchCount: planIndexWorkstreamMismatches.length,
       ...summarizeIntakePlans(intakePlans),
       ...summarizeArchiveReferences(archiveReferences),
       changelogCount: changelog.length,
