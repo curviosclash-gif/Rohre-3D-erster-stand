@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-25T12:55:19.259Z",
+  "timestamp": "2026-05-25T13:40:29.583Z",
   "locks": [
     {
       "block_id": "V103",
@@ -621,10 +621,42 @@
       "target_completion": "2026-05-22",
       "status": "completed",
       "notes": ""
+    },
+    {
+      "block_id": "V123",
+      "phase": "123.4",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/generated/plan-index.json",
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.scorecard.json",
+        "docs/plaene/aktiv/V123.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/prozess/Dokumentationsstatus.md",
+        "AGENTS.md",
+        ".agents/rules/planning_and_governance.md",
+        ".agents/rules/token_efficiency_and_tools.md",
+        ".agents/workflows/plan.md",
+        ".agents/workflows/code.md",
+        "scripts/validate-umsetzungsplan.mjs",
+        "scripts/plan-context-report.mjs",
+        "scripts/validate-plan-index.mjs",
+        "scripts/build-plan-index.mjs",
+        "scripts/build-knowledge-graph.mjs",
+        "scripts/check-knowledge-graph.mjs",
+        "tests/plan-context-report.contract.test.mjs",
+        "tests/plan-index.contract.test.mjs",
+        "package.json"
+      ],
+      "start_date": "2026-05-25",
+      "target_completion": "2026-05-25",
+      "status": "in-progress",
+      "notes": "V123.4 plan-context report index drift slice"
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "123.2",
+    "phase_id": "123.4",
     "completed_items": [],
     "last_commit": ""
   }

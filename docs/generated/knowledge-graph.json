@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 234,
+          "concreteCount": 235,
           "plannedCount": 0
         }
       }
@@ -1660,10 +1660,11 @@
           "scripts/plan-context-report.mjs",
           "scripts/validate-plan-index.mjs",
           "scripts/validate-umsetzungsplan.mjs",
+          "tests/plan-context-report.contract.test.mjs",
           "tests/plan-index.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 21,
+          "concreteCount": 22,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -13399,8 +13400,8 @@
     {
       "id": "V123.4.1",
       "type": "subphase",
-      "title": "`plan-context-report` optional an `docs/generated/plan-index.json` anbinden; wenn Datei fehlt, bleibt alter Markdown-Pfad aktiv.",
-      "status": "open",
+      "title": "`plan-context-report` optional an `docs/generated/plan-index.json` anbinden; wenn Datei fehlt, bleibt alter Markdown-Pfad aktiv. (abgeschlossen: 2026-05-25; evidence: `npm run plan:context:check` -> PASS, Report nennt `structured_index=docs/generated/plan-index.json`; Fallback bleibt bei fehlendem Index `missing-index-fallback-markdown`)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.4",
@@ -13410,8 +13411,8 @@
     {
       "id": "V123.4.2",
       "type": "subphase",
-      "title": "Report-Felder trennen: `masterSource`, `structuredIndexSource`, `driftStatus`, `missingInIndex`, `missingInMaster`, `fieldMismatches`, `workstreamMismatches`, `lockMismatches`.",
-      "status": "open",
+      "title": "Report-Felder trennen: `masterSource`, `structuredIndexSource`, `driftStatus`, `missingInIndex`, `missingInMaster`, `fieldMismatches`, `workstreamMismatches`, `lockMismatches`. (abgeschlossen: 2026-05-25; evidence: `node --test tests/plan-context-report.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.4",
@@ -13421,8 +13422,8 @@
     {
       "id": "V123.4.3",
       "type": "subphase",
-      "title": "`validate-umsetzungsplan` nicht sofort ersetzen, sondern gegen Drift-Check ergaenzen.",
-      "status": "open",
+      "title": "`validate-umsetzungsplan` nicht sofort ersetzen, sondern gegen Drift-Check ergaenzen. (abgeschlossen: 2026-05-25; evidence: `plan:check` bleibt `scripts/validate-umsetzungsplan.mjs`; `plan:context:check` ruft ergaenzend `validatePlanIndex` und meldet Drift getrennt)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.4",
@@ -48513,6 +48514,23 @@
       }
     },
     {
+      "id": "tests/plan-context-report.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "V123"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/plan-evidence-claims.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -56348,6 +56366,15 @@
     {
       "from": "B13",
       "to": "tests/physics-policy.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/plan-context-report.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -75836,6 +75863,15 @@
     {
       "from": "V123",
       "to": "scripts/validate-umsetzungsplan.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "tests/plan-context-report.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {

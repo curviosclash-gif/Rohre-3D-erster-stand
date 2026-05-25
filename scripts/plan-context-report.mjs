@@ -2,13 +2,19 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 
 import {
     classifyIntakeDraft as classifySharedIntakeDraft,
     parsePlanMapMaster,
 } from './planning/PlanIntakeOps.mjs';
+import { validatePlanIndex } from './validate-plan-index.mjs';
 
 const ROOT = process.cwd();
+const MASTER_PLAN_PATH = 'docs/Umsetzungsplan.md';
+const STRUCTURED_INDEX_PATH = 'docs/generated/plan-index.json';
+const OPEN_FINDINGS_PATH = 'docs/prozess/Open_Findings.md';
+const KNOWLEDGE_GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const args = new Set(process.argv.slice(2));
 const checkMode = args.has('--check');
 const jsonMode = args.has('--json');
@@ -102,6 +108,70 @@ function parseFrontmatter(content) {
 
 function parseMasterPlan(content) {
     return parsePlanMapMaster(content);
+}
+
+function compactIndexViolation(violation) {
+    return {
+        type: violation.type || null,
+        id: violation.id || null,
+        field: violation.field || null,
+        path: violation.path || null,
+        plan_file: violation.plan_file || null,
+        workstream: violation.workstream || null,
+        dependency: violation.dependency || null,
+        message: violation.message || '',
+    };
+}
+
+function indexViolationsOfType(violations, type) {
+    return violations
+        .filter((violation) => violation.type === type)
+        .map(compactIndexViolation);
+}
+
+async function buildStructuredIndexStatus() {
+    const hasStructuredIndex = await exists(STRUCTURED_INDEX_PATH);
+    if (!hasStructuredIndex) {
+        return {
+            masterSource: MASTER_PLAN_PATH,
+            structuredIndexSource: null,
+            driftStatus: 'missing-index-fallback-markdown',
+            planIndexViolationCount: 0,
+            missingInIndex: [],
+            missingInMaster: [],
+            fieldMismatches: [],
+            workstreamMismatches: [],
+            lockMismatches: [],
+            otherIndexViolations: [],
+        };
+    }
+
+    const violations = await validatePlanIndex({
+        rootDir: ROOT,
+        indexPath: STRUCTURED_INDEX_PATH,
+    });
+    const knownTypes = new Set([
+        'missing-in-index',
+        'missing-in-master',
+        'field-mismatch',
+        'workstream-mismatch',
+        'lock-mismatch',
+    ]);
+
+    return {
+        masterSource: MASTER_PLAN_PATH,
+        structuredIndexSource: STRUCTURED_INDEX_PATH,
+        driftStatus: violations.length > 0 ? 'drift' : 'clean',
+        planIndexViolationCount: violations.length,
+        missingInIndex: indexViolationsOfType(violations, 'missing-in-index'),
+        missingInMaster: indexViolationsOfType(violations, 'missing-in-master'),
+        fieldMismatches: indexViolationsOfType(violations, 'field-mismatch'),
+        workstreamMismatches: indexViolationsOfType(violations, 'workstream-mismatch'),
+        lockMismatches: indexViolationsOfType(violations, 'lock-mismatch'),
+        otherIndexViolations: violations
+            .filter((violation) => !knownTypes.has(violation.type))
+            .map(compactIndexViolation),
+    };
 }
 
 function masterRowFor(master, blockId) {
@@ -203,12 +273,13 @@ function summarize(items) {
     }, {});
 }
 
-async function buildReport() {
-    const [masterContent, openFindingsContent] = await Promise.all([
-        readText('docs/Umsetzungsplan.md'),
-        exists('docs/prozess/Open_Findings.md') ? readText('docs/prozess/Open_Findings.md') : '',
+export async function buildReport() {
+    const [masterContent, openFindingsContent, structuredIndexStatus] = await Promise.all([
+        readText(MASTER_PLAN_PATH),
+        exists(OPEN_FINDINGS_PATH) ? readText(OPEN_FINDINGS_PATH) : '',
+        buildStructuredIndexStatus(),
     ]);
-    const graph = await readJson('docs/generated/knowledge-graph.json');
+    const graph = await readJson(KNOWLEDGE_GRAPH_PATH);
     const graphIndex = indexKnowledgeGraph(graph);
     const master = parseMasterPlan(masterContent);
     const activePlanFiles = (await listMarkdownFiles('docs/plaene/aktiv'))
@@ -246,6 +317,18 @@ async function buildReport() {
         });
     }
 
+    if (
+        checkMode
+        && structuredIndexStatus.structuredIndexSource
+        && structuredIndexStatus.driftStatus !== 'clean'
+    ) {
+        violations.push({
+            id: 'plan-index-drift',
+            path: structuredIndexStatus.structuredIndexSource,
+            message: `Structured plan index drift detected: ${structuredIndexStatus.planIndexViolationCount} violation(s).`,
+        });
+    }
+
     const intakeDrafts = [];
     for (const file of intakeFiles) {
         const content = await readText(file);
@@ -268,10 +351,20 @@ async function buildReport() {
         generatedAt: new Date().toISOString(),
         mode: checkMode ? 'check' : 'report',
         inputs: {
-            masterPlan: 'docs/Umsetzungsplan.md',
-            openFindings: 'docs/prozess/Open_Findings.md',
-            knowledgeGraph: 'docs/generated/knowledge-graph.json',
+            masterPlan: MASTER_PLAN_PATH,
+            structuredPlanIndex: structuredIndexStatus.structuredIndexSource,
+            openFindings: OPEN_FINDINGS_PATH,
+            knowledgeGraph: KNOWLEDGE_GRAPH_PATH,
         },
+        masterSource: structuredIndexStatus.masterSource,
+        structuredIndexSource: structuredIndexStatus.structuredIndexSource,
+        driftStatus: structuredIndexStatus.driftStatus,
+        missingInIndex: structuredIndexStatus.missingInIndex,
+        missingInMaster: structuredIndexStatus.missingInMaster,
+        fieldMismatches: structuredIndexStatus.fieldMismatches,
+        workstreamMismatches: structuredIndexStatus.workstreamMismatches,
+        lockMismatches: structuredIndexStatus.lockMismatches,
+        otherIndexViolations: structuredIndexStatus.otherIndexViolations,
         summary: {
             masterReferencedActivePlans: master.referencedPlanFiles.length,
             activePlanFiles: activePlanFiles.length,
@@ -279,6 +372,8 @@ async function buildReport() {
             activePlanClassifications: summarize(activePlans),
             intakeDraftClassifications: summarize(intakeDrafts),
             graphOnlyPlanFiles: graphOnlyPlanFiles.length,
+            planIndexDriftStatus: structuredIndexStatus.driftStatus,
+            planIndexViolationCount: structuredIndexStatus.planIndexViolationCount,
             violations: violations.length,
         },
         activePlans,
@@ -296,6 +391,10 @@ async function writeReport(report) {
 function printHumanSummary(report) {
     console.log(`[plan-context] mode=${report.mode}`);
     console.log(`[plan-context] report=${normalizePath(path.relative(ROOT, reportPath))}`);
+    console.log(`[plan-context] master_source=${report.masterSource}`);
+    console.log(`[plan-context] structured_index=${report.structuredIndexSource || 'fallback:markdown'}`);
+    console.log(`[plan-context] drift_status=${report.driftStatus}`);
+    console.log(`[plan-context] index_violations=${report.summary.planIndexViolationCount}`);
     console.log(`[plan-context] master_referenced=${report.summary.masterReferencedActivePlans}`);
     console.log(`[plan-context] active_plans=${report.summary.activePlanFiles}`);
     console.log(`[plan-context] intake_drafts=${report.summary.intakeDraftFiles}`);
@@ -334,15 +433,24 @@ function printHumanSummary(report) {
     }
 }
 
-const report = await buildReport();
-await writeReport(report);
+async function main() {
+    const report = await buildReport();
+    await writeReport(report);
 
-if (jsonMode) {
-    console.log(JSON.stringify(report, null, 2));
-} else {
-    printHumanSummary(report);
+    if (jsonMode) {
+        console.log(JSON.stringify(report, null, 2));
+    } else {
+        printHumanSummary(report);
+    }
+
+    if (checkMode && report.violations.length > 0) {
+        process.exitCode = 1;
+    }
 }
 
-if (checkMode && report.violations.length > 0) {
-    process.exitCode = 1;
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+    main().catch((error) => {
+        console.error(`[plan-context] ${error.message}`);
+        process.exitCode = 1;
+    });
 }

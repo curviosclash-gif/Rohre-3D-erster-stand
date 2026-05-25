@@ -185,12 +185,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2068,
-    "rawCoveredFileCount": 1311,
+    "trackedFileCount": 2069,
+    "rawCoveredFileCount": 1312,
     "rawCoveragePercent": 63.4,
-    "adjustedTrackedFileCount": 1386,
-    "adjustedCoveredFileCount": 1079,
-    "adjustedCoveragePercent": 77.8,
+    "adjustedTrackedFileCount": 1387,
+    "adjustedCoveredFileCount": 1080,
+    "adjustedCoveragePercent": 77.9,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
     "classifications": [
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 990,
-        "coveredCount": 867
+        "count": 991,
+        "coveredCount": 868
       },
       {
         "classification": "product-docs",
@@ -34121,6 +34121,25 @@
         "V69",
         "V88",
         "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/plan-context-report.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V123"
       ],
       "surfaces": [],
       "classification": "product-code",
