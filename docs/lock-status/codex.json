@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-25T12:30:39.019Z",
+  "timestamp": "2026-05-25T12:42:32.097Z",
   "locks": [
     {
       "block_id": "V103",
@@ -620,15 +620,6 @@
       "start_date": "2026-05-22",
       "target_completion": "2026-05-22",
       "status": "completed",
-      "notes": ""
-    },
-    {
-      "block_id": "V123",
-      "phase": "123.1",
-      "scope_files": [],
-      "start_date": "2026-05-25",
-      "target_completion": "2026-05-25",
-      "status": "in-progress",
       "notes": ""
     }
   ],
