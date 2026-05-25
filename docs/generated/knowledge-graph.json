@@ -13504,12 +13504,23 @@
     {
       "id": "V123.5.6",
       "type": "subphase",
-      "title": "User-Gate einholen, bevor eine Autoritaetsverschiebung umgesetzt wird.",
+      "title": "AI-Benachrichtigung an den User ausloesen, sobald die Entscheidung zwischen Spiegelbetrieb und Source-of-Truth-Migration ansteht.",
       "status": "open",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.5",
         "subphaseCode": "123.5.6"
+      }
+    },
+    {
+      "id": "V123.5.7",
+      "type": "subphase",
+      "title": "User-Gate einholen, bevor eine Autoritaetsverschiebung umgesetzt wird.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.7"
       }
     },
     {
@@ -76139,6 +76150,17 @@
         "blockId": "V123",
         "phaseCode": "123.5",
         "subphaseCode": "123.5.6"
+      }
+    },
+    {
+      "from": "V123.5",
+      "to": "V123.5.7",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V123",
+        "phaseCode": "123.5",
+        "subphaseCode": "123.5.7"
       }
     },
     {
