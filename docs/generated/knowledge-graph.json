@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 231,
+          "concreteCount": 232,
           "plannedCount": 0
         }
       }
@@ -1645,9 +1645,13 @@
           ".agents/workflows/code.md",
           ".agents/workflows/plan.md",
           "AGENTS.md",
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.scorecard.json",
           "docs/generated/plan-index.json",
           "docs/plaene/aktiv/V123.md",
           "docs/plaene/CHANGELOG.md",
+          "docs/prozess/Dokumentationsstatus.md",
           "docs/Umsetzungsplan.md",
           "package.json",
           "scripts/build-knowledge-graph.mjs",
@@ -1658,8 +1662,8 @@
           "scripts/validate-umsetzungsplan.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 13,
-          "plannedCount": 3
+          "concreteCount": 19,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [
           "V112",
@@ -4980,7 +4984,7 @@
       "id": "V123.1",
       "type": "phase",
       "title": "Schema und Spiegel-Pilot",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.1"
@@ -13218,8 +13222,8 @@
     {
       "id": "V123.1.1",
       "type": "subphase",
-      "title": "Feldliste fuer den MVP finalisieren: `schema_version`, `updated`, `start_anchor`, `next_recommended_start`, `sources`, `workstreams`, `blocks`, `lock`.",
-      "status": "open",
+      "title": "Feldliste fuer den MVP finalisieren: `schema_version`, `updated`, `start_anchor`, `next_recommended_start`, `sources`, `workstreams`, `blocks`, `lock`. (abgeschlossen: 2026-05-25; evidence: `docs/plaene/aktiv/V123.md` + `docs/generated/plan-index.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.1",
@@ -13229,8 +13233,8 @@
     {
       "id": "V123.1.2",
       "type": "subphase",
-      "title": "Alle Master-Tabellenfelder aus `docs/Umsetzungsplan.md` in das Schema abbilden: `id`, `title`, `status`, `priority`, `owner`, `workstream`, `depends_on`, `current_phase`, `plan_file`.",
-      "status": "open",
+      "title": "Alle Master-Tabellenfelder aus `docs/Umsetzungsplan.md` in das Schema abbilden: `id`, `title`, `status`, `priority`, `owner`, `workstream`, `depends_on`, `current_phase`, `plan_file`. (abgeschlossen: 2026-05-25; evidence: `npm run plan:index:build` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.1",
@@ -13240,8 +13244,8 @@
     {
       "id": "V123.1.3",
       "type": "subphase",
-      "title": "Sonderfaelle dokumentieren: `-` fuer keine Dependencies, freie Owner, blockierte Bloecke, erledigte aber noch referenzierte Bloecke, fehlende oder geschlossene Locks.",
-      "status": "open",
+      "title": "Sonderfaelle dokumentieren: `-` fuer keine Dependencies, freie Owner, blockierte Bloecke, erledigte aber noch referenzierte Bloecke, fehlende oder geschlossene Locks. (abgeschlossen: 2026-05-25; evidence: `MVP-Sonderfaelle` in diesem Plan)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.1",
@@ -13251,8 +13255,8 @@
     {
       "id": "V123.1.4",
       "type": "subphase",
-      "title": "Pilot-Regel im Plan festhalten: Bei Konflikt gewinnt bis zur spaeteren Migration der Markdown-Master.",
-      "status": "open",
+      "title": "Pilot-Regel im Plan festhalten: Bei Konflikt gewinnt bis zur spaeteren Migration der Markdown-Master. (abgeschlossen: 2026-05-25; evidence: Pilot-Regel bleibt unveraendert in V123)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.1",
@@ -13262,8 +13266,8 @@
     {
       "id": "V123.1.5",
       "type": "subphase",
-      "title": "Workstream-Regel fixieren: genau ein primaerer `workstream` pro Block, Master-Arbeitsstrom als Pilot-Wahrheit, keine Vermischung mit `intakeLane`, keine Ableitung von Prioritaet oder Reihenfolge.",
-      "status": "open",
+      "title": "Workstream-Regel fixieren: genau ein primaerer `workstream` pro Block, Master-Arbeitsstrom als Pilot-Wahrheit, keine Vermischung mit `intakeLane`, keine Ableitung von Prioritaet oder Reihenfolge. (abgeschlossen: 2026-05-25; evidence: `docs/generated/plan-index.json` Workstream-Projektion aus Master-Arbeitsstrom)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.1",
@@ -13273,8 +13277,8 @@
     {
       "id": "V123.1.6",
       "type": "subphase",
-      "title": "Format-/Ablageregel fixieren: `docs/generated/plan-index.json` wird generiert, nicht manuell editiert, und enthaelt Startanker plus Empfehlung statt eines mehrdeutigen `next_free_p1_start`.",
-      "status": "open",
+      "title": "Format-/Ablageregel fixieren: `docs/generated/plan-index.json` wird generiert, nicht manuell editiert, und enthaelt Startanker plus Empfehlung statt eines mehrdeutigen `next_free_p1_start`. (abgeschlossen: 2026-05-25; evidence: `scripts/build-plan-index.mjs` + `npm run plan:index:build` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.1",
@@ -29463,6 +29467,7 @@
           "V116",
           "V119",
           "V120",
+          "V123",
           "V125",
           "V90"
         ],
@@ -29487,6 +29492,7 @@
           "V116",
           "V119",
           "V120",
+          "V123",
           "V125",
           "V90",
           "V94"
@@ -29526,6 +29532,7 @@
           "V111",
           "V116",
           "V120",
+          "V123",
           "V125",
           "V90"
         ],
@@ -29544,7 +29551,7 @@
         "scopeBlocks": [
           "V123"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -32640,6 +32647,7 @@
           "V110",
           "V111",
           "V119",
+          "V123",
           "V125",
           "V90"
         ],
@@ -34906,12 +34914,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V123"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -55013,6 +55023,15 @@
     {
       "from": "B13",
       "to": "scripts/build-mobile-classic-app.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/build-plan-index.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -75652,6 +75671,33 @@
     },
     {
       "from": "V123",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "docs/generated/knowledge-graph.scorecard.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
       "to": "docs/generated/plan-index.json",
       "type": "scope",
       "hint": null,
@@ -75671,6 +75717,15 @@
     {
       "from": "V123",
       "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "docs/prozess/Dokumentationsstatus.md",
       "type": "scope",
       "hint": null,
       "attributes": {

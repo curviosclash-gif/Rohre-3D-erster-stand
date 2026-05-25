@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2064,
-    "rawCoveredFileCount": 1307,
-    "rawCoveragePercent": 63.3,
-    "adjustedTrackedFileCount": 1382,
-    "adjustedCoveredFileCount": 1075,
+    "trackedFileCount": 2066,
+    "rawCoveredFileCount": 1309,
+    "rawCoveragePercent": 63.4,
+    "adjustedTrackedFileCount": 1384,
+    "adjustedCoveredFileCount": 1077,
     "adjustedCoveragePercent": 77.8,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -257,14 +257,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 987,
-        "coveredCount": 864
+        "count": 988,
+        "coveredCount": 865
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 320,
-        "coveredCount": 166
+        "count": 321,
+        "coveredCount": 167
       },
       {
         "classification": "prototype",
@@ -11089,6 +11089,7 @@
         "V116",
         "V119",
         "V120",
+        "V123",
         "V125",
         "V90"
       ],
@@ -11115,6 +11116,7 @@
         "V116",
         "V119",
         "V120",
+        "V123",
         "V125",
         "V90",
         "V94"
@@ -11158,8 +11160,26 @@
         "V111",
         "V116",
         "V120",
+        "V123",
         "V125",
         "V90"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/generated/plan-index.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V123"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -14701,6 +14721,7 @@
         "V110",
         "V111",
         "V119",
+        "V123",
         "V125",
         "V90"
       ],
@@ -19107,6 +19128,25 @@
       "scopeBlocks": [
         "B13",
         "V132"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/build-plan-index.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V123"
       ],
       "surfaces": [],
       "classification": "product-code",
