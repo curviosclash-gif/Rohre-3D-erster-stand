@@ -5005,7 +5005,7 @@
       "id": "V123.3",
       "type": "phase",
       "title": "Agenten-Leseweg",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.3"
@@ -13344,8 +13344,8 @@
     {
       "id": "V123.3.1",
       "type": "subphase",
-      "title": "Leseweg fuer Pilotphase definieren: `AGENTS.md`, passende Rule/Workflow, `docs/generated/plan-index.json` fuer Blockstatus/Workstream/Lock-Einstieg, genau eine VXX-Datei fuer Details.",
-      "status": "open",
+      "title": "Leseweg fuer Pilotphase definieren: `AGENTS.md`, passende Rule/Workflow, `docs/generated/plan-index.json` fuer Blockstatus/Workstream/Lock-Einstieg, genau eine VXX-Datei fuer Details. (abgeschlossen: 2026-05-25; evidence: `AGENTS.md` + `.agents/workflows/fix-planung.md` + `.agents/workflows/status.md` -> Pilot-Leseweg: Index als Einstieg, Master als Kanon, eine VXX-Detaildatei)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.3",
@@ -13355,8 +13355,8 @@
     {
       "id": "V123.3.2",
       "type": "subphase",
-      "title": "Konfliktregel dokumentieren: Bei Abweichung zwischen JSON und Markdown gewinnt bis zur Migration `docs/Umsetzungsplan.md`.",
-      "status": "open",
+      "title": "Konfliktregel dokumentieren: Bei Abweichung zwischen JSON und Markdown gewinnt bis zur Migration `docs/Umsetzungsplan.md`. (abgeschlossen: 2026-05-25; evidence: `AGENTS.md` + `.agents/rules/token_efficiency_and_tools.md` + `.agents/workflows/fix-planung.md` -> Master gewinnt bei Konflikt)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.3",
@@ -13366,8 +13366,8 @@
     {
       "id": "V123.3.3",
       "type": "subphase",
-      "title": "Token-Effizienz-Regel ergaenzen: Agents duerfen nicht standardmaessig JSON, Markdown, Changelog und Reports alle zugleich lesen.",
-      "status": "open",
+      "title": "Token-Effizienz-Regel ergaenzen: Agents duerfen nicht standardmaessig JSON, Markdown, Changelog und Reports alle zugleich lesen. (abgeschlossen: 2026-05-25; evidence: `.agents/rules/token_efficiency_and_tools.md` -> Changelog, Reports und weitere VXX-Dateien nur bei konkretem Bedarf)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.3",
@@ -13377,8 +13377,8 @@
     {
       "id": "V123.3.4",
       "type": "subphase",
-      "title": "Bot-Training-Sonderweg bestaetigen: `docs/bot-training/Bot_Trainingsplan.md` bleibt eigene Quelle und wird nicht in den normalen Master-Index-MVP gezogen.",
-      "status": "open",
+      "title": "Bot-Training-Sonderweg bestaetigen: `docs/bot-training/Bot_Trainingsplan.md` bleibt eigene Quelle und wird nicht in den normalen Master-Index-MVP gezogen. (abgeschlossen: 2026-05-25; evidence: `.agents/rules/token_efficiency_and_tools.md` + `AGENTS.md` -> Bot-Training bleibt Sonderweg)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.3",
@@ -13388,8 +13388,8 @@
     {
       "id": "V123.3.5",
       "type": "subphase",
-      "title": "`workstream` als Einstiegshilfe fuer Kontextwahl dokumentieren: erst Lane/Block finden, dann Dependencies/Locks pruefen, dann genau eine VXX-Detaildatei lesen.",
-      "status": "open",
+      "title": "`workstream` als Einstiegshilfe fuer Kontextwahl dokumentieren: erst Lane/Block finden, dann Dependencies/Locks pruefen, dann genau eine VXX-Detaildatei lesen. (abgeschlossen: 2026-05-25; evidence: `.agents/rules/token_efficiency_and_tools.md` + `.agents/workflows/status.md` -> `workstream` nur fuer Kontextwahl und Filterung, nicht als Status-/Scheduling-Quelle)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.3",

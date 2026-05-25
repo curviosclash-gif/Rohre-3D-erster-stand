@@ -7,8 +7,9 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 // turbo
 - Optional: `git pull --rebase`.
 - `npm run guard:main`.
-- Read `docs/Umsetzungsplan.md`.
-- Read the linked `docs/plaene/aktiv/VXX.md` for the claimed block before execution.
+- Read `docs/generated/plan-index.json` first when available for compact block status, `workstream`, start recommendation and lock projection; if drift or conflict is known, skip it as authority.
+- Read `docs/Umsetzungsplan.md` for canonical plan decisions; bei Konflikt gewinnt der Master.
+- Read exactly one linked `docs/plaene/aktiv/VXX.md` for the claimed block before execution; load Changelog, reports or additional VXX files only for concrete evidence, drift or dependency questions.
 - If the requested scope is bot-training, stop here and switch to `/bot-training-plan`; `/fix-planung` is only for `VXX` blocks backed by `docs/plaene/aktiv/`.
 - `git log -n 5 --oneline`.
 - `npm run plan:check`.

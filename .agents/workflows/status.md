@@ -5,8 +5,10 @@ description: Quick project status snapshot.
 
 ## 1. Plan status
 
-- Read `docs/Umsetzungsplan.md` and bei Bot-Training-Scope `docs/bot-training/Bot_Trainingsplan.md`.
-- If available, read `docs/generated/knowledge-graph.json` first for dependency/scope/surface questions.
+- Read `docs/generated/plan-index.json` first when available for compact block status, `workstream`, start recommendation and lock projection; if drift or conflict is known, skip it as authority.
+- Read `docs/Umsetzungsplan.md` for canonical plan decisions; bei Bot-Training-Scope `docs/bot-training/Bot_Trainingsplan.md`.
+- For block details read exactly one relevant `docs/plaene/aktiv/VXX.md`; load Changelog, reports or additional VXX files only for concrete evidence, drift or dependency questions.
+- For dependency/scope/surface questions, use `docs/generated/knowledge-graph.json` before free-text scans when available.
 - Determine the actually relevant active block ID from `docs/Umsetzungsplan.md` first, then run graph queries for that block:
   - `node scripts/query-knowledge-graph.mjs open-deps <active-block-id> --json`
   - `node scripts/query-knowledge-graph.mjs scope-collisions --json`

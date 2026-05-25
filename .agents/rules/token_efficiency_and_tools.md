@@ -17,6 +17,14 @@ description: Token efficiency, file access, and tool usage (consolidated)
 - Agent-Explore sparsam: Default `quick`/`medium`. `very thorough` nur auf User-Anfrage.
 - Graph-First fuer Plan- und Runtimefragen: bei Abhaengigkeits-/Scope-/Surface-Fragen zuerst `docs/generated/knowledge-graph.json` oder `npm run graph:query` nutzen; bei Runtime-Diagnosen zuerst `impact-for-file`, `event-flow`, `critical-path-health`, `untested-systems` oder `coverage-report` ueber `node scripts/query-knowledge-graph.mjs` pruefen.
 
+## Plan-Leseweg in der V123-Pilotphase
+
+- `docs/generated/plan-index.json` darf als kompakter, generierter Einstieg fuer Blockstatus, `workstream`, Startempfehlung und Lock-Projektion genutzt werden, sofern kein Drift bekannt ist.
+- `docs/Umsetzungsplan.md` bleibt bis zur expliziten Source-of-Truth-Migration kanonisch; bei Abweichung zwischen JSON und Markdown gewinnt der Master.
+- Fuer Blockdetails genau eine passende `docs/plaene/aktiv/VXX.md` lesen; weitere VXX-Dateien, `docs/plaene/CHANGELOG.md`, Reports oder Graph-Artefakte nur bei konkretem Dependency-, Evidence-, Drift- oder Abgleichsbedarf nachladen.
+- `workstream` ist nur Einstiegshilfe fuer Kontextwahl und Filterung, keine Prioritaet, Reihenfolge, Scheduling- oder Statusquelle.
+- Bot-Training bleibt Sonderweg ueber `docs/bot-training/Bot_Trainingsplan.md` und wird nicht in den normalen Master-Index-MVP gezogen.
+
 ## AI-Arbeitsleitplanken
 
 - Ein Hauptpfad gleichzeitig: keine neuen Nebenpfade ohne klaren Produkt- oder Stabilitaetshebel.

@@ -7,8 +7,9 @@ Orientierung fuer alle Agents. Details liegen in den verlinkten Rules und Workfl
 1. `AGENTS.md` (diese Datei)
 2. passende Rule in `.agents/rules/`
 3. passenden Workflow in `.agents/workflows/`
-4. `docs/Umsetzungsplan.md` als kompakter Master-Index; Blockdetails in `docs/plaene/aktiv/VXX.md`
-5. Plan-Historie und Abgleich-Fliesstext in `docs/plaene/CHANGELOG.md`
+4. `docs/generated/plan-index.json` in der V123-Pilotphase als kompakter, generierter Einstieg fuer Blockstatus, Workstream und Lock-Projektion, sofern kein Drift bekannt ist.
+5. `docs/Umsetzungsplan.md` bleibt bis zur expliziten Source-of-Truth-Migration kanonischer Master-Index; bei Konflikt gewinnt der Master.
+6. Genau eine passende `docs/plaene/aktiv/VXX.md` fuer Blockdetails; Plan-Historie und Abgleich-Fliesstext in `docs/plaene/CHANGELOG.md` nur bei konkretem Evidence-, Drift- oder Abgleichsbedarf.
 
 ## Rule-Quellen (Einzelquelle je Thema)
 
@@ -38,6 +39,8 @@ Policy-Details werden nicht in AGENTS.md wiederholt. Bei Konflikt gewinnt die Ru
 ## Plan-Einstieg
 
 - `docs/Umsetzungsplan.md` ist nur der kompakte Master-Index.
+- `docs/generated/plan-index.json` ist in der V123-Pilotphase ein generierter, nicht-kanonischer Index fuer schnelle AI-Kontextwahl.
+- Der strukturierte Index ersetzt keine Master-, Status-, Phasen- oder Lock-Entscheidung; bei Abweichung gewinnt `docs/Umsetzungsplan.md`.
 - Kanonische Blockdetails: `docs/plaene/aktiv/VXX.md` (DoD, Risiken, `scope_files`, Phasen).
 - Neue Intake-Entwuerfe: `docs/plaene/neu/`. Intake in den Master bleibt User-owned.
 - Bot-Training: `docs/bot-training/Bot_Trainingsplan.md`.
