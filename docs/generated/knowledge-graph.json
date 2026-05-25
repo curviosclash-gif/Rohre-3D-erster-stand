@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 232,
+          "concreteCount": 234,
           "plannedCount": 0
         }
       }
@@ -1659,11 +1659,12 @@
           "scripts/check-knowledge-graph.mjs",
           "scripts/plan-context-report.mjs",
           "scripts/validate-plan-index.mjs",
-          "scripts/validate-umsetzungsplan.mjs"
+          "scripts/validate-umsetzungsplan.mjs",
+          "tests/plan-index.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 19,
-          "plannedCount": 1
+          "concreteCount": 21,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
           "V112",
@@ -4994,7 +4995,7 @@
       "id": "V123.2",
       "type": "phase",
       "title": "Validator und Drift-Report",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.2"
@@ -13288,8 +13289,8 @@
     {
       "id": "V123.2.1",
       "type": "subphase",
-      "title": "`scripts/validate-plan-index.mjs` entwerfen oder erstellen: JSON lesen, Master-Zeilen, Arbeitsstrom-Index und Lock-Projektion vergleichen, Feldmismatches berichten.",
-      "status": "open",
+      "title": "`scripts/validate-plan-index.mjs` entwerfen oder erstellen: JSON lesen, Master-Zeilen, Arbeitsstrom-Index und Lock-Projektion vergleichen, Feldmismatches berichten. (abgeschlossen: 2026-05-25; evidence: `npm run plan:index:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.2",
@@ -13299,8 +13300,8 @@
     {
       "id": "V123.2.2",
       "type": "subphase",
-      "title": "Fehlertypen stabilisieren: `missing-in-index`, `missing-in-master`, `duplicate-id`, `field-mismatch`, `invalid-plan-file`, `unknown-dependency`, `unknown-workstream`, `workstream-mismatch`, `lock-mismatch`, `manual-generated-edit`.",
-      "status": "open",
+      "title": "Fehlertypen stabilisieren: `missing-in-index`, `missing-in-master`, `duplicate-id`, `field-mismatch`, `invalid-plan-file`, `unknown-dependency`, `unknown-workstream`, `workstream-mismatch`, `lock-mismatch`, `manual-generated-edit`. (abgeschlossen: 2026-05-25; evidence: `node --test tests/plan-index.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.2",
@@ -13310,8 +13311,8 @@
     {
       "id": "V123.2.3",
       "type": "subphase",
-      "title": "`package.json` um `plan:index:check` ergaenzen, aber noch nicht automatisch in `gates:pre-commit` erzwingen.",
-      "status": "open",
+      "title": "`package.json` um `plan:index:check` ergaenzen, aber noch nicht automatisch in `gates:pre-commit` erzwingen. (abgeschlossen: 2026-05-25; evidence: `npm run plan:index:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.2",
@@ -13321,8 +13322,8 @@
     {
       "id": "V123.2.4",
       "type": "subphase",
-      "title": "`scripts/build-plan-index.mjs` als expliziten Generator vorbereiten; keine verdeckte Auto-Korrektur in Checks.",
-      "status": "open",
+      "title": "`scripts/build-plan-index.mjs` als expliziten Generator vorbereiten; keine verdeckte Auto-Korrektur in Checks. (abgeschlossen: 2026-05-25; evidence: `scripts/validate-plan-index.mjs` vergleicht nur und schreibt nicht)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.2",
@@ -13332,8 +13333,8 @@
     {
       "id": "V123.2.5",
       "type": "subphase",
-      "title": "Contract-Tests fuer Parser/Generator/Validator planen oder ergaenzen: stabiler JSON-Output, Drift bei Master-Feldabweichung, Workstream-Abweichung, Lock-Abweichung und fehlendem Planfile.",
-      "status": "open",
+      "title": "Contract-Tests fuer Parser/Generator/Validator planen oder ergaenzen: stabiler JSON-Output, Drift bei Master-Feldabweichung, Workstream-Abweichung, Lock-Abweichung und fehlendem Planfile. (abgeschlossen: 2026-05-25; evidence: `node --test tests/plan-index.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.2",
@@ -36162,12 +36163,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V123"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -48529,6 +48532,23 @@
       }
     },
     {
+      "id": "tests/plan-index.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "V123"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/plan-map-export.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -55652,6 +55672,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/validate-plan-index.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/validate-umsetzungsplan.mjs",
       "type": "scope",
       "hint": null,
@@ -56328,6 +56357,15 @@
     {
       "from": "B13",
       "to": "tests/plan-evidence-claims.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/plan-index.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -75798,6 +75836,15 @@
     {
       "from": "V123",
       "to": "scripts/validate-umsetzungsplan.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "tests/plan-index.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {

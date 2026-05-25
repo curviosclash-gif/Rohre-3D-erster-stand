@@ -80,6 +80,7 @@
     "guard:main": "npm run git:acl:heal && node scripts/ensure-main-branch.mjs",
     "plan:check": "node scripts/validate-umsetzungsplan.mjs",
     "plan:index:build": "node scripts/build-plan-index.mjs",
+    "plan:index:check": "node scripts/validate-plan-index.mjs",
     "plan:context": "node scripts/plan-context-report.mjs",
     "plan:context:check": "node scripts/plan-context-report.mjs --check",
     "graph:build": "node scripts/build-knowledge-graph.mjs",

@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2066,
-    "rawCoveredFileCount": 1309,
+    "trackedFileCount": 2068,
+    "rawCoveredFileCount": 1311,
     "rawCoveragePercent": 63.4,
-    "adjustedTrackedFileCount": 1384,
-    "adjustedCoveredFileCount": 1077,
+    "adjustedTrackedFileCount": 1386,
+    "adjustedCoveredFileCount": 1079,
     "adjustedCoveragePercent": 77.8,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 988,
-        "coveredCount": 865
+        "count": 990,
+        "coveredCount": 867
       },
       {
         "classification": "product-docs",
@@ -20403,6 +20403,25 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/validate-plan-index.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V123"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/validate-umsetzungsplan.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -34123,6 +34142,25 @@
         "V117",
         "V119",
         "V125"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/plan-index.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V123"
       ],
       "surfaces": [],
       "classification": "product-code",
