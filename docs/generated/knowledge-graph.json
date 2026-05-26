@@ -5795,7 +5795,7 @@
       "id": "V138.5",
       "type": "phase",
       "title": "Rauschen, Scope-Validator-Folge und Rollout-Entscheidung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.5"
@@ -16819,8 +16819,8 @@
     {
       "id": "V138.5.1",
       "type": "subphase",
-      "title": "Audit gegen typische Graph-/Plan-/Generated-Slices trocken pruefen.",
-      "status": "open",
+      "title": "Audit gegen typische Graph-/Plan-/Generated-Slices trocken pruefen. (abgeschlossen: 2026-05-26; evidence: auditStagedDiff dry-run matrix via inline Node fuer reale V138-Commits 4e93b463/3cd12af8/30d18bd1 plus synthetische generated-only/Plan-/Shadow-Truth-Faelle -> PASS; erlaubte Faelle ohne Warnungen, Shadow-Truth-Negativkontrolle mit erwarteter violation)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.5",
@@ -16830,8 +16830,8 @@
     {
       "id": "V138.5.2",
       "type": "subphase",
-      "title": "False-Positive-Liste dokumentieren und nur Pattern korrigieren, keine Semantik hinzufuegen.",
-      "status": "open",
+      "title": "False-Positive-Liste dokumentieren und nur Pattern korrigieren, keine Semantik hinzufuegen. (abgeschlossen: 2026-05-26; evidence: dry-run matrix -> keine False Positives in erlaubten Graph-/Plan-/Generated-Slices; keine Pattern-Aenderung noetig)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.5",
@@ -16841,8 +16841,8 @@
     {
       "id": "V138.5.3",
       "type": "subphase",
-      "title": "Scope-Validator-Import als separaten Folge-Slice entscheiden: pure function extrahieren, CLI als Wrapper behalten, Phase-Pflicht bei aktiven Locks pruefen.",
-      "status": "open",
+      "title": "Scope-Validator-Import als separaten Folge-Slice entscheiden: pure function extrahieren, CLI als Wrapper behalten, Phase-Pflicht bei aktiven Locks pruefen. (abgeschlossen: 2026-05-26; evidence: read-only inspection `.agents/scripts/scope-validator.js` -> CLI-first mit `process.exit`, staged Git-Zugriff und duplizierter Glob-/Lock-Logik; Import/Refactor bleibt separater D3/D4-Folge-Slice)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.5",
