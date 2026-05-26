@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-26. Aktiver Lock: `-`; Startanker: `V123 123.99 abgeschlossen`; naechster empfohlener P1-Schritt ist `V120 120.1`.
+Stand: 2026-05-26. Aktiver Lock: `-`; Startanker: `V123 123.99 abgeschlossen`; naechster empfohlener P1-Schritt ist `V138 138.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -32,7 +32,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | Map Content, Map Tools & Settings | `V103`, `V106`, `V114`, `V130` | Map-/GLB-Content, SettingsManager, SurfacePolicy und kuratierte Parcours-Map-Varianz. |
 | Android / Mobile | `V132`, `V135` | Android Arcade-Parcours als erster aktiver Mobile-Spielmodus-Folgeblock; V135 fuehrt die Mobile-Menue-/Start-Setup-UX als Folgeblock. Weitere Mobile-/Android-Intakes bleiben bis zur Uebernahme unter `docs/plaene/neu/`. |
 | Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface und Architektur-Gates. |
-| Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126` | Governance, Planpflege, Toolchain, Evidence, Cleanup und Delivery-/Dev-Gates. |
+| Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126`, `V138` | Governance, Planpflege, Toolchain, Evidence, Cleanup, Delivery-/Dev- und Agent-Diff-Gates. |
 | AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V134`, `V137` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation und AI-Kontext. |
 
 ## Aktive Bloecke
@@ -75,6 +75,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V123 | AI-optimierter Plan-Index und Source-of-Truth-Migration | done | P1 | frei | V116.4,V119.1 | 123.99 | `docs/plaene/aktiv/V123.md` |
 | V125 | Architektur-Compliance fuer Folgearbeit | done | P1 | frei | V91.99,V104.99,V117.99 | 125.99 | `docs/plaene/aktiv/V125.md` |
 | V126 | Local Dev-API, Preview- und Delivery-Hardening | done | P1 | frei | V102.99,V105.99 | 126.99 | `docs/plaene/aktiv/V126.md` |
+| V138 | KI-Diff-Audit-Gate fuer deterministische Agenten-Selbstpruefung | planned | P1 | frei | V117.99,V119.99,V123.99,V125.99 | 138.1 | `docs/plaene/aktiv/V138.md` |
 | V120 | Graph-RAG mit lokalem Context-Adapter | planned | P1 | frei | V107.99,V110.99,V111.99 | 120.1 | `docs/plaene/aktiv/V120.md` |
 | V137 | CodeGraph Read-only Installationsspike fuer Graph-RAG | planned | P2 | frei | V107.99,V110.99,V111.99,V120.1 | 137.1 | `docs/plaene/aktiv/V137.md` |
 | V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.1 | `docs/plaene/aktiv/V121.md` |
@@ -138,6 +139,10 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V125 | V91.99 | hard | ja | Architektur-Ratchet und Legacy-Surface-Matrix sind die Baseline fuer die Workflow- und Guard-Verankerung |
 | V125 | V104.99 | hard | ja | God-Object-/Port-Zuschnitt liefert den aktuellen Contract-/Snapshot-/Intent-Port-Zielpfad fuer Folgearbeit |
 | V125 | V117.99 | hard | ja | AI Decision Framework und D3/D4-Gates begrenzen Governance-, Workflow- und Hook-Aenderungen |
+| V138 | V117.99 | hard | ja | AI Decision Framework, D3/D4-Gates und Commit-Envelope-Regeln sind Grundlage fuer das Diff-Audit-Gate |
+| V138 | V119.99 | hard | ja | Evidence-Remediation und Claim-Pruefung bilden die Baseline fuer ehrliche `Not-checked`- und Broad-Claim-Regeln |
+| V138 | V123.99 | hard | ja | Plan-Index-Pilot und Markdown-Source-of-Truth-Regel begrenzen Generated-Artefakte und Schatten-Wahrheiten |
+| V138 | V125.99 | hard | ja | Staged Architecture Guard und Workflow-Eskalation sind die technische Baseline fuer weitere Agent-Gate-Haertung |
 | V126 | V102.99 | hard | ja | Security-/Runtime-Hardening ist Baseline fuer lokale API- und Preview-Grenzen |
 | V126 | V105.99 | hard | ja | Guard-/Typecheck-Recovery ist Baseline fuer gezielte Tooling- und Preview-Verifikation |
 | V126 | V90.2 | soft | ja | Dependency-/Version-/Lockfile-Scope ist mit dokumentierten Security-Ausnahmen geschlossen; V126 darf starten, solange Package-/Lockfile-/CI-Upgrades nicht Teil des Slices sind |
@@ -195,6 +200,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V123 | 2026-05-26 | closed | Abgeschlossen 2026-05-26; Plan-Index-Pilot, Drift-/Kontext-/Dashboard-/Docs-/Graph-Gates gruen; Markdown bleibt kanonisch |
 | - | V125 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Architektur-Capsule, staged Guard, Boundary-/Ratchet-/Contract-Evidence und Abschluss-Gates gruen |
 | - | V126 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Dev-API-/Preview-Hardening gruen, Handoff an V127/V128/V129 |
+| - | V138 | - | frei | Geplant; P1-Einschub fuer KI-Diff-Audit vor V120/V137/V122 |
 | - | V120 | - | frei | Geplant |
 | - | V137 | - | frei | Geplant; CodeGraph nur als read-only Installationsspike mit separaten D4-Gates fuer Init/MCP/Agent-Config |
 | - | V121 | - | frei | Geplant |
@@ -219,18 +225,19 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 3. `V125` ist abgeschlossen: Architektur-Capsule, staged Architecture Guard, Workflow-Eskalation, Application-/Electron-Scorecard und Ratchet-/Contracttest-Evidence sind gruen.
 4. `V119` ist abgeschlossen: historische Plan-Evidence ist pro Befund entschieden, schwache Abschlussclaims sind nachgeschaerft oder als Restwiderspruch sichtbar, und der Praeventions-Check ist gruen.
 5. `V123` ist abgeschlossen: Plan-Index, Drift-/Kontext-Checks und Dashboard laufen als nicht-kanonischer Pilot; `docs/Umsetzungsplan.md` bleibt bis zur expliziten Migration kanonisch.
-6. `V120` (Graph-RAG mit lokalem Context-Adapter) erst nach frischem Graph-/SLO-Signal als Graph-RAG-Kontexthebel starten.
-7. `V137` (CodeGraph Read-only Installationsspike fuer Graph-RAG) nach `V120.1` und vor einer produktiven CodeGraph-/MCP-Nutzung evaluieren; Curvios-Graph bleibt Wahrheit, CodeGraph hoechstens Candidate Provider.
-8. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) erst nach `V120.99` oder einem expliziten V120-`fixture-ready`-Gate als read-only Consumer starten.
-9. `V134` ist abgeschlossen: Plan Map trennt Intake-Drafts in Ideen, bereits geplante Drafts, Archivkandidaten, Bot-Training und Meta, ohne Source-of-Truth- oder Move-Pfade zu erweitern.
-10. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) kann nach V119-Baseline eingeordnet werden; vor `V120.99` nur als kleines CLI-only Memory-MVP, Graph-RAG-/Ruflo-Kontext erst danach.
-11. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) nach Graph-Frische und ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113 einordnen.
-12. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
-13. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Hardening- und Produktqualitaets-Schnitten einplanen.
-14. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
-15. `V130` ist kanonisch abgeschlossen: sechs neue Parcours-Maps, gestaffelte Arcade-Pool-Erweiterung und targeted Contract-/Start-Smokes sind gruen; Browser-Demo, GLB-/Asset-Setdressing und Preview-Scope bleiben bewusst unveraendert.
-16. `V132` (Android Arcade-Parcours Integration) kann nach kanonischem V130-Abschluss und idealerweise nach V131-Steuerungsbaseline eingeordnet werden; erster Slice bleibt kuratierter Android-Parcours statt vollstaendiger Desktop-Modusparitaet.
-17. `V135` ist abgeschlossen: Fokus-/Scrollsprung, kompakter Mobile-Start-CTA, Route-Kurzpfad und Landscape-/Small-Viewport-Regeln sind gruen; echtes Android-WebView-Geraet und APK/Install-Flow bleiben ausserhalb dieses Slices.
+6. `V138` (KI-Diff-Audit-Gate) als P1-Einschub vor der naechsten groesseren Agent-/Graph-RAG-/CodeGraph-Arbeit ausfuehren; erster Slice bleibt langweilig-deterministisch: staged Diff Audit, `Generated-by:`, Shadow-Truth-Heuristik, Gate-Bypass-Muster und `Not-checked:` ab D2.
+7. `V120` (Graph-RAG mit lokalem Context-Adapter) erst nach frischem Graph-/SLO-Signal und idealerweise nach V138 als Graph-RAG-Kontexthebel starten.
+8. `V137` (CodeGraph Read-only Installationsspike fuer Graph-RAG) nach `V120.1` und vor einer produktiven CodeGraph-/MCP-Nutzung evaluieren; Curvios-Graph bleibt Wahrheit, CodeGraph hoechstens Candidate Provider.
+9. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) erst nach `V120.99` oder einem expliziten V120-`fixture-ready`-Gate als read-only Consumer starten.
+10. `V134` ist abgeschlossen: Plan Map trennt Intake-Drafts in Ideen, bereits geplante Drafts, Archivkandidaten, Bot-Training und Meta, ohne Source-of-Truth- oder Move-Pfade zu erweitern.
+11. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) kann nach V119-Baseline eingeordnet werden; vor `V120.99` nur als kleines CLI-only Memory-MVP, Graph-RAG-/Ruflo-Kontext erst danach.
+12. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) nach Graph-Frische und ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113 einordnen.
+13. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
+14. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Hardening- und Produktqualitaets-Schnitten einplanen.
+15. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
+16. `V130` ist kanonisch abgeschlossen: sechs neue Parcours-Maps, gestaffelte Arcade-Pool-Erweiterung und targeted Contract-/Start-Smokes sind gruen; Browser-Demo, GLB-/Asset-Setdressing und Preview-Scope bleiben bewusst unveraendert.
+17. `V132` (Android Arcade-Parcours Integration) kann nach kanonischem V130-Abschluss und idealerweise nach V131-Steuerungsbaseline eingeordnet werden; erster Slice bleibt kuratierter Android-Parcours statt vollstaendiger Desktop-Modusparitaet.
+18. `V135` ist abgeschlossen: Fokus-/Scrollsprung, kompakter Mobile-Start-CTA, Route-Kurzpfad und Landscape-/Small-Viewport-Regeln sind gruen; echtes Android-WebView-Geraet und APK/Install-Flow bleiben ausserhalb dieses Slices.
 
 ## Conflict-Log
 

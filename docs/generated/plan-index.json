@@ -7,8 +7,8 @@
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
-    "block": "V120",
-    "phase": "120.1",
+    "block": "V138",
+    "phase": "138.1",
     "source": "docs/Umsetzungsplan.md",
     "authority": "recommendation"
   },
@@ -542,6 +542,29 @@
         "agent": "-",
         "start_date": "2026-05-20",
         "target": "Abgeschlossen 2026-05-20; Dev-API-/Preview-Hardening gruen, Handoff an V127/V128/V129",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V138",
+      "title": "KI-Diff-Audit-Gate fuer deterministische Agenten-Selbstpruefung",
+      "status": "planned",
+      "priority": "P1",
+      "owner": "frei",
+      "workstream": "repo-governance",
+      "depends_on": [
+        "V117.99",
+        "V119.99",
+        "V123.99",
+        "V125.99"
+      ],
+      "current_phase": "138.1",
+      "plan_file": "docs/plaene/aktiv/V138.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant; P1-Einschub fuer KI-Diff-Audit vor V120/V137/V122",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

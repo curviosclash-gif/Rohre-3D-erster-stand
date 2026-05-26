@@ -1530,6 +1530,7 @@
           "V123",
           "V125",
           "V137",
+          "V138",
           "V90"
         ],
         "unknownFrontmatterFields": [
@@ -1634,6 +1635,7 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P1",
@@ -2044,9 +2046,52 @@
           "V120",
           "V122",
           "V123",
-          "V124"
+          "V124",
+          "V138"
         ],
         "unknownFrontmatterFields": [
+          "scope_reference_files",
+          "soft_depends_on"
+        ]
+      }
+    },
+    {
+      "id": "V138",
+      "type": "block",
+      "title": "KI-Diff-Audit-Gate fuer deterministische Agenten-Selbstpruefung",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P1",
+        "owner": "frei",
+        "currentPhase": "138.1",
+        "planFile": "docs/plaene/aktiv/V138.md",
+        "scopeDeclarations": [
+          "docs/plaene/aktiv/V120.md",
+          "docs/plaene/aktiv/V137.md",
+          "docs/plaene/aktiv/V138.md",
+          "docs/plaene/CHANGELOG.md",
+          "docs/Umsetzungsplan.md",
+          "package.json",
+          "scripts/agent-preflight.mjs",
+          "scripts/check-agent-commit-message.mjs",
+          "scripts/check-ai-diff-audit.mjs",
+          "tests/agent-diff-audit.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 8,
+          "plannedCount": 2
+        },
+        "scopeOverlapAllowedWith": [
+          "V120",
+          "V137"
+        ],
+        "unknownFrontmatterFields": [
+          "blocks_recommended_before",
+          "decision_class",
           "scope_reference_files",
           "soft_depends_on"
         ]
@@ -2765,7 +2810,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 339,
+          "concreteCount": 341,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5701,6 +5746,66 @@
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.99"
+      }
+    },
+    {
+      "id": "V138.1",
+      "type": "phase",
+      "title": "Audit-Design und Testmatrix",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.1"
+      }
+    },
+    {
+      "id": "V138.2",
+      "type": "phase",
+      "title": "Check-Script und Contracttests",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.2"
+      }
+    },
+    {
+      "id": "V138.3",
+      "type": "phase",
+      "title": "Agent-Preflight-Integration",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.3"
+      }
+    },
+    {
+      "id": "V138.4",
+      "type": "phase",
+      "title": "Envelope-Haertung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.4"
+      }
+    },
+    {
+      "id": "V138.5",
+      "type": "phase",
+      "title": "Rauschen, Scope-Validator-Folge und Rollout-Entscheidung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.5"
+      }
+    },
+    {
+      "id": "V138.99",
+      "type": "phase",
+      "title": "Abschluss",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.99"
       }
     },
     {
@@ -16574,6 +16679,215 @@
         "blockId": "V137",
         "phaseCode": "137.99",
         "subphaseCode": "137.99.6"
+      }
+    },
+    {
+      "id": "V138.1.1",
+      "type": "subphase",
+      "title": "Datei-Klassen fuer Runtime-Code, Generator-Code, Generated-Artefakte, Governance, Source-of-Truth und Tests konkret in Pattern-Listen uebersetzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.1",
+        "subphaseCode": "138.1.1"
+      }
+    },
+    {
+      "id": "V138.1.2",
+      "type": "subphase",
+      "title": "Envelope-Felder `Generated-by:` und `Canonical-source:` fuer Preflight/Commit-Message-Parsing festlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.1",
+        "subphaseCode": "138.1.2"
+      }
+    },
+    {
+      "id": "V138.1.3",
+      "type": "subphase",
+      "title": "Testmatrix fuer die sechs Kernfaelle fixieren: runtime+generated, generator+generated mit `Generated-by`, Shadow-Truth, Gate-Bypass, `test.only`, D2 ohne `Not-checked`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.1",
+        "subphaseCode": "138.1.3"
+      }
+    },
+    {
+      "id": "V138.2.1",
+      "type": "subphase",
+      "title": "`scripts/check-ai-diff-audit.mjs` mit purem `auditStagedDiff()` und CLI anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.2",
+        "subphaseCode": "138.2.1"
+      }
+    },
+    {
+      "id": "V138.2.2",
+      "type": "subphase",
+      "title": "`tests/agent-diff-audit.contract.test.mjs` fuer die sechs Kernfaelle anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.2",
+        "subphaseCode": "138.2.2"
+      }
+    },
+    {
+      "id": "V138.2.3",
+      "type": "subphase",
+      "title": "`package.json` um `check:ai-diff-audit` ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.2",
+        "subphaseCode": "138.2.3"
+      }
+    },
+    {
+      "id": "V138.3.1",
+      "type": "subphase",
+      "title": "`agent-preflight.mjs` ruft `auditStagedDiff()` mit staged changes, diff und Envelope auf.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.3",
+        "subphaseCode": "138.3.1"
+      }
+    },
+    {
+      "id": "V138.3.2",
+      "type": "subphase",
+      "title": "Findings werden in bestehende `violations`/`warnings` eingeordnet.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.3",
+        "subphaseCode": "138.3.2"
+      }
+    },
+    {
+      "id": "V138.3.3",
+      "type": "subphase",
+      "title": "`check-agent-commit-message.mjs` liest und reicht `Generated-by:` sowie `Canonical-source:` weiter.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.3",
+        "subphaseCode": "138.3.3"
+      }
+    },
+    {
+      "id": "V138.4.1",
+      "type": "subphase",
+      "title": "`Not-checked:` ab `Decision: D2` hard required machen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.4",
+        "subphaseCode": "138.4.1"
+      }
+    },
+    {
+      "id": "V138.4.2",
+      "type": "subphase",
+      "title": "`Residual-risk:` fuer D2 als Warnung oder optionales Feld belassen; D3/D4 bleiben hard required.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.4",
+        "subphaseCode": "138.4.2"
+      }
+    },
+    {
+      "id": "V138.4.3",
+      "type": "subphase",
+      "title": "Commit-Message-Hinweise und Tests an neue Anforderungen anpassen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.4",
+        "subphaseCode": "138.4.3"
+      }
+    },
+    {
+      "id": "V138.5.1",
+      "type": "subphase",
+      "title": "Audit gegen typische Graph-/Plan-/Generated-Slices trocken pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.5",
+        "subphaseCode": "138.5.1"
+      }
+    },
+    {
+      "id": "V138.5.2",
+      "type": "subphase",
+      "title": "False-Positive-Liste dokumentieren und nur Pattern korrigieren, keine Semantik hinzufuegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.5",
+        "subphaseCode": "138.5.2"
+      }
+    },
+    {
+      "id": "V138.5.3",
+      "type": "subphase",
+      "title": "Scope-Validator-Import als separaten Folge-Slice entscheiden: pure function extrahieren, CLI als Wrapper behalten, Phase-Pflicht bei aktiven Locks pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.5",
+        "subphaseCode": "138.5.3"
+      }
+    },
+    {
+      "id": "V138.99.1",
+      "type": "subphase",
+      "title": "`node --test tests/agent-diff-audit.contract.test.mjs` ist gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.99",
+        "subphaseCode": "138.99.1"
+      }
+    },
+    {
+      "id": "V138.99.2",
+      "type": "subphase",
+      "title": "`npm run check:ai-diff-audit` ist fuer den staged Abschlussdiff gruen oder meldet erwartete Warnungen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.99",
+        "subphaseCode": "138.99.2"
+      }
+    },
+    {
+      "id": "V138.99.3",
+      "type": "subphase",
+      "title": "`npm run plan:check` und `npm run gates:pre-commit` sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.99",
+        "subphaseCode": "138.99.3"
+      }
+    },
+    {
+      "id": "V138.99.4",
+      "type": "subphase",
+      "title": "Abschluss-Evidence nennt `Not-checked:` ehrlich: keine semantische Bewertung guter Tests, kein Scope-Validator-Import, keine CI-/Pre-Commit-Hardverdrahtung ausserhalb Agent-Preflight.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.99",
+        "subphaseCode": "138.99.4"
       }
     },
     {
@@ -30331,6 +30645,7 @@
         ],
         "scopeBlocks": [
           "V120",
+          "V138",
           "V77",
           "V90"
         ],
@@ -30520,6 +30835,23 @@
         ],
         "scopeBlocks": [
           "V137",
+          "V138",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V138.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V138",
           "V77"
         ],
         "exists": true
@@ -32171,6 +32503,7 @@
           "V125",
           "V130",
           "V137",
+          "V138",
           "V77",
           "V93"
         ],
@@ -32944,6 +33277,21 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_KI_Diff_Audit_Gate_V138.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md",
       "type": "file",
       "title": null,
@@ -33537,6 +33885,7 @@
           "V123",
           "V125",
           "V137",
+          "V138",
           "V51",
           "V69",
           "V89",
@@ -34836,6 +35185,7 @@
           "V117",
           "V123",
           "V125",
+          "V138",
           "V75",
           "V87",
           "V88",
@@ -35118,10 +35468,12 @@
       "attributes": {
         "source": [
           "audit-scope",
-          "knowledge-graph-mapping"
+          "knowledge-graph-mapping",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V138"
         ],
         "mappedNodes": [
           "runtime:agent-preflight"
@@ -35431,10 +35783,12 @@
       "status": "unknown",
       "attributes": {
         "source": [
-          "audit-scope"
+          "audit-scope",
+          "scope-files"
         ],
         "scopeBlocks": [
-          "B13"
+          "B13",
+          "V138"
         ],
         "exists": true
       }
@@ -35471,6 +35825,21 @@
           "V117"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "scripts/check-ai-diff-audit.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V138"
+        ],
+        "exists": false
       }
     },
     {
@@ -47628,6 +47997,21 @@
           "V116"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "tests/agent-diff-audit.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V138"
+        ],
+        "exists": false
       }
     },
     {
@@ -81732,6 +82116,437 @@
       }
     },
     {
+      "from": "V138",
+      "to": "docs/plaene/aktiv/V120.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "docs/plaene/aktiv/V137.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "docs/plaene/aktiv/V138.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "docs/Umsetzungsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "scripts/agent-preflight.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "scripts/check-agent-commit-message.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "scripts/check-ai-diff-audit.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "tests/agent-diff-audit.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "V117",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "AI Decision Framework, D3/D4-Gates und Commit-Envelope-Regeln sind Grundlage fuer das Diff-Audit-Gate",
+      "attributes": {
+        "dependsPhase": "117.99",
+        "rawToken": "V117.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V138",
+      "to": "V119",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Evidence-Remediation und Claim-Pruefung bilden die Baseline fuer ehrliche `Not-checked`- und Broad-Claim-Regeln",
+      "attributes": {
+        "dependsPhase": "119.99",
+        "rawToken": "V119.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V138",
+      "to": "V123",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Plan-Index-Pilot und Markdown-Source-of-Truth-Regel begrenzen Generated-Artefakte und Schatten-Wahrheiten",
+      "attributes": {
+        "dependsPhase": "123.99",
+        "rawToken": "V123.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V138",
+      "to": "V125",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Staged Architecture Guard und Workflow-Eskalation sind die technische Baseline fuer weitere Agent-Gate-Haertung",
+      "attributes": {
+        "dependsPhase": "125.99",
+        "rawToken": "V125.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V138",
+      "to": "V138.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.1"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "V138.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.2"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "V138.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.3"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "V138.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.4"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "V138.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.5"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "V138.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.99"
+      }
+    },
+    {
+      "from": "V138.1",
+      "to": "V138.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.1",
+        "subphaseCode": "138.1.1"
+      }
+    },
+    {
+      "from": "V138.1",
+      "to": "V138.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.1",
+        "subphaseCode": "138.1.2"
+      }
+    },
+    {
+      "from": "V138.1",
+      "to": "V138.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.1",
+        "subphaseCode": "138.1.3"
+      }
+    },
+    {
+      "from": "V138.2",
+      "to": "V138.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.2",
+        "subphaseCode": "138.2.1"
+      }
+    },
+    {
+      "from": "V138.2",
+      "to": "V138.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.2",
+        "subphaseCode": "138.2.2"
+      }
+    },
+    {
+      "from": "V138.2",
+      "to": "V138.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.2",
+        "subphaseCode": "138.2.3"
+      }
+    },
+    {
+      "from": "V138.3",
+      "to": "V138.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.3",
+        "subphaseCode": "138.3.1"
+      }
+    },
+    {
+      "from": "V138.3",
+      "to": "V138.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.3",
+        "subphaseCode": "138.3.2"
+      }
+    },
+    {
+      "from": "V138.3",
+      "to": "V138.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.3",
+        "subphaseCode": "138.3.3"
+      }
+    },
+    {
+      "from": "V138.4",
+      "to": "V138.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.4",
+        "subphaseCode": "138.4.1"
+      }
+    },
+    {
+      "from": "V138.4",
+      "to": "V138.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.4",
+        "subphaseCode": "138.4.2"
+      }
+    },
+    {
+      "from": "V138.4",
+      "to": "V138.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.4",
+        "subphaseCode": "138.4.3"
+      }
+    },
+    {
+      "from": "V138.5",
+      "to": "V138.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.5",
+        "subphaseCode": "138.5.1"
+      }
+    },
+    {
+      "from": "V138.5",
+      "to": "V138.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.5",
+        "subphaseCode": "138.5.2"
+      }
+    },
+    {
+      "from": "V138.5",
+      "to": "V138.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.5",
+        "subphaseCode": "138.5.3"
+      }
+    },
+    {
+      "from": "V138.99",
+      "to": "V138.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.99",
+        "subphaseCode": "138.99.1"
+      }
+    },
+    {
+      "from": "V138.99",
+      "to": "V138.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.99",
+        "subphaseCode": "138.99.2"
+      }
+    },
+    {
+      "from": "V138.99",
+      "to": "V138.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.99",
+        "subphaseCode": "138.99.3"
+      }
+    },
+    {
+      "from": "V138.99",
+      "to": "V138.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V138",
+        "phaseCode": "138.99",
+        "subphaseCode": "138.99.4"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -92080,6 +92895,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V138.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V64.md",
       "type": "scope",
       "hint": null,
@@ -93458,6 +94282,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Hangar_Shell_Productivierung_V113.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_KI_Diff_Audit_Gate_V138.md",
       "type": "scope",
       "hint": null,
       "attributes": {

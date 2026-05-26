@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2075,
-    "rawCoveredFileCount": 1318,
-    "rawCoveragePercent": 63.5,
-    "adjustedTrackedFileCount": 1393,
-    "adjustedCoveredFileCount": 1086,
+    "trackedFileCount": 2077,
+    "rawCoveredFileCount": 1320,
+    "rawCoveragePercent": 63.6,
+    "adjustedTrackedFileCount": 1395,
+    "adjustedCoveredFileCount": 1088,
     "adjustedCoveragePercent": 78,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -263,8 +263,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 325,
-        "coveredCount": 171
+        "count": 327,
+        "coveredCount": 173
       },
       {
         "classification": "prototype",
@@ -11713,6 +11713,7 @@
       ],
       "scopeBlocks": [
         "V120",
+        "V138",
         "V77",
         "V90"
       ],
@@ -11926,6 +11927,25 @@
       ],
       "scopeBlocks": [
         "V137",
+        "V138",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V138.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V138",
         "V77"
       ],
       "surfaces": [],
@@ -13735,6 +13755,7 @@
         "V125",
         "V130",
         "V137",
+        "V138",
         "V77",
         "V93"
       ],
@@ -14612,6 +14633,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/Feature_KI_Diff_Audit_Gate_V138.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md",
       "tracked": true,
       "coveredInCore": true,
@@ -15449,6 +15487,7 @@
         "V123",
         "V125",
         "V137",
+        "V138",
         "V51",
         "V69",
         "V89",
@@ -16869,6 +16908,7 @@
         "V117",
         "V123",
         "V125",
+        "V138",
         "V75",
         "V87",
         "V88",
@@ -18931,10 +18971,12 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
-        "knowledge-graph-mapping"
+        "knowledge-graph-mapping",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V138"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -19274,10 +19316,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V138"
       ],
       "surfaces": [],
       "classification": "product-code",
