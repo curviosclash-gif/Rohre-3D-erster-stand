@@ -1,10 +1,12 @@
 ---
 title: CodeGraph Read-only Installationsspike fuer Graph-RAG
-status: draft
-planned_block_id: TBD
-plan_file: docs/plaene/aktiv/V120.md
+status: superseded
+planned_block_id: V137
+plan_file: docs/plaene/aktiv/V137.md
 target_master: docs/Umsetzungsplan.md
-intake_status: draft
+intake_status: adopted-open
+superseded_by: docs/plaene/aktiv/V137.md
+archive_read_rule: only-for-history-or-intake-trace
 decision_class: D4
 priority: P2
 owner: frei

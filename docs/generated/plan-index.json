@@ -568,6 +568,29 @@
       }
     },
     {
+      "id": "V137",
+      "title": "CodeGraph Read-only Installationsspike fuer Graph-RAG",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "ai-graph-tools",
+      "depends_on": [
+        "V107.99",
+        "V110.99",
+        "V111.99",
+        "V120.1"
+      ],
+      "current_phase": "137.1",
+      "plan_file": "docs/plaene/aktiv/V137.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant; CodeGraph nur als read-only Installationsspike mit separaten D4-Gates fuer Init/MCP/Agent-Config",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
       "id": "V121",
       "title": "Lokaler Graph-RAG Viewer und Evidence-Dashboard",
       "status": "planned",

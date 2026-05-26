@@ -6,6 +6,15 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Plan-Intake 2026-05-26 (Block `V137`)
+
+- `V137` ist als geplanter P2-Block fuer den CodeGraph Read-only Installationsspike in den Master aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V137.md`.
+- Einordnung: eigener AI/Graph-Scope statt versteckter V120-Unterpunkt, weil `codegraph init`, MCP-Registrierung und globale Agent-Config D4/User-Gates bleiben muessen.
+- Dependencies: harte Baseline `V107.99`, `V110.99`, `V111.99` und `V120.1`; der Spike soll nach dem V120-SLO-Ausgangssignal starten und V120 nicht durch eine Installation blockieren.
+- Der Draft `docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md` ist als `adopted-open`/`superseded_by` markiert; aktive Steuerung liegt in `V137`.
+- Evidence: `npm run plan:check`, `npm run plan:index:build`, `npm run plan:index:check`, `npm run plan:dashboard:build`, `npm run plan:context:check`, `npm run graph:build`, `npm run graph:check`, `npm run docs:sync`, `npm run docs:check`, `npm run check:plan-evidence-claims` und `npm run gates:pre-commit` -> PASS; `check:plan-evidence-claims` meldet weiterhin die bekannte V76-Warnung.
+- Not-checked: kein CodeGraph-Installer, kein `codegraph init`, keine MCP-Registrierung, keine globale User-/Agent-Config, keine produktiven Runtime-/UI-/Spielpfade und keine Vollsuite.
+
 ## V119 119.99 Abschluss-Gate 2026-05-23
 
 - Nach User-Gate `beende plan 119` wurde V119 als D3-Doku-/Governance-Slice geschlossen: aktive Planakte, Master-Index und Lock-Status zeigen `done`/`119.99`/closed, ohne historische Altplaene rueckwirkend schoenzuschreiben.

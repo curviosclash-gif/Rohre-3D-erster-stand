@@ -1529,6 +1529,7 @@
           "V119",
           "V123",
           "V125",
+          "V137",
           "V90"
         ],
         "unknownFrontmatterFields": [
@@ -1684,6 +1685,7 @@
           "V120",
           "V121",
           "V125",
+          "V137",
           "V90",
           "V96"
         ],
@@ -2011,6 +2013,43 @@
           "V96"
         ],
         "unknownFrontmatterFields": []
+      }
+    },
+    {
+      "id": "V137",
+      "type": "block",
+      "title": "CodeGraph Read-only Installationsspike fuer Graph-RAG",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "137.1",
+        "planFile": "docs/plaene/aktiv/V137.md",
+        "scopeDeclarations": [
+          ".gitignore",
+          "docs/plaene/aktiv/V137.md",
+          "docs/plaene/CHANGELOG.md",
+          "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
+          "docs/Umsetzungsplan.md"
+        ],
+        "scopeResolution": {
+          "concreteCount": 5,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [
+          "V120",
+          "V122",
+          "V123",
+          "V124"
+        ],
+        "unknownFrontmatterFields": [
+          "scope_reference_files",
+          "soft_depends_on"
+        ]
       }
     },
     {
@@ -2726,7 +2765,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 338,
+          "concreteCount": 339,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5592,6 +5631,76 @@
       "attributes": {
         "blockId": "V135",
         "phaseCode": "135.99"
+      }
+    },
+    {
+      "id": "V137.1",
+      "type": "phase",
+      "title": "Freshness und Installationswirkung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.1"
+      }
+    },
+    {
+      "id": "V137.2",
+      "type": "phase",
+      "title": "Repo-Schutz vor Init",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.2"
+      }
+    },
+    {
+      "id": "V137.3",
+      "type": "phase",
+      "title": "Projekt-Init und Baseline",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.3"
+      }
+    },
+    {
+      "id": "V137.4",
+      "type": "phase",
+      "title": "Vergleich mit Curvios-Graph",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.4"
+      }
+    },
+    {
+      "id": "V137.5",
+      "type": "phase",
+      "title": "MCP-Entscheidung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.5"
+      }
+    },
+    {
+      "id": "V137.6",
+      "type": "phase",
+      "title": "Go/No-Go",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.6"
+      }
+    },
+    {
+      "id": "V137.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99"
       }
     },
     {
@@ -16193,6 +16302,281 @@
       }
     },
     {
+      "id": "V137.1.1",
+      "type": "subphase",
+      "title": "Offizielle CodeGraph-Doku erneut pruefen: Version, unterstuetzte Agents, MCP-Tools, `init`, `uninit`, `install --print-config`, lokale Indexpfade.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.1",
+        "subphaseCode": "137.1.1"
+      }
+    },
+    {
+      "id": "V137.1.2",
+      "type": "subphase",
+      "title": "Datei- und Config-Wirkung klassifizieren: repo-lokal, global user config, MCP registry, Cache, Netzwerkdownload.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.1",
+        "subphaseCode": "137.1.2"
+      }
+    },
+    {
+      "id": "V137.1.3",
+      "type": "subphase",
+      "title": "Sicherheitsentscheidung festhalten: kein Pipe-Installer als Default; bevorzugt versionierter npm-/npx- oder bereits installierter Binary-Pfad.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.1",
+        "subphaseCode": "137.1.3"
+      }
+    },
+    {
+      "id": "V137.2.1",
+      "type": "subphase",
+      "title": "`.gitignore`-Status pruefen und `.codegraph/` absichern, bevor `codegraph init` im Hauptrepo laeuft.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.2",
+        "subphaseCode": "137.2.1"
+      }
+    },
+    {
+      "id": "V137.2.2",
+      "type": "subphase",
+      "title": "`git status --short` vor Init dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.2",
+        "subphaseCode": "137.2.2"
+      }
+    },
+    {
+      "id": "V137.2.3",
+      "type": "subphase",
+      "title": "Wenn ein separater Sandbox-Pfad genutzt wird, den Pfad unter `tmp/` halten und nicht als dauerhafte Doku verwenden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.2",
+        "subphaseCode": "137.2.3"
+      }
+    },
+    {
+      "id": "V137.3.1",
+      "type": "subphase",
+      "title": "User-Gate einholen fuer `codegraph init` oder `codegraph init -i`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.3",
+        "subphaseCode": "137.3.1"
+      }
+    },
+    {
+      "id": "V137.3.2",
+      "type": "subphase",
+      "title": "Nach Init `git status --short` pruefen; getrackte Aenderungen duerfen nur vorher erlaubte Schutz-/Plan-Dateien sein.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.3",
+        "subphaseCode": "137.3.2"
+      }
+    },
+    {
+      "id": "V137.3.3",
+      "type": "subphase",
+      "title": "CodeGraph-Status-/Files-Signal erfassen und grob mit Curvios-Dateiabdeckung vergleichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.3",
+        "subphaseCode": "137.3.3"
+      }
+    },
+    {
+      "id": "V137.4.1",
+      "type": "subphase",
+      "title": "Settings-Referenz: `SettingsManager` Curvios-Impact gegen CodeGraph-Symbol-/Caller-/Callee-Sicht vergleichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.4",
+        "subphaseCode": "137.4.1"
+      }
+    },
+    {
+      "id": "V137.4.2",
+      "type": "subphase",
+      "title": "Spawn-Referenz: Curvios `event-flow spawn` gegen CodeGraph-Trace/Context vergleichen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.4",
+        "subphaseCode": "137.4.2"
+      }
+    },
+    {
+      "id": "V137.4.3",
+      "type": "subphase",
+      "title": "Scope-Referenz: `scope-collisions` bleibt Curvios-only Wahrheit; pruefen, ob CodeGraph trotzdem relevante Code-Lesepfade kuerzt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.4",
+        "subphaseCode": "137.4.3"
+      }
+    },
+    {
+      "id": "V137.4.4",
+      "type": "subphase",
+      "title": "Ergebnis als kurzen transienten Report oder aktive V137-/V120-Evidence zusammenfassen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.4",
+        "subphaseCode": "137.4.4"
+      }
+    },
+    {
+      "id": "V137.5.1",
+      "type": "subphase",
+      "title": "No-MCP-Variante bewerten: CLI/Report reicht fuer V120 Candidate Provider?",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.5",
+        "subphaseCode": "137.5.1"
+      }
+    },
+    {
+      "id": "V137.5.2",
+      "type": "subphase",
+      "title": "Falls MCP sinnvoll: konkrete read-only Tools, Config-Pfad, Recovery und User-visible Risk nennen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.5",
+        "subphaseCode": "137.5.2"
+      }
+    },
+    {
+      "id": "V137.5.3",
+      "type": "subphase",
+      "title": "MCP-Registrierung nur nach separatem D4/User-Gate ausfuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.5",
+        "subphaseCode": "137.5.3"
+      }
+    },
+    {
+      "id": "V137.6.1",
+      "type": "subphase",
+      "title": "`keep`: CodeGraph bleibt optionaler read-only Candidate Provider fuer V120.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.6",
+        "subphaseCode": "137.6.1"
+      }
+    },
+    {
+      "id": "V137.6.2",
+      "type": "subphase",
+      "title": "`manual-only`: CodeGraph bleibt lokales CLI-Hilfsmittel ohne Agent-/MCP-Registrierung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.6",
+        "subphaseCode": "137.6.2"
+      }
+    },
+    {
+      "id": "V137.6.3",
+      "type": "subphase",
+      "title": "`remove`: `codegraph uninit`/Cleanup ausfuehren und Ergebnis dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.6",
+        "subphaseCode": "137.6.3"
+      }
+    },
+    {
+      "id": "V137.99.1",
+      "type": "subphase",
+      "title": "`npm run plan:check` ist gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.1"
+      }
+    },
+    {
+      "id": "V137.99.2",
+      "type": "subphase",
+      "title": "`npm run plan:index:check` ist gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.2"
+      }
+    },
+    {
+      "id": "V137.99.3",
+      "type": "subphase",
+      "title": "`npm run graph:check` ist gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.3"
+      }
+    },
+    {
+      "id": "V137.99.4",
+      "type": "subphase",
+      "title": "`npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.4"
+      }
+    },
+    {
+      "id": "V137.99.5",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt: CodeGraph-Version, Datei-/Config-Wirkung, Vergleichsfragen, MCP-Entscheidung, Recovery und Not-checked.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.5"
+      }
+    },
+    {
+      "id": "V137.99.6",
+      "type": "subphase",
+      "title": "Falls V120/V122 Folgearbeit aufnehmen: Uebergabe nennt exakt, welche CodeGraph-Ausgaben Hinweise bleiben und welche Curvios-Evidence weiterhin gewinnen muss.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.6"
+      }
+    },
+    {
       "id": "V51.1.1",
       "type": "subphase",
       "title": "Finale Topologie \"Rift Gauntlet\" mit Sector-Flows, Sichtachsen, Risiko-Shortcuts und Rueckfuehrungen festgezurrt (abgeschlossen: 2026-03-22; evidence: src/core/config/maps/presets/parcours_maps.js -> Sektoren/Flow authored)",
@@ -26691,6 +27075,7 @@
         ],
         "scopeBlocks": [
           "V116",
+          "V137",
           "V71"
         ],
         "exists": true
@@ -30125,6 +30510,22 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V137.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V137",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V64.md",
       "type": "file",
       "title": null,
@@ -31769,6 +32170,7 @@
           "V123",
           "V125",
           "V130",
+          "V137",
           "V77",
           "V93"
         ],
@@ -32475,6 +32877,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V137",
           "V77"
         ],
         "exists": true
@@ -33133,6 +33536,7 @@
           "V120",
           "V123",
           "V125",
+          "V137",
           "V51",
           "V69",
           "V89",
@@ -80866,6 +81270,468 @@
       }
     },
     {
+      "from": "V137",
+      "to": ".gitignore",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "docs/plaene/aktiv/V137.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "docs/Umsetzungsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V107",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Core-Graph und Query-Layer bleiben kanonische Vergleichsbasis fuer den CodeGraph-Spike",
+      "attributes": {
+        "dependsPhase": "107.99",
+        "rawToken": "V107.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V110",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Graph-Ops-, Guard- und SLO-Basis begrenzen externe Tool- und Installationswirkung",
+      "attributes": {
+        "dependsPhase": "110.99",
+        "rawToken": "V110.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V111",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Adaptive Diagnose- und Entscheidungsregeln sichern die Trennung zwischen Curvios-Wahrheit und CodeGraph-Hinweis",
+      "attributes": {
+        "dependsPhase": "111.99",
+        "rawToken": "V111.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V120",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Der Spike startet erst nach dem V120-SLO-Ausgangssignal, blockiert den V120-Start selbst aber nicht",
+      "attributes": {
+        "dependsPhase": "120.1",
+        "rawToken": "V120.1",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V137.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.1"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V137.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.2"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V137.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.3"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V137.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.4"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V137.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.5"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V137.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.6"
+      }
+    },
+    {
+      "from": "V137",
+      "to": "V137.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99"
+      }
+    },
+    {
+      "from": "V137.1",
+      "to": "V137.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.1",
+        "subphaseCode": "137.1.1"
+      }
+    },
+    {
+      "from": "V137.1",
+      "to": "V137.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.1",
+        "subphaseCode": "137.1.2"
+      }
+    },
+    {
+      "from": "V137.1",
+      "to": "V137.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.1",
+        "subphaseCode": "137.1.3"
+      }
+    },
+    {
+      "from": "V137.2",
+      "to": "V137.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.2",
+        "subphaseCode": "137.2.1"
+      }
+    },
+    {
+      "from": "V137.2",
+      "to": "V137.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.2",
+        "subphaseCode": "137.2.2"
+      }
+    },
+    {
+      "from": "V137.2",
+      "to": "V137.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.2",
+        "subphaseCode": "137.2.3"
+      }
+    },
+    {
+      "from": "V137.3",
+      "to": "V137.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.3",
+        "subphaseCode": "137.3.1"
+      }
+    },
+    {
+      "from": "V137.3",
+      "to": "V137.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.3",
+        "subphaseCode": "137.3.2"
+      }
+    },
+    {
+      "from": "V137.3",
+      "to": "V137.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.3",
+        "subphaseCode": "137.3.3"
+      }
+    },
+    {
+      "from": "V137.4",
+      "to": "V137.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.4",
+        "subphaseCode": "137.4.1"
+      }
+    },
+    {
+      "from": "V137.4",
+      "to": "V137.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.4",
+        "subphaseCode": "137.4.2"
+      }
+    },
+    {
+      "from": "V137.4",
+      "to": "V137.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.4",
+        "subphaseCode": "137.4.3"
+      }
+    },
+    {
+      "from": "V137.4",
+      "to": "V137.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.4",
+        "subphaseCode": "137.4.4"
+      }
+    },
+    {
+      "from": "V137.5",
+      "to": "V137.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.5",
+        "subphaseCode": "137.5.1"
+      }
+    },
+    {
+      "from": "V137.5",
+      "to": "V137.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.5",
+        "subphaseCode": "137.5.2"
+      }
+    },
+    {
+      "from": "V137.5",
+      "to": "V137.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.5",
+        "subphaseCode": "137.5.3"
+      }
+    },
+    {
+      "from": "V137.6",
+      "to": "V137.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.6",
+        "subphaseCode": "137.6.1"
+      }
+    },
+    {
+      "from": "V137.6",
+      "to": "V137.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.6",
+        "subphaseCode": "137.6.2"
+      }
+    },
+    {
+      "from": "V137.6",
+      "to": "V137.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.6",
+        "subphaseCode": "137.6.3"
+      }
+    },
+    {
+      "from": "V137.99",
+      "to": "V137.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.1"
+      }
+    },
+    {
+      "from": "V137.99",
+      "to": "V137.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.2"
+      }
+    },
+    {
+      "from": "V137.99",
+      "to": "V137.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.3"
+      }
+    },
+    {
+      "from": "V137.99",
+      "to": "V137.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.4"
+      }
+    },
+    {
+      "from": "V137.99",
+      "to": "V137.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.5"
+      }
+    },
+    {
+      "from": "V137.99",
+      "to": "V137.99.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V137",
+        "phaseCode": "137.99",
+        "subphaseCode": "137.99.6"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -91197,6 +92063,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/aktiv/V135.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V137.md",
       "type": "scope",
       "hint": null,
       "attributes": {

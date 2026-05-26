@@ -185,12 +185,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2074,
-    "rawCoveredFileCount": 1317,
+    "trackedFileCount": 2075,
+    "rawCoveredFileCount": 1318,
     "rawCoveragePercent": 63.5,
-    "adjustedTrackedFileCount": 1392,
-    "adjustedCoveredFileCount": 1085,
-    "adjustedCoveragePercent": 77.9,
+    "adjustedTrackedFileCount": 1393,
+    "adjustedCoveredFileCount": 1086,
+    "adjustedCoveragePercent": 78,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
     "classifications": [
@@ -263,8 +263,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 324,
-        "coveredCount": 170
+        "count": 325,
+        "coveredCount": 171
       },
       {
         "classification": "prototype",
@@ -1097,6 +1097,7 @@
       ],
       "scopeBlocks": [
         "V116",
+        "V137",
         "V71"
       ],
       "surfaces": [],
@@ -11915,6 +11916,24 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V137.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V137",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V64.md",
       "tracked": true,
       "coveredInCore": true,
@@ -13715,6 +13734,7 @@
         "V123",
         "V125",
         "V130",
+        "V137",
         "V77",
         "V93"
       ],
@@ -14515,6 +14535,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V137",
         "V77"
       ],
       "surfaces": [],
@@ -15427,6 +15448,7 @@
         "V120",
         "V123",
         "V125",
+        "V137",
         "V51",
         "V69",
         "V89",
