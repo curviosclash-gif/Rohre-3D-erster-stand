@@ -30,6 +30,7 @@ export async function validateAgentCommitMessage({
   root = process.cwd(),
   messageText,
   changes = null,
+  diff = null,
   uncommittedFiles = null,
 } = {}) {
   const text = stripComments(messageText || '');
@@ -46,6 +47,8 @@ export async function validateAgentCommitMessage({
   const knownUncommitted = extractFields(text, 'Known-uncommitted').join(',');
   const residualRisk = extractField(text, 'Residual-risk');
   const notChecked = extractField(text, 'Not-checked');
+  const generatedBy = extractField(text, 'Generated-by');
+  const canonicalSource = extractField(text, 'Canonical-source');
 
   const result = await validateAgentEnvelope({
     root,
@@ -58,7 +61,10 @@ export async function validateAgentCommitMessage({
     knownUncommitted,
     residualRisk,
     notChecked,
+    generatedBy,
+    canonicalSource,
     changes,
+    diff,
     uncommittedFiles,
     claimText: text,
   });
@@ -74,6 +80,8 @@ export async function validateAgentCommitMessage({
     knownUncommitted,
     residualRisk,
     notChecked,
+    generatedBy,
+    canonicalSource,
     ...result,
   };
 }
@@ -111,6 +119,8 @@ async function main() {
     console.error('Known-uncommitted: none');
     console.error('Residual-risk: none');
     console.error('Not-checked: full test suite');
+    console.error('Generated-by: npm run graph:build');
+    console.error('Canonical-source: docs/Umsetzungsplan.md');
     console.error('Gate: User approved D3 scope');
     console.error('Recovery: git revert <commit>');
     process.exitCode = 1;

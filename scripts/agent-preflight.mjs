@@ -4,6 +4,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
+import { auditStagedDiff } from './check-ai-diff-audit.mjs';
+
 const DECISION_ORDER = new Map([
   ['D0', 0],
   ['D1', 1],
@@ -86,6 +88,10 @@ export function getStagedChanges({ root = process.cwd() } = {}) {
   return parseStagedNameStatus(runGit(['diff', '--cached', '--name-status'], { root }));
 }
 
+export function getStagedDiff({ root = process.cwd() } = {}) {
+  return runGit(['diff', '--cached', '--no-ext-diff', '--unified=0'], { root });
+}
+
 export function getUncommittedFiles({ root = process.cwd() } = {}) {
   return runGit(['status', '--short'], { root })
     .split(/\r?\n/)
@@ -128,6 +134,12 @@ function normalizeUnique(values) {
 
 function isPresent(value) {
   return Boolean(value && value.trim());
+}
+
+function decisionAtLeast(decision, minimum) {
+  return DECISION_ORDER.has(decision)
+    && DECISION_ORDER.has(minimum)
+    && DECISION_ORDER.get(decision) >= DECISION_ORDER.get(minimum);
 }
 
 function listDifference(left, right) {
@@ -234,13 +246,17 @@ export async function validateAgentEnvelope({
   knownUncommitted,
   residualRisk,
   notChecked,
+  generatedBy,
+  canonicalSource,
   changes = null,
+  diff = null,
   uncommittedFiles = null,
   graph = true,
   claimText = '',
 } = {}) {
   const workflows = await listWorkflows({ root });
   const stagedChanges = changes || getStagedChanges({ root });
+  const stagedDiff = diff ?? (changes ? '' : getStagedDiff({ root }));
   const actualUncommittedFiles = uncommittedFiles || getUncommittedFiles({ root });
   const violations = [];
   const warnings = [];
@@ -339,8 +355,8 @@ export async function validateAgentEnvelope({
     addViolation(violations, 'missing-residual-risk', '`Decision: D3/D4` braucht `Residual-risk:`.');
   }
 
-  if ((decision === 'D3' || decision === 'D4') && !isPresent(notChecked)) {
-    addViolation(violations, 'missing-not-checked', '`Decision: D3/D4` braucht `Not-checked:`.');
+  if (decisionAtLeast(decision, 'D2') && !isPresent(notChecked)) {
+    addViolation(violations, 'missing-not-checked', '`Decision: D2/D3/D4` braucht `Not-checked:`.');
   }
 
   if (decision === 'D4') {
@@ -381,6 +397,29 @@ export async function validateAgentEnvelope({
     );
   }
 
+  const diffAudit = auditStagedDiff({
+    changes: stagedChanges,
+    diff: stagedDiff,
+    envelope: {
+      decision,
+      gate,
+      generatedBy,
+      canonicalSource,
+      residualRisk,
+      notChecked,
+    },
+  });
+  for (const finding of diffAudit.violations) {
+    if (finding.id === 'missing-not-checked-d2' && violations.some((entry) => entry.id === 'missing-not-checked')) {
+      continue;
+    }
+    addViolation(violations, `ai-diff-${finding.id}`, `AI-Diff-Audit: ${finding.message}`, finding.files);
+  }
+  for (const finding of diffAudit.warnings) {
+    const files = finding.files.length > 0 ? ` files=${finding.files.join(', ')}` : '';
+    warnings.push(`AI-Diff-Audit: [${finding.id}] ${finding.message}${files}`);
+  }
+
   const graphContext = graph
     ? await readAgentGraphContext({ root, files: stagedFiles })
     : { available: false, files: [], warnings: [] };
@@ -391,6 +430,7 @@ export async function validateAgentEnvelope({
     stagedChanges,
     uncommittedFiles: actualUncommittedFiles,
     graphContext,
+    diffAudit,
     violations,
     warnings,
   };
@@ -411,6 +451,8 @@ async function main() {
   const knownUncommitted = valueFromCliOrEnv(args, 'known-uncommitted', 'AGENT_KNOWN_UNCOMMITTED');
   const residualRisk = valueFromCliOrEnv(args, 'residual-risk', 'AGENT_RESIDUAL_RISK');
   const notChecked = valueFromCliOrEnv(args, 'not-checked', 'AGENT_NOT_CHECKED');
+  const generatedBy = valueFromCliOrEnv(args, 'generated-by', 'AGENT_GENERATED_BY');
+  const canonicalSource = valueFromCliOrEnv(args, 'canonical-source', 'AGENT_CANONICAL_SOURCE');
 
   const result = await validateAgentEnvelope({
     workflow,
@@ -422,6 +464,8 @@ async function main() {
     knownUncommitted,
     residualRisk,
     notChecked,
+    generatedBy,
+    canonicalSource,
   });
 
   if (result.violations.length > 0) {

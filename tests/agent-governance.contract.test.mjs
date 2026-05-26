@@ -21,6 +21,17 @@ async function writeGraphFixture(root, graph) {
   await fs.writeFile(target, JSON.stringify(graph, null, 2), 'utf8');
 }
 
+function diffFor(file, addedLines = []) {
+  const added = addedLines.map((line) => `+${line}`).join('\n');
+  return [
+    `diff --git a/${file} b/${file}`,
+    `--- a/${file}`,
+    `+++ b/${file}`,
+    '@@',
+    added,
+  ].join('\n');
+}
+
 test('agent envelope accepts scoped D2 code commit metadata', async () => {
   const root = await createFixture();
   const result = await validateAgentEnvelope({
@@ -30,6 +41,7 @@ test('agent envelope accepts scoped D2 code commit metadata', async () => {
     evidence: 'npm run plan:check -> PASS',
     scope: 'src/core/main.js',
     knownUncommitted: 'none',
+    notChecked: 'full suite',
     changes: [{ status: 'M', file: 'src/core/main.js' }],
     uncommittedFiles: ['src/core/main.js'],
   });
@@ -46,6 +58,7 @@ test('agent envelope blocks governance surfaces below D3', async () => {
     evidence: 'npm run plan:check -> PASS',
     scope: '.agents/workflows/code.md',
     knownUncommitted: 'none',
+    notChecked: 'full suite',
     changes: [{ status: 'M', file: '.agents/workflows/code.md' }],
     uncommittedFiles: ['.agents/workflows/code.md'],
   });
@@ -121,6 +134,7 @@ test('agent envelope reports missing graph as a warning only', async () => {
     evidence: 'npm run plan:check -> PASS',
     scope: 'src/core/main.js',
     knownUncommitted: 'none',
+    notChecked: 'full suite',
     changes: [{ status: 'M', file: 'src/core/main.js' }],
     uncommittedFiles: ['src/core/main.js'],
   });
@@ -160,6 +174,7 @@ test('agent envelope includes graph scope context for staged files', async () =>
     evidence: 'npm run plan:check -> PASS',
     scope: 'src/core/main.js',
     knownUncommitted: 'none',
+    notChecked: 'full suite',
     changes: [{ status: 'M', file: 'src/core/main.js' }],
     uncommittedFiles: ['src/core/main.js'],
   });
@@ -168,6 +183,71 @@ test('agent envelope includes graph scope context for staged files', async () =>
   assert.equal(result.graphContext.available, true);
   assert.equal(result.graphContext.files[0].inGraph, true);
   assert.deepEqual(result.graphContext.files[0].scopeBlocks, ['B13', 'V99']);
+});
+
+test('agent envelope requires Not-checked starting at D2', async () => {
+  const root = await createFixture();
+  const result = await validateAgentEnvelope({
+    root,
+    workflow: 'quick',
+    decision: 'D2',
+    evidence: 'npm run plan:check -> PASS',
+    scope: 'src/core/main.js',
+    knownUncommitted: 'none',
+    changes: [{ status: 'M', file: 'src/core/main.js' }],
+    uncommittedFiles: ['src/core/main.js'],
+  });
+  const ids = result.violations.map((violation) => violation.id).sort();
+
+  assert(ids.includes('missing-not-checked'));
+});
+
+test('agent envelope maps AI diff audit failures into preflight violations', async () => {
+  const root = await createFixture();
+  const result = await validateAgentEnvelope({
+    root,
+    workflow: 'code',
+    decision: 'D2',
+    evidence: 'npm run plan:check -> PASS',
+    scope: 'package.json',
+    knownUncommitted: 'none',
+    notChecked: 'full suite',
+    changes: [{ status: 'M', file: 'package.json' }],
+    diff: diffFor('package.json', ['"commit": "git commit --no-verify"']),
+    uncommittedFiles: ['package.json'],
+  });
+  const ids = result.violations.map((violation) => violation.id).sort();
+
+  assert(ids.includes('ai-diff-gate-bypass-requires-d3'));
+});
+
+test('commit message validator forwards generated and canonical source fields', async () => {
+  const root = await createFixture();
+  const result = await validateAgentCommitMessage({
+    root,
+    messageText: [
+      'docs: record generated source',
+      '',
+      'Workflow: quick',
+      'Decision: D2',
+      'Evidence: npm run plan:check -> PASS',
+      'Scope: docs/new-status.md',
+      'Known-uncommitted: none',
+      'Not-checked: full suite',
+      'Generated-by: npm run graph:build',
+      'Canonical-source: docs/Umsetzungsplan.md',
+    ].join('\n'),
+    changes: [{ status: 'A', file: 'docs/new-status.md' }],
+    diff: diffFor('docs/new-status.md', [
+      '# New Status',
+      'This file is canonical and defines scope_files plus Phase gates.',
+    ]),
+    uncommittedFiles: ['docs/new-status.md'],
+  });
+
+  assert.deepEqual(result.violations, []);
+  assert.equal(result.generatedBy, 'npm run graph:build');
+  assert.equal(result.canonicalSource, 'docs/Umsetzungsplan.md');
 });
 
 test('commit message validator blocks scope mismatch and unnamed uncommitted files', async () => {

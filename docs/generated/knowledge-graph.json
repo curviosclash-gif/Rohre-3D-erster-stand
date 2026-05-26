@@ -2081,10 +2081,11 @@
           "scripts/agent-preflight.mjs",
           "scripts/check-agent-commit-message.mjs",
           "scripts/check-ai-diff-audit.mjs",
-          "tests/agent-diff-audit.contract.test.mjs"
+          "tests/agent-diff-audit.contract.test.mjs",
+          "tests/agent-governance.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 12,
+          "concreteCount": 13,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -5774,7 +5775,7 @@
       "id": "V138.3",
       "type": "phase",
       "title": "Agent-Preflight-Integration",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.3"
@@ -5784,7 +5785,7 @@
       "id": "V138.4",
       "type": "phase",
       "title": "Envelope-Haertung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.4"
@@ -16752,8 +16753,8 @@
     {
       "id": "V138.3.1",
       "type": "subphase",
-      "title": "`agent-preflight.mjs` ruft `auditStagedDiff()` mit staged changes, diff und Envelope auf.",
-      "status": "open",
+      "title": "`agent-preflight.mjs` ruft `auditStagedDiff()` mit staged changes, diff und Envelope auf. (abgeschlossen: 2026-05-26; evidence: node --test tests/agent-governance.contract.test.mjs -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.3",
@@ -16763,8 +16764,8 @@
     {
       "id": "V138.3.2",
       "type": "subphase",
-      "title": "Findings werden in bestehende `violations`/`warnings` eingeordnet.",
-      "status": "open",
+      "title": "Findings werden in bestehende `violations`/`warnings` eingeordnet. (abgeschlossen: 2026-05-26; evidence: tests/agent-governance.contract.test.mjs -> ai-diff-gate-bypass-requires-d3)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.3",
@@ -16774,8 +16775,8 @@
     {
       "id": "V138.3.3",
       "type": "subphase",
-      "title": "`check-agent-commit-message.mjs` liest und reicht `Generated-by:` sowie `Canonical-source:` weiter.",
-      "status": "open",
+      "title": "`check-agent-commit-message.mjs` liest und reicht `Generated-by:` sowie `Canonical-source:` weiter. (abgeschlossen: 2026-05-26; evidence: tests/agent-governance.contract.test.mjs -> forwards generated and canonical source fields)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.3",
@@ -16785,8 +16786,8 @@
     {
       "id": "V138.4.1",
       "type": "subphase",
-      "title": "`Not-checked:` ab `Decision: D2` hard required machen.",
-      "status": "open",
+      "title": "`Not-checked:` ab `Decision: D2` hard required machen. (abgeschlossen: 2026-05-26; evidence: node --test tests/agent-governance.contract.test.mjs -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.4",
@@ -16796,8 +16797,8 @@
     {
       "id": "V138.4.2",
       "type": "subphase",
-      "title": "`Residual-risk:` fuer D2 als Warnung oder optionales Feld belassen; D3/D4 bleiben hard required.",
-      "status": "open",
+      "title": "`Residual-risk:` fuer D2 als Warnung oder optionales Feld belassen; D3/D4 bleiben hard required. (abgeschlossen: 2026-05-26; evidence: tests/agent-governance.contract.test.mjs -> D3 residual risk and not checked fields)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.4",
@@ -16807,8 +16808,8 @@
     {
       "id": "V138.4.3",
       "type": "subphase",
-      "title": "Commit-Message-Hinweise und Tests an neue Anforderungen anpassen.",
-      "status": "open",
+      "title": "Commit-Message-Hinweise und Tests an neue Anforderungen anpassen. (abgeschlossen: 2026-05-26; evidence: scripts/check-agent-commit-message.mjs example fields; node --test tests/agent-governance.contract.test.mjs -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.4",
@@ -48034,7 +48035,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V125"
+          "V125",
+          "V138"
         ],
         "exists": true
       }
@@ -82243,6 +82245,15 @@
     {
       "from": "V138",
       "to": "tests/agent-diff-audit.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "tests/agent-governance.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
