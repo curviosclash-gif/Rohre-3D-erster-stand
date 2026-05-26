@@ -1,0 +1,259 @@
+---
+title: KI-Diff-Audit-Gate fuer deterministische Agenten-Selbstpruefung
+status: draft
+planned_block_id: V138
+plan_file: docs/plaene/aktiv/V138.md
+target_master: docs/Umsetzungsplan.md
+intake_status: manual-user-owned
+decision_class: D3
+priority: P1
+owner: frei
+affected_area: ai-governance-agent-preflight-commit-gates
+depends_on:
+  - V117.99
+  - V119.99
+  - V123.99
+  - V125.99
+soft_depends_on: []
+blocks_recommended_before:
+  - V120.1
+  - V137.1
+  - V122.1
+scope_files:
+  - docs/plaene/neu/Feature_KI_Diff_Audit_Gate_V138.md
+  - docs/plaene/aktiv/V138.md
+  - docs/Umsetzungsplan.md
+  - docs/plaene/CHANGELOG.md
+  - package.json
+  - scripts/check-ai-diff-audit.mjs
+  - scripts/agent-preflight.mjs
+  - scripts/check-agent-commit-message.mjs
+  - tests/agent-diff-audit.contract.test.mjs
+scope_reference_files:
+  - AGENTS.md
+  - .agents/rules/planning_and_governance.md
+  - .agents/rules/git_and_commits.md
+  - .agents/workflows/plan.md
+  - .agents/workflows/code.md
+  - .agents/workflows/quick.md
+  - .husky/pre-commit
+  - .husky/commit-msg
+  - scripts/check-ai-decision-policy.mjs
+  - scripts/check-plan-evidence-claims.mjs
+  - tests/agent-governance.contract.test.mjs
+verification:
+  - npm run plan:check
+  - node --test tests/agent-diff-audit.contract.test.mjs
+  - npm run check:ai-diff-audit
+  - npm run gates:pre-commit
+updated_at: 2026-05-26
+---
+
+# Feature: KI-Diff-Audit-Gate fuer deterministische Agenten-Selbstpruefung
+
+## Kurzfassung
+
+Dieser Block ergaenzt das bestehende AI Decision Framework um ein kleines, deterministisches Diff-Audit vor Agent-Commits. Das Audit bewertet keine "gute Software" semantisch, sondern sucht nach objektiven Risikospuren im staged Diff: Generated-Artefakte im falschen Commit, neue Schatten-Wahrheiten, Gate-Bypass-Muster, Test-Skip-Spuren und fehlende `Not-checked`-Ehrlichkeit ab D2.
+
+Der Block soll nicht neue Governance neben V117/V125 erzeugen, sondern `agent-preflight` und den Commit-Envelope als technische Durchsetzung nutzen.
+
+## Ziel
+
+- KI-Diffs muessen vor Commit maschinell zeigen, ob sie Runtime-Code, Generator-Code, Generated-Artefakte, Governance, Source-of-Truth oder Tests beruehren.
+- Generated-Artefakte werden differenziert behandelt:
+  - `generated-artifact + runtime-code` ist ein harter Risikofall.
+  - `generated-artifact + generator-code/tests` bleibt fuer Graph-/Plan-/Dashboard-Arbeit erlaubt, braucht aber `Generated-by:`.
+  - `generated-artifact` allein wird als bewusstes Artefakt-Signal gemeldet.
+- Gate-Bypass-Muster in Schutzflaechen erzwingen mindestens D3.
+- Neue potenzielle Schatten-Wahrheiten unter `docs/**` werden nur bei starker Autoritaetswirkung eskaliert.
+- D2-Commits brauchen kuenftig `Not-checked:`, damit kleine KI-Aenderungen ihre Nicht-Pruefung ehrlich benennen.
+
+## Nicht-Ziel
+
+- Kein Import-/Refactor des `scope-validator.js` im ersten Slice.
+- Keine semantische KI-Bewertung, ob ein Test "gut" ist.
+- Kein genereller Block fuer legitime Graph-, Plan- oder Dashboard-Generator-Arbeit.
+- Keine Veraenderung der Master-Intake-Regeln.
+- Keine Vollsuite-Pflicht fuer kleine D2-Slices.
+- Kein Ersatz fuer `scope:validate`, `gates:pre-commit`, `check:plan-evidence-claims` oder Architektur-Gates.
+
+## Wann ausfuehren?
+
+Roadmap-seitig sollte V138 **nach V117/V119/V123/V125 und vor der naechsten groesseren Agent-/Graph-RAG-/CodeGraph-Arbeit** ausgefuehrt werden. Konkret ist V138 ein sinnvoller P1-Einschub vor:
+
+- `V120.1` Graph-RAG Context Adapter,
+- `V137.1` CodeGraph Read-only Installationsspike,
+- `V122.1` Agent-Memory/Ruflo-Orchestrierung.
+
+Grund: Diese Folgearbeiten erzeugen voraussichtlich viele Agenten-, Graph-, Generated- und Governance-nahe Diffs. Das Audit sollte vorher liegen, damit diese Diffs nicht erst nachtraeglich diszipliniert werden.
+
+Technisch soll das Audit in drei Stufen laufen:
+
+1. `npm run check:ai-diff-audit` als expliziter lokaler Check fuer staged Diffs.
+2. Integration in `validateAgentEnvelope()` und damit in `npm run agent:preflight` sowie den bestehenden `commit-msg` Hook.
+3. Spaeter optional in CI oder `gates:pre-commit`, wenn der Check rauscharme Ergebnisse liefert.
+
+Nicht sofort in `.husky/pre-commit` hart verdrahten: Der erste Slice soll das Audit im Agent-Preflight blockierend machen, aber den schnellen Pre-Commit-Hook nicht mit semantischen Warnungen ueberladen.
+
+## Datei-Klassen
+
+| Klasse | Beispiele | Zweck |
+| --- | --- | --- |
+| `runtime-code` | `src/**`, `electron/**`, `server/**`, Android-App-Code | Produktiver Runtime-/App-Code. |
+| `generator-code` | Graph-/Plan-/Dashboard-Builder, Validatoren, Exporter | Code, der Generated-Artefakte erzeugt oder validiert. |
+| `generated-artifact` | `docs/generated/**`, Graph-/Dashboard-Artefakte, Lock-Registry | Abgeleitete Dateien, nicht primaere Wahrheit. |
+| `governance` | `AGENTS.md`, `.agents/**`, `.husky/**`, Gate-/Validator-Scripts | Regeln, Workflows und Schutzmechanismen. |
+| `source-of-truth` | `docs/Umsetzungsplan.md`, `docs/plaene/aktiv/**`, Bot-Trainingsplan | Kanonische Status-/Planquellen. |
+| `tests` | `tests/**`, Playwright-/Contract-Tests | Verifikationssignale. |
+
+## Audit-Regeln
+
+### Generated-Artefakte
+
+- `generated-artifact + runtime-code`: `FAIL`, ausser `Decision >= D3`, `Gate:`, `Generated-by:`, `Not-checked:` und `Residual-risk:` sind gesetzt.
+- `generated-artifact + generator-code/tests`: `FAIL`, wenn `Generated-by:` fehlt; sonst `INFO/WARN`.
+- `generated-artifact` allein: `INFO` oder `WARN`, je nach Datei und Generatorbezug.
+
+### Shadow-Truth
+
+Neue Dateien unter `docs/**` eskalieren nur, wenn alle Bedingungen zutreffen:
+
+- Datei liegt nicht in erlaubten Intake-/Referenz-/Fehlerbericht-Orten wie `docs/plaene/neu/`, `docs/referenz/`, `docs/Fehlerberichte/`.
+- Datei enthaelt starke Autoritaetsbegriffe wie `source of truth`, `kanonisch`, `DoD`, `scope_files`, `Lock-Status`, `Phase`.
+- Der Commit benennt keine kanonische Quelle ueber `Canonical-source:` oder kein D3-`Gate:`.
+
+### Gate-Bypass
+
+In Schutzflaechen wie `package.json`, `.husky/**`, `.agents/**`, `scripts/check-*`, `scripts/gates-*`, `scripts/validate-*` eskalieren Muster wie:
+
+- `.only`, `test.only`, `describe.only`,
+- `.skip`, `test.skip`, `describe.skip`,
+- `--no-verify`,
+- neue oder ausgeweitete `--force`-Pfade,
+- erhoehte `max-warnings`,
+- entfernte Gate-/Check-Kommandos,
+- abgeschwaechte Exit-/Fail-Bedingungen,
+- neue globale Bypass-/Ignore-Pfade.
+
+Mindestens D3 ist Pflicht; bei Entfernen zentraler Schutzmechanismen D4 pruefen.
+
+### Test-Signale
+
+Hard-Fail:
+
+- `test.only` / `describe.only`,
+- `test.skip` / `describe.skip`,
+- offensichtlich entfernte Assertions ohne Ersatz.
+
+Warn:
+
+- Snapshot-only-Aenderungen,
+- reine Mock-/Callcount-Tests,
+- private Implementierungsnamen als Testanker,
+- Expected-Werte geaendert ohne neuen Verhaltensfall.
+
+Diese Warnungen sind Review-Hinweise, keine automatische Aussage ueber echte Testqualitaet.
+
+### Commit-Envelope
+
+- D2 braucht `Not-checked:` hard required.
+- D2 bekommt `Residual-risk:` vorerst optional oder als Warnung.
+- D3/D4 behalten `Residual-risk:` und `Not-checked:` hard required.
+- `Generated-by:` wird als optionales Envelope-Feld eingefuehrt und bei Generated-Regeln verpflichtend.
+- `Canonical-source:` wird als optionales Envelope-Feld fuer Shadow-Truth-Eskalationen eingefuehrt.
+
+## AI-Ausfuehrungsmatrix
+
+| Phase | Modus | Erlaubt ohne Rueckfrage | Stop-/Rueckfragepflicht |
+| --- | --- | --- | --- |
+| 138.1 Audit-Design und Klassifikator | `[REVIEW]` | Read-only Analyse, Script-Design, Testfallliste | Datei-Aenderungen an Preflight, Commit-Hook oder package scripts |
+| 138.2 Diff-Audit-Script | `[REVIEW]` | Implementierung nach User-Freigabe, Contracttests | Neue harte Fail-Regeln ausserhalb der hier geplanten Matrix |
+| 138.3 Agent-Preflight-Integration | `[USER-GATE]` | Patch-Vorschlag, Dry-run | Blockierende Integration in `validateAgentEnvelope()` |
+| 138.4 Envelope-Felder und D2-Not-checked | `[USER-GATE]` | Testvorschlag, Dokumentation | Aenderung der Commit-Anforderungen |
+| 138.5 Rauschen und Follow-up Scope-Validator | `[REVIEW]` | Report, Warn-/Fail-Abgleich | Import-/Refactor von `.agents/scripts/scope-validator.js` |
+| 138.99 Abschluss | `[USER-GATE]` | Abschlussvorschlag und Evidence-Matrix | Master-/Aktivplan-Finalisierung |
+
+## Definition of Done
+
+- [ ] DoD.1 `scripts/check-ai-diff-audit.mjs` existiert mit purem Export `auditStagedDiff({ changes, diff, envelope })`.
+- [ ] DoD.2 `package.json` enthaelt `check:ai-diff-audit`.
+- [ ] DoD.3 `validateAgentEnvelope()` integriert das Audit und reicht `Generated-by:` sowie `Canonical-source:` durch.
+- [ ] DoD.4 D2-Commits ohne `Not-checked:` failen.
+- [ ] DoD.5 Generated-Artefakte unterscheiden `runtime-code`, `generator-code/tests` und reine Artefakt-Commits.
+- [ ] DoD.6 Shadow-Truth-Heuristik eskaliert nur bei starker Autoritaetswirkung und erlaubtem Pfadabgleich.
+- [ ] DoD.7 Gate-Bypass-Muster in Schutzflaechen erzwingen mindestens D3.
+- [ ] DoD.8 Test-Skip-/Only-Spuren failen; weichere Testqualitaetsmuster bleiben Warnungen.
+- [ ] DoD.9 Contracttests decken die geplanten sechs Kernfaelle ab.
+- [ ] DoD.10 Abschluss-Evidence nennt gelaufene Gates, bewusst nicht gepruefte Semantik und verbleibende Warn-Risiken.
+
+## Risiken
+
+| Risiko | Stufe | Gegenmassnahme |
+| --- | --- | --- |
+| Check blockiert legitime Graph-/Plan-/Dashboard-Arbeit | hoch | Drei-Klassen-Regel fuer Runtime, Generator und Generated-Artefakt; `Generated-by:` statt Pauschalblock |
+| Shadow-Truth-Heuristik erzeugt False Positives | mittel | Fail nur bei drei kumulativen Bedingungen; Referenz-/Fehlerbericht-/Intake-Pfade erlauben |
+| Gate-Bypass-Erkennung wird zu schwach | mittel | Schutzflaechen eng definieren und objektive Diff-Muster testen |
+| Gate-Bypass-Erkennung wird zu laut | mittel | Erst Agent-Preflight/commit-msg, nicht sofort Pre-Commit-Hardening |
+| Testqualitaetscheck wird Pseudo-Intelligenz | hoch | Nur `.only`/`.skip`/objektive Assertion-Signale hart blocken; Rest Warnung |
+| D2-Envelope wird zu schwer | niedrig | Nur `Not-checked:` hard required; `Residual-risk:` fuer D2 zunaechst Warnung/optional |
+| Scope-Validator-Import sprengt den Slice | mittel | Explizit aus V138.1-V138.4 ausklammern; spaeter eigene Phase |
+
+## Phasen
+
+### 138.1 Audit-Design und Testmatrix
+
+goal: Objektive Regeln finalisieren, bevor Gate-Verhalten geaendert wird
+
+- [ ] 138.1.1 Datei-Klassen fuer Runtime-Code, Generator-Code, Generated-Artefakte, Governance, Source-of-Truth und Tests konkret in Pattern-Listen uebersetzen.
+- [ ] 138.1.2 Envelope-Felder `Generated-by:` und `Canonical-source:` fuer Preflight/Commit-Message-Parsing festlegen.
+- [ ] 138.1.3 Testmatrix fuer die sechs Kernfaelle fixieren: runtime+generated, generator+generated mit `Generated-by`, Shadow-Truth, Gate-Bypass, `test.only`, D2 ohne `Not-checked`.
+
+### 138.2 Check-Script und Contracttests
+
+goal: Diff-Audit als kleines, testbares Script bauen
+
+- [ ] 138.2.1 `scripts/check-ai-diff-audit.mjs` mit purem `auditStagedDiff()` und CLI anlegen.
+- [ ] 138.2.2 `tests/agent-diff-audit.contract.test.mjs` fuer die sechs Kernfaelle anlegen.
+- [ ] 138.2.3 `package.json` um `check:ai-diff-audit` ergaenzen.
+
+### 138.3 Agent-Preflight-Integration
+
+goal: Bestehende Agent-Gates nutzen statt neuen Nebenpfad zu erzeugen
+
+- [ ] 138.3.1 `agent-preflight.mjs` ruft `auditStagedDiff()` mit staged changes, diff und Envelope auf.
+- [ ] 138.3.2 Findings werden in bestehende `violations`/`warnings` eingeordnet.
+- [ ] 138.3.3 `check-agent-commit-message.mjs` liest und reicht `Generated-by:` sowie `Canonical-source:` weiter.
+
+### 138.4 Envelope-Haertung
+
+goal: Kleine KI-Diffs muessen ehrlich sagen, was nicht geprueft wurde
+
+- [ ] 138.4.1 `Not-checked:` ab `Decision: D2` hard required machen.
+- [ ] 138.4.2 `Residual-risk:` fuer D2 als Warnung oder optionales Feld belassen; D3/D4 bleiben hard required.
+- [ ] 138.4.3 Commit-Message-Hinweise und Tests an neue Anforderungen anpassen.
+
+### 138.5 Rauschen, Scope-Validator-Folge und Rollout-Entscheidung
+
+goal: Check bewusst klein halten und Folgeausbau trennen
+
+- [ ] 138.5.1 Audit gegen typische Graph-/Plan-/Generated-Slices trocken pruefen.
+- [ ] 138.5.2 False-Positive-Liste dokumentieren und nur Pattern korrigieren, keine Semantik hinzufuegen.
+- [ ] 138.5.3 Scope-Validator-Import als separaten Folge-Slice entscheiden: pure function extrahieren, CLI als Wrapper behalten, Phase-Pflicht bei aktiven Locks pruefen.
+
+### 138.99 Abschluss
+
+goal: Gate-Haertung gruensicher abschliessen
+
+- [ ] 138.99.1 `node --test tests/agent-diff-audit.contract.test.mjs` ist gruen.
+- [ ] 138.99.2 `npm run check:ai-diff-audit` ist fuer den staged Abschlussdiff gruen oder meldet erwartete Warnungen.
+- [ ] 138.99.3 `npm run plan:check` und `npm run gates:pre-commit` sind gruen.
+- [ ] 138.99.4 Abschluss-Evidence nennt `Not-checked:` ehrlich: keine semantische Bewertung guter Tests, kein Scope-Validator-Import, keine CI-/Pre-Commit-Hardverdrahtung ausserhalb Agent-Preflight.
+
+## Intake-Hinweis
+
+- Ziel-Masterplan: `docs/Umsetzungsplan.md`.
+- Vorgeschlagene Block-ID: `V138`.
+- Vorgeschlagene Prioritaet: `P1`.
+- Harte Dependencies: `V117.99`, `V119.99`, `V123.99`, `V125.99`.
+- Empfohlene Reihenfolge: V138 vor `V120.1`, `V137.1` und `V122.1` aufnehmen.
+- Manuelle Uebernahme erforderlich: Dieser Draft aendert den Master nicht. Nach User-Intake gehoert die kanonische Detaildatei nach `docs/plaene/aktiv/V138.md`; dieser Draft wird danach archiviert oder als superseded markiert.
