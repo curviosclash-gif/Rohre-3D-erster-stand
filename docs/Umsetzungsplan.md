@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-26. Aktiver Lock: `-`; Startanker: `V119 119.99 abgeschlossen`; naechster empfohlener P1-Schritt ist `V123 123.99`.
+Stand: 2026-05-26. Aktiver Lock: `-`; Startanker: `V123 123.99 abgeschlossen`; naechster empfohlener P1-Schritt ist `V120 120.1`.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -72,7 +72,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V117 | AI Decision Framework und Autonomie-Gates | done | P1 | frei | V109.99 | 117.99 | `docs/plaene/aktiv/V117.md` |
 | V116 | Repo-Kontext-Reduktion und Deep-Cleanup-Sanierung | done | P1 | frei | V109.99,V117.99,V115.99 | 116.99 | `docs/plaene/aktiv/V116.md` |
 | V119 | Planabschluss-Evidence-Remediation und Git-Historienabgleich | done | P1 | frei | V117.99 | 119.99 | `docs/plaene/aktiv/V119.md` |
-| V123 | AI-optimierter Plan-Index und Source-of-Truth-Migration | planned | P1 | frei | V116.4,V119.1 | 123.99 | `docs/plaene/aktiv/V123.md` |
+| V123 | AI-optimierter Plan-Index und Source-of-Truth-Migration | done | P1 | frei | V116.4,V119.1 | 123.99 | `docs/plaene/aktiv/V123.md` |
 | V125 | Architektur-Compliance fuer Folgearbeit | done | P1 | frei | V91.99,V104.99,V117.99 | 125.99 | `docs/plaene/aktiv/V125.md` |
 | V126 | Local Dev-API, Preview- und Delivery-Hardening | done | P1 | frei | V102.99,V105.99 | 126.99 | `docs/plaene/aktiv/V126.md` |
 | V120 | Graph-RAG mit lokalem Context-Adapter | planned | P1 | frei | V107.99,V110.99,V111.99 | 120.1 | `docs/plaene/aktiv/V120.md` |
@@ -192,7 +192,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V117 | 2026-05-14 | closed | Abgeschlossen 2026-05-14 |
 | - | V116 | 2026-05-18 | closed | Abgeschlossen 2026-05-18 |
 | - | V119 | 2026-05-23 | closed | Abgeschlossen 2026-05-23; P1-/P2-Evidence-Remediation, Praeventions-Check und Abschluss-Gates gruen |
-| - | V123 | - | frei | Geplant |
+| - | V123 | 2026-05-26 | closed | Abgeschlossen 2026-05-26; Plan-Index-Pilot, Drift-/Kontext-/Dashboard-/Docs-/Graph-Gates gruen; Markdown bleibt kanonisch |
 | - | V125 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Architektur-Capsule, staged Guard, Boundary-/Ratchet-/Contract-Evidence und Abschluss-Gates gruen |
 | - | V126 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Dev-API-/Preview-Hardening gruen, Handoff an V127/V128/V129 |
 | - | V120 | - | frei | Geplant |

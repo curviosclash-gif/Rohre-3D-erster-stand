@@ -6,6 +6,15 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V123 123.99 Abschluss-Gate 2026-05-26
+
+- Nach User-Gate `setze plan 123 fort` wurde V123 als D3-Plan-/Governance-Slice geschlossen: aktive Planakte, Master-Index und Lock-Status zeigen den abgeschlossenen Plan-Index-Pilot ohne Source-of-Truth-Wechsel.
+- Abschlussbild: `docs/Umsetzungsplan.md` bleibt kanonische Schreib- und Entscheidungsquelle; `docs/generated/plan-index.json` bleibt generierter, nicht-kanonischer Einstieg fuer Blockstatus, `workstream`, Startanker, Empfehlung und Lock-Projektion; bei Konflikt gewinnt weiter der Markdown-Master.
+- Drift-/Kontextpfad: `plan:index:check` und `plan:context:check` melden `drift_status=clean` und `index_violations=0`; das HTML-Dashboard bleibt eine generierte read-only Menschenansicht ohne eigene Planlogik.
+- Entscheidung: Option A ist abgeschlossen. Option B, JSON als spaetere Source-of-Truth, bleibt als Future-Intake mit Blast-Radius, Promotion-Kriterien, Entscheidungstests und Rollback-Anforderungen dokumentiert.
+- Evidence: `npm run plan:check`, `npm run plan:index:check`, `npm run plan:context:check`, `npm run graph:check`, `node --test tests/plan-dashboard.contract.test.mjs`, `npm run docs:sync`, `npm run docs:check` und `npm run gates:pre-commit` -> PASS.
+- Not-checked: keine Vollsuite, keine produktiven Runtime-/UI-/Gameplay-/Bot-Training-Pfade, kein Graph-Source-Switch und keine Autoritaetsverschiebung auf JSON; V120/V123-Overlap bleibt bewusst spaeterer Consumer-/Migrationsscope.
+
 ## Plan-Intake 2026-05-26 (Block `V137`)
 
 - `V137` ist als geplanter P2-Block fuer den CodeGraph Read-only Installationsspike in den Master aufgenommen und verweist kanonisch auf `docs/plaene/aktiv/V137.md`.

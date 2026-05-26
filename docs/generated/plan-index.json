@@ -2,13 +2,13 @@
   "schema_version": 1,
   "updated": "2026-05-26",
   "start_anchor": {
-    "block": "V119",
-    "phase": "119.99",
+    "block": "V123",
+    "phase": "123.99",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
-    "block": "V123",
-    "phase": "123.99",
+    "block": "V120",
+    "phase": "120.1",
     "source": "docs/Umsetzungsplan.md",
     "authority": "recommendation"
   },
@@ -484,7 +484,7 @@
     {
       "id": "V123",
       "title": "AI-optimierter Plan-Index und Source-of-Truth-Migration",
-      "status": "planned",
+      "status": "done",
       "priority": "P1",
       "owner": "frei",
       "workstream": "repo-governance",
@@ -495,10 +495,10 @@
       "current_phase": "123.99",
       "plan_file": "docs/plaene/aktiv/V123.md",
       "lock": {
-        "status": "frei",
+        "status": "closed",
         "agent": "-",
-        "start_date": "-",
-        "target": "Geplant",
+        "start_date": "2026-05-26",
+        "target": "Abgeschlossen 2026-05-26; Plan-Index-Pilot, Drift-/Kontext-/Dashboard-/Docs-/Graph-Gates gruen; Markdown bleibt kanonisch",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

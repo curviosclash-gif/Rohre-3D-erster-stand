@@ -1630,7 +1630,7 @@
       "id": "V123",
       "type": "block",
       "title": "AI-optimierter Plan-Index und Source-of-Truth-Migration",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -5097,7 +5097,7 @@
       "id": "V123.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.99"
@@ -13697,8 +13697,8 @@
     {
       "id": "V123.99.1",
       "type": "subphase",
-      "title": "`npm run plan:check` ist gruen.",
-      "status": "open",
+      "title": "`npm run plan:check` ist gruen. (abgeschlossen: 2026-05-26; evidence: `npm run plan:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.99",
@@ -13708,8 +13708,8 @@
     {
       "id": "V123.99.2",
       "type": "subphase",
-      "title": "`npm run plan:index:check` ist gruen oder der Check ist bewusst noch nicht eingefuehrt und blockerfest begruendet.",
-      "status": "open",
+      "title": "`npm run plan:index:check` ist gruen oder der Check ist bewusst noch nicht eingefuehrt und blockerfest begruendet. (abgeschlossen: 2026-05-26; evidence: `npm run plan:index:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.99",
@@ -13719,8 +13719,8 @@
     {
       "id": "V123.99.3",
       "type": "subphase",
-      "title": "`npm run plan:context:check` zeigt keinen neuen Autoritaetskonflikt.",
-      "status": "open",
+      "title": "`npm run plan:context:check` zeigt keinen neuen Autoritaetskonflikt. (abgeschlossen: 2026-05-26; evidence: `npm run plan:context:check` -> PASS mit `drift_status=clean`, `index_violations=0`)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.99",
@@ -13730,8 +13730,8 @@
     {
       "id": "V123.99.4",
       "type": "subphase",
-      "title": "`npm run graph:check` ist gruen, falls Graph-Inputs oder Graph-Reports betroffen sind.",
-      "status": "open",
+      "title": "`npm run graph:check` ist gruen, falls Graph-Inputs oder Graph-Reports betroffen sind. (abgeschlossen: 2026-05-26; evidence: `npm run graph:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.99",
@@ -13741,8 +13741,8 @@
     {
       "id": "V123.99.5",
       "type": "subphase",
-      "title": "`npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "`npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-26; evidence: `npm run docs:sync` -> PASS, `updated=0`; `npm run docs:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.99",
@@ -13752,8 +13752,8 @@
     {
       "id": "V123.99.6",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt: Pilot/Quelle, Konfliktregel, Drift-Check, Agenten-Leseweg, Tests/Promotion-Kriterien, Restrisiko und Entscheidung zum Source-of-Truth-Wechsel.",
-      "status": "open",
+      "title": "Abschlussnotiz nennt: Pilot/Quelle, Konfliktregel, Drift-Check, Agenten-Leseweg, Tests/Promotion-Kriterien, Restrisiko und Entscheidung zum Source-of-Truth-Wechsel. (abgeschlossen: 2026-05-26; evidence: Abschlussnotiz in diesem Plan + `docs/plaene/CHANGELOG.md`)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.99",
