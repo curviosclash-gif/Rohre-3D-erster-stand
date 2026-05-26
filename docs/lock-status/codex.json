@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-26T01:28:37.551Z",
+  "timestamp": "2026-05-26T02:11:03.317Z",
   "locks": [
     {
       "block_id": "V103",
@@ -621,10 +621,30 @@
       "target_completion": "2026-05-22",
       "status": "completed",
       "notes": ""
+    },
+    {
+      "block_id": "V138",
+      "phase": "138.1",
+      "scope_files": [
+        "docs/plaene/aktiv/V138.md",
+        "docs/plaene/aktiv/V120.md",
+        "docs/plaene/aktiv/V137.md",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/CHANGELOG.md",
+        "package.json",
+        "scripts/check-ai-diff-audit.mjs",
+        "scripts/agent-preflight.mjs",
+        "scripts/check-agent-commit-message.mjs",
+        "tests/agent-diff-audit.contract.test.mjs"
+      ],
+      "start_date": "2026-05-26",
+      "target_completion": "2026-05-26",
+      "status": "in-progress",
+      "notes": ""
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "123.99",
+    "phase_id": "138.1",
     "completed_items": [],
     "last_commit": ""
   }
