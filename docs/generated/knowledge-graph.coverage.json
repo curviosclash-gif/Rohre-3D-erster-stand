@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2071,
-    "rawCoveredFileCount": 1314,
-    "rawCoveragePercent": 63.4,
-    "adjustedTrackedFileCount": 1389,
-    "adjustedCoveredFileCount": 1082,
+    "trackedFileCount": 2074,
+    "rawCoveredFileCount": 1317,
+    "rawCoveragePercent": 63.5,
+    "adjustedTrackedFileCount": 1392,
+    "adjustedCoveredFileCount": 1085,
     "adjustedCoveragePercent": 77.9,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -257,14 +257,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 991,
-        "coveredCount": 868
+        "count": 993,
+        "coveredCount": 870
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 323,
-        "coveredCount": 169
+        "count": 324,
+        "coveredCount": 170
       },
       {
         "classification": "prototype",
@@ -11170,6 +11170,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/generated/plan-dashboard.html",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V123"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/generated/plan-index.json",
       "tracked": true,
       "coveredInCore": true,
@@ -19167,6 +19184,25 @@
       "scopeBlocks": [
         "B13",
         "V132"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/build-plan-dashboard.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V123"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34169,6 +34205,25 @@
     },
     {
       "path": "tests/plan-context-report.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V123"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/plan-dashboard.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

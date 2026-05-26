@@ -8,7 +8,7 @@
   },
   "next_recommended_start": {
     "block": "V123",
-    "phase": "123.6",
+    "phase": "123.99",
     "source": "docs/Umsetzungsplan.md",
     "authority": "recommendation"
   },
@@ -492,7 +492,7 @@
         "V116.4",
         "V119.1"
       ],
-      "current_phase": "123.6",
+      "current_phase": "123.99",
       "plan_file": "docs/plaene/aktiv/V123.md",
       "lock": {
         "status": "frei",
