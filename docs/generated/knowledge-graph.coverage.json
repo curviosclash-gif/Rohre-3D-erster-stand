@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2070,
-    "rawCoveredFileCount": 1313,
+    "trackedFileCount": 2071,
+    "rawCoveredFileCount": 1314,
     "rawCoveragePercent": 63.4,
-    "adjustedTrackedFileCount": 1388,
-    "adjustedCoveredFileCount": 1081,
+    "adjustedTrackedFileCount": 1389,
+    "adjustedCoveredFileCount": 1082,
     "adjustedCoveragePercent": 77.9,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -263,8 +263,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 322,
-        "coveredCount": 168
+        "count": 323,
+        "coveredCount": 169
       },
       {
         "classification": "prototype",
@@ -14473,6 +14473,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Audit_Followup_V11_GLB_Map_Varianz_V106.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

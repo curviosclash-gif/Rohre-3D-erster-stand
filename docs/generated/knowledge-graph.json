@@ -2723,7 +2723,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 337,
+          "concreteCount": 338,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -32434,6 +32434,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Audit_Followup_V11_GLB_Map_Varianz_V106.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -92426,6 +92441,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Audit_Followup_V11_GLB_Map_Varianz_V106.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
       "type": "scope",
       "hint": null,
       "attributes": {
