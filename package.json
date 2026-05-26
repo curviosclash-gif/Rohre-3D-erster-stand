@@ -19,6 +19,7 @@
     "check:runtime:determinism": "node scripts/check-runtime-determinism.mjs",
     "check:runtime:encoding": "node scripts/check-runtime-encoding.mjs",
     "check:ai-decision-policy": "node scripts/check-ai-decision-policy.mjs",
+    "check:ai-diff-audit": "node scripts/check-ai-diff-audit.mjs",
     "check:agent-commit": "node scripts/check-agent-commit-message.mjs",
     "check:plan-evidence-claims": "node scripts/check-plan-evidence-claims.mjs",
     "check:gemini": "node scripts/check-gemini-governance.mjs",

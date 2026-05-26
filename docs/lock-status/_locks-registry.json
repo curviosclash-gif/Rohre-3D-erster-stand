@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T02:11:03.452Z",
+  "generated_at": "2026-05-26T02:21:46.540Z",
   "locks": [
     {
       "person": "codex",
@@ -652,6 +652,8 @@
         "docs/plaene/aktiv/V137.md",
         "docs/Umsetzungsplan.md",
         "docs/plaene/CHANGELOG.md",
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
         "package.json",
         "scripts/check-ai-diff-audit.mjs",
         "scripts/agent-preflight.mjs",

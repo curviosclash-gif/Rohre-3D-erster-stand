@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2077,
-    "rawCoveredFileCount": 1320,
+    "trackedFileCount": 2079,
+    "rawCoveredFileCount": 1322,
     "rawCoveragePercent": 63.6,
-    "adjustedTrackedFileCount": 1395,
-    "adjustedCoveredFileCount": 1088,
+    "adjustedTrackedFileCount": 1397,
+    "adjustedCoveredFileCount": 1090,
     "adjustedCoveragePercent": 78,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 993,
-        "coveredCount": 870
+        "count": 995,
+        "coveredCount": 872
       },
       {
         "classification": "product-docs",
@@ -11092,6 +11092,7 @@
         "V120",
         "V123",
         "V125",
+        "V138",
         "V90"
       ],
       "surfaces": [],
@@ -11119,6 +11120,7 @@
         "V120",
         "V123",
         "V125",
+        "V138",
         "V90",
         "V94"
       ],
@@ -19360,6 +19362,25 @@
       "scopeBlocks": [
         "B13",
         "V117"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/check-ai-diff-audit.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V138"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -32922,6 +32943,25 @@
       "scopeBlocks": [
         "B13",
         "V116"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/agent-diff-audit.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V138"
       ],
       "surfaces": [],
       "classification": "product-code",

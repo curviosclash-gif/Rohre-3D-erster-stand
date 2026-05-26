@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 237,
+          "concreteCount": 239,
           "plannedCount": 0
         }
       }
@@ -2070,6 +2070,8 @@
         "currentPhase": "138.1",
         "planFile": "docs/plaene/aktiv/V138.md",
         "scopeDeclarations": [
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
           "docs/plaene/aktiv/V120.md",
           "docs/plaene/aktiv/V137.md",
           "docs/plaene/aktiv/V138.md",
@@ -2082,8 +2084,8 @@
           "tests/agent-diff-audit.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 8,
-          "plannedCount": 2
+          "concreteCount": 12,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
           "V120",
@@ -5752,7 +5754,7 @@
       "id": "V138.1",
       "type": "phase",
       "title": "Audit-Design und Testmatrix",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.1"
@@ -5762,7 +5764,7 @@
       "id": "V138.2",
       "type": "phase",
       "title": "Check-Script und Contracttests",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.2"
@@ -16684,8 +16686,8 @@
     {
       "id": "V138.1.1",
       "type": "subphase",
-      "title": "Datei-Klassen fuer Runtime-Code, Generator-Code, Generated-Artefakte, Governance, Source-of-Truth und Tests konkret in Pattern-Listen uebersetzen.",
-      "status": "open",
+      "title": "Datei-Klassen fuer Runtime-Code, Generator-Code, Generated-Artefakte, Governance, Source-of-Truth und Tests konkret in Pattern-Listen uebersetzen. (abgeschlossen: 2026-05-26; evidence: scripts/check-ai-diff-audit.mjs -> FILE_CLASS_RULES)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.1",
@@ -16695,8 +16697,8 @@
     {
       "id": "V138.1.2",
       "type": "subphase",
-      "title": "Envelope-Felder `Generated-by:` und `Canonical-source:` fuer Preflight/Commit-Message-Parsing festlegen.",
-      "status": "open",
+      "title": "Envelope-Felder `Generated-by:` und `Canonical-source:` fuer Preflight/Commit-Message-Parsing festlegen. (abgeschlossen: 2026-05-26; evidence: scripts/check-ai-diff-audit.mjs -> normalizeEnvelope)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.1",
@@ -16706,8 +16708,8 @@
     {
       "id": "V138.1.3",
       "type": "subphase",
-      "title": "Testmatrix fuer die sechs Kernfaelle fixieren: runtime+generated, generator+generated mit `Generated-by`, Shadow-Truth, Gate-Bypass, `test.only`, D2 ohne `Not-checked`.",
-      "status": "open",
+      "title": "Testmatrix fuer die sechs Kernfaelle fixieren: runtime+generated, generator+generated mit `Generated-by`, Shadow-Truth, Gate-Bypass, `test.only`, D2 ohne `Not-checked`. (abgeschlossen: 2026-05-26; evidence: node --test tests/agent-diff-audit.contract.test.mjs -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.1",
@@ -16717,8 +16719,8 @@
     {
       "id": "V138.2.1",
       "type": "subphase",
-      "title": "`scripts/check-ai-diff-audit.mjs` mit purem `auditStagedDiff()` und CLI anlegen.",
-      "status": "open",
+      "title": "`scripts/check-ai-diff-audit.mjs` mit purem `auditStagedDiff()` und CLI anlegen. (abgeschlossen: 2026-05-26; evidence: node --test tests/agent-diff-audit.contract.test.mjs -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.2",
@@ -16728,8 +16730,8 @@
     {
       "id": "V138.2.2",
       "type": "subphase",
-      "title": "`tests/agent-diff-audit.contract.test.mjs` fuer die sechs Kernfaelle anlegen.",
-      "status": "open",
+      "title": "`tests/agent-diff-audit.contract.test.mjs` fuer die sechs Kernfaelle anlegen. (abgeschlossen: 2026-05-26; evidence: node --test tests/agent-diff-audit.contract.test.mjs -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.2",
@@ -16739,8 +16741,8 @@
     {
       "id": "V138.2.3",
       "type": "subphase",
-      "title": "`package.json` um `check:ai-diff-audit` ergaenzen.",
-      "status": "open",
+      "title": "`package.json` um `check:ai-diff-audit` ergaenzen. (abgeschlossen: 2026-05-26; evidence: npm run check:ai-diff-audit -- --decision=D3 --gate=\"User approved V138 138.1/138.2 D3 slice\" --generated-by=\"npm run graph:build\" --not-checked=\"semantic test quality; preflight integration; D2 commit enforcement; CI/pre-commit hard wiring\" --residual-risk=\"false positives may surface in later generated/governance slices\" -> PASS staged=8 warnings=0)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.2",
@@ -30182,6 +30184,7 @@
           "V120",
           "V123",
           "V125",
+          "V138",
           "V90"
         ],
         "exists": true
@@ -30207,6 +30210,7 @@
           "V120",
           "V123",
           "V125",
+          "V138",
           "V90",
           "V94"
         ],
@@ -35834,12 +35838,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V138"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -48006,12 +48012,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V138"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -56009,6 +56017,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/check-ai-diff-audit.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/check-architecture-boundaries.mjs",
       "type": "scope",
       "hint": null,
@@ -56622,6 +56639,15 @@
     {
       "from": "B13",
       "to": "tests/agent-context.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/agent-diff-audit.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -82113,6 +82139,24 @@
         "blockId": "V137",
         "phaseCode": "137.99",
         "subphaseCode": "137.99.6"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V138",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
       }
     },
     {

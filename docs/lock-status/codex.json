@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-26T02:11:03.317Z",
+  "timestamp": "2026-05-26T02:21:46.372Z",
   "locks": [
     {
       "block_id": "V103",
@@ -631,6 +631,8 @@
         "docs/plaene/aktiv/V137.md",
         "docs/Umsetzungsplan.md",
         "docs/plaene/CHANGELOG.md",
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
         "package.json",
         "scripts/check-ai-diff-audit.mjs",
         "scripts/agent-preflight.mjs",
