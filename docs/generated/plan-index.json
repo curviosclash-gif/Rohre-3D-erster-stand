@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-05-23",
+  "updated": "2026-05-26",
   "start_anchor": {
     "block": "V119",
     "phase": "119.99",
@@ -8,7 +8,7 @@
   },
   "next_recommended_start": {
     "block": "V123",
-    "phase": "123.1",
+    "phase": "123.6",
     "source": "docs/Umsetzungsplan.md",
     "authority": "recommendation"
   },
@@ -492,7 +492,7 @@
         "V116.4",
         "V119.1"
       ],
-      "current_phase": "123.1",
+      "current_phase": "123.6",
       "plan_file": "docs/plaene/aktiv/V123.md",
       "lock": {
         "status": "frei",

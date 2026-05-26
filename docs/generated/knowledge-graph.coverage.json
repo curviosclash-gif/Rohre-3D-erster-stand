@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2069,
-    "rawCoveredFileCount": 1312,
+    "trackedFileCount": 2070,
+    "rawCoveredFileCount": 1313,
     "rawCoveragePercent": 63.4,
-    "adjustedTrackedFileCount": 1387,
-    "adjustedCoveredFileCount": 1080,
+    "adjustedTrackedFileCount": 1388,
+    "adjustedCoveredFileCount": 1081,
     "adjustedCoveragePercent": 77.9,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -263,8 +263,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 321,
-        "coveredCount": 167
+        "count": 322,
+        "coveredCount": 168
       },
       {
         "classification": "prototype",
@@ -12158,6 +12158,7 @@
       ],
       "scopeBlocks": [
         "V110",
+        "V123",
         "V77",
         "V96"
       ],
@@ -14573,6 +14574,24 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/neu/Feature_Plan_Index_JSON_Source_of_Truth_Migration_B_Entscheidung.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V123",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/neu/Feature_Portabler_Knowledge_Core_Memory_RAG_V136.md",
       "tracked": true,
       "coveredInCore": true,
@@ -15175,6 +15194,7 @@
         "V111",
         "V114",
         "V119",
+        "V123",
         "V125",
         "V74",
         "V77",
@@ -15213,6 +15233,7 @@
         "V116",
         "V117",
         "V119",
+        "V123",
         "V125",
         "V89",
         "V91"
@@ -15236,6 +15257,7 @@
         "V110",
         "V111",
         "V119",
+        "V123",
         "V125"
       ],
       "surfaces": [],

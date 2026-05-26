@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T13:54:31.154Z",
+  "generated_at": "2026-05-25T14:59:05.283Z",
   "locks": [
     {
       "person": "codex",
@@ -640,6 +640,41 @@
       "start_date": "2026-05-22",
       "target_completion": "2026-05-22",
       "status": "completed",
+      "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V123",
+      "phase": "123.5",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/generated/plan-index.json",
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.scorecard.json",
+        "docs/plaene/aktiv/V123.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/prozess/Dokumentationsstatus.md",
+        "AGENTS.md",
+        ".agents/rules/planning_and_governance.md",
+        ".agents/rules/token_efficiency_and_tools.md",
+        ".agents/workflows/plan.md",
+        ".agents/workflows/code.md",
+        "scripts/validate-umsetzungsplan.mjs",
+        "scripts/plan-context-report.mjs",
+        "scripts/validate-plan-index.mjs",
+        "scripts/build-plan-index.mjs",
+        "scripts/export-plan-map.mjs",
+        "scripts/build-knowledge-graph.mjs",
+        "scripts/check-knowledge-graph.mjs",
+        "tests/plan-context-report.contract.test.mjs",
+        "tests/plan-index.contract.test.mjs",
+        "tests/plan-map-export.contract.test.mjs",
+        "package.json"
+      ],
+      "start_date": "2026-05-25",
+      "target_completion": "2026-05-25",
+      "status": "in-progress",
       "notes": ""
     }
   ],

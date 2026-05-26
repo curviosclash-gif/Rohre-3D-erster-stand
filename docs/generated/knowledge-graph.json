@@ -1637,7 +1637,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "123.1",
+        "currentPhase": "123.6",
         "planFile": "docs/plaene/aktiv/V123.md",
         "scopeDeclarations": [
           ".agents/rules/planning_and_governance.md",
@@ -1650,8 +1650,13 @@
           "docs/generated/knowledge-graph.scorecard.json",
           "docs/generated/plan-index.json",
           "docs/plaene/aktiv/V123.md",
+          "docs/plaene/aktiv/V96.md",
           "docs/plaene/CHANGELOG.md",
+          "docs/plaene/neu/Feature_Plan_Index_JSON_Source_of_Truth_Migration_B_Entscheidung.md",
           "docs/prozess/Dokumentationsstatus.md",
+          "docs/referenz/ai_architecture_context.md",
+          "docs/referenz/ai_project_onboarding.md",
+          "docs/referenz/architektur_ausfuehrlich.md",
           "docs/Umsetzungsplan.md",
           "package.json",
           "scripts/build-knowledge-graph.mjs",
@@ -1666,7 +1671,7 @@
           "tests/plan-map-export.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 24,
+          "concreteCount": 29,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1676,7 +1681,8 @@
           "V120",
           "V121",
           "V125",
-          "V90"
+          "V90",
+          "V96"
         ],
         "unknownFrontmatterFields": [
           "scope_reference_files"
@@ -2717,7 +2723,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 336,
+          "concreteCount": 337,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3472,6 +3478,7 @@
           "V114",
           "V115",
           "V119",
+          "V123",
           "V125",
           "V90"
         ],
@@ -5028,7 +5035,7 @@
       "id": "V123.5",
       "type": "phase",
       "title": "Source-of-Truth-Entscheidung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.5"
@@ -13457,8 +13464,8 @@
     {
       "id": "V123.5.1",
       "type": "subphase",
-      "title": "Option A bewerten: Markdown bleibt Wahrheit, JSON bleibt generierter Spiegel.",
-      "status": "open",
+      "title": "Option A bewerten: Markdown bleibt Wahrheit, JSON bleibt generierter Spiegel. (abgeschlossen: 2026-05-26; evidence: `npm run plan:index:check` + `npm run plan:context:check` -> PASS; Entscheidung unten dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.5",
@@ -13468,8 +13475,8 @@
     {
       "id": "V123.5.2",
       "type": "subphase",
-      "title": "Option B bewerten: JSON wird Wahrheit, Markdown wird generierte Menschenansicht.",
-      "status": "open",
+      "title": "Option B bewerten: JSON wird Wahrheit, Markdown wird generierte Menschenansicht. (abgeschlossen: 2026-05-26; evidence: `node scripts/query-knowledge-graph.mjs scope-collisions --json` -> V120/V123-Overlap bleibt; Option B als Future-Intake vertagt)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.5",
@@ -13479,8 +13486,8 @@
     {
       "id": "V123.5.3",
       "type": "subphase",
-      "title": "Blast-Radius fuer Option B dokumentieren: Master, Validatoren, Graph, Workflows, Rules, Changelog, Agenten-Leseweg, Plan-Map und Lock-Projektion.",
-      "status": "open",
+      "title": "Blast-Radius fuer Option B dokumentieren: Master, Validatoren, Graph, Workflows, Rules, Changelog, Agenten-Leseweg, Plan-Map und Lock-Projektion. (abgeschlossen: 2026-05-26; evidence: `docs/plaene/neu/Feature_Plan_Index_JSON_Source_of_Truth_Migration_B_Entscheidung.md` -> Blast-Radius und Gate-Scope dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.5",
@@ -13490,8 +13497,8 @@
     {
       "id": "V123.5.4",
       "type": "subphase",
-      "title": "Promotion-Kriterien definieren: `plan:index:check`, `plan:check`, `plan:context:check` und relevante Graph-/Docs-Gates bleiben nach mindestens einem echten Planpflege-Slice gruen; keine manuelle Nachkorrektur an generierten Master-/Index-Daten.",
-      "status": "open",
+      "title": "Promotion-Kriterien definieren: `plan:index:check`, `plan:check`, `plan:context:check` und relevante Graph-/Docs-Gates bleiben nach mindestens einem echten Planpflege-Slice gruen; keine manuelle Nachkorrektur an generierten Master-/Index-Daten. (abgeschlossen: 2026-05-26; evidence: Future-Intake `Feature_Plan_Index_JSON_Source_of_Truth_Migration_B_Entscheidung.md` -> Promotion-Kriterien)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.5",
@@ -13501,8 +13508,8 @@
     {
       "id": "V123.5.5",
       "type": "subphase",
-      "title": "Entscheidungstest einfuehren oder dokumentieren: Generator-Determinismus, Drift-Erkennung, Roundtrip/Readback fuer Master-Felder, Workstream und Lock-Projektion.",
-      "status": "open",
+      "title": "Entscheidungstest einfuehren oder dokumentieren: Generator-Determinismus, Drift-Erkennung, Roundtrip/Readback fuer Master-Felder, Workstream und Lock-Projektion. (abgeschlossen: 2026-05-26; evidence: Future-Intake `Feature_Plan_Index_JSON_Source_of_Truth_Migration_B_Entscheidung.md` -> Entscheidungstest-Anforderungen)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.5",
@@ -13512,8 +13519,8 @@
     {
       "id": "V123.5.6",
       "type": "subphase",
-      "title": "AI-Benachrichtigung an den User ausloesen, sobald die Entscheidung zwischen Spiegelbetrieb und Source-of-Truth-Migration ansteht.",
-      "status": "open",
+      "title": "AI-Benachrichtigung an den User ausloesen, sobald die Entscheidung zwischen Spiegelbetrieb und Source-of-Truth-Migration ansteht. (abgeschlossen: 2026-05-26; evidence: User-Gate im Thread -> Option A freigegeben, Future-Plan fuer B angefordert)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.5",
@@ -13523,8 +13530,8 @@
     {
       "id": "V123.5.7",
       "type": "subphase",
-      "title": "User-Gate einholen, bevor eine Autoritaetsverschiebung umgesetzt wird.",
-      "status": "open",
+      "title": "User-Gate einholen, bevor eine Autoritaetsverschiebung umgesetzt wird. (abgeschlossen: 2026-05-26; evidence: User-Gate im Thread -> keine Autoritaetsverschiebung, Option A umgesetzt)",
+      "status": "done",
       "attributes": {
         "blockId": "V123",
         "phaseCode": "123.5",
@@ -30380,6 +30387,7 @@
         ],
         "scopeBlocks": [
           "V110",
+          "V123",
           "V77",
           "V96"
         ],
@@ -32515,6 +32523,22 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_Plan_Index_JSON_Source_of_Truth_Migration_B_Entscheidung.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V123",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Portabler_Knowledge_Core_Memory_RAG_V136.md",
       "type": "file",
       "title": null,
@@ -32976,6 +33000,7 @@
           "V111",
           "V114",
           "V119",
+          "V123",
           "V125",
           "V74",
           "V77",
@@ -33012,6 +33037,7 @@
           "V116",
           "V117",
           "V119",
+          "V123",
           "V125",
           "V89",
           "V91"
@@ -33033,6 +33059,7 @@
           "V110",
           "V111",
           "V119",
+          "V123",
           "V125"
         ],
         "exists": true
@@ -75785,6 +75812,15 @@
     },
     {
       "from": "V123",
+      "to": "docs/plaene/aktiv/V96.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
       "to": "docs/plaene/CHANGELOG.md",
       "type": "scope",
       "hint": null,
@@ -75794,7 +75830,43 @@
     },
     {
       "from": "V123",
+      "to": "docs/plaene/neu/Feature_Plan_Index_JSON_Source_of_Truth_Migration_B_Entscheidung.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
       "to": "docs/prozess/Dokumentationsstatus.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "docs/referenz/ai_architecture_context.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "docs/referenz/ai_project_onboarding.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V123",
+      "to": "docs/referenz/architektur_ausfuehrlich.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -92399,6 +92471,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Plan_Index_JSON_Source_of_Truth_Migration_B_Entscheidung.md",
       "type": "scope",
       "hint": null,
       "attributes": {
