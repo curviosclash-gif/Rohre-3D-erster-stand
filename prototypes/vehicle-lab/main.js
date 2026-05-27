@@ -20,6 +20,55 @@ function toBlueprintId(value) {
         .replace(/\s+/g, '_') || 'custom_blueprint';
 }
 
+function cloneVehicleConfig(config) {
+    return JSON.parse(JSON.stringify(config || {}));
+}
+
+function walkVehicleParts(parts, visit) {
+    if (!Array.isArray(parts)) return;
+    parts.forEach((part) => {
+        if (!part || typeof part !== 'object') return;
+        visit(part);
+        walkVehicleParts(part.children, visit);
+    });
+}
+
+function summarizeVehicleConfig(config = {}) {
+    const summary = {
+        parts: 0,
+        engines: 0,
+        wings: 0,
+        animated: 0,
+    };
+
+    walkVehicleParts(config.parts, (part) => {
+        summary.parts += 1;
+        const name = String(part.name || '').toLowerCase();
+        const geo = String(part.geo || '').toLowerCase();
+        if (geo === 'engine' || name.includes('engine')) summary.engines += 1;
+        if (name.includes('wing') || name.includes('fin')) summary.wings += 1;
+        if (part.anim && part.anim.type && part.anim.type !== 'none') summary.animated += 1;
+    });
+
+    return summary;
+}
+
+function createCompareRows(currentConfig, baselineConfig) {
+    const current = summarizeVehicleConfig(currentConfig);
+    const baseline = summarizeVehicleConfig(baselineConfig);
+    return [
+        { key: 'parts', label: 'Parts' },
+        { key: 'engines', label: 'Engines' },
+        { key: 'wings', label: 'Wings/Fins' },
+        { key: 'animated', label: 'Animated' },
+    ].map((metric) => ({
+        ...metric,
+        current: current[metric.key],
+        baseline: baseline[metric.key],
+        delta: current[metric.key] - baseline[metric.key],
+    }));
+}
+
 class VehicleLabApp {
     constructor() {
         this.canvas = document.getElementById('vehicleCanvas');
@@ -57,6 +106,7 @@ class VehicleLabApp {
             onHitboxChange: (val) => { this.viewport.setHitboxVisible(val); },
             onUndo: () => this.undo(),
             onRedo: () => this.redo(),
+            onCompareVehicleChange: (vehicleId) => this.setCompareVehicle(vehicleId),
             onGlobalUpdate: (type, val) => this.onGlobalUpdate(type, val)
         });
         this.vehicle = new ModularVehicleMesh(initialConfig);
@@ -71,6 +121,9 @@ class VehicleLabApp {
         this.selectedIndex = null;
         this.selectedPath = [];
         this.savedVehicles = [];
+        this.compareVehicleId = VEHICLE_PRESETS[1]?.id || VEHICLE_PRESETS[0]?.id || '';
+        this.statusMessage = 'Bereit';
+        this.statusTone = 'info';
         this.arcadeBlueprintStatus = 'Blueprint: n/a';
         this.lastArcadeBlueprintResult = null;
         this.updateArcadeBlueprintStatus();
@@ -100,7 +153,8 @@ class VehicleLabApp {
             if (this.selectedIndex === null) return;
             this.syncGizmoToConfig();
             this.vehicle.build();
-            this.history.save(this.vehicle.config);
+            this.updateArcadeBlueprintStatus();
+            this.persistCurrentConfig('Gizmo-Aenderung gespeichert.');
             const part = this.vehicle.config.parts[this.selectedIndex];
             if (part) {
                 this.ui.showProperties(part, (type) => this.onPropUpdate(type));
@@ -128,17 +182,78 @@ class VehicleLabApp {
         }));
     }
 
+    getCompareCandidates() {
+        return VEHICLE_PRESETS.map((preset) => ({
+            id: preset.id,
+            label: preset.label || preset.id,
+        }));
+    }
+
+    resolveComparePreset() {
+        return VEHICLE_PRESETS.find((preset) => preset.id === this.compareVehicleId) || VEHICLE_PRESETS[0] || {};
+    }
+
+    setCompareVehicle(vehicleId) {
+        const normalizedVehicleId = String(vehicleId || '').trim();
+        const candidate = VEHICLE_PRESETS.find((preset) => preset.id === normalizedVehicleId);
+        if (!candidate) return;
+        this.compareVehicleId = candidate.id;
+        this.setStatus(`Vergleich: ${candidate.label || candidate.id}`, 'info');
+        this.updateUI();
+    }
+
+    getSelectedPartLabel() {
+        if (this.selectedIndex === null) return '';
+        let part = this.vehicle?.config?.parts?.[this.selectedIndex] || null;
+        if (part && this.selectedPath && this.selectedPath.length > 0) {
+            this.selectedPath.forEach((pathIndex) => {
+                if (part && Array.isArray(part.children)) part = part.children[pathIndex];
+            });
+        }
+        return part?.name ? `Auswahl: ${part.name}` : '';
+    }
+
+    setStatus(message, tone = 'info') {
+        this.statusMessage = String(message || 'Bereit');
+        this.statusTone = String(tone || 'info');
+        this.updateStatusBar();
+    }
+
+    updateStatusBar() {
+        if (!this.ui || !this.history) return;
+        this.ui.updateHistoryControls(this.history.getState());
+        this.ui.updateStatusBar({
+            message: this.statusMessage,
+            tone: this.statusTone,
+            historyState: this.history.getState(),
+            blueprintStatus: this.arcadeBlueprintStatus,
+            selectedLabel: this.getSelectedPartLabel(),
+        });
+    }
+
+    persistCurrentConfig(statusMessage = 'Aenderungen lokal gespeichert.') {
+        this.history.save(this.vehicle.config);
+        localStorage.setItem('vehicle_lab_config', JSON.stringify(this.vehicle.config));
+        this.setStatus(statusMessage, 'success');
+    }
+
+    flushPendingSave() {
+        if (!this._saveTimeout) return;
+        clearTimeout(this._saveTimeout);
+        this._saveTimeout = null;
+        this.persistCurrentConfig('Aenderungen lokal gespeichert.');
+    }
+
     applyVehicleConfigToEditor(config) {
         if (!config || typeof config !== 'object') {
             throw new Error('Invalid vehicle config');
         }
-        const cloned = JSON.parse(JSON.stringify(config));
+        const cloned = cloneVehicleConfig(config);
         this.vehicle.updateConfig(cloned);
-        this.history.save(this.vehicle.config);
-        this.updateUI();
-        this.selectPart(null);
-        localStorage.setItem('vehicle_lab_config', JSON.stringify(this.vehicle.config));
         this.updateArcadeBlueprintStatus();
+        this.persistCurrentConfig('Fahrzeug geladen.');
+        this.selectPart(null);
+        this.updateUI();
     }
 
     updateSavedVehiclesUi(errorMessage = '') {
@@ -229,18 +344,19 @@ class VehicleLabApp {
     onPropUpdate(type) {
         this.vehicle.build();
         this.refreshGizmoAttachment();
-        this.debouncedSave();
         this.updateArcadeBlueprintStatus();
+        this.setStatus(type === 'add' ? 'Bauteil hinzugefuegt.' : 'Aenderungen ausstehend.', 'warning');
+        this.debouncedSave();
         this.updateUI();
     }
 
     debouncedSave() {
         if (this._saveTimeout) clearTimeout(this._saveTimeout);
         this._saveTimeout = setTimeout(() => {
-            this.history.save(this.vehicle.config);
-            localStorage.setItem('vehicle_lab_config', JSON.stringify(this.vehicle.config));
             this._saveTimeout = null;
-        }, 250);
+            this.persistCurrentConfig('Aenderungen lokal gespeichert.');
+            this.updateUI();
+        }, 180);
     }
 
     onGlobalUpdate(type, val) {
@@ -251,9 +367,9 @@ class VehicleLabApp {
             this.vehicle.initMaterials(this.vehicle.config);
             this.vehicle.build();
         }
-        this.history.save(this.vehicle.config);
-        localStorage.setItem('vehicle_lab_config', JSON.stringify(this.vehicle.config));
         this.updateArcadeBlueprintStatus();
+        this.persistCurrentConfig('Ship Settings gespeichert.');
+        this.updateUI();
     }
 
     updateArcadeBlueprintStatus(labelOverride = '') {
@@ -321,9 +437,6 @@ class VehicleLabApp {
             Number.isFinite(obj.scale.z) ? obj.scale.z : (part.scale ? part.scale[2] : 1)
         ];
 
-        this.updateUI();
-        this.history.save(this.vehicle.config);
-        localStorage.setItem('vehicle_lab_config', JSON.stringify(this.vehicle.config));
     }
 
     addPart() {
@@ -372,10 +485,9 @@ class VehicleLabApp {
             }
 
             this.vehicle.build();
-            this.history.save(this.vehicle.config);
-            this.updateUI();
-            localStorage.setItem('vehicle_lab_config', JSON.stringify(this.vehicle.config));
             this.updateArcadeBlueprintStatus();
+            this.persistCurrentConfig('Bauteil geloescht.');
+            this.updateUI();
         }
     }
 
@@ -387,6 +499,12 @@ class VehicleLabApp {
             (i, path) => this.selectPart(i, path)
         );
         this.ui.updateShipInfo(this.vehicle.config);
+        this.ui.updateComparePanel({
+            candidates: this.getCompareCandidates(),
+            selectedId: this.compareVehicleId,
+            rows: createCompareRows(this.vehicle.config, this.resolveComparePreset()),
+        });
+        this.updateStatusBar();
 
         if (this.selectedIndex !== null) {
             let part = this.vehicle.config.parts[this.selectedIndex];
@@ -588,22 +706,32 @@ class VehicleLabApp {
     }
 
     undo() {
+        this.flushPendingSave();
         const config = this.history.undo();
         if (config) {
             this.vehicle.updateConfig(config);
-            this.updateUI();
-            this.selectPart(null);
+            this.updateArcadeBlueprintStatus();
             localStorage.setItem('vehicle_lab_config', JSON.stringify(config));
+            this.setStatus('Undo angewendet.', 'info');
+            this.selectPart(null);
+            this.updateUI();
+        } else {
+            this.setStatus('Keine Undo-Schritte verfuegbar.', 'warning');
         }
     }
 
     redo() {
+        this.flushPendingSave();
         const config = this.history.redo();
         if (config) {
             this.vehicle.updateConfig(config);
-            this.updateUI();
-            this.selectPart(null);
+            this.updateArcadeBlueprintStatus();
             localStorage.setItem('vehicle_lab_config', JSON.stringify(config));
+            this.setStatus('Redo angewendet.', 'info');
+            this.selectPart(null);
+            this.updateUI();
+        } else {
+            this.setStatus('Keine Redo-Schritte verfuegbar.', 'warning');
         }
     }
 

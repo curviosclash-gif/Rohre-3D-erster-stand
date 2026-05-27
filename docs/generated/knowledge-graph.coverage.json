@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2091,
-    "rawCoveredFileCount": 1334,
+    "trackedFileCount": 2092,
+    "rawCoveredFileCount": 1335,
     "rawCoveragePercent": 63.8,
-    "adjustedTrackedFileCount": 1409,
-    "adjustedCoveredFileCount": 1102,
+    "adjustedTrackedFileCount": 1410,
+    "adjustedCoveredFileCount": 1103,
     "adjustedCoveragePercent": 78.2,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1007,
-        "coveredCount": 884
+        "count": 1008,
+        "coveredCount": 885
       },
       {
         "classification": "product-docs",
@@ -35515,6 +35515,23 @@
     },
     {
       "path": "tests/vehicle-lab-history.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/vehicle-lab-workshop-ui.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

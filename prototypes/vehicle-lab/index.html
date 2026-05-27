@@ -82,6 +82,14 @@
                 </div>
             </section>
 
+            <section class="sidebar__panel">
+                <h2>Vergleich</h2>
+                <div class="sidebar__row">
+                    <select id="compareVehicleSelect" aria-label="Vergleichsfahrzeug"></select>
+                </div>
+                <div id="compareRows" class="compare-rows"></div>
+            </section>
+
             <section id="propertyPanel" class="sidebar__panel is-hidden">
                 <h2 id="partTitle">Bauteil Edit</h2>
                 <div id="propertiesContainer" class="sidebar__grid">
@@ -129,6 +137,11 @@
             <div id="viewportHud" class="viewport__hud">
                 <span id="partCountBadge" class="badge">Parts: 0</span>
                 <span id="polyCountBadge" class="badge">Polys: 0</span>
+            </div>
+            <div id="workshopStatusBar" class="workshop-status-bar" role="status" aria-live="polite">
+                <span id="workshopStatusMessage">Bereit</span>
+                <span id="workshopHistoryState">History 1/1</span>
+                <span id="workshopBlueprintState">Blueprint n/a</span>
             </div>
         </main>
     </div>

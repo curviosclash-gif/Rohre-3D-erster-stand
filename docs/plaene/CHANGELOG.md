@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V76 DoD.5 Werkstatt-Follow-up 2026-05-27
+
+- Nach User-Gate wurde der historische V76-DoD.5-Restwiderspruch geschlossen: Vehicle Lab besitzt jetzt History-State fuer Undo/Redo, ein Vergleichspanel gegen Presets und eine klare Desktop-Statusbar mit Blueprint-/History-/Auswahlstatus.
+- Evidence: `node --check prototypes/vehicle-lab/main.js`, `node --check prototypes/vehicle-lab/src/VehicleLabUI.js`, `node --test tests/vehicle-lab-history.contract.test.mjs tests/vehicle-lab-workshop-ui.contract.test.mjs tests/hangar-desktop-flow.contract.test.mjs tests/arcade-hangar-rules.contract.test.mjs` -> PASS (18/18), `npm exec -- vite build` -> PASS.
+- Residual-risk: `npm run build` stoppt vor dem Vite-Build im bestehenden `architecture:guard` wegen Max-Lines-Fehlern ausserhalb des Slices (`src/mobile-classic/MobileClassicApp.js`, `src/ui/TouchInputSource.js`); `test:browser:compat -- tests/editor-vehicle.spec.js` blieb im lokalen Vite-Dev-Transform fuer Vehicle-Lab-Dateien haengen und ist deshalb nicht als Abschluss-Evidence verwendet.
+- Not-checked: keine Vollsuite, keine produktive Electron-Runtime, kein Multiplayer-/Recording-/Bot-Training-Scope und keine V113-Hangar-Shell-Productivierung.
+
 ## V123 123.99 Abschluss-Gate 2026-05-26
 
 - Nach User-Gate `setze plan 123 fort` wurde V123 als D3-Plan-/Governance-Slice geschlossen: aktive Planakte, Master-Index und Lock-Status zeigen den abgeschlossenen Plan-Index-Pilot ohne Source-of-Truth-Wechsel.

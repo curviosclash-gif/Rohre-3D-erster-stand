@@ -23,6 +23,10 @@ export class VehicleLabUI {
         document.getElementById('btnAddPart').onclick = () => this.callbacks.onAddPart();
         document.getElementById('btnAddChild').onclick = () => this.callbacks.onAddChild();
         document.getElementById('btnDeletePart').onclick = () => this.callbacks.onDeletePart();
+        const compareSelect = document.getElementById('compareVehicleSelect');
+        if (compareSelect) {
+            compareSelect.onchange = (e) => this.callbacks.onCompareVehicleChange?.(e.target.value);
+        }
 
         const flyToggle = document.getElementById('chkFlyMode');
         if (flyToggle) {
@@ -354,5 +358,73 @@ export class VehicleLabUI {
         } else {
             renderEmpty(savedList, 'Noch keine gespeicherten Custom-Fahrzeuge.');
         }
+    }
+
+    updateHistoryControls(historyState = {}) {
+        const btnUndo = document.getElementById('btnUndo');
+        const btnRedo = document.getElementById('btnRedo');
+        if (btnUndo) btnUndo.disabled = historyState.canUndo !== true;
+        if (btnRedo) btnRedo.disabled = historyState.canRedo !== true;
+    }
+
+    updateComparePanel({ candidates = [], selectedId = '', rows = [] } = {}) {
+        const select = document.getElementById('compareVehicleSelect');
+        const container = document.getElementById('compareRows');
+        if (!select || !container) return;
+
+        const normalizedSelectedId = String(selectedId || '');
+        select.innerHTML = '';
+        candidates.forEach((candidate) => {
+            const option = document.createElement('option');
+            option.value = String(candidate.id || '');
+            option.textContent = String(candidate.label || candidate.id || 'Vehicle');
+            if (option.value === normalizedSelectedId) option.selected = true;
+            select.appendChild(option);
+        });
+        select.disabled = candidates.length === 0;
+
+        container.innerHTML = '';
+        rows.forEach((metric) => {
+            const row = document.createElement('div');
+            row.className = 'compare-row';
+            row.dataset.metric = metric.key;
+
+            const label = document.createElement('span');
+            label.className = 'compare-label';
+            label.textContent = metric.label;
+            row.appendChild(label);
+
+            const current = document.createElement('strong');
+            current.className = 'compare-current';
+            current.textContent = String(metric.current);
+            row.appendChild(current);
+
+            const baseline = document.createElement('span');
+            baseline.className = 'compare-baseline';
+            baseline.textContent = String(metric.baseline);
+            row.appendChild(baseline);
+
+            const delta = document.createElement('span');
+            delta.className = `compare-delta ${metric.delta > 0 ? 'is-positive' : metric.delta < 0 ? 'is-negative' : 'is-neutral'}`;
+            delta.textContent = metric.delta === 0 ? '0' : `${metric.delta > 0 ? '+' : ''}${metric.delta}`;
+            row.appendChild(delta);
+
+            container.appendChild(row);
+        });
+    }
+
+    updateStatusBar({ message = 'Bereit', tone = 'info', historyState = {}, blueprintStatus = '', selectedLabel = '' } = {}) {
+        const bar = document.getElementById('workshopStatusBar');
+        const messageNode = document.getElementById('workshopStatusMessage');
+        const historyNode = document.getElementById('workshopHistoryState');
+        const blueprintNode = document.getElementById('workshopBlueprintState');
+        if (!bar || !messageNode || !historyNode || !blueprintNode) return;
+
+        bar.dataset.tone = tone;
+        messageNode.textContent = selectedLabel ? `${message} | ${selectedLabel}` : message;
+        const currentIndex = Number.isFinite(historyState.index) ? historyState.index + 1 : 1;
+        const historyLength = Number.isFinite(historyState.length) ? historyState.length : 1;
+        historyNode.textContent = `History ${currentIndex}/${historyLength}`;
+        blueprintNode.textContent = blueprintStatus || 'Blueprint n/a';
     }
 }

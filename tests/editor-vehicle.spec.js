@@ -20,7 +20,8 @@ async function resetVehicleLab(page) {
         localStorage.removeItem('vehicle_lab_config');
     });
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#partsList .part-item');
+    await expect(page.locator('#partsList .part-item')).toHaveCount(8, { timeout: 15000 });
+    await expect(page.locator('#workshopStatusBar')).toBeVisible();
 }
 
 async function getVehicleLabPartCount(page) {
@@ -76,20 +77,38 @@ test.describe('EditorAssetLoader', () => {
 });
 
 test.describe('Vehicle Lab', () => {
-    test('Ctrl+Z undoes only one step', async ({ page }) => {
+    test('Ctrl+Z undoes only one step and Ctrl+Y reapplies it', async ({ page }) => {
         await resetVehicleLab(page);
 
         await page.locator('#btnAddPart').click();
-        await page.waitForTimeout(350);
+        await expect(page.locator('#partsList .part-item')).toHaveCount(9);
+        await expect(page.locator('#workshopHistoryState')).toHaveText('History 2/2');
         await page.locator('#btnAddPart').click();
-        await page.waitForTimeout(350);
-
-        expect(await getVehicleLabPartCount(page)).toBe(10);
+        await expect(page.locator('#partsList .part-item')).toHaveCount(10);
+        await expect(page.locator('#workshopHistoryState')).toHaveText('History 3/3');
 
         await page.keyboard.press('Control+z');
-        await page.waitForTimeout(150);
+        await expect(page.locator('#partsList .part-item')).toHaveCount(9);
+        await expect(page.locator('#workshopStatusMessage')).toContainText('Undo');
+        await expect(page.locator('#btnRedo')).toBeEnabled();
 
-        expect(await getVehicleLabPartCount(page)).toBe(9);
+        await page.keyboard.press('Control+y');
+        await expect(page.locator('#partsList .part-item')).toHaveCount(10);
+        await expect(page.locator('#workshopStatusMessage')).toContainText('Redo');
+    });
+
+    test('comparison panel and status bar reflect workshop state', async ({ page }) => {
+        await resetVehicleLab(page);
+
+        await expect(page.locator('#compareVehicleSelect')).toHaveValue('spaceship');
+        await expect(page.locator('[data-metric="parts"] .compare-current')).toHaveText('8');
+        await expect(page.locator('[data-metric="parts"] .compare-baseline')).toHaveText('6');
+        await expect(page.locator('[data-metric="parts"] .compare-delta')).toHaveText('+2');
+        await expect(page.locator('#workshopBlueprintState')).toContainText('Blueprint');
+
+        await page.locator('#btnAddPart').click();
+        await expect(page.locator('[data-metric="parts"] .compare-current')).toHaveText('9');
+        await expect(page.locator('#workshopStatusMessage')).toContainText('Bauteil');
     });
 
     test('deleting a part persists across reload', async ({ page }) => {

@@ -30,4 +30,21 @@ export class VehicleHistory {
         }
         return null;
     }
+
+    canUndo() {
+        return this.historyIndex > 0;
+    }
+
+    canRedo() {
+        return this.historyIndex < this.history.length - 1;
+    }
+
+    getState() {
+        return {
+            index: this.historyIndex,
+            length: this.history.length,
+            canUndo: this.canUndo(),
+            canRedo: this.canRedo(),
+        };
+    }
 }

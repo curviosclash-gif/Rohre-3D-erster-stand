@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 248,
+          "concreteCount": 249,
           "plannedCount": 0
         }
       }
@@ -50450,6 +50450,21 @@
       }
     },
     {
+      "id": "tests/vehicle-lab-workshop-ui.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/vehicle-manager-ui.spec.js",
       "type": "file",
       "title": null,
@@ -57987,6 +58002,15 @@
     {
       "from": "B13",
       "to": "tests/vehicle-lab-history.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/vehicle-lab-workshop-ui.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
