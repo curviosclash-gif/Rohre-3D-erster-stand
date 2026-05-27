@@ -990,3 +990,11 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Der Domain-Drift-Checker hat jetzt eine enge Allowlist fuer `map-tools` read-only Dashboard-Kanten auf die drei Dataset-Knoten `state:plan-map-readonly-dataset`, `state:repo-map-readonly-dataset` und `state:agent-map-readonly-dataset`.
 - Domains bleiben Ownership-Signal: `plan-map`, `repo-map` und `agent-governance` werden nicht auf `map-tools` umetikettiert; `writes_state` oder Reads auf andere fremde States melden weiter `KG_CONTRADICTION_DOMAIN_DRIFT`.
 - Evidence: `node --test tests/knowledge-graph-build.contract.test.mjs` -> PASS; `npm run graph:check` -> PASS; `npm run plan:check` -> PASS.
+
+## Abschluss-Snapshot 2026-05-27 (Block `V138 138.99`)
+
+- `V138` ist geschlossen: das staged Diff-Audit klassifiziert Runtime-Code, Generator-Code, Generated-Artefakte, Governance, Source-of-Truth und Tests deterministisch und bleibt an den bestehenden Agent-Preflight-/Commit-Envelope-Pfad gebunden.
+- Effekt: `Generated-by:`, `Canonical-source:` und `Not-checked:` machen Generated-/Shadow-Truth- und D2-Slices expliziter; Gate-Bypass- und Test-Only/Skip-Spuren werden ohne semantische Pseudo-Bewertung abgefangen.
+- Evidence: `node --test tests/agent-diff-audit.contract.test.mjs` -> PASS; `npm run check:ai-diff-audit` -> PASS; `npm run plan:check` -> PASS; `npm run gates:pre-commit` -> PASS mit bekannter nicht-blockierender V76-Evidence-Warnung.
+- Restrisiko: weichere Testqualitaetswarnungen bleiben heuristisch; Scope-Validator-Import, CI-Hardening und direkte Pre-Commit-Hardverdrahtung bleiben bewusst separate Folgeentscheidungen.
+- Not-checked: keine semantische Bewertung guter Tests, kein Import-/Refactor von `.agents/scripts/scope-validator.js`, keine CI-/Pre-Commit-Hardverdrahtung ausserhalb Agent-Preflight, keine Vollsuite.

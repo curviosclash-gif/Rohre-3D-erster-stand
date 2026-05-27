@@ -2059,7 +2059,7 @@
       "id": "V138",
       "type": "block",
       "title": "KI-Diff-Audit-Gate fuer deterministische Agenten-Selbstpruefung",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2067,7 +2067,7 @@
         ],
         "priority": "P1",
         "owner": "frei",
-        "currentPhase": "138.1",
+        "currentPhase": "138.99",
         "planFile": "docs/plaene/aktiv/V138.md",
         "scopeDeclarations": [
           "docs/generated/knowledge-graph.coverage.json",
@@ -5805,7 +5805,7 @@
       "id": "V138.99",
       "type": "phase",
       "title": "Abschluss",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.99"
@@ -16852,8 +16852,8 @@
     {
       "id": "V138.99.1",
       "type": "subphase",
-      "title": "`node --test tests/agent-diff-audit.contract.test.mjs` ist gruen.",
-      "status": "open",
+      "title": "`node --test tests/agent-diff-audit.contract.test.mjs` ist gruen. (abgeschlossen: 2026-05-27; evidence: node --test tests/agent-diff-audit.contract.test.mjs -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.99",
@@ -16863,8 +16863,8 @@
     {
       "id": "V138.99.2",
       "type": "subphase",
-      "title": "`npm run check:ai-diff-audit` ist fuer den staged Abschlussdiff gruen oder meldet erwartete Warnungen.",
-      "status": "open",
+      "title": "`npm run check:ai-diff-audit` ist fuer den staged Abschlussdiff gruen oder meldet erwartete Warnungen. (abgeschlossen: 2026-05-27; evidence: npm run check:ai-diff-audit -- --decision=D3 --gate=\"User approved V138 138.99 closure\" --generated-by=\"npm run plan:index:build; npm run graph:build\" --canonical-source=\"docs/Umsetzungsplan.md; docs/plaene/aktiv/V138.md\" --not-checked=\"semantic test quality; scope-validator import; CI/pre-commit hard wiring outside agent-preflight\" --residual-risk=\"soft test-quality warnings remain heuristic; scope-validator import remains separate D3/D4 follow-up\" -> PASS, INFO generated-artifact-only)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.99",
@@ -16874,8 +16874,8 @@
     {
       "id": "V138.99.3",
       "type": "subphase",
-      "title": "`npm run plan:check` und `npm run gates:pre-commit` sind gruen.",
-      "status": "open",
+      "title": "`npm run plan:check` und `npm run gates:pre-commit` sind gruen. (abgeschlossen: 2026-05-27; evidence: npm run plan:check -> PASS; npm run gates:pre-commit -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.99",
@@ -16885,8 +16885,8 @@
     {
       "id": "V138.99.4",
       "type": "subphase",
-      "title": "Abschluss-Evidence nennt `Not-checked:` ehrlich: keine semantische Bewertung guter Tests, kein Scope-Validator-Import, keine CI-/Pre-Commit-Hardverdrahtung ausserhalb Agent-Preflight.",
-      "status": "open",
+      "title": "Abschluss-Evidence nennt `Not-checked:` ehrlich: keine semantische Bewertung guter Tests, kein Scope-Validator-Import, keine CI-/Pre-Commit-Hardverdrahtung ausserhalb Agent-Preflight. (abgeschlossen: 2026-05-27; evidence: Abschluss-Snapshot in docs/plaene/CHANGELOG.md; Not-checked explizit benannt)",
+      "status": "done",
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.99",

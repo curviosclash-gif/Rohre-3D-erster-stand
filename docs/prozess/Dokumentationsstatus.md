@@ -1,6 +1,6 @@
 # Dokumentationsstatus
 
-Stand: 2026-05-26
+Stand: 2026-05-27
 Modus: sync
 Gate: PASS
 
@@ -20,4 +20,4 @@ Gate: PASS
 - Keine Mojibake-Muster gefunden.
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-05-26).
+- Dokumentation aktuell (geprueft am 2026-05-27).
