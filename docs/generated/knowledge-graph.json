@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 245,
+          "concreteCount": 247,
           "plannedCount": 0
         }
       }
@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 29,
+          "concreteCount": 30,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1001,7 +1001,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 45,
+          "concreteCount": 46,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1059,7 +1059,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 31,
+          "concreteCount": 32,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1495,7 +1495,7 @@
         ],
         "priority": "P1",
         "owner": "codex",
-        "currentPhase": "120.5",
+        "currentPhase": "120.6",
         "planFile": "docs/plaene/aktiv/V120.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
@@ -1523,8 +1523,8 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 19,
-          "plannedCount": 4
+          "concreteCount": 22,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [
           "V116",
@@ -4887,7 +4887,7 @@
       "id": "V120.5",
       "type": "phase",
       "title": "Lokaler Context-Adapter",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.5"
@@ -12333,8 +12333,8 @@
     {
       "id": "V120.5.1",
       "type": "subphase",
-      "title": "`context-adapter-profiles.v1.json` fuer Adapterprofile, Timeouts, Max-Input, Max-Output und Fallbacks definieren.",
-      "status": "open",
+      "title": "`context-adapter-profiles.v1.json` fuer Adapterprofile, Timeouts, Max-Input, Max-Output und Fallbacks definieren. (abgeschlossen: 2026-05-27; evidence: `data/contracts/knowledge-graph/context-adapter-profiles.v1.json` beschreibt `graph-rag-local-context-mvp`, Operationen `rerank`/`summary`/`fact-extract`, Timeouts, Budgetlimits, `rulebased`/`mock` Fallbacks und read-only Safety; `node --test tests/graph-rag-context-adapter.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.5",
@@ -12344,8 +12344,8 @@
     {
       "id": "V120.5.2",
       "type": "subphase",
-      "title": "`graph-rag-context-adapter.mjs` als read-only Adapter fuer Rerank, Summary und Fact-Extraction implementieren.",
-      "status": "open",
+      "title": "`graph-rag-context-adapter.mjs` als read-only Adapter fuer Rerank, Summary und Fact-Extraction implementieren. (abgeschlossen: 2026-05-27; evidence: `scripts/graph-rag-context-adapter.mjs` konsumiert Graph-RAG-Query-Ausgaben, budgetiert Chunks, erzeugt source-backed Rerank/Summary/Facts und schreibt nur bei `--write`/`--out` nach `tmp/graph-rag/`; CLI-Smoke `node scripts/graph-rag-context-adapter.mjs \"Zeige mir den spawn Critical Path mit Tests und Evidence.\" --json --mode rulebased --max-chunks 3` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.5",
@@ -12355,8 +12355,8 @@
     {
       "id": "V120.5.3",
       "type": "subphase",
-      "title": "Mock-/No-Agent-Modus fuer Tests und Arbeitsplaetze ohne lokale AI bereitstellen.",
-      "status": "open",
+      "title": "Mock-/No-Agent-Modus fuer Tests und Arbeitsplaetze ohne lokale AI bereitstellen. (abgeschlossen: 2026-05-27; evidence: `runGraphRagContextAdapter(..., { mode: \"mock\" })` ist deterministisch, benoetigt keine lokale Runtime und Contract-Test prueft stabile Outputs; `node --test tests/graph-rag-index.contract.test.mjs tests/graph-rag-query.contract.test.mjs tests/graph-rag-local-llm-selection.contract.test.mjs tests/graph-rag-context-adapter.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.5",
@@ -29405,9 +29405,12 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -36407,12 +36410,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -48628,12 +48633,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -56320,6 +56327,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/graph-rag-context-adapter.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/graph-rag-index.mjs",
       "type": "scope",
       "hint": null,
@@ -56978,6 +56994,15 @@
     {
       "from": "B13",
       "to": "tests/gpu.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/graph-rag-context-adapter.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -67136,6 +67161,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/contradictions.v1.json",
       "type": "scope",
       "hint": null,
@@ -68514,6 +68548,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/contradictions.v1.json",
       "type": "scope",
       "hint": null,
@@ -69120,6 +69163,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/agent-governance.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {

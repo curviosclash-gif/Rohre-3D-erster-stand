@@ -185,12 +185,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2087,
-    "rawCoveredFileCount": 1330,
-    "rawCoveragePercent": 63.7,
-    "adjustedTrackedFileCount": 1405,
-    "adjustedCoveredFileCount": 1098,
-    "adjustedCoveragePercent": 78.1,
+    "trackedFileCount": 2090,
+    "rawCoveredFileCount": 1333,
+    "rawCoveragePercent": 63.8,
+    "adjustedTrackedFileCount": 1408,
+    "adjustedCoveredFileCount": 1101,
+    "adjustedCoveragePercent": 78.2,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
     "classifications": [
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1003,
-        "coveredCount": 880
+        "count": 1006,
+        "coveredCount": 883
       },
       {
         "classification": "product-docs",
@@ -5827,6 +5827,26 @@
         "V107",
         "V110",
         "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
+        "V120"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -19991,6 +20011,25 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/graph-rag-context-adapter.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V120"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/graph-rag-index.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -33657,6 +33696,25 @@
       ],
       "scopeBlocks": [
         "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/graph-rag-context-adapter.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V120"
       ],
       "surfaces": [],
       "classification": "product-code",
