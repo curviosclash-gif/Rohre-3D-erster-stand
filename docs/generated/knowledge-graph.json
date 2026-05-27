@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 30,
+          "concreteCount": 31,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1001,7 +1001,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 46,
+          "concreteCount": 47,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1059,7 +1059,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 32,
+          "concreteCount": 33,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1495,7 +1495,7 @@
         ],
         "priority": "P1",
         "owner": "codex",
-        "currentPhase": "120.6",
+        "currentPhase": "120.7",
         "planFile": "docs/plaene/aktiv/V120.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
@@ -1523,8 +1523,8 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 22,
-          "plannedCount": 1
+          "concreteCount": 23,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
           "V116",
@@ -4897,7 +4897,7 @@
       "id": "V120.6",
       "type": "phase",
       "title": "Evidence-Paket und Tests",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.6"
@@ -12376,8 +12376,8 @@
     {
       "id": "V120.6.1",
       "type": "subphase",
-      "title": "Gate pruefen: `V119.1` abgeschlossen oder historisches Evidence-Risiko dokumentiert.",
-      "status": "open",
+      "title": "Gate pruefen: `V119.1` abgeschlossen oder historisches Evidence-Risiko dokumentiert. (abgeschlossen: 2026-05-27; evidence: `docs/Umsetzungsplan.md` fuehrt `V119` als `done`/`119.99`, `docs/plaene/aktiv/V119.md` belegt `119.1.1`-`119.1.3`; `node scripts/query-knowledge-graph.mjs open-deps V120 --json` -> `openDependencies: []`)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.6",
@@ -12387,8 +12387,8 @@
     {
       "id": "V120.6.2",
       "type": "subphase",
-      "title": "Evidence-Paket-Vertrag mit `claim`, `path`, `lineStart`, `lineEnd`, `confidence`, `uncertainties` validieren.",
-      "status": "open",
+      "title": "Evidence-Paket-Vertrag mit `claim`, `path`, `lineStart`, `lineEnd`, `confidence`, `uncertainties` validieren. (abgeschlossen: 2026-05-27; evidence: `rag-evidence-package.v1.json`, `loadRagEvidencePackageContract()`, `validateRagEvidencePackageContract()` und `validateRagEvidencePackage()` erzwingen finale Package-ID, Source-Pfade, Line-Ranges, Confidence-Werte, Claim-Unsicherheiten und Budget-Report; `node --test tests/graph-rag-query.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.6",
@@ -12398,8 +12398,8 @@
     {
       "id": "V120.6.3",
       "type": "subphase",
-      "title": "Contract-Tests fuer Chunking, Quellenfilter, Graph-Kandidatenauswahl, LLM-Auswahlprofil, Install-Smoke-Fallback und Mock-Adapter ergaenzen.",
-      "status": "open",
+      "title": "Contract-Tests fuer Chunking, Quellenfilter, Graph-Kandidatenauswahl, LLM-Auswahlprofil, Install-Smoke-Fallback und Mock-Adapter ergaenzen. (abgeschlossen: 2026-05-27; evidence: `tests/graph-rag-index.contract.test.mjs`, `tests/graph-rag-query.contract.test.mjs`, `tests/graph-rag-local-llm-selection.contract.test.mjs`, `tests/graph-rag-context-adapter.contract.test.mjs`; `node --test tests/graph-rag-index.contract.test.mjs tests/graph-rag-query.contract.test.mjs tests/graph-rag-local-llm-selection.contract.test.mjs tests/graph-rag-context-adapter.contract.test.mjs` -> PASS mit 13 Tests)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.6",
@@ -12409,8 +12409,8 @@
     {
       "id": "V120.6.4",
       "type": "subphase",
-      "title": "Kontextbudget messen und als Report ausgeben.",
-      "status": "open",
+      "title": "Kontextbudget messen und als Report ausgeben. (abgeschlossen: 2026-05-27; evidence: `graph-rag-query.mjs` gibt `evidencePackage.budgetReport` und CLI-Zeile `Budget: <selected>/<max> chunks; rejected: <n>; fallback: <yes|no>` aus; `node scripts/graph-rag-query.mjs \"Zeige mir den spawn Critical Path mit Tests und Evidence.\" --max-chunks 3` -> PASS mit `Budget: 3/3 chunks; rejected: 131; fallback: no`, JSON-Smoke -> `selectedEstimatedTokens: 1192`)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.6",
@@ -29767,9 +29767,12 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -67386,6 +67389,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/rag-sources.v1.json",
       "type": "scope",
       "hint": null,
@@ -68773,6 +68785,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/rag-sources.v1.json",
       "type": "scope",
       "hint": null,
@@ -69388,6 +69409,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/query-ops.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {

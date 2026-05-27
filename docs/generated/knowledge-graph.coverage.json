@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2092,
-    "rawCoveredFileCount": 1335,
+    "trackedFileCount": 2093,
+    "rawCoveredFileCount": 1336,
     "rawCoveragePercent": 63.8,
-    "adjustedTrackedFileCount": 1410,
-    "adjustedCoveredFileCount": 1103,
+    "adjustedTrackedFileCount": 1411,
+    "adjustedCoveredFileCount": 1104,
     "adjustedCoveragePercent": 78.2,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1008,
-        "coveredCount": 885
+        "count": 1009,
+        "coveredCount": 886
       },
       {
         "classification": "product-docs",
@@ -6011,6 +6011,26 @@
     },
     {
       "path": "data/contracts/knowledge-graph/query-ops.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
+        "V120"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

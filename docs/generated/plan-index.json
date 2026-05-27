@@ -8,7 +8,7 @@
   },
   "next_recommended_start": {
     "block": "V120",
-    "phase": "120.6",
+    "phase": "120.7",
     "source": "docs/Umsetzungsplan.md",
     "authority": "recommendation"
   },
@@ -580,13 +580,13 @@
         "V110.99",
         "V111.99"
       ],
-      "current_phase": "120.6",
+      "current_phase": "120.7",
       "plan_file": "docs/plaene/aktiv/V120.md",
       "lock": {
         "status": "active",
         "agent": "codex",
         "start_date": "2026-05-27",
-        "target": "120.6 naechster Slice; 120.5 lokaler Context-Adapter mit Mock/Fallback abgeschlossen",
+        "target": "120.7 naechster Slice; 120.6 Evidence-Paket-Vertrag, Tests und Budget-Report abgeschlossen",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

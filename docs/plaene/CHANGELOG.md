@@ -1005,3 +1005,10 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Evidence: `node --test tests/agent-diff-audit.contract.test.mjs` -> PASS; `npm run check:ai-diff-audit` -> PASS; `npm run plan:check` -> PASS; `npm run gates:pre-commit` -> PASS mit bekannter nicht-blockierender V76-Evidence-Warnung.
 - Restrisiko: weichere Testqualitaetswarnungen bleiben heuristisch; Scope-Validator-Import, CI-Hardening und direkte Pre-Commit-Hardverdrahtung bleiben bewusst separate Folgeentscheidungen.
 - Not-checked: keine semantische Bewertung guter Tests, kein Import-/Refactor von `.agents/scripts/scope-validator.js`, keine CI-/Pre-Commit-Hardverdrahtung ausserhalb Agent-Preflight, keine Vollsuite.
+
+## Stand-Snapshot 2026-05-27 (Subphase `V120 120.6`)
+
+- `120.6` ist geschlossen: Graph-RAG Query-Ausgaben nutzen jetzt den finalen Contract `knowledge-graph.rag-evidence-package.v1` statt eines Drafts.
+- Effekt: Evidence-Packages validieren source-backed Claims mit Pfad, Zeilenbereich, Confidence, Unsicherheiten, Chunk-ID und Hash; der Budget-Report zeigt ausgewaehlte, verworfene und geschaetzte Kontext-Tokens fuer den Hauptmodell-Kontext.
+- Evidence: `node --test tests/graph-rag-index.contract.test.mjs tests/graph-rag-query.contract.test.mjs tests/graph-rag-local-llm-selection.contract.test.mjs tests/graph-rag-context-adapter.contract.test.mjs` -> PASS mit 13 Tests; `node scripts/graph-rag-query.mjs "Zeige mir den spawn Critical Path mit Tests und Evidence." --max-chunks 3` -> PASS mit `Budget: 3/3 chunks; rejected: 131; fallback: no`; `npm run gates:pre-commit` -> PASS.
+- Not-checked: keine echte lokale Ollama-/llama.cpp-Installation, kein Viewer/UI, keine Produkt-Runtime, keine Vollsuite und kein `120.99`-Abschlussgate.
