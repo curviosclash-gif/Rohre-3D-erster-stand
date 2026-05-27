@@ -1,0 +1,188 @@
+{
+  "contract": "knowledge-graph.local-llm-selection.v1",
+  "schema_version": 1,
+  "description": "Local model selection and smoke-check policy for Graph-RAG. Local AI is optional and never becomes source of truth.",
+  "runtime_priority": [
+    "ollama",
+    "llama-cpp",
+    "rulebased"
+  ],
+  "timeouts": {
+    "connect_ms": 750,
+    "request_ms": 4000,
+    "smoke_total_ms": 5000
+  },
+  "runtimes": [
+    {
+      "id": "ollama",
+      "kind": "http",
+      "adapter": "ollama",
+      "priority": 100,
+      "required": false,
+      "base_url": {
+        "default": "http://127.0.0.1:11434",
+        "env": "OLLAMA_HOST"
+      },
+      "model_env": "GRAPH_RAG_OLLAMA_MODEL",
+      "preferred_models": [
+        "qwen2.5:7b-instruct",
+        "llama3.1:8b-instruct",
+        "mistral:7b-instruct"
+      ],
+      "healthcheck": {
+        "method": "GET",
+        "path": "/api/tags"
+      },
+      "smoke": {
+        "method": "POST",
+        "path": "/api/generate",
+        "response_field": "response"
+      }
+    },
+    {
+      "id": "llama-cpp",
+      "kind": "http",
+      "adapter": "openai-compatible",
+      "priority": 80,
+      "required": false,
+      "base_url": {
+        "default": "http://127.0.0.1:8080",
+        "env": "LLAMA_CPP_SERVER_URL"
+      },
+      "model_env": "GRAPH_RAG_LLAMA_CPP_MODEL",
+      "preferred_models": [
+        "local-instruct"
+      ],
+      "healthcheck": {
+        "method": "GET",
+        "path": "/v1/models"
+      },
+      "smoke": {
+        "method": "POST",
+        "path": "/v1/chat/completions",
+        "response_field": "choices.0.message.content"
+      }
+    },
+    {
+      "id": "rulebased",
+      "kind": "local-fallback",
+      "adapter": "deterministic-rulebased",
+      "priority": 0,
+      "required": true,
+      "description": "Always-available fallback used when no local model is installed, too slow, unavailable, or returns invalid output."
+    }
+  ],
+  "model_profiles": [
+    {
+      "id": "small-instruct",
+      "intended_for": [
+        "fast-rerank",
+        "fact-extract"
+      ],
+      "hardware_hint": "CPU or modest local GPU; prefer 4-8B instruct-class models.",
+      "max_input_tokens": 4096,
+      "max_output_tokens": 512
+    },
+    {
+      "id": "summary-instruct",
+      "intended_for": [
+        "summary"
+      ],
+      "hardware_hint": "Use the smallest local model that reliably returns parseable source-backed JSON.",
+      "max_input_tokens": 8192,
+      "max_output_tokens": 768
+    }
+  ],
+  "model_roles": [
+    {
+      "id": "fast-rerank",
+      "runtime_preference": [
+        "ollama",
+        "llama-cpp",
+        "rulebased"
+      ],
+      "profile": "small-instruct",
+      "output": "JSON list of candidate ids and scores only",
+      "source_of_truth": false
+    },
+    {
+      "id": "summary",
+      "runtime_preference": [
+        "ollama",
+        "llama-cpp",
+        "rulebased"
+      ],
+      "profile": "summary-instruct",
+      "output": "JSON summary with source chunk ids and uncertainties",
+      "source_of_truth": false
+    },
+    {
+      "id": "fact-extract",
+      "runtime_preference": [
+        "ollama",
+        "llama-cpp",
+        "rulebased"
+      ],
+      "profile": "small-instruct",
+      "output": "JSON facts with source chunk ids, confidence, and uncertainty",
+      "source_of_truth": false
+    },
+    {
+      "id": "fallback-rulebased",
+      "runtime_preference": [
+        "rulebased"
+      ],
+      "profile": "small-instruct",
+      "output": "Deterministic graph-first retrieval without local model calls",
+      "source_of_truth": false
+    }
+  ],
+  "fallback_criteria": [
+    "runtime-unavailable",
+    "model-missing",
+    "timeout",
+    "invalid-json",
+    "healthcheck-failed",
+    "request-failed"
+  ],
+  "smoke_fixture": {
+    "id": "graph-rag-local-llm-smoke",
+    "prompt": "Return only compact JSON with fixture_id, verdict and reason. Use fixture_id graph-rag-local-llm-smoke and verdict pass.",
+    "expected_verdict": "pass",
+    "expected_fields": [
+      "fixture_id",
+      "verdict",
+      "reason"
+    ],
+    "max_output_tokens": 96
+  },
+  "installation_guidance": [
+    {
+      "runtime": "ollama",
+      "priority": 1,
+      "user_action_only": true,
+      "steps": [
+        "Install Ollama locally.",
+        "Pull one preferred instruct model, for example qwen2.5:7b-instruct.",
+        "Keep the service reachable at OLLAMA_HOST or http://127.0.0.1:11434.",
+        "Optionally set GRAPH_RAG_OLLAMA_MODEL to the installed model name."
+      ]
+    },
+    {
+      "runtime": "llama-cpp",
+      "priority": 2,
+      "user_action_only": true,
+      "steps": [
+        "Start a llama.cpp server with an instruct model.",
+        "Expose an OpenAI-compatible endpoint at LLAMA_CPP_SERVER_URL or http://127.0.0.1:8080.",
+        "Optionally set GRAPH_RAG_LLAMA_CPP_MODEL to the served model id."
+      ]
+    }
+  ],
+  "safety": {
+    "downloads_or_installs": "never",
+    "writes_runtime_outputs_to": "tmp/graph-rag only when --write or --out is passed",
+    "secret_handling": "Smoke prompts use a fixed mini-fixture and never include indexed repo chunks.",
+    "truth_boundary": "Graph queries and source files remain authoritative; local model output can only rerank, summarize or extract with cited chunk ids."
+  }
+}
