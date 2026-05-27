@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 
 import {
     buildKnowledgeGraph,
@@ -45,6 +46,9 @@ import {
     queryWhatIfReplace,
     queryWhyNot,
 } from '../scripts/query-knowledge-graph.mjs';
+import {
+    SUPPORTED_SLO_QUERY_IDS,
+} from '../scripts/check-knowledge-graph-slos.mjs';
 import {
     resolveKnowledgeGraphMigration,
     validateKnowledgeGraphMigrationContract,
@@ -1413,6 +1417,22 @@ test('query ops contract requires SLO profiles and operator playbooks', () => {
     const codes = brokenViolations.map((violation) => violation.code);
     assert.ok(codes.includes('KG_QUERY_SLO_PROFILE_MISSING'));
     assert.ok(codes.includes('KG_QUERY_PLAYBOOK_MISSING'));
+});
+
+test('knowledge graph SLO runner supports every budgeted query op', () => {
+    const contract = JSON.parse(fs.readFileSync(
+        new URL('../data/contracts/knowledge-graph/query-ops.v1.json', import.meta.url),
+        'utf8'
+    ));
+    const supported = new Set(SUPPORTED_SLO_QUERY_IDS);
+    const budgetedQueryIds = (contract.queries || [])
+        .filter((query) => query.profile_budgets?.['desktop-local'] || query.profile_budgets?.['ci-linux'])
+        .map((query) => query.id);
+
+    assert.deepEqual(
+        budgetedQueryIds.filter((queryId) => !supported.has(queryId)),
+        []
+    );
 });
 
 test('knowledge graph schema migrations accept current v1 artifacts and reject missing current path', () => {
