@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 243,
+          "concreteCount": 245,
           "plannedCount": 0
         }
       }
@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 28,
+          "concreteCount": 29,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1001,7 +1001,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 44,
+          "concreteCount": 45,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1059,7 +1059,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 30,
+          "concreteCount": 31,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1495,7 +1495,7 @@
         ],
         "priority": "P1",
         "owner": "codex",
-        "currentPhase": "120.4",
+        "currentPhase": "120.5",
         "planFile": "docs/plaene/aktiv/V120.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
@@ -1523,8 +1523,8 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 16,
-          "plannedCount": 7
+          "concreteCount": 19,
+          "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
           "V116",
@@ -4877,7 +4877,7 @@
       "id": "V120.4",
       "type": "phase",
       "title": "Lokale LLM-Auswahl und Installation",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.4"
@@ -12278,8 +12278,8 @@
     {
       "id": "V120.4.1",
       "type": "subphase",
-      "title": "`local-llm-selection.v1.json` mit Runtime-Prioritaet, Modellprofilen, Hardware-Hinweisen, Timeouts und Fallback-Kriterien definieren.",
-      "status": "open",
+      "title": "`local-llm-selection.v1.json` mit Runtime-Prioritaet, Modellprofilen, Hardware-Hinweisen, Timeouts und Fallback-Kriterien definieren. (abgeschlossen: 2026-05-27; evidence: `data/contracts/knowledge-graph/local-llm-selection.v1.json` mit `runtime_priority`, `model_profiles`, `timeouts`, `fallback_criteria`; `node --test tests/graph-rag-local-llm-selection.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.4",
@@ -12289,8 +12289,8 @@
     {
       "id": "V120.4.2",
       "type": "subphase",
-      "title": "Installationspfade fuer Ollama-first und llama.cpp-optional dokumentieren; Downloads und Installationen bleiben User-Aktion.",
-      "status": "open",
+      "title": "Installationspfade fuer Ollama-first und llama.cpp-optional dokumentieren; Downloads und Installationen bleiben User-Aktion. (abgeschlossen: 2026-05-27; evidence: `local-llm-selection.v1.json` `installation_guidance` setzt Ollama auf Priority 1, llama.cpp auf Priority 2 und alle Eintraege auf `user_action_only: true`; Contract-Test prueft `user_action_only`)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.4",
@@ -12300,8 +12300,8 @@
     {
       "id": "V120.4.3",
       "type": "subphase",
-      "title": "`graph-rag-local-llm-check.mjs` als lokalen Smoke-Check implementieren: Runtime erreichbar, Modell vorhanden, Mini-Fixture beantwortet, Output parsebar, Timeout eingehalten.",
-      "status": "open",
+      "title": "`graph-rag-local-llm-check.mjs` als lokalen Smoke-Check implementieren: Runtime erreichbar, Modell vorhanden, Mini-Fixture beantwortet, Output parsebar, Timeout eingehalten. (abgeschlossen: 2026-05-27; evidence: `scripts/graph-rag-local-llm-check.mjs` prueft Ollama-/OpenAI-kompatible Endpoints, Modellliste, Mini-Fixture-JSON und Timeout; `node --test tests/graph-rag-local-llm-selection.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.4",
@@ -12311,8 +12311,8 @@
     {
       "id": "V120.4.4",
       "type": "subphase",
-      "title": "Modellrollen festlegen: `fast-rerank`, `summary`, `fact-extract`, `fallback-rulebased`.",
-      "status": "open",
+      "title": "Modellrollen festlegen: `fast-rerank`, `summary`, `fact-extract`, `fallback-rulebased`. (abgeschlossen: 2026-05-27; evidence: `local-llm-selection.v1.json` `model_roles`; Contract-Test prueft alle vier Rollen)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.4",
@@ -12322,8 +12322,8 @@
     {
       "id": "V120.4.5",
       "type": "subphase",
-      "title": "Fallback-Regel pruefbar machen: kein Modell, langsames Modell oder invalides JSON blockiert Graph-RAG nicht.",
-      "status": "open",
+      "title": "Fallback-Regel pruefbar machen: kein Modell, langsames Modell oder invalides JSON blockiert Graph-RAG nicht. (abgeschlossen: 2026-05-27; evidence: Contract-Test simuliert fehlendes Ollama-Modell und invalides Ollama-JSON, beide liefern `rulebased-fallback` mit `graphRagBlocked: false`; CLI-Smoke `node scripts/graph-rag-local-llm-check.mjs --runtime rulebased --json` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.4",
@@ -29514,9 +29514,12 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -36436,12 +36439,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -48655,12 +48660,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -56322,6 +56329,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/graph-rag-local-llm-check.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/graph-rag-query.mjs",
       "type": "scope",
       "hint": null,
@@ -56971,6 +56987,15 @@
     {
       "from": "B13",
       "to": "tests/graph-rag-index.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/graph-rag-local-llm-selection.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -67129,6 +67154,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/map-tools-android.v1.json",
       "type": "scope",
       "hint": null,
@@ -68498,6 +68532,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/map-tools-android.v1.json",
       "type": "scope",
       "hint": null,
@@ -69095,6 +69138,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {

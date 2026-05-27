@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2084,
-    "rawCoveredFileCount": 1327,
+    "trackedFileCount": 2087,
+    "rawCoveredFileCount": 1330,
     "rawCoveragePercent": 63.7,
-    "adjustedTrackedFileCount": 1402,
-    "adjustedCoveredFileCount": 1095,
+    "adjustedTrackedFileCount": 1405,
+    "adjustedCoveredFileCount": 1098,
     "adjustedCoveragePercent": 78.1,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1000,
-        "coveredCount": 877
+        "count": 1003,
+        "coveredCount": 880
       },
       {
         "classification": "product-docs",
@@ -5865,6 +5865,26 @@
         "V107",
         "V110",
         "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
+        "V120"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -19990,6 +20010,25 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/graph-rag-local-llm-check.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V120"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/graph-rag-query.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -33626,6 +33665,25 @@
     },
     {
       "path": "tests/graph-rag-index.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V120"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/graph-rag-local-llm-selection.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
