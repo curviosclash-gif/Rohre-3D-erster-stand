@@ -1018,3 +1018,11 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - `git push origin main` wurde lokal vom Pre-Push-Hook blockiert, weil `npm run lint:architecture` an bestehenden Max-Lines-Hotspots in `src/mobile-classic/MobileClassicApp.js` und `src/ui/TouchInputSource.js` stoppte.
 - Fixpfad: `scripts/architecture/LegacyMaxLinesConfig.mjs` fuehrt fuer die bestehende Mobile-Android-Shell ein Legacy-Ceiling ein und aktualisiert das Touch-Input-Ceiling auf den aktuellen ESLint-Zaehlerstand; Verhalten, UI und Runtime-Code bleiben unveraendert.
 - Residual-risk: Die Ceilings sichern den Push-Guard, ersetzen aber keinen spaeteren fachlichen Split der Mobile-App-/Touch-Module.
+
+## Stand-Snapshot 2026-05-27 (Subphase `V120 120.7`)
+
+- `120.7` ist geschlossen: die bestehende Graph-First-Regel trennt jetzt Graph-RAG fuer Erklaerfragen, historische Entscheidungen und source-backed Evidence-Summaries von strukturierten Graph-Queries fuer harte Scope-, Lock-, Dependency-, Impact- und Surface-Fakten.
+- Effekt: Agents koennen `graph-rag-query` oder den regelbasierten Context-Adapter als token-sparenden Erklaerpfad nutzen, ohne Graph-RAG zur neuen Source of Truth zu machen; die Wahrheit fuer Scope und Impact bleibt beim Knowledge-Graph und den kanonischen Markdown-Quellen.
+- Evidence: `rg -n "Graph-RAG-Ergaenzung" .agents/rules/token_efficiency_and_tools.md` -> PASS; `node scripts/graph-rag-query.mjs "Wie nutze ich Graph-RAG fuer historische SettingsManager-Entscheidungen?" --max-chunks 3` -> PASS; `npm run check:plan-evidence-claims` und `npm run gates:pre-commit` -> PASS.
+- Residual-risk: V120 bleibt offen fuer `120.99`; Abschluss-Gates fuer Graph, Plan und Docs sind noch nicht als Blockabschluss markiert.
+- Not-checked: keine echte lokale Ollama-/llama.cpp-Installation, kein Viewer/UI, keine Produkt-Runtime und keine Vollsuite.

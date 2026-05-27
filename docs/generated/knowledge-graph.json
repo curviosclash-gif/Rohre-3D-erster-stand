@@ -1495,7 +1495,7 @@
         ],
         "priority": "P1",
         "owner": "codex",
-        "currentPhase": "120.7",
+        "currentPhase": "120.99",
         "planFile": "docs/plaene/aktiv/V120.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
@@ -4907,7 +4907,7 @@
       "id": "V120.7",
       "type": "phase",
       "title": "Rollout und Workflow-Integration",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.7"
@@ -12420,8 +12420,8 @@
     {
       "id": "V120.7.1",
       "type": "subphase",
-      "title": "Kurze Nutzungshinweise in passendem Referenz-/Plan-Kontext dokumentieren, ohne einen neuen parallelen Steuerkanal aufzubauen.",
-      "status": "open",
+      "title": "Kurze Nutzungshinweise in passendem Referenz-/Plan-Kontext dokumentieren, ohne einen neuen parallelen Steuerkanal aufzubauen. (abgeschlossen: 2026-05-27; evidence: `.agents/rules/token_efficiency_and_tools.md` erweitert die bestehende Graph-First-Regel um Graph-RAG-Nutzung fuer Erklaer-/Historienfragen, statt einen neuen Steuerkanal anzulegen; `rg -n \"Graph-RAG-Ergaenzung\" .agents/rules/token_efficiency_and_tools.md` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.7",
@@ -12431,8 +12431,8 @@
     {
       "id": "V120.7.2",
       "type": "subphase",
-      "title": "Graph-First-Regel konkretisieren: Graph-RAG fuer Erklaerfragen und historische Entscheidungen, reine Graph-Queries fuer harte Scope-/Impact-Fakten.",
-      "status": "open",
+      "title": "Graph-First-Regel konkretisieren: Graph-RAG fuer Erklaerfragen und historische Entscheidungen, reine Graph-Queries fuer harte Scope-/Impact-Fakten. (abgeschlossen: 2026-05-27; evidence: Regeltext trennt `graph-rag-query`/`graph-rag-context-adapter` fuer source-backed Evidence-Summaries von strukturierten Graph-Queries fuer Scope-, Lock-, Dependency-, Impact- und Surface-Fakten; `node scripts/graph-rag-query.mjs \"Wie nutze ich Graph-RAG fuer historische SettingsManager-Entscheidungen?\" --max-chunks 3` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.7",
@@ -12442,8 +12442,8 @@
     {
       "id": "V120.7.3",
       "type": "subphase",
-      "title": "Abschluss-Evidence im aktiven Block und/oder `docs/plaene/CHANGELOG.md` hinterlegen.",
-      "status": "open",
+      "title": "Abschluss-Evidence im aktiven Block und/oder `docs/plaene/CHANGELOG.md` hinterlegen. (abgeschlossen: 2026-05-27; evidence: V120-Phase und `docs/plaene/CHANGELOG.md` enthalten Rollout-Effekt, Residual-risk und Not-checked; `npm run check:plan-evidence-claims` und `npm run gates:pre-commit` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.7",

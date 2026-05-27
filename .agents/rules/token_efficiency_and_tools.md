@@ -16,6 +16,7 @@ description: Token efficiency, file access, and tool usage (consolidated)
 - Kein Plan-Mode fuer kleine Tasks - nur bei grossen Multi-Datei-Vorhaben.
 - Agent-Explore sparsam: Default `quick`/`medium`. `very thorough` nur auf User-Anfrage.
 - Graph-First fuer Plan- und Runtimefragen: bei Abhaengigkeits-/Scope-/Surface-Fragen zuerst `docs/generated/knowledge-graph.json` oder `npm run graph:query` nutzen; bei Runtime-Diagnosen zuerst `impact-for-file`, `event-flow`, `critical-path-health`, `untested-systems` oder `coverage-report` ueber `node scripts/query-knowledge-graph.mjs` pruefen.
+- Graph-RAG-Ergaenzung: fuer Erklaerfragen, historische Entscheidungen und source-backed Evidence-Summaries `node scripts/graph-rag-query.mjs "<frage>" --max-chunks <n>` oder bei lokaler Vorfilterung `node scripts/graph-rag-context-adapter.mjs "<frage>" --mode rulebased --max-chunks <n>` nutzen; fuer harte Scope-, Lock-, Dependency-, Impact- oder Surface-Fakten bleiben die strukturierten Graph-Queries massgeblich.
 
 ## Plan-Leseweg in der V123-Pilotphase
 
