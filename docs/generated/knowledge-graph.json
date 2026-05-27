@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 241,
+          "concreteCount": 243,
           "plannedCount": 0
         }
       }
@@ -1486,7 +1486,7 @@
       "id": "V120",
       "type": "block",
       "title": "Graph-RAG mit lokalem Context-Adapter",
-      "status": "planned",
+      "status": "active",
       "attributes": {
         "source": [
           "block-plan",
@@ -1494,8 +1494,8 @@
           "master-index"
         ],
         "priority": "P1",
-        "owner": "frei",
-        "currentPhase": "120.1",
+        "owner": "codex",
+        "currentPhase": "120.4",
         "planFile": "docs/plaene/aktiv/V120.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
@@ -1506,6 +1506,7 @@
           "docs/generated/knowledge-graph.coverage.json",
           "docs/generated/knowledge-graph.json",
           "docs/generated/knowledge-graph.scorecard.json",
+          "docs/generated/plan-index.json",
           "docs/plaene/aktiv/V120.md",
           "docs/plaene/CHANGELOG.md",
           "docs/Umsetzungsplan.md",
@@ -1522,8 +1523,8 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 13,
-          "plannedCount": 9
+          "concreteCount": 16,
+          "plannedCount": 7
         },
         "scopeOverlapAllowedWith": [
           "V116",
@@ -4866,7 +4867,7 @@
       "id": "V120.3",
       "type": "phase",
       "title": "Graph-gesteuerte Retrieval-Pipeline",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.3"
@@ -12244,8 +12245,8 @@
     {
       "id": "V120.3.1",
       "type": "subphase",
-      "title": "Intent-Router fuer Plan-, Runtime-, Datei-, Test-, Architektur- und Historienfragen als konservative Heuristik implementieren.",
-      "status": "open",
+      "title": "Intent-Router fuer Plan-, Runtime-, Datei-, Test-, Architektur- und Historienfragen als konservative Heuristik implementieren. (abgeschlossen: 2026-05-27; evidence: `routeGraphRagQuestion()` erkennt Block-IDs, bekannte Dateialiases wie `SettingsManager`, Critical Paths wie `spawn`, Test-/Architektur-/Historienbegriffe und waehlt daraus vorhandene Graph-Queries; `node --test tests/graph-rag-query.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.3",
@@ -12255,8 +12256,8 @@
     {
       "id": "V120.3.2",
       "type": "subphase",
-      "title": "`graph-rag-query.mjs` anlegen: User-Frage -> Graph-Queries -> Kandidaten -> Chunks -> Evidence-Paket.",
-      "status": "open",
+      "title": "`graph-rag-query.mjs` anlegen: User-Frage -> Graph-Queries -> Kandidaten -> Chunks -> Evidence-Paket. (abgeschlossen: 2026-05-27; evidence: `scripts/graph-rag-query.mjs` erzeugt `knowledge-graph.rag-query.v1` mit Pipeline, Graph-Summaries, Kandidaten, Retrieval-Budget, ausgewaehlten Chunks und draft Evidence-Package; CLI-Smoke `node scripts/graph-rag-query.mjs \"Zeige mir den spawn Critical Path mit Tests und Evidence.\" --json --max-chunks 3` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.3",
@@ -12266,8 +12267,8 @@
     {
       "id": "V120.3.3",
       "type": "subphase",
-      "title": "Referenzfragen fuer `scope-collisions`, `SettingsManager` und `spawn` als Contract-Fixtures ablegen.",
-      "status": "open",
+      "title": "Referenzfragen fuer `scope-collisions`, `SettingsManager` und `spawn` als Contract-Fixtures ablegen. (abgeschlossen: 2026-05-27; evidence: `tests/graph-rag-query.contract.test.mjs` enthaelt `scope-collisions-v112-v96`, `settings-manager-history` und `spawn-critical-path` und prueft Graph-Queries plus source-backed Claims; `node --test tests/graph-rag-query.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.3",
@@ -30286,6 +30287,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V120",
           "V123"
         ],
         "exists": true
@@ -36449,12 +36451,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -48666,12 +48670,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -56316,6 +56322,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/graph-rag-query.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/headless-match-kernel-smoke.mjs",
       "type": "scope",
       "hint": null,
@@ -56956,6 +56971,15 @@
     {
       "from": "B13",
       "to": "tests/graph-rag-index.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/graph-rag-query.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -74580,6 +74604,15 @@
     {
       "from": "V120",
       "to": "docs/generated/knowledge-graph.scorecard.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V120",
+      "to": "docs/generated/plan-index.json",
       "type": "scope",
       "hint": null,
       "attributes": {

@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-27T11:50:03.559Z",
+  "timestamp": "2026-05-27T12:21:48.991Z",
   "locks": [
     {
       "block_id": "V103",
@@ -715,12 +715,45 @@
       ],
       "start_date": "2026-05-27",
       "target_completion": "2026-05-27",
-      "status": "in-progress",
+      "status": "completed",
       "notes": ""
+    },
+    {
+      "block_id": "V120",
+      "phase": "120.4",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V120.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.scorecard.json",
+        "docs/generated/plan-index.json",
+        "scripts/check-knowledge-graph-slos.mjs",
+        "scripts/build-knowledge-graph.mjs",
+        "scripts/graph-rag-index.mjs",
+        "scripts/graph-rag-query.mjs",
+        "scripts/graph-rag-context-adapter.mjs",
+        "scripts/graph-rag-local-llm-check.mjs",
+        "data/contracts/knowledge-graph/query-ops.v1.json",
+        "data/contracts/knowledge-graph/rag-sources.v1.json",
+        "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+        "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+        "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+        "tests/knowledge-graph-build.contract.test.mjs",
+        "tests/graph-rag-index.contract.test.mjs",
+        "tests/graph-rag-query.contract.test.mjs",
+        "tests/graph-rag-context-adapter.contract.test.mjs",
+        "tests/graph-rag-local-llm-selection.contract.test.mjs"
+      ],
+      "start_date": "2026-05-27",
+      "target_completion": "2026-05-27",
+      "status": "in-progress",
+      "notes": "120.4 next; V120.3 closed"
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "120.3",
+    "phase_id": "120.4",
     "completed_items": [],
     "last_commit": ""
   }
