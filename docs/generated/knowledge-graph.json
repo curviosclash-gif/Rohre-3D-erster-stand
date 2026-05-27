@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 247,
+          "concreteCount": 248,
           "plannedCount": 0
         }
       }
@@ -5231,6 +5231,16 @@
       "attributes": {
         "blockId": "V124",
         "phaseCode": "124.8"
+      }
+    },
+    {
+      "id": "V124.9",
+      "type": "phase",
+      "title": "Testdesign-Ratchet",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9"
       }
     },
     {
@@ -14223,6 +14233,72 @@
       }
     },
     {
+      "id": "V124.9.1",
+      "type": "subphase",
+      "title": "Grosse Spec-Dateien und Cluster klassifizieren: `keep`, `split`, `contract-first`, `probe-first` oder `heavy-diagnostic`; dabei `desktop-smoke`, `desktop-e2e`, `browser-compat` und `heavy-diagnostic` aus `.agents/test_mapping.md` nicht vermischen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.1"
+      }
+    },
+    {
+      "id": "V124.9.2",
+      "type": "subphase",
+      "title": "Top-`waitForTimeout`-Stellen inventarisieren und pro Stelle entscheiden: semantischer Wait, Event-/State-Probe, diagnostischer Sleep mit Begruendung oder Follow-up.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.2"
+      }
+    },
+    {
+      "id": "V124.9.3",
+      "type": "subphase",
+      "title": "Direkte `GAME_INSTANCE`-/Runtime-Global-Reads in produktnahen Tests nach Zielprobe gruppieren: Menu-Surface, Match-Runtime, Recording, Physics, Arcade, Settings; neue Test-Probes nur planen, wenn sie einen breiten privaten Zugriff ersetzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.3"
+      }
+    },
+    {
+      "id": "V124.9.4",
+      "type": "subphase",
+      "title": "Helper-Fallbacks wie Runtime-Start, Mode-Pfad oder Return-to-Menu trennen: Product-Gates bleiben UI-first; Fallbacks werden als Diagnose-/Recovery-Pfade markiert oder nur explizit opt-in genutzt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.4"
+      }
+    },
+    {
+      "id": "V124.9.5",
+      "type": "subphase",
+      "title": "Fehlende oder zu breite Testmapping-Zuordnungen aus Hotspots in drei Klassen einteilen: `mapping-update`, `contract-fixture-needed`, `defer-with-risk`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.5"
+      }
+    },
+    {
+      "id": "V124.9.6",
+      "type": "subphase",
+      "title": "Ergebnis in `test-prioritization` und Coverage-/Hotspot-Ratchet spiegeln: neue Testarbeit startet bei Contract/Probe, eskaliert erst bei echtem Desktop-, DOM-, Canvas- oder Electron-Risiko.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.6"
+      }
+    },
+    {
       "id": "V124.99.1",
       "type": "subphase",
       "title": "Alle frueheren Phasen sind abgeschlossen oder blockerfest mit Nachfolgeentscheid dokumentiert.",
@@ -14269,12 +14345,23 @@
     {
       "id": "V124.99.5",
       "type": "subphase",
-      "title": "Abschlussnotiz in `docs/plaene/CHANGELOG.md` erklaert Produktnutzen, Grenzen, verbleibende Risiken und naechste Semantik-Kandidaten.",
+      "title": "Testdesign-Ratchet nennt bewusst nicht umgesetzte Splits, nicht ersetzte Sleeps und verbleibende Heavy-Diagnostic-Pfade mit Risiko und Owner.",
       "status": "open",
       "attributes": {
         "blockId": "V124",
         "phaseCode": "124.99",
         "subphaseCode": "124.99.5"
+      }
+    },
+    {
+      "id": "V124.99.6",
+      "type": "subphase",
+      "title": "Abschlussnotiz in `docs/plaene/CHANGELOG.md` erklaert Produktnutzen, Grenzen, verbleibende Risiken und naechste Semantik-Kandidaten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.6"
       }
     },
     {
@@ -50348,6 +50435,21 @@
       }
     },
     {
+      "id": "tests/vehicle-lab-history.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "tests/vehicle-manager-ui.spec.js",
       "type": "file",
       "title": null,
@@ -57876,6 +57978,15 @@
     {
       "from": "B13",
       "to": "tests/validate-umsetzungsplan.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/vehicle-lab-history.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -77805,6 +77916,16 @@
     },
     {
       "from": "V124",
+      "to": "V124.9",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9"
+      }
+    },
+    {
+      "from": "V124",
       "to": "V124.99",
       "type": "contains_phase",
       "hint": null,
@@ -78166,6 +78287,72 @@
       }
     },
     {
+      "from": "V124.9",
+      "to": "V124.9.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.1"
+      }
+    },
+    {
+      "from": "V124.9",
+      "to": "V124.9.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.2"
+      }
+    },
+    {
+      "from": "V124.9",
+      "to": "V124.9.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.3"
+      }
+    },
+    {
+      "from": "V124.9",
+      "to": "V124.9.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.4"
+      }
+    },
+    {
+      "from": "V124.9",
+      "to": "V124.9.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.5"
+      }
+    },
+    {
+      "from": "V124.9",
+      "to": "V124.9.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.9",
+        "subphaseCode": "124.9.6"
+      }
+    },
+    {
       "from": "V124.99",
       "to": "V124.99.1",
       "type": "contains_subphase",
@@ -78218,6 +78405,17 @@
         "blockId": "V124",
         "phaseCode": "124.99",
         "subphaseCode": "124.99.5"
+      }
+    },
+    {
+      "from": "V124.99",
+      "to": "V124.99.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V124",
+        "phaseCode": "124.99",
+        "subphaseCode": "124.99.6"
       }
     },
     {

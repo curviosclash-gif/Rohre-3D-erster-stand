@@ -185,11 +185,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2090,
-    "rawCoveredFileCount": 1333,
+    "trackedFileCount": 2091,
+    "rawCoveredFileCount": 1334,
     "rawCoveragePercent": 63.8,
-    "adjustedTrackedFileCount": 1408,
-    "adjustedCoveredFileCount": 1101,
+    "adjustedTrackedFileCount": 1409,
+    "adjustedCoveredFileCount": 1102,
     "adjustedCoveragePercent": 78.2,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1006,
-        "coveredCount": 883
+        "count": 1007,
+        "coveredCount": 884
       },
       {
         "classification": "product-docs",
@@ -35498,6 +35498,23 @@
     },
     {
       "path": "tests/validate-umsetzungsplan.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/vehicle-lab-history.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
