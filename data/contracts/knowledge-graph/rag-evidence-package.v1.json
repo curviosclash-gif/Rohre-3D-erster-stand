@@ -1,0 +1,81 @@
+{
+  "contract": "knowledge-graph.rag-evidence-package.v1",
+  "schema_version": 1,
+  "description": "Source-backed evidence package contract for local Graph-RAG query outputs. Claims cite bounded source chunks; graph facts and cited files remain authoritative.",
+  "source_boundary": {
+    "graph_source_of_truth": "docs/generated/knowledge-graph.json via scripts/query-knowledge-graph.mjs",
+    "text_source_of_truth": "cited repository files and line ranges",
+    "local_ai_source_of_truth": false,
+    "writes_runtime_outputs_to": "tmp/graph-rag only when --write or --out is passed"
+  },
+  "claim_schema": {
+    "required": [
+      "id",
+      "claim",
+      "path",
+      "lineStart",
+      "lineEnd",
+      "confidence",
+      "uncertainties",
+      "chunkId",
+      "hash",
+      "sourceClass"
+    ],
+    "allowed_path_prefixes": [
+      "docs/",
+      ".agents/"
+    ],
+    "confidence_values": [
+      "high",
+      "medium",
+      "low"
+    ],
+    "max_claim_chars": 220,
+    "max_claims": 12,
+    "line_range": {
+      "lineStart": "integer >= 1",
+      "lineEnd": "integer >= lineStart"
+    },
+    "uncertainties": {
+      "required": true,
+      "min_items": 1,
+      "meaning": "Known limits of the deterministic retrieval or optional local context adapter; absence of uncertainty is invalid."
+    }
+  },
+  "budget_report": {
+    "required": [
+      "maxChunks",
+      "chunksAvailable",
+      "graphCandidateChunks",
+      "chunksScored",
+      "chunksSelected",
+      "chunksRejected",
+      "selectedEstimatedTokens",
+      "fallbackUsed"
+    ],
+    "unit": "estimated tokens",
+    "purpose": "Expose the context budget used before handing compact evidence to the main model."
+  },
+  "validation_rules": [
+    {
+      "id": "source-backed-claim",
+      "severity": "error",
+      "rule": "Every claim must have path, lineStart, lineEnd, chunkId and hash."
+    },
+    {
+      "id": "bounded-confidence",
+      "severity": "error",
+      "rule": "confidence must be one of high, medium or low."
+    },
+    {
+      "id": "uncertainty-required",
+      "severity": "error",
+      "rule": "Each claim and the package must carry at least one uncertainty marker."
+    },
+    {
+      "id": "budget-required",
+      "severity": "error",
+      "rule": "Package output must include the context budget report."
+    }
+  ]
+}

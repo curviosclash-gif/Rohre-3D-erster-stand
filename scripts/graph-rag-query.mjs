@@ -22,9 +22,11 @@ import {
 const ROOT = process.cwd();
 const GRAPH_PATH = 'docs/generated/knowledge-graph.json';
 const COVERAGE_PATH = 'docs/generated/knowledge-graph.coverage.json';
+const EVIDENCE_PACKAGE_CONTRACT_PATH = 'data/contracts/knowledge-graph/rag-evidence-package.v1.json';
 const QUERY_CONTRACT = 'knowledge-graph.rag-query.v1';
-const EVIDENCE_PACKAGE_DRAFT_CONTRACT = 'knowledge-graph.rag-evidence-package.draft.v1';
+const EVIDENCE_PACKAGE_CONTRACT = 'knowledge-graph.rag-evidence-package.v1';
 const DEFAULT_MAX_CHUNKS = 6;
+const CONFIDENCE_VALUES = Object.freeze(['high', 'medium', 'low']);
 
 const KNOWN_FILE_ALIASES = Object.freeze({
     settingsmanager: 'src/core/SettingsManager.js',
@@ -197,6 +199,70 @@ function routeGraphRagQuestion(question) {
 async function readJson(root, relativePath) {
     const raw = await fs.readFile(path.join(root, normalizeRepoPath(relativePath)), 'utf8');
     return JSON.parse(raw);
+}
+
+function assertObject(value, label) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        throw new Error(`${label} must be an object`);
+    }
+}
+
+function hasRequiredValues(values, required, label) {
+    const set = new Set(Array.isArray(values) ? values : []);
+    for (const entry of required) {
+        if (!set.has(entry)) throw new Error(`${label} missing ${entry}`);
+    }
+}
+
+function validateRagEvidencePackageContract(contract) {
+    assertObject(contract, 'rag evidence package contract');
+    if (contract.contract !== EVIDENCE_PACKAGE_CONTRACT) {
+        throw new Error(`Unsupported rag evidence package contract: ${contract.contract || '<empty>'}`);
+    }
+    if (Number(contract.schema_version) !== 1) {
+        throw new Error(`Unsupported rag evidence package schema_version: ${contract.schema_version}`);
+    }
+
+    assertObject(contract.claim_schema, 'rag evidence package claim_schema');
+    hasRequiredValues(contract.claim_schema.required, [
+        'claim',
+        'path',
+        'lineStart',
+        'lineEnd',
+        'confidence',
+        'uncertainties',
+    ], 'rag evidence package claim_schema.required');
+    hasRequiredValues(contract.claim_schema.confidence_values, CONFIDENCE_VALUES, 'rag evidence package confidence_values');
+    hasRequiredValues(contract.claim_schema.allowed_path_prefixes, ['docs/', '.agents/'], 'rag evidence package allowed_path_prefixes');
+    if (Number(contract.claim_schema.max_claims || 0) <= 0) {
+        throw new Error('rag evidence package claim_schema requires max_claims');
+    }
+    if (Number(contract.claim_schema.max_claim_chars || 0) <= 0) {
+        throw new Error('rag evidence package claim_schema requires max_claim_chars');
+    }
+    if (contract.claim_schema.uncertainties?.required !== true) {
+        throw new Error('rag evidence package claim uncertainties must be required');
+    }
+
+    assertObject(contract.budget_report, 'rag evidence package budget_report');
+    hasRequiredValues(contract.budget_report.required, [
+        'maxChunks',
+        'chunksAvailable',
+        'graphCandidateChunks',
+        'chunksScored',
+        'chunksSelected',
+        'chunksRejected',
+        'selectedEstimatedTokens',
+        'fallbackUsed',
+    ], 'rag evidence package budget_report.required');
+
+    return contract;
+}
+
+async function loadRagEvidencePackageContract(options = {}) {
+    const root = options.root || ROOT;
+    const contractPath = options.contractPath || EVIDENCE_PACKAGE_CONTRACT_PATH;
+    return validateRagEvidencePackageContract(await readJson(root, contractPath));
 }
 
 function addCandidatePath(candidates, filePath, reason, weight = 1) {
@@ -450,7 +516,78 @@ function scoreChunk(chunk, route, candidatePaths, candidateWeights, queryTokens)
 function makeExcerpt(text, maxChars = 360) {
     const compact = String(text || '').replace(/\s+/g, ' ').trim();
     if (compact.length <= maxChars) return compact;
-    return `${compact.slice(0, maxChars - 1).trim()}...`;
+    return `${compact.slice(0, Math.max(0, maxChars - 3)).trim()}...`;
+}
+
+function allowedEvidencePath(filePath, contract) {
+    const normalized = normalizeRepoPath(filePath);
+    return (contract.claim_schema.allowed_path_prefixes || []).some((prefix) => normalized.startsWith(prefix));
+}
+
+function validateRagEvidencePackage(evidencePackage, contract) {
+    const evidenceContract = validateRagEvidencePackageContract(contract);
+    assertObject(evidencePackage, 'rag evidence package');
+    if (evidencePackage.contract !== evidenceContract.contract) {
+        throw new Error(`Unsupported evidence package contract: ${evidencePackage.contract || '<empty>'}`);
+    }
+    if (Number(evidencePackage.schema_version) !== Number(evidenceContract.schema_version)) {
+        throw new Error(`Unsupported evidence package schema_version: ${evidencePackage.schema_version}`);
+    }
+    if (!Array.isArray(evidencePackage.claims)) {
+        throw new Error('evidence package requires claims');
+    }
+    if (evidencePackage.claims.length > Number(evidenceContract.claim_schema.max_claims)) {
+        throw new Error(`evidence package has too many claims: ${evidencePackage.claims.length}`);
+    }
+    if (!Array.isArray(evidencePackage.uncertainties) || evidencePackage.uncertainties.length === 0) {
+        throw new Error('evidence package requires uncertainties');
+    }
+
+    const confidenceValues = new Set(evidenceContract.claim_schema.confidence_values);
+    const maxClaimChars = Number(evidenceContract.claim_schema.max_claim_chars);
+    for (const claim of evidencePackage.claims) {
+        assertObject(claim, 'evidence package claim');
+        for (const field of evidenceContract.claim_schema.required) {
+            if (claim[field] == null || claim[field] === '') {
+                throw new Error(`evidence package claim missing ${field}`);
+            }
+        }
+        if (String(claim.claim).length > maxClaimChars) {
+            throw new Error(`evidence package claim exceeds ${maxClaimChars} chars`);
+        }
+        if (!allowedEvidencePath(claim.path, evidenceContract)) {
+            throw new Error(`evidence package claim path is not allowed: ${claim.path}`);
+        }
+        if (!Number.isInteger(claim.lineStart) || claim.lineStart < 1) {
+            throw new Error(`evidence package claim has invalid lineStart: ${claim.lineStart}`);
+        }
+        if (!Number.isInteger(claim.lineEnd) || claim.lineEnd < claim.lineStart) {
+            throw new Error(`evidence package claim has invalid lineEnd: ${claim.lineEnd}`);
+        }
+        if (!confidenceValues.has(claim.confidence)) {
+            throw new Error(`evidence package claim has invalid confidence: ${claim.confidence}`);
+        }
+        if (!Array.isArray(claim.uncertainties) || claim.uncertainties.length === 0) {
+            throw new Error('evidence package claim requires uncertainties');
+        }
+    }
+
+    assertObject(evidencePackage.budgetReport, 'evidence package budgetReport');
+    for (const field of evidenceContract.budget_report.required) {
+        if (evidencePackage.budgetReport[field] == null) {
+            throw new Error(`evidence package budgetReport missing ${field}`);
+        }
+    }
+    for (const field of evidenceContract.budget_report.required.filter((entry) => entry !== 'fallbackUsed')) {
+        if (!Number.isFinite(Number(evidencePackage.budgetReport[field]))) {
+            throw new Error(`evidence package budgetReport field is not numeric: ${field}`);
+        }
+    }
+    if (typeof evidencePackage.budgetReport.fallbackUsed !== 'boolean') {
+        throw new Error('evidence package budgetReport fallbackUsed must be boolean');
+    }
+
+    return evidencePackage;
 }
 
 function selectGraphRagChunks(index, route, candidates, options = {}) {
@@ -522,7 +659,21 @@ function selectGraphRagChunks(index, route, candidates, options = {}) {
     };
 }
 
-function makeEvidencePackage(route, graphSelection, chunkSelection) {
+function makeBudgetReport(chunkSelection, options = {}) {
+    const stats = chunkSelection.retrievalStats;
+    return {
+        maxChunks: Number(options.maxChunks || DEFAULT_MAX_CHUNKS),
+        chunksAvailable: stats.chunksAvailable,
+        graphCandidateChunks: stats.graphCandidateChunks,
+        chunksScored: stats.chunksScored,
+        chunksSelected: stats.chunksSelected,
+        chunksRejected: stats.chunksRejected,
+        selectedEstimatedTokens: stats.selectedEstimatedTokens,
+        fallbackUsed: stats.fallbackUsed,
+    };
+}
+
+function makeEvidencePackage(route, graphSelection, chunkSelection, options = {}) {
     const claims = chunkSelection.selectedChunks.map((chunk, index) => {
         const directCandidate = chunk.selectedVia === 'graph-candidate';
         const confidence = directCandidate && chunk.retrievalScore >= 300
@@ -546,15 +697,16 @@ function makeEvidencePackage(route, graphSelection, chunkSelection) {
     });
 
     return {
-        contract: EVIDENCE_PACKAGE_DRAFT_CONTRACT,
+        contract: EVIDENCE_PACKAGE_CONTRACT,
         schema_version: 1,
         question: route.question,
         mode: 'graph-first-deterministic-retrieval',
         graphQueries: graphSelection.graphResults.map((entry) => entry.summary),
+        budgetReport: makeBudgetReport(chunkSelection, options),
         claims,
         uncertainties: [
-            'Local LLM rerank/summary is not part of V120.3.',
-            'Evidence package contract is still draft until V120.6.',
+            'deterministic-retrieval-only',
+            'local-ai-not-source-of-truth',
         ],
     };
 }
@@ -593,7 +745,17 @@ async function runGraphRagQuery(question, options = {}) {
     const graphSelection = runGraphCandidateSelection(route, graph, coverage);
     const index = await loadIndex(root, { ...options, graph });
     const chunkSelection = selectGraphRagChunks(index, route, graphSelection.candidates, options);
-    const evidencePackage = makeEvidencePackage(route, graphSelection, chunkSelection);
+    const evidenceContract = validateRagEvidencePackageContract(
+        options.evidencePackageContract
+        || await loadRagEvidencePackageContract({
+            root,
+            contractPath: options.evidencePackageContractPath,
+        })
+    );
+    const evidencePackage = validateRagEvidencePackage(
+        makeEvidencePackage(route, graphSelection, chunkSelection, options),
+        evidenceContract
+    );
     const result = {
         contract: QUERY_CONTRACT,
         schema_version: 1,
@@ -664,6 +826,9 @@ function parseCliArgs(argv) {
         } else if (arg === '--coverage') {
             options.coveragePath = argv[index + 1];
             index += 1;
+        } else if (arg === '--evidence-contract') {
+            options.evidencePackageContractPath = argv[index + 1];
+            index += 1;
         } else if (arg === '--include-conditional') {
             options.includeConditional.push(argv[index + 1]);
             index += 1;
@@ -708,6 +873,7 @@ async function runCli(argv = process.argv.slice(2)) {
         `Intents: ${result.route.intents.join(', ')}`,
         `Graph queries: ${result.route.graphQueries.map((query) => query.id).join(', ')}`,
         `Candidates: ${result.budget.graphCandidatePathCount}; chunks: ${result.budget.selectedChunkCount}; estimated tokens: ${result.budget.selectedEstimatedTokens}`,
+        `Budget: ${result.evidencePackage.budgetReport.chunksSelected}/${result.evidencePackage.budgetReport.maxChunks} chunks; rejected: ${result.evidencePackage.budgetReport.chunksRejected}; fallback: ${result.evidencePackage.budgetReport.fallbackUsed ? 'yes' : 'no'}`,
         `Output: ${result.writtenPath || 'stdout only'}`,
     ].join('\n') + '\n');
 }
@@ -721,10 +887,14 @@ if (isCli) {
 }
 
 export {
-    EVIDENCE_PACKAGE_DRAFT_CONTRACT,
+    EVIDENCE_PACKAGE_CONTRACT,
+    EVIDENCE_PACKAGE_CONTRACT_PATH,
     QUERY_CONTRACT,
+    loadRagEvidencePackageContract,
     routeGraphRagQuestion,
     runGraphCandidateSelection,
     runGraphRagQuery,
     selectGraphRagChunks,
+    validateRagEvidencePackage,
+    validateRagEvidencePackageContract,
 };

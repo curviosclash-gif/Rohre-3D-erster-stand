@@ -3,8 +3,12 @@ import assert from 'node:assert/strict';
 
 import { buildGraphRagIndex } from '../scripts/graph-rag-index.mjs';
 import {
+    EVIDENCE_PACKAGE_CONTRACT,
+    loadRagEvidencePackageContract,
     routeGraphRagQuestion,
     runGraphRagQuery,
+    validateRagEvidencePackage,
+    validateRagEvidencePackageContract,
 } from '../scripts/graph-rag-query.mjs';
 
 const REFERENCE_QUESTIONS = Object.freeze([
@@ -27,6 +31,21 @@ const REFERENCE_QUESTIONS = Object.freeze([
         expectedCriticalPath: 'spawn',
     },
 ]);
+
+test('rag evidence package contract defines source-backed claims and budget report', async () => {
+    const contract = await loadRagEvidencePackageContract();
+    validateRagEvidencePackageContract(contract);
+
+    assert.equal(contract.contract, EVIDENCE_PACKAGE_CONTRACT);
+    assert.ok(contract.claim_schema.required.includes('claim'));
+    assert.ok(contract.claim_schema.required.includes('path'));
+    assert.ok(contract.claim_schema.required.includes('lineStart'));
+    assert.ok(contract.claim_schema.required.includes('lineEnd'));
+    assert.ok(contract.claim_schema.required.includes('confidence'));
+    assert.ok(contract.claim_schema.required.includes('uncertainties'));
+    assert.deepEqual(contract.claim_schema.confidence_values, ['high', 'medium', 'low']);
+    assert.ok(contract.budget_report.required.includes('selectedEstimatedTokens'));
+});
 
 test('graph rag intent router maps reference questions to conservative graph queries', () => {
     const scopeRoute = routeGraphRagQuestion(REFERENCE_QUESTIONS[0].question);
@@ -79,13 +98,24 @@ test('graph rag query runs graph-first before selecting source-backed chunks', a
 
         assert.ok(result.budget.graphCandidatePathCount > 0, `${fixture.id} should have graph candidates`);
         assert.ok(result.selectedChunks.length > 0, `${fixture.id} should select chunks`);
-        assert.equal(result.evidencePackage.contract, 'knowledge-graph.rag-evidence-package.draft.v1', fixture.id);
+        assert.equal(result.evidencePackage.contract, EVIDENCE_PACKAGE_CONTRACT, fixture.id);
+        validateRagEvidencePackage(result.evidencePackage, await loadRagEvidencePackageContract());
         assert.equal(result.evidencePackage.claims.length, result.selectedChunks.length, fixture.id);
+        assert.equal(result.evidencePackage.budgetReport.chunksSelected, result.selectedChunks.length, fixture.id);
+        assert.equal(
+            result.evidencePackage.budgetReport.selectedEstimatedTokens,
+            result.budget.selectedEstimatedTokens,
+            fixture.id
+        );
+        assert.ok(result.graph.candidates.every((candidate) => candidate.path && candidate.reasons.length > 0));
         for (const claim of result.evidencePackage.claims) {
             assert.match(claim.path, /^(docs|\.agents)\//, fixture.id);
             assert.ok(Number.isInteger(claim.lineStart), fixture.id);
             assert.ok(Number.isInteger(claim.lineEnd), fixture.id);
+            assert.ok(claim.lineEnd >= claim.lineStart, fixture.id);
             assert.ok(['high', 'medium', 'low'].includes(claim.confidence), fixture.id);
+            assert.ok(Array.isArray(claim.uncertainties), fixture.id);
+            assert.ok(claim.uncertainties.length > 0, fixture.id);
         }
     }
 });

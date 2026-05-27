@@ -86,4 +86,6 @@ test('context adapter mock mode is deterministic and does not require local AI',
     assert.equal(first.fallbackUsed, false);
     assert.deepEqual(first.outputs, second.outputs);
     assert.ok(first.outputs.summary.uncertainties.includes('mock-mode'));
+    assert.ok(first.outputs.summary.citations.every((citation) => Number.isInteger(citation.lineStart)));
+    assert.ok(first.outputs.facts.every((fact) => fact.uncertainties.includes('mock-mode')));
 });

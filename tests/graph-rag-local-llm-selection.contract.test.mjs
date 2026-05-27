@@ -48,6 +48,8 @@ test('local LLM selection contract defines optional runtimes, roles and fallback
     assert.ok(roles.has('summary'));
     assert.ok(roles.has('fact-extract'));
     assert.ok(roles.has('fallback-rulebased'));
+    assert.ok(contract.fallback_criteria.includes('model-missing'));
+    assert.ok(contract.fallback_criteria.includes('invalid-json'));
     assert.ok(contract.installation_guidance.every((entry) => entry.user_action_only === true));
 });
 

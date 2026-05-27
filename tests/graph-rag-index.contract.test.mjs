@@ -17,6 +17,8 @@ test('rag sources contract allows canonical markdown and excludes raw graph arti
     const contract = await loadRagSourceContract();
     validateRagSourceContract(contract);
 
+    assert.equal(contract.chunking.stable_id, 'rag:<path>#L<lineStart>-L<lineEnd>:<sha256-12>');
+    assert.ok(contract.safety_rules.some((rule) => rule.id === 'reject-secret-like-content'));
     assert.equal(shouldIndexRagPath('docs/plaene/aktiv/V120.md', contract), true);
     assert.equal(shouldIndexRagPath('docs/Umsetzungsplan.md', contract), true);
     assert.equal(shouldIndexRagPath('docs/generated/knowledge-graph.json', contract), false);
