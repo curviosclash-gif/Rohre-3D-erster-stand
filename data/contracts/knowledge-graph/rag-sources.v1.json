@@ -1,0 +1,182 @@
+{
+  "contract": "knowledge-graph.rag-sources.v1",
+  "schema_version": 1,
+  "description": "Source contract for local Graph-RAG indexing. The knowledge graph remains the source for hard facts; this contract only allows bounded source-backed text chunks.",
+  "index_output": {
+    "default_dir": "tmp/graph-rag",
+    "default_path": "tmp/graph-rag/graph-rag-index.json",
+    "transient": true,
+    "gitignore_rule": "tmp/"
+  },
+  "chunking": {
+    "strategy": "markdown-heading-aware",
+    "max_chars": 1800,
+    "stable_id": "rag:<path>#L<lineStart>-L<lineEnd>:<sha256-12>",
+    "line_endings": "lf",
+    "hash": "sha256"
+  },
+  "source_classes": [
+    {
+      "id": "active-plans",
+      "mode": "allowed",
+      "index_as_text": true,
+      "priority": 100,
+      "include": [
+        "docs/plaene/aktiv/**/*.md"
+      ],
+      "classification": "canonical-plan",
+      "evidence_role": "current-block-details"
+    },
+    {
+      "id": "master-plan",
+      "mode": "allowed",
+      "index_as_text": true,
+      "priority": 95,
+      "include": [
+        "docs/Umsetzungsplan.md"
+      ],
+      "classification": "canonical-index",
+      "evidence_role": "current-plan-index"
+    },
+    {
+      "id": "plan-changelog",
+      "mode": "allowed",
+      "index_as_text": true,
+      "priority": 90,
+      "include": [
+        "docs/plaene/CHANGELOG.md"
+      ],
+      "classification": "evidence-history",
+      "evidence_role": "status-and-closure-history"
+    },
+    {
+      "id": "reference-docs",
+      "mode": "allowed",
+      "index_as_text": true,
+      "priority": 80,
+      "include": [
+        "docs/referenz/**/*.md"
+      ],
+      "classification": "reference",
+      "evidence_role": "architecture-and-working-context"
+    },
+    {
+      "id": "agent-rules",
+      "mode": "allowed",
+      "index_as_text": true,
+      "priority": 75,
+      "include": [
+        ".agents/rules/**/*.md",
+        ".agents/workflows/**/*.md"
+      ],
+      "classification": "governance-reference",
+      "evidence_role": "agent-routing-and-gates"
+    },
+    {
+      "id": "qa-docs",
+      "mode": "allowed",
+      "index_as_text": true,
+      "priority": 50,
+      "include": [
+        "docs/qa/**/*.md"
+      ],
+      "classification": "qa-evidence",
+      "evidence_role": "audit-and-playtest-evidence"
+    },
+    {
+      "id": "graph-contracts",
+      "mode": "allowed",
+      "index_as_text": false,
+      "priority": 70,
+      "include": [
+        "data/contracts/knowledge-graph/**/*.json"
+      ],
+      "classification": "structured-contract",
+      "evidence_role": "structured-reference-only"
+    },
+    {
+      "id": "graph-selected-code",
+      "mode": "conditional",
+      "index_as_text": false,
+      "priority": 40,
+      "include": [
+        "src/**/*.js",
+        "scripts/**/*.mjs",
+        "tests/**/*.mjs"
+      ],
+      "condition": "Only after graph candidate selection in V120.3+; never as a broad repo text crawl.",
+      "classification": "graph-candidate",
+      "evidence_role": "graph-selected-supporting-context"
+    },
+    {
+      "id": "historical-plans",
+      "mode": "conditional",
+      "index_as_text": true,
+      "priority": 30,
+      "include": [
+        "docs/plaene/alt/**/*.md",
+        "docs/archive/**/*.md"
+      ],
+      "condition": "Only for historical decisions, evidence reconciliation, or explicit references from graph, changelog, master or active plans.",
+      "classification": "historical",
+      "evidence_role": "historical-context"
+    },
+    {
+      "id": "generated-graph-artifacts",
+      "mode": "graph-reference-only",
+      "index_as_text": false,
+      "priority": 0,
+      "include": [
+        "docs/generated/knowledge-graph*.json"
+      ],
+      "classification": "generated-graph",
+      "evidence_role": "structured-query-only"
+    }
+  ],
+  "safety_rules": [
+    {
+      "id": "exclude-runtime-and-private-data",
+      "severity": "error",
+      "path_patterns": [
+        ".env",
+        ".env.*",
+        "**/.env",
+        "**/.env.*",
+        "**/*.pem",
+        "**/*.key",
+        "**/*.p12",
+        "tmp/**",
+        ".codex_tmp/**",
+        "node_modules/**",
+        "data/training/**",
+        "logs/**"
+      ],
+      "action": "exclude-file"
+    },
+    {
+      "id": "exclude-raw-generated-graph-text",
+      "severity": "error",
+      "path_patterns": [
+        "docs/generated/knowledge-graph*.json"
+      ],
+      "action": "exclude-text-index",
+      "fallback": "Use node scripts/query-knowledge-graph.mjs for structured graph facts."
+    },
+    {
+      "id": "reject-secret-like-content",
+      "severity": "error",
+      "content_patterns": [
+        "(?i)(api[-_]?key|auth|credential|password|secret|token)\\s*[:=]",
+        "\\b(?:sk|ghp|pat|xox[baprs]|AKIA)[A-Za-z0-9_-]{12,}\\b",
+        "-----BEGIN (?:RSA |OPENSSH |EC )?PRIVATE KEY-----"
+      ],
+      "action": "reject-chunk"
+    }
+  ],
+  "graph_reference": {
+    "path": "docs/generated/knowledge-graph.json",
+    "allowed": true,
+    "text_index": false,
+    "usage": "Attach file-node and scope-block references to chunks; query hard facts through scripts/query-knowledge-graph.mjs."
+  }
+}

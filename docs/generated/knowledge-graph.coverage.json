@@ -185,12 +185,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2079,
-    "rawCoveredFileCount": 1322,
+    "trackedFileCount": 2082,
+    "rawCoveredFileCount": 1325,
     "rawCoveragePercent": 63.6,
-    "adjustedTrackedFileCount": 1397,
-    "adjustedCoveredFileCount": 1090,
-    "adjustedCoveragePercent": 78,
+    "adjustedTrackedFileCount": 1400,
+    "adjustedCoveredFileCount": 1093,
+    "adjustedCoveragePercent": 78.1,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
     "classifications": [
@@ -257,8 +257,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 995,
-        "coveredCount": 872
+        "count": 998,
+        "coveredCount": 875
       },
       {
         "classification": "product-docs",
@@ -5971,6 +5971,26 @@
     },
     {
       "path": "data/contracts/knowledge-graph/query-ops.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
+        "V120"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/rag-sources.v1.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -19950,6 +19970,25 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/graph-rag-index.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V120"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/headless-match-kernel-smoke.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -33559,6 +33598,25 @@
       ],
       "scopeBlocks": [
         "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/graph-rag-index.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V120"
       ],
       "surfaces": [],
       "classification": "product-code",

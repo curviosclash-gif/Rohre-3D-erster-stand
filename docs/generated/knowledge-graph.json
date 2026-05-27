@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 239,
+          "concreteCount": 241,
           "plannedCount": 0
         }
       }
@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 27,
+          "concreteCount": 28,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1001,7 +1001,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 43,
+          "concreteCount": 44,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1059,7 +1059,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 29,
+          "concreteCount": 30,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1522,8 +1522,8 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 10,
-          "plannedCount": 12
+          "concreteCount": 13,
+          "plannedCount": 9
         },
         "scopeOverlapAllowedWith": [
           "V116",
@@ -4856,7 +4856,7 @@
       "id": "V120.2",
       "type": "phase",
       "title": "Quellenvertrag und Chunk-Index-MVP",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.2"
@@ -12178,8 +12178,8 @@
     {
       "id": "V120.2.1",
       "type": "subphase",
-      "title": "Gate pruefen: `V116.3`/`V116.4` abgeschlossen oder verbleibendes Quellen-/Archivrisiko dokumentiert.",
-      "status": "open",
+      "title": "Gate pruefen: `V116.3`/`V116.4` abgeschlossen oder verbleibendes Quellen-/Archivrisiko dokumentiert. (abgeschlossen: 2026-05-27; evidence: `docs/Umsetzungsplan.md` fuehrt `V116` als `done` mit `current_phase 116.99`; `node scripts/query-knowledge-graph.mjs open-deps V120 --json` -> `openDependencies: []`)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.2",
@@ -12189,8 +12189,8 @@
     {
       "id": "V120.2.2",
       "type": "subphase",
-      "title": "`rag-sources.v1.json` mit Includes, Excludes, Klassifikationen und Safety-Regeln anlegen.",
-      "status": "open",
+      "title": "`rag-sources.v1.json` mit Includes, Excludes, Klassifikationen und Safety-Regeln anlegen. (abgeschlossen: 2026-05-27; evidence: `data/contracts/knowledge-graph/rag-sources.v1.json`; `node --test tests/graph-rag-index.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.2",
@@ -12200,8 +12200,8 @@
     {
       "id": "V120.2.3",
       "type": "subphase",
-      "title": "Quellenprioritaet festschreiben: aktive Plaene, Master, Changelog und Referenzquellen zuerst; Altplaene nur historisch oder explizit graph-/changelog-referenziert.",
-      "status": "open",
+      "title": "Quellenprioritaet festschreiben: aktive Plaene, Master, Changelog und Referenzquellen zuerst; Altplaene nur historisch oder explizit graph-/changelog-referenziert. (abgeschlossen: 2026-05-27; evidence: `rag-sources.v1.json` priorisiert `active-plans`, `master-plan`, `plan-changelog`, `reference-docs`; historische Quellen sind `conditional`; Contract-Test prueft Default-Ausschluss und explizite Freigabe)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.2",
@@ -12211,8 +12211,8 @@
     {
       "id": "V120.2.4",
       "type": "subphase",
-      "title": "`graph-rag-index.mjs` fuer Markdown-/Plan-Chunks mit stabilen IDs, Zeilenbereichen und Hashes implementieren.",
-      "status": "open",
+      "title": "`graph-rag-index.mjs` fuer Markdown-/Plan-Chunks mit stabilen IDs, Zeilenbereichen und Hashes implementieren. (abgeschlossen: 2026-05-27; evidence: `scripts/graph-rag-index.mjs`; `node --test tests/graph-rag-index.contract.test.mjs` -> PASS; `node scripts/graph-rag-index.mjs --no-write` -> PASS mit 2018 Chunks aus 105 Dateien)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.2",
@@ -12222,8 +12222,8 @@
     {
       "id": "V120.2.5",
       "type": "subphase",
-      "title": "Cache-/Index-Ablage unter `tmp/graph-rag/` als transient und untracked absichern.",
-      "status": "open",
+      "title": "Cache-/Index-Ablage unter `tmp/graph-rag/` als transient und untracked absichern. (abgeschlossen: 2026-05-27; evidence: `node scripts/graph-rag-index.mjs` -> `tmp/graph-rag/graph-rag-index.json`; `git check-ignore -v tmp/graph-rag/graph-rag-index.json` -> `.gitignore:28:tmp/`)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.2",
@@ -12233,8 +12233,8 @@
     {
       "id": "V120.2.6",
       "type": "subphase",
-      "title": "Generated Graph JSONs aus dem Volltextindex ausschliessen und nur ueber strukturierte Graph-Queries referenzieren.",
-      "status": "open",
+      "title": "Generated Graph JSONs aus dem Volltextindex ausschliessen und nur ueber strukturierte Graph-Queries referenzieren. (abgeschlossen: 2026-05-27; evidence: `rag-sources.v1.json` setzt `generated-graph-artifacts` auf `graph-reference-only`; Contract-Test prueft Ausschluss von `docs/generated/knowledge-graph*.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.2",
@@ -29688,9 +29688,12 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -36414,12 +36417,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -48629,12 +48634,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V120"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -56300,6 +56307,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/graph-rag-index.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/headless-match-kernel-smoke.mjs",
       "type": "scope",
       "hint": null,
@@ -56931,6 +56947,15 @@
     {
       "from": "B13",
       "to": "tests/gpu.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/graph-rag-index.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -67134,6 +67159,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/rag-sources.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
       "type": "scope",
       "hint": null,
@@ -68494,6 +68528,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/rag-sources.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/runtime-taxonomy.v1.json",
       "type": "scope",
       "hint": null,
@@ -69082,6 +69125,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/query-ops.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/rag-sources.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {
