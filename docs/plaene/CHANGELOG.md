@@ -1026,3 +1026,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Evidence: `rg -n "Graph-RAG-Ergaenzung" .agents/rules/token_efficiency_and_tools.md` -> PASS; `node scripts/graph-rag-query.mjs "Wie nutze ich Graph-RAG fuer historische SettingsManager-Entscheidungen?" --max-chunks 3` -> PASS; `npm run check:plan-evidence-claims` und `npm run gates:pre-commit` -> PASS.
 - Residual-risk: V120 bleibt offen fuer `120.99`; Abschluss-Gates fuer Graph, Plan und Docs sind noch nicht als Blockabschluss markiert.
 - Not-checked: keine echte lokale Ollama-/llama.cpp-Installation, kein Viewer/UI, keine Produkt-Runtime und keine Vollsuite.
+
+## Abschluss-Snapshot 2026-05-28 (Block `V120 120.99`)
+
+- `V120` ist geschlossen: der lokale Graph-RAG-Pfad bleibt graph-first, source-backed und optional; lokale AI darf nur verdichten, reranken oder Fakten aus Quellen extrahieren, aber keine neue Wahrheitsschicht oder Aenderungsautoritaet werden.
+- Nutzen: Komplexe Repo-Fragen koennen nun ueber `graph-rag-query` und den Context-Adapter mit begrenzten Chunks, Claims, Zeilen-Evidence und Budget-Report beantwortet werden, statt breite Volltextkontexte in das Hauptmodell zu laden.
+- Fallback: Ohne Ollama/llama.cpp bleibt Graph-only, `rulebased` und `mock` verfuegbar; fehlende, langsame oder invalide lokale Runtime blockiert Graph-RAG nicht.
+- Evidence: `npm run graph:slo`, `npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `node --test tests/graph-rag-index.contract.test.mjs tests/graph-rag-query.contract.test.mjs tests/graph-rag-local-llm-selection.contract.test.mjs tests/graph-rag-context-adapter.contract.test.mjs`, `npm run docs:sync`, `npm run docs:check`, `npm run plan:index:build`, `npm run plan:index:check` und `npm run gates:pre-commit` -> PASS.
+- Residual-risk: keine echte lokale Ollama-/llama.cpp-Installation, kein Viewer/UI, keine Produkt-Runtime und keine Vollsuite; V121 und V137 bleiben separate Folge- bzw. Spike-Bloecke.
+- Not-checked: keine produktiven Runtime-/UI-/Gameplay-/Bot-Training-Pfade, keine Cloud-AI-Integration, kein CodeGraph-Init/MCP/Agent-Config und kein Graph-Source-of-Truth-Wechsel.

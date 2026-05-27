@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "updated": "2026-05-27",
+  "updated": "2026-05-28",
   "start_anchor": {
-    "block": "V138",
-    "phase": "138.99",
+    "block": "V120",
+    "phase": "120.99",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
-    "block": "V120",
-    "phase": "120.99",
+    "block": null,
+    "phase": null,
     "source": "docs/Umsetzungsplan.md",
     "authority": "recommendation"
   },
@@ -571,9 +571,9 @@
     {
       "id": "V120",
       "title": "Graph-RAG mit lokalem Context-Adapter",
-      "status": "active",
+      "status": "done",
       "priority": "P1",
-      "owner": "codex",
+      "owner": "frei",
       "workstream": "ai-graph-tools",
       "depends_on": [
         "V107.99",
@@ -583,10 +583,10 @@
       "current_phase": "120.99",
       "plan_file": "docs/plaene/aktiv/V120.md",
       "lock": {
-        "status": "active",
-        "agent": "codex",
+        "status": "closed",
+        "agent": "-",
         "start_date": "2026-05-27",
-        "target": "120.99 naechster Slice; 120.7 Rollout- und Workflow-Integration abgeschlossen",
+        "target": "Abgeschlossen 2026-05-28; Graph-RAG-Abschluss-Gates, Docs, Fallbacks und Budget-Evidence gruen",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

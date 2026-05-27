@@ -1486,7 +1486,7 @@
       "id": "V120",
       "type": "block",
       "title": "Graph-RAG mit lokalem Context-Adapter",
-      "status": "active",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -1494,7 +1494,7 @@
           "master-index"
         ],
         "priority": "P1",
-        "owner": "codex",
+        "owner": "frei",
         "currentPhase": "120.99",
         "planFile": "docs/plaene/aktiv/V120.md",
         "scopeDeclarations": [
@@ -4917,7 +4917,7 @@
       "id": "V120.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.99"
@@ -12453,8 +12453,8 @@
     {
       "id": "V120.99.1",
       "type": "subphase",
-      "title": "`npm run graph:slo` ist gruen oder documented-skip fuer nicht-SLO-faehige Queries ist contract-seitig begruendet.",
-      "status": "open",
+      "title": "`npm run graph:slo` ist gruen oder documented-skip fuer nicht-SLO-faehige Queries ist contract-seitig begruendet. (abgeschlossen: 2026-05-28; evidence: `npm run graph:slo` -> PASS mit 16/16 budgetierten Query-IDs, u. a. `critical-path-health`, `export-view`, `policy-evaluate`, `event-flow-spawn` und `impact-settings-manager`)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.99",
@@ -12464,8 +12464,8 @@
     {
       "id": "V120.99.2",
       "type": "subphase",
-      "title": "`npm run graph:build`, `npm run graph:check` und `npm run plan:check` sind gruen.",
-      "status": "open",
+      "title": "`npm run graph:build`, `npm run graph:check` und `npm run plan:check` sind gruen. (abgeschlossen: 2026-05-28; evidence: `npm run graph:build` -> PASS mit 3530 Nodes, 6311 Edges, adjusted Coverage 78.2%, Scorecard 92.4/pass; `npm run graph:check` -> PASS; `npm run plan:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.99",
@@ -12475,8 +12475,8 @@
     {
       "id": "V120.99.3",
       "type": "subphase",
-      "title": "Relevante Graph-RAG-Contract-Tests sind gruen.",
-      "status": "open",
+      "title": "Relevante Graph-RAG-Contract-Tests sind gruen. (abgeschlossen: 2026-05-28; evidence: `node --test tests/graph-rag-index.contract.test.mjs tests/graph-rag-query.contract.test.mjs tests/graph-rag-local-llm-selection.contract.test.mjs tests/graph-rag-context-adapter.contract.test.mjs` -> PASS mit 13/13 Tests)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.99",
@@ -12486,8 +12486,8 @@
     {
       "id": "V120.99.4",
       "type": "subphase",
-      "title": "`npm run docs:sync && npm run docs:check` ist nach Governance-Regel geprueft.",
-      "status": "open",
+      "title": "`npm run docs:sync && npm run docs:check` ist nach Governance-Regel geprueft. (abgeschlossen: 2026-05-28; evidence: `npm run docs:sync` -> PASS mit 3 aktualisierten Referenz-Freshness-Daten; `npm run docs:check` -> PASS inkl. `plan:check` und `check:gemini`)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.99",
@@ -12497,8 +12497,8 @@
     {
       "id": "V120.99.5",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt Nutzen, Restrisiko, Fallback und Tokenbudget-Effekt.",
-      "status": "open",
+      "title": "Abschlussnotiz nennt Nutzen, Restrisiko, Fallback und Tokenbudget-Effekt. (abgeschlossen: 2026-05-28; evidence: V120-Abschlussnotiz in dieser Phase und `docs/plaene/CHANGELOG.md` dokumentiert Nutzen, Residual-risk, Fallback-Pfad und Budget-Effekt; `npm run gates:pre-commit` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V120",
         "phaseCode": "120.99",
@@ -75686,8 +75686,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "Viewer bleibt Consumer von stabilen Graph-RAG-Evidence-Paketen oder einem explizit dokumentierten V120-`fixture-ready`-Gate",
+      "fulfilled": true,
+      "hint": "Viewer bleibt Consumer von stabilen Graph-RAG-Evidence-Paketen; V120.99 ist abgeschlossen",
       "attributes": {
         "dependsPhase": "120.99",
         "rawToken": "V120.99",
@@ -82238,8 +82238,8 @@
       "type": "depends_on",
       "source": "merged",
       "hard": true,
-      "fulfilled": false,
-      "hint": "Der Spike startet erst nach dem V120-SLO-Ausgangssignal, blockiert den V120-Start selbst aber nicht",
+      "fulfilled": true,
+      "hint": "Der Spike startet erst nach dem V120-SLO-Ausgangssignal; V120.1 und der V120-Abschluss sind erledigt",
       "attributes": {
         "dependsPhase": "120.1",
         "rawToken": "V120.1",

@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-27. Aktiver Lock: `codex V120 120.99`; Startanker: `V138 138.99 abgeschlossen`; naechster empfohlener P1-Schritt ist `V120 120.99`.
+Stand: 2026-05-28. Aktiver Lock: `-`; Startanker: `V120 120.99 abgeschlossen`; kein offener P1-Schritt; naechster empfohlener AI/Graph-Folgepfad ist `V137 137.1` oder `V121 121.1` nach User-Priorisierung.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -76,7 +76,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V125 | Architektur-Compliance fuer Folgearbeit | done | P1 | frei | V91.99,V104.99,V117.99 | 125.99 | `docs/plaene/aktiv/V125.md` |
 | V126 | Local Dev-API, Preview- und Delivery-Hardening | done | P1 | frei | V102.99,V105.99 | 126.99 | `docs/plaene/aktiv/V126.md` |
 | V138 | KI-Diff-Audit-Gate fuer deterministische Agenten-Selbstpruefung | done | P1 | frei | V117.99,V119.99,V123.99,V125.99 | 138.99 | `docs/plaene/aktiv/V138.md` |
-| V120 | Graph-RAG mit lokalem Context-Adapter | active | P1 | codex | V107.99,V110.99,V111.99 | 120.99 | `docs/plaene/aktiv/V120.md` |
+| V120 | Graph-RAG mit lokalem Context-Adapter | done | P1 | frei | V107.99,V110.99,V111.99 | 120.99 | `docs/plaene/aktiv/V120.md` |
 | V137 | CodeGraph Read-only Installationsspike fuer Graph-RAG | planned | P2 | frei | V107.99,V110.99,V111.99,V120.1 | 137.1 | `docs/plaene/aktiv/V137.md` |
 | V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.1 | `docs/plaene/aktiv/V121.md` |
 | V134 | Plan Map Intake-Uebersicht und Kandidaten-Trennung | done | P2 | frei | V116.99,V117.99 | 134.99 | `docs/plaene/aktiv/V134.md` |
@@ -133,7 +133,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V137 | V107.99 | hard | ja | Core-Graph und Query-Layer bleiben kanonische Vergleichsbasis fuer den CodeGraph-Spike |
 | V137 | V110.99 | hard | ja | Graph-Ops-, Guard- und SLO-Basis begrenzen externe Tool- und Installationswirkung |
 | V137 | V111.99 | hard | ja | Adaptive Diagnose- und Entscheidungsregeln sichern die Trennung zwischen Curvios-Wahrheit und CodeGraph-Hinweis |
-| V137 | V120.1 | hard | nein | Der Spike startet erst nach dem V120-SLO-Ausgangssignal, blockiert den V120-Start selbst aber nicht |
+| V137 | V120.1 | hard | ja | Der Spike startet erst nach dem V120-SLO-Ausgangssignal; V120.1 und der V120-Abschluss sind erledigt |
 | V123 | V116.4 | hard | ja | Plan-Kontext-Klassifikation und AI-Leseweg bilden die Baseline fuer den strukturierten Plan-Index-Pilot |
 | V123 | V119.1 | hard | ja | Evidence-/Abschluss-Baseline ist durch V119 geklaert, bevor Source-of-Truth-Entscheidungen starten |
 | V125 | V91.99 | hard | ja | Architektur-Ratchet und Legacy-Surface-Matrix sind die Baseline fuer die Workflow- und Guard-Verankerung |
@@ -147,7 +147,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V126 | V105.99 | hard | ja | Guard-/Typecheck-Recovery ist Baseline fuer gezielte Tooling- und Preview-Verifikation |
 | V126 | V90.2 | soft | ja | Dependency-/Version-/Lockfile-Scope ist mit dokumentierten Security-Ausnahmen geschlossen; V126 darf starten, solange Package-/Lockfile-/CI-Upgrades nicht Teil des Slices sind |
 | V126 | V125.3 | soft | ja | Neue Pflicht-Gates, Hooks oder Pre-Commit-Policy sind durch den V125-staged-Guard-Pfad koordiniert; V126 bleibt ohne weiteren Hook-Umbau abgeschlossen |
-| V121 | V120.99 | hard | nein | Viewer bleibt Consumer von stabilen Graph-RAG-Evidence-Paketen oder einem explizit dokumentierten V120-`fixture-ready`-Gate |
+| V121 | V120.99 | hard | ja | Viewer bleibt Consumer von stabilen Graph-RAG-Evidence-Paketen; V120.99 ist abgeschlossen |
 | V121 | V107.99 | hard | ja | Core-Graph und Export-/Viewer-Historie bilden die technische Basis |
 | V121 | V110.99 | hard | ja | Graph-Ops-, Guard- und SLO-Basis bleibt Voraussetzung fuer sichere Viewer-Exports |
 | V121 | V111.99 | hard | ja | Safety-/Redaction- und adaptive Query-Grundlagen sind Basis fuer Evidence-Dashboard-Ausgaben |
@@ -201,7 +201,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V125 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Architektur-Capsule, staged Guard, Boundary-/Ratchet-/Contract-Evidence und Abschluss-Gates gruen |
 | - | V126 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Dev-API-/Preview-Hardening gruen, Handoff an V127/V128/V129 |
 | - | V138 | 2026-05-26 | closed | Abgeschlossen 2026-05-27; KI-Diff-Audit, Agent-Preflight-Integration, D2-Not-checked und Abschluss-Gates gruen |
-| codex | V120 | 2026-05-27 | active | 120.99 naechster Slice; 120.7 Rollout- und Workflow-Integration abgeschlossen |
+| - | V120 | 2026-05-27 | closed | Abgeschlossen 2026-05-28; Graph-RAG-Abschluss-Gates, Docs, Fallbacks und Budget-Evidence gruen |
 | - | V137 | - | frei | Geplant; CodeGraph nur als read-only Installationsspike mit separaten D4-Gates fuer Init/MCP/Agent-Config |
 | - | V121 | - | frei | Geplant |
 | - | V134 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Plan-Map-Intake-Lanes, Summary-Split und read-only Handoff-Links gruen |
@@ -226,11 +226,11 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 4. `V119` ist abgeschlossen: historische Plan-Evidence ist pro Befund entschieden, schwache Abschlussclaims sind nachgeschaerft oder als Restwiderspruch sichtbar, und der Praeventions-Check ist gruen.
 5. `V123` ist abgeschlossen: Plan-Index, Drift-/Kontext-Checks und Dashboard laufen als nicht-kanonischer Pilot; `docs/Umsetzungsplan.md` bleibt bis zur expliziten Migration kanonisch.
 6. `V138` ist abgeschlossen: staged Diff Audit, `Generated-by:`, `Canonical-source:`, Shadow-Truth-Heuristik, Gate-Bypass-Muster und `Not-checked:` ab D2 sind im Agent-Preflight/Commit-Envelope verankert.
-7. `V120` (Graph-RAG mit lokalem Context-Adapter) ist aktiv; `120.7` hat Graph-RAG-Nutzung fuer Erklaer-/Historienfragen von strukturierten Graph-Queries fuer harte Scope-/Impact-Fakten getrennt, naechster P1-Schritt ist `120.99` Abschluss-Gate.
-8. `V137` (CodeGraph Read-only Installationsspike fuer Graph-RAG) nach `V120.1` und vor einer produktiven CodeGraph-/MCP-Nutzung evaluieren; Curvios-Graph bleibt Wahrheit, CodeGraph hoechstens Candidate Provider.
-9. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) erst nach `V120.99` oder einem expliziten V120-`fixture-ready`-Gate als read-only Consumer starten.
+7. `V120` (Graph-RAG mit lokalem Context-Adapter) ist abgeschlossen: Graph-RAG-Nutzung fuer Erklaer-/Historienfragen ist von strukturierten Graph-Queries fuer harte Scope-/Impact-Fakten getrennt; Abschluss-Gates fuer Graph, Plan, Docs, Contracts, Fallbacks und Budget-Evidence sind gruen.
+8. `V137` (CodeGraph Read-only Installationsspike fuer Graph-RAG) kann nach `V120.1`/`V120.99` evaluiert werden, bleibt aber read-only und braucht separate D4-Gates fuer Init/MCP/Agent-Config; Curvios-Graph bleibt Wahrheit, CodeGraph hoechstens Candidate Provider.
+9. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) kann nach `V120.99` als read-only Consumer stabiler Graph-RAG-Evidence-Pakete starten.
 10. `V134` ist abgeschlossen: Plan Map trennt Intake-Drafts in Ideen, bereits geplante Drafts, Archivkandidaten, Bot-Training und Meta, ohne Source-of-Truth- oder Move-Pfade zu erweitern.
-11. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) kann nach V119-Baseline eingeordnet werden; vor `V120.99` nur als kleines CLI-only Memory-MVP, Graph-RAG-/Ruflo-Kontext erst danach.
+11. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) kann nach V119-Baseline eingeordnet werden; Graph-RAG-/Ruflo-Kontext darf nach `V120.99` nur mit eigenem Scope und Governance-Gate starten.
 12. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) nach Graph-Frische und ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113 einordnen.
 13. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
 14. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Hardening- und Produktqualitaets-Schnitten einplanen.
