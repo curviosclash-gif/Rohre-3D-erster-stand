@@ -1,0 +1,90 @@
+{
+  "contract": "knowledge-graph.context-adapter-profiles.v1",
+  "schema_version": 1,
+  "description": "Read-only local context-adapter profiles for Graph-RAG rerank, summary and fact extraction. Local AI is optional and never becomes source of truth.",
+  "default_profile": "graph-rag-local-context-mvp",
+  "default_mode": "rulebased",
+  "runtime_priority": [
+    "ollama",
+    "llama-cpp",
+    "rulebased"
+  ],
+  "profiles": [
+    {
+      "id": "graph-rag-local-context-mvp",
+      "description": "MVP profile for token-saving Graph-RAG context prefiltering with deterministic fallback.",
+      "read_only": true,
+      "source_of_truth": false,
+      "limits": {
+        "max_chunks": 8,
+        "max_input_tokens": 8192,
+        "max_output_tokens": 768
+      },
+      "timeouts": {
+        "connect_ms": 750,
+        "request_ms": 4000,
+        "total_ms": 5000
+      },
+      "operations": [
+        {
+          "id": "rerank",
+          "role": "fast-rerank",
+          "max_input_tokens": 4096,
+          "max_output_tokens": 256,
+          "timeout_ms": 1500,
+          "fallbacks": [
+            "rulebased",
+            "mock"
+          ],
+          "output": "JSON array of source chunk ids, scores and reasons"
+        },
+        {
+          "id": "summary",
+          "role": "summary",
+          "max_input_tokens": 8192,
+          "max_output_tokens": 512,
+          "timeout_ms": 4000,
+          "fallbacks": [
+            "rulebased",
+            "mock"
+          ],
+          "output": "JSON summary with cited source chunk ids and uncertainties"
+        },
+        {
+          "id": "fact-extract",
+          "role": "fact-extract",
+          "max_input_tokens": 4096,
+          "max_output_tokens": 512,
+          "timeout_ms": 2500,
+          "fallbacks": [
+            "rulebased",
+            "mock"
+          ],
+          "output": "JSON facts with source chunk ids, confidence and uncertainties"
+        }
+      ]
+    }
+  ],
+  "fallbacks": [
+    {
+      "id": "rulebased",
+      "mode": "default-no-agent",
+      "requires_local_ai": false,
+      "description": "Deterministic rerank, summary and fact extraction from already source-backed Graph-RAG chunks."
+    },
+    {
+      "id": "mock",
+      "mode": "test-fixture",
+      "requires_local_ai": false,
+      "description": "Stable no-agent fixture mode for tests and workstations without a local AI runtime."
+    }
+  ],
+  "safety": {
+    "read_only": true,
+    "source_of_truth": false,
+    "writes_runtime_outputs_to": "tmp/graph-rag only when --write or --out is passed",
+    "downloads_or_installs": "never",
+    "secret_handling": "Adapter input may only use selected Graph-RAG chunks that already passed rag-sources filters.",
+    "truth_boundary": "Graph queries and cited source files remain authoritative; local model output can only rerank, summarize or extract cited facts."
+  }
+}
