@@ -6,6 +6,12 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Android Classic Bugfix 2026-05-28
+
+- Android-Classic setzt im nativen Capacitor-Wrapper `FLAG_KEEP_SCREEN_ON`, damit laufende Mobile-Partien bei Tilt-/Controller-Steuerung nicht nach dem Android-Display-Timeout abdunkeln oder sperren.
+- Evidence: `npm run plan:check`, `npm run app:classic:android:check`, `npm run app:android:check` -> PASS.
+- Not-checked: kein echter Android-Geraetelauf und kein APK-Installationslauf; Map-Tools-Android bleibt unveraendert.
+
 ## V76 DoD.5 Werkstatt-Follow-up 2026-05-27
 
 - Nach User-Gate wurde der historische V76-DoD.5-Restwiderspruch geschlossen: Vehicle Lab besitzt jetzt History-State fuer Undo/Redo, ein Vergleichspanel gegen Presets und eine klare Desktop-Statusbar mit Blueprint-/History-/Auswahlstatus.

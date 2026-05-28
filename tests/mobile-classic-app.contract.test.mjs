@@ -607,6 +607,7 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   const buildScript = await readText('scripts/build-mobile-classic-app.mjs');
   const capacitorScript = await readText('scripts/capacitor-mobile-classic.mjs');
   const gradleFile = await readText('android-classic/app/build.gradle');
+  const mainActivity = await readText('android-classic/app/src/main/java/de/curviosclash/classic/MainActivity.java');
   const updateScript = await readText('scripts/update-mobile-classic-from-github.mjs');
   const mobileClassicApp = await readText('src/mobile-classic/MobileClassicApp.js');
   const startSetupUiOps = await readText('src/ui/start-setup/StartSetupUiOps.js');
@@ -650,6 +651,7 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   assert.doesNotMatch(gradleFile, /mobileAndroidIsArcade|de\.curviosclash\.arcade/);
   assert.match(gradleFile, /versionCode mobileClassicVersionCode/);
   assert.match(gradleFile, /versionName mobileClassicVersionName/);
+  assert.match(mainActivity, /WindowManager\.LayoutParams\.FLAG_KEEP_SCREEN_ON/);
   assert.match(updateScript, /merge', '--ff-only'/);
   assert.match(updateScript, /ensureCleanWorkingTree/);
   assert.match(updateScript, /capacitor-mobile-classic\.mjs/);
