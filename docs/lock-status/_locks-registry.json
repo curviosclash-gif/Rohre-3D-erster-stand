@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T12:11:40.824Z",
+  "generated_at": "2026-05-28T20:31:27.963Z",
   "locks": [
     {
       "person": "codex",
@@ -924,6 +924,38 @@
       "target_completion": "2026-05-28",
       "status": "completed",
       "notes": "Curvios-CodeGraph comparison"
+    },
+    {
+      "person": "codex",
+      "block_id": "V137",
+      "phase": "137.5",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V137.md",
+        "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
+        "docs/plaene/CHANGELOG.md",
+        ".gitignore"
+      ],
+      "start_date": "2026-05-28",
+      "target_completion": "2026-05-28",
+      "status": "completed",
+      "notes": "MCP decision without registration"
+    },
+    {
+      "person": "codex",
+      "block_id": "V137",
+      "phase": "137.6",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V137.md",
+        "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
+        "docs/plaene/CHANGELOG.md",
+        ".gitignore"
+      ],
+      "start_date": "2026-05-28",
+      "target_completion": "2026-05-28",
+      "status": "completed",
+      "notes": ""
     }
   ],
   "metadata": {
