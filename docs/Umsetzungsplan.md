@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-28. Aktiver Lock: `-`; Startanker: `V120 120.99 abgeschlossen`; kein offener P1-Schritt; naechster empfohlener AI/Graph-Folgepfad ist `V137 137.1` oder `V121 121.1` nach User-Priorisierung.
+Stand: 2026-05-28. Aktiver Lock: `-`; Startanker: `V120 120.99 abgeschlossen`; kein offener P1-Schritt; naechster empfohlener AI/Graph-Folgepfad ist `V137 137.3` nach separatem D4/User-Gate oder `V121 121.1` nach User-Priorisierung.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -77,7 +77,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V126 | Local Dev-API, Preview- und Delivery-Hardening | done | P1 | frei | V102.99,V105.99 | 126.99 | `docs/plaene/aktiv/V126.md` |
 | V138 | KI-Diff-Audit-Gate fuer deterministische Agenten-Selbstpruefung | done | P1 | frei | V117.99,V119.99,V123.99,V125.99 | 138.99 | `docs/plaene/aktiv/V138.md` |
 | V120 | Graph-RAG mit lokalem Context-Adapter | done | P1 | frei | V107.99,V110.99,V111.99 | 120.99 | `docs/plaene/aktiv/V120.md` |
-| V137 | CodeGraph Read-only Installationsspike fuer Graph-RAG | planned | P2 | frei | V107.99,V110.99,V111.99,V120.1 | 137.1 | `docs/plaene/aktiv/V137.md` |
+| V137 | CodeGraph Read-only Installationsspike fuer Graph-RAG | planned | P2 | frei | V107.99,V110.99,V111.99,V120.1 | 137.3 | `docs/plaene/aktiv/V137.md` |
 | V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.1 | `docs/plaene/aktiv/V121.md` |
 | V134 | Plan Map Intake-Uebersicht und Kandidaten-Trennung | done | P2 | frei | V116.99,V117.99 | 134.99 | `docs/plaene/aktiv/V134.md` |
 | V122 | Repo-natives Agent-Memory und externe Ruflo-Orchestrierung | planned | P2 | frei | V116.99,V117.99,V119.1 | 122.1 | `docs/plaene/aktiv/V122.md` |
@@ -202,7 +202,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V126 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Dev-API-/Preview-Hardening gruen, Handoff an V127/V128/V129 |
 | - | V138 | 2026-05-26 | closed | Abgeschlossen 2026-05-27; KI-Diff-Audit, Agent-Preflight-Integration, D2-Not-checked und Abschluss-Gates gruen |
 | - | V120 | 2026-05-27 | closed | Abgeschlossen 2026-05-28; Graph-RAG-Abschluss-Gates, Docs, Fallbacks und Budget-Evidence gruen |
-| - | V137 | - | frei | Geplant; CodeGraph nur als read-only Installationsspike mit separaten D4-Gates fuer Init/MCP/Agent-Config |
+| - | V137 | - | frei | 137.2 abgeschlossen 2026-05-28; naechster Schritt 137.3 nur nach separatem D4/User-Gate fuer Init; MCP/Agent-Config bleiben eigene D4-Gates |
 | - | V121 | - | frei | Geplant |
 | - | V134 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Plan-Map-Intake-Lanes, Summary-Split und read-only Handoff-Links gruen |
 | - | V122 | - | frei | Geplant |
@@ -227,7 +227,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 5. `V123` ist abgeschlossen: Plan-Index, Drift-/Kontext-Checks und Dashboard laufen als nicht-kanonischer Pilot; `docs/Umsetzungsplan.md` bleibt bis zur expliziten Migration kanonisch.
 6. `V138` ist abgeschlossen: staged Diff Audit, `Generated-by:`, `Canonical-source:`, Shadow-Truth-Heuristik, Gate-Bypass-Muster und `Not-checked:` ab D2 sind im Agent-Preflight/Commit-Envelope verankert.
 7. `V120` (Graph-RAG mit lokalem Context-Adapter) ist abgeschlossen: Graph-RAG-Nutzung fuer Erklaer-/Historienfragen ist von strukturierten Graph-Queries fuer harte Scope-/Impact-Fakten getrennt; Abschluss-Gates fuer Graph, Plan, Docs, Contracts, Fallbacks und Budget-Evidence sind gruen.
-8. `V137` (CodeGraph Read-only Installationsspike fuer Graph-RAG) kann nach `V120.1`/`V120.99` evaluiert werden, bleibt aber read-only und braucht separate D4-Gates fuer Init/MCP/Agent-Config; Curvios-Graph bleibt Wahrheit, CodeGraph hoechstens Candidate Provider.
+8. `V137` (CodeGraph Read-only Installationsspike fuer Graph-RAG) steht nach abgeschlossenem Repo-Schutz auf `137.3`; `codegraph init`, MCP und Agent-Config bleiben separate D4-Gates; Curvios-Graph bleibt Wahrheit, CodeGraph hoechstens Candidate Provider.
 9. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) kann nach `V120.99` als read-only Consumer stabiler Graph-RAG-Evidence-Pakete starten.
 10. `V134` ist abgeschlossen: Plan Map trennt Intake-Drafts in Ideen, bereits geplante Drafts, Archivkandidaten, Bot-Training und Meta, ohne Source-of-Truth- oder Move-Pfade zu erweitern.
 11. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) kann nach V119-Baseline eingeordnet werden; Graph-RAG-/Ruflo-Kontext darf nach `V120.99` nur mit eigenem Scope und Governance-Gate starten.

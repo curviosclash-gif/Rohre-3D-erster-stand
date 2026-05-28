@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V137 137.2 Repo-Schutz vor Init 2026-05-28
+
+- Nach User-Gate `setze plan 137 fort` wurde der V137-Schutzslice vor jeder CodeGraph-Init-Wirkung geschlossen: `.gitignore` ignoriert jetzt `.codegraph/`, V137 steht im Master auf `137.3`, und der naechste Schritt bleibt D4/User-Gate.
+- Evidence: `git status --short --branch` vor Init -> `main` ahead 5 mit bereits fremd gestagtem `docs/plaene/neu/Feature_Graph_RAG_Followup_Roadmap_V139.md`; `node scripts/query-knowledge-graph.mjs scope-collisions --json` meldete keine V137-Kollision; `npm run plan:check`, `npm run plan:index:check`, `npm run graph:check`, `npm run docs:sync`, `npm run docs:check`, `npm run check:plan-evidence-claims` und `npm run gates:pre-commit` -> PASS.
+- Residual-risk: `137.3` darf ohne separates User-Gate keinen Projektindex erzeugen; MCP- und Agent-Config bleiben spaetere eigene D4-Gates.
+- Not-checked: kein CodeGraph-Installer, kein `npx`, kein `codegraph init`/`uninit`, keine MCP-Registrierung, keine Agent-/User-Config-Aenderung, keine CodeGraph-Vergleichsfragen und keine Vollsuite.
+
 ## Android Classic Bugfix 2026-05-28
 
 - Android-Classic setzt im nativen Capacitor-Wrapper `FLAG_KEEP_SCREEN_ON`, damit laufende Mobile-Partien bei Tilt-/Controller-Steuerung nicht nach dem Android-Display-Timeout abdunkeln oder sperren.

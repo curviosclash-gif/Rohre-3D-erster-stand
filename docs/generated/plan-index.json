@@ -603,13 +603,13 @@
         "V111.99",
         "V120.1"
       ],
-      "current_phase": "137.1",
+      "current_phase": "137.3",
       "plan_file": "docs/plaene/aktiv/V137.md",
       "lock": {
         "status": "frei",
         "agent": "-",
         "start_date": "-",
-        "target": "Geplant; CodeGraph nur als read-only Installationsspike mit separaten D4-Gates fuer Init/MCP/Agent-Config",
+        "target": "137.2 abgeschlossen 2026-05-28; naechster Schritt 137.3 nur nach separatem D4/User-Gate fuer Init; MCP/Agent-Config bleiben eigene D4-Gates",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

@@ -2031,7 +2031,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "137.1",
+        "currentPhase": "137.3",
         "planFile": "docs/plaene/aktiv/V137.md",
         "scopeDeclarations": [
           ".gitignore",
@@ -5707,7 +5707,7 @@
       "id": "V137.2",
       "type": "phase",
       "title": "Repo-Schutz vor Init",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.2"
@@ -16534,8 +16534,8 @@
     {
       "id": "V137.2.1",
       "type": "subphase",
-      "title": "`.gitignore`-Status pruefen und `.codegraph/` absichern, bevor `codegraph init` im Hauptrepo laeuft.",
-      "status": "open",
+      "title": "`.gitignore`-Status pruefen und `.codegraph/` absichern, bevor `codegraph init` im Hauptrepo laeuft. (abgeschlossen: 2026-05-28; evidence: `.gitignore` enthielt vor dem Slice keine `.codegraph/`-Regel und ignoriert jetzt `.codegraph/` unter lokalen Laufzeit-/Screenshot-Artefakten)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.2",
@@ -16545,8 +16545,8 @@
     {
       "id": "V137.2.2",
       "type": "subphase",
-      "title": "`git status --short` vor Init dokumentieren.",
-      "status": "open",
+      "title": "`git status --short` vor Init dokumentieren. (abgeschlossen: 2026-05-28; evidence: `git status --short --branch` vor jeder Init-Wirkung -> `## main...origin/main [ahead 5]` und bereits fremd gestaged `A docs/plaene/neu/Feature_Graph_RAG_Followup_Roadmap_V139.md`; keine `.codegraph/`- oder CodeGraph-Init-Dateien vorhanden)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.2",
@@ -16556,8 +16556,8 @@
     {
       "id": "V137.2.3",
       "type": "subphase",
-      "title": "Wenn ein separater Sandbox-Pfad genutzt wird, den Pfad unter `tmp/` halten und nicht als dauerhafte Doku verwenden.",
-      "status": "open",
+      "title": "Wenn ein separater Sandbox-Pfad genutzt wird, den Pfad unter `tmp/` halten und nicht als dauerhafte Doku verwenden. (abgeschlossen: 2026-05-28; evidence: kein separater Sandbox-Pfad angelegt; falls spaeter transienter Vergleich noetig wird, bleibt er unter `tmp/graph-rag/codegraph-spike/` und wird nicht zur dauerhaften Quelle)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.2",

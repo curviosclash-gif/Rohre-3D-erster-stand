@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T00:50:00.044Z",
+  "generated_at": "2026-05-28T10:54:28.262Z",
   "locks": [
     {
       "person": "codex",
@@ -906,7 +906,7 @@
       ],
       "start_date": "2026-05-28",
       "target_completion": "2026-05-28",
-      "status": "in-progress",
+      "status": "completed",
       "notes": ""
     }
   ],
