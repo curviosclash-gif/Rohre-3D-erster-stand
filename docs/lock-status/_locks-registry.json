@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-27T23:44:36.584Z",
+  "generated_at": "2026-05-28T00:50:00.044Z",
   "locks": [
     {
       "person": "codex",
@@ -875,6 +875,38 @@
       "start_date": "2026-05-27",
       "target_completion": "2026-05-27",
       "status": "completed",
+      "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V137",
+      "phase": "137.1",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V137.md",
+        "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
+        "docs/plaene/CHANGELOG.md",
+        ".gitignore"
+      ],
+      "start_date": "2026-05-28",
+      "target_completion": "2026-05-28",
+      "status": "completed",
+      "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V137",
+      "phase": "137.2",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V137.md",
+        "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
+        "docs/plaene/CHANGELOG.md",
+        ".gitignore"
+      ],
+      "start_date": "2026-05-28",
+      "target_completion": "2026-05-28",
+      "status": "in-progress",
       "notes": ""
     }
   ],

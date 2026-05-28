@@ -185,12 +185,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2093,
-    "rawCoveredFileCount": 1336,
+    "trackedFileCount": 2094,
+    "rawCoveredFileCount": 1337,
     "rawCoveragePercent": 63.8,
-    "adjustedTrackedFileCount": 1411,
-    "adjustedCoveredFileCount": 1104,
-    "adjustedCoveragePercent": 78.2,
+    "adjustedTrackedFileCount": 1412,
+    "adjustedCoveredFileCount": 1105,
+    "adjustedCoveragePercent": 78.3,
     "uncoveredFileCount": 757,
     "uncoveredActiveFileCount": 307,
     "classifications": [
@@ -263,8 +263,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 327,
-        "coveredCount": 173
+        "count": 328,
+        "coveredCount": 174
       },
       {
         "classification": "prototype",
@@ -14649,6 +14649,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Graph_RAG_Followup_Roadmap_V139.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
