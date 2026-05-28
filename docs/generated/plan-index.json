@@ -591,6 +591,26 @@
       }
     },
     {
+      "id": "V139",
+      "title": "Graph-RAG Follow-up Roadmap, Safety und Qualitaetsausbau",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "ai-graph-tools",
+      "depends_on": [
+        "V120.99"
+      ],
+      "current_phase": "139.1",
+      "plan_file": "docs/plaene/aktiv/V139.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant; Graph-RAG-Folgeblock fuer Safety-Hardening, Retrieval-Qualitaet, SLO-Stabilitaet und Handoffs",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
       "id": "V137",
       "title": "CodeGraph Read-only Installationsspike fuer Graph-RAG",
       "status": "planned",

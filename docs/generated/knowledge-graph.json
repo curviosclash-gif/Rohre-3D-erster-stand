@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 249,
+          "concreteCount": 250,
           "plannedCount": 0
         }
       }
@@ -2031,7 +2031,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "137.5",
+        "currentPhase": "137.99",
         "planFile": "docs/plaene/aktiv/V137.md",
         "scopeDeclarations": [
           ".gitignore",
@@ -2096,6 +2096,61 @@
         ],
         "unknownFrontmatterFields": [
           "blocks_recommended_before",
+          "decision_class",
+          "scope_reference_files",
+          "soft_depends_on"
+        ]
+      }
+    },
+    {
+      "id": "V139",
+      "type": "block",
+      "title": "Graph-RAG Follow-up Roadmap, Safety und Qualitaetsausbau",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "139.1",
+        "planFile": "docs/plaene/aktiv/V139.md",
+        "scopeDeclarations": [
+          "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+          "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+          "data/contracts/knowledge-graph/query-ops.v1.json",
+          "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+          "data/contracts/knowledge-graph/rag-sources.v1.json",
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.scorecard.json",
+          "docs/generated/plan-index.json",
+          "docs/plaene/aktiv/V139.md",
+          "docs/plaene/neu/Feature_Graph_RAG_Followup_Roadmap_V139.md",
+          "scripts/graph-rag-context-adapter.mjs",
+          "scripts/graph-rag-index.mjs",
+          "scripts/graph-rag-local-llm-check.mjs",
+          "scripts/graph-rag-query.mjs",
+          "tests/graph-rag-context-adapter.contract.test.mjs",
+          "tests/graph-rag-index.contract.test.mjs",
+          "tests/graph-rag-local-llm-selection.contract.test.mjs",
+          "tests/graph-rag-query.contract.test.mjs",
+          "tests/knowledge-graph-build.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 20,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [
+          "V120",
+          "V121",
+          "V122",
+          "V123",
+          "V124",
+          "V137"
+        ],
+        "unknownFrontmatterFields": [
           "decision_class",
           "scope_reference_files",
           "soft_depends_on"
@@ -2815,7 +2870,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 342,
+          "concreteCount": 343,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -5737,7 +5792,7 @@
       "id": "V137.5",
       "type": "phase",
       "title": "MCP-Entscheidung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.5"
@@ -5747,7 +5802,7 @@
       "id": "V137.6",
       "type": "phase",
       "title": "Go/No-Go",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.6"
@@ -5821,6 +5876,96 @@
       "attributes": {
         "blockId": "V138",
         "phaseCode": "138.99"
+      }
+    },
+    {
+      "id": "V139.1",
+      "type": "phase",
+      "title": "Baseline und Scope-Schnitt",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.1"
+      }
+    },
+    {
+      "id": "V139.2",
+      "type": "phase",
+      "title": "Safety-Hardening fuer Outputs und lokale Runtimes",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.2"
+      }
+    },
+    {
+      "id": "V139.3",
+      "type": "phase",
+      "title": "Retrieval-Qualitaet und Intent-Router",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.3"
+      }
+    },
+    {
+      "id": "V139.4",
+      "type": "phase",
+      "title": "Evidence-Package, Budget und Adapter-Qualitaet",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.4"
+      }
+    },
+    {
+      "id": "V139.5",
+      "type": "phase",
+      "title": "SLO-, Ops- und Graph-Modell-Haertung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.5"
+      }
+    },
+    {
+      "id": "V139.6",
+      "type": "phase",
+      "title": "V121-Handoff: Viewer und Ask Repo",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.6"
+      }
+    },
+    {
+      "id": "V139.7",
+      "type": "phase",
+      "title": "V137-Handoff: CodeGraph als Candidate Provider",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.7"
+      }
+    },
+    {
+      "id": "V139.8",
+      "type": "phase",
+      "title": "V122/V124-Handoff: Memory, Ruflo und Produktsemantik",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.8"
+      }
+    },
+    {
+      "id": "V139.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.99"
       }
     },
     {
@@ -16644,8 +16789,8 @@
     {
       "id": "V137.5.1",
       "type": "subphase",
-      "title": "No-MCP-Variante bewerten: CLI/Report reicht fuer V120 Candidate Provider?",
-      "status": "open",
+      "title": "No-MCP-Variante bewerten: CLI/Report reicht fuer V120 Candidate Provider? (abgeschlossen: 2026-05-28; evidence: `137.4` zeigt genuegend Nutzen ueber CLI `query`/`impact`/`context`; `npx --yes @colbymchenry/codegraph@0.9.6 status` -> PASS mit 1057 Files/18322 Nodes/50492 Edges, Index up to date)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.5",
@@ -16655,8 +16800,8 @@
     {
       "id": "V137.5.2",
       "type": "subphase",
-      "title": "Falls MCP sinnvoll: konkrete read-only Tools, Config-Pfad, Recovery und User-visible Risk nennen.",
-      "status": "open",
+      "title": "Falls MCP sinnvoll: konkrete read-only Tools, Config-Pfad, Recovery und User-visible Risk nennen. (abgeschlossen: 2026-05-28; evidence: `npx --yes @colbymchenry/codegraph@0.9.6 install --print-config codex` -> PASS mit `C:\\Users\\gunda\\.codex\\config.toml`, `[mcp_servers.codegraph]`, `command = \"codegraph\"`, `args = [\"serve\", \"--mcp\"]`; Recovery waere Stanza entfernen und optional `codegraph uninit`; Risiko bleibt neue Agent-Tool-Oberflaeche/PATH-Abhaengigkeit/Index-Staleness)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.5",
@@ -16666,8 +16811,8 @@
     {
       "id": "V137.5.3",
       "type": "subphase",
-      "title": "MCP-Registrierung nur nach separatem D4/User-Gate ausfuehren.",
-      "status": "open",
+      "title": "MCP-Registrierung nur nach separatem D4/User-Gate ausfuehren. (abgeschlossen: 2026-05-28; evidence: keine MCP-Registrierung, kein `codegraph install`, keine Aenderung an `C:\\Users\\gunda\\.codex\\config.toml`, `C:\\Users\\gunda\\.claude.json` oder Agent-Instructions; nur `install --print-config` no-write ausgefuehrt)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.5",
@@ -16677,8 +16822,8 @@
     {
       "id": "V137.6.1",
       "type": "subphase",
-      "title": "`keep`: CodeGraph bleibt optionaler read-only Candidate Provider fuer V120.",
-      "status": "open",
+      "title": "`keep`: CodeGraph bleibt optionaler read-only Candidate Provider fuer V120. (abgeschlossen: 2026-05-28; evidence: bewertet, aber nicht als Agent-/MCP-Keep gewaehlt; CodeGraph-Ausgaben duerfen nur manuelle Hinweise fuer Code-Symbole/Callpfade bleiben)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.6",
@@ -16688,8 +16833,8 @@
     {
       "id": "V137.6.2",
       "type": "subphase",
-      "title": "`manual-only`: CodeGraph bleibt lokales CLI-Hilfsmittel ohne Agent-/MCP-Registrierung.",
-      "status": "open",
+      "title": "`manual-only`: CodeGraph bleibt lokales CLI-Hilfsmittel ohne Agent-/MCP-Registrierung. (abgeschlossen: 2026-05-28; evidence: Go/No-Go = `manual-only`; lokaler `.codegraph/`-Index bleibt ignoriert, keine MCP- oder Agent-Config-Wirkung)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.6",
@@ -16699,8 +16844,8 @@
     {
       "id": "V137.6.3",
       "type": "subphase",
-      "title": "`remove`: `codegraph uninit`/Cleanup ausfuehren und Ergebnis dokumentieren.",
-      "status": "open",
+      "title": "`remove`: `codegraph uninit`/Cleanup ausfuehren und Ergebnis dokumentieren. (abgeschlossen: 2026-05-28; evidence: Removal bewertet, aber nicht ausgefuehrt; Recovery trocken dokumentiert: `npx --yes @colbymchenry/codegraph@0.9.6 uninit` entfernt `.codegraph/`, nicht angewendete MCP-Config haette als Stanza-Entfernung aus `C:\\Users\\gunda\\.codex\\config.toml` zu erfolgen)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.6",
@@ -16710,8 +16855,8 @@
     {
       "id": "V137.99.1",
       "type": "subphase",
-      "title": "`npm run plan:check` ist gruen.",
-      "status": "open",
+      "title": "`npm run plan:check` ist gruen. (abgeschlossen: 2026-05-28; evidence: `npm run plan:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.99",
@@ -16721,8 +16866,8 @@
     {
       "id": "V137.99.2",
       "type": "subphase",
-      "title": "`npm run plan:index:check` ist gruen.",
-      "status": "open",
+      "title": "`npm run plan:index:check` ist gruen. (abgeschlossen: 2026-05-28; evidence: `npm run plan:index:build` -> PASS; `npm run plan:index:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.99",
@@ -16732,8 +16877,8 @@
     {
       "id": "V137.99.3",
       "type": "subphase",
-      "title": "`npm run graph:check` ist gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "`npm run graph:check` ist gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-28; evidence: `npm run graph:check` -> FAIL mit `COVERAGE_GATE_FAILED` fuer `update_android_phone.bat`; blockerfest dokumentiert in `docs/Fehlerberichte/2026-05-28_v137-abschluss-blocked-by-android-update-coverage.md`)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.99",
@@ -16743,8 +16888,8 @@
     {
       "id": "V137.99.4",
       "type": "subphase",
-      "title": "`npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "`npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-28; evidence: `npm run docs:sync` -> PASS; `npm run docs:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.99",
@@ -16980,6 +17125,347 @@
         "blockId": "V138",
         "phaseCode": "138.99",
         "subphaseCode": "138.99.4"
+      }
+    },
+    {
+      "id": "V139.1.1",
+      "type": "subphase",
+      "title": "`open-deps V139` nach Intake und `scope-collisions` pruefen; bekannte Handoffs zu V121/V137/V122/V124 dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.1",
+        "subphaseCode": "139.1.1"
+      }
+    },
+    {
+      "id": "V139.1.2",
+      "type": "subphase",
+      "title": "V120-Abschlussanalyse in konkrete Fix-, Quality-, Ops- und Handoff-Slices aufteilen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.1",
+        "subphaseCode": "139.1.2"
+      }
+    },
+    {
+      "id": "V139.1.3",
+      "type": "subphase",
+      "title": "Bestehende fremde/uncommitted Graph-RAG-Aenderungen vor Umsetzung klassifizieren und nicht ueberschreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.1",
+        "subphaseCode": "139.1.3"
+      }
+    },
+    {
+      "id": "V139.2.1",
+      "type": "subphase",
+      "title": "Gemeinsamen Guard fuer Graph-RAG-Outputpfade implementieren: nur `tmp/graph-rag/**`, keine absoluten Pfade, kein `..`, keine Repo-Ziele ausserhalb des Graph-RAG-Tmp-Bereichs.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.2",
+        "subphaseCode": "139.2.1"
+      }
+    },
+    {
+      "id": "V139.2.2",
+      "type": "subphase",
+      "title": "`graph-rag-index`, `graph-rag-query`, `graph-rag-context-adapter` und `graph-rag-local-llm-check` auf denselben Guard ziehen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.2",
+        "subphaseCode": "139.2.2"
+      }
+    },
+    {
+      "id": "V139.2.3",
+      "type": "subphase",
+      "title": "Negative Tests fuer verbotene `--out`-Pfade und positive Tests fuer `tmp/graph-rag/...` ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.2",
+        "subphaseCode": "139.2.3"
+      }
+    },
+    {
+      "id": "V139.2.4",
+      "type": "subphase",
+      "title": "Local-Runtime-Base-URL pruefen: Standard nur `localhost`, `127.0.0.1` oder `[::1]`; externe URLs nur nach explizitem Opt-in oder als Follow-up verwerfen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.2",
+        "subphaseCode": "139.2.4"
+      }
+    },
+    {
+      "id": "V139.3.1",
+      "type": "subphase",
+      "title": "Aliasliste fuer zentrale Dateien, Bloeke, Critical Paths und Tests erweitern, ohne breite Volltextsuche als Default einzufuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.3",
+        "subphaseCode": "139.3.1"
+      }
+    },
+    {
+      "id": "V139.3.2",
+      "type": "subphase",
+      "title": "Negative Referenzfragen aufnehmen: unklare Datei, nicht existierender Block, gemischter Scope, bewusst falscher Critical Path.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.3",
+        "subphaseCode": "139.3.2"
+      }
+    },
+    {
+      "id": "V139.3.3",
+      "type": "subphase",
+      "title": "Ranking-Metriken ausgeben: Top-Kandidaten, Rejected-Grund, Graph-vs-Text-Anteil, Fallback-Rate und niedrigste Confidence.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.3",
+        "subphaseCode": "139.3.3"
+      }
+    },
+    {
+      "id": "V139.3.4",
+      "type": "subphase",
+      "title": "Tests so erweitern, dass falsche starke Treffer nicht als `high` Confidence durchgehen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.3",
+        "subphaseCode": "139.3.4"
+      }
+    },
+    {
+      "id": "V139.4.1",
+      "type": "subphase",
+      "title": "Evidence-Package um optionale Consumer-Hints fuer Viewer/Ask-Repo vorbereiten, ohne V121-UI zu bauen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.4",
+        "subphaseCode": "139.4.1"
+      }
+    },
+    {
+      "id": "V139.4.2",
+      "type": "subphase",
+      "title": "Adapter-Ausgabe gegen leere oder rein mockhafte Claims haerten; Unsicherheiten und Confidence muessen falsifizierbar bleiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.4",
+        "subphaseCode": "139.4.2"
+      }
+    },
+    {
+      "id": "V139.4.3",
+      "type": "subphase",
+      "title": "Budget-Report in CLI und JSON konsistent halten: selected/rejected/estimated tokens/fallback.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.4",
+        "subphaseCode": "139.4.3"
+      }
+    },
+    {
+      "id": "V139.4.4",
+      "type": "subphase",
+      "title": "`rulebased`, `mock` und `local` klar in Evidence markieren, damit lokale AI nicht mit kanonischen Fakten verwechselt wird.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.4",
+        "subphaseCode": "139.4.4"
+      }
+    },
+    {
+      "id": "V139.5.1",
+      "type": "subphase",
+      "title": "`graph:slo` wiederholt messen; `export-view`-Jitter mit Warmup-/Sample-Analyse oder kleinem Performance-Fix bewerten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.5",
+        "subphaseCode": "139.5.1"
+      }
+    },
+    {
+      "id": "V139.5.2",
+      "type": "subphase",
+      "title": "Keine SLO-Budget-Erhoehung ohne begruendete Messreihe und Playbook-Notiz.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.5",
+        "subphaseCode": "139.5.2"
+      }
+    },
+    {
+      "id": "V139.5.3",
+      "type": "subphase",
+      "title": "Pruefen, ob Graph-RAG-Skripte als Core-Graph-Knoten mit RelationEdges modelliert werden sollen; Umsetzung nur, wenn Query-/Impact-Nutzen klar ist.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.5",
+        "subphaseCode": "139.5.3"
+      }
+    },
+    {
+      "id": "V139.5.4",
+      "type": "subphase",
+      "title": "Coverage-Report und `impact-for-file` fuer Graph-RAG-Skripte als Abschluss-Evidence aufnehmen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.5",
+        "subphaseCode": "139.5.4"
+      }
+    },
+    {
+      "id": "V139.6.1",
+      "type": "subphase",
+      "title": "Export-/Cache-Regeln fuer V121 festlegen: welche JSON-Artefakte transient bleiben, welche nur live erzeugt werden und welche nie committed werden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.6",
+        "subphaseCode": "139.6.1"
+      }
+    },
+    {
+      "id": "V139.6.2",
+      "type": "subphase",
+      "title": "Minimalen Contract fuer Ask-Repo-Antworten definieren: Frage, Graph-Queries, Claims, Unsicherheiten, Budget und Source-Links.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.6",
+        "subphaseCode": "139.6.2"
+      }
+    },
+    {
+      "id": "V139.6.3",
+      "type": "subphase",
+      "title": "V121-Nicht-Ziel bestaetigen: Viewer zeigt Evidence, erzeugt aber keine Wahrheit, keine Plan-Status-Aenderung und keine Code-Aenderung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.6",
+        "subphaseCode": "139.6.3"
+      }
+    },
+    {
+      "id": "V139.7.1",
+      "type": "subphase",
+      "title": "Definieren, welche CodeGraph-Daten hilfreich waeren: Symbole, Callpaths, Importnaehe, Testnaehe, aber keine Plan-/Lock-/Dependency-Wahrheit.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.7",
+        "subphaseCode": "139.7.1"
+      }
+    },
+    {
+      "id": "V139.7.2",
+      "type": "subphase",
+      "title": "Akzeptanztests fuer eine spaetere Candidate-Provider-Schnittstelle entwerfen: gleiche Frage, Curvios-Graph gewinnt, CodeGraph darf nur Kandidaten ergaenzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.7",
+        "subphaseCode": "139.7.2"
+      }
+    },
+    {
+      "id": "V139.7.3",
+      "type": "subphase",
+      "title": "D4-Grenze bestaetigen: Installation, MCP-Registrierung und globale Agent-Config bleiben V137/User-Gate.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.7",
+        "subphaseCode": "139.7.3"
+      }
+    },
+    {
+      "id": "V139.8.1",
+      "type": "subphase",
+      "title": "V122-Regel festhalten: Memory darf V120-Evidence lesen, aber keine unzitierten RAG-Antworten als dauerhafte Wahrheit speichern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.8",
+        "subphaseCode": "139.8.1"
+      }
+    },
+    {
+      "id": "V139.8.2",
+      "type": "subphase",
+      "title": "Ruflo-Orchestrierung darf Graph-RAG-Kontext nur read-only und nach V122-Gate nutzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.8",
+        "subphaseCode": "139.8.2"
+      }
+    },
+    {
+      "id": "V139.8.3",
+      "type": "subphase",
+      "title": "V124-Regel festhalten: Produktsemantik entsteht aus kuratierten Graph-/Produkt-Evidence-Slices, nicht aus freier lokaler LLM-Zusammenfassung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.8",
+        "subphaseCode": "139.8.3"
+      }
+    },
+    {
+      "id": "V139.99.1",
+      "type": "subphase",
+      "title": "Graph-RAG-Contracttests sind gruen: `node --test tests/graph-rag-index.contract.test.mjs tests/graph-rag-query.contract.test.mjs tests/graph-rag-local-llm-selection.contract.test.mjs tests/graph-rag-context-adapter.contract.test.mjs`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.99",
+        "subphaseCode": "139.99.1"
+      }
+    },
+    {
+      "id": "V139.99.2",
+      "type": "subphase",
+      "title": "`npm run graph:slo`, `npm run graph:check`, `npm run plan:check` und `npm run gates:pre-commit` sind gruen oder ein rotes Signal ist als Blocker/Folgefinding dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.99",
+        "subphaseCode": "139.99.2"
+      }
+    },
+    {
+      "id": "V139.99.3",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt Nutzen, verbleibende Grenzen, Handoffs zu V121/V137/V122/V124 und bewusst nicht gepruefte Pfade.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.99",
+        "subphaseCode": "139.99.3"
       }
     },
     {
@@ -29495,7 +29981,8 @@
           "V107",
           "V110",
           "V111",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -29607,7 +30094,8 @@
           "V107",
           "V110",
           "V111",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -29752,7 +30240,8 @@
           "V107",
           "V110",
           "V111",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -29770,7 +30259,8 @@
           "V107",
           "V110",
           "V111",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -29788,7 +30278,8 @@
           "V107",
           "V110",
           "V111",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -30287,6 +30778,7 @@
           "V123",
           "V125",
           "V138",
+          "V139",
           "V90"
         ],
         "exists": true
@@ -30313,6 +30805,7 @@
           "V123",
           "V125",
           "V138",
+          "V139",
           "V90",
           "V94"
         ],
@@ -30353,6 +30846,7 @@
           "V120",
           "V123",
           "V125",
+          "V139",
           "V90"
         ],
         "exists": true
@@ -30384,7 +30878,8 @@
         ],
         "scopeBlocks": [
           "V120",
-          "V123"
+          "V123",
+          "V139"
         ],
         "exists": true
       }
@@ -30959,6 +31454,22 @@
         ],
         "scopeBlocks": [
           "V138",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V139.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V139",
           "V77"
         ],
         "exists": true
@@ -33348,6 +33859,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V139",
           "V77"
         ],
         "exists": true
@@ -36520,7 +37032,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -36537,7 +37050,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -36554,7 +37068,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -36571,7 +37086,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -37114,6 +37630,21 @@
     },
     {
       "id": "scripts/training-smoke.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "scripts/update-android-phone.mjs",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -48743,7 +49274,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -48760,7 +49292,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -48777,7 +49310,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -48794,7 +49328,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V120"
+          "V120",
+          "V139"
         ],
         "exists": true
       }
@@ -48913,6 +49448,7 @@
           "V110",
           "V111",
           "V120",
+          "V139",
           "V94"
         ],
         "exists": true
@@ -56787,6 +57323,15 @@
     {
       "from": "B13",
       "to": "scripts/training-smoke.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/update-android-phone.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83069,6 +83614,635 @@
       }
     },
     {
+      "from": "V139",
+      "to": "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "data/contracts/knowledge-graph/query-ops.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "data/contracts/knowledge-graph/rag-sources.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "docs/generated/knowledge-graph.scorecard.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "docs/generated/plan-index.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "docs/plaene/aktiv/V139.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "docs/plaene/neu/Feature_Graph_RAG_Followup_Roadmap_V139.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "scripts/graph-rag-context-adapter.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "scripts/graph-rag-index.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "scripts/graph-rag-local-llm-check.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "scripts/graph-rag-query.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "tests/graph-rag-context-adapter.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "tests/graph-rag-index.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "tests/graph-rag-local-llm-selection.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "tests/graph-rag-query.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "tests/knowledge-graph-build.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "V120",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Der Graph-RAG-Kern ist abgeschlossen; V139 kann Safety-, Retrieval-, Budget- und Handoff-Haertung als Folgeblock starten",
+      "attributes": {
+        "dependsPhase": "120.99",
+        "rawToken": "V120.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V139",
+      "to": "V139.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.1"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "V139.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.2"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "V139.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.3"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "V139.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.4"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "V139.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.5"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "V139.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.6"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "V139.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.7"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "V139.8",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.8"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "V139.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.99"
+      }
+    },
+    {
+      "from": "V139.1",
+      "to": "V139.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.1",
+        "subphaseCode": "139.1.1"
+      }
+    },
+    {
+      "from": "V139.1",
+      "to": "V139.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.1",
+        "subphaseCode": "139.1.2"
+      }
+    },
+    {
+      "from": "V139.1",
+      "to": "V139.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.1",
+        "subphaseCode": "139.1.3"
+      }
+    },
+    {
+      "from": "V139.2",
+      "to": "V139.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.2",
+        "subphaseCode": "139.2.1"
+      }
+    },
+    {
+      "from": "V139.2",
+      "to": "V139.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.2",
+        "subphaseCode": "139.2.2"
+      }
+    },
+    {
+      "from": "V139.2",
+      "to": "V139.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.2",
+        "subphaseCode": "139.2.3"
+      }
+    },
+    {
+      "from": "V139.2",
+      "to": "V139.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.2",
+        "subphaseCode": "139.2.4"
+      }
+    },
+    {
+      "from": "V139.3",
+      "to": "V139.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.3",
+        "subphaseCode": "139.3.1"
+      }
+    },
+    {
+      "from": "V139.3",
+      "to": "V139.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.3",
+        "subphaseCode": "139.3.2"
+      }
+    },
+    {
+      "from": "V139.3",
+      "to": "V139.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.3",
+        "subphaseCode": "139.3.3"
+      }
+    },
+    {
+      "from": "V139.3",
+      "to": "V139.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.3",
+        "subphaseCode": "139.3.4"
+      }
+    },
+    {
+      "from": "V139.4",
+      "to": "V139.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.4",
+        "subphaseCode": "139.4.1"
+      }
+    },
+    {
+      "from": "V139.4",
+      "to": "V139.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.4",
+        "subphaseCode": "139.4.2"
+      }
+    },
+    {
+      "from": "V139.4",
+      "to": "V139.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.4",
+        "subphaseCode": "139.4.3"
+      }
+    },
+    {
+      "from": "V139.4",
+      "to": "V139.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.4",
+        "subphaseCode": "139.4.4"
+      }
+    },
+    {
+      "from": "V139.5",
+      "to": "V139.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.5",
+        "subphaseCode": "139.5.1"
+      }
+    },
+    {
+      "from": "V139.5",
+      "to": "V139.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.5",
+        "subphaseCode": "139.5.2"
+      }
+    },
+    {
+      "from": "V139.5",
+      "to": "V139.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.5",
+        "subphaseCode": "139.5.3"
+      }
+    },
+    {
+      "from": "V139.5",
+      "to": "V139.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.5",
+        "subphaseCode": "139.5.4"
+      }
+    },
+    {
+      "from": "V139.6",
+      "to": "V139.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.6",
+        "subphaseCode": "139.6.1"
+      }
+    },
+    {
+      "from": "V139.6",
+      "to": "V139.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.6",
+        "subphaseCode": "139.6.2"
+      }
+    },
+    {
+      "from": "V139.6",
+      "to": "V139.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.6",
+        "subphaseCode": "139.6.3"
+      }
+    },
+    {
+      "from": "V139.7",
+      "to": "V139.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.7",
+        "subphaseCode": "139.7.1"
+      }
+    },
+    {
+      "from": "V139.7",
+      "to": "V139.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.7",
+        "subphaseCode": "139.7.2"
+      }
+    },
+    {
+      "from": "V139.7",
+      "to": "V139.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.7",
+        "subphaseCode": "139.7.3"
+      }
+    },
+    {
+      "from": "V139.8",
+      "to": "V139.8.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.8",
+        "subphaseCode": "139.8.1"
+      }
+    },
+    {
+      "from": "V139.8",
+      "to": "V139.8.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.8",
+        "subphaseCode": "139.8.2"
+      }
+    },
+    {
+      "from": "V139.8",
+      "to": "V139.8.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.8",
+        "subphaseCode": "139.8.3"
+      }
+    },
+    {
+      "from": "V139.99",
+      "to": "V139.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.99",
+        "subphaseCode": "139.99.1"
+      }
+    },
+    {
+      "from": "V139.99",
+      "to": "V139.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.99",
+        "subphaseCode": "139.99.2"
+      }
+    },
+    {
+      "from": "V139.99",
+      "to": "V139.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V139",
+        "phaseCode": "139.99",
+        "subphaseCode": "139.99.3"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -93418,6 +94592,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/aktiv/V138.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V139.md",
       "type": "scope",
       "hint": null,
       "attributes": {

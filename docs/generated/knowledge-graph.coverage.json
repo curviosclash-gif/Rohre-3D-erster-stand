@@ -185,14 +185,14 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2094,
-    "rawCoveredFileCount": 1337,
+    "trackedFileCount": 2098,
+    "rawCoveredFileCount": 1339,
     "rawCoveragePercent": 63.8,
-    "adjustedTrackedFileCount": 1412,
-    "adjustedCoveredFileCount": 1105,
-    "adjustedCoveragePercent": 78.3,
-    "uncoveredFileCount": 757,
-    "uncoveredActiveFileCount": 307,
+    "adjustedTrackedFileCount": 1415,
+    "adjustedCoveredFileCount": 1107,
+    "adjustedCoveragePercent": 78.2,
+    "uncoveredFileCount": 759,
+    "uncoveredActiveFileCount": 308,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -215,7 +215,7 @@
       {
         "classification": "blocker-report",
         "excludedFromCoverage": true,
-        "count": 41,
+        "count": 42,
         "coveredCount": 2
       },
       {
@@ -251,20 +251,20 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 44,
+        "count": 45,
         "coveredCount": 27
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1009,
-        "coveredCount": 886
+        "count": 1010,
+        "coveredCount": 887
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 328,
-        "coveredCount": 174
+        "count": 329,
+        "coveredCount": 175
       },
       {
         "classification": "prototype",
@@ -288,7 +288,7 @@
   },
   "gate": {
     "contract": "knowledge-graph.coverage.gate.v1",
-    "status": "pass",
+    "status": "fail",
     "baseline": {
       "ref": "HEAD",
       "path": "docs/generated/knowledge-graph.coverage.json",
@@ -298,10 +298,19 @@
       {
         "id": "no-new-active-uncovered-files",
         "severity": "error",
-        "status": "pass",
+        "status": "fail",
         "description": "Active repo files may not become newly uncovered; add them to a graph scope/mapping or classify them as excluded.",
-        "violationCount": 0,
-        "files": []
+        "violationCount": 1,
+        "files": [
+          {
+            "path": "update_android_phone.bat",
+            "classification": "other",
+            "baselineState": "absent",
+            "coveredInCore": false,
+            "coveredByOverlay": false,
+            "scopeBlocks": []
+          }
+        ]
       }
     ]
   },
@@ -5846,7 +5855,8 @@
         "V107",
         "V110",
         "V111",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -5904,7 +5914,8 @@
         "V107",
         "V110",
         "V111",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -6022,7 +6033,8 @@
         "V107",
         "V110",
         "V111",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -6042,7 +6054,8 @@
         "V107",
         "V110",
         "V111",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -6062,7 +6075,8 @@
         "V107",
         "V110",
         "V111",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -11127,6 +11141,19 @@
       "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
+      "path": "docs/Fehlerberichte/2026-05-28_v137-abschluss-blocked-by-android-update-coverage.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
+    },
+    {
       "path": "docs/Fehlerberichte/FEHLERBERICHT_TEMPLATE.md",
       "tracked": true,
       "coveredInCore": false,
@@ -11173,6 +11200,7 @@
         "V123",
         "V125",
         "V138",
+        "V139",
         "V90"
       ],
       "surfaces": [],
@@ -11201,6 +11229,7 @@
         "V123",
         "V125",
         "V138",
+        "V139",
         "V90",
         "V94"
       ],
@@ -11245,6 +11274,7 @@
         "V120",
         "V123",
         "V125",
+        "V139",
         "V90"
       ],
       "surfaces": [],
@@ -11280,7 +11310,8 @@
       ],
       "scopeBlocks": [
         "V120",
-        "V123"
+        "V123",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -12029,6 +12060,24 @@
       ],
       "scopeBlocks": [
         "V138",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V139.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V139",
         "V77"
       ],
       "surfaces": [],
@@ -14674,6 +14723,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V139",
         "V77"
       ],
       "surfaces": [],
@@ -20059,7 +20109,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -20078,7 +20129,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -20097,7 +20149,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -20116,7 +20169,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -20707,6 +20761,23 @@
     },
     {
       "path": "scripts/training-smoke.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/update-android-phone.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -33751,7 +33822,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33770,7 +33842,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33789,7 +33862,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33808,7 +33882,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V120"
+        "V120",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33907,6 +33982,7 @@
         "V110",
         "V111",
         "V120",
+        "V139",
         "V94"
       ],
       "surfaces": [],
@@ -36229,6 +36305,19 @@
     },
     {
       "path": "tsconfig.json",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "update_android_phone.bat",
       "tracked": true,
       "coveredInCore": false,
       "coveredByOverlay": false,
