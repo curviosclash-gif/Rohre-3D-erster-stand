@@ -603,13 +603,13 @@
         "V111.99",
         "V120.1"
       ],
-      "current_phase": "137.4",
+      "current_phase": "137.5",
       "plan_file": "docs/plaene/aktiv/V137.md",
       "lock": {
         "status": "frei",
         "agent": "-",
         "start_date": "-",
-        "target": "137.3 abgeschlossen 2026-05-28; lokaler CodeGraph-Init und Sync auf 1057 Files/18321 Nodes; naechster Schritt 137.4 Vergleich; MCP/Agent-Config bleiben eigene D4-Gates",
+        "target": "137.4 abgeschlossen 2026-05-28; drei Referenzfragen zeigen CodeGraph nur als technischen Candidate Provider; naechster Schritt 137.5 MCP-Entscheidung; MCP/Agent-Config bleiben eigene D4-Gates",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

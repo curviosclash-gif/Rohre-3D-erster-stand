@@ -2031,7 +2031,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "137.4",
+        "currentPhase": "137.5",
         "planFile": "docs/plaene/aktiv/V137.md",
         "scopeDeclarations": [
           ".gitignore",
@@ -5727,7 +5727,7 @@
       "id": "V137.4",
       "type": "phase",
       "title": "Vergleich mit Curvios-Graph",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.4"
@@ -16600,8 +16600,8 @@
     {
       "id": "V137.4.1",
       "type": "subphase",
-      "title": "Settings-Referenz: `SettingsManager` Curvios-Impact gegen CodeGraph-Symbol-/Caller-/Callee-Sicht vergleichen.",
-      "status": "open",
+      "title": "Settings-Referenz: `SettingsManager` Curvios-Impact gegen CodeGraph-Symbol-/Caller-/Callee-Sicht vergleichen. (abgeschlossen: 2026-05-28; evidence: `node scripts/query-knowledge-graph.mjs impact-for-file src/core/SettingsManager.js --json` -> PASS; CodeGraph `query SettingsManager`, `callers SettingsManager`, `callees SettingsManager`, `impact SettingsManager --depth 2` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.4",
@@ -16611,8 +16611,8 @@
     {
       "id": "V137.4.2",
       "type": "subphase",
-      "title": "Spawn-Referenz: Curvios `event-flow spawn` gegen CodeGraph-Trace/Context vergleichen.",
-      "status": "open",
+      "title": "Spawn-Referenz: Curvios `event-flow spawn` gegen CodeGraph-Trace/Context vergleichen. (abgeschlossen: 2026-05-28; evidence: `node scripts/query-knowledge-graph.mjs event-flow spawn --json` -> PASS; CodeGraph `query spawn`, `query EntitySpawnOps`, `impact EntitySpawnOps --depth 2`, `context \"spawn lifecycle EntitySpawnOps SpawnPlacementSystem\" --format json --no-code --max-nodes 20` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.4",
@@ -16622,8 +16622,8 @@
     {
       "id": "V137.4.3",
       "type": "subphase",
-      "title": "Scope-Referenz: `scope-collisions` bleibt Curvios-only Wahrheit; pruefen, ob CodeGraph trotzdem relevante Code-Lesepfade kuerzt.",
-      "status": "open",
+      "title": "Scope-Referenz: `scope-collisions` bleibt Curvios-only Wahrheit; pruefen, ob CodeGraph trotzdem relevante Code-Lesepfade kuerzt. (abgeschlossen: 2026-05-28; evidence: `node scripts/query-knowledge-graph.mjs scope-collisions --json` -> PASS; CodeGraph `query scope-collisions`, `query scopeCollisions`, `context \"scope-collisions query-knowledge-graph active block scope files\" --format json --no-code --max-nodes 20` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.4",
@@ -16633,8 +16633,8 @@
     {
       "id": "V137.4.4",
       "type": "subphase",
-      "title": "Ergebnis als kurzen transienten Report oder aktive V137-/V120-Evidence zusammenfassen.",
-      "status": "open",
+      "title": "Ergebnis als kurzen transienten Report oder aktive V137-/V120-Evidence zusammenfassen. (abgeschlossen: 2026-05-28; evidence: aktive V137-Evidence-Notiz in diesem Abschnitt)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.4",

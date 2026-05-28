@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-28T11:57:31.757Z",
+  "timestamp": "2026-05-28T12:11:40.295Z",
   "locks": [
     {
       "block_id": "V103",
@@ -879,10 +879,25 @@
       "target_completion": "2026-05-28",
       "status": "completed",
       "notes": ""
+    },
+    {
+      "block_id": "V137",
+      "phase": "137.4",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V137.md",
+        "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
+        "docs/plaene/CHANGELOG.md",
+        ".gitignore"
+      ],
+      "start_date": "2026-05-28",
+      "target_completion": "2026-05-28",
+      "status": "completed",
+      "notes": "Curvios-CodeGraph comparison"
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "137.3",
+    "phase_id": "137.5",
     "completed_items": [],
     "last_commit": ""
   }
