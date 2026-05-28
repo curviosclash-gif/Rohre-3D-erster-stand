@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T10:54:28.262Z",
+  "generated_at": "2026-05-28T11:43:39.529Z",
   "locks": [
     {
       "person": "codex",
@@ -908,6 +908,22 @@
       "target_completion": "2026-05-28",
       "status": "completed",
       "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V137",
+      "phase": "137.3",
+      "scope_files": [
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V137.md",
+        "docs/plaene/neu/Feature_CodeGraph_Readonly_Installation_Spike.md",
+        "docs/plaene/CHANGELOG.md",
+        ".gitignore"
+      ],
+      "start_date": "2026-05-28",
+      "target_completion": "2026-05-28",
+      "status": "in-progress",
+      "notes": "CodeGraph init user-approved D4 slice"
     }
   ],
   "metadata": {

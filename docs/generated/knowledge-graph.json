@@ -2031,7 +2031,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "137.3",
+        "currentPhase": "137.4",
         "planFile": "docs/plaene/aktiv/V137.md",
         "scopeDeclarations": [
           ".gitignore",
@@ -5717,7 +5717,7 @@
       "id": "V137.3",
       "type": "phase",
       "title": "Projekt-Init und Baseline",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.3"
@@ -16567,8 +16567,8 @@
     {
       "id": "V137.3.1",
       "type": "subphase",
-      "title": "User-Gate einholen fuer `codegraph init` oder `codegraph init -i`.",
-      "status": "open",
+      "title": "User-Gate einholen fuer `codegraph init` oder `codegraph init -i`. (abgeschlossen: 2026-05-28; evidence: User-Freigabe im Thread fuer V137 137.3; `npm run agent:preflight -- --workflow=fix-planung --decision=D4 ...` mit temporaerem Index wegen fremdem staged V139 -> PASS; `npx --yes @colbymchenry/codegraph@0.9.6 init` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.3",
@@ -16578,8 +16578,8 @@
     {
       "id": "V137.3.2",
       "type": "subphase",
-      "title": "Nach Init `git status --short` pruefen; getrackte Aenderungen duerfen nur vorher erlaubte Schutz-/Plan-Dateien sein.",
-      "status": "open",
+      "title": "Nach Init `git status --short` pruefen; getrackte Aenderungen duerfen nur vorher erlaubte Schutz-/Plan-Dateien sein. (abgeschlossen: 2026-05-28; evidence: `.codegraph/` enthaelt nur ignorierte lokale Dateien `.gitignore` und `codegraph.db`; `git status --short --branch` zeigt keine getrackten CodeGraph-Dateien, nur V137-Lock-/Plan-Scope plus bekannte fremde Mobile-/V139-Aenderungen)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.3",
@@ -16589,8 +16589,8 @@
     {
       "id": "V137.3.3",
       "type": "subphase",
-      "title": "CodeGraph-Status-/Files-Signal erfassen und grob mit Curvios-Dateiabdeckung vergleichen.",
-      "status": "open",
+      "title": "CodeGraph-Status-/Files-Signal erfassen und grob mit Curvios-Dateiabdeckung vergleichen. (abgeschlossen: 2026-05-28; evidence: `npx --yes @colbymchenry/codegraph@0.9.6 sync` -> PASS mit 1057 geaenderten Dateien und 18321 Nodes; `npx --yes @colbymchenry/codegraph@0.9.6 status` -> PASS mit 1057 Files, 18321 Nodes, 50499 Edges, 50.73 MB DB, Index up to date; `node scripts/query-knowledge-graph.mjs coverage-report --json` -> PASS mit Curvios 2094 tracked Files, 1412 adjusted tracked Files, Coverage-Gate pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.3",
