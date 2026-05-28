@@ -3,6 +3,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { assertGraphRagRuntimeOutputPath } from './graph-rag-index.mjs';
+
 const ROOT = process.cwd();
 const CONTRACT_PATH = 'data/contracts/knowledge-graph/local-llm-selection.v1.json';
 const SELECTION_CONTRACT = 'knowledge-graph.local-llm-selection.v1';
@@ -40,6 +42,26 @@ function normalizeBaseUrl(value) {
     return `http://${trimmed}`;
 }
 
+function assertLocalBaseUrlAllowed(baseUrl, options = {}) {
+    const normalized = normalizeBaseUrl(baseUrl);
+    let parsed;
+    try {
+        parsed = new URL(normalized);
+    } catch {
+        throw new Error(`blocked-non-local-base-url: invalid URL for ${options.runtimeId || 'runtime'}`);
+    }
+
+    const hostname = parsed.hostname.replace(/^\[|\]$/g, '').toLowerCase();
+    const allowed = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+    if (!allowed) {
+        throw new Error(`blocked-non-local-base-url: ${normalized} for ${options.runtimeId || 'runtime'}`);
+    }
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        throw new Error(`blocked-non-local-base-url: unsupported protocol ${parsed.protocol}`);
+    }
+    return normalized;
+}
+
 function buildUrl(baseUrl, urlPath) {
     return `${normalizeBaseUrl(baseUrl)}${String(urlPath || '').startsWith('/') ? '' : '/'}${urlPath}`;
 }
@@ -66,7 +88,7 @@ async function readJson(root, relativePath) {
 }
 
 async function writeJson(root, relativePath, artifact) {
-    const normalizedPath = normalizeRepoPath(relativePath);
+    const normalizedPath = assertGraphRagRuntimeOutputPath(relativePath);
     const absolutePath = toAbsolute(root, normalizedPath);
     await fs.mkdir(path.dirname(absolutePath), { recursive: true });
     await fs.writeFile(absolutePath, `${JSON.stringify(artifact, null, 2)}\n`, 'utf8');
@@ -294,6 +316,7 @@ function smokeRequestForRuntime(runtime, model, fixture) {
 }
 
 function classifyAttemptError(error) {
+    if (/blocked-non-local-base-url/i.test(error?.message || '')) return 'blocked-non-local-base-url';
     if (error?.code === 'timeout') return 'timeout';
     if (/fetch failed|ECONNREFUSED|ENOTFOUND|EADDRNOTAVAIL|Failed to parse URL/i.test(error?.message || '')) {
         return 'runtime-unavailable';
@@ -341,6 +364,7 @@ async function runHttpRuntimeSmoke(runtime, contract, options = {}) {
     };
 
     try {
+        assertLocalBaseUrlAllowed(baseUrl, { runtimeId: runtime.id });
         const health = await fetchJson(buildUrl(baseUrl, runtime.healthcheck.path), {
             method: runtime.healthcheck.method || 'GET',
             timeoutMs: remainingTimeout(),
@@ -537,9 +561,12 @@ async function runCli(argv = process.argv.slice(2)) {
         usage();
         return;
     }
+    const requestedWritePath = options.write || options.outPath
+        ? assertGraphRagRuntimeOutputPath(options.outPath || 'tmp/graph-rag/local-llm-smoke.json')
+        : null;
     const result = await runLocalLlmSmokeCheck(options);
     if (options.write) {
-        result.writtenPath = await writeJson(ROOT, options.outPath || 'tmp/graph-rag/local-llm-smoke.json', result);
+        result.writtenPath = await writeJson(ROOT, requestedWritePath, result);
     }
 
     if (options.json) {
@@ -571,6 +598,7 @@ export {
     CONTRACT_PATH,
     SELECTION_CONTRACT,
     SMOKE_CONTRACT,
+    assertLocalBaseUrlAllowed,
     loadLocalLlmSelectionContract,
     runLocalLlmSmokeCheck,
     validateLocalLlmSelectionContract,

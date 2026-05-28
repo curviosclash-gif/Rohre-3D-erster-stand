@@ -4,6 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import {
+    assertGraphRagRuntimeOutputPath,
     buildGraphRagIndex,
     loadRagSourceContract,
     normalizeRepoPath,
@@ -727,7 +728,7 @@ async function loadIndex(root, options) {
 }
 
 async function writeJson(root, relativePath, artifact) {
-    const normalizedPath = normalizeRepoPath(relativePath);
+    const normalizedPath = assertGraphRagRuntimeOutputPath(relativePath);
     const absolutePath = path.join(root, normalizedPath);
     await fs.mkdir(path.dirname(absolutePath), { recursive: true });
     await fs.writeFile(absolutePath, `${JSON.stringify(artifact, null, 2)}\n`, 'utf8');
@@ -738,6 +739,9 @@ async function runGraphRagQuery(question, options = {}) {
     const root = options.root || ROOT;
     const route = routeGraphRagQuestion(question);
     if (!route.question) throw new Error('Question is required');
+    const requestedWritePath = options.write || options.outPath
+        ? assertGraphRagRuntimeOutputPath(options.outPath || 'tmp/graph-rag/graph-rag-query.json')
+        : null;
     const [graph, coverage] = await Promise.all([
         options.graph || readJson(root, options.graphPath || GRAPH_PATH),
         options.coverage || readJson(root, options.coveragePath || COVERAGE_PATH),
@@ -785,7 +789,7 @@ async function runGraphRagQuery(question, options = {}) {
     };
 
     if (options.write || options.outPath) {
-        result.writtenPath = await writeJson(root, options.outPath || 'tmp/graph-rag/graph-rag-query.json', result);
+        result.writtenPath = await writeJson(root, requestedWritePath, result);
     }
     return result;
 }

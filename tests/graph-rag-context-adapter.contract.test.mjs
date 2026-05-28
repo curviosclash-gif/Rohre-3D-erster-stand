@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 import { buildGraphRagIndex } from '../scripts/graph-rag-index.mjs';
 import {
@@ -8,6 +11,8 @@ import {
     validateContextAdapterProfilesContract,
 } from '../scripts/graph-rag-context-adapter.mjs';
 import { runGraphRagQuery } from '../scripts/graph-rag-query.mjs';
+
+const ROOT = process.cwd();
 
 test('context adapter profiles define read-only operations and no-agent fallbacks', async () => {
     const contract = await loadContextAdapterProfilesContract();
@@ -29,6 +34,62 @@ test('context adapter profiles define read-only operations and no-agent fallback
     assert.ok(operationIds.has('fact-extract'));
     assert.ok(profile.operations.every((operation) => operation.fallbacks.includes('rulebased')));
     assert.ok(profile.operations.every((operation) => operation.fallbacks.includes('mock')));
+});
+
+test('context adapter CLI rejects --out outside tmp/graph-rag and writes allowed outputs', async () => {
+    const forbidden = spawnSync(process.execPath, [
+        'scripts/graph-rag-context-adapter.mjs',
+        'Zeige mir den spawn Critical Path mit Tests und Evidence.',
+        '--mode',
+        'rulebased',
+        '--max-chunks',
+        '1',
+        '--out',
+        'docs/forbidden-context.json',
+    ], {
+        cwd: ROOT,
+        encoding: 'utf8',
+    });
+    assert.notEqual(forbidden.status, 0);
+    assert.match(forbidden.stderr, /Graph-RAG runtime output path must stay under tmp\/graph-rag\//);
+
+    const outPath = 'tmp/graph-rag/graph-rag-context-adapter-contract-test.json';
+    const index = await buildGraphRagIndex();
+    const queryResult = await runGraphRagQuery('Zeige mir den spawn Critical Path mit Tests und Evidence.', {
+        index,
+        maxChunks: 1,
+    });
+    try {
+        const result = await runGraphRagContextAdapter(queryResult, {
+            mode: 'rulebased',
+            maxChunks: 1,
+            outPath,
+        });
+        assert.equal(result.writtenPath, outPath);
+        const artifact = JSON.parse(await fs.readFile(path.join(ROOT, outPath), 'utf8'));
+        assert.equal(artifact.contract, 'knowledge-graph.rag-context-adapter.v1');
+    } finally {
+        await fs.rm(path.join(ROOT, outPath), { force: true });
+    }
+});
+
+test('context adapter local mode blocks non-local base URLs before HTTP calls', async () => {
+    const index = await buildGraphRagIndex();
+    const queryResult = await runGraphRagQuery('Zeige mir den spawn Critical Path mit Tests und Evidence.', {
+        index,
+        maxChunks: 1,
+    });
+    const result = await runGraphRagContextAdapter(queryResult, {
+        mode: 'local',
+        runtimeId: 'ollama',
+        baseUrl: 'https://example.com:11434',
+        maxChunks: 1,
+    });
+
+    assert.equal(result.mode, 'rulebased');
+    assert.equal(result.fallbackUsed, true);
+    assert.equal(result.fallbackReason, 'blocked-non-local-base-url');
+    assert.equal(result.attempts[0].reason, 'blocked-non-local-base-url');
 });
 
 test('context adapter rulebased mode returns source-backed rerank, summary and facts', async () => {

@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 import { buildGraphRagIndex } from '../scripts/graph-rag-index.mjs';
 import {
@@ -10,6 +13,8 @@ import {
     validateRagEvidencePackage,
     validateRagEvidencePackageContract,
 } from '../scripts/graph-rag-query.mjs';
+
+const ROOT = process.cwd();
 
 const REFERENCE_QUESTIONS = Object.freeze([
     {
@@ -45,6 +50,37 @@ test('rag evidence package contract defines source-backed claims and budget repo
     assert.ok(contract.claim_schema.required.includes('uncertainties'));
     assert.deepEqual(contract.claim_schema.confidence_values, ['high', 'medium', 'low']);
     assert.ok(contract.budget_report.required.includes('selectedEstimatedTokens'));
+});
+
+test('graph rag query CLI rejects --out outside tmp/graph-rag and writes allowed outputs', async () => {
+    const forbidden = spawnSync(process.execPath, [
+        'scripts/graph-rag-query.mjs',
+        'Zeige mir den spawn Critical Path mit Tests und Evidence.',
+        '--max-chunks',
+        '1',
+        '--out',
+        'tmp/forbidden-query.json',
+    ], {
+        cwd: ROOT,
+        encoding: 'utf8',
+    });
+    assert.notEqual(forbidden.status, 0);
+    assert.match(forbidden.stderr, /Graph-RAG runtime output path must stay under tmp\/graph-rag\//);
+
+    const outPath = 'tmp/graph-rag/graph-rag-query-contract-test.json';
+    const index = await buildGraphRagIndex();
+    try {
+        const result = await runGraphRagQuery('Zeige mir den spawn Critical Path mit Tests und Evidence.', {
+            index,
+            maxChunks: 1,
+            outPath,
+        });
+        assert.equal(result.writtenPath, outPath);
+        const artifact = JSON.parse(await fs.readFile(path.join(ROOT, outPath), 'utf8'));
+        assert.equal(artifact.contract, 'knowledge-graph.rag-query.v1');
+    } finally {
+        await fs.rm(path.join(ROOT, outPath), { force: true });
+    }
 });
 
 test('graph rag intent router maps reference questions to conservative graph queries', () => {

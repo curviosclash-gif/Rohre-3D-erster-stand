@@ -1,12 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs/promises';
 import http from 'node:http';
+import path from 'node:path';
 
 import {
     loadLocalLlmSelectionContract,
     runLocalLlmSmokeCheck,
     validateLocalLlmSelectionContract,
 } from '../scripts/graph-rag-local-llm-check.mjs';
+
+const ROOT = process.cwd();
 
 async function createFixtureServer(handler) {
     const server = http.createServer(handler);
@@ -51,6 +56,58 @@ test('local LLM selection contract defines optional runtimes, roles and fallback
     assert.ok(contract.fallback_criteria.includes('model-missing'));
     assert.ok(contract.fallback_criteria.includes('invalid-json'));
     assert.ok(contract.installation_guidance.every((entry) => entry.user_action_only === true));
+});
+
+test('local LLM CLI rejects --out outside tmp/graph-rag and writes allowed outputs', async () => {
+    const forbidden = spawnSync(process.execPath, [
+        'scripts/graph-rag-local-llm-check.mjs',
+        '--runtime',
+        'rulebased',
+        '--write',
+        '--out',
+        'docs/forbidden-local-llm.json',
+    ], {
+        cwd: ROOT,
+        encoding: 'utf8',
+    });
+    assert.notEqual(forbidden.status, 0);
+    assert.match(forbidden.stderr, /Graph-RAG runtime output path must stay under tmp\/graph-rag\//);
+
+    const outPath = 'tmp/graph-rag/graph-rag-local-llm-contract-test.json';
+    try {
+        const allowed = spawnSync(process.execPath, [
+            'scripts/graph-rag-local-llm-check.mjs',
+            '--runtime',
+            'rulebased',
+            '--write',
+            '--out',
+            outPath,
+            '--json',
+        ], {
+            cwd: ROOT,
+            encoding: 'utf8',
+        });
+        assert.equal(allowed.status, 0, allowed.stderr);
+        const artifact = JSON.parse(await fs.readFile(path.join(ROOT, outPath), 'utf8'));
+        assert.equal(artifact.contract, 'knowledge-graph.local-llm-smoke.v1');
+    } finally {
+        await fs.rm(path.join(ROOT, outPath), { force: true });
+    }
+});
+
+test('local LLM smoke check blocks non-local base URLs before HTTP calls', async () => {
+    const result = await runLocalLlmSmokeCheck({
+        runtimeId: 'ollama',
+        baseUrl: 'https://example.com:11434',
+        timeoutMs: 100,
+    });
+
+    assert.equal(result.status, 'pass');
+    assert.equal(result.mode, 'rulebased-fallback');
+    assert.equal(result.fallbackUsed, true);
+    assert.equal(result.fallbackReason, 'blocked-non-local-base-url');
+    assert.equal(result.attempts[0].status, 'blocked-non-local-base-url');
+    assert.equal(result.checks.graphRagBlocked, false);
 });
 
 test('local LLM smoke check passes through rulebased fallback when no model is available', async () => {

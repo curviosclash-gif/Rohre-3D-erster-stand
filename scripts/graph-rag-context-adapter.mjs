@@ -3,8 +3,12 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { assertGraphRagRuntimeOutputPath } from './graph-rag-index.mjs';
 import { runGraphRagQuery } from './graph-rag-query.mjs';
-import { loadLocalLlmSelectionContract } from './graph-rag-local-llm-check.mjs';
+import {
+    assertLocalBaseUrlAllowed,
+    loadLocalLlmSelectionContract,
+} from './graph-rag-local-llm-check.mjs';
 
 const ROOT = process.cwd();
 const CONTRACT_PATH = 'data/contracts/knowledge-graph/context-adapter-profiles.v1.json';
@@ -72,7 +76,7 @@ async function readJson(root, relativePath) {
 }
 
 async function writeJson(root, relativePath, artifact) {
-    const normalizedPath = normalizeRepoPath(relativePath);
+    const normalizedPath = assertGraphRagRuntimeOutputPath(relativePath);
     const absolutePath = toAbsolute(root, normalizedPath);
     await fs.mkdir(path.dirname(absolutePath), { recursive: true });
     await fs.writeFile(absolutePath, `${JSON.stringify(artifact, null, 2)}\n`, 'utf8');
@@ -426,6 +430,7 @@ function parseJsonObject(text) {
 }
 
 function classifyLocalError(error) {
+    if (/blocked-non-local-base-url/i.test(error?.message || '')) return 'blocked-non-local-base-url';
     if (error?.code === 'timeout' || /timeout|timed out|AbortError/i.test(error?.message || '')) return 'timeout';
     if (/parseable JSON|Unexpected token|empty model output/i.test(error?.message || '')) return 'invalid-json';
     if (/model-missing/i.test(error?.message || '')) return 'model-missing';
@@ -615,6 +620,7 @@ async function runLocalRuntimeOutput(input, profile, options = {}) {
         if (!runtime || runtime.kind !== 'http') continue;
         try {
             const { baseUrl, requestedModel } = resolveRuntimeSettings(runtime, options);
+            assertLocalBaseUrlAllowed(baseUrl, { runtimeId: runtime.id });
             const health = await fetchJson(buildUrl(baseUrl, runtime.healthcheck.path), {
                 method: runtime.healthcheck.method || 'GET',
                 timeoutMs: Math.min(timeoutMs, asPositiveNumber(profile.timeouts?.connect_ms, 750)),
@@ -692,6 +698,9 @@ async function loadQueryResult(questionOrQuery, options = {}) {
 
 async function runGraphRagContextAdapter(questionOrQuery, options = {}) {
     const root = options.root || ROOT;
+    const requestedWritePath = options.write || options.outPath
+        ? assertGraphRagRuntimeOutputPath(options.outPath || 'tmp/graph-rag/graph-rag-context-adapter.json')
+        : null;
     const contract = validateContextAdapterProfilesContract(options.contract || await loadContextAdapterProfilesContract({
         root,
         contractPath: options.contractPath,
@@ -752,7 +761,7 @@ async function runGraphRagContextAdapter(questionOrQuery, options = {}) {
     };
 
     if (options.write || options.outPath) {
-        result.writtenPath = await writeJson(root, options.outPath || 'tmp/graph-rag/graph-rag-context-adapter.json', result);
+        result.writtenPath = await writeJson(root, requestedWritePath, result);
     }
     return result;
 }

@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
 import {
+    assertGraphRagRuntimeOutputPath,
     buildGraphRagIndex,
     chunkMarkdownText,
     classifyRagSourcePath,
@@ -12,6 +14,8 @@ import {
     shouldIndexRagPath,
     validateRagSourceContract,
 } from '../scripts/graph-rag-index.mjs';
+
+const ROOT = process.cwd();
 
 test('rag sources contract allows canonical markdown and excludes raw graph artifacts', async () => {
     const contract = await loadRagSourceContract();
@@ -41,6 +45,65 @@ test('rag sources contract allows canonical markdown and excludes raw graph arti
     });
     assert.equal(historicalExplicit.allowed, true);
     assert.equal(historicalExplicit.sourceClass, 'historical-plans');
+});
+
+test('graph rag runtime output path guard only allows tmp/graph-rag files', () => {
+    assert.equal(
+        assertGraphRagRuntimeOutputPath('./tmp/graph-rag/allowed.json'),
+        'tmp/graph-rag/allowed.json'
+    );
+    assert.equal(
+        assertGraphRagRuntimeOutputPath('tmp/graph-rag/nested/allowed.json'),
+        'tmp/graph-rag/nested/allowed.json'
+    );
+
+    for (const forbidden of [
+        'docs/forbidden.json',
+        'tmp/forbidden.json',
+        'tmp/graph-rag/../forbidden.json',
+        '../tmp/graph-rag/forbidden.json',
+        '/tmp/graph-rag/forbidden.json',
+        'C:\\tmp\\graph-rag\\forbidden.json',
+        'tmp/graph-rag/',
+    ]) {
+        assert.throws(
+            () => assertGraphRagRuntimeOutputPath(forbidden),
+            /Graph-RAG runtime output path must stay under tmp\/graph-rag\//
+        );
+    }
+});
+
+test('graph rag index CLI enforces --out path guard', async () => {
+    const forbidden = spawnSync(process.execPath, [
+        'scripts/graph-rag-index.mjs',
+        '--out',
+        'docs/forbidden-index.json',
+    ], {
+        cwd: ROOT,
+        encoding: 'utf8',
+    });
+    assert.notEqual(forbidden.status, 0);
+    assert.match(forbidden.stderr, /Graph-RAG runtime output path must stay under tmp\/graph-rag\//);
+
+    const outPath = 'tmp/graph-rag/graph-rag-index-contract-test.json';
+    try {
+        const allowed = spawnSync(process.execPath, [
+            'scripts/graph-rag-index.mjs',
+            '--source',
+            'docs/Umsetzungsplan.md',
+            '--out',
+            outPath,
+            '--json',
+        ], {
+            cwd: ROOT,
+            encoding: 'utf8',
+        });
+        assert.equal(allowed.status, 0, allowed.stderr);
+        const artifact = JSON.parse(await fs.readFile(path.join(ROOT, outPath), 'utf8'));
+        assert.equal(artifact.contract, 'knowledge-graph.rag-index.v1');
+    } finally {
+        await fs.rm(path.join(ROOT, outPath), { force: true });
+    }
 });
 
 test('markdown chunker creates stable ids with line ranges, hashes and headings', () => {

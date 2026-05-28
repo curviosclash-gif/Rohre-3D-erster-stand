@@ -11,6 +11,7 @@ const SOURCE_CONTRACT = 'knowledge-graph.rag-sources.v1';
 const SOURCE_SCHEMA_VERSION = 1;
 const DEFAULT_MAX_CHARS = 1800;
 const MARKDOWN_EXTENSIONS = new Set(['.md', '.markdown', '.txt']);
+const RAG_RUNTIME_OUTPUT_PREFIX = 'tmp/graph-rag/';
 
 const BUILT_IN_SECRET_PATTERNS = Object.freeze([
     /(?:api[-_]?key|auth|credential|password|secret|token)\s*[:=]/i,
@@ -24,6 +25,47 @@ function normalizeRepoPath(value) {
         .replace(/\\/g, '/')
         .replace(/^\.\/+/, '')
         .replace(/\/{2,}/g, '/');
+}
+
+function graphRagOutputPathError(value, reason) {
+    const received = String(value || '').trim() || '<empty>';
+    return new Error(`Graph-RAG runtime output path must stay under tmp/graph-rag/ (received: ${received}; reason: ${reason})`);
+}
+
+function isAbsolutePathInput(value) {
+    const raw = String(value || '').trim();
+    const slashNormalized = raw.replace(/\\/g, '/');
+    return path.isAbsolute(raw)
+        || path.win32.isAbsolute(raw)
+        || path.posix.isAbsolute(slashNormalized);
+}
+
+function assertGraphRagRuntimeOutputPath(value) {
+    const raw = String(value || '').trim();
+    if (!raw) {
+        throw graphRagOutputPathError(value, 'empty path');
+    }
+    if (raw.includes('\0')) {
+        throw graphRagOutputPathError(value, 'invalid null byte');
+    }
+    if (isAbsolutePathInput(raw)) {
+        throw graphRagOutputPathError(value, 'absolute paths are not allowed');
+    }
+
+    const normalizedInput = normalizeRepoPath(raw);
+    const segments = normalizedInput.split('/').filter(Boolean);
+    if (segments.includes('..')) {
+        throw graphRagOutputPathError(value, 'path traversal is not allowed');
+    }
+
+    const normalized = path.posix.normalize(normalizedInput).replace(/^\.\//, '');
+    if (!normalized.startsWith(RAG_RUNTIME_OUTPUT_PREFIX)) {
+        throw graphRagOutputPathError(value, `allowed prefix is ${RAG_RUNTIME_OUTPUT_PREFIX}`);
+    }
+    if (normalized === RAG_RUNTIME_OUTPUT_PREFIX.slice(0, -1) || normalized.endsWith('/')) {
+        throw graphRagOutputPathError(value, 'output must be a file below tmp/graph-rag/');
+    }
+    return normalized;
 }
 
 function toAbsolute(root, relativePath) {
@@ -593,7 +635,7 @@ function parseCliArgs(argv) {
 }
 
 async function writeIndexArtifact(root, outPath, artifact) {
-    const normalizedOut = normalizeRepoPath(outPath);
+    const normalizedOut = assertGraphRagRuntimeOutputPath(outPath);
     const absoluteOut = toAbsolute(root, normalizedOut);
     await fs.mkdir(path.dirname(absoluteOut), { recursive: true });
     await fs.writeFile(absoluteOut, `${JSON.stringify(artifact, null, 2)}\n`, 'utf8');
@@ -604,8 +646,10 @@ async function runCli(argv = process.argv.slice(2)) {
     const cliOptions = parseCliArgs(argv);
     const root = ROOT;
     const contract = await loadRagSourceContract({ root, contractPath: cliOptions.contractPath });
+    const outPath = assertGraphRagRuntimeOutputPath(
+        cliOptions.outPath || contract.index_output?.default_path || 'tmp/graph-rag/graph-rag-index.json'
+    );
     const artifact = await buildGraphRagIndex({ root, contract, ...cliOptions });
-    const outPath = normalizeRepoPath(cliOptions.outPath || contract.index_output?.default_path || 'tmp/graph-rag/graph-rag-index.json');
 
     let writtenPath = null;
     if (cliOptions.write) {
@@ -634,7 +678,9 @@ if (isCli) {
 
 export {
     RAG_INDEX_CONTRACT,
+    RAG_RUNTIME_OUTPUT_PREFIX,
     SOURCE_CONTRACT,
+    assertGraphRagRuntimeOutputPath,
     buildGraphRagIndex,
     chunkMarkdownText,
     classifyRagSourcePath,
