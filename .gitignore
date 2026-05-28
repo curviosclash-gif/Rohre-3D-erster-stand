@@ -24,6 +24,7 @@ scripts/tmp_refactor*.cjs
 
 # Lokale Laufzeit-/Screenshot-Artefakte
 output/
+.codegraph/
 start_gemini_yolo.bat
 tmp/
 tmp-vite*.out.log
