@@ -57,6 +57,7 @@
     "app:android:open": "node scripts/capacitor-mobile-classic.mjs open",
     "app:android:apk": "node scripts/capacitor-mobile-classic.mjs apk",
     "app:android:install": "node scripts/capacitor-mobile-classic.mjs install",
+    "android:update:phone": "node scripts/update-android-phone.mjs",
     "app:classic:android:build": "node scripts/build-mobile-classic-app.mjs",
     "app:classic:android:check": "node --test tests/mobile-classic-app.contract.test.mjs",
     "app:classic:android:add": "node scripts/capacitor-mobile-classic.mjs add",
