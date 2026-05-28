@@ -18,7 +18,7 @@ export const MOBILE_CLASSIC_TILT_SENSITIVITY_LIMITS = Object.freeze({
 export const DEFAULT_MOBILE_CLASSIC_CONTROLS = Object.freeze({
     tiltSensitivity: 1,
     tiltPitchMode: MOBILE_CLASSIC_TILT_PITCH_MODES.TILT,
-    tiltAssistMode: MOBILE_CLASSIC_TILT_ASSIST_MODES.OFF,
+    tiltAssistMode: MOBILE_CLASSIC_TILT_ASSIST_MODES.SOFT,
     tiltDebugVisible: false,
     tiltSensorHzVisible: false,
 });

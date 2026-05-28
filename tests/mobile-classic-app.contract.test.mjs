@@ -33,6 +33,7 @@ import {
   TOUCH_CONTROL_MODES,
 } from '../src/ui/TouchInputSource.js';
 import {
+  DEFAULT_MOBILE_CLASSIC_CONTROLS,
   MOBILE_CLASSIC_TILT_ASSIST_MODES,
   MOBILE_CLASSIC_TILT_PITCH_MODES,
   normalizeMobileClassicControlSettings,
@@ -120,6 +121,56 @@ function createClassList(initial = []) {
       if (enabled) entries.add(value);
       else entries.delete(value);
       return enabled;
+    },
+  };
+}
+
+function createStyle() {
+  return {
+    setProperty(name, value) {
+      this[name] = value;
+    },
+    removeProperty(name) {
+      delete this[name];
+    },
+  };
+}
+
+function createTouchElement({ id = '', hidden = false } = {}) {
+  return {
+    id,
+    dataset: {},
+    style: createStyle(),
+    attributes: {},
+    classList: createClassList(hidden ? ['hidden'] : []),
+    listeners: {},
+    ownerDocument: null,
+    appendChild(child) {
+      child.parentNode = this;
+    },
+    removeChild(child) {
+      if (child.parentNode === this) child.parentNode = null;
+    },
+    addEventListener(type, handler) {
+      this.listeners[type] = handler;
+    },
+    removeEventListener(type) {
+      delete this.listeners[type];
+    },
+    setAttribute(name, value) {
+      this.attributes[name] = value;
+    },
+    getAttribute(name) {
+      return this.attributes[name];
+    },
+    contains(target) {
+      return target === this;
+    },
+    closest() {
+      return null;
+    },
+    getBoundingClientRect() {
+      return { left: 20, top: 400, width: 120, height: 120 };
     },
   };
 }
@@ -270,6 +321,13 @@ test('Unified Mobile Android runtime guard defaults invalid modes to single-play
   assert.equal(settings.localSettings.mobileControls.tiltSensorHzVisible, true);
   assert.equal(settings.gameplay.planarMode, false);
   assert.equal(settings.hunt.respawnEnabled, false);
+});
+
+test('Mobile Classic default tilt assist is soft for phone play', () => {
+  const controls = normalizeMobileClassicControlSettings({});
+
+  assert.equal(DEFAULT_MOBILE_CLASSIC_CONTROLS.tiltAssistMode, MOBILE_CLASSIC_TILT_ASSIST_MODES.SOFT);
+  assert.equal(controls.tiltAssistMode, MOBILE_CLASSIC_TILT_ASSIST_MODES.SOFT);
 });
 
 test('Unified Mobile Android UI exposes Classic and Arcade-Parcours in one app shell', () => {
@@ -544,6 +602,143 @@ test('Mobile Classic tilt touch controls expose all classic match actions', () =
   assert.equal(tiltButtons.includes('shootMG'), false);
 });
 
+test('Mobile Classic touch path has pause and edge-triggered item actions', () => {
+  const tiltButtons = resolveTouchButtonDefinitions(TOUCH_CONTROL_MODES.TILT, {
+    includePauseButton: true,
+  }).map((button) => button.id);
+
+  assert.deepEqual(tiltButtons, ['fire', 'useItem', 'nextItem', 'boost', 'pause']);
+
+  let pauseCount = 0;
+  const source = new TouchInputSource({
+    controlMode: TOUCH_CONTROL_MODES.TILT,
+    includePauseButton: true,
+    game: {
+      matchFlowUiController: {
+        pause() {
+          pauseCount += 1;
+        },
+      },
+      settings: {
+        localSettings: {},
+      },
+    },
+  });
+  source._resolveActionState = () => ({
+    canShootNow: true,
+    canUseNow: true,
+    canCycle: true,
+    showMg: false,
+  });
+
+  source._buttons.fire = true;
+  source._buttons.useItem = true;
+  source._buttons.nextItem = true;
+  const firstPoll = source.poll();
+  const secondPoll = source.poll();
+
+  assert.equal(firstPoll.shootItem, true);
+  assert.equal(firstPoll.useItem, true);
+  assert.equal(firstPoll.nextItem, true);
+  assert.equal(secondPoll.shootItem, false);
+  assert.equal(secondPoll.useItem, false);
+  assert.equal(secondPoll.nextItem, false);
+  assert.equal(source._requestPause(), true);
+  assert.equal(source._requestPause(), false);
+  assert.equal(pauseCount, 1);
+
+  source.dispose();
+});
+
+test('Mobile Classic touch controls yield to pause overlay and Android back resumes', () => {
+  const container = createTouchElement({ id: 'touch-controls' });
+  const joystick = createTouchElement();
+  const fireButton = createTouchElement();
+  const pauseOverlay = createTouchElement({ hidden: true });
+  let pauseCount = 0;
+  let resumeCount = 0;
+  const source = new TouchInputSource({
+    game: {
+      ui: {
+        pauseOverlay,
+      },
+      matchFlowUiController: {
+        pause() {
+          pauseCount += 1;
+          pauseOverlay.classList.remove('hidden');
+        },
+        resumeFromPause() {
+          resumeCount += 1;
+          pauseOverlay.classList.add('hidden');
+        },
+      },
+      settings: {
+        localSettings: {},
+      },
+    },
+  });
+
+  source._containerEl = container;
+  source._joystickEl = joystick;
+  source._buttonEls = { fire: fireButton };
+  source._inMatch = true;
+  source._setUIVisibility(true);
+  assert.equal(container.style.pointerEvents, 'auto');
+
+  assert.equal(source._handleAndroidBack(), true);
+  assert.equal(pauseCount, 1);
+  assert.equal(container.dataset.overlayActive, '1');
+  assert.equal(container.style.pointerEvents, 'none');
+  assert.equal(fireButton.style.display, 'none');
+
+  assert.equal(source._handleAndroidBack(), true);
+  assert.equal(resumeCount, 1);
+  assert.equal(container.dataset.overlayActive, '0');
+  assert.equal(container.style.pointerEvents, 'auto');
+
+  source.dispose();
+});
+
+test('Mobile Classic fallback joystick can start as a floating left-side stick', () => {
+  const container = createTouchElement({ id: 'touch-controls' });
+  container.ownerDocument = {
+    defaultView: {
+      innerWidth: 400,
+      innerHeight: 800,
+    },
+    documentElement: {
+      clientWidth: 400,
+      clientHeight: 800,
+    },
+  };
+  const joystick = createTouchElement();
+  const knob = createTouchElement();
+  const source = new TouchInputSource({
+    controlMode: TOUCH_CONTROL_MODES.JOYSTICK,
+    game: {
+      settings: {
+        localSettings: {},
+      },
+    },
+  });
+
+  source._containerEl = container;
+  source._joystickEl = joystick;
+  source._joystickKnobEl = knob;
+  source._setUIVisibility(true);
+
+  const touch = { identifier: 7, clientX: 120, clientY: 520 };
+  assert.equal(source._shouldStartFloatingJoystick(touch, null), true);
+  source._beginJoystickTouch(touch, { floating: true });
+
+  assert.equal(source._joystickTouchId, 7);
+  assert.deepEqual(source._joystickCenter, { x: 120, y: 520 });
+  assert.equal(joystick.style.left, '60px');
+  assert.equal(joystick.style.top, '460px');
+
+  source.dispose();
+});
+
 test('Mobile Classic input resolver prefers a connected gamepad over touch fallback', () => {
   const gamepad = {
     axes: [0, 0, 0],
@@ -652,6 +847,9 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   assert.match(gradleFile, /versionCode mobileClassicVersionCode/);
   assert.match(gradleFile, /versionName mobileClassicVersionName/);
   assert.match(mainActivity, /WindowManager\.LayoutParams\.FLAG_KEEP_SCREEN_ON/);
+  assert.match(mainActivity, /OnBackPressedCallback/);
+  assert.match(mainActivity, /__curviosAndroidBackHandler/);
+  assert.match(mainActivity, /evaluateJavascript/);
   assert.match(updateScript, /merge', '--ff-only'/);
   assert.match(updateScript, /ensureCleanWorkingTree/);
   assert.match(updateScript, /capacitor-mobile-classic\.mjs/);

@@ -153,7 +153,7 @@ export function createPreferredMatchInputSource({
             playerIndex,
             getMatchRuntimeProjection,
             controlMode: (mobileClassic || mobileArcade) ? TOUCH_CONTROL_MODES.TILT : TOUCH_CONTROL_MODES.JOYSTICK,
-            includePauseButton: mobileArcadeMode,
+            includePauseButton: mobileClassic || mobileArcadeMode,
             mobileControls: normalizeMobileClassicControlSettings(game?.settings?.localSettings?.mobileControls),
         });
         touchSource.createUI();

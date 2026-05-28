@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Mobile Android Steuerungs-Hardening 2026-05-28
+
+- Nach User-Gate `bitte alles umsetzen` wurde der Android-Steuerungsslice umgesetzt: Classic und Parcours zeigen einen Pause-Button, Touch-Controls geben sichtbare Overlays frei, Android-Back wird im Match an Pause/Resume delegiert, der Joystick kann links als Floating-Fallback starten, und Mobile-Tilt nutzt `soft` als Default-Assist.
+- Evidence: `node --test tests/mobile-classic-app.contract.test.mjs`, `node --test tests/mobile-arcade-app.contract.test.mjs`, `npm run app:android:check`, `npm run app:android:assets:check`, `npm run docs:check`, `npm run gates:pre-commit` -> PASS.
+- Residual-risk: Native Back-Integration ist im Java-Wrapper contract-/textgesichert; echter Android-WebView-/Back-Button-Smoke bleibt wegen Device-Abhaengigkeit manuell.
+- Not-checked: keine Vollsuite, keine echte Android-Installation, keine FPS-/Sensor-Latenz-Messung, keine Desktop-Playwright-Suite.
+
 ## V137 137.2 Repo-Schutz vor Init 2026-05-28
 
 - Nach User-Gate `setze plan 137 fort` wurde der V137-Schutzslice vor jeder CodeGraph-Init-Wirkung geschlossen: `.gitignore` ignoriert jetzt `.codegraph/`, V137 steht im Master auf `137.3`, und der naechste Schritt bleibt D4/User-Gate.

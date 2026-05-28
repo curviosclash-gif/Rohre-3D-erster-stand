@@ -303,6 +303,10 @@ export class TouchInputSource extends PlayerInputSource {
             nextItem: false,
         };
         this._lastPauseRequestAt = 0;
+        this._overlayActive = false;
+        this._blockingOverlayObserver = null;
+        this._androidBackHandler = null;
+        this._previousAndroidBackHandler = null;
 
         this._containerEl = null;
         this._joystickEl = null;
@@ -399,6 +403,8 @@ export class TouchInputSource extends PlayerInputSource {
         this._containerEl.addEventListener('touchmove', this._touchMoveHandler, { passive: false });
         this._containerEl.addEventListener('touchend', this._touchEndHandler, { passive: false });
         this._containerEl.addEventListener('touchcancel', this._touchEndHandler, { passive: false });
+        this._bindBlockingOverlayObserver();
+        this._registerAndroidBackHandler();
 
         this._setUIVisibility(false);
     }
@@ -461,20 +467,24 @@ export class TouchInputSource extends PlayerInputSource {
 
     _setUIVisibility(visible) {
         this._uiVisible = visible;
+        this._overlayActive = this._isBlockingOverlayActive();
         const display = visible ? 'block' : 'none';
+        const controlsVisible = visible && !this._overlayActive;
 
         if (this._joystickEl) {
-            this._joystickEl.style.display = visible && this._shouldShowJoystickFallback() ? '' : 'none';
+            this._joystickEl.style.display = controlsVisible && this._shouldShowJoystickFallback() ? '' : 'none';
         }
         for (const el of Object.values(this._buttonEls)) {
-            if (el) el.style.display = visible ? 'flex' : 'none';
+            if (el) el.style.display = controlsVisible ? 'flex' : 'none';
         }
-        if (this._tiltButtonEl) this._tiltButtonEl.style.display = visible ? 'flex' : 'none';
-        if (this._tiltStatusEl) this._tiltStatusEl.style.display = visible ? 'block' : 'none';
+        if (this._tiltButtonEl) this._tiltButtonEl.style.display = controlsVisible ? 'flex' : 'none';
+        if (this._tiltStatusEl) this._tiltStatusEl.style.display = controlsVisible ? 'block' : 'none';
 
         if (this._containerEl?.id === 'touch-controls') {
             this._containerEl.style.display = display;
+            this._containerEl.style.pointerEvents = controlsVisible ? 'auto' : 'none';
             this._containerEl.setAttribute('aria-hidden', visible ? 'false' : 'true');
+            this._containerEl.dataset.overlayActive = this._overlayActive ? '1' : '0';
         }
         this._updateTiltUi();
     }
@@ -497,6 +507,9 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     _onTouchStart(e) {
+        if (this._syncBlockingOverlayState()) {
+            return;
+        }
         e.preventDefault();
         for (const touch of e.changedTouches) {
             const target = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -505,12 +518,8 @@ export class TouchInputSource extends PlayerInputSource {
                 this._tiltActivateHandler(e);
                 continue;
             }
-            if (target === this._joystickEl || target === this._joystickKnobEl || this._joystickEl?.contains(target)) {
-                this._joystickTouchId = touch.identifier;
-                const rect = this._joystickEl.getBoundingClientRect();
-                this._joystickCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-                this._joystickActive = true;
-                this._updateJoystick(touch.clientX, touch.clientY);
+            if (this._isJoystickTarget(target) || this._shouldStartFloatingJoystick(touch, target)) {
+                this._beginJoystickTouch(touch, { floating: !this._isJoystickTarget(target) });
             } else {
                 const actionTarget = target?.closest?.('[data-action]') || target;
                 const action = actionTarget?.dataset?.action;
@@ -545,6 +554,7 @@ export class TouchInputSource extends PlayerInputSource {
                 if (this._joystickKnobEl) {
                     this._joystickKnobEl.style.transform = '';
                 }
+                this._restoreJoystickHomePosition();
                 continue;
             }
 
@@ -557,6 +567,63 @@ export class TouchInputSource extends PlayerInputSource {
             }
             this._buttonTouches.delete(touch.identifier);
         }
+    }
+
+    _isJoystickTarget(target) {
+        return target === this._joystickEl
+            || target === this._joystickKnobEl
+            || this._joystickEl?.contains(target);
+    }
+
+    _shouldStartFloatingJoystick(touch, target) {
+        if (!this._joystickEl || this._joystickActive || !this._shouldShowJoystickFallback()) {
+            return false;
+        }
+        if (target?.closest?.('[data-action], [data-tilt-action], button, input, select, textarea, a')) {
+            return false;
+        }
+        const ownerWindow = this._containerEl?.ownerDocument?.defaultView
+            || (typeof window !== 'undefined' ? window : null);
+        const viewportWidth = Number(ownerWindow?.innerWidth)
+            || Number(this._containerEl?.ownerDocument?.documentElement?.clientWidth)
+            || 0;
+        const viewportHeight = Number(ownerWindow?.innerHeight)
+            || Number(this._containerEl?.ownerDocument?.documentElement?.clientHeight)
+            || 0;
+        if (viewportWidth <= 0 || viewportHeight <= 0) {
+            return false;
+        }
+        return touch.clientX <= viewportWidth * 0.5
+            && touch.clientY >= viewportHeight * 0.16;
+    }
+
+    _beginJoystickTouch(touch, { floating = false } = {}) {
+        this._joystickTouchId = touch.identifier;
+        if (floating) {
+            this._joystickCenter = { x: touch.clientX, y: touch.clientY };
+            this._positionFloatingJoystick(touch.clientX, touch.clientY);
+        } else {
+            const rect = this._joystickEl.getBoundingClientRect();
+            this._joystickCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        }
+        this._joystickActive = true;
+        this._updateJoystick(touch.clientX, touch.clientY);
+    }
+
+    _positionFloatingJoystick(clientX, clientY) {
+        if (!this._joystickEl) return;
+        const left = Math.round(clientX - this._joystickRadius);
+        const top = Math.round(clientY - this._joystickRadius);
+        this._joystickEl.style.setProperty('left', `${left}px`, 'important');
+        this._joystickEl.style.setProperty('top', `${top}px`, 'important');
+        this._joystickEl.style.setProperty('bottom', 'auto', 'important');
+    }
+
+    _restoreJoystickHomePosition() {
+        if (!this._joystickEl) return;
+        this._joystickEl.style.setProperty('left', '5%');
+        this._joystickEl.style.setProperty('bottom', '20%');
+        this._joystickEl.style.setProperty('top', 'auto');
     }
 
     _updateJoystick(clientX, clientY) {
@@ -595,7 +662,8 @@ export class TouchInputSource extends PlayerInputSource {
     _setButtonVisualState(id, { enabled = true, visible = true, title = '' } = {}) {
         const button = this._buttonEls[id];
         if (!button) return;
-        button.style.display = visible ? 'flex' : 'none';
+        const controlsVisible = this._uiVisible && !this._overlayActive;
+        button.style.display = visible && controlsVisible ? 'flex' : 'none';
         button.title = title;
         button.dataset.enabled = enabled ? '1' : '0';
         button.style.opacity = enabled ? '1' : '0.35';
@@ -610,7 +678,9 @@ export class TouchInputSource extends PlayerInputSource {
             return false;
         }
         this._lastPauseRequestAt = nowMs;
+        this._releaseAllControls();
         this._game?.matchFlowUiController?.pause?.();
+        this._syncBlockingOverlayState();
         return true;
     }
 
@@ -660,6 +730,10 @@ export class TouchInputSource extends PlayerInputSource {
 
     poll() {
         this._syncMobileControlSettings();
+        if (this._syncBlockingOverlayState()) {
+            this._releaseAllControls();
+            return this._createNeutralInput();
+        }
         const deadzone = 0.15;
         const jx = Math.abs(this._joystickDelta.x) > deadzone ? this._joystickDelta.x : 0;
         const jy = Math.abs(this._joystickDelta.y) > deadzone ? this._joystickDelta.y : 0;
@@ -697,6 +771,147 @@ export class TouchInputSource extends PlayerInputSource {
             shootMG: this._buttons.shootMG && !!actionState?.showMg,
             nextItem: nextItemPressed && !!actionState?.canCycle,
         };
+    }
+
+    _createNeutralInput() {
+        return {
+            pitchUp: false,
+            pitchDown: false,
+            yawLeft: false,
+            yawRight: false,
+            rollLeft: false,
+            rollRight: false,
+            pitchAxis: 0,
+            yawAxis: 0,
+            rollAxis: 0,
+            boost: false,
+            boostPressed: false,
+            cameraSwitch: false,
+            dropItem: false,
+            useItem: false,
+            shootItem: false,
+            shootMG: false,
+            nextItem: false,
+        };
+    }
+
+    _releaseAllControls() {
+        this._joystickActive = false;
+        this._joystickTouchId = null;
+        this._joystickDelta = { x: 0, y: 0 };
+        if (this._joystickKnobEl) {
+            this._joystickKnobEl.style.transform = '';
+        }
+        this._restoreJoystickHomePosition();
+        this._buttonTouches.clear();
+        for (const key of Object.keys(this._buttons)) {
+            this._buttons[key] = false;
+        }
+        this._prevBoost = false;
+        for (const key of Object.keys(this._prevDiscreteButtons)) {
+            this._prevDiscreteButtons[key] = false;
+        }
+    }
+
+    _isElementVisible(element) {
+        return !!element && !element.classList?.contains?.('hidden')
+            && element.getAttribute?.('aria-hidden') !== 'true';
+    }
+
+    _isPauseOverlayActive() {
+        const doc = this._containerEl?.ownerDocument || (typeof document !== 'undefined' ? document : null);
+        return this._isElementVisible(this._game?.ui?.pauseOverlay || doc?.getElementById?.('pause-overlay'));
+    }
+
+    _isBlockingOverlayActive() {
+        const doc = this._containerEl?.ownerDocument || (typeof document !== 'undefined' ? document : null);
+        return this._isPauseOverlayActive()
+            || this._isElementVisible(this._game?.ui?.messageOverlay || doc?.getElementById?.('message-overlay'));
+    }
+
+    _syncBlockingOverlayState() {
+        const overlayActive = this._isBlockingOverlayActive();
+        if (overlayActive !== this._overlayActive) {
+            this._overlayActive = overlayActive;
+            if (overlayActive) {
+                this._releaseAllControls();
+            }
+            this._setUIVisibility(this._uiVisible);
+        } else if (this._containerEl?.id === 'touch-controls') {
+            this._containerEl.dataset.overlayActive = overlayActive ? '1' : '0';
+            this._containerEl.style.pointerEvents = this._uiVisible && !overlayActive ? 'auto' : 'none';
+        }
+        return overlayActive;
+    }
+
+    _bindBlockingOverlayObserver() {
+        const ownerWindow = this._containerEl?.ownerDocument?.defaultView
+            || (typeof window !== 'undefined' ? window : null);
+        if (!ownerWindow?.MutationObserver || this._blockingOverlayObserver) {
+            return;
+        }
+        const doc = this._containerEl?.ownerDocument || (typeof document !== 'undefined' ? document : null);
+        const targets = [
+            this._game?.ui?.pauseOverlay || doc?.getElementById?.('pause-overlay'),
+            this._game?.ui?.messageOverlay || doc?.getElementById?.('message-overlay'),
+        ].filter(Boolean);
+        if (targets.length === 0) {
+            return;
+        }
+        this._blockingOverlayObserver = new ownerWindow.MutationObserver(() => {
+            this._syncBlockingOverlayState();
+        });
+        for (const target of targets) {
+            this._blockingOverlayObserver.observe(target, {
+                attributes: true,
+                attributeFilter: ['class', 'aria-hidden'],
+            });
+        }
+    }
+
+    _registerAndroidBackHandler() {
+        const ownerWindow = this._containerEl?.ownerDocument?.defaultView
+            || (typeof window !== 'undefined' ? window : null);
+        if (!ownerWindow || this._androidBackHandler) {
+            return;
+        }
+        this._previousAndroidBackHandler = typeof ownerWindow.__curviosAndroidBackHandler === 'function'
+            ? ownerWindow.__curviosAndroidBackHandler
+            : null;
+        this._androidBackHandler = () => {
+            if (this._handleAndroidBack()) return true;
+            return this._previousAndroidBackHandler?.() === true;
+        };
+        ownerWindow.__curviosAndroidBackHandler = this._androidBackHandler;
+    }
+
+    _unregisterAndroidBackHandler() {
+        const ownerWindow = this._containerEl?.ownerDocument?.defaultView
+            || (typeof window !== 'undefined' ? window : null);
+        if (!ownerWindow || !this._androidBackHandler) {
+            return;
+        }
+        if (ownerWindow.__curviosAndroidBackHandler === this._androidBackHandler) {
+            if (this._previousAndroidBackHandler) {
+                ownerWindow.__curviosAndroidBackHandler = this._previousAndroidBackHandler;
+            } else {
+                delete ownerWindow.__curviosAndroidBackHandler;
+            }
+        }
+        this._androidBackHandler = null;
+        this._previousAndroidBackHandler = null;
+    }
+
+    _handleAndroidBack() {
+        if (!this._inMatch || !this._uiVisible) {
+            return false;
+        }
+        if (this._isPauseOverlayActive()) {
+            this._game?.matchFlowUiController?.resumeFromPause?.();
+            this._syncBlockingOverlayState();
+            return true;
+        }
+        return this._requestPause();
     }
 
     _isTiltFresh() {
@@ -908,11 +1123,14 @@ export class TouchInputSource extends PlayerInputSource {
             this._tiltStatusEl.textContent = this._resolveTiltStatusText();
         }
         if (this._uiVisible && this._joystickEl) {
-            this._joystickEl.style.display = this._shouldShowJoystickFallback() ? '' : 'none';
+            this._joystickEl.style.display = !this._overlayActive && this._shouldShowJoystickFallback() ? '' : 'none';
         }
     }
 
     removeUI() {
+        this._unregisterAndroidBackHandler();
+        this._blockingOverlayObserver?.disconnect?.();
+        this._blockingOverlayObserver = null;
         if (this._containerEl) {
             this._containerEl.removeEventListener('touchstart', this._touchStartHandler);
             this._containerEl.removeEventListener('touchmove', this._touchMoveHandler);
