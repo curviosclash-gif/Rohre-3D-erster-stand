@@ -35,6 +35,44 @@ const REFERENCE_QUESTIONS = Object.freeze([
         expectedQueries: ['event-flow', 'critical-path-health'],
         expectedCriticalPath: 'spawn',
     },
+    {
+        id: 'graph-rag-query-alias',
+        question: 'Wo ist der Graph-RAG Query Code und welche Tests pruefen ihn?',
+        expectedQueries: ['impact-for-file', 'test-prioritization'],
+        expectedFiles: [
+            'scripts/graph-rag-query.mjs',
+            'tests/graph-rag-query.contract.test.mjs',
+        ],
+    },
+    {
+        id: 'codegraph-block-alias',
+        question: 'Welche Handoff-Regeln gelten fuer CodeGraph?',
+        expectedQueries: ['open-deps', 'files-for-block'],
+        expectedBlocks: ['V137'],
+    },
+]);
+
+const NEGATIVE_REFERENCE_QUESTIONS = Object.freeze([
+    {
+        id: 'nonexistent-block',
+        question: 'Was ist mit V999 gemeint?',
+        expectedUnresolved: { type: 'block', value: 'V999' },
+    },
+    {
+        id: 'unclear-file',
+        question: 'Was ist in src/does-not-exist/NopeWidget.js geregelt?',
+        expectedUnresolved: { type: 'file', value: 'src/does-not-exist/NopeWidget.js' },
+    },
+    {
+        id: 'mixed-scope',
+        question: 'Welche Scope-Kollisionen betreffen V112 und V999?',
+        expectedUnresolved: { type: 'block', value: 'V999' },
+    },
+    {
+        id: 'false-critical-path',
+        question: 'Zeige mir den fake Critical Path mit Tests und Evidence.',
+        expectedUnresolved: { type: 'critical-path', value: 'fake' },
+    },
 ]);
 
 test('rag evidence package contract defines source-backed claims and budget report', async () => {
@@ -50,6 +88,8 @@ test('rag evidence package contract defines source-backed claims and budget repo
     assert.ok(contract.claim_schema.required.includes('uncertainties'));
     assert.deepEqual(contract.claim_schema.confidence_values, ['high', 'medium', 'low']);
     assert.ok(contract.budget_report.required.includes('selectedEstimatedTokens'));
+    assert.ok(contract.budget_report.required.includes('fallbackRate'));
+    assert.ok(contract.ranking_report.required.includes('lowestConfidence'));
 });
 
 test('graph rag query CLI rejects --out outside tmp/graph-rag and writes allowed outputs', async () => {
@@ -101,6 +141,16 @@ test('graph rag intent router maps reference questions to conservative graph que
     assert.ok(spawnRoute.intents.includes('runtime'));
     assert.ok(spawnRoute.intents.includes('test'));
     assert.ok(spawnRoute.graphQueries.some((query) => query.id === 'event-flow'));
+
+    const graphRagRoute = routeGraphRagQuestion(REFERENCE_QUESTIONS[3].question);
+    assert.ok(graphRagRoute.filePaths.includes('scripts/graph-rag-query.mjs'));
+    assert.ok(graphRagRoute.filePaths.includes('tests/graph-rag-query.contract.test.mjs'));
+    assert.ok(graphRagRoute.intents.includes('file'));
+    assert.ok(graphRagRoute.intents.includes('test'));
+
+    const codeGraphRoute = routeGraphRagQuestion(REFERENCE_QUESTIONS[4].question);
+    assert.ok(codeGraphRoute.blockIds.includes('V137'));
+    assert.ok(codeGraphRoute.intents.includes('plan'));
 });
 
 test('graph rag query runs graph-first before selecting source-backed chunks', async () => {
@@ -138,11 +188,16 @@ test('graph rag query runs graph-first before selecting source-backed chunks', a
         validateRagEvidencePackage(result.evidencePackage, await loadRagEvidencePackageContract());
         assert.equal(result.evidencePackage.claims.length, result.selectedChunks.length, fixture.id);
         assert.equal(result.evidencePackage.budgetReport.chunksSelected, result.selectedChunks.length, fixture.id);
+        assert.equal(result.evidencePackage.budgetReport.candidatePathCount, result.graph.candidates.length, fixture.id);
+        assert.equal(result.evidencePackage.budgetReport.selectedGraphCandidateChunks + result.evidencePackage.budgetReport.selectedTextFallbackChunks, result.selectedChunks.length, fixture.id);
         assert.equal(
             result.evidencePackage.budgetReport.selectedEstimatedTokens,
             result.budget.selectedEstimatedTokens,
             fixture.id
         );
+        assert.equal(result.evidencePackage.rankingReport.lowestConfidence, result.budget.lowestConfidence, fixture.id);
+        assert.ok(result.evidencePackage.rankingReport.topCandidates.length > 0, fixture.id);
+        assert.ok(Array.isArray(result.evidencePackage.rankingReport.rejectedChunks), fixture.id);
         assert.ok(result.graph.candidates.every((candidate) => candidate.path && candidate.reasons.length > 0));
         for (const claim of result.evidencePackage.claims) {
             assert.match(claim.path, /^(docs|\.agents)\//, fixture.id);
@@ -153,5 +208,28 @@ test('graph rag query runs graph-first before selecting source-backed chunks', a
             assert.ok(Array.isArray(claim.uncertainties), fixture.id);
             assert.ok(claim.uncertainties.length > 0, fixture.id);
         }
+    }
+});
+
+test('graph rag negative reference questions keep unresolved matches below high confidence', async () => {
+    const index = await buildGraphRagIndex();
+
+    for (const fixture of NEGATIVE_REFERENCE_QUESTIONS) {
+        const result = await runGraphRagQuery(fixture.question, {
+            index,
+            maxChunks: 4,
+        });
+
+        assert.ok(
+            result.route.unresolvedReferences.some((reference) => (
+                reference.type === fixture.expectedUnresolved.type
+                && reference.value === fixture.expectedUnresolved.value
+            )),
+            `${fixture.id} should expose unresolved ${fixture.expectedUnresolved.type}`
+        );
+        assert.ok(result.evidencePackage.uncertainties.includes('unresolved-query-reference'), fixture.id);
+        assert.ok(!result.evidencePackage.claims.some((claim) => claim.confidence === 'high'), fixture.id);
+        assert.notEqual(result.evidencePackage.rankingReport.lowestConfidence, 'high', fixture.id);
+        assert.ok(result.evidencePackage.rankingReport.rejectedChunks.every((chunk) => chunk.rejectedReason), fixture.id);
     }
 });

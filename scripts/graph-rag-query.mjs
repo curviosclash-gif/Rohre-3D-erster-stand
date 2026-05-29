@@ -32,17 +32,96 @@ const CONFIDENCE_VALUES = Object.freeze(['high', 'medium', 'low']);
 const KNOWN_FILE_ALIASES = Object.freeze({
     settingsmanager: 'src/core/SettingsManager.js',
     settingsmanagerjs: 'src/core/SettingsManager.js',
+    umsetzungsplan: 'docs/Umsetzungsplan.md',
+    masterplan: 'docs/Umsetzungsplan.md',
+    planindex: 'docs/generated/plan-index.json',
+    knowledgegraph: 'docs/generated/knowledge-graph.json',
+    wissensgraph: 'docs/generated/knowledge-graph.json',
+    graphragquery: 'scripts/graph-rag-query.mjs',
+    graphragquerymjs: 'scripts/graph-rag-query.mjs',
+    graphragindex: 'scripts/graph-rag-index.mjs',
+    graphragindexmjs: 'scripts/graph-rag-index.mjs',
+    graphragcontextadapter: 'scripts/graph-rag-context-adapter.mjs',
+    contextadapter: 'scripts/graph-rag-context-adapter.mjs',
+    graphraglocalllmcheck: 'scripts/graph-rag-local-llm-check.mjs',
+    localllmcheck: 'scripts/graph-rag-local-llm-check.mjs',
+    queryops: 'data/contracts/knowledge-graph/query-ops.v1.json',
+    ragevidencepackage: 'data/contracts/knowledge-graph/rag-evidence-package.v1.json',
+    ragsources: 'data/contracts/knowledge-graph/rag-sources.v1.json',
+});
+
+const TEST_FILE_ALIASES = Object.freeze({
+    graphragquery: 'tests/graph-rag-query.contract.test.mjs',
+    graphragquerycontract: 'tests/graph-rag-query.contract.test.mjs',
+    graphragindex: 'tests/graph-rag-index.contract.test.mjs',
+    graphragcontextadapter: 'tests/graph-rag-context-adapter.contract.test.mjs',
+    contextadapter: 'tests/graph-rag-context-adapter.contract.test.mjs',
+    localllm: 'tests/graph-rag-local-llm-selection.contract.test.mjs',
+    graphraglocalllm: 'tests/graph-rag-local-llm-selection.contract.test.mjs',
+});
+
+const KNOWN_BLOCK_ALIASES = Object.freeze({
+    graphragcore: 'V120',
+    graphragkern: 'V120',
+    graphragmvp: 'V120',
+    graphragviewer: 'V121',
+    evidencedashboard: 'V121',
+    askrepo: 'V121',
+    askrepochat: 'V121',
+    agentmemory: 'V122',
+    ruflo: 'V122',
+    produktsemantik: 'V124',
+    productsemantics: 'V124',
+    codegraph: 'V137',
+    graphragfollowup: 'V139',
+    graphragfolgeblock: 'V139',
+    graphragqualitat: 'V139',
+    graphragquality: 'V139',
 });
 
 const CRITICAL_PATH_ALIASES = Object.freeze({
     spawn: 'spawn',
+    entityspawn: 'spawn',
+    spawnpath: 'spawn',
     settings: 'settings',
+    einstellungen: 'settings',
+    settingsmanager: 'settings',
     combat: 'combat-hit',
+    kampf: 'combat-hit',
+    damage: 'combat-hit',
+    treffer: 'combat-hit',
     hit: 'combat-hit',
     'combat-hit': 'combat-hit',
     round: 'round-end',
+    runde: 'round-end',
+    rundenende: 'round-end',
     'round-end': 'round-end',
 });
+
+const GENERIC_CRITICAL_PATH_TOKENS = Object.freeze(new Set([
+    'critical',
+    'path',
+    'critical-path',
+    'kritisch',
+    'kritischer',
+    'kritischen',
+    'pfad',
+    'event-flow',
+    'eventflow',
+    'tests',
+    'test',
+    'evidence',
+    'gate',
+    'check',
+    'checks',
+    'mit',
+    'mir',
+    'den',
+    'dem',
+    'der',
+    'die',
+    'das',
+]));
 
 function normalizeText(value) {
     return String(value || '')
@@ -72,6 +151,9 @@ function tokenize(value) {
         'about',
         'show',
         'zeige',
+        'mir',
+        'den',
+        'dem',
     ]);
     return Array.from(new Set(
         normalizeText(value)
@@ -97,6 +179,15 @@ function extractBlockIds(question) {
     )).sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
 }
 
+function inferBlockAliases(question) {
+    const normalized = normalizeText(question).replace(/[^a-z0-9]/g, '');
+    const blockIds = [];
+    for (const [alias, blockId] of Object.entries(KNOWN_BLOCK_ALIASES)) {
+        if (normalized.includes(alias)) blockIds.push(blockId);
+    }
+    return Array.from(new Set(blockIds)).sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
+}
+
 function extractExplicitFilePaths(question) {
     return Array.from(new Set(
         (String(question || '').match(/[A-Za-z0-9_.:/\\-]+\.(?:js|mjs|md|json|css|html)/g) || [])
@@ -105,10 +196,17 @@ function extractExplicitFilePaths(question) {
 }
 
 function inferFileAliases(question) {
+    const normalizedQuestion = normalizeText(question);
     const normalized = normalizeText(question).replace(/[^a-z0-9]/g, '');
     const files = [];
     for (const [alias, filePath] of Object.entries(KNOWN_FILE_ALIASES)) {
         if (normalized.includes(alias)) files.push(filePath);
+    }
+    const testContext = hasAny(normalizedQuestion, [/test/, /contract/, /smoke/, /check/, /gate/]);
+    if (testContext) {
+        for (const [alias, filePath] of Object.entries(TEST_FILE_ALIASES)) {
+            if (normalized.includes(alias)) files.push(filePath);
+        }
     }
     return Array.from(new Set(files)).sort((left, right) => left.localeCompare(right));
 }
@@ -121,20 +219,48 @@ function inferCriticalPath(question) {
     return null;
 }
 
+function inferUnknownCriticalPath(question, knownCriticalPath) {
+    if (knownCriticalPath) return null;
+    const normalizedQuestion = normalizeText(question);
+    if (!hasAny(normalizedQuestion, [/critical[- ]?path/, /kritisch(?:er|en)? pfad/, /event[- ]?flow/])) return null;
+    const knownTokens = new Set([
+        ...Object.keys(CRITICAL_PATH_ALIASES),
+        ...Object.values(CRITICAL_PATH_ALIASES),
+    ]);
+    for (const token of tokenize(question)) {
+        if (knownTokens.has(token) || GENERIC_CRITICAL_PATH_TOKENS.has(token)) continue;
+        if (/^v\d+$/i.test(token) || token.includes('.')) continue;
+        return token;
+    }
+    return 'unknown-critical-path';
+}
+
 function hasAny(text, patterns) {
     return patterns.some((pattern) => pattern.test(text));
 }
 
 function routeGraphRagQuestion(question) {
     const normalizedQuestion = normalizeText(question);
-    const blockIds = extractBlockIds(question);
+    const blockIds = Array.from(new Set([
+        ...extractBlockIds(question),
+        ...inferBlockAliases(question),
+    ])).sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
     const explicitFiles = extractExplicitFilePaths(question);
     const aliasFiles = inferFileAliases(question);
     const filePaths = Array.from(new Set([...explicitFiles, ...aliasFiles]))
         .sort((left, right) => left.localeCompare(right));
     const criticalPath = inferCriticalPath(question);
+    const unknownCriticalPath = inferUnknownCriticalPath(question, criticalPath);
     const intents = new Set();
     const graphQueries = [];
+    const unresolvedReferences = [];
+    if (unknownCriticalPath) {
+        unresolvedReferences.push({
+            type: 'critical-path',
+            value: unknownCriticalPath,
+            reason: 'unknown-critical-path-alias',
+        });
+    }
 
     if (blockIds.length > 0 || hasAny(normalizedQuestion, [/scope/, /kollision/, /collision/, /abhangig/, /dependency/, /plan/, /block/])) {
         intents.add('plan');
@@ -194,6 +320,7 @@ function routeGraphRagQuestion(question) {
         filePaths,
         criticalPath,
         graphQueries: dedupedGraphQueries,
+        unresolvedReferences,
     };
 }
 
@@ -250,12 +377,23 @@ function validateRagEvidencePackageContract(contract) {
         'maxChunks',
         'chunksAvailable',
         'graphCandidateChunks',
+        'candidatePathCount',
         'chunksScored',
         'chunksSelected',
         'chunksRejected',
+        'selectedGraphCandidateChunks',
+        'selectedTextFallbackChunks',
         'selectedEstimatedTokens',
         'fallbackUsed',
+        'fallbackRate',
     ], 'rag evidence package budget_report.required');
+    assertObject(contract.ranking_report, 'rag evidence package ranking_report');
+    hasRequiredValues(contract.ranking_report.required, [
+        'topCandidates',
+        'rejectedChunks',
+        'lowestConfidence',
+        'confidenceCounts',
+    ], 'rag evidence package ranking_report.required');
 
     return contract;
 }
@@ -286,6 +424,70 @@ function addNodeArtifactsToCandidates(candidates, nodes = [], reasonPrefix = 'gr
 
 function blockPlanPath(blockId) {
     return `docs/plaene/aktiv/${blockId}.md`;
+}
+
+function graphHasBlock(graph, blockId) {
+    return (graph.nodes || []).some((node) => node?.type === 'block' && node.id === blockId);
+}
+
+function graphHasArtifactPath(graph, filePath) {
+    const normalized = normalizeRepoPath(filePath);
+    return (graph.nodes || []).some((node) => {
+        if (normalizeRepoPath(node?.file || '') === normalized) return true;
+        return (node?.artifacts || []).some((artifact) => normalizeRepoPath(artifact?.path || '') === normalized);
+    });
+}
+
+function coverageHasFile(coverage, filePath) {
+    const normalized = normalizeRepoPath(filePath);
+    return (coverage.files || []).some((entry) => normalizeRepoPath(entry?.path || '') === normalized);
+}
+
+function dedupeUnresolvedReferences(references) {
+    const seen = new Set();
+    const deduped = [];
+    for (const reference of references || []) {
+        const key = `${reference.type}:${reference.value}:${reference.reason}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        deduped.push(reference);
+    }
+    return deduped;
+}
+
+function resolveRouteReferences(route, graph, coverage) {
+    const unresolvedReferences = [...(route.unresolvedReferences || [])];
+    for (const blockId of route.blockIds || []) {
+        if (!graphHasBlock(graph, blockId)) {
+            unresolvedReferences.push({
+                type: 'block',
+                value: blockId,
+                reason: 'block-not-in-knowledge-graph',
+            });
+        }
+    }
+    for (const filePath of route.filePaths || []) {
+        if (!coverageHasFile(coverage, filePath) && !graphHasArtifactPath(graph, filePath)) {
+            unresolvedReferences.push({
+                type: 'file',
+                value: normalizeRepoPath(filePath),
+                reason: 'file-not-in-knowledge-graph-coverage',
+            });
+        }
+    }
+    return {
+        ...route,
+        unresolvedReferences: dedupeUnresolvedReferences(unresolvedReferences),
+    };
+}
+
+function routeHasUnresolved(route, type, value) {
+    const normalizedValue = type === 'file' ? normalizeRepoPath(value) : String(value || '');
+    return (route.unresolvedReferences || []).some((reference) => {
+        if (reference.type !== type) return false;
+        const referenceValue = type === 'file' ? normalizeRepoPath(reference.value) : String(reference.value || '');
+        return referenceValue === normalizedValue;
+    });
 }
 
 function summarizeGraphResult(result, route) {
@@ -403,16 +605,19 @@ function collectCandidatesForResult(result, route, candidates) {
         }
     }
     if (result.query === 'files-for-block') {
+        if (routeHasUnresolved(route, 'block', result.blockId)) return;
         addCandidatePath(candidates, blockPlanPath(result.blockId), `files-for-block:${result.blockId}`, 7);
         for (const entry of result.files || []) {
             addCandidatePath(candidates, entry.path, `files-for-block:${result.blockId}`, 2);
         }
     }
     if (result.query === 'open-deps') {
+        if (routeHasUnresolved(route, 'block', result.blockId)) return;
         addCandidatePath(candidates, 'docs/Umsetzungsplan.md', `open-deps:${result.blockId}`, 4);
         addCandidatePath(candidates, blockPlanPath(result.blockId), `open-deps:${result.blockId}`, 5);
     }
     if (result.query === 'impact-for-file') {
+        if (routeHasUnresolved(route, 'file', result.file)) return;
         addCandidatePath(candidates, result.file, 'impact-for-file:subject', 5);
         addNodeArtifactsToCandidates(candidates, result.implementedNodes, 'impact-for-file:implemented');
         addNodeArtifactsToCandidates(candidates, result.relatedNodes, 'impact-for-file:related');
@@ -465,9 +670,11 @@ function runGraphCandidateSelection(route, graph, coverage) {
     }
 
     for (const blockId of route.blockIds) {
+        if (routeHasUnresolved(route, 'block', blockId)) continue;
         addCandidatePath(candidates, blockPlanPath(blockId), 'mentioned-block', 8);
     }
     for (const filePath of route.filePaths) {
+        if (routeHasUnresolved(route, 'file', filePath)) continue;
         addCandidatePath(candidates, filePath, 'mentioned-file', 8);
     }
 
@@ -587,8 +794,46 @@ function validateRagEvidencePackage(evidencePackage, contract) {
     if (typeof evidencePackage.budgetReport.fallbackUsed !== 'boolean') {
         throw new Error('evidence package budgetReport fallbackUsed must be boolean');
     }
+    if (Number(evidencePackage.budgetReport.fallbackRate) < 0 || Number(evidencePackage.budgetReport.fallbackRate) > 1) {
+        throw new Error('evidence package budgetReport fallbackRate must be between 0 and 1');
+    }
+
+    assertObject(evidencePackage.rankingReport, 'evidence package rankingReport');
+    if (!Array.isArray(evidencePackage.rankingReport.topCandidates)) {
+        throw new Error('evidence package rankingReport topCandidates must be an array');
+    }
+    if (!Array.isArray(evidencePackage.rankingReport.rejectedChunks)) {
+        throw new Error('evidence package rankingReport rejectedChunks must be an array');
+    }
+    if (!confidenceValues.has(evidencePackage.rankingReport.lowestConfidence)) {
+        throw new Error(`evidence package rankingReport has invalid lowestConfidence: ${evidencePackage.rankingReport.lowestConfidence}`);
+    }
+    assertObject(evidencePackage.rankingReport.confidenceCounts, 'evidence package rankingReport confidenceCounts');
+    for (const confidence of confidenceValues) {
+        if (!Number.isFinite(Number(evidencePackage.rankingReport.confidenceCounts[confidence] || 0))) {
+            throw new Error(`evidence package rankingReport confidenceCounts invalid: ${confidence}`);
+        }
+    }
 
     return evidencePackage;
+}
+
+function isStrongChunkMatch(chunk, route, candidatePaths) {
+    return candidatePaths.has(normalizeRepoPath(chunk.path))
+        || route.blockIds.some((blockId) => (chunk.graph?.blockIds || []).includes(blockId))
+        || route.filePaths.some((filePath) => normalizeText(chunk.text).includes(path.posix.basename(filePath).toLowerCase()))
+        || (route.criticalPath && containsExactTerm(chunk.text, route.criticalPath));
+}
+
+function summarizeRankedChunk(chunk, selectedIds = new Set(), rejectedReason = null) {
+    return {
+        id: chunk.id,
+        path: chunk.path,
+        retrievalScore: chunk.retrievalScore,
+        selectedVia: chunk.selectedVia,
+        selected: selectedIds.has(chunk.id),
+        rejectedReason,
+    };
 }
 
 function selectGraphRagChunks(index, route, candidates, options = {}) {
@@ -612,12 +857,13 @@ function selectGraphRagChunks(index, route, candidates, options = {}) {
 
     const selected = [];
     const seenPaths = new Set();
+    const rejectedReasons = new Map();
     for (const chunk of scored) {
-        const strongMatch = candidatePaths.has(normalizeRepoPath(chunk.path))
-            || route.blockIds.some((blockId) => (chunk.graph?.blockIds || []).includes(blockId))
-            || route.filePaths.some((filePath) => normalizeText(chunk.text).includes(path.posix.basename(filePath).toLowerCase()))
-            || (route.criticalPath && containsExactTerm(chunk.text, route.criticalPath));
-        if (!strongMatch && selected.length > 0) continue;
+        const strongMatch = isStrongChunkMatch(chunk, route, candidatePaths);
+        if (!strongMatch && selected.length > 0) {
+            rejectedReasons.set(chunk.id, 'weak-match-after-strong-selection');
+            continue;
+        }
         selected.push(chunk);
         seenPaths.add(normalizeRepoPath(chunk.path));
         if (selected.length >= maxChunks) break;
@@ -626,12 +872,25 @@ function selectGraphRagChunks(index, route, candidates, options = {}) {
     if (selected.length < maxChunks) {
         for (const chunk of scored) {
             if (selected.some((entry) => entry.id === chunk.id)) continue;
-            if (seenPaths.has(normalizeRepoPath(chunk.path)) && selected.length >= Math.ceil(maxChunks / 2)) continue;
+            if (seenPaths.has(normalizeRepoPath(chunk.path)) && selected.length >= Math.ceil(maxChunks / 2)) {
+                rejectedReasons.set(chunk.id, 'same-path-budget-limit');
+                continue;
+            }
+            rejectedReasons.delete(chunk.id);
             selected.push(chunk);
             seenPaths.add(normalizeRepoPath(chunk.path));
             if (selected.length >= maxChunks) break;
         }
     }
+
+    const selectedIds = new Set(selected.map((chunk) => chunk.id));
+    for (const chunk of scored) {
+        if (selectedIds.has(chunk.id) || rejectedReasons.has(chunk.id)) continue;
+        rejectedReasons.set(chunk.id, selected.length >= maxChunks ? 'ranked-below-budget' : 'not-selected');
+    }
+    const selectedGraphCandidateChunks = selected.filter((chunk) => chunk.selectedVia === 'graph-candidate').length;
+    const selectedTextFallbackChunks = selected.filter((chunk) => chunk.selectedVia === 'text-fallback').length;
+    const fallbackRate = selected.length === 0 ? (graphCandidateChunks.length === 0 ? 1 : 0) : selectedTextFallbackChunks / selected.length;
 
     return {
         selectedChunks: selected.map((chunk) => ({
@@ -651,11 +910,20 @@ function selectGraphRagChunks(index, route, candidates, options = {}) {
         retrievalStats: {
             chunksAvailable: chunks.length,
             graphCandidateChunks: graphCandidateChunks.length,
+            candidatePathCount: candidatePaths.size,
             chunksScored: scored.length,
             chunksSelected: selected.length,
             chunksRejected: Math.max(0, scored.length - selected.length),
+            selectedGraphCandidateChunks,
+            selectedTextFallbackChunks,
             selectedEstimatedTokens: selected.reduce((sum, chunk) => sum + Number(chunk.estimatedTokens || 0), 0),
             fallbackUsed: graphCandidateChunks.length === 0,
+            fallbackRate: Number(fallbackRate.toFixed(3)),
+            topCandidates: scored.slice(0, 8).map((chunk) => summarizeRankedChunk(chunk, selectedIds, rejectedReasons.get(chunk.id) || null)),
+            rejectedChunks: scored
+                .filter((chunk) => !selectedIds.has(chunk.id))
+                .slice(0, 12)
+                .map((chunk) => summarizeRankedChunk(chunk, selectedIds, rejectedReasons.get(chunk.id) || 'not-selected')),
         },
     };
 }
@@ -666,22 +934,57 @@ function makeBudgetReport(chunkSelection, options = {}) {
         maxChunks: Number(options.maxChunks || DEFAULT_MAX_CHUNKS),
         chunksAvailable: stats.chunksAvailable,
         graphCandidateChunks: stats.graphCandidateChunks,
+        candidatePathCount: stats.candidatePathCount,
         chunksScored: stats.chunksScored,
         chunksSelected: stats.chunksSelected,
         chunksRejected: stats.chunksRejected,
+        selectedGraphCandidateChunks: stats.selectedGraphCandidateChunks,
+        selectedTextFallbackChunks: stats.selectedTextFallbackChunks,
         selectedEstimatedTokens: stats.selectedEstimatedTokens,
         fallbackUsed: stats.fallbackUsed,
+        fallbackRate: stats.fallbackRate,
+    };
+}
+
+function confidenceRank(confidence) {
+    return CONFIDENCE_VALUES.indexOf(confidence);
+}
+
+function confidenceForChunk(route, chunk) {
+    const directCandidate = chunk.selectedVia === 'graph-candidate';
+    let confidence = directCandidate && chunk.retrievalScore >= 300
+        ? 'high'
+        : (chunk.retrievalScore >= 160 ? 'medium' : 'low');
+    if ((route.unresolvedReferences || []).length > 0 && confidence === 'high') {
+        confidence = 'medium';
+    }
+    return confidence;
+}
+
+function makeRankingReport(chunkSelection, claims) {
+    const confidenceCounts = Object.fromEntries(CONFIDENCE_VALUES.map((confidence) => [confidence, 0]));
+    for (const claim of claims) confidenceCounts[claim.confidence] += 1;
+    const lowestConfidence = claims.length === 0
+        ? 'low'
+        : claims
+            .map((claim) => claim.confidence)
+            .sort((left, right) => confidenceRank(right) - confidenceRank(left))[0];
+    const stats = chunkSelection.retrievalStats;
+    return {
+        topCandidates: stats.topCandidates,
+        rejectedChunks: stats.rejectedChunks,
+        lowestConfidence,
+        confidenceCounts,
     };
 }
 
 function makeEvidencePackage(route, graphSelection, chunkSelection, options = {}) {
     const claims = chunkSelection.selectedChunks.map((chunk, index) => {
         const directCandidate = chunk.selectedVia === 'graph-candidate';
-        const confidence = directCandidate && chunk.retrievalScore >= 300
-            ? 'high'
-            : (chunk.retrievalScore >= 160 ? 'medium' : 'low');
+        const confidence = confidenceForChunk(route, chunk);
         const uncertainties = ['deterministic-retrieval-only'];
         if (!directCandidate) uncertainties.push('text-fallback-used');
+        if ((route.unresolvedReferences || []).length > 0) uncertainties.push('unresolved-query-reference');
         if (!chunk.graph?.fileNodeId && !chunk.graph?.blockIds?.length) uncertainties.push('no-graph-file-reference');
         return {
             id: `claim-${index + 1}`,
@@ -696,6 +999,13 @@ function makeEvidencePackage(route, graphSelection, chunkSelection, options = {}
             sourceClass: chunk.sourceClass,
         };
     });
+    const packageUncertainties = [
+        'deterministic-retrieval-only',
+        'local-ai-not-source-of-truth',
+    ];
+    if ((route.unresolvedReferences || []).length > 0) {
+        packageUncertainties.push('unresolved-query-reference');
+    }
 
     return {
         contract: EVIDENCE_PACKAGE_CONTRACT,
@@ -704,11 +1014,9 @@ function makeEvidencePackage(route, graphSelection, chunkSelection, options = {}
         mode: 'graph-first-deterministic-retrieval',
         graphQueries: graphSelection.graphResults.map((entry) => entry.summary),
         budgetReport: makeBudgetReport(chunkSelection, options),
+        rankingReport: makeRankingReport(chunkSelection, claims),
         claims,
-        uncertainties: [
-            'deterministic-retrieval-only',
-            'local-ai-not-source-of-truth',
-        ],
+        uncertainties: packageUncertainties,
     };
 }
 
@@ -737,8 +1045,8 @@ async function writeJson(root, relativePath, artifact) {
 
 async function runGraphRagQuery(question, options = {}) {
     const root = options.root || ROOT;
-    const route = routeGraphRagQuestion(question);
-    if (!route.question) throw new Error('Question is required');
+    const initialRoute = routeGraphRagQuestion(question);
+    if (!initialRoute.question) throw new Error('Question is required');
     const requestedWritePath = options.write || options.outPath
         ? assertGraphRagRuntimeOutputPath(options.outPath || 'tmp/graph-rag/graph-rag-query.json')
         : null;
@@ -746,6 +1054,7 @@ async function runGraphRagQuery(question, options = {}) {
         options.graph || readJson(root, options.graphPath || GRAPH_PATH),
         options.coverage || readJson(root, options.coveragePath || COVERAGE_PATH),
     ]);
+    const route = resolveRouteReferences(initialRoute, graph, coverage);
     const graphSelection = runGraphCandidateSelection(route, graph, coverage);
     const index = await loadIndex(root, { ...options, graph });
     const chunkSelection = selectGraphRagChunks(index, route, graphSelection.candidates, options);
@@ -781,9 +1090,14 @@ async function runGraphRagQuery(question, options = {}) {
         selectedChunks: chunkSelection.selectedChunks,
         budget: {
             graphQueryCount: graphSelection.graphResults.length,
+            candidatePathCount: graphSelection.candidates.length,
             graphCandidatePathCount: graphSelection.candidates.length,
             selectedChunkCount: chunkSelection.selectedChunks.length,
+            rejectedChunkCount: chunkSelection.retrievalStats.chunksRejected,
             selectedEstimatedTokens: chunkSelection.retrievalStats.selectedEstimatedTokens,
+            fallbackUsed: chunkSelection.retrievalStats.fallbackUsed,
+            fallbackRate: chunkSelection.retrievalStats.fallbackRate,
+            lowestConfidence: evidencePackage.rankingReport.lowestConfidence,
         },
         evidencePackage,
     };
@@ -878,6 +1192,7 @@ async function runCli(argv = process.argv.slice(2)) {
         `Graph queries: ${result.route.graphQueries.map((query) => query.id).join(', ')}`,
         `Candidates: ${result.budget.graphCandidatePathCount}; chunks: ${result.budget.selectedChunkCount}; estimated tokens: ${result.budget.selectedEstimatedTokens}`,
         `Budget: ${result.evidencePackage.budgetReport.chunksSelected}/${result.evidencePackage.budgetReport.maxChunks} chunks; rejected: ${result.evidencePackage.budgetReport.chunksRejected}; fallback: ${result.evidencePackage.budgetReport.fallbackUsed ? 'yes' : 'no'}`,
+        `Confidence: lowest ${result.budget.lowestConfidence}; fallback rate ${result.budget.fallbackRate}`,
         `Output: ${result.writtenPath || 'stdout only'}`,
     ].join('\n') + '\n');
 }

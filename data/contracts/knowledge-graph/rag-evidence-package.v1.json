@@ -47,14 +47,35 @@
       "maxChunks",
       "chunksAvailable",
       "graphCandidateChunks",
+      "candidatePathCount",
       "chunksScored",
       "chunksSelected",
       "chunksRejected",
+      "selectedGraphCandidateChunks",
+      "selectedTextFallbackChunks",
       "selectedEstimatedTokens",
-      "fallbackUsed"
+      "fallbackUsed",
+      "fallbackRate"
     ],
     "unit": "estimated tokens",
     "purpose": "Expose the context budget used before handing compact evidence to the main model."
+  },
+  "ranking_report": {
+    "required": [
+      "topCandidates",
+      "rejectedChunks",
+      "lowestConfidence",
+      "confidenceCounts"
+    ],
+    "top_candidate_limit": 8,
+    "rejected_chunk_limit": 12,
+    "rejection_reason_examples": [
+      "weak-match-after-strong-selection",
+      "same-path-budget-limit",
+      "ranked-below-budget",
+      "not-selected"
+    ],
+    "purpose": "Expose deterministic ranking diagnostics for Viewer, Ask-Repo and negative reference questions."
   },
   "validation_rules": [
     {
@@ -76,6 +97,11 @@
       "id": "budget-required",
       "severity": "error",
       "rule": "Package output must include the context budget report."
+    },
+    {
+      "id": "ranking-report-required",
+      "severity": "error",
+      "rule": "Package output must include top candidates, rejected chunks and confidence distribution."
     }
   ]
 }
