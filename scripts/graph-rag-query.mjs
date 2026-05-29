@@ -394,6 +394,13 @@ function validateRagEvidencePackageContract(contract) {
         'lowestConfidence',
         'confidenceCounts',
     ], 'rag evidence package ranking_report.required');
+    assertObject(contract.consumer_hints, 'rag evidence package consumer_hints');
+    hasRequiredValues(contract.consumer_hints.required, [
+        'viewer',
+        'askRepo',
+        'exportPolicy',
+        'sourceLinks',
+    ], 'rag evidence package consumer_hints.required');
 
     return contract;
 }
@@ -815,6 +822,31 @@ function validateRagEvidencePackage(evidencePackage, contract) {
         }
     }
 
+    assertObject(evidencePackage.consumerHints, 'evidence package consumerHints');
+    assertObject(evidencePackage.consumerHints.viewer, 'evidence package consumerHints.viewer');
+    assertObject(evidencePackage.consumerHints.askRepo, 'evidence package consumerHints.askRepo');
+    assertObject(evidencePackage.consumerHints.exportPolicy, 'evidence package consumerHints.exportPolicy');
+    if (evidencePackage.consumerHints.viewer.sourceOfTruth !== false) {
+        throw new Error('evidence package viewer hints must not be source of truth');
+    }
+    if (evidencePackage.consumerHints.askRepo.sourceOfTruth !== false) {
+        throw new Error('evidence package Ask-Repo hints must not be source of truth');
+    }
+    if (evidencePackage.consumerHints.exportPolicy.safeToCommit !== false) {
+        throw new Error('evidence package exportPolicy.safeToCommit must be false');
+    }
+    if (!Array.isArray(evidencePackage.consumerHints.sourceLinks)) {
+        throw new Error('evidence package consumerHints.sourceLinks must be an array');
+    }
+    for (const link of evidencePackage.consumerHints.sourceLinks) {
+        if (!link?.chunkId || !allowedEvidencePath(link.path, evidenceContract)) {
+            throw new Error(`evidence package consumer hint source link is invalid: ${link?.path || '<empty>'}`);
+        }
+        if (!Number.isInteger(link.lineStart) || !Number.isInteger(link.lineEnd) || link.lineEnd < link.lineStart) {
+            throw new Error(`evidence package consumer hint source link has invalid lines: ${link.path}`);
+        }
+    }
+
     return evidencePackage;
 }
 
@@ -978,6 +1010,36 @@ function makeRankingReport(chunkSelection, claims) {
     };
 }
 
+function makeConsumerHints(route, graphSelection, claims) {
+    return {
+        viewer: {
+            purpose: 'display-source-backed-evidence',
+            suggestedSections: ['graphQueries', 'claims', 'uncertainties', 'budgetReport', 'rankingReport'],
+            cacheScope: 'transient-per-query',
+            sourceOfTruth: false,
+        },
+        askRepo: {
+            answerContract: ['question', 'graphQueries', 'claims', 'uncertainties', 'budgetReport', 'sourceLinks'],
+            requiresSourceLinks: true,
+            sourceOfTruth: false,
+            unresolvedReferenceCount: (route.unresolvedReferences || []).length,
+            graphQueryCount: graphSelection.graphResults.length,
+        },
+        exportPolicy: {
+            runtimeOutputDir: 'tmp/graph-rag/',
+            cacheTtl: 'per-query',
+            generatedBy: 'scripts/graph-rag-query.mjs',
+            safeToCommit: false,
+        },
+        sourceLinks: claims.map((claim) => ({
+            chunkId: claim.chunkId,
+            path: claim.path,
+            lineStart: claim.lineStart,
+            lineEnd: claim.lineEnd,
+        })),
+    };
+}
+
 function makeEvidencePackage(route, graphSelection, chunkSelection, options = {}) {
     const claims = chunkSelection.selectedChunks.map((chunk, index) => {
         const directCandidate = chunk.selectedVia === 'graph-candidate';
@@ -1006,6 +1068,8 @@ function makeEvidencePackage(route, graphSelection, chunkSelection, options = {}
     if ((route.unresolvedReferences || []).length > 0) {
         packageUncertainties.push('unresolved-query-reference');
     }
+    const budgetReport = makeBudgetReport(chunkSelection, options);
+    const rankingReport = makeRankingReport(chunkSelection, claims);
 
     return {
         contract: EVIDENCE_PACKAGE_CONTRACT,
@@ -1013,8 +1077,9 @@ function makeEvidencePackage(route, graphSelection, chunkSelection, options = {}
         question: route.question,
         mode: 'graph-first-deterministic-retrieval',
         graphQueries: graphSelection.graphResults.map((entry) => entry.summary),
-        budgetReport: makeBudgetReport(chunkSelection, options),
-        rankingReport: makeRankingReport(chunkSelection, claims),
+        budgetReport,
+        rankingReport,
+        consumerHints: makeConsumerHints(route, graphSelection, claims),
         claims,
         uncertainties: packageUncertainties,
     };
@@ -1069,6 +1134,7 @@ async function runGraphRagQuery(question, options = {}) {
         makeEvidencePackage(route, graphSelection, chunkSelection, options),
         evidenceContract
     );
+    const budgetReport = evidencePackage.budgetReport;
     const result = {
         contract: QUERY_CONTRACT,
         schema_version: 1,
@@ -1090,13 +1156,10 @@ async function runGraphRagQuery(question, options = {}) {
         selectedChunks: chunkSelection.selectedChunks,
         budget: {
             graphQueryCount: graphSelection.graphResults.length,
-            candidatePathCount: graphSelection.candidates.length,
-            graphCandidatePathCount: graphSelection.candidates.length,
-            selectedChunkCount: chunkSelection.selectedChunks.length,
-            rejectedChunkCount: chunkSelection.retrievalStats.chunksRejected,
-            selectedEstimatedTokens: chunkSelection.retrievalStats.selectedEstimatedTokens,
-            fallbackUsed: chunkSelection.retrievalStats.fallbackUsed,
-            fallbackRate: chunkSelection.retrievalStats.fallbackRate,
+            ...budgetReport,
+            graphCandidatePathCount: budgetReport.candidatePathCount,
+            selectedChunkCount: budgetReport.chunksSelected,
+            rejectedChunkCount: budgetReport.chunksRejected,
             lowestConfidence: evidencePackage.rankingReport.lowestConfidence,
         },
         evidencePackage,
@@ -1186,13 +1249,14 @@ async function runCli(argv = process.argv.slice(2)) {
         process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
         return;
     }
+    const budget = result.evidencePackage.budgetReport;
     process.stdout.write([
         `Graph-RAG query: ${result.question}`,
         `Intents: ${result.route.intents.join(', ')}`,
         `Graph queries: ${result.route.graphQueries.map((query) => query.id).join(', ')}`,
-        `Candidates: ${result.budget.graphCandidatePathCount}; chunks: ${result.budget.selectedChunkCount}; estimated tokens: ${result.budget.selectedEstimatedTokens}`,
-        `Budget: ${result.evidencePackage.budgetReport.chunksSelected}/${result.evidencePackage.budgetReport.maxChunks} chunks; rejected: ${result.evidencePackage.budgetReport.chunksRejected}; fallback: ${result.evidencePackage.budgetReport.fallbackUsed ? 'yes' : 'no'}`,
-        `Confidence: lowest ${result.budget.lowestConfidence}; fallback rate ${result.budget.fallbackRate}`,
+        `Candidates: paths ${budget.candidatePathCount}; graph chunks ${budget.graphCandidateChunks}; scored ${budget.chunksScored}`,
+        `Budget: selected ${budget.chunksSelected}/${budget.maxChunks}; rejected ${budget.chunksRejected}; estimated tokens ${budget.selectedEstimatedTokens}; fallback ${budget.fallbackUsed ? 'yes' : 'no'} (${budget.fallbackRate})`,
+        `Confidence: lowest ${result.budget.lowestConfidence}; fallback rate ${budget.fallbackRate}`,
         `Output: ${result.writtenPath || 'stdout only'}`,
     ].join('\n') + '\n');
 }

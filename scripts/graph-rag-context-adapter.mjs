@@ -15,6 +15,9 @@ const CONTRACT_PATH = 'data/contracts/knowledge-graph/context-adapter-profiles.v
 const CONTEXT_ADAPTER_PROFILE_CONTRACT = 'knowledge-graph.context-adapter-profiles.v1';
 const CONTEXT_ADAPTER_RESULT_CONTRACT = 'knowledge-graph.rag-context-adapter.v1';
 const SCHEMA_VERSION = 1;
+const CONFIDENCE_VALUES = Object.freeze(['high', 'medium', 'low']);
+const ADAPTER_OUTPUT_MODES = Object.freeze(['rulebased', 'mock', 'local-runtime']);
+const CLAIM_STATUS_VALUES = Object.freeze(['source-backed', 'fixture-only', 'no-source-backed-claims']);
 const REQUIRED_OPERATIONS = Object.freeze(['rerank', 'summary', 'fact-extract']);
 const REQUIRED_FALLBACKS = Object.freeze(['rulebased', 'mock']);
 const DEFAULT_MODE = 'rulebased';
@@ -34,6 +37,13 @@ function toAbsolute(root, relativePath) {
 function asPositiveNumber(value, fallback) {
     const number = Number(value);
     return Number.isFinite(number) && number > 0 ? number : fallback;
+}
+
+function hasRequiredValues(values, required, label) {
+    const set = new Set(Array.isArray(values) ? values : []);
+    for (const entry of required) {
+        if (!set.has(entry)) throw new Error(`${label} missing ${entry}`);
+    }
 }
 
 function valueAtPath(object, dottedPath) {
@@ -117,6 +127,17 @@ function validateContextAdapterProfilesContract(contract) {
     if (contract.safety?.downloads_or_installs !== 'never') {
         throw new Error('context adapter must not download or install runtimes');
     }
+    if (!contract.result_evidence || typeof contract.result_evidence !== 'object') {
+        throw new Error('context adapter profiles require result_evidence');
+    }
+    hasRequiredValues(contract.result_evidence.required, [
+        'evidenceMode',
+        'quality',
+        'sourceOfTruth',
+        'claimStatus',
+    ], 'context adapter result_evidence.required');
+    hasRequiredValues(contract.result_evidence.mode_values, ADAPTER_OUTPUT_MODES, 'context adapter result_evidence.mode_values');
+    hasRequiredValues(contract.result_evidence.claim_status_values, CLAIM_STATUS_VALUES, 'context adapter result_evidence.claim_status_values');
 
     if (!Array.isArray(contract.profiles) || contract.profiles.length === 0) {
         throw new Error('context adapter profiles require at least one profile');
@@ -338,13 +359,7 @@ function makeRuleBasedOutput(input, profile, details = {}) {
 }
 
 function makeMockOutput(input) {
-    const first = input.chunks[0] || {
-        id: 'mock:empty',
-        path: 'mock/no-source.md',
-        lineStart: 1,
-        lineEnd: 1,
-        excerpt: 'Mock context adapter fixture.',
-    };
+    const first = input.chunks[0] || null;
     return {
         mode: 'mock',
         runtime: {
@@ -355,25 +370,28 @@ function makeMockOutput(input) {
         fallbackUsed: false,
         fallbackReason: null,
         outputs: {
-            rerank: [{
+            rerank: first ? [{
                 chunkId: first.id,
                 path: first.path,
                 lineStart: first.lineStart,
                 lineEnd: first.lineEnd,
                 score: 100,
                 reason: ['mock-fixture'],
-            }],
+            }] : [],
             summary: {
                 text: `Mock context summary for ${makeExcerpt(input.question || 'Graph-RAG question', 96)}`,
-                citations: [{
+                citations: first ? [{
                     chunkId: first.id,
                     path: first.path,
                     lineStart: first.lineStart,
                     lineEnd: first.lineEnd,
-                }],
-                uncertainties: ['mock-mode'],
+                }] : [],
+                uncertainties: [
+                    'mock-mode',
+                    first ? 'fixture-only' : 'no-source-backed-chunks',
+                ],
             },
-            facts: [{
+            facts: first ? [{
                 id: 'fact-1',
                 claim: makeExcerpt(first.excerpt, 180),
                 path: first.path,
@@ -381,9 +399,100 @@ function makeMockOutput(input) {
                 lineEnd: first.lineEnd,
                 chunkId: first.id,
                 confidence: 'low',
-                uncertainties: ['mock-mode'],
-            }],
+                uncertainties: ['mock-mode', 'fixture-only', 'local-ai-not-source-of-truth'],
+            }] : [],
         },
+    };
+}
+
+function confidenceCountsForFacts(facts = []) {
+    const counts = Object.fromEntries(CONFIDENCE_VALUES.map((confidence) => [confidence, 0]));
+    for (const fact of facts) {
+        if (Object.prototype.hasOwnProperty.call(counts, fact.confidence)) counts[fact.confidence] += 1;
+    }
+    return counts;
+}
+
+function validateAdapterOutputs(input, adapterOutput) {
+    if (!adapterOutput || typeof adapterOutput !== 'object') {
+        throw new Error('context adapter output must be an object');
+    }
+    if (!ADAPTER_OUTPUT_MODES.includes(adapterOutput.mode)) {
+        throw new Error(`context adapter output has invalid mode: ${adapterOutput.mode || '<empty>'}`);
+    }
+    const outputs = adapterOutput.outputs;
+    if (!outputs || typeof outputs !== 'object') {
+        throw new Error('context adapter output requires outputs');
+    }
+    if (!Array.isArray(outputs.rerank)) throw new Error('context adapter output rerank must be an array');
+    if (!Array.isArray(outputs.summary?.citations)) throw new Error('context adapter output summary citations must be an array');
+    if (!Array.isArray(outputs.summary?.uncertainties) || outputs.summary.uncertainties.length === 0) {
+        throw new Error('context adapter output summary requires uncertainties');
+    }
+    if (!Array.isArray(outputs.facts)) throw new Error('context adapter output facts must be an array');
+
+    const inputChunks = new Map(input.chunks.map((chunk) => [chunk.id, chunk]));
+    const assertSourceChunk = (chunkId, label) => {
+        if (!inputChunks.has(chunkId)) {
+            throw new Error(`context adapter ${label} references unknown source chunk: ${chunkId || '<empty>'}`);
+        }
+    };
+    for (const entry of outputs.rerank) assertSourceChunk(entry.chunkId, 'rerank');
+    for (const citation of outputs.summary.citations) assertSourceChunk(citation.chunkId, 'summary citation');
+    for (const fact of outputs.facts) {
+        assertSourceChunk(fact.chunkId, 'fact');
+        if (!String(fact.claim || '').trim()) throw new Error('context adapter fact requires a claim');
+        if (!CONFIDENCE_VALUES.includes(fact.confidence)) {
+            throw new Error(`context adapter fact has invalid confidence: ${fact.confidence || '<empty>'}`);
+        }
+        if (!Array.isArray(fact.uncertainties) || fact.uncertainties.length === 0) {
+            throw new Error('context adapter fact requires uncertainties');
+        }
+        if (!fact.uncertainties.includes('local-ai-not-source-of-truth')) {
+            throw new Error('context adapter fact must mark local AI as non-source-of-truth');
+        }
+        if (adapterOutput.mode === 'mock') {
+            if (fact.confidence !== 'low') throw new Error('mock context adapter facts must stay low confidence');
+            if (!fact.uncertainties.includes('mock-mode')) throw new Error('mock context adapter facts must carry mock-mode uncertainty');
+        }
+    }
+
+    if (input.chunks.length > 0 && adapterOutput.mode !== 'mock') {
+        if (outputs.rerank.length === 0 || outputs.summary.citations.length === 0 || outputs.facts.length === 0) {
+            throw new Error('context adapter output is missing source-backed adapter fields');
+        }
+    }
+    return adapterOutput;
+}
+
+function makeAdapterEvidenceMode(input, adapterOutput, requestedMode) {
+    const facts = adapterOutput.outputs.facts || [];
+    const sourceChunkIds = new Set(input.chunks.map((chunk) => chunk.id));
+    const sourceBackedFactCount = facts.filter((fact) => sourceChunkIds.has(fact.chunkId)).length;
+    const claimStatus = facts.length === 0
+        ? 'no-source-backed-claims'
+        : (adapterOutput.mode === 'mock' ? 'fixture-only' : 'source-backed');
+    const uncertainties = Array.from(new Set([
+        'local-ai-not-source-of-truth',
+        adapterOutput.mode === 'mock' ? 'mock-mode' : null,
+        adapterOutput.fallbackUsed ? `fallback:${adapterOutput.fallbackReason || 'unknown'}` : null,
+        claimStatus === 'no-source-backed-claims' ? 'no-source-backed-chunks' : null,
+    ].filter(Boolean)));
+    return {
+        requestedMode,
+        actualMode: adapterOutput.mode,
+        runtimeId: adapterOutput.runtime?.id || null,
+        runtimeAdapter: adapterOutput.runtime?.adapter || null,
+        localAiUsed: adapterOutput.mode === 'local-runtime',
+        deterministicFallback: adapterOutput.mode === 'rulebased',
+        fixtureOnly: adapterOutput.mode === 'mock',
+        sourceOfTruth: false,
+        fallbackUsed: adapterOutput.fallbackUsed,
+        fallbackReason: adapterOutput.fallbackReason,
+        claimStatus,
+        sourceBackedFactCount,
+        confidenceCounts: confidenceCountsForFacts(facts),
+        uncertainties,
     };
 }
 
@@ -720,6 +829,8 @@ async function runGraphRagContextAdapter(questionOrQuery, options = {}) {
     } else {
         throw new Error(`Unknown context adapter mode: ${requestedMode}`);
     }
+    validateAdapterOutputs(input, adapterOutput);
+    const evidenceMode = makeAdapterEvidenceMode(input, adapterOutput, requestedMode);
 
     const result = {
         contract: CONTEXT_ADAPTER_RESULT_CONTRACT,
@@ -732,6 +843,14 @@ async function runGraphRagContextAdapter(questionOrQuery, options = {}) {
         runtime: adapterOutput.runtime,
         fallbackUsed: adapterOutput.fallbackUsed,
         fallbackReason: adapterOutput.fallbackReason,
+        evidenceMode,
+        quality: {
+            sourceOfTruth: false,
+            claimStatus: evidenceMode.claimStatus,
+            sourceBackedFactCount: evidenceMode.sourceBackedFactCount,
+            confidenceCounts: evidenceMode.confidenceCounts,
+            uncertainties: evidenceMode.uncertainties,
+        },
         pipeline: [
             { stage: 'graph-rag-query', output: queryResult.contract },
             { stage: 'adapter-input-budget', output: input.stats },
@@ -754,6 +873,7 @@ async function runGraphRagContextAdapter(questionOrQuery, options = {}) {
         safety: {
             readOnly: true,
             sourceOfTruth: false,
+            localAiSourceOfTruth: false,
             graphRagBlocked: false,
             writesOnlyWhenRequested: true,
         },
@@ -871,6 +991,7 @@ async function runCli(argv = process.argv.slice(2)) {
         `Graph-RAG context adapter: ${result.mode}`,
         `Profile: ${result.profile}`,
         `Chunks: ${result.input.budget.chunksSelected}/${result.input.budget.chunksAvailable}; estimated input tokens: ${result.input.budget.estimatedInputTokens}`,
+        `Evidence: ${result.evidenceMode.actualMode}; claim status: ${result.quality.claimStatus}; source of truth: no`,
         `Fallback used: ${result.fallbackUsed ? 'yes' : 'no'}`,
         `Output: ${result.writtenPath || 'stdout only'}`,
     ].join('\n') + '\n');

@@ -77,6 +77,18 @@
     ],
     "purpose": "Expose deterministic ranking diagnostics for Viewer, Ask-Repo and negative reference questions."
   },
+  "consumer_hints": {
+    "required": [
+      "viewer",
+      "askRepo",
+      "exportPolicy",
+      "sourceLinks"
+    ],
+    "source_of_truth": false,
+    "runtime_output_dir": "tmp/graph-rag/",
+    "safe_to_commit": false,
+    "purpose": "Expose optional Viewer and Ask-Repo hints without turning runtime artifacts into committed truth."
+  },
   "validation_rules": [
     {
       "id": "source-backed-claim",
@@ -102,6 +114,11 @@
       "id": "ranking-report-required",
       "severity": "error",
       "rule": "Package output must include top candidates, rejected chunks and confidence distribution."
+    },
+    {
+      "id": "consumer-hints-noncanonical",
+      "severity": "error",
+      "rule": "Consumer hints must mark Viewer and Ask-Repo output as non-source-of-truth and runtime artifacts as unsafe to commit."
     }
   ]
 }

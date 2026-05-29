@@ -86,5 +86,24 @@
     "downloads_or_installs": "never",
     "secret_handling": "Adapter input may only use selected Graph-RAG chunks that already passed rag-sources filters.",
     "truth_boundary": "Graph queries and cited source files remain authoritative; local model output can only rerank, summarize or extract cited facts."
+  },
+  "result_evidence": {
+    "required": [
+      "evidenceMode",
+      "quality",
+      "sourceOfTruth",
+      "claimStatus"
+    ],
+    "mode_values": [
+      "rulebased",
+      "mock",
+      "local-runtime"
+    ],
+    "claim_status_values": [
+      "source-backed",
+      "fixture-only",
+      "no-source-backed-claims"
+    ],
+    "truth_boundary": "Adapter result evidence must name requested and actual mode; mock and local outputs are never source of truth."
   }
 }

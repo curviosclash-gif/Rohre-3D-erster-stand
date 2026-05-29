@@ -34,6 +34,9 @@ test('context adapter profiles define read-only operations and no-agent fallback
     assert.ok(operationIds.has('fact-extract'));
     assert.ok(profile.operations.every((operation) => operation.fallbacks.includes('rulebased')));
     assert.ok(profile.operations.every((operation) => operation.fallbacks.includes('mock')));
+    assert.ok(contract.result_evidence.required.includes('evidenceMode'));
+    assert.ok(contract.result_evidence.mode_values.includes('local-runtime'));
+    assert.ok(contract.result_evidence.claim_status_values.includes('fixture-only'));
 });
 
 test('context adapter CLI rejects --out outside tmp/graph-rag and writes allowed outputs', async () => {
@@ -90,6 +93,11 @@ test('context adapter local mode blocks non-local base URLs before HTTP calls', 
     assert.equal(result.fallbackUsed, true);
     assert.equal(result.fallbackReason, 'blocked-non-local-base-url');
     assert.equal(result.attempts[0].reason, 'blocked-non-local-base-url');
+    assert.equal(result.evidenceMode.requestedMode, 'local');
+    assert.equal(result.evidenceMode.actualMode, 'rulebased');
+    assert.equal(result.evidenceMode.localAiUsed, false);
+    assert.equal(result.evidenceMode.sourceOfTruth, false);
+    assert.equal(result.quality.claimStatus, 'source-backed');
 });
 
 test('context adapter rulebased mode returns source-backed rerank, summary and facts', async () => {
@@ -108,7 +116,14 @@ test('context adapter rulebased mode returns source-backed rerank, summary and f
     assert.equal(result.fallbackUsed, false);
     assert.equal(result.safety.readOnly, true);
     assert.equal(result.safety.sourceOfTruth, false);
+    assert.equal(result.safety.localAiSourceOfTruth, false);
     assert.equal(result.safety.graphRagBlocked, false);
+    assert.equal(result.evidenceMode.requestedMode, 'rulebased');
+    assert.equal(result.evidenceMode.actualMode, 'rulebased');
+    assert.equal(result.evidenceMode.deterministicFallback, true);
+    assert.equal(result.evidenceMode.sourceOfTruth, false);
+    assert.equal(result.quality.claimStatus, 'source-backed');
+    assert.ok(result.quality.sourceBackedFactCount > 0);
     assert.ok(result.input.budget.chunksSelected > 0);
     assert.ok(result.outputs.rerank.length > 0);
     assert.ok(result.outputs.summary.citations.length > 0);
@@ -145,8 +160,31 @@ test('context adapter mock mode is deterministic and does not require local AI',
     assert.equal(first.mode, 'mock');
     assert.equal(first.runtime.adapter, 'deterministic-test-fixture');
     assert.equal(first.fallbackUsed, false);
+    assert.equal(first.evidenceMode.fixtureOnly, true);
+    assert.equal(first.evidenceMode.sourceOfTruth, false);
+    assert.equal(first.quality.claimStatus, 'fixture-only');
     assert.deepEqual(first.outputs, second.outputs);
     assert.ok(first.outputs.summary.uncertainties.includes('mock-mode'));
     assert.ok(first.outputs.summary.citations.every((citation) => Number.isInteger(citation.lineStart)));
     assert.ok(first.outputs.facts.every((fact) => fact.uncertainties.includes('mock-mode')));
+    assert.ok(first.outputs.facts.every((fact) => fact.uncertainties.includes('fixture-only')));
+    assert.ok(first.outputs.facts.every((fact) => fact.confidence === 'low'));
+});
+
+test('context adapter marks empty source input as no-source-backed claims', async () => {
+    const result = await runGraphRagContextAdapter({
+        contract: 'knowledge-graph.rag-query.v1',
+        generated_at: '2026-05-29T00:00:00.000Z',
+        question: 'Leere Graph-RAG Fixture',
+        selectedChunks: [],
+    }, {
+        mode: 'rulebased',
+    });
+
+    assert.equal(result.mode, 'rulebased');
+    assert.equal(result.quality.claimStatus, 'no-source-backed-claims');
+    assert.equal(result.evidenceMode.sourceBackedFactCount, 0);
+    assert.equal(result.evidenceMode.sourceOfTruth, false);
+    assert.ok(result.evidenceMode.uncertainties.includes('no-source-backed-chunks'));
+    assert.deepEqual(result.outputs.facts, []);
 });

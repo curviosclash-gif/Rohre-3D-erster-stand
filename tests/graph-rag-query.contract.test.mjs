@@ -90,6 +90,10 @@ test('rag evidence package contract defines source-backed claims and budget repo
     assert.ok(contract.budget_report.required.includes('selectedEstimatedTokens'));
     assert.ok(contract.budget_report.required.includes('fallbackRate'));
     assert.ok(contract.ranking_report.required.includes('lowestConfidence'));
+    assert.ok(contract.consumer_hints.required.includes('viewer'));
+    assert.ok(contract.consumer_hints.required.includes('askRepo'));
+    assert.equal(contract.consumer_hints.source_of_truth, false);
+    assert.equal(contract.consumer_hints.safe_to_commit, false);
 });
 
 test('graph rag query CLI rejects --out outside tmp/graph-rag and writes allowed outputs', async () => {
@@ -198,6 +202,15 @@ test('graph rag query runs graph-first before selecting source-backed chunks', a
         assert.equal(result.evidencePackage.rankingReport.lowestConfidence, result.budget.lowestConfidence, fixture.id);
         assert.ok(result.evidencePackage.rankingReport.topCandidates.length > 0, fixture.id);
         assert.ok(Array.isArray(result.evidencePackage.rankingReport.rejectedChunks), fixture.id);
+        for (const field of (await loadRagEvidencePackageContract()).budget_report.required) {
+            assert.deepEqual(result.budget[field], result.evidencePackage.budgetReport[field], `${fixture.id} budget ${field}`);
+        }
+        assert.equal(result.budget.selectedChunkCount, result.evidencePackage.budgetReport.chunksSelected, fixture.id);
+        assert.equal(result.budget.rejectedChunkCount, result.evidencePackage.budgetReport.chunksRejected, fixture.id);
+        assert.equal(result.evidencePackage.consumerHints.viewer.sourceOfTruth, false, fixture.id);
+        assert.equal(result.evidencePackage.consumerHints.askRepo.requiresSourceLinks, true, fixture.id);
+        assert.equal(result.evidencePackage.consumerHints.exportPolicy.safeToCommit, false, fixture.id);
+        assert.equal(result.evidencePackage.consumerHints.sourceLinks.length, result.evidencePackage.claims.length, fixture.id);
         assert.ok(result.graph.candidates.every((candidate) => candidate.path && candidate.reasons.length > 0));
         for (const claim of result.evidencePackage.claims) {
             assert.match(claim.path, /^(docs|\.agents)\//, fixture.id);
