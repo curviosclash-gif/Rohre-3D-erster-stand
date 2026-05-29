@@ -2,8 +2,8 @@
   "schema_version": 1,
   "updated": "2026-05-29",
   "start_anchor": {
-    "block": "V137",
-    "phase": "137.99",
+    "block": "V139",
+    "phase": "139.1",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -600,13 +600,13 @@
       "depends_on": [
         "V120.99"
       ],
-      "current_phase": "139.1",
+      "current_phase": "139.2",
       "plan_file": "docs/plaene/aktiv/V139.md",
       "lock": {
         "status": "frei",
         "agent": "-",
         "start_date": "-",
-        "target": "Geplant; Graph-RAG-Folgeblock fuer Safety-Hardening, Retrieval-Qualitaet, SLO-Stabilitaet und Handoffs",
+        "target": "139.1 abgeschlossen 2026-05-29; naechster Slice 139.2 Output-/Runtime-Safety-Hardening",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },
