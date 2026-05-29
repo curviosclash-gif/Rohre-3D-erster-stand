@@ -17,6 +17,7 @@ import {
   applyMobileClassicUiLocks,
   isMobileClassicTargetValue,
 } from '../src/mobile-classic/MobileClassicApp.js';
+import { LEVEL4_SECTION_IDS } from '../src/ui/menu/MenuStateContracts.js';
 import { MenuNavigationRuntime } from '../src/ui/menu/MenuNavigationRuntime.js';
 import { createPreferredMatchInputSource } from '../src/ui/MatchInputSourceResolver.js';
 import {
@@ -329,6 +330,28 @@ test('Unified Mobile Android runtime guard defaults invalid modes to single-play
   assert.equal(settings.hunt.respawnEnabled, false);
 });
 
+test('Unified Mobile Android settings keep Level 4 on phone-relevant sections', () => {
+  const settings = {
+    localSettings: {
+      modePath: 'normal',
+      toolsState: {
+        activeSection: LEVEL4_SECTION_IDS.ADVANCED_MAP,
+      },
+    },
+    gameplay: {},
+    hunt: {},
+  };
+
+  applyMobileClassicSettings(settings);
+
+  assert.equal(settings.localSettings.toolsState.activeSection, LEVEL4_SECTION_IDS.MOBILE_CONTROLS);
+
+  settings.localSettings.toolsState.activeSection = LEVEL4_SECTION_IDS.GAMEPLAY;
+  applyMobileClassicSettings(settings);
+
+  assert.equal(settings.localSettings.toolsState.activeSection, LEVEL4_SECTION_IDS.GAMEPLAY);
+});
+
 test('Mobile Classic default tilt assist is soft for phone play', () => {
   const controls = normalizeMobileClassicControlSettings({});
 
@@ -377,6 +400,54 @@ test('Unified Mobile Android UI exposes Classic and Arcade-Parcours in one app s
   assert.equal(gameSettings.localSettings.startSetup.arcadeGhostDuelMode, 'self_longest_ghost');
   assert.equal(startButton.textContent, 'Parcours starten');
   assert.equal(menuContext.textContent, 'Arcade-Parcours');
+});
+
+test('Unified Mobile Android Level 4 copy opens curated settings', () => {
+  const nodesById = new Map([
+    ['btn-open-level4', { textContent: '', dataset: { level4Section: LEVEL4_SECTION_IDS.TOOLS } }],
+    ['level4-tab-mobile-controls', { textContent: '' }],
+    ['level4-tab-gameplay', { textContent: '' }],
+  ]);
+  const nodesBySelector = new Map([
+    ['#submenu-level4 .level4-header .submenu-title', { textContent: '' }],
+    ['#level4-section-mobile-controls .section-title', { textContent: '' }],
+    ['#level4-section-gameplay .section-title', { textContent: '' }],
+  ]);
+  const doc = {
+    documentElement: {
+      dataset: {},
+    },
+    body: {
+      dataset: {},
+    },
+    getElementById(id) {
+      return nodesById.get(id) || null;
+    },
+    querySelector(selector) {
+      return nodesBySelector.get(selector) || null;
+    },
+  };
+
+  applyMobileClassicUiLocks({
+    settings: {
+      localSettings: {
+        modePath: 'normal',
+      },
+    },
+    ui: {
+      mainMenu: {
+        ownerDocument: doc,
+      },
+    },
+  });
+
+  assert.equal(nodesById.get('btn-open-level4').textContent, 'Einstellungen');
+  assert.equal(nodesById.get('btn-open-level4').dataset.level4Section, LEVEL4_SECTION_IDS.MOBILE_CONTROLS);
+  assert.equal(nodesBySelector.get('#submenu-level4 .level4-header .submenu-title').textContent, 'Einstellungen');
+  assert.equal(nodesById.get('level4-tab-mobile-controls').textContent, 'Steuerung');
+  assert.equal(nodesById.get('level4-tab-gameplay').textContent, 'Anzeige');
+  assert.equal(nodesBySelector.get('#level4-section-mobile-controls .section-title').textContent, 'Steuerung');
+  assert.equal(nodesBySelector.get('#level4-section-gameplay .section-title').textContent, 'Anzeige & Spielgefuehl');
 });
 
 test('Mobile Classic GitHub update config resolves repository metadata', () => {

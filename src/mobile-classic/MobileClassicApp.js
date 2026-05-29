@@ -3,7 +3,7 @@
 
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { MENU_SESSION_TYPES } from '../composition/core-ui/CoreSettingsPorts.js';
-import { MENU_MODE_PATHS } from '../ui/menu/MenuStateContracts.js';
+import { LEVEL4_SECTION_IDS, MENU_MODE_PATHS } from '../ui/menu/MenuStateContracts.js';
 import {
     ARCADE_GHOST_DUEL_MODES,
 } from '../shared/contracts/ArcadeGhostDuelContract.js';
@@ -36,6 +36,10 @@ const MOBILE_ANDROID_ROUTE_EMPTY_ID = 'mobile-android-route-empty';
 const MOBILE_ANDROID_MODE_PATHS = Object.freeze([
     MENU_MODE_PATHS.NORMAL,
     MENU_MODE_PATHS.ARCADE,
+]);
+const MOBILE_ANDROID_LEVEL4_SECTION_IDS = Object.freeze([
+    LEVEL4_SECTION_IDS.MOBILE_CONTROLS,
+    LEVEL4_SECTION_IDS.GAMEPLAY,
 ]);
 const DEFAULT_MOBILE_CLASSIC_UPDATE_CONFIG = createMobileClassicGithubUpdateConfig();
 const mobileClassicUpdateState = {
@@ -120,6 +124,13 @@ export function applyMobileClassicSettings(settings = null) {
     }
     // Phone tilt already maps the calibrated hand posture directly; desktop pitch-invert feels reversed here.
     settings.invertPitch.PLAYER_1 = false;
+    if (!settings.localSettings.toolsState || typeof settings.localSettings.toolsState !== 'object') {
+        settings.localSettings.toolsState = {};
+    }
+    const requestedLevel4Section = normalizeTarget(settings.localSettings.toolsState.activeSection);
+    settings.localSettings.toolsState.activeSection = MOBILE_ANDROID_LEVEL4_SECTION_IDS.includes(requestedLevel4Section)
+        ? requestedLevel4Section
+        : LEVEL4_SECTION_IDS.MOBILE_CONTROLS;
     settings.gameplay.planarMode = false;
     settings.hunt.respawnEnabled = false;
     if (modePath === MENU_MODE_PATHS.ARCADE) {
@@ -427,6 +438,8 @@ body.mobile-classic-app .nav-btn[data-session-type="splitscreen"],
 body.mobile-classic-app .mode-path-btn[data-mode-path="fight"],
 body.mobile-classic-app #submenu-multiplayer,
 body.mobile-classic-app #multiplayer-inline-stub,
+body.mobile-classic-app #btn-level3-reset,
+body.mobile-classic-app #btn-level4-reset,
 body.mobile-classic-app #btn-open-expert,
 body.mobile-classic-app #btn-open-developer,
 body.mobile-classic-app #btn-open-debug,
@@ -436,6 +449,61 @@ body.mobile-classic-app #fight-mg-damage-setting,
 body.mobile-classic-app #fight-tuning-hint,
 body.mobile-classic-app #arcade-ghost-duel-row,
 body.mobile-classic-app #arcade-ghost-trail-collision-row {
+    display: none !important;
+}
+
+body.mobile-classic-app #level4-tab-controls,
+body.mobile-classic-app #level4-section-controls,
+body.mobile-classic-app #level4-tab-advanced-map,
+body.mobile-classic-app #level4-section-advanced-map,
+body.mobile-classic-app #level4-tab-tools,
+body.mobile-classic-app #level4-section-tools,
+body.mobile-classic-app #submenu-game .setup-search-grid,
+body.mobile-classic-app #btn-map-favorite-toggle,
+body.mobile-classic-app #btn-vehicle-favorite-toggle,
+body.mobile-classic-app #submenu-game .menu-section:has(#arcade-ghost-duel-mode-select),
+body.mobile-classic-app #submenu-game .menu-section:has(#btn-dimension-planar),
+body.mobile-classic-app #submenu-game .menu-section:has(#bot-policy-strategy),
+body.mobile-classic-app label:has(#mobile-tilt-debug-toggle),
+body.mobile-classic-app label:has(#mobile-tilt-sensor-hz-toggle),
+body.mobile-classic-app label[for="speed-slider"],
+body.mobile-classic-app #speed-slider,
+body.mobile-classic-app label[for="turn-slider"],
+body.mobile-classic-app #turn-slider,
+body.mobile-classic-app label[for="plane-size-slider"],
+body.mobile-classic-app #plane-size-slider,
+body.mobile-classic-app label[for="trail-width-slider"],
+body.mobile-classic-app #trail-width-slider,
+body.mobile-classic-app label[for="gap-size-slider"],
+body.mobile-classic-app #gap-size-slider,
+body.mobile-classic-app label[for="gap-frequency-slider"],
+body.mobile-classic-app #gap-frequency-slider,
+body.mobile-classic-app label[for="item-amount-slider"],
+body.mobile-classic-app #item-amount-slider,
+body.mobile-classic-app label[for="fire-rate-slider"],
+body.mobile-classic-app #fire-rate-slider,
+body.mobile-classic-app label[for="lockon-slider"],
+body.mobile-classic-app #lockon-slider,
+body.mobile-classic-app label[for="next-checkpoint-glow-slider"],
+body.mobile-classic-app #next-checkpoint-glow-slider,
+body.mobile-classic-app label[for="mg-trail-aim-slider"],
+body.mobile-classic-app #mg-trail-aim-slider,
+body.mobile-classic-app label[for="recording-profile-select"],
+body.mobile-classic-app #recording-profile-select,
+body.mobile-classic-app label[for="recording-hud-mode-select"],
+body.mobile-classic-app #recording-hud-mode-select,
+body.mobile-classic-app #recording-profile-hint,
+body.mobile-classic-app label[for="normal-camera-perspective-select"],
+body.mobile-classic-app #normal-camera-perspective-select,
+body.mobile-classic-app label:has(#normal-camera-speed-fov-toggle),
+body.mobile-classic-app label[for="normal-camera-speed-fov-intensity-slider"],
+body.mobile-classic-app #normal-camera-speed-fov-intensity-slider,
+body.mobile-classic-app label[for="normal-camera-thruster-exhaust-intensity-slider"],
+body.mobile-classic-app #normal-camera-thruster-exhaust-intensity-slider,
+body.mobile-classic-app #normal-camera-perspective-hint,
+body.mobile-classic-app label:has(#invert-p2),
+body.mobile-classic-app label:has(#cockpit-cam-p1),
+body.mobile-classic-app label:has(#cockpit-cam-p2) {
     display: none !important;
 }
 
@@ -1024,6 +1092,31 @@ function syncMobileAndroidMenuCopy(doc = document) {
     const gameTitle = doc?.getElementById?.('submenu-game-title');
     if (gameTitle) {
         gameTitle.textContent = 'Start vorbereiten';
+    }
+    const openLevel4Button = doc?.getElementById?.('btn-open-level4');
+    if (openLevel4Button) {
+        openLevel4Button.textContent = 'Einstellungen';
+        openLevel4Button.dataset.level4Section = LEVEL4_SECTION_IDS.MOBILE_CONTROLS;
+    }
+    const level4Title = doc?.querySelector?.('#submenu-level4 .level4-header .submenu-title');
+    if (level4Title) {
+        level4Title.textContent = 'Einstellungen';
+    }
+    const mobileControlsTab = doc?.getElementById?.('level4-tab-mobile-controls');
+    if (mobileControlsTab) {
+        mobileControlsTab.textContent = 'Steuerung';
+    }
+    const gameplayTab = doc?.getElementById?.('level4-tab-gameplay');
+    if (gameplayTab) {
+        gameplayTab.textContent = 'Anzeige';
+    }
+    const mobileControlsTitle = doc?.querySelector?.('#level4-section-mobile-controls .section-title');
+    if (mobileControlsTitle) {
+        mobileControlsTitle.textContent = 'Steuerung';
+    }
+    const gameplayTitle = doc?.querySelector?.('#level4-section-gameplay .section-title');
+    if (gameplayTitle) {
+        gameplayTitle.textContent = 'Anzeige & Spielgefuehl';
     }
 }
 

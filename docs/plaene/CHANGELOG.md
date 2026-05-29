@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Mobile Android Level-4 UX-Follow-up 2026-05-29
+
+- Nach User-Gate wurde die freigegebene Mobile-Classic-WIP-Aenderung als V135-Follow-up uebernommen: Android-Level-4 oeffnet direkt die kuratierten `Einstellungen`, erlaubt mobil nur `mobile_controls` und `gameplay`, und blendet Desktop-/Expert-Tuning im Mobile-Shell aus.
+- Evidence: `node --test tests/mobile-classic-app.contract.test.mjs tests/mobile-arcade-app.contract.test.mjs` -> PASS (29/29).
+- Residual-risk: Die Aenderung ist bewusst Mobile-App-spezifisch; ein echter Android-WebView-/Device-Smoke bleibt separat.
+- Not-checked: keine Vollsuite, kein APK-/Installationslauf, keine Desktop-Browser-Suite.
+
 ## V137 137.99 Abschluss-Gate 2026-05-29
 
 - V137 ist abgeschlossen: CodeGraph bleibt nach Version-/Installationscheck, lokalem ignoriertem Index, drei Vergleichsfragen und Go/No-Go als `manual-only` CLI-Hinweisgeber begrenzt; keine MCP-Registrierung, kein globaler Install und keine Agent-/User-Config-Aenderung wurden ausgefuehrt.
