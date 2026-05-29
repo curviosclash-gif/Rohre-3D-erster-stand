@@ -2114,7 +2114,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "139.4",
+        "currentPhase": "139.5",
         "planFile": "docs/plaene/aktiv/V139.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
@@ -5913,7 +5913,7 @@
       "id": "V139.4",
       "type": "phase",
       "title": "Evidence-Package, Budget und Adapter-Qualitaet",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.4"
@@ -17252,8 +17252,8 @@
     {
       "id": "V139.4.1",
       "type": "subphase",
-      "title": "Evidence-Package um optionale Consumer-Hints fuer Viewer/Ask-Repo vorbereiten, ohne V121-UI zu bauen.",
-      "status": "open",
+      "title": "Evidence-Package um optionale Consumer-Hints fuer Viewer/Ask-Repo vorbereiten, ohne V121-UI zu bauen. (abgeschlossen: 2026-05-29; evidence: `data/contracts/knowledge-graph/rag-evidence-package.v1.json` definiert `consumer_hints`; `scripts/graph-rag-query.mjs` erzeugt `evidencePackage.consumerHints` mit Viewer-/Ask-Repo-Hinweisen, transientem `tmp/graph-rag/`-Export und `safeToCommit: false`; Contracttest -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.4",
@@ -17263,8 +17263,8 @@
     {
       "id": "V139.4.2",
       "type": "subphase",
-      "title": "Adapter-Ausgabe gegen leere oder rein mockhafte Claims haerten; Unsicherheiten und Confidence muessen falsifizierbar bleiben.",
-      "status": "open",
+      "title": "Adapter-Ausgabe gegen leere oder rein mockhafte Claims haerten; Unsicherheiten und Confidence muessen falsifizierbar bleiben. (abgeschlossen: 2026-05-29; evidence: `validateAdapterOutputs()` erzwingt source-backed Chunk-Referenzen, nichtleere Claims, Confidence-Werte und Unsicherheiten; leere Eingaben werden als `no-source-backed-claims` markiert; Mock-Facts bleiben `low` und `fixture-only`; Contracttest -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.4",
@@ -17274,8 +17274,8 @@
     {
       "id": "V139.4.3",
       "type": "subphase",
-      "title": "Budget-Report in CLI und JSON konsistent halten: selected/rejected/estimated tokens/fallback.",
-      "status": "open",
+      "title": "Budget-Report in CLI und JSON konsistent halten: selected/rejected/estimated tokens/fallback. (abgeschlossen: 2026-05-29; evidence: Top-Level `budget` spiegelt alle Pflichtfelder aus `evidencePackage.budgetReport`; CLI-Smoke zeigt `Budget: selected 2/2; rejected 307; estimated tokens 636; fallback no (0)`; Contracttest prueft Feldgleichheit -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.4",
@@ -17285,8 +17285,8 @@
     {
       "id": "V139.4.4",
       "type": "subphase",
-      "title": "`rulebased`, `mock` und `local` klar in Evidence markieren, damit lokale AI nicht mit kanonischen Fakten verwechselt wird.",
-      "status": "open",
+      "title": "`rulebased`, `mock` und `local` klar in Evidence markieren, damit lokale AI nicht mit kanonischen Fakten verwechselt wird. (abgeschlossen: 2026-05-29; evidence: Context-Adapter-Ergebnisse enthalten `evidenceMode` und `quality` mit `requestedMode`, `actualMode`, `localAiUsed`, `fixtureOnly`, `sourceOfTruth: false` und `claimStatus`; Contracttests pruefen `rulebased`, geblocktes `local` und `mock` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.4",
