@@ -2114,7 +2114,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "139.3",
+        "currentPhase": "139.4",
         "planFile": "docs/plaene/aktiv/V139.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
@@ -2128,6 +2128,7 @@
           "docs/generated/plan-index.json",
           "docs/plaene/aktiv/V139.md",
           "docs/plaene/neu/Feature_Graph_RAG_Followup_Roadmap_V139.md",
+          "docs/Umsetzungsplan.md",
           "scripts/graph-rag-context-adapter.mjs",
           "scripts/graph-rag-index.mjs",
           "scripts/graph-rag-local-llm-check.mjs",
@@ -2139,7 +2140,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 20,
+          "concreteCount": 21,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -5902,7 +5903,7 @@
       "id": "V139.3",
       "type": "phase",
       "title": "Retrieval-Qualitaet und Intent-Router",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.3"
@@ -17207,8 +17208,8 @@
     {
       "id": "V139.3.1",
       "type": "subphase",
-      "title": "Aliasliste fuer zentrale Dateien, Bloeke, Critical Paths und Tests erweitern, ohne breite Volltextsuche als Default einzufuehren.",
-      "status": "open",
+      "title": "Aliasliste fuer zentrale Dateien, Bloecke, Critical Paths und Tests erweitern, ohne breite Volltextsuche als Default einzufuehren. (abgeschlossen: 2026-05-29; evidence: `routeGraphRagQuestion()` erkennt Graph-RAG-Skript-/Contract-/Test-Aliase, Handoff-Block-Aliase fuer V120/V121/V122/V124/V137/V139 und deutsche/englische Critical-Path-Aliase; Tests `graph-rag-query-alias` und `codegraph-block-alias` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.3",
@@ -17218,8 +17219,8 @@
     {
       "id": "V139.3.2",
       "type": "subphase",
-      "title": "Negative Referenzfragen aufnehmen: unklare Datei, nicht existierender Block, gemischter Scope, bewusst falscher Critical Path.",
-      "status": "open",
+      "title": "Negative Referenzfragen aufnehmen: unklare Datei, nicht existierender Block, gemischter Scope, bewusst falscher Critical Path. (abgeschlossen: 2026-05-29; evidence: `NEGATIVE_REFERENCE_QUESTIONS` prueft `V999`, `src/does-not-exist/NopeWidget.js`, `V112 + V999` und `fake Critical Path`; `runGraphRagQuery()` liefert `route.unresolvedReferences` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.3",
@@ -17229,8 +17230,8 @@
     {
       "id": "V139.3.3",
       "type": "subphase",
-      "title": "Ranking-Metriken ausgeben: Top-Kandidaten, Rejected-Grund, Graph-vs-Text-Anteil, Fallback-Rate und niedrigste Confidence.",
-      "status": "open",
+      "title": "Ranking-Metriken ausgeben: Top-Kandidaten, Rejected-Grund, Graph-vs-Text-Anteil, Fallback-Rate und niedrigste Confidence. (abgeschlossen: 2026-05-29; evidence: Query-Result und Evidence-Package enthalten `candidatePathCount`, `selectedGraphCandidateChunks`, `selectedTextFallbackChunks`, `fallbackRate`, `topCandidates`, `rejectedChunks`, `lowestConfidence` und `confidenceCounts`; Contractvalidation -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.3",
@@ -17240,8 +17241,8 @@
     {
       "id": "V139.3.4",
       "type": "subphase",
-      "title": "Tests so erweitern, dass falsche starke Treffer nicht als `high` Confidence durchgehen.",
-      "status": "open",
+      "title": "Tests so erweitern, dass falsche starke Treffer nicht als `high` Confidence durchgehen. (abgeschlossen: 2026-05-29; evidence: negative Referenztests erzwingen `unresolved-query-reference` und keine `high`-Claims fuer unbekannte oder gemischte Treffer; `node --test tests/graph-rag-query.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.3",
@@ -34520,6 +34521,7 @@
           "V125",
           "V137",
           "V138",
+          "V139",
           "V51",
           "V69",
           "V89",
@@ -83706,6 +83708,15 @@
     {
       "from": "V139",
       "to": "docs/plaene/neu/Feature_Graph_RAG_Followup_Roadmap_V139.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "docs/Umsetzungsplan.md",
       "type": "scope",
       "hint": null,
       "attributes": {
