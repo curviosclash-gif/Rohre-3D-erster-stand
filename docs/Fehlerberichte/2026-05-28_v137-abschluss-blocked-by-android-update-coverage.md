@@ -1,7 +1,7 @@
 # V137 Abschluss durch Android-Update-Coverage-Drift blockiert
 
 Datum: 2026-05-28
-Status: offen fuer Graph-Coverage-Scope; V137-Entscheidung bleibt `manual-only`
+Status: geloest 2026-05-29; V137-Entscheidung bleibt `manual-only`
 
 ## Kontext
 
@@ -48,8 +48,8 @@ Externer Coverage-Drift:
 
 ## Aktueller Stand
 
-V137 kann bis `137.99` vorbereitet werden, aber der Abschluss bleibt blockiert, bis `update_android_phone.bat` entweder einem passenden Graph-Scope zugeordnet oder bewusst klassifiziert/exkludiert ist.
+Der Abschluss-Blocker ist geloest. `update_android_phone.bat` ist als Root-Wrapper fuer `npm run android:update:phone` bewusst als `repo-ops` klassifiziert und bleibt damit ausserhalb der aktiven Produkt-/Code-Coverage. Der Zielpfad `scripts/update-android-phone.mjs` bleibt unveraendert als Graph-bekannter Skriptpfad sichtbar.
 
 ## Naechster Schritt
 
-Android-/Repo-Ops-Scope klaeren: `update_android_phone.bat` als Wrapper zu `scripts/update-android-phone.mjs` in den passenden Graph-Scope aufnehmen oder als ausgeschlossenen Repo-Ops-Pfad klassifizieren; danach `npm run graph:build`, `npm run graph:check` und V137 137.99 erneut abschliessen.
+Kein offener Blocker fuer V137. Nachzug 2026-05-29: `node --test tests/knowledge-graph-build.contract.test.mjs`, `npm run graph:build`, `npm run graph:check` und `coverage-report` sind gruen; `no-new-active-uncovered-files` meldet violationCount 0.

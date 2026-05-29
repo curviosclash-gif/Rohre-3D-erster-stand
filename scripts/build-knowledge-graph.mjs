@@ -89,7 +89,7 @@ const COVERAGE_CLASSIFICATION_RULES = Object.freeze([
     },
     {
         classification: 'repo-ops',
-        prefixes: ['.github/', '.husky/', 'start_', 'start-', 'tools/'],
+        prefixes: ['.github/', '.husky/', 'start_', 'start-', 'tools/', 'update_android_phone.bat'],
         excludedFromCoverage: true,
         reason: 'Repository automation scaffolding is tracked separately from product/code coverage.',
     },

@@ -2023,7 +2023,7 @@
       "id": "V137",
       "type": "block",
       "title": "CodeGraph Read-only Installationsspike fuer Graph-RAG",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -5812,7 +5812,7 @@
       "id": "V137.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.99"
@@ -16877,7 +16877,7 @@
     {
       "id": "V137.99.3",
       "type": "subphase",
-      "title": "`npm run graph:check` ist gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-28; evidence: `npm run graph:check` -> FAIL mit `COVERAGE_GATE_FAILED` fuer `update_android_phone.bat`; blockerfest dokumentiert in `docs/Fehlerberichte/2026-05-28_v137-abschluss-blocked-by-android-update-coverage.md`)",
+      "title": "`npm run graph:check` ist gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-29; evidence: `update_android_phone.bat` als `repo-ops`-Wrapper klassifiziert; `npm run graph:build` -> PASS mit coverage adjusted 78.3% und scorecard 92.4/pass; `npm run graph:check` -> PASS; `coverage-report` -> gate pass, `no-new-active-uncovered-files` violationCount 0)",
       "status": "done",
       "attributes": {
         "blockId": "V137",
@@ -16888,7 +16888,7 @@
     {
       "id": "V137.99.4",
       "type": "subphase",
-      "title": "`npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-28; evidence: `npm run docs:sync` -> PASS; `npm run docs:check` -> PASS)",
+      "title": "`npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-05-29; evidence: `npm run docs:sync` -> PASS; `npm run docs:check` -> PASS)",
       "status": "done",
       "attributes": {
         "blockId": "V137",
@@ -16899,8 +16899,8 @@
     {
       "id": "V137.99.5",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt: CodeGraph-Version, Datei-/Config-Wirkung, Vergleichsfragen, MCP-Entscheidung, Recovery und Not-checked.",
-      "status": "open",
+      "title": "Abschlussnotiz nennt: CodeGraph-Version, Datei-/Config-Wirkung, Vergleichsfragen, MCP-Entscheidung, Recovery und Not-checked. (abgeschlossen: 2026-05-29; evidence: Abschlussnotiz 2026-05-29 in diesem Abschnitt)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.99",
@@ -16910,8 +16910,8 @@
     {
       "id": "V137.99.6",
       "type": "subphase",
-      "title": "Falls V120/V122 Folgearbeit aufnehmen: Uebergabe nennt exakt, welche CodeGraph-Ausgaben Hinweise bleiben und welche Curvios-Evidence weiterhin gewinnen muss.",
-      "status": "open",
+      "title": "Falls V120/V122 Folgearbeit aufnehmen: Uebergabe nennt exakt, welche CodeGraph-Ausgaben Hinweise bleiben und welche Curvios-Evidence weiterhin gewinnen muss. (abgeschlossen: 2026-05-29; evidence: Handoff-Notiz 2026-05-29 in diesem Abschnitt)",
+      "status": "done",
       "attributes": {
         "blockId": "V137",
         "phaseCode": "137.99",

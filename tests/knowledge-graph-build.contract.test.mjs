@@ -267,6 +267,11 @@ test('classifyCoveragePath marks excluded and active buckets', () => {
         excludedFromCoverage: true,
         excludeReason: 'Task-specific blocker reports are evidence artifacts, not architecture coverage targets.',
     });
+    assert.deepEqual(classifyCoveragePath('update_android_phone.bat'), {
+        classification: 'repo-ops',
+        excludedFromCoverage: true,
+        excludeReason: 'Repository automation scaffolding is tracked separately from product/code coverage.',
+    });
     assert.deepEqual(classifyCoveragePath('src/core/AppInitializer.js'), {
         classification: 'product-code',
         excludedFromCoverage: false,

@@ -100,7 +100,8 @@
         ".husky/",
         "start_",
         "start-",
-        "tools/"
+        "tools/",
+        "update_android_phone.bat"
       ],
       "excludedFromCoverage": true,
       "reason": "Repository automation scaffolding is tracked separately from product/code coverage."
@@ -188,11 +189,11 @@
     "trackedFileCount": 2098,
     "rawCoveredFileCount": 1339,
     "rawCoveragePercent": 63.8,
-    "adjustedTrackedFileCount": 1415,
+    "adjustedTrackedFileCount": 1414,
     "adjustedCoveredFileCount": 1107,
-    "adjustedCoveragePercent": 78.2,
+    "adjustedCoveragePercent": 78.3,
     "uncoveredFileCount": 759,
-    "uncoveredActiveFileCount": 308,
+    "uncoveredActiveFileCount": 307,
     "classifications": [
       {
         "classification": "agent-workflow",
@@ -251,7 +252,7 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 45,
+        "count": 44,
         "coveredCount": 27
       },
       {
@@ -275,7 +276,7 @@
       {
         "classification": "repo-ops",
         "excludedFromCoverage": true,
-        "count": 37,
+        "count": 38,
         "coveredCount": 21
       },
       {
@@ -288,7 +289,7 @@
   },
   "gate": {
     "contract": "knowledge-graph.coverage.gate.v1",
-    "status": "fail",
+    "status": "pass",
     "baseline": {
       "ref": "HEAD",
       "path": "docs/generated/knowledge-graph.coverage.json",
@@ -298,19 +299,10 @@
       {
         "id": "no-new-active-uncovered-files",
         "severity": "error",
-        "status": "fail",
+        "status": "pass",
         "description": "Active repo files may not become newly uncovered; add them to a graph scope/mapping or classify them as excluded.",
-        "violationCount": 1,
-        "files": [
-          {
-            "path": "update_android_phone.bat",
-            "classification": "other",
-            "baselineState": "absent",
-            "coveredInCore": false,
-            "coveredByOverlay": false,
-            "scopeBlocks": []
-          }
-        ]
+        "violationCount": 0,
+        "files": []
       }
     ]
   },
@@ -36325,9 +36317,9 @@
       "coverageSources": [],
       "scopeBlocks": [],
       "surfaces": [],
-      "classification": "other",
-      "excludedFromCoverage": false,
-      "excludeReason": null
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
     },
     {
       "path": "vite.config.js",
