@@ -6,6 +6,14 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V137 137.99 Abschluss-Gate 2026-05-29
+
+- V137 ist abgeschlossen: CodeGraph bleibt nach Version-/Installationscheck, lokalem ignoriertem Index, drei Vergleichsfragen und Go/No-Go als `manual-only` CLI-Hinweisgeber begrenzt; keine MCP-Registrierung, kein globaler Install und keine Agent-/User-Config-Aenderung wurden ausgefuehrt.
+- Der externe Abschlussblocker `update_android_phone.bat` ist geloest: der Root-Wrapper ist als `repo-ops` klassifiziert, waehrend `scripts/update-android-phone.mjs` als Graph-bekannter Skriptpfad sichtbar bleibt.
+- Evidence: `node --test tests/knowledge-graph-build.contract.test.mjs`, `npm run graph:build`, `npm run graph:check`, `coverage-report`, `npm run plan:check`, `npm run plan:index:build`, `npm run plan:index:check`, `npm run docs:sync`, `npm run docs:check` und `npm run gates:pre-commit` -> PASS.
+- Residual-risk: CodeGraph-Ausgaben bleiben technische Kandidaten und duerfen keine Plan-, Scope-, Lock-, Produktsemantik-, Testauswahl- oder Governance-Entscheidung tragen; ein spaeterer V122-MCP-Pfad bleibt D4/User-Gate.
+- Not-checked: kein `codegraph uninit`, keine MCP-Registrierung, keine globale Installation, keine Agent-/User-Config-Aenderung, keine produktive Runtime-/UI-/Gameplay-Aenderung und keine Vollsuite.
+
 ## Mobile Android Steuerungs-Hardening 2026-05-28
 
 - Nach User-Gate `bitte alles umsetzen` wurde der Android-Steuerungsslice umgesetzt: Classic und Parcours zeigen einen Pause-Button, Touch-Controls geben sichtbare Overlays frei, Android-Back wird im Match an Pause/Resume delegiert, der Joystick kann links als Floating-Fallback starten, und Mobile-Tilt nutzt `soft` als Default-Assist.

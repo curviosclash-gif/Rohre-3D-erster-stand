@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated": "2026-05-28",
+  "updated": "2026-05-29",
   "start_anchor": {
-    "block": "V120",
-    "phase": "120.99",
+    "block": "V137",
+    "phase": "137.99",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -613,7 +613,7 @@
     {
       "id": "V137",
       "title": "CodeGraph Read-only Installationsspike fuer Graph-RAG",
-      "status": "planned",
+      "status": "done",
       "priority": "P2",
       "owner": "frei",
       "workstream": "ai-graph-tools",
@@ -626,10 +626,10 @@
       "current_phase": "137.99",
       "plan_file": "docs/plaene/aktiv/V137.md",
       "lock": {
-        "status": "frei",
+        "status": "closed",
         "agent": "-",
-        "start_date": "-",
-        "target": "137.5/137.6 abgeschlossen 2026-05-28; Entscheidung `manual-only`, kein MCP/Agent-Config; naechster Schritt 137.99 Abschluss-Gates",
+        "start_date": "2026-05-29",
+        "target": "Abgeschlossen 2026-05-29; CodeGraph bleibt `manual-only`, kein MCP/Agent-Config, Graph-/Plan-/Docs-Gates gruen",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },
