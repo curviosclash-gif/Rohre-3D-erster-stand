@@ -2114,7 +2114,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "139.2",
+        "currentPhase": "139.3",
         "planFile": "docs/plaene/aktiv/V139.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
@@ -5892,7 +5892,7 @@
       "id": "V139.2",
       "type": "phase",
       "title": "Safety-Hardening fuer Outputs und lokale Runtimes",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.2"
@@ -17163,8 +17163,8 @@
     {
       "id": "V139.2.1",
       "type": "subphase",
-      "title": "Gemeinsamen Guard fuer Graph-RAG-Outputpfade implementieren: nur `tmp/graph-rag/**`, keine absoluten Pfade, kein `..`, keine Repo-Ziele ausserhalb des Graph-RAG-Tmp-Bereichs.",
-      "status": "open",
+      "title": "Gemeinsamen Guard fuer Graph-RAG-Outputpfade implementieren: nur `tmp/graph-rag/**`, keine absoluten Pfade, kein `..`, keine Repo-Ziele ausserhalb des Graph-RAG-Tmp-Bereichs. (abgeschlossen: 2026-05-29; evidence: `scripts/graph-rag-index.mjs` exportiert `assertGraphRagRuntimeOutputPath()` mit Nullbyte-, Absolutpfad-, Traversal- und Prefix-Check; `node --test tests/graph-rag-index.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.2",
@@ -17174,8 +17174,8 @@
     {
       "id": "V139.2.2",
       "type": "subphase",
-      "title": "`graph-rag-index`, `graph-rag-query`, `graph-rag-context-adapter` und `graph-rag-local-llm-check` auf denselben Guard ziehen.",
-      "status": "open",
+      "title": "`graph-rag-index`, `graph-rag-query`, `graph-rag-context-adapter` und `graph-rag-local-llm-check` auf denselben Guard ziehen. (abgeschlossen: 2026-05-29; evidence: `rg -n -- \"assertGraphRagRuntimeOutputPath\" scripts/graph-rag-index.mjs scripts/graph-rag-query.mjs scripts/graph-rag-context-adapter.mjs scripts/graph-rag-local-llm-check.mjs` zeigt denselben Import/Export-Pfad; fokussierter Graph-RAG-Contract-Run -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.2",
@@ -17185,8 +17185,8 @@
     {
       "id": "V139.2.3",
       "type": "subphase",
-      "title": "Negative Tests fuer verbotene `--out`-Pfade und positive Tests fuer `tmp/graph-rag/...` ergaenzen.",
-      "status": "open",
+      "title": "Negative Tests fuer verbotene `--out`-Pfade und positive Tests fuer `tmp/graph-rag/...` ergaenzen. (abgeschlossen: 2026-05-29; evidence: `tests/graph-rag-index.contract.test.mjs`, `tests/graph-rag-query.contract.test.mjs`, `tests/graph-rag-context-adapter.contract.test.mjs` und `tests/graph-rag-local-llm-selection.contract.test.mjs` pruefen verbotene `--out`-Ziele und erlaubte `tmp/graph-rag/...`-Writes; fokussierter Graph-RAG-Contract-Run -> PASS mit 20 Tests)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.2",
@@ -17196,8 +17196,8 @@
     {
       "id": "V139.2.4",
       "type": "subphase",
-      "title": "Local-Runtime-Base-URL pruefen: Standard nur `localhost`, `127.0.0.1` oder `[::1]`; externe URLs nur nach explizitem Opt-in oder als Follow-up verwerfen.",
-      "status": "open",
+      "title": "Local-Runtime-Base-URL pruefen: Standard nur `localhost`, `127.0.0.1` oder `[::1]`; externe URLs nur nach explizitem Opt-in oder als Follow-up verwerfen. (abgeschlossen: 2026-05-29; evidence: `scripts/graph-rag-local-llm-check.mjs` exportiert `assertLocalBaseUrlAllowed()`, `scripts/graph-rag-context-adapter.mjs` nutzt denselben Guard vor lokalen HTTP-Calls; Tests blocken `https://example.com:11434` vor HTTP-Faktennutzung -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.2",

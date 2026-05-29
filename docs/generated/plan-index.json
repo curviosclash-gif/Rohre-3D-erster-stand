@@ -3,7 +3,7 @@
   "updated": "2026-05-29",
   "start_anchor": {
     "block": "V139",
-    "phase": "139.1",
+    "phase": "139.2",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -600,13 +600,13 @@
       "depends_on": [
         "V120.99"
       ],
-      "current_phase": "139.2",
+      "current_phase": "139.3",
       "plan_file": "docs/plaene/aktiv/V139.md",
       "lock": {
         "status": "frei",
         "agent": "-",
         "start_date": "-",
-        "target": "139.1 abgeschlossen 2026-05-29; naechster Slice 139.2 Output-/Runtime-Safety-Hardening",
+        "target": "139.2 abgeschlossen 2026-05-29; naechster Slice 139.3 Retrieval-Qualitaet und Intent-Router",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },
