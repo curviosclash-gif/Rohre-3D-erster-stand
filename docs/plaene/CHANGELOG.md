@@ -1063,3 +1063,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Evidence: `npm run graph:slo`, `npm run graph:build`, `npm run graph:check`, `npm run plan:check`, `node --test tests/graph-rag-index.contract.test.mjs tests/graph-rag-query.contract.test.mjs tests/graph-rag-local-llm-selection.contract.test.mjs tests/graph-rag-context-adapter.contract.test.mjs`, `npm run docs:sync`, `npm run docs:check`, `npm run plan:index:build`, `npm run plan:index:check` und `npm run gates:pre-commit` -> PASS.
 - Residual-risk: keine echte lokale Ollama-/llama.cpp-Installation, kein Viewer/UI, keine Produkt-Runtime und keine Vollsuite; V121 und V137 bleiben separate Folge- bzw. Spike-Bloecke.
 - Not-checked: keine produktiven Runtime-/UI-/Gameplay-/Bot-Training-Pfade, keine Cloud-AI-Integration, kein CodeGraph-Init/MCP/Agent-Config und kein Graph-Source-of-Truth-Wechsel.
+
+## Bugfix-Notiz 2026-05-29 (Mobile Tilt Pitch-Invert)
+
+- Ursache: Die gemeinsame Android-Mobile-App erbt den Desktop-Default `invertPitch.PLAYER_1=true`; bei Tilt-Steuerung macht das die Handy-Pitch-Richtung gefuehlt falsch.
+- Fixpfad: `applyMobileClassicSettings()` setzt `invertPitch.PLAYER_1=false` nur im Mobile-Target und laesst die bestehenden Mobile-Tilt-Achsen unveraendert.
+- Evidence: `node --test tests/mobile-classic-app.contract.test.mjs` -> PASS; `node --test tests/mobile-arcade-app.contract.test.mjs` -> PASS; `npm run plan:check` -> PASS.

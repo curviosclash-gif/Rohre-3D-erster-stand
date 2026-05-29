@@ -115,6 +115,11 @@ export function applyMobileClassicSettings(settings = null) {
     settings.localSettings.sessionType = MENU_SESSION_TYPES.SINGLE;
     settings.localSettings.modePath = modePath;
     settings.localSettings.mobileControls = normalizeMobileClassicControlSettings(settings.localSettings.mobileControls);
+    if (!settings.invertPitch || typeof settings.invertPitch !== 'object') {
+        settings.invertPitch = {};
+    }
+    // Phone tilt already maps the calibrated hand posture directly; desktop pitch-invert feels reversed here.
+    settings.invertPitch.PLAYER_1 = false;
     settings.gameplay.planarMode = false;
     settings.hunt.respawnEnabled = false;
     if (modePath === MENU_MODE_PATHS.ARCADE) {

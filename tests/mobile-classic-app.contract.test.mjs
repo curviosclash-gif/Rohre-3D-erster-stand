@@ -286,6 +286,10 @@ test('Unified Mobile Android runtime guard defaults invalid modes to single-play
   const settings = {
     mode: '2p',
     gameMode: 'HUNT',
+    invertPitch: {
+      PLAYER_1: true,
+      PLAYER_2: true,
+    },
     localSettings: {
       sessionType: 'multiplayer',
       modePath: 'fight',
@@ -314,6 +318,8 @@ test('Unified Mobile Android runtime guard defaults invalid modes to single-play
   assert.equal(settings.gameMode, 'CLASSIC');
   assert.equal(settings.localSettings.sessionType, 'single');
   assert.equal(settings.localSettings.modePath, 'normal');
+  assert.equal(settings.invertPitch.PLAYER_1, false);
+  assert.equal(settings.invertPitch.PLAYER_2, true);
   assert.equal(settings.localSettings.mobileControls.tiltSensitivity, 1.8);
   assert.equal(settings.localSettings.mobileControls.tiltPitchMode, MOBILE_CLASSIC_TILT_PITCH_MODES.TILT);
   assert.equal(settings.localSettings.mobileControls.tiltAssistMode, MOBILE_CLASSIC_TILT_ASSIST_MODES.ARCADE);
