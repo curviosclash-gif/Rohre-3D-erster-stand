@@ -12985,6 +12985,17 @@
       }
     },
     {
+      "id": "V121.6.6",
+      "type": "subphase",
+      "title": "Quantitative Nutzenmessung fuer mindestens acht Referenzaufgaben dokumentieren: CLI-Baseline, Dashboard-only und fuer passende Fragen Dashboard plus `Ask Repo`; je Pfad Zeit bis zur source-backed Antwort und Anzahl manueller CLI-Schritte erfassen. Akzeptanz: Dashboard-MVP senkt die medianen manuellen CLI-Schritte um mindestens 30 Prozent, ohne die mediane Antwortzeit zu verschlechtern. Fuer `Ask Repo` den marginalen Nutzen separat ausweisen und bei fehlender messbarer Verbesserung den Vollscope vor Rollout vereinfachen oder verschieben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.6"
+      }
+    },
+    {
       "id": "V121.7.1",
       "type": "subphase",
       "title": "`tools/graph-rag-viewer/README.md` dokumentiert Nutzung, Input-Dateien, Safety-Modi, Chat-Fallback und Nicht-Ziele.",
@@ -13097,12 +13108,23 @@
     {
       "id": "V121.99.7",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt read-only Grenze, Safety-Status, Chat-Fallback, V120-Dependency, historische Viewer-Reste und verbleibende Nicht-Ziele.",
+      "title": "Quantitative Nutzenmessung aus 121.6.6 -> pass oder dokumentierte Reduce-/Defer-Entscheidung fuer nicht ausreichend nuetzliche Oberflaechen.",
       "status": "open",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99",
         "subphaseCode": "121.99.7"
+      }
+    },
+    {
+      "id": "V121.99.8",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt read-only Grenze, Safety-Status, Chat-Fallback, V120-Dependency, historische Viewer-Reste, Nutzenmessung und verbleibende Nicht-Ziele.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.8"
       }
     },
     {
@@ -77526,6 +77548,17 @@
       }
     },
     {
+      "from": "V121.6",
+      "to": "V121.6.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.6",
+        "subphaseCode": "121.6.6"
+      }
+    },
+    {
       "from": "V121.7",
       "to": "V121.7.1",
       "type": "contains_subphase",
@@ -77644,6 +77677,17 @@
         "blockId": "V121",
         "phaseCode": "121.99",
         "subphaseCode": "121.99.7"
+      }
+    },
+    {
+      "from": "V121.99",
+      "to": "V121.99.8",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V121",
+        "phaseCode": "121.99",
+        "subphaseCode": "121.99.8"
       }
     },
     {

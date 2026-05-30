@@ -1076,3 +1076,10 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Ursache: Die gemeinsame Android-Mobile-App erbt den Desktop-Default `invertPitch.PLAYER_1=true`; bei Tilt-Steuerung macht das die Handy-Pitch-Richtung gefuehlt falsch.
 - Fixpfad: `applyMobileClassicSettings()` setzt `invertPitch.PLAYER_1=false` nur im Mobile-Target und laesst die bestehenden Mobile-Tilt-Achsen unveraendert.
 - Evidence: `node --test tests/mobile-classic-app.contract.test.mjs` -> PASS; `node --test tests/mobile-arcade-app.contract.test.mjs` -> PASS; `npm run plan:check` -> PASS.
+
+## Plan-Notiz 2026-05-30 (Block `V121 121.6`)
+
+- Nach User-Gate `bitte einplanen` misst V121 den praktischen Nutzen des Viewer-MVP quantitativ statt nur Safety und Contract-Korrektheit zu pruefen.
+- Fuer mindestens acht Referenzaufgaben werden CLI-Baseline, Dashboard-only und fuer passende Fragen Dashboard plus `Ask Repo` verglichen: Zeit bis zur source-backed Antwort und Anzahl manueller CLI-Schritte.
+- Akzeptanz: Das Dashboard senkt die medianen manuellen CLI-Schritte mindestens um 30 Prozent, ohne die mediane Antwortzeit zu verschlechtern. `Ask Repo` bleibt nur im Vollscope, wenn es einen zusaetzlichen messbaren Nutzen zeigt; andernfalls wird es vor Rollout vereinfacht oder verschoben.
+- Residual-risk: Fixture-nahe Referenzaufgaben koennen den Alltagsnutzen ueberzeichnen; die Abschluss-Evidence muss deshalb Aufgaben, Messwerte und Reduce-/Defer-Entscheidung sichtbar dokumentieren.
