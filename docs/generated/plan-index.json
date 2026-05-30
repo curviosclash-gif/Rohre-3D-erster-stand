@@ -595,7 +595,7 @@
       "title": "Graph-RAG Follow-up Roadmap, Safety und Qualitaetsausbau",
       "status": "done",
       "priority": "P2",
-      "owner": "codex",
+      "owner": "frei",
       "workstream": "ai-graph-tools",
       "depends_on": [
         "V120.99"
@@ -603,10 +603,10 @@
       "current_phase": "139.99",
       "plan_file": "docs/plaene/aktiv/V139.md",
       "lock": {
-        "status": "claimed",
-        "agent": "codex",
+        "status": "closed",
+        "agent": "-",
         "start_date": "2026-05-30",
-        "target": "139.99 abgeschlossen 2026-05-30; Lockfreigabe folgt nach Closure-Commit",
+        "target": "Abgeschlossen 2026-05-30; Safety-, Retrieval-, SLO- und Handoff-Gates gruen",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },
