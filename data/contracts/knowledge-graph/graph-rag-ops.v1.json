@@ -1,0 +1,221 @@
+{
+  "contract": "knowledge-graph.mapping.v1",
+  "schema_version": 1,
+  "mapping_id": "graph-rag-ops",
+  "description": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+  "nodes": [
+    {
+      "id": "runtime:graph-rag-index",
+      "type": "runtime",
+      "title": "Graph-RAG transient index builder",
+      "file": "scripts/graph-rag-index.mjs",
+      "attributes": {
+        "domain": "graph-rag",
+        "tooling": "read-only-context-index"
+      }
+    },
+    {
+      "id": "runtime:graph-rag-query",
+      "type": "runtime",
+      "title": "Graph-RAG source-backed query",
+      "file": "scripts/graph-rag-query.mjs",
+      "attributes": {
+        "domain": "graph-rag",
+        "tooling": "read-only-evidence-query"
+      }
+    },
+    {
+      "id": "runtime:graph-rag-context-adapter",
+      "type": "runtime",
+      "title": "Graph-RAG optional context adapter",
+      "file": "scripts/graph-rag-context-adapter.mjs",
+      "attributes": {
+        "domain": "graph-rag",
+        "tooling": "optional-local-context-adapter"
+      }
+    },
+    {
+      "id": "runtime:graph-rag-local-llm-check",
+      "type": "runtime",
+      "title": "Graph-RAG local LLM smoke check",
+      "file": "scripts/graph-rag-local-llm-check.mjs",
+      "attributes": {
+        "domain": "graph-rag",
+        "tooling": "optional-local-runtime-smoke"
+      }
+    },
+    {
+      "id": "state:graph-rag-transient-index",
+      "type": "state",
+      "title": "Transient source-backed Graph-RAG index",
+      "attributes": {
+        "domain": "graph-rag",
+        "path": "tmp/graph-rag/graph-rag-index.json",
+        "ephemeral": true
+      }
+    },
+    {
+      "id": "state:graph-rag-transient-evidence",
+      "type": "state",
+      "title": "Transient source-backed Graph-RAG evidence",
+      "attributes": {
+        "domain": "graph-rag",
+        "path": "tmp/graph-rag/",
+        "ephemeral": true
+      }
+    },
+    {
+      "id": "config:graph-rag-source-contract",
+      "type": "config",
+      "title": "Graph-RAG source contract",
+      "file": "data/contracts/knowledge-graph/rag-sources.v1.json",
+      "attributes": {
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "config:graph-rag-evidence-package-contract",
+      "type": "config",
+      "title": "Graph-RAG evidence package contract",
+      "file": "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+      "attributes": {
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "config:graph-rag-context-adapter-profile",
+      "type": "config",
+      "title": "Graph-RAG context adapter profiles",
+      "file": "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+      "attributes": {
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "config:graph-rag-local-llm-selection",
+      "type": "config",
+      "title": "Graph-RAG local LLM selection",
+      "file": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+      "attributes": {
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "config:graph-rag-ops-graph-anchor",
+      "type": "config",
+      "title": "Graph-RAG ops knowledge graph mapping",
+      "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+      "attributes": {
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "test:graph-rag-index-contract",
+      "type": "test",
+      "title": "Graph-RAG index contract",
+      "file": "tests/graph-rag-index.contract.test.mjs",
+      "attributes": {
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "test:graph-rag-query-contract",
+      "type": "test",
+      "title": "Graph-RAG query contract",
+      "file": "tests/graph-rag-query.contract.test.mjs",
+      "attributes": {
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "test:graph-rag-context-adapter-contract",
+      "type": "test",
+      "title": "Graph-RAG context adapter contract",
+      "file": "tests/graph-rag-context-adapter.contract.test.mjs",
+      "attributes": {
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "test:graph-rag-local-llm-selection-contract",
+      "type": "test",
+      "title": "Graph-RAG local LLM selection contract",
+      "file": "tests/graph-rag-local-llm-selection.contract.test.mjs",
+      "attributes": {
+        "domain": "graph-rag"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "runtime:graph-rag-index",
+      "to": "state:graph-rag-transient-index",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:graph-rag-index",
+      "to": "config:graph-rag-source-contract",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:graph-rag-index",
+      "to": "config:graph-rag-ops-graph-anchor",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:graph-rag-index",
+      "to": "test:graph-rag-index-contract",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:graph-rag-query",
+      "to": "state:graph-rag-transient-index",
+      "type": "reads_state"
+    },
+    {
+      "from": "runtime:graph-rag-query",
+      "to": "state:graph-rag-transient-evidence",
+      "type": "writes_state"
+    },
+    {
+      "from": "runtime:graph-rag-query",
+      "to": "config:graph-rag-evidence-package-contract",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:graph-rag-query",
+      "to": "test:graph-rag-query-contract",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:graph-rag-context-adapter",
+      "to": "state:graph-rag-transient-evidence",
+      "type": "reads_state"
+    },
+    {
+      "from": "runtime:graph-rag-context-adapter",
+      "to": "config:graph-rag-context-adapter-profile",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:graph-rag-context-adapter",
+      "to": "config:graph-rag-local-llm-selection",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:graph-rag-context-adapter",
+      "to": "test:graph-rag-context-adapter-contract",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:graph-rag-local-llm-check",
+      "to": "config:graph-rag-local-llm-selection",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:graph-rag-local-llm-check",
+      "to": "test:graph-rag-local-llm-selection-contract",
+      "type": "validated_by"
+    }
+  ]
+}
