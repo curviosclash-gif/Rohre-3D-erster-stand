@@ -186,11 +186,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2098,
-    "rawCoveredFileCount": 1339,
+    "trackedFileCount": 2099,
+    "rawCoveredFileCount": 1340,
     "rawCoveragePercent": 63.8,
-    "adjustedTrackedFileCount": 1414,
-    "adjustedCoveredFileCount": 1107,
+    "adjustedTrackedFileCount": 1415,
+    "adjustedCoveredFileCount": 1108,
     "adjustedCoveragePercent": 78.3,
     "uncoveredFileCount": 759,
     "uncoveredActiveFileCount": 307,
@@ -258,8 +258,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1010,
-        "coveredCount": 887
+        "count": 1011,
+        "coveredCount": 888
       },
       {
         "classification": "product-docs",
@@ -5841,6 +5841,7 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -5894,12 +5895,34 @@
       "excludeReason": null
     },
     {
+      "path": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
+        "V139"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -6040,6 +6063,7 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -6061,6 +6085,7 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -20098,6 +20123,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -20118,6 +20144,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -20138,6 +20165,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -20158,6 +20186,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -20387,6 +20416,7 @@
         "V110",
         "V111",
         "V116",
+        "V139",
         "V94"
       ],
       "surfaces": [],
@@ -33811,6 +33841,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -33831,6 +33862,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -33851,6 +33883,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -33871,6 +33904,7 @@
       "covered": true,
       "coverageSources": [
         "audit-scope",
+        "knowledge-graph-mapping",
         "scope-files"
       ],
       "scopeBlocks": [
@@ -33995,7 +34029,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V111"
+        "V111",
+        "V139"
       ],
       "surfaces": [],
       "classification": "product-code",

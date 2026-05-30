@@ -16,11 +16,11 @@
       "criticalPathOkPercent": 100,
       "criticalPathOkCount": 4,
       "criticalPathTotalCount": 4,
-      "mappedNodeCount": 92,
-      "mappedEdgeCount": 188,
-      "validationEdgeCount": 20,
+      "mappedNodeCount": 107,
+      "mappedEdgeCount": 215,
+      "validationEdgeCount": 24,
       "negativeEdgeCount": 3,
-      "mappedNodeValidationRatio": 0.217
+      "mappedNodeValidationRatio": 0.224
     }
   },
   "trend": {
@@ -135,11 +135,11 @@
         "criticalPathOkPercent": 100,
         "criticalPathOkCount": 4,
         "criticalPathTotalCount": 4,
-        "mappedNodeCount": 92,
-        "mappedEdgeCount": 188,
-        "validationEdgeCount": 20,
+        "mappedNodeCount": 107,
+        "mappedEdgeCount": 215,
+        "validationEdgeCount": 24,
         "negativeEdgeCount": 3,
-        "mappedNodeValidationRatio": 0.217
+        "mappedNodeValidationRatio": 0.224
       }
     }
   ]

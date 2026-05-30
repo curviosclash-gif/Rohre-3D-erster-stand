@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 31,
+          "concreteCount": 32,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1001,7 +1001,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 47,
+          "concreteCount": 48,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1059,7 +1059,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 33,
+          "concreteCount": 34,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -2114,10 +2114,11 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "139.5",
+        "currentPhase": "139.6",
         "planFile": "docs/plaene/aktiv/V139.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+          "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
           "data/contracts/knowledge-graph/local-llm-selection.v1.json",
           "data/contracts/knowledge-graph/query-ops.v1.json",
           "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
@@ -2133,14 +2134,16 @@
           "scripts/graph-rag-index.mjs",
           "scripts/graph-rag-local-llm-check.mjs",
           "scripts/graph-rag-query.mjs",
+          "scripts/query-knowledge-graph.mjs",
           "tests/graph-rag-context-adapter.contract.test.mjs",
           "tests/graph-rag-index.contract.test.mjs",
           "tests/graph-rag-local-llm-selection.contract.test.mjs",
           "tests/graph-rag-query.contract.test.mjs",
-          "tests/knowledge-graph-build.contract.test.mjs"
+          "tests/knowledge-graph-build.contract.test.mjs",
+          "tests/knowledge-graph-query.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 21,
+          "concreteCount": 24,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -5923,7 +5926,7 @@
       "id": "V139.5",
       "type": "phase",
       "title": "SLO-, Ops- und Graph-Modell-Haertung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.5"
@@ -17296,8 +17299,8 @@
     {
       "id": "V139.5.1",
       "type": "subphase",
-      "title": "`graph:slo` wiederholt messen; `export-view`-Jitter mit Warmup-/Sample-Analyse oder kleinem Performance-Fix bewerten.",
-      "status": "open",
+      "title": "`graph:slo` wiederholt messen; `export-view`-Jitter mit Warmup-/Sample-Analyse oder kleinem Performance-Fix bewerten. (abgeschlossen: 2026-05-30; evidence: initial fuenf sequenzielle `npm run graph:slo`-Laeufe -> PASS mit `export-view` p95 71.494ms bis 109.493ms; Nachmessung unter paralleler Last -> FAIL mit 248.865ms und sequenzielle Siebenfach-Nachmessung -> 6x PASS, 1x FAIL mit 165.663ms; `queryExportView()` cached den sicheren read-only Export nach dem vorhandenen Warmup; fuenf Post-Fix-Laeufe -> PASS mit 22.239ms bis 64.455ms; belasteter Parallellauf neben Contracttests -> PASS mit 92.033ms)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.5",
@@ -17307,8 +17310,8 @@
     {
       "id": "V139.5.2",
       "type": "subphase",
-      "title": "Keine SLO-Budget-Erhoehung ohne begruendete Messreihe und Playbook-Notiz.",
-      "status": "open",
+      "title": "Keine SLO-Budget-Erhoehung ohne begruendete Messreihe und Playbook-Notiz. (abgeschlossen: 2026-05-30; evidence: `data/contracts/knowledge-graph/query-ops.v1.json` bleibt unveraendert bei 160ms fuer `export-view`; Jitter wurde durch den kleineren warmed Cache-Pfad statt Budget-Lift adressiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.5",
@@ -17318,8 +17321,8 @@
     {
       "id": "V139.5.3",
       "type": "subphase",
-      "title": "Pruefen, ob Graph-RAG-Skripte als Core-Graph-Knoten mit RelationEdges modelliert werden sollen; Umsetzung nur, wenn Query-/Impact-Nutzen klar ist.",
-      "status": "open",
+      "title": "Pruefen, ob Graph-RAG-Skripte als Core-Graph-Knoten mit RelationEdges modelliert werden sollen; Umsetzung nur, wenn Query-/Impact-Nutzen klar ist. (abgeschlossen: 2026-05-30; evidence: Vorher lieferten `impact-for-file`-Abfragen fuer alle vier Graph-RAG-Skripte `existsInCoreGraph: false` und leere `relationEdges`; `data/contracts/knowledge-graph/graph-rag-ops.v1.json` modelliert die vier read-only Runtime-Knoten, transiente Zustaende, Contracts und bestehende Contracttests; `tests/knowledge-graph-build.contract.test.mjs` sichert den Query-Nutzen ab)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.5",
@@ -17329,8 +17332,8 @@
     {
       "id": "V139.5.4",
       "type": "subphase",
-      "title": "Coverage-Report und `impact-for-file` fuer Graph-RAG-Skripte als Abschluss-Evidence aufnehmen.",
-      "status": "open",
+      "title": "Coverage-Report und `impact-for-file` fuer Graph-RAG-Skripte als Abschluss-Evidence aufnehmen. (abgeschlossen: 2026-05-30; evidence: `coverage-report` -> PASS mit 78.3% adjusted Coverage und 0 neuen aktiven Coverage-Luecken; `impact-for-file scripts/graph-rag-index.mjs|graph-rag-query.mjs|graph-rag-context-adapter.mjs|graph-rag-local-llm-check.mjs --json` zeigt nach `graph:build` Core-Graph-Knoten sowie Config-/State-/Test-RelationEdges)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.5",
@@ -25433,6 +25436,94 @@
       }
     },
     {
+      "id": "runtime:graph-rag-context-adapter",
+      "type": "runtime",
+      "title": "Graph-RAG optional context adapter",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 28,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "scripts/graph-rag-context-adapter.mjs",
+        "domain": "graph-rag",
+        "tooling": "optional-local-context-adapter"
+      }
+    },
+    {
+      "id": "runtime:graph-rag-index",
+      "type": "runtime",
+      "title": "Graph-RAG transient index builder",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 8,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "scripts/graph-rag-index.mjs",
+        "domain": "graph-rag",
+        "tooling": "read-only-context-index"
+      }
+    },
+    {
+      "id": "runtime:graph-rag-local-llm-check",
+      "type": "runtime",
+      "title": "Graph-RAG local LLM smoke check",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 38,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "scripts/graph-rag-local-llm-check.mjs",
+        "domain": "graph-rag",
+        "tooling": "optional-local-runtime-smoke"
+      }
+    },
+    {
+      "id": "runtime:graph-rag-query",
+      "type": "runtime",
+      "title": "Graph-RAG source-backed query",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 18,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "scripts/graph-rag-query.mjs",
+        "domain": "graph-rag",
+        "tooling": "read-only-evidence-query"
+      }
+    },
+    {
       "id": "runtime:hunt-combat-system",
       "type": "runtime",
       "title": "HuntCombatSystem",
@@ -26097,6 +26188,50 @@
       }
     },
     {
+      "id": "state:graph-rag-transient-evidence",
+      "type": "state",
+      "title": "Transient source-backed Graph-RAG evidence",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 58,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "domain": "graph-rag",
+        "path": "tmp/graph-rag/",
+        "ephemeral": true
+      }
+    },
+    {
+      "id": "state:graph-rag-transient-index",
+      "type": "state",
+      "title": "Transient source-backed Graph-RAG index",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 48,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "domain": "graph-rag",
+        "path": "tmp/graph-rag/graph-rag-index.json",
+        "ephemeral": true
+      }
+    },
+    {
       "id": "state:hunt-combat-lock-on",
       "type": "state",
       "title": "Hunt combat targeting and lock-on cache",
@@ -26753,6 +26888,111 @@
       }
     },
     {
+      "id": "config:graph-rag-context-adapter-profile",
+      "type": "config",
+      "title": "Graph-RAG context adapter profiles",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 86,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "config:graph-rag-evidence-package-contract",
+      "type": "config",
+      "title": "Graph-RAG evidence package contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 77,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "config:graph-rag-local-llm-selection",
+      "type": "config",
+      "title": "Graph-RAG local LLM selection",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 95,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "config:graph-rag-ops-graph-anchor",
+      "type": "config",
+      "title": "Graph-RAG ops knowledge graph mapping",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 104,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "config:graph-rag-source-contract",
+      "type": "config",
+      "title": "Graph-RAG source contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 68,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "data/contracts/knowledge-graph/rag-sources.v1.json",
+        "domain": "graph-rag"
+      }
+    },
+    {
       "id": "config:map-tools-android-capacitor",
       "type": "config",
       "title": "Map Tools Android Capacitor config",
@@ -27237,6 +27477,90 @@
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
         "file": "tests/agent-map-export.contract.test.mjs",
         "domain": "agent-governance"
+      }
+    },
+    {
+      "id": "test:graph-rag-context-adapter-contract",
+      "type": "test",
+      "title": "Graph-RAG context adapter contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 131,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "tests/graph-rag-context-adapter.contract.test.mjs",
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "test:graph-rag-index-contract",
+      "type": "test",
+      "title": "Graph-RAG index contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 113,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "tests/graph-rag-index.contract.test.mjs",
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "test:graph-rag-local-llm-selection-contract",
+      "type": "test",
+      "title": "Graph-RAG local LLM selection contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 140,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "tests/graph-rag-local-llm-selection.contract.test.mjs",
+        "domain": "graph-rag"
+      }
+    },
+    {
+      "id": "test:graph-rag-query-contract",
+      "type": "test",
+      "title": "Graph-RAG query contract",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 122,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "mappingDescription": "Read-only Graph-RAG ops layer for transient indexing, source-backed retrieval and optional local context adaptation.",
+        "file": "tests/graph-rag-query.contract.test.mjs",
+        "domain": "graph-rag"
       }
     },
     {
@@ -29976,6 +30300,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -29984,6 +30309,9 @@
           "V111",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "config:graph-rag-context-adapter-profile"
         ],
         "exists": true
       }
@@ -30053,6 +30381,28 @@
       }
     },
     {
+      "id": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
+          "V139"
+        ],
+        "mappedNodes": [
+          "config:graph-rag-ops-graph-anchor"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
       "type": "file",
       "title": null,
@@ -30089,6 +30439,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -30097,6 +30448,9 @@
           "V111",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "config:graph-rag-local-llm-selection"
         ],
         "exists": true
       }
@@ -30254,6 +30608,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -30262,6 +30617,9 @@
           "V111",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "config:graph-rag-evidence-package-contract"
         ],
         "exists": true
       }
@@ -30273,6 +30631,7 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
@@ -30281,6 +30640,9 @@
           "V111",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "config:graph-rag-source-contract"
         ],
         "exists": true
       }
@@ -37030,12 +37392,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "runtime:graph-rag-context-adapter"
         ],
         "exists": true
       }
@@ -37048,12 +37414,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "runtime:graph-rag-index"
         ],
         "exists": true
       }
@@ -37066,12 +37436,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "runtime:graph-rag-local-llm-check"
         ],
         "exists": true
       }
@@ -37084,12 +37458,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "runtime:graph-rag-query"
         ],
         "exists": true
       }
@@ -37307,6 +37685,7 @@
           "V110",
           "V111",
           "V116",
+          "V139",
           "V94"
         ],
         "exists": true
@@ -49272,12 +49651,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "test:graph-rag-context-adapter-contract"
         ],
         "exists": true
       }
@@ -49290,12 +49673,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "test:graph-rag-index-contract"
         ],
         "exists": true
       }
@@ -49308,12 +49695,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "test:graph-rag-local-llm-selection-contract"
         ],
         "exists": true
       }
@@ -49326,12 +49717,16 @@
       "attributes": {
         "source": [
           "audit-scope",
+          "knowledge-graph-mapping",
           "scope-files"
         ],
         "scopeBlocks": [
           "B13",
           "V120",
           "V139"
+        ],
+        "mappedNodes": [
+          "test:graph-rag-query-contract"
         ],
         "exists": true
       }
@@ -49483,7 +49878,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V111"
+          "V111",
+          "V139"
         ],
         "exists": true
       }
@@ -58955,6 +59351,54 @@
       }
     },
     {
+      "from": "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
+      "to": "config:graph-rag-context-adapter-profile",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 86,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+      "to": "config:graph-rag-ops-graph-anchor",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 104,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
+      "to": "config:graph-rag-local-llm-selection",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 95,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "data/contracts/knowledge-graph/map-tools-android.v1.json",
       "to": "config:map-tools-android-graph-anchor",
       "type": "implements",
@@ -58998,6 +59442,38 @@
           "file": "data/contracts/knowledge-graph/plan-map-tooling.v1.json",
           "line": 85,
           "commit": "1b2b98e7e8281bad2ceda8092f8a9780434b4680"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "data/contracts/knowledge-graph/rag-evidence-package.v1.json",
+      "to": "config:graph-rag-evidence-package-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 77,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "data/contracts/knowledge-graph/rag-sources.v1.json",
+      "to": "config:graph-rag-source-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 68,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
         },
         "relationLayer": "runtime"
       }
@@ -59345,6 +59821,230 @@
           "file": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
           "line": 289,
           "commit": "5a4574485bb97bd9f7e9a7055859a78e559d4f27"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-context-adapter",
+      "to": "config:graph-rag-context-adapter-profile",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 191,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-context-adapter",
+      "to": "config:graph-rag-local-llm-selection",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 191,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-context-adapter",
+      "to": "state:graph-rag-transient-evidence",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 191,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-context-adapter",
+      "to": "test:graph-rag-context-adapter-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 201,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-index",
+      "to": "config:graph-rag-ops-graph-anchor",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 151,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-index",
+      "to": "config:graph-rag-source-contract",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 151,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-index",
+      "to": "state:graph-rag-transient-index",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 151,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-index",
+      "to": "test:graph-rag-index-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 161,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-local-llm-check",
+      "to": "config:graph-rag-local-llm-selection",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 211,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-local-llm-check",
+      "to": "test:graph-rag-local-llm-selection-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 211,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-query",
+      "to": "config:graph-rag-evidence-package-contract",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 176,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-query",
+      "to": "state:graph-rag-transient-evidence",
+      "type": "writes_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 171,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-query",
+      "to": "state:graph-rag-transient-index",
+      "type": "reads_state",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 171,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "state"
+      }
+    },
+    {
+      "from": "runtime:graph-rag-query",
+      "to": "test:graph-rag-query-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 181,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
         },
         "relationLayer": "test"
       }
@@ -60717,6 +61417,70 @@
       }
     },
     {
+      "from": "scripts/graph-rag-context-adapter.mjs",
+      "to": "runtime:graph-rag-context-adapter",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 28,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "scripts/graph-rag-index.mjs",
+      "to": "runtime:graph-rag-index",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 8,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "scripts/graph-rag-local-llm-check.mjs",
+      "to": "runtime:graph-rag-local-llm-check",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 38,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "scripts/graph-rag-query.mjs",
+      "to": "runtime:graph-rag-query",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 18,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "scripts/planning/PlanIntakeOps.mjs",
       "to": "runtime:plan-intake-ops",
       "type": "implements",
@@ -61187,6 +61951,70 @@
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
           "line": 224,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tests/graph-rag-context-adapter.contract.test.mjs",
+      "to": "test:graph-rag-context-adapter-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 131,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tests/graph-rag-index.contract.test.mjs",
+      "to": "test:graph-rag-index-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 113,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tests/graph-rag-local-llm-selection.contract.test.mjs",
+      "to": "test:graph-rag-local-llm-selection-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 140,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": "tests/graph-rag-query.contract.test.mjs",
+      "to": "test:graph-rag-query-contract",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "graph-rag-ops",
+        "mappingFile": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+          "line": 122,
+          "commit": "ed4450f49d560864364e243383998345ecf77a8e"
         },
         "relationLayer": "runtime"
       }
@@ -67888,6 +68716,15 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
       "type": "scope",
       "hint": null,
@@ -69284,6 +70121,15 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
       "type": "scope",
       "hint": null,
@@ -69908,6 +70754,15 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -83626,6 +84481,15 @@
     },
     {
       "from": "V139",
+      "to": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
       "to": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
       "type": "scope",
       "hint": null,
@@ -83761,6 +84625,15 @@
     },
     {
       "from": "V139",
+      "to": "scripts/query-knowledge-graph.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
       "to": "tests/graph-rag-context-adapter.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -83798,6 +84671,15 @@
     {
       "from": "V139",
       "to": "tests/knowledge-graph-build.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V139",
+      "to": "tests/knowledge-graph-query.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
