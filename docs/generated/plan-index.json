@@ -3,7 +3,7 @@
   "updated": "2026-05-30",
   "start_anchor": {
     "block": "V139",
-    "phase": "139.5",
+    "phase": "139.99",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -593,20 +593,20 @@
     {
       "id": "V139",
       "title": "Graph-RAG Follow-up Roadmap, Safety und Qualitaetsausbau",
-      "status": "planned",
+      "status": "done",
       "priority": "P2",
-      "owner": "frei",
+      "owner": "codex",
       "workstream": "ai-graph-tools",
       "depends_on": [
         "V120.99"
       ],
-      "current_phase": "139.6",
+      "current_phase": "139.99",
       "plan_file": "docs/plaene/aktiv/V139.md",
       "lock": {
-        "status": "frei",
-        "agent": "-",
+        "status": "claimed",
+        "agent": "codex",
         "start_date": "2026-05-30",
-        "target": "139.5 abgeschlossen 2026-05-30; naechster Slice 139.6 V121-Viewer-/Ask-Repo-Handoff",
+        "target": "139.99 abgeschlossen 2026-05-30; Lockfreigabe folgt nach Closure-Commit",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

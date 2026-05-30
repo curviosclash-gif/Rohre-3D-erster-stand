@@ -2106,7 +2106,7 @@
       "id": "V139",
       "type": "block",
       "title": "Graph-RAG Follow-up Roadmap, Safety und Qualitaetsausbau",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2114,7 +2114,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "139.6",
+        "currentPhase": "139.99",
         "planFile": "docs/plaene/aktiv/V139.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/context-adapter-profiles.v1.json",
@@ -5936,7 +5936,7 @@
       "id": "V139.6",
       "type": "phase",
       "title": "V121-Handoff: Viewer und Ask Repo",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.6"
@@ -5946,7 +5946,7 @@
       "id": "V139.7",
       "type": "phase",
       "title": "V137-Handoff: CodeGraph als Candidate Provider",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.7"
@@ -5956,7 +5956,7 @@
       "id": "V139.8",
       "type": "phase",
       "title": "V122/V124-Handoff: Memory, Ruflo und Produktsemantik",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.8"
@@ -5966,7 +5966,7 @@
       "id": "V139.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.99"
@@ -17343,8 +17343,8 @@
     {
       "id": "V139.6.1",
       "type": "subphase",
-      "title": "Export-/Cache-Regeln fuer V121 festlegen: welche JSON-Artefakte transient bleiben, welche nur live erzeugt werden und welche nie committed werden.",
-      "status": "open",
+      "title": "Export-/Cache-Regeln fuer V121 festlegen: welche JSON-Artefakte transient bleiben, welche nur live erzeugt werden und welche nie committed werden. (abgeschlossen: 2026-05-30; evidence: `data/contracts/knowledge-graph/rag-evidence-package.v1.json#consumer_hints` und `scripts/graph-rag-query.mjs#makeConsumerHints()` -> PASS; Runtime-Ausgaben bleiben unter `tmp/graph-rag/`, `safeToCommit: false`, Viewer-Export unter `tmp/graph-rag/viewer/`)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.6",
@@ -17354,8 +17354,8 @@
     {
       "id": "V139.6.2",
       "type": "subphase",
-      "title": "Minimalen Contract fuer Ask-Repo-Antworten definieren: Frage, Graph-Queries, Claims, Unsicherheiten, Budget und Source-Links.",
-      "status": "open",
+      "title": "Minimalen Contract fuer Ask-Repo-Antworten definieren: Frage, Graph-Queries, Claims, Unsicherheiten, Budget und Source-Links. (abgeschlossen: 2026-05-30; evidence: `scripts/graph-rag-query.mjs#makeConsumerHints()` -> PASS mit `question`, `graphQueries`, `claims`, `uncertainties`, `budgetReport`, `sourceLinks`; V121 erweitert diesen Basiskern spaeter um Chat-Response, Replay und Trace)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.6",
@@ -17365,8 +17365,8 @@
     {
       "id": "V139.6.3",
       "type": "subphase",
-      "title": "V121-Nicht-Ziel bestaetigen: Viewer zeigt Evidence, erzeugt aber keine Wahrheit, keine Plan-Status-Aenderung und keine Code-Aenderung.",
-      "status": "open",
+      "title": "V121-Nicht-Ziel bestaetigen: Viewer zeigt Evidence, erzeugt aber keine Wahrheit, keine Plan-Status-Aenderung und keine Code-Aenderung. (abgeschlossen: 2026-05-30; evidence: `docs/plaene/aktiv/V121.md#Nicht-Ziel` und `#Sicherheit und Governance` -> PASS; Viewer bleibt read-only Consumer)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.6",
@@ -17376,8 +17376,8 @@
     {
       "id": "V139.7.1",
       "type": "subphase",
-      "title": "Definieren, welche CodeGraph-Daten hilfreich waeren: Symbole, Callpaths, Importnaehe, Testnaehe, aber keine Plan-/Lock-/Dependency-Wahrheit.",
-      "status": "open",
+      "title": "Definieren, welche CodeGraph-Daten hilfreich waeren: Symbole, Callpaths, Importnaehe, Testnaehe, aber keine Plan-/Lock-/Dependency-Wahrheit. (abgeschlossen: 2026-05-30; evidence: `docs/plaene/aktiv/V137.md#Handoff-Notiz 2026-05-29` -> PASS; erlaubte CLI-Hinweise und verbotene Autoritaetsclaims sind benannt)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.7",
@@ -17387,8 +17387,8 @@
     {
       "id": "V139.7.2",
       "type": "subphase",
-      "title": "Akzeptanztests fuer eine spaetere Candidate-Provider-Schnittstelle entwerfen: gleiche Frage, Curvios-Graph gewinnt, CodeGraph darf nur Kandidaten ergaenzen.",
-      "status": "open",
+      "title": "Akzeptanztests fuer eine spaetere Candidate-Provider-Schnittstelle entwerfen: gleiche Frage, Curvios-Graph gewinnt, CodeGraph darf nur Kandidaten ergaenzen. (abgeschlossen: 2026-05-30; evidence: Handoff-Notiz 2026-05-30 unter `139.7` -> PASS mit drei Vergleichsfragen und Gewinnerregel)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.7",
@@ -17398,8 +17398,8 @@
     {
       "id": "V139.7.3",
       "type": "subphase",
-      "title": "D4-Grenze bestaetigen: Installation, MCP-Registrierung und globale Agent-Config bleiben V137/User-Gate.",
-      "status": "open",
+      "title": "D4-Grenze bestaetigen: Installation, MCP-Registrierung und globale Agent-Config bleiben V137/User-Gate. (abgeschlossen: 2026-05-30; evidence: `docs/plaene/aktiv/V137.md#Abschlussnotiz 2026-05-29` -> PASS; kein MCP-Stanza und keine Agent-/User-Config geschrieben)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.7",
@@ -17409,8 +17409,8 @@
     {
       "id": "V139.8.1",
       "type": "subphase",
-      "title": "V122-Regel festhalten: Memory darf V120-Evidence lesen, aber keine unzitierten RAG-Antworten als dauerhafte Wahrheit speichern.",
-      "status": "open",
+      "title": "V122-Regel festhalten: Memory darf V120-Evidence lesen, aber keine unzitierten RAG-Antworten als dauerhafte Wahrheit speichern. (abgeschlossen: 2026-05-30; evidence: Handoff-Notiz 2026-05-30 unter `139.8` -> PASS; source-backed Read-Regel und verbotene Schatten-Wahrheit benannt)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.8",
@@ -17420,8 +17420,8 @@
     {
       "id": "V139.8.2",
       "type": "subphase",
-      "title": "Ruflo-Orchestrierung darf Graph-RAG-Kontext nur read-only und nach V122-Gate nutzen.",
-      "status": "open",
+      "title": "Ruflo-Orchestrierung darf Graph-RAG-Kontext nur read-only und nach V122-Gate nutzen. (abgeschlossen: 2026-05-30; evidence: Handoff-Notiz 2026-05-30 unter `139.8` -> PASS; Orchestrierungsgrenze bleibt V122/User-Gate)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.8",
@@ -17431,8 +17431,8 @@
     {
       "id": "V139.8.3",
       "type": "subphase",
-      "title": "V124-Regel festhalten: Produktsemantik entsteht aus kuratierten Graph-/Produkt-Evidence-Slices, nicht aus freier lokaler LLM-Zusammenfassung.",
-      "status": "open",
+      "title": "V124-Regel festhalten: Produktsemantik entsteht aus kuratierten Graph-/Produkt-Evidence-Slices, nicht aus freier lokaler LLM-Zusammenfassung. (abgeschlossen: 2026-05-30; evidence: Handoff-Notiz 2026-05-30 unter `139.8` -> PASS; Produktsemantik-Harvest bleibt V124-Scope)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.8",
@@ -17442,8 +17442,8 @@
     {
       "id": "V139.99.1",
       "type": "subphase",
-      "title": "Graph-RAG-Contracttests sind gruen: `node --test tests/graph-rag-index.contract.test.mjs tests/graph-rag-query.contract.test.mjs tests/graph-rag-local-llm-selection.contract.test.mjs tests/graph-rag-context-adapter.contract.test.mjs`.",
-      "status": "open",
+      "title": "Graph-RAG-Contracttests sind gruen: `node --test tests/graph-rag-index.contract.test.mjs tests/graph-rag-query.contract.test.mjs tests/graph-rag-local-llm-selection.contract.test.mjs tests/graph-rag-context-adapter.contract.test.mjs`. (abgeschlossen: 2026-05-30; evidence: fokussierter Contract-Run -> PASS mit 22/22 Tests)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.99",
@@ -17453,8 +17453,8 @@
     {
       "id": "V139.99.2",
       "type": "subphase",
-      "title": "`npm run graph:slo`, `npm run graph:check`, `npm run plan:check` und `npm run gates:pre-commit` sind gruen oder ein rotes Signal ist als Blocker/Folgefinding dokumentiert.",
-      "status": "open",
+      "title": "`npm run graph:slo`, `npm run graph:check`, `npm run plan:check` und `npm run gates:pre-commit` sind gruen oder ein rotes Signal ist als Blocker/Folgefinding dokumentiert. (abgeschlossen: 2026-05-30; evidence: `npm run graph:build` -> PASS mit 3590 Nodes, 6409 Edges, adjusted Coverage 78.3% und Scorecard 92.4/pass; `npm run graph:slo` -> PASS mit `export-view` p95 47.121ms; `npm run graph:check` -> PASS; `npm run plan:check` -> PASS; `npm run gates:pre-commit` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.99",
@@ -17464,8 +17464,8 @@
     {
       "id": "V139.99.3",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt Nutzen, verbleibende Grenzen, Handoffs zu V121/V137/V122/V124 und bewusst nicht gepruefte Pfade.",
-      "status": "open",
+      "title": "Abschlussnotiz nennt Nutzen, verbleibende Grenzen, Handoffs zu V121/V137/V122/V124 und bewusst nicht gepruefte Pfade. (abgeschlossen: 2026-05-30; evidence: Abschluss-Evidence 2026-05-30 in diesem Abschnitt)",
+      "status": "done",
       "attributes": {
         "blockId": "V139",
         "phaseCode": "139.99",
