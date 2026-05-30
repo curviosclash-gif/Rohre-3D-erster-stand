@@ -1552,13 +1552,16 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "121.1",
+        "currentPhase": "121.2",
         "planFile": "docs/plaene/aktiv/V121.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
           "data/contracts/knowledge-graph/graph-rag-chat-response.v1.json",
           "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
           "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/plan-index.json",
           "docs/plaene/aktiv/V121.md",
           "scripts/graph-rag-chat.mjs",
           "scripts/graph-rag-viewer-export.mjs",
@@ -1571,7 +1574,7 @@
           "tools/graph-rag-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 2,
+          "concreteCount": 5,
           "plannedCount": 12
         },
         "scopeOverlapAllowedWith": [
@@ -4986,7 +4989,7 @@
       "id": "V121.1",
       "type": "phase",
       "title": "Intake und Scope-Abgrenzung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.1"
@@ -12657,8 +12660,8 @@
     {
       "id": "V121.1.1",
       "type": "subphase",
-      "title": "V120-Outputs pruefen: Evidence-Paket, Graph-RAG-Query-Ausgabe, LLM-Smoke-Report und Cache-/Export-Regeln.",
-      "status": "open",
+      "title": "V120-Outputs pruefen: Evidence-Paket, Graph-RAG-Query-Ausgabe, LLM-Smoke-Report und Cache-/Export-Regeln. (abgeschlossen: 2026-05-30; evidence: `node scripts/graph-rag-query.mjs \"Was blockiert V121?\" --json` -> PASS mit `knowledge-graph.rag-evidence-package.v1`, 6 source-backed Claims, Budget-/Ranking-Signalen und nicht-kanonischen `consumerHints`; `node scripts/graph-rag-local-llm-check.mjs --runtime rulebased --json` -> PASS mit `rulebased-fallback`; V139-Handoff unter `139.6` -> transiente Exporte unter `tmp/graph-rag/**`, `safeToCommit: false`)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.1",
@@ -12668,8 +12671,8 @@
     {
       "id": "V121.1.2",
       "type": "subphase",
-      "title": "Historische V107/V111-Viewer-Reste klassifizieren: ersetzen, bewusst nicht wieder aufnehmen oder als Drift dokumentieren.",
-      "status": "open",
+      "title": "Historische V107/V111-Viewer-Reste klassifizieren: ersetzen, bewusst nicht wieder aufnehmen oder als Drift dokumentieren. (abgeschlossen: 2026-05-30; evidence: `node scripts/query-knowledge-graph.mjs why-file tools/graph-viewer/index.html --json` und `why-file scripts/export-knowledge-graph-view.mjs --json` -> historische Scope-Nodes aus V107/V111 mit `exists: false`; Klassifikation: `contract-first/plan-drift`, Nachfolger sind `tools/graph-rag-viewer/**` und `scripts/graph-rag-viewer-export.mjs`)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.1",
@@ -12679,8 +12682,8 @@
     {
       "id": "V121.1.3",
       "type": "subphase",
-      "title": "Viewer-Scope begrenzen: read-only HTML, Export-Script, Fixture, Tests; keine Graph-/RAG-Kernlogik.",
-      "status": "open",
+      "title": "Viewer-Scope begrenzen: read-only HTML, Export-Script, Fixture, Tests; keine Graph-/RAG-Kernlogik. (abgeschlossen: 2026-05-30; evidence: `docs/plaene/aktiv/V121.md` Frontmatter, `Nicht-Ziel` und V139-Handoff unter `139.6` abgeglichen -> Viewer/Chat bleiben read-only Consumer ohne Schreibpfade, Modellinstallation oder zweite Wahrheit)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.1",
@@ -12690,8 +12693,8 @@
     {
       "id": "V121.1.4",
       "type": "subphase",
-      "title": "`scope_files` fuer spaetere aktive Uebernahme vorbereiten, inklusive `tools/graph-rag-viewer/**`, Export-Script, Contract und Tests.",
-      "status": "open",
+      "title": "`scope_files` fuer spaetere aktive Uebernahme vorbereiten, inklusive `tools/graph-rag-viewer/**`, Export-Script, Contract und Tests. (abgeschlossen: 2026-05-30; evidence: `docs/plaene/aktiv/V121.md` Frontmatter -> begrenzte `scope_files` mit Viewer, Export-/Chat-Scripts, versionierten Contracts, Fixtures, fokussierten Tests, synchronisierten Graph-/Coverage-/Plan-Indizes und aktivem Blockplan; `npm run lock:claim V121 codex -- --phase=121.1 --target=\"2026-05-30\"` plus `npm run lock:validate` -> PASS ohne Lock-Konflikt)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.1",
@@ -31160,6 +31163,7 @@
           "V116",
           "V119",
           "V120",
+          "V121",
           "V123",
           "V125",
           "V138",
@@ -31187,6 +31191,7 @@
           "V116",
           "V119",
           "V120",
+          "V121",
           "V123",
           "V125",
           "V138",
@@ -31263,6 +31268,7 @@
         ],
         "scopeBlocks": [
           "V120",
+          "V121",
           "V123",
           "V139"
         ],
@@ -76969,6 +76975,33 @@
     {
       "from": "V121",
       "to": "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "docs/generated/plan-index.json",
       "type": "scope",
       "hint": null,
       "attributes": {
