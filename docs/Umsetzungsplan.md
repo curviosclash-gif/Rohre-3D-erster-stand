@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-30. Aktiver Lock: `codex` auf `V139 139.5`; Startanker: `V139 139.5 abgeschlossen`; kein offener P1-Schritt; naechster empfohlener AI/Graph-Folgepfad ist `V139 139.6` fuer den V121-Viewer-/Ask-Repo-Handoff oder `V121 121.1` nach User-Priorisierung.
+Stand: 2026-05-30. Aktiver Lock: `-`; Startanker: `V139 139.5 abgeschlossen`; kein offener P1-Schritt; naechster empfohlener AI/Graph-Folgepfad ist `V139 139.6` fuer den V121-Viewer-/Ask-Repo-Handoff oder `V121 121.1` nach User-Priorisierung.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -77,7 +77,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V126 | Local Dev-API, Preview- und Delivery-Hardening | done | P1 | frei | V102.99,V105.99 | 126.99 | `docs/plaene/aktiv/V126.md` |
 | V138 | KI-Diff-Audit-Gate fuer deterministische Agenten-Selbstpruefung | done | P1 | frei | V117.99,V119.99,V123.99,V125.99 | 138.99 | `docs/plaene/aktiv/V138.md` |
 | V120 | Graph-RAG mit lokalem Context-Adapter | done | P1 | frei | V107.99,V110.99,V111.99 | 120.99 | `docs/plaene/aktiv/V120.md` |
-| V139 | Graph-RAG Follow-up Roadmap, Safety und Qualitaetsausbau | planned | P2 | codex | V120.99 | 139.6 | `docs/plaene/aktiv/V139.md` |
+| V139 | Graph-RAG Follow-up Roadmap, Safety und Qualitaetsausbau | planned | P2 | frei | V120.99 | 139.6 | `docs/plaene/aktiv/V139.md` |
 | V137 | CodeGraph Read-only Installationsspike fuer Graph-RAG | done | P2 | frei | V107.99,V110.99,V111.99,V120.1 | 137.99 | `docs/plaene/aktiv/V137.md` |
 | V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.1 | `docs/plaene/aktiv/V121.md` |
 | V134 | Plan Map Intake-Uebersicht und Kandidaten-Trennung | done | P2 | frei | V116.99,V117.99 | 134.99 | `docs/plaene/aktiv/V134.md` |
@@ -204,7 +204,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V126 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Dev-API-/Preview-Hardening gruen, Handoff an V127/V128/V129 |
 | - | V138 | 2026-05-26 | closed | Abgeschlossen 2026-05-27; KI-Diff-Audit, Agent-Preflight-Integration, D2-Not-checked und Abschluss-Gates gruen |
 | - | V120 | 2026-05-27 | closed | Abgeschlossen 2026-05-28; Graph-RAG-Abschluss-Gates, Docs, Fallbacks und Budget-Evidence gruen |
-| codex | V139 | 2026-05-30 | claimed | 139.5 abgeschlossen 2026-05-30; naechster Slice 139.6 V121-Viewer-/Ask-Repo-Handoff |
+| - | V139 | 2026-05-30 | frei | 139.5 abgeschlossen 2026-05-30; naechster Slice 139.6 V121-Viewer-/Ask-Repo-Handoff |
 | - | V137 | 2026-05-29 | closed | Abgeschlossen 2026-05-29; CodeGraph bleibt `manual-only`, kein MCP/Agent-Config, Graph-/Plan-/Docs-Gates gruen |
 | - | V121 | - | frei | Geplant |
 | - | V134 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Plan-Map-Intake-Lanes, Summary-Split und read-only Handoff-Links gruen |
