@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-05-30T13:02:18.485Z",
+  "timestamp": "2026-05-30T13:07:51.064Z",
   "locks": [
     {
       "block_id": "V103",
@@ -984,33 +984,6 @@
       "start_date": "2026-05-30",
       "target_completion": "2026-05-30",
       "status": "completed",
-      "notes": ""
-    },
-    {
-      "block_id": "V121",
-      "phase": "121.2",
-      "scope_files": [
-        "tools/graph-rag-viewer/index.html",
-        "tools/graph-rag-viewer/viewer.js",
-        "tools/graph-rag-viewer/viewer.css",
-        "tools/graph-rag-viewer/README.md",
-        "scripts/graph-rag-viewer-export.mjs",
-        "scripts/graph-rag-chat.mjs",
-        "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
-        "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
-        "data/contracts/knowledge-graph/graph-rag-chat-response.v1.json",
-        "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
-        "tests/graph-rag-viewer-export.contract.test.mjs",
-        "tests/graph-rag-viewer-ui.contract.test.mjs",
-        "tests/graph-rag-chat.contract.test.mjs",
-        "docs/generated/knowledge-graph.json",
-        "docs/generated/knowledge-graph.coverage.json",
-        "docs/generated/plan-index.json",
-        "docs/plaene/aktiv/V121.md"
-      ],
-      "start_date": "2026-05-30",
-      "target_completion": "2026-05-30",
-      "status": "in-progress",
       "notes": ""
     }
   ],

@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-05-30. Aktiver Lock: `codex` auf `V121 121.1`; Startanker: `V121 121.1 abgeschlossen`; kein offener P1-Schritt; naechster empfohlener AI/Graph-Folgepfad ist `V121 121.2` fuer Viewer-Export und Fixture oder `V122 122.1` nach User-Priorisierung.
+Stand: 2026-05-30. Aktiver Lock: `-`; Startanker: `V121 121.1 abgeschlossen`; kein offener P1-Schritt; naechster empfohlener AI/Graph-Folgepfad ist `V121 121.2` fuer Viewer-Export und Fixture oder `V122 122.1` nach User-Priorisierung.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -79,7 +79,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V120 | Graph-RAG mit lokalem Context-Adapter | done | P1 | frei | V107.99,V110.99,V111.99 | 120.99 | `docs/plaene/aktiv/V120.md` |
 | V139 | Graph-RAG Follow-up Roadmap, Safety und Qualitaetsausbau | done | P2 | frei | V120.99 | 139.99 | `docs/plaene/aktiv/V139.md` |
 | V137 | CodeGraph Read-only Installationsspike fuer Graph-RAG | done | P2 | frei | V107.99,V110.99,V111.99,V120.1 | 137.99 | `docs/plaene/aktiv/V137.md` |
-| V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | codex | V120.99,V107.99,V110.99,V111.99 | 121.2 | `docs/plaene/aktiv/V121.md` |
+| V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.2 | `docs/plaene/aktiv/V121.md` |
 | V134 | Plan Map Intake-Uebersicht und Kandidaten-Trennung | done | P2 | frei | V116.99,V117.99 | 134.99 | `docs/plaene/aktiv/V134.md` |
 | V122 | Repo-natives Agent-Memory und externe Ruflo-Orchestrierung | planned | P2 | frei | V116.99,V117.99,V119.1 | 122.1 | `docs/plaene/aktiv/V122.md` |
 | V124 | Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet | planned | P2 | frei | V107.99,V110.99,V111.99 | 124.1 | `docs/plaene/aktiv/V124.md` |
@@ -206,7 +206,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V120 | 2026-05-27 | closed | Abgeschlossen 2026-05-28; Graph-RAG-Abschluss-Gates, Docs, Fallbacks und Budget-Evidence gruen |
 | - | V139 | 2026-05-30 | closed | Abgeschlossen 2026-05-30; Safety-, Retrieval-, SLO- und Handoff-Gates gruen |
 | - | V137 | 2026-05-29 | closed | Abgeschlossen 2026-05-29; CodeGraph bleibt `manual-only`, kein MCP/Agent-Config, Graph-/Plan-/Docs-Gates gruen |
-| codex | V121 | 2026-05-30 | claimed | 121.1 abgeschlossen 2026-05-30; naechster Slice 121.2 Viewer-Export und Fixture |
+| - | V121 | 2026-05-30 | frei | 121.1 abgeschlossen 2026-05-30; naechster Slice 121.2 Viewer-Export und Fixture |
 | - | V134 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Plan-Map-Intake-Lanes, Summary-Split und read-only Handoff-Links gruen |
 | - | V122 | - | frei | Geplant |
 | - | V124 | - | frei | Geplant |
