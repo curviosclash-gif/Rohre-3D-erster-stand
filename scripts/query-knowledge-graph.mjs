@@ -122,6 +122,7 @@ const EMAIL_VALUE_PATTERN = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i;
 const SECRET_VALUE_PATTERN = /\b(?:sk|ghp|pat|xox[baprs]|AKIA)[A-Za-z0-9_-]{12,}\b/;
 const REDACTED_SECRET_VALUE = '[REDACTED:secret]';
 const REDACTED_PII_VALUE = '[REDACTED:pii]';
+const SAFE_EXPORT_VIEW_CACHE = new WeakMap();
 
 function normalizePath(value) {
     return String(value || '')
@@ -528,6 +529,12 @@ function queryCoverageReport(coverage) {
 }
 
 function queryExportView(graph, coverage, { unsafeRaw = false } = {}) {
+    if (!unsafeRaw && graph && typeof graph === 'object' && coverage && typeof coverage === 'object') {
+        const coverageCache = SAFE_EXPORT_VIEW_CACHE.get(graph);
+        const cached = coverageCache?.get(coverage);
+        if (cached) return cached;
+    }
+
     const { nodes, edges } = buildGraphIndexes(graph);
     const payload = {
         query: 'export-view',
@@ -546,7 +553,18 @@ function queryExportView(graph, coverage, { unsafeRaw = false } = {}) {
         edges,
     };
 
-    return applyGraphSafetyFilter(payload, { unsafeRaw });
+    const result = applyGraphSafetyFilter(payload, { unsafeRaw });
+    if (!unsafeRaw && graph && typeof graph === 'object' && coverage && typeof coverage === 'object') {
+        // Loaded graph artifacts are read-only. Cache the safe export after warmup so repeated viewer reads
+        // do not redo the same full-graph redaction walk.
+        let coverageCache = SAFE_EXPORT_VIEW_CACHE.get(graph);
+        if (!coverageCache) {
+            coverageCache = new WeakMap();
+            SAFE_EXPORT_VIEW_CACHE.set(graph, coverageCache);
+        }
+        coverageCache.set(coverage, result);
+    }
+    return result;
 }
 
 function queryUncoveredFiles(coverage, prefix = '') {

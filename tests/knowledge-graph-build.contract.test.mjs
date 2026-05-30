@@ -975,6 +975,16 @@ test('knowledge graph core runtime queries return stable JSON shapes', async () 
         ]
     );
 
+    const graphRagImpact = queryImpactForFile(graph, { files: [] }, 'scripts/graph-rag-query.mjs');
+    assert.equal(graphRagImpact.existsInCoreGraph, true);
+    assert.ok(graphRagImpact.implementedNodes.some((node) => node.id === 'runtime:graph-rag-query'));
+    assert.ok(graphRagImpact.relationEdges.some((edge) => (
+        edge.type === 'reads_config' && edge.to === 'config:graph-rag-evidence-package-contract'
+    )));
+    assert.ok(graphRagImpact.relationEdges.some((edge) => (
+        edge.type === 'validated_by' && edge.to === 'test:graph-rag-query-contract'
+    )));
+
     const eventFlow = queryEventFlow(graph, 'round-end');
     assert.equal(eventFlow.query, 'event-flow');
     assert.deepEqual(eventFlow.events.map((event) => event.id), ['event:round-end']);

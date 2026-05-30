@@ -288,6 +288,7 @@ test('export-view redacts PII and secrets by default with explicit raw override'
     assert.equal(safe.nodes[0].attributes.apiToken, '[REDACTED:secret]');
     assert.equal(safe.nodes[0].attributes.note, '[REDACTED:pii]');
     assert.deepEqual(safe.safety.redactedFields, ['apiToken', 'note', 'ownerEmail']);
+    assert.equal(queryExportView(sensitiveGraph, coverage), safe);
 
     const raw = queryExportView(sensitiveGraph, coverage, { unsafeRaw: true });
     assert.equal(raw.safety.mode, 'unsafe-raw');
