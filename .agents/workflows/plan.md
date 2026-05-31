@@ -30,6 +30,7 @@ description: Create a compact implementation plan for a new feature or extension
 - Dependencies klassifizieren (`hard`/`soft`).
 - Dependency-/Scope-Abgleich zuerst ueber Graph-Query (`open-deps`, `scope-collisions`), dann bei Bedarf Volltext.
 - Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; `D3`/`D4`-Aenderungen an Source-of-truth, Planstruktur, Archivierung oder Governance brauchen User-Gate.
+- Falls eine Freigabe noetig ist, das Erklaerformat aus `.agents/rules/planning_and_governance.md` verwenden: Entscheidung, Gate-Grund, konkrete Umsetzung, erwarteter Effekt, ausgeschlossener Scope und passende Kurzantwort.
 - Subagents nur mit expliziter User-Erlaubnis und klarer Ownership nutzen; sie ersetzen keine Gate-, Evidence- oder Integrationsverantwortung.
 - Neue dauerhafte Ablagen nach Zweckklasse (`transient`, `evidence`, `reference`, `governance`, `plan`, `archive-index`) einordnen und bestehende kanonische Zielquelle bevorzugen.
 - Verdacht auf Totcode oder Legacy-Pfade frueh klassifizieren: `duplicate-backed`, `legacy-with-replacement`, `contract-first/plan-drift`, `unverified-altpath`.

@@ -53,6 +53,16 @@ Fuer `D3` und `D4` braucht es vor Umsetzung: mindestens zwei Quellen, Alternativ
 
 Vor jeder D3-/D4-Freigabefrage und vor Aenderungen in `[REVIEW]`- oder `[USER-GATE]`-Phasen klassifiziert der Agent die betroffenen Dateien oder Oberflaechen kompakt als `no-op`, `read-only evidence`, `optional` oder `edit required`. Die Freigabe darf nur die `edit required`-Teile umfassen; `no-op` und `read-only evidence` werden nicht als Aenderung verkauft, `optional` braucht eine ausdrueckliche Entscheidung oder bleibt unangetastet.
 
+Jede Freigabefrage muss fuer den User ohne Rueckfrage entscheidbar sein. Sie nennt in Alltagssprache:
+
+- welche Entscheidung jetzt gebraucht wird und warum das Gate greift,
+- was nach Freigabe konkret geaendert oder ausgefuehrt wird,
+- welchen beobachtbaren Nutzen oder Effekt der Schritt haben soll,
+- was bewusst nicht Teil der Freigabe ist,
+- die `edit required`-Dateien oder Oberflaechen,
+- bei `D3`/`D4` zusaetzlich Alternativen, Blast-Radius und bei `D4` Recovery-/Rollback-Pfad,
+- eine kurze beispielhafte Antwort, mit der der User exakt diesen Scope freigeben kann.
+
 Agenten stoppen und fragen nach, wenn Graph, Master, Findings oder Locks widersprechen, ein unerwartetes Gate rot wird, der Diff groesser als angekuendigt wird, fremde uncommittete Aenderungen in betroffenen Dateien liegen, getrackte Dateien geloescht/verschoben wuerden, ein Cleanup-Skript mehr Klassen trifft als angekuendigt, ein Refactor produktive Parameter/Physik/Bot-Training/Recording/Multiplayer beruehrt oder ein Rebuild-/Reborn-Pfad entstehen soll.
 
 ## Subagent and Parallel Agent Use

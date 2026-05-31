@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Governance-Notiz 2026-05-31 (Freigabefragen)
+
+- Nach User-Auftrag muessen Workflow-Freigabefragen den entscheidbaren Scope in Alltagssprache erklaeren: benoetigte Entscheidung, Gate-Grund, konkrete Umsetzung, erwarteter Effekt, ausgeschlossener Scope und passende Kurzantwort; bei D3/D4 bleiben Alternativen, Blast-Radius und D4-Recovery explizit.
+- Die gemeinsame Pflicht steht in `.agents/rules/planning_and_governance.md`; `code`, `fix-planung`, `bugfix`, `plan`, `cleanup` und der Quick-Exit verweisen auf dieses Format.
+- Residual-risk: Freitextqualitaet bleibt agentenabhaengig; die neue Regel macht die Pflicht pruefbar sichtbar, erzwingt aber noch kein maschinelles Prompt-Linting.
+- Not-checked: keine Aenderung an produktivem Code, Plaenen, Locks oder Graph-Artefakten.
+
 ## Mobile Android Level-4 UX-Follow-up 2026-05-29
 
 - Nach User-Gate wurde die freigegebene Mobile-Classic-WIP-Aenderung als V135-Follow-up uebernommen: Android-Level-4 oeffnet direkt die kuratierten `Einstellungen`, erlaubt mobil nur `mobile_controls` und `gameplay`, und blendet Desktop-/Expert-Tuning im Mobile-Shell aus.

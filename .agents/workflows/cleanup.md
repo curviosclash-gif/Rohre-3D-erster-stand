@@ -13,6 +13,7 @@ description: Detect and retire dead code/files with replacement-proof and safe d
 
 // turbo
 - Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; Cleanup-, Archivierungs-, Move-/Delete- und breite Refactor-Schritte sind D3/D4-nahe und brauchen User-Gate vor Umsetzung.
+- Jede Freigabefrage nach dem Erklaerformat aus `.agents/rules/planning_and_governance.md` stellen: Entscheidung, Gate-Grund, konkrete Removes/Archives, erwarteter Effekt, ausgeschlossener Scope, Blast-Radius, Recovery-Pfad und passende Kurzantwort.
 - Neue Reports, Ablagen oder Archiv-Indizes vorab nach Zweckklasse (`transient`, `evidence`, `reference`, `governance`, `plan`, `archive-index`) einordnen und bestehende kanonische Zielquellen bevorzugen.
 - `git ls-files "src/**/*.js" "editor/js/**/*.js" "tests/**/*.js" "tests/**/*.mjs"`
 - Cross-check with actual imports/references.
