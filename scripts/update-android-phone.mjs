@@ -29,11 +29,13 @@ const apps = Object.freeze([
     apkPath: mobileClassicApk,
   },
 ]);
+const watchPollIntervalMs = 1500;
 
 function parseArgs(argv) {
   const options = {
     device: process.env.ANDROID_SERIAL || '',
     skipLaunch: false,
+    watch: false,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -45,6 +47,8 @@ function parseArgs(argv) {
       options.device = arg.slice('--device='.length).trim();
     } else if (arg === '--no-launch') {
       options.skipLaunch = true;
+    } else if (arg === '--watch') {
+      options.watch = true;
     } else if (arg === '--help' || arg === '-h') {
       options.help = true;
     } else {
@@ -53,6 +57,12 @@ function parseArgs(argv) {
   }
 
   return options;
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
 }
 
 async function pathExists(filePath) {
@@ -230,7 +240,46 @@ async function installAndLaunch(adbCommand, serial, skipLaunch) {
 }
 
 function printHelp() {
-  process.stdout.write(`Usage: npm run android:update:phone -- [--device <serial>] [--no-launch]\n`);
+  process.stdout.write(`Usage: npm run android:update:phone -- [--device <serial>] [--no-launch] [--watch]\n`);
+}
+
+async function waitForDevice(adbCommand, requestedDevice) {
+  let previousMessage = '';
+  while (true) {
+    const selected = await selectDevice(adbCommand, requestedDevice);
+    if (selected.status === 'ready') {
+      return selected.serial;
+    }
+    if (selected.message !== previousMessage) {
+      process.stdout.write(`[android:update] ${selected.message}\n`);
+      previousMessage = selected.message;
+    }
+    await delay(watchPollIntervalMs);
+  }
+}
+
+async function waitForDisconnect(adbCommand, serial) {
+  process.stdout.write(`[android:update] Warte auf Trennung von ${serial}.\n`);
+  while (true) {
+    const selected = await selectDevice(adbCommand, serial);
+    if (selected.status !== 'ready') {
+      return;
+    }
+    await delay(watchPollIntervalMs);
+  }
+}
+
+async function watch(adbCommand, options) {
+  process.stdout.write('[android:update] Watch-Modus aktiv. Motorola anschliessen oder erneut verbinden; Abbruch mit Strg+C.\n');
+  while (true) {
+    const serial = await waitForDevice(adbCommand, options.device);
+    process.stdout.write(`[android:update] ${serial} erkannt. Baue die neuesten APKs.\n`);
+    await buildApks();
+    process.stdout.write(`[android:update] Installiere auf ${serial}.\n`);
+    await installAndLaunch(adbCommand, serial, options.skipLaunch);
+    process.stdout.write('[android:update] Fertig: Map Tools und Curvios Clash sind aktualisiert.\n');
+    await waitForDisconnect(adbCommand, serial);
+  }
 }
 
 async function main() {
@@ -241,6 +290,11 @@ async function main() {
   }
 
   const adbCommand = createAdbCommand();
+  if (options.watch) {
+    await watch(adbCommand, options);
+    return;
+  }
+
   process.stdout.write('[android:update] Building Map Tools and Curvios Clash APKs.\n');
   await buildApks();
 
