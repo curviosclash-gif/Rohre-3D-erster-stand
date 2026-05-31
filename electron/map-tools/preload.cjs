@@ -22,6 +22,13 @@ const mapToolsApi = Object.freeze({
     setView: (viewId) => invoke('map-tools:set-view', viewId),
     refresh: (viewId = 'all') => invoke('map-tools:refresh', { viewId }),
     openPath: (targetId) => invoke('map-tools:open-path', targetId),
+    listMarkdown: () => invoke('map-tools:list-markdown'),
+    readMarkdown: (path) => invoke('map-tools:read-markdown', path),
+    previewMarkdown: (payload) => invoke('map-tools:preview-markdown', payload),
+    saveMarkdown: (payload) => invoke('map-tools:save-markdown', payload),
+    gitState: () => invoke('map-tools:git-state'),
+    commitMarkdown: (payload) => invoke('map-tools:commit-markdown', payload),
+    pushMarkdown: () => invoke('map-tools:push-markdown'),
     onViewRequested: (callback) => subscribe('map-tools:view-requested', callback),
     onRefreshRequested: (callback) => subscribe('map-tools:refresh-requested', callback),
 });

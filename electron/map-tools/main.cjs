@@ -7,6 +7,15 @@ const {
     initSessionDataSelfHeal,
 } = require('../session-data-runtime.cjs');
 const { startMapToolsServer } = require('./server.cjs');
+const {
+    commitGovernanceMarkdown,
+    getGovernanceGitState,
+    listEditableMarkdownFiles,
+    previewEditableMarkdown,
+    pushGovernanceMarkdown,
+    readEditableMarkdown,
+    saveEditableMarkdown,
+} = require('./governance-editor.cjs');
 
 const execFileAsync = promisify(execFile);
 
@@ -21,6 +30,13 @@ const IPC_CHANNELS = Object.freeze({
     refresh: 'map-tools:refresh',
     setView: 'map-tools:set-view',
     openPath: 'map-tools:open-path',
+    listMarkdown: 'map-tools:list-markdown',
+    readMarkdown: 'map-tools:read-markdown',
+    previewMarkdown: 'map-tools:preview-markdown',
+    saveMarkdown: 'map-tools:save-markdown',
+    gitState: 'map-tools:git-state',
+    commitMarkdown: 'map-tools:commit-markdown',
+    pushMarkdown: 'map-tools:push-markdown',
     viewRequested: 'map-tools:view-requested',
     refreshRequested: 'map-tools:refresh-requested',
 });
@@ -209,6 +225,20 @@ async function openRepoPath(targetId) {
     };
 }
 
+async function confirmDesktopAction({ title, message, detail, confirmLabel }) {
+    const result = await dialog.showMessageBox(mainWindow, {
+        type: 'warning',
+        buttons: [confirmLabel, 'Abbrechen'],
+        defaultId: 1,
+        cancelId: 1,
+        noLink: true,
+        title,
+        message,
+        detail,
+    });
+    return result.response === 0;
+}
+
 function registerIpc() {
     if (ipcRegistered) {
         return;
@@ -237,6 +267,53 @@ function registerIpc() {
     ipcMain.handle(IPC_CHANNELS.openPath, async (_event, targetId) => (
         openRepoPath(targetId)
     ));
+    ipcMain.handle(IPC_CHANNELS.listMarkdown, async () => (
+        listEditableMarkdownFiles(resolveRepoRoot())
+    ));
+    ipcMain.handle(IPC_CHANNELS.readMarkdown, async (_event, relativePath) => (
+        readEditableMarkdown(resolveRepoRoot(), relativePath)
+    ));
+    ipcMain.handle(IPC_CHANNELS.previewMarkdown, async (_event, payload) => (
+        previewEditableMarkdown(resolveRepoRoot(), payload)
+    ));
+    ipcMain.handle(IPC_CHANNELS.saveMarkdown, async (_event, payload) => {
+        const preview = await previewEditableMarkdown(resolveRepoRoot(), payload);
+        if (!preview.changed) return { ...preview, saved: false };
+        const confirmed = await confirmDesktopAction({
+            title: 'Governance-Markdown speichern',
+            message: `${preview.path} wirklich speichern?`,
+            detail: 'Die lokale Repository-Datei wird geaendert. Commit und Push bleiben separate Schritte.',
+            confirmLabel: 'Speichern',
+        });
+        if (!confirmed) return { ...preview, saved: false, cancelled: true };
+        await saveEditableMarkdown(resolveRepoRoot(), payload);
+        return { ...preview, saved: true };
+    });
+    ipcMain.handle(IPC_CHANNELS.gitState, async () => (
+        getGovernanceGitState(resolveRepoRoot())
+    ));
+    ipcMain.handle(IPC_CHANNELS.commitMarkdown, async (_event, payload) => {
+        const state = await getGovernanceGitState(resolveRepoRoot());
+        const confirmed = await confirmDesktopAction({
+            title: 'Governance-Markdowns committen',
+            message: `${state.files.length} freigegebene Markdown-Datei(en) committen?`,
+            detail: state.files.join('\n') || 'Keine freigegebenen Markdown-Aenderungen vorhanden.',
+            confirmLabel: 'Commit erstellen',
+        });
+        if (!confirmed) return { cancelled: true };
+        return commitGovernanceMarkdown(resolveRepoRoot(), payload || {});
+    });
+    ipcMain.handle(IPC_CHANNELS.pushMarkdown, async () => {
+        const state = await getGovernanceGitState(resolveRepoRoot());
+        const confirmed = await confirmDesktopAction({
+            title: 'Nach GitHub pushen',
+            message: `Aktuellen Stand nach ${state.remote} pushen?`,
+            detail: 'Vor dem Push wird ein lokaler Recovery-Tag erzeugt. Der Push wirkt extern auf GitHub.',
+            confirmLabel: 'Snapshot + Push',
+        });
+        if (!confirmed) return { cancelled: true };
+        return pushGovernanceMarkdown(resolveRepoRoot());
+    });
 }
 
 function unregisterIpc() {
@@ -248,6 +325,13 @@ function unregisterIpc() {
         IPC_CHANNELS.setView,
         IPC_CHANNELS.refresh,
         IPC_CHANNELS.openPath,
+        IPC_CHANNELS.listMarkdown,
+        IPC_CHANNELS.readMarkdown,
+        IPC_CHANNELS.previewMarkdown,
+        IPC_CHANNELS.saveMarkdown,
+        IPC_CHANNELS.gitState,
+        IPC_CHANNELS.commitMarkdown,
+        IPC_CHANNELS.pushMarkdown,
     ]) {
         ipcMain.removeHandler(channel);
     }

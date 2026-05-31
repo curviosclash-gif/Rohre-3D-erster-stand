@@ -2335,7 +2335,7 @@
           "src/ui/MenuController.js"
         ],
         "scopeResolution": {
-          "concreteCount": 75,
+          "concreteCount": 76,
           "plannedCount": 4
         }
       }
@@ -3277,7 +3277,7 @@
           "tests/training-automation.spec.js"
         ],
         "scopeResolution": {
-          "concreteCount": 97,
+          "concreteCount": 98,
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
@@ -25668,10 +25668,33 @@
           "line": 8,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "electron/map-tools/main.cjs",
         "domain": "map-tools",
         "tooling": "read-only-map-dashboard",
+        "surface": "desktop-tool"
+      }
+    },
+    {
+      "id": "runtime:map-tools-governance-editor",
+      "type": "runtime",
+      "title": "Map Tools governance Markdown editor",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 29,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
+        "file": "electron/map-tools/governance-editor.cjs",
+        "domain": "map-tools",
+        "tooling": "confirmed-governance-markdown-editor",
         "surface": "desktop-tool"
       }
     },
@@ -25688,10 +25711,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 49,
+          "line": 60,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "electron/map-tools/launch.cjs",
         "domain": "map-tools",
         "tooling": "local-startup"
@@ -25713,7 +25736,7 @@
           "line": 19,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "electron/map-tools/preload.cjs",
         "domain": "map-tools",
         "tooling": "desktop-ipc-bridge"
@@ -25732,10 +25755,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 29,
+          "line": 40,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "electron/map-tools/ui/map-tools-renderer.js",
         "domain": "map-tools",
         "tooling": "status-and-navigation-shell"
@@ -25754,10 +25777,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 39,
+          "line": 50,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "electron/map-tools/server.cjs",
         "domain": "map-tools",
         "tooling": "local-viewer-server"
@@ -25934,10 +25957,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 59,
+          "line": 70,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "scripts/export-repo-map.mjs",
         "domain": "repo-map",
         "tooling": "read-only-repo-dashboard"
@@ -25956,10 +25979,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 69,
+          "line": 80,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "tools/repo-map/viewer.js",
         "domain": "repo-map",
         "tooling": "read-only-repo-dashboard"
@@ -26334,10 +26357,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 79,
+          "line": 90,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "domain": "repo-map",
         "path": "tmp/repo-map/repo-map.json",
         "ephemeral": true
@@ -27177,10 +27200,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 107,
+          "line": 118,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "electron/map-tools/README.md",
         "domain": "map-tools"
       }
@@ -27198,10 +27221,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 116,
+          "line": 127,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "domain": "map-tools"
       }
@@ -27219,10 +27242,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 89,
+          "line": 100,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "electron/map-tools/ui/map-tools.html",
         "domain": "map-tools"
       }
@@ -27240,10 +27263,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 98,
+          "line": 109,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "electron/map-tools/ui/map-tools.css",
         "domain": "map-tools"
       }
@@ -27345,10 +27368,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 143,
+          "line": 154,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "tools/repo-map/README.md",
         "domain": "repo-map"
       }
@@ -27366,10 +27389,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 125,
+          "line": 136,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "tools/repo-map/index.html",
         "domain": "repo-map"
       }
@@ -27387,10 +27410,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 134,
+          "line": 145,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "tools/repo-map/viewer.css",
         "domain": "repo-map"
       }
@@ -27622,10 +27645,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 152,
+          "line": 163,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "tests/map-tools-electron.contract.test.mjs",
         "domain": "map-tools"
       }
@@ -27643,10 +27666,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 161,
+          "line": 172,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "tests/map-tools-electron-smoke.test.mjs",
         "domain": "map-tools"
       }
@@ -27729,10 +27752,10 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 170,
+          "line": 181,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
-        "mappingDescription": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+        "mappingDescription": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
         "file": "tests/repo-map-export.contract.test.mjs",
         "domain": "repo-map"
       }
@@ -35434,6 +35457,26 @@
           "V81",
           "V83",
           "V89"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "electron/map-tools/governance-editor.cjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V60",
+          "V89"
+        ],
+        "mappedNodes": [
+          "runtime:map-tools-governance-editor"
         ],
         "exists": true
       }
@@ -59276,7 +59319,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 296,
+          "line": 312,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -59452,7 +59495,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 116,
+          "line": 127,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -59507,6 +59550,22 @@
       }
     },
     {
+      "from": "electron/map-tools/governance-editor.cjs",
+      "to": "runtime:map-tools-governance-editor",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 29,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
       "from": "electron/map-tools/launch.cjs",
       "to": "runtime:map-tools-launcher",
       "type": "implements",
@@ -59516,7 +59575,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 49,
+          "line": 60,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -59564,7 +59623,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 107,
+          "line": 118,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -59580,7 +59639,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 39,
+          "line": 50,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -59596,7 +59655,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 29,
+          "line": 40,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -59612,7 +59671,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 98,
+          "line": 109,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -59628,7 +59687,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 89,
+          "line": 100,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -60439,7 +60498,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 181,
+          "line": 192,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -60455,7 +60514,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 181,
+          "line": 192,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -60471,7 +60530,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 186,
+          "line": 197,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
@@ -60487,7 +60546,23 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 186,
+          "line": 197,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "test"
+      }
+    },
+    {
+      "from": "runtime:map-tools-governance-editor",
+      "to": "test:map-tools-electron-contract",
+      "type": "validated_by",
+      "hint": null,
+      "attributes": {
+        "mappingId": "map-tools-electron",
+        "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
+          "line": 222,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
@@ -60503,7 +60578,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 201,
+          "line": 212,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
@@ -60519,7 +60594,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 206,
+          "line": 217,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
@@ -60535,7 +60610,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 211,
+          "line": 227,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -60551,7 +60626,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 211,
+          "line": 227,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -60567,7 +60642,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 221,
+          "line": 237,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
@@ -60583,7 +60658,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 216,
+          "line": 232,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
@@ -60599,7 +60674,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 216,
+          "line": 232,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
@@ -60615,7 +60690,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 236,
+          "line": 252,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -60631,7 +60706,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 236,
+          "line": 252,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -60647,7 +60722,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 236,
+          "line": 252,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -60663,7 +60738,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 251,
+          "line": 267,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
@@ -60679,7 +60754,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 246,
+          "line": 262,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
@@ -60695,7 +60770,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 246,
+          "line": 262,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
@@ -60983,7 +61058,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 266,
+          "line": 282,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
@@ -60999,7 +61074,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 266,
+          "line": 282,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
@@ -61015,7 +61090,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 281,
+          "line": 297,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -61031,7 +61106,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 276,
+          "line": 292,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -61047,7 +61122,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 276,
+          "line": 292,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -61063,7 +61138,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 276,
+          "line": 292,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
@@ -61438,7 +61513,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 59,
+          "line": 70,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -62073,7 +62148,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 161,
+          "line": 172,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -62089,7 +62164,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 152,
+          "line": 163,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -62153,7 +62228,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 170,
+          "line": 181,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -62409,7 +62484,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 125,
+          "line": 136,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -62425,7 +62500,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 143,
+          "line": 154,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -62441,7 +62516,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 134,
+          "line": 145,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -62457,7 +62532,7 @@
         "mappingFile": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/map-tools-electron.v1.json",
-          "line": 69,
+          "line": 80,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -86728,6 +86803,15 @@
     },
     {
       "from": "V60",
+      "to": "electron/map-tools/governance-editor.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "archive-summary"
+      }
+    },
+    {
+      "from": "V60",
       "to": "electron/map-tools/launch.cjs",
       "type": "scope",
       "hint": null,
@@ -107037,6 +107121,15 @@
     {
       "from": "V89",
       "to": "electron/main.cjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V89",
+      "to": "electron/map-tools/governance-editor.cjs",
       "type": "scope",
       "hint": null,
       "attributes": {

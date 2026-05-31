@@ -58,6 +58,20 @@ test('map tools Electron shell loads Plan Map and switches between Repo Map and 
     Math.abs(initialState.layout.stageHeight - initialState.layout.frameHeight) <= 2,
     `iframe does not fill viewer stage: ${JSON.stringify(initialState.layout)}`,
   );
+  await page.locator('#editorToggle').click();
+  await page.waitForFunction(() => document.querySelector('#markdownEditor')?.hidden === false);
+  const editorState = await page.evaluate(() => ({
+    visible: document.querySelector('#markdownEditor')?.hidden === false,
+    optionCount: document.querySelectorAll('#markdownPath option').length,
+    selectedPath: document.querySelector('#markdownPath')?.value,
+    contentLength: document.querySelector('#markdownContent')?.value.length || 0,
+  }));
+  assert.equal(editorState.visible, true);
+  assert.ok(editorState.optionCount >= 10);
+  assert.ok(editorState.selectedPath);
+  assert.ok(editorState.contentLength > 0);
+  await page.locator('#editorClose').click();
+  await page.waitForFunction(() => document.querySelector('#markdownEditor')?.hidden === true);
 
   await page.locator('[data-view-id="repo"]').click();
   await page.waitForFunction(() => (

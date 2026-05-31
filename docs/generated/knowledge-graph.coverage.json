@@ -186,11 +186,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2099,
-    "rawCoveredFileCount": 1340,
-    "rawCoveragePercent": 63.8,
-    "adjustedTrackedFileCount": 1415,
-    "adjustedCoveredFileCount": 1108,
+    "trackedFileCount": 2100,
+    "rawCoveredFileCount": 1341,
+    "rawCoveragePercent": 63.9,
+    "adjustedTrackedFileCount": 1416,
+    "adjustedCoveredFileCount": 1109,
     "adjustedCoveragePercent": 78.3,
     "uncoveredFileCount": 759,
     "uncoveredActiveFileCount": 307,
@@ -258,8 +258,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1011,
-        "coveredCount": 888
+        "count": 1012,
+        "coveredCount": 889
       },
       {
         "classification": "product-docs",
@@ -16221,6 +16221,25 @@
         "V77",
         "V81",
         "V83",
+        "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "electron/map-tools/governance-editor.cjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V60",
         "V89"
       ],
       "surfaces": [],

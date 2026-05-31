@@ -2,7 +2,7 @@
   "contract": "knowledge-graph.mapping.v1",
   "schema_version": 1,
   "mapping_id": "map-tools-electron",
-  "description": "Separate Electron shell for read-only Plan Map, Repo Map and Agent Map navigation.",
+  "description": "Separate Electron shell for read-only maps plus confirmed desktop governance Markdown editing.",
   "nodes": [
     {
       "id": "runtime:map-tools-electron-shell",
@@ -23,6 +23,17 @@
       "attributes": {
         "domain": "map-tools",
         "tooling": "desktop-ipc-bridge"
+      }
+    },
+    {
+      "id": "runtime:map-tools-governance-editor",
+      "type": "runtime",
+      "title": "Map Tools governance Markdown editor",
+      "file": "electron/map-tools/governance-editor.cjs",
+      "attributes": {
+        "domain": "map-tools",
+        "tooling": "confirmed-governance-markdown-editor",
+        "surface": "desktop-tool"
       }
     },
     {
@@ -204,6 +215,11 @@
     },
     {
       "from": "runtime:map-tools-preload",
+      "to": "test:map-tools-electron-contract",
+      "type": "validated_by"
+    },
+    {
+      "from": "runtime:map-tools-governance-editor",
       "to": "test:map-tools-electron-contract",
       "type": "validated_by"
     },

@@ -24,6 +24,7 @@
         <div class="actions">
           <button id="refreshCurrent" type="button">Aktualisieren <span class="button-help" data-help-term="refresh-current" aria-label="Aktualisieren erklaeren">i</span></button>
           <button id="refreshAll" type="button">Alle Exporte <span class="button-help" data-help-term="refresh-all" aria-label="Alle Exporte erklaeren">i</span></button>
+          <button id="editorToggle" type="button" aria-pressed="false">Markdowns</button>
           <button id="infoToggle" type="button" class="is-active" aria-pressed="true">Info</button>
         </div>
       </header>
@@ -47,8 +48,41 @@
 
       <div id="helpPopover" class="help-popover" role="dialog" aria-live="polite" hidden></div>
 
-      <main class="viewer-stage">
-        <iframe id="mapFrame" title="Curvios Map Viewer"></iframe>
+      <main class="content-stage">
+        <section class="viewer-stage">
+          <iframe id="mapFrame" title="Curvios Map Viewer"></iframe>
+        </section>
+        <aside id="markdownEditor" class="markdown-editor" aria-label="Governance Markdown Editor" hidden>
+          <div class="editor-heading">
+            <div>
+              <strong>Governance-Markdowns</strong>
+              <span>Desktop-only, bestaetigte Schreibaktionen</span>
+            </div>
+            <button id="editorClose" type="button" aria-label="Markdown-Editor schliessen">x</button>
+          </div>
+          <label class="editor-field">
+            <span>Datei</span>
+            <select id="markdownPath"></select>
+          </label>
+          <textarea id="markdownContent" spellcheck="false" aria-label="Markdown-Inhalt"></textarea>
+          <div class="editor-actions">
+            <button id="markdownReload" type="button">Neu laden</button>
+            <button id="markdownPreview" type="button">Diff-Vorschau</button>
+            <button id="markdownSave" type="button">Speichern</button>
+          </div>
+          <pre id="markdownDiff" class="markdown-diff">Noch keine Vorschau.</pre>
+          <div class="editor-git">
+            <label class="editor-field">
+              <span>Commit-Text</span>
+              <input id="markdownCommitSubject" value="docs(agent-map): update governance markdown">
+            </label>
+            <div class="editor-actions">
+              <button id="markdownCommit" type="button">Scoped Commit</button>
+              <button id="markdownPush" type="button">Snapshot + Push</button>
+            </div>
+            <pre id="markdownGitState" class="markdown-git-state">Git-Status wird geladen.</pre>
+          </div>
+        </aside>
       </main>
     </div>
     <script type="module" src="./map-tools-renderer.js"></script>

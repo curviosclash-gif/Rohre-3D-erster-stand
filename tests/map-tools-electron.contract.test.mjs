@@ -12,6 +12,13 @@ const {
     resolveMapToolsRequestPath,
     startMapToolsServer,
 } = require('../electron/map-tools/server.cjs');
+const {
+    isEditableMarkdownPath,
+    listEditableMarkdownFiles,
+    previewEditableMarkdown,
+    readEditableMarkdown,
+    saveEditableMarkdown,
+} = require('../electron/map-tools/governance-editor.cjs');
 
 async function writeFixtureFile(rootDir, relativePath, content) {
     const filePath = path.join(rootDir, relativePath);
@@ -64,6 +71,53 @@ test('map tools request resolver defaults to Plan Map and rejects non-map paths'
     assert.equal(resolveMapToolsRequestPath(rootDir, '/tmp/other/tool.json'), null);
 });
 
+test('desktop governance editor allows only whitelisted markdown sources and rejects stale saves', async (t) => {
+    const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'curvios-map-tools-editor-'));
+    t.after(async () => {
+        await fs.rm(rootDir, { recursive: true, force: true });
+    });
+    await writeFixtureFile(rootDir, 'AGENTS.md', '# Agents\n');
+    await writeFixtureFile(rootDir, '.agents/rules/example.md', '# Rule\n');
+    await writeFixtureFile(rootDir, '.agents/workflows/example.md', '# Workflow\n');
+    await writeFixtureFile(rootDir, '.gemini/skills/example/SKILL.md', '# Skill\n');
+    await writeFixtureFile(rootDir, 'docs/private.md', '# Nope\n');
+
+    assert.equal(isEditableMarkdownPath('AGENTS.md'), true);
+    assert.equal(isEditableMarkdownPath('.agents/rules/example.md'), true);
+    assert.equal(isEditableMarkdownPath('.agents/workflows/example.md'), true);
+    assert.equal(isEditableMarkdownPath('.gemini/skills/example/SKILL.md'), true);
+    assert.equal(isEditableMarkdownPath('docs/private.md'), false);
+    assert.equal(isEditableMarkdownPath('../AGENTS.md'), false);
+
+    assert.deepEqual(await listEditableMarkdownFiles(rootDir), [
+        '.agents/rules/example.md',
+        '.agents/workflows/example.md',
+        '.gemini/skills/example/SKILL.md',
+        'AGENTS.md',
+    ]);
+    const original = await readEditableMarkdown(rootDir, '.agents/rules/example.md');
+    const preview = await previewEditableMarkdown(rootDir, {
+        path: original.path,
+        originalContent: original.content,
+        content: '# Rule\n\nUpdated\n',
+    });
+    assert.equal(preview.changed, true);
+    assert.match(preview.diff, /\+ Updated/);
+    await saveEditableMarkdown(rootDir, {
+        path: original.path,
+        originalContent: original.content,
+        content: '# Rule\n\nUpdated\n',
+    });
+    await assert.rejects(
+        () => saveEditableMarkdown(rootDir, {
+            path: original.path,
+            originalContent: original.content,
+            content: '# Rule\n\nStale\n',
+        }),
+        /extern geaendert/,
+    );
+});
+
 test('map tools app is wired as a separate Electron entry with native menu actions', async () => {
     const rootPackage = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf8'));
     const electronPackage = JSON.parse(await fs.readFile(new URL('../electron/package.json', import.meta.url), 'utf8'));
@@ -88,10 +142,15 @@ test('map tools app is wired as a separate Electron entry with native menu actio
     assert.match(mainSource, /scripts\/export-agent-map\.mjs/);
     assert.match(preloadSource, /mapToolsApi/);
     assert.match(preloadSource, /map-tools-preload\.v1/);
+    assert.match(preloadSource, /listMarkdown/);
+    assert.match(mainSource, /confirmDesktopAction/);
+    assert.match(mainSource, /pushGovernanceMarkdown/);
     assert.match(rendererSource, /#errorPanel/);
     assert.match(rendererSource, /mapFrame/);
     assert.match(shellHtml, /id="infoToggle"/);
     assert.match(shellHtml, /id="helpPopover"/);
+    assert.match(shellHtml, /id="markdownEditor"/);
+    assert.match(shellHtml, /id="markdownDiff"/);
     assert.match(shellCss, /\.map-tools-shell\.info-hidden/);
     assert.match(rendererSource, /function setInfoVisible/);
     assert.match(rendererSource, /curvios\.map-tools:set-help-visible/);

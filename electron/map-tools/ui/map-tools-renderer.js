@@ -9,6 +9,9 @@ const state = {
   busy: false,
   activeHelpTerm: '',
   infoVisible: true,
+  editorVisible: false,
+  markdownPath: '',
+  markdownOriginal: '',
 };
 
 const elements = {
@@ -18,6 +21,19 @@ const elements = {
   refreshCurrent: document.querySelector('#refreshCurrent'),
   refreshAll: document.querySelector('#refreshAll'),
   infoToggle: document.querySelector('#infoToggle'),
+  editorToggle: document.querySelector('#editorToggle'),
+  editorClose: document.querySelector('#editorClose'),
+  markdownEditor: document.querySelector('#markdownEditor'),
+  markdownPath: document.querySelector('#markdownPath'),
+  markdownContent: document.querySelector('#markdownContent'),
+  markdownReload: document.querySelector('#markdownReload'),
+  markdownPreview: document.querySelector('#markdownPreview'),
+  markdownSave: document.querySelector('#markdownSave'),
+  markdownDiff: document.querySelector('#markdownDiff'),
+  markdownCommitSubject: document.querySelector('#markdownCommitSubject'),
+  markdownCommit: document.querySelector('#markdownCommit'),
+  markdownPush: document.querySelector('#markdownPush'),
+  markdownGitState: document.querySelector('#markdownGitState'),
   activeViewLabel: document.querySelector('#activeViewLabel'),
   refreshStatus: document.querySelector('#refreshStatus'),
   lastRefresh: document.querySelector('#lastRefresh'),
@@ -95,6 +111,105 @@ function setInfoVisible(isVisible) {
     closeHelpPopover();
   }
   syncFrameInfoVisibility();
+}
+
+function setEditorVisible(isVisible) {
+  state.editorVisible = isVisible === true;
+  elements.markdownEditor.hidden = !state.editorVisible;
+  elements.editorToggle.classList.toggle('is-active', state.editorVisible);
+  elements.editorToggle.setAttribute('aria-pressed', state.editorVisible ? 'true' : 'false');
+}
+
+function editorPayload() {
+  return {
+    path: state.markdownPath,
+    originalContent: state.markdownOriginal,
+    content: elements.markdownContent.value,
+  };
+}
+
+function setEditorMessage(message) {
+  elements.markdownDiff.textContent = String(message || '');
+}
+
+async function refreshMarkdownGitState() {
+  const gitState = await api.gitState();
+  elements.markdownGitState.textContent = [
+    `Branch: ${gitState.branch || '<leer>'}`,
+    `Remote: ${gitState.remote}`,
+    '',
+    gitState.files.length > 0 ? gitState.files.join('\n') : 'Keine freigegebenen Markdown-Aenderungen.',
+  ].join('\n');
+}
+
+async function loadMarkdown(relativePath = elements.markdownPath.value) {
+  const file = await api.readMarkdown(relativePath);
+  state.markdownPath = file.path;
+  state.markdownOriginal = file.content;
+  elements.markdownPath.value = file.path;
+  elements.markdownContent.value = file.content;
+  setEditorMessage('Datei geladen. Diff-Vorschau vor dem Speichern pruefen.');
+  await refreshMarkdownGitState();
+}
+
+async function initMarkdownEditor() {
+  const files = await api.listMarkdown();
+  elements.markdownPath.innerHTML = files
+    .map((file) => `<option value="${escapeHtml(file)}">${escapeHtml(file)}</option>`)
+    .join('');
+  if (files.length > 0) {
+    await loadMarkdown(files[0]);
+  } else {
+    setEditorMessage('Keine freigegebenen Markdown-Dateien gefunden.');
+  }
+}
+
+async function previewMarkdown() {
+  const preview = await api.previewMarkdown(editorPayload());
+  setEditorMessage(preview.changed ? preview.diff : 'Keine Aenderungen.');
+  return preview;
+}
+
+async function saveMarkdown() {
+  const result = await api.saveMarkdown(editorPayload());
+  if (result.cancelled) {
+    setEditorMessage('Speichern abgebrochen.');
+    return;
+  }
+  if (result.saved) {
+    state.markdownOriginal = elements.markdownContent.value;
+    setEditorMessage(`${result.path} gespeichert.\n\n${result.diff}`);
+    await refreshMarkdownGitState();
+  } else {
+    setEditorMessage('Keine Aenderungen.');
+  }
+}
+
+async function commitMarkdown() {
+  const result = await api.commitMarkdown({ subject: elements.markdownCommitSubject.value });
+  if (result.cancelled) {
+    elements.markdownGitState.textContent = 'Commit abgebrochen.';
+    return;
+  }
+  elements.markdownGitState.textContent = `Commit ${result.commit} erstellt.\n${result.files.join('\n')}`;
+  await refreshMarkdownGitState();
+}
+
+async function pushMarkdown() {
+  const result = await api.pushMarkdown();
+  if (result.cancelled) {
+    elements.markdownGitState.textContent = 'Push abgebrochen.';
+    return;
+  }
+  elements.markdownGitState.textContent = `Push nach ${result.remote} abgeschlossen: ${result.commit}`;
+}
+
+async function runEditorAction(action) {
+  try {
+    await action();
+  } catch (error) {
+    setEditorMessage(error instanceof Error ? error.message : String(error || 'Editor-Aktion fehlgeschlagen'));
+  }
 }
 
 function openHelpPopover(term, anchor) {
@@ -288,6 +403,30 @@ function bindEvents() {
   elements.infoToggle.addEventListener('click', () => {
     setInfoVisible(!state.infoVisible);
   });
+  elements.editorToggle.addEventListener('click', () => {
+    setEditorVisible(!state.editorVisible);
+  });
+  elements.editorClose.addEventListener('click', () => {
+    setEditorVisible(false);
+  });
+  elements.markdownPath.addEventListener('change', () => {
+    void runEditorAction(() => loadMarkdown());
+  });
+  elements.markdownReload.addEventListener('click', () => {
+    void runEditorAction(() => loadMarkdown());
+  });
+  elements.markdownPreview.addEventListener('click', () => {
+    void runEditorAction(previewMarkdown);
+  });
+  elements.markdownSave.addEventListener('click', () => {
+    void runEditorAction(saveMarkdown);
+  });
+  elements.markdownCommit.addEventListener('click', () => {
+    void runEditorAction(commitMarkdown);
+  });
+  elements.markdownPush.addEventListener('click', () => {
+    void runEditorAction(pushMarkdown);
+  });
   elements.retryRefresh.addEventListener('click', () => {
     void refreshMaps(state.activeViewId);
   });
@@ -320,6 +459,7 @@ async function init() {
   setError(failures);
   setBusy(false);
   render();
+  await initMarkdownEditor();
 }
 
 init().catch((error) => {
