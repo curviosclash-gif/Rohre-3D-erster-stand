@@ -22,6 +22,7 @@ Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/p
 - Ursache mit minimaler Reproduktion bestaetigen.
 - Betroffene Dateien und Seiteneffekte notieren.
 - Bei architekturrelevantem Bugfix die Architecture Capsule aus `.agents/rules/code_quality_and_debugging.md` benennen und den kleinsten Guard festlegen; der Fix darf keine neuen Runtime-/Global-Surface-Consumer still einfuehren.
+- Beruehrt der Fix eine produktive Datei ab 400 Zeilen oder eine Debt-Surface aus `scripts/architecture/LegacyMaxLinesConfig.mjs`, bestehende Verantwortung, Fix-Delta und Vorher-/Nachher-Zeilenstand erfassen.
 
 ## 3. Fix
 
@@ -34,6 +35,7 @@ Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/p
 - Verdaechtige Altpfade nicht still mitloeschen; nur entfernen, wenn ein juengerer produktiver Ersatzpfad oder eine exakte Dublette belegt ist.
 - Wenn der Fix einen alten Pfad umgeht oder ersetzt, verbleibende Konsumenten und Delete-Kriterium im Scope dokumentieren.
 - Wenn der Fix einen nicht-offensichtlichen Kompatibilitaets-, Migrations-, Alias- oder Fallback-Pfad behaelt, einen kurzen lokalen Why-Kommentar direkt an dieser Stelle hinterlassen.
+- Enge Fixes innerhalb der bestehenden Verantwortung bleiben in Debt-Surfaces erlaubt. Neue fachliche Verantwortung oder groesseres Netto-Wachstum nicht als Bugfix tarnen: auf `.agents/workflows/code.md`, `.agents/workflows/refactor.md` oder einen Plan-Draft wechseln.
 - Tests sind user-owned. Vor `*.99` sind kleine, risikoadjustierte Signale erlaubt (enger Contract-/Build-/Runtime-Check).
 
 ## 4. Governance + Gate-Strategie

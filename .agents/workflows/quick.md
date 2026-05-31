@@ -23,6 +23,8 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 - Neue dauerhafte Ablagen nur nach Zweckklasse anlegen und bestehende kanonische Zielquelle bevorzugen.
 - Bleibt ein nicht-offensichtlicher Kompatibilitaets-, Migrations-, Alias- oder Fallback-Pfad stehen, einen kurzen lokalen Why-Kommentar direkt dort hinterlassen.
 - Wenn die Aenderung auf Totcode-Loeschung oder Legacy-Ablosung hinauslaeuft, Quick-Path verlassen und `.agents/workflows/code.md` oder `.agents/workflows/cleanup.md` nutzen.
+- Vor fachlicher Erweiterung einer produktiven Datei ab 400 Zeilen oder einer Debt-Surface aus `scripts/architecture/LegacyMaxLinesConfig.mjs` den Responsibility Growth Guard anwenden. Neue Verantwortung oder nicht-triviales Netto-Wachstum verlassen den Quick-Path und wechseln in `.agents/workflows/code.md`, `.agents/workflows/refactor.md` oder einen Plan-Draft.
+- Ein enger Bugfix innerhalb der bestehenden Verantwortung darf im Quick-Path bleiben, wenn das fachliche Delta, die kleinste Verification und verbleibendes Netto-Wachstum kurz benannt werden.
 
 ## 2. Verify
 
@@ -31,6 +33,7 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 - Wenn Plan-/Workflow-/Rule-Dateien geaendert wurden: `npm run gates:pre-commit`.
 - Sonst mindestens `npm run plan:check`.
 - Keine Totcode-Loeschung ohne nachgewiesenen Nachfolgerpfad und dokumentierte Konsumentenlage.
+- Bei beruehrten produktiven Dateien ab 400 Zeilen oder gelisteten Debt-Surfaces im Abschluss kurz festhalten: unveraendert, reduziert oder begruendet gewachsen.
 
 ## 3. Commit
 

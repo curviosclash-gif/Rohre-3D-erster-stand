@@ -30,6 +30,7 @@ Optional (nur bei Bedarf):
 - Subagents nur mit expliziter User-Erlaubnis fuer unabhaengige oder disjunkte Teilaufgaben einsetzen; der fuehrende Agent bleibt fuer Integration, Evidence und Commit verantwortlich.
 - Neue dauerhafte Ablagen nach Zweckklasse klassifizieren und bestehende kanonische Zielquelle bevorzugen.
 - Breite Plan-Evidence-Claims mit Globs oder "alle Workflows/Rules/scope_files/repo-weit" nur abschliessen, wenn sie durch konkrete Evidence oder `scripts/check-plan-evidence-claims.mjs` abgesichert sind.
+- Vor fachlicher Erweiterung produktiver Dateien ab 400 Zeilen oder von Debt-Surfaces aus `scripts/architecture/LegacyMaxLinesConfig.mjs` den Responsibility Growth Guard anwenden: bestehende Verantwortung, fachliches Delta und Zielmodul oder begruendete Restschuld benennen.
 - Bei klarem Scope direkt weiter. Nur bei kritisch fehlender Information nachfragen.
 - Fremde uncommittete Aenderungen nicht absorbieren; nur scoped Dateien committen.
 
@@ -42,6 +43,7 @@ Optional (nur bei Bedarf):
 - Totcode oder Legacy-Pfade vor einem Remove erst klassifizieren: `duplicate-backed`, `legacy-with-replacement`, `contract-first/plan-drift`, `unverified-altpath`.
 - Nur exakte Dubletten/Shims oder nachweislich ersetzte Altpfade entfernen; sonst im Scope als `legacy`, `compatibility path`, `shim` oder `plan-drift` markieren.
 - Wenn ein neuer Pfad einen alten ersetzt, verbleibende Konsumenten und Delete-Kriterium im aktiven Block oder den Scope-Docs festhalten.
+- Neue Verantwortlichkeiten nicht in gelistete Debt-Surfaces hineinbauen. Wenn eine sichere Extraktion den aktuellen Slice unvertretbar verbreitert, den Bugfix oder das Feature eng halten und den Refactor-Pfad mit Nachfolger und Gate dokumentieren.
 - Planentwuerfe bleiben in `docs/plaene/neu/`, aktive Bloecke in `docs/plaene/aktiv/VXX.md`.
 - Bot-Training-Scope: Status/Phase nur in `docs/bot-training/Bot_Trainingsplan.md` pflegen.
 
@@ -51,6 +53,7 @@ Optional (nur bei Bedarf):
 - `Grep` nach offenen Markern in geaenderten Pfaden: `(console\.log|TODO:|FIXME:|HACK:)`.
 - Keine offenen TODOs im geaenderten Code.
 - Bei Legacy-/Dead-Code-Aenderungen pruefen, dass keine neuen Konsumenten auf markierte Altpfade zeigen und dass Ersatz-/Behalteentscheidung im Scope dokumentiert ist.
+- Bei beruehrten produktiven Dateien ab 400 Zeilen oder gelisteten Debt-Surfaces Vorher-/Nachher-Zeilenstand und Verantwortlichkeits-Delta fuer Evidence erfassen: unveraendert, reduziert, extrahiert oder begruendet gewachsen.
 - Kleine risikoadjustierte Verifikation vor `*.99` ist erlaubt (enges Contract-/Build-/Runtime-Signal fuer den geaenderten Pfad).
 
 ## 4. Governance + Gate-Strategie

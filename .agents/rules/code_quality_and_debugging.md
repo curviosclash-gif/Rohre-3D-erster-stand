@@ -25,6 +25,15 @@ description: Code quality, debugging, performance, and lifecycle (consolidated)
 - Every changed line must trace back to the current scope; avoid adjacent refactors, formatting churn, or speculative cleanup.
 - For bugfixes or risky changes, define the smallest relevant verification signal before declaring the fix done.
 
+## Responsibility Growth Guard
+
+- Dateigroesse ist ein Review-Signal, kein Selbstzweck: nicht mechanisch splitten, komprimieren oder Helfer ohne klare Ownership auslagern, nur um ein Zeilenlimit zu unterschreiten.
+- Vor fachlicher Erweiterung einer produktiven Datei ab 400 Zeilen pruefen, ob der Slice eine neue Verantwortung einfuehrt. Falls ja, die neue Verantwortung in ein benanntes Modul mit engem Zweck legen oder vor Umsetzung einen begruendeten Refactor-Scope planen.
+- Dateien aus `scripts/architecture/LegacyMaxLinesConfig.mjs` sind Debt-Surfaces. Enge Bugfixes innerhalb der bestehenden Verantwortung bleiben erlaubt; neue Verantwortlichkeiten duerfen dort nicht weiter anwachsen.
+- Netto-Wachstum einer Debt-Surface braucht vor Abschluss eine kurze Begruendung und Evidence: Ausgangsstand, fachliches Delta, warum keine sichere Extraktion im aktuellen Slice erfolgt und welcher Nachfolger- oder Refactor-Pfad die Schuld begrenzt.
+- Erhoehungen bestehender Legacy-Ceilings sind keine routinemaessige Bugfix-Massnahme. Sie sind Governance-/Guard-Aenderungen (`D3`) und brauchen User-Gate, Begruendung und Rueckbaukriterium.
+- Refactor-Slices schneiden entlang fachlicher Verantwortung, Lifecycle-Grenze oder testbarer Berechnung. Pro Slice bevorzugt genau eine Verantwortung extrahieren und danach das passende Legacy-Ceiling senken oder entfernen.
+
 ## Dead Code Prevention
 
 - Replace-first: when a newer path is introduced, migrate active consumers and remove the old path in the same scope whenever safely possible.

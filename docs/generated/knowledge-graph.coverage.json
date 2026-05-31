@@ -186,13 +186,13 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2100,
-    "rawCoveredFileCount": 1341,
-    "rawCoveragePercent": 63.9,
-    "adjustedTrackedFileCount": 1416,
-    "adjustedCoveredFileCount": 1109,
+    "trackedFileCount": 2102,
+    "rawCoveredFileCount": 1342,
+    "rawCoveragePercent": 63.8,
+    "adjustedTrackedFileCount": 1417,
+    "adjustedCoveredFileCount": 1110,
     "adjustedCoveragePercent": 78.3,
-    "uncoveredFileCount": 759,
+    "uncoveredFileCount": 760,
     "uncoveredActiveFileCount": 307,
     "classifications": [
       {
@@ -216,7 +216,7 @@
       {
         "classification": "blocker-report",
         "excludedFromCoverage": true,
-        "count": 42,
+        "count": 43,
         "coveredCount": 2
       },
       {
@@ -264,8 +264,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 329,
-        "coveredCount": 175
+        "count": 330,
+        "coveredCount": 176
       },
       {
         "classification": "prototype",
@@ -11171,6 +11171,19 @@
       "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
+      "path": "docs/Fehlerberichte/2026-05-31_map-tools-editor-push-blocked-by-existing-max-lines.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
+    },
+    {
       "path": "docs/Fehlerberichte/FEHLERBERICHT_TEMPLATE.md",
       "tracked": true,
       "coveredInCore": false,
@@ -14821,6 +14834,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Mobile_God_File_Sunset_V140.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

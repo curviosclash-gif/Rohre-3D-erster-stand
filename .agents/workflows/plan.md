@@ -25,6 +25,7 @@ description: Create a compact implementation plan for a new feature or extension
 - Documentation impact list.
 - Evidence-Claim-Pruefung planen: Breite Claims mit Globs oder Formulierungen wie "alle Workflows/Rules/scope_files" oder "repo-weit konsistent" brauchen konkrete File-by-File-Evidence oder eine Assertion in `scripts/check-plan-evidence-claims.mjs`.
 - Bei neuen oder groesser ueberarbeiteten Feature-Plaenen mit Code-/Runtime-Scope eine `## Architecture Acceptance`-Sektion planen: betroffene Schichten, erlaubte Zielpfade, verbotene Legacy-Surfaces, neue/veraenderte Dependency-Kanten, Contract-/Snapshot-/Port-Erweiterung, Guard-Signal und Ratchet-Auswirkung.
+- Beruehrt ein geplanter Scope produktive Dateien ab 400 Zeilen oder Debt-Surfaces aus `scripts/architecture/LegacyMaxLinesConfig.mjs`, eine Responsibility-Growth-Matrix planen: bestehende Verantwortung, neue oder veraenderte Verantwortung, bevorzugtes Zielmodul, Vorher-/Nachher-Evidence und Reihenfolge gegen funktionale Nachbarbloecke.
 - Note any intentional online-demo limitations or deferred parity work.
 - Datei-Ownership pruefen: kollidiert der Scope mit einem gelockten Block?
 - Dependencies klassifizieren (`hard`/`soft`).
@@ -48,6 +49,7 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 - Abschluss-Gate als `X.99`.
 - Bei Legacy-/Dead-Code-Scope pro Kandidat: Klassifikation, geplanter Nachfolger, verbleibende Konsumenten und Delete-Kriterium.
 - Bei Code-/Runtime-Scope eine `## Architecture Acceptance`-Sektion mit diesen Punkten ergaenzen: Betroffene Schichten, erlaubte Zielpfade, verbotene Legacy-Surfaces, neue/veraenderte Dependency-Kanten, Contract-/Snapshot-/Port-Erweiterung, Guard-Signal, Ratchet-Auswirkung.
+- Bei grossen oder gelisteten Debt-Surfaces die Responsibility-Growth-Matrix sowie kleine, einzeln pruefbare Extraktions-Slices aufnehmen; keine Big-Bang-Zerlegung nur wegen Zeilenanzahl planen.
 - Evidence format for completed items:
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
 - Keine Sammel-Evidence ohne pruefbaren Abgleich: Wenn der Plan mehrere Dateien per Glob oder "alle X" behauptet, Assertion in `check-plan-evidence-claims` ergaenzen oder die Evidence auf konkrete Dateien/Commands reduzieren.
