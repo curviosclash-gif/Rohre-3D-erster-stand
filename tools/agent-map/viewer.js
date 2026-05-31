@@ -6,7 +6,7 @@ const DATA_URLS = [
 
 const state = {
   data: null,
-  activeView: 'path',
+  activeView: 'catalog',
   selectedId: 'entry:agents',
   search: '',
   workflowFilter: 'all',
@@ -24,7 +24,9 @@ const elements = {
   metrics: document.querySelector('#metrics'),
   svg: document.querySelector('#agentSvg'),
   pathTables: document.querySelector('#pathTables'),
+  catalogPanel: document.querySelector('#catalogPanel'),
   workflowPanel: document.querySelector('#workflowPanel'),
+  rulesPanel: document.querySelector('#rulesPanel'),
   skillsPanel: document.querySelector('#skillsPanel'),
   checksPanel: document.querySelector('#checksPanel'),
   detailPanel: document.querySelector('#detailPanel'),
@@ -262,20 +264,61 @@ function renderSvg() {
 }
 
 function renderListPanel(title, items, getBadges) {
+  const cards = items.map((item) => `
+    <details class="item-card">
+      <summary>
+        <h3>${escapeHtml(item.label || item.id)}</h3>
+        <p>${escapeHtml(item.description || item.command || item.path || '')}</p>
+      </summary>
+      <div class="badge-row">${getBadges(item).map((badge) => `<span class="badge ${escapeHtml(badge.kind || '')}">${escapeHtml(badge.label)}</span>`).join('')}</div>
+    </details>
+  `).join('');
   return `
     <div class="data-panel">
-      <h2>${escapeHtml(title)}</h2>
+      <div class="panel-heading">
+        <h2>${escapeHtml(title)}</h2>
+        <span>${escapeHtml(items.length)} Eintraege</span>
+      </div>
       <div class="data-grid">
-        ${items.map((item) => `
-          <article class="item-card">
-            <h3>${escapeHtml(item.label || item.id)}</h3>
-            <p>${escapeHtml(item.description || item.command || item.path || '')}</p>
-            <div class="badge-row">${getBadges(item).map((badge) => `<span class="badge ${escapeHtml(badge.kind || '')}">${escapeHtml(badge.label)}</span>`).join('')}</div>
-          </article>
-        `).join('')}
+        ${cards || '<p class="muted">Keine passenden Eintraege.</p>'}
       </div>
     </div>
   `;
+}
+
+function filteredItems(items) {
+  const needle = normalizeText(state.search);
+  return toArray(items).filter((item) => textMatches(item, needle));
+}
+
+function workflowUsageBadges(itemId, relationKey) {
+  return toArray(state.data?.workflows)
+    .filter((workflow) => toArray(workflow[relationKey]).includes(itemId))
+    .map((workflow) => ({ label: workflow.id, kind: 'workflow' }));
+}
+
+function workflowBadges(workflow) {
+  return [
+    { label: workflow.path, kind: 'workflow' },
+    ...toArray(workflow.ruleIds).map((id) => ({ label: id, kind: 'rule' })),
+    ...toArray(workflow.skillIds).map((id) => ({ label: id, kind: 'skill' })),
+    ...toArray(workflow.checkIds).map((id) => ({ label: id, kind: 'check' })),
+  ];
+}
+
+function ruleBadges(rule) {
+  return [
+    { label: rule.path, kind: 'rule' },
+    ...workflowUsageBadges(rule.id, 'ruleIds'),
+  ];
+}
+
+function skillBadges(skill) {
+  return [
+    { label: skill.source, kind: 'skill' },
+    { label: skill.scope, kind: 'skill' },
+    ...workflowUsageBadges(skill.id, 'skillIds'),
+  ];
 }
 
 function renderPathTables() {
@@ -286,7 +329,7 @@ function renderPathTables() {
   elements.pathTables.innerHTML = [
     renderListPanel('Workflow-Pfad', workflows, (workflow) => [
       { label: workflow.path, kind: 'workflow' },
-      ...toArray(workflow.ruleIds).slice(0, 3).map((id) => ({ label: id, kind: 'rule' })),
+      ...toArray(workflow.ruleIds).map((id) => ({ label: id, kind: 'rule' })),
     ]),
     renderListPanel('Empfohlene Skills und Checks', workflows.flatMap((workflow) => [
       ...toArray(workflow.skillIds).map((id) => state.data.skills.find((skill) => skill.id === id)).filter(Boolean),
@@ -298,16 +341,19 @@ function renderPathTables() {
 }
 
 function renderPanels() {
-  elements.workflowPanel.innerHTML = renderListPanel('Workflows', toArray(state.data?.workflows), (workflow) => [
-    { label: workflow.path, kind: 'workflow' },
-    { label: `${toArray(workflow.ruleIds).length} Rules`, kind: 'rule' },
-    { label: `${toArray(workflow.checkIds).length} Checks`, kind: 'check' },
-  ]);
-  elements.skillsPanel.innerHTML = renderListPanel('Skills', toArray(state.data?.skills), (skill) => [
-    { label: skill.source, kind: 'skill' },
-    { label: skill.scope, kind: 'skill' },
-  ]);
-  elements.checksPanel.innerHTML = renderListPanel('Checks', toArray(state.data?.checks), (check) => [
+  const workflows = filteredItems(state.data?.workflows);
+  const rules = filteredItems(state.data?.rules);
+  const skills = filteredItems(state.data?.skills);
+  const checks = filteredItems(state.data?.checks);
+  elements.catalogPanel.innerHTML = [
+    renderListPanel('Alle Workflows', workflows, workflowBadges),
+    renderListPanel('Alle Rules', rules, ruleBadges),
+    renderListPanel('Alle Skills', skills, skillBadges),
+  ].join('');
+  elements.workflowPanel.innerHTML = renderListPanel('Workflows', workflows, workflowBadges);
+  elements.rulesPanel.innerHTML = renderListPanel('Rules', rules, ruleBadges);
+  elements.skillsPanel.innerHTML = renderListPanel('Skills', skills, skillBadges);
+  elements.checksPanel.innerHTML = renderListPanel('Checks', checks, (check) => [
     { label: check.kind, kind: 'check' },
     { label: check.command, kind: 'check' },
   ]);

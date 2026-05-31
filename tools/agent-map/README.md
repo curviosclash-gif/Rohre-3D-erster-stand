@@ -34,6 +34,10 @@ Use the Agent Map for the question:
 Which workflow, rules, skills and checks should an agent use for this task?
 ```
 
+The default catalog view keeps the full workflow, rule and skill inventory
+visible in three compact sections. Individual cards expand on demand; the path
+view remains available for task-specific routing.
+
 Use the Plan Map for block dependencies. Use the Repo Map for file and coverage
 navigation. The Agent Map only explains the operational route.
 

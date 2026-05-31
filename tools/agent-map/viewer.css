@@ -104,6 +104,7 @@ h1 {
 }
 
 .segmented {
+  flex-wrap: wrap;
   padding: 3px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -329,6 +330,30 @@ h1 {
   padding: 12px;
 }
 
+.catalog-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.panel-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.panel-heading span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .data-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -342,6 +367,14 @@ h1 {
   padding: 10px;
 }
 
+.item-card summary {
+  cursor: pointer;
+}
+
+.item-card summary::marker {
+  color: var(--accent);
+}
+
 .item-card h3 {
   margin: 0 0 6px;
   font-size: 15px;
@@ -352,6 +385,12 @@ h1 {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.35;
+}
+
+.item-card .badge-row {
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
 }
 
 .badge-row {

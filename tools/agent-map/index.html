@@ -19,8 +19,10 @@
             <input id="fileInput" type="file" accept="application/json,.json">
           </label>
           <div class="segmented" aria-label="Ansicht">
-            <button type="button" data-view="path" class="is-active">Pfad</button>
+            <button type="button" data-view="catalog" class="is-active">Katalog</button>
+            <button type="button" data-view="path">Pfad</button>
             <button type="button" data-view="workflows">Workflows</button>
+            <button type="button" data-view="rules">Rules</button>
             <button type="button" data-view="skills">Skills</button>
             <button type="button" data-view="checks">Checks</button>
           </div>
@@ -58,7 +60,11 @@
         <section class="main-stage" aria-label="Agent-Karte">
           <div id="metrics" class="metrics-strip"></div>
 
-          <section id="pathView" class="view-panel is-active">
+          <section id="catalogView" class="view-panel is-active">
+            <div id="catalogPanel" class="catalog-stack"></div>
+          </section>
+
+          <section id="pathView" class="view-panel">
             <div class="map-card">
               <svg id="agentSvg" class="agent-svg" role="img" aria-label="Agent Governance Map"></svg>
             </div>
@@ -67,6 +73,10 @@
 
           <section id="workflowsView" class="view-panel">
             <div id="workflowPanel" class="data-panel"></div>
+          </section>
+
+          <section id="rulesView" class="view-panel">
+            <div id="rulesPanel" class="data-panel"></div>
           </section>
 
           <section id="skillsView" class="view-panel">
