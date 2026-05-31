@@ -16,7 +16,7 @@ test('agent map export builds a read-only agent governance dataset', async () =>
   assert.ok(data.summary.taskCount >= 8);
   assert.ok(data.summary.ruleCount >= 5);
   assert.ok(data.summary.workflowCount >= 10);
-  assert.ok(data.summary.skillCount >= 2);
+  assert.ok(data.summary.skillCount >= 3);
   assert.ok(data.summary.checkCount >= 6);
   assert.ok(data.summary.edgeCount > data.summary.workflowCount);
 
@@ -39,6 +39,7 @@ test('agent map export builds a read-only agent governance dataset', async () =>
   assert.ok(nodeIds.has('workflow:code'));
   assert.ok(nodeIds.has('rule:planning-and-governance'));
   assert.ok(nodeIds.has('skill:curvios-agent-governance'));
+  assert.ok(nodeIds.has('skill:plan-generator'));
   assert.ok(nodeIds.has('check:agent-preflight'));
   assert.ok(edgeKeys.has('task:bugfix->workflow:bugfix:uses_workflow'));
   assert.ok(edgeKeys.has('workflow:code->rule:planning-and-governance:reads_rule'));

@@ -21,6 +21,7 @@ The viewer reads existing sources only:
 - `AGENTS.md`
 - `.agents/rules/*.md`
 - `.agents/workflows/*.md`
+- `.gemini/skills/**/SKILL.md`
 - `data/contracts/knowledge-graph/agent-governance.v1.json`
 
 It does not write plans, locks, rules, workflows, skills, graph artifacts or

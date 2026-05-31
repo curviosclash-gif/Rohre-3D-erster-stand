@@ -7,6 +7,7 @@ const DEFAULT_OUTPUT = 'tmp/agent-map/agent-map.json';
 const AGENTS_PATH = 'AGENTS.md';
 const RULES_DIR = '.agents/rules';
 const WORKFLOWS_DIR = '.agents/workflows';
+const REPO_SKILL_DIRS = ['.gemini/skills'];
 const AGENT_GOVERNANCE_MAPPING_PATH = 'data/contracts/knowledge-graph/agent-governance.v1.json';
 
 const SKILL_CATALOG = [
@@ -283,6 +284,23 @@ async function listMarkdownFiles(rootDir, relativeDir) {
     .sort((left, right) => left.localeCompare(right));
 }
 
+async function listSkillFiles(rootDir, relativeDir) {
+  const absoluteDir = path.join(rootDir, relativeDir);
+  let entries;
+  try {
+    entries = await fs.readdir(absoluteDir, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === 'ENOENT') return [];
+    throw error;
+  }
+  const nestedFiles = await Promise.all(entries.map(async (entry) => {
+    const relativePath = normalizePath(path.join(relativeDir, entry.name));
+    if (entry.isDirectory()) return listSkillFiles(rootDir, relativePath);
+    return entry.isFile() && entry.name === 'SKILL.md' ? [relativePath] : [];
+  }));
+  return nestedFiles.flat().sort((left, right) => left.localeCompare(right));
+}
+
 function unique(values) {
   return [...new Set((values || []).filter(Boolean))].sort((left, right) => left.localeCompare(right));
 }
@@ -450,10 +468,11 @@ function summarizeMapping(mapping) {
 }
 
 export async function buildAgentMapData({ rootDir = process.cwd() } = {}) {
-  const [agentsMarkdown, rulePaths, workflowPaths, graphMapping] = await Promise.all([
+  const [agentsMarkdown, rulePaths, workflowPaths, repoSkillPaths, graphMapping] = await Promise.all([
     readText(rootDir, AGENTS_PATH),
     listMarkdownFiles(rootDir, RULES_DIR),
     listMarkdownFiles(rootDir, WORKFLOWS_DIR),
+    Promise.all(REPO_SKILL_DIRS.map((relativeDir) => listSkillFiles(rootDir, relativeDir))).then((paths) => paths.flat()),
     readJsonIfExists(rootDir, AGENT_GOVERNANCE_MAPPING_PATH),
   ]);
 
@@ -497,12 +516,28 @@ export async function buildAgentMapData({ rootDir = process.cwd() } = {}) {
     ...task,
     workflowIds: task.workflowIds.filter((id) => workflowById.has(id)),
   }));
+  const repoSkills = await Promise.all(repoSkillPaths.map(async (skillPath) => {
+    const markdown = await readText(rootDir, skillPath);
+    const frontmatter = parseFrontmatter(markdown);
+    const id = frontmatter.name || basenameId(path.dirname(skillPath));
+    return {
+      id,
+      label: firstHeading(markdown) || titleFromId(id),
+      scope: normalizePath(path.dirname(skillPath)),
+      source: 'repo-skill',
+      pathHint: skillPath,
+      description: frontmatter.description || firstPlainLine(markdown) || '',
+    };
+  }));
+  const skills = [...SKILL_CATALOG, ...repoSkills].filter((skill, index, catalog) => (
+    catalog.findIndex((candidate) => candidate.id === skill.id) === index
+  ));
 
   const nodes = createNodes({
     tasks: normalizedTasks,
     rules,
     workflows,
-    skills: SKILL_CATALOG,
+    skills,
     checks: CHECK_CATALOG,
   });
   const edges = createEdges({
@@ -527,7 +562,7 @@ export async function buildAgentMapData({ rootDir = process.cwd() } = {}) {
     tasks: normalizedTasks,
     rules,
     workflows,
-    skills: SKILL_CATALOG,
+    skills,
     checks: CHECK_CATALOG,
     nodes,
     edges,
@@ -535,7 +570,7 @@ export async function buildAgentMapData({ rootDir = process.cwd() } = {}) {
       tasks: normalizedTasks,
       rules,
       workflows,
-      skills: SKILL_CATALOG,
+      skills,
       checks: CHECK_CATALOG,
       edges,
     }),
