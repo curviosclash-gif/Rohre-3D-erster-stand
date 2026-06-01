@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 250,
+          "concreteCount": 252,
           "plannedCount": 0
         }
       }
@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 32,
+          "concreteCount": 34,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1001,7 +1001,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 48,
+          "concreteCount": 50,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1059,7 +1059,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 34,
+          "concreteCount": 36,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1561,6 +1561,7 @@
           "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
           "docs/generated/knowledge-graph.coverage.json",
           "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.scorecard.json",
           "docs/generated/plan-index.json",
           "docs/plaene/aktiv/V121.md",
           "scripts/graph-rag-chat.mjs",
@@ -1574,8 +1575,8 @@
           "tools/graph-rag-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 5,
-          "plannedCount": 12
+          "concreteCount": 10,
+          "plannedCount": 8
         },
         "scopeOverlapAllowedWith": [
           "V120",
@@ -4999,7 +5000,7 @@
       "id": "V121.2",
       "type": "phase",
       "title": "Viewer-Export und Fixture",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.2"
@@ -12704,8 +12705,8 @@
     {
       "id": "V121.2.1",
       "type": "subphase",
-      "title": "`graph-rag.viewer-export.v1` definieren: Graph-Summary, Coverage, Critical Paths, Evidence, Chunks, Safety, Adapterstatus.",
-      "status": "open",
+      "title": "`graph-rag.viewer-export.v1` definieren: Graph-Summary, Coverage, Critical Paths, Evidence, Chunks, Safety, Adapterstatus. (abgeschlossen: 2026-06-01; evidence: `node --test tests/graph-rag-viewer-export.contract.test.mjs` -> PASS mit versioniertem Viewer-Export-Vertrag und Pflichtsektionen)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.2",
@@ -12715,8 +12716,8 @@
     {
       "id": "V121.2.2",
       "type": "subphase",
-      "title": "`scripts/graph-rag-viewer-export.mjs` planen/implementieren: liest Graph-/RAG-/Smoke-Artefakte, schreibt redigierten Export nach `tmp/graph-rag/viewer/`.",
-      "status": "open",
+      "title": "`scripts/graph-rag-viewer-export.mjs` planen/implementieren: liest Graph-/RAG-/Smoke-Artefakte, schreibt redigierten Export nach `tmp/graph-rag/viewer/`. (abgeschlossen: 2026-06-01; evidence: `node scripts/graph-rag-viewer-export.mjs --write --runtime rulebased --json` -> PASS mit transientem Export unter `tmp/graph-rag/viewer/graph-rag-viewer-export.json`; Pfadschutz lehnt Ausgaben ausserhalb `tmp/graph-rag/viewer/` ab)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.2",
@@ -12726,8 +12727,8 @@
     {
       "id": "V121.2.3",
       "type": "subphase",
-      "title": "Kleines getracktes Fixture fuer Tests anlegen, ohne Secrets, Raw-Quelltexte oder grosse Graph-Dumps.",
-      "status": "open",
+      "title": "Kleines getracktes Fixture fuer Tests anlegen, ohne Secrets, Raw-Quelltexte oder grosse Graph-Dumps. (abgeschlossen: 2026-06-01; evidence: `data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json` plus `node --test tests/graph-rag-viewer-export.contract.test.mjs` -> PASS ohne Raw-Chunk-Text)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.2",
@@ -12737,8 +12738,8 @@
     {
       "id": "V121.2.4",
       "type": "subphase",
-      "title": "Contract-Test fuer Export-Schema, Redaction-Default, Historical-Markierung und fehlende LLM-Runtime ergaenzen.",
-      "status": "open",
+      "title": "Contract-Test fuer Export-Schema, Redaction-Default, Historical-Markierung und fehlende LLM-Runtime ergaenzen. (abgeschlossen: 2026-06-01; evidence: `node --test tests/graph-rag-viewer-export.contract.test.mjs` -> PASS, 3 Tests fuer Fixture, realen Export, Pfadschutz und Prompt-Injection-Signal)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.2",
@@ -30460,9 +30461,12 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
           "V121"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -30475,9 +30479,12 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
           "V121"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -31257,6 +31264,7 @@
           "V111",
           "V116",
           "V120",
+          "V121",
           "V123",
           "V125",
           "V139",
@@ -37565,12 +37573,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V121"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -49824,12 +49834,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V121"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -57518,6 +57530,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/graph-rag-viewer-export.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/headless-match-kernel-smoke.mjs",
       "type": "scope",
       "hint": null,
@@ -58194,6 +58215,15 @@
     {
       "from": "B13",
       "to": "tests/graph-rag-query.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/graph-rag-viewer-export.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -68843,6 +68873,24 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
       "type": "scope",
       "hint": null,
@@ -70248,6 +70296,24 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
       "type": "scope",
       "hint": null,
@@ -70881,6 +70947,24 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -77083,6 +77167,15 @@
     {
       "from": "V121",
       "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V121",
+      "to": "docs/generated/knowledge-graph.scorecard.json",
       "type": "scope",
       "hint": null,
       "attributes": {

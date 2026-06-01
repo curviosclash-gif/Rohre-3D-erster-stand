@@ -186,12 +186,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2102,
-    "rawCoveredFileCount": 1342,
-    "rawCoveragePercent": 63.8,
-    "adjustedTrackedFileCount": 1417,
-    "adjustedCoveredFileCount": 1110,
-    "adjustedCoveragePercent": 78.3,
+    "trackedFileCount": 2106,
+    "rawCoveredFileCount": 1346,
+    "rawCoveragePercent": 63.9,
+    "adjustedTrackedFileCount": 1421,
+    "adjustedCoveredFileCount": 1114,
+    "adjustedCoveragePercent": 78.4,
     "uncoveredFileCount": 760,
     "uncoveredActiveFileCount": 307,
     "classifications": [
@@ -258,8 +258,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1012,
-        "coveredCount": 889
+        "count": 1016,
+        "coveredCount": 893
       },
       {
         "classification": "product-docs",
@@ -5916,6 +5916,46 @@
       "excludeReason": null
     },
     {
+      "path": "data/contracts/knowledge-graph/graph-rag-viewer-export.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
+        "V121"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
+        "V121"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/contracts/knowledge-graph/local-llm-selection.v1.json",
       "tracked": true,
       "coveredInCore": true,
@@ -11304,6 +11344,7 @@
         "V111",
         "V116",
         "V120",
+        "V121",
         "V123",
         "V125",
         "V139",
@@ -20245,6 +20286,25 @@
         "B13",
         "V120",
         "V139"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/graph-rag-viewer-export.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V121"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -33963,6 +34023,25 @@
         "B13",
         "V120",
         "V139"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/graph-rag-viewer-export.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V121"
       ],
       "surfaces": [],
       "classification": "product-code",

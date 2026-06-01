@@ -1,0 +1,72 @@
+{
+  "contract": "knowledge-graph.graph-rag.viewer-export.v1",
+  "schema_version": 1,
+  "description": "Default-redacted, read-only projection for the local Graph-RAG viewer. Runtime exports are transient consumers and never become source of truth.",
+  "runtime_output_dir": "tmp/graph-rag/viewer/",
+  "source_of_truth": false,
+  "safe_to_commit": false,
+  "required_sections": [
+    "graphSummary",
+    "coverage",
+    "criticalPaths",
+    "evidence",
+    "chunks",
+    "safety",
+    "adapterStatus"
+  ],
+  "graph_summary_required": [
+    "nodeCount",
+    "edgeCount",
+    "nodeTypeCounts",
+    "edgeTypeCounts"
+  ],
+  "evidence_claim_required": [
+    "id",
+    "claim",
+    "path",
+    "lineStart",
+    "lineEnd",
+    "confidence",
+    "uncertainties",
+    "chunkId",
+    "hash",
+    "sourceClass",
+    "historical"
+  ],
+  "chunk_required": [
+    "id",
+    "path",
+    "lineStart",
+    "lineEnd",
+    "hash",
+    "sourceClass",
+    "estimatedTokens",
+    "excerpt",
+    "historical"
+  ],
+  "redaction": {
+    "default_mode": "default-redacted",
+    "allowed_modes": [
+      "default-redacted"
+    ],
+    "max_excerpt_chars": 280,
+    "raw_chunk_text_allowed": false,
+    "secret_like_values_allowed": false
+  },
+  "safety_required": [
+    "mode",
+    "redacted",
+    "rawIncluded",
+    "sourceOfTruth",
+    "safeToCommit",
+    "historicalVisible",
+    "promptInjectionSignals"
+  ],
+  "adapter_status_required": [
+    "mode",
+    "runtime",
+    "fallbackUsed",
+    "fallbackReason",
+    "graphRagBlocked"
+  ]
+}

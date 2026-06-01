@@ -1,0 +1,121 @@
+{
+  "contract": "knowledge-graph.graph-rag.viewer-export.v1",
+  "schema_version": 1,
+  "generated_at": "2026-06-01T00:00:00.000Z",
+  "graphSummary": {
+    "nodeCount": 4,
+    "edgeCount": 3,
+    "nodeTypeCounts": {
+      "block": 1,
+      "runtime": 1,
+      "test": 1,
+      "file": 1
+    },
+    "edgeTypeCounts": {
+      "scope": 1,
+      "validated_by": 1,
+      "reads_state": 1
+    }
+  },
+  "coverage": {
+    "contract": "knowledge-graph.coverage.v1",
+    "adjustedCoveragePercent": 78.3,
+    "uncoveredActiveFileCount": 307,
+    "gateStatus": "pass"
+  },
+  "criticalPaths": [
+    {
+      "criticalPath": "spawn",
+      "status": "ok",
+      "counts": {
+        "runtime": 2,
+        "event": 1,
+        "state": 1,
+        "config": 1,
+        "test": 1
+      },
+      "missingLayers": [],
+      "missingValidation": [],
+      "stability": {
+        "tier": "watch"
+      }
+    }
+  ],
+  "evidence": {
+    "question": "Was blockiert V121?",
+    "mode": "graph-first-deterministic-retrieval",
+    "graphQueries": [
+      {
+        "query": "open-deps",
+        "blockId": "V121",
+        "openDependencyCount": 0,
+        "openDependencies": []
+      }
+    ],
+    "claims": [
+      {
+        "id": "claim-active",
+        "claim": "V121 is a read-only consumer of source-backed Graph-RAG evidence.",
+        "path": "docs/plaene/aktiv/V121.md",
+        "lineStart": 105,
+        "lineEnd": 112,
+        "confidence": "high",
+        "uncertainties": [
+          "fixture-only"
+        ],
+        "chunkId": "rag:docs/plaene/aktiv/V121.md#L105-L112:fixtureactive",
+        "hash": "fixtureactive",
+        "sourceClass": "active-plans",
+        "historical": false
+      },
+      {
+        "id": "claim-historical",
+        "claim": "Historical viewer paths remain visible as plan drift and are not active sources.",
+        "path": "docs/plaene/alt/V111.md",
+        "lineStart": 1,
+        "lineEnd": 2,
+        "confidence": "medium",
+        "uncertainties": [
+          "historical-source"
+        ],
+        "chunkId": "rag:docs/plaene/alt/V111.md#L1-L2:fixturehistory",
+        "hash": "fixturehistory",
+        "sourceClass": "historical-plans",
+        "historical": true
+      }
+    ],
+    "uncertainties": [
+      "fixture-only",
+      "local-ai-not-source-of-truth"
+    ]
+  },
+  "chunks": [
+    {
+      "id": "rag:docs/plaene/aktiv/V121.md#L105-L112:fixtureactive",
+      "path": "docs/plaene/aktiv/V121.md",
+      "lineStart": 105,
+      "lineEnd": 112,
+      "hash": "fixtureactive",
+      "sourceClass": "active-plans",
+      "estimatedTokens": 18,
+      "excerpt": "V121 viewer fixture: redacted source-backed evidence only.",
+      "historical": false
+    }
+  ],
+  "safety": {
+    "mode": "default-redacted",
+    "redacted": true,
+    "rawIncluded": false,
+    "sourceOfTruth": false,
+    "safeToCommit": false,
+    "historicalVisible": true,
+    "promptInjectionSignals": []
+  },
+  "adapterStatus": {
+    "mode": "rulebased-fallback",
+    "runtime": "rulebased",
+    "fallbackUsed": true,
+    "fallbackReason": "explicit-rulebased-runtime",
+    "graphRagBlocked": false
+  }
+}
