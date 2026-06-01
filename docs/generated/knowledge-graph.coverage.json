@@ -186,9 +186,9 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2106,
-    "rawCoveredFileCount": 1346,
-    "rawCoveragePercent": 63.9,
+    "trackedFileCount": 2109,
+    "rawCoveredFileCount": 1349,
+    "rawCoveragePercent": 64,
     "adjustedTrackedFileCount": 1421,
     "adjustedCoveredFileCount": 1114,
     "adjustedCoveragePercent": 78.4,
@@ -276,8 +276,8 @@
       {
         "classification": "repo-ops",
         "excludedFromCoverage": true,
-        "count": 38,
-        "coveredCount": 21
+        "count": 41,
+        "coveredCount": 24
       },
       {
         "classification": "temp",
@@ -35923,6 +35923,57 @@
         "knowledge-graph-mapping"
       ],
       "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/graph-rag-viewer/index.html",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V121"
+      ],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/graph-rag-viewer/viewer.css",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V121"
+      ],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/graph-rag-viewer/viewer.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V121"
+      ],
       "surfaces": [],
       "classification": "repo-ops",
       "excludedFromCoverage": true,

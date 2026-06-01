@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Curvios Graph-RAG Viewer</title>
+    <link rel="stylesheet" href="./viewer.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Curvios local tools</p>
+        <h1>Graph-RAG Evidence Dashboard</h1>
+      </div>
+      <div class="toolbar">
+        <span id="sourceMeta" class="source-meta">read-only consumer</span>
+        <button id="fixtureButton" type="button" class="button button-secondary">Fixture laden</button>
+        <label class="button button-primary">
+          JSON laden
+          <input id="fileInput" type="file" accept="application/json,.json">
+        </label>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section id="statusStrip" class="status-strip" aria-label="Viewer-Status"></section>
+      <div id="errorBanner" class="error-banner" role="alert" hidden></div>
+
+      <nav class="tabs" aria-label="Dashboard-Ansichten">
+        <button type="button" data-view="overview" class="is-active">Overview</button>
+        <button type="button" data-view="critical-paths">Critical Paths</button>
+        <button type="button" data-view="evidence">Evidence</button>
+        <button type="button" data-view="chunks">Chunks</button>
+        <button type="button" data-view="adapter">Local Adapter</button>
+        <button type="button" data-view="safety">Safety</button>
+        <button type="button" data-view="ask-repo">Ask Repo</button>
+      </nav>
+
+      <section id="emptyState" class="empty-state">
+        <h2>Redigierten Export laden</h2>
+        <p>Nutze das getrackte Fixture oder waehle einen lokalen Export aus <code>tmp/graph-rag/viewer/</code>.</p>
+      </section>
+
+      <section id="dashboard" class="dashboard" hidden>
+        <section id="overviewView" class="view-panel is-active" data-panel="overview"></section>
+        <section id="criticalPathsView" class="view-panel" data-panel="critical-paths"></section>
+        <section id="evidenceView" class="view-panel" data-panel="evidence"></section>
+        <section id="chunksView" class="view-panel" data-panel="chunks"></section>
+        <section id="adapterView" class="view-panel" data-panel="adapter"></section>
+        <section id="safetyView" class="view-panel" data-panel="safety"></section>
+        <section id="askRepoView" class="view-panel" data-panel="ask-repo"></section>
+      </section>
+    </main>
+
+    <script type="module" src="./viewer.js"></script>
+  </body>
+</html>
