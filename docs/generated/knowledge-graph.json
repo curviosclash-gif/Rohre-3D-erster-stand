@@ -5020,7 +5020,7 @@
       "id": "V121.4",
       "type": "phase",
       "title": "Safety, Explainability und Historical UX",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.4"
@@ -12804,8 +12804,8 @@
     {
       "id": "V121.4.1",
       "type": "subphase",
-      "title": "Redaction-Badge und Unsafe-Raw-Warnung anzeigen; Unsafe-Raw darf nur explizit als lokaler Auditmodus erscheinen.",
-      "status": "open",
+      "title": "Redaction-Badge und Unsafe-Raw-Warnung anzeigen; Unsafe-Raw darf nur explizit als lokaler Auditmodus erscheinen. (abgeschlossen: 2026-06-02; evidence: lokaler Browser-Smoke unter `http://127.0.0.1:4178/tools/graph-rag-viewer/index.html` -> PASS mit `default-redacted`, `RAW AUDIT DISABLED`, `Raw included: no`, `Source of truth: no`, `Safe to commit: no` und expliziter Auditmodus-Warnung)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.4",
@@ -12815,8 +12815,8 @@
     {
       "id": "V121.4.2",
       "type": "subphase",
-      "title": "`historical` Quellen optisch und textlich von aktiven Plan-/Graphquellen unterscheiden.",
-      "status": "open",
+      "title": "`historical` Quellen optisch und textlich von aktiven Plan-/Graphquellen unterscheiden. (abgeschlossen: 2026-06-02; evidence: lokaler Browser-Smoke mit `graph-rag-viewer-fixture.v1.json` -> PASS mit `HISTORICAL SOURCES`, gelber Historical-Evidence-Karte und Hinweis `Historical sources are context only`)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.4",
@@ -12826,8 +12826,8 @@
     {
       "id": "V121.4.3",
       "type": "subphase",
-      "title": "Evidence-Claims mit `path`, `lineStart`, `lineEnd`, `confidence`, `uncertainties` und Query-Herkunft anzeigen.",
-      "status": "open",
+      "title": "Evidence-Claims mit `path`, `lineStart`, `lineEnd`, `confidence`, `uncertainties` und Query-Herkunft anzeigen. (abgeschlossen: 2026-06-02; evidence: lokaler Browser-Smoke mit Fixture -> PASS mit `Source path`, `Lines`, `Confidence`, `Uncertainties` und `Graph query origin`)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.4",
@@ -12837,8 +12837,8 @@
     {
       "id": "V121.4.4",
       "type": "subphase",
-      "title": "Kontextbudget und verworfene Kandidaten als Diagnose anzeigen, damit Tokenersparnis nachvollziehbar wird.",
-      "status": "open",
+      "title": "Kontextbudget und verworfene Kandidaten als Diagnose anzeigen, damit Tokenersparnis nachvollziehbar wird. (abgeschlossen: 2026-06-02; evidence: `node --test tests/graph-rag-viewer-export.contract.test.mjs` und lokaler Browser-Smoke -> PASS mit versionierter `diagnostics`-Projektion, Context-Budget-Metriken und redigierter Rejected-Candidates-Tabelle ohne Raw-Text)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.4",

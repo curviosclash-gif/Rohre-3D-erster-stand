@@ -102,6 +102,30 @@ function redactChunk(chunk) {
     };
 }
 
+function makeDiagnostics(queryResult = {}) {
+    const budget = queryResult.budget || queryResult.evidencePackage?.budgetReport || {};
+    const rejectedCandidates = (queryResult.retrieval?.rejectedChunks || []).slice(0, 12).map((chunk) => ({
+        id: chunk.id,
+        path: normalizeRepoPath(chunk.path),
+        retrievalScore: chunk.retrievalScore,
+        selectedVia: chunk.selectedVia,
+        rejectedReason: chunk.rejectedReason,
+        historical: isHistorical(chunk),
+    }));
+    return {
+        maxChunks: budget.maxChunks ?? null,
+        chunksAvailable: budget.chunksAvailable ?? null,
+        graphCandidateChunks: budget.graphCandidateChunks ?? null,
+        candidatePathCount: budget.candidatePathCount ?? budget.graphCandidatePathCount ?? null,
+        chunksScored: budget.chunksScored ?? null,
+        chunksSelected: budget.chunksSelected ?? budget.selectedChunkCount ?? null,
+        chunksRejected: budget.chunksRejected ?? budget.rejectedChunkCount ?? null,
+        selectedEstimatedTokens: budget.selectedEstimatedTokens ?? null,
+        fallbackRate: budget.fallbackRate ?? null,
+        rejectedCandidates,
+    };
+}
+
 function detectPromptInjectionSignals(claims) {
     const patterns = [
         /ignore (?:all |previous |prior )?instructions/i,
@@ -156,6 +180,7 @@ function validateViewerExport(artifact, contract) {
     if (artifact?.contract !== VIEWER_EXPORT_CONTRACT) throw new Error('Viewer export has unsupported contract');
     for (const section of contract.required_sections) requireFields(artifact, [section], 'viewer export');
     requireFields(artifact.graphSummary, contract.graph_summary_required, 'graphSummary');
+    requireFields(artifact.diagnostics, contract.diagnostics_required, 'diagnostics');
     requireFields(artifact.safety, contract.safety_required, 'safety');
     requireFields(artifact.adapterStatus, contract.adapter_status_required, 'adapterStatus');
     if (artifact.safety.mode !== 'default-redacted' || artifact.safety.redacted !== true || artifact.safety.rawIncluded !== false) {
@@ -196,6 +221,7 @@ async function buildGraphRagViewerExport(options = {}) {
             uncertainties: queryResult.evidencePackage?.uncertainties || [],
         },
         chunks,
+        diagnostics: makeDiagnostics(queryResult),
         safety: {
             mode: 'default-redacted',
             redacted: true,

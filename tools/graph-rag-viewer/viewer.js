@@ -65,9 +65,10 @@ function validateExport(data) {
   if (Number(data.schema_version) !== 1) {
     throw new Error(`Nicht unterstuetzte schema_version: ${data.schema_version}`);
   }
-  requireFields(data, ['graphSummary', 'coverage', 'criticalPaths', 'evidence', 'chunks', 'safety', 'adapterStatus'], 'Viewer-Export');
+  requireFields(data, ['graphSummary', 'coverage', 'criticalPaths', 'evidence', 'chunks', 'diagnostics', 'safety', 'adapterStatus'], 'Viewer-Export');
   requireFields(data.graphSummary, ['nodeCount', 'edgeCount', 'nodeTypeCounts', 'edgeTypeCounts'], 'Graph-Summary');
   requireFields(data.safety, ['mode', 'redacted', 'rawIncluded', 'sourceOfTruth', 'safeToCommit', 'historicalVisible', 'promptInjectionSignals'], 'Safety');
+  requireFields(data.diagnostics, ['maxChunks', 'chunksAvailable', 'graphCandidateChunks', 'candidatePathCount', 'chunksScored', 'chunksSelected', 'chunksRejected', 'selectedEstimatedTokens', 'fallbackRate', 'rejectedCandidates'], 'Diagnostics');
   requireFields(data.adapterStatus, ['mode', 'runtime', 'fallbackUsed', 'fallbackReason', 'graphRagBlocked'], 'Adapterstatus');
   if (!Array.isArray(data.criticalPaths) || !Array.isArray(data.evidence?.claims) || !Array.isArray(data.chunks)) {
     throw new Error('Critical Paths, Evidence-Claims und Chunks muessen Listen sein.');
@@ -88,6 +89,7 @@ function renderStatus() {
     badge(data.safety.mode, 'good'),
     data.adapterStatus.fallbackUsed ? badge('LLM FALLBACK', 'warn') : badge('LLM READY', 'good'),
     data.safety.historicalVisible ? badge('HISTORICAL SOURCES', 'warn') : badge('ACTIVE SOURCES', 'neutral'),
+    badge('RAW AUDIT DISABLED', 'neutral'),
     list(data.safety.promptInjectionSignals).length ? badge('SAFETY SIGNAL', 'bad') : badge('NO INJECTION SIGNAL', 'neutral'),
   ].join('');
 }
@@ -142,6 +144,7 @@ function renderEvidence() {
         <code>${escapeHtml(claim.path)}#L${escapeHtml(claim.lineStart)}-L${escapeHtml(claim.lineEnd)}</code>
       </div>
       <p>${escapeHtml(claim.claim)}</p>
+      <small>Source path: ${escapeHtml(claim.path)} | Lines: ${escapeHtml(claim.lineStart)}-${escapeHtml(claim.lineEnd)} | Confidence: ${escapeHtml(claim.confidence || 'unknown')}</small>
       <small>Uncertainties: ${escapeHtml(list(claim.uncertainties).join(', ') || 'none')}</small>
     </article>
   `).join('');
@@ -149,7 +152,7 @@ function renderEvidence() {
   document.querySelector('#evidenceView').innerHTML = `
     <div class="section-heading"><div><p class="eyebrow">Source-backed</p><h2>Evidence</h2></div><p>${escapeHtml(state.data.evidence.mode || '-')}</p></div>
     <div class="evidence-list">${claims || '<p>Keine Claims.</p>'}</div>
-    <article class="data-card"><h3>Graph queries</h3><ul class="code-list">${queries || '<li>Keine Queries.</li>'}</ul></article>
+    <article class="data-card"><h3>Graph query origin</h3><ul class="code-list">${queries || '<li>Keine Queries.</li>'}</ul></article>
   `;
 }
 
@@ -192,7 +195,38 @@ function renderSafety() {
       ${metric('Source of truth', safety.sourceOfTruth ? 'yes' : 'no')}
       ${metric('Safe to commit', safety.safeToCommit ? 'yes' : 'no')}
     </div>
+    <article class="warning-card">
+      <h3>Unsafe raw audit mode is disabled</h3>
+      <p>Dieser Viewer akzeptiert ausschliesslich <code>default-redacted</code>. Raw-Ausgaben sind nur fuer explizite lokale Incident-Audits ausserhalb dieses Viewers vorgesehen und duerfen nicht als Viewer-Export oder Commit-Artefakt verwendet werden.</p>
+    </article>
+    ${safety.historicalVisible ? '<article class="historical-note"><h3>Historical sources are context only</h3><p>Gelb markierte Quellen stammen aus historischen Plaenen. Sie erklaeren Drift, steuern aber keine aktiven Entscheidungen.</p></article>' : ''}
     <article class="data-card"><h3>Prompt-injection signals</h3><ul>${signals || '<li>Keine Signale im geladenen Export.</li>'}</ul></article>
+  `;
+}
+
+function renderDiagnostics() {
+  const diagnostics = state.data.diagnostics;
+  const rejectedRows = list(diagnostics.rejectedCandidates).map((candidate) => `
+    <tr>
+      <td><code>${escapeHtml(candidate.path)}</code></td>
+      <td>${candidate.historical ? badge('historical', 'warn') : badge(candidate.selectedVia || 'candidate', 'neutral')}</td>
+      <td>${escapeHtml(candidate.retrievalScore ?? '-')}</td>
+      <td>${escapeHtml(candidate.rejectedReason || '-')}</td>
+    </tr>
+  `).join('');
+  return `
+    <article class="data-card">
+      <h3>Context budget</h3>
+      <div class="metric-grid">
+        ${metric('Chunk limit', diagnostics.maxChunks ?? '-')}
+        ${metric('Available chunks', diagnostics.chunksAvailable ?? '-')}
+        ${metric('Candidate paths', diagnostics.candidatePathCount ?? '-')}
+        ${metric('Chunks scored', diagnostics.chunksScored ?? '-')}
+        ${metric('Chunks selected', diagnostics.chunksSelected ?? '-')}
+        ${metric('Estimated tokens', diagnostics.selectedEstimatedTokens ?? '-')}
+      </div>
+    </article>
+    ${tablePanel('Rejected candidates', 'Kompakte Diagnose ohne Raw-Quelltext.', ['Source', 'Class', 'Score', 'Reason'], rejectedRows)}
   `;
 }
 
@@ -227,6 +261,7 @@ function render() {
   renderChunks();
   renderAdapter();
   renderSafety();
+  document.querySelector('#chunksView').insertAdjacentHTML('beforeend', renderDiagnostics());
   renderAskRepo();
   elements.sourceMeta.textContent = `${state.source} | ${state.data.contract}`;
   elements.emptyState.hidden = true;

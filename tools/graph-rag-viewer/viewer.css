@@ -229,7 +229,9 @@ h3 {
 
 .metric-card,
 .data-card,
-.evidence-card {
+.evidence-card,
+.warning-card,
+.historical-note {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
@@ -300,9 +302,36 @@ th {
   padding: 14px;
 }
 
+.evidence-card small {
+  display: block;
+  margin-top: 5px;
+}
+
 .evidence-card.is-historical {
   border-color: #e0bd76;
   background: #fffaf0;
+}
+
+.warning-card,
+.historical-note {
+  margin-bottom: 14px;
+  padding: 14px;
+}
+
+.warning-card {
+  border-color: #e3b4b4;
+  background: var(--bad-soft);
+}
+
+.historical-note {
+  border-color: #e0bd76;
+  background: #fffaf0;
+}
+
+.warning-card p,
+.historical-note p {
+  margin-bottom: 0;
+  font-size: 13px;
 }
 
 .card-header {

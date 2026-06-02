@@ -102,6 +102,27 @@
       "historical": false
     }
   ],
+  "diagnostics": {
+    "maxChunks": 6,
+    "chunksAvailable": 42,
+    "graphCandidateChunks": 8,
+    "candidatePathCount": 3,
+    "chunksScored": 8,
+    "chunksSelected": 1,
+    "chunksRejected": 7,
+    "selectedEstimatedTokens": 18,
+    "fallbackRate": 0,
+    "rejectedCandidates": [
+      {
+        "id": "rag:docs/plaene/alt/V111.md#L1-L2:fixturehistory",
+        "path": "docs/plaene/alt/V111.md",
+        "retrievalScore": 140,
+        "selectedVia": "graph-candidate",
+        "rejectedReason": "ranked-below-budget",
+        "historical": true
+      }
+    ]
+  },
   "safety": {
     "mode": "default-redacted",
     "redacted": true,

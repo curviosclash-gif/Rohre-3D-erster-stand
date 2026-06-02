@@ -24,6 +24,8 @@ test('viewer export fixture validates redaction, historical marking and rulebase
     assert.equal(fixture.evidence.claims.find((claim) => claim.id === 'claim-historical').historical, true);
     assert.equal(fixture.adapterStatus.mode, 'rulebased-fallback');
     assert.equal(fixture.adapterStatus.fallbackUsed, true);
+    assert.equal(fixture.diagnostics.chunksRejected, 7);
+    assert.equal(fixture.diagnostics.rejectedCandidates[0].historical, true);
     assert.ok(fixture.chunks.every((chunk) => !('text' in chunk)));
 });
 
@@ -53,6 +55,9 @@ test('viewer export CLI writes only below tmp/graph-rag/viewer', async () => {
         assert.equal(artifact.contract, 'knowledge-graph.graph-rag.viewer-export.v1');
         assert.equal(artifact.safety.redacted, true);
         assert.equal(artifact.adapterStatus.mode, 'rulebased-fallback');
+        assert.ok(artifact.diagnostics.chunksSelected > 0);
+        assert.ok(artifact.diagnostics.chunksRejected > 0);
+        assert.ok(artifact.diagnostics.rejectedCandidates.every((candidate) => !('text' in candidate)));
         assert.ok(artifact.chunks.every((chunk) => !('text' in chunk)));
     } finally {
         await fs.rm(path.join(ROOT, outPath), { force: true });
@@ -96,4 +101,5 @@ test('viewer export builder exposes prompt-injection signals as source-data warn
 
     assert.equal(artifact.safety.promptInjectionSignals.length, 1);
     assert.equal(artifact.safety.promptInjectionSignals[0].claimId, 'claim-injection');
+    assert.deepEqual(artifact.diagnostics.rejectedCandidates, []);
 });
