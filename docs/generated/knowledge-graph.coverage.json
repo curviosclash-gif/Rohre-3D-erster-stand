@@ -186,13 +186,13 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2114,
+    "trackedFileCount": 2115,
     "rawCoveredFileCount": 1354,
     "rawCoveragePercent": 64,
     "adjustedTrackedFileCount": 1426,
     "adjustedCoveredFileCount": 1119,
     "adjustedCoveragePercent": 78.5,
-    "uncoveredFileCount": 760,
+    "uncoveredFileCount": 761,
     "uncoveredActiveFileCount": 307,
     "classifications": [
       {
@@ -276,7 +276,7 @@
       {
         "classification": "repo-ops",
         "excludedFromCoverage": true,
-        "count": 41,
+        "count": 42,
         "coveredCount": 24
       },
       {
@@ -36037,6 +36037,19 @@
       "scopeBlocks": [
         "V121"
       ],
+      "surfaces": [],
+      "classification": "repo-ops",
+      "excludedFromCoverage": true,
+      "excludeReason": "Repository automation scaffolding is tracked separately from product/code coverage."
+    },
+    {
+      "path": "tools/graph-rag-viewer/README.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
       "surfaces": [],
       "classification": "repo-ops",
       "excludedFromCoverage": true,
