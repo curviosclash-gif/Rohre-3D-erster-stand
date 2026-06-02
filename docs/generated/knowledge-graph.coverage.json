@@ -186,11 +186,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2113,
-    "rawCoveredFileCount": 1353,
+    "trackedFileCount": 2114,
+    "rawCoveredFileCount": 1354,
     "rawCoveragePercent": 64,
-    "adjustedTrackedFileCount": 1425,
-    "adjustedCoveredFileCount": 1118,
+    "adjustedTrackedFileCount": 1426,
+    "adjustedCoveredFileCount": 1119,
     "adjustedCoveragePercent": 78.5,
     "uncoveredFileCount": 760,
     "uncoveredActiveFileCount": 307,
@@ -258,8 +258,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1020,
-        "coveredCount": 897
+        "count": 1021,
+        "coveredCount": 898
       },
       {
         "classification": "product-docs",
@@ -34109,6 +34109,25 @@
     },
     {
       "path": "tests/graph-rag-viewer-export.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V121"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/graph-rag-viewer-ui.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated": "2026-05-30",
+  "updated": "2026-06-02",
   "start_anchor": {
     "block": "V121",
-    "phase": "121.1",
+    "phase": "121.6",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -638,7 +638,7 @@
       "title": "Lokaler Graph-RAG Viewer und Evidence-Dashboard",
       "status": "planned",
       "priority": "P2",
-      "owner": "frei",
+      "owner": "codex",
       "workstream": "ai-graph-tools",
       "depends_on": [
         "V120.99",
@@ -646,13 +646,13 @@
         "V110.99",
         "V111.99"
       ],
-      "current_phase": "121.2",
+      "current_phase": "121.7",
       "plan_file": "docs/plaene/aktiv/V121.md",
       "lock": {
-        "status": "frei",
-        "agent": "-",
-        "start_date": "2026-05-30",
-        "target": "121.1 abgeschlossen 2026-05-30; naechster Slice 121.2 Viewer-Export und Fixture",
+        "status": "claimed",
+        "agent": "codex",
+        "start_date": "2026-06-02",
+        "target": "121.6 abgeschlossen 2026-06-02; naechster Slice 121.7 Dokumentation und Rollout",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

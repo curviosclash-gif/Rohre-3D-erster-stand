@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 254,
+          "concreteCount": 255,
           "plannedCount": 0
         }
       }
@@ -1552,7 +1552,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "121.2",
+        "currentPhase": "121.7",
         "planFile": "docs/plaene/aktiv/V121.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
@@ -1575,8 +1575,8 @@
           "tools/graph-rag-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 17,
-          "plannedCount": 1
+          "concreteCount": 18,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
           "V120",
@@ -5040,7 +5040,7 @@
       "id": "V121.6",
       "type": "phase",
       "title": "Tests und lokale Verifikation",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.6"
@@ -12936,8 +12936,8 @@
     {
       "id": "V121.6.1",
       "type": "subphase",
-      "title": "Export-Contract-Test fuer Fixture und realen redigierten Export ergaenzen.",
-      "status": "open",
+      "title": "Export-Contract-Test fuer Fixture und realen redigierten Export ergaenzen. (abgeschlossen: 2026-06-02; evidence: `node --test tests/graph-rag-viewer-export.contract.test.mjs tests/graph-rag-chat.contract.test.mjs tests/graph-rag-viewer-ui.contract.test.mjs` -> PASS, 11 Tests inklusive realem transientem Export)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.6",
@@ -12947,8 +12947,8 @@
     {
       "id": "V121.6.2",
       "type": "subphase",
-      "title": "Chat-Contract-Test fuer Fixture, Modi, Replay, Trace, Fallback, Prompt-Injection-Signal und insufficient-context-Fall ergaenzen.",
-      "status": "open",
+      "title": "Chat-Contract-Test fuer Fixture, Modi, Replay, Trace, Fallback, Prompt-Injection-Signal und insufficient-context-Fall ergaenzen. (abgeschlossen: 2026-06-02; evidence: `node --test tests/graph-rag-viewer-export.contract.test.mjs tests/graph-rag-chat.contract.test.mjs tests/graph-rag-viewer-ui.contract.test.mjs` -> PASS mit allen fuenf Modi, Replay, Trace, `fallback-rulebased`, Prompt-Injection-Signal und unknown-file-Negativfall)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.6",
@@ -12958,8 +12958,8 @@
     {
       "id": "V121.6.3",
       "type": "subphase",
-      "title": "UI-Smoke-Test mit Fixture: Dashboard laedt, Critical Paths sichtbar, Evidence sichtbar, Ask Repo sichtbar, Safety sichtbar, LLM-Fallback sichtbar.",
-      "status": "open",
+      "title": "UI-Smoke-Test mit Fixture: Dashboard laedt, Critical Paths sichtbar, Evidence sichtbar, Ask Repo sichtbar, Safety sichtbar, LLM-Fallback sichtbar. (abgeschlossen: 2026-06-02; evidence: `tests/graph-rag-viewer-ui.contract.test.mjs` plus fokussierter Node-Testlauf -> PASS mit lokalem kurzlebigem HTTP-Server und headless Chromium)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.6",
@@ -12969,8 +12969,8 @@
     {
       "id": "V121.6.4",
       "type": "subphase",
-      "title": "Negativtests: invalides Contract-Feld, fehlende Evidence-Liste, unsafe-raw Input, historical-only Quellen.",
-      "status": "open",
+      "title": "Negativtests: invalides Contract-Feld, fehlende Evidence-Liste, unsafe-raw Input, historical-only Quellen. (abgeschlossen: 2026-06-02; evidence: `tests/graph-rag-viewer-ui.contract.test.mjs` -> PASS; Viewer lehnt Contract-Drift, fehlende Evidence und Unsafe-Raw ab und markiert Historical-only-Claims sichtbar)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.6",
@@ -12980,8 +12980,8 @@
     {
       "id": "V121.6.5",
       "type": "subphase",
-      "title": "Sicherstellen, dass keine Schreibpfade in Graph/Plans/Contracts/Cache aus Viewer oder Chat existieren.",
-      "status": "open",
+      "title": "Sicherstellen, dass keine Schreibpfade in Graph/Plans/Contracts/Cache aus Viewer oder Chat existieren. (abgeschlossen: 2026-06-02; evidence: `tests/graph-rag-viewer-ui.contract.test.mjs` -> PASS mit statischem Surface-Check: keine Apply-/Save-/Write-/Install-/Download-Aktionen, keine Browser-Persistenz und Chat-Ausgabe nur unter `tmp/graph-rag/chat/`)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.6",
@@ -12991,8 +12991,8 @@
     {
       "id": "V121.6.6",
       "type": "subphase",
-      "title": "Quantitative Nutzenmessung fuer mindestens acht Referenzaufgaben dokumentieren: CLI-Baseline, Dashboard-only und fuer passende Fragen Dashboard plus `Ask Repo`; je Pfad Zeit bis zur source-backed Antwort und Anzahl manueller CLI-Schritte erfassen. Akzeptanz: Dashboard-MVP senkt die medianen manuellen CLI-Schritte um mindestens 30 Prozent, ohne die mediane Antwortzeit zu verschlechtern. Fuer `Ask Repo` den marginalen Nutzen separat ausweisen und bei fehlender messbarer Verbesserung den Vollscope vor Rollout vereinfachen oder verschieben.",
-      "status": "open",
+      "title": "Quantitative Nutzenmessung fuer mindestens acht Referenzaufgaben dokumentieren: CLI-Baseline, Dashboard-only und fuer passende Fragen Dashboard plus `Ask Repo`; je Pfad Zeit bis zur source-backed Antwort und Anzahl manueller CLI-Schritte erfassen. Akzeptanz: Dashboard-MVP senkt die medianen manuellen CLI-Schritte um mindestens 30 Prozent, ohne die mediane Antwortzeit zu verschlechtern. Fuer `Ask Repo` den marginalen Nutzen separat ausweisen und bei fehlender messbarer Verbesserung den Vollscope vor Rollout vereinfachen oder verschieben. (abgeschlossen: 2026-06-02; evidence: read-only Node-/Playwright-Messlauf fuer acht Referenzaufgaben -> CLI-Median `733 ms` bei `1` manuellem CLI-Schritt, Dashboard-Median `52 ms` bei `0` manuellen CLI-Schritten, damit `100 %` Schritt-Reduktion ohne langsamere Medianzeit; `Ask Repo` fuer vier passende Faelle Median `711 ms` bei `1` CLI-Schritt -> kein marginaler Vorteil gegen Dashboard-only, daher Rollout nur als optionale experimentelle read-only Oberflaeche)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.6",
@@ -49861,12 +49861,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V121"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -58252,6 +58254,15 @@
     {
       "from": "B13",
       "to": "tests/graph-rag-viewer-export.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/graph-rag-viewer-ui.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
