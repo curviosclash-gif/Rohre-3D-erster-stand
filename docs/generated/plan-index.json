@@ -638,7 +638,7 @@
       "title": "Lokaler Graph-RAG Viewer und Evidence-Dashboard",
       "status": "planned",
       "priority": "P2",
-      "owner": "codex",
+      "owner": "frei",
       "workstream": "ai-graph-tools",
       "depends_on": [
         "V120.99",
@@ -649,8 +649,8 @@
       "current_phase": "121.7",
       "plan_file": "docs/plaene/aktiv/V121.md",
       "lock": {
-        "status": "claimed",
-        "agent": "codex",
+        "status": "frei",
+        "agent": "-",
         "start_date": "2026-06-02",
         "target": "121.6 abgeschlossen 2026-06-02; naechster Slice 121.7 Dokumentation und Rollout",
         "source": "docs/Umsetzungsplan.md#lock-status"
