@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-06-02. Aktiver Lock: `-`; Startanker: `V121 121.6 abgeschlossen`; kein offener P1-Schritt; naechster empfohlener AI/Graph-Folgepfad ist `V121 121.7` fuer Dokumentation und Rollout oder `V122 122.1` nach User-Priorisierung.
+Stand: 2026-06-02. Aktiver Lock: `-`; Startanker: `V121 121.99 abgeschlossen`; kein offener P1-Schritt; naechster empfohlener AI/Graph-Folgepfad ist `V122 122.1` nach User-Priorisierung.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -79,7 +79,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V120 | Graph-RAG mit lokalem Context-Adapter | done | P1 | frei | V107.99,V110.99,V111.99 | 120.99 | `docs/plaene/aktiv/V120.md` |
 | V139 | Graph-RAG Follow-up Roadmap, Safety und Qualitaetsausbau | done | P2 | frei | V120.99 | 139.99 | `docs/plaene/aktiv/V139.md` |
 | V137 | CodeGraph Read-only Installationsspike fuer Graph-RAG | done | P2 | frei | V107.99,V110.99,V111.99,V120.1 | 137.99 | `docs/plaene/aktiv/V137.md` |
-| V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | planned | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.7 | `docs/plaene/aktiv/V121.md` |
+| V121 | Lokaler Graph-RAG Viewer und Evidence-Dashboard | done | P2 | frei | V120.99,V107.99,V110.99,V111.99 | 121.99 | `docs/plaene/aktiv/V121.md` |
 | V134 | Plan Map Intake-Uebersicht und Kandidaten-Trennung | done | P2 | frei | V116.99,V117.99 | 134.99 | `docs/plaene/aktiv/V134.md` |
 | V122 | Repo-natives Agent-Memory und externe Ruflo-Orchestrierung | planned | P2 | frei | V116.99,V117.99,V119.1 | 122.1 | `docs/plaene/aktiv/V122.md` |
 | V124 | Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet | planned | P2 | frei | V107.99,V110.99,V111.99 | 124.1 | `docs/plaene/aktiv/V124.md` |
@@ -206,7 +206,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V120 | 2026-05-27 | closed | Abgeschlossen 2026-05-28; Graph-RAG-Abschluss-Gates, Docs, Fallbacks und Budget-Evidence gruen |
 | - | V139 | 2026-05-30 | closed | Abgeschlossen 2026-05-30; Safety-, Retrieval-, SLO- und Handoff-Gates gruen |
 | - | V137 | 2026-05-29 | closed | Abgeschlossen 2026-05-29; CodeGraph bleibt `manual-only`, kein MCP/Agent-Config, Graph-/Plan-/Docs-Gates gruen |
-| - | V121 | 2026-06-02 | frei | 121.6 abgeschlossen 2026-06-02; naechster Slice 121.7 Dokumentation und Rollout |
+| - | V121 | 2026-06-02 | closed | Abgeschlossen 2026-06-02; read-only Viewer-Rollout, optional experimentelles Ask Repo und Abschluss-Gates gruen |
 | - | V134 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Plan-Map-Intake-Lanes, Summary-Split und read-only Handoff-Links gruen |
 | - | V122 | - | frei | Geplant |
 | - | V124 | - | frei | Geplant |
@@ -232,7 +232,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 7. `V120` (Graph-RAG mit lokalem Context-Adapter) ist abgeschlossen: Graph-RAG-Nutzung fuer Erklaer-/Historienfragen ist von strukturierten Graph-Queries fuer harte Scope-/Impact-Fakten getrennt; Abschluss-Gates fuer Graph, Plan, Docs, Contracts, Fallbacks und Budget-Evidence sind gruen.
 8. `V137` ist abgeschlossen: CodeGraph bleibt nach lokalem Init, Sync, drei Curvios-/CodeGraph-Referenzvergleichen und `manual-only`-Entscheidung ein lokaler CLI-Hinweisgeber; MCP und Agent-Config bleiben separate D4-Gates; Curvios-Graph bleibt Wahrheit.
 9. `V139` ist abgeschlossen: Output-Pfade und lokale Runtime-Grenzen sind technisch gehaertet, Retrieval-Aliase und negative Referenzfragen liefern ehrlichere Confidence-Signale, Consumer-Hints und Budgetberichte sind fuer Folgeconsumer auswertbar, `export-view` bleibt mit Warmup-Cache unter unveraendertem SLO-Budget, Graph-RAG-Ops sind im Core-Graph sichtbar und die Handoffs zu V121/V137/V122/V124 trennen Viewer, Candidate-Provider, Memory/Ruflo und Produktsemantik klar vom Graph-RAG-Kern.
-10. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) ist bis `121.6` als read-only Consumer stabiler Graph-RAG-Evidence-Pakete verifiziert: Dashboard-, Safety-, Historical-, Fallback- und UI-Negativtests sind gruen; die Nutzenmessung bestaetigt das Dashboard, waehrend `Ask Repo` im Rollout mangels marginalem Messvorteil optional experimentell bleibt. `121.7` dokumentiert Nutzung und Handoff.
+10. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) ist abgeschlossen: Der lokale Viewer konsumiert stabile, redigierte Graph-RAG-Evidence-Pakete read-only; Dashboard-, Safety-, Historical-, Fallback-, UI-Negativ- und Abschluss-Gates sind gruen. Die Nutzenmessung bestaetigt Dashboard-only als MVP, waehrend `Ask Repo` mangels marginalem Messvorteil optional experimentell bleibt.
 11. `V134` ist abgeschlossen: Plan Map trennt Intake-Drafts in Ideen, bereits geplante Drafts, Archivkandidaten, Bot-Training und Meta, ohne Source-of-Truth- oder Move-Pfade zu erweitern.
 12. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) kann nach V119-Baseline eingeordnet werden; Graph-RAG-/Ruflo-Kontext darf nach `V120.99` nur mit eigenem Scope und Governance-Gate starten.
 13. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) nach Graph-Frische und ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113 einordnen.

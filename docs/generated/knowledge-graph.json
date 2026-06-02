@@ -1544,7 +1544,7 @@
       "id": "V121",
       "type": "block",
       "title": "Lokaler Graph-RAG Viewer und Evidence-Dashboard",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -1552,7 +1552,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "121.7",
+        "currentPhase": "121.99",
         "planFile": "docs/plaene/aktiv/V121.md",
         "scopeDeclarations": [
           "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
@@ -5060,7 +5060,7 @@
       "id": "V121.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99"
@@ -13046,8 +13046,8 @@
     {
       "id": "V121.99.1",
       "type": "subphase",
-      "title": "Relevante Viewer-Contract-Tests -> pass.",
-      "status": "open",
+      "title": "Relevante Viewer-Contract-Tests -> pass. (abgeschlossen: 2026-06-02; evidence: `node --test tests/graph-rag-viewer-export.contract.test.mjs tests/graph-rag-chat.contract.test.mjs tests/graph-rag-viewer-ui.contract.test.mjs` -> PASS, 11 Tests)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99",
@@ -13057,8 +13057,8 @@
     {
       "id": "V121.99.2",
       "type": "subphase",
-      "title": "Relevante Chat-Contract-Tests -> pass.",
-      "status": "open",
+      "title": "Relevante Chat-Contract-Tests -> pass. (abgeschlossen: 2026-06-02; evidence: fokussierter V121-Testlauf -> PASS mit source-backed Responses, allen fuenf Modi, Replay, Trace, Fallback und `insufficient_context`)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99",
@@ -13068,8 +13068,8 @@
     {
       "id": "V121.99.3",
       "type": "subphase",
-      "title": "UI-Smoke mit Fixture -> pass.",
-      "status": "open",
+      "title": "UI-Smoke mit Fixture -> pass. (abgeschlossen: 2026-06-02; evidence: fokussierter V121-Testlauf -> PASS mit Dashboard, Critical Paths, Evidence, Safety, Historical-Markierung, Fallback und Ask Repo)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99",
@@ -13079,8 +13079,8 @@
     {
       "id": "V121.99.4",
       "type": "subphase",
-      "title": "`node scripts/check-knowledge-graph.mjs` -> pass.",
-      "status": "open",
+      "title": "`node scripts/check-knowledge-graph.mjs` -> pass. (abgeschlossen: 2026-06-02; evidence: `node scripts/check-knowledge-graph.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99",
@@ -13090,8 +13090,8 @@
     {
       "id": "V121.99.5",
       "type": "subphase",
-      "title": "`npm run plan:check` -> pass.",
-      "status": "open",
+      "title": "`npm run plan:check` -> pass. (abgeschlossen: 2026-06-02; evidence: `npm run plan:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99",
@@ -13101,8 +13101,8 @@
     {
       "id": "V121.99.6",
       "type": "subphase",
-      "title": "Bei aktiver Uebernahme: `npm run docs:sync && npm run docs:check` nach Governance-Regel pruefen.",
-      "status": "open",
+      "title": "Bei aktiver Uebernahme: `npm run docs:sync && npm run docs:check` nach Governance-Regel pruefen. (abgeschlossen: 2026-06-02; evidence: `npm run docs:sync` und `npm run docs:check` -> PASS ohne Drift)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99",
@@ -13112,8 +13112,8 @@
     {
       "id": "V121.99.7",
       "type": "subphase",
-      "title": "Quantitative Nutzenmessung aus 121.6.6 -> pass oder dokumentierte Reduce-/Defer-Entscheidung fuer nicht ausreichend nuetzliche Oberflaechen.",
-      "status": "open",
+      "title": "Quantitative Nutzenmessung aus 121.6.6 -> pass oder dokumentierte Reduce-/Defer-Entscheidung fuer nicht ausreichend nuetzliche Oberflaechen. (abgeschlossen: 2026-06-02; evidence: 121.6.6 -> Dashboard-MVP reduziert mediane manuelle CLI-Schritte um `100 %`; `Ask Repo` bleibt mangels marginalem Vorteil optional experimentell)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99",
@@ -13123,8 +13123,8 @@
     {
       "id": "V121.99.8",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt read-only Grenze, Safety-Status, Chat-Fallback, V120-Dependency, historische Viewer-Reste, Nutzenmessung und verbleibende Nicht-Ziele.",
-      "status": "open",
+      "title": "Abschlussnotiz nennt read-only Grenze, Safety-Status, Chat-Fallback, V120-Dependency, historische Viewer-Reste, Nutzenmessung und verbleibende Nicht-Ziele. (abgeschlossen: 2026-06-02; evidence: Abschlussnotiz unter 121.99 und `tools/graph-rag-viewer/README.md`)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.99",

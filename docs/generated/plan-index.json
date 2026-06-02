@@ -3,7 +3,7 @@
   "updated": "2026-06-02",
   "start_anchor": {
     "block": "V121",
-    "phase": "121.6",
+    "phase": "121.99",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -636,7 +636,7 @@
     {
       "id": "V121",
       "title": "Lokaler Graph-RAG Viewer und Evidence-Dashboard",
-      "status": "planned",
+      "status": "done",
       "priority": "P2",
       "owner": "frei",
       "workstream": "ai-graph-tools",
@@ -646,13 +646,13 @@
         "V110.99",
         "V111.99"
       ],
-      "current_phase": "121.7",
+      "current_phase": "121.99",
       "plan_file": "docs/plaene/aktiv/V121.md",
       "lock": {
-        "status": "frei",
+        "status": "closed",
         "agent": "-",
         "start_date": "2026-06-02",
-        "target": "121.6 abgeschlossen 2026-06-02; naechster Slice 121.7 Dokumentation und Rollout",
+        "target": "Abgeschlossen 2026-06-02; read-only Viewer-Rollout, optional experimentelles Ask Repo und Abschluss-Gates gruen",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },
