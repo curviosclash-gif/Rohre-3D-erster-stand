@@ -186,12 +186,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2109,
-    "rawCoveredFileCount": 1349,
+    "trackedFileCount": 2113,
+    "rawCoveredFileCount": 1353,
     "rawCoveragePercent": 64,
-    "adjustedTrackedFileCount": 1421,
-    "adjustedCoveredFileCount": 1114,
-    "adjustedCoveragePercent": 78.4,
+    "adjustedTrackedFileCount": 1425,
+    "adjustedCoveredFileCount": 1118,
+    "adjustedCoveragePercent": 78.5,
     "uncoveredFileCount": 760,
     "uncoveredActiveFileCount": 307,
     "classifications": [
@@ -258,8 +258,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1016,
-        "coveredCount": 893
+        "count": 1020,
+        "coveredCount": 897
       },
       {
         "classification": "product-docs",
@@ -5888,6 +5888,46 @@
         "V107",
         "V110",
         "V111"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
+        "V121"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "data/contracts/knowledge-graph/graph-rag-chat-response.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V107",
+        "V110",
+        "V111",
+        "V121"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -20209,6 +20249,25 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/graph-rag-chat.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V121"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/graph-rag-context-adapter.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -33939,6 +33998,25 @@
       ],
       "scopeBlocks": [
         "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/graph-rag-chat.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V121"
       ],
       "surfaces": [],
       "classification": "product-code",

@@ -30,7 +30,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -367,8 +368,57 @@ code {
   color: var(--muted);
 }
 
+.chat-toolbar {
+  display: grid;
+  grid-template-columns: 180px minmax(320px, 1fr) auto auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.chat-toolbar label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chat-toolbar input,
+.chat-toolbar select {
+  min-height: 35px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.chat-toolbar .button input {
+  display: none;
+}
+
+.chat-response {
+  margin-bottom: 14px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.chat-response small,
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 @media (max-width: 1180px) {
   .metric-grid {
     grid-template-columns: repeat(3, minmax(140px, 1fr));
+  }
+
+  .chat-toolbar {
+    grid-template-columns: 180px minmax(320px, 1fr);
   }
 }

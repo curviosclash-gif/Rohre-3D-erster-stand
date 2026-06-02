@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 252,
+          "concreteCount": 254,
           "plannedCount": 0
         }
       }
@@ -845,7 +845,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 34,
+          "concreteCount": 36,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1001,7 +1001,7 @@
           "tests/knowledge-graph-build.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 50,
+          "concreteCount": 52,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1059,7 +1059,7 @@
           "tools/graph-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 36,
+          "concreteCount": 38,
           "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
@@ -1575,8 +1575,8 @@
           "tools/graph-rag-viewer/viewer.js"
         ],
         "scopeResolution": {
-          "concreteCount": 13,
-          "plannedCount": 5
+          "concreteCount": 17,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [
           "V120",
@@ -5030,7 +5030,7 @@
       "id": "V121.5",
       "type": "phase",
       "title": "Ask-Repo-Chat-Panel",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.5"
@@ -12848,8 +12848,8 @@
     {
       "id": "V121.5.1",
       "type": "subphase",
-      "title": "`graph-rag.chat-response.v1` definieren: Modus, Status, Frage, Kontext, Kurzantwort, Evidence, Queries, Replay, Trace, Links, Safety, Follow-ups, Cache-Policy, Runtime/Fallback.",
-      "status": "open",
+      "title": "`graph-rag.chat-response.v1` definieren: Modus, Status, Frage, Kontext, Kurzantwort, Evidence, Queries, Replay, Trace, Links, Safety, Follow-ups, Cache-Policy, Runtime/Fallback. (abgeschlossen: 2026-06-02; evidence: `node --test tests/graph-rag-chat.contract.test.mjs` -> PASS mit versioniertem read-only Chat-Response-Vertrag)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.5",
@@ -12859,8 +12859,8 @@
     {
       "id": "V121.5.2",
       "type": "subphase",
-      "title": "`scripts/graph-rag-chat.mjs` planen/implementieren: Chat-Frage plus optionaler `file`/`block`/`view`-Kontext -> V120-Query -> Chat-Response.",
-      "status": "open",
+      "title": "`scripts/graph-rag-chat.mjs` planen/implementieren: Chat-Frage plus optionaler `file`/`block`/`view`-Kontext -> V120-Query -> Chat-Response. (abgeschlossen: 2026-06-02; evidence: `node scripts/graph-rag-chat.mjs --block V121 --view dependencies --question \"Was blockiert V121?\" --json` -> PASS mit V120-Evidence, Graph-Queries, Replay und `fallback-rulebased`)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.5",
@@ -12870,8 +12870,8 @@
     {
       "id": "V121.5.3",
       "type": "subphase",
-      "title": "Antwortmodi implementieren oder als Fixture-Vertrag pruefen: `graph-only`, `evidence`, `rag-summary`, `explain`, `plan-next`.",
-      "status": "open",
+      "title": "Antwortmodi implementieren oder als Fixture-Vertrag pruefen: `graph-only`, `evidence`, `rag-summary`, `explain`, `plan-next`. (abgeschlossen: 2026-06-02; evidence: `node --test tests/graph-rag-chat.contract.test.mjs` -> PASS fuer alle fuenf Modi)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.5",
@@ -12881,8 +12881,8 @@
     {
       "id": "V121.5.4",
       "type": "subphase",
-      "title": "Chat-Fixture und Contract-Test ergaenzen fuer Datei-Frage, Block-Dependency-Frage, Scope-/Collision-Frage, Critical-Path-Frage, historische Quelle und `insufficient_context`.",
-      "status": "open",
+      "title": "Chat-Fixture und Contract-Test ergaenzen fuer Datei-Frage, Block-Dependency-Frage, Scope-/Collision-Frage, Critical-Path-Frage, historische Quelle und `insufficient_context`. (abgeschlossen: 2026-06-02; evidence: `node --test tests/graph-rag-chat.contract.test.mjs` -> PASS mit source-backed Referenzfragen und unknown-file Negativfall)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.5",
@@ -12892,8 +12892,8 @@
     {
       "id": "V121.5.5",
       "type": "subphase",
-      "title": "Replay- und Trace-Pfad pruefen: jede Fixture-Antwort enthaelt reproduzierbaren CLI-Befehl und `Explain this answer`-Daten.",
-      "status": "open",
+      "title": "Replay- und Trace-Pfad pruefen: jede Fixture-Antwort enthaelt reproduzierbaren CLI-Befehl und `Explain this answer`-Daten. (abgeschlossen: 2026-06-02; evidence: `node --test tests/graph-rag-chat.contract.test.mjs` -> PASS mit `replay.command`, `inputsHash`, Graph-Query- und Evidence-Trace)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.5",
@@ -12903,8 +12903,8 @@
     {
       "id": "V121.5.6",
       "type": "subphase",
-      "title": "Viewer-Panel umsetzen: Modus-Schalter, Kurzantwort, Quellenkarten, Graph-Query-Liste, Confidence, Unsicherheiten, Trace und Links zu Repo Map/Plan Map.",
-      "status": "open",
+      "title": "Viewer-Panel umsetzen: Modus-Schalter, Kurzantwort, Quellenkarten, Graph-Query-Liste, Confidence, Unsicherheiten, Trace und Links zu Repo Map/Plan Map. (abgeschlossen: 2026-06-02; evidence: lokaler Browser-Smoke unter `http://127.0.0.1:4178/tools/graph-rag-viewer/index.html` -> PASS mit Chat-Fixture, Antwortkarte, Quellenkarte, Graph-Queries, Trace und Replay)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.5",
@@ -12914,8 +12914,8 @@
     {
       "id": "V121.5.7",
       "type": "subphase",
-      "title": "Fallback pruefen: Ohne Ollama/llama.cpp liefert der Chat fuer Graph-/Export-nahe Fragen regelbasierte Antworten oder klar `insufficient_context`.",
-      "status": "open",
+      "title": "Fallback pruefen: Ohne Ollama/llama.cpp liefert der Chat fuer Graph-/Export-nahe Fragen regelbasierte Antworten oder klar `insufficient_context`. (abgeschlossen: 2026-06-02; evidence: `node --test tests/graph-rag-chat.contract.test.mjs` -> PASS mit `fallback-rulebased` und unknown-file `insufficient_context`)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.5",
@@ -12925,8 +12925,8 @@
     {
       "id": "V121.5.8",
       "type": "subphase",
-      "title": "Safety pruefen: keine Persistenz von Prompt-/Antworttext, keine Schreibbuttons, keine Modellinstallation aus dem Viewer, Quellenanweisungen bleiben Daten.",
-      "status": "open",
+      "title": "Safety pruefen: keine Persistenz von Prompt-/Antworttext, keine Schreibbuttons, keine Modellinstallation aus dem Viewer, Quellenanweisungen bleiben Daten. (abgeschlossen: 2026-06-02; evidence: `node --test tests/graph-rag-chat.contract.test.mjs` und lokaler Browser-Smoke -> PASS mit `writesAllowed: false`, `sourceTextIsData: true`, `finalAnswerCached: false`, Prompt-Injection-Signal und ausschliesslich lesenden UI-Aktionen)",
+      "status": "done",
       "attributes": {
         "blockId": "V121",
         "phaseCode": "121.5",
@@ -30409,9 +30409,12 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
           "V121"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -30424,9 +30427,12 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V107",
+          "V110",
+          "V111",
           "V121"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -37470,12 +37476,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V121"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -49731,12 +49739,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V121"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -57494,6 +57504,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/graph-rag-chat.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/graph-rag-context-adapter.mjs",
       "type": "scope",
       "hint": null,
@@ -58179,6 +58198,15 @@
     {
       "from": "B13",
       "to": "tests/gpu.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/graph-rag-chat.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -68864,6 +68892,24 @@
     },
     {
       "from": "V107",
+      "to": "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
+      "to": "data/contracts/knowledge-graph/graph-rag-chat-response.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V107",
       "to": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
       "type": "scope",
       "hint": null,
@@ -70287,6 +70333,24 @@
     },
     {
       "from": "V110",
+      "to": "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
+      "to": "data/contracts/knowledge-graph/graph-rag-chat-response.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V110",
       "to": "data/contracts/knowledge-graph/graph-rag-ops.v1.json",
       "type": "scope",
       "hint": null,
@@ -70938,6 +71002,24 @@
     {
       "from": "V111",
       "to": "data/contracts/knowledge-graph/desktop-critical-paths.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V111",
+      "to": "data/contracts/knowledge-graph/graph-rag-chat-response.v1.json",
       "type": "scope",
       "hint": null,
       "attributes": {

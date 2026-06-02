@@ -1,0 +1,74 @@
+{
+  "contract": "knowledge-graph.graph-rag.chat-response.v1",
+  "schema_version": 1,
+  "mode": "graph-only",
+  "status": "answered",
+  "question": "Was blockiert V121?",
+  "context": {
+    "blockId": "V121",
+    "file": null,
+    "view": "dependencies"
+  },
+  "answer": {
+    "summary": "V121 hat keine offenen Graph-Dependencies.",
+    "confidence": "high",
+    "uncertainties": [
+      "fixture-only",
+      "local-ai-not-source-of-truth"
+    ]
+  },
+  "evidence": [
+    {
+      "path": "docs/plaene/aktiv/V121.md",
+      "lineStart": 105,
+      "lineEnd": 112,
+      "kind": "active-plans",
+      "claim": "V121 is a read-only consumer of source-backed Graph-RAG evidence.",
+      "confidence": "high",
+      "uncertainties": [
+        "fixture-only"
+      ],
+      "selectionReason": "graph-candidate",
+      "historical": false
+    }
+  ],
+  "queries": [
+    "open-deps V121",
+    "files-for-block V121"
+  ],
+  "replay": {
+    "command": "node scripts/graph-rag-chat.mjs --block V121 --view dependencies --question \"Was blockiert V121?\" --json",
+    "inputsHash": "sha256:fixture-v121-dependencies"
+  },
+  "trace": [
+    "intent:plan",
+    "graph:open-deps V121",
+    "graph:files-for-block V121",
+    "evidence:docs/plaene/aktiv/V121.md",
+    "summary:rulebased"
+  ],
+  "links": [
+    {
+      "label": "Plan Map: V121",
+      "target": "tools/plan-map/index.html?block=V121"
+    }
+  ],
+  "safety": {
+    "redactionApplied": true,
+    "writesAllowed": false,
+    "sourceTextIsData": true,
+    "promptInjectionSignals": [],
+    "runtime": "fallback-rulebased"
+  },
+  "followups": [
+    {
+      "label": "Zeige Scope-Kollisionen",
+      "action": "ask",
+      "question": "Welche Scope-Kollisionen hat V121?"
+    }
+  ],
+  "cache": {
+    "policy": "evidence-only",
+    "finalAnswerCached": false
+  }
+}

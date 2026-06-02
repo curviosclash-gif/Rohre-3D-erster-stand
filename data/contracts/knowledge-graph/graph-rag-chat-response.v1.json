@@ -1,0 +1,63 @@
+{
+  "contract": "knowledge-graph.graph-rag.chat-response.v1",
+  "schema_version": 1,
+  "description": "Read-only Ask Repo response contract. Graph facts and cited repository sources remain authoritative; final wording is transient.",
+  "source_of_truth": false,
+  "writes_allowed": false,
+  "final_answer_cached": false,
+  "allowed_modes": [
+    "graph-only",
+    "evidence",
+    "rag-summary",
+    "explain",
+    "plan-next"
+  ],
+  "allowed_statuses": [
+    "answered",
+    "insufficient_context",
+    "error"
+  ],
+  "required_sections": [
+    "mode",
+    "status",
+    "question",
+    "context",
+    "answer",
+    "evidence",
+    "queries",
+    "replay",
+    "trace",
+    "links",
+    "safety",
+    "followups",
+    "cache"
+  ],
+  "context_required": [
+    "blockId",
+    "file",
+    "view"
+  ],
+  "answer_required": [
+    "summary",
+    "confidence",
+    "uncertainties"
+  ],
+  "evidence_required": [
+    "path",
+    "lineStart",
+    "lineEnd",
+    "kind",
+    "claim",
+    "confidence",
+    "uncertainties",
+    "selectionReason",
+    "historical"
+  ],
+  "safety_required": [
+    "redactionApplied",
+    "writesAllowed",
+    "sourceTextIsData",
+    "promptInjectionSignals",
+    "runtime"
+  ]
+}

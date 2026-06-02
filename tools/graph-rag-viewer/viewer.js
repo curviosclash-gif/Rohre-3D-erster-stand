@@ -1,5 +1,7 @@
 const VIEWER_CONTRACT = 'knowledge-graph.graph-rag.viewer-export.v1';
+const CHAT_CONTRACT = 'knowledge-graph.graph-rag.chat-response.v1';
 const FIXTURE_URL = '../../data/contracts/knowledge-graph/graph-rag-viewer-fixture.v1.json';
+const CHAT_FIXTURE_URL = '../../data/contracts/knowledge-graph/graph-rag-chat-fixture.v1.json';
 const DEFAULT_DATA_URLS = [
   '../../tmp/graph-rag/viewer/graph-rag-viewer-export.json',
   FIXTURE_URL,
@@ -7,6 +9,7 @@ const DEFAULT_DATA_URLS = [
 
 const state = {
   data: null,
+  chat: null,
   source: '',
   view: 'overview',
 };
@@ -79,6 +82,17 @@ function validateExport(data) {
   if (data.safety.sourceOfTruth !== false || data.safety.safeToCommit !== false) {
     throw new Error('Viewer-Export muss nicht-kanonisch und nicht commitbar bleiben.');
   }
+  return data;
+}
+
+function validateChatResponse(data) {
+  if (data?.contract !== CHAT_CONTRACT) throw new Error(`Nicht unterstuetzter Chat-Contract: ${data?.contract || '<leer>'}`);
+  requireFields(data, ['mode', 'status', 'question', 'context', 'answer', 'evidence', 'queries', 'replay', 'trace', 'links', 'safety', 'followups', 'cache'], 'Chat-Response');
+  requireFields(data.answer, ['summary', 'confidence', 'uncertainties'], 'Chat-Antwort');
+  requireFields(data.safety, ['redactionApplied', 'writesAllowed', 'sourceTextIsData', 'promptInjectionSignals', 'runtime'], 'Chat-Safety');
+  if (!Array.isArray(data.evidence) || !Array.isArray(data.queries) || !Array.isArray(data.trace)) throw new Error('Chat-Evidence, Queries und Trace muessen Listen sein.');
+  if (data.safety.redactionApplied !== true || data.safety.writesAllowed !== false || data.safety.sourceTextIsData !== true) throw new Error('Chat-Response verletzt die read-only Safety-Grenze.');
+  if (data.cache?.finalAnswerCached !== false) throw new Error('Finale Chat-Antworten duerfen nicht gecacht werden.');
   return data;
 }
 
@@ -231,14 +245,60 @@ function renderDiagnostics() {
 }
 
 function renderAskRepo() {
-  document.querySelector('#askRepoView').innerHTML = `
-    <article class="reserved-panel">
-      <p class="eyebrow">Reserved slot</p>
-      <h2>Ask Repo</h2>
-      <p>Das read-only Chat-Panel wird erst nach dem versionierten Antwortvertrag in Phase 121.5 aktiviert.</p>
-      <button type="button" disabled>Chat noch nicht aktiv</button>
+  const chat = state.chat;
+  const response = chat ? `
+    <div class="chat-response">
+      <div class="card-header">
+        <div>${badge(chat.status, chat.status === 'answered' ? 'good' : 'warn')} ${badge(chat.mode, 'neutral')} ${badge(chat.safety.runtime, 'neutral')}</div>
+        <strong>${escapeHtml(chat.answer.confidence)}</strong>
+      </div>
+      <h3>${escapeHtml(chat.question)}</h3>
+      <p>${escapeHtml(chat.answer.summary)}</p>
+      <small>Uncertainties: ${escapeHtml(list(chat.answer.uncertainties).join(', ') || 'none')}</small>
+    </div>
+    <div class="two-column">
+      <article class="data-card">
+        <h3>Sources</h3>
+        <div class="evidence-list">${list(chat.evidence).map((entry) => `
+          <article class="evidence-card ${entry.historical ? 'is-historical' : ''}">
+            <div>${badge(entry.confidence, entry.confidence === 'high' ? 'good' : 'warn')} ${entry.historical ? badge('historical', 'warn') : badge(entry.kind, 'neutral')}</div>
+            <code>${escapeHtml(entry.path)}#L${escapeHtml(entry.lineStart)}-L${escapeHtml(entry.lineEnd)}</code>
+            <p>${escapeHtml(entry.claim)}</p>
+          </article>
+        `).join('') || '<p>Keine Evidence vorhanden.</p>'}</div>
+      </article>
+      <article class="data-card">
+        <h3>Explain this answer</h3>
+        <ul class="code-list">${list(chat.trace).map((entry) => `<li><code>${escapeHtml(entry)}</code></li>`).join('')}</ul>
+        <h3>Graph queries</h3>
+        <ul class="code-list">${list(chat.queries).map((entry) => `<li><code>${escapeHtml(entry)}</code></li>`).join('')}</ul>
+      </article>
+    </div>
+    <article class="data-card">
+      <h3>Replay locally</h3>
+      <code>${escapeHtml(chat.replay.command)}</code>
     </article>
+  ` : '<p class="muted">Chat-Fixture laden oder eine lokal erzeugte Chat-Response aus <code>tmp/graph-rag/chat/</code> auswaehlen.</p>';
+  document.querySelector('#askRepoView').innerHTML = `
+    <div class="section-heading"><div><p class="eyebrow">Read-only evidence chat</p>
+      <h2>Ask Repo</h2>
+      <p>Antworten werden lokal per CLI erzeugt. Der Viewer liest nur versionierte Responses und bietet keine Schreibaktionen.</p></div></div>
+    <article class="chat-toolbar data-card">
+      <label>Modus
+        <select id="chatMode">
+          ${['graph-only', 'evidence', 'rag-summary', 'explain', 'plan-next'].map((mode) => `<option${chat?.mode === mode ? ' selected' : ''}>${mode}</option>`).join('')}
+        </select>
+      </label>
+      <label>Frage
+        <input id="chatQuestion" value="${escapeHtml(chat?.question || 'Was blockiert V121?')}">
+      </label>
+      <button id="chatFixtureButton" type="button" class="button button-secondary">Chat-Fixture laden</button>
+      <label class="button button-primary">Chat-JSON laden<input id="chatFileInput" type="file" accept="application/json,.json"></label>
+    </article>
+    ${response}
   `;
+  document.querySelector('#chatFixtureButton').addEventListener('click', () => loadChatUrl(CHAT_FIXTURE_URL).catch(showError));
+  document.querySelector('#chatFileInput').addEventListener('change', loadChatFile);
 }
 
 function tablePanel(title, description, headers, rows) {
@@ -287,6 +347,26 @@ async function loadUrl(url) {
   state.source = url;
   elements.errorBanner.hidden = true;
   render();
+}
+
+async function loadChatUrl(url) {
+  const response = await fetch(url, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`Chat-Response konnte nicht geladen werden: ${url} (${response.status})`);
+  state.chat = validateChatResponse(await response.json());
+  elements.errorBanner.hidden = true;
+  renderAskRepo();
+}
+
+async function loadChatFile(event) {
+  const [file] = event.target.files;
+  if (!file) return;
+  try {
+    state.chat = validateChatResponse(JSON.parse(await file.text()));
+    elements.errorBanner.hidden = true;
+    renderAskRepo();
+  } catch (error) {
+    showError(error);
+  }
 }
 
 async function loadDefault() {
