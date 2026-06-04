@@ -1,7 +1,10 @@
 ---
 title: Agent-Skills statt Regeltext fuer Spezialroutinen
 status: draft
-planned_block_id: TBD
+planned_block_id: V143
+plan_file: docs/plaene/aktiv/V143.md
+target_master: docs/Umsetzungsplan.md
+intake_status: adopted-open
 priority: P2
 owner: frei
 intake_rule: not-yet-in-master

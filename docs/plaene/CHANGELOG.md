@@ -6,6 +6,15 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Plan-Intake 2026-06-04 (V118, V127, V131, V136, V140-V144)
+
+- Nach User-Gate `bitte aufnehmen` wurden die neun normalen `intake-review`-Drafts in den Master-Index und kanonische aktive Planakten uebernommen: `V118`, `V127`, `V131`, `V136`, `V140`, `V141`, `V142`, `V143` und `V144`.
+- Die beiden bisherigen TBD-Drafts wurden eindeutig zugeordnet: Agent-Skills -> `V143`, JSON-Source-of-Truth-Future-Entscheidung -> `V144`; `V133` bleibt laut Rollback-Historie No-go, `V128`/`V129` bleiben V126-Handoff-Ideen.
+- Scope-Grenze: keine Bot-Training-Intakes, keine Archiv-Moves, keine Runtime-/Code-Umsetzung und keine Source-of-Truth-Umstellung auf JSON.
+- Evidence: `npm run plan:context:check` vor Intake -> PASS mit 9 `intake-review`, 0 Violations und cleanem Drift; nach Intake `npm run plan:check`, `npm run plan:index:check`, `npm run plan:context:check`, `npm run graph:check`, `npm run docs:check`, `npm run check:plan-evidence-claims` und `npm run gates:pre-commit` -> PASS.
+- Residual-risk: Die neuen Bloecke sind geplant/frei und konkurrieren in der Priorisierung; V140 basiert auf der bereits vorhandenen uncommitted Draft-Aktualisierung, die nicht als Draft-Datei Teil dieses Intake-Commits wird.
+- Not-checked: keine Vollsuite, keine Produktpfade, keine Bot-Training-Gates, keine Archivierung der Drafts.
+
 ## Governance-Notiz 2026-06-04 (Graph/RAG-Router)
 
 - Nach User-Auftrag wurde die Graph-vs-RAG-Entscheidungslogik in Rules und Standard-Workflows sichtbarer gemacht: strukturierte Graph-/Plan-/Code-Quellen bleiben Pflicht fuer harte Scope-, Lock-, Dependency-, Impact-, Coverage- und Source-of-Truth-Fakten; Graph-RAG ist als Erklaer-, Historien- und Evidence-Summary-Hilfe begrenzt.

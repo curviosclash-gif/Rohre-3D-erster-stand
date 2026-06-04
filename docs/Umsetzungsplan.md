@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-06-02. Aktiver Lock: `-`; Startanker: `V121 121.99 abgeschlossen`; kein offener P1-Schritt; naechster empfohlener AI/Graph-Folgepfad ist `V122 122.1` nach User-Priorisierung.
+Stand: 2026-06-04. Aktiver Lock: `-`; Startanker: `V121 121.99 abgeschlossen`; neue Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V140`-`V144` sind geplant; naechster Start nach User-Priorisierung.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -30,10 +30,10 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | --- | --- | --- |
 | Hauptspiel | `V76`, `V99`, `V108`, `V112`, `V113`, `V115` | Gameplay, Multiplayer, Hangar, Playtest- und produktnahe Spielqualitaet. |
 | Map Content, Map Tools & Settings | `V103`, `V106`, `V114`, `V130` | Map-/GLB-Content, SettingsManager, SurfacePolicy und kuratierte Parcours-Map-Varianz. |
-| Android / Mobile | `V132`, `V135` | Android Arcade-Parcours als erster aktiver Mobile-Spielmodus-Folgeblock; V135 fuehrt die Mobile-Menue-/Start-Setup-UX als Folgeblock. Weitere Mobile-/Android-Intakes bleiben bis zur Uebernahme unter `docs/plaene/neu/`. |
-| Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface und Architektur-Gates. |
-| Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126`, `V138` | Governance, Planpflege, Toolchain, Evidence, Cleanup, Delivery-/Dev- und Agent-Diff-Gates. |
-| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V134`, `V137`, `V139` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation und AI-Kontext. |
+| Android / Mobile | `V131`, `V132`, `V135`, `V140` | Mobile-Classic-Steuerung, Android Arcade-Parcours, Mobile-Menue-UX und God-File-Sunset fuer produktive Mobile-/Android-Folgearbeit. |
+| Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V118`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface, UI-/Runtime-Entflechtung und Architektur-Gates. |
+| Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126`, `V138`, `V141`, `V142`, `V144` | Governance, Planpflege, Toolchain, Evidence, Cleanup, Delivery-/Dev-, Agent-Diff-, Drift- und Source-of-Truth-Gates. |
+| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V127`, `V134`, `V136`, `V137`, `V139`, `V143` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation, portabler Knowledge-Core und AI-Kontext. |
 
 ## Aktive Bloecke
 
@@ -90,6 +90,15 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V130 | Kreatives Parcours Map Pack und Arcade-Routenvarianz | done | P2 | frei | V82.99,V108.99,V115.99 | 130.99 | `docs/plaene/aktiv/V130.md` |
 | V132 | Android Arcade-Parcours Integration | planned | P2 | frei | V82.99,V108.99,V130.99 | 132.1 | `docs/plaene/aktiv/V132.md` |
 | V135 | Mobile Menue UX-Hardening und Start-Setup-Kompaktmodus | done | P2 | frei | V132.99 | 135.99 | `docs/plaene/aktiv/V135.md` |
+| V118 | Runtime-/UI-Entflechtung Slice 1 | planned | P2 | frei | V116.99,V117.99 | 118.1 | `docs/plaene/aktiv/V118.md` |
+| V127 | Repo Map Gesamtuebersicht, Plan-Map-Abhaengigkeiten und Wissensgraph-Verankerung | planned | P2 | frei | V107.99,V110.99,V111.99 | 127.1 | `docs/plaene/aktiv/V127.md` |
+| V131 | Mobile Classic Steuerung Hardening | planned | P2 | frei | V112.99,V126.99,V72.99 | 131.1 | `docs/plaene/aktiv/V131.md` |
+| V136 | Portabler Knowledge-Core fuer Memory und RAG | planned | P1 | frei | V116.99,V117.99 | 136.1 | `docs/plaene/aktiv/V136.md` |
+| V140 | Mobile God-File-Sunset fuer App-Shell und Touch-Input | planned | P2 | frei | V132.99,V135.99 | 140.1 | `docs/plaene/aktiv/V140.md` |
+| V141 | Finding-, Plan- und Doku-Drift-Automatisierung | planned | P2 | frei | V116.99,V117.99,V119.99,V123.99,V138.99 | 141.1 | `docs/plaene/aktiv/V141.md` |
+| V142 | Graph-Drift-Guard-Automatisierung | planned | P2 | frei | V94.99,V116.99,V123.99,V138.99 | 142.1 | `docs/plaene/aktiv/V142.md` |
+| V143 | Agent-Skills statt Regeltext fuer Spezialroutinen | planned | P2 | frei | V116.99 | 143.1 | `docs/plaene/aktiv/V143.md` |
+| V144 | Future-Entscheidung JSON als Plan-Source-of-Truth | planned | P2 | frei | V123.99 | 144.1 | `docs/plaene/aktiv/V144.md` |
 
 ## Abhaengigkeiten
 
@@ -174,6 +183,21 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V134 | V117.99 | hard | ja | D3/D4-Gates und User-owned Intake-Governance sind Baseline |
 | V134 | V123.1,V127 | soft | nein | V123 kann spaeter strukturierte Plan-Daten liefern; V127 bleibt verwandter Repo-/Plan-Map-Crosslink-Scope, aber kein Startblocker |
 
+| V118 | V116.99,V117.99 | hard | ja | V116/V117 bilden Kontextreduktion und D3/D4-Gate-Basis fuer den ersten Runtime-/UI-Entflechtungsslice |
+| V127 | V107.99,V110.99,V111.99 | hard | ja | Core-Graph, Ops-Guardrails und adaptive Graph-Grundlagen sind Baseline fuer Repo-/Plan-Map-Verankerung |
+| V127 | V120.99,V121.99,V123.99,V124.99 | soft | nein | Graph-RAG, Viewer, Plan-Index und Produktsemantik sind Handoffs; V124 bleibt optionaler spaeterer Harvest-Consumer |
+| V131 | V112.99,V126.99,V72.99 | hard | ja | Mobile-Classic-Haertung, lokale Delivery-Basis und Action-Availability-Vertrag sind technische Baseline |
+| V131 | V125.99,V96.99 | soft | nein | Architektur-Compliance ist erledigt; V96-Boundary-Folgearbeit bleibt hilfreich, aber kein Startblocker |
+| V136 | V116.99,V117.99 | hard | ja | Kontextreduktion und AI-Decision-Gates begrenzen portablen Memory-/RAG-Kern |
+| V136 | V119.1,V120.2,V120.3,V120.6,V122.2,V122.3 | soft | nein | Evidence-, Graph-RAG- und Agent-Memory-Teilpfade sind Handoffs, aber keine Startblocker fuer den Kernel-Schnitt |
+| V140 | V132.99,V135.99 | hard | ja | Android-/Mobile-Baseline und Mobile-Menue-UX bilden die Ausgangslage fuer God-File-Sunset |
+| V141 | V116.99,V117.99,V119.99,V123.99,V138.99 | hard | ja | Kontext-, Gate-, Evidence-, Plan-Index- und Diff-Audit-Basis begrenzen Drift-Automatisierung |
+| V141 | V120.99,V134.99 | soft | ja | Graph-RAG und Plan-Map-Intake liefern hilfreiche Signale, sind aber keine Startblocker |
+| V142 | V94.99,V116.99,V123.99,V138.99 | hard | ja | Graph-Basis, Kontextreduktion, Plan-Index-Pilot und Diff-Audit-Gates begrenzen Graph-Drift-Guard |
+| V143 | V116.99 | hard | ja | Repo-Kontext-Reduktion ist Baseline fuer Agent-Skill-Auslagerung |
+| V144 | V123.99 | hard | ja | V123-Option-A-Entscheidung ist Voraussetzung fuer spaetere Source-of-Truth-Neubewertung |
+| V144 | V120.99,V134.99 | soft | ja | Graph-RAG- und Plan-Map-Piloten liefern Vergleichssignale fuer strukturierte Planpflege |
+
 ## Lock-Status
 
 Operativer Lock-Wahrheitsraum liegt in `docs/lock-status/*.json`.
@@ -220,6 +244,15 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V130 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; sechs Parcours-Maps, gestaffelter Arcade-Pool und targeted Map-Pack-Smokes gruen |
 | - | V132 | - | frei | Geplant; Android Arcade-Parcours nach V82/V108 und kanonischem V130-Abschluss |
 | - | V135 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Fokus-/Scrollsprung, kompakter Start-Setup-CTA und Mobile-Route-Auswahl gruen |
+| - | V118 | - | frei | Geplant |
+| - | V127 | - | frei | Geplant |
+| - | V131 | - | frei | Geplant |
+| - | V136 | - | frei | Geplant |
+| - | V140 | - | frei | Geplant |
+| - | V141 | - | frei | Geplant |
+| - | V142 | - | frei | Geplant |
+| - | V143 | - | frei | Geplant |
+| - | V144 | - | frei | Geplant |
 
 ## Empfohlene Reihenfolge
 
@@ -242,6 +275,16 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 17. `V130` ist kanonisch abgeschlossen: sechs neue Parcours-Maps, gestaffelte Arcade-Pool-Erweiterung und targeted Contract-/Start-Smokes sind gruen; Browser-Demo, GLB-/Asset-Setdressing und Preview-Scope bleiben bewusst unveraendert.
 18. `V132` (Android Arcade-Parcours Integration) kann nach kanonischem V130-Abschluss und idealerweise nach V131-Steuerungsbaseline eingeordnet werden; erster Slice bleibt kuratierter Android-Parcours statt vollstaendiger Desktop-Modusparitaet.
 19. `V135` ist abgeschlossen: Fokus-/Scrollsprung, kompakter Mobile-Start-CTA, Route-Kurzpfad und Landscape-/Small-Viewport-Regeln sind gruen; echtes Android-WebView-Geraet und APK/Install-Flow bleiben ausserhalb dieses Slices.
+
+20. `V118` (Runtime-/UI-Entflechtung Slice 1) ist als geplanter Architektur-Folgeblock aufgenommen; erster Kandidat bleibt `UIStartSyncController` nach V116/V117.
+21. `V127` (Repo Map / Plan Map / Wissensgraph-Verankerung) ist als geplanter Repo-Tooling-Navigationsblock aufgenommen; V128/V129 bleiben separate V126-Handoff-Ideen.
+22. `V131` (Mobile Classic Steuerung Hardening) ist als geplanter Mobile-Folgeblock aufgenommen; Punkt-4-Layout-Personalisierung bleibt Nicht-Ziel.
+23. `V136` (Portabler Knowledge-Core fuer Memory und RAG) ist als geplanter P1-Kernel-Schnitt aufgenommen, ohne V120/V122 automatisch umzubauen.
+24. `V140` (Mobile God-File-Sunset) ist als geplanter Refactor-Folgeblock aufgenommen und nutzt die aktualisierte Draft-Evidence vom 2026-06-04 als Quelle.
+25. `V141` (Finding-, Plan- und Doku-Drift-Automatisierung) ist als geplanter Governance-Drift-Pilot aufgenommen.
+26. `V142` (Graph-Drift-Guard-Automatisierung) ist als geplanter Graph-Generated-Gate-Schutz aufgenommen; V77-Done-Glob-Freeze bleibt separater User-Gate.
+27. `V143` (Agent-Skills statt Regeltext) ist als geplanter Agent-Kontextreduktionsblock aus dem bisherigen TBD-Draft aufgenommen.
+28. `V144` (Future-Entscheidung JSON als Plan-Source-of-Truth) ist als geplanter Future-Entscheidungsblock aus dem bisherigen TBD-Draft aufgenommen; ein echter Autoritaetswechsel bleibt separater D3/D4-Gate.
 
 ## Conflict-Log
 

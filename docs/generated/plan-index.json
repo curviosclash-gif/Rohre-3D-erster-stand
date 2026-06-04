@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-06-02",
+  "updated": "2026-06-04",
   "start_anchor": {
     "block": "V121",
     "phase": "121.99",
@@ -863,6 +863,200 @@
         "agent": "-",
         "start_date": "2026-05-22",
         "target": "Abgeschlossen 2026-05-22; Fokus-/Scrollsprung, kompakter Start-Setup-CTA und Mobile-Route-Auswahl gruen",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V118",
+      "title": "Runtime-/UI-Entflechtung Slice 1",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "architecture-runtime",
+      "depends_on": [
+        "V116.99",
+        "V117.99"
+      ],
+      "current_phase": "118.1",
+      "plan_file": "docs/plaene/aktiv/V118.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V127",
+      "title": "Repo Map Gesamtuebersicht, Plan-Map-Abhaengigkeiten und Wissensgraph-Verankerung",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "ai-graph-tools",
+      "depends_on": [
+        "V107.99",
+        "V110.99",
+        "V111.99"
+      ],
+      "current_phase": "127.1",
+      "plan_file": "docs/plaene/aktiv/V127.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V131",
+      "title": "Mobile Classic Steuerung Hardening",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "android-mobile",
+      "depends_on": [
+        "V112.99",
+        "V126.99",
+        "V72.99"
+      ],
+      "current_phase": "131.1",
+      "plan_file": "docs/plaene/aktiv/V131.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V136",
+      "title": "Portabler Knowledge-Core fuer Memory und RAG",
+      "status": "planned",
+      "priority": "P1",
+      "owner": "frei",
+      "workstream": "ai-graph-tools",
+      "depends_on": [
+        "V116.99",
+        "V117.99"
+      ],
+      "current_phase": "136.1",
+      "plan_file": "docs/plaene/aktiv/V136.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V140",
+      "title": "Mobile God-File-Sunset fuer App-Shell und Touch-Input",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "android-mobile",
+      "depends_on": [
+        "V132.99",
+        "V135.99"
+      ],
+      "current_phase": "140.1",
+      "plan_file": "docs/plaene/aktiv/V140.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V141",
+      "title": "Finding-, Plan- und Doku-Drift-Automatisierung",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "repo-governance",
+      "depends_on": [
+        "V116.99",
+        "V117.99",
+        "V119.99",
+        "V123.99",
+        "V138.99"
+      ],
+      "current_phase": "141.1",
+      "plan_file": "docs/plaene/aktiv/V141.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V142",
+      "title": "Graph-Drift-Guard-Automatisierung",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "repo-governance",
+      "depends_on": [
+        "V94.99",
+        "V116.99",
+        "V123.99",
+        "V138.99"
+      ],
+      "current_phase": "142.1",
+      "plan_file": "docs/plaene/aktiv/V142.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V143",
+      "title": "Agent-Skills statt Regeltext fuer Spezialroutinen",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "ai-graph-tools",
+      "depends_on": [
+        "V116.99"
+      ],
+      "current_phase": "143.1",
+      "plan_file": "docs/plaene/aktiv/V143.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V144",
+      "title": "Future-Entscheidung JSON als Plan-Source-of-Truth",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "repo-governance",
+      "depends_on": [
+        "V123.99"
+      ],
+      "current_phase": "144.1",
+      "plan_file": "docs/plaene/aktiv/V144.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     }
