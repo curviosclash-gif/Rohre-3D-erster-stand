@@ -2878,7 +2878,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 344,
+          "concreteCount": 345,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -34330,6 +34330,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Finding_Plan_Doku_Drift_Automatisierung_V141.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -97347,6 +97362,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Finding_Plan_Doku_Drift_Automatisierung_V141.md",
       "type": "scope",
       "hint": null,
       "attributes": {

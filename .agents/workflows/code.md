@@ -10,6 +10,7 @@ Pflicht-Reads:
 - `docs/Umsetzungsplan.md` (nur Master-Index, keine Historie).
 - Die verlinkte `docs/plaene/aktiv/VXX.md` mit Lese-Budget: Frontmatter + DoD + aktuelle + naechste Subphase.
 - Fuer Abhaengigkeits-, Scope- und Surface-Fragen zuerst `docs/generated/knowledge-graph.json` oder `node scripts/query-knowledge-graph.mjs ...` nutzen.
+- Graph-/RAG-Router anwenden: harte Scope-, Lock-, Dependency-, Impact- und Surface-Fakten ueber strukturierte Graph-/Plan-/Code-Quellen klaeren; `graph-rag-query.mjs` nur fuer Historie, Begruendung oder source-backed Evidence-Summaries nutzen.
 - `git log -n 3 --oneline`.
 - `npm run guard:main`.
 
@@ -27,6 +28,7 @@ Optional (nur bei Bedarf):
 - Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; `D3`/`D4`-Source-of-truth-, Planstruktur-, Archivierungs-, Move-/Delete- oder High-Blast-Radius-Aenderungen brauchen User-Gate.
 - Bei `D3`/`D4`, `[REVIEW]` oder `[USER-GATE]` vor der Freigabe betroffene Dateien/Oberflaechen als `no-op`, `read-only evidence`, `optional` oder `edit required` klassifizieren; nur `edit required` freigeben lassen.
 - Jede Freigabefrage nach dem Erklaerformat aus `.agents/rules/planning_and_governance.md` stellen: Entscheidung, Gate-Grund, konkrete Umsetzung, erwarteter Effekt, ausgeschlossener Scope und passende Kurzantwort.
+- Wenn Graph/RAG den Scope absichert, Evidence kompakt nach `.agents/rules/token_efficiency_and_tools.md` ausweisen und bei Widerspruch die kanonische Quelle benennen.
 - Subagents nur mit expliziter User-Erlaubnis fuer unabhaengige oder disjunkte Teilaufgaben einsetzen; der fuehrende Agent bleibt fuer Integration, Evidence und Commit verantwortlich.
 - Neue dauerhafte Ablagen nach Zweckklasse klassifizieren und bestehende kanonische Zielquelle bevorzugen.
 - Breite Plan-Evidence-Claims mit Globs oder "alle Workflows/Rules/scope_files/repo-weit" nur abschliessen, wenn sie durch konkrete Evidence oder `scripts/check-plan-evidence-claims.mjs` abgesichert sind.

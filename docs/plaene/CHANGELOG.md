@@ -6,6 +6,15 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Governance-Notiz 2026-06-04 (Graph/RAG-Router)
+
+- Nach User-Auftrag wurde die Graph-vs-RAG-Entscheidungslogik in Rules und Standard-Workflows sichtbarer gemacht: strukturierte Graph-/Plan-/Code-Quellen bleiben Pflicht fuer harte Scope-, Lock-, Dependency-, Impact-, Coverage- und Source-of-Truth-Fakten; Graph-RAG ist als Erklaer-, Historien- und Evidence-Summary-Hilfe begrenzt.
+- Betroffene Governance-Pfade: `.agents/rules/token_efficiency_and_tools.md`, `.agents/workflows/code.md`, `.agents/workflows/quick.md`, `.agents/workflows/bugfix.md`, `.agents/workflows/plan.md`, `.agents/workflows/status.md`.
+- Gate-Sync: `docs/generated/knowledge-graph.json` und `docs/generated/knowledge-graph.coverage.json` wurden durch `graph:build` nachgezogen, weil `graph:check` den bereits getrackten V141-Draft noch nicht im generierten Graph sah.
+- Evidence: `npm run plan:check`, `npm run check:plan-evidence-claims`, `npm run graph:build` und `npm run gates:pre-commit` -> PASS.
+- Residual-risk: Die Trennung ist workflow-seitig klarer, aber weiterhin agentenabhaengig; sie erzwingt keine maschinelle RAG-Nutzungspruefung pro Antwort.
+- Not-checked: keine Produktcode-, Masterplan-, Lock- oder RAG-Kernskript-Aenderung; der fremde V140-Draft bleibt uncommitted ausserhalb dieses Slices.
+
 ## V122 122.1 Planungsschaerfung 2026-06-04
 
 - Nach User-Auftrag wurde die externe Repo `pogii123/obsidian-agentic-second-brain` als begrenzter Quelleninput in V122 eingeplant: Curvios uebernimmt das Trust-Modell fuer Agent-Memory (`system_of_record`, `verification`, `review_after`, `last_synced`, External Mirrors, Health-Report und Node-Provenance-Pruefung), aber keine Obsidian-/PARA-Repo-Struktur.

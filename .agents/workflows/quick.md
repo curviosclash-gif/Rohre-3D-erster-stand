@@ -11,6 +11,7 @@ Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_
 
 - Kein Pflicht-Read des kompletten Master-Index. Vor Einstieg aber einen kompakten Governance-Check machen: betroffene Dateien gegen `docs/Umsetzungsplan.md`, `docs/plaene/aktiv/VXX.md` oder `docs/lock-status/*.json` abgleichen.
 - Nur wenn kein aktiver Block, kein Lock und keine laufende Subphase betroffen sind, im Quick-Path bleiben.
+- Bei unklarem Datei-Impact oder sichtbarer Blocknaehe `node scripts/query-knowledge-graph.mjs impact-for-file <path> --json` nutzen; RAG im Quick-Path nur fuer kurze Historien-/Erklaerfragen, nicht fuer Scope- oder Lock-Entscheidungen.
 - `git log -n 3 --oneline` fuer aktuellen Stand.
 
 ## 1. Implement

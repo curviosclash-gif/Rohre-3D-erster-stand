@@ -17,6 +17,7 @@ description: Quick project status snapshot.
   - `node scripts/query-knowledge-graph.mjs coverage-report`
   - `node scripts/query-knowledge-graph.mjs impact-for-file <path> --json`
   - `node scripts/query-knowledge-graph.mjs event-flow spawn|combat-hit|round-end|settings`
+- For "why", history, decision-rationale or source-backed summary questions, use `node scripts/graph-rag-query.mjs "<frage>" --max-chunks <n>` as an explanation aid after canonical Graph/Master/Plan facts are known.
 - Identify next open phase and dependency blockers.
 - Check pending external intake plans in `docs/plaene/neu/`.
 - Run `npm run plan:check`.
@@ -31,6 +32,7 @@ description: Quick project status snapshot.
 
 - Next phase, open dependencies, lock status, uncommitted changes, active branches.
 - Include graph-query findings for open deps and scope collisions when graph data exists.
+- Include `Graph:`, `RAG:` and `Source-of-truth:` when the status answer relies on Graph/RAG evidence; if RAG conflicts with Graph/Master/Plan, mark it as context only.
 - Include runtime health, coverage gate, or event-flow findings when the status question touches runtime impact, tests, or critical desktop paths.
 - Highlight desktop-app priorities and intentional demo limitations.
 - List pending external plans waiting for manual intake.

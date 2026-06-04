@@ -15,12 +15,14 @@ Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/p
 // turbo
 - Aktuelle Logs und Traces pruefen; auf Desktop-Pfad reproduzieren, ausser es ist klar online-demo-only.
 - Wahrscheinlichen Failure-Pfad extrahieren.
+- Bei datei-, runtime- oder flow-nahem Befund zuerst passende Graph-Queries nutzen (`impact-for-file`, `event-flow`, `critical-path-health`, `coverage-report`); Graph-RAG nur fuer historische Root-Cause-Kontexte oder source-backed Evidence-Summaries heranziehen.
 
 ## 2. Find root cause
 
 - Fehlerpattern lokalisieren mit `Grep` (ripgrep-basiert).
 - Ursache mit minimaler Reproduktion bestaetigen.
 - Betroffene Dateien und Seiteneffekte notieren.
+- Wenn Graph/RAG zur Einordnung genutzt wurde, kurz `Graph:`, `RAG:` und `Source-of-truth:` nach `.agents/rules/token_efficiency_and_tools.md` festhalten.
 - Bei architekturrelevantem Bugfix die Architecture Capsule aus `.agents/rules/code_quality_and_debugging.md` benennen und den kleinsten Guard festlegen; der Fix darf keine neuen Runtime-/Global-Surface-Consumer still einfuehren.
 - Beruehrt der Fix eine produktive Datei ab 400 Zeilen oder eine Debt-Surface aus `scripts/architecture/LegacyMaxLinesConfig.mjs`, bestehende Verantwortung, Fix-Delta und Vorher-/Nachher-Zeilenstand erfassen.
 

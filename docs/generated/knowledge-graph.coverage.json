@@ -186,11 +186,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2115,
-    "rawCoveredFileCount": 1354,
+    "trackedFileCount": 2116,
+    "rawCoveredFileCount": 1355,
     "rawCoveragePercent": 64,
-    "adjustedTrackedFileCount": 1426,
-    "adjustedCoveredFileCount": 1119,
+    "adjustedTrackedFileCount": 1427,
+    "adjustedCoveredFileCount": 1120,
     "adjustedCoveragePercent": 78.5,
     "uncoveredFileCount": 761,
     "uncoveredActiveFileCount": 307,
@@ -264,8 +264,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 330,
-        "coveredCount": 176
+        "count": 331,
+        "coveredCount": 177
       },
       {
         "classification": "prototype",
@@ -14812,6 +14812,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Finding_Plan_Doku_Drift_Automatisierung_V141.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

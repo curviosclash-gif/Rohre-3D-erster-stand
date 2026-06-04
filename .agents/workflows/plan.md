@@ -8,6 +8,7 @@ description: Create a compact implementation plan for a new feature or extension
 - Read `docs/Umsetzungsplan.md`.
 - Read a related `docs/plaene/aktiv/VXX.md` when extending or refreshing an active block.
 - If present, use `docs/generated/knowledge-graph.json` or `node scripts/query-knowledge-graph.mjs ...` for dependency/scope/surface reads before full plan text.
+- Use Graph-RAG only for historical rationale, prior decision context or source-backed Evidence-Summaries; hard dependencies, locks, scope and Source-of-Truth status remain Graph/Master/Plan decisions.
 - For bot-training scope also read `docs/bot-training/Bot_Trainingsplan.md` and treat it as active master plan.
 - `git log -n 5 --oneline`.
 - Scan impacted modules in `src/`, `tests/`, `editor/js/`.
@@ -30,6 +31,7 @@ description: Create a compact implementation plan for a new feature or extension
 - Datei-Ownership pruefen: kollidiert der Scope mit einem gelockten Block?
 - Dependencies klassifizieren (`hard`/`soft`).
 - Dependency-/Scope-Abgleich zuerst ueber Graph-Query (`open-deps`, `scope-collisions`), dann bei Bedarf Volltext.
+- Bei Graph/RAG-Einsatz Evidence kompakt nach `.agents/rules/token_efficiency_and_tools.md` ausweisen, damit der Draft zwischen Faktenquelle und Erklaerhilfe trennt.
 - Decision-Klasse nach `.agents/rules/planning_and_governance.md` bestimmen; `D3`/`D4`-Aenderungen an Source-of-truth, Planstruktur, Archivierung oder Governance brauchen User-Gate.
 - Falls eine Freigabe noetig ist, das Erklaerformat aus `.agents/rules/planning_and_governance.md` verwenden: Entscheidung, Gate-Grund, konkrete Umsetzung, erwarteter Effekt, ausgeschlossener Scope und passende Kurzantwort.
 - Subagents nur mit expliziter User-Erlaubnis und klarer Ownership nutzen; sie ersetzen keine Gate-, Evidence- oder Integrationsverantwortung.
