@@ -2878,7 +2878,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 345,
+          "concreteCount": 346,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -34345,6 +34345,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Finding_Plan_Doku_Drift_Automatisierung_V141.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Graph_Drift_Guard_Automatisierung_V142.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -97371,6 +97386,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Finding_Plan_Doku_Drift_Automatisierung_V141.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Graph_Drift_Guard_Automatisierung_V142.md",
       "type": "scope",
       "hint": null,
       "attributes": {

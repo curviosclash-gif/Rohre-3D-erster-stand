@@ -186,11 +186,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2116,
-    "rawCoveredFileCount": 1355,
-    "rawCoveragePercent": 64,
-    "adjustedTrackedFileCount": 1427,
-    "adjustedCoveredFileCount": 1120,
+    "trackedFileCount": 2117,
+    "rawCoveredFileCount": 1356,
+    "rawCoveragePercent": 64.1,
+    "adjustedTrackedFileCount": 1428,
+    "adjustedCoveredFileCount": 1121,
     "adjustedCoveragePercent": 78.5,
     "uncoveredFileCount": 761,
     "uncoveredActiveFileCount": 307,
@@ -264,8 +264,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 331,
-        "coveredCount": 177
+        "count": 332,
+        "coveredCount": 178
       },
       {
         "classification": "prototype",
@@ -14829,6 +14829,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Finding_Plan_Doku_Drift_Automatisierung_V141.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Graph_Drift_Guard_Automatisierung_V142.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
