@@ -13198,6 +13198,17 @@
       }
     },
     {
+      "id": "V122.1.7",
+      "type": "subphase",
+      "title": "Obsidian-Second-Brain als externe Quellenanalyse festhalten: `adopt limited` fuer Trust-Metadaten, External Mirrors, Health-Check und generated-block-Provenance; `reject` fuer Vault-/PARA-Struktur, Bash-Hook und konkurrierende Agent-Governance.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.7"
+      }
+    },
+    {
       "id": "V122.2.1",
       "type": "subphase",
       "title": "`docs/agent-memory/README.md` anlegen: Zweck, Nicht-Zweck, kanonische Quellen, Schreibfluss, Review-Regeln.",
@@ -13253,6 +13264,28 @@
       }
     },
     {
+      "id": "V122.2.6",
+      "type": "subphase",
+      "title": "Trust-Metadaten aus dem Obsidian-Modell Curvios-nativ definieren: `system_of_record`, `verification`, `last_synced`, `review_after`, `source_hash`; Status und Verification nicht vermischen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.6"
+      }
+    },
+    {
+      "id": "V122.2.7",
+      "type": "subphase",
+      "title": "External-Mirror-Vertrag fuer spaetere Ruflo-/GitHub-/Tracker-Kontexte dokumentieren: Externes System besitzt STATE, Curvios besitzt durable Knowledge und validierte Entscheidungen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.7"
+      }
+    },
+    {
       "id": "V122.3.1",
       "type": "subphase",
       "title": "`scripts/agent-memory.mjs` implementieren: `search`, `get`, `add-proposed`, `verify`, `deprecate`, `check`.",
@@ -13305,6 +13338,17 @@
         "blockId": "V122",
         "phaseCode": "122.3",
         "subphaseCode": "122.3.5"
+      }
+    },
+    {
+      "id": "V122.3.6",
+      "type": "subphase",
+      "title": "`memory:check` als Health-Report ausbauen: stale Quellen, unverified Eintraege, `source_hash`-Drift, fehlendes `verified_by`, Secret-Muster, zu lange Summaries und generated-block-Provenance fuer Mirror-Dateien.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.6"
       }
     },
     {
@@ -13517,6 +13561,17 @@
       }
     },
     {
+      "id": "V122.6.8",
+      "type": "subphase",
+      "title": "Ruflo wie einen External Mirror behandeln: STATE und Cache bleiben extern, Curvios uebernimmt nur bewusst gepruefte durable Knowledge-Eintraege.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.8"
+      }
+    },
+    {
       "id": "V122.7.1",
       "type": "subphase",
       "title": "Regel fuer Repo -> Ruflo Spiegel definieren: selektiv, kurz, verified-only, niemals automatisch umgekehrt.",
@@ -13569,6 +13624,17 @@
         "blockId": "V122",
         "phaseCode": "122.7",
         "subphaseCode": "122.7.5"
+      }
+    },
+    {
+      "id": "V122.7.6",
+      "type": "subphase",
+      "title": "`llms.txt`-aehnlichen Root-Index nur als spaeteren Adapter/Export bewerten; keine neue Wahrheitsschicht neben `AGENTS.md`, Rules, Workflows und `check:agent-context`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.6"
       }
     },
     {
@@ -78317,6 +78383,17 @@
       }
     },
     {
+      "from": "V122.1",
+      "to": "V122.1.7",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.1",
+        "subphaseCode": "122.1.7"
+      }
+    },
+    {
       "from": "V122.2",
       "to": "V122.2.1",
       "type": "contains_subphase",
@@ -78372,6 +78449,28 @@
       }
     },
     {
+      "from": "V122.2",
+      "to": "V122.2.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.6"
+      }
+    },
+    {
+      "from": "V122.2",
+      "to": "V122.2.7",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.2",
+        "subphaseCode": "122.2.7"
+      }
+    },
+    {
       "from": "V122.3",
       "to": "V122.3.1",
       "type": "contains_subphase",
@@ -78424,6 +78523,17 @@
         "blockId": "V122",
         "phaseCode": "122.3",
         "subphaseCode": "122.3.5"
+      }
+    },
+    {
+      "from": "V122.3",
+      "to": "V122.3.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.3",
+        "subphaseCode": "122.3.6"
       }
     },
     {
@@ -78636,6 +78746,17 @@
       }
     },
     {
+      "from": "V122.6",
+      "to": "V122.6.8",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.6",
+        "subphaseCode": "122.6.8"
+      }
+    },
+    {
       "from": "V122.7",
       "to": "V122.7.1",
       "type": "contains_subphase",
@@ -78688,6 +78809,17 @@
         "blockId": "V122",
         "phaseCode": "122.7",
         "subphaseCode": "122.7.5"
+      }
+    },
+    {
+      "from": "V122.7",
+      "to": "V122.7.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V122",
+        "phaseCode": "122.7",
+        "subphaseCode": "122.7.6"
       }
     },
     {

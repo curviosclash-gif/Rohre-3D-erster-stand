@@ -6,6 +6,13 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V122 122.1 Planungsschaerfung 2026-06-04
+
+- Nach User-Auftrag wurde die externe Repo `pogii123/obsidian-agentic-second-brain` als begrenzter Quelleninput in V122 eingeplant: Curvios uebernimmt das Trust-Modell fuer Agent-Memory (`system_of_record`, `verification`, `review_after`, `last_synced`, External Mirrors, Health-Report und Node-Provenance-Pruefung), aber keine Obsidian-/PARA-Repo-Struktur.
+- Einordnung: Die Ergaenzung schaerft V122.1/122.2/122.3/122.3a/122.6/122.7, ohne neue Source-of-Truth, neue Agent-Governance oder externe Tool-Installation einzufuehren.
+- Evidence: `node scripts/query-knowledge-graph.mjs open-deps V122 --json` -> PASS mit `openDependencies: []`; `node scripts/query-knowledge-graph.mjs scope-collisions --json` -> PASS ohne V122-Kollision.
+- Not-checked: keine `docs/agent-memory/**`-Dateien angelegt, kein Memory-CLI gebaut, kein Ruflo-/MCP-Setup, kein Obsidian-Vault-Import, keine produktiven Runtime-/UI-/Gameplay-Pfade und keine Vollsuite.
+
 ## Governance-Notiz 2026-05-31 (Freigabefragen)
 
 - Nach User-Auftrag muessen Workflow-Freigabefragen den entscheidbaren Scope in Alltagssprache erklaeren: benoetigte Entscheidung, Gate-Grund, konkrete Umsetzung, erwarteter Effekt, ausgeschlossener Scope und passende Kurzantwort; bei D3/D4 bleiben Alternativen, Blast-Radius und D4-Recovery explizit.
