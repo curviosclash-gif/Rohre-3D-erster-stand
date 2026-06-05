@@ -6,6 +6,14 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Priorisierungsabgleich 2026-06-05 (offene V-Bloecke)
+
+- Nach User-Auftrag wurde die tiefere read-only Analyse offener V-Bloecke in die empfohlene Reihenfolge des Master-Index eingetragen: erst `V132`-Statusdrift, dann ein kleiner `V140`-Gate-Recovery-Slice, danach `V131`, `V118`, `V106`, `V113`, `V96` und erst spaeter die gestaffelten Meta-/AI-Bloecke.
+- Begruendung: `V132` ist im Master/Index noch `planned`, die aktive Detailakte enthaelt aber `done`-Evidence; `docs:check` war vor dem Eintrag wegen drei Freshness-Stamps rot; `lint:architecture` bleibt wegen `MobileClassicApp.js` und `TouchInputSource.js` rot. Diese Basisgates sollen vor breiter Produkt- oder Meta-Arbeit entschärft werden.
+- Evidence: `npm run plan:check`, `npm run plan:index:check`, `npm run plan:context:check`, `npm run graph:check`, `npm run check:plan-evidence-claims`, `npm run check:agent-context`, `node scripts/query-knowledge-graph.mjs scope-collisions --json`, `critical-path-health`, `coverage-report`, `docs:check`, `lint:architecture`, `npm run plan:index:build` und `npm run gates:pre-commit` wurden fuer Priorisierung und Eintrag ausgewertet; das Meta-Gate fuehrte `docs:sync` aus und brachte Docs-Freshness wieder auf PASS.
+- Residual-risk: Die Reihenfolge ist eine Planempfehlung und schliesst `V132` oder `lint:architecture` nicht selbst; die Architektur-Max-Lines-Basis bleibt bis zu einem eigenen Umsetzungsslice bestehen.
+- Not-checked: keine Produktcode-Aenderung, keine Architekturfixes, keine Vollsuite, kein Bot-Training-Gate.
+
 ## Plan-Intake 2026-06-04 (V118, V127, V131, V136, V140-V144)
 
 - Nach User-Gate `bitte aufnehmen` wurden die neun normalen `intake-review`-Drafts in den Master-Index und kanonische aktive Planakten uebernommen: `V118`, `V127`, `V131`, `V136`, `V140`, `V141`, `V142`, `V143` und `V144`.

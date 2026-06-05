@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-06-04. Aktiver Lock: `-`; Startanker: `V121 121.99 abgeschlossen`; neue Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V140`-`V144` sind geplant; naechster Start nach User-Priorisierung.
+Stand: 2026-06-05. Aktiver Lock: `-`; Startanker: `V121 121.99 abgeschlossen`; neue Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V140`-`V144` sind geplant; naechster Start gemaess Priorisierungsabgleich: erst Status-/Gate-Hygiene, dann kleine Produkt-/Architektur-Slices.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -256,35 +256,18 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 ## Empfohlene Reihenfolge
 
-1. `V126` ist abgeschlossen: Training-Spawn, Preview-Mutationsgrenze, lokale API-Matrix, Ringbuffer und erste `vite.config.js`-Entflechtung sind gruen; Folgepfade bleiben `V127`, `V128` und `V129`.
-2. `V112` ist abgeschlossen; der dokumentierte `T20ba`-Seitenfund bleibt ausserhalb dieses Blocks als separater Ghost-Replay-Hinweis.
-3. `V125` ist abgeschlossen: Architektur-Capsule, staged Architecture Guard, Workflow-Eskalation, Application-/Electron-Scorecard und Ratchet-/Contracttest-Evidence sind gruen.
-4. `V119` ist abgeschlossen: historische Plan-Evidence ist pro Befund entschieden, schwache Abschlussclaims sind nachgeschaerft oder als Restwiderspruch sichtbar, und der Praeventions-Check ist gruen.
-5. `V123` ist abgeschlossen: Plan-Index, Drift-/Kontext-Checks und Dashboard laufen als nicht-kanonischer Pilot; `docs/Umsetzungsplan.md` bleibt bis zur expliziten Migration kanonisch.
-6. `V138` ist abgeschlossen: staged Diff Audit, `Generated-by:`, `Canonical-source:`, Shadow-Truth-Heuristik, Gate-Bypass-Muster und `Not-checked:` ab D2 sind im Agent-Preflight/Commit-Envelope verankert.
-7. `V120` (Graph-RAG mit lokalem Context-Adapter) ist abgeschlossen: Graph-RAG-Nutzung fuer Erklaer-/Historienfragen ist von strukturierten Graph-Queries fuer harte Scope-/Impact-Fakten getrennt; Abschluss-Gates fuer Graph, Plan, Docs, Contracts, Fallbacks und Budget-Evidence sind gruen.
-8. `V137` ist abgeschlossen: CodeGraph bleibt nach lokalem Init, Sync, drei Curvios-/CodeGraph-Referenzvergleichen und `manual-only`-Entscheidung ein lokaler CLI-Hinweisgeber; MCP und Agent-Config bleiben separate D4-Gates; Curvios-Graph bleibt Wahrheit.
-9. `V139` ist abgeschlossen: Output-Pfade und lokale Runtime-Grenzen sind technisch gehaertet, Retrieval-Aliase und negative Referenzfragen liefern ehrlichere Confidence-Signale, Consumer-Hints und Budgetberichte sind fuer Folgeconsumer auswertbar, `export-view` bleibt mit Warmup-Cache unter unveraendertem SLO-Budget, Graph-RAG-Ops sind im Core-Graph sichtbar und die Handoffs zu V121/V137/V122/V124 trennen Viewer, Candidate-Provider, Memory/Ruflo und Produktsemantik klar vom Graph-RAG-Kern.
-10. `V121` (Lokaler Graph-RAG Viewer und Evidence-Dashboard) ist abgeschlossen: Der lokale Viewer konsumiert stabile, redigierte Graph-RAG-Evidence-Pakete read-only; Dashboard-, Safety-, Historical-, Fallback-, UI-Negativ- und Abschluss-Gates sind gruen. Die Nutzenmessung bestaetigt Dashboard-only als MVP, waehrend `Ask Repo` mangels marginalem Messvorteil optional experimentell bleibt.
-11. `V134` ist abgeschlossen: Plan Map trennt Intake-Drafts in Ideen, bereits geplante Drafts, Archivkandidaten, Bot-Training und Meta, ohne Source-of-Truth- oder Move-Pfade zu erweitern.
-12. `V122` (Repo-natives Agent-Memory und externe Ruflo-Orchestrierung) kann nach V119-Baseline eingeordnet werden; Graph-RAG-/Ruflo-Kontext darf nach `V120.99` nur mit eigenem Scope und Governance-Gate starten.
-13. `V124` (Wissensgraph Produktsemantik-Ausbau und Nutzwert-Ratchet) nach Graph-Frische und ersten produktnahen Harvest-Quellen aus V112/V96/V106/V113 einordnen.
-14. `V114` (SurfacePolicyPort fuer Demo- und Vollversionsgrenze), falls nach Abschlussabgleich noch Produktgrenzen nachzuziehen sind.
-15. `V96` als groesseren Boundary-/Legacy-Folgeblock nach den P1-Hardening- und Produktqualitaets-Schnitten einplanen.
-16. `V106` und `V113` als produktnahe Content-/Hangar-Folgeblocks einordnen, sobald kein P1-Hardening blockiert.
-17. `V130` ist kanonisch abgeschlossen: sechs neue Parcours-Maps, gestaffelte Arcade-Pool-Erweiterung und targeted Contract-/Start-Smokes sind gruen; Browser-Demo, GLB-/Asset-Setdressing und Preview-Scope bleiben bewusst unveraendert.
-18. `V132` (Android Arcade-Parcours Integration) kann nach kanonischem V130-Abschluss und idealerweise nach V131-Steuerungsbaseline eingeordnet werden; erster Slice bleibt kuratierter Android-Parcours statt vollstaendiger Desktop-Modusparitaet.
-19. `V135` ist abgeschlossen: Fokus-/Scrollsprung, kompakter Mobile-Start-CTA, Route-Kurzpfad und Landscape-/Small-Viewport-Regeln sind gruen; echtes Android-WebView-Geraet und APK/Install-Flow bleiben ausserhalb dieses Slices.
+Priorisierungsabgleich 2026-06-05: Die aktuelle Startempfehlung priorisiert erst Status-/Gate-Hygiene und danach kleine, pruefbare Produkt- oder Architektur-Slices. Hintergrund: `V132` ist im Master/Index noch `planned`, die Detailakte enthaelt aber `done`-Evidence; `docs:check` war vor dem Eintrag wegen drei Freshness-Stamps rot und wurde im Gate-Sync aktualisiert; `lint:architecture` bleibt wegen `MobileClassicApp.js` und `TouchInputSource.js` rot. Graph-, Plan- und Evidence-Gates waren fuer die Analyse ansonsten gruen.
 
-20. `V118` (Runtime-/UI-Entflechtung Slice 1) ist als geplanter Architektur-Folgeblock aufgenommen; erster Kandidat bleibt `UIStartSyncController` nach V116/V117.
-21. `V127` (Repo Map / Plan Map / Wissensgraph-Verankerung) ist als geplanter Repo-Tooling-Navigationsblock aufgenommen; V128/V129 bleiben separate V126-Handoff-Ideen.
-22. `V131` (Mobile Classic Steuerung Hardening) ist als geplanter Mobile-Folgeblock aufgenommen; Punkt-4-Layout-Personalisierung bleibt Nicht-Ziel.
-23. `V136` (Portabler Knowledge-Core fuer Memory und RAG) ist als geplanter P1-Kernel-Schnitt aufgenommen, ohne V120/V122 automatisch umzubauen.
-24. `V140` (Mobile God-File-Sunset) ist als geplanter Refactor-Folgeblock aufgenommen und nutzt die aktualisierte Draft-Evidence vom 2026-06-04 als Quelle.
-25. `V141` (Finding-, Plan- und Doku-Drift-Automatisierung) ist als geplanter Governance-Drift-Pilot aufgenommen.
-26. `V142` (Graph-Drift-Guard-Automatisierung) ist als geplanter Graph-Generated-Gate-Schutz aufgenommen; V77-Done-Glob-Freeze bleibt separater User-Gate.
-27. `V143` (Agent-Skills statt Regeltext) ist als geplanter Agent-Kontextreduktionsblock aus dem bisherigen TBD-Draft aufgenommen.
-28. `V144` (Future-Entscheidung JSON als Plan-Source-of-Truth) ist als geplanter Future-Entscheidungsblock aus dem bisherigen TBD-Draft aufgenommen; ein echter Autoritaetswechsel bleibt separater D3/D4-Gate.
+1. Status-/Gate-Hygiene vor neuer Featurearbeit: `V132` Master-vs-Detaildrift klaeren und Docs-Freshness bei Folgearbeit aktuell halten. Diese Schritte sind D3-planrelevant und duerfen keine Produktcode- oder Source-of-Truth-Migration nebenbei starten.
+2. `V140` als kleinster Gate-Recovery-Slice vor `V131`: zuerst verhaltensneutrale Extraktion aus `MobileClassicApp.js` und `TouchInputSource.js`, damit `lint:architecture` wieder erreichbar wird. Keine funktionale Touch-/Tilt-Aenderung in diesem Slice.
+3. `V131` danach als funktionale Mobile-Classic-Steuerungshaertung: Press-/Pause-/Tilt-/Orientation-Arbeit soll auf die durch `V140` vorbereiteten Zielmodule aufsetzen und nicht die Debt-Surfaces weiter aufblasen.
+4. `V118` bleibt der bevorzugte Architektur-Slice: `UIStartSyncController` kandidatenscharf gegen P14/P45, Consumer und kleinste Contract-/Runtime-Signale pruefen; Draft-/Intake-Altformulierungen in der aktiven Akte vor Umsetzung als Statusdrift behandeln.
+5. Produktspur: `V106` vor `V113`, weil GLB-Map-Varianz kleiner und weniger kollisionsreich ist. `V113` erst nach V76-Abgleich und nicht parallel zu `V118`/`V96`, da Start-Setup- und Hangar-Contracts geteilt werden.
+6. `V96` erst nach einem erfolgreichen kleinen Architektur-Proof (`V118`) oder als eng begrenzter Boundary-Slice; kein breiter Boundary-/Legacy-Block am Stueck.
+7. `V141` als kleiner WARN-Pilot fuer Finding-/Plan-/Doku-Drift, nicht als harter Source-of-Truth-Wechsel. Pilotfaelle: `V132`-Statusdrift, `docs:check`-Freshness und stale Finding-/Changelog-Signale.
+8. `V142` nach `V141`: Graph-Generated-Gate und CI/Hook-Schutz erst haerten, wenn Driftklassen und Warn-/Fail-Grenzen kalibriert sind.
+9. `V136` vor `V122`, falls AI-/Memory-Arbeit priorisiert wird: erst portabler Knowledge-Core/Kernelschnitt, danach repo-natives Memory; Ruflo/MCP bleibt spaeterer User-Gate.
+10. `V127`, `V143` und `V144` nur nach konkretem Nutzenbeweis: Repo-/Plan-Map-Navigation, Agent-Skill-Auslagerung und JSON-Source-of-Truth-Entscheidung bleiben nachrangig. `V144` bleibt explizit Future-Entscheidung; Markdown bleibt kanonisch bis separater D3/D4-Gate.
 
 ## Conflict-Log
 
