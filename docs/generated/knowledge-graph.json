@@ -2028,7 +2028,7 @@
       "id": "V132",
       "type": "block",
       "title": "Android Arcade-Parcours Integration",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2038,7 +2038,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "132.1",
+        "currentPhase": "132.99",
         "planFile": "docs/plaene/aktiv/V132.md",
         "scopeDeclarations": [
           "android-classic/app/build.gradle",

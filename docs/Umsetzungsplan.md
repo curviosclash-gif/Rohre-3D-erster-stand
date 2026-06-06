@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-06-05. Aktiver Lock: `-`; Startanker: `V121 121.99 abgeschlossen`; neue Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V140`-`V144` sind geplant; naechster Start gemaess Priorisierungsabgleich: erst Status-/Gate-Hygiene, dann kleine Produkt-/Architektur-Slices.
+Stand: 2026-06-06. Aktiver Lock: `-`; Startanker: `V132 132.99 abgeschlossen`; neue Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V140`-`V144` sind geplant; naechster Start gemaess Priorisierungsabgleich: kleiner `V140`-Gate-Recovery-Slice, dann kleine Produkt-/Architektur-Slices.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -88,7 +88,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V106 | Kuratierte GLB-Map-Varianz | planned | P2 | frei | - | 106.1 | `docs/plaene/aktiv/V106.md` |
 | V113 | Hangar Shell Productivierung und Rules Panel | planned | P2 | frei | V76.99,V103.99 | 113.1 | `docs/plaene/aktiv/V113.md` |
 | V130 | Kreatives Parcours Map Pack und Arcade-Routenvarianz | done | P2 | frei | V82.99,V108.99,V115.99 | 130.99 | `docs/plaene/aktiv/V130.md` |
-| V132 | Android Arcade-Parcours Integration | planned | P2 | frei | V82.99,V108.99,V130.99 | 132.1 | `docs/plaene/aktiv/V132.md` |
+| V132 | Android Arcade-Parcours Integration | done | P2 | frei | V82.99,V108.99,V130.99 | 132.99 | `docs/plaene/aktiv/V132.md` |
 | V135 | Mobile Menue UX-Hardening und Start-Setup-Kompaktmodus | done | P2 | frei | V132.99 | 135.99 | `docs/plaene/aktiv/V135.md` |
 | V118 | Runtime-/UI-Entflechtung Slice 1 | planned | P2 | frei | V116.99,V117.99 | 118.1 | `docs/plaene/aktiv/V118.md` |
 | V127 | Repo Map Gesamtuebersicht, Plan-Map-Abhaengigkeiten und Wissensgraph-Verankerung | planned | P2 | frei | V107.99,V110.99,V111.99 | 127.1 | `docs/plaene/aktiv/V127.md` |
@@ -242,7 +242,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V112 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; Spielaudit-/Playtest-Hardening gruen, T20ba-Seitenfund dokumentiert |
 | - | V113 | - | frei | Geplant |
 | - | V130 | 2026-05-20 | closed | Abgeschlossen 2026-05-20; sechs Parcours-Maps, gestaffelter Arcade-Pool und targeted Map-Pack-Smokes gruen |
-| - | V132 | - | frei | Geplant; Android Arcade-Parcours nach V82/V108 und kanonischem V130-Abschluss |
+| - | V132 | 2026-05-21 | closed | Abgeschlossen 2026-05-21; Master-/Index-Statusdrift am 2026-06-06 nach aktiver Detailakte synchronisiert |
 | - | V135 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Fokus-/Scrollsprung, kompakter Start-Setup-CTA und Mobile-Route-Auswahl gruen |
 | - | V118 | - | frei | Geplant |
 | - | V127 | - | frei | Geplant |
@@ -256,18 +256,17 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 ## Empfohlene Reihenfolge
 
-Priorisierungsabgleich 2026-06-05: Die aktuelle Startempfehlung priorisiert erst Status-/Gate-Hygiene und danach kleine, pruefbare Produkt- oder Architektur-Slices. Hintergrund: `V132` ist im Master/Index noch `planned`, die Detailakte enthaelt aber `done`-Evidence; `docs:check` war vor dem Eintrag wegen drei Freshness-Stamps rot und wurde im Gate-Sync aktualisiert; `lint:architecture` bleibt wegen `MobileClassicApp.js` und `TouchInputSource.js` rot. Graph-, Plan- und Evidence-Gates waren fuer die Analyse ansonsten gruen.
+Priorisierungsabgleich 2026-06-06: Die V132-Statusdrift ist geklaert; Master/Index folgen der aktiven Detailakte (`done`, `132.99`) und Docs-Freshness wurde im Gate-Sync nachgezogen. `lint:architecture` bleibt wegen `MobileClassicApp.js` und `TouchInputSource.js` rot; der naechste kleine Umsetzungsschnitt soll deshalb Gate-Recovery vor weiterer Mobile-Funktionalitaet priorisieren.
 
-1. Status-/Gate-Hygiene vor neuer Featurearbeit: `V132` Master-vs-Detaildrift klaeren und Docs-Freshness bei Folgearbeit aktuell halten. Diese Schritte sind D3-planrelevant und duerfen keine Produktcode- oder Source-of-Truth-Migration nebenbei starten.
-2. `V140` als kleinster Gate-Recovery-Slice vor `V131`: zuerst verhaltensneutrale Extraktion aus `MobileClassicApp.js` und `TouchInputSource.js`, damit `lint:architecture` wieder erreichbar wird. Keine funktionale Touch-/Tilt-Aenderung in diesem Slice.
-3. `V131` danach als funktionale Mobile-Classic-Steuerungshaertung: Press-/Pause-/Tilt-/Orientation-Arbeit soll auf die durch `V140` vorbereiteten Zielmodule aufsetzen und nicht die Debt-Surfaces weiter aufblasen.
-4. `V118` bleibt der bevorzugte Architektur-Slice: `UIStartSyncController` kandidatenscharf gegen P14/P45, Consumer und kleinste Contract-/Runtime-Signale pruefen; Draft-/Intake-Altformulierungen in der aktiven Akte vor Umsetzung als Statusdrift behandeln.
-5. Produktspur: `V106` vor `V113`, weil GLB-Map-Varianz kleiner und weniger kollisionsreich ist. `V113` erst nach V76-Abgleich und nicht parallel zu `V118`/`V96`, da Start-Setup- und Hangar-Contracts geteilt werden.
-6. `V96` erst nach einem erfolgreichen kleinen Architektur-Proof (`V118`) oder als eng begrenzter Boundary-Slice; kein breiter Boundary-/Legacy-Block am Stueck.
-7. `V141` als kleiner WARN-Pilot fuer Finding-/Plan-/Doku-Drift, nicht als harter Source-of-Truth-Wechsel. Pilotfaelle: `V132`-Statusdrift, `docs:check`-Freshness und stale Finding-/Changelog-Signale.
-8. `V142` nach `V141`: Graph-Generated-Gate und CI/Hook-Schutz erst haerten, wenn Driftklassen und Warn-/Fail-Grenzen kalibriert sind.
-9. `V136` vor `V122`, falls AI-/Memory-Arbeit priorisiert wird: erst portabler Knowledge-Core/Kernelschnitt, danach repo-natives Memory; Ruflo/MCP bleibt spaeterer User-Gate.
-10. `V127`, `V143` und `V144` nur nach konkretem Nutzenbeweis: Repo-/Plan-Map-Navigation, Agent-Skill-Auslagerung und JSON-Source-of-Truth-Entscheidung bleiben nachrangig. `V144` bleibt explizit Future-Entscheidung; Markdown bleibt kanonisch bis separater D3/D4-Gate.
+1. `V140` als kleinster Gate-Recovery-Slice vor `V131`: zuerst verhaltensneutrale Extraktion aus `MobileClassicApp.js` und `TouchInputSource.js`, damit `lint:architecture` wieder erreichbar wird. Keine funktionale Touch-/Tilt-Aenderung in diesem Slice.
+2. `V131` danach als funktionale Mobile-Classic-Steuerungshaertung: Press-/Pause-/Tilt-/Orientation-Arbeit soll auf die durch `V140` vorbereiteten Zielmodule aufsetzen und nicht die Debt-Surfaces weiter aufblasen.
+3. `V118` bleibt der bevorzugte Architektur-Slice: `UIStartSyncController` kandidatenscharf gegen P14/P45, Consumer und kleinste Contract-/Runtime-Signale pruefen; Draft-/Intake-Altformulierungen in der aktiven Akte vor Umsetzung als Statusdrift behandeln.
+4. Produktspur: `V106` vor `V113`, weil GLB-Map-Varianz kleiner und weniger kollisionsreich ist. `V113` erst nach V76-Abgleich und nicht parallel zu `V118`/`V96`, da Start-Setup- und Hangar-Contracts geteilt werden.
+5. `V96` erst nach einem erfolgreichen kleinen Architektur-Proof (`V118`) oder als eng begrenzter Boundary-Slice; kein breiter Boundary-/Legacy-Block am Stueck.
+6. `V141` als kleiner WARN-Pilot fuer Finding-/Plan-/Doku-Drift, nicht als harter Source-of-Truth-Wechsel. Pilotfaelle: Docs-Freshness, stale Finding-/Changelog-Signale und kuenftige Master-vs-Detail-Statusdrift.
+7. `V142` nach `V141`: Graph-Generated-Gate und CI/Hook-Schutz erst haerten, wenn Driftklassen und Warn-/Fail-Grenzen kalibriert sind.
+8. `V136` vor `V122`, falls AI-/Memory-Arbeit priorisiert wird: erst portabler Knowledge-Core/Kernelschnitt, danach repo-natives Memory; Ruflo/MCP bleibt spaeterer User-Gate.
+9. `V127`, `V143` und `V144` nur nach konkretem Nutzenbeweis: Repo-/Plan-Map-Navigation, Agent-Skill-Auslagerung und JSON-Source-of-Truth-Entscheidung bleiben nachrangig. `V144` bleibt explizit Future-Entscheidung; Markdown bleibt kanonisch bis separater D3/D4-Gate.
 
 ## Conflict-Log
 

@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated": "2026-06-05",
+  "updated": "2026-06-06",
   "start_anchor": {
-    "block": "V121",
-    "phase": "121.99",
+    "block": "V132",
+    "phase": "132.99",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -827,7 +827,7 @@
     {
       "id": "V132",
       "title": "Android Arcade-Parcours Integration",
-      "status": "planned",
+      "status": "done",
       "priority": "P2",
       "owner": "frei",
       "workstream": "android-mobile",
@@ -836,13 +836,13 @@
         "V108.99",
         "V130.99"
       ],
-      "current_phase": "132.1",
+      "current_phase": "132.99",
       "plan_file": "docs/plaene/aktiv/V132.md",
       "lock": {
-        "status": "frei",
+        "status": "closed",
         "agent": "-",
-        "start_date": "-",
-        "target": "Geplant; Android Arcade-Parcours nach V82/V108 und kanonischem V130-Abschluss",
+        "start_date": "2026-05-21",
+        "target": "Abgeschlossen 2026-05-21; Master-/Index-Statusdrift am 2026-06-06 nach aktiver Detailakte synchronisiert",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

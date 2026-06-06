@@ -6,6 +6,14 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V132 Status-Sync 2026-06-06
+
+- Nach User-Gate wurde die Master-/Index-Statusdrift fuer `V132` bereinigt: `docs/Umsetzungsplan.md` folgt jetzt der aktiven Detailakte `docs/plaene/aktiv/V132.md` mit Status `done`, Phase `132.99` und geschlossenem Lock-Hinweis.
+- Begruendung: `V132.md` enthaelt vollstaendige Abschluss-Evidence bis `132.99`; Master und generierter Index standen noch auf `planned`/`132.1` und blockierten damit die Folgepriorisierung kuenstlich.
+- Evidence: `npm run guard:main`, `npm run plan:check`, `npm run lock:validate` und `npm run plan:index:check` vor dem Sync -> PASS; `npm run docs:check` vor dem Sync -> FAIL wegen 3 Freshness-Stamps; `npm run graph:build` wurde nach User-Freigabe noetig, weil `graph:check` den Master-Sync als Generated-Drift erkannte; `npm run gates:pre-commit` nach Sync -> PASS.
+- Residual-risk: Es wurde keine Android-Device-Nachpruefung nachgeholt; der Sync uebernimmt die Not-checked-Grenzen aus der aktiven V132-Akte.
+- Not-checked: keine Produktcode-Aenderung, keine Runtime-/Android-/Touch-Dateien, keine Vollsuite, keine neue Source-of-Truth-Migration.
+
 ## Priorisierungsabgleich 2026-06-05 (offene V-Bloecke)
 
 - Nach User-Auftrag wurde die tiefere read-only Analyse offener V-Bloecke in die empfohlene Reihenfolge des Master-Index eingetragen: erst `V132`-Statusdrift, dann ein kleiner `V140`-Gate-Recovery-Slice, danach `V131`, `V118`, `V106`, `V113`, `V96` und erst spaeter die gestaffelten Meta-/AI-Bloecke.
