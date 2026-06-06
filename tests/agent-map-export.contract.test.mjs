@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
 
 import { buildAgentMapData } from '../scripts/export-agent-map.mjs';
 import { buildKnowledgeGraph } from '../scripts/build-knowledge-graph.mjs';
@@ -69,4 +70,14 @@ test('agent governance is represented in the knowledge graph mapping source', as
   assert.ok(edges.has('runtime:agent-map-export->state:agent-map-readonly-dataset:writes_state'));
   assert.ok(edges.has('runtime:agent-map-viewer->state:agent-map-readonly-dataset:reads_state'));
   assert.ok(edges.has('config:agent-governance-entrypoint->config:agent-rule-planning-and-governance:reads_config'));
+});
+
+test('agent map layout supports embedded mid-width desktop frames', async () => {
+  const css = await fs.readFile(new URL('../tools/agent-map/viewer.css', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(css, /min-width:\s*1040px/);
+  assert.match(css, /grid-template-columns:\s*minmax\(220px,\s*286px\)\s+minmax\(0,\s*1fr\)\s+minmax\(280px,\s*372px\)/);
+  assert.match(css, /@media\s*\(max-width:\s*1180px\)/);
+  assert.match(css, /grid-template-columns:\s*minmax\(220px,\s*260px\)\s+minmax\(0,\s*1fr\)/);
+  assert.match(css, /\.detail-panel\s*\{[^}]*grid-column:\s*1\s*\/\s*-1/s);
 });
