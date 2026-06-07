@@ -1,6 +1,6 @@
 # AI Project Onboarding (Aktiv)
 
-Stand: 2026-06-06
+Stand: 2026-06-07
 
 Diese Datei ist ein Referenz-Einstieg fuer KI-Assistenz in diesem Repository.
 Operativ fuehrend bleibt `AGENTS.md` mit den passenden Rules und Workflows.

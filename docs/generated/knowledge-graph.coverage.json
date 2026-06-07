@@ -186,11 +186,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2126,
-    "rawCoveredFileCount": 1368,
-    "rawCoveragePercent": 64.3,
-    "adjustedTrackedFileCount": 1437,
-    "adjustedCoveredFileCount": 1132,
+    "trackedFileCount": 2127,
+    "rawCoveredFileCount": 1369,
+    "rawCoveragePercent": 64.4,
+    "adjustedTrackedFileCount": 1438,
+    "adjustedCoveredFileCount": 1133,
     "adjustedCoveragePercent": 78.8,
     "uncoveredFileCount": 758,
     "uncoveredActiveFileCount": 305,
@@ -264,8 +264,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 341,
-        "coveredCount": 189
+        "count": 342,
+        "coveredCount": 190
       },
       {
         "classification": "prototype",
@@ -14990,6 +14990,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Fallow_Code_Intelligence_Pilot_V145.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

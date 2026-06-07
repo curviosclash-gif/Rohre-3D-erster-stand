@@ -3268,7 +3268,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 355,
+          "concreteCount": 356,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -37883,6 +37883,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Fallow_Code_Intelligence_Pilot_V145.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -105858,6 +105873,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Fallow_Code_Intelligence_Pilot_V145.md",
       "type": "scope",
       "hint": null,
       "attributes": {
