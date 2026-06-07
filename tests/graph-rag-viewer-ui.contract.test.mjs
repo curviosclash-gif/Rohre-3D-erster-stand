@@ -136,3 +136,13 @@ test('viewer and chat surfaces keep write actions outside the static UI', async 
     assert.match(chatSource, /writesAllowed:\s*false/);
     assert.doesNotMatch(chatSource, /docs\/plaene\/aktiv\/.*writeFile|data\/contracts\/.*writeFile/);
 });
+
+test('viewer layout stays readable below the former desktop minimum width', async () => {
+    const css = await fs.readFile(path.join(ROOT, 'tools/graph-rag-viewer/viewer.css'), 'utf8');
+
+    assert.doesNotMatch(css, /min-width:\s*1024px/);
+    assert.match(css, /\.topbar\s*\{[^}]*flex-wrap:\s*wrap/s);
+    assert.match(css, /grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(120px,\s*1fr\)\)/);
+    assert.match(css, /@media\s*\(max-width:\s*760px\)/);
+    assert.match(css, /\.two-column,[\s\S]*\.chat-toolbar\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+});

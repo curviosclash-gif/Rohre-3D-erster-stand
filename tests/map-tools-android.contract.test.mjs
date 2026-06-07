@@ -124,11 +124,17 @@ test('Map Tools Android shell keeps phone viewports inside the app frame', async
   assert.match(shellCss, /\.plan-filter-strip/);
   assert.match(shellCss, /\.plan-filter-strip\[hidden\]/);
   assert.match(planCss, /@media \(max-width: 760px\)/);
+  assert.doesNotMatch(planCss, /min-width:\s*(?:980|760)px/);
+  assert.match(planCss, /@media \(max-width: 1180px\)/);
+  assert.match(planCss, /grid-template-columns: repeat\(5, minmax\(0, 1fr\)\)/);
+  assert.match(planCss, /\.block-row\s*\{[\s\S]*grid-template-columns: 50px minmax\(0, 1fr\)/);
+  assert.match(planCss, /\.block-badges\s*\{[\s\S]*grid-column: 2;[\s\S]*flex-wrap: wrap/);
   assert.match(planCss, /overflow-x: hidden/);
   assert.match(planCss, /grid-template-columns: minmax\(0, 1fr\)/);
   assert.match(planCss, /#mapView\s*\{[\s\S]*overflow: auto/);
   assert.match(planCss, /\.plan-svg\s*\{[\s\S]*min-width: 0/);
   assert.match(repoCss, /@media \(max-width: 640px\)/);
+  assert.doesNotMatch(repoCss, /min-height:\s*calc\(100vh - 68px\)/);
 });
 
 test('Map Tools Android launcher icon uses map-specific adaptive assets', async () => {

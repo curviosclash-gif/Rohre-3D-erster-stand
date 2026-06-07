@@ -24,7 +24,6 @@
 
 body {
   margin: 0;
-  min-width: 1024px;
   background: var(--bg);
   color: var(--ink);
 }
@@ -46,7 +45,9 @@ select {
 }
 
 .topbar {
+  flex-wrap: wrap;
   justify-content: space-between;
+  gap: 14px;
   min-height: 76px;
   padding: 14px 20px;
   border-bottom: 1px solid var(--line);
@@ -85,6 +86,8 @@ h3 {
 }
 
 .toolbar {
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 10px;
 }
 
@@ -223,7 +226,7 @@ h3 {
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 10px;
   margin-bottom: 14px;
 }
@@ -414,11 +417,36 @@ code {
 }
 
 @media (max-width: 1180px) {
+  .topbar,
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .source-meta {
+    max-width: none;
+  }
+
   .metric-grid {
-    grid-template-columns: repeat(3, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   }
 
   .chat-toolbar {
-    grid-template-columns: 180px minmax(320px, 1fr);
+    grid-template-columns: minmax(160px, 180px) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    padding: 12px;
+  }
+
+  .app-shell {
+    padding: 12px;
+  }
+
+  .two-column,
+  .chat-toolbar {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

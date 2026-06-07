@@ -27,7 +27,6 @@
 
 body {
   margin: 0;
-  min-width: 980px;
   min-height: 100vh;
   overflow: hidden;
   background: var(--bg);
@@ -728,7 +727,7 @@ h1 {
 .plan-svg {
   display: block;
   width: 100%;
-  height: calc(100vh - 244px);
+  height: 100%;
   min-height: 520px;
   background:
     linear-gradient(90deg, rgba(31, 39, 35, 0.04) 1px, transparent 1px),
@@ -1661,11 +1660,55 @@ th {
 
 @media (max-width: 1180px) {
   body {
-    min-width: 760px;
+    min-width: 0;
+  }
+
+  .topbar,
+  .top-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .file-control {
+    display: none;
+  }
+
+  .source-meta {
+    white-space: normal;
+  }
+
+  .segmented {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .segmented button {
+    min-width: 0;
+    padding: 0 6px;
+  }
+
+  #focusToggle {
+    width: 100%;
   }
 
   .workspace {
-    grid-template-columns: 250px minmax(420px, 1fr);
+    grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
+  }
+
+  .sidebar {
+    overflow-x: hidden;
+  }
+
+  .block-row {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: 50px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .block-badges {
+    grid-column: 2;
+    flex-wrap: wrap;
   }
 
   .legend-strip {
@@ -1682,7 +1725,7 @@ th {
   }
 
   .metrics-strip {
-    grid-template-columns: repeat(3, minmax(112px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   }
 
   .decision-bar {
@@ -1743,7 +1786,6 @@ th {
   }
 
   .segmented {
-    display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
@@ -1863,16 +1905,11 @@ th {
   }
 
   .block-row {
-    width: 100%;
-    min-width: 0;
-    grid-template-columns: 50px minmax(0, 1fr);
-    gap: 8px;
     min-height: 50px;
     padding: 9px 10px;
   }
 
   .block-badges {
-    grid-column: 2;
     min-width: 0;
   }
 

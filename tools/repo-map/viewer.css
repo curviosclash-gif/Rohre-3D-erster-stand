@@ -190,7 +190,7 @@ h1 {
 
 .sidebar,
 .detail-panel {
-  min-height: calc(100vh - 68px);
+  min-height: 0;
   background: #ffffff;
   border-right: 1px solid var(--line);
   overflow: auto;
