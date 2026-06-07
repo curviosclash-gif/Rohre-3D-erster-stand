@@ -23,7 +23,7 @@ description: Verify docs/workflows/rules are current with an automated gate.
 // turbo
 - `npm run plan:check`
 - `npm run docs:check`
-- Read `docs/prozess/Dokumentationsstatus.md`.
+- `docs:check` ist read-only und schreibt `docs/prozess/Dokumentationsstatus.md` nicht neu. Den Report nur als Evidence des letzten `docs:sync` lesen; bei gemeldeten Pending-Updates ist die aktuelle Konsolenausgabe massgeblich.
 
 ## 3. If check fails
 
@@ -34,7 +34,7 @@ description: Verify docs/workflows/rules are current with an automated gate.
 
 - `npm run plan:check` PASS.
 - `npm run docs:check` PASS.
-- `docs/prozess/Dokumentationsstatus.md` has current date and no blocking issues.
+- Nach einem erforderlichen `/aktualitaet-sync`: `docs/prozess/Dokumentationsstatus.md` hat das aktuelle Datum und keine blockierenden Issues. Bei einem reinen Check ohne Drift genuegt `docs:check` PASS; der Report darf aeltere Sync-Evidence enthalten.
 - Product positioning is consistent: desktop app primary, online/browser demo secondary.
 
 ## Report

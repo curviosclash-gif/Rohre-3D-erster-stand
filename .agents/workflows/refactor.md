@@ -30,10 +30,12 @@ description: Restructure code without changing behavior.
 - If refactor touches plans/workflows/rules: `npm run plan:check`.
 - `npm run docs:sync && npm run docs:check`.
 
-## 4. Commit (see AGENTS.md section Commit Convention)
+## 4. Commit
+
+- Git-Policy: `.agents/rules/git_and_commits.md`.
 
 - `git add [scoped-files]` -> `refactor: [scope] - [reason]`
-- Verify scope: `git diff --name-only`.
+- Verify staged scope: `git diff --cached --name-only`; remaining worktree changes via `git status --short`.
 
 ## Report
 

@@ -37,11 +37,13 @@ description: Detect and retire dead code/files with replacement-proof and safe d
 - Delete only `duplicate-backed` items or paths with proven productive replacement; keep or mark everything else as `legacy`, `compatibility path`, `shim`, or `plan-drift`.
 - Re-run relevant tests only after explicit user request; otherwise list the recommended manual test command for the user.
 
-## 5. Commit (see AGENTS.md section Commit Convention)
+## 5. Commit
+
+- Git-Policy: `.agents/rules/git_and_commits.md`.
 
 - Wenn die freigegebenen Cleanup-Aenderungen umgesetzt und nachvollziehbar eingegrenzt sind, Commit im selben Turn erstellen.
 - `git add [approved-files]` -> `chore: cleanup - remove dead code/files`
-- Verify scope: `git diff --name-only`.
+- Verify staged scope: `git diff --cached --name-only`; remaining worktree changes via `git status --short`.
 
 ## Report
 

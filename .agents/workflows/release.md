@@ -25,11 +25,12 @@ description: Prepare and publish a safe release.
 - `npm run docs:sync && npm run docs:check`
 - Ensure release notes and plan status are date-accurate and reflect the desktop-first / online-demo product positioning.
 
-## 4. Tag and push (see AGENTS.md section Commit Convention)
+## 4. Tag and push
 
+- Git-Policy: `.agents/rules/git_and_commits.md`.
 - `git add [release-files]` -> `release: v[X.Y.Z]`
 - `git tag -a v[X.Y.Z] -m "Release v[X.Y.Z]"`
-- Verify scope before push.
+- Verify staged scope via `git diff --cached --name-only` and remaining worktree changes via `git status --short` before push.
 
 ## Report
 

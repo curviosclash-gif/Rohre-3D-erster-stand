@@ -62,10 +62,10 @@ description: Koordinations-Workflow fuer Paararbeit ohne Merge-Konflikte
 ## FAQ
 
 **F: Was wenn ich meine Phase nicht zeitig fertig werde?**
-A: `docs/lock-status/<person>.json` aktualisieren oder `lock:advance`/`lock:release` sauber nachziehen.
+A: Bevorzugt `lock:advance` oder `lock:release` sauber nachziehen. Einen manuellen Edit von `docs/lock-status/<person>.json` nur verwenden, wenn das Lock-Tooling den Sonderfall nicht abbildet; danach immer `npm run lock:validate`.
 
 **F: Darf ich Lock-Files direkt editieren?**
-A: Ja, aber danach `npm run lock:validate` ausfuehren.
+A: Nur als begruendeten Fallback, wenn `lock:claim`, `lock:advance` oder `lock:release` den Sonderfall nicht abbilden. Danach `npm run lock:validate` ausfuehren; Agents bevorzugen immer das Lock-Tooling.
 
 **F: Wo ist der operative Lock-Wahrheitsraum?**
 A: In `docs/lock-status/*.json` (plus `_locks-registry.json` als generierter Merge).

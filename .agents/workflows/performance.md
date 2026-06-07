@@ -26,10 +26,11 @@ description: Measure baseline, optimize bottlenecks, and verify impact.
 // turbo
 - Re-run the baseline scenario only after explicit user request. Otherwise report expected impact and the benchmark command the user should run.
 
-## 5. Commit (see AGENTS.md §Commit Convention)
+## 5. Commit
 
-- `git add [scoped-files]` → `perf: [short reason]`
-- Verify scope: `git diff --name-only`.
+- Git-Policy: `.agents/rules/git_and_commits.md`.
+- `git add [scoped-files]` -> `perf: [short reason]`
+- Verify staged scope: `git diff --cached --name-only`; remaining worktree changes via `git status --short`.
 
 ## Report
 

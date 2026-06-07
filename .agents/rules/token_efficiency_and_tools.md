@@ -37,10 +37,11 @@ description: Token efficiency, file access, and tool usage (consolidated)
 
 ## File Access (Harness-Tools)
 
-- Datei-Suche: `Glob` (z. B. `src/**/*.js`) statt `rg --files` oder `find`.
-- Inhalts-Suche: `Grep` (ripgrep-basiert) statt `rg` im Bash.
-- Lesen: `Read` mit `offset`/`limit` fuer grosse Dateien statt `cat`/`head`/`tail`.
-- Bearbeiten: `Edit`/`Write` statt `sed`/`awk`.
+- Bevorzuge strukturierte Harness-Tools, wenn sie in der aktuellen Agentenoberflaeche verfuegbar sind; nutze sonst das engste gleichwertige lokale Werkzeug.
+- Datei-Suche: bevorzugt `Glob`; als Fallback `rg --files` oder eine gezielte native Dateisuche.
+- Inhalts-Suche: bevorzugt `Grep` (ripgrep-basiert); als Fallback `rg` oder eine gezielte native Textsuche.
+- Lesen: bevorzugt `Read` mit `offset`/`limit`; als Fallback gezielte Zeilenbereiche statt kompletter grosser Dateien.
+- Bearbeiten: bevorzugt strukturierte Edit-Tools wie `Edit`/`Write` oder `apply_patch`; Shell-Rewrites nur fuer klar begrenzte mechanische Aenderungen.
 - Nur gezielte Abschnitte grosser Dateien laden; fuer `docs/plaene/aktiv/VXX.md` nur aktuelle + naechste Subphase lesen.
 - Query-Shortcuts fuer den Graph: `node scripts/query-knowledge-graph.mjs open-deps V81 --json`, `node scripts/query-knowledge-graph.mjs scope-collisions --json`, `node scripts/query-knowledge-graph.mjs surfaces-for-file src/core/main.js --json`, `node scripts/query-knowledge-graph.mjs impact-for-file src/core/SettingsManager.js --json`, `node scripts/query-knowledge-graph.mjs event-flow spawn`, `node scripts/query-knowledge-graph.mjs critical-path-health`, `node scripts/query-knowledge-graph.mjs coverage-report`.
 
@@ -52,7 +53,7 @@ description: Token efficiency, file access, and tool usage (consolidated)
 
 ## Tool Usage
 
-- Turbo Default: sichere Read-only-Kommandos (`git log`, `git status`, `Grep`/`Glob`, `npm run docs:check`) ohne User-Nachfrage ausfuehren.
+- Turbo Default: sichere Read-only-Kommandos (`git log`, `git status`, strukturierte Suche oder gleichwertige Fallbacks, `npm run docs:check`) ohne User-Nachfrage ausfuehren.
 - Safe Commands implizit ausfuehren - User nicht um Erlaubnis fragen.
 - Docs-Drift: `npm run docs:sync` + `npm run docs:check` nur bei Docs-/Governance-/Graph-Scope oder explizitem Drift-Verdacht.
 - Lieber leichte Inspection-/Build-Kommandos als Voll-Test-Suites (Tests sind user-owned, siehe `planning_and_governance.md`).

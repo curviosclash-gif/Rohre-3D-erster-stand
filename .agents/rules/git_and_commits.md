@@ -23,7 +23,7 @@ description: Git safety, branch enforcement, and commit policy (consolidated)
 ## Commit Policy
 
 - On Windows before staging, run `npm run git:acl:heal` once per commit cycle to clear recurring `.git/index.lock` ACL denies.
-- Stage only scoped files (`git add [files]`); verify via `git diff --name-only`. Niemals `git add .` oder `git add -A`.
+- Stage only scoped files (`git add [files]`); verify staged scope via `git diff --cached --name-only` and remaining worktree changes via `git status --short`. Niemals `git add .` oder `git add -A`.
 - Commits folgen fachlichen Delivery-Slices: zusammengehoerige Aenderungen (`code + passende tests + minimale scope-doku`) duerfen und sollen in einem scoped Commit landen.
 - Sobald eine Aufgabe, Subphase oder ein Workflow nach Verifikation fachlich abgeschlossen ist und geaenderte Repo-Dateien im Scope vorliegen, wird im selben Turn standardmaessig commitet.
 - Kein bewusst offen gelassener eigener Worktree am Task-Ende, ausser der User fordert explizit nur Vorarbeit ohne Commit an, es fehlt noch notwendige Verifikation, oder mehrere Aenderungsstraenge sind noch nicht sauber trennbar.
