@@ -10,6 +10,18 @@ import {
     normalizeMobileClassicTiltSensitivity,
 } from '../shared/contracts/MobileClassicControlsContract.js';
 import {
+    applyTouchButtonVisualState,
+    applyTouchControlsVisibility,
+    createTouchButtonElements,
+    createTouchJoystickElements,
+    createTouchTiltControlElements,
+    positionFloatingJoystick,
+    resolveTouchButtonDefinitions,
+    restoreJoystickHomePosition,
+    shouldStartFloatingJoystick,
+    TOUCH_CONTROL_MODES,
+} from './touch/TouchControlLayoutOps.js';
+import {
     deriveTiltSteeringState,
     TILT_DEFAULT_CURVE_EXPONENT,
     TILT_DEFAULT_DEADZONE_DEG,
@@ -24,11 +36,10 @@ export {
     deriveTiltSteeringState,
     resolveTiltCalibrationNeutral,
 } from './touch/TouchTiltSteeringOps.js';
-
-export const TOUCH_CONTROL_MODES = Object.freeze({
-    JOYSTICK: 'joystick',
-    TILT: 'tilt',
-});
+export {
+    resolveTouchButtonDefinitions,
+    TOUCH_CONTROL_MODES,
+} from './touch/TouchControlLayoutOps.js';
 
 const TILT_DEFAULT_SMOOTHING = 0.24;
 const TILT_DEFAULT_RELEASE_THRESHOLD = 0.015;
@@ -37,29 +48,6 @@ const TILT_EVENT_STALE_MS = 1600;
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
-
-const JOYSTICK_BUTTON_DEFINITIONS = Object.freeze([
-    Object.freeze({ id: 'fire', label: 'FIRE', bottom: '36%', right: '5%', size: 62 }),
-    Object.freeze({ id: 'useItem', label: 'USE', bottom: '20%', right: '5%', size: 62 }),
-    Object.freeze({ id: 'shootMG', label: 'MG', bottom: '36%', right: '20%', size: 54 }),
-    Object.freeze({ id: 'nextItem', label: 'NEXT', bottom: '20%', right: '20%', size: 54 }),
-    Object.freeze({ id: 'boost', label: 'BOOST', bottom: '52%', right: '12%', size: 54 }),
-]);
-
-const TILT_BUTTON_DEFINITIONS = Object.freeze([
-    Object.freeze({ id: 'fire', label: 'SCHUSS', bottom: '9%', right: '6%', size: 86 }),
-    Object.freeze({ id: 'useItem', label: 'ITEM', bottom: '9%', right: '35%', size: 58 }),
-    Object.freeze({ id: 'nextItem', label: 'NXT', bottom: '9%', right: '52%', size: 52 }),
-    Object.freeze({ id: 'boost', label: 'BOOST', bottom: '24%', right: '24%', size: 56 }),
-]);
-
-const MOBILE_ARCADE_PAUSE_BUTTON_DEFINITION = Object.freeze({
-    id: 'pause',
-    label: 'PAUSE',
-    top: 'max(14px, env(safe-area-inset-top))',
-    right: 'max(14px, env(safe-area-inset-right))',
-    size: 58,
-});
 
 function formatAxisValue(value) {
     const numeric = Number(value);
@@ -70,17 +58,6 @@ function formatAxisValue(value) {
 function formatSensorHz(value) {
     const numeric = Number(value);
     return Number.isFinite(numeric) && numeric > 0 ? `${numeric.toFixed(0)}Hz` : '--Hz';
-}
-
-export function resolveTouchButtonDefinitions(controlMode = TOUCH_CONTROL_MODES.JOYSTICK, options = {}) {
-    const definitions = controlMode === TOUCH_CONTROL_MODES.TILT
-        ? TILT_BUTTON_DEFINITIONS
-        : JOYSTICK_BUTTON_DEFINITIONS;
-    const resolved = definitions.map((definition) => ({ ...definition }));
-    if (options?.includePauseButton === true) {
-        resolved.push({ ...MOBILE_ARCADE_PAUSE_BUTTON_DEFINITION });
-    }
-    return resolved;
 }
 
 /**
@@ -205,51 +182,16 @@ export class TouchInputSource extends PlayerInputSource {
         this._containerEl = container || document.getElementById('touch-controls') || document.body;
         this._containerEl.dataset.touchControlMode = this._controlMode;
 
-        this._joystickEl = document.createElement('div');
-        this._joystickEl.className = 'touch-joystick';
-        this._joystickEl.style.cssText = `
-            position: fixed; bottom: 20%; left: 5%;
-            width: ${this._joystickRadius * 2}px; height: ${this._joystickRadius * 2}px;
-            border-radius: 50%; border: 2px solid rgba(255,255,255,0.4);
-            background: rgba(0,0,0,0.2); touch-action: none; z-index: 1000;
-        `;
-        this._joystickKnobEl = document.createElement('div');
-        this._joystickKnobEl.className = 'touch-joystick-knob';
-        this._joystickKnobEl.style.cssText = `
-            position: absolute; top: 50%; left: 50%;
-            width: 40px; height: 40px; margin: -20px 0 0 -20px;
-            border-radius: 50%; background: rgba(255,255,255,0.6);
-        `;
-        this._joystickEl.appendChild(this._joystickKnobEl);
-        this._containerEl.appendChild(this._joystickEl);
-
-        const buttonDefs = this._resolveButtonDefinitions();
-
-        for (const def of buttonDefs) {
-            const size = Number(def.size) || 60;
-            const verticalPosition = def.top
-                ? `top: ${def.top};`
-                : `bottom: ${def.bottom};`;
-            const horizontalPosition = def.left
-                ? `left: ${def.left};`
-                : `right: ${def.right};`;
-            const btn = document.createElement('div');
-            btn.className = `touch-button touch-button-${def.id}`;
-            btn.dataset.action = def.id;
-            btn.dataset.baseLabel = def.label;
-            btn.textContent = def.label;
-            btn.style.cssText = `
-                position: fixed; ${verticalPosition} ${horizontalPosition}
-                width: ${size}px; height: ${size}px; border-radius: 50%;
-                border: 2px solid rgba(255,255,255,0.4); background: rgba(0,0,0,0.3);
-                color: white; display: flex; align-items: center; justify-content: center;
-                font-size: 11px; font-weight: bold; touch-action: none;
-                user-select: none; z-index: 1000;
-                transition: opacity 120ms ease, transform 120ms ease, border-color 120ms ease;
-            `;
-            this._containerEl.appendChild(btn);
-            this._buttonEls[def.id] = btn;
-        }
+        const joystick = createTouchJoystickElements({
+            containerEl: this._containerEl,
+            joystickRadius: this._joystickRadius,
+        });
+        this._joystickEl = joystick.joystickEl;
+        this._joystickKnobEl = joystick.joystickKnobEl;
+        this._buttonEls = createTouchButtonElements({
+            containerEl: this._containerEl,
+            buttonDefinitions: this._resolveButtonDefinitions(),
+        });
 
         if (this._controlMode === TOUCH_CONTROL_MODES.TILT) {
             this._createTiltControlUI();
@@ -272,31 +214,12 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     _createTiltControlUI() {
-        this._tiltButtonEl = document.createElement('button');
-        this._tiltButtonEl.type = 'button';
-        this._tiltButtonEl.className = 'touch-tilt-button';
-        this._tiltButtonEl.dataset.tiltAction = 'calibrate';
-        this._tiltButtonEl.textContent = 'NEIGUNG';
-        this._tiltButtonEl.style.cssText = `
-            position: fixed; top: max(14px, env(safe-area-inset-top)); left: max(14px, env(safe-area-inset-left));
-            min-width: 96px; min-height: 42px; border-radius: 999px;
-            border: 1px solid rgba(132,226,255,0.72); background: rgba(4,12,20,0.66);
-            color: white; font-size: 12px; font-weight: 800; letter-spacing: 0;
-            touch-action: manipulation; user-select: none; z-index: 1001;
-        `;
-        this._tiltButtonEl.addEventListener('click', this._tiltActivateHandler);
-        this._containerEl.appendChild(this._tiltButtonEl);
-
-        this._tiltStatusEl = document.createElement('div');
-        this._tiltStatusEl.className = 'touch-tilt-status';
-        this._tiltStatusEl.textContent = 'TILT';
-        this._tiltStatusEl.style.cssText = `
-            position: fixed; top: max(60px, calc(env(safe-area-inset-top) + 58px)); left: max(16px, env(safe-area-inset-left));
-            color: rgba(210,245,255,0.82); font-size: 11px; font-weight: 700;
-            text-shadow: 0 1px 8px rgba(0,0,0,0.7); z-index: 1001;
-            pointer-events: none; user-select: none;
-        `;
-        this._containerEl.appendChild(this._tiltStatusEl);
+        const tiltControls = createTouchTiltControlElements({
+            containerEl: this._containerEl,
+            activateHandler: this._tiltActivateHandler,
+        });
+        this._tiltButtonEl = tiltControls.tiltButtonEl;
+        this._tiltStatusEl = tiltControls.tiltStatusEl;
         this._updateTiltUi();
     }
 
@@ -324,24 +247,16 @@ export class TouchInputSource extends PlayerInputSource {
     _setUIVisibility(visible) {
         this._uiVisible = visible;
         this._overlayActive = this._isBlockingOverlayActive();
-        const display = visible ? 'block' : 'none';
-        const controlsVisible = visible && !this._overlayActive;
-
-        if (this._joystickEl) {
-            this._joystickEl.style.display = controlsVisible && this._shouldShowJoystickFallback() ? '' : 'none';
-        }
-        for (const el of Object.values(this._buttonEls)) {
-            if (el) el.style.display = controlsVisible ? 'flex' : 'none';
-        }
-        if (this._tiltButtonEl) this._tiltButtonEl.style.display = controlsVisible ? 'flex' : 'none';
-        if (this._tiltStatusEl) this._tiltStatusEl.style.display = controlsVisible ? 'block' : 'none';
-
-        if (this._containerEl?.id === 'touch-controls') {
-            this._containerEl.style.display = display;
-            this._containerEl.style.pointerEvents = controlsVisible ? 'auto' : 'none';
-            this._containerEl.setAttribute('aria-hidden', visible ? 'false' : 'true');
-            this._containerEl.dataset.overlayActive = this._overlayActive ? '1' : '0';
-        }
+        applyTouchControlsVisibility({
+            containerEl: this._containerEl,
+            joystickEl: this._joystickEl,
+            buttonEls: this._buttonEls,
+            tiltButtonEl: this._tiltButtonEl,
+            tiltStatusEl: this._tiltStatusEl,
+            visible,
+            overlayActive: this._overlayActive,
+            showJoystickFallback: this._shouldShowJoystickFallback(),
+        });
         this._updateTiltUi();
     }
 
@@ -435,22 +350,14 @@ export class TouchInputSource extends PlayerInputSource {
         if (!this._joystickEl || this._joystickActive || !this._shouldShowJoystickFallback()) {
             return false;
         }
-        if (target?.closest?.('[data-action], [data-tilt-action], button, input, select, textarea, a')) {
-            return false;
-        }
-        const ownerWindow = this._containerEl?.ownerDocument?.defaultView
-            || (typeof window !== 'undefined' ? window : null);
-        const viewportWidth = Number(ownerWindow?.innerWidth)
-            || Number(this._containerEl?.ownerDocument?.documentElement?.clientWidth)
-            || 0;
-        const viewportHeight = Number(ownerWindow?.innerHeight)
-            || Number(this._containerEl?.ownerDocument?.documentElement?.clientHeight)
-            || 0;
-        if (viewportWidth <= 0 || viewportHeight <= 0) {
-            return false;
-        }
-        return touch.clientX <= viewportWidth * 0.5
-            && touch.clientY >= viewportHeight * 0.16;
+        return shouldStartFloatingJoystick({
+            touch,
+            target,
+            joystickEl: this._joystickEl,
+            joystickActive: this._joystickActive,
+            showJoystickFallback: true,
+            containerEl: this._containerEl,
+        });
     }
 
     _beginJoystickTouch(touch, { floating = false } = {}) {
@@ -467,19 +374,15 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     _positionFloatingJoystick(clientX, clientY) {
-        if (!this._joystickEl) return;
-        const left = Math.round(clientX - this._joystickRadius);
-        const top = Math.round(clientY - this._joystickRadius);
-        this._joystickEl.style.setProperty('left', `${left}px`, 'important');
-        this._joystickEl.style.setProperty('top', `${top}px`, 'important');
-        this._joystickEl.style.setProperty('bottom', 'auto', 'important');
+        positionFloatingJoystick(this._joystickEl, {
+            clientX,
+            clientY,
+            joystickRadius: this._joystickRadius,
+        });
     }
 
     _restoreJoystickHomePosition() {
-        if (!this._joystickEl) return;
-        this._joystickEl.style.setProperty('left', '5%');
-        this._joystickEl.style.setProperty('bottom', '20%');
-        this._joystickEl.style.setProperty('top', 'auto');
+        restoreJoystickHomePosition(this._joystickEl);
     }
 
     _updateJoystick(clientX, clientY) {
@@ -518,14 +421,12 @@ export class TouchInputSource extends PlayerInputSource {
     _setButtonVisualState(id, { enabled = true, visible = true, title = '' } = {}) {
         const button = this._buttonEls[id];
         if (!button) return;
-        const controlsVisible = this._uiVisible && !this._overlayActive;
-        button.style.display = visible && controlsVisible ? 'flex' : 'none';
-        button.title = title;
-        button.dataset.enabled = enabled ? '1' : '0';
-        button.style.opacity = enabled ? '1' : '0.35';
-        button.style.transform = enabled ? 'scale(1)' : 'scale(0.96)';
-        button.style.borderColor = enabled ? 'rgba(132,226,255,0.85)' : 'rgba(255,255,255,0.18)';
-        button.style.boxShadow = enabled ? '0 0 14px rgba(0,170,255,0.18)' : 'none';
+        applyTouchButtonVisualState(button, {
+            enabled,
+            visible,
+            title,
+            controlsVisible: this._uiVisible && !this._overlayActive,
+        });
     }
 
     _requestPause() {
