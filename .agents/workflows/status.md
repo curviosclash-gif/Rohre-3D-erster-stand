@@ -1,5 +1,13 @@
 ﻿---
 description: Quick project status snapshot.
+decision_floor: D0
+mutates: never
+user_gate: never
+commit_strategy: none
+required_checks:
+  - npm run plan:check
+outputs:
+  - chat
 ---
 // turbo-all
 
@@ -37,7 +45,7 @@ description: Quick project status snapshot.
 - Highlight desktop-app priorities and intentional demo limitations.
 - List pending external plans waiting for manual intake.
 - Keep output compact and action-oriented; keine neue Meta-Arbeit erfinden.
-- Nur bei konkretem Drift-Signal `npm run docs:sync && npm run docs:check` empfehlen.
+- Bei konkretem Drift-Signal zuerst `npm run docs:check`; `npm run docs:sync` nur zum bewussten Aktualisieren des Statusreports empfehlen.
 
 ## Report
 

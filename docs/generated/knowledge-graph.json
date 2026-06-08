@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 255,
+          "concreteCount": 258,
           "plannedCount": 0
         }
       }
@@ -742,7 +742,7 @@
           "tsconfig.architecture.json"
         ],
         "scopeResolution": {
-          "concreteCount": 251,
+          "concreteCount": 253,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2366,8 +2366,8 @@
           "tests/touch-tilt-steering-ops.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 6,
-          "plannedCount": 7
+          "concreteCount": 9,
+          "plannedCount": 4
         },
         "scopeOverlapAllowedWith": [
           "V131",
@@ -3775,7 +3775,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 264,
+          "concreteCount": 266,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -6642,7 +6642,7 @@
       "id": "V140.1",
       "type": "phase",
       "title": "Baseline und Scope-Freeze",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.1"
@@ -6652,7 +6652,7 @@
       "id": "V140.2",
       "type": "phase",
       "title": "Touch-Tilt-Ops extrahieren",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.2"
@@ -19686,8 +19686,8 @@
     {
       "id": "V140.1.1",
       "type": "subphase",
-      "title": "`git status --short`, `npm run lint:architecture`, `npm run check:architecture:metrics`, `npm run check:architecture:ratchet`, `npm run graph:check` und `npm run plan:check` als Baseline erfassen; keine Vollsuite.",
-      "status": "open",
+      "title": "`git status --short`, `npm run lint:architecture`, `npm run check:architecture:metrics`, `npm run check:architecture:ratchet`, `npm run graph:check` und `npm run plan:check` als Baseline erfassen; keine Vollsuite. (abgeschlossen: 2026-06-08; evidence: `lint:architecture` -> erwartetes FAIL nur an `MobileClassicApp.js`/`TouchInputSource.js`; Metrics/Ratchet/Plan -> PASS; `graph:check` -> FAIL wegen vorbestehendem Generated-Drift, kein Rebuild im V140-Scope)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.1",
@@ -19697,8 +19697,8 @@
     {
       "id": "V140.1.2",
       "type": "subphase",
-      "title": "ESLint-Zaehlerstand, physische Zeilenzahl, Exporte und produktive Konsumenten fuer beide Debt-Surfaces erfassen.",
-      "status": "open",
+      "title": "ESLint-Zaehlerstand, physische Zeilenzahl, Exporte und produktive Konsumenten fuer beide Debt-Surfaces erfassen. (abgeschlossen: 2026-06-08; evidence: Baseline `MobileClassicApp.js` 1276 ESLint-/1435 physische Zeilen bei Ceiling 1180, `TouchInputSource.js` 1050 ESLint-/1165 physische Zeilen bei Ceiling 847; produktive Konsumenten `src/core/main.js` und `src/ui/MatchInputSourceResolver.js`, Mobile-Contracts als direkte Importkonsumenten)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.1",
@@ -19708,8 +19708,8 @@
     {
       "id": "V140.1.3",
       "type": "subphase",
-      "title": "Mobile-Contracts und vorhandene Tilt-/Touch-Testsignale inventarisieren; Testluecken fuer Pure-Ops-Extraktionen benennen.",
-      "status": "open",
+      "title": "Mobile-Contracts und vorhandene Tilt-/Touch-Testsignale inventarisieren; Testluecken fuer Pure-Ops-Extraktionen benennen. (abgeschlossen: 2026-06-08; evidence: `tests/mobile-classic-app.contract.test.mjs`, `tests/mobile-arcade-app.contract.test.mjs` und Double-Dispose-Signal in `tests/core-targeted-regressions.spec.js` inventarisiert; fehlender direkter Pure-Ops-Contract als 140.2-Luecke festgehalten)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.1",
@@ -19719,8 +19719,8 @@
     {
       "id": "V140.1.4",
       "type": "subphase",
-      "title": "Reihenfolge gegen V131 festziehen: zuerst verhaltensneutrale Ops-Extraktion oder explizite Zielmodul-Nutzung im funktionalen Nachbarblock.",
-      "status": "open",
+      "title": "Reihenfolge gegen V131 festziehen: zuerst verhaltensneutrale Ops-Extraktion oder explizite Zielmodul-Nutzung im funktionalen Nachbarblock. (abgeschlossen: 2026-06-08; evidence: Master-Priorisierung und Graph-Impact -> V140-Pure-Ops vor funktionaler V131-Steuerungsarbeit; keine Press-/Pause-/Tilt-Semantikaenderung in 140.2)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.1",
@@ -19730,8 +19730,8 @@
     {
       "id": "V140.1.5",
       "type": "subphase",
-      "title": "Architecture Capsule und D2/D4-Slice-Grenze pro Extraktion dokumentieren.",
-      "status": "open",
+      "title": "Architecture Capsule und D2/D4-Slice-Grenze pro Extraktion dokumentieren. (abgeschlossen: 2026-06-08; evidence: Layers `ui input adapter -> ui/touch pure ops`; Dependency delta nur bestehender Shared-Control-Contract; Contract bestehende Re-Exports; Legacy surface nur reduziert; `npm run check:architecture:touched-strict`, Metrics und Ratchet -> PASS; Not-checked Device-Smoke, Sensor-Lifecycle, Layout/DOM und App-Shell; D4 bleibt fuer breite Lifecycle-/Surface-Wirkung ausgeschlossen)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.1",
@@ -19741,8 +19741,8 @@
     {
       "id": "V140.2.1",
       "type": "subphase",
-      "title": "`resolveTiltCalibrationNeutral`, Response-Curve-, Sensitivity-, Assist- und Steering-State-Berechnung als pure Ops extrahieren.",
-      "status": "open",
+      "title": "`resolveTiltCalibrationNeutral`, Response-Curve-, Sensitivity-, Assist- und Steering-State-Berechnung als pure Ops extrahieren. (abgeschlossen: 2026-06-08; evidence: `src/ui/touch/TouchTiltSteeringOps.js` plus `tests/touch-tilt-steering-ops.contract.test.mjs` -> DOM-/Sensor-/Lifecycle-freier Berechnungspfad)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.2",
@@ -19752,8 +19752,8 @@
     {
       "id": "V140.2.2",
       "type": "subphase",
-      "title": "Bestehende Exporte kompatibel halten oder mit nachgewiesenem Konsumentenabgleich migrieren.",
-      "status": "open",
+      "title": "Bestehende Exporte kompatibel halten oder mit nachgewiesenem Konsumentenabgleich migrieren. (abgeschlossen: 2026-06-08; evidence: `TouchInputSource.js` re-exportiert `deriveTiltSteeringState` und `resolveTiltCalibrationNeutral`; `node --test tests/touch-tilt-steering-ops.contract.test.mjs tests/mobile-classic-app.contract.test.mjs tests/mobile-arcade-app.contract.test.mjs` -> 33/33 PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.2",
@@ -19763,8 +19763,8 @@
     {
       "id": "V140.2.3",
       "type": "subphase",
-      "title": "Gezielte Pure-Ops-Contracts und Mobile-Contracts ausfuehren; `TouchInputSource.js`-Ceiling auf den verifizierten Stand senken.",
-      "status": "open",
+      "title": "Gezielte Pure-Ops-Contracts und Mobile-Contracts ausfuehren; `TouchInputSource.js`-Ceiling auf den verifizierten Stand senken. (abgeschlossen: 2026-06-08; evidence: Lifecycle-Folgeschnitt aus 140.3.1 bringt `TouchInputSource.js` physisch 1049 -> 901 und im ESLint-Zaehler 946 -> 809; `node --test tests/touch-tilt-steering-ops.contract.test.mjs tests/mobile-classic-app.contract.test.mjs tests/mobile-arcade-app.contract.test.mjs` -> 34/34 PASS; Ceiling 847 -> 809, `npm run lint:architecture` meldet keinen `TouchInputSource.js`-Fehler mehr)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.2",
@@ -19774,8 +19774,8 @@
     {
       "id": "V140.3.1",
       "type": "subphase",
-      "title": "Device-Orientation-Binding, Permission-, Calibration- und Dispose-Pfad nach `TouchTiltSensorLifecycle.js` schneiden.",
-      "status": "open",
+      "title": "Device-Orientation-Binding, Permission-, Calibration- und Dispose-Pfad nach `TouchTiltSensorLifecycle.js` schneiden. (abgeschlossen: 2026-06-08; evidence: `TouchTiltSensorLifecycle` besitzt Support-/Permission-Pruefung, Orientation-Listener, Kalibrierung, Sensorfrequenz und idempotenten Listener-Stop; `TouchInputSource` komponiert nur State-Aliasse und UI-/Axis-Callbacks; fokussierter Contract plus Mobile-Contracts -> 34/34 PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.3",
@@ -19807,7 +19807,7 @@
     {
       "id": "V140.3.4",
       "type": "subphase",
-      "title": "Contract-Signale ausfuehren und `TouchInputSource.js`-Ceiling erneut senken oder entfernen.",
+      "title": "Contract-Signale ausfuehren und `TouchInputSource.js`-Ceiling erneut senken oder entfernen. (Teil-Evidence 2026-06-08: Sensor-Lifecycle-Slice 34/34 PASS; `check:architecture:touched-strict`, Metrics und Ratchet -> PASS; Ceiling fuer den Adapter 847 -> 809 gesenkt. `npm run gates:pre-commit` -> FAIL am parallel eingefuehrten Workflow-Contract-Check mit 102 noch nicht migrierten `.agents/workflows/**`-Findings; kein V140-Dateifehler. Layout-Slice und dessen erneutes Ratchet bleiben offen.)",
       "status": "open",
       "attributes": {
         "blockId": "V140",
@@ -41007,6 +41007,21 @@
       }
     },
     {
+      "id": "scripts/check-workflow-contracts.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "scripts/clean-dev-temp-logs.mjs",
       "type": "file",
       "title": null,
@@ -52942,9 +52957,11 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V140"
+          "V105",
+          "V140",
+          "V91"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -52957,9 +52974,11 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V140"
+          "V105",
+          "V140",
+          "V91"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -55169,12 +55188,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V140"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -55698,6 +55719,21 @@
     },
     {
       "id": "tests/vulkan-odyssey-playability.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope"
+        ],
+        "scopeBlocks": [
+          "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/workflow-contracts.contract.test.mjs",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -61525,6 +61561,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/check-workflow-contracts.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/clean-dev-temp-logs.mjs",
       "type": "scope",
       "hint": null,
@@ -63010,6 +63055,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/touch-tilt-steering-ops.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/trainer-v34-bridge.test.mjs",
       "type": "scope",
       "hint": null,
@@ -63299,6 +63353,15 @@
     {
       "from": "B13",
       "to": "tests/vulkan-odyssey-playability.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/workflow-contracts.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -71064,6 +71127,24 @@
     {
       "from": "V105",
       "to": "src/ui/StorageKeys.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
+      "to": "src/ui/touch/TouchTiltSensorLifecycle.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
+      "to": "src/ui/touch/TouchTiltSteeringOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -119686,6 +119767,24 @@
     {
       "from": "V91",
       "to": "src/ui/StorageKeys.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/ui/touch/TouchTiltSensorLifecycle.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/ui/touch/TouchTiltSteeringOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {

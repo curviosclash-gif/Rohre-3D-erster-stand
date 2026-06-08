@@ -1,5 +1,13 @@
 ---
 description: Create a quick safety checkpoint before edits.
+decision_floor: D2
+mutates: optional
+user_gate: conditional
+commit_strategy: scoped
+required_checks: []
+outputs:
+  - repo-change
+  - commands
 ---
 
 ## 1. Preferred backup

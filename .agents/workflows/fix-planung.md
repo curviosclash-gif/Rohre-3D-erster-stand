@@ -1,5 +1,14 @@
 ﻿---
 description: Execute the next open phase from master plan with dynamic N-bot parallel support.
+decision_floor: D3
+mutates: required
+user_gate: required
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - commands
 ---
 
 ## 0. Read status

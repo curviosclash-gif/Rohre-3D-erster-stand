@@ -24,10 +24,15 @@ if echo "$STAGED" | grep -q "^docs/Umsetzungsplan\.md$"; then
   fi
 fi
 
-# Plan governance check only when relevant files are staged.
-if git diff --cached --name-only | grep -Eq "^(docs/(Umsetzungsplan|Bot_Trainingsplan)\.md|\.agents/(workflows|rules)/|AGENTS\.md|scripts/validate-umsetzungsplan\.mjs|package\.json)$"; then
+# Governance checks only when relevant files are staged.
+if echo "$STAGED" | grep -Eq "^(docs/Umsetzungsplan\.md|docs/bot-training/Bot_Trainingsplan\.md|docs/plaene/aktiv/|\.agents/(workflows|rules)/|\.husky/(pre-commit|commit-msg)$|AGENTS\.md|scripts/(agent-commit-wrapper|agent-preflight|check-agent-commit-message|check-ai-diff-audit|check-workflow-contracts|docs-freshness|gates-pre-commit|validate-umsetzungsplan)\.mjs$|package\.json$)"; then
   echo "Running plan:check for staged governance files..."
   npm run plan:check
+fi
+
+if echo "$STAGED" | grep -Eq "^\.agents/workflows/|^scripts/check-workflow-contracts\.mjs$|^package\.json$"; then
+  echo "Running workflow contract check..."
+  npm run check:workflows
 fi
 
 # Lock protocol check in explicit bot mode.
@@ -37,7 +42,7 @@ if [ -n "$BOT_MODE" ]; then
 fi
 
 # Architecture guard for staged runtime/source/tooling files.
-if git diff --cached --name-only | grep -Eq "^(src/|server/|electron/|scripts/architecture/|scripts/check-architecture-)"; then
+if echo "$STAGED" | grep -Eq "^(src/|server/|electron/|scripts/architecture/|scripts/check-architecture-)"; then
   echo "Running staged architecture guard..."
   npm run check:architecture:staged
 fi

@@ -1,5 +1,14 @@
 ---
 description: Verify docs/workflows/rules are current with an automated gate.
+decision_floor: D0
+mutates: never
+user_gate: never
+commit_strategy: none
+required_checks:
+  - npm run docs:check
+  - npm run plan:check
+outputs:
+  - chat
 ---
 
 ## 0. Context
@@ -23,7 +32,7 @@ description: Verify docs/workflows/rules are current with an automated gate.
 // turbo
 - `npm run plan:check`
 - `npm run docs:check`
-- `docs:check` ist read-only und schreibt `docs/prozess/Dokumentationsstatus.md` nicht neu. Den Report nur als Evidence des letzten `docs:sync` lesen; bei gemeldeten Pending-Updates ist die aktuelle Konsolenausgabe massgeblich.
+- `docs:check` ist read-only und schreibt weder Referenzdokumente noch `docs/prozess/Dokumentationsstatus.md` neu. Der Report ist nur Evidence des letzten expliziten `docs:sync`.
 
 ## 3. If check fails
 

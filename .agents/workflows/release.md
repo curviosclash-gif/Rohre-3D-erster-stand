@@ -1,5 +1,16 @@
 ---
 description: Prepare and publish a safe release.
+decision_floor: D4
+mutates: required
+user_gate: required
+commit_strategy: release
+required_checks:
+  - npm run build
+  - npm run plan:check
+  - npm run docs:check
+outputs:
+  - release
+  - repo-change
 ---
 
 ## 0. Pre-check
@@ -22,7 +33,7 @@ description: Prepare and publish a safe release.
 // turbo
 - `npm run build`
 - `npm run plan:check`
-- `npm run docs:sync && npm run docs:check`
+- `npm run docs:check`; `npm run docs:sync` nur explizit, wenn der Release-Statusreport geschrieben werden soll.
 - Ensure release notes and plan status are date-accurate and reflect the desktop-first / online-demo product positioning.
 
 ## 4. Tag and push

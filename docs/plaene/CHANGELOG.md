@@ -1131,3 +1131,13 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Fuer mindestens acht Referenzaufgaben werden CLI-Baseline, Dashboard-only und fuer passende Fragen Dashboard plus `Ask Repo` verglichen: Zeit bis zur source-backed Antwort und Anzahl manueller CLI-Schritte.
 - Akzeptanz: Das Dashboard senkt die medianen manuellen CLI-Schritte mindestens um 30 Prozent, ohne die mediane Antwortzeit zu verschlechtern. `Ask Repo` bleibt nur im Vollscope, wenn es einen zusaetzlichen messbaren Nutzen zeigt; andernfalls wird es vor Rollout vereinfacht oder verschoben.
 - Residual-risk: Fixture-nahe Referenzaufgaben koennen den Alltagsnutzen ueberzeichnen; die Abschluss-Evidence muss deshalb Aufgaben, Messwerte und Reduce-/Defer-Entscheidung sichtbar dokumentieren.
+
+## Governance-Haertung 2026-06-08 (Commit-, Gate- und Workflow-Vertraege)
+
+- Nach User-Gate `1-4 bitte umsetzen` ist `npm run agent:commit` der gemeinsame Commit-Pfad: Der Wrapper staged nichts selbst, leitet `Scope` und `Known-uncommitted` aus Git ab, validiert den bestehenden Agent-Envelope gegen den echten staged Diff und uebergibt erst danach die Commit-Nachricht an Git.
+- D3 und D4 akzeptieren nur noch ein semantisch explizites User-Gate. Hook- und Preflight-Abdeckung umfasst jetzt aktive Plaene, den korrekten Bot-Trainingspfad sowie die Governance-Skripte fuer Commit, Diff-Audit, Workflow-Vertraege, Freshness und Meta-Gates.
+- `docs:check` und `gates:pre-commit` sind read-only. `docs:sync` schreibt nur noch den Dokumentationsstatusreport; Referenzdokumente werden nicht mehr taeglich allein wegen ihres `Stand:`-Datums umgeschrieben.
+- Alle 19 Repo-Workflows tragen einen validierten Frontmatter-Vertrag fuer Decision-Floor, Mutationsmodus, User-Gate, Commit-Strategie, Pflichtchecks und Outputs. `npm run check:workflows` blockiert fehlende Felder und widerspruechliche Kombinationen.
+- Evidence: `node --test tests/agent-governance.contract.test.mjs tests/workflow-contracts.contract.test.mjs`, `npm run check:workflows`, `npm run docs:check`, `npm run check:agent-context`, `npm run check:plan-evidence-claims` und `npm run plan:check` -> PASS; `npm run gates:pre-commit` im isolierten Governance-Scope und nach dem finalen `graph:build` im gemeinsamen Arbeitsbaum -> PASS.
+- Residual-risk: Die Workflow-Metadaten beschreiben und validieren den vorgesehenen Pfad, ersetzen aber keine semantische Laufzeitbeobachtung jedes Agenten. Der Commit-Wrapper setzt weiterhin bewusst voraus, dass der aufrufende Workflow zuvor nur seinen eigenen Scope gestaged hat.
+- Not-checked: keine Vollsuite und keine produktiven Runtime-, UI-, Gameplay-, Physik-, Multiplayer-, Recording- oder Bot-Training-Pfade.

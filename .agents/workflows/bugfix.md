@@ -1,5 +1,14 @@
 ﻿---
 description: Diagnose a reported issue and apply a targeted fix.
+decision_floor: D2
+mutates: required
+user_gate: conditional
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - chat
 ---
 
 Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/planning_and_governance.md`, `.agents/rules/git_and_commits.md`, `.agents/rules/product_focus.md`, `.agents/rules/token_efficiency_and_tools.md`.

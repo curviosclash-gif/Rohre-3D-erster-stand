@@ -1,5 +1,14 @@
 ---
 description: Roll back safely to an earlier state with plan sync.
+decision_floor: D4
+mutates: required
+user_gate: required
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - commands
 ---
 
 ## 0. Inspect
@@ -15,7 +24,7 @@ description: Roll back safely to an earlier state with plan sync.
 
 ```bash
 git revert --no-commit <COMMIT>..HEAD
-git commit -m "revert: rollback to <COMMIT>"
+npm run agent:commit -- --message="revert: rollback to <COMMIT>" --workflow=rollback --decision=D4 --evidence="<rollback checks> -> PASS" --gate="<explizite User-Freigabe>" --recovery="<Restore-Pfad>" --residual-risk="<Restrisiko>" --not-checked="<nicht geprueft>"
 ```
 
 ## 3. Destructive option (explicit approval only)

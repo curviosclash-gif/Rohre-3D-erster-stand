@@ -1,5 +1,14 @@
 ﻿---
 description: Fast path for small, scoped changes (1-2 Dateien, keine Subphase).
+decision_floor: D0
+mutates: optional
+user_gate: conditional
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - chat
 ---
 // turbo-all
 

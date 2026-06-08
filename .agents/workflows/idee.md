@@ -1,5 +1,14 @@
 ---
 description: Turn a rough idea into a scoped, evaluable concept.
+decision_floor: D2
+mutates: required
+user_gate: conditional
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - chat
 ---
 
 ## 0. Capture

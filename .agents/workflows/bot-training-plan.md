@@ -1,5 +1,14 @@
 ---
 description: Plan and execute bot-training work outside the general Umsetzungsplan.
+decision_floor: D3
+mutates: required
+user_gate: required
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - commands
 ---
 
 ## 0. Context
@@ -36,7 +45,7 @@ description: Plan and execute bot-training work outside the general Umsetzungspl
 ```bash
 npm run guard:main
 git add docs/lock-status/<person>.json
-git commit -m "chore: claim BT block <BTXX phase>"
+npm run agent:commit -- --message="chore: claim BT block <BTXX phase>" --workflow=bot-training-plan --decision=D3 --evidence="npm run plan:check -> PASS" --gate="<explizite User-Freigabe>" --residual-risk="<Restrisiko>" --not-checked="<nicht geprueft>"
 npm run snapshot:tag
 git push
 ```

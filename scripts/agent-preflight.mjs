@@ -18,11 +18,11 @@ const D3_SURFACE_PATTERNS = [
   /^AGENTS\.md$/,
   /^\.agents\/rules\//,
   /^\.agents\/workflows\//,
+  /^\.husky\/(?:pre-commit|commit-msg)$/,
   /^docs\/Umsetzungsplan\.md$/,
   /^docs\/plaene\/aktiv\//,
   /^docs\/bot-training\/Bot_Trainingsplan\.md$/,
-  /^scripts\/validate-umsetzungsplan\.mjs$/,
-  /^scripts\/gates-pre-commit\.mjs$/,
+  /^scripts\/(?:agent-commit-wrapper|agent-preflight|check-agent-commit-message|check-ai-diff-audit|check-workflow-contracts|docs-freshness|gates-pre-commit|validate-umsetzungsplan)\.mjs$/,
 ];
 
 const KNOWLEDGE_GRAPH_PATH = 'docs/generated/knowledge-graph.json';
@@ -134,6 +134,15 @@ function normalizeUnique(values) {
 
 function isPresent(value) {
   return Boolean(value && value.trim());
+}
+
+export function isExplicitUserGate(value) {
+  if (!isPresent(value)) {
+    return false;
+  }
+  const actor = String.raw`(?:user|nutzer(?:in|innen)?|benutzer(?:in|innen)?)`;
+  const approval = String.raw`(?:approved|requested|confirmed|authorized|authorised|freigabe|freigegeben|beauftragt|bestaetigt|bestätigt|zugestimmt|genehmigt|angefordert)`;
+  return new RegExp(`(?:${actor}.{0,120}${approval}|${approval}.{0,120}${actor})`, 'i').test(value);
 }
 
 function decisionAtLeast(decision, minimum) {
@@ -347,8 +356,8 @@ export async function validateAgentEnvelope({
     );
   }
 
-  if (decision === 'D3' && !gate) {
-    addViolation(violations, 'd3-missing-gate', '`Decision: D3` braucht `Gate: <User-Gate oder Grund>`.');
+  if (decision === 'D3' && !isExplicitUserGate(gate)) {
+    addViolation(violations, 'd3-missing-user-gate', '`Decision: D3` braucht ein explizit bestaetigtes User-Gate in `Gate:`.');
   }
 
   if ((decision === 'D3' || decision === 'D4') && !isPresent(residualRisk)) {
@@ -360,7 +369,7 @@ export async function validateAgentEnvelope({
   }
 
   if (decision === 'D4') {
-    if (!gate || !/\b(user|freigabe|approved|gate|confirm)/i.test(gate)) {
+    if (!isExplicitUserGate(gate)) {
       addViolation(violations, 'd4-missing-user-gate', '`Decision: D4` braucht ein explizites User-Gate in `Gate:`.');
     }
     if (!recovery) {

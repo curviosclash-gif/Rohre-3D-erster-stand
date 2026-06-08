@@ -186,12 +186,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2127,
-    "rawCoveredFileCount": 1369,
+    "trackedFileCount": 2132,
+    "rawCoveredFileCount": 1374,
     "rawCoveragePercent": 64.4,
-    "adjustedTrackedFileCount": 1438,
-    "adjustedCoveredFileCount": 1133,
-    "adjustedCoveragePercent": 78.8,
+    "adjustedTrackedFileCount": 1443,
+    "adjustedCoveredFileCount": 1138,
+    "adjustedCoveragePercent": 78.9,
     "uncoveredFileCount": 758,
     "uncoveredActiveFileCount": 305,
     "classifications": [
@@ -258,8 +258,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1021,
-        "coveredCount": 898
+        "count": 1026,
+        "coveredCount": 903
       },
       {
         "classification": "product-docs",
@@ -20234,6 +20234,23 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/check-workflow-contracts.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/clean-dev-temp-logs.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -33332,6 +33349,44 @@
       "excludeReason": null
     },
     {
+      "path": "src/ui/touch/TouchTiltSensorLifecycle.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V105",
+        "V140",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/ui/touch/TouchTiltSteeringOps.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V105",
+        "V140",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/ui/TouchInputSource.js",
       "tracked": true,
       "coveredInCore": true,
@@ -35677,6 +35732,25 @@
       "excludeReason": null
     },
     {
+      "path": "tests/touch-tilt-steering-ops.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V140"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "tests/trainer-v34-bridge.test.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -36230,6 +36304,23 @@
     },
     {
       "path": "tests/vulkan-odyssey-playability.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope"
+      ],
+      "scopeBlocks": [
+        "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/workflow-contracts.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

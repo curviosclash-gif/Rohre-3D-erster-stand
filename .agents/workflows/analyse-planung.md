@@ -1,5 +1,14 @@
 ---
 description: Run full test analysis, persist results, and update prioritized action plan.
+decision_floor: D0
+mutates: optional
+user_gate: conditional
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - report
+  - repo-change
 ---
 
 Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_and_commits.md`, `.agents/rules/token_efficiency_and_tools.md`.

@@ -1,5 +1,14 @@
 ---
 description: Koordinations-Workflow fuer Paararbeit ohne Merge-Konflikte
+decision_floor: D0
+mutates: optional
+user_gate: conditional
+commit_strategy: scoped
+required_checks:
+  - npm run lock:validate
+outputs:
+  - commands
+  - repo-change
 ---
 
 ## Workflow fuer zwei Personen (Alice & Bob)

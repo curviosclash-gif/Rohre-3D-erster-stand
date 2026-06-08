@@ -4,7 +4,12 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { validateAgentEnvelope } from '../scripts/agent-preflight.mjs';
+import { isExplicitUserGate, validateAgentEnvelope } from '../scripts/agent-preflight.mjs';
+import {
+  buildCommitMessage,
+  deriveCommitScope,
+  findOverlongCommitLines,
+} from '../scripts/agent-commit-wrapper.mjs';
 import { validateAgentCommitMessage } from '../scripts/check-agent-commit-message.mjs';
 
 async function createFixture() {
@@ -65,6 +70,27 @@ test('agent envelope blocks governance surfaces below D3', async () => {
 
   assert.equal(result.violations.length, 1);
   assert.equal(result.violations[0].id, 'd3-surface-underrated');
+});
+
+test('D3 requires an explicit user approval instead of a generic gate note', async () => {
+  const root = await createFixture();
+  const result = await validateAgentEnvelope({
+    root,
+    workflow: 'code',
+    decision: 'D3',
+    evidence: 'npm run plan:check -> PASS',
+    gate: 'governance rationale recorded',
+    scope: '.agents/workflows/code.md',
+    knownUncommitted: 'none',
+    residualRisk: 'none',
+    notChecked: 'full suite',
+    changes: [{ status: 'M', file: '.agents/workflows/code.md' }],
+    uncommittedFiles: ['.agents/workflows/code.md'],
+  });
+
+  assert(result.violations.some((violation) => violation.id === 'd3-missing-user-gate'));
+  assert.equal(isExplicitUserGate('Freigabe durch den Nutzer bestaetigt'), true);
+  assert.equal(isExplicitUserGate('user gate rationale'), false);
 });
 
 test('agent envelope requires recovery for tracked deletions', async () => {
@@ -379,4 +405,53 @@ test('commit message validator accepts repeated scope and known-uncommitted fiel
   });
 
   assert.deepEqual(result.violations, []);
+});
+
+test('commit wrapper derives and renders exact staged and remaining scopes', () => {
+  const { stagedFiles, knownUncommitted } = deriveCommitScope({
+    changes: [
+      { status: 'M', file: 'scripts/agent-preflight.mjs' },
+      { status: 'A', file: 'tests/new.contract.test.mjs' },
+    ],
+    uncommittedFiles: [
+      'docs/user-note.md',
+      'scripts/agent-preflight.mjs',
+      'tests/new.contract.test.mjs',
+    ],
+  });
+  const message = buildCommitMessage({
+    message: 'fix: enforce commit metadata',
+    workflow: 'code',
+    decision: 'D3',
+    evidence: 'npm run plan:check -> PASS',
+    stagedFiles,
+    knownUncommitted,
+    residualRisk: 'none',
+    notChecked: 'full suite',
+    gate: 'User approved governance scope',
+  });
+
+  assert.deepEqual(stagedFiles, ['scripts/agent-preflight.mjs', 'tests/new.contract.test.mjs']);
+  assert.deepEqual(knownUncommitted, ['docs/user-note.md']);
+  assert.match(message, /^Scope: scripts\/agent-preflight\.mjs$/m);
+  assert.match(message, /^Scope: tests\/new\.contract\.test\.mjs$/m);
+  assert.match(message, /^Known-uncommitted: docs\/user-note\.md$/m);
+});
+
+test('commit wrapper detects commitlint line-length violations before commit', () => {
+  const message = buildCommitMessage({
+    message: 'fix: enforce commit metadata',
+    workflow: 'code',
+    decision: 'D3',
+    evidence: 'npm run plan:check -> PASS',
+    stagedFiles: ['scripts/agent-preflight.mjs'],
+    knownUncommitted: [],
+    residualRisk: 'x'.repeat(100),
+    notChecked: 'full suite',
+    gate: 'User approved governance scope',
+  });
+
+  const violations = findOverlongCommitLines(message);
+  assert.equal(violations.length, 1);
+  assert.match(violations[0].text, /^Residual-risk:/);
 });

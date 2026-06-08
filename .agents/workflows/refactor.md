@@ -1,5 +1,14 @@
 ---
 description: Restructure code without changing behavior.
+decision_floor: D2
+mutates: required
+user_gate: conditional
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - report
 ---
 
 ## 0. Scope
@@ -28,7 +37,7 @@ description: Restructure code without changing behavior.
 // turbo
 - Re-run baseline tests only after explicit user request. Otherwise document the recommended regression checks for the user.
 - If refactor touches plans/workflows/rules: `npm run plan:check`.
-- `npm run docs:sync && npm run docs:check`.
+- `npm run docs:check`; `npm run docs:sync` nur explizit zum Aktualisieren des Statusreports.
 
 ## 4. Commit
 

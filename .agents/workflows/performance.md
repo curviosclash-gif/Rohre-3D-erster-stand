@@ -1,5 +1,14 @@
 ---
 description: Measure baseline, optimize bottlenecks, and verify impact.
+decision_floor: D2
+mutates: required
+user_gate: conditional
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - report
 ---
 
 ## 0. Context (skip if target is clear)

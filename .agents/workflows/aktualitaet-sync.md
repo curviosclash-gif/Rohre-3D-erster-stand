@@ -1,5 +1,15 @@
 ---
 description: Check and auto-update docs/workflows/rules to current repository reality.
+decision_floor: D3
+mutates: required
+user_gate: required
+commit_strategy: scoped
+required_checks:
+  - npm run docs:check
+  - npm run plan:check
+outputs:
+  - repo-change
+  - report
 ---
 
 ## 0. Context
@@ -14,7 +24,7 @@ description: Check and auto-update docs/workflows/rules to current repository re
 
 // turbo
 - `npm run docs:sync`
-- Review findings in `docs/prozess/Dokumentationsstatus.md`.
+- Review findings in `docs/prozess/Dokumentationsstatus.md`; der Sync aktualisiert nur diesen Report und datiert keine Referenzdokumente automatisch um.
 
 ## 2. Resolve remaining drift
 
@@ -34,7 +44,7 @@ description: Check and auto-update docs/workflows/rules to current repository re
 - Nur geaenderte Scope-Dateien stagen (kein pauschales `docs/`-Bulk-Add).
 - Wenn der Sync-Lauf abgeschlossen ist und Drift behoben wurde, den scoped Commit direkt im selben Turn erstellen.
 - Ergaenze eine kurze Sync-Notiz im passenden Doku-Kontext, die die relevante Drift und den Grund fuer den Commit benennt.
-- `git commit -m "docs: sync documentation and plan governance"`
+- `npm run agent:commit -- --message="docs: sync documentation and plan governance" --workflow=aktualitaet-sync --decision=D3 --evidence="npm run docs:check -> PASS" --gate="<explizite User-Freigabe>" --residual-risk="<Restrisiko>" --not-checked="<nicht geprueft>"`
 - Before push on `main`: `npm run snapshot:tag`
 
 ## 5. Optional reality checks

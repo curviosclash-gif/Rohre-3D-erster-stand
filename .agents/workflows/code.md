@@ -1,5 +1,14 @@
 ﻿---
 description: Implement a planned change from coding to verification and commit.
+decision_floor: D2
+mutates: required
+user_gate: conditional
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - chat
 ---
 
 Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_and_commits.md`, `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/product_focus.md`, `.agents/rules/token_efficiency_and_tools.md`.
@@ -79,8 +88,7 @@ Optional (nur bei Bedarf):
 - Windows vor Staging: `npm run git:acl:heal`.
 - `git add [scoped-files]`.
 - Staged Scope pruefen: `git diff --cached --name-only`; Restdiffs mit `git status --short` erfassen und als `Known-uncommitted` benennen.
-- `npm run agent:preflight -- --workflow=code --decision=<D0-D4> --evidence="<gate> -> PASS" --scope="<staged files>" --known-uncommitted="<rest oder none>"` vor dem Commit ausfuehren; D3/D4-Felder vollstaendig setzen.
-- `git commit -m "[type]: [name] - [short reason]"`.
+- `npm run agent:commit -- --message="[type]: [short reason]" --workflow=code --decision=<D0-D4> --evidence="<command> -> PASS" --not-checked="<nicht geprueft>"` ausfuehren; der Wrapper leitet `Scope` und `Known-uncommitted` aus Git ab, validiert den Envelope und committed erst danach. D3/D4-Felder vollstaendig setzen.
 - Nach Commit `git status --short`; eigene Restdiffs committen, blockerfest dokumentieren oder bekannte generierte Timestamp-/Registry-Nachwirkungen bereinigen.
 - Vor Push auf `main`: `npm run snapshot:tag`.
 

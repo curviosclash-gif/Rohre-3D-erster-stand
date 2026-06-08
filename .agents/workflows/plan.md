@@ -1,5 +1,14 @@
 ﻿---
 description: Create a compact implementation plan for a new feature or extension.
+decision_floor: D2
+mutates: required
+user_gate: conditional
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - report
 ---
 
 ## 0. Context
@@ -75,7 +84,7 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 - `npm run plan:check`
 - `npm run check:plan-evidence-claims` wenn aktive Plaene, Workflow-/Rule-/Scope-Claims oder Plan-Evidence geaendert wurden.
 - `npm run graph:check` sobald der Draft in `docs/plaene/aktiv/VXX.md` oder den Master aufgenommen wurde.
-- `npm run docs:sync && npm run docs:check`
+- `npm run docs:check`; `npm run docs:sync` nur explizit, wenn der Statusreport aktualisiert werden soll.
 
 ## 6. Commit
 

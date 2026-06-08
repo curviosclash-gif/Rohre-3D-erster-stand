@@ -4,18 +4,11 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const args = new Set(process.argv.slice(2));
-const checkOnly = args.has('--check');
-const writeMode = args.has('--write') || !checkOnly;
+const writeMode = args.has('--write');
 
 const ACTIVE_SCAN_ROOTS = ['.agents', 'docs'];
 const EXCLUDED_PREFIXES = ['docs/archive'];
 const EXTRA_ACTIVE_FILES = ['AGENTS.md', 'README.md', 'CLAUDE.md'];
-
-const STAMPED_FILES = [
-  'docs/referenz/ai_project_onboarding.md',
-  'docs/referenz/ai_architecture_context.md',
-  'docs/referenz/architektur_ausfuehrlich.md'
-];
 
 const REQUIRED_FILES = [
   'README.md',
@@ -154,16 +147,6 @@ function collectMojibakeWarnings(filesToScan, contentByFile) {
   return warnings;
 }
 
-function applyStampUpdate(text, today) {
-  const stampPattern = /^Stand:\s+\d{4}-\d{2}-\d{2}$/m;
-  if (!stampPattern.test(text)) {
-    return { updated: false, content: text };
-  }
-
-  const next = text.replace(stampPattern, `Stand: ${today}`);
-  return { updated: next !== text, content: next };
-}
-
 function escapeRegex(input) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -231,7 +214,6 @@ async function collectOnboardingCanonicalFindings(onboardingText, filesToScan) {
 function buildReport({
   today,
   modeLabel,
-  updatedFiles,
   missingFiles,
   onboardingRefs,
   onboardingFindings,
@@ -247,14 +229,9 @@ function buildReport({
   lines.push(`Gate: ${canPass ? 'PASS' : 'FAIL'}`);
   lines.push('');
 
-  lines.push('## Automatisch aktualisiert');
-  if (updatedFiles.length === 0) {
-    lines.push('- Keine inhaltlichen Datumsupdates noetig.');
-  } else {
-    for (const f of updatedFiles) {
-      lines.push(`- ${f}`);
-    }
-  }
+  lines.push('## Schreibverhalten');
+  lines.push('- Referenzdokumente werden nicht automatisch umdatiert.');
+  lines.push(`- Statusreport: ${modeLabel === 'sync' ? 'explizit aktualisiert' : 'nicht geschrieben'}.`);
   lines.push('');
 
   lines.push('## Pflichtdateien');
@@ -341,23 +318,6 @@ async function main() {
     }
   }
 
-  const updatedFiles = [];
-
-  for (const file of STAMPED_FILES) {
-    if (!contentByFile.has(file)) {
-      continue;
-    }
-    const original = contentByFile.get(file);
-    const { updated, content } = applyStampUpdate(original, today);
-    if (updated) {
-      if (writeMode) {
-        await writeUtf8(file, content);
-      }
-      contentByFile.set(file, content);
-      updatedFiles.push(file);
-    }
-  }
-
   const missingFiles = [];
   for (const file of REQUIRED_FILES) {
     if (!(await exists(file))) {
@@ -376,14 +336,12 @@ async function main() {
   if (legacyFindings.length > 0) {
     console.log(`[docs] WARNUNG: ${legacyFindings.length} Legacy-Pfad-Funde (nicht blockierend)`);
   }
-  const hasPendingUpdates = checkOnly && updatedFiles.length > 0;
-  const canPass = !hasBlockingIssues && !hasPendingUpdates;
+  const canPass = !hasBlockingIssues;
 
-  const modeLabel = checkOnly ? 'check' : 'sync';
+  const modeLabel = writeMode ? 'sync' : 'check';
   const report = buildReport({
     today,
     modeLabel,
-    updatedFiles,
     missingFiles,
     onboardingRefs,
     onboardingFindings,
@@ -398,7 +356,7 @@ async function main() {
 
   // Short console output for CI/workflow visibility.
   console.log(`[docs] mode=${modeLabel}`);
-  console.log(`[docs] updated=${updatedFiles.length}`);
+  console.log(`[docs] report-written=${writeMode ? 'yes' : 'no'}`);
   console.log(`[docs] missing=${missingFiles.length}`);
   console.log(`[docs] onboarding=${onboardingFindings.length}`);
   console.log(`[docs] legacy=${legacyFindings.length}`);

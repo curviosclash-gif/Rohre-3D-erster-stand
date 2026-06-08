@@ -1,5 +1,14 @@
 ---
 description: Pruefe den zuletzt abgeschlossenen Plan gruendlich gegen Ziele, Evidence und Git-Historie.
+decision_floor: D0
+mutates: optional
+user_gate: conditional
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - report
+  - chat
 ---
 // turbo
 

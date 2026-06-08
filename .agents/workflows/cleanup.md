@@ -1,5 +1,14 @@
 ---
 description: Detect and retire dead code/files with replacement-proof and safe dry-run first.
+decision_floor: D4
+mutates: required
+user_gate: required
+commit_strategy: scoped
+required_checks:
+  - npm run plan:check
+outputs:
+  - repo-change
+  - report
 ---
 
 ## 0. Detect
