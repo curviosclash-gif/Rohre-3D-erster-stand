@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated": "2026-06-06",
+  "updated": "2026-06-08",
   "start_anchor": {
-    "block": "V132",
-    "phase": "132.99",
+    "block": "V140",
+    "phase": "140.99",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -955,7 +955,7 @@
     {
       "id": "V140",
       "title": "Mobile God-File-Sunset fuer App-Shell und Touch-Input",
-      "status": "planned",
+      "status": "done",
       "priority": "P2",
       "owner": "frei",
       "workstream": "android-mobile",
@@ -963,13 +963,13 @@
         "V132.99",
         "V135.99"
       ],
-      "current_phase": "140.1",
+      "current_phase": "140.99",
       "plan_file": "docs/plaene/aktiv/V140.md",
       "lock": {
         "status": "frei",
         "agent": "-",
         "start_date": "-",
-        "target": "Geplant",
+        "target": "Abgeschlossen 2026-06-08",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

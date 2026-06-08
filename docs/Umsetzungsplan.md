@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-06-06. Aktiver Lock: `-`; Startanker: `V132 132.99 abgeschlossen`; neue Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V140`-`V144` sind geplant; naechster Start gemaess Priorisierungsabgleich: kleiner `V140`-Gate-Recovery-Slice, dann kleine Produkt-/Architektur-Slices.
+Stand: 2026-06-08. Aktiver Lock: `-`; Startanker: `V140 140.99 abgeschlossen`; neue Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V141`-`V144` sind geplant; naechster Start gemaess Priorisierungsabgleich: kleiner `V131`-Funktionsslice oder `V118`-Architektur-Proof.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -94,7 +94,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V127 | Repo Map Gesamtuebersicht, Plan-Map-Abhaengigkeiten und Wissensgraph-Verankerung | planned | P2 | frei | V107.99,V110.99,V111.99 | 127.1 | `docs/plaene/aktiv/V127.md` |
 | V131 | Mobile Classic Steuerung Hardening | planned | P2 | frei | V112.99,V126.99,V72.99 | 131.1 | `docs/plaene/aktiv/V131.md` |
 | V136 | Portabler Knowledge-Core fuer Memory und RAG | planned | P1 | frei | V116.99,V117.99 | 136.1 | `docs/plaene/aktiv/V136.md` |
-| V140 | Mobile God-File-Sunset fuer App-Shell und Touch-Input | planned | P2 | frei | V132.99,V135.99 | 140.1 | `docs/plaene/aktiv/V140.md` |
+| V140 | Mobile God-File-Sunset fuer App-Shell und Touch-Input | done | P2 | frei | V132.99,V135.99 | 140.99 | `docs/plaene/aktiv/V140.md` |
 | V141 | Finding-, Plan- und Doku-Drift-Automatisierung | planned | P2 | frei | V116.99,V117.99,V119.99,V123.99,V138.99 | 141.1 | `docs/plaene/aktiv/V141.md` |
 | V142 | Graph-Drift-Guard-Automatisierung | planned | P2 | frei | V94.99,V116.99,V123.99,V138.99 | 142.1 | `docs/plaene/aktiv/V142.md` |
 | V143 | Agent-Skills statt Regeltext fuer Spezialroutinen | planned | P2 | frei | V116.99 | 143.1 | `docs/plaene/aktiv/V143.md` |
@@ -248,7 +248,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V127 | - | frei | Geplant |
 | - | V131 | - | frei | Geplant |
 | - | V136 | - | frei | Geplant |
-| - | V140 | - | frei | Geplant |
+| - | V140 | - | frei | Abgeschlossen 2026-06-08 |
 | - | V141 | - | frei | Geplant |
 | - | V142 | - | frei | Geplant |
 | - | V143 | - | frei | Geplant |
@@ -256,17 +256,16 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 
 ## Empfohlene Reihenfolge
 
-Priorisierungsabgleich 2026-06-06: Die V132-Statusdrift ist geklaert; Master/Index folgen der aktiven Detailakte (`done`, `132.99`) und Docs-Freshness wurde im Gate-Sync nachgezogen. `lint:architecture` bleibt wegen `MobileClassicApp.js` und `TouchInputSource.js` rot; der naechste kleine Umsetzungsschnitt soll deshalb Gate-Recovery vor weiterer Mobile-Funktionalitaet priorisieren.
+Priorisierungsabgleich 2026-06-08: V140 ist abgeschlossen; `lint:architecture` ist wieder erreichbar (PASS mit den bekannten 29 `innerHTML`-Warnungen), und die `max-lines`-Blocker in `MobileClassicApp.js` und `TouchInputSource.js` sind beseitigt. Funktionale Mobile-Arbeit soll jetzt auf den Zielmodulen aufsetzen, statt die alten Debt-Surfaces wieder auszubauen.
 
-1. `V140` als kleinster Gate-Recovery-Slice vor `V131`: zuerst verhaltensneutrale Extraktion aus `MobileClassicApp.js` und `TouchInputSource.js`, damit `lint:architecture` wieder erreichbar wird. Keine funktionale Touch-/Tilt-Aenderung in diesem Slice.
-2. `V131` danach als funktionale Mobile-Classic-Steuerungshaertung: Press-/Pause-/Tilt-/Orientation-Arbeit soll auf die durch `V140` vorbereiteten Zielmodule aufsetzen und nicht die Debt-Surfaces weiter aufblasen.
-3. `V118` bleibt der bevorzugte Architektur-Slice: `UIStartSyncController` kandidatenscharf gegen P14/P45, Consumer und kleinste Contract-/Runtime-Signale pruefen; Draft-/Intake-Altformulierungen in der aktiven Akte vor Umsetzung als Statusdrift behandeln.
-4. Produktspur: `V106` vor `V113`, weil GLB-Map-Varianz kleiner und weniger kollisionsreich ist. `V113` erst nach V76-Abgleich und nicht parallel zu `V118`/`V96`, da Start-Setup- und Hangar-Contracts geteilt werden.
-5. `V96` erst nach einem erfolgreichen kleinen Architektur-Proof (`V118`) oder als eng begrenzter Boundary-Slice; kein breiter Boundary-/Legacy-Block am Stueck.
-6. `V141` als kleiner WARN-Pilot fuer Finding-/Plan-/Doku-Drift, nicht als harter Source-of-Truth-Wechsel. Pilotfaelle: Docs-Freshness, stale Finding-/Changelog-Signale und kuenftige Master-vs-Detail-Statusdrift.
-7. `V142` nach `V141`: Graph-Generated-Gate und CI/Hook-Schutz erst haerten, wenn Driftklassen und Warn-/Fail-Grenzen kalibriert sind.
-8. `V136` vor `V122`, falls AI-/Memory-Arbeit priorisiert wird: erst portabler Knowledge-Core/Kernelschnitt, danach repo-natives Memory; Ruflo/MCP bleibt spaeterer User-Gate.
-9. `V127`, `V143` und `V144` nur nach konkretem Nutzenbeweis: Repo-/Plan-Map-Navigation, Agent-Skill-Auslagerung und JSON-Source-of-Truth-Entscheidung bleiben nachrangig. `V144` bleibt explizit Future-Entscheidung; Markdown bleibt kanonisch bis separater D3/D4-Gate.
+1. `V131` als funktionale Mobile-Classic-Steuerungshaertung: Press-/Pause-/Tilt-/Orientation-Arbeit nutzt `TouchTiltSteeringOps`, `TouchTiltSensorLifecycle`, `TouchControlLayoutOps` und `MobileClassicMenuUi`.
+2. `V118` bleibt der bevorzugte Architektur-Slice: `UIStartSyncController` kandidatenscharf gegen P14/P45, Consumer und kleinste Contract-/Runtime-Signale pruefen; Draft-/Intake-Altformulierungen in der aktiven Akte vor Umsetzung als Statusdrift behandeln.
+3. Produktspur: `V106` vor `V113`, weil GLB-Map-Varianz kleiner und weniger kollisionsreich ist. `V113` erst nach V76-Abgleich und nicht parallel zu `V118`/`V96`, da Start-Setup- und Hangar-Contracts geteilt werden.
+4. `V96` erst nach einem erfolgreichen kleinen Architektur-Proof (`V118`) oder als eng begrenzter Boundary-Slice; kein breiter Boundary-/Legacy-Block am Stueck.
+5. `V141` als kleiner WARN-Pilot fuer Finding-/Plan-/Doku-Drift, nicht als harter Source-of-Truth-Wechsel. Pilotfaelle: Docs-Freshness, stale Finding-/Changelog-Signale und kuenftige Master-vs-Detail-Statusdrift.
+6. `V142` nach `V141`: Graph-Generated-Gate und CI/Hook-Schutz erst haerten, wenn Driftklassen und Warn-/Fail-Grenzen kalibriert sind.
+7. `V136` vor `V122`, falls AI-/Memory-Arbeit priorisiert wird: erst portabler Knowledge-Core/Kernelschnitt, danach repo-natives Memory; Ruflo/MCP bleibt spaeterer User-Gate.
+8. `V127`, `V143` und `V144` nur nach konkretem Nutzenbeweis: Repo-/Plan-Map-Navigation, Agent-Skill-Auslagerung und JSON-Source-of-Truth-Entscheidung bleiben nachrangig. `V144` bleibt explizit Future-Entscheidung; Markdown bleibt kanonisch bis separater D3/D4-Gate.
 
 ## Conflict-Log
 

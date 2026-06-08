@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 258,
+          "concreteCount": 259,
           "plannedCount": 0
         }
       }
@@ -742,7 +742,7 @@
           "tsconfig.architecture.json"
         ],
         "scopeResolution": {
-          "concreteCount": 253,
+          "concreteCount": 254,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -2340,7 +2340,7 @@
       "id": "V140",
       "type": "block",
       "title": "Mobile God-File-Sunset fuer App-Shell und Touch-Input",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2348,10 +2348,14 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "140.1",
+        "currentPhase": "140.99",
         "planFile": "docs/plaene/aktiv/V140.md",
         "scopeDeclarations": [
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/plan-index.json",
           "docs/plaene/aktiv/V140.md",
+          "docs/prozess/Dokumentationsstatus.md",
           "scripts/architecture/LegacyMaxLinesConfig.mjs",
           "src/mobile-classic/MobileClassicApp.js",
           "src/mobile-classic/MobileClassicMenuUi.js",
@@ -2363,11 +2367,12 @@
           "src/ui/TouchInputSource.js",
           "tests/mobile-arcade-app.contract.test.mjs",
           "tests/mobile-classic-app.contract.test.mjs",
+          "tests/touch-control-layout-ops.contract.test.mjs",
           "tests/touch-tilt-steering-ops.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 9,
-          "plannedCount": 4
+          "concreteCount": 18,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
           "V131",
@@ -3775,7 +3780,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 266,
+          "concreteCount": 267,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -6662,7 +6667,7 @@
       "id": "V140.3",
       "type": "phase",
       "title": "Touch-Sensor-Lifecycle und Layout schneiden",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.3"
@@ -6672,7 +6677,7 @@
       "id": "V140.4",
       "type": "phase",
       "title": "Mobile-App-Shell schneiden",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.4"
@@ -6682,7 +6687,7 @@
       "id": "V140.5",
       "type": "phase",
       "title": "Guard-Ratchet und Handoff",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.5"
@@ -6692,7 +6697,7 @@
       "id": "V140.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.99"
@@ -19785,8 +19790,8 @@
     {
       "id": "V140.3.2",
       "type": "subphase",
-      "title": "Button-Definitionen, Layout-Resolver und DOM-nahe Darstellung nach `TouchControlLayoutOps.js` schneiden.",
-      "status": "open",
+      "title": "Button-Definitionen, Layout-Resolver und DOM-nahe Darstellung nach `TouchControlLayoutOps.js` schneiden. (abgeschlossen: 2026-06-08; evidence: `src/ui/touch/TouchControlLayoutOps.js` uebernimmt Button-Definitionen, Joystick-/Button-/Tilt-DOM-Bau, Sichtbarkeit, Button-Visual-State und Floating-Joystick-Positionierung; `TouchInputSource.js` re-exportiert die bestehenden Touch-Contracts kompatibel)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.3",
@@ -19796,8 +19801,8 @@
     {
       "id": "V140.3.3",
       "type": "subphase",
-      "title": "Press-/Hold-Semantik unveraendert lassen; funktionale V131-Aenderungen erst auf den neuen Zielmodulen umsetzen.",
-      "status": "open",
+      "title": "Press-/Hold-Semantik unveraendert lassen; funktionale V131-Aenderungen erst auf den neuen Zielmodulen umsetzen. (abgeschlossen: 2026-06-08; evidence: `_onTouchStart`, `_onTouchEnd`, `_requestPause`, Edge-Pressed-Polling und Action-Gating bleiben im Adapter; `node --test tests/touch-control-layout-ops.contract.test.mjs tests/touch-tilt-steering-ops.contract.test.mjs tests/mobile-classic-app.contract.test.mjs tests/mobile-arcade-app.contract.test.mjs` -> 37/37 PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.3",
@@ -19807,8 +19812,8 @@
     {
       "id": "V140.3.4",
       "type": "subphase",
-      "title": "Contract-Signale ausfuehren und `TouchInputSource.js`-Ceiling erneut senken oder entfernen. (Teil-Evidence 2026-06-08: Sensor-Lifecycle-Slice 34/34 PASS; `check:architecture:touched-strict`, Metrics und Ratchet -> PASS; Ceiling fuer den Adapter 847 -> 809 gesenkt. `npm run gates:pre-commit` -> FAIL am parallel eingefuehrten Workflow-Contract-Check mit 102 noch nicht migrierten `.agents/workflows/**`-Findings; kein V140-Dateifehler. Layout-Slice und dessen erneutes Ratchet bleiben offen.)",
-      "status": "open",
+      "title": "Contract-Signale ausfuehren und `TouchInputSource.js`-Ceiling erneut senken oder entfernen. (abgeschlossen: 2026-06-08; evidence: `node --test tests/touch-control-layout-ops.contract.test.mjs tests/touch-tilt-steering-ops.contract.test.mjs tests/mobile-classic-app.contract.test.mjs tests/mobile-arcade-app.contract.test.mjs` -> 37/37 PASS; `npm run check:eslint:touched-strict`, `npm run check:architecture:touched-strict`, Metrics, Ratchet und `npm run plan:check` -> PASS; `npx eslint src/ui/TouchInputSource.js src/ui/touch/TouchControlLayoutOps.js` -> PASS; `TouchInputSource.js` ESLint-Zaehler 809 -> 720, physisch 901 -> 802; `npm run lint:architecture` -> FAIL nur am verbleibenden `MobileClassicApp.js`-Ceiling 1276/1180 plus bestehende 29 innerHTML-Warnungen; `npm run gates:pre-commit` -> FAIL bei vorbestehendem `graph:check`-Drift fuer `knowledge-graph.json`/Coverage, kein 140.3-Dateifehler)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.3",
@@ -19818,8 +19823,8 @@
     {
       "id": "V140.4.1",
       "type": "subphase",
-      "title": "Style-Injection nach `MobileClassicStyles.js` extrahieren.",
-      "status": "open",
+      "title": "Style-Injection nach `MobileClassicStyles.js` extrahieren. (abgeschlossen: 2026-06-08; evidence: `src/mobile-classic/MobileClassicStyles.js` uebernimmt `ensureMobileClassicStyles` und die kompakte CSS-Injection; `MobileClassicApp.js` importiert nur noch den Style-Owner; Mobile-Classic-/Arcade-Contracts -> 29/29 PASS; `npm run lint:architecture`, touched-strict, Metrics, Ratchet, `npm run app:android:assets:check` und `npm run plan:check` -> PASS; `MobileClassicApp.js` ESLint-Zaehler 1276 -> 706, physisch 1435 -> 774; neues Style-Modul 10 ESLint-/14 physische Zeilen; `npm run gates:pre-commit` -> FAIL bei vorbestehendem `graph:check`-Drift fuer `knowledge-graph.json`/Coverage)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.4",
@@ -19829,8 +19834,8 @@
     {
       "id": "V140.4.2",
       "type": "subphase",
-      "title": "Update-Konfiguration, Github-Release-Check und Update-DOM nach `MobileClassicUpdateUi.js` extrahieren.",
-      "status": "open",
+      "title": "Update-Konfiguration, Github-Release-Check und Update-DOM nach `MobileClassicUpdateUi.js` extrahieren. (abgeschlossen: 2026-06-08; evidence: `src/mobile-classic/MobileClassicUpdateUi.js` uebernimmt Update-Panel, Manifest-Hydration, GitHub-Release-Check und Update-Ziel; `MobileClassicApp.js` importiert nur noch `setupMobileClassicUpdateUi` und re-exportiert die bestehende Update-API kompatibel; Mobile-Classic-/Arcade-Contracts -> 29/29 PASS; `npm run lint:architecture`, `npm run check:eslint:touched-strict`, `npm run check:architecture:touched-strict`, Metrics, Ratchet, `npm run app:android:assets:check`, `npm run plan:check` und `npm run check:plan-evidence-claims` -> PASS; `npx eslint src/mobile-classic/MobileClassicApp.js src/mobile-classic/MobileClassicUpdateUi.js tests/mobile-classic-app.contract.test.mjs` -> PASS; `MobileClassicApp.js` ESLint-Zaehler 706 -> 548, physisch 774 -> 598; neues Update-Modul 189 physische Zeilen und unter Default-Limit)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.4",
@@ -19840,8 +19845,8 @@
     {
       "id": "V140.4.3",
       "type": "subphase",
-      "title": "Android-Menue-DOM, Route-Sync, Quick-Starts und UI-Locks nach Verantwortung pruefen und den kleinsten sicheren Folge-Schnitt nach `MobileClassicMenuUi.js` umsetzen.",
-      "status": "open",
+      "title": "Android-Menue-DOM, Route-Sync, Quick-Starts und UI-Locks nach Verantwortung pruefen und den kleinsten sicheren Folge-Schnitt nach `MobileClassicMenuUi.js` umsetzen. (abgeschlossen: 2026-06-08; evidence: `src/mobile-classic/MobileClassicMenuUi.js` uebernimmt Entry-/Route-DOM, Menue-Copy, Sichtbarkeitsobserver, Quick-Start-Ausblendung, Mode-/Route-Button-Sync und UI-Locks; `MobileClassicApp.js` delegiert ueber `setupMobileClassicMenuDocumentState` und `applyMobileClassicMenuUiLocks`)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.4",
@@ -19851,8 +19856,8 @@
     {
       "id": "V140.4.4",
       "type": "subphase",
-      "title": "Mobile-Contracts und Android-Asset-Check ausfuehren; `MobileClassicApp.js`-Ceiling nach jedem sicheren Schnitt senken oder entfernen.",
-      "status": "open",
+      "title": "Mobile-Contracts und Android-Asset-Check ausfuehren; `MobileClassicApp.js`-Ceiling nach jedem sicheren Schnitt senken oder entfernen. (abgeschlossen: 2026-06-08; evidence: Style-Slice -> Mobile-Contracts 29/29 PASS, `app:android:assets:check` PASS, Ceiling 1180 -> 706; Update-Slice -> Mobile-Contracts 29/29 PASS, `app:android:assets:check` PASS, Ceiling 706 -> 548; Menu-Slice -> Mobile-Contracts 29/29 PASS, `app:android:assets:check` PASS, `npm run lint:architecture` PASS mit bekannten 29 innerHTML-Warnungen, Metrics/Ratchet PASS, direkter ESLint auf App/MenuUI/Contracts PASS; `MobileClassicApp.js` 548 ESLint-/598 physische Zeilen -> 127 physische Zeilen; Ceiling entfernt)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.4",
@@ -19862,8 +19867,8 @@
     {
       "id": "V140.5.1",
       "type": "subphase",
-      "title": "`LegacyMaxLinesConfig.mjs` nur auf verifizierte niedrigere Staende anpassen; keine Ceiling-Erhoehung.",
-      "status": "open",
+      "title": "`LegacyMaxLinesConfig.mjs` nur auf verifizierte niedrigere Staende anpassen; keine Ceiling-Erhoehung. (abgeschlossen: 2026-06-08; evidence: `TouchInputSource.js`-Ceiling 847 -> 720 aus 140.3 bleibt gesenkt; `MobileClassicApp.js`-Ceiling 548 wurde nach App-Shell-Schnitt entfernt; keine Ceiling-Erhoehung und keine neue Menue-Ceiling)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.5",
@@ -19873,8 +19878,8 @@
     {
       "id": "V140.5.2",
       "type": "subphase",
-      "title": "Restverantwortungen und maximal zwei weitere Folge-Slices dokumentieren, falls eine Entry-Datei noch ueber 500 Zeilen liegt.",
-      "status": "open",
+      "title": "Restverantwortungen und maximal zwei weitere Folge-Slices dokumentieren, falls eine Entry-Datei noch ueber 500 Zeilen liegt. (abgeschlossen: 2026-06-08; evidence: `MobileClassicApp.js` ist mit 127 physischen Zeilen keine Entry-Debt-Surface mehr; Restverantwortungen: Target-Erkennung, Settings-Normalisierung, Document-Composition, Update-/Menu-Delegation; kein weiterer Pflicht-Folge-Slice fuer die Entry-Datei)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.5",
@@ -19884,8 +19889,8 @@
     {
       "id": "V140.5.3",
       "type": "subphase",
-      "title": "V131-Handoff aktualisieren: Press-/Hold-, Pause-/Back- und Orientation-Arbeit nutzt die neuen Zielmodule statt die Debt-Surfaces auszubauen.",
-      "status": "open",
+      "title": "V131-Handoff aktualisieren: Press-/Hold-, Pause-/Back- und Orientation-Arbeit nutzt die neuen Zielmodule statt die Debt-Surfaces auszubauen. (abgeschlossen: 2026-06-08; evidence: V131-Folgearbeit soll Touch-Verhalten ueber `TouchTiltSteeringOps`, `TouchTiltSensorLifecycle`, `TouchControlLayoutOps` und Menue-/Route-Arbeit ueber `MobileClassicMenuUi` anschliessen; `TouchInputSource.js` und `MobileClassicApp.js` bleiben Adapter/Composition statt Feature-Ablage)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.5",
@@ -19895,8 +19900,8 @@
     {
       "id": "V140.5.4",
       "type": "subphase",
-      "title": "V141- und Tooling-Smoke-Abgrenzung im Abschluss benennen, damit V140 nicht als Fix fuer Doku- oder Viewer-Drift missverstanden wird.",
-      "status": "open",
+      "title": "V141- und Tooling-Smoke-Abgrenzung im Abschluss benennen, damit V140 nicht als Fix fuer Doku- oder Viewer-Drift missverstanden wird. (abgeschlossen: 2026-06-08; evidence: V140-Gates adressieren nur Mobile-App-Shell, Touch-Input und Legacy-Ceilings; Doku-Freshness/Finding-Drift bleibt V141, Viewer-/Repo-Tool-Smokes bleiben separater Tooling-Scope)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.5",
@@ -19906,8 +19911,8 @@
     {
       "id": "V140.99.1",
       "type": "subphase",
-      "title": "Alle vorherigen Phasen sind abgeschlossen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "Alle vorherigen Phasen sind abgeschlossen oder blockerfest dokumentiert. (abgeschlossen: 2026-06-08; evidence: 140.1-140.5 sind `[x]`; Restabgrenzung V131/V141/Tooling-Smokes ist in 140.5 dokumentiert)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.99",
@@ -19917,8 +19922,8 @@
     {
       "id": "V140.99.2",
       "type": "subphase",
-      "title": "`npm run lint:architecture`, `npm run architecture:guard`, Mobile-Contracts, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen.",
-      "status": "open",
+      "title": "`npm run lint:architecture`, `npm run architecture:guard`, Mobile-Contracts, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen. (abgeschlossen: 2026-06-08; evidence: `npm run architecture:guard` -> PASS; `node --test tests/mobile-classic-app.contract.test.mjs tests/mobile-arcade-app.contract.test.mjs` -> 29/29 PASS; `npm run plan:check`, `npm run check:plan-evidence-claims`, `npm run docs:sync`, `npm run docs:check`, `npm run graph:build`, `npm run graph:check` und `npm run gates:pre-commit` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.99",
@@ -19928,8 +19933,8 @@
     {
       "id": "V140.99.3",
       "type": "subphase",
-      "title": "Beide aktuellen `max-lines`-Blocker sind entfernt; keine neue Debt-Surface und keine versteckte Mobile-Verhaltensaenderung sind entstanden.",
-      "status": "open",
+      "title": "Beide aktuellen `max-lines`-Blocker sind entfernt; keine neue Debt-Surface und keine versteckte Mobile-Verhaltensaenderung sind entstanden. (abgeschlossen: 2026-06-08; evidence: `TouchInputSource.js`-Ceiling auf 720 gesenkt und kein `lint:architecture`-Fehler mehr; `MobileClassicApp.js` 127 physische Zeilen und ohne Legacy-Ceiling; `MobileClassicMenuUi.js` besitzt den Menue-/Route-/Lock-Owner ohne eigene Ceiling; Mobile-Contracts 29/29 PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V140",
         "phaseCode": "140.99",
@@ -34661,6 +34666,7 @@
           "V125",
           "V138",
           "V139",
+          "V140",
           "V90"
         ],
         "exists": true
@@ -34689,6 +34695,7 @@
           "V125",
           "V138",
           "V139",
+          "V140",
           "V90",
           "V94"
         ],
@@ -34780,6 +34787,7 @@
           "V121",
           "V123",
           "V139",
+          "V140",
           "V144"
         ],
         "exists": true
@@ -38217,6 +38225,7 @@
           "V119",
           "V123",
           "V125",
+          "V140",
           "V141",
           "V90"
         ],
@@ -47535,7 +47544,7 @@
         "scopeBlocks": [
           "V140"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -47550,7 +47559,7 @@
         "scopeBlocks": [
           "V140"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -47565,7 +47574,7 @@
         "scopeBlocks": [
           "V140"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -52942,9 +52951,11 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V140"
+          "V105",
+          "V140",
+          "V91"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -55177,6 +55188,23 @@
         ],
         "scopeBlocks": [
           "B13"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "tests/touch-control-layout-ops.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "audit-scope",
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "B13",
+          "V140"
         ],
         "exists": true
       }
@@ -63047,6 +63075,15 @@
     {
       "from": "B13",
       "to": "tests/tmp-shorts-diagnostic.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/touch-control-layout-ops.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -71127,6 +71164,15 @@
     {
       "from": "V105",
       "to": "src/ui/StorageKeys.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
+      "to": "src/ui/touch/TouchControlLayoutOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91814,7 +91860,43 @@
     },
     {
       "from": "V140",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V140",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V140",
+      "to": "docs/generated/plan-index.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V140",
       "to": "docs/plaene/aktiv/V140.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V140",
+      "to": "docs/prozess/Dokumentationsstatus.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -91914,6 +91996,15 @@
     {
       "from": "V140",
       "to": "tests/mobile-classic-app.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V140",
+      "to": "tests/touch-control-layout-ops.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -119767,6 +119858,15 @@
     {
       "from": "V91",
       "to": "src/ui/StorageKeys.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/ui/touch/TouchControlLayoutOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {

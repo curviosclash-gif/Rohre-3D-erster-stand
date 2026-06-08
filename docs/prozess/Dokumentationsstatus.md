@@ -1,11 +1,12 @@
 # Dokumentationsstatus
 
-Stand: 2026-06-07
+Stand: 2026-06-08
 Modus: sync
 Gate: PASS
 
-## Automatisch aktualisiert
-- Keine inhaltlichen Datumsupdates noetig.
+## Schreibverhalten
+- Referenzdokumente werden nicht automatisch umdatiert.
+- Statusreport: explizit aktualisiert.
 
 ## Pflichtdateien
 - Alle Pflichtdateien vorhanden.
@@ -20,4 +21,4 @@ Gate: PASS
 - Keine Mojibake-Muster gefunden.
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-06-07).
+- Dokumentation aktuell (geprueft am 2026-06-08).

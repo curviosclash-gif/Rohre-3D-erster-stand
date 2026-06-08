@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-08T14:20:23.279Z",
+  "generated_at": "2026-06-08T15:32:37.322Z",
   "locks": [
     {
       "person": "codex",
@@ -1091,31 +1091,6 @@
       "start_date": "2026-06-08",
       "target_completion": "2026-06-07",
       "status": "completed",
-      "notes": ""
-    },
-    {
-      "person": "codex",
-      "block_id": "V140",
-      "phase": "140.4",
-      "scope_files": [
-        "src/mobile-classic/MobileClassicApp.js",
-        "src/ui/TouchInputSource.js",
-        "src/mobile-classic/MobileClassicStyles.js",
-        "src/mobile-classic/MobileClassicUpdateUi.js",
-        "src/mobile-classic/MobileClassicMenuUi.js",
-        "src/ui/touch/TouchTiltSteeringOps.js",
-        "src/ui/touch/TouchTiltSensorLifecycle.js",
-        "src/ui/touch/TouchControlLayoutOps.js",
-        "tests/touch-tilt-steering-ops.contract.test.mjs",
-        "tests/touch-control-layout-ops.contract.test.mjs",
-        "tests/mobile-classic-app.contract.test.mjs",
-        "tests/mobile-arcade-app.contract.test.mjs",
-        "scripts/architecture/LegacyMaxLinesConfig.mjs",
-        "docs/plaene/aktiv/V140.md"
-      ],
-      "start_date": "2026-06-08",
-      "target_completion": "2026-06-07",
-      "status": "in-progress",
       "notes": ""
     }
   ],

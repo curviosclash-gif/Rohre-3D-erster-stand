@@ -186,11 +186,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2132,
-    "rawCoveredFileCount": 1374,
-    "rawCoveragePercent": 64.4,
-    "adjustedTrackedFileCount": 1443,
-    "adjustedCoveredFileCount": 1138,
+    "trackedFileCount": 2137,
+    "rawCoveredFileCount": 1379,
+    "rawCoveragePercent": 64.5,
+    "adjustedTrackedFileCount": 1445,
+    "adjustedCoveredFileCount": 1140,
     "adjustedCoveragePercent": 78.9,
     "uncoveredFileCount": 758,
     "uncoveredActiveFileCount": 305,
@@ -240,8 +240,8 @@
       {
         "classification": "mobile-wrapper",
         "excludedFromCoverage": true,
-        "count": 3,
-        "coveredCount": 2
+        "count": 6,
+        "coveredCount": 5
       },
       {
         "classification": "native-wrapper",
@@ -258,8 +258,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1026,
-        "coveredCount": 903
+        "count": 1028,
+        "coveredCount": 905
       },
       {
         "classification": "product-docs",
@@ -11325,6 +11325,7 @@
         "V125",
         "V138",
         "V139",
+        "V140",
         "V90"
       ],
       "surfaces": [],
@@ -11355,6 +11356,7 @@
         "V125",
         "V138",
         "V139",
+        "V140",
         "V90",
         "V94"
       ],
@@ -11439,6 +11441,7 @@
         "V121",
         "V123",
         "V139",
+        "V140",
         "V144"
       ],
       "surfaces": [],
@@ -15349,6 +15352,7 @@
         "V119",
         "V123",
         "V125",
+        "V140",
         "V141",
         "V90"
       ],
@@ -27536,6 +27540,40 @@
       "excludeReason": "Mobile app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
     },
     {
+      "path": "src/mobile-classic/MobileClassicMenuUi.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V140"
+      ],
+      "surfaces": [],
+      "classification": "mobile-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Mobile app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
+    },
+    {
+      "path": "src/mobile-classic/MobileClassicStyles.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V140"
+      ],
+      "surfaces": [],
+      "classification": "mobile-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Mobile app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
+    },
+    {
       "path": "src/mobile-classic/MobileClassicUpdateConfig.js",
       "tracked": true,
       "coveredInCore": false,
@@ -27543,6 +27581,23 @@
       "covered": false,
       "coverageSources": [],
       "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "mobile-wrapper",
+      "excludedFromCoverage": true,
+      "excludeReason": "Mobile app adapter files are validated by app-specific contracts outside the desktop architecture KPI."
+    },
+    {
+      "path": "src/mobile-classic/MobileClassicUpdateUi.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V140"
+      ],
       "surfaces": [],
       "classification": "mobile-wrapper",
       "excludedFromCoverage": true,
@@ -33349,6 +33404,25 @@
       "excludeReason": null
     },
     {
+      "path": "src/ui/touch/TouchControlLayoutOps.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V105",
+        "V140",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "src/ui/touch/TouchTiltSensorLifecycle.js",
       "tracked": true,
       "coveredInCore": true,
@@ -35725,6 +35799,25 @@
       ],
       "scopeBlocks": [
         "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/touch-control-layout-ops.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V140"
       ],
       "surfaces": [],
       "classification": "product-code",
