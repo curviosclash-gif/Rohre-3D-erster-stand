@@ -156,19 +156,20 @@ test('Mobile Arcade route allowlist preserves MVP routes and existing route keys
 test('Unified Mobile Android shell carries Arcade HUD, Ghost, and pause affordances', async () => {
   const mobileClassicApp = await readText('src/mobile-classic/MobileClassicApp.js');
   const mobileClassicStyles = await readText('src/mobile-classic/MobileClassicStyles.js');
-  const mobileClassicSurface = `${mobileClassicApp}\n${mobileClassicStyles}`;
+  const mobileClassicMenuUi = await readText('src/mobile-classic/MobileClassicMenuUi.js');
+  const mobileClassicSurface = `${mobileClassicApp}\n${mobileClassicStyles}\n${mobileClassicMenuUi}`;
   const hudRuntimeSystem = await readText('src/ui/HudRuntimeSystem.js');
 
   assert.match(mobileClassicApp, /modePath === MENU_MODE_PATHS\.ARCADE/);
   assert.match(mobileClassicSurface, /touch-button-pause/);
   assert.match(mobileClassicSurface, /mobile-android-entry-panel/);
-  assert.match(mobileClassicApp, /mobileModeEntry/);
-  assert.match(mobileClassicApp, /Spielstil waehlen/);
-  assert.match(mobileClassicApp, /Start vorbereiten/);
+  assert.match(mobileClassicMenuUi, /mobileModeEntry/);
+  assert.match(mobileClassicMenuUi, /Spielstil waehlen/);
+  assert.match(mobileClassicMenuUi, /Start vorbereiten/);
   assert.match(mobileClassicSurface, /#parcours-hud/);
   assert.match(mobileClassicSurface, /#parcours-minimap/);
   assert.match(mobileClassicSurface, /mobile-arcade-ghost-status/);
-  assert.match(mobileClassicApp, /Ghost: Selbstduell/);
+  assert.match(mobileClassicMenuUi, /Ghost: Selbstduell/);
   assert.match(hudRuntimeSystem, /_updateParcoursHud[\s\S]*tickMinimap/);
 });
 
