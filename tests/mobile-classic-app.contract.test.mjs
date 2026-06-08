@@ -882,6 +882,8 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   const mainActivity = await readText('android-classic/app/src/main/java/de/curviosclash/classic/MainActivity.java');
   const updateScript = await readText('scripts/update-mobile-classic-from-github.mjs');
   const mobileClassicApp = await readText('src/mobile-classic/MobileClassicApp.js');
+  const mobileClassicStyles = await readText('src/mobile-classic/MobileClassicStyles.js');
+  const mobileClassicSurface = `${mobileClassicApp}\n${mobileClassicStyles}`;
   const startSetupUiOps = await readText('src/ui/start-setup/StartSetupUiOps.js');
   const matchInputResolver = await readText('src/ui/MatchInputSourceResolver.js');
   const touchInputSource = await readText('src/ui/TouchInputSource.js');
@@ -936,10 +938,11 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   assert.match(mobileClassicApp, /mobile-classic\.manifest\.json/);
   assert.match(mobileClassicApp, /Freier Flug fuer den schnellen Start/);
   assert.match(mobileClassicApp, /Zeitroute mit Ghost-Selbstduell/);
-  assert.match(mobileClassicApp, /mobile-android-route-panel/);
+  assert.match(mobileClassicSurface, /mobile-android-route-panel/);
   assert.match(mobileClassicApp, /mobileRouteKey/);
   assert.match(mobileClassicApp, /dispatchMapSelectChange/);
-  assert.match(mobileClassicApp, /start-summary-block\[data-summary-label="ghost_kollision"\]/);
+  assert.match(mobileClassicStyles, /start-summary-block\[data-summary-label="ghost_kollision"\]/);
+  assert.match(mobileClassicApp, /ensureMobileClassicStyles/);
   assert.match(startSetupUiOps, /dataset\.summaryLabel/);
   assert.match(mobileClassicApp, /Classic starten/);
   assert.match(mobileClassicApp, /Parcours starten/);
