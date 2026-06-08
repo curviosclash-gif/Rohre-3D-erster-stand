@@ -883,7 +883,8 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   const updateScript = await readText('scripts/update-mobile-classic-from-github.mjs');
   const mobileClassicApp = await readText('src/mobile-classic/MobileClassicApp.js');
   const mobileClassicStyles = await readText('src/mobile-classic/MobileClassicStyles.js');
-  const mobileClassicSurface = `${mobileClassicApp}\n${mobileClassicStyles}`;
+  const mobileClassicUpdateUi = await readText('src/mobile-classic/MobileClassicUpdateUi.js');
+  const mobileClassicSurface = `${mobileClassicApp}\n${mobileClassicStyles}\n${mobileClassicUpdateUi}`;
   const startSetupUiOps = await readText('src/ui/start-setup/StartSetupUiOps.js');
   const matchInputResolver = await readText('src/ui/MatchInputSourceResolver.js');
   const touchInputSource = await readText('src/ui/TouchInputSource.js');
@@ -933,9 +934,11 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   assert.match(updateScript, /ensureCleanWorkingTree/);
   assert.match(updateScript, /capacitor-mobile-classic\.mjs/);
   assert.match(updateScript, /GitHub URL/);
-  assert.match(mobileClassicApp, /mobile-classic-update-check/);
-  assert.match(mobileClassicApp, /checkMobileClassicGithubRelease/);
-  assert.match(mobileClassicApp, /mobile-classic\.manifest\.json/);
+  assert.match(mobileClassicApp, /setupMobileClassicUpdateUi/);
+  assert.doesNotMatch(mobileClassicApp, /mobileClassicUpdateState|mobile-classic\.manifest\.json/);
+  assert.match(mobileClassicUpdateUi, /mobile-classic-update-check/);
+  assert.match(mobileClassicUpdateUi, /checkMobileClassicGithubRelease/);
+  assert.match(mobileClassicUpdateUi, /mobile-classic\.manifest\.json/);
   assert.match(mobileClassicApp, /Freier Flug fuer den schnellen Start/);
   assert.match(mobileClassicApp, /Zeitroute mit Ghost-Selbstduell/);
   assert.match(mobileClassicSurface, /mobile-android-route-panel/);
@@ -947,7 +950,7 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   assert.match(mobileClassicApp, /Classic starten/);
   assert.match(mobileClassicApp, /Parcours starten/);
   assert.match(mobileClassicApp, /Solo spielen/);
-  assert.match(mobileClassicApp, /Update/);
+  assert.match(mobileClassicUpdateUi, /Update/);
   assert.match(touchInputSource, /TILT SANFT/);
   assert.match(touchInputSource, /KALIBRIERE/);
   assert.match(touchInputSource, /resolveTiltCalibrationNeutral/);
