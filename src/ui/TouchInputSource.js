@@ -11,12 +11,14 @@ import {
 } from '../shared/contracts/MobileClassicControlsContract.js';
 import {
     deriveTiltSteeringState,
-    normalizeOrientationAngle,
-    resolveTiltCalibrationNeutral,
     TILT_DEFAULT_CURVE_EXPONENT,
     TILT_DEFAULT_DEADZONE_DEG,
     TILT_DEFAULT_RANGE_DEG,
 } from './touch/TouchTiltSteeringOps.js';
+import {
+    resolveScreenOrientationAngle,
+    TouchTiltSensorLifecycle,
+} from './touch/TouchTiltSensorLifecycle.js';
 
 export {
     deriveTiltSteeringState,
@@ -31,9 +33,6 @@ export const TOUCH_CONTROL_MODES = Object.freeze({
 const TILT_DEFAULT_SMOOTHING = 0.24;
 const TILT_DEFAULT_RELEASE_THRESHOLD = 0.015;
 const TILT_EVENT_STALE_MS = 1600;
-const TILT_CALIBRATION_MIN_SAMPLES = 8;
-const TILT_CALIBRATION_SAMPLE_MS = 520;
-const TILT_CALIBRATION_MAX_MS = 1100;
 
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -71,20 +70,6 @@ function formatAxisValue(value) {
 function formatSensorHz(value) {
     const numeric = Number(value);
     return Number.isFinite(numeric) && numeric > 0 ? `${numeric.toFixed(0)}Hz` : '--Hz';
-}
-
-function hasDeviceOrientationSupport() {
-    return typeof window !== 'undefined' && 'DeviceOrientationEvent' in window;
-}
-
-function resolveScreenOrientationAngle() {
-    if (typeof window === 'undefined') return 0;
-    const screenAngle = Number(window.screen?.orientation?.angle);
-    if (Number.isFinite(screenAngle)) {
-        return screenAngle;
-    }
-    const legacyAngle = Number(window.orientation);
-    return Number.isFinite(legacyAngle) ? legacyAngle : 0;
 }
 
 export function resolveTouchButtonDefinitions(controlMode = TOUCH_CONTROL_MODES.JOYSTICK, options = {}) {
@@ -144,32 +129,20 @@ export class TouchInputSource extends PlayerInputSource {
         this._joystickActive = false;
         this._joystickTouchId = null;
         this._buttonTouches = new Map();
-        this._tiltState = {
-            supported: hasDeviceOrientationSupport(),
-            enabled: false,
-            listening: false,
-            permission: 'idle',
-            beta: 0,
-            gamma: 0,
-            neutralBeta: 0,
-            neutralGamma: 0,
-            neutralOrientationAngle: 0,
-            hasNeutral: false,
-            pendingCalibration: false,
-            lastEventAt: 0,
-            eventIntervalMs: 0,
-            sensorHz: 0,
-        };
         this._tiltResolved = {
             yawAxis: 0,
             pitchAxis: 0,
         };
-        this._tiltCalibration = {
-            active: false,
-            samples: [],
-            startedAt: 0,
-            reason: 'none',
-        };
+        this._tiltSensorLifecycle = new TouchTiltSensorLifecycle({
+            isTiltMode: () => this._controlMode === TOUCH_CONTROL_MODES.TILT,
+            resetResolvedAxes: () => {
+                this._tiltResolved.yawAxis = 0;
+                this._tiltResolved.pitchAxis = 0;
+            },
+            updateUi: () => this._updateTiltUi(),
+        });
+        this._tiltState = this._tiltSensorLifecycle.state;
+        this._tiltCalibration = this._tiltSensorLifecycle.calibration;
 
         this._buttons = {
             fire: false,
@@ -205,7 +178,6 @@ export class TouchInputSource extends PlayerInputSource {
         this._touchStartHandler = (e) => this._onTouchStart(e);
         this._touchMoveHandler = (e) => this._onTouchMove(e);
         this._touchEndHandler = (e) => this._onTouchEnd(e);
-        this._orientationHandler = (e) => this._onDeviceOrientation(e);
         this._tiltActivateHandler = (e) => {
             e.preventDefault();
             this.requestTiltControl().catch(() => {
@@ -339,7 +311,7 @@ export class TouchInputSource extends PlayerInputSource {
     onMatchStart() {
         this._inMatch = true;
         if (this._controlMode === TOUCH_CONTROL_MODES.TILT) {
-            this._startTiltListening({ auto: true });
+            this._tiltSensorLifecycle.startListening({ auto: true });
         }
         this.autoDetectAndShow();
     }
@@ -810,116 +782,8 @@ export class TouchInputSource extends PlayerInputSource {
             || !this._isTiltFresh();
     }
 
-    _startTiltListening({ auto = false } = {}) {
-        if (this._controlMode !== TOUCH_CONTROL_MODES.TILT) return false;
-        this._tiltState.supported = hasDeviceOrientationSupport();
-        if (!this._tiltState.supported) {
-            this._tiltState.permission = 'unsupported';
-            this._updateTiltUi();
-            return false;
-        }
-        if (!this._tiltState.listening) {
-            window.addEventListener('deviceorientation', this._orientationHandler, { passive: true });
-            this._tiltState.listening = true;
-        }
-        this._tiltState.enabled = true;
-        this._tiltState.permission = auto ? 'auto' : 'granted';
-        this._beginTiltCalibration(auto ? 'match-start' : 'manual');
-        this._updateTiltUi();
-        return true;
-    }
-
-    async requestTiltControl() {
-        if (this._controlMode !== TOUCH_CONTROL_MODES.TILT) return false;
-        this._tiltState.supported = hasDeviceOrientationSupport();
-        if (!this._tiltState.supported) {
-            this._tiltState.permission = 'unsupported';
-            this._updateTiltUi();
-            return false;
-        }
-
-        const requestPermission = window.DeviceOrientationEvent?.requestPermission;
-        if (typeof requestPermission === 'function') {
-            const permission = await requestPermission.call(window.DeviceOrientationEvent);
-            this._tiltState.permission = permission === 'granted' ? 'granted' : 'denied';
-            if (permission !== 'granted') {
-                this._updateTiltUi();
-                return false;
-            }
-        }
-
-        return this._startTiltListening({ auto: false });
-    }
-
-    _onDeviceOrientation(event) {
-        const beta = Number(event?.beta);
-        const gamma = Number(event?.gamma);
-        if (!Number.isFinite(beta) || !Number.isFinite(gamma)) {
-            return;
-        }
-        const orientationAngle = resolveScreenOrientationAngle();
-        const now = Date.now();
-        const previousEventAt = this._tiltState.lastEventAt;
-        if (previousEventAt > 0 && now > previousEventAt) {
-            const intervalMs = now - previousEventAt;
-            this._tiltState.eventIntervalMs = this._tiltState.eventIntervalMs > 0
-                ? (this._tiltState.eventIntervalMs * 0.82) + (intervalMs * 0.18)
-                : intervalMs;
-            this._tiltState.sensorHz = this._tiltState.eventIntervalMs > 0
-                ? 1000 / this._tiltState.eventIntervalMs
-                : 0;
-        }
-        this._tiltState.beta = beta;
-        this._tiltState.gamma = gamma;
-        this._tiltState.lastEventAt = now;
-        if (
-            this._tiltState.hasNeutral
-            && normalizeOrientationAngle(this._tiltState.neutralOrientationAngle) !== orientationAngle
-            && !this._tiltCalibration.active
-        ) {
-            this._beginTiltCalibration('orientation-change');
-        }
-        if (this._tiltState.pendingCalibration || !this._tiltState.hasNeutral || this._tiltCalibration.active) {
-            this._captureTiltCalibrationSample(beta, gamma, orientationAngle);
-        }
-        this._updateTiltUi();
-    }
-
-    _beginTiltCalibration(reason = 'manual') {
-        this._tiltCalibration.active = true;
-        this._tiltCalibration.samples = [];
-        this._tiltCalibration.startedAt = Date.now();
-        this._tiltCalibration.reason = reason;
-        this._tiltState.pendingCalibration = true;
-        this._tiltResolved.yawAxis = 0;
-        this._tiltResolved.pitchAxis = 0;
-    }
-
-    _captureTiltCalibrationSample(beta, gamma, orientationAngle) {
-        if (!this._tiltCalibration.active) {
-            this._beginTiltCalibration('sample');
-        }
-        this._tiltCalibration.samples.push({ beta, gamma, orientationAngle });
-        const elapsedMs = Date.now() - this._tiltCalibration.startedAt;
-        const enoughSamples = this._tiltCalibration.samples.length >= TILT_CALIBRATION_MIN_SAMPLES;
-        const enoughTime = elapsedMs >= TILT_CALIBRATION_SAMPLE_MS;
-        const timedOut = elapsedMs >= TILT_CALIBRATION_MAX_MS;
-        if ((enoughSamples && enoughTime) || timedOut) {
-            this._finishTiltCalibration();
-        }
-    }
-
-    _finishTiltCalibration() {
-        const neutral = resolveTiltCalibrationNeutral(this._tiltCalibration.samples, this._tiltState);
-        this._tiltState.neutralBeta = neutral.neutralBeta;
-        this._tiltState.neutralGamma = neutral.neutralGamma;
-        this._tiltState.neutralOrientationAngle = neutral.neutralOrientationAngle;
-        this._tiltState.hasNeutral = true;
-        this._tiltState.pendingCalibration = false;
-        this._tiltCalibration.active = false;
-        this._tiltCalibration.samples = [];
-        this._tiltResolved.yawAxis = 0;
-        this._tiltResolved.pitchAxis = 0;
+    requestTiltControl() {
+        return this._tiltSensorLifecycle.requestControl();
     }
 
     _resolveTiltSteeringInput() {
@@ -964,17 +828,6 @@ export class TouchInputSource extends PlayerInputSource {
             pitchUp: pitchAxis < 0,
             pitchDown: pitchAxis > 0,
         };
-    }
-
-    _stopTiltListening() {
-        if (this._tiltState.listening && typeof window !== 'undefined') {
-            window.removeEventListener('deviceorientation', this._orientationHandler);
-        }
-        this._tiltState.listening = false;
-        this._tiltState.enabled = false;
-        this._tiltState.lastEventAt = 0;
-        this._tiltState.eventIntervalMs = 0;
-        this._tiltState.sensorHz = 0;
     }
 
     _resolveTiltStatusText() {
@@ -1024,7 +877,7 @@ export class TouchInputSource extends PlayerInputSource {
         if (this._tiltButtonEl) {
             this._tiltButtonEl.removeEventListener('click', this._tiltActivateHandler);
         }
-        this._stopTiltListening();
+        this._tiltSensorLifecycle.stopListening();
         if (this._joystickEl?.parentNode) this._joystickEl.parentNode.removeChild(this._joystickEl);
         for (const el of Object.values(this._buttonEls)) {
             if (el?.parentNode) el.parentNode.removeChild(el);

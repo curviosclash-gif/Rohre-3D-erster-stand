@@ -10,6 +10,6 @@ export const LEGACY_MAX_LINES = Object.freeze({
     'src/shared/runtime/GameRuntimePorts.js': 420,
     'src/ui/MatchFlowUiController.js': 790,
     'src/ui/PauseOverlayController.js': 300,
-    'src/ui/TouchInputSource.js': 847,
+    'src/ui/TouchInputSource.js': 809,
     'src/ui/UIManager.js': 1225,
 });

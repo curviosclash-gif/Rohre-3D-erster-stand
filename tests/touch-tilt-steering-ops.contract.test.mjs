@@ -6,6 +6,7 @@ import {
   normalizeOrientationAngle,
   resolveTiltCalibrationNeutral,
 } from '../src/ui/touch/TouchTiltSteeringOps.js';
+import { TouchTiltSensorLifecycle } from '../src/ui/touch/TouchTiltSensorLifecycle.js';
 import {
   MOBILE_CLASSIC_TILT_ASSIST_MODES,
 } from '../src/shared/contracts/MobileClassicControlsContract.js';
@@ -86,4 +87,70 @@ test('Touch tilt sensitivity and assist remain monotonic', () => {
   assert.ok(arcade.yawAxis > base.yawAxis);
   assert.ok(sensitive.yawAxis <= 1);
   assert.ok(arcade.yawAxis <= 1);
+});
+
+test('Touch tilt sensor lifecycle owns permission, calibration, and listener cleanup', async () => {
+  const listeners = new Map();
+  let now = 1000;
+  let resetCount = 0;
+  let updateCount = 0;
+  const ownerWindow = {
+    DeviceOrientationEvent: {
+      async requestPermission() {
+        return 'granted';
+      },
+    },
+    screen: {
+      orientation: {
+        angle: 90,
+      },
+    },
+    addEventListener(type, handler) {
+      listeners.set(type, handler);
+    },
+    removeEventListener(type, handler) {
+      if (listeners.get(type) === handler) listeners.delete(type);
+    },
+  };
+  const lifecycle = new TouchTiltSensorLifecycle({
+    getWindow: () => ownerWindow,
+    isTiltMode: () => true,
+    now: () => now,
+    resetResolvedAxes: () => {
+      resetCount += 1;
+    },
+    updateUi: () => {
+      updateCount += 1;
+    },
+  });
+
+  assert.equal(await lifecycle.requestControl(), true);
+  assert.equal(lifecycle.state.listening, true);
+  assert.equal(lifecycle.state.permission, 'granted');
+  assert.equal(lifecycle.calibration.reason, 'manual');
+  assert.equal(listeners.has('deviceorientation'), true);
+
+  for (let index = 0; index < 8; index += 1) {
+    now += 80;
+    listeners.get('deviceorientation')({
+      beta: 30 + index,
+      gamma: 10 + index,
+    });
+  }
+
+  assert.equal(lifecycle.state.hasNeutral, true);
+  assert.equal(lifecycle.state.pendingCalibration, false);
+  assert.equal(lifecycle.state.neutralOrientationAngle, 90);
+  assert.ok(lifecycle.state.sensorHz > 0);
+  assert.ok(resetCount >= 2);
+  assert.ok(updateCount >= 2);
+
+  lifecycle.stopListening();
+  assert.equal(lifecycle.state.listening, false);
+  assert.equal(lifecycle.state.enabled, false);
+  assert.equal(lifecycle.state.sensorHz, 0);
+  assert.equal(listeners.has('deviceorientation'), false);
+
+  lifecycle.stopListening();
+  assert.equal(lifecycle.state.listening, false);
 });
