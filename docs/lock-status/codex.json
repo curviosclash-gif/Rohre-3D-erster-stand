@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-06-02T12:15:01.210Z",
+  "timestamp": "2026-06-08T13:18:41.770Z",
   "locks": [
     {
       "block_id": "V103",
@@ -985,10 +985,56 @@
       "target_completion": "2026-05-30",
       "status": "completed",
       "notes": ""
+    },
+    {
+      "block_id": "V140",
+      "phase": "140.1",
+      "scope_files": [
+        "src/mobile-classic/MobileClassicApp.js",
+        "src/ui/TouchInputSource.js",
+        "src/mobile-classic/MobileClassicStyles.js",
+        "src/mobile-classic/MobileClassicUpdateUi.js",
+        "src/mobile-classic/MobileClassicMenuUi.js",
+        "src/ui/touch/TouchTiltSteeringOps.js",
+        "src/ui/touch/TouchTiltSensorLifecycle.js",
+        "src/ui/touch/TouchControlLayoutOps.js",
+        "tests/touch-tilt-steering-ops.contract.test.mjs",
+        "tests/mobile-classic-app.contract.test.mjs",
+        "tests/mobile-arcade-app.contract.test.mjs",
+        "scripts/architecture/LegacyMaxLinesConfig.mjs",
+        "docs/plaene/aktiv/V140.md"
+      ],
+      "start_date": "2026-06-07",
+      "target_completion": "2026-06-07",
+      "status": "completed",
+      "notes": ""
+    },
+    {
+      "block_id": "V140",
+      "phase": "140.2",
+      "scope_files": [
+        "src/mobile-classic/MobileClassicApp.js",
+        "src/ui/TouchInputSource.js",
+        "src/mobile-classic/MobileClassicStyles.js",
+        "src/mobile-classic/MobileClassicUpdateUi.js",
+        "src/mobile-classic/MobileClassicMenuUi.js",
+        "src/ui/touch/TouchTiltSteeringOps.js",
+        "src/ui/touch/TouchTiltSensorLifecycle.js",
+        "src/ui/touch/TouchControlLayoutOps.js",
+        "tests/touch-tilt-steering-ops.contract.test.mjs",
+        "tests/mobile-classic-app.contract.test.mjs",
+        "tests/mobile-arcade-app.contract.test.mjs",
+        "scripts/architecture/LegacyMaxLinesConfig.mjs",
+        "docs/plaene/aktiv/V140.md"
+      ],
+      "start_date": "2026-06-08",
+      "target_completion": "2026-06-07",
+      "status": "in-progress",
+      "notes": ""
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "121.99",
+    "phase_id": "140.2",
     "completed_items": [],
     "last_commit": ""
   }
