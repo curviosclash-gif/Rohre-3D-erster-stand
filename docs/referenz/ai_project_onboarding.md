@@ -25,10 +25,9 @@ Bei Scope-, Dependency- oder Surface-Fragen zuerst den Knowledge-Graph nutzen.
 ## 3. Referenzquellen bei Bedarf
 
 1. `docs/referenz/ai_architecture_context.md`
-2. `docs/release/Releaseplan_Spiel_2026.md`
-3. Neuester `docs/tests/Testergebnisse_Phase4b_YYYY-MM-DD.md`
-4. `docs/prozess/Dokumentationsstatus.md`
-5. `docs/INDEX.md`
+2. Neuester `docs/tests/Testergebnisse_Phase4b_YYYY-MM-DD.md`
+3. `docs/prozess/Dokumentationsstatus.md`
+4. `docs/INDEX.md`
 
 Historische Deep-Dive-Dokumente liegen in `docs/archive/` und alte Planakten in `docs/plaene/alt/`.
 Diese Quellen nur bei explizitem Historien-, Evidence-, Dependency- oder Abgleichsauftrag lesen.

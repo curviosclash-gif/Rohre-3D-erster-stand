@@ -41,8 +41,7 @@ Beispiele: `delete` fuer `dist/` oder `playwright-report/`, `archive` fuer aelte
 2. `docs/referenz/ai_architecture_context.md`
 3. `docs/referenz/desktop_online_signaling.md`
 4. `docs/Umsetzungsplan.md`
-5. `docs/release/Releaseplan_Spiel_2026.md`
-6. `docs/INDEX.md`
+5. `docs/INDEX.md`
 
 ## Desktop Online Build
 
