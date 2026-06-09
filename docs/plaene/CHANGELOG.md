@@ -1151,3 +1151,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Evidence: `node --test tests/agent-governance.contract.test.mjs tests/workflow-contracts.contract.test.mjs`, `npm run check:workflows`, `npm run docs:check`, `npm run check:agent-context`, `npm run check:plan-evidence-claims` und `npm run plan:check` -> PASS; `npm run gates:pre-commit` im isolierten Governance-Scope und nach dem finalen `graph:build` im gemeinsamen Arbeitsbaum -> PASS.
 - Residual-risk: Die Workflow-Metadaten beschreiben und validieren den vorgesehenen Pfad, ersetzen aber keine semantische Laufzeitbeobachtung jedes Agenten. Der Commit-Wrapper setzt weiterhin bewusst voraus, dass der aufrufende Workflow zuvor nur seinen eigenen Scope gestaged hat.
 - Not-checked: keine Vollsuite und keine produktiven Runtime-, UI-, Gameplay-, Physik-, Multiplayer-, Recording- oder Bot-Training-Pfade.
+
+## V141 Abschluss 2026-06-09 (Phase `141.99`)
+
+- `V141 141.99` ist abgeschlossen: `finding-decisions.v1` trennt manuelle Entscheidungen von `open-findings-index.v1`; Finding-, Plan-/Changelog-, Testmapping- und Snapshot-Freshness-Drift laufen additiv als WARN/INFO-Pilot.
+- `P21` bleibt `accepted-risk` mit Wiedervorlage 2026-06-17. P14/P45/P46/P47/P48 und drei historische Master-/Aktivplan-Signale werden sichtbar, aber nicht automatisch repariert oder geschlossen.
+- Gate-Matrix: `drift:check` laeuft in `docs:check`; `plan:check` bleibt kanonischer Strukturvalidator; `gates:pre-commit` konsumiert den read-only Docs-/Graph-Pfad.
+- Evidence: `npm run findings:index:build`, `npm run findings:check`, `npm run plan:check`, `npm run plan:index:check`, `npm run plan:context:check`, `npm run graph:check`, `npm run docs:sync`, `npm run docs:check`, 17 targeted Contract-Tests und `npm run gates:pre-commit` -> PASS.
+- Residual-risk: historische WARN/INFO-Signale brauchen menschliche Triage; die QA-Checkliste bleibt stale mit 241 offenen Punkten. Kein Source-of-Truth-Wechsel und keine harte Drift-Blockade.
+- Not-checked: keine Vollsuite und keine produktiven Runtime-, UI-, Gameplay-, Multiplayer-, Recording- oder Bot-Training-Pfade.

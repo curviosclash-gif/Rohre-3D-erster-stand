@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated": "2026-06-08",
+  "updated": "2026-06-09",
   "start_anchor": {
-    "block": "V140",
-    "phase": "140.99",
+    "block": "V141",
+    "phase": "141.99",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -976,7 +976,7 @@
     {
       "id": "V141",
       "title": "Finding-, Plan- und Doku-Drift-Automatisierung",
-      "status": "planned",
+      "status": "done",
       "priority": "P2",
       "owner": "frei",
       "workstream": "repo-governance",
@@ -987,13 +987,13 @@
         "V123.99",
         "V138.99"
       ],
-      "current_phase": "141.1",
+      "current_phase": "141.99",
       "plan_file": "docs/plaene/aktiv/V141.md",
       "lock": {
-        "status": "frei",
+        "status": "closed",
         "agent": "-",
-        "start_date": "-",
-        "target": "Geplant",
+        "start_date": "2026-06-09",
+        "target": "Abgeschlossen 2026-06-09; WARN-Pilot, Drift-Indizes, Freshness- und Mapping-Checks gruen",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

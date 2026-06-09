@@ -2388,7 +2388,7 @@
       "id": "V141",
       "type": "block",
       "title": "Finding-, Plan- und Doku-Drift-Automatisierung",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2396,7 +2396,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "141.1",
+        "currentPhase": "141.99",
         "planFile": "docs/plaene/aktiv/V141.md",
         "scopeDeclarations": [
           ".agents/test_mapping.md",
@@ -2404,6 +2404,7 @@
           "docs/generated/knowledge-graph.json",
           "docs/generated/knowledge-graph.scorecard.json",
           "docs/generated/open-findings-index.json",
+          "docs/generated/plan-index.json",
           "docs/plaene/aktiv/V141.md",
           "docs/plaene/CHANGELOG.md",
           "docs/prozess/Backlog.md",
@@ -2424,7 +2425,7 @@
           "tests/test-mapping-drift.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 23,
+          "concreteCount": 24,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -6777,7 +6778,7 @@
       "id": "V141.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.99"
@@ -20228,8 +20229,8 @@
     {
       "id": "V141.99.1",
       "type": "subphase",
-      "title": "`npm run findings:index:build` ist gruen und erzeugt deterministisches Output.",
-      "status": "open",
+      "title": "`npm run findings:index:build` ist gruen und erzeugt deterministisches Output. (abgeschlossen: 2026-06-09; evidence: zwei Builds -> identischer SHA-256; `npm run findings:index:build` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.99",
@@ -20239,8 +20240,8 @@
     {
       "id": "V141.99.2",
       "type": "subphase",
-      "title": "`npm run findings:check` ist gruen oder meldet erwartete, dokumentierte Warnungen.",
-      "status": "open",
+      "title": "`npm run findings:check` ist gruen oder meldet erwartete, dokumentierte Warnungen. (abgeschlossen: 2026-06-09; evidence: PASS mit 10 erwarteten WARN-Signalen, `P21` ohne Drift)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.99",
@@ -20250,8 +20251,8 @@
     {
       "id": "V141.99.3",
       "type": "subphase",
-      "title": "`npm run plan:check`, `npm run plan:index:check` und `npm run plan:context:check` sind gruen.",
-      "status": "open",
+      "title": "`npm run plan:check`, `npm run plan:index:check` und `npm run plan:context:check` sind gruen. (abgeschlossen: 2026-06-09; evidence: alle drei Kommandos -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.99",
@@ -20261,8 +20262,8 @@
     {
       "id": "V141.99.4",
       "type": "subphase",
-      "title": "`npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "`npm run docs:sync` und `npm run docs:check` sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-06-09; evidence: beide Kommandos -> PASS; Snapshot-Warnungen bleiben nicht blockierend)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.99",
@@ -20272,8 +20273,8 @@
     {
       "id": "V141.99.5",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt: manuelle Entscheidungen, generierte Signale, harte Nicht-Ziele, Warn-/Fail-Politik, Restrisiko und naechsten Schritt.",
-      "status": "open",
+      "title": "Abschlussnotiz nennt: manuelle Entscheidungen, generierte Signale, harte Nicht-Ziele, Warn-/Fail-Politik, Restrisiko und naechsten Schritt. (abgeschlossen: 2026-06-09; evidence: Abschnitt `Abschlussnotiz 2026-06-09`)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.99",
@@ -34977,6 +34978,7 @@
           "V123",
           "V139",
           "V140",
+          "V141",
           "V144"
         ],
         "exists": true
@@ -92707,6 +92709,15 @@
     {
       "from": "V141",
       "to": "docs/generated/open-findings-index.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V141",
+      "to": "docs/generated/plan-index.json",
       "type": "scope",
       "hint": null,
       "attributes": {
