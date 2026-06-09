@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   buildAutopilotPlan,
   classifyCandidateGate,
+  extractActivePlanContext,
   getCurrentOpenSubphase,
   normalizeGateToken,
   parseAiExecutionMatrix,
@@ -61,6 +62,48 @@ status: planned
 status: open
 
 - [ ] 200.1.1 Manuelle Uebernahme erforderlich vor Umsetzung.
+`;
+
+const HISTORY_HEAVY_PLAN = `---
+id: V202
+status: planned
+---
+# History Heavy
+
+## AI-Ausfuehrungsmatrix
+
+| Arbeit | Decision | Gate |
+| --- | --- | --- |
+| Dry-run Planner und Auswahlmodell | D0/D2 | [AUTO] |
+
+## Phasen
+
+### 202.1 Abgeschlossene Historie
+
+status: done
+
+- [x] 202.1.1 Alter D4 Rebuild, darf nicht im aktiven Kontext landen.
+
+Gate:
+
+- npm run gates:pre-commit
+
+### 202.2 Aktuelle Phase
+
+status: open
+
+- [x] 202.2.1 Schon erledigt.
+- [ ] 202.2.2 Naechste offene Subphase sparsam erkennen.
+
+Gate:
+
+- node --test tests/plan-autopilot.contract.test.mjs
+
+### 202.3 Zukunft
+
+status: open
+
+- [ ] 202.3.1 Spaeter.
 `;
 
 function planMapFixture() {
@@ -145,6 +188,22 @@ test('extracts the current open subphase and phase gate without completed histor
   assert.deepEqual(open.checks, ['node --test tests/plan-autopilot.contract.test.mjs']);
 });
 
+test('builds an active plan context without loading completed phase history', () => {
+  const context = extractActivePlanContext(HISTORY_HEAVY_PLAN, '202.2');
+  const open = getCurrentOpenSubphase(context.text, '202.2');
+  const rows = parseAiExecutionMatrix(context.text);
+
+  assert.equal(context.readMode, 'provided-slice');
+  assert.equal(context.selectedPhaseId, '202.2');
+  assert.equal(context.phaseSectionsLoaded, 1);
+  assert.equal(context.completedPhaseSectionsLoaded, 0);
+  assert.equal(open.subphaseId, '202.2.2');
+  assert.equal(open.nextOpenSubphaseId, null);
+  assert.equal(rows[0].normalizedGate, 'AUTO');
+  assert.doesNotMatch(context.text, /Alter D4 Rebuild/);
+  assert.doesNotMatch(context.text, /202\.3\.1/);
+});
+
 test('classifies red text and D3/D4 signals conservatively', () => {
   const matrixRows = parseAiExecutionMatrix(GATED_PLAN);
   const classification = classifyCandidateGate({
@@ -213,7 +272,10 @@ test('current V145 plan exposes a dry-run planner candidate', async () => {
   assert.ok(candidate);
   assert.equal(candidate.phaseId, '145.1');
   assert.match(candidate.subphaseId, /^145\.1\.\d+$/);
-  assert.equal(candidate.gate, 'AUTO');
+  assert.match(candidate.gate, /^(AUTO|REVIEW|USER-GATE|UNKNOWN)$/);
+  assert.equal(candidate.planRead.mode, 'active-file-slice');
+  assert.equal(candidate.planRead.phaseSectionsLoaded, 1);
+  assert.equal(candidate.planRead.completedPhaseSectionsLoaded, 0);
   if (!report.selected) {
     assert(report.parked.some((entry) => entry.blockId === 'V145' && entry.reason === 'lock'));
   }

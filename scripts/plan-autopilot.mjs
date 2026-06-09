@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-import fs from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { execFileSync } from 'node:child_process';
+import readline from 'node:readline';
 import { fileURLToPath } from 'node:url';
 
 import { buildPlanMapData } from './export-plan-map.mjs';
@@ -93,6 +94,8 @@ const RED_SIGNAL_PATTERNS = [
     pattern: /\bReborn\b/i,
   },
 ];
+const AI_MATRIX_HEADING_PATTERN = /^##\s+AI-Ausfuehrungsmatrix\b/i;
+const PHASE_HEADING_PATTERN = /^###\s+(\d+\.(?:\d+|99))\s+(.+?)\s*$/;
 
 function normalizePath(value) {
   return String(value || '').replace(/\\/g, '/');
@@ -129,6 +132,20 @@ function decisionRank(decision) {
 
 function readinessRank(status) {
   return READINESS_ORDER.get(String(status || 'unknown')) ?? READINESS_ORDER.get('unknown');
+}
+
+function isSecondLevelHeading(line) {
+  return /^##\s+/.test(String(line || '').trim());
+}
+
+function phaseHasOpenSubphase(phaseLines) {
+  const [phase] = parsePlanPhases(phaseLines.join('\n'));
+  return Boolean(
+    phase
+    && phase.status !== 'done'
+    && phase.status !== 'closed'
+    && phase.items.some((item) => !item.done)
+  );
 }
 
 export function normalizeGateToken(value) {
@@ -237,7 +254,7 @@ export function parsePlanPhases(content) {
   let inGate = false;
 
   for (const line of content.split(/\r?\n/)) {
-    const phaseMatch = line.match(/^###\s+(\d+\.(?:\d+|99))\s+(.+?)\s*$/);
+    const phaseMatch = line.match(PHASE_HEADING_PATTERN);
     if (phaseMatch) {
       current = {
         id: phaseMatch[1],
@@ -420,12 +437,156 @@ function shouldSkipBlock(block) {
   return status === 'done' || status === 'closed' || readiness === 'done';
 }
 
-async function readPlanText({ rootDir, planFile, planTextByPath }) {
+function createPlanContextCollector({ preferredPhaseId = null, readMode, planFile }) {
+  const matrixLines = [];
+  let inMatrix = false;
+  let matrixDone = false;
+  let phaseSectionsScanned = 0;
+  let completedPhaseSectionsLoaded = 0;
+  let preferredPhaseSeen = false;
+  let selectedPhaseId = null;
+  let selectedPhaseLines = [];
+  let currentPhaseId = null;
+  let currentPhaseLines = [];
+  let collectCurrentPhase = false;
+  let done = false;
+
+  function maybeFinishCurrentPhase() {
+    if (!collectCurrentPhase || currentPhaseLines.length === 0 || selectedPhaseLines.length > 0) {
+      currentPhaseLines = [];
+      return;
+    }
+    if (phaseHasOpenSubphase(currentPhaseLines)) {
+      selectedPhaseId = currentPhaseId;
+      selectedPhaseLines = currentPhaseLines;
+      if (matrixDone || matrixLines.length === 0) done = true;
+    } else {
+      completedPhaseSectionsLoaded += 1;
+    }
+    currentPhaseLines = [];
+  }
+
+  function shouldCollectPhase(phaseId) {
+    if (selectedPhaseLines.length > 0) return false;
+    if (!preferredPhaseId) return true;
+    if (phaseId === preferredPhaseId) {
+      preferredPhaseSeen = true;
+      return true;
+    }
+    return preferredPhaseSeen;
+  }
+
+  function accept(line) {
+    if (done) return;
+    const rawLine = String(line || '');
+    const trimmed = rawLine.trim();
+
+    if (AI_MATRIX_HEADING_PATTERN.test(trimmed)) {
+      inMatrix = true;
+      matrixDone = false;
+      matrixLines.length = 0;
+      matrixLines.push(rawLine);
+      return;
+    }
+    if (inMatrix) {
+      if (isSecondLevelHeading(rawLine)) {
+        inMatrix = false;
+        matrixDone = true;
+        if (selectedPhaseLines.length > 0) {
+          done = true;
+          return;
+        }
+      } else {
+        matrixLines.push(rawLine);
+        return;
+      }
+    }
+
+    const phaseMatch = rawLine.match(PHASE_HEADING_PATTERN);
+    if (phaseMatch) {
+      maybeFinishCurrentPhase();
+      if (done) return;
+      currentPhaseId = phaseMatch[1];
+      phaseSectionsScanned += 1;
+      collectCurrentPhase = shouldCollectPhase(currentPhaseId);
+      currentPhaseLines = collectCurrentPhase ? [rawLine] : [];
+      return;
+    }
+
+    if (collectCurrentPhase) {
+      currentPhaseLines.push(rawLine);
+    }
+  }
+
+  function finish() {
+    if (inMatrix) {
+      matrixDone = true;
+      inMatrix = false;
+    }
+    maybeFinishCurrentPhase();
+    const parts = [];
+    if (matrixLines.length > 0) parts.push(matrixLines.join('\n'));
+    if (selectedPhaseLines.length > 0) parts.push('## Phasen', selectedPhaseLines.join('\n'));
+    return {
+      text: parts.join('\n\n'),
+      readMode,
+      planFile,
+      preferredPhaseId,
+      selectedPhaseId,
+      matrixLoaded: matrixLines.length > 0,
+      phaseSectionsLoaded: selectedPhaseLines.length > 0 ? 1 : 0,
+      completedPhaseSectionsLoaded,
+      phaseSectionsScanned,
+    };
+  }
+
+  return {
+    accept,
+    finish,
+    get done() {
+      return done;
+    },
+  };
+}
+
+export function extractActivePlanContext(content, preferredPhaseId = null, options = {}) {
+  const collector = createPlanContextCollector({
+    preferredPhaseId,
+    readMode: options.readMode || 'provided-slice',
+    planFile: options.planFile || null,
+  });
+  for (const line of String(content || '').split(/\r?\n/)) {
+    collector.accept(line);
+    if (collector.done) break;
+  }
+  return collector.finish();
+}
+
+async function readActivePlanContext({ rootDir, planFile, preferredPhaseId, planTextByPath }) {
   const normalized = normalizePath(planFile);
   if (planTextByPath && Object.hasOwn(planTextByPath, normalized)) {
-    return planTextByPath[normalized];
+    return extractActivePlanContext(planTextByPath[normalized], preferredPhaseId, {
+      readMode: 'provided-slice',
+      planFile: normalized,
+    });
   }
-  return fs.readFile(path.resolve(rootDir, normalized), 'utf8');
+  const collector = createPlanContextCollector({
+    preferredPhaseId,
+    readMode: 'active-file-slice',
+    planFile: normalized,
+  });
+  const input = createReadStream(path.resolve(rootDir, normalized), { encoding: 'utf8' });
+  const lines = readline.createInterface({ input, crlfDelay: Infinity });
+  try {
+    for await (const line of lines) {
+      collector.accept(line);
+      if (collector.done) break;
+    }
+  } finally {
+    lines.close();
+    input.destroy();
+  }
+  return collector.finish();
 }
 
 function gitDirtyFiles(rootDir) {
@@ -465,7 +626,8 @@ function readinessParking(block) {
   return null;
 }
 
-function createCandidate({ block, index, planText, mode, scopeCollisions }) {
+function createCandidate({ block, index, planContext, mode, scopeCollisions }) {
+  const planText = planContext.text;
   const open = getCurrentOpenSubphase(planText, block.currentPhase);
   if (!open) {
     return {
@@ -513,6 +675,16 @@ function createCandidate({ block, index, planText, mode, scopeCollisions }) {
     impact: block.impact || null,
     allowedFiles: block.scopeFiles || [],
     checks: open.checks.length > 0 ? open.checks : (block.verification || []),
+    planRead: {
+      mode: planContext.readMode,
+      planFile: planContext.planFile,
+      preferredPhaseId: planContext.preferredPhaseId,
+      selectedPhaseId: planContext.selectedPhaseId,
+      matrixLoaded: planContext.matrixLoaded,
+      phaseSectionsLoaded: planContext.phaseSectionsLoaded,
+      completedPhaseSectionsLoaded: planContext.completedPhaseSectionsLoaded,
+      phaseSectionsScanned: planContext.phaseSectionsScanned,
+    },
     matrixMatch: gate.matrixRow ? {
       work: gate.matrixRow.work,
       decision: gate.matrixRow.decision,
@@ -582,9 +754,14 @@ export async function buildAutopilotPlan(options = {}) {
       });
       continue;
     }
-    let planText = '';
+    let planContext = null;
     try {
-      planText = await readPlanText({ rootDir, planFile, planTextByPath: options.planTextByPath });
+      planContext = await readActivePlanContext({
+        rootDir,
+        planFile,
+        preferredPhaseId: block.currentPhase,
+        planTextByPath: options.planTextByPath,
+      });
     } catch (error) {
       parked.push({
         blockId: block.id,
@@ -598,7 +775,7 @@ export async function buildAutopilotPlan(options = {}) {
     const result = createCandidate({
       block,
       index,
-      planText,
+      planContext,
       mode,
       scopeCollisions: collisionsByBlock.get(block.id) || [],
     });

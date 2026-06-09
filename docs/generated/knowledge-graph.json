@@ -21161,8 +21161,8 @@
     {
       "id": "V145.1.2",
       "type": "subphase",
-      "title": "Offene Phase/Subphase aus aktiver VXX-Datei erkennen, ohne abgeschlossene Phasen breit zu laden.",
-      "status": "open",
+      "title": "Offene Phase/Subphase aus aktiver VXX-Datei erkennen, ohne abgeschlossene Phasen breit zu laden. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS; `node scripts/plan-autopilot.mjs plan --dry-run --block=V145 --json` -> V145/145.1.2 mit `planRead.mode=active-file-slice`, `phaseSectionsLoaded=1`, `completedPhaseSectionsLoaded=0`)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.1",
