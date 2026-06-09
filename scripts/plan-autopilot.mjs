@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { createReadStream } from 'node:fs';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { execFileSync } from 'node:child_process';
@@ -9,8 +10,14 @@ import { fileURLToPath } from 'node:url';
 import { buildPlanMapData } from './export-plan-map.mjs';
 
 const CONTRACT = 'curvios.plan-autopilot.plan.v1';
+const RUN_CONTRACT = 'curvios.plan-autopilot.run.v1';
+const WORKER_OUTPUT_CONTRACT = 'curvios.plan-autopilot.worker-output.v1';
+const WORKER_PROMPT_PATH = 'scripts/prompts/plan-autopilot-subphase.md';
 const DEFAULT_MODE = 'auto-safe';
 const SUPPORTED_MODES = new Set(['auto-safe', 'auto-d2-review', 'report-only']);
+const SUPPORTED_EXECUTORS = new Set(['codex', 'fake']);
+const WORKER_STATUSES = new Set(['completed', 'gate_required', 'blocked', 'no_change']);
+const FAKE_STATUSES = new Set([...WORKER_STATUSES, 'out_of_scope']);
 const DECISION_ORDER = new Map([
   ['D0', 0],
   ['D1', 1],
@@ -94,6 +101,60 @@ const RED_SIGNAL_PATTERNS = [
     pattern: /\bReborn\b/i,
   },
 ];
+const PARKING_REASON_META = {
+  user_gate: {
+    type: 'gate',
+    requiredUserDecision: 'USER-GATE fuer diesen Slice explizit freigeben.',
+  },
+  d3_d4_requires_user_gate: {
+    type: 'gate',
+    requiredUserDecision: 'D3/D4-Blast-Radius und Umsetzung explizit freigeben.',
+  },
+  review_gate_parked: {
+    type: 'gate',
+    requiredUserDecision: 'REVIEW-Scope fuer auto-d2-review oder manuelle Umsetzung freigeben.',
+  },
+  missing_ai_gate: {
+    type: 'gate',
+    requiredUserDecision: 'AI-Gate im Plan klaeren oder Slice manuell freigeben.',
+  },
+  red_text_signal: {
+    type: 'red-text-signal',
+    requiredUserDecision: 'Rotes Textsignal pruefen und weiteren Umgang freigeben.',
+  },
+  lock: {
+    type: 'lock',
+    requiredUserDecision: 'Lock klaeren oder warten, bis der Scope frei ist.',
+  },
+  readiness_blocked: {
+    type: 'dependency',
+    requiredUserDecision: 'Blocker/Dependency klaeren.',
+  },
+  dirty_worktree: {
+    type: 'dirty-worktree',
+    requiredUserDecision: 'Uncommitted Worktree vor Live-Run bereinigen oder bewusst ausnehmen.',
+  },
+  scope_conflict: {
+    type: 'scope-conflict',
+    requiredUserDecision: 'Scope-Konflikt mit aktivem Lock klaeren.',
+  },
+  report_only: {
+    type: 'mode',
+    requiredUserDecision: 'Ausfuehrbaren Modus waehlen.',
+  },
+  no_open_subphase: {
+    type: 'plan-shape',
+    requiredUserDecision: 'Planstatus oder offene Subphase klaeren.',
+  },
+  missing_plan_file: {
+    type: 'plan-shape',
+    requiredUserDecision: 'Plan-Dateipfad im Master/Index klaeren.',
+  },
+  plan_file_unreadable: {
+    type: 'plan-shape',
+    requiredUserDecision: 'Plan-Datei lesbar machen.',
+  },
+};
 const AI_MATRIX_HEADING_PATTERN = /^##\s+AI-Ausfuehrungsmatrix\b/i;
 const PHASE_HEADING_PATTERN = /^###\s+(\d+\.(?:\d+|99))\s+(.+?)\s*$/;
 
@@ -171,6 +232,21 @@ export function scanRedSignals(value) {
     .map(({ id, label }) => ({ id, label }));
 }
 
+function createParkingEntry({ blockId, itemId, reason, detail, requiredUserDecision = null }) {
+  const meta = PARKING_REASON_META[reason] || {
+    type: 'unknown',
+    requiredUserDecision: 'Manuell pruefen.',
+  };
+  return {
+    blockId: blockId || null,
+    itemId: itemId || null,
+    type: meta.type,
+    reason,
+    detail: detail || '',
+    requiredUserDecision: requiredUserDecision || meta.requiredUserDecision,
+  };
+}
+
 function parseMarkdownTable(section) {
   const rows = [];
   const lines = section.split(/\r?\n/);
@@ -228,11 +304,8 @@ function matrixMatchScore(row, candidateText) {
   const candidateTokens = new Set(tokenize(candidateText));
   if (candidateTokens.size === 0) return 0;
   let score = 0;
-  for (const token of tokenize(row.work)) {
-    if (candidateTokens.has(token)) score += 2;
-  }
-  for (const token of tokenize(row.raw)) {
-    if (candidateTokens.has(token)) score += 1;
+  for (const token of unique(tokenize(row.work))) {
+    if (candidateTokens.has(token)) score += 4;
   }
   return score;
 }
@@ -396,7 +469,10 @@ export function classifyCandidateGate({ candidateText, matrixRows = [], mode = D
   const gateSource = matrixRow?.gate || candidateText;
   const decisionSource = matrixRow?.decision || candidateText;
   const rowRedSignals = scanRedSignals(matrixRow?.raw || '');
-  const textRedSignals = scanRedSignals(candidateText);
+  const signalFixtureWork = matrixRow
+    && matrixRow.normalizedGate === 'AUTO'
+    && /dry-run|parser|kandidatenreport|fake-executor/i.test(matrixRow.work);
+  const textRedSignals = signalFixtureWork ? [] : scanRedSignals(candidateText);
   const redSignals = unique([...rowRedSignals, ...textRedSignals].map((signal) => signal.id))
     .map((id) => [...rowRedSignals, ...textRedSignals].find((signal) => signal.id === id));
   const gate = normalizeGateToken(gateSource);
@@ -610,33 +686,56 @@ function gitDirtyFiles(rootDir) {
 function readinessParking(block) {
   const status = String(block.readiness?.status || '').toLowerCase();
   if (block.readiness?.activeLock || status === 'locked') {
-    return {
+    return createParkingEntry({
+      blockId: block.id,
+      itemId: block.currentPhase || null,
       reason: 'lock',
       detail: block.readiness?.activeLock?.agent
         ? `locked by ${block.readiness.activeLock.agent}`
         : 'active lock',
-    };
+    });
   }
   if (status === 'blocked') {
-    return {
+    return createParkingEntry({
+      blockId: block.id,
+      itemId: block.currentPhase || null,
       reason: 'readiness_blocked',
       detail: block.readiness?.reason || 'readiness is blocked',
-    };
+    });
   }
   return null;
 }
 
-function createCandidate({ block, index, planContext, mode, scopeCollisions }) {
+function scopeConflictParking({ block, open, scopeCollisions, activeLocksByBlock = new Map() }) {
+  const activeConflicts = (scopeCollisions || []).filter((collision) => {
+    const otherBlockId = collision.leftBlock === block.id ? collision.rightBlock : collision.leftBlock;
+    return otherBlockId && activeLocksByBlock.has(otherBlockId);
+  });
+  if (activeConflicts.length === 0) return null;
+  const details = activeConflicts.map((collision) => {
+    const otherBlockId = collision.leftBlock === block.id ? collision.rightBlock : collision.leftBlock;
+    const fileCount = collision.sharedFileCount ?? (collision.sharedFiles || []).length;
+    return `${otherBlockId} (${fileCount} shared file${fileCount === 1 ? '' : 's'})`;
+  });
+  return createParkingEntry({
+    blockId: block.id,
+    itemId: open.subphaseId,
+    reason: 'scope_conflict',
+    detail: `active lock collision: ${details.join(', ')}`,
+  });
+}
+
+function createCandidate({ block, index, planContext, mode, scopeCollisions, activeLocksByBlock = new Map() }) {
   const planText = planContext.text;
   const open = getCurrentOpenSubphase(planText, block.currentPhase);
   if (!open) {
     return {
-      parked: {
+      parked: createParkingEntry({
         blockId: block.id,
         itemId: block.currentPhase || null,
         reason: 'no_open_subphase',
         detail: 'No unchecked subphase was found in the active plan file',
-      },
+      }),
       candidate: null,
     };
   }
@@ -695,25 +794,28 @@ function createCandidate({ block, index, planContext, mode, scopeCollisions }) {
   };
 
   if (readiness) {
+    readiness.itemId = open.subphaseId;
     return {
       candidate,
-      parked: {
-        blockId: block.id,
-        itemId: open.subphaseId,
-        reason: readiness.reason,
-        detail: readiness.detail,
-      },
+      parked: readiness,
+    };
+  }
+  const scopeConflict = scopeConflictParking({ block, open, scopeCollisions, activeLocksByBlock });
+  if (scopeConflict) {
+    return {
+      candidate,
+      parked: scopeConflict,
     };
   }
   if (!gate.runnable) {
     return {
       candidate,
-      parked: {
+      parked: createParkingEntry({
         blockId: block.id,
         itemId: open.subphaseId,
         reason: gate.reason,
         detail: gate.detail,
-      },
+      }),
     };
   }
   return { candidate, parked: null };
@@ -730,6 +832,14 @@ export async function buildAutopilotPlan(options = {}) {
   const dirtyFiles = options.gitDirtyFiles || gitDirtyFiles(rootDir);
   const candidates = [];
   const parked = [];
+  if (dirtyFiles.length > 0) {
+    parked.push(createParkingEntry({
+      blockId: null,
+      itemId: null,
+      reason: 'dirty_worktree',
+      detail: dirtyFiles.join(', '),
+    }));
+  }
   const collisionsByBlock = new Map();
   for (const collision of planMapData.scopeCollisions || []) {
     for (const blockId of [collision.leftBlock, collision.rightBlock].filter(Boolean)) {
@@ -737,6 +847,9 @@ export async function buildAutopilotPlan(options = {}) {
       collisionsByBlock.get(blockId).push(collision);
     }
   }
+  const activeLocksByBlock = new Map((planMapData.locks?.active || [])
+    .filter((lock) => lock?.blockId)
+    .map((lock) => [lock.blockId, lock]));
   const blockFilter = options.blockFilter ? new Set([String(options.blockFilter).toUpperCase()]) : null;
   const blocks = (planMapData.blocks || []).filter((block) => (
     (!blockFilter || blockFilter.has(String(block.id).toUpperCase()))
@@ -778,6 +891,7 @@ export async function buildAutopilotPlan(options = {}) {
       planContext,
       mode,
       scopeCollisions: collisionsByBlock.get(block.id) || [],
+      activeLocksByBlock,
     });
     if (result.candidate) candidates.push(result.candidate);
     if (result.parked) parked.push(result.parked);
@@ -822,6 +936,354 @@ export async function buildAutopilotPlan(options = {}) {
   };
 }
 
+function ensureStringArray(value) {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string');
+}
+
+export function validateWorkerOutput(output, candidate) {
+  const violations = [];
+  if (!output || typeof output !== 'object' || Array.isArray(output)) {
+    return {
+      valid: false,
+      violations: ['worker output must be an object'],
+    };
+  }
+  if (output.contract !== WORKER_OUTPUT_CONTRACT) {
+    violations.push(`contract must be ${WORKER_OUTPUT_CONTRACT}`);
+  }
+  if (!WORKER_STATUSES.has(output.status)) {
+    violations.push('status must be completed, gate_required, blocked or no_change');
+  }
+  for (const [field, expected] of [
+    ['blockId', candidate?.blockId],
+    ['phaseId', candidate?.phaseId],
+    ['subphaseId', candidate?.subphaseId],
+  ]) {
+    if (expected && output[field] !== expected) {
+      violations.push(`${field} must match selected slice ${expected}`);
+    }
+  }
+  if (!ensureStringArray(output.checks)) {
+    violations.push('checks must be an array of strings');
+  }
+  if (!ensureStringArray(output.notChecked)) {
+    violations.push('notChecked must be an array of strings');
+  }
+  if (!ensureStringArray(output.changedFiles)) {
+    violations.push('changedFiles must be an array of strings');
+  }
+  if (output.status === 'completed' && !output.commit) {
+    violations.push('completed output requires commit');
+  }
+  if ((output.status === 'gate_required' || output.status === 'blocked') && !output.gateReason) {
+    violations.push(`${output.status} output requires gateReason`);
+  }
+  return {
+    valid: violations.length === 0,
+    violations,
+  };
+}
+
+export function validateDiffScope(changedFiles, allowedFiles) {
+  const allowed = new Set((allowedFiles || []).map(normalizePath));
+  const changed = (changedFiles || []).map(normalizePath).filter(Boolean);
+  const outOfScope = changed.filter((file) => !allowed.has(file));
+  return {
+    valid: outOfScope.length === 0,
+    changedFiles: changed,
+    outOfScope,
+  };
+}
+
+function parseWorkerJson(text) {
+  const raw = String(text || '').trim();
+  if (!raw) {
+    throw new Error('Worker produced no output');
+  }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i)?.[1];
+    if (fenced) {
+      return JSON.parse(fenced);
+    }
+    const objectMatch = raw.match(/\{[\s\S]*\}\s*$/);
+    if (objectMatch) {
+      return JSON.parse(objectMatch[0]);
+    }
+    throw new Error('Worker output did not contain parseable JSON');
+  }
+}
+
+function fakeWorkerOutput({ candidate, status }) {
+  if (!FAKE_STATUSES.has(status)) {
+    throw new Error(`Unsupported fake status: ${status}`);
+  }
+  const changedFiles = status === 'completed'
+    ? [candidate.allowedFiles[0] || 'scripts/plan-autopilot.mjs']
+    : status === 'out_of_scope'
+      ? ['tmp/out-of-scope.txt']
+      : [];
+  return {
+    contract: WORKER_OUTPUT_CONTRACT,
+    status: status === 'out_of_scope' ? 'completed' : status,
+    blockId: candidate.blockId,
+    phaseId: candidate.phaseId,
+    subphaseId: candidate.subphaseId,
+    checks: status === 'completed' || status === 'out_of_scope'
+      ? candidate.checks.map((check) => `${check} -> PASS`)
+      : [],
+    commit: status === 'completed' || status === 'out_of_scope' ? 'fake-commit' : null,
+    gateReason: status === 'gate_required'
+      ? 'Fake executor requested a gate'
+      : status === 'blocked'
+        ? 'Fake executor hit a blocker'
+        : null,
+    notChecked: status === 'no_change' ? ['fake executor made no changes'] : [],
+    changedFiles,
+  };
+}
+
+export function renderWorkerPrompt(candidate, templateText) {
+  const payload = {
+    contract: WORKER_OUTPUT_CONTRACT,
+    blockId: candidate.blockId,
+    phaseId: candidate.phaseId,
+    subphaseId: candidate.subphaseId,
+    subphaseTitle: candidate.subphaseTitle,
+    mode: candidate.mode,
+    decision: candidate.decision,
+    gate: candidate.gate,
+    allowedFiles: candidate.allowedFiles,
+    forbiddenSurfaces: [
+      'AGENTS.md',
+      '.agents/rules/',
+      '.agents/workflows/',
+      'docs/Umsetzungsplan.md',
+      'git add .',
+      'git stash',
+      'git reset --hard',
+      'git clean',
+    ],
+    checks: candidate.checks,
+    stopConditions: [
+      'USER-GATE',
+      'D3',
+      'D4',
+      'scope violation',
+      'dirty unrelated files',
+      'red text signal',
+    ],
+  };
+  const renderedPayload = JSON.stringify(payload, null, 2);
+  if (String(templateText || '').includes('{{PLAN_AUTOPILOT_SLICE_JSON}}')) {
+    return String(templateText).replace('{{PLAN_AUTOPILOT_SLICE_JSON}}', renderedPayload);
+  }
+  return `${templateText || ''}\n\n${renderedPayload}\n`;
+}
+
+async function runCodexWorker({ rootDir, candidate }) {
+  const template = await fs.readFile(path.resolve(rootDir, WORKER_PROMPT_PATH), 'utf8');
+  const prompt = renderWorkerPrompt(candidate, template);
+  let stdout = '';
+  try {
+    stdout = execFileSync('codex', ['exec', '--ask-for-approval', 'never', prompt], {
+      cwd: rootDir,
+      encoding: 'utf8',
+      windowsHide: true,
+      maxBuffer: 8 * 1024 * 1024,
+    });
+  } catch (error) {
+    const stderr = error?.stderr ? String(error.stderr) : '';
+    const message = stderr || error?.message || 'codex exec failed';
+    throw new Error(`codex exec failed: ${message}`);
+  }
+  return parseWorkerJson(stdout);
+}
+
+function buildReviewChecklist({ plan, workerOutput, diffScope, status, reason }) {
+  return {
+    parkedGates: plan.parked
+      .filter((entry) => entry.type === 'gate' || entry.type === 'red-text-signal')
+      .map((entry) => ({
+        blockId: entry.blockId,
+        itemId: entry.itemId,
+        reason: entry.reason,
+        requiredUserDecision: entry.requiredUserDecision,
+      })),
+    processedScope: plan.selected ? {
+      blockId: plan.selected.blockId,
+      subphaseId: plan.selected.subphaseId,
+      allowedFiles: plan.selected.allowedFiles,
+      changedFiles: diffScope?.changedFiles || workerOutput?.changedFiles || [],
+      outOfScope: diffScope?.outOfScope || [],
+    } : null,
+    checks: workerOutput?.checks || [],
+    commit: workerOutput?.commit || null,
+    notChecked: workerOutput?.notChecked || [],
+    status,
+    reason: reason || null,
+    knownRisks: [
+      'Codex-Live-Run bleibt lokal CLI-abhaengig.',
+      'D3/D4 und USER-GATE bleiben geparkt statt automatisch ausgefuehrt.',
+      'MVP verarbeitet maximal einen Slice pro Run.',
+    ],
+  };
+}
+
+export async function executeAutopilotRun(options = {}) {
+  const rootDir = options.rootDir || process.cwd();
+  const mode = options.mode || DEFAULT_MODE;
+  const executor = options.executor || 'codex';
+  const maxSlices = Number(options.maxSlices || 0);
+  if (!SUPPORTED_EXECUTORS.has(executor)) {
+    throw new Error(`Unsupported executor: ${executor}`);
+  }
+  if (!Number.isInteger(maxSlices) || maxSlices < 1) {
+    throw new Error('run requires explicit --max-slices=N');
+  }
+  if (maxSlices !== 1) {
+    throw new Error('V145 MVP supports --max-slices=1 only; raise the limit after review evidence.');
+  }
+
+  const plan = await buildAutopilotPlan({
+    rootDir,
+    mode,
+    blockFilter: options.blockFilter,
+    planMapData: options.planMapData,
+    planTextByPath: options.planTextByPath,
+    gitDirtyFiles: options.gitDirtyFiles,
+  });
+
+  if (plan.dirtyWorktree) {
+    const status = 'blocked';
+    const reason = 'dirty_worktree';
+    return {
+      contract: RUN_CONTRACT,
+      status,
+      reason,
+      executor,
+      maxSlices,
+      selected: plan.selected,
+      dirtyFiles: plan.dirtyFiles,
+      parked: plan.parked,
+      workerOutput: null,
+      reviewChecklist: buildReviewChecklist({ plan, status, reason }),
+    };
+  }
+
+  if (!plan.selected) {
+    const status = 'no_change';
+    const reason = 'no_runnable_candidate';
+    return {
+      contract: RUN_CONTRACT,
+      status,
+      reason,
+      executor,
+      maxSlices,
+      selected: null,
+      parked: plan.parked,
+      workerOutput: null,
+      reviewChecklist: buildReviewChecklist({ plan, status, reason }),
+    };
+  }
+
+  let workerOutput = null;
+  try {
+    workerOutput = executor === 'fake'
+      ? fakeWorkerOutput({ candidate: plan.selected, status: options.fakeStatus || 'completed' })
+      : await runCodexWorker({ rootDir, candidate: plan.selected });
+  } catch (error) {
+    const status = 'blocked';
+    const reason = 'executor_failed';
+    return {
+      contract: RUN_CONTRACT,
+      status,
+      reason,
+      executor,
+      maxSlices,
+      selected: plan.selected,
+      parked: plan.parked,
+      error: error.message,
+      workerOutput: null,
+      reviewChecklist: buildReviewChecklist({ plan, status, reason }),
+    };
+  }
+
+  const workerValidation = validateWorkerOutput(workerOutput, plan.selected);
+  if (!workerValidation.valid) {
+    const status = 'blocked';
+    const reason = 'worker_contract_violation';
+    return {
+      contract: RUN_CONTRACT,
+      status,
+      reason,
+      executor,
+      maxSlices,
+      selected: plan.selected,
+      parked: plan.parked,
+      workerOutput,
+      violations: workerValidation.violations,
+      reviewChecklist: buildReviewChecklist({ plan, workerOutput, status, reason }),
+    };
+  }
+
+  const diffScope = validateDiffScope(workerOutput.changedFiles, plan.selected.allowedFiles);
+  if (!diffScope.valid) {
+    const status = 'blocked';
+    const reason = 'scope_violation';
+    return {
+      contract: RUN_CONTRACT,
+      status,
+      reason,
+      executor,
+      maxSlices,
+      selected: plan.selected,
+      parked: plan.parked,
+      workerOutput,
+      diffScope,
+      reviewChecklist: buildReviewChecklist({ plan, workerOutput, diffScope, status, reason }),
+    };
+  }
+
+  if ((workerOutput.status === 'gate_required' || workerOutput.status === 'blocked')
+    && diffScope.changedFiles.length > 0) {
+    const status = 'blocked';
+    const reason = 'partial_work_requires_manual_review';
+    return {
+      contract: RUN_CONTRACT,
+      status,
+      reason,
+      executor,
+      maxSlices,
+      selected: plan.selected,
+      parked: plan.parked,
+      workerOutput,
+      diffScope,
+      reviewChecklist: buildReviewChecklist({ plan, workerOutput, diffScope, status, reason }),
+    };
+  }
+
+  return {
+    contract: RUN_CONTRACT,
+    status: workerOutput.status,
+    reason: workerOutput.gateReason || null,
+    executor,
+    maxSlices,
+    selected: plan.selected,
+    parked: plan.parked,
+    workerOutput,
+    diffScope,
+    reviewChecklist: buildReviewChecklist({
+      plan,
+      workerOutput,
+      diffScope,
+      status: workerOutput.status,
+      reason: workerOutput.gateReason,
+    }),
+  };
+}
+
 function parseArgs(argv) {
   const args = {
     command: null,
@@ -829,6 +1291,9 @@ function parseArgs(argv) {
     dryRun: false,
     json: false,
     blockFilter: null,
+    maxSlices: null,
+    executor: 'codex',
+    fakeStatus: 'completed',
     help: false,
   };
   for (const token of argv) {
@@ -841,6 +1306,9 @@ function parseArgs(argv) {
     else if (token === '--help' || token === '-h') args.help = true;
     else if (token.startsWith('--mode=')) args.mode = token.slice('--mode='.length);
     else if (token.startsWith('--block=')) args.blockFilter = token.slice('--block='.length);
+    else if (token.startsWith('--max-slices=')) args.maxSlices = Number(token.slice('--max-slices='.length));
+    else if (token.startsWith('--executor=')) args.executor = token.slice('--executor='.length);
+    else if (token.startsWith('--fake-status=')) args.fakeStatus = token.slice('--fake-status='.length);
   }
   return args;
 }
@@ -848,8 +1316,9 @@ function parseArgs(argv) {
 function printHelp() {
   process.stdout.write(`Usage:
   node scripts/plan-autopilot.mjs plan --dry-run [--mode=auto-safe|auto-d2-review|report-only] [--block=V145] [--json]
+  node scripts/plan-autopilot.mjs run --max-slices=1 [--mode=auto-safe|auto-d2-review] [--executor=codex|fake] [--json]
 
-The MVP is read-only. It builds a deterministic selection and parking report; it does not start codex exec.
+plan is read-only. run requires an explicit max-slices limit and a clean worktree before it can start codex exec.
 `);
 }
 
@@ -872,26 +1341,67 @@ function printTextReport(report) {
   process.stdout.write(`${lines.join('\n')}\n`);
 }
 
+function printRunReport(report) {
+  const selected = report.selected
+    ? `${report.selected.blockId} ${report.selected.subphaseId} ${report.selected.subphaseTitle}`
+    : 'none';
+  const lines = [
+    `plan-autopilot run status=${report.status}`,
+    `reason: ${report.reason || 'none'}`,
+    `executor: ${report.executor}`,
+    `selected: ${selected}`,
+  ];
+  if (report.dirtyFiles?.length > 0) {
+    lines.push(`dirty-worktree: ${report.dirtyFiles.join(', ')}`);
+  }
+  if (report.diffScope?.outOfScope?.length > 0) {
+    lines.push(`out-of-scope: ${report.diffScope.outOfScope.join(', ')}`);
+  }
+  if (report.workerOutput?.checks?.length > 0) {
+    lines.push(`checks: ${report.workerOutput.checks.join('; ')}`);
+  }
+  if (report.workerOutput?.commit) {
+    lines.push(`commit: ${report.workerOutput.commit}`);
+  }
+  process.stdout.write(`${lines.join('\n')}\n`);
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help || !args.command) {
     printHelp();
     return;
   }
-  if (args.command !== 'plan') {
+  if (args.command !== 'plan' && args.command !== 'run') {
     throw new Error(`Unsupported command: ${args.command}`);
   }
-  if (!args.dryRun) {
-    throw new Error('V145.1 only supports plan --dry-run');
+  if (args.command === 'plan' && !args.dryRun) {
+    throw new Error('plan requires --dry-run');
   }
-  const report = await buildAutopilotPlan({
+  if (args.command === 'plan') {
+    const report = await buildAutopilotPlan({
+      mode: args.mode,
+      blockFilter: args.blockFilter,
+    });
+    if (args.json) {
+      process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+    } else {
+      printTextReport(report);
+    }
+    return;
+  }
+
+  const report = await executeAutopilotRun({
     mode: args.mode,
     blockFilter: args.blockFilter,
+    maxSlices: args.maxSlices,
+    executor: args.executor,
+    fakeStatus: args.fakeStatus,
   });
   if (args.json) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   } else {
-    printTextReport(report);
+    printRunReport(report);
   }
 }
 

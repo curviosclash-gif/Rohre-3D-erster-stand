@@ -1,0 +1,41 @@
+{
+  "contract": "curvios.plan-autopilot.worker-output.v1",
+  "schema_version": 1,
+  "description": "Machine-readable output contract for one plan-autopilot Codex worker slice.",
+  "required_fields": [
+    "contract",
+    "status",
+    "blockId",
+    "phaseId",
+    "subphaseId",
+    "checks",
+    "commit",
+    "gateReason",
+    "notChecked",
+    "changedFiles"
+  ],
+  "status_values": [
+    "completed",
+    "gate_required",
+    "blocked",
+    "no_change"
+  ],
+  "field_contract": {
+    "contract": "Must equal curvios.plan-autopilot.worker-output.v1.",
+    "status": "One of status_values.",
+    "blockId": "Selected V-block id, for example V145.",
+    "phaseId": "Selected phase id, for example 145.4.",
+    "subphaseId": "Selected subphase id, for example 145.4.2.",
+    "checks": "Array of executed checks with PASS/WARN/FAIL result text.",
+    "commit": "Commit hash for completed, otherwise null.",
+    "gateReason": "Reason text for gate_required or blocked, otherwise null.",
+    "notChecked": "Array of intentionally skipped checks or surfaces.",
+    "changedFiles": "Array of repo-relative files changed by this worker."
+  },
+  "safety_rules": [
+    "completed requires commit.",
+    "gate_required and blocked require gateReason.",
+    "changedFiles must be within the selected allowedFiles.",
+    "Worker must stop instead of editing when USER-GATE, D3, D4, dirty unrelated files, scope expansion, or red text signals appear."
+  ]
+}
