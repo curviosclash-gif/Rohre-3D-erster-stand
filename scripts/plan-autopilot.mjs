@@ -683,6 +683,66 @@ function gitDirtyFiles(rootDir) {
   }
 }
 
+function normalizeCommitRef(value) {
+  const commit = String(value || '').trim();
+  if (!/^[0-9a-f]{7,40}$/i.test(commit)) {
+    throw new Error('commit must be a git hash');
+  }
+  return commit;
+}
+
+function gitCommitFiles(rootDir, commit) {
+  let normalizedCommit = null;
+  try {
+    normalizedCommit = normalizeCommitRef(commit);
+    const output = execFileSync('git', [
+      'diff-tree',
+      '--root',
+      '--no-commit-id',
+      '--name-only',
+      '-r',
+      normalizedCommit,
+    ], {
+      cwd: rootDir,
+      encoding: 'utf8',
+      windowsHide: true,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    return {
+      commit: normalizedCommit,
+      verified: true,
+      files: output.split(/\r?\n/).map(normalizePath).filter(Boolean),
+      error: null,
+    };
+  } catch (error) {
+    return {
+      commit: normalizedCommit || String(commit || '').trim() || null,
+      verified: false,
+      files: [],
+      error: error?.stderr ? String(error.stderr).trim() : error.message,
+    };
+  }
+}
+
+function readPostWorkerGitState({ rootDir, workerOutput }) {
+  const commitState = workerOutput?.commit
+    ? gitCommitFiles(rootDir, workerOutput.commit)
+    : {
+        commit: null,
+        verified: false,
+        files: [],
+        error: null,
+      };
+  return {
+    source: 'git',
+    dirtyFiles: gitDirtyFiles(rootDir),
+    commit: commitState.commit,
+    commitVerified: commitState.verified,
+    commitFiles: commitState.files,
+    commitError: commitState.error,
+  };
+}
+
 function readinessParking(block) {
   const status = String(block.readiness?.status || '').toLowerCase();
   if (block.readiness?.activeLock || status === 'locked') {
@@ -995,6 +1055,110 @@ export function validateDiffScope(changedFiles, allowedFiles) {
   };
 }
 
+function uniqueNormalizedFiles(values) {
+  return unique((values || []).map(normalizePath).filter(Boolean));
+}
+
+function setDifference(left, right) {
+  const rightSet = new Set(right);
+  return left.filter((value) => !rightSet.has(value));
+}
+
+function inferPostWorkerReason(findings) {
+  const codes = new Set(findings.map((finding) => finding.code));
+  if ([...codes].some((code) => code.endsWith('_scope'))) return 'scope_violation';
+  if (codes.has('commit_unverified')) return 'commit_verification_failed';
+  if (codes.has('changed_files_mismatch')) return 'worker_changed_files_mismatch';
+  if (codes.has('dirty_after_worker')) return 'partial_work_requires_manual_review';
+  return 'post_worker_git_validation_failed';
+}
+
+export function validatePostWorkerGitState({ workerOutput, candidate, gitState }) {
+  const normalizedGitState = {
+    source: gitState?.source || 'git',
+    dirtyFiles: uniqueNormalizedFiles(gitState?.dirtyFiles || []),
+    commit: gitState?.commit || workerOutput?.commit || null,
+    commitVerified: Boolean(gitState?.commitVerified),
+    commitFiles: uniqueNormalizedFiles(gitState?.commitFiles || []),
+    commitError: gitState?.commitError || null,
+  };
+  const reportedScope = validateDiffScope(workerOutput?.changedFiles || [], candidate?.allowedFiles || []);
+  const commitScope = validateDiffScope(normalizedGitState.commitFiles, candidate?.allowedFiles || []);
+  const dirtyScope = validateDiffScope(normalizedGitState.dirtyFiles, candidate?.allowedFiles || []);
+  const diffScope = validateDiffScope(uniqueNormalizedFiles([
+    ...reportedScope.changedFiles,
+    ...commitScope.changedFiles,
+    ...dirtyScope.changedFiles,
+  ]), candidate?.allowedFiles || []);
+  const findings = [];
+
+  if (!reportedScope.valid) {
+    findings.push({
+      code: 'reported_scope',
+      message: `worker reported out-of-scope files: ${reportedScope.outOfScope.join(', ')}`,
+    });
+  }
+  if (!commitScope.valid) {
+    findings.push({
+      code: 'commit_scope',
+      message: `commit contains out-of-scope files: ${commitScope.outOfScope.join(', ')}`,
+    });
+  }
+  if (!dirtyScope.valid) {
+    findings.push({
+      code: 'dirty_scope',
+      message: `post-worker worktree contains out-of-scope files: ${dirtyScope.outOfScope.join(', ')}`,
+    });
+  }
+
+  if (workerOutput?.status === 'completed') {
+    if (!normalizedGitState.commitVerified) {
+      findings.push({
+        code: 'commit_unverified',
+        message: normalizedGitState.commitError
+          ? `completed commit could not be verified: ${normalizedGitState.commitError}`
+          : 'completed commit could not be verified',
+      });
+    }
+    if (normalizedGitState.dirtyFiles.length > 0) {
+      findings.push({
+        code: 'dirty_after_worker',
+        message: `completed worker left uncommitted files: ${normalizedGitState.dirtyFiles.join(', ')}`,
+      });
+    }
+    const reportedFiles = uniqueNormalizedFiles(reportedScope.changedFiles);
+    const commitFiles = uniqueNormalizedFiles(normalizedGitState.commitFiles);
+    const missingFromReport = setDifference(commitFiles, reportedFiles);
+    const missingFromCommit = setDifference(reportedFiles, commitFiles);
+    if (missingFromReport.length > 0 || missingFromCommit.length > 0) {
+      findings.push({
+        code: 'changed_files_mismatch',
+        message: [
+          missingFromReport.length > 0 ? `commit-only: ${missingFromReport.join(', ')}` : null,
+          missingFromCommit.length > 0 ? `reported-only: ${missingFromCommit.join(', ')}` : null,
+        ].filter(Boolean).join('; '),
+      });
+    }
+  } else if (normalizedGitState.dirtyFiles.length > 0) {
+    findings.push({
+      code: 'dirty_after_worker',
+      message: `non-completed worker left uncommitted files: ${normalizedGitState.dirtyFiles.join(', ')}`,
+    });
+  }
+
+  return {
+    valid: findings.length === 0,
+    reason: findings.length > 0 ? inferPostWorkerReason(findings) : null,
+    violations: findings.map((finding) => finding.message),
+    findings,
+    gitState: normalizedGitState,
+    reportedScope,
+    commitScope,
+    dirtyScope,
+    diffScope,
+  };
+}
+
 function parseWorkerJson(text) {
   const raw = String(text || '').trim();
   if (!raw) {
@@ -1041,6 +1205,17 @@ function fakeWorkerOutput({ candidate, status }) {
         : null,
     notChecked: status === 'no_change' ? ['fake executor made no changes'] : [],
     changedFiles,
+  };
+}
+
+function fakePostWorkerGitState(workerOutput) {
+  return {
+    source: 'fake',
+    dirtyFiles: [],
+    commit: workerOutput?.commit || null,
+    commitVerified: workerOutput?.status === 'completed' && Boolean(workerOutput?.commit),
+    commitFiles: workerOutput?.status === 'completed' ? (workerOutput.changedFiles || []) : [],
+    commitError: null,
   };
 }
 
@@ -1228,10 +1403,20 @@ export async function executeAutopilotRun(options = {}) {
     };
   }
 
-  const diffScope = validateDiffScope(workerOutput.changedFiles, plan.selected.allowedFiles);
-  if (!diffScope.valid) {
+  const gitState = options.gitPostWorkerState || (
+    executor === 'fake'
+      ? fakePostWorkerGitState(workerOutput)
+      : readPostWorkerGitState({ rootDir, workerOutput })
+  );
+  const postWorkerValidation = validatePostWorkerGitState({
+    workerOutput,
+    candidate: plan.selected,
+    gitState,
+  });
+  const diffScope = postWorkerValidation.diffScope;
+  if (!postWorkerValidation.valid) {
     const status = 'blocked';
-    const reason = 'scope_violation';
+    const reason = postWorkerValidation.reason;
     return {
       contract: RUN_CONTRACT,
       status,
@@ -1241,6 +1426,8 @@ export async function executeAutopilotRun(options = {}) {
       selected: plan.selected,
       parked: plan.parked,
       workerOutput,
+      gitState: postWorkerValidation.gitState,
+      postWorkerValidation,
       diffScope,
       reviewChecklist: buildReviewChecklist({ plan, workerOutput, diffScope, status, reason }),
     };
@@ -1273,6 +1460,7 @@ export async function executeAutopilotRun(options = {}) {
     selected: plan.selected,
     parked: plan.parked,
     workerOutput,
+    gitState: postWorkerValidation.gitState,
     diffScope,
     reviewChecklist: buildReviewChecklist({
       plan,

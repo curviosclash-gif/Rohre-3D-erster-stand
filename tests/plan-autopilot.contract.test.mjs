@@ -13,6 +13,7 @@ import {
   renderWorkerPrompt,
   scanRedSignals,
   validateDiffScope,
+  validatePostWorkerGitState,
   validateWorkerOutput,
 } from '../scripts/plan-autopilot.mjs';
 
@@ -460,6 +461,7 @@ test('worker output contract validation rejects missing commit and scope drift',
     blockId: 'V203',
     phaseId: '203.1',
     subphaseId: '203.1.1',
+    allowedFiles: ['scripts/plan-autopilot.mjs'],
   };
   const validation = validateWorkerOutput({
     contract: 'curvios.plan-autopilot.worker-output.v1',
@@ -482,6 +484,85 @@ test('worker output contract validation rejects missing commit and scope drift',
   assert(validation.violations.some((entry) => /commit/.test(entry)));
   assert.equal(diff.valid, false);
   assert.deepEqual(diff.outOfScope, ['src/outside.js']);
+});
+
+test('post-worker git validation blocks unverified commits and mismatched changed files', () => {
+  const candidate = {
+    blockId: 'V203',
+    phaseId: '203.1',
+    subphaseId: '203.1.1',
+    allowedFiles: ['scripts/plan-autopilot.mjs', 'tests/plan-autopilot.contract.test.mjs'],
+  };
+  const workerOutput = {
+    contract: 'curvios.plan-autopilot.worker-output.v1',
+    status: 'completed',
+    blockId: 'V203',
+    phaseId: '203.1',
+    subphaseId: '203.1.1',
+    checks: ['node --test tests/plan-autopilot.contract.test.mjs -> PASS'],
+    commit: 'abcdef1',
+    gateReason: null,
+    notChecked: [],
+    changedFiles: ['scripts/plan-autopilot.mjs'],
+  };
+
+  const unverified = validatePostWorkerGitState({
+    workerOutput,
+    candidate,
+    gitState: {
+      source: 'git',
+      dirtyFiles: [],
+      commit: 'abcdef1',
+      commitVerified: false,
+      commitFiles: ['scripts/plan-autopilot.mjs'],
+      commitError: 'bad object',
+    },
+  });
+  const mismatch = validatePostWorkerGitState({
+    workerOutput,
+    candidate,
+    gitState: {
+      source: 'git',
+      dirtyFiles: [],
+      commit: 'abcdef1',
+      commitVerified: true,
+      commitFiles: ['scripts/plan-autopilot.mjs', 'tests/plan-autopilot.contract.test.mjs'],
+      commitError: null,
+    },
+  });
+
+  assert.equal(unverified.valid, false);
+  assert.equal(unverified.reason, 'commit_verification_failed');
+  assert.equal(mismatch.valid, false);
+  assert.equal(mismatch.reason, 'worker_changed_files_mismatch');
+  assert(mismatch.violations.some((entry) => /commit-only/.test(entry)));
+});
+
+test('run blocks completed worker output when git cannot verify the commit', async () => {
+  const report = await executeAutopilotRun({
+    rootDir: process.cwd(),
+    mode: 'auto-d2-review',
+    maxSlices: 1,
+    executor: 'fake',
+    fakeStatus: 'completed',
+    planMapData: singleReviewPlanMapFixture(),
+    planTextByPath: {
+      'docs/plaene/aktiv/V203.md': REVIEW_PLAN,
+    },
+    gitDirtyFiles: [],
+    gitPostWorkerState: {
+      source: 'git',
+      dirtyFiles: [],
+      commit: 'fake-commit',
+      commitVerified: false,
+      commitFiles: [],
+      commitError: 'commit must be a git hash',
+    },
+  });
+
+  assert.equal(report.status, 'blocked');
+  assert.equal(report.reason, 'commit_verification_failed');
+  assert.equal(report.postWorkerValidation.reason, 'commit_verification_failed');
 });
 
 test('worker prompt and contract file expose the one-slice JSON handoff', async () => {
