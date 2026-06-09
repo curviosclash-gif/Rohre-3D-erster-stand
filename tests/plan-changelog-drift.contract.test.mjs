@@ -13,6 +13,9 @@ const MASTER = `
 `;
 
 const CHANGELOG = `
+## V9 Abschluss 2026-06-08
+- V9 nennt V1 nur als Overlap; evidence: test -> PASS.
+
 ## V1 Abschluss 2026-06-09
 - V1 1.99 abgeschlossen; evidence: node --test -> PASS.
 

@@ -70,7 +70,12 @@ function splitChangelogSections(markdown) {
 
 function findClosureSection(sections, blockId) {
   const closurePattern = /\b(abgeschlossen|geschlossen|closure|closed|recovery|abschluss)\b/i;
-  return sections.find((section) => section.text.includes(blockId) && closurePattern.test(section.text)) || null;
+  const candidates = sections.filter(
+    (section) => section.text.includes(blockId) && closurePattern.test(section.text)
+  );
+  return candidates.find((section) => section.heading.includes(blockId))
+    || candidates.at(-1)
+    || null;
 }
 
 function hasDate(section) {
