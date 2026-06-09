@@ -12,13 +12,34 @@ function stableJson(value) {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
-export async function checkOpenFindings({ rootDir = ROOT, asOf } = {}) {
-  const expected = await buildOpenFindingsIndex({ rootDir, asOf });
+export async function checkOpenFindings({
+  rootDir = ROOT,
+  asOf,
+  findingsMarkdown,
+  decisionsDocument,
+  masterMarkdown,
+  changelogMarkdown,
+  trackedFiles,
+  currentIndexDocument,
+} = {}) {
+  const expected = await buildOpenFindingsIndex({
+    rootDir,
+    asOf,
+    findingsMarkdown,
+    decisionsDocument,
+    masterMarkdown,
+    changelogMarkdown,
+    trackedFiles,
+  });
   let current = null;
-  try {
-    current = JSON.parse(await fs.readFile(path.resolve(rootDir, INDEX_PATH), 'utf8'));
-  } catch {
-    // Missing or malformed generated output is reported as WARN during the pilot.
+  if (currentIndexDocument) {
+    current = currentIndexDocument;
+  } else {
+    try {
+      current = JSON.parse(await fs.readFile(path.resolve(rootDir, INDEX_PATH), 'utf8'));
+    } catch {
+      // Missing or malformed generated output is reported as WARN during the pilot.
+    }
   }
 
   const warnings = [];
@@ -26,6 +47,7 @@ export async function checkOpenFindings({ rootDir = ROOT, asOf } = {}) {
     warnings.push({
       code: 'open-findings-index-stale',
       finding_id: null,
+      severity: 'warn',
       message: `Run npm run findings:index:build to refresh ${INDEX_PATH}.`,
     });
   }
@@ -35,6 +57,7 @@ export async function checkOpenFindings({ rootDir = ROOT, asOf } = {}) {
       warnings.push({
         code: drift.code,
         finding_id: finding.id,
+        severity: drift.severity || 'warn',
         message: drift.message,
       });
     }
@@ -50,7 +73,8 @@ async function main() {
 
   for (const warning of warnings) {
     const finding = warning.finding_id ? ` ${warning.finding_id}` : '';
-    console.warn(`[findings:check] WARN ${warning.code}${finding}: ${warning.message}`);
+    const level = warning.severity === 'info' ? 'INFO' : 'WARN';
+    console.warn(`[findings:check] ${level} ${warning.code}${finding}: ${warning.message}`);
   }
   console.log(
     `[findings:check] PASS pilot=warn-only findings=${index.summary.finding_count} warnings=${warnings.length}`

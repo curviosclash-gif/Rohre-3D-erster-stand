@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { buildOpenFindingsIndex } from '../scripts/build-open-findings-index.mjs';
+import { checkOpenFindings } from '../scripts/check-open-findings.mjs';
 
 const MASTER = `
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
@@ -53,7 +54,7 @@ const DECISIONS = {
       id: 'P3',
       status: 'open',
       owner_block: 'V1',
-      severity: 'high',
+      severity: 'medium',
       review_after: '2026-06-01',
       reason: 'due',
       manual_override: false,
@@ -110,7 +111,8 @@ test('open finding on completed owner reports owner and changelog drift', async 
 
 test('past review date reports review-after-due', async () => {
   const index = await buildFixture();
-  assert(codesFor(index, 'P3').has('review-after-due'));
+  const drift = index.findings.find((finding) => finding.id === 'P3').drift;
+  assert(drift.some((entry) => entry.code === 'review-after-due' && entry.severity === 'info'));
 });
 
 test('missing tracked path reports missing-file', async () => {
@@ -126,4 +128,22 @@ test('manual owner disagreement reports mapping-table-mismatch', async () => {
 test('planned owner with existing file has no drift', async () => {
   const index = await buildFixture();
   assert.deepEqual(codesFor(index, 'P6'), new Set());
+});
+
+test('findings check preserves generated drift severity', async () => {
+  const { warnings } = await checkOpenFindings({
+    asOf: '2026-06-09',
+    findingsMarkdown: FINDINGS,
+    decisionsDocument: DECISIONS,
+    masterMarkdown: MASTER,
+    changelogMarkdown: 'V1 abgeschlossen und Recovery geschlossen.',
+    trackedFiles: TRACKED_FILES,
+    currentIndexDocument: await buildFixture(),
+  });
+
+  assert(warnings.some((warning) =>
+    warning.finding_id === 'P3'
+    && warning.code === 'review-after-due'
+    && warning.severity === 'info'
+  ));
 });
