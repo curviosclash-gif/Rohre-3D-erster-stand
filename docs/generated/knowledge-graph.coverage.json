@@ -186,11 +186,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2148,
-    "rawCoveredFileCount": 1390,
+    "trackedFileCount": 2150,
+    "rawCoveredFileCount": 1392,
     "rawCoveragePercent": 64.7,
-    "adjustedTrackedFileCount": 1456,
-    "adjustedCoveredFileCount": 1151,
+    "adjustedTrackedFileCount": 1458,
+    "adjustedCoveredFileCount": 1153,
     "adjustedCoveragePercent": 79.1,
     "uncoveredFileCount": 758,
     "uncoveredActiveFileCount": 305,
@@ -258,8 +258,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1037,
-        "coveredCount": 914
+        "count": 1039,
+        "coveredCount": 916
       },
       {
         "classification": "product-docs",
@@ -6251,6 +6251,23 @@
       "excludeReason": null
     },
     {
+      "path": "data/contracts/plan-autopilot-worker-output.v1.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V145"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "data/maps/.gitkeep",
       "tracked": true,
       "coveredInCore": false,
@@ -11466,7 +11483,8 @@
         "V139",
         "V140",
         "V141",
-        "V144"
+        "V144",
+        "V145"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -16059,6 +16077,7 @@
         "V139",
         "V141",
         "V144",
+        "V145",
         "V51",
         "V69",
         "V89",
@@ -17501,6 +17520,7 @@
         "V138",
         "V141",
         "V142",
+        "V145",
         "V75",
         "V87",
         "V88",
@@ -20984,6 +21004,25 @@
       "scopeBlocks": [
         "B13",
         "V112"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/prompts/plan-autopilot-subphase.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V145"
       ],
       "surfaces": [],
       "classification": "product-code",

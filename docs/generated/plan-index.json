@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated": "2026-06-09",
+  "updated": "2026-06-10",
   "start_anchor": {
-    "block": "V141",
-    "phase": "141.99",
+    "block": "V145",
+    "phase": "145.99",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -1063,7 +1063,7 @@
     {
       "id": "V145",
       "title": "Plan-Autopilot fuer gate-sichere Subphasen-Automatisierung",
-      "status": "planned",
+      "status": "done",
       "priority": "P2",
       "owner": "frei",
       "workstream": "ai-graph-tools",
@@ -1075,13 +1075,13 @@
         "V138.99",
         "V141.99"
       ],
-      "current_phase": "145.1",
+      "current_phase": "145.99",
       "plan_file": "docs/plaene/aktiv/V145.md",
       "lock": {
-        "status": "frei",
+        "status": "closed",
         "agent": "-",
-        "start_date": "-",
-        "target": "Geplant",
+        "start_date": "2026-06-10",
+        "target": "Abgeschlossen 2026-06-10; Dry-run-/Parking-/Fake-Executor-/Worker-Contract-MVP gruen, Live-Run nur sauberer Ein-Slice-Handoff",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     }

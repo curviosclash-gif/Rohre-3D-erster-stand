@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 268,
+          "concreteCount": 269,
           "plannedCount": 0
         }
       }
@@ -2577,7 +2577,7 @@
       "id": "V145",
       "type": "block",
       "title": "Plan-Autopilot fuer gate-sichere Subphasen-Automatisierung",
-      "status": "planned",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -2585,21 +2585,24 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "145.1",
+        "currentPhase": "145.99",
         "planFile": "docs/plaene/aktiv/V145.md",
         "scopeDeclarations": [
           "data/contracts/plan-autopilot-worker-output.v1.json",
           "docs/generated/knowledge-graph.coverage.json",
           "docs/generated/knowledge-graph.json",
           "docs/generated/knowledge-graph.scorecard.json",
+          "docs/generated/plan-index.json",
           "docs/plaene/aktiv/V145.md",
+          "docs/Umsetzungsplan.md",
+          "package.json",
           "scripts/plan-autopilot.mjs",
           "scripts/prompts/plan-autopilot-subphase.md",
           "tests/plan-autopilot.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 6,
-          "plannedCount": 2
+          "concreteCount": 11,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": [
@@ -6984,7 +6987,7 @@
       "id": "V145.1",
       "type": "phase",
       "title": "Dry-run Planner und Auswahlmodell",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.1"
@@ -6994,7 +6997,7 @@
       "id": "V145.2",
       "type": "phase",
       "title": "Policy-Modi und Parking-Logik",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.2"
@@ -7004,7 +7007,7 @@
       "id": "V145.3",
       "type": "phase",
       "title": "Fake Executor und Contract-Tests",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.3"
@@ -7014,7 +7017,7 @@
       "id": "V145.4",
       "type": "phase",
       "title": "Prompt- und Codex-Worker-Adapter",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.4"
@@ -7024,7 +7027,7 @@
       "id": "V145.5",
       "type": "phase",
       "title": "Live-Pilot und Review-Handoff",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.5"
@@ -7034,7 +7037,7 @@
       "id": "V145.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.99"
@@ -21172,8 +21175,8 @@
     {
       "id": "V145.1.3",
       "type": "subphase",
-      "title": "AI-Matrix-Varianten erkennen: `[AUTO]`, `AUTO`, `` `[USER-GATE]` ``, `REVIEW; D4 falls ...`, Tabellen mit `Decision`/`Gate`.",
-      "status": "open",
+      "title": "AI-Matrix-Varianten erkennen: `[AUTO]`, `AUTO`, `` `[USER-GATE]` ``, `REVIEW; D4 falls ...`, Tabellen mit `Decision`/`Gate`. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS; Matrix-Work-Tokens werden dedupliziert, `AUTO`-Parser-Slices parken nicht an ihren eigenen Testbegriffen)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.1",
@@ -21183,8 +21186,8 @@
     {
       "id": "V145.1.4",
       "type": "subphase",
-      "title": "Rote Textsignale erkennen: `Manuelle Uebernahme erforderlich`, `darf nicht direkt umgesetzt werden`, `Draft fuer User-Intake`, `D3`, `D4`, `Full-Init`, `Rebuild`, `Reborn`.",
-      "status": "open",
+      "title": "Rote Textsignale erkennen: `Manuelle Uebernahme erforderlich`, `darf nicht direkt umgesetzt werden`, `Draft fuer User-Intake`, `D3`, `D4`, `Full-Init`, `Rebuild`, `Reborn`. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS; D3/D4-, Full-Init-/Rebuild-/Reborn- und Intake-Signale werden als `red_text_signal` geparkt)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.1",
@@ -21194,8 +21197,8 @@
     {
       "id": "V145.2.1",
       "type": "subphase",
-      "title": "`auto-safe`, `auto-d2-review` und `report-only` implementieren; Default bleibt Dry-run/`auto-safe`.",
-      "status": "open",
+      "title": "`auto-safe`, `auto-d2-review` und `report-only` implementieren; Default bleibt Dry-run/`auto-safe`. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.2",
@@ -21205,8 +21208,8 @@
     {
       "id": "V145.2.2",
       "type": "subphase",
-      "title": "Parking-Objekte fuer Gate, Lock, Dirty-Worktree, Scope-Konflikt und rote Textsignale definieren.",
-      "status": "open",
+      "title": "Parking-Objekte fuer Gate, Lock, Dirty-Worktree, Scope-Konflikt und rote Textsignale definieren. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.2",
@@ -21216,8 +21219,8 @@
     {
       "id": "V145.2.3",
       "type": "subphase",
-      "title": "Auswahlheuristik festlegen: recommended rank vor Master-Reihenfolge, readiness `ready` vor `ready-with-risk`, niedriger Impact vor hohem Impact, keine aktiven Locks.",
-      "status": "open",
+      "title": "Auswahlheuristik festlegen: recommended rank vor Master-Reihenfolge, readiness `ready` vor `ready-with-risk`, niedriger Impact vor hohem Impact, keine aktiven Locks. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.2",
@@ -21227,8 +21230,8 @@
     {
       "id": "V145.2.4",
       "type": "subphase",
-      "title": "Wenn kein sicherer Scope uebrig ist, sauber mit Report statt Fehlerrauschen stoppen.",
-      "status": "open",
+      "title": "Wenn kein sicherer Scope uebrig ist, sauber mit Report statt Fehlerrauschen stoppen. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.2",
@@ -21238,8 +21241,8 @@
     {
       "id": "V145.3.1",
       "type": "subphase",
-      "title": "Fixtures fuer `[AUTO]`, `[REVIEW]`, `[USER-GATE]`, D3/D4, Locks, rote Textsignale und alternative Kandidaten anlegen.",
-      "status": "open",
+      "title": "Fixtures fuer `[AUTO]`, `[REVIEW]`, `[USER-GATE]`, D3/D4, Locks, rote Textsignale und alternative Kandidaten anlegen. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.3",
@@ -21249,8 +21252,8 @@
     {
       "id": "V145.3.2",
       "type": "subphase",
-      "title": "Fake-Executor fuer `completed`, `gate_required`, `blocked`, `no_change` und Out-of-Scope-Diff simulieren.",
-      "status": "open",
+      "title": "Fake-Executor fuer `completed`, `gate_required`, `blocked`, `no_change` und Out-of-Scope-Diff simulieren. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.3",
@@ -21260,8 +21263,8 @@
     {
       "id": "V145.3.3",
       "type": "subphase",
-      "title": "Dirty-Worktree-Stopp testen: Live-Modus startet nicht bei fremden uncommitted Aenderungen.",
-      "status": "open",
+      "title": "Dirty-Worktree-Stopp testen: Live-Modus startet nicht bei fremden uncommitted Aenderungen. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.3",
@@ -21271,8 +21274,8 @@
     {
       "id": "V145.3.4",
       "type": "subphase",
-      "title": "Scope-/Commit-Pruefung testen: staged Dateien muessen im erlaubten Scope oder explizit governance-erlaubt sein.",
-      "status": "open",
+      "title": "Scope-/Commit-Pruefung testen: staged Dateien muessen im erlaubten Scope oder explizit governance-erlaubt sein. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.3",
@@ -21282,8 +21285,8 @@
     {
       "id": "V145.4.1",
       "type": "subphase",
-      "title": "`scripts/prompts/plan-autopilot-subphase.md` erstellen: Subphase, erlaubte Dateien, verbotene Oberflaechen, Checks, Commit-Regel, Stop-Bedingungen.",
-      "status": "open",
+      "title": "`scripts/prompts/plan-autopilot-subphase.md` erstellen: Subphase, erlaubte Dateien, verbotene Oberflaechen, Checks, Commit-Regel, Stop-Bedingungen. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.4",
@@ -21293,8 +21296,8 @@
     {
       "id": "V145.4.2",
       "type": "subphase",
-      "title": "`data/contracts/plan-autopilot-worker-output.v1.json` definieren und Worker-Antwort validieren.",
-      "status": "open",
+      "title": "`data/contracts/plan-autopilot-worker-output.v1.json` definieren und Worker-Antwort validieren. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.4",
@@ -21304,8 +21307,8 @@
     {
       "id": "V145.4.3",
       "type": "subphase",
-      "title": "`codex exec`-Adapter hinter explizitem `run --max-slices=N` implementieren; Shell-Zugriff und WindowsApps-Fehler blockerfest melden.",
-      "status": "open",
+      "title": "`codex exec`-Adapter hinter explizitem `run --max-slices=N` implementieren; Shell-Zugriff und WindowsApps-Fehler blockerfest melden. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.4",
@@ -21315,8 +21318,8 @@
     {
       "id": "V145.4.4",
       "type": "subphase",
-      "title": "Nach Worker-Ende Diff, Checks, Commit und Lock-Zustand validieren; bei Partial Work stoppen.",
-      "status": "open",
+      "title": "Nach Worker-Ende Diff, Checks, Commit und Lock-Zustand validieren; bei Partial Work stoppen. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.4",
@@ -21326,8 +21329,8 @@
     {
       "id": "V145.5.1",
       "type": "subphase",
-      "title": "`autopilot:plan` und `autopilot:run` npm-Scripts ergaenzen, ohne normale Agenten-Defaults zu veraendern.",
-      "status": "open",
+      "title": "`autopilot:plan` und `autopilot:run` npm-Scripts ergaenzen, ohne normale Agenten-Defaults zu veraendern. (abgeschlossen: 2026-06-10; evidence: `npm run autopilot:plan -- --block=V145 --json` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.5",
@@ -21337,8 +21340,8 @@
     {
       "id": "V145.5.2",
       "type": "subphase",
-      "title": "Live-Pilot auf `--max-slices=1` begrenzen; bevorzugt kleiner D2-Scope, keine D3/D4-/Governance-Aenderung.",
-      "status": "open",
+      "title": "Live-Pilot auf `--max-slices=1` begrenzen; bevorzugt kleiner D2-Scope, keine D3/D4-/Governance-Aenderung. (abgeschlossen: 2026-06-10; evidence: `npm run autopilot:run -- --max-slices=1 --executor=fake --block=V145 --json` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.5",
@@ -21348,8 +21351,8 @@
     {
       "id": "V145.5.3",
       "type": "subphase",
-      "title": "Review-Checkliste ausgeben: geparkte Gates, bearbeiteter Scope, Checks, Commit, Not-checked, bekannte Risiken.",
-      "status": "open",
+      "title": "Review-Checkliste ausgeben: geparkte Gates, bearbeiteter Scope, Checks, Commit, Not-checked, bekannte Risiken. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.5",
@@ -21359,8 +21362,8 @@
     {
       "id": "V145.5.4",
       "type": "subphase",
-      "title": "Ausbaukriterium fuer `--max-slices=2/3` definieren: Dry-run stabil, Fake-Executor gruen, ein Live-Pilot gruen.",
-      "status": "open",
+      "title": "Ausbaukriterium fuer `--max-slices=2/3` definieren: Dry-run stabil, Fake-Executor gruen, ein Live-Pilot gruen. (abgeschlossen: 2026-06-10; evidence: V145 Abschlussnotiz 145.99 -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.5",
@@ -21370,8 +21373,8 @@
     {
       "id": "V145.99.1",
       "type": "subphase",
-      "title": "Alle vorherigen Phasen sind abgeschlossen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "Alle vorherigen Phasen sind abgeschlossen oder blockerfest dokumentiert. (abgeschlossen: 2026-06-10; evidence: V145 Phasen 145.1-145.5 -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.99",
@@ -21381,8 +21384,8 @@
     {
       "id": "V145.99.2",
       "type": "subphase",
-      "title": "`node --test tests/plan-autopilot.contract.test.mjs` ist gruen.",
-      "status": "open",
+      "title": "`node --test tests/plan-autopilot.contract.test.mjs` ist gruen. (abgeschlossen: 2026-06-10; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.99",
@@ -21392,8 +21395,8 @@
     {
       "id": "V145.99.3",
       "type": "subphase",
-      "title": "`npm run plan:check`, `npm run plan:index:check` und bei Plan-/Generated-Scope `npm run gates:pre-commit` sind gruen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "`npm run plan:check`, `npm run plan:index:check` und bei Plan-/Generated-Scope `npm run gates:pre-commit` sind gruen oder blockerfest dokumentiert. (abgeschlossen: 2026-06-10; evidence: Abschluss-Gates -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.99",
@@ -21403,8 +21406,8 @@
     {
       "id": "V145.99.4",
       "type": "subphase",
-      "title": "Keine normale Governance-, Rule-, Workflow- oder Agent-Default-Aenderung wurde eingebaut.",
-      "status": "open",
+      "title": "Keine normale Governance-, Rule-, Workflow- oder Agent-Default-Aenderung wurde eingebaut. (abgeschlossen: 2026-06-10; evidence: `git diff -- .agents AGENTS.md` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.99",
@@ -21414,8 +21417,8 @@
     {
       "id": "V145.99.5",
       "type": "subphase",
-      "title": "Abschlussnotiz nennt geparkte Gate-Klassen, Live-Pilot-Status, Restgefahren und naechste moegliche Freigabe.",
-      "status": "open",
+      "title": "Abschlussnotiz nennt geparkte Gate-Klassen, Live-Pilot-Status, Restgefahren und naechste moegliche Freigabe. (abgeschlossen: 2026-06-10; evidence: V145 Abschlussnotiz 145.99 -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.99",
@@ -34813,7 +34816,7 @@
         "scopeBlocks": [
           "V145"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -35390,7 +35393,8 @@
           "V139",
           "V140",
           "V141",
-          "V144"
+          "V144",
+          "V145"
         ],
         "exists": true
       }
@@ -39306,6 +39310,7 @@
           "V139",
           "V141",
           "V144",
+          "V145",
           "V51",
           "V69",
           "V89",
@@ -40628,6 +40633,7 @@
           "V138",
           "V141",
           "V142",
+          "V145",
           "V75",
           "V87",
           "V88",
@@ -42330,12 +42336,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V145"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -62637,6 +62645,15 @@
     {
       "from": "B13",
       "to": "scripts/playwright-run-profile.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/prompts/plan-autopilot-subphase.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -95322,7 +95339,34 @@
     },
     {
       "from": "V145",
+      "to": "docs/generated/plan-index.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
       "to": "docs/plaene/aktiv/V145.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "docs/Umsetzungsplan.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "package.json",
       "type": "scope",
       "hint": null,
       "attributes": {
