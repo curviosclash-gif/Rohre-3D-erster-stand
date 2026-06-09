@@ -2079,6 +2079,7 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P2",
@@ -2392,6 +2393,7 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P2",
@@ -2568,6 +2570,37 @@
         "unknownFrontmatterFields": [
           "scope_reference_files",
           "soft_depends_on"
+        ]
+      }
+    },
+    {
+      "id": "V145",
+      "type": "block",
+      "title": "Plan-Autopilot fuer gate-sichere Subphasen-Automatisierung",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "145.1",
+        "planFile": "docs/plaene/aktiv/V145.md",
+        "scopeDeclarations": [
+          "data/contracts/plan-autopilot-worker-output.v1.json",
+          "docs/plaene/aktiv/V145.md",
+          "scripts/plan-autopilot.mjs",
+          "scripts/prompts/plan-autopilot-subphase.md",
+          "tests/plan-autopilot.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 1,
+          "plannedCount": 4
+        },
+        "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": [
+          "scope_reference_files"
         ]
       }
     },
@@ -3284,7 +3317,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 356,
+          "concreteCount": 357,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -6942,6 +6975,66 @@
       "attributes": {
         "blockId": "V144",
         "phaseCode": "144.99"
+      }
+    },
+    {
+      "id": "V145.1",
+      "type": "phase",
+      "title": "Dry-run Planner und Auswahlmodell",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.1"
+      }
+    },
+    {
+      "id": "V145.2",
+      "type": "phase",
+      "title": "Policy-Modi und Parking-Logik",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.2"
+      }
+    },
+    {
+      "id": "V145.3",
+      "type": "phase",
+      "title": "Fake Executor und Contract-Tests",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.3"
+      }
+    },
+    {
+      "id": "V145.4",
+      "type": "phase",
+      "title": "Prompt- und Codex-Worker-Adapter",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.4"
+      }
+    },
+    {
+      "id": "V145.5",
+      "type": "phase",
+      "title": "Live-Pilot und Review-Handoff",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.5"
+      }
+    },
+    {
+      "id": "V145.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99"
       }
     },
     {
@@ -20317,12 +20410,23 @@
     {
       "id": "V142.1.4",
       "type": "subphase",
-      "title": "Baseline-Kommandos ausfuehren: `git status --short`, `npm run graph:check`, `node scripts/query-knowledge-graph.mjs scope-collisions --json`.",
+      "title": "Baseline-Kommandos ausfuehren: `git status --short`, `npm run graph:check`, `node scripts/query-knowledge-graph.mjs scope-collisions --json`, `node scripts/query-knowledge-graph.mjs open-deps V141 --json`.",
       "status": "open",
       "attributes": {
         "blockId": "V142",
         "phaseCode": "142.1",
         "subphaseCode": "142.1.4"
+      }
+    },
+    {
+      "id": "V142.1.5",
+      "type": "subphase",
+      "title": "Master-Abhaengigkeitstabellen mit Mehrfach-Tokens als Regression-Fall erfassen: `V141 | V116.99,V117.99,V119.99,V123.99,V138.99 | hard | ja` darf im Graph keine falschen offenen `open-deps` fuer die Folge-Tokens erzeugen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V142",
+        "phaseCode": "142.1",
+        "subphaseCode": "142.1.5"
       }
     },
     {
@@ -20455,6 +20559,17 @@
         "blockId": "V142",
         "phaseCode": "142.4",
         "subphaseCode": "142.4.4"
+      }
+    },
+    {
+      "id": "V142.4.5",
+      "type": "subphase",
+      "title": "Dependency-Metadata-Baseline pruefen: `depends_on`-Kanten aus kompakten Master-Tabellenzellen behalten `hard`, `fulfilled` und `hint` fuer jedes Token oder melden eine eindeutige Parser-Warnung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V142",
+        "phaseCode": "142.4",
+        "subphaseCode": "142.4.5"
       }
     },
     {
@@ -21027,6 +21142,281 @@
         "blockId": "V144",
         "phaseCode": "144.99",
         "subphaseCode": "144.99.5"
+      }
+    },
+    {
+      "id": "V145.1.1",
+      "type": "subphase",
+      "title": "`buildPlanMapData()` als primaere Quelle fuer Readiness, Dependencies, Locks, Scope-Kollisionen, Impact und empfohlene Reihenfolge nutzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.1",
+        "subphaseCode": "145.1.1"
+      }
+    },
+    {
+      "id": "V145.1.2",
+      "type": "subphase",
+      "title": "Offene Phase/Subphase aus aktiver VXX-Datei erkennen, ohne abgeschlossene Phasen breit zu laden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.1",
+        "subphaseCode": "145.1.2"
+      }
+    },
+    {
+      "id": "V145.1.3",
+      "type": "subphase",
+      "title": "AI-Matrix-Varianten erkennen: `[AUTO]`, `AUTO`, `` `[USER-GATE]` ``, `REVIEW; D4 falls ...`, Tabellen mit `Decision`/`Gate`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.1",
+        "subphaseCode": "145.1.3"
+      }
+    },
+    {
+      "id": "V145.1.4",
+      "type": "subphase",
+      "title": "Rote Textsignale erkennen: `Manuelle Uebernahme erforderlich`, `darf nicht direkt umgesetzt werden`, `Draft fuer User-Intake`, `D3`, `D4`, `Full-Init`, `Rebuild`, `Reborn`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.1",
+        "subphaseCode": "145.1.4"
+      }
+    },
+    {
+      "id": "V145.2.1",
+      "type": "subphase",
+      "title": "`auto-safe`, `auto-d2-review` und `report-only` implementieren; Default bleibt Dry-run/`auto-safe`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.2",
+        "subphaseCode": "145.2.1"
+      }
+    },
+    {
+      "id": "V145.2.2",
+      "type": "subphase",
+      "title": "Parking-Objekte fuer Gate, Lock, Dirty-Worktree, Scope-Konflikt und rote Textsignale definieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.2",
+        "subphaseCode": "145.2.2"
+      }
+    },
+    {
+      "id": "V145.2.3",
+      "type": "subphase",
+      "title": "Auswahlheuristik festlegen: recommended rank vor Master-Reihenfolge, readiness `ready` vor `ready-with-risk`, niedriger Impact vor hohem Impact, keine aktiven Locks.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.2",
+        "subphaseCode": "145.2.3"
+      }
+    },
+    {
+      "id": "V145.2.4",
+      "type": "subphase",
+      "title": "Wenn kein sicherer Scope uebrig ist, sauber mit Report statt Fehlerrauschen stoppen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.2",
+        "subphaseCode": "145.2.4"
+      }
+    },
+    {
+      "id": "V145.3.1",
+      "type": "subphase",
+      "title": "Fixtures fuer `[AUTO]`, `[REVIEW]`, `[USER-GATE]`, D3/D4, Locks, rote Textsignale und alternative Kandidaten anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.3",
+        "subphaseCode": "145.3.1"
+      }
+    },
+    {
+      "id": "V145.3.2",
+      "type": "subphase",
+      "title": "Fake-Executor fuer `completed`, `gate_required`, `blocked`, `no_change` und Out-of-Scope-Diff simulieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.3",
+        "subphaseCode": "145.3.2"
+      }
+    },
+    {
+      "id": "V145.3.3",
+      "type": "subphase",
+      "title": "Dirty-Worktree-Stopp testen: Live-Modus startet nicht bei fremden uncommitted Aenderungen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.3",
+        "subphaseCode": "145.3.3"
+      }
+    },
+    {
+      "id": "V145.3.4",
+      "type": "subphase",
+      "title": "Scope-/Commit-Pruefung testen: staged Dateien muessen im erlaubten Scope oder explizit governance-erlaubt sein.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.3",
+        "subphaseCode": "145.3.4"
+      }
+    },
+    {
+      "id": "V145.4.1",
+      "type": "subphase",
+      "title": "`scripts/prompts/plan-autopilot-subphase.md` erstellen: Subphase, erlaubte Dateien, verbotene Oberflaechen, Checks, Commit-Regel, Stop-Bedingungen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.4",
+        "subphaseCode": "145.4.1"
+      }
+    },
+    {
+      "id": "V145.4.2",
+      "type": "subphase",
+      "title": "`data/contracts/plan-autopilot-worker-output.v1.json` definieren und Worker-Antwort validieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.4",
+        "subphaseCode": "145.4.2"
+      }
+    },
+    {
+      "id": "V145.4.3",
+      "type": "subphase",
+      "title": "`codex exec`-Adapter hinter explizitem `run --max-slices=N` implementieren; Shell-Zugriff und WindowsApps-Fehler blockerfest melden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.4",
+        "subphaseCode": "145.4.3"
+      }
+    },
+    {
+      "id": "V145.4.4",
+      "type": "subphase",
+      "title": "Nach Worker-Ende Diff, Checks, Commit und Lock-Zustand validieren; bei Partial Work stoppen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.4",
+        "subphaseCode": "145.4.4"
+      }
+    },
+    {
+      "id": "V145.5.1",
+      "type": "subphase",
+      "title": "`autopilot:plan` und `autopilot:run` npm-Scripts ergaenzen, ohne normale Agenten-Defaults zu veraendern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.5",
+        "subphaseCode": "145.5.1"
+      }
+    },
+    {
+      "id": "V145.5.2",
+      "type": "subphase",
+      "title": "Live-Pilot auf `--max-slices=1` begrenzen; bevorzugt kleiner D2-Scope, keine D3/D4-/Governance-Aenderung.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.5",
+        "subphaseCode": "145.5.2"
+      }
+    },
+    {
+      "id": "V145.5.3",
+      "type": "subphase",
+      "title": "Review-Checkliste ausgeben: geparkte Gates, bearbeiteter Scope, Checks, Commit, Not-checked, bekannte Risiken.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.5",
+        "subphaseCode": "145.5.3"
+      }
+    },
+    {
+      "id": "V145.5.4",
+      "type": "subphase",
+      "title": "Ausbaukriterium fuer `--max-slices=2/3` definieren: Dry-run stabil, Fake-Executor gruen, ein Live-Pilot gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.5",
+        "subphaseCode": "145.5.4"
+      }
+    },
+    {
+      "id": "V145.99.1",
+      "type": "subphase",
+      "title": "Alle vorherigen Phasen sind abgeschlossen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99",
+        "subphaseCode": "145.99.1"
+      }
+    },
+    {
+      "id": "V145.99.2",
+      "type": "subphase",
+      "title": "`node --test tests/plan-autopilot.contract.test.mjs` ist gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99",
+        "subphaseCode": "145.99.2"
+      }
+    },
+    {
+      "id": "V145.99.3",
+      "type": "subphase",
+      "title": "`npm run plan:check`, `npm run plan:index:check` und bei Plan-/Generated-Scope `npm run gates:pre-commit` sind gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99",
+        "subphaseCode": "145.99.3"
+      }
+    },
+    {
+      "id": "V145.99.4",
+      "type": "subphase",
+      "title": "Keine normale Governance-, Rule-, Workflow- oder Agent-Default-Aenderung wurde eingebaut.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99",
+        "subphaseCode": "145.99.4"
+      }
+    },
+    {
+      "id": "V145.99.5",
+      "type": "subphase",
+      "title": "Abschlussnotiz nennt geparkte Gate-Klassen, Live-Pilot-Status, Restgefahren und naechste moegliche Freigabe.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99",
+        "subphaseCode": "145.99.5"
       }
     },
     {
@@ -34409,6 +34799,21 @@
       }
     },
     {
+      "id": "data/contracts/plan-autopilot-worker-output.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V145"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "dev/scripts/_forward-legacy-script.mjs",
       "type": "file",
       "title": null,
@@ -35714,6 +36119,22 @@
         ],
         "scopeBlocks": [
           "V144",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V145.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V145",
           "V77"
         ],
         "exists": true
@@ -41789,6 +42210,21 @@
       }
     },
     {
+      "id": "scripts/plan-autopilot.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V145"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "scripts/plan-context-report.mjs",
       "type": "file",
       "title": null,
@@ -41877,6 +42313,21 @@
           "V112"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "scripts/prompts/plan-autopilot-subphase.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V145"
+        ],
+        "exists": false
       }
     },
     {
@@ -54917,6 +55368,21 @@
           "V89"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "tests/plan-autopilot.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V145"
+        ],
+        "exists": false
       }
     },
     {
@@ -93622,6 +94088,17 @@
       }
     },
     {
+      "from": "V142.1",
+      "to": "V142.1.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V142",
+        "phaseCode": "142.1",
+        "subphaseCode": "142.1.5"
+      }
+    },
+    {
       "from": "V142.2",
       "to": "V142.2.1",
       "type": "contains_subphase",
@@ -93751,6 +94228,17 @@
         "blockId": "V142",
         "phaseCode": "142.4",
         "subphaseCode": "142.4.4"
+      }
+    },
+    {
+      "from": "V142.4",
+      "to": "V142.4.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V142",
+        "phaseCode": "142.4",
+        "subphaseCode": "142.4.5"
       }
     },
     {
@@ -94766,6 +95254,494 @@
         "blockId": "V144",
         "phaseCode": "144.99",
         "subphaseCode": "144.99.5"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "data/contracts/plan-autopilot-worker-output.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "docs/plaene/aktiv/V145.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "scripts/plan-autopilot.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "scripts/prompts/plan-autopilot-subphase.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "tests/plan-autopilot.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V116",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Kontextreduktion, AI-Gates, Plan-Index, Plan-Map, Diff-Audit und Drift-Pilot begrenzen den gate-sicheren Autopilot-MVP",
+      "attributes": {
+        "dependsPhase": "116.99",
+        "rawToken": "V116.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V117",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": false,
+      "fulfilled": false,
+      "hint": null,
+      "attributes": {
+        "dependsPhase": "117.99",
+        "rawToken": "V117.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V123",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": false,
+      "fulfilled": false,
+      "hint": null,
+      "attributes": {
+        "dependsPhase": "123.99",
+        "rawToken": "V123.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V134",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": false,
+      "fulfilled": false,
+      "hint": null,
+      "attributes": {
+        "dependsPhase": "134.99",
+        "rawToken": "V134.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V138",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": false,
+      "fulfilled": false,
+      "hint": null,
+      "attributes": {
+        "dependsPhase": "138.99",
+        "rawToken": "V138.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V141",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": false,
+      "fulfilled": false,
+      "hint": null,
+      "attributes": {
+        "dependsPhase": "141.99",
+        "rawToken": "V141.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V145.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.1"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V145.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.2"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V145.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.3"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V145.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.4"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V145.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.5"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "V145.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99"
+      }
+    },
+    {
+      "from": "V145.1",
+      "to": "V145.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.1",
+        "subphaseCode": "145.1.1"
+      }
+    },
+    {
+      "from": "V145.1",
+      "to": "V145.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.1",
+        "subphaseCode": "145.1.2"
+      }
+    },
+    {
+      "from": "V145.1",
+      "to": "V145.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.1",
+        "subphaseCode": "145.1.3"
+      }
+    },
+    {
+      "from": "V145.1",
+      "to": "V145.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.1",
+        "subphaseCode": "145.1.4"
+      }
+    },
+    {
+      "from": "V145.2",
+      "to": "V145.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.2",
+        "subphaseCode": "145.2.1"
+      }
+    },
+    {
+      "from": "V145.2",
+      "to": "V145.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.2",
+        "subphaseCode": "145.2.2"
+      }
+    },
+    {
+      "from": "V145.2",
+      "to": "V145.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.2",
+        "subphaseCode": "145.2.3"
+      }
+    },
+    {
+      "from": "V145.2",
+      "to": "V145.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.2",
+        "subphaseCode": "145.2.4"
+      }
+    },
+    {
+      "from": "V145.3",
+      "to": "V145.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.3",
+        "subphaseCode": "145.3.1"
+      }
+    },
+    {
+      "from": "V145.3",
+      "to": "V145.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.3",
+        "subphaseCode": "145.3.2"
+      }
+    },
+    {
+      "from": "V145.3",
+      "to": "V145.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.3",
+        "subphaseCode": "145.3.3"
+      }
+    },
+    {
+      "from": "V145.3",
+      "to": "V145.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.3",
+        "subphaseCode": "145.3.4"
+      }
+    },
+    {
+      "from": "V145.4",
+      "to": "V145.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.4",
+        "subphaseCode": "145.4.1"
+      }
+    },
+    {
+      "from": "V145.4",
+      "to": "V145.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.4",
+        "subphaseCode": "145.4.2"
+      }
+    },
+    {
+      "from": "V145.4",
+      "to": "V145.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.4",
+        "subphaseCode": "145.4.3"
+      }
+    },
+    {
+      "from": "V145.4",
+      "to": "V145.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.4",
+        "subphaseCode": "145.4.4"
+      }
+    },
+    {
+      "from": "V145.5",
+      "to": "V145.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.5",
+        "subphaseCode": "145.5.1"
+      }
+    },
+    {
+      "from": "V145.5",
+      "to": "V145.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.5",
+        "subphaseCode": "145.5.2"
+      }
+    },
+    {
+      "from": "V145.5",
+      "to": "V145.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.5",
+        "subphaseCode": "145.5.3"
+      }
+    },
+    {
+      "from": "V145.5",
+      "to": "V145.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.5",
+        "subphaseCode": "145.5.4"
+      }
+    },
+    {
+      "from": "V145.99",
+      "to": "V145.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99",
+        "subphaseCode": "145.99.1"
+      }
+    },
+    {
+      "from": "V145.99",
+      "to": "V145.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99",
+        "subphaseCode": "145.99.2"
+      }
+    },
+    {
+      "from": "V145.99",
+      "to": "V145.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99",
+        "subphaseCode": "145.99.3"
+      }
+    },
+    {
+      "from": "V145.99",
+      "to": "V145.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99",
+        "subphaseCode": "145.99.4"
+      }
+    },
+    {
+      "from": "V145.99",
+      "to": "V145.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V145",
+        "phaseCode": "145.99",
+        "subphaseCode": "145.99.5"
       }
     },
     {
@@ -105217,6 +106193,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/aktiv/V144.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V145.md",
       "type": "scope",
       "hint": null,
       "attributes": {
