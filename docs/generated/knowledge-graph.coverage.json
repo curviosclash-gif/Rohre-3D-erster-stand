@@ -186,11 +186,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2137,
-    "rawCoveredFileCount": 1379,
+    "trackedFileCount": 2136,
+    "rawCoveredFileCount": 1378,
     "rawCoveragePercent": 64.5,
-    "adjustedTrackedFileCount": 1445,
-    "adjustedCoveredFileCount": 1140,
+    "adjustedTrackedFileCount": 1444,
+    "adjustedCoveredFileCount": 1139,
     "adjustedCoveragePercent": 78.9,
     "uncoveredFileCount": 758,
     "uncoveredActiveFileCount": 305,
@@ -264,8 +264,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 342,
-        "coveredCount": 190
+        "count": 341,
+        "coveredCount": 189
       },
       {
         "classification": "prototype",
@@ -15925,23 +15925,6 @@
       "excludeReason": null
     },
     {
-      "path": "docs/release/Releaseplan_Spiel_2026.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V141"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
       "path": "docs/tests/Testergebnisse_Phase4b_2026-03-18.md",
       "tracked": true,
       "coveredInCore": false,
@@ -20094,7 +20077,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V116"
+        "V116",
+        "V143"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -34355,10 +34339,12 @@
       "coveredByOverlay": false,
       "covered": true,
       "coverageSources": [
-        "audit-scope"
+        "audit-scope",
+        "scope-files"
       ],
       "scopeBlocks": [
-        "B13"
+        "B13",
+        "V143"
       ],
       "surfaces": [],
       "classification": "product-code",

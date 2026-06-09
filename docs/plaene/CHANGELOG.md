@@ -6,6 +6,16 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## V143 Planungsschaerfung 2026-06-09 (tokenarme Gemini-Modell-Auslagerung)
+
+- Nach User-Gate `bitte alles einplanen` wurde V143 um einen begrenzten Gemini-Review-Router-Pilot erweitert: explizite Lite-/Flash-/Pro-Profile, Input-/Outputbudgets, Read-only-Policy, validiertes Kurz-JSON, Modell-/Fallback-Pruefung, Secret-Blocker, transiente Rohartefakte und getrennte Token-/Nutzwertmessung.
+- Ownership bleibt getrennt: V143 besitzt nur die konkrete Spezialroutine und deren Contracts; V122 behaelt Agent-Memory und allgemeine Orchestrierung, V136 den portablen Knowledge-Core, und der fuehrende Agent bleibt fuer Entscheidung, Integration, Evidence und Commit verantwortlich.
+- Geplanter Umsetzungsscope: `.gemini/policies/token-efficient-review.toml`, zwei Contracts unter `data/contracts/`, `scripts/gemini-review-router.mjs`, Router-/Governance-Tests und `docs/referenz/gemini_model_routing.md`. `package.json` bleibt wegen V141/V142-Ownership Referenz; Router und Test erhalten direkte Node-Aufrufe. Rules, Workflows und Master bleiben in diesem Planungsslice no-op/read-only.
+- Live-Ausgangsevidence: Gemini CLI `0.45.2`; `gemini-2.5-flash-lite` und `gemini-3-flash-preview` headless mit JSON -> PASS; `gemini-2.5-flash` fiel unerwartet auf `gemini-3.1-pro-preview` zurueck; Minimalruns lagen bei etwa 8.600-12.000 Gemini-Input-Tokens; lokales Gemma-Routing ist nicht installiert.
+- Plan-Gates: `npm run plan:check`, `npm run check:plan-evidence-claims`, `npm run check:gemini`, `npm run check:agent-context`, `npm run plan:index:check` und `npm run gates:pre-commit` -> PASS. Zusaetzlich bestanden `validate-umsetzungsplan`, `graph:build` und `graph:check` in einem sauberen Detached-Worktree mit genau dem neuen V143-/Changelog-Slice. Der zuvor parallel gestagte Fremdscope wurde separat als `23f48939` abgeschlossen, sodass dieser Planungsslice isoliert commitbar ist.
+- Residual-risk: Modellnamen, Providerpreise, Quota und Fallback-Verhalten koennen extern driften; die Umsetzung muss deshalb angefordertes und tatsaechlich verwendetes Modell sowie Tokenstatistik pro Lauf pruefen.
+- Not-checked: keine Routerimplementierung, kein Gemma-/MCP-/Ruflo-Setup, keine globale Gemini-Konfigurationsaenderung, keine Produktcodepfade und keine Vollsuite.
+
 ## V132 Status-Sync 2026-06-06
 
 - Nach User-Gate wurde die Master-/Index-Statusdrift fuer `V132` bereinigt: `docs/Umsetzungsplan.md` folgt jetzt der aktiven Detailakte `docs/plaene/aktiv/V132.md` mit Status `done`, Phase `132.99` und geschlossenem Lock-Hinweis.
