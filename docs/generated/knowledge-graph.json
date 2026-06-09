@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 266,
+          "concreteCount": 268,
           "plannedCount": 0
         }
       }
@@ -2589,14 +2589,17 @@
         "planFile": "docs/plaene/aktiv/V145.md",
         "scopeDeclarations": [
           "data/contracts/plan-autopilot-worker-output.v1.json",
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.scorecard.json",
           "docs/plaene/aktiv/V145.md",
           "scripts/plan-autopilot.mjs",
           "scripts/prompts/plan-autopilot-subphase.md",
           "tests/plan-autopilot.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 1,
-          "plannedCount": 4
+          "concreteCount": 6,
+          "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": [
@@ -21147,8 +21150,8 @@
     {
       "id": "V145.1.1",
       "type": "subphase",
-      "title": "`buildPlanMapData()` als primaere Quelle fuer Readiness, Dependencies, Locks, Scope-Kollisionen, Impact und empfohlene Reihenfolge nutzen.",
-      "status": "open",
+      "title": "`buildPlanMapData()` als primaere Quelle fuer Readiness, Dependencies, Locks, Scope-Kollisionen, Impact und empfohlene Reihenfolge nutzen. (abgeschlossen: 2026-06-09; evidence: `node --test tests/plan-autopilot.contract.test.mjs` -> PASS; `node scripts/plan-autopilot.mjs plan --dry-run --block=V145 --json` -> V145/145.1.1 mit Plan-Map Readiness, Dependencies, Scope-Collisions, Impact und Rang)",
+      "status": "done",
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.1",
@@ -35260,6 +35263,7 @@
           "V139",
           "V140",
           "V141",
+          "V145",
           "V90"
         ],
         "exists": true
@@ -35290,6 +35294,7 @@
           "V139",
           "V140",
           "V141",
+          "V145",
           "V90",
           "V94"
         ],
@@ -35333,6 +35338,7 @@
           "V125",
           "V139",
           "V141",
+          "V145",
           "V90"
         ],
         "exists": true
@@ -42216,12 +42222,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V145"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -55377,12 +55385,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V145"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -62581,6 +62591,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/plan-autopilot.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/plan-context-report.mjs",
       "type": "scope",
       "hint": null,
@@ -63599,6 +63618,15 @@
     {
       "from": "B13",
       "to": "tests/physics-policy.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/plan-autopilot.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -95259,6 +95287,33 @@
     {
       "from": "V145",
       "to": "data/contracts/plan-autopilot-worker-output.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V145",
+      "to": "docs/generated/knowledge-graph.scorecard.json",
       "type": "scope",
       "hint": null,
       "attributes": {

@@ -186,12 +186,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2146,
-    "rawCoveredFileCount": 1388,
+    "trackedFileCount": 2148,
+    "rawCoveredFileCount": 1390,
     "rawCoveragePercent": 64.7,
-    "adjustedTrackedFileCount": 1454,
-    "adjustedCoveredFileCount": 1149,
-    "adjustedCoveragePercent": 79,
+    "adjustedTrackedFileCount": 1456,
+    "adjustedCoveredFileCount": 1151,
+    "adjustedCoveragePercent": 79.1,
     "uncoveredFileCount": 758,
     "uncoveredActiveFileCount": 305,
     "classifications": [
@@ -258,8 +258,8 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1035,
-        "coveredCount": 912
+        "count": 1037,
+        "coveredCount": 914
       },
       {
         "classification": "product-docs",
@@ -11327,6 +11327,7 @@
         "V139",
         "V140",
         "V141",
+        "V145",
         "V90"
       ],
       "surfaces": [],
@@ -11359,6 +11360,7 @@
         "V139",
         "V140",
         "V141",
+        "V145",
         "V90",
         "V94"
       ],
@@ -11406,6 +11408,7 @@
         "V125",
         "V139",
         "V141",
+        "V145",
         "V90"
       ],
       "surfaces": [],
@@ -20864,6 +20867,25 @@
       ],
       "scopeBlocks": [
         "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/plan-autopilot.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V145"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -35439,6 +35461,25 @@
         "V69",
         "V88",
         "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/plan-autopilot.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V145"
       ],
       "surfaces": [],
       "classification": "product-code",
