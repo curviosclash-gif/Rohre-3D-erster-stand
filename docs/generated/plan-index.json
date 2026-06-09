@@ -1059,6 +1059,31 @@
         "target": "Geplant",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
+    },
+    {
+      "id": "V145",
+      "title": "Plan-Autopilot fuer gate-sichere Subphasen-Automatisierung",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "ai-graph-tools",
+      "depends_on": [
+        "V116.99",
+        "V117.99",
+        "V123.99",
+        "V134.99",
+        "V138.99",
+        "V141.99"
+      ],
+      "current_phase": "145.1",
+      "plan_file": "docs/plaene/aktiv/V145.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
     }
   ]
 }

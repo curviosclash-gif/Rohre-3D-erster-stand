@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-06-09. Aktiver Lock: `-`; Startanker: `V141 141.99 abgeschlossen`; offene Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V142`-`V144` sind geplant; naechster Start gemaess Priorisierungsabgleich: kleiner `V131`-Funktionsslice, `V118`-Architektur-Proof oder V142-Graph-Drift-Folgearbeit.
+Stand: 2026-06-09. Aktiver Lock: `-`; Startanker: `V141 141.99 abgeschlossen`; offene Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V142`-`V145` sind geplant; naechster Start gemaess Priorisierungsabgleich: kleiner `V131`-Funktionsslice, `V118`-Architektur-Proof, V142-Graph-Drift-Folgearbeit oder V145-Autopilot-Dry-run.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -33,7 +33,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | Android / Mobile | `V131`, `V132`, `V135`, `V140` | Mobile-Classic-Steuerung, Android Arcade-Parcours, Mobile-Menue-UX und God-File-Sunset fuer produktive Mobile-/Android-Folgearbeit. |
 | Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V118`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface, UI-/Runtime-Entflechtung und Architektur-Gates. |
 | Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126`, `V138`, `V141`, `V142`, `V144` | Governance, Planpflege, Toolchain, Evidence, Cleanup, Delivery-/Dev-, Agent-Diff-, Drift- und Source-of-Truth-Gates. |
-| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V127`, `V134`, `V136`, `V137`, `V139`, `V143` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation, portabler Knowledge-Core und AI-Kontext. |
+| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V127`, `V134`, `V136`, `V137`, `V139`, `V143`, `V145` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation, portabler Knowledge-Core, AI-Kontext und Plan-Autopilot. |
 
 ## Aktive Bloecke
 
@@ -99,6 +99,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V142 | Graph-Drift-Guard-Automatisierung | planned | P2 | frei | V94.99,V116.99,V123.99,V138.99 | 142.1 | `docs/plaene/aktiv/V142.md` |
 | V143 | Agent-Skills statt Regeltext fuer Spezialroutinen | planned | P2 | frei | V116.99 | 143.1 | `docs/plaene/aktiv/V143.md` |
 | V144 | Future-Entscheidung JSON als Plan-Source-of-Truth | planned | P2 | frei | V123.99 | 144.1 | `docs/plaene/aktiv/V144.md` |
+| V145 | Plan-Autopilot fuer gate-sichere Subphasen-Automatisierung | planned | P2 | frei | V116.99,V117.99,V123.99,V134.99,V138.99,V141.99 | 145.1 | `docs/plaene/aktiv/V145.md` |
 
 ## Abhaengigkeiten
 
@@ -197,6 +198,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V143 | V116.99 | hard | ja | Repo-Kontext-Reduktion ist Baseline fuer Agent-Skill-Auslagerung |
 | V144 | V123.99 | hard | ja | V123-Option-A-Entscheidung ist Voraussetzung fuer spaetere Source-of-Truth-Neubewertung |
 | V144 | V120.99,V134.99 | soft | ja | Graph-RAG- und Plan-Map-Piloten liefern Vergleichssignale fuer strukturierte Planpflege |
+| V145 | V116.99,V117.99,V123.99,V134.99,V138.99,V141.99 | hard | ja | Kontextreduktion, AI-Gates, Plan-Index, Plan-Map, Diff-Audit und Drift-Pilot begrenzen den gate-sicheren Autopilot-MVP |
 
 ## Lock-Status
 
@@ -253,6 +255,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V142 | - | frei | Geplant |
 | - | V143 | - | frei | Geplant |
 | - | V144 | - | frei | Geplant |
+| - | V145 | - | frei | Geplant |
 
 ## Empfohlene Reihenfolge
 
@@ -265,7 +268,8 @@ Priorisierungsabgleich 2026-06-09: V140 und V141 sind abgeschlossen. Funktionale
 5. `V141` ist als WARN-Pilot abgeschlossen: Finding-/Plan-/Doku-Drift wird sichtbar, aber weder Findings noch Source-of-Truth-Entscheidungen werden automatisch geaendert.
 6. `V142` kann nun Graph-Generated-Gate und CI/Hook-Schutz auf Basis der kalibrierten Driftklassen haerten.
 7. `V136` vor `V122`, falls AI-/Memory-Arbeit priorisiert wird: erst portabler Knowledge-Core/Kernelschnitt, danach repo-natives Memory; Ruflo/MCP bleibt spaeterer User-Gate.
-8. `V127`, `V143` und `V144` nur nach konkretem Nutzenbeweis: Repo-/Plan-Map-Navigation, Agent-Skill-Auslagerung und JSON-Source-of-Truth-Entscheidung bleiben nachrangig. `V144` bleibt explizit Future-Entscheidung; Markdown bleibt kanonisch bis separater D3/D4-Gate.
+8. `V145` als separater Plan-Autopilot: zuerst Dry-run, Parser, Parking-Logik und Fake-Executor; keine normale Governance-Aenderung und kein Live-Run vor Review.
+9. `V127`, `V143` und `V144` nur nach konkretem Nutzenbeweis: Repo-/Plan-Map-Navigation, Agent-Skill-Auslagerung und JSON-Source-of-Truth-Entscheidung bleiben nachrangig. `V144` bleibt explizit Future-Entscheidung; Markdown bleibt kanonisch bis separater D3/D4-Gate.
 
 ## Conflict-Log
 
