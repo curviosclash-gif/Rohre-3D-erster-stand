@@ -186,12 +186,12 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2136,
-    "rawCoveredFileCount": 1378,
-    "rawCoveragePercent": 64.5,
-    "adjustedTrackedFileCount": 1444,
-    "adjustedCoveredFileCount": 1139,
-    "adjustedCoveragePercent": 78.9,
+    "trackedFileCount": 2145,
+    "rawCoveredFileCount": 1387,
+    "rawCoveragePercent": 64.7,
+    "adjustedTrackedFileCount": 1453,
+    "adjustedCoveredFileCount": 1148,
+    "adjustedCoveragePercent": 79,
     "uncoveredFileCount": 758,
     "uncoveredActiveFileCount": 305,
     "classifications": [
@@ -258,14 +258,14 @@
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1028,
-        "coveredCount": 905
+        "count": 1035,
+        "coveredCount": 912
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 341,
-        "coveredCount": 189
+        "count": 343,
+        "coveredCount": 191
       },
       {
         "classification": "prototype",
@@ -11326,6 +11326,7 @@
         "V138",
         "V139",
         "V140",
+        "V141",
         "V90"
       ],
       "surfaces": [],
@@ -11357,6 +11358,7 @@
         "V138",
         "V139",
         "V140",
+        "V141",
         "V90",
         "V94"
       ],
@@ -11403,7 +11405,25 @@
         "V123",
         "V125",
         "V139",
+        "V141",
         "V90"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/generated/open-findings-index.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V141"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -15355,6 +15375,23 @@
         "V140",
         "V141",
         "V90"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/prozess/finding-decisions.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V141"
       ],
       "surfaces": [],
       "classification": "product-docs",
@@ -19792,6 +19829,25 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/build-open-findings-index.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V141"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/build-plan-dashboard.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -20131,6 +20187,25 @@
       "excludeReason": null
     },
     {
+      "path": "scripts/check-open-findings.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V141"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "scripts/check-parcours-routes.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -20141,6 +20216,25 @@
       ],
       "scopeBlocks": [
         "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/check-plan-changelog-drift.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V141"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -20215,6 +20309,25 @@
       ],
       "scopeBlocks": [
         "B13"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "scripts/check-test-mapping-drift.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V141"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -35050,6 +35163,25 @@
       "excludeReason": null
     },
     {
+      "path": "tests/open-findings-index.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V141"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "tests/parcours-ghost.contract.test.mjs",
       "tracked": true,
       "coveredInCore": true,
@@ -35288,6 +35420,25 @@
         "V69",
         "V88",
         "V89"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/plan-changelog-drift.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V141"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -35768,6 +35919,25 @@
         "B13",
         "V51",
         "V63"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "tests/test-mapping-drift.contract.test.mjs",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "audit-scope",
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "B13",
+        "V141"
       ],
       "surfaces": [],
       "classification": "product-code",

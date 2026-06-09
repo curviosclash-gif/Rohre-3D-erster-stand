@@ -1,6 +1,6 @@
 {
   "person": "codex",
-  "timestamp": "2026-06-08T15:32:37.136Z",
+  "timestamp": "2026-06-09T13:25:42.823Z",
   "locks": [
     {
       "block_id": "V103",
@@ -1055,10 +1055,103 @@
       "target_completion": "2026-06-07",
       "status": "completed",
       "notes": ""
+    },
+    {
+      "block_id": "V141",
+      "phase": "141.1",
+      "scope_files": [
+        "docs/prozess/Open_Findings.md",
+        "docs/prozess/finding-decisions.json",
+        "docs/generated/open-findings-index.json",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/prozess/Dokumentationsstatus.md",
+        "docs/prozess/Backlog.md",
+        "docs/qa/Manuelle_Testcheckliste_Spiel.md",
+        ".agents/test_mapping.md",
+        "package.json",
+        "scripts/build-open-findings-index.mjs",
+        "scripts/check-open-findings.mjs",
+        "scripts/check-plan-changelog-drift.mjs",
+        "scripts/check-test-mapping-drift.mjs",
+        "scripts/docs-freshness.mjs",
+        "scripts/validate-umsetzungsplan.mjs",
+        "tests/open-findings-index.contract.test.mjs",
+        "tests/plan-changelog-drift.contract.test.mjs",
+        "tests/test-mapping-drift.contract.test.mjs",
+        "docs/plaene/aktiv/V141.md"
+      ],
+      "start_date": "2026-06-09",
+      "target_completion": "2026-06-09",
+      "status": "completed",
+      "notes": ""
+    },
+    {
+      "block_id": "V141",
+      "phase": "141.6",
+      "scope_files": [
+        "docs/prozess/Open_Findings.md",
+        "docs/prozess/finding-decisions.json",
+        "docs/generated/open-findings-index.json",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/prozess/Dokumentationsstatus.md",
+        "docs/prozess/Backlog.md",
+        "docs/qa/Manuelle_Testcheckliste_Spiel.md",
+        ".agents/test_mapping.md",
+        "package.json",
+        "scripts/build-open-findings-index.mjs",
+        "scripts/check-open-findings.mjs",
+        "scripts/check-plan-changelog-drift.mjs",
+        "scripts/check-test-mapping-drift.mjs",
+        "scripts/docs-freshness.mjs",
+        "scripts/validate-umsetzungsplan.mjs",
+        "tests/open-findings-index.contract.test.mjs",
+        "tests/plan-changelog-drift.contract.test.mjs",
+        "tests/test-mapping-drift.contract.test.mjs",
+        "docs/plaene/aktiv/V141.md"
+      ],
+      "start_date": "2026-06-09",
+      "target_completion": "2026-06-09",
+      "status": "completed",
+      "notes": ""
+    },
+    {
+      "block_id": "V141",
+      "phase": "141.99",
+      "scope_files": [
+        "docs/prozess/Open_Findings.md",
+        "docs/prozess/finding-decisions.json",
+        "docs/generated/open-findings-index.json",
+        "docs/generated/knowledge-graph.json",
+        "docs/generated/knowledge-graph.coverage.json",
+        "docs/generated/knowledge-graph.scorecard.json",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/CHANGELOG.md",
+        "docs/prozess/Dokumentationsstatus.md",
+        "docs/prozess/Backlog.md",
+        "docs/qa/Manuelle_Testcheckliste_Spiel.md",
+        ".agents/test_mapping.md",
+        "package.json",
+        "scripts/build-open-findings-index.mjs",
+        "scripts/check-open-findings.mjs",
+        "scripts/check-plan-changelog-drift.mjs",
+        "scripts/check-test-mapping-drift.mjs",
+        "scripts/docs-freshness.mjs",
+        "scripts/validate-umsetzungsplan.mjs",
+        "tests/open-findings-index.contract.test.mjs",
+        "tests/plan-changelog-drift.contract.test.mjs",
+        "tests/test-mapping-drift.contract.test.mjs",
+        "docs/plaene/aktiv/V141.md"
+      ],
+      "start_date": "2026-06-09",
+      "target_completion": "2026-06-09",
+      "status": "in-progress",
+      "notes": ""
     }
   ],
   "current_phase_evidence": {
-    "phase_id": "140.99",
+    "phase_id": "141.99",
     "completed_items": [],
     "last_commit": ""
   }

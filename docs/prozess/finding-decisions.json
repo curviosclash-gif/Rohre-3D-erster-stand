@@ -1,0 +1,50 @@
+{
+  "schema_version": "finding-decisions.v1",
+  "updated_at": "2026-06-09",
+  "authority": {
+    "manual_fields": [
+      "status",
+      "owner_block",
+      "severity",
+      "review_after",
+      "reason",
+      "manual_override"
+    ],
+    "generated_fields": [
+      "signals",
+      "drift",
+      "confidence",
+      "sources"
+    ],
+    "conflict_rule": "Manual decisions and canonical Markdown sources win over generated signals."
+  },
+  "decisions": [
+    {
+      "id": "P21",
+      "status": "accepted-risk",
+      "owner_block": "V90",
+      "severity": "high",
+      "review_after": "2026-06-17",
+      "reason": "V90 accepted the remaining major-version-bound dependency findings until the scheduled security review.",
+      "manual_override": true
+    },
+    {
+      "id": "P47",
+      "status": "open",
+      "owner_block": "V105",
+      "severity": "high",
+      "review_after": null,
+      "reason": "Pilot case: the owning block is complete, but the canonical open-findings table still lists the finding.",
+      "manual_override": false
+    },
+    {
+      "id": "P48",
+      "status": "open",
+      "owner_block": "V105",
+      "severity": "high",
+      "review_after": null,
+      "reason": "Pilot case: the owning block is complete, but the canonical open-findings table still lists the finding.",
+      "manual_override": false
+    }
+  ]
+}

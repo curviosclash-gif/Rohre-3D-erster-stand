@@ -454,7 +454,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 259,
+          "concreteCount": 266,
           "plannedCount": 0
         }
       }
@@ -2400,6 +2400,9 @@
         "planFile": "docs/plaene/aktiv/V141.md",
         "scopeDeclarations": [
           ".agents/test_mapping.md",
+          "docs/generated/knowledge-graph.coverage.json",
+          "docs/generated/knowledge-graph.json",
+          "docs/generated/knowledge-graph.scorecard.json",
           "docs/generated/open-findings-index.json",
           "docs/plaene/aktiv/V141.md",
           "docs/plaene/CHANGELOG.md",
@@ -2421,8 +2424,8 @@
           "tests/test-mapping-drift.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 11,
-          "plannedCount": 9
+          "concreteCount": 23,
+          "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
           "V142",
@@ -6714,7 +6717,7 @@
       "id": "V141.1",
       "type": "phase",
       "title": "Finding-Decision-Modell und Index-Schema",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.1"
@@ -6724,7 +6727,7 @@
       "id": "V141.2",
       "type": "phase",
       "title": "Generator und Finding-Drift-Check",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.2"
@@ -6734,7 +6737,7 @@
       "id": "V141.3",
       "type": "phase",
       "title": "Plan-/Changelog-Abgleich",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.3"
@@ -6744,7 +6747,7 @@
       "id": "V141.4",
       "type": "phase",
       "title": "Testmapping-Drift",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.4"
@@ -6754,7 +6757,7 @@
       "id": "V141.5",
       "type": "phase",
       "title": "QA-/Release-/Backlog-Freshness",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.5"
@@ -6764,7 +6767,7 @@
       "id": "V141.6",
       "type": "phase",
       "title": "Gate-Integration und Handoff",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.6"
@@ -19961,8 +19964,8 @@
     {
       "id": "V141.1.1",
       "type": "subphase",
-      "title": "Aktuelle `Open_Findings.md`-Eintraege in Kategorien schneiden: `manual-decision`, `status-signal`, `owner-mapping`, `stale-candidate`.",
-      "status": "open",
+      "title": "Aktuelle `Open_Findings.md`-Eintraege in Kategorien schneiden: `manual-decision`, `status-signal`, `owner-mapping`, `stale-candidate`. (abgeschlossen: 2026-06-09; evidence: Generated-Index trennt Decision-Overlay, Master-Signale, Markdown-Mappings und Drift-Codes)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.1",
@@ -19972,8 +19975,8 @@
     {
       "id": "V141.1.2",
       "type": "subphase",
-      "title": "Schema fuer `docs/prozess/finding-decisions.json` festlegen: `id`, `status`, `owner_block`, `severity`, `review_after`, `reason`, `manual_override`.",
-      "status": "open",
+      "title": "Schema fuer `docs/prozess/finding-decisions.json` festlegen: `id`, `status`, `owner_block`, `severity`, `review_after`, `reason`, `manual_override`. (abgeschlossen: 2026-06-09; evidence: `docs/prozess/finding-decisions.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.1",
@@ -19983,8 +19986,8 @@
     {
       "id": "V141.1.3",
       "type": "subphase",
-      "title": "Schema fuer `docs/generated/open-findings-index.json` festlegen: Quellen, Signale, Drift-Klasse, Confidence und Wiedervorlage.",
-      "status": "open",
+      "title": "Schema fuer `docs/generated/open-findings-index.json` festlegen: Quellen, Signale, Drift-Klasse, Confidence und Wiedervorlage. (abgeschlossen: 2026-06-09; evidence: `npm run findings:index:build` -> `docs/generated/open-findings-index.json`)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.1",
@@ -19994,8 +19997,8 @@
     {
       "id": "V141.1.4",
       "type": "subphase",
-      "title": "`P21`, `P47` und `P48` als Pilotfaelle modellieren, ohne ihren fachlichen Status automatisch zu aendern.",
-      "status": "open",
+      "title": "`P21`, `P47` und `P48` als Pilotfaelle modellieren, ohne ihren fachlichen Status automatisch zu aendern. (abgeschlossen: 2026-06-09; evidence: `P21=accepted-risk`; `P47/P48=open` mit done-owner WARN)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.1",
@@ -20005,8 +20008,8 @@
     {
       "id": "V141.2.1",
       "type": "subphase",
-      "title": "`scripts/build-open-findings-index.mjs` implementieren: Entscheidungen, Master/Plan-Index, VXX-Dateien und Open-Findings-Tabelle lesen.",
-      "status": "open",
+      "title": "`scripts/build-open-findings-index.mjs` implementieren: Entscheidungen, Master/Plan-Index, VXX-Dateien und Open-Findings-Tabelle lesen. (abgeschlossen: 2026-06-09; evidence: `npm run findings:index:build` -> PASS, 6 Finding-IDs)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.2",
@@ -20016,8 +20019,8 @@
     {
       "id": "V141.2.2",
       "type": "subphase",
-      "title": "`scripts/check-open-findings.mjs` implementieren: Drift-Codes fuer `owner-block-done`, `review-after-due`, `missing-file`, `changelog-resolved-open`, `mapping-table-mismatch`.",
-      "status": "open",
+      "title": "`scripts/check-open-findings.mjs` implementieren: Drift-Codes fuer `owner-block-done`, `review-after-due`, `missing-file`, `changelog-resolved-open`, `mapping-table-mismatch`. (abgeschlossen: 2026-06-09; evidence: Contract-Tests -> 6 PASS; Repo-Pilot -> WARN-only)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.2",
@@ -20027,8 +20030,8 @@
     {
       "id": "V141.2.3",
       "type": "subphase",
-      "title": "`package.json` um `findings:index:build` und `findings:check` ergaenzen.",
-      "status": "open",
+      "title": "`package.json` um `findings:index:build` und `findings:check` ergaenzen. (abgeschlossen: 2026-06-09; evidence: beide npm-Kommandos -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.2",
@@ -20038,8 +20041,8 @@
     {
       "id": "V141.2.4",
       "type": "subphase",
-      "title": "Contract-Test fuer mindestens drei positive und drei negative Drift-Faelle ergaenzen.",
-      "status": "open",
+      "title": "Contract-Test fuer mindestens drei positive und drei negative Drift-Faelle ergaenzen. (abgeschlossen: 2026-06-09; evidence: `tests/open-findings-index.contract.test.mjs` -> 6 PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.2",
@@ -20049,8 +20052,8 @@
     {
       "id": "V141.3.1",
       "type": "subphase",
-      "title": "Regeln definieren: `*.99` im Master braucht Abschlussnotiz; Abschlussnotiz muss Block/Phase/Datum/Evidence oder Not-checked nennen.",
-      "status": "open",
+      "title": "Regeln definieren: `*.99` im Master braucht Abschlussnotiz; Abschlussnotiz muss Block/Phase/Datum/Evidence oder Not-checked nennen. (abgeschlossen: 2026-06-09; evidence: `scripts/check-plan-changelog-drift.mjs`)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.3",
@@ -20060,8 +20063,8 @@
     {
       "id": "V141.3.2",
       "type": "subphase",
-      "title": "Offene Findings im owning Scope gegen Blockstatus und Changelog abgleichen.",
-      "status": "open",
+      "title": "Offene Findings im owning Scope gegen Blockstatus und Changelog abgleichen. (abgeschlossen: 2026-06-09; evidence: `open-finding-owner-done` fuer P14/P45/P46/P47/P48)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.3",
@@ -20071,8 +20074,8 @@
     {
       "id": "V141.3.3",
       "type": "subphase",
-      "title": "`scripts/check-plan-changelog-drift.mjs` als separaten Check oder schmalen `validate-umsetzungsplan`-Integrationspunkt umsetzen.",
-      "status": "open",
+      "title": "`scripts/check-plan-changelog-drift.mjs` als separaten Check oder schmalen `validate-umsetzungsplan`-Integrationspunkt umsetzen. (abgeschlossen: 2026-06-09; evidence: `npm run plan:changelog:check` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.3",
@@ -20082,8 +20085,8 @@
     {
       "id": "V141.3.4",
       "type": "subphase",
-      "title": "Warnklasse kalibrieren: keine harten Failures fuer historische Altbloecke ohne expliziten V141-Gate-Beschluss.",
-      "status": "open",
+      "title": "Warnklasse kalibrieren: keine harten Failures fuer historische Altbloecke ohne expliziten V141-Gate-Beschluss. (abgeschlossen: 2026-06-09; evidence: historische Closure-Formatluecken -> INFO; Status-/Finding-Widersprueche -> WARN; Exit 0)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.3",
@@ -20093,8 +20096,8 @@
     {
       "id": "V141.4.1",
       "type": "subphase",
-      "title": "Genannte npm-Scripts gegen `package.json` pruefen.",
-      "status": "open",
+      "title": "Genannte npm-Scripts gegen `package.json` pruefen. (abgeschlossen: 2026-06-09; evidence: `npm run test-mapping:check` -> 0 fehlende Scripts)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.4",
@@ -20104,8 +20107,8 @@
     {
       "id": "V141.4.2",
       "type": "subphase",
-      "title": "Genannte Pfade und Globs gegen Repo-Dateien pruefen; absichtliche Pattern klar erlauben.",
-      "status": "open",
+      "title": "Genannte Pfade und Globs gegen Repo-Dateien pruefen; absichtliche Pattern klar erlauben. (abgeschlossen: 2026-06-09; evidence: `check-test-mapping-drift.mjs` + Contract-Fall `missing-mapped-path`)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.4",
@@ -20115,8 +20118,8 @@
     {
       "id": "V141.4.3",
       "type": "subphase",
-      "title": "Neue `tests/*.contract.test.mjs` und kanonische Runner-Surfaces gegen Mapping-Sichtbarkeit pruefen.",
-      "status": "open",
+      "title": "Neue `tests/*.contract.test.mjs` und kanonische Runner-Surfaces gegen Mapping-Sichtbarkeit pruefen. (abgeschlossen: 2026-06-09; evidence: Contract-Catch-all und vier kanonische Runner sichtbar)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.4",
@@ -20126,8 +20129,8 @@
     {
       "id": "V141.4.4",
       "type": "subphase",
-      "title": "Drift-Check mit `WARN` starten; harte Fehler nur fuer geloeschte Scripts/Pfade nach separater Entscheidung.",
-      "status": "open",
+      "title": "Drift-Check mit `WARN` starten; harte Fehler nur fuer geloeschte Scripts/Pfade nach separater Entscheidung. (abgeschlossen: 2026-06-09; evidence: `npm run test-mapping:check` -> `pilot=warn-only`)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.4",
@@ -20137,8 +20140,8 @@
     {
       "id": "V141.5.1",
       "type": "subphase",
-      "title": "`docs/prozess/Backlog.md` und `docs/qa/Manuelle_Testcheckliste_Spiel.md` klassifizieren: aktiv, historisch, draft oder stale.",
-      "status": "open",
+      "title": "`docs/prozess/Backlog.md` und `docs/qa/Manuelle_Testcheckliste_Spiel.md` klassifizieren: aktiv, historisch, draft oder stale. (abgeschlossen: 2026-06-09; evidence: Backlog=`historical`; QA-Checkliste=`stale`)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.5",
@@ -20148,8 +20151,8 @@
     {
       "id": "V141.5.2",
       "type": "subphase",
-      "title": "`scripts/docs-freshness.mjs` um konservative Warnungen fuer alte Stand-Daten und offene Checklisten erweitern.",
-      "status": "open",
+      "title": "`scripts/docs-freshness.mjs` um konservative Warnungen fuer alte Stand-Daten und offene Checklisten erweitern. (abgeschlossen: 2026-06-09; evidence: `npm run docs:sync` -> `snapshot-warnings=2`)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.5",
@@ -20159,8 +20162,8 @@
     {
       "id": "V141.5.3",
       "type": "subphase",
-      "title": "Keine automatische Textkorrektur in QA-/Backlog-Dateien ohne User-Gate; nur Statussignal oder expliziter Label-Vorschlag.",
-      "status": "open",
+      "title": "Keine automatische Textkorrektur in QA-/Backlog-Dateien ohne User-Gate; nur Statussignal oder expliziter Label-Vorschlag. (abgeschlossen: 2026-06-09; evidence: beide Quelldateien unveraendert; nur Statusreport geschrieben)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.5",
@@ -20170,8 +20173,8 @@
     {
       "id": "V141.5.4",
       "type": "subphase",
-      "title": "`docs/prozess/Dokumentationsstatus.md` zeigt die neuen Freshness-Warnungen kompakt.",
-      "status": "open",
+      "title": "`docs/prozess/Dokumentationsstatus.md` zeigt die neuen Freshness-Warnungen kompakt. (abgeschlossen: 2026-06-09; evidence: `npm run docs:sync` -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.5",
@@ -20181,8 +20184,8 @@
     {
       "id": "V141.6.1",
       "type": "subphase",
-      "title": "Gate-Matrix erstellen: `findings:check`, `plan:check`, `docs:check`, `gates:pre-commit`.",
-      "status": "open",
+      "title": "Gate-Matrix erstellen: `findings:check`, `plan:check`, `docs:check`, `gates:pre-commit`. (abgeschlossen: 2026-06-09; evidence: `drift:check` buendelt drei WARN-Piloten; `docs:check` ruft ihn additiv auf; `plan:check` bleibt unveraendert)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.6",
@@ -20192,8 +20195,8 @@
     {
       "id": "V141.6.2",
       "type": "subphase",
-      "title": "WARN/FAIL-Grenzen je Drift-Code festlegen und P1-/Security-Faelle gesondert behandeln.",
-      "status": "open",
+      "title": "WARN/FAIL-Grenzen je Drift-Code festlegen und P1-/Security-Faelle gesondert behandeln. (abgeschlossen: 2026-06-09; evidence: Driftcodes -> WARN/INFO; Parser-/Schema-/IO-Fehler -> FAIL; P21 bleibt accepted-risk und wird nur nach `review_after` warnend faellig)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.6",
@@ -20203,8 +20206,8 @@
     {
       "id": "V141.6.3",
       "type": "subphase",
-      "title": "Entscheiden, ob `Open_Findings.md` manuelle Entscheidungsschicht bleibt oder spaeter als generierte Ansicht markiert werden soll.",
-      "status": "open",
+      "title": "Entscheiden, ob `Open_Findings.md` manuelle Entscheidungsschicht bleibt oder spaeter als generierte Ansicht markiert werden soll. (abgeschlossen: 2026-06-09; evidence: Markdown bleibt kanonisches Inventar; JSON besitzt nur explizite manuelle Entscheidungsfelder; Generated-Index hat keine Autoritaet)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.6",
@@ -20214,8 +20217,8 @@
     {
       "id": "V141.6.4",
       "type": "subphase",
-      "title": "Folge-Intake fuer einen echten Source-of-Truth-Wechsel nur anlegen, wenn Pilot-Evidence zeigt, dass der Generator stabiler ist als manuelle Pflege.",
-      "status": "open",
+      "title": "Folge-Intake fuer einen echten Source-of-Truth-Wechsel nur anlegen, wenn Pilot-Evidence zeigt, dass der Generator stabiler ist als manuelle Pflege. (abgeschlossen: 2026-06-09; evidence: deferred/no-op; kein Folge-Intake, da 10 Finding-WARN und historische Kalibrierung noch menschliche Entscheidung brauchen)",
+      "status": "done",
       "attributes": {
         "blockId": "V141",
         "phaseCode": "141.6",
@@ -34850,6 +34853,7 @@
           "V138",
           "V139",
           "V140",
+          "V141",
           "V90"
         ],
         "exists": true
@@ -34879,6 +34883,7 @@
           "V138",
           "V139",
           "V140",
+          "V141",
           "V90",
           "V94"
         ],
@@ -34921,6 +34926,7 @@
           "V123",
           "V125",
           "V139",
+          "V141",
           "V90"
         ],
         "exists": true
@@ -34938,7 +34944,7 @@
         "scopeBlocks": [
           "V141"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -38427,7 +38433,7 @@
         "scopeBlocks": [
           "V141"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -40745,12 +40751,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V141"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -41080,12 +41088,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V141"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -41110,12 +41120,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V141"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -41191,12 +41203,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V141"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -54668,12 +54682,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V141"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -54908,12 +54924,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V141"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -55385,12 +55403,14 @@
       "status": "unknown",
       "attributes": {
         "source": [
+          "audit-scope",
           "scope-files"
         ],
         "scopeBlocks": [
+          "B13",
           "V141"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -61607,6 +61627,15 @@
     },
     {
       "from": "B13",
+      "to": "scripts/build-open-findings-index.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/build-plan-dashboard.mjs",
       "type": "scope",
       "hint": null,
@@ -61760,7 +61789,25 @@
     },
     {
       "from": "B13",
+      "to": "scripts/check-open-findings.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "scripts/check-parcours-routes.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/check-plan-changelog-drift.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -61797,6 +61844,15 @@
     {
       "from": "B13",
       "to": "scripts/check-runtime-encoding.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "scripts/check-test-mapping-drift.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -62957,6 +63013,15 @@
     },
     {
       "from": "B13",
+      "to": "tests/open-findings-index.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
       "to": "tests/parcours-ghost.contract.test.mjs",
       "type": "scope",
       "hint": null,
@@ -63066,6 +63131,15 @@
     {
       "from": "B13",
       "to": "tests/physics-policy.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/plan-changelog-drift.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -63282,6 +63356,15 @@
     {
       "from": "B13",
       "to": "tests/stress.spec.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "audit-scope"
+      }
+    },
+    {
+      "from": "B13",
+      "to": "tests/test-mapping-drift.contract.test.mjs",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -92588,6 +92671,33 @@
     {
       "from": "V141",
       "to": ".agents/test_mapping.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V141",
+      "to": "docs/generated/knowledge-graph.coverage.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V141",
+      "to": "docs/generated/knowledge-graph.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V141",
+      "to": "docs/generated/knowledge-graph.scorecard.json",
       "type": "scope",
       "hint": null,
       "attributes": {

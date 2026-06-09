@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const ROOT = process.cwd();
 const args = new Set(process.argv.slice(2));
@@ -27,6 +28,16 @@ const LEGACY_PATH_ALLOWLIST = new Set([
 
 const REPORT_FILE = 'docs/prozess/Dokumentationsstatus.md';
 const ONBOARDING_FILE = 'docs/referenz/ai_project_onboarding.md';
+const SNAPSHOT_DOCUMENTS = [
+  {
+    file: 'docs/prozess/Backlog.md',
+    staleAfterDays: 45,
+  },
+  {
+    file: 'docs/qa/Manuelle_Testcheckliste_Spiel.md',
+    staleAfterDays: 45,
+  },
+];
 
 function todayLocalISO() {
   const d = new Date();
@@ -147,6 +158,56 @@ function collectMojibakeWarnings(filesToScan, contentByFile) {
   return warnings;
 }
 
+function daysBetween(fromDate, toDate) {
+  const from = Date.parse(`${fromDate}T00:00:00Z`);
+  const to = Date.parse(`${toDate}T00:00:00Z`);
+  if (!Number.isFinite(from) || !Number.isFinite(to)) return null;
+  return Math.floor((to - from) / 86400000);
+}
+
+export function classifySnapshotFreshness({ file, text, today, staleAfterDays = 45 }) {
+  const stand = String(text || '').match(/^Stand:\s*(\d{4}-\d{2}-\d{2})/m)?.[1] || null;
+  const explicitStatus = String(text || '').match(/^Status:\s*(.+)$/mi)?.[1]?.trim() || null;
+  const ageDays = stand ? daysBetween(stand, today) : null;
+  const openCheckboxCount = (String(text || '').match(/^\s*-\s*\[\s\]/gm) || []).length;
+  const historicalMarker = /\b(historisch|historical|inaktive eintraege|archiviert)\b/i.test(
+    `${explicitStatus || ''}\n${String(text || '').slice(0, 200)}`
+  );
+  const draftMarker = /\b(entwurf|draft)\b/i.test(explicitStatus || '');
+
+  let classification = 'active';
+  if (historicalMarker) classification = 'historical';
+  else if (draftMarker) classification = 'draft';
+  else if (ageDays === null || ageDays > staleAfterDays) classification = 'stale';
+
+  const warnings = [];
+  if (classification === 'stale') {
+    warnings.push({
+      code: 'snapshot-stale',
+      file,
+      message: stand
+        ? `Stand ${stand} is ${ageDays} days old.`
+        : 'No parseable Stand date found.',
+    });
+  }
+  if (classification === 'stale' && openCheckboxCount > 0) {
+    warnings.push({
+      code: 'snapshot-open-checklist',
+      file,
+      message: `${openCheckboxCount} open checklist items remain in a stale snapshot.`,
+    });
+  }
+
+  return {
+    file,
+    classification,
+    stand,
+    ageDays,
+    openCheckboxCount,
+    warnings,
+  };
+}
+
 function escapeRegex(input) {
   return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -219,6 +280,7 @@ function buildReport({
   onboardingFindings,
   legacyFindings,
   mojibakeWarnings,
+  snapshotFreshness,
   canPass
 }) {
   const lines = [];
@@ -282,6 +344,21 @@ function buildReport({
   }
   lines.push('');
 
+  lines.push('## Snapshot-Freshness');
+  for (const snapshot of snapshotFreshness) {
+    const age = snapshot.ageDays === null ? 'Alter unbekannt' : `${snapshot.ageDays} Tage alt`;
+    const openItems = snapshot.openCheckboxCount > 0
+      ? `, ${snapshot.openCheckboxCount} offene Checklistenpunkte`
+      : '';
+    lines.push(
+      `- ${snapshot.file}: ${snapshot.classification} (${snapshot.stand || 'kein Stand'}, ${age}${openItems})`
+    );
+    for (const warning of snapshot.warnings) {
+      lines.push(`  - WARN ${warning.code}: ${warning.message}`);
+    }
+  }
+  lines.push('');
+
   lines.push('## Ergebnis');
   if (canPass) {
     lines.push(`- Dokumentation aktuell (geprueft am ${today}).`);
@@ -331,6 +408,15 @@ async function main() {
 
   const legacyFindings = collectLegacyPathFindings(filesToScan, contentByFile);
   const mojibakeWarnings = collectMojibakeWarnings(filesToScan, contentByFile);
+  const snapshotFreshness = SNAPSHOT_DOCUMENTS.map((snapshot) => classifySnapshotFreshness({
+    ...snapshot,
+    text: contentByFile.get(snapshot.file) || '',
+    today,
+  }));
+  const snapshotWarningCount = snapshotFreshness.reduce(
+    (count, snapshot) => count + snapshot.warnings.length,
+    0
+  );
 
   const hasBlockingIssues = missingFiles.length > 0 || onboardingFindings.length > 0;
   if (legacyFindings.length > 0) {
@@ -347,6 +433,7 @@ async function main() {
     onboardingFindings,
     legacyFindings,
     mojibakeWarnings,
+    snapshotFreshness,
     canPass
   });
 
@@ -361,13 +448,16 @@ async function main() {
   console.log(`[docs] onboarding=${onboardingFindings.length}`);
   console.log(`[docs] legacy=${legacyFindings.length}`);
   console.log(`[docs] mojibake=${mojibakeWarnings.length}`);
+  console.log(`[docs] snapshot-warnings=${snapshotWarningCount}`);
 
   if (!canPass) {
     process.exit(1);
   }
 }
 
-main().catch((err) => {
-  console.error('[docs] fatal:', err?.message || err);
-  process.exit(1);
-});
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  main().catch((err) => {
+    console.error('[docs] fatal:', err?.message || err);
+    process.exit(1);
+  });
+}

@@ -1,6 +1,6 @@
 # Dokumentationsstatus
 
-Stand: 2026-06-08
+Stand: 2026-06-09
 Modus: sync
 Gate: PASS
 
@@ -20,5 +20,11 @@ Gate: PASS
 ## Encoding-Warnungen (Mojibake)
 - Keine Mojibake-Muster gefunden.
 
+## Snapshot-Freshness
+- docs/prozess/Backlog.md: historical (2026-03-27, 74 Tage alt)
+- docs/qa/Manuelle_Testcheckliste_Spiel.md: stale (2026-03-30, 71 Tage alt, 241 offene Checklistenpunkte)
+  - WARN snapshot-stale: Stand 2026-03-30 is 71 days old.
+  - WARN snapshot-open-checklist: 241 open checklist items remain in a stale snapshot.
+
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-06-08).
+- Dokumentation aktuell (geprueft am 2026-06-09).

@@ -1,0 +1,284 @@
+{
+  "schema_version": "open-findings-index.v1",
+  "generated_by": "scripts/build-open-findings-index.mjs",
+  "authority": "generated-signals-only",
+  "as_of": "2026-06-09",
+  "canonical_sources": {
+    "findings": "docs/prozess/Open_Findings.md",
+    "manual_decisions": "docs/prozess/finding-decisions.json",
+    "master": "docs/Umsetzungsplan.md",
+    "changelog": "docs/plaene/CHANGELOG.md"
+  },
+  "summary": {
+    "finding_count": 6,
+    "manual_decision_count": 3,
+    "drift_count": 10,
+    "warning_count": 10
+  },
+  "findings": [
+    {
+      "id": "P14",
+      "declared_status": "open",
+      "owner_block": "V104",
+      "owner_mappings": [
+        "V104"
+      ],
+      "severity": "mittel",
+      "review_after": null,
+      "manual_override": false,
+      "reason": null,
+      "file_references": [
+        "UIStartSyncController.js"
+      ],
+      "descriptions": [
+        "Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()`; nachhaltige Behebung ueber Ownership-/Port-Zuschnitt in `V104"
+      ],
+      "signals": {
+        "owner_block_status": "done",
+        "owner_block_phase": "104.99",
+        "referenced_file_count": 1,
+        "missing_file_count": 0
+      },
+      "drift": [
+        {
+          "code": "owner-block-done",
+          "severity": "warn",
+          "message": "P14 is open while owner V104 is done at 104.99."
+        },
+        {
+          "code": "changelog-resolved-open",
+          "severity": "warn",
+          "message": "P14 remains open while the changelog contains a resolution signal for V104."
+        }
+      ],
+      "confidence": "medium",
+      "sources": [
+        "docs/prozess/Open_Findings.md",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V104.md",
+        "docs/plaene/CHANGELOG.md"
+      ]
+    },
+    {
+      "id": "P21",
+      "declared_status": "accepted-risk",
+      "owner_block": "V90",
+      "owner_mappings": [
+        "V90"
+      ],
+      "severity": "high",
+      "review_after": "2026-06-17",
+      "manual_override": true,
+      "reason": "V90 accepted the remaining major-version-bound dependency findings until the scheduled security review.",
+      "file_references": [
+        "electron/package-lock.json",
+        "electron/package.json",
+        "package-lock.json",
+        "package.json"
+      ],
+      "descriptions": [
+        "npm audit --audit-level=low --json` meldet 2 moderate Root-Reste fuer `vite`/`esbuild`; `npm --prefix electron audit --audit-level=low --json` meldet 12 Major-gebundene `electron`-/`electron-builder`-/`tar`-/`@tootallnate/once`-Reste. Die non-force Kandidaten `fast-uri`, `ip-address` und der lockfile-kompatible `@tootallnate/once`-Pfad sind in V90 erledigt. V90 akzeptiert den Rest als dokumentierte Security-Ausnahme mit Wiedervorlage 2026-06-17 oder frueher bei neuer non-force Fix-Verfuegbarkeit; Build-/Architektur-/Doku-Gates sind seit 2026-05-18 gruen"
+      ],
+      "signals": {
+        "owner_block_status": "done",
+        "owner_block_phase": "90.99",
+        "referenced_file_count": 4,
+        "missing_file_count": 0
+      },
+      "drift": [],
+      "confidence": "high",
+      "sources": [
+        "docs/prozess/Open_Findings.md",
+        "docs/prozess/finding-decisions.json",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V90.md",
+        "docs/plaene/CHANGELOG.md"
+      ]
+    },
+    {
+      "id": "P45",
+      "declared_status": "open",
+      "owner_block": "V102",
+      "owner_mappings": [
+        "V102",
+        "V104"
+      ],
+      "severity": "niedrig",
+      "review_after": null,
+      "manual_override": false,
+      "reason": null,
+      "file_references": [
+        "src/ui/UIStartSyncController.js",
+        "src/ui/arcade/ArcadeVehicleManager.js",
+        "src/ui/menu/MenuGameplayBindings.js",
+        "tests/audio.contract.test.mjs",
+        "vite.config.js"
+      ],
+      "descriptions": [
+        "Test-Isolation fuer `MockAudioContext` in `afterEach` nicht konsistent (`global.AudioContext` reset fehlt)",
+        "Hohe Komplexitaet in Hotspots erhoeht Regressionsrisiko"
+      ],
+      "signals": {
+        "owner_block_status": "done",
+        "owner_block_phase": "102.99",
+        "referenced_file_count": 5,
+        "missing_file_count": 0
+      },
+      "drift": [
+        {
+          "code": "owner-block-done",
+          "severity": "warn",
+          "message": "P45 is open while owner V102 is done at 102.99."
+        },
+        {
+          "code": "changelog-resolved-open",
+          "severity": "warn",
+          "message": "P45 remains open while the changelog contains a resolution signal for V102."
+        }
+      ],
+      "confidence": "medium",
+      "sources": [
+        "docs/prozess/Open_Findings.md",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V102.md",
+        "docs/plaene/CHANGELOG.md"
+      ]
+    },
+    {
+      "id": "P46",
+      "declared_status": "open",
+      "owner_block": "V102",
+      "owner_mappings": [
+        "V102"
+      ],
+      "severity": "mittel",
+      "review_after": null,
+      "manual_override": false,
+      "reason": null,
+      "file_references": [
+        "eslint.config.js",
+        "tsconfig.architecture.json"
+      ],
+      "descriptions": [
+        "Tooling-Gates decken nur engen Laufzeitpfad ab"
+      ],
+      "signals": {
+        "owner_block_status": "done",
+        "owner_block_phase": "102.99",
+        "referenced_file_count": 2,
+        "missing_file_count": 0
+      },
+      "drift": [
+        {
+          "code": "owner-block-done",
+          "severity": "warn",
+          "message": "P46 is open while owner V102 is done at 102.99."
+        },
+        {
+          "code": "changelog-resolved-open",
+          "severity": "warn",
+          "message": "P46 remains open while the changelog contains a resolution signal for V102."
+        }
+      ],
+      "confidence": "medium",
+      "sources": [
+        "docs/prozess/Open_Findings.md",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V102.md",
+        "docs/plaene/CHANGELOG.md"
+      ]
+    },
+    {
+      "id": "P47",
+      "declared_status": "open",
+      "owner_block": "V105",
+      "owner_mappings": [
+        "V105"
+      ],
+      "severity": "high",
+      "review_after": null,
+      "manual_override": false,
+      "reason": "Pilot case: the owning block is complete, but the canonical open-findings table still lists the finding.",
+      "file_references": [
+        "src/core/AppInitializer.js",
+        "src/core/TestApiBridge.js"
+      ],
+      "descriptions": [
+        "Test-/E2E-Modulregistries importieren `ui`-Module direkt aus `core"
+      ],
+      "signals": {
+        "owner_block_status": "done",
+        "owner_block_phase": "105.99",
+        "referenced_file_count": 2,
+        "missing_file_count": 0
+      },
+      "drift": [
+        {
+          "code": "owner-block-done",
+          "severity": "warn",
+          "message": "P47 is open while owner V105 is done at 105.99."
+        },
+        {
+          "code": "changelog-resolved-open",
+          "severity": "warn",
+          "message": "P47 remains open while the changelog contains a resolution signal for V105."
+        }
+      ],
+      "confidence": "high",
+      "sources": [
+        "docs/prozess/Open_Findings.md",
+        "docs/prozess/finding-decisions.json",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V105.md",
+        "docs/plaene/CHANGELOG.md"
+      ]
+    },
+    {
+      "id": "P48",
+      "declared_status": "open",
+      "owner_block": "V105",
+      "owner_mappings": [
+        "V105"
+      ],
+      "severity": "high",
+      "review_after": null,
+      "manual_override": false,
+      "reason": "Pilot case: the owning block is complete, but the canonical open-findings table still lists the finding.",
+      "file_references": [
+        "src/core/MediaRecorderSystem.js",
+        "src/core/recording/**/*",
+        "src/core/renderer/CameraRigSystem.js",
+        "src/core/renderer/RecordingCapturePipeline.js"
+      ],
+      "descriptions": [
+        "Recorder-/Capture-Vertraege driften in Teilpfaden auseinander; weitere Konsolidierung in `V105"
+      ],
+      "signals": {
+        "owner_block_status": "done",
+        "owner_block_phase": "105.99",
+        "referenced_file_count": 4,
+        "missing_file_count": 0
+      },
+      "drift": [
+        {
+          "code": "owner-block-done",
+          "severity": "warn",
+          "message": "P48 is open while owner V105 is done at 105.99."
+        },
+        {
+          "code": "changelog-resolved-open",
+          "severity": "warn",
+          "message": "P48 remains open while the changelog contains a resolution signal for V105."
+        }
+      ],
+      "confidence": "high",
+      "sources": [
+        "docs/prozess/Open_Findings.md",
+        "docs/prozess/finding-decisions.json",
+        "docs/Umsetzungsplan.md",
+        "docs/plaene/aktiv/V105.md",
+        "docs/plaene/CHANGELOG.md"
+      ]
+    }
+  ]
+}
