@@ -715,10 +715,10 @@ test('Mobile Classic touch path has pause and edge-triggered item actions', () =
   const secondPoll = source.poll();
 
   assert.equal(firstPoll.shootItem, true);
-  assert.equal(firstPoll.useItem, true);
+  assert.equal(firstPoll.useItem, 0);
   assert.equal(firstPoll.nextItem, true);
   assert.equal(secondPoll.shootItem, false);
-  assert.equal(secondPoll.useItem, false);
+  assert.equal(secondPoll.useItem, -1);
   assert.equal(secondPoll.nextItem, false);
   assert.equal(source._requestPause(), true);
   assert.equal(source._requestPause(), false);

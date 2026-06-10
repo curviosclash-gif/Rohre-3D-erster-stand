@@ -11,7 +11,7 @@ export class PlayerActionPhase {
         if (input.nextItem) player.cycleItem();
         if (input.dropItem) player.dropItem();
 
-        if (input.useItem >= 0) {
+        if (Number.isInteger(input.useItem) && input.useItem >= 0) {
             const result = entityManager._useInventoryItem(player, input.useItem);
             if (entityManager.recorder && result) {
                 entityManager.recorder.logEvent('ITEM_USE', player.index, encodeGameplayActionResultForLog(result, {
