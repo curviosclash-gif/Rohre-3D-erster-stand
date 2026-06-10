@@ -92,7 +92,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V135 | Mobile Menue UX-Hardening und Start-Setup-Kompaktmodus | done | P2 | frei | V132.99 | 135.99 | `docs/plaene/aktiv/V135.md` |
 | V118 | Runtime-/UI-Entflechtung Slice 1 | planned | P2 | frei | V116.99,V117.99 | 118.1 | `docs/plaene/aktiv/V118.md` |
 | V127 | Repo Map Gesamtuebersicht, Plan-Map-Abhaengigkeiten und Wissensgraph-Verankerung | planned | P2 | frei | V107.99,V110.99,V111.99 | 127.1 | `docs/plaene/aktiv/V127.md` |
-| V131 | Mobile Classic Steuerung Hardening | planned | P2 | frei | V112.99,V126.99,V72.99 | 131.1 | `docs/plaene/aktiv/V131.md` |
+| V131 | Mobile Classic Steuerung Hardening | active | P2 | frei | V112.99,V126.99,V72.99 | 131.4 | `docs/plaene/aktiv/V131.md` |
 | V136 | Portabler Knowledge-Core fuer Memory und RAG | planned | P1 | frei | V116.99,V117.99 | 136.1 | `docs/plaene/aktiv/V136.md` |
 | V140 | Mobile God-File-Sunset fuer App-Shell und Touch-Input | done | P2 | frei | V132.99,V135.99 | 140.99 | `docs/plaene/aktiv/V140.md` |
 | V141 | Finding-, Plan- und Doku-Drift-Automatisierung | done | P2 | frei | V116.99,V117.99,V119.99,V123.99,V138.99 | 141.99 | `docs/plaene/aktiv/V141.md` |
@@ -248,7 +248,7 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V135 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Fokus-/Scrollsprung, kompakter Start-Setup-CTA und Mobile-Route-Auswahl gruen |
 | - | V118 | - | frei | Geplant |
 | - | V127 | - | frei | Geplant |
-| - | V131 | - | frei | Geplant |
+| - | V131 | 2026-06-10 | active | 131.1-131.3 abgeschlossen (useItem-Protokoll, Pause-/Back-Drift-Abschluss, Tilt-Kalibrierungszustand); 131.4 offen |
 | - | V136 | - | frei | Geplant |
 | - | V140 | - | frei | Abgeschlossen 2026-06-08 |
 | - | V141 | 2026-06-09 | closed | Abgeschlossen 2026-06-09; WARN-Pilot, Drift-Indizes, Freshness- und Mapping-Checks gruen |
