@@ -30,11 +30,13 @@ import {
   deriveTiltSteeringState,
   resolveTouchButtonDefinitions,
   resolveTiltCalibrationNeutral,
-  TILT_CONTROL_STATES,
   TouchInputSource,
-  TouchTiltSensorLifecycle,
   TOUCH_CONTROL_MODES,
 } from '../src/ui/TouchInputSource.js';
+import {
+  TILT_CONTROL_STATES,
+  TouchTiltSensorLifecycle,
+} from '../src/ui/touch/TouchTiltSensorLifecycle.js';
 import {
   DEFAULT_MOBILE_CLASSIC_CONTROLS,
   MOBILE_CLASSIC_TILT_ASSIST_MODES,
@@ -999,6 +1001,7 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   const startSetupUiOps = await readText('src/ui/start-setup/StartSetupUiOps.js');
   const matchInputResolver = await readText('src/ui/MatchInputSourceResolver.js');
   const touchInputSource = await readText('src/ui/TouchInputSource.js');
+  const touchTiltUiOps = await readText('src/ui/touch/TouchTiltUiOps.js');
   const readme = await readText('tools/mobile-classic-app/README.md');
 
   assert.equal(packageJson.scripts['app:android:build'], 'node scripts/build-mobile-classic-app.mjs');
@@ -1062,8 +1065,8 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   assert.match(mobileClassicMenuUi, /Parcours starten/);
   assert.match(mobileClassicMenuUi, /Solo spielen/);
   assert.match(mobileClassicUpdateUi, /Update/);
-  assert.match(touchInputSource, /TILT SANFT/);
-  assert.match(touchInputSource, /KALIBRIERE/);
+  assert.match(touchTiltUiOps, /TILT SANFT/);
+  assert.match(touchTiltUiOps, /KALIBRIERE/);
   assert.match(touchInputSource, /resolveTiltCalibrationNeutral/);
   assert.match(touchInputSource, /resolveTouchButtonDefinitions/);
   assert.match(touchInputSource, /maxTouchPoints/);

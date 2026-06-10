@@ -22,6 +22,7 @@ import {
     TOUCH_CONTROL_MODES,
 } from './touch/TouchControlLayoutOps.js';
 import {
+    clamp,
     deriveTiltSteeringState,
     TILT_DEFAULT_CURVE_EXPONENT,
     TILT_DEFAULT_DEADZONE_DEG,
@@ -33,11 +34,10 @@ import {
     TouchTiltSensorLifecycle,
 } from './touch/TouchTiltSensorLifecycle.js';
 
-export {
-    resolveTiltControlState,
-    TILT_CONTROL_STATES,
-    TouchTiltSensorLifecycle,
-} from './touch/TouchTiltSensorLifecycle.js';
+import {
+    resolveTiltButtonUi,
+    resolveTiltStatusText,
+} from './touch/TouchTiltUiOps.js';
 
 export {
     deriveTiltSteeringState,
@@ -51,21 +51,6 @@ export {
 const TILT_DEFAULT_SMOOTHING = 0.24;
 const TILT_DEFAULT_RELEASE_THRESHOLD = 0.015;
 const TILT_EVENT_STALE_MS = 1600;
-
-function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
-}
-
-function formatAxisValue(value) {
-    const numeric = Number(value);
-    if (!Number.isFinite(numeric) || Math.abs(numeric) < 0.005) return '0.00';
-    return `${numeric > 0 ? '+' : ''}${numeric.toFixed(2)}`;
-}
-
-function formatSensorHz(value) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) && numeric > 0 ? `${numeric.toFixed(0)}Hz` : '--Hz';
-}
 
 /**
  * Virtual joystick + touch buttons for tablet/mobile play.
@@ -746,21 +731,13 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     _resolveTiltStatusText(controlState = this._resolveTiltControlState()) {
-        if (controlState === TILT_CONTROL_STATES.CALIBRATING) return 'KALIBRIERE - RUHIG NEUTRAL HALTEN';
-        if (controlState === TILT_CONTROL_STATES.DENIED) return 'NEIGUNG ABGELEHNT - JOYSTICK AKTIV';
-        if (controlState === TILT_CONTROL_STATES.UNSUPPORTED) return 'KEIN NEIGUNGSSENSOR - JOYSTICK AKTIV';
-        if (controlState !== TILT_CONTROL_STATES.ACTIVE) {
-            return this._tiltSensorHzVisible ? `TILT ${formatSensorHz(0)} - JOYSTICK` : 'TILT AUS - JOYSTICK AKTIV';
-        }
-        const parts = [];
-        if (this._tiltDebugVisible) {
-            parts.push(`Y ${formatAxisValue(this._tiltResolved.yawAxis)}`);
-            parts.push(`P ${formatAxisValue(this._tiltResolved.pitchAxis)}`);
-        }
-        if (this._tiltSensorHzVisible) {
-            parts.push(formatSensorHz(this._tiltState.sensorHz));
-        }
-        return parts.length > 0 ? parts.join(' ') : 'TILT SANFT';
+        return resolveTiltStatusText(controlState, {
+            debugVisible: this._tiltDebugVisible,
+            sensorHzVisible: this._tiltSensorHzVisible,
+            yawAxis: this._tiltResolved.yawAxis,
+            pitchAxis: this._tiltResolved.pitchAxis,
+            sensorHz: this._tiltState.sensorHz,
+        });
     }
 
     _updateTiltUi() {
@@ -772,13 +749,10 @@ export class TouchInputSource extends PlayerInputSource {
             this._containerEl.dataset.tiltControlState = controlState;
         }
         if (this._tiltButtonEl) {
-            this._tiltButtonEl.dataset.active = controlState === TILT_CONTROL_STATES.ACTIVE ? '1' : '0';
-            this._tiltButtonEl.textContent = controlState === TILT_CONTROL_STATES.CALIBRATING
-                ? 'HALTEN'
-                : (controlState === TILT_CONTROL_STATES.ACTIVE ? 'NEU' : 'NEIGUNG');
-            this._tiltButtonEl.title = controlState === TILT_CONTROL_STATES.ACTIVE
-                ? 'Neu kalibrieren: Geraet kurz neutral halten'
-                : 'Neigungssteuerung aktivieren: Geraet kurz neutral halten';
+            const buttonUi = resolveTiltButtonUi(controlState);
+            this._tiltButtonEl.dataset.active = buttonUi.active ? '1' : '0';
+            this._tiltButtonEl.textContent = buttonUi.text;
+            this._tiltButtonEl.title = buttonUi.title;
         }
         if (this._tiltStatusEl) {
             this._tiltStatusEl.textContent = this._resolveTiltStatusText(controlState);

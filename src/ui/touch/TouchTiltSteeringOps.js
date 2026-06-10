@@ -7,7 +7,7 @@ export const TILT_DEFAULT_DEADZONE_DEG = 2.5;
 export const TILT_DEFAULT_RANGE_DEG = 26;
 export const TILT_DEFAULT_CURVE_EXPONENT = 1.1;
 
-function clamp(value, min, max) {
+export function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
