@@ -29,6 +29,13 @@ import {
 } from './touch/TouchTiltSteeringOps.js';
 import {
     resolveScreenOrientationAngle,
+    TILT_CONTROL_STATES,
+    TouchTiltSensorLifecycle,
+} from './touch/TouchTiltSensorLifecycle.js';
+
+export {
+    resolveTiltControlState,
+    TILT_CONTROL_STATES,
     TouchTiltSensorLifecycle,
 } from './touch/TouchTiltSensorLifecycle.js';
 
@@ -731,9 +738,20 @@ export class TouchInputSource extends PlayerInputSource {
         };
     }
 
-    _resolveTiltStatusText() {
-        if (this._tiltCalibration.active) return 'KALIBRIERE';
-        if (!this._isTiltFresh()) return this._tiltSensorHzVisible ? `TILT ${formatSensorHz(0)}` : 'TILT';
+    _resolveTiltControlState() {
+        return this._tiltSensorLifecycle.resolveControlState({
+            fresh: this._isTiltFresh(),
+            tiltMode: this._controlMode === TOUCH_CONTROL_MODES.TILT,
+        });
+    }
+
+    _resolveTiltStatusText(controlState = this._resolveTiltControlState()) {
+        if (controlState === TILT_CONTROL_STATES.CALIBRATING) return 'KALIBRIERE - RUHIG NEUTRAL HALTEN';
+        if (controlState === TILT_CONTROL_STATES.DENIED) return 'NEIGUNG ABGELEHNT - JOYSTICK AKTIV';
+        if (controlState === TILT_CONTROL_STATES.UNSUPPORTED) return 'KEIN NEIGUNGSSENSOR - JOYSTICK AKTIV';
+        if (controlState !== TILT_CONTROL_STATES.ACTIVE) {
+            return this._tiltSensorHzVisible ? `TILT ${formatSensorHz(0)} - JOYSTICK` : 'TILT AUS - JOYSTICK AKTIV';
+        }
         const parts = [];
         if (this._tiltDebugVisible) {
             parts.push(`Y ${formatAxisValue(this._tiltResolved.yawAxis)}`);
@@ -747,18 +765,23 @@ export class TouchInputSource extends PlayerInputSource {
 
     _updateTiltUi() {
         this._syncMobileControlSettings();
+        const controlState = this._resolveTiltControlState();
         if (this._containerEl) {
-            this._containerEl.dataset.tiltActive = this._isTiltFresh() ? '1' : '0';
+            this._containerEl.dataset.tiltActive = controlState === TILT_CONTROL_STATES.ACTIVE ? '1' : '0';
             this._containerEl.dataset.tiltPermission = this._tiltState.permission;
+            this._containerEl.dataset.tiltControlState = controlState;
         }
         if (this._tiltButtonEl) {
-            this._tiltButtonEl.dataset.active = this._isTiltFresh() ? '1' : '0';
-            this._tiltButtonEl.textContent = this._tiltCalibration.active
+            this._tiltButtonEl.dataset.active = controlState === TILT_CONTROL_STATES.ACTIVE ? '1' : '0';
+            this._tiltButtonEl.textContent = controlState === TILT_CONTROL_STATES.CALIBRATING
                 ? 'HALTEN'
-                : (this._tiltState.hasNeutral && this._isTiltFresh() ? 'NEU' : 'NEIGUNG');
+                : (controlState === TILT_CONTROL_STATES.ACTIVE ? 'NEU' : 'NEIGUNG');
+            this._tiltButtonEl.title = controlState === TILT_CONTROL_STATES.ACTIVE
+                ? 'Neu kalibrieren: Geraet kurz neutral halten'
+                : 'Neigungssteuerung aktivieren: Geraet kurz neutral halten';
         }
         if (this._tiltStatusEl) {
-            this._tiltStatusEl.textContent = this._resolveTiltStatusText();
+            this._tiltStatusEl.textContent = this._resolveTiltStatusText(controlState);
         }
         if (this._uiVisible && this._joystickEl) {
             this._joystickEl.style.display = !this._overlayActive && this._shouldShowJoystickFallback() ? '' : 'none';

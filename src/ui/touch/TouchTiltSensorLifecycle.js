@@ -15,6 +15,29 @@ function hasDeviceOrientationSupport(ownerWindow) {
     return !!ownerWindow && 'DeviceOrientationEvent' in ownerWindow;
 }
 
+export const TILT_CONTROL_STATES = Object.freeze({
+    CALIBRATING: 'calibrating',
+    ACTIVE: 'active',
+    FALLBACK: 'fallback',
+    DENIED: 'denied',
+    UNSUPPORTED: 'unsupported',
+});
+
+/**
+ * Derives the guided tilt control state for UI and input decisions.
+ * `fresh` is owned by the caller (sensor staleness window lives in TouchInputSource).
+ */
+export function resolveTiltControlState({ state, calibration, tiltMode = true, fresh = false } = {}) {
+    if (!tiltMode || !state) return TILT_CONTROL_STATES.FALLBACK;
+    if (state.permission === 'unsupported') return TILT_CONTROL_STATES.UNSUPPORTED;
+    if (state.permission === 'denied') return TILT_CONTROL_STATES.DENIED;
+    if (state.enabled && (calibration?.active || state.pendingCalibration || !state.hasNeutral)) {
+        return TILT_CONTROL_STATES.CALIBRATING;
+    }
+    if (state.enabled && state.hasNeutral && fresh) return TILT_CONTROL_STATES.ACTIVE;
+    return TILT_CONTROL_STATES.FALLBACK;
+}
+
 export function resolveScreenOrientationAngle(ownerWindow = resolveDefaultWindow()) {
     if (!ownerWindow) return 0;
     const screenAngle = Number(ownerWindow.screen?.orientation?.angle);
@@ -67,6 +90,15 @@ export class TouchTiltSensorLifecycle {
 
     _resolveWindow() {
         return this._getWindow() || null;
+    }
+
+    resolveControlState({ fresh = false, tiltMode = this._isTiltMode() } = {}) {
+        return resolveTiltControlState({
+            state: this.state,
+            calibration: this.calibration,
+            tiltMode,
+            fresh,
+        });
     }
 
     startListening({ auto = false } = {}) {

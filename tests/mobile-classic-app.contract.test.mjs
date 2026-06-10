@@ -30,7 +30,9 @@ import {
   deriveTiltSteeringState,
   resolveTouchButtonDefinitions,
   resolveTiltCalibrationNeutral,
+  TILT_CONTROL_STATES,
   TouchInputSource,
+  TouchTiltSensorLifecycle,
   TOUCH_CONTROL_MODES,
 } from '../src/ui/TouchInputSource.js';
 import {
@@ -671,6 +673,114 @@ test('Mobile Classic tilt calibration treats the current hand posture as neutral
     gamma: neutral.neutralGamma + 18,
   });
   assert.equal(turnRight.yawRight, true);
+});
+
+test('Mobile Classic tilt lifecycle models calibrating, active, fallback and re-calibration', async () => {
+  let nowMs = 100000;
+  const fakeWindow = {
+    DeviceOrientationEvent: function DeviceOrientationEvent() {},
+    screen: { orientation: { angle: 0 } },
+    listeners: {},
+    addEventListener(type, handler) {
+      this.listeners[type] = handler;
+    },
+    removeEventListener(type) {
+      delete this.listeners[type];
+    },
+  };
+  const lifecycle = new TouchTiltSensorLifecycle({
+    getWindow: () => fakeWindow,
+    now: () => nowMs,
+  });
+
+  assert.equal(lifecycle.resolveControlState({ fresh: false }), TILT_CONTROL_STATES.FALLBACK);
+
+  assert.equal(lifecycle.startListening({ auto: true }), true);
+  assert.equal(lifecycle.resolveControlState({ fresh: true }), TILT_CONTROL_STATES.CALIBRATING);
+
+  for (let i = 0; i < 9; i += 1) {
+    nowMs += 80;
+    lifecycle.handleOrientation({ beta: 21, gamma: 1 });
+  }
+  assert.equal(lifecycle.state.hasNeutral, true);
+  assert.equal(lifecycle.calibration.active, false);
+  assert.equal(lifecycle.resolveControlState({ fresh: true }), TILT_CONTROL_STATES.ACTIVE);
+  assert.equal(lifecycle.resolveControlState({ fresh: false }), TILT_CONTROL_STATES.FALLBACK);
+
+  fakeWindow.screen.orientation.angle = 90;
+  nowMs += 80;
+  lifecycle.handleOrientation({ beta: 2, gamma: -20 });
+  assert.equal(lifecycle.calibration.active, true);
+  assert.equal(lifecycle.calibration.reason, 'orientation-change');
+  assert.equal(lifecycle.resolveControlState({ fresh: true }), TILT_CONTROL_STATES.CALIBRATING);
+
+  const deniedWindow = {
+    DeviceOrientationEvent: function DeviceOrientationEvent() {},
+    screen: { orientation: { angle: 0 } },
+    addEventListener() {},
+    removeEventListener() {},
+  };
+  deniedWindow.DeviceOrientationEvent.requestPermission = async () => 'denied';
+  const deniedLifecycle = new TouchTiltSensorLifecycle({ getWindow: () => deniedWindow });
+  assert.equal(await deniedLifecycle.requestControl(), false);
+  assert.equal(deniedLifecycle.state.permission, 'denied');
+  assert.equal(deniedLifecycle.resolveControlState({ fresh: true }), TILT_CONTROL_STATES.DENIED);
+
+  const unsupportedLifecycle = new TouchTiltSensorLifecycle({
+    getWindow: () => ({ addEventListener() {}, removeEventListener() {} }),
+  });
+  assert.equal(unsupportedLifecycle.startListening({ auto: true }), false);
+  assert.equal(unsupportedLifecycle.state.permission, 'unsupported');
+  assert.equal(unsupportedLifecycle.resolveControlState({ fresh: false }), TILT_CONTROL_STATES.UNSUPPORTED);
+});
+
+test('Mobile Classic tilt UI guides neutral hold, fallback and re-calibration', () => {
+  const container = createTouchElement({ id: 'touch-controls' });
+  const tiltStatus = createTouchElement();
+  const tiltButton = createTouchElement();
+  const source = new TouchInputSource({
+    controlMode: TOUCH_CONTROL_MODES.TILT,
+    game: { settings: { localSettings: {} } },
+  });
+  source._containerEl = container;
+  source._tiltStatusEl = tiltStatus;
+  source._tiltButtonEl = tiltButton;
+
+  source._tiltState.enabled = true;
+  source._tiltState.permission = 'auto';
+  source._tiltState.pendingCalibration = true;
+  source._tiltCalibration.active = true;
+  source._updateTiltUi();
+  assert.equal(container.dataset.tiltControlState, TILT_CONTROL_STATES.CALIBRATING);
+  assert.match(tiltStatus.textContent, /KALIBRIERE/);
+  assert.match(tiltStatus.textContent, /NEUTRAL HALTEN/);
+  assert.equal(tiltButton.textContent, 'HALTEN');
+
+  source._tiltCalibration.active = false;
+  source._tiltState.pendingCalibration = false;
+  source._tiltState.hasNeutral = true;
+  source._tiltState.lastEventAt = Date.now();
+  source._updateTiltUi();
+  assert.equal(container.dataset.tiltControlState, TILT_CONTROL_STATES.ACTIVE);
+  assert.equal(tiltButton.textContent, 'NEU');
+  assert.match(tiltButton.title, /Neu kalibrieren/);
+
+  source._tiltState.lastEventAt = Date.now() - 5000;
+  source._updateTiltUi();
+  assert.equal(container.dataset.tiltControlState, TILT_CONTROL_STATES.FALLBACK);
+  assert.match(tiltStatus.textContent, /JOYSTICK/);
+
+  source._tiltState.permission = 'denied';
+  source._updateTiltUi();
+  assert.equal(container.dataset.tiltControlState, TILT_CONTROL_STATES.DENIED);
+  assert.match(tiltStatus.textContent, /ABGELEHNT/);
+
+  source._tiltState.permission = 'unsupported';
+  source._updateTiltUi();
+  assert.equal(container.dataset.tiltControlState, TILT_CONTROL_STATES.UNSUPPORTED);
+  assert.match(tiltStatus.textContent, /KEIN NEIGUNGSSENSOR/);
+
+  source.dispose();
 });
 
 test('Mobile Classic tilt touch controls expose all classic match actions', () => {
