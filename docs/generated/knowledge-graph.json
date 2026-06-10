@@ -742,7 +742,7 @@
           "tsconfig.architecture.json"
         ],
         "scopeResolution": {
-          "concreteCount": 254,
+          "concreteCount": 255,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [
@@ -1987,7 +1987,7 @@
       "id": "V131",
       "type": "block",
       "title": "Mobile Classic Steuerung Hardening",
-      "status": "planned",
+      "status": "active",
       "attributes": {
         "source": [
           "block-plan",
@@ -1995,7 +1995,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "131.1",
+        "currentPhase": "131.4",
         "planFile": "docs/plaene/aktiv/V131.md",
         "scopeDeclarations": [
           "android-classic/app/src/main/AndroidManifest.xml",
@@ -2004,13 +2004,16 @@
           "src/core/main.js",
           "src/mobile-classic/MobileClassicApp.js",
           "src/ui/MatchInputSourceResolver.js",
+          "src/ui/touch/TouchTiltSensorLifecycle.js",
+          "src/ui/touch/TouchTiltSteeringOps.js",
+          "src/ui/touch/TouchTiltUiOps.js",
           "src/ui/TouchInputSource.js",
           "tests/core-targeted-runtime.spec.js",
           "tests/mobile-classic-app.contract.test.mjs",
           "tools/mobile-classic-app/capacitor.config.json"
         ],
         "scopeResolution": {
-          "concreteCount": 8,
+          "concreteCount": 11,
           "plannedCount": 2
         },
         "scopeOverlapAllowedWith": [
@@ -3323,7 +3326,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 357,
+          "concreteCount": 358,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -3830,7 +3833,7 @@
           "tests/runtime-regressions.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 267,
+          "concreteCount": 268,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -6097,7 +6100,7 @@
       "id": "V131.1",
       "type": "phase",
       "title": "Touch-Aktionen entprellen",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.1"
@@ -6107,7 +6110,7 @@
       "id": "V131.2",
       "type": "phase",
       "title": "Pause- und Zurueck-Pfad fuer Android",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.2"
@@ -6117,7 +6120,7 @@
       "id": "V131.3",
       "type": "phase",
       "title": "Gefuehrte Tilt-Kalibrierung",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.3"
@@ -17215,8 +17218,8 @@
     {
       "id": "V131.1.1",
       "type": "subphase",
-      "title": "Aktuelle Button-Semantik fuer `fire`, `useItem`, `nextItem`, `boost` und `shootMG` gegen `PlayerInputSystem`/`PlayerActionPhase` abgleichen.",
-      "status": "open",
+      "title": "Aktuelle Button-Semantik fuer `fire`, `useItem`, `nextItem`, `boost` und `shootMG` gegen `PlayerInputSystem`/`PlayerActionPhase` abgleichen. (abgeschlossen: 2026-06-10; evidence: Befund: `useItem` Protokollfehler — `poll()` lieferte boolean, `PlayerActionPhase` prueft `>= 0`; `false >= 0` ist `true`, Item-Use jeden Frame)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.1",
@@ -17226,8 +17229,8 @@
     {
       "id": "V131.1.2",
       "type": "subphase",
-      "title": "In `TouchInputSource` Edge-State fuer einmalige Aktionen planen/umsetzen: `shootItem`, `useItem`, `nextItem`; `boost` bleibt held + `boostPressed`.",
-      "status": "open",
+      "title": "In `TouchInputSource` Edge-State fuer einmalige Aktionen umgesetzt: `useItem` jetzt Integer `0`/`-1`; `_createNeutralInput` auf `-1`; `PlayerActionPhase` auf `Number.isInteger` gehaertet. (abgeschlossen: 2026-06-10; evidence: src/ui/TouchInputSource.js poll()+_createNeutralInput; src/entities/systems/lifecycle/PlayerActionPhase.js Zeile 14)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.1",
@@ -17237,8 +17240,8 @@
     {
       "id": "V131.1.3",
       "type": "subphase",
-      "title": "Contract-Test ergaenzen: langer Touch darf `nextItem`/`useItem`/`shootItem` nur einmal pro Touch-Down ausloesen.",
-      "status": "open",
+      "title": "Contract-Test aktualisiert: `firstPoll.useItem === 0`, `secondPoll.useItem === -1`; 22/22 Tests gruen. (abgeschlossen: 2026-06-10; evidence: node --test tests/mobile-classic-app.contract.test.mjs pass 22)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.1",
@@ -17248,8 +17251,8 @@
     {
       "id": "V131.2.1",
       "type": "subphase",
-      "title": "Minimalen Pause-Intent bestimmen: In-App-Pause-Button, Android-Back-Handler oder beides; Desktop-Escape bleibt unveraendert.",
-      "status": "open",
+      "title": "Pause-Intent: beides umgesetzt — In-App-Pause-Button (`includePauseButton` via `MatchInputSourceResolver` fuer Mobile Classic/Arcade) plus Android-Back-Handler (`window.__curviosAndroidBackHandler`, `OnBackPressedCallback` in MainActivity); Desktop-Escape unveraendert. (abgeschlossen: 2026-06-10; evidence: src/ui/MatchInputSourceResolver.js Zeile 156, MainActivity.java)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.2",
@@ -17259,8 +17262,8 @@
     {
       "id": "V131.2.2",
       "type": "subphase",
-      "title": "Touch-Control-Visibility mit Match-/Pause-/Message-State absichern, sodass `#touch-controls` keine Pause-Buttons ueberlagert.",
-      "status": "open",
+      "title": "Touch-Control-Visibility abgesichert: `_syncBlockingOverlayState` + MutationObserver setzen bei Pause-/Message-Overlay `pointer-events: none` und `overlayActive`-Dataset, Controls werden released. (abgeschlossen: 2026-06-10; evidence: src/ui/TouchInputSource.js `_syncBlockingOverlayState`/`_bindBlockingOverlayObserver`)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.2",
@@ -17270,8 +17273,8 @@
     {
       "id": "V131.2.3",
       "type": "subphase",
-      "title": "Contract-/Runtime-Test fuer Pause-Overlay + Touch-Controls ergaenzen; Device-Smoke als manuelles Gate dokumentieren.",
-      "status": "open",
+      "title": "Contract-Tests vorhanden und gruen: \"touch path has pause and edge-triggered item actions\", \"touch controls yield to pause overlay and Android back resumes\" plus MainActivity-Back-Assertions; Device-Smoke bleibt manuelles Gate gemaess Verifikationsplan. (abgeschlossen: 2026-06-10; evidence: node --test tests/mobile-classic-app.contract.test.mjs pass)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.2",
@@ -17281,8 +17284,8 @@
     {
       "id": "V131.3.1",
       "type": "subphase",
-      "title": "Tilt-Aktivierung am Matchstart als klaren Zustand modellieren: `calibrating`, `active`, `fallback`, `denied/unsupported`.",
-      "status": "open",
+      "title": "Zustandsmodell umgesetzt: `TILT_CONTROL_STATES` (`calibrating`/`active`/`fallback`/`denied`/`unsupported`) plus pure Funktion `resolveTiltControlState` und Lifecycle-Methode `resolveControlState`; `TouchInputSource` exponiert den Zustand als `dataset.tiltControlState`. (abgeschlossen: 2026-06-10; evidence: src/ui/touch/TouchTiltSensorLifecycle.js, src/ui/TouchInputSource.js `_resolveTiltControlState`)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.3",
@@ -17292,8 +17295,8 @@
     {
       "id": "V131.3.2",
       "type": "subphase",
-      "title": "UI-Texte/Status so anpassen, dass der Spieler beim Start kurz neutral halten kann und Re-Kalibrierung verstaendlich bleibt.",
-      "status": "open",
+      "title": "UI-Texte fuehren den Spieler: Kalibrierung zeigt `KALIBRIERE - RUHIG NEUTRAL HALTEN`, Fallback/Denied/Unsupported nennen den Joystick explizit, Tilt-Button traegt Re-Kalibrierungs-Title `Neu kalibrieren: Geraet kurz neutral halten` und Text `NEU` nur im aktiven Zustand. (abgeschlossen: 2026-06-10; evidence: src/ui/TouchInputSource.js `_resolveTiltStatusText`/`_updateTiltUi`)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.3",
@@ -17303,8 +17306,8 @@
     {
       "id": "V131.3.3",
       "type": "subphase",
-      "title": "Tests fuer Kalibrierungszustand, frische Sensorwerte, Joystick-Fallback und Re-Kalibrierung bei Orientation-Change erweitern.",
-      "status": "open",
+      "title": "Tests erweitert: Lifecycle-Test deckt calibrating->active, stale->fallback, Orientation-Change-Re-Kalibrierung (`reason: orientation-change`), denied und unsupported ab; UI-Test prueft Dataset-/Text-/Title-Fuehrung. 24/24 Contract-Tests gruen. (abgeschlossen: 2026-06-10; evidence: node --test tests/mobile-classic-app.contract.test.mjs pass 24)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.3",
@@ -30434,7 +30437,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 215,
+          "line": 225,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30518,7 +30521,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 105,
+          "line": 115,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30540,7 +30543,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 95,
+          "line": 105,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30562,7 +30565,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 85,
+          "line": 95,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30584,7 +30587,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 125,
+          "line": 135,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30606,7 +30609,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 115,
+          "line": 125,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30628,7 +30631,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 195,
+          "line": 205,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30650,7 +30653,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 205,
+          "line": 215,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30672,7 +30675,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 165,
+          "line": 175,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30694,7 +30697,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 145,
+          "line": 155,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30716,7 +30719,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 185,
+          "line": 195,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30738,7 +30741,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 135,
+          "line": 145,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30760,7 +30763,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 155,
+          "line": 165,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30782,7 +30785,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 175,
+          "line": 185,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -30811,6 +30814,28 @@
         "file": "src/core/Config.js",
         "criticalPath": "settings",
         "domain": "settings"
+      }
+    },
+    {
+      "id": "config:claude-project-settings",
+      "type": "config",
+      "title": "Claude Code project settings",
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 85,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
+        "file": ".claude/settings.json",
+        "domain": "agent-governance",
+        "providerNeutral": true
       }
     },
     {
@@ -31447,7 +31472,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 224,
+          "line": 234,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "mappingDescription": "Read-only Agent Map layer for task-to-workflow, rules, skills and checks navigation.",
@@ -32125,6 +32150,21 @@
         ],
         "scopeBlocks": [
           "V109"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": ".claude/settings.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "knowledge-graph-mapping"
+        ],
+        "mappedNodes": [
+          "config:claude-project-settings"
         ],
         "exists": true
       }
@@ -38770,6 +38810,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Wissensgraph_Produktsemantik_Ausbau_V124.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Handlungsempfehlungen_Meta_Quote_Reduktion.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -53651,6 +53706,7 @@
         ],
         "scopeBlocks": [
           "V105",
+          "V131",
           "V140",
           "V91"
         ],
@@ -53668,7 +53724,25 @@
         ],
         "scopeBlocks": [
           "V105",
+          "V131",
           "V140",
+          "V91"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "src/ui/touch/TouchTiltUiOps.js",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V105",
+          "V131",
           "V91"
         ],
         "exists": true
@@ -56509,7 +56583,7 @@
         "scopeBlocks": [
           "V116"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -57237,7 +57311,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 105,
+          "line": 115,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -57253,7 +57327,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 95,
+          "line": 105,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -57269,7 +57343,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 85,
+          "line": 95,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -57285,7 +57359,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 125,
+          "line": 135,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -57301,7 +57375,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 115,
+          "line": 125,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -57317,7 +57391,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 165,
+          "line": 175,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -57333,7 +57407,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 145,
+          "line": 155,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -57349,7 +57423,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 185,
+          "line": 195,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -57365,7 +57439,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 135,
+          "line": 145,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -57381,7 +57455,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 155,
+          "line": 165,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -57397,7 +57471,23 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 175,
+          "line": 185,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "runtime"
+      }
+    },
+    {
+      "from": ".claude/settings.json",
+      "to": "config:claude-project-settings",
+      "type": "implements",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 85,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -64261,7 +64351,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 280,
+          "line": 295,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64277,7 +64367,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 280,
+          "line": 295,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64293,7 +64383,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 280,
+          "line": 295,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64309,7 +64399,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 290,
+          "line": 305,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64325,7 +64415,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 285,
+          "line": 300,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64341,7 +64431,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 335,
+          "line": 350,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64357,7 +64447,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 325,
+          "line": 340,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64373,7 +64463,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 330,
+          "line": 345,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64389,7 +64479,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 305,
+          "line": 320,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64405,7 +64495,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 305,
+          "line": 320,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64421,7 +64511,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 305,
+          "line": 320,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64437,7 +64527,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 310,
+          "line": 325,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64565,7 +64655,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 215,
+          "line": 225,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -64864,7 +64954,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 235,
+          "line": 245,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64880,7 +64970,23 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 235,
+          "line": 250,
+          "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
+        },
+        "relationLayer": "config"
+      }
+    },
+    {
+      "from": "runtime:agent-map-export",
+      "to": "config:claude-project-settings",
+      "type": "reads_config",
+      "hint": null,
+      "attributes": {
+        "mappingId": "agent-governance",
+        "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
+        "provenance": {
+          "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
+          "line": 245,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64896,7 +65002,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 235,
+          "line": 245,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
@@ -64912,7 +65018,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 245,
+          "line": 260,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "test"
@@ -64928,7 +65034,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 260,
+          "line": 275,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64944,7 +65050,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 255,
+          "line": 270,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64960,7 +65066,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 255,
+          "line": 270,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -64976,7 +65082,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 255,
+          "line": 270,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "state"
@@ -64992,7 +65098,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 275,
+          "line": 290,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "config"
@@ -67202,7 +67308,7 @@
         "mappingFile": "data/contracts/knowledge-graph/agent-governance.v1.json",
         "provenance": {
           "file": "data/contracts/knowledge-graph/agent-governance.v1.json",
-          "line": 224,
+          "line": 234,
           "commit": "306d9828927e29c3bc6dae42c07b00cc7439d822"
         },
         "relationLayer": "runtime"
@@ -72003,6 +72109,15 @@
     {
       "from": "V105",
       "to": "src/ui/touch/TouchTiltSteeringOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V105",
+      "to": "src/ui/touch/TouchTiltUiOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -88280,6 +88395,33 @@
     {
       "from": "V131",
       "to": "src/ui/MatchInputSourceResolver.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V131",
+      "to": "src/ui/touch/TouchTiltSensorLifecycle.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V131",
+      "to": "src/ui/touch/TouchTiltSteeringOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V131",
+      "to": "src/ui/touch/TouchTiltUiOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -107812,6 +107954,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/neu/Handlungsempfehlungen_Meta_Quote_Reduktion.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/neu/README.md",
       "type": "scope",
       "hint": null,
@@ -121500,6 +121651,15 @@
     {
       "from": "V91",
       "to": "src/ui/touch/TouchTiltSteeringOps.js",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V91",
+      "to": "src/ui/touch/TouchTiltUiOps.js",
       "type": "scope",
       "hint": null,
       "attributes": {

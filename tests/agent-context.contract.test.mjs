@@ -26,11 +26,19 @@ async function createFixture() {
     '5. `docs/plaene/aktiv/VXX.md`',
   ].join('\n'));
   await writeFixture(root, 'CLAUDE.md', [
+    '@AGENTS.md',
+    '',
     '# CLAUDE.md',
     '',
     '> Diese Datei definiert keine eigene Governance.',
     '> Verbindlich sind `AGENTS.md` und `.agents/rules`.',
   ].join('\n'));
+  await writeFixture(root, '.claude/settings.json', JSON.stringify({
+    permissions: {
+      defaultMode: 'acceptEdits',
+      allow: ['Bash(git status *)', 'Bash(npm run plan:check)'],
+    },
+  }, null, 2));
   await writeFixture(root, '.gemini/README.md', [
     '# Gemini-Konfiguration',
     '',
@@ -100,4 +108,37 @@ test('validateAgentContext requires minimal D3/D4 classification language', asyn
 
   assert(ids.includes('gate-class-no-op'));
   assert(ids.includes('gate-class-edit-required'));
+});
+
+test('validateAgentContext requires Claude to import AGENTS.md', async () => {
+  const root = await createFixture();
+  await writeFixture(root, 'CLAUDE.md', [
+    '# CLAUDE.md',
+    '',
+    '> Diese Datei definiert keine eigene Governance.',
+    '> Verbindlich sind `AGENTS.md` und `.agents/rules`.',
+  ].join('\n'));
+
+  const result = await validateAgentContext({ root });
+
+  assert(result.violations.some((violation) => violation.id === 'claude-agents-import'));
+});
+
+test('validateAgentContext rejects provider pins and PowerShell-only project permissions', async () => {
+  const root = await createFixture();
+  await writeFixture(root, '.claude/settings.json', JSON.stringify({
+    model: 'claude-opus-4-7',
+    env: {
+      CLAUDE_CODE_USE_VERTEX: '1',
+    },
+    permissions: {
+      allow: ['PowerShell(git status *)'],
+    },
+  }, null, 2));
+
+  const result = await validateAgentContext({ root });
+  const ids = result.violations.map((violation) => violation.id);
+
+  assert(ids.includes('claude-settings-provider-pinned'));
+  assert(ids.includes('claude-settings-shell-mismatch'));
 });

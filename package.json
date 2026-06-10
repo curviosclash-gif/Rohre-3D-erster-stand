@@ -79,7 +79,7 @@
     "lint:architecture": "eslint src --max-warnings 29",
     "prebuild": "npm run architecture:guard",
     "preview": "vite preview",
-    "docs:check": "node scripts/docs-freshness.mjs --check && npm run plan:check && npm run check:gemini && npm run drift:check",
+    "docs:check": "node scripts/docs-freshness.mjs --check && npm run plan:check && npm run check:agent-context && npm run check:gemini && npm run drift:check",
     "docs:sync": "node scripts/docs-freshness.mjs --write",
     "gates:pre-commit": "node scripts/gates-pre-commit.mjs",
     "agent:commit": "node scripts/agent-commit-wrapper.mjs",

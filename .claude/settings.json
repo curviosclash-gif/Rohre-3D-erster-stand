@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git show *)",
+      "Bash(git status *)",
+      "Bash(git branch *)",
+      "Bash(npm run plan:check)",
+      "Bash(npm run docs:check)",
+      "Bash(npm run drift:check)",
+      "Bash(npm run graph:check)",
+      "Bash(npm run graph:query *)",
+      "Bash(npm run graph:slo)",
+      "Bash(npm run git:acl:heal)",
+      "Bash(npm run agent:commit *)",
+      "Bash(npm test *)",
+      "Bash(npm run build)"
+    ]
+  }
+}

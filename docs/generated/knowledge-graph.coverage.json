@@ -186,11 +186,11 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2150,
-    "rawCoveredFileCount": 1392,
-    "rawCoveragePercent": 64.7,
-    "adjustedTrackedFileCount": 1458,
-    "adjustedCoveredFileCount": 1153,
+    "trackedFileCount": 2153,
+    "rawCoveredFileCount": 1395,
+    "rawCoveragePercent": 64.8,
+    "adjustedTrackedFileCount": 1461,
+    "adjustedCoveredFileCount": 1156,
     "adjustedCoveragePercent": 79.1,
     "uncoveredFileCount": 758,
     "uncoveredActiveFileCount": 305,
@@ -252,20 +252,20 @@
       {
         "classification": "other",
         "excludedFromCoverage": false,
-        "count": 44,
-        "coveredCount": 27
+        "count": 45,
+        "coveredCount": 28
       },
       {
         "classification": "product-code",
         "excludedFromCoverage": false,
-        "count": 1039,
-        "coveredCount": 916
+        "count": 1040,
+        "coveredCount": 917
       },
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 344,
-        "coveredCount": 192
+        "count": 345,
+        "coveredCount": 193
       },
       {
         "classification": "prototype",
@@ -849,6 +849,21 @@
       "classification": "agent-workflow",
       "excludedFromCoverage": true,
       "excludeReason": "Agent workflow documents are governance references, not product/code coverage targets."
+    },
+    {
+      "path": ".claude/settings.json",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "knowledge-graph-mapping"
+      ],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "other",
+      "excludedFromCoverage": false,
+      "excludeReason": null
     },
     {
       "path": ".codex_tmp/HuntHUD.head.js",
@@ -15327,6 +15342,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Wissensgraph_Produktsemantik_Ausbau_V124.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Handlungsempfehlungen_Meta_Quote_Reduktion.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -33610,6 +33642,7 @@
       ],
       "scopeBlocks": [
         "V105",
+        "V131",
         "V140",
         "V91"
       ],
@@ -33629,7 +33662,27 @@
       ],
       "scopeBlocks": [
         "V105",
+        "V131",
         "V140",
+        "V91"
+      ],
+      "surfaces": [],
+      "classification": "product-code",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "src/ui/touch/TouchTiltUiOps.js",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V105",
+        "V131",
         "V91"
       ],
       "surfaces": [],

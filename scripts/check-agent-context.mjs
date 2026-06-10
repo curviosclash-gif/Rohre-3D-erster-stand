@@ -6,6 +6,7 @@ import { pathToFileURL } from 'node:url';
 const REQUIRED_FILES = {
   agents: 'AGENTS.md',
   claude: 'CLAUDE.md',
+  claudeSettings: '.claude/settings.json',
   gemini: '.gemini/README.md',
   onboarding: 'docs/referenz/ai_project_onboarding.md',
   currentContext: 'docs/CURRENT_CONTEXT.md',
@@ -113,15 +114,63 @@ function validateAgentsFile(text, violations) {
 }
 
 function validateClaudeAdapter(text, violations) {
+  if (!/^@AGENTS\.md\s*$/m.test(text)) {
+    addViolation(
+      violations,
+      REQUIRED_FILES.claude,
+      'claude-agents-import',
+      'CLAUDE.md muss AGENTS.md mit @AGENTS.md automatisch importieren.'
+    );
+  }
+
   const required = [
-    ['claude-no-own-governance', 'keine eigene Governance'],
+    ['claude-no-own-governance', /keine eigene (?:Governance|Policy)/],
     ['claude-agents-reference', 'AGENTS.md'],
     ['claude-rules-reference', '.agents/rules'],
   ];
   for (const [id, snippet] of required) {
-    if (!text.includes(snippet)) {
+    const present = snippet instanceof RegExp ? snippet.test(text) : text.includes(snippet);
+    if (!present) {
       addViolation(violations, REQUIRED_FILES.claude, id, `CLAUDE.md muss als Adapter ${snippet} nennen.`);
     }
+  }
+}
+
+function validateClaudeSettings(text, violations) {
+  let settings;
+  try {
+    settings = JSON.parse(text);
+  } catch (error) {
+    addViolation(
+      violations,
+      REQUIRED_FILES.claudeSettings,
+      'claude-settings-invalid-json',
+      `.claude/settings.json ist kein valides JSON: ${error.message}`
+    );
+    return;
+  }
+
+  if (settings.model || settings.env?.CLAUDE_CODE_USE_VERTEX) {
+    addViolation(
+      violations,
+      REQUIRED_FILES.claudeSettings,
+      'claude-settings-provider-pinned',
+      '.claude/settings.json muss providerneutral bleiben.'
+    );
+  }
+
+  const permissionRules = [
+    ...(settings.permissions?.allow || []),
+    ...(settings.permissions?.ask || []),
+    ...(settings.permissions?.deny || []),
+  ];
+  if (permissionRules.some((rule) => /^PowerShell\(/.test(rule))) {
+    addViolation(
+      violations,
+      REQUIRED_FILES.claudeSettings,
+      'claude-settings-shell-mismatch',
+      'Projektweite Claude-Permissions muessen den verfuegbaren Bash-Toolnamen verwenden.'
+    );
   }
 }
 
@@ -218,7 +267,7 @@ async function validateForbiddenArtifacts(root, violations) {
 export async function validateAgentContext({ root = process.cwd() } = {}) {
   const violations = [];
 
-  for (const relPath of [REQUIRED_FILES.agents, REQUIRED_FILES.onboarding]) {
+  for (const relPath of [REQUIRED_FILES.agents, REQUIRED_FILES.claudeSettings, REQUIRED_FILES.onboarding]) {
     if (!await exists(root, relPath)) {
       addViolation(violations, relPath, 'required-file-missing', `${relPath} fehlt.`);
     }
@@ -229,6 +278,9 @@ export async function validateAgentContext({ root = process.cwd() } = {}) {
   }
   if (await exists(root, REQUIRED_FILES.claude)) {
     validateClaudeAdapter(await readUtf8(root, REQUIRED_FILES.claude), violations);
+  }
+  if (await exists(root, REQUIRED_FILES.claudeSettings)) {
+    validateClaudeSettings(await readUtf8(root, REQUIRED_FILES.claudeSettings), violations);
   }
   if (await exists(root, REQUIRED_FILES.gemini)) {
     validateGeminiAdapter(await readUtf8(root, REQUIRED_FILES.gemini), violations);

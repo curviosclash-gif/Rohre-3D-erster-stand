@@ -14,6 +14,7 @@ const steps = [
   ['parcours:check/strict', 'scripts/check-parcours-routes.mjs', ['--strict']],
   ['docs:check', 'scripts/docs-freshness.mjs', ['--check']],
   ['docs:check/plan:check', 'scripts/validate-umsetzungsplan.mjs', []],
+  ['docs:check/check:agent-context', 'scripts/check-agent-context.mjs', []],
   ['docs:check/check:gemini', 'scripts/check-gemini-governance.mjs', []],
 ];
 

@@ -1,7 +1,9 @@
+@AGENTS.md
+
 # CLAUDE.md - Router fuer Claude Code
 
 > Verbindliche Governance: `AGENTS.md` und `.agents/rules/*`.
-> Diese Datei routet nur und definiert keine eigene Policy. Bei Widerspruch gewinnen AGENTS.md und die Rules.
+> Diese Datei routet nur und definiert keine eigene Governance. Bei Widerspruch gewinnen AGENTS.md und die Rules.
 
 ## Leseweg (identisch zu AGENTS.md)
 

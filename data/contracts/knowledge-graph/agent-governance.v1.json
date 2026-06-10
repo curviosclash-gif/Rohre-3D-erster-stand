@@ -82,6 +82,16 @@
       }
     },
     {
+      "id": "config:claude-project-settings",
+      "type": "config",
+      "title": "Claude Code project settings",
+      "file": ".claude/settings.json",
+      "attributes": {
+        "domain": "agent-governance",
+        "providerNeutral": true
+      }
+    },
+    {
       "id": "config:agent-rule-planning-and-governance",
       "type": "config",
       "title": "Planning and governance rule",
@@ -239,6 +249,11 @@
     {
       "from": "runtime:agent-map-export",
       "to": "config:agent-governance-entrypoint",
+      "type": "reads_config"
+    },
+    {
+      "from": "runtime:agent-map-export",
+      "to": "config:claude-project-settings",
       "type": "reads_config"
     },
     {

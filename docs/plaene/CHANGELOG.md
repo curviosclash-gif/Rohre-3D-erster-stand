@@ -1160,3 +1160,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Evidence: `npm run findings:index:build`, `npm run findings:check`, `npm run plan:check`, `npm run plan:index:check`, `npm run plan:context:check`, `npm run graph:check`, `npm run docs:sync`, `npm run docs:check`, 17 targeted Contract-Tests und `npm run gates:pre-commit` -> PASS.
 - Residual-risk: historische WARN/INFO-Signale brauchen menschliche Triage; die QA-Checkliste bleibt stale mit 241 offenen Punkten. Kein Source-of-Truth-Wechsel und keine harte Drift-Blockade.
 - Not-checked: keine Vollsuite und keine produktiven Runtime-, UI-, Gameplay-, Multiplayer-, Recording- oder Bot-Training-Pfade.
+
+## Governance-Fix 2026-06-10 (Claude-Code-Repo-Setup)
+
+- `CLAUDE.md` importiert `AGENTS.md` jetzt automatisch und bleibt ein reiner Tool-Adapter ohne eigene Governance. Die gemeinsame `.claude/settings.json` ist providerneutral, Git-Bash-kompatibel und als einzige Datei aus `.claude/` versioniert; lokale Settings, Plaene, Launch-Dateien und Worktrees bleiben ignoriert.
+- `check:agent-context` prueft den Import, valide providerneutrale Projektsettings und Shell-Permissions. Das Gate laeuft jetzt in `docs:check` und `gates:pre-commit`, damit Adapterdrift nicht erneut an den Abschlusschecks vorbeikommt.
+- Lokale Account-, CLI- und Worktree-Bereinigung wurde getrennt vom Repo-Commit ausgefuehrt, damit persoenliche Zugangsdaten und Recovery-Artefakte nicht in die Projekt-Governance gelangen.
+- Evidence: `npm run test:agent-context` und `npm run docs:check` -> PASS; isoliert nach `npm run graph:build` auch `npm run gates:pre-commit` -> PASS.
+- Residual-risk: persoenliche Claude-Account-, Modell- und App-Einstellungen bleiben bewusst ausserhalb der Repo-Governance.
+- Not-checked: keine Produktcodepfade und keine Vollsuite.
