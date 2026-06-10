@@ -297,28 +297,6 @@
       }
     },
     {
-      "id": "V76",
-      "title": "Desktop Hangar Arcade Fight",
-      "status": "done",
-      "priority": "P3",
-      "owner": "frei",
-      "workstream": "main-game",
-      "depends_on": [
-        "V71.4",
-        "V77.99",
-        "V64.99"
-      ],
-      "current_phase": "76.99",
-      "plan_file": "docs/plaene/aktiv/V76.md",
-      "lock": {
-        "status": "closed",
-        "agent": "-",
-        "start_date": "2026-04-27",
-        "target": "Abgeschlossen 2026-04-27",
-        "source": "docs/Umsetzungsplan.md#lock-status"
-      }
-    },
-    {
       "id": "V90",
       "title": "Toolchain-Security und Dependency-Upgrade",
       "status": "done",
@@ -912,7 +890,7 @@
     {
       "id": "V131",
       "title": "Mobile Classic Steuerung Hardening",
-      "status": "planned",
+      "status": "active",
       "priority": "P2",
       "owner": "frei",
       "workstream": "android-mobile",
@@ -921,13 +899,13 @@
         "V126.99",
         "V72.99"
       ],
-      "current_phase": "131.1",
+      "current_phase": "131.4",
       "plan_file": "docs/plaene/aktiv/V131.md",
       "lock": {
-        "status": "frei",
+        "status": "active",
         "agent": "-",
-        "start_date": "-",
-        "target": "Geplant",
+        "start_date": "2026-06-10",
+        "target": "131.1-131.3 abgeschlossen (useItem-Protokoll, Pause-/Back-Drift-Abschluss, Tilt-Kalibrierungszustand); 131.4 offen",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },
@@ -949,51 +927,6 @@
         "agent": "-",
         "start_date": "-",
         "target": "Geplant",
-        "source": "docs/Umsetzungsplan.md#lock-status"
-      }
-    },
-    {
-      "id": "V140",
-      "title": "Mobile God-File-Sunset fuer App-Shell und Touch-Input",
-      "status": "done",
-      "priority": "P2",
-      "owner": "frei",
-      "workstream": "android-mobile",
-      "depends_on": [
-        "V132.99",
-        "V135.99"
-      ],
-      "current_phase": "140.99",
-      "plan_file": "docs/plaene/aktiv/V140.md",
-      "lock": {
-        "status": "frei",
-        "agent": "-",
-        "start_date": "-",
-        "target": "Abgeschlossen 2026-06-08",
-        "source": "docs/Umsetzungsplan.md#lock-status"
-      }
-    },
-    {
-      "id": "V141",
-      "title": "Finding-, Plan- und Doku-Drift-Automatisierung",
-      "status": "done",
-      "priority": "P2",
-      "owner": "frei",
-      "workstream": "repo-governance",
-      "depends_on": [
-        "V116.99",
-        "V117.99",
-        "V119.99",
-        "V123.99",
-        "V138.99"
-      ],
-      "current_phase": "141.99",
-      "plan_file": "docs/plaene/aktiv/V141.md",
-      "lock": {
-        "status": "closed",
-        "agent": "-",
-        "start_date": "2026-06-09",
-        "target": "Abgeschlossen 2026-06-09; WARN-Pilot, Drift-Indizes, Freshness- und Mapping-Checks gruen",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },

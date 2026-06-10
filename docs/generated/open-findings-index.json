@@ -2,7 +2,7 @@
   "schema_version": "open-findings-index.v1",
   "generated_by": "scripts/build-open-findings-index.mjs",
   "authority": "generated-signals-only",
-  "as_of": "2026-06-09",
+  "as_of": "2026-06-10",
   "canonical_sources": {
     "findings": "docs/prozess/Open_Findings.md",
     "manual_decisions": "docs/prozess/finding-decisions.json",

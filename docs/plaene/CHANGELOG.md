@@ -6,6 +6,15 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Archivierungsabgleich 2026-06-11 (V76, V140, V141)
+
+- Nach User-Gate (Intake-Entwurf `docs/plaene/neu/Handlungsempfehlungen_Meta_Quote_Reduktion.md`, Punkt 3.3) wurden `V76`, `V140` und `V141` aus den Master-Tabellen (Aktive Bloecke, Abhaengigkeiten, Lock-Status, Arbeitsstrom-Index) entfernt; die Sektion "Abgeschlossene Bloecke (offener Abgleich vor Archivierung)" ist damit leer und wurde aufgeloest.
+- `V140.md` liegt jetzt unter `docs/plaene/alt/`. `V76.md` und `V141.md` bleiben als `protected-dependency-source` unter `docs/plaene/aktiv/`, weil `V113` von `V76.99` und `V145` von `V141.99` abhaengen und `plan:index:check` Dependency-Ziele nur im Master oder unter `aktiv/` aufloest.
+- Zusaetzlich wurde der stale Findings-Index neu gebaut (`npm run findings:index:build`, 6 Findings).
+- Evidence: `npm run plan:check` -> PASS; `npm run plan:index:build` -> 46 Bloecke; `npm run plan:index:check` -> PASS; `npm run plan:context:check` -> PASS mit `drift_status=clean`, `violations=0` (vorher 4 Index-Violations).
+- Residual-risk: Abschluss-Historie von V76/V140/V141 ist nur noch ueber dieses Changelog, die Detailakten und `git log` nachvollziehbar, nicht mehr ueber Master-Tabellenzeilen.
+- Not-checked: keine Produktcode-Aenderung, keine Vollsuite; parallel gestagter Fremdscope (V131-Test-Follow-up) wurde bewusst nicht angefasst.
+
 ## V143 Planungsschaerfung 2026-06-09 (tokenarme Gemini-Modell-Auslagerung)
 
 - Nach User-Gate `bitte alles einplanen` wurde V143 um einen begrenzten Gemini-Review-Router-Pilot erweitert: explizite Lite-/Flash-/Pro-Profile, Input-/Outputbudgets, Read-only-Policy, validiertes Kurz-JSON, Modell-/Fallback-Pruefung, Secret-Blocker, transiente Rohartefakte und getrennte Token-/Nutzwertmessung.

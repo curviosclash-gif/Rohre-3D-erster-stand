@@ -28,11 +28,11 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 
 | Arbeitsstrom | Master-Bloecke | Hinweis |
 | --- | --- | --- |
-| Hauptspiel | `V76`, `V99`, `V108`, `V112`, `V113`, `V115` | Gameplay, Multiplayer, Hangar, Playtest- und produktnahe Spielqualitaet. |
+| Hauptspiel | `V99`, `V108`, `V112`, `V113`, `V115` | Gameplay, Multiplayer, Hangar, Playtest- und produktnahe Spielqualitaet. |
 | Map Content, Map Tools & Settings | `V103`, `V106`, `V114`, `V130` | Map-/GLB-Content, SettingsManager, SurfacePolicy und kuratierte Parcours-Map-Varianz. |
-| Android / Mobile | `V131`, `V132`, `V135`, `V140` | Mobile-Classic-Steuerung, Android Arcade-Parcours, Mobile-Menue-UX und God-File-Sunset fuer produktive Mobile-/Android-Folgearbeit. |
+| Android / Mobile | `V131`, `V132`, `V135` | Mobile-Classic-Steuerung, Android Arcade-Parcours, Mobile-Menue-UX und God-File-Sunset fuer produktive Mobile-/Android-Folgearbeit. |
 | Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V118`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface, UI-/Runtime-Entflechtung und Architektur-Gates. |
-| Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126`, `V138`, `V141`, `V142`, `V144` | Governance, Planpflege, Toolchain, Evidence, Cleanup, Delivery-/Dev-, Agent-Diff-, Drift- und Source-of-Truth-Gates. |
+| Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126`, `V138`, `V142`, `V144` | Governance, Planpflege, Toolchain, Evidence, Cleanup, Delivery-/Dev-, Agent-Diff-, Drift- und Source-of-Truth-Gates. |
 | AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V127`, `V134`, `V136`, `V137`, `V139`, `V143`, `V145` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation, portabler Knowledge-Core, AI-Kontext und Plan-Autopilot. |
 
 ## Aktive Bloecke
@@ -53,12 +53,6 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V107 | Kompletter Spiel-Wissensgraph als mehrschichtiger Query-Layer | done | P2 | frei | V94.99 | 107.99 | `docs/plaene/aktiv/V107.md` |
 | V110 | Wissensgraph Ops-, Guard- und Integritaets-Haertung | done | P2 | frei | V107.99 | 110.99 | `docs/plaene/aktiv/V110.md` |
 | V111 | Wissensgraph Adaptive Diagnose- und Entscheidungsintelligenz | done | P2 | frei | V107.99,V110.99 | 111.99 | `docs/plaene/aktiv/V111.md` |
-
-### Abgeschlossene Bloecke (offener Abgleich vor Archivierung)
-
-| id | titel | status | prio | owner | depends_on | current_phase | plan_file |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| V76 | Desktop Hangar Arcade Fight | done | P3 | frei | V71.4,V77.99,V64.99 | 76.99 | `docs/plaene/aktiv/V76.md` |
 
 ### Aktive und geplante Bloecke
 
@@ -94,8 +88,6 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V127 | Repo Map Gesamtuebersicht, Plan-Map-Abhaengigkeiten und Wissensgraph-Verankerung | planned | P2 | frei | V107.99,V110.99,V111.99 | 127.1 | `docs/plaene/aktiv/V127.md` |
 | V131 | Mobile Classic Steuerung Hardening | active | P2 | frei | V112.99,V126.99,V72.99 | 131.4 | `docs/plaene/aktiv/V131.md` |
 | V136 | Portabler Knowledge-Core fuer Memory und RAG | planned | P1 | frei | V116.99,V117.99 | 136.1 | `docs/plaene/aktiv/V136.md` |
-| V140 | Mobile God-File-Sunset fuer App-Shell und Touch-Input | done | P2 | frei | V132.99,V135.99 | 140.99 | `docs/plaene/aktiv/V140.md` |
-| V141 | Finding-, Plan- und Doku-Drift-Automatisierung | done | P2 | frei | V116.99,V117.99,V119.99,V123.99,V138.99 | 141.99 | `docs/plaene/aktiv/V141.md` |
 | V142 | Graph-Drift-Guard-Automatisierung | planned | P2 | frei | V94.99,V116.99,V123.99,V138.99 | 142.1 | `docs/plaene/aktiv/V142.md` |
 | V143 | Agent-Skills statt Regeltext fuer Spezialroutinen | planned | P2 | frei | V116.99 | 143.1 | `docs/plaene/aktiv/V143.md` |
 | V144 | Future-Entscheidung JSON als Plan-Source-of-Truth | planned | P2 | frei | V123.99 | 144.1 | `docs/plaene/aktiv/V144.md` |
@@ -117,8 +109,6 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V105 | V99.99 | hard | ja | Guard-Recovery darf LAN-/Signaling-Abschluss aus V99 voraussetzen |
 | V105 | V102.99 | hard | ja | Security-/Runtime-/Contract-Haertung aus V102 ist abgeschlossen und war V105-Baseline |
 | V105 | V104.99 | hard | ja | God-Object-/Port-Zuschnitt ist abgeschlossen und Baseline fuer Boundary-Recovery |
-| V76 | V64.99 | hard | ja | Abschluss vorhanden; verbleibt nur im offenen Abgleich vor Archivierung |
-| V76 | V77.99 | hard | ja | Surface-Policy-Baseline weiterhin erfuellt |
 | V96 | V92.99 | hard | ja | Runtime-Application-Ownership-Entkopplung ist Voraussetzung fuer weitere Boundary-Reduktion |
 | V96 | V64.99 | hard | ja | Desktop-Multiplayer-/Runtime-Basis bleibt Grundlage fuer Application-Boundary-Schnitt |
 | V107 | V94.99 | hard | ja | V94 ist abgeschlossen; V107 kann als Core-Graph-Block gestartet werden |
@@ -191,9 +181,6 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V131 | V125.99,V96.99 | soft | nein | Architektur-Compliance ist erledigt; V96-Boundary-Folgearbeit bleibt hilfreich, aber kein Startblocker |
 | V136 | V116.99,V117.99 | hard | ja | Kontextreduktion und AI-Decision-Gates begrenzen portablen Memory-/RAG-Kern |
 | V136 | V119.1,V120.2,V120.3,V120.6,V122.2,V122.3 | soft | nein | Evidence-, Graph-RAG- und Agent-Memory-Teilpfade sind Handoffs, aber keine Startblocker fuer den Kernel-Schnitt |
-| V140 | V132.99,V135.99 | hard | ja | Android-/Mobile-Baseline und Mobile-Menue-UX bilden die Ausgangslage fuer God-File-Sunset |
-| V141 | V116.99,V117.99,V119.99,V123.99,V138.99 | hard | ja | Kontext-, Gate-, Evidence-, Plan-Index- und Diff-Audit-Basis begrenzen Drift-Automatisierung |
-| V141 | V120.99,V134.99 | soft | ja | Graph-RAG und Plan-Map-Intake liefern hilfreiche Signale, sind aber keine Startblocker |
 | V142 | V94.99,V116.99,V123.99,V138.99 | hard | ja | Graph-Basis, Kontextreduktion, Plan-Index-Pilot und Diff-Audit-Gates begrenzen Graph-Drift-Guard |
 | V143 | V116.99 | hard | ja | Repo-Kontext-Reduktion ist Baseline fuer Agent-Skill-Auslagerung |
 | V144 | V123.99 | hard | ja | V123-Option-A-Entscheidung ist Voraussetzung fuer spaetere Source-of-Truth-Neubewertung |
@@ -213,7 +200,6 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V101 | - | closed | Abgeschlossen 2026-04-24 |
 | - | V103 | - | closed | Abgeschlossen 2026-04-26 |
 | - | V99 | - | closed | Abgeschlossen 2026-05-04 |
-| - | V76 | 2026-04-27 | closed | Abgeschlossen 2026-04-27 |
 | - | V104 | 2026-05-05 | closed | Abgeschlossen 2026-05-05 |
 | - | V109 | 2026-05-04 | closed | Abgeschlossen 2026-05-04 |
 | - | V100 | 2026-05-05 | closed | Abgeschlossen 2026-05-06 |
@@ -250,8 +236,6 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V127 | - | frei | Geplant |
 | - | V131 | 2026-06-10 | active | 131.1-131.3 abgeschlossen (useItem-Protokoll, Pause-/Back-Drift-Abschluss, Tilt-Kalibrierungszustand); 131.4 offen |
 | - | V136 | - | frei | Geplant |
-| - | V140 | - | frei | Abgeschlossen 2026-06-08 |
-| - | V141 | 2026-06-09 | closed | Abgeschlossen 2026-06-09; WARN-Pilot, Drift-Indizes, Freshness- und Mapping-Checks gruen |
 | - | V142 | - | frei | Geplant |
 | - | V143 | - | frei | Geplant |
 | - | V144 | - | frei | Geplant |
